@@ -1,5 +1,9 @@
 'use strict';
 
+function _cf(method, path, opts = {}) {
+  return ListShell._cf(path, { ...opts, method });
+}
+
 // ── 列定义 ──────────────────────────────────────────────────
 const TASK_COLS = [
   { key: 'display_id',   label: 'ID',      type: 'text', width: 90,  editable: false },
@@ -72,7 +76,7 @@ window.addEventListener('message', e => {
 
 async function loadFollows() {
   try {
-    const res = await ListShell._cf('/api/follows?item_type=task');
+    const res = await _cf('GET', '/api/follows?item_type=task');
     _followedMap.clear();
     for (const f of (res?.data || [])) {
       _followedMap.set(f.item_gid, { gid: f.gid, conditions: f.notify_on || [] });
@@ -92,12 +96,12 @@ async function _onRowsChange(newRows) {
       if (!changed) continue;
       const fields = {};
       for (const k of editableKeys) { if (row[k] !== undefined) fields[k] = row[k]; }
-      await ListShell._cf(`/api/tasks/${row.gid}`, { method: 'PUT', body: JSON.stringify(fields) })
+      await _cf('PUT', `/api/tasks/${row.gid}`, { method: 'PUT', body: JSON.stringify(fields) })
         .catch(e => console.error('[update task cloud]', e));
       didSave = true;
     } else if (row.title) {
       const _listGid = ListShell._canonListGid(_currentList);
-      await ListShell._cf('/api/tasks', { method: 'POST', body: JSON.stringify({
+      await _cf('POST', '/api/tasks', { method: 'POST', body: JSON.stringify({
         title: row.title, priority: row.priority || 'normal',
         list_gid: _listGid,
         owner_gid: window.top?._authUser?.gid || window._authUser?.gid || '',
@@ -126,7 +130,7 @@ async function load() {
   const isNoList = _currentList === ListShell.NO_LIST;
   try {
     const qs = (_currentList && !isNoList) ? `?list_gid=${_currentList}` : '';
-    const res = await ListShell._cf(`/api/tasks${qs}`).catch(() => null);
+    const res = await _cf('GET', '/api/tasks' + qs).catch(() => null);
     const _toTime = v => {
       if (!v) return 0;
       if (typeof v === 'number') return v;
@@ -157,7 +161,8 @@ async function _loadSapIndicators(gids) {
   if (!gids.length) return;
   for (let i = 0; i < gids.length; i += 500) {
     const chunk = gids.slice(i, i + 500);
-    const res = await ListShell._cf(`/api/self_ann/batch?gids=${chunk.join(',')}`).catch(() => null);
+    const res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+      .call('base.annotations.batch', { gids: chunk }).catch(() => null);
     if (!res) return;
     Object.entries(res).forEach(([gid, info]) => {
       document.querySelectorAll(`.sap-row-pin[data-gid="${gid}"]`).forEach(el => {
@@ -199,7 +204,7 @@ async function init() {
       async (rows, _fm, _c, signal) => {
         for (const r of rows) {
           if (signal?.aborted) break;
-          await ListShell._cf('/api/tasks', { method: 'POST', body: JSON.stringify({
+          await _cf('POST', '/api/tasks', { method: 'POST', body: JSON.stringify({
             title: r.title || '导入任务',
             priority: r.priority || 'normal',
             list_gid: shell?.currentListGid || null,
@@ -288,7 +293,7 @@ async function init() {
           const patch = result.type === 'user'
             ? { feishu_assignee_open_id: result.open_id, feishu_assignee_name: result.name, feishu_assignee_avatar_url: result.avatar_url || '' }
             : { feishu_group_chat_id: result.chat_id, feishu_group_name: result.name };
-          await ListShell._cf(`/api/tasks/${gid}`, { method: 'PUT', body: JSON.stringify(patch) })
+          await _cf('PUT', `/api/tasks/${gid}`, { method: 'PUT', body: JSON.stringify(patch) })
             .catch(e => console.error('[fm patch task]', e));
           Object.assign(row, patch);
           shell.setRows(_all);
@@ -297,7 +302,7 @@ async function init() {
           const patch = field === 'feishu_assignee'
             ? { feishu_assignee_open_id: null, feishu_assignee_name: null }
             : { feishu_group_chat_id: null, feishu_group_name: null };
-          await ListShell._cf(`/api/tasks/${gid}`, { method: 'PUT', body: JSON.stringify(patch) })
+          await _cf('PUT', `/api/tasks/${gid}`, { method: 'PUT', body: JSON.stringify(patch) })
             .catch(e => console.error('[fm clear task]', e));
           Object.assign(row, patch);
           shell.setRows(_all);
@@ -312,7 +317,7 @@ async function init() {
       const gid = done.dataset.gid;
       const row = _all.find(t => t.gid === gid);
       if (!row) return;
-      await ListShell._cf(`/api/tasks/${gid}`, { method: 'PUT', body: JSON.stringify({ status: 'completed' }) });
+      await _cf('PUT', `/api/tasks/${gid}`, { method: 'PUT', body: JSON.stringify({ status: 'completed' }) });
       load();
     } else if (sub) {
       ev.stopPropagation();
@@ -324,7 +329,7 @@ async function init() {
         followed: _followedMap.has(gid),
         followGid: state.gid,
         conditions: state.conditions,
-        cf: _cf,
+        cf: ListShell._cf,
         onSave: (newState) => {
           if (newState.followed) {
             _followedMap.set(gid, { gid: newState.followGid, conditions: newState.conditions });
@@ -352,7 +357,7 @@ async function init() {
     document.getElementById('tplPickList').innerHTML = '';
     _tplSelected = null;
     try {
-      const res = await ListShell._cf('/api/task-templates');
+      const res = await _cf('GET', '/api/task-templates');
       _tplList = res?.data || [];
       _renderTplList();
     } catch (e) {
@@ -386,10 +391,11 @@ async function init() {
     const gid = sel.dataset.gid;
     document.getElementById('tplPickNext').disabled = true;
     try {
-      const res = await ListShell._cf(`/api/task-templates/${gid}`);
+      const res = await _cf('GET', `/api/task-templates/${gid}`);
       _tplSelected = res?.data;
       if (!_userList.length) {
-        const ur = await ListShell._cf('/api/users').catch(() => null);
+        const ur = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+          .call('base.users.list').catch(() => null);
         _userList = ur?.data || [];
       }
       _closeTplPick(false);
@@ -487,7 +493,7 @@ async function init() {
 
     document.getElementById('tplInstConfirm').disabled = true;
     try {
-      const res = await ListShell._cf(`/api/task-templates/${_tplSelected.gid}/instantiate`, {
+      const res = await _cf('POST', `/api/task-templates/${_tplSelected.gid}/instantiate`, {
         method: 'POST',
         body: JSON.stringify({
           project_gid:  projectGid || null,

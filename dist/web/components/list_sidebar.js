@@ -74,10 +74,10 @@ class ListSidebar {
     this._renderItems();
   }
 
-  _cf(path, opts = {}) {
+  _cf(method, path, opts = {}) {
     // 优先用主窗口的 _cloudFetch（已验证 task/issue CRUD 可用），避免 iframe 内 fetch() 跨域问题
     const cf = window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
-    if (cf) return cf(path, opts);
+    if (cf) return cf(path, { ...opts, method });
 
     // 降级：直接使用 electronAPI（本地模式或 _cloudFetch 未挂载时）
     const eAPI = window.top?.electronAPI || window.parent?.electronAPI || window.electronAPI;
@@ -92,6 +92,7 @@ class ListSidebar {
       const token = state?.token || '';
       const res = await fetch(`${baseUrl}${path}`, {
         ...opts,
+        method,
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { 'X-AI00-Token': token } : {}),
@@ -106,11 +107,29 @@ class ListSidebar {
     })();
   }
 
+  async _invokeCapability(id, payload = {}) {
+    const _cf = this._cf.bind(this);
+    const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ version: 1, payload }),
+    });
+    const envelope = response?.data;
+    if (response?.success !== true || envelope?.ok !== true) {
+      const detail = envelope?.error || response?.error || {};
+      throw new Error(detail.message || `能力调用失败：${id}@1`);
+    }
+    const value = envelope.data;
+    return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+  }
+
   async _loadLists() {
+    const _cf = this._cf.bind(this);
     // 云端 PG 清单
     let cloudLists = [];
     try {
-      const res = await this._cf(`/api/lists?item_type=${this._itemType}`);
+      const res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+        .call('project.lists.search', { itemType: this._itemType });
       cloudLists = (res?.data || []).map(l => ({ ...l, _source: 'cloud' }));
       console.log(`[ListSidebar:${this._itemType}] 云端清单结果:`, cloudLists.length);
     } catch (e) {
@@ -672,12 +691,13 @@ class ListSidebar {
   }
 
   async _doCreateList(name, color = '#5b8dee', visibility = 'team', projectGid = null, sharedTeamGid = null) {
+    const _cf = this._cf.bind(this);
     const uid = window.top?._authUser?.gid || window.parent?._authUser?.gid || '';
     const body = { name, color, storage_scope: 'cloud', owner_type: 'user',
                    item_type: this._itemType, visibility, owner_gid: uid };
     if (projectGid)    body.project_gid     = projectGid;
     if (sharedTeamGid) body.shared_team_gid = sharedTeamGid;
-    const res = await this._cf('/api/lists', { method: 'POST', body: JSON.stringify(body) });
+    const res = await _cf('POST', '/api/lists', { body: JSON.stringify(body) });
     const newGid = res?.data?.gid || null;
     await this._loadLists();
     this._renderItems();
@@ -854,8 +874,10 @@ class ListSidebar {
     if (!isCloud || isOwnerOrAdmin) {
       addSep();
       add('删除', 'danger', async () => {
-        if (!confirm(`确认删除清单"${listObj.name}"？清单内条目将变为未归类。`)) return;
-        await this._deleteList(listObj.gid);
+        await this._deleteList(
+          listObj.gid,
+          () => confirm(`确认删除清单"${listObj.name}"？清单内条目将变为未归类。`),
+        );
       });
     }
 
@@ -887,8 +909,8 @@ class ListSidebar {
     // 加载项目列表
     let projects = [];
     try {
-      const res = await this._cf('/api/projects');
-      projects = res?.data || res || [];
+      const value = await this._invokeCapability('project.project.read.atomic.projects_search', {});
+      projects = Array.isArray(value) ? value : (value?.data || value?.projects || []);
     } catch (e) {
       alert('加载项目列表失败：' + e.message);
       return;
@@ -928,6 +950,7 @@ class ListSidebar {
 
   /** 转让 Owner 弹层 */
   async _transferOwner(listObj) {
+    const _cf = this._cf.bind(this);
     document.querySelectorAll('.ls-owner-modal').forEach(m => m.remove());
     const overlay = document.createElement('div');
     overlay.className = 'ls-owner-modal';
@@ -975,7 +998,7 @@ class ListSidebar {
       _timer = setTimeout(async () => {
         const q = input.value.trim();
         try {
-          const res = await this._cf(`/api/users/search?q=${encodeURIComponent(q)}&limit=10`);
+          const res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('base.users.search', { query: q, limit: 10 });
           renderUsers(res?.data || []);
         } catch { listEl.innerHTML = '<div class="ls-om-empty">搜索失败</div>'; }
       }, 250);
@@ -987,7 +1010,7 @@ class ListSidebar {
 
     // 初始加载空搜索
     try {
-      const res = await this._cf('/api/users/search?q=&limit=20');
+      const res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('base.users.search', { query: '', limit: 20 });
       renderUsers(res?.data || []);
     } catch {}
   }
@@ -1063,11 +1086,10 @@ class ListSidebar {
   }
 
   async _updateList(gid, fields) {
+    const _cf = this._cf.bind(this);
     try {
-      await this._cf(`/api/lists/${gid}`, {
-        method: 'PATCH',
-        body: JSON.stringify(fields),
-      });
+      await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+        .call('project.lists.patch', { gid, patch: fields });
     } catch (e) { console.warn('[ListSidebar] 更新清单失败:', e); }
     await this._loadLists();
     this._renderItems();
@@ -1079,10 +1101,22 @@ class ListSidebar {
     alert('当前为云端模式，清单迁移功能不适用。');
   }
 
-  async _deleteList(gid) {
+  async _deleteList(gid, confirmDelete = () => false) {
+    const _cf = this._cf.bind(this);
+    const list = this._lists.find(item => item.gid === gid);
+    if (!Number.isInteger(list?.revision)) {
+      console.warn('[ListSidebar] 删除清单失败: 缺少当前 revision');
+      return;
+    }
     try {
-      await this._cf(`/api/lists/${gid}`, { method: 'DELETE' });
-    } catch (e) { console.warn('[ListSidebar] 删除清单失败:', e); }
+      await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+        .call('project.lists.delete', {
+          gid, itemType: this._itemType, expectedRevision: list.revision,
+        }, {
+          confirm: confirmDelete,
+          idempotencyKey: `list-delete:${this._itemType}:${gid}:${list.revision}`,
+        });
+    } catch (e) { console.warn('[ListSidebar] 删除清单失败:', e); return; }
     const p = this._getPinned();   p.delete(gid); this._setPinned(p);
     const a = this._getArchived(); a.delete(gid); this._setArchived(a);
     if (this._selected === gid) { this._selected = null; this._onSelect(null); }
@@ -1195,4 +1229,3 @@ class ListSidebar {
 window.ListSidebar = ListSidebar;
 /** 虚拟 GID：代表"无清单条目"视图，选中时仅显示 list_gid 为空的条目 */
 ListSidebar.NO_LIST = '__no_list__';
-

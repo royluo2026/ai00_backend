@@ -46,6 +46,23 @@ window.VisibilitySelector = (() => {
   const _esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const _cf  = () => window._cloudFetch || window.top?._cloudFetch || window.parent?._cloudFetch;
 
+  async function _invokeCapability(id, payload = {}) {
+    const _cloudFetch = _cf();
+    if (!_cloudFetch) throw new Error('云端服务未连接');
+    const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ version: 1, payload }),
+    });
+    const envelope = response?.data;
+    if (response?.success !== true || envelope?.ok !== true) {
+      const detail = envelope?.error || response?.error || {};
+      throw new Error(detail.message || `能力调用失败：${id}@1`);
+    }
+    const value = envelope.data;
+    return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+  }
+
   // ── 数据获取 ────────────────────────────────────────────────────────────────
 
   let _teamsCache    = null;
@@ -54,9 +71,9 @@ window.VisibilitySelector = (() => {
   async function _fetchTeams() {
     if (_teamsCache) return _teamsCache;
     try {
-      const cf = _cf();
-      if (!cf) return [];
-      const data = await cf('/api/teams');
+      const client = window.top?.AI00ExistingCapabilityClient || window.parent?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
+      if (!client) return [];
+      const data = await client.call('base.teams.list');
       _teamsCache = Array.isArray(data) ? data : (data?.data || data?.teams || []);
     } catch (_) { _teamsCache = []; }
     return _teamsCache;
@@ -65,16 +82,10 @@ window.VisibilitySelector = (() => {
   async function _fetchUserProjects() {
     if (_projectsCache) return _projectsCache;
     try {
-      const cf = _cf();
-      if (!cf) return [];
-      const uid = window.top?._authUser?.gid || window._authUser?.gid || '';
-      const data = await cf(`/api/projects?member_gid=${uid}`);
-      let arr = Array.isArray(data) ? data : (data?.data || data?.projects || []);
-      // 若后端不支持 member_gid 过滤，降级到全量列表
-      if (!arr.length) {
-        const all = await cf('/api/projects');
-        arr = Array.isArray(all) ? all : (all?.data || all?.projects || []);
-      }
+      const _cloudFetch = _cf();
+      if (!_cloudFetch) return [];
+      const data = await _invokeCapability('project.project.read.atomic.projects_search', {});
+      const arr = Array.isArray(data) ? data : (data?.data || data?.projects || []);
       _projectsCache = arr;
     } catch (_) { _projectsCache = []; }
     return _projectsCache;
@@ -288,4 +299,3 @@ window.VisibilitySelector = (() => {
 
   return { renderWidget, getValue, renderBadge, showDialog, VIS_META };
 })();
-

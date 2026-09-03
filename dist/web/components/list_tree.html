@@ -270,13 +270,30 @@ async function _load() {
   _loading = true;
   _render();  // 显示加载中
 
-  const cf  = window._cloudFetch || window.parent?._cloudFetch || window.top?._cloudFetch;
+  const _cloudFetch  = window._cloudFetch || window.parent?._cloudFetch || window.top?._cloudFetch;
+
+  async function invokeCapability(id, payload = {}) {
+    if (!_cloudFetch) throw new Error('云端服务未连接');
+    const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ version: 1, payload }),
+    });
+    const envelope = response?.data;
+    if (response?.success !== true || envelope?.ok !== true) {
+      const detail = envelope?.error || response?.error || {};
+      throw new Error(detail.message || `能力调用失败：${id}@1`);
+    }
+    const value = envelope.data;
+    return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+  }
 
   // 云端清单
   let cloudLists = [];
   try {
-    if (cf) {
-      const res = await cf('/api/lists');
+    if (_cloudFetch) {
+      const res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+        .call('project.lists.search');
       cloudLists = (res?.data || []).filter(l => !l.deleted_at).map(l => ({ ...l, _src: 'cloud' }));
     }
   } catch (_) {}
@@ -291,26 +308,27 @@ async function _load() {
   // 3. 车型（仅云端）
   _vehicles = [];
   try {
-    if (cf) {
-      const res = await cf('/api/projects/vehicle_models');
-      _vehicles = res?.data || res || [];
+    if (_cloudFetch) {
+      const value = await invokeCapability('project.project.read.atomic.vehicle_models_list', {});
+      _vehicles = Array.isArray(value) ? value : (value?.data || value?.items || []);
     }
   } catch (_) {}
 
   // 4. 项目（仅云端）
   _projects = [];
   try {
-    if (cf) {
-      const res = await cf('/api/projects');
-      _projects = (res?.data || res || []).filter(p => !p.is_deleted && !p.is_archived);
+    if (_cloudFetch) {
+      const value = await invokeCapability('project.project.read.atomic.projects_search', {});
+      const rows = Array.isArray(value) ? value : (value?.data || value?.projects || []);
+      _projects = rows.filter(p => !p.is_deleted && !p.is_archived);
     }
   } catch (_) {}
 
   // 5. PBOM 快照（仅云端）
   _pbomSnaps = [];
   try {
-    if (cf) {
-      const res = await cf('/api/ebom/snapshots');
+    if (_cloudFetch) {
+      const res = await _cloudFetch('/api/ebom/snapshots', { method: 'GET' });
       _pbomSnaps = (res?.data || []).map(s => ({
         gid:         s.gid,
         name:        s.name || s.version_tag || s.gid,
@@ -326,9 +344,10 @@ async function _load() {
   // 6. BOP 版本（工艺流程图，仅云端）
   _bopVersions = [];
   try {
-    if (cf) {
-      const res = await cf('/api/bop/versions');
-      _bopVersions = (res?.data || []).map(v => ({
+    if (_cloudFetch) {
+      const value = await invokeCapability('craft.bop.version.list', { include_archived: false, page_size: 100 });
+      const rows = Array.isArray(value) ? value : (value?.items || value?.versions || value?.data || []);
+      _bopVersions = rows.map(v => ({
           gid:         v.gid,
           name:        v.bop_name ? `${v.bop_name}（${v.version_tag || v.gid.slice(-6)}）` : (v.version_tag || v.gid.slice(-6)),
           color:       '#cba6f7',
@@ -606,13 +625,11 @@ function _showCtxMenu(e, list) {
 
 // ── 关联项目（PATCH /api/lists/{gid}）────────────────────────
 async function _assignProject(list, projectGid) {
-  const cf = window._cloudFetch || window.parent?._cloudFetch || window.top?._cloudFetch;
+  const _cloudFetch = window._cloudFetch || window.parent?._cloudFetch || window.top?._cloudFetch;
   try {
-    if (cf) {
-      await cf(`/api/lists/${list.gid}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ project_gid: projectGid }),
-      });
+    if (_cloudFetch) {
+      await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+        .call('project.lists.patch', { gid: list.gid, patch: { project_gid: projectGid } });
     }
     list.project_gid = projectGid || null;
     _render();

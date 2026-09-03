@@ -23,23 +23,62 @@ window.ContainerModes['field_detail'] = (() => {
   };
   const DATE_FIELDS = new Set(['due_date','plan_start','plan_end','actual_start','actual_end']);
   const TEXT_FIELDS = new Set(['description','content','content_md']);
+  const _ruleChangeOperations = new Map();
+  const _ruleChangeFields = new Set(['name', 'description', 'severity', 'enabled', 'condition', 'message', 'scope', 'tags', 'priority', 'category']);
+
+  async function _saveRuleDefinition(rule, field, value) {
+    const reference = rule?.rule_reference;
+    const expectedRevision = reference?.rule_revision;
+    const ruleGid = reference?.rule_gid;
+    if (!ruleGid || !Number.isInteger(expectedRevision)) throw new Error('规则引用未绑定，请刷新后重试');
+    const target = field === 'expression' ? 'condition' : field;
+    if (!_ruleChangeFields.has(target)) throw new Error(`规则字段不支持受控更新：${field}`);
+    const payload = { rule_gid: ruleGid, expected_revision: expectedRevision, changes: { [target]: value } };
+    const operationKey = JSON.stringify(payload);
+    let operation = _ruleChangeOperations.get(operationKey);
+    if (!operation) {
+      const idempotencyKey = window.crypto?.randomUUID?.();
+      if (!idempotencyKey) throw new Error('无法安全生成规则变更操作标识');
+      operation = { idempotencyKey, payload };
+      _ruleChangeOperations.set(operationKey, operation);
+    }
+    if (!window.confirm('确认保存此规则定义变更？')) throw new Error('已取消规则定义变更');
+    try {
+      const result = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).invoke(
+        'craft.rule.definition.change.apply', operation.payload,
+        { write: true, confirmed: true, idempotencyKey: operation.idempotencyKey },
+      );
+      if (result?.status === 'outcome_unknown') throw new Error('规则变更结果未知，请刷新后核对操作结果');
+      return result;
+    } catch (error) {
+      if (error?.code === 'revision_conflict') throw new Error('规则已被更新，请刷新后再试');
+      if (error?.code === 'outcome_unknown') throw new Error('规则变更结果未知，请刷新后核对操作结果');
+      throw error;
+    }
+  }
 
   // ── 加载条目数据 ──────────────────────────────────────────────────────────
   async function _fetchItem(itemType, gid, source, cloudFetch) {
-    const cf = cloudFetch || window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
-    if (!cf) return null;
-    const resp = await cf(`/api/${itemType}s/${gid}`);
+    const _cloudFetch = cloudFetch || window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
+    if (!_cloudFetch) return null;
+    let resp;
+    if (itemType === 'task') resp = await _cloudFetch(`/api/tasks/${gid}`, { method: 'GET' });
+    else if (itemType === 'issue') resp = await _cloudFetch(`/api/issues/${gid}`, { method: 'GET' });
+    else if (itemType === 'knowledge') resp = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('knowledge.get', { gid });
+    else if (itemType === 'rule') resp = await _cloudFetch(`/api/rules/${gid}`, { method: 'GET' });
+    else throw new Error(`不支持的条目类型: ${itemType}`);
     return resp?.data || resp;
   }
 
   // ── 保存字段 ─────────────────────────────────────────────────────────────
-  async function _saveField(itemType, gid, field, value, source, cloudFetch) {
-    const cf = cloudFetch || window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
-    if (!cf) return;
-    return cf(`/api/${itemType}s/${gid}`, {
-      method: 'PUT',
-      body: JSON.stringify({ [field]: value }),
-    });
+  async function _saveField(itemType, gid, field, value, source, cloudFetch, currentItem) {
+    const _cloudFetch = cloudFetch || window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
+    if (!_cloudFetch) return;
+    if (itemType === 'task') return _cloudFetch(`/api/tasks/${gid}`, { method: 'PUT', body: JSON.stringify({ [field]: value }) });
+    if (itemType === 'issue') return _cloudFetch(`/api/issues/${gid}`, { method: 'PUT', body: JSON.stringify({ [field]: value }) });
+    if (itemType === 'knowledge') return (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('knowledge.update', { gid, updates: { [field]: value } });
+    if (itemType === 'rule') return _saveRuleDefinition(currentItem, field, value);
+    throw new Error(`不支持的条目类型: ${itemType}`);
   }
 
   // ── 字段值摘要（卡片内显示） ──────────────────────────────────────────────
@@ -221,11 +260,15 @@ window.ContainerModes['field_detail'] = (() => {
           _saving = true;
           saveBtn.textContent = '保存中…';
           try {
-            await _saveField(itemType, gid, field, getValue(), source, cloudFetch);
+            const result = await _saveField(itemType, gid, field, getValue(), source, cloudFetch, item);
+            if (itemType === 'rule' && Number.isInteger(result?.revision)) {
+              item.revision = result.revision;
+              item.rule_reference = { rule_gid: result.rule_gid || item.gid, rule_revision: result.revision };
+            }
             saveBtn.textContent = '已保存';
             setTimeout(() => { saveBtn.textContent = '保存'; _saving = false; }, 1500);
           } catch (err) {
-            saveBtn.textContent = '保存失败';
+            saveBtn.textContent = err?.message || '保存失败';
             setTimeout(() => { saveBtn.textContent = '保存'; _saving = false; }, 2000);
           }
         });

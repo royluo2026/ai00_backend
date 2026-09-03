@@ -36,42 +36,41 @@ function _fmt(ts) {
 
 // 调用云端 API（替代本地 bridge）
 async function _bridge(method, ...args) {
-  const cf = _cf();
-  if (!cf) throw new Error('cloudFetch not available');
+  const _cloudFetch = _cf();
+  if (!_cloudFetch) throw new Error('cloudFetch not available');
   switch (method) {
     case 'list_folders': {
       const scopeType = args[0] || 'personal';
-      return { data: await cf(`/api/knowledge_hub/folders?scope_type=${scopeType}`) };
+      return { data: await _cloudFetch(`/api/knowledge_hub/folders?scope_type=${scopeType}`, { method: 'GET' }) };
     }
     case 'list_favorites':
-      return { data: await cf('/api/knowledge_hub/favorites') };
+      return { data: await _cloudFetch('/api/knowledge_hub/favorites', { method: 'GET' }) };
     case 'list_recent':
-      return { data: await cf(`/api/knowledge_hub/recent?limit=${args[0] || 20}`) };
+      return { data: await _cloudFetch(`/api/knowledge_hub/recent?limit=${args[0] || 20}`, { method: 'GET' }) };
     case 'list_items': {
       const folderGid = args[0];
-      const url = folderGid ? `/api/knowledge_hub/items?folder_gid=${folderGid}` : '/api/knowledge_hub/items';
-      return { data: await cf(url) };
+      return { data: await _cloudFetch(folderGid ? `/api/knowledge_hub/items?folder_gid=${folderGid}` : '/api/knowledge_hub/items', { method: 'GET' }) };
     }
     case 'update_item': {
       const { gid, ...fields } = args[0] || {};
-      return cf(`/api/knowledge_hub/items/${gid}`, { method: 'PATCH', body: JSON.stringify(fields) });
+      return _cloudFetch(`/api/knowledge_hub/items/${gid}`, { method: 'PATCH', body: JSON.stringify(fields) });
     }
     case 'delete_item':
-      return cf(`/api/knowledge_hub/items/${args[0]}`, { method: 'DELETE' });
+      return _cloudFetch(`/api/knowledge_hub/items/${args[0]}`, { method: 'DELETE' });
     case 'create_folder':
-      return { data: await cf('/api/knowledge_hub/folders', { method: 'POST', body: JSON.stringify({ parent_gid: args[0] || null, name: args[1] || '新建文件夹', scope_type: 'personal' }) }) };
+      return { data: await _cloudFetch('/api/knowledge_hub/folders', { method: 'POST', body: JSON.stringify({ parent_gid: args[0] || null, name: args[1] || '新建文件夹', scope_type: 'personal' }) }) };
     case 'rename_folder':
-      return cf(`/api/knowledge_hub/folders/${args[0]}`, { method: 'PATCH', body: JSON.stringify({ name: args[1] }) });
+      return _cloudFetch(`/api/knowledge_hub/folders/${args[0]}`, { method: 'PATCH', body: JSON.stringify({ name: args[1] }) });
     case 'delete_folder':
-      return cf(`/api/knowledge_hub/folders/${args[0]}`, { method: 'DELETE' });
+      return _cloudFetch(`/api/knowledge_hub/folders/${args[0]}`, { method: 'DELETE' });
     case 'move_folder':
-      return cf(`/api/knowledge_hub/folders/${args[0]}`, { method: 'PATCH', body: JSON.stringify({ parent_gid: args[1] || null }) });
+      return _cloudFetch(`/api/knowledge_hub/folders/${args[0]}`, { method: 'PATCH', body: JSON.stringify({ parent_gid: args[1] || null }) });
     case 'create_item': {
       const [folderGid, itemType, title, contentBody, contentMd, filePath, url, siteRef, tags] = args;
-      return { data: await cf('/api/knowledge_hub/items', { method: 'POST', body: JSON.stringify({ folder_gid: folderGid, item_type: itemType, title, content_body: contentBody, content_md: contentMd, file_path: filePath, url, site_ref: siteRef, tags, scope_type: 'personal' }) }) };
+      return { data: await _cloudFetch('/api/knowledge_hub/items', { method: 'POST', body: JSON.stringify({ folder_gid: folderGid, item_type: itemType, title, content_body: contentBody, content_md: contentMd, file_path: filePath, url, site_ref: siteRef, tags, scope_type: 'personal' }) }) };
     }
     case 'record_recent':
-      return cf(`/api/knowledge_hub/items/${args[0]}/recent`, { method: 'POST' });
+      return _cloudFetch(`/api/knowledge_hub/items/${args[0]}/recent`, { method: 'POST' });
     default:
       throw new Error(`Unknown bridge method: ${method}`);
   }
@@ -176,9 +175,9 @@ async function init() {
   const _urlItemGid = new URLSearchParams(location.search).get('item_gid');
   if (_urlItemGid) {
     try {
-      const cf = _cf();
-      if (cf) {
-        const item = await cf(`/api/knowledge_hub/items/${_urlItemGid}`);
+      const _cloudFetch = _cf();
+      if (_cloudFetch) {
+        const item = await _cloudFetch(`/api/knowledge_hub/items/${_urlItemGid}`, { method: 'GET' });
         if (item?.gid) _openItem(item);
       }
     } catch (_) { /* 静默失败，保持默认视图 */ }
@@ -355,11 +354,11 @@ async function _loadCloudFolders(scopeType, teamGid) {
   const key = scopeType === 'team' ? `team:${teamGid}` : 'public';
   if (!_isCloud()) { _cloudFolders[key] = []; return; }
   try {
-    const cf = _cf();
-    if (!cf) return;
-    let url = `/api/knowledge_hub/folders?scope_type=${scopeType}`;
-    if (teamGid) url += `&team_gid=${teamGid}`;
-    const data = await cf(url);
+    const _cloudFetch = _cf();
+    if (!_cloudFetch) return;
+    const query = new URLSearchParams({ scope_type: scopeType });
+    if (teamGid) query.set('team_gid', teamGid);
+    const data = await _cloudFetch(`/api/knowledge_hub/folders?${query}`, { method: 'GET' });
     _cloudFolders[key] = Array.isArray(data) ? data : [];
   } catch (_) { _cloudFolders[key] = []; }
 }
@@ -495,25 +494,25 @@ async function _loadItems() {
   _items = [];
   try {
     if (_currentScope === 'annotated') {
-      const cf = _cf();
-      if (cf) {
-        const anns = (await cf('/api/self_ann/list?module=knowledge_hub').catch(() => null)) || [];
+      const client = window.top?.AI00ExistingCapabilityClient || window.parent?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
+      if (client) {
+        const anns = await client.call('base.annotations.search', { limit: 200 }).catch(() => []);
         // 将标注记录映射为 file-row 可渲染的 item 结构
         _items = anns.map(a => ({
           gid:        a.item_gid,
-          title:      a.item_title || a.item_gid,
+          title:      a.item_gid,
           item_type:  'richtext',
           status:     '',
-          updated_at: a.updated_at,
-          _annotation: a,
+          updated_at: '',
+          _annotation: { self_status: a.status, self_schedule: a.schedule, self_note: a.note, self_attachments: a.attachments },
         }));
       }
       return;
     }
     if (_currentScope === 'favorites') {
       if (_isCloud()) {
-        const cf = _cf();
-        if (cf) _items = (await cf('/api/knowledge_hub/favorites')) || [];
+        const _cloudFetch = _cf();
+        if (_cloudFetch) _items = (await _cloudFetch('/api/knowledge_hub/favorites', { method: 'GET' })) || [];
       } else {
         const res = await _bridge('list_favorites');
         _items = res?.data || [];
@@ -522,8 +521,8 @@ async function _loadItems() {
     }
     if (_currentScope === 'recent') {
       if (_isCloud()) {
-        const cf = _cf();
-        if (cf) _items = (await cf('/api/knowledge_hub/recent')) || [];
+        const _cloudFetch = _cf();
+        if (_cloudFetch) _items = (await _cloudFetch('/api/knowledge_hub/recent', { method: 'GET' })) || [];
       } else {
         const res = await _bridge('list_recent', 20);
         _items = res?.data || [];
@@ -536,13 +535,13 @@ async function _loadItems() {
     } else {
       // cloud (public / team)
       if (!_isCloud()) { _items = []; return; }
-      const cf = _cf();
-      if (!cf) return;
-      let url = `/api/knowledge_hub/items?scope_type=${_currentScope}`;
-      if (_currentFolderGid) url += `&folder_gid=${_currentFolderGid}`;
-      if (_currentTeamGid)   url += `&team_gid=${_currentTeamGid}`;
-      if (_getAuthRole() === 'super_admin') url += '&show_hidden=true';
-      _items = (await cf(url)) || [];
+      const _cloudFetch = _cf();
+      if (!_cloudFetch) return;
+      const query = new URLSearchParams({ scope_type: _currentScope });
+      if (_currentFolderGid) query.set('folder_gid', _currentFolderGid);
+      if (_currentTeamGid) query.set('team_gid', _currentTeamGid);
+      if (_getAuthRole() === 'super_admin') query.set('show_hidden', 'true');
+      _items = (await _cloudFetch(`/api/knowledge_hub/items?${query}`, { method: 'GET' })) || [];
     }
   } catch (_) {}
 }
@@ -608,11 +607,12 @@ function _renderLeft2() {
 // ── 自我标注批量指示器 ─────────────────────────────────────────────────────
 async function _loadSapIndicators(gids) {
   if (!gids.length) return;
-  const cf = _cf();
-  if (!cf) return;
+  const _cloudFetch = _cf();
+  if (!_cloudFetch) return;
   for (let i = 0; i < gids.length; i += 500) {
     const chunk = gids.slice(i, i + 500);
-    const res = await cf(`/api/self_ann/batch?gids=${chunk.join(',')}`).catch(() => null);
+    const res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+      .call('base.annotations.batch', { gids: chunk }).catch(() => null);
     if (!res) return;
     Object.entries(res).forEach(([gid, info]) => {
       document.querySelectorAll(`.sap-row-pin[data-gid="${gid}"]`).forEach(el => {
@@ -725,8 +725,8 @@ async function _renameItem(item) {
     if (_currentScope === 'personal') {
       await _bridge('update_item', { gid: item.gid, title: newTitle });
     } else if (_isCloud()) {
-      const cf = _cf();
-      if (cf) await cf(`/api/knowledge_hub/items/${item.gid}`, { method: 'PATCH', body: JSON.stringify({ title: newTitle }) });
+      const _cloudFetch = _cf();
+      if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/items/${item.gid}`, { method: 'PATCH', body: JSON.stringify({ title: newTitle }) });
     }
     item.title = newTitle;
     if (_currentItem?.gid === item.gid) _centerTitle.textContent = newTitle;
@@ -761,8 +761,8 @@ async function _moveItem(item) {
     if (_currentScope === 'personal') {
       await _bridge('update_item', { gid: item.gid, folder_gid: targetGid });
     } else if (_isCloud()) {
-      const cf = _cf();
-      if (cf) await cf(`/api/knowledge_hub/items/${item.gid}`, { method: 'PATCH', body: JSON.stringify({ folder_gid: targetGid }) });
+      const _cloudFetch = _cf();
+      if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/items/${item.gid}`, { method: 'PATCH', body: JSON.stringify({ folder_gid: targetGid }) });
     }
     item.folder_gid = targetGid;
     // 如果移出了当前文件夹，从列表移除
@@ -790,9 +790,9 @@ async function _setItemVisibility(item) {
     shared_project_gid: item.shared_project_gid  || null,
   };
   await VisibilitySelector.showDialog(itemForDialog, async (val) => {
-    const cf = _cf();
-    if (!cf) return;
-    await cf(`/api/knowledge_hub/items/${item.gid}`, {
+    const _cloudFetch = _cf();
+    if (!_cloudFetch) return;
+    await _cloudFetch(`/api/knowledge_hub/items/${item.gid}`, {
       method: 'PATCH',
       body: JSON.stringify({
         scope_type:         visToScope[val.visibility] || 'public',
@@ -815,8 +815,8 @@ async function _togglePinItem(item) {
     if (_currentScope === 'personal') {
       await _bridge('update_item', { gid: item.gid, is_pinned: newVal });
     } else if (_isCloud()) {
-      const cf = _cf();
-      if (cf) await cf(`/api/knowledge_hub/items/${item.gid}`, { method: 'PATCH', body: JSON.stringify({ is_pinned: newVal }) });
+      const _cloudFetch = _cf();
+      if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/items/${item.gid}`, { method: 'PATCH', body: JSON.stringify({ is_pinned: newVal }) });
     }
     item.is_pinned = newVal;
     _renderLeft2();
@@ -835,8 +835,8 @@ async function _toggleHideItem(item) {
     if (_currentScope === 'personal') {
       await _bridge('update_item', { gid: item.gid, is_hidden: newVal });
     } else if (_isCloud()) {
-      const cf = _cf();
-      if (cf) await cf(`/api/knowledge_hub/items/${item.gid}`, { method: 'PATCH', body: JSON.stringify({ is_hidden: newVal }) });
+      const _cloudFetch = _cf();
+      if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/items/${item.gid}`, { method: 'PATCH', body: JSON.stringify({ is_hidden: newVal }) });
     }
     item.is_hidden = newVal;
     _renderLeft2();
@@ -854,8 +854,8 @@ async function _deleteItem(item) {
     if (_currentScope === 'personal') {
       await _bridge('delete_item', item.gid);
     } else if (_isCloud()) {
-      const cf = _cf();
-      if (cf) await cf(`/api/knowledge_hub/items/${item.gid}`, { method: 'DELETE' });
+      const _cloudFetch = _cf();
+      if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/items/${item.gid}`, { method: 'DELETE' });
     }
     _items = _items.filter(i => i.gid !== item.gid);
     if (_currentItem?.gid === item.gid) {
@@ -923,7 +923,7 @@ async function _openItem(item) {
     _centerBody.style.cssText = '';
     const iframe = document.createElement('iframe');
     iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;';
-    iframe.src = path ? `../${path}` : 'about:blank';
+    iframe.src = resolveKnowledgeSitePageUrl(path);
     _centerBody.appendChild(iframe);
     _loadThread(item);
     return;
@@ -1001,8 +1001,8 @@ function _renderMarkdownCenter(item, scope) {
       if (scope === 'local') {
         await _bridge('update_item', { gid: item.gid, content_md: val });
       } else {
-        const cf = _cf();
-        if (cf) await cf(`/api/knowledge_hub/items/${item.gid}`, {
+        const _cloudFetch = _cf();
+        if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/items/${item.gid}`, {
           method: 'PATCH', body: JSON.stringify({ content_md: val }),
         });
       }
@@ -1036,7 +1036,8 @@ function _recordRecent(item) {
     if (_currentScope === 'personal') {
       _bridge('record_recent', item.gid);
     } else if (_isCloud()) {
-      _cf()?.(`/api/knowledge_hub/items/${item.gid}/recent`, { method: 'POST' });
+      const _cloudFetch = _cf();
+      if (_cloudFetch) _cloudFetch(`/api/knowledge_hub/items/${item.gid}/recent`, { method: 'POST' });
     }
   } catch (_) {}
 }
@@ -1122,11 +1123,11 @@ async function _fetchEntries(item) {
   if (!_thread) return;
   try {
     if (_isCloud()) {
-      const cf = _cf();
-      if (!cf) return;
+      const _cloudFetch = _cf();
+      if (!_cloudFetch) return;
 
       // 加载变更历史（section=history）
-      const histRes = await cf(`/api/knowledge_hub/items/${item.gid}/history`).catch(() => null);
+      const histRes = await _cloudFetch(`/api/knowledge_hub/items/${item.gid}/history`, { method: 'GET' }).catch(() => null);
       const histEntries = histRes?.data || [];
 
       // 渲染历史区域（header + 折叠列表）
@@ -1149,7 +1150,7 @@ async function _fetchEntries(item) {
       histEl.querySelector('.kh-history-body').innerHTML = _renderHistory(histEntries);
 
       // 加载评论（section != history）
-      const data = await cf(`/api/item-entries/knowledge_item/${item.gid}`);
+      const data = await _cloudFetch(`/api/item-entries/knowledge_item/${item.gid}`, { method: 'GET' });
       const allEntries = Array.isArray(data) ? data : (data?.entries || []);
       const comments = allEntries.filter(e => e.section !== 'history');
       _thread.setEntries(comments, item.gid);
@@ -1169,9 +1170,9 @@ async function _newFolder(parentGid, scopeKey, teamGid) {
       await _loadPersonalFolders();
       console.log('[KH-DEBUG] _newFolder: after reload, _personalFolders =', JSON.stringify(_personalFolders));
     } else if (_isCloud()) {
-      const cf = _cf();
-      if (cf) {
-        newFolder = await cf('/api/knowledge_hub/folders', {
+      const _cloudFetch = _cf();
+      if (_cloudFetch) {
+        newFolder = await _cloudFetch('/api/knowledge_hub/folders', {
           method: 'POST',
           body: JSON.stringify({ parent_gid: parentGid, scope_type: scopeKey, team_gid: teamGid, name: '新建文件夹' }),
         });
@@ -1201,8 +1202,8 @@ async function _renameFolder(folder, scopeKey, teamGid) {
       await _bridge('rename_folder', folder.gid, name);
       await _loadPersonalFolders();
     } else if (_isCloud()) {
-      const cf = _cf();
-      if (cf) await cf(`/api/knowledge_hub/folders/${folder.gid}`, {
+      const _cloudFetch = _cf();
+      if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/folders/${folder.gid}`, {
         method: 'PATCH', body: JSON.stringify({ name }),
       });
       await _loadCloudFolders(scopeKey, teamGid);
@@ -1240,8 +1241,8 @@ function _startInlineRename(node, folder, scopeKey, teamGid, isNew) {
         await _bridge('rename_folder', folder.gid, newName);
         await _loadPersonalFolders();
       } else if (_isCloud()) {
-        const cf = _cf();
-        if (cf) await cf(`/api/knowledge_hub/folders/${folder.gid}`, {
+        const _cloudFetch = _cf();
+        if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/folders/${folder.gid}`, {
           method: 'PATCH', body: JSON.stringify({ name: newName }),
         });
         await _loadCloudFolders(scopeKey, teamGid);
@@ -1270,8 +1271,8 @@ async function _doDeleteFolder(folder, scopeKey, teamGid) {
       await _bridge('delete_folder', folder.gid);
       await _loadPersonalFolders();
     } else if (_isCloud()) {
-      const cf = _cf();
-      if (cf) await cf(`/api/knowledge_hub/folders/${folder.gid}`, { method: 'DELETE' });
+      const _cloudFetch = _cf();
+      if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/folders/${folder.gid}`, { method: 'DELETE' });
       await _loadCloudFolders(scopeKey, teamGid);
     }
   } catch (_) {}
@@ -1413,8 +1414,8 @@ async function _handleDrop(dragData, targetFolderGid, targetScopeKey, targetTeam
         await _bridge('move_folder', dragData.gid, targetFolderGid || null);
         await _loadPersonalFolders();
       } else if (_isCloud()) {
-        const cf = _cf();
-        if (cf) await cf(`/api/knowledge_hub/folders/${dragData.gid}`, {
+        const _cloudFetch = _cf();
+        if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/folders/${dragData.gid}`, {
           method: 'PATCH',
           body: JSON.stringify({ parent_gid: targetFolderGid || null }),
         });
@@ -1431,8 +1432,8 @@ async function _handleDrop(dragData, targetFolderGid, targetScopeKey, targetTeam
       if (dragData.scopeKey === 'personal') {
         await _bridge('update_item', { gid: dragData.gid, folder_gid: targetFolderGid || null });
       } else if (_isCloud()) {
-        const cf = _cf();
-        if (cf) await cf(`/api/knowledge_hub/items/${dragData.gid}`, {
+        const _cloudFetch = _cf();
+        if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/items/${dragData.gid}`, {
           method: 'PATCH',
           body: JSON.stringify({ folder_gid: targetFolderGid || null }),
         });
@@ -1561,9 +1562,9 @@ async function _createSitePage() {
   // 从全部 scope 搜索已存在的 site_page
   try {
     if (_isCloud()) {
-      const cf = _cf();
-      if (cf) {
-        const all = await cf('/api/knowledge_hub/items?scope_type=public&show_hidden=true') || [];
+      const _cloudFetch = _cf();
+      if (_cloudFetch) {
+        const all = await _cloudFetch('/api/knowledge_hub/items?scope_type=public&show_hidden=true', { method: 'GET' }) || [];
         all.forEach(it => {
           if (it.item_type === 'site_page') {
             const ref = typeof it.site_ref === 'string' ? JSON.parse(it.site_ref || '{}') : (it.site_ref || {});
@@ -1589,14 +1590,17 @@ async function _createSitePage() {
   if (!picked || !picked.length) return;
 
   // 批量添加
+  let added = 0;
   for (const page of picked) {
-    await _doCreateItem({
+    const item = await _doCreateItem({
       item_type: 'site_page',
       title: page.title,
-      site_ref: { path: page.path, label: page.title },
+      site_ref: { path: page.path },
+      _visOverride: { scope_type: 'public' },
     });
+    if (item) added += 1;
   }
-  _showToast(`已添加 ${picked.length} 个页面`);
+  if (added) _showToast(`已添加 ${added} 个页面`);
 }
 
 // ── 页面选择器弹窗（多选） ───────────────────────────────────────────────────
@@ -1689,8 +1693,8 @@ async function _doCreateItem(fields) {
         cleanFields.tags || [], '');
       item = res?.data;
     } else if (_isCloud()) {
-      const cf = _cf();
-      if (!cf) return;
+      const _cloudFetch = _cf();
+      if (!_cloudFetch) return;
       const body = {
         ...extra,
         scope_type: visOverride?.scope_type || scope,
@@ -1698,14 +1702,19 @@ async function _doCreateItem(fields) {
         ...cleanFields,
       };
       if (visOverride?.shared_project_gid) body.shared_project_gid = visOverride.shared_project_gid;
-      item = await cf('/api/knowledge_hub/items', { method: 'POST', body: JSON.stringify(body) });
+      item = await _cloudFetch('/api/knowledge_hub/items', { method: 'POST', body: JSON.stringify(body) });
     }
     if (item) {
       _items.unshift(item);
       _renderLeft2();
       _openItem(item);
     }
-  } catch (_) {}
+    return item || null;
+  } catch (error) {
+    console.error('[KnowledgeHub] 创建条目失败', error);
+    _showToast(`创建失败：${error?.message || error}`);
+    return null;
+  }
 }
 
 // ── 下拉菜单 ──────────────────────────────────────────────────────────────────

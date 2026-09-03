@@ -24,6 +24,7 @@ window.addEventListener('message', e => {
 // ── 状态 ──────────────────────────────────────────────────────────────────────
 let _orders = [];
 let _selected = null;
+let _rejectionOperation = null;
 
 const STATUS_LABEL = {
   pending:   '待提交',
@@ -147,20 +148,63 @@ async function rejectOrder() {
   if (!_selected) return;
   const comment = document.getElementById('approval-remark').value.trim();
   if (!comment) { alert('驳回请填写审批意见'); return; }
-  if (_selected.status === 'pending') {
-    await api(`/api/approval/orders/${_selected.gid}/start`, { method: 'POST' });
+  const expectedRevision = _selected.revision;
+  if (!Number.isInteger(expectedRevision) || expectedRevision < 1) {
+    alert('审批单版本无效，请刷新后重试');
+    return;
   }
-  const res = await api(`/api/approval/orders/${_selected.gid}/reject`, {
-    method: 'POST',
-    body: JSON.stringify({ comment }),
-  });
-  if (res?.success !== false) {
-    document.getElementById('approval-remark').value = '';
-    await loadOrders();
-    await selectOrder(_selected.gid);
-  } else {
-    alert('操作失败：' + (res?.error || '未知错误'));
+  const capabilityClient = window.parent?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
+  if (!capabilityClient?.invoke) {
+    alert('操作失败：审批能力客户端未就绪');
+    return;
   }
+  const payload = {
+    order_gid: _selected.gid,
+    comment,
+    expected_revision: expectedRevision,
+  };
+  const unchangedOperation = _rejectionOperation &&
+    _rejectionOperation.payload.order_gid === payload.order_gid &&
+    _rejectionOperation.payload.comment === payload.comment &&
+    _rejectionOperation.payload.expected_revision === payload.expected_revision;
+  if (!unchangedOperation) {
+    const confirmation = _rejectionOperation
+      ? '存在待协调的驳回请求。确认以当前意见发起新的驳回操作？'
+      : '确认驳回该审批单？';
+    if (!window.confirm(confirmation)) return;
+    const operationId = window.crypto?.randomUUID?.();
+    if (!operationId) {
+      alert('操作失败：无法创建驳回操作标识');
+      return;
+    }
+    _rejectionOperation = Object.freeze({
+      payload: Object.freeze({ ...payload }),
+      idempotencyKey: `approval-order-reject:${operationId}`,
+    });
+  }
+  let res;
+  try {
+    res = await capabilityClient.invoke('project.approval.order.reject', _rejectionOperation.payload, {
+      write: true, confirmed: true, idempotencyKey: _rejectionOperation.idempotencyKey,
+      expectedResourceVersion: _rejectionOperation.payload.expected_revision,
+    });
+  } catch (error) {
+    if (error?.code === 'outcome_unknown') {
+      alert('驳回结果待协调，请刷新后确认审批单状态');
+      return;
+    }
+    alert('操作失败：' + (error?.message || '未知错误'));
+    return;
+  }
+  if (res?.order_gid !== _selected.gid || res?.status !== 'rejected' ||
+      !Number.isInteger(res?.revision) || !res?.notification_event_gid) {
+    alert('驳回结果待协调，请刷新后确认审批单状态');
+    return;
+  }
+  _rejectionOperation = null;
+  document.getElementById('approval-remark').value = '';
+  await loadOrders();
+  await selectOrder(_selected.gid);
 }
 
 async function withdrawOrder() {

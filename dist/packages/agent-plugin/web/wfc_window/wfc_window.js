@@ -23,6 +23,30 @@
   function _esc(s) {
     return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
+  function _capabilityClient() {
+    const client = window.parent?.AI00ExistingCapabilityClient
+      || window.top?.AI00ExistingCapabilityClient
+      || window.AI00ExistingCapabilityClient;
+    if (!client?.invoke) throw new Error('能力客户端未就绪');
+    return client;
+  }
+  function _inputValues(values) {
+    return Object.entries(values || {}).map(([name, value]) => ({ name, value }));
+  }
+  function _newOperationKey() {
+    return window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  }
+  function _immutableOperation(payload, scopeKey) {
+    const inputValues = Object.freeze(payload.input_values.map(item => Object.freeze({ ...item })));
+    return Object.freeze({
+      scopeKey,
+      payload: Object.freeze({ ...payload, input_values: inputValues }),
+      idempotencyKey: _newOperationKey(),
+    });
+  }
+  function _isCanvasConflict(error) {
+    return error?.code === 'idempotency_conflict' || error?.code === 'version_conflict';
+  }
 
   /* ── Skill 执行沙盘 ────────────────────────────────────────────────────── */
   class SkillSandbox {
@@ -39,6 +63,7 @@
     }
     clearForInteraction(_opts) {
       if (!this._el) return;
+      this._el.querySelectorAll('.wfcw-sb-approval').forEach(card => card._destroy?.());
       this._el.innerHTML = '';
       this._el.scrollTop = 0;
       this.show();
@@ -77,16 +102,45 @@
       btnRow.className = 'wfcw-sb-btns';
       const btnOk = document.createElement('button'); btnOk.className = 'wfcw-sb-btn wfcw-sb-btn-ok'; btnOk.textContent = '确认';
       const btnNo = document.createElement('button'); btnNo.className = 'wfcw-sb-btn wfcw-sb-btn-no'; btnNo.textContent = '拒绝';
-      const disable = () => { btnOk.disabled = true; btnNo.disabled = true; card.classList.add('wfcw-sb-submitted'); hdr.querySelector('.wfcw-sb-badge')?.remove(); };
-      btnOk.addEventListener('click', () => {
+      const binding = Object.freeze({
+        skillGid: params._skill_gid,
+        runToken: params._run_token,
+        pauseToken: token,
+        expectedRevision: params._revision,
+      });
+      const badge = hdr.querySelector('.wfcw-sb-badge');
+      const disable = () => {
+        btnOk.disabled = true; btnNo.disabled = true;
+        body.querySelectorAll('input, select, textarea').forEach(control => { control.disabled = true; });
+        card.classList.add('wfcw-sb-submitted'); badge?.remove();
+      };
+      const enableRetry = (button, label) => {
+        button.disabled = false;
+        button.textContent = `重试${label}`;
+        card.classList.remove('wfcw-sb-submitted');
+        if (badge) { badge.textContent = '等待重试'; if (!badge.isConnected) hdr.appendChild(badge); }
+      };
+      const onApprove = async () => {
         const ud = {};
         card.querySelectorAll('.wfcw-sb-radio-group[data-key]').forEach(g => { const c = g.querySelector('input[type=radio]:checked'); if (c) ud[g.dataset.key] = c.value; });
         card.querySelectorAll('.wfcw-sb-select[data-key]').forEach(s => { if (s.value) ud[s.dataset.key] = s.value; });
         card.querySelectorAll('.wfcw-sb-checklist[data-key]').forEach(cl => { const v = [...cl.querySelectorAll('input[type=checkbox]:checked')].map(c => c.value); if (v.length) ud[cl.dataset.key] = v; });
         console.debug('[SkillSandbox] confirm userData', ud);
-        disable(); this._onApprove?.(token, ud);
-      });
-      btnNo.addEventListener('click', () => { disable(); this._onReject?.(token); });
+        disable();
+        if (await this._onApprove?.(binding, ud) === false) enableRetry(btnOk, '确认');
+      };
+      const onReject = async () => {
+        disable();
+        if (await this._onReject?.(binding) === false) enableRetry(btnNo, '拒绝');
+      };
+      btnOk.addEventListener('click', onApprove);
+      btnNo.addEventListener('click', onReject);
+      card._destroy = () => {
+        btnOk.removeEventListener('click', onApprove);
+        btnNo.removeEventListener('click', onReject);
+        card.querySelectorAll('button, input, select, textarea').forEach(control => { control.disabled = true; });
+        card.remove();
+      };
       btnRow.append(btnOk, btnNo);
       body.appendChild(btnRow);
       card.appendChild(body);
@@ -118,12 +172,12 @@
           if (f.depends_on) { sel.disabled = true; row.dataset.dependsOn = f.depends_on; }
           row.appendChild(sel);
           const p = f._resolved_source_param || {};
-          if (f.source_tool) {
-            this._fetchOptions(f.source_tool, p).then(res => {
+          if (!f.options?.length) {
+            this._fetchOptions(f, p).then(res => {
               sel.innerHTML = '<option value="">请选择…</option>';
               (res?.options || []).forEach(o => { const op = document.createElement('option'); op.value = o.value; op.textContent = o.label || o.value; sel.appendChild(op); });
             });
-          } else if (f.options?.length) {
+          } else {
             sel.innerHTML = '<option value="">请选择…</option>';
             f.options.forEach(o => { const op = document.createElement('option'); op.value = o.value; op.textContent = o.label || o.value; sel.appendChild(op); });
           }
@@ -132,12 +186,15 @@
           const cl = document.createElement('div'); cl.className = 'wfcw-sb-checklist'; cl.dataset.key = f.key;
           cl.innerHTML = '<div class="wfcw-sb-loading">加载中…</div>'; row.appendChild(cl);
           const p = f._resolved_source_param || {};
-          if (f.source_tool) {
-            this._fetchOptions(f.source_tool, p).then(res => {
+          if (!f.options?.length) {
+            this._fetchOptions(f, p).then(res => {
               cl.innerHTML = '';
               (res?.options || []).forEach(o => { const lbl = document.createElement('label'); lbl.className = 'wfcw-sb-chk-item'; const inp = document.createElement('input'); inp.type = 'checkbox'; inp.value = o.value; lbl.append(inp, document.createTextNode(' ' + (o.label || o.value))); cl.appendChild(lbl); });
               if (!cl.children.length) cl.innerHTML = '<div class="wfcw-sb-empty">（暂无数据）</div>';
             });
+          } else {
+            cl.innerHTML = '';
+            f.options.forEach(o => { const lbl = document.createElement('label'); lbl.className = 'wfcw-sb-chk-item'; const inp = document.createElement('input'); inp.type = 'checkbox'; inp.value = o.value; lbl.append(inp, document.createTextNode(' ' + (o.label || o.value))); cl.appendChild(lbl); });
           }
         }
         if (f.show_when) row.dataset.showWhen = JSON.stringify(f.show_when);
@@ -146,7 +203,7 @@
       this._updateShowWhen(fields, fieldEls, formState);
       // cascade: wire parent→child
       fields.forEach(f => {
-        if (!f.depends_on || !f.source_tool) return;
+        if (!f.depends_on) return;
         const pSel = fieldEls[f.depends_on]?.querySelector('select');
         const cSel = fieldEls[f.key]?.querySelector('select');
         if (!pSel || !cSel) return;
@@ -154,7 +211,7 @@
           const pv = pSel.value;
           if (!pv) { cSel.innerHTML = '<option value="">请先选上级</option>'; cSel.disabled = true; return; }
           cSel.innerHTML = '<option value="">加载中…</option>'; cSel.disabled = false;
-          const res = await this._fetchOptions(f.source_tool, { ...(f._resolved_source_param || {}), [f.depends_on]: pv });
+          const res = await this._fetchOptions(f, { ...(f._resolved_source_param || {}), [f.depends_on]: pv });
           cSel.innerHTML = '<option value="">请选择…</option>';
           (res?.options || []).forEach(o => { const op = document.createElement('option'); op.value = o.value; op.textContent = o.label || o.value; cSel.appendChild(op); });
         });
@@ -165,7 +222,10 @@
       fields.forEach(f => {
         if (!f.show_when) return;
         const el = fieldEls[f.key]; if (!el) return;
-        el.style.display = Object.entries(f.show_when).every(([k, v]) => formState[k] === v) ? '' : 'none';
+        const conditions = Array.isArray(f.show_when)
+          ? Object.fromEntries(f.show_when.map(rule => [rule.field_key, rule.value]))
+          : f.show_when;
+        el.style.display = Object.entries(conditions).every(([k, v]) => formState[k] === v) ? '' : 'none';
       });
     }
     _buildResultCard(label, params) {
@@ -310,6 +370,10 @@
   let _wfcMode  = 'explore'; // 'explore' | 'fixed'
   let _fixedSkill = null;    // 当前激活的固定 Skill（固定模式时有值）
   let _skillsList = [];      // 缓存的 Skill 列表（供 @ mention 搜索）
+  let _fixedSkillScope = null;
+  let _canvasStartOperation = null;
+  let _canvasResumeOperation = null;
+  let _activeCanvasRun = null;
 
   /* ── WorkflowCanvas 初始化 ────────────────────────────────────────────── */
   let _wfCanvas  = null;   // 下层：交互画布（接收 generate_canvas 结果）
@@ -353,8 +417,8 @@
     _skillSandbox = new SkillSandbox({
       containerEl: document.getElementById('wfcwSandbox'),
       fetchOptions: _fetchApprovalOptions,
-      onApprove: (tok, ud) => _resumeSkillCanvas(tok, true, ud),
-      onReject:  (tok)     => _resumeSkillCanvas(tok, false, {}),
+      onApprove: (binding, ud) => _resumeSkillCanvas(binding, true, ud),
+      onReject:  binding       => _resumeSkillCanvas(binding, false, {}),
     });
 
     // 关闭流程总览按钮
@@ -409,8 +473,18 @@
 
   /** 进入固定模式（Skill 有预定义画布） */
   function _enterFixedMode(skill, canvasData) {
+    const nextScope = `${skill.gid}@${skill.revision}`;
+    if (_fixedSkillScope && _fixedSkillScope !== nextScope
+      && (_canvasStartOperation || _canvasResumeOperation || _activeCanvasRun)) {
+      if (!confirm('当前 Skill 仍有待协调的执行。确认放弃该操作并切换 Skill？')) return;
+      _skillSandbox?.clearForInteraction({});
+      _canvasStartOperation = null;
+      _canvasResumeOperation = null;
+      _activeCanvasRun = null;
+    }
     _wfcMode    = 'fixed';
     _fixedSkill = skill;
+    _fixedSkillScope = nextScope;
     _topCanvas.fromJSON(canvasData);
     requestAnimationFrame(_syncTopColumnWidths);
     _updateModeIndicator();
@@ -619,7 +693,7 @@
 
   /* ── SSE 流式 AI 对话 helpers ────────────────────────────────────────── */
 
-  async function _fetchAiChatStreamRaw(endpoint, body, signal, callbacks) {
+  async function _cf(method, endpoint, body, signal, callbacks) {
     const eAPI = window.electronAPI;
     if (!eAPI) { callbacks.onError?.('electronAPI 未就绪'); return; }
     const config  = await eAPI.getConfig?.().catch?.(() => ({})) || {};
@@ -631,7 +705,7 @@
     let res;
     try {
       res = await fetch(`${baseUrl}${endpoint}`, {
-        method:  'POST',
+        method,
         headers: {
           'Content-Type':  'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}`, 'X-AI00-Token': token } : {}),
@@ -678,7 +752,7 @@
   }
 
   async function _fetchAiChatStream(text, sessionGid, ctxObj, signal, callbacks) {
-    return _fetchAiChatStreamRaw('/api/ai/chat/stream', {
+    return _cf('POST', '/api/ai/chat/stream', {
       message:    text,
       session_id: sessionGid || '',
       user_gid:   _getUserGid(),
@@ -738,6 +812,7 @@
 
   // 转 Skill（从当前执行流程另存为新 Skill）
   document.getElementById('wfcToSkillBtn')?.addEventListener('click', async () => {
+    const _cloudFetch = window._cloudFetch?.bind(window);
     const canvasData = _getFlowCanvasJSON();
     if (!canvasData || (canvasData.nodes || []).length === 0) {
       _showToast('执行流程为空，无法转 Skill');
@@ -748,7 +823,7 @@
     if (!title?.trim()) return;
     const name = title.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^\w\u4e00-\u9fa5]/g, '');
     const content = JSON.stringify({ canvas: canvasData });
-    const res = await window._cloudFetch?.('/api/skills', {
+    const res = await _cloudFetch?.('/api/skills', {
       method: 'POST',
       body: JSON.stringify({
       name, title: title.trim(),
@@ -765,6 +840,7 @@
 
   // 更新 Skill（将本次调整写回原 Skill，仅固定模式下可用）
   document.getElementById('wfcUpdateSkillBtn')?.addEventListener('click', async () => {
+    const _cloudFetch = window._cloudFetch?.bind(window);
     if (!_fixedSkill) { _showToast('未加载任何 Skill'); return; }
     const canvasData = _getFlowCanvasJSON();
     if (!canvasData) { _showToast('执行流程为空'); return; }
@@ -779,7 +855,7 @@
     } catch (_) {}
     contentObj.canvas = canvasData;
 
-    const res = await window._cloudFetch?.(`/api/skills/${_fixedSkill.gid}`, {
+    const res = await _cloudFetch?.(`/api/skills/${_fixedSkill.gid}`, {
       method: 'PUT',
       body: JSON.stringify({
       gid: _fixedSkill.gid,
@@ -1458,7 +1534,7 @@
         const cf = window._cloudFetch;
         if (!cf) { $bub.innerHTML = '❌ _cloudFetch 未就绪'; return; }
         await new Promise(resolveConfirm => {
-          _fetchAiChatStreamRaw('/api/ai/confirm', {
+          _cf('POST', '/api/ai/confirm', {
             session_gid:   _apSessionGid,
             confirm_token: evt.confirm_token,
             tool_name:     evt.tool_name,
@@ -1519,6 +1595,41 @@
   // 跨步骤积累的节点结果（用于 BOP Canvas 渲染时获取 version_gid 等上下文）
   let _lastNodeResults = {};
 
+  function _projectNodeResults(items) {
+    if (!Array.isArray(items)) return items || {};
+    return Object.fromEntries(items.map(item => [item.node_id, {
+      ...Object.fromEntries((item.output_values || []).map(output => [output.name, output.value])),
+      _status: item.status,
+      _summary: item.summary,
+      summary: item.summary,
+    }]));
+  }
+
+  function _rememberCanvasDispatch(result) {
+    if (!result?.run_token || !Number.isInteger(result.revision)) return;
+    _activeCanvasRun = {
+      runToken: result.run_token,
+      revision: result.revision,
+      haltedNodeId: result.halted_node_id || null,
+      pauseToken: result.pause_token || _activeCanvasRun?.pauseToken || null,
+      status: result.status,
+    };
+  }
+
+  function _renderReconcilingDispatch(result) {
+    if (result?.status === 'accepted') {
+      _appendAiMsg('assistant', '**执行已受理，等待结果。**');
+      _showToast('执行已受理，等待结果');
+      return true;
+    }
+    if (result?.status === 'outcome_unknown') {
+      _appendAiMsg('assistant', '**执行结果未知，正在协调；请重试核对。**');
+      _showToast('执行结果未知，正在协调');
+      return true;
+    }
+    return false;
+  }
+
   /** 模板表达式解析：{{n5.gid||u0.version_gid}} → 第一个非空值 */
   function _resolveTemplate(tpl, nodeResults) {
     if (typeof tpl !== 'string') return tpl;
@@ -1547,7 +1658,7 @@
     });
   }
 
-  function _appendHumanApprovalCard(nodeLabel, pauseToken, skillTitle, nodeResults, contextSummary, collectFields, canvasLayout) {
+  function _appendHumanApprovalCard(nodeLabel, pauseToken, skillTitle, nodeResults, contextSummary, collectFields, canvasLayout, runToken, revision) {
     if (!_skillSandbox) return;
 
     // 切换步骤：清空沙盘，重播上下文结果节点
@@ -1576,6 +1687,9 @@
     _approvalStep = approvalStep + 1;
     _skillSandbox.addNode('human_approval', nodeLabel, 0, approvalStep, {
       _pause_token:    pauseToken,
+      _run_token:      runToken,
+      _revision:       revision,
+      _skill_gid:      _fixedSkill?.gid,
       _skill_title:    skillTitle || '',
       _context:        contextText,
       _collect_fields: resolvedFields?.length ? JSON.stringify(resolvedFields) : '[]',
@@ -1585,46 +1699,73 @@
   /** WorkflowCanvas 审批操作回调 */
   function _onCanvasApprovalAction(nodeId, approved, userData) {
     const node = _wfCanvas?._nodes?.find(n => n.id === nodeId);
-    const pauseToken = node?.params?._pause_token;
-    if (!pauseToken) return;
-    _resumeSkillCanvas(pauseToken, approved, userData);
+    const params = node?.params;
+    if (!params?._pause_token) return;
+    _resumeSkillCanvas(Object.freeze({
+      skillGid: params._skill_gid,
+      runToken: params._run_token,
+      pauseToken: params._pause_token,
+      expectedRevision: params._revision,
+    }), approved, userData);
   }
 
   /** WorkflowCanvas 审批表单选项加载回调 */
-  async function _fetchApprovalOptions(toolName, params) {
+  async function _fetchApprovalOptions(field, params) {
     try {
-      return await window._cloudFetch?.('/api/skills/canvas-options', {
-        method: 'POST',
-        body: JSON.stringify({
-          tool_name:  toolName,
-          params:     params || {},
-          auth_token: _getAuthToken?.() || '',
-        }),
-      }) ?? { options: [] };
+      if (!_fixedSkill?.gid || !_activeCanvasRun?.haltedNodeId || !field?.key) return { options: [] };
+      return await _capabilityClient().invoke('agent.canvas.options.resolve', {
+        skill_gid: _fixedSkill.gid,
+        node_id: _activeCanvasRun.haltedNodeId,
+        field_key: field.key,
+        input_values: _inputValues(params),
+      }, {});
     } catch (_) {
       return { options: [] };
     }
   }
 
-  async function _resumeSkillCanvas(pauseToken, approved, userData = {}) {
-    try {
-      const res = await window._cloudFetch?.('/api/skills/resume-canvas', {
-        method: 'POST',
-        body: JSON.stringify({
-          pause_token: pauseToken,
-          approved:    approved,
-          owner_gid:   _getUserGid(),
-          user_data:   approved ? userData : {},
-        }),
-      });
-
-      if (res?.error) {
-        _showToast(`❌ ${res.error}`);
-        return;
+  async function _resumeSkillCanvas(binding, approved, userData = {}) {
+    if (!binding || binding.skillGid !== _fixedSkill?.gid) return true;
+    const payload = {
+      run_token: binding.runToken,
+      pause_token: binding.pauseToken,
+      expected_revision: binding.expectedRevision,
+      approved,
+      input_values: _inputValues(approved ? userData : {}),
+    };
+    if (_canvasResumeOperation) {
+      const retained = _canvasResumeOperation.payload;
+      if (_canvasResumeOperation.scopeKey !== _fixedSkillScope
+        || retained.run_token !== payload.run_token
+        || retained.pause_token !== payload.pause_token
+        || retained.expected_revision !== payload.expected_revision
+        || retained.approved !== payload.approved
+        || JSON.stringify(retained.input_values) !== JSON.stringify(payload.input_values)) {
+        _showToast('已有待协调的审批操作，只能重试原决定');
+        return false;
       }
+    } else {
+      if (_fixedSkillScope !== `${binding.skillGid}@${_fixedSkill.revision}`
+        || _activeCanvasRun?.runToken !== binding.runToken
+        || _activeCanvasRun?.pauseToken !== binding.pauseToken
+        || _activeCanvasRun?.revision !== binding.expectedRevision) {
+        return true;
+      }
+      _canvasResumeOperation = _immutableOperation(payload, _fixedSkillScope);
+    }
+    try {
+      const operation = _canvasResumeOperation;
+      const res = await _capabilityClient().invoke('agent.canvas.execution.resume', operation.payload, {
+        write: true,
+        confirmed: true,
+        idempotencyKey: operation.idempotencyKey,
+      });
+      _rememberCanvasDispatch(res);
+      if (_renderReconcilingDispatch(res)) return false;
+      _canvasResumeOperation = null;
 
       // 更新左侧边栏步骤状态
-      const nodeResults = res?.node_results || {};
+      const nodeResults = _projectNodeResults(res?.node_results);
       _updateSidebarStatus(nodeResults);
       // 注入结果节点到交互画布（n2 vpps核对 / n6 预览关联）
       for (const [nid, nr] of Object.entries(nodeResults)) {
@@ -1636,9 +1777,11 @@
 
       // 如果还有下一个 human 节点需要确认
       if (res?.status === 'paused' && res.pause_token) {
-        _appendHumanApprovalCard(res.halted_label || '人工步骤', res.pause_token, res.skill_title, nodeResults, res.context_summary, res.collect_fields || null, res.canvas_layout || null);
-        return;
+        _appendHumanApprovalCard(res.halted_label || '人工步骤', res.pause_token, res.skill_title, nodeResults, res.context_summary, res.collect_fields || null, res.canvas_layout || null, res.run_token, res.revision);
+        return true;
       }
+
+      _activeCanvasRun = null;
 
       // 流程结束（completed / halted / error）
       const isOk     = res.status === 'completed';
@@ -1657,9 +1800,16 @@
       _appendAiMsg('assistant', `**${statusText}**\n\n${summary}`);
       _showToast(isOk ? '✅ Skill 执行完成' : isHalted ? '⛔ 流程已中止' : `⚠️ Skill 执行${res.status}`);
       if (res.log_path) _appendLogLink(res.log_path);
-
+      return true;
     } catch (e) {
+      if (_isCanvasConflict(e)) {
+        _canvasResumeOperation = null;
+        _activeCanvasRun = null;
+        _showToast('审批状态已变化，请重新载入 Skill');
+        return true;
+      }
       _showToast(`❌ 请求失败: ${e.message || e}`);
+      return false;
     }
   }
 
@@ -1696,9 +1846,33 @@
 
   /** 获取指定版本的所有 BOP 条目（去重：因 LEFT JOIN 可能产生重复行） */
   async function _fetchBopEntries(versionGid) {
+    const _cloudFetch = window._cloudFetch?.bind(window);
     try {
-      const res = await window._cloudFetch(`/api/bop/versions/${versionGid}/entries`);
-      const raw = Array.isArray(res) ? res : (res?.data || res?.items || []);
+      const raw = [];
+      const pageSize = 100;
+      let offset = 0;
+      let total = null;
+      do {
+        const res = await _cloudFetch('/api/v1/capabilities/craft.bop.entry.legacy_read:invoke', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ version: 1, payload: {
+            operation: 'version_entries', version_gid: versionGid,
+            limit: pageSize, offset,
+          }}),
+        });
+        const envelope = res?.data;
+        if (res?.success !== true || envelope?.ok !== true) {
+          const detail = envelope?.error || res?.error || {};
+          throw new Error(detail.message || 'BOP 条目能力调用失败');
+        }
+        const page = envelope.data;
+        const items = Array.isArray(page) ? page : (page?.items || page?.data || []);
+        raw.push(...items);
+        total = Number.isFinite(Number(page?.total)) ? Number(page.total) : raw.length;
+        offset += items.length;
+        if (!items.length) break;
+      } while (offset < total);
       // 按 gid 去重，保留 primary_link_count 最高的行
       const byGid = {};
       for (const e of raw) {
@@ -1865,6 +2039,7 @@
   }
 
   function _initAiPanel() {
+    const _cloudFetch = window._cloudFetch?.bind(window);
     const panel  = document.getElementById('wfcwAiPanel');
     const hdr    = document.getElementById('wfcwApHdr');
     const toggle = document.getElementById('wfcwApToggle');
@@ -1921,7 +2096,7 @@
       if ($sb) $sb.style.display = 'none';
       // 同步通知服务端（工具调用轮次间的兜底）
       if (_apSessionGid) {
-        window._cloudFetch?.('/api/ai/abort', {
+        _cloudFetch?.('/api/ai/abort', {
           method: 'POST',
           body: JSON.stringify({ session_gid: _apSessionGid }),
         }).catch(() => {});
@@ -1934,6 +2109,7 @@
 
   /* ── 工具库面板 ───────────────────────────────────────────────────────── */
   function _initToolsPanel() {
+    const _cloudFetch = window._cloudFetch?.bind(window);
     const $sec  = document.getElementById('wfcwToolsSection');
     const $hdr  = document.getElementById('wfcwToolsHdr');
     const $body = document.getElementById('wfcwToolsBody');
@@ -1941,7 +2117,7 @@
 
     $hdr.addEventListener('click', () => $sec.classList.toggle('collapsed'));
 
-    window._cloudFetch?.('/api/ai/tools').then(data => {
+    _cloudFetch?.('/api/ai/tools', { method: 'GET' }).then(data => {
       if (!data || !$body) return;
       const all = [
         ...(data.read || []),
@@ -1978,10 +2154,11 @@
 
   /* ── Skill 库面板（悬浮聊天窗内） ───────────────────────────────────── */
   function _initSkillsPanel() {
+    const _cloudFetch = window._cloudFetch?.bind(window);
     const $body = document.getElementById('wfcwSkillsBody');
     if (!$body) return;
 
-    window._cloudFetch?.('/api/skills?scope_filter=all').then(list => {
+    _cloudFetch?.('/api/skills?scope_filter=all', { method: 'GET' }).then(list => {
       if (!$body) return;
       const skills = Array.isArray(list) ? list.filter(s => s.status === 'active') : [];
       _skillsList = skills;   // 缓存供 @ mention 使用
@@ -2127,6 +2304,7 @@
   let _canvasSnapshot = null;   // 临时保存原有画布内容（放入画布预览时）
 
   function _initFlowSidebar() {
+    const _cloudFetch = window._cloudFetch?.bind(window);
     const $sb  = document.getElementById('wfcwFlowSidebar');
     const $btn = document.getElementById('wfcwFsCollapseBtn');
     const $hdr = document.getElementById('wfcwFsHdr');
@@ -2191,7 +2369,7 @@
       let contentObj = {};
       try { contentObj = JSON.parse(_fixedSkill.content || '{}'); } catch (_) {}
       contentObj.canvas = canvasData;
-      const res = await window._cloudFetch?.(`/api/skills/${_fixedSkill.gid}`, {
+      const res = await _cloudFetch?.(`/api/skills/${_fixedSkill.gid}`, {
         method: 'PUT', body: JSON.stringify({ gid: _fixedSkill.gid, content: JSON.stringify(contentObj) }),
       });
       if (res?.error) { _showToast(`更新失败：${res.error}`); return; }
@@ -2212,8 +2390,12 @@
     if (!_fixedSkill?.gid) {
       _showToast('请先选中一个 Skill'); return;
     }
+    if (!Number.isInteger(_fixedSkill.revision)) {
+      _showToast('Skill 版本不可用，无法安全执行'); return;
+    }
     const $btn = document.getElementById('wfcwFsRunBtn');
     if ($btn?.classList.contains('running')) return;
+    if (!confirm(`确认执行 Skill「${_fixedSkill.title}」？`)) return;
     $btn?.classList.add('running');
 
     _showToast(`▶ 开始执行「${_fixedSkill.title}」…`);
@@ -2228,21 +2410,27 @@
     _lastNodeResults      = {};
 
     try {
-      const res = await window._cloudFetch?.('/api/skills/execute-canvas', {
-        method: 'POST',
-        body: JSON.stringify({
-          gid:        _fixedSkill.gid,
-          auth_token: _getAuthToken(),
-          owner_gid:  _getUserGid(),
-        }),
-      });
-
-      if (res?.error) {
-        _showToast(`执行失败：${res.error}`); return;
+      if (!_canvasStartOperation) {
+        _canvasStartOperation = _immutableOperation(
+          { skill_gid: _fixedSkill.gid, expected_revision: _fixedSkill.revision, input_values: [] },
+          _fixedSkillScope,
+        );
+      } else if (_canvasStartOperation.scopeKey !== _fixedSkillScope) {
+        _showToast('当前 Skill 有另一项待协调执行，请重新选择');
+        return;
       }
+      const operation = _canvasStartOperation;
+      const res = await _capabilityClient().invoke('agent.canvas.execution.start', operation.payload, {
+        write: true,
+        confirmed: true,
+        idempotencyKey: operation.idempotencyKey,
+      });
+      _rememberCanvasDispatch(res);
+      if (_renderReconcilingDispatch(res)) return;
+      _canvasStartOperation = null;
 
       // 根据返回的 node_results 更新左侧边栏步骤状态
-      const nodeResults = res?.node_results || {};
+      const nodeResults = _projectNodeResults(res?.node_results);
       _updateSidebarStatus(nodeResults);
       // 注入结果节点到交互画布（n2 vpps核对 / n6 预览关联）
       for (const [nid, nr] of Object.entries(nodeResults)) {
@@ -2262,14 +2450,19 @@
           res.context_summary,
           res.collect_fields || null,
           res.canvas_layout  || null,
+          res.run_token,
+          res.revision,
         );
         if (res.log_path) _appendLogLink(res.log_path);
         return;
       }
 
+      _activeCanvasRun = null;
+
       // 在聊天框追加执行结果摘要
       const isRunHalted = res?.status === 'halted';
-      const summary = res?.summary || res?.halt_reason || '执行完成';
+      const isRunCompleted = res?.status === 'completed';
+      const summary = res?.summary || res?.halt_reason || (isRunCompleted ? '执行完成' : '执行异常');
       if (isRunHalted) {
         // halted 时在沙盘加状态卡片
         if (_skillSandbox) {
@@ -2278,11 +2471,14 @@
         }
         _showToast('⛔ 流程已中止');
         _appendAiMsg('assistant', `**⛔ 流程已中止**\n\n${summary}`);
-      } else {
+      } else if (isRunCompleted) {
         _appendAiMsg('assistant', `**✅ Skill「${_fixedSkill.title}」自主执行完成**\n\n${summary}`);
         if (_skillSandbox) {
           _skillSandbox.addNode('agent', `✅ ${_fixedSkill.title} 执行完成`, 0, _approvalStep++, { note: summary });
         }
+      } else {
+        _appendAiMsg('assistant', `**⚠️ 执行异常（${res?.status || 'error'}）**\n\n${summary}`);
+        _showToast(`执行失败：${summary}`);
       }
       if (res?.log_path) _appendLogLink(res.log_path);
 
@@ -2293,6 +2489,12 @@
         chatTab?.click();
       }
     } catch (e) {
+      if (_isCanvasConflict(e)) {
+        _canvasStartOperation = null;
+        _activeCanvasRun = null;
+        _showToast('Skill 执行状态已变化，请重新载入后再试');
+        return;
+      }
       _showToast(`执行出错：${e.message || e}`);
     } finally {
       $btn?.classList.remove('running');
@@ -2452,6 +2654,7 @@
 
   /* ── 悬浮聊天窗 ───────────────────────────────────────────────────────── */
   function _initFloatChat() {
+    const _cloudFetch = window._cloudFetch?.bind(window);
     const $chat = document.getElementById('wfcwFloatChat');
     if (!$chat) return;
 
@@ -2533,7 +2736,7 @@
       if ($sb) $sb.style.display = 'none';
       // 同步通知服务端（工具调用轮次间的兜底）
       if (_apSessionGid) {
-        window._cloudFetch?.('/api/ai/abort', {
+        _cloudFetch?.('/api/ai/abort', {
           method: 'POST',
           body: JSON.stringify({ session_gid: _apSessionGid }),
         }).catch(() => {});

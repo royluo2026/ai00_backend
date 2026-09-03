@@ -30,6 +30,25 @@ const GlobalSearch = (() => {
   // ── DOM 引用（init 后赋值）────────────────────────────────────────────────
   let _overlay, _panel, _input, _badge, _tabs, _resultsEl, _footer;
 
+  function _cloudFetch(path, opts = {}) {
+    return window._cloudFetch(path, opts);
+  }
+
+  async function _invokeCapability(id, payload = {}) {
+    const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ version: 1, payload }),
+    });
+    const envelope = response?.data;
+    if (response?.success !== true || envelope?.ok !== true) {
+      const detail = envelope?.error || response?.error || {};
+      throw new Error(detail.message || `能力调用失败：${id}@1`);
+    }
+    const value = envelope.data;
+    return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+  }
+
   // ── 分类自动识别 ──────────────────────────────────────────────────────────
   function _detectCategory(q) {
     if (!q || q.length < 2) return 'all';
@@ -57,9 +76,9 @@ const GlobalSearch = (() => {
     if (authMode !== 'feishu') return [];
     try {
       const [usersRes, chatsRes, docsRes] = await Promise.allSettled([
-        window._cloudFetch(`/feishu/search/users?q=${encodeURIComponent(q)}&limit=5`),
-        window._cloudFetch(`/feishu/search/chats?q=${encodeURIComponent(q)}&limit=5`),
-        window._cloudFetch(`/feishu/search/docs?q=${encodeURIComponent(q)}&limit=4`),
+        _cloudFetch(`/feishu/search/users?q=${encodeURIComponent(q)}&limit=5`, { method: 'GET' }),
+        _cloudFetch(`/feishu/search/chats?q=${encodeURIComponent(q)}&limit=5`, { method: 'GET' }),
+        _cloudFetch(`/feishu/search/docs?q=${encodeURIComponent(q)}&limit=4`, { method: 'GET' }),
       ]);
       const items = [];
       if (usersRes.status === 'fulfilled' && usersRes.value?.data) {
@@ -85,8 +104,9 @@ const GlobalSearch = (() => {
 
   async function _searchBop(q) {
     try {
-      const res = await window._cloudFetch(`/api/bop/entries/search?q=${encodeURIComponent(q)}&limit=8`);
-      return (res?.data || []).map(r => ({ _cat: 'bop', ...r }));
+      const value = await _invokeCapability('craft.bop.entry.search', { q, limit: 8 });
+      const rows = Array.isArray(value) ? value : (value?.data || []);
+      return rows.map(r => ({ _cat: 'bop', ...r }));
     } catch (_) {
       return [];
     }
@@ -95,8 +115,8 @@ const GlobalSearch = (() => {
   async function _searchTasks(q) {
     try {
       const [tasksRes, issuesRes] = await Promise.allSettled([
-        window._cloudFetch(`/api/tasks?q=${encodeURIComponent(q)}&page_size=5`),
-        window._cloudFetch(`/api/issues?q=${encodeURIComponent(q)}&page_size=5`),
+        _cloudFetch(`/api/tasks?q=${encodeURIComponent(q)}&page_size=5`, { method: 'GET' }),
+        _cloudFetch(`/api/issues?q=${encodeURIComponent(q)}&page_size=5`, { method: 'GET' }),
       ]);
       const items = [];
       if (tasksRes.status === 'fulfilled' && tasksRes.value?.data) {
@@ -114,8 +134,8 @@ const GlobalSearch = (() => {
   async function _searchKnow(q) {
     try {
       const [knowRes, rulesRes] = await Promise.allSettled([
-        window._cloudFetch(`/api/knowledge_hub/items?q=${encodeURIComponent(q)}&limit=5`),
-        window._cloudFetch(`/api/rules?q=${encodeURIComponent(q)}&limit=5`),
+        _cloudFetch(`/api/knowledge_hub/items?q=${encodeURIComponent(q)}&limit=5`, { method: 'GET' }),
+        _cloudFetch(`/api/rules?q=${encodeURIComponent(q)}&limit=5`, { method: 'GET' }),
       ]);
       const items = [];
       if (knowRes.status === 'fulfilled' && Array.isArray(knowRes.value)) {
@@ -135,8 +155,8 @@ const GlobalSearch = (() => {
     if (authMode !== 'feishu') return [];
     try {
       const [evRes, mtRes] = await Promise.allSettled([
-        window._cloudFetch(`/feishu/search/events?q=${encodeURIComponent(q)}&limit=5`),
-        window._cloudFetch(`/feishu/search/meetings?q=${encodeURIComponent(q)}&limit=4`),
+        _cloudFetch(`/feishu/search/events?q=${encodeURIComponent(q)}&limit=5`, { method: 'GET' }),
+        _cloudFetch(`/feishu/search/meetings?q=${encodeURIComponent(q)}&limit=4`, { method: 'GET' }),
       ]);
       const items = [];
       if (evRes.status === 'fulfilled' && evRes.value?.data) {
@@ -174,13 +194,13 @@ const GlobalSearch = (() => {
     if (cat === 'all' || cat === 'feishu') {
       if (authOk) {
         all.push(
-          window._cloudFetch(`/feishu/search/users?q=${enc}&limit=5`).then(r =>
+          _cloudFetch(`/feishu/search/users?q=${enc}&limit=5`, { method: 'GET' }).then(r =>
             _addGroup('飞书联系人', (r?.data || []).map(u => ({ _cat:'feishu', _subtype:'user', ...u })))
           ).catch(() => {}),
-          window._cloudFetch(`/feishu/search/chats?q=${enc}&limit=5`).then(r =>
+          _cloudFetch(`/feishu/search/chats?q=${enc}&limit=5`, { method: 'GET' }).then(r =>
             _addGroup('飞书群聊', (r?.data || []).map(c => ({ _cat:'feishu', _subtype:'chat', ...c })))
           ).catch(() => {}),
-          window._cloudFetch(`/feishu/search/docs?q=${enc}&limit=4`).then(r =>
+          _cloudFetch(`/feishu/search/docs?q=${enc}&limit=4`, { method: 'GET' }).then(r =>
             _addGroup('飞书文档', (r?.data || []).map(d => ({ _cat:'feishu', _subtype:'doc', ...d })))
           ).catch(() => {}),
         );
@@ -188,34 +208,33 @@ const GlobalSearch = (() => {
     }
     if (cat === 'all') {
       all.push(
-        window._cloudFetch(`/api/lists?q=${enc}`).then(r =>
+        (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+          .call('project.lists.search', { query: q }).then(r =>
           _addGroup('清单', (r?.data || []).map(l => ({ _cat:'lists', _subtype:'list', ...l })))
         ).catch(() => {}),
       );
     }
     if (cat === 'all' || cat === 'bop') {
       all.push(
-        window._cloudFetch(`/api/bop/entries/search?q=${enc}&limit=8`).then(r =>
-          _addGroup('BOP 工艺节点', (r?.data || []).map(b => ({ _cat:'bop', ...b })))
-        ).catch(() => {}),
+        _searchBop(q).then(items => _addGroup('BOP 工艺节点', items)).catch(() => {}),
       );
     }
     if (cat === 'all' || cat === 'tasks') {
       all.push(
-        window._cloudFetch(`/api/tasks?q=${enc}&page_size=5`).then(r =>
+        _cloudFetch(`/api/tasks?q=${enc}&page_size=5`, { method: 'GET' }).then(r =>
           _addGroup('任务', (r?.data || []).map(t => ({ _cat:'tasks', _subtype:'task', ...t })))
         ).catch(() => {}),
-        window._cloudFetch(`/api/issues?q=${enc}&page_size=5`).then(r =>
+        _cloudFetch(`/api/issues?q=${enc}&page_size=5`, { method: 'GET' }).then(r =>
           _addGroup('问题', (r?.data || []).map(i => ({ _cat:'tasks', _subtype:'issue', ...i })))
         ).catch(() => {}),
       );
     }
     if (cat === 'all' || cat === 'know') {
       all.push(
-        window._cloudFetch(`/api/knowledge_hub/items?q=${enc}&limit=5`).then(r =>
+        _cloudFetch(`/api/knowledge_hub/items?q=${enc}&limit=5`, { method: 'GET' }).then(r =>
           _addGroup('知识库', (Array.isArray(r) ? r : []).map(k => ({ _cat:'know', _subtype:'knowledge', ...k })))
         ).catch(() => {}),
-        window._cloudFetch(`/api/rules?q=${enc}&limit=5`).then(r =>
+        _cloudFetch(`/api/rules?q=${enc}&limit=5`, { method: 'GET' }).then(r =>
           _addGroup('规则', (r?.data || []).map(r => ({ _cat:'know', _subtype:'rule', ...r })))
         ).catch(() => {}),
       );
@@ -223,10 +242,10 @@ const GlobalSearch = (() => {
     if (cat === 'all' || cat === 'cal') {
       if (authOk) {
         all.push(
-          window._cloudFetch(`/feishu/search/events?q=${enc}&limit=5`).then(r =>
+          _cloudFetch(`/feishu/search/events?q=${enc}&limit=5`, { method: 'GET' }).then(r =>
             _addGroup('日程', (r?.data || []).map(e => ({ _cat:'cal', _subtype:'event', ...e })))
           ).catch(() => {}),
-          window._cloudFetch(`/feishu/search/meetings?q=${enc}&limit=4`).then(r =>
+          _cloudFetch(`/feishu/search/meetings?q=${enc}&limit=4`, { method: 'GET' }).then(r =>
             _addGroup('会议记录', (r?.data || []).map(m => ({ _cat:'cal', _subtype:'meeting', ...m })))
           ).catch(() => {}),
         );
@@ -562,4 +581,3 @@ const GlobalSearch = (() => {
 })();
 
 window.GlobalSearch = GlobalSearch;
-

@@ -24,9 +24,9 @@ window.ContainerModes['image_gallery'] = (() => {
   async function _loadAnn(key) {
     if (!key) return {};
     try {
-      const cf = window.parent?._cloudFetch || window._cloudFetch;
-      if (cf) {
-        const resp = await cf(`/api/annotations/${encodeURIComponent(key)}`);
+      const _cloudFetch = window.parent?._cloudFetch || window._cloudFetch;
+      if (_cloudFetch) {
+        const resp = await _cloudFetch(`/api/annotations/${encodeURIComponent(key)}`, { method: 'GET' });
         if (resp?.data) return resp.data;
       }
     } catch (_) {}
@@ -40,9 +40,9 @@ window.ContainerModes['image_gallery'] = (() => {
     try { localStorage.setItem(key, JSON.stringify(data)); } catch (_) {}
     // 异步持久化到 DB
     try {
-      const cf = window.parent?._cloudFetch || window._cloudFetch;
-      if (cf) {
-        await cf(`/api/annotations/${encodeURIComponent(key)}`, {
+      const _cloudFetch = window.parent?._cloudFetch || window._cloudFetch;
+      if (_cloudFetch) {
+        await _cloudFetch(`/api/annotations/${encodeURIComponent(key)}`, {
           method: 'PUT',
           body: JSON.stringify({ data }),
         });

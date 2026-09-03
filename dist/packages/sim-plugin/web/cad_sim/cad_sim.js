@@ -38,6 +38,23 @@ async function _bridge(ns, method, ...args) {
 const _eAPI = () => window.electronAPI || window.parent?.electronAPI;
 const $ = id => document.getElementById(id);
 
+async function _invokeCapability(id, payload = {}) {
+  const _cloudFetch = window.parent?._cloudFetch || window._cloudFetch;
+  if (!_cloudFetch) throw new Error('cloudFetch 不可用');
+  const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version: 1, payload }),
+  });
+  const envelope = response?.data;
+  if (response?.success !== true || envelope?.ok !== true) {
+    const detail = envelope?.error || response?.error || {};
+    throw new Error(detail.message || `能力调用失败：${id}@1`);
+  }
+  const value = envelope.data;
+  return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+}
+
 // ── VisMockup 状态 ────────────────────────────────────────────────────────────
 let _vmConnected = false;
 let _catiaScanDone = false;   // scan_vis_catia_map 是否完成
@@ -492,8 +509,11 @@ async function _loadBopVersions() {
   const cf = window.parent?._cloudFetch || window._cloudFetch;
   if (!cf) return;
   try {
-    const data = await cf('/api/bop/versions?limit=100');
-    _bopVersions = data?.data || data?.versions || data?.items || [];
+    const data = await _invokeCapability('craft.bop.version.list', {
+      include_archived: false,
+      page_size: 100,
+    });
+    _bopVersions = data?.items || data?.data || data?.versions || [];
     _renderVersionSelector();
   } catch(e) { console.warn('[cad_sim] loadBopVersions:', e); }
 }
@@ -528,7 +548,9 @@ async function _loadBopTree(versionGid) {
   }
   try {
     // 用 alt-hier 端点：返回带 parts（catia_occ）的完整条目列表
-    const data = await cf(`/api/bop/versions/${versionGid}/alt-hier`);
+    const data = await _invokeCapability('craft.bop.alt_hierarchy.read', {
+      version_gid: versionGid,
+    });
     _bopEntries = data?.entries || [];
     _bopEntryIndex = Object.fromEntries(_bopEntries.map(e => [e.gid, e]));
     // 构建父子映射（parent_gid → children[]，按 sort_order 排序）
@@ -1068,8 +1090,10 @@ async function _loadTasks() {
   const cf = window.parent?._cloudFetch || window._cloudFetch;
   if (!cf) return;
   try {
-    const data = await cf('/api/tasks?list_gid=sim_eval&limit=200');
-    _tasks = data?.items || data?.data || [];
+    const data = await _invokeCapability('project.task.read.atomic.tasks_search', {
+      list_gid: 'sim_eval', page_size: 200,
+    });
+    _tasks = data?.items || data?.data || data || [];
   } catch(e) { console.warn('[cad_sim] loadTasks:', e); }
 }
 
@@ -1098,16 +1122,12 @@ async function _saveTask() {
   const cf = window.parent?._cloudFetch || window._cloudFetch;
   if (!cf) { alert('需要飞书登录才能创建任务'); return; }
   try {
-    await cf('/api/tasks', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title,
-        list_gid:        'sim_eval',
-        bop_version_gid: _selectedBopGid || null,
-        task_type:       $('taskModalType').value,
-        work_plan_gid:   $('taskModalWorkPlan').value.trim() || null,
-      }),
+    await _invokeCapability('project.task.change.apply.atomic.tasks_create', {
+      title,
+      list_gid: 'sim_eval',
+      bop_version_gid: _selectedBopGid || null,
+      task_type: $('taskModalType').value,
+      work_plan_gid: $('taskModalWorkPlan').value.trim() || null,
     });
     _closeTaskModal();
     await _loadTasks();
@@ -1212,11 +1232,12 @@ async function _captureOpSequence(overrideRootGid = null, progressCb = null) {
         const b64 = await eAPI?.readFileBase64(capRes.data.screenshot_path);
         if (b64) {
           const filename  = capRes.data.screenshot_path.split(/[\\/]/).pop();
-          const uploadRes = await cf('/api/bop/pics/upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ filename, mime: 'image/png', data_b64: b64 }),
+          const uploadResult = await _invokeCapability('craft.bop.picture.upload', {
+            filename,
+            mime: 'image/png',
+            data_b64: b64,
           });
+          const uploadRes = uploadResult?.data || uploadResult;
           if (uploadRes?.url) {
             const picItem = {
               url: uploadRes.url,
@@ -1224,10 +1245,10 @@ async function _captureOpSequence(overrideRootGid = null, progressCb = null) {
               storage: uploadRes.storage || '',
             };
             // c. PATCH → 写入 bop_entries.process_flow_pic
-            await cf(`/api/bop/entries/${op.bop_entry_gid}`, {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ process_flow_pic: [picItem] }),
+            await _invokeCapability('craft.bop.entry.change.apply', {
+              operation: 'update',
+              entry_gid: op.bop_entry_gid,
+              updates: { process_flow_pic: [picItem] },
             });
             saved++;
           _cmdShow(`  [${i + 1}] 已保存`);

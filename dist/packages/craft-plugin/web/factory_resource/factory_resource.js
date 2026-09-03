@@ -6,16 +6,16 @@
 // ── 列定义 ────────────────────────────────────────────────────────────────────
 const FR_COLS = [
   { key: 'asset_no',     label: '资产编号', type: 'text', width: 160 },
-  { key: 'status',       label: '状态',     type: 'enum', width: 90,  options: [{value:'active',label:'运行中'},{value:'idle',label:'闲置'},{value:'maintenance',label:'维护中'},{value:'retired',label:'已退役'}] },
+  { key: 'status',       label: '状态',     type: 'enum', width: 90,  options: [{value:'in_use',label:'在用'},{value:'maintenance',label:'维护中'},{value:'scrapped',label:'已报废'}] },
   { key: 'template_gid', label: '模板GID',  type: 'text', width: 220, editable: false, visible: false },
   { key: '_actions',     label: '操作',     type: 'text', width: 140, alwaysVisible: true, editable: false },
 ];
 
 // ── 子标签配置 ────────────────────────────────────────────────────────────────
 const TAB_CONFIG = {
-  tool:      { apiPath: '/api/factory/tools' },
-  equipment: { apiPath: '/api/factory/equipments' },
-  fixture:   { apiPath: '/api/factory/fixtures' },
+  tool:      { assetType: 'tool' },
+  equipment: { assetType: 'equipment' },
+  fixture:   { assetType: 'fixture' },
 };
 
 // ── 状态 ──────────────────────────────────────────────────────────────────────
@@ -25,24 +25,57 @@ let _currentList = null;
 let _allLists    = [];
 let _shell       = null;
 
+function _cf(method, path, opts = {}) {
+  return ListShell._cf(path, { ...opts, method });
+}
+
+async function _factoryInvoke(id, payload = {}) {
+  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version: 1, payload }),
+  });
+  const envelope = response?.data;
+  if (response?.success !== true || envelope?.ok !== true) {
+    const detail = envelope?.error || response?.error || {};
+    throw new Error(detail.message || `能力调用失败：${id}@1`);
+  }
+  const value = envelope.data;
+  return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+}
+
+function _assetRow(gid) {
+  const row = _assets.find(item => item.gid === gid);
+  if (!row) throw new Error('资产不存在或已刷新');
+  return row;
+}
+
+function _normalizeAsset(row) {
+  return { ...row, template_gid: row.template_gid ?? row.catalog_gid ?? null };
+}
+
+function _assetUpdates(row, orig) {
+  const updates = {};
+  if (String(row.asset_no ?? '') !== String(orig.asset_no ?? '')) updates.asset_no = row.asset_no;
+  if (String(row.template_gid ?? '') !== String(orig.template_gid ?? '')) updates.catalog_gid = row.template_gid || null;
+  return updates;
+}
+
 
 // ── 操作函数（inline onclick 需要全局暴露）────────────────────────────────────
 async function sendMaintenance(gid) {
-  const cfg = TAB_CONFIG[_currentTab];
-  try { await ListShell._cfSafe(`${cfg.apiPath}/${gid}/maintenance`, { method: 'POST' }); await loadAssets(); }
+  try { const row = _assetRow(gid); await _factoryInvoke('factory.asset.maintenance.start', { gid, expected_version: row.version || 1 }); await loadAssets(); }
   catch (e) { alert('送修失败: ' + e.message); }
 }
 
 async function returnAsset(gid) {
-  const cfg = TAB_CONFIG[_currentTab];
-  try { await ListShell._cfSafe(`${cfg.apiPath}/${gid}/return`, { method: 'POST' }); await loadAssets(); }
+  try { const row = _assetRow(gid); await _factoryInvoke('factory.asset.maintenance.complete', { gid, expected_version: row.version || 1 }); await loadAssets(); }
   catch (e) { alert('归还失败: ' + e.message); }
 }
 
 async function scrapAsset(gid) {
   if (!confirm('确认报废该资产？')) return;
-  const cfg = TAB_CONFIG[_currentTab];
-  try { await ListShell._cfSafe(`${cfg.apiPath}/${gid}/scrap`, { method: 'POST' }); await loadAssets(); }
+  try { const row = _assetRow(gid); await _factoryInvoke('factory.asset.scrap', { gid, expected_version: row.version || 1 }); await loadAssets(); }
   catch (e) { alert('报废失败: ' + e.message); }
 }
 
@@ -68,9 +101,8 @@ const CELL_RENDERERS = {
 async function loadAssets() {
   const cfg = TAB_CONFIG[_currentTab];
   try {
-    const url = _currentList ? `${cfg.apiPath}?list_gid=${_currentList}` : cfg.apiPath;
-    const res = await ListShell._cfSafe(url);
-    _assets = res?.data || [];
+    const res = await _factoryInvoke('factory.asset.search', { asset_type: cfg.assetType, limit: 500 });
+    _assets = (Array.isArray(res) ? res : (res?.items || res?.data || [])).map(_normalizeAsset);
   } catch (e) {
     _assets = [];
     console.warn('[factory_resource] 加载失败:', e.message);
@@ -97,13 +129,29 @@ async function init() {
         const cfg = TAB_CONFIG[_currentTab];
         for (const r of rows) {
           if (signal?.aborted) break;
-          await ListShell._cfSafe(cfg.apiPath, { method: 'POST', body: JSON.stringify(r), signal });
+          if (!r.asset_no) continue;
+          await _factoryInvoke('factory.asset.register', {
+            asset_no: r.asset_no,
+            asset_type: cfg.assetType,
+            catalog_gid: r.template_gid || r.catalog_gid || null,
+          });
         }
         if (!signal?.aborted) await loadAssets();
       }),
     diffManager: ListShell.makeDiffManager('factory_resource', _getViewRows, 'asset_no'),
     rdpSaveOpts: {
-      cloudPath: (row) => TAB_CONFIG[_currentTab].apiPath,
+      savePatch: async (row, patch) => {
+        const updates = {};
+        if (patch.asset_no !== undefined) updates.asset_no = patch.asset_no;
+        if (Object.keys(updates).length) {
+          const saved = await _factoryInvoke('factory.asset.update', {
+            gid: row.gid,
+            expected_version: row.version || 1,
+            updates,
+          });
+          if (saved?.version) row.version = saved.version;
+        }
+      },
     },
     cellRenderer: CELL_RENDERERS,
     onRowsChange: async (newRows) => {
@@ -113,17 +161,15 @@ async function init() {
         if (row.gid) {
           const orig = _assets.find(a => a.gid === row.gid);
           if (!orig) continue;
-          const body = {};
-          ['asset_no', 'template_gid'].forEach(k => {
-            if (String(row[k] ?? '') !== String(orig[k] ?? '')) body[k] = row[k];
-          });
-          if (!Object.keys(body).length) continue;
-          await ListShell._cfSafe(`${cfg.apiPath}/${row.gid}`, { method: 'PATCH', body: JSON.stringify(body) });
+          const updates = _assetUpdates(row, orig);
+          if (!Object.keys(updates).length) continue;
+          await _factoryInvoke('factory.asset.update', { gid: row.gid, expected_version: orig.version || 1, updates });
           didSave = true;
         } else if (row.asset_no) {
-          await ListShell._cfSafe(cfg.apiPath, {
-            method: 'POST',
-            body: JSON.stringify({ asset_no: row.asset_no, template_gid: row.template_gid || null }),
+          await _factoryInvoke('factory.asset.register', {
+            asset_no: row.asset_no,
+            asset_type: cfg.assetType,
+            catalog_gid: row.template_gid || null,
           });
           didSave = true;
         }

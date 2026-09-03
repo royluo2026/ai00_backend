@@ -61,9 +61,9 @@ window.ContainerModes['richtext'] = (() => {
   async function _loadContent(itemGid, scope) {
     if (!itemGid) return null;
     try {
-      const cf = _cf();
-      if (!cf) return null;
-      const data = await cf(`/api/knowledge_hub/items/${itemGid}`);
+      const _cloudFetch = _cf();
+      if (!_cloudFetch) return null;
+      const data = await _cloudFetch(`/api/knowledge_hub/items/${itemGid}`, { method: 'GET' });
       return data?.content_body || null;
     } catch (_) { return null; }
   }
@@ -71,8 +71,8 @@ window.ContainerModes['richtext'] = (() => {
   async function _saveContent(itemGid, scope, content) {
     if (!itemGid) return;
     try {
-      const cf = _cf();
-      if (cf) await cf(`/api/knowledge_hub/items/${itemGid}`, {
+      const _cloudFetch = _cf();
+      if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/items/${itemGid}`, {
         method: 'PATCH', body: JSON.stringify({ content_body: content }),
       });
     } catch (_) {}

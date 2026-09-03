@@ -83,10 +83,37 @@ function _toggleFavorite(file) {
 }
 
 /* ── cloudFetch helper ───────────────────────────────── */
-function _cf(path, opts) {
+function _cf(method, path, opts = {}) {
   const fn = window.parent?._cloudFetch || window._cloudFetch;
   if (!fn) return Promise.reject(new Error('_cloudFetch not available'));
-  return fn(path, opts);
+  return fn(path, { ...opts, method });
+}
+async function _invokeCapability(id, payload) {
+  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version: 1, payload }),
+  });
+  const envelope = response?.data;
+  if (response?.success !== true || envelope?.ok !== true) {
+    const detail = envelope?.error || response?.error || {};
+    throw new Error(detail.message || `能力调用失败：${id}@1`);
+  }
+  const value = envelope.data;
+  return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+}
+async function _invokeAtomic(id, argumentsValue = {}) {
+  return _invokeCapability(id, { arguments: argumentsValue });
+}
+async function _loadBopVersions() {
+  const rows = [];
+  let cursor;
+  do {
+    const page = await _invokeCapability('craft.bop.version.list', { page_size: 100, ...(cursor ? { cursor } : {}) });
+    rows.push(...(page?.items || []));
+    cursor = page?.next_cursor || null;
+  } while (cursor);
+  return rows;
 }
 
 /* ── 时间分组辅助 ────────────────────────────────────── */
@@ -114,9 +141,9 @@ async function _loadFiles() {
 
   try {
     const [listsRes, bopRes, knowledgeRes] = await Promise.allSettled([
-      _cf('/api/lists'),
-      _cf('/api/bop/versions'),
-      _cf('/api/knowledge_hub/items'),
+      _invokeAtomic('project.list.read.atomic.lists_search'),
+      _loadBopVersions(),
+      _invokeAtomic('knowledge.hub.read.atomic.items_list'),
     ]);
 
     const files = [];
@@ -623,9 +650,9 @@ async function _openCreateModal(fileType) {
   const needVersions = fileType === 'bop_version';
 
   const [projRes, folderRes, verRes] = await Promise.allSettled([
-    needProjects ? _cf('/api/projects') : Promise.resolve(null),
-    needFolders  ? _cf('/api/knowledge_hub/folders') : Promise.resolve(null),
-    needVersions ? _cf('/api/bop/versions') : Promise.resolve(null),
+    needProjects ? _invokeAtomic('project.project.read.atomic.projects_search') : Promise.resolve(null),
+    needFolders  ? _invokeAtomic('knowledge.hub.read.atomic.folders_list') : Promise.resolve(null),
+    needVersions ? _loadBopVersions() : Promise.resolve(null),
   ]);
 
   if (needProjects && projRes.status === 'fulfilled') {
@@ -887,7 +914,7 @@ async function _doCreate(fileType) {
     };
     if (projectGid)    body.project_gid     = projectGid;
     if (sharedTeamGid) body.shared_team_gid = sharedTeamGid;
-    const res = await _cf('/api/lists', { method: 'POST', body: JSON.stringify(body) });
+    const res = await _invokeAtomic('project.list.change.apply.atomic.lists_create', body);
     return { gid: res?.data?.gid || res?.gid, file_type: fileType };
   }
 
@@ -901,7 +928,7 @@ async function _doCreate(fileType) {
       if (!versionTag) { _showToast('请填写版本标签'); return null; }
       const body = { version_tag: versionTag, bop_name: bopName, takt_time: taktTime };
       if (projectGid) body.project_gid = projectGid;
-      const res = await _cf('/api/bop/versions', { method: 'POST', body: JSON.stringify(body) });
+      const res = await _invokeCapability('craft.bop.version.create', body);
       return { gid: res?.data?.gid || res?.gid, file_type: fileType };
     }
     if (mode === 'fork') {
@@ -910,9 +937,10 @@ async function _doCreate(fileType) {
       const note   = document.getElementById('mfFormForkNote')?.value?.trim() || null;
       const bName  = document.getElementById('mfFormForkBopName')?.value?.trim() || '';
       if (!srcGid || !tag) { _showToast('请选择源版本并填写新版本标签'); return null; }
-      const res = await _cf(`/api/bop/versions/${srcGid}/fork`, { method: 'POST', body: JSON.stringify({
+      const res = await _invokeCapability('craft.bop.fork.change.apply', {
+        operation: 'fork', source_version_gid: srcGid,
         target_version_tag: tag, target_bop_name: bName, change_note: note,
-      }) });
+      });
       return { gid: res?.data?.gid || res?.gid, file_type: fileType };
     }
     if (mode === 'smart') {
@@ -920,9 +948,9 @@ async function _doCreate(fileType) {
       const m      = document.getElementById('mfFormSmartMode')?.value;
       const tag    = document.getElementById('mfFormSmartTag')?.value?.trim();
       if (!srcGid || !tag) { _showToast('请选择源版本并填写新版本标签'); return null; }
-      const res = await _cf(`/api/bop/versions/${srcGid}/smart-fork`, { method: 'POST', body: JSON.stringify({
-        mode: m, target_version_tag: tag,
-      }) });
+      const res = await _invokeCapability('craft.bop.fork.change.apply', {
+        operation: 'smart_fork', source_version_gid: srcGid, mode: m, target_version_tag: tag,
+      });
       return { gid: res?.data?.gid || res?.gid, file_type: fileType };
     }
   }
@@ -932,9 +960,9 @@ async function _doCreate(fileType) {
     if (mode === 'import') return null;
     const name = document.getElementById('mfFormPbomName')?.value?.trim();
     if (!name) { _showToast('请填写版本名称'); return null; }
-    const res = await _cf('/api/ebom/snapshots', { method: 'POST', body: JSON.stringify({
+    const res = await _invokeCapability('craft.pbom.version.create', {
       name, version_tag: name, source_type: 'manual',
-    }) });
+    });
     return { gid: res?.data?.gid || res?.gid, file_type: fileType };
   }
 
@@ -968,7 +996,7 @@ async function _doCreate(fileType) {
     }
 
     body.title = title || '未命名';
-    const res = await _cf('/api/knowledge_hub/items', { method: 'POST', body: JSON.stringify(body) });
+    const res = await _invokeAtomic('knowledge.hub.change.apply.atomic.items_create', body);
     return { gid: res?.gid || res?.data?.gid, file_type: fileType };
   }
 

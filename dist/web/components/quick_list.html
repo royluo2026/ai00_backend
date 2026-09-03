@@ -170,7 +170,7 @@
     [data-theme="light"] .ql-s-completed,[data-theme="light"] .ql-s-closed { background:rgba(64,160,43,.1); color:#40a02b; }
     [data-theme="light"] .ql-s-blocked      { background:rgba(210,15,57,.1); color:#d20f39; }
   </style>
-  <link rel="stylesheet" href="/assets/tree_list_shell-da642102.css">
+  <link rel="stylesheet" href="/assets/tree_list_shell-907216c5.css">
 </head>
 <body>
 <div id="qlWrap">
@@ -284,11 +284,43 @@ const NODE_TYPE_LABELS = {
 };
 
 const TYPE_API = {
-  task:      { list: t => `/api/lists?item_type=${t}`, data: '/api/tasks'             },
-  issue:     { list: t => `/api/lists?item_type=${t}`, data: '/api/issues'            },
-  knowledge: { list: t => `/api/lists?item_type=${t}`, data: '/api/knowledge/entries' },
-  bop_entry: { list: () => '/api/bop/versions'                                         },
-  pbom_part: { list: () => '/api/ebom/snapshots'                                       },
+  task: {
+    list: (_cloudFetch, t) => (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+      .call('project.lists.search', { itemType: t }),
+    data: (_cloudFetch, listGid) => _cloudFetch('/api/tasks' + (listGid ? `?list_gid=${listGid}` : ''), { method: 'GET' }),
+    save: (_cloudFetch, updated) => {
+      const { gid, ...updates } = updated;
+      return (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+        .call('project.task.update', { gid, updates });
+    },
+  },
+  issue: {
+    list: (_cloudFetch, t) => (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+      .call('project.lists.search', { itemType: t }),
+    data: (_cloudFetch, listGid) => _cloudFetch('/api/issues' + (listGid ? `?list_gid=${listGid}` : ''), { method: 'GET' }),
+    save: (_cloudFetch, updated) => {
+      const { gid, ...updates } = updated;
+      return (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+        .call('project.issue.update', { gid, updates });
+    },
+  },
+  knowledge: {
+    list: (_cloudFetch, t) => (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+      .call('project.lists.search', { itemType: t }),
+    data: (_cloudFetch, listGid) => (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+      .call('knowledge.search', { listGid }),
+    save: (_cloudFetch, updated) => {
+      const { gid, ...updates } = updated;
+      return (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+        .call('knowledge.update', { gid, updates });
+    },
+  },
+  // BOP versions are read through craft.bop.version.list in _onLoadLists.
+  bop_entry: {},
+  pbom_part: {
+    list: (_cloudFetch) => _cloudFetch('/api/ebom/snapshots', { method: 'GET' }),
+    data: (_cloudFetch, listGid) => _cloudFetch(`/api/ebom/snapshots/${listGid}/parts`, { method: 'GET' }),
+  },
 };
 const STATUS_LABELS   = { open:'待处理', todo:'待办', in_progress:'进行中', inprogress:'进行中', completed:'已完成', closed:'已关闭', blocked:'阻塞' };
 const PRIORITY_LABELS = { high:'高', medium:'中', low:'低', normal:'普通' };
@@ -307,6 +339,23 @@ window.addEventListener('message', e => {
 
 // ── 状态 ──────────────────────────────────────────────────────
 const _cf = () => window._cloudFetch || window.parent?._cloudFetch;
+
+async function _invokeCapability(id, payload = {}) {
+  const _cloudFetch = _cf();
+  if (!_cloudFetch) throw new Error('云端服务未连接');
+  const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version: 1, payload }),
+  });
+  const envelope = response?.data;
+  if (response?.success !== true || envelope?.ok !== true) {
+    const detail = envelope?.error || response?.error || {};
+    throw new Error(detail.message || `能力调用失败：${id}@1`);
+  }
+  const value = envelope.data;
+  return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+}
 let _currentType = '';
 let _tls = null;
 let _activeSlot = 0;
@@ -508,17 +557,23 @@ function _renderSetup(root, slot) {
 
 async function _loadSetupLists(type, listEl, selectedGid = '') {
   listEl.innerHTML = '<option value="">（加载中…）</option>';
-  const cf = _cf();
+  const _cloudFetch = _cf();
   const versioned = VERSIONED_TYPES.has(type);
-  if (!cf) {
+  if (!_cloudFetch) {
     listEl.innerHTML = versioned ? '' : '<option value="">（全部）</option>';
     return;
   }
   try {
-    const url = TYPE_API[type]?.list?.(type);
-    if (!url) { listEl.innerHTML = versioned ? '' : '<option value="">（全部）</option>'; return; }
-    const res = await cf(url);
-    const raw = res?.data || [];
+    let raw;
+    if (type === 'bop_entry') {
+      const value = await _invokeCapability('craft.bop.version.list', { include_archived: false, page_size: 100 });
+      raw = Array.isArray(value) ? value : (value?.items || value?.versions || value?.data || []);
+    } else {
+      const loadLists = TYPE_API[type]?.list;
+      if (!loadLists) { listEl.innerHTML = versioned ? '' : '<option value="">（全部）</option>'; return; }
+      const res = await loadLists(_cloudFetch, type);
+      raw = res?.data || [];
+    }
 
     let lists;
     if (type === 'bop_entry') {
@@ -628,13 +683,19 @@ function _openSettingsPanel(anchorEl) {
 // ── 数据加载 ──────────────────────────────────────────────────
 async function _onLoadLists(itemType) {
   _currentType = itemType;
-  const cf = _cf();
-  if (!cf) return [];
+  const _cloudFetch = _cf();
+  if (!_cloudFetch) return [];
   try {
-    const url = TYPE_API[itemType]?.list?.(itemType);
-    if (!url) return [];
-    const res = await cf(url);
-    const raw = res?.data || [];
+    let raw;
+    if (itemType === 'bop_entry') {
+      const value = await _invokeCapability('craft.bop.version.list', { include_archived: false, page_size: 100 });
+      raw = Array.isArray(value) ? value : (value?.items || value?.versions || value?.data || []);
+    } else {
+      const loadLists = TYPE_API[itemType]?.list;
+      if (!loadLists) return [];
+      const res = await loadLists(_cloudFetch, itemType);
+      raw = res?.data || [];
+    }
     if (itemType === 'bop_entry') {
       return raw.map(v => ({ gid: v.gid, name: (v.bop_name || v.version_tag || v.gid) + (v.status && v.status !== 'active' ? ` [${v.status}]` : '') }));
     }
@@ -647,33 +708,45 @@ async function _onLoadLists(itemType) {
 
 async function _onLoadData(itemType, listGid) {
   _currentType = itemType;
-  const cf = _cf();
-  if (!cf) return [];
+  const _cloudFetch = _cf();
+  if (!_cloudFetch) return [];
   try {
-    let url;
     if (itemType === 'bop_entry') {
       if (!listGid) return [];
-      url = `/api/bop/versions/${listGid}/entries`;
-    } else if (itemType === 'pbom_part') {
-      if (!listGid) return [];
-      url = `/api/ebom/snapshots/${listGid}/parts`;
+      const rows = [];
+      const pageSize = 100;
+      let offset = 0;
+      let total = null;
+      do {
+        const page = await _invokeCapability('craft.bop.entry.legacy_read', {
+          operation: 'version_entries', version_gid: listGid,
+          limit: pageSize, offset,
+        });
+        const items = Array.isArray(page) ? page : (page?.items || page?.data || []);
+        rows.push(...items);
+        total = Number.isFinite(Number(page?.total)) ? Number(page.total) : rows.length;
+        offset += items.length;
+        if (!items.length) break;
+      } while (offset < total);
+      return rows;
     } else {
-      const base = TYPE_API[itemType]?.data || `/api/${itemType}s`;
-      url = listGid ? `${base}?list_gid=${listGid}` : base;
+      if (itemType === 'pbom_part' && !listGid) return [];
+      const loadData = TYPE_API[itemType]?.data;
+      if (!loadData) return [];
+      const res = await loadData(_cloudFetch, listGid);
+      return res?.data || res || [];
     }
-    const res = await cf(url);
-    return res?.data || res || [];
   } catch { return []; }
 }
 
 async function _onSave(updated) {
   if (VERSIONED_TYPES.has(_currentType)) return null;
-  const cf   = _cf();
-  if (!cf) return null;
-  const base = TYPE_API[_currentType]?.data;
-  if (!base) return null;
+  const _cloudFetch   = _cf();
+  if (!_cloudFetch) return null;
+  const save = TYPE_API[_currentType]?.save;
+  if (!save) return null;
   try {
-    const res = await cf(base, { method: 'PUT', body: { ...updated } });
+    const res = await save(_cloudFetch, updated);
     return res?.data || updated;
   } catch (e) { throw e; }
 }
@@ -682,8 +755,8 @@ async function _onSave(updated) {
 function _makeRowActions(row) {
   if (row._isGroup) return null;
   if (VERSIONED_TYPES.has(_currentType)) return null;
-  const cf = _cf();
-  if (!cf) return null;
+  const _cloudFetch = _cf();
+  if (!_cloudFetch) return null;
 
   if (_currentType === 'task' && row.status !== 'completed') {
     const btn = document.createElement('button');
@@ -694,7 +767,8 @@ function _makeRowActions(row) {
       e.stopPropagation();
       btn.disabled = true;
       try {
-        await cf('/api/tasks', { method: 'PUT', body: { gid: row.gid, status: 'completed' } });
+        await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+          .call('project.task.update', { gid: row.gid, updates: { status: 'completed' } });
         await _tls?.refreshItems?.();
       } catch { btn.disabled = false; }
     });
@@ -710,7 +784,8 @@ function _makeRowActions(row) {
       e.stopPropagation();
       btn.disabled = true;
       try {
-        await cf('/api/issues', { method: 'PUT', body: { gid: row.gid, status: 'closed' } });
+        await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+          .call('project.issue.update', { gid: row.gid, updates: { status: 'closed' } });
         await _tls?.refreshItems?.();
       } catch { btn.disabled = false; }
     });

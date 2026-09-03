@@ -318,6 +318,60 @@ function _cf() {
   } catch (_) {}
   return null;
 }
+async function _invokeCapability(id, payload) {
+  const _cloudFetch = _cf();
+  if (!_cloudFetch) throw new Error('云端服务未连接');
+  const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version: 1, payload }),
+  });
+  const envelope = response?.data;
+  if (response?.success !== true || envelope?.ok !== true) {
+    const detail = envelope?.error || response?.error || {};
+    throw new Error(detail.message || `能力调用失败：${id}@1`);
+  }
+  const value = envelope.data;
+  return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+}
+async function _assetCurrent(gid) {
+  return _invokeCapability('factory.asset.get', { gid });
+}
+async function _assetUpdate(gid, body) {
+  const row = await _assetCurrent(gid);
+  const updates = { ...body };
+  if (Object.prototype.hasOwnProperty.call(updates, 'template_gid')) {
+    updates.catalog_gid = updates.template_gid;
+    delete updates.template_gid;
+  }
+  return _invokeCapability('factory.asset.update', { gid, expected_version: row.version, updates });
+}
+async function _assetScrap(gid) {
+  const row = await _assetCurrent(gid);
+  return _invokeCapability('factory.asset.scrap', { gid, expected_version: row.version });
+}
+async function _structureCurrent(gid) {
+  return _invokeCapability('factory.structure.get', { gid });
+}
+async function _structureUpdate(gid, body, kind) {
+  const row = await _structureCurrent(gid);
+  const attrs = { ...(row.attributes || {}) };
+  const updates = { ...body };
+  const parentKey = kind === 'section' ? 'factory_gid' : 'factory_section_gid';
+  const parent = updates[parentKey];
+  delete updates[parentKey];
+  const name = updates.name;
+  delete updates.name;
+  Object.assign(attrs, updates);
+  const payload = { gid, expected_version: row.version, updates: { attributes: attrs } };
+  if (name !== undefined) payload.updates.name = name;
+  if (parent !== undefined) payload.updates.parent_gid = parent;
+  return _invokeCapability('factory.structure.update', payload);
+}
+async function _structureArchive(gid) {
+  const row = await _structureCurrent(gid);
+  return _invokeCapability('factory.structure.archive', { gid, expected_version: row.version });
+}
 function _esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function _toast(msg, ms = 2500) {
   const el = document.createElement('div');
@@ -350,9 +404,9 @@ const SECTIONS = {
       { key:'status', label:'状态', options: () => ['in_use','maintenance','scrapped'], labelMap: STATUS_LABELS },
     ],
 
-    async load(cf) {
-      const r = await cf('/api/factory/tools');
-      return r?.data || [];
+    async load(_cloudFetch) {
+      const rows = await _invokeCapability('factory.asset.search', { asset_type: 'tool' });
+      return (rows || []).map(r => ({ ...r, template_gid: r.template_gid ?? r.catalog_gid }));
     },
 
     cols: [
@@ -390,16 +444,16 @@ const SECTIONS = {
       return { asset_no: no, template_gid: _val('fTemplateGid').trim() || null };
     },
 
-    async create(cf, body) { return cf('/api/factory/tools', { method:'POST', body: JSON.stringify(body) }); },
-    async update(cf, gid, body) { return cf(`/api/factory/tools/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
-    async remove(cf, gid) { return cf(`/api/factory/tools/${gid}`, { method:'DELETE' }); },
+    async create(_cloudFetch, body) { return _invokeCapability('factory.asset.register', { asset_no: body.asset_no, asset_type: 'tool', catalog_gid: body.template_gid || null, meta: {} }); },
+    async update(_cloudFetch, gid, body) { return _assetUpdate(gid, body); },
+    async remove(_cloudFetch, gid) { return _assetScrap(gid); },
 
     buildImportBody(row) {
       const raw = row._raw || row;
       return { asset_no: row.asset_no || raw['资产编号'] || '', template_gid: row.template_gid || raw['模板GID'] || null };
     },
     importRequiredFn(body) { return !!body.asset_no; },
-    async importOne(cf, body) { return cf('/api/factory/tools', { method:'POST', body: JSON.stringify(body) }); },
+    async importOne(_cloudFetch, body) { return SECTIONS.tools.create(_cloudFetch, body); },
 
     searchFn(r, q) {
       return (r.asset_no||'').toLowerCase().includes(q)
@@ -416,9 +470,9 @@ const SECTIONS = {
       { key:'status', label:'状态', options: () => ['in_use','maintenance','scrapped'], labelMap: STATUS_LABELS },
     ],
 
-    async load(cf) {
-      const r = await cf('/api/factory/equipments');
-      return r?.data || [];
+    async load(_cloudFetch) {
+      const rows = await _invokeCapability('factory.asset.search', { asset_type: 'equipment' });
+      return (rows || []).map(r => ({ ...r, template_gid: r.template_gid ?? r.catalog_gid }));
     },
 
     cols: [
@@ -456,16 +510,16 @@ const SECTIONS = {
       return { asset_no: no, template_gid: _val('fTemplateGid').trim() || null };
     },
 
-    async create(cf, body) { return cf('/api/factory/equipments', { method:'POST', body: JSON.stringify(body) }); },
-    async update(cf, gid, body) { return cf(`/api/factory/equipments/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
-    async remove(cf, gid) { return cf(`/api/factory/equipments/${gid}`, { method:'DELETE' }); },
+    async create(_cloudFetch, body) { return _invokeCapability('factory.asset.register', { asset_no: body.asset_no, asset_type: 'equipment', catalog_gid: body.template_gid || null, meta: {} }); },
+    async update(_cloudFetch, gid, body) { return _assetUpdate(gid, body); },
+    async remove(_cloudFetch, gid) { return _assetScrap(gid); },
 
     buildImportBody(row) {
       const raw = row._raw || row;
       return { asset_no: row.asset_no || raw['资产编号'] || '', template_gid: row.template_gid || raw['模板GID'] || null };
     },
     importRequiredFn(body) { return !!body.asset_no; },
-    async importOne(cf, body) { return cf('/api/factory/equipments', { method:'POST', body: JSON.stringify(body) }); },
+    async importOne(_cloudFetch, body) { return SECTIONS.equipments.create(_cloudFetch, body); },
 
     searchFn(r, q) {
       return (r.asset_no||'').toLowerCase().includes(q)
@@ -482,9 +536,9 @@ const SECTIONS = {
       { key:'status', label:'状态', options: () => ['in_use','maintenance','scrapped'], labelMap: STATUS_LABELS },
     ],
 
-    async load(cf) {
-      const r = await cf('/api/factory/fixtures');
-      return r?.data || [];
+    async load(_cloudFetch) {
+      const rows = await _invokeCapability('factory.asset.search', { asset_type: 'fixture' });
+      return (rows || []).map(r => ({ ...r, template_gid: r.template_gid ?? r.catalog_gid }));
     },
 
     cols: [
@@ -522,16 +576,16 @@ const SECTIONS = {
       return { asset_no: no, template_gid: _val('fTemplateGid').trim() || null };
     },
 
-    async create(cf, body) { return cf('/api/factory/fixtures', { method:'POST', body: JSON.stringify(body) }); },
-    async update(cf, gid, body) { return cf(`/api/factory/fixtures/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
-    async remove(cf, gid) { return cf(`/api/factory/fixtures/${gid}`, { method:'DELETE' }); },
+    async create(_cloudFetch, body) { return _invokeCapability('factory.asset.register', { asset_no: body.asset_no, asset_type: 'fixture', catalog_gid: body.template_gid || null, meta: {} }); },
+    async update(_cloudFetch, gid, body) { return _assetUpdate(gid, body); },
+    async remove(_cloudFetch, gid) { return _assetScrap(gid); },
 
     buildImportBody(row) {
       const raw = row._raw || row;
       return { asset_no: row.asset_no || raw['资产编号'] || '', template_gid: row.template_gid || raw['模板GID'] || null };
     },
     importRequiredFn(body) { return !!body.asset_no; },
-    async importOne(cf, body) { return cf('/api/factory/fixtures', { method:'POST', body: JSON.stringify(body) }); },
+    async importOne(_cloudFetch, body) { return SECTIONS.fixtures.create(_cloudFetch, body); },
 
     searchFn(r, q) {
       return (r.asset_no||'').toLowerCase().includes(q)
@@ -546,9 +600,9 @@ const SECTIONS = {
 
     filters: [],
 
-    async load(cf) {
-      const r = await cf('/api/factory/sections');
-      return r?.data || [];
+    async load(_cloudFetch) {
+      const rows = await _invokeCapability('factory.structure.search', { kind: 'section' });
+      return (rows || []).map(r => ({ ...r, factory_gid: r.factory_gid ?? r.parent_gid, ...(r.attributes || {}) }));
     },
 
     cols: [
@@ -598,9 +652,9 @@ const SECTIONS = {
       return { name, factory_gid: fgid, sort_order: parseInt(_val('fSecOrder')) || 0, color: _val('fSecColor').trim() || '#7287fd' };
     },
 
-    async create(cf, body) { return cf('/api/factory/sections', { method:'POST', body: JSON.stringify(body) }); },
-    async update(cf, gid, body) { return cf(`/api/factory/sections/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
-    async remove(cf, gid) { return cf(`/api/factory/sections/${gid}`, { method:'DELETE' }); },
+    async create(_cloudFetch, body) { return _invokeCapability('factory.structure.create', { kind: 'section', name: body.name, parent_gid: body.factory_gid, attributes: { sort_order: body.sort_order, color: body.color } }); },
+    async update(_cloudFetch, gid, body) { return _structureUpdate(gid, body, 'section'); },
+    async remove(_cloudFetch, gid) { return _structureArchive(gid); },
 
     buildImportBody(row) {
       const raw = row._raw || row;
@@ -612,7 +666,7 @@ const SECTIONS = {
       };
     },
     importRequiredFn(body) { return !!(body.name && body.factory_gid); },
-    async importOne(cf, body) { return cf('/api/factory/sections', { method:'POST', body: JSON.stringify(body) }); },
+    async importOne(_cloudFetch, body) { return SECTIONS.sections.create(_cloudFetch, body); },
 
     searchFn(r, q) {
       return (r.name||'').toLowerCase().includes(q)
@@ -627,9 +681,9 @@ const SECTIONS = {
 
     filters: [],
 
-    async load(cf) {
-      const r = await cf('/api/factory/stations');
-      return r?.data || [];
+    async load(_cloudFetch) {
+      const rows = await _invokeCapability('factory.structure.search', { kind: 'station' });
+      return (rows || []).map(r => ({ ...r, factory_section_gid: r.factory_section_gid ?? r.parent_gid, ...(r.attributes || {}) }));
     },
 
     cols: [
@@ -689,9 +743,9 @@ const SECTIONS = {
       };
     },
 
-    async create(cf, body) { return cf('/api/factory/stations', { method:'POST', body: JSON.stringify(body) }); },
-    async update(cf, gid, body) { return cf(`/api/factory/stations/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
-    async remove(cf, gid) { return cf(`/api/factory/stations/${gid}`, { method:'DELETE' }); },
+    async create(_cloudFetch, body) { return _invokeCapability('factory.structure.create', { kind: 'station', name: body.name || body.code, parent_gid: body.factory_section_gid, attributes: { code: body.code, takt_time: body.takt_time, height_mm: body.height_mm } }); },
+    async update(_cloudFetch, gid, body) { return _structureUpdate(gid, body, 'station'); },
+    async remove(_cloudFetch, gid) { return _structureArchive(gid); },
 
     buildImportBody(row) {
       const raw = row._raw || row;
@@ -704,7 +758,7 @@ const SECTIONS = {
       };
     },
     importRequiredFn(body) { return !!body.factory_section_gid; },
-    async importOne(cf, body) { return cf('/api/factory/stations', { method:'POST', body: JSON.stringify(body) }); },
+    async importOne(_cloudFetch, body) { return SECTIONS.stations.create(_cloudFetch, body); },
 
     searchFn(r, q) {
       return (r.code||'').toLowerCase().includes(q)
@@ -730,11 +784,11 @@ let _sortDir = 'asc';
 
 // ── 加载 ─────────────────────────────────────────────────────────
 async function _load() {
-  const cf = _cf();
+  const _cloudFetch = _cf();
   const sec = SECTIONS[_section];
-  if (!cf || !sec) { _rows = []; _renderFilterBar(); _render(); return; }
+  if (!_cloudFetch || !sec) { _rows = []; _renderFilterBar(); _render(); return; }
   try {
-    _rows = await sec.load(cf);
+    _rows = await sec.load(_cloudFetch);
     _renderFilterBar();
     _render();
   } catch (e) {
@@ -965,17 +1019,17 @@ function _openModal(row) {
 function _closeModal() { document.getElementById('mdModal').style.display = 'none'; }
 
 async function _saveModal() {
-  const cf = _cf();
+  const _cloudFetch = _cf();
   const sec = SECTIONS[_section];
-  if (!cf) { _toast('未连接云端'); return; }
+  if (!_cloudFetch) { _toast('未连接云端'); return; }
   const body = sec.readForm();
   if (!body) return;
   try {
     if (_editGid && sec.update) {
-      await sec.update(cf, _editGid, body);
+      await sec.update(_cloudFetch, _editGid, body);
       _toast('已更新');
     } else {
-      await sec.create(cf, body);
+      await sec.create(_cloudFetch, body);
       _toast('已创建');
     }
     _closeModal();
@@ -987,11 +1041,11 @@ async function _saveModal() {
 
 async function _deleteRow(gid, name) {
   if (!confirm(`确认删除「${name}」？`)) return;
-  const cf = _cf();
+  const _cloudFetch = _cf();
   const sec = SECTIONS[_section];
-  if (!cf) return;
+  if (!_cloudFetch) return;
   try {
-    await sec.remove(cf, gid);
+    await sec.remove(_cloudFetch, gid);
     _toast('已删除');
     await _load();
   } catch (e) {
@@ -1053,12 +1107,12 @@ function _splitCSVLine(line) {
 }
 
 async function _parseXLSX(file) {
-  const cf = _cf();
-  if (!cf) { _toast('未连接云端，无法解析 Excel'); return; }
+  const _cloudFetch = _cf();
+  if (!_cloudFetch) { _toast('未连接云端，无法解析 Excel'); return; }
   const buf = await file.arrayBuffer();
   const b64 = _arrayBufferToBase64(buf);
   try {
-    const res = await cf('/api/import-export/import/parse-excel', {
+    const res = await _cloudFetch('/api/import-export/import/parse-excel', {
       method: 'POST',
       body: JSON.stringify({ file_b64: b64, filename: file.name }),
     });
@@ -1155,9 +1209,9 @@ function _showImportPreview(headers, rows) {
 }
 
 async function _doImport() {
-  const cf = _cf();
+  const _cloudFetch = _cf();
   const sec = SECTIONS[_section];
-  if (!cf || !_importParsedRows.length) return;
+  if (!_cloudFetch || !_importParsedRows.length) return;
 
   document.getElementById('importConfirm').disabled = true;
   document.getElementById('importConfirm').textContent = '导入中…';
@@ -1170,7 +1224,7 @@ async function _doImport() {
       : !!body[sec.importFields[0]];
     if (!requiredCheck) { fail++; lastErr = '必填字段为空'; continue; }
     try {
-      await sec.importOne(cf, body);
+      await sec.importOne(_cloudFetch, body);
       ok++;
     } catch (e) {
       fail++;

@@ -5,6 +5,10 @@
  */
 'use strict';
 
+function _cf(method, path, opts = {}) {
+  return ListShell._cf(path, { ...opts, method });
+}
+
 // ── 列定义 ────────────────────────────────────────────────────────────────────
 const RULE_COLS = [
   { key: 'display_id',        label: 'ID',        type: 'text',   width: 90,  editable: false },
@@ -41,14 +45,34 @@ let _shell       = null;
 let _rules       = [];
 let _allLists    = [];
 let _currentList = null;
-let _devRuleGid  = null;
 let _ontoClasses = [];   // { gid, name, label_zh }
+
+async function _listOntologyObjects(kinds) {
+  const items = [];
+  let offset = 0;
+  let total = 0;
+  do {
+    const page = await _cf('POST', `/api/v1/capabilities/ontology.object.list:invoke`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ version: 1, payload: { kinds, limit: 100, offset } }),
+    });
+    const envelope = page?.data;
+    if (page?.success !== true || envelope?.ok !== true) throw new Error('ontology.object.list failed');
+    const value = envelope.data;
+    const result = value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+    const rows = result?.items || [];
+    items.push(...rows);
+    total = Number(result?.total || items.length);
+    offset += rows.length;
+    if (!rows.length) break;
+  } while (offset < total);
+  return items;
+}
 
 // 加载本体类列表（用于绑定类显示和选择）
 async function _loadOntoClasses() {
   try {
-    const resp = await ListShell._cf('/api/ontology/classes');
-    _ontoClasses = _flattenOnto(resp.data || []);
+    _ontoClasses = _flattenOnto(await _listOntologyObjects(['concept']));
     // 刷新渲染（让 context_class_gid 列显示中文名）
     if (_shell) _shell.setRows(_rules);
   } catch { /* 本体未就绪，静默 */ }
@@ -56,7 +80,7 @@ async function _loadOntoClasses() {
 
 function _flattenOnto(nodes, result = []) {
   for (const n of nodes) {
-    result.push({ gid: n.gid, name: n.name, label_zh: n.label_zh || n.name });
+    result.push({ gid: n.gid || n.stable_gid, name: n.name, label_zh: n.label_zh || n.name });
     _flattenOnto(n.children || [], result);
   }
   return result;
@@ -94,14 +118,8 @@ const CELL_RENDERER = {
     : '<span style="color:var(--text-muted,#a6adc8);font-size:11px">未绑定</span>',
   _actions: (_v, row) => {
     if (!row.gid) return '';
-    const st = row.status || 'draft';
-    const activateBtn  = st === 'draft' || st === 'suspended'
-      ? `<button class="btn-rule-action btn-ok-sm" data-gid="${row.gid}" data-action="activate" style="font-size:11px;padding:2px 6px">激活</button>` : '';
-    const suspendBtn   = st === 'active'
-      ? `<button class="btn-rule-action btn-warn-sm" data-gid="${row.gid}" data-action="suspend" style="font-size:11px;padding:2px 6px">暂停</button>` : '';
-    const devBtn       = `<button class="btn-rule-dev" data-gid="${row.gid}" style="font-size:11px;padding:2px 6px;background:transparent;border:1px solid var(--border,#313244);border-radius:4px;cursor:pointer;color:var(--text-muted,#a6adc8)">+背离</button>`;
     const openBtn      = `<button class="btn-rule-open" data-gid="${row.gid}" style="font-size:11px;padding:2px 6px;background:transparent;border:1px solid var(--border,#313244);border-radius:4px;cursor:pointer;color:var(--text,#cdd6f4)">详情</button>`;
-    return `<div style="display:flex;gap:4px;align-items:center">${activateBtn}${suspendBtn}${devBtn}${openBtn}</div>`;
+    return `<div style="display:flex;gap:4px;align-items:center"><span style="font-size:11px;color:var(--text-muted,#a6adc8)">状态变更和背离记录不支持</span>${openBtn}</div>`;
   },
 };
 
@@ -109,7 +127,7 @@ const CELL_RENDERER = {
 const load = ListShell.buildLoadHandler({
   bridgeNs:         'rule',
   bridgeListMethod: 'list_rules',
-  cloudPath:        '/api/rules',
+  cloudRequest:     (query) => _cf('GET', `/api/rules?${query}`),
   getCurrentList:   () => _currentList,
   getAllLists:       () => _allLists,
   getShell:         () => _shell,
@@ -120,8 +138,8 @@ const load = ListShell.buildLoadHandler({
 const _onRowsChange = ListShell.buildRowsChangeHandler({
   editableKeys:       ['code', 'name', 'rule_type', 'enforcement_level', 'expression', 'context_class_gid'],
   primaryKey:         'name',
-  cloudUpdatePath:    (gid) => `/api/rules/${gid}`,
-  cloudCreatePath:    '/api/rules',
+  cloudUpdate:        (gid, body) => _cf('PATCH', `/api/rules/${gid}`, { body: JSON.stringify(body) }),
+  cloudCreate:        (body) => _cf('POST', '/api/rules', { body: JSON.stringify(body) }),
   bridgeNs:           'rule',
   bridgeUpdateMethod: 'update_rule',
   bridgeCreateMethod: 'create_rule',
@@ -139,16 +157,6 @@ const _onRowsChange = ListShell.buildRowsChangeHandler({
   load,
 });
 
-// ── 状态操作 ──────────────────────────────────────────────────────────────────
-async function _ruleAction(gid, action) {
-  const rule = _rules.find(r => r.gid === gid);
-  if (!rule) return;
-  try {
-    await ListShell._cf(`/api/rules/${gid}/${action}`, { method: 'POST' });
-    await load();
-  } catch (err) { alert('操作失败：' + err.message); }
-}
-
 // ── 规则检验 ──────────────────────────────────────────────────────────────────
 async function _runRuleCheck(row) {
   const contextStr = prompt(`输入 JSON context 测试规则「${row.name}」\n示例：{"torque": 12.0, "std_time": 60}`, '{}');
@@ -156,7 +164,7 @@ async function _runRuleCheck(row) {
   let context;
   try { context = JSON.parse(contextStr); } catch { alert('JSON 格式错误，请检查输入'); return; }
   try {
-    const resp = await ListShell._cf('/api/rule-engine/check', {
+    const resp = await _cf('POST', '/api/rule-engine/check', {
       method: 'POST',
       body: JSON.stringify({ rule_gid: row.gid, context }),
     });
@@ -164,36 +172,6 @@ async function _runRuleCheck(row) {
   } catch (e) {
     alert('检验请求失败：' + e);
   }
-}
-
-// ── 背离记录 ──────────────────────────────────────────────────────────────────
-function showDeviationModal(gid) {
-  _devRuleGid = gid;
-  document.getElementById('dev-work-plan').value = '';
-  document.getElementById('dev-operation').value  = '';
-  document.getElementById('dev-reason').value     = '';
-  document.getElementById('modal-deviation').style.display = 'flex';
-}
-
-function hideDeviationModal() {
-  document.getElementById('modal-deviation').style.display = 'none';
-  _devRuleGid = null;
-}
-
-async function saveDeviation() {
-  if (!_devRuleGid) return;
-  const workPlan  = document.getElementById('dev-work-plan').value.trim();
-  const operation = document.getElementById('dev-operation').value.trim();
-  const reason    = document.getElementById('dev-reason').value.trim();
-  try {
-    const res = await ListShell._cf(`/api/rules/${_devRuleGid}/deviations`, {
-      method: 'POST',
-      body: JSON.stringify({ work_plan_gid: workPlan, operation_gid: operation, deviation_reason: reason }),
-    });
-    hideDeviationModal();
-    if (res?.data?.requires_approval) alert('该背离需要审批，已标记！');
-    await load();
-  } catch (err) { alert('保存失败：' + err.message); }
 }
 
 // ── 视图行（视图过滤/排序后的数据，供 IE/Diff 使用）────────────────────────
@@ -215,25 +193,23 @@ async function init() {
       { label: '在新标签中打开详情', action: 'open_detail' },
       { label: '打开规则定义字段', action: 'open_def' },
       { label: '绑定本体类…', action: 'bind_class' },
-      { label: '记录背离', action: 'add_deviation' },
       { label: '运行规则检验…', action: 'run_rule_check' },
     ],
     onContextAction: (action, row) => {
       if (action === 'open_detail')   _openRuleDetail(row);
       if (action === 'open_def')      _openRuleDef(row);
       if (action === 'bind_class')    row.gid && _showBindClassModal(row);
-      if (action === 'add_deviation') row.gid && showDeviationModal(row.gid);
       if (action === 'run_rule_check') row.gid && _runRuleCheck(row);
     },
     rowClass: (row) => row._source === 'cloud' ? 'ge-row-cloud' : 'ge-row-local',
     onListsChange: (lists) => { _allLists = lists; },
     onSelect:   (gid) => { _currentList = gid; load(); },
-    rdpSaveOpts: { bridgeNs: 'rule', bridgeMethod: 'update_rule', cloudPath: '/api/rules' },
+    rdpSaveOpts: { bridgeNs: 'rule', bridgeMethod: 'update_rule', savePatch: (row, patch) => _cf('PATCH', `/api/rules/${row.gid}`, { body: JSON.stringify(patch) }) },
     importExport: ListShell.makeImportExport('rule_mgmt', _getViewRows, async (rows, _fm, _c, signal) => {
         for (const r of rows) {
           if (signal?.aborted) break;
           if (!r.name) continue;
-          await ListShell._cf('/api/rules', {
+          await _cf('POST', '/api/rules', {
             method: 'POST',
             body: JSON.stringify({ name: r.name, code: r.code || '', rule_type: r.rule_type || 'other', enforcement_level: r.enforcement_level || 'advisory', list_gid: _currentList || null }),
             signal,
@@ -246,12 +222,8 @@ async function init() {
   await _shell.init();
   _loadOntoClasses();
 
-  // 按钮事件委托（_actions 列内的按钮）
+  // 按钮事件委托（详情按钮）
   _shell.grid._el.addEventListener('click', async (ev) => {
-    const actionBtn = ev.target.closest('.btn-rule-action');
-    if (actionBtn) { ev.stopPropagation(); await _ruleAction(actionBtn.dataset.gid, actionBtn.dataset.action); return; }
-    const devBtn = ev.target.closest('.btn-rule-dev');
-    if (devBtn) { ev.stopPropagation(); showDeviationModal(devBtn.dataset.gid); return; }
     const openBtn = ev.target.closest('.btn-rule-open');
     if (openBtn) {
       ev.stopPropagation();
@@ -259,11 +231,6 @@ async function init() {
       if (row) _openRuleDetail(row);
     }
   });
-
-  // 背离弹窗按钮
-  document.getElementById('btn-close-dev-modal').addEventListener('click', hideDeviationModal);
-  document.getElementById('btn-cancel-dev-modal').addEventListener('click', hideDeviationModal);
-  document.getElementById('btn-save-deviation').addEventListener('click', saveDeviation);
 
   // 主题同步由 list_shell.js 的 _lsInitTheme() IIFE 统一处理
 
@@ -298,7 +265,7 @@ function _showBindClassModal(row) {
   overlay.querySelector('#_bindClassSave').addEventListener('click', async () => {
     const val = overlay.querySelector('#_bindClassSel').value || null;
     try {
-      await ListShell._cf(`/api/rules/${row.gid}`, {
+      await _cf('PATCH', `/api/rules/${row.gid}`, {
         method: 'PATCH',
         body: JSON.stringify({ context_class_gid: val }),
       });

@@ -163,16 +163,19 @@
           <div class="db-test-result hidden" id="local-db-result"></div>
         </div>
 
-        <!-- 云端 PostgreSQL -->
+        <!-- 云端 MySQL / OceanBase 只读连接检测 -->
         <div class="setting-group">
           <div class="setting-group-title">
             云端数据库（MySQL）
-            <span style="font-size:11px;color:var(--text-muted);font-weight:400;margin-left:8px;">配置后启用云同步</span>
+            <span style="font-size:11px;color:var(--text-muted);font-weight:400;margin-left:8px;">只读连接检测</span>
+          </div>
+          <div class="setting-item-desc" style="margin:0 0 10px;line-height:1.6;">
+            此处仅执行 SELECT 1，不切换运行中的数据库。生产环境由 USERS_DB_URL 和各领域 AI00_*_DB_URL 管理，修改后需重启后端。
           </div>
 
           <div class="setting-item">
             <div class="setting-item-info"><div class="setting-item-label">主机地址</div></div>
-            <input type="text" class="setting-input" id="pg-host" value="sam-bdmsdb01-test.chj.cloud" placeholder="例：sam-bdmsdb01-test.chj.cloud" autocomplete="off">
+            <input type="text" class="setting-input" id="pg-host" placeholder="数据库主机地址" autocomplete="off">
           </div>
           <div class="setting-item">
             <div class="setting-item-info"><div class="setting-item-label">端口</div></div>
@@ -180,7 +183,7 @@
           </div>
           <div class="setting-item">
             <div class="setting-item-info"><div class="setting-item-label">用户名</div></div>
-            <input type="text" class="setting-input" id="pg-user" value="sht_mes_tool@mom#test_bdms01" placeholder="数据库用户名" autocomplete="off">
+            <input type="text" class="setting-input" id="pg-user" placeholder="数据库用户名" autocomplete="off">
           </div>
           <div class="setting-item">
             <div class="setting-item-info">
@@ -194,14 +197,14 @@
               <div class="setting-item-label">协作库名</div>
               <div class="setting-item-desc">团队数据、工艺方案等</div>
             </div>
-            <input type="text" class="setting-input" id="pg-collab-db" value="sht_mes_tool" placeholder="例：sht_mes_tool" autocomplete="off">
+            <input type="text" class="setting-input" id="pg-collab-db" placeholder="协作库名" autocomplete="off">
           </div>
           <div class="setting-item">
             <div class="setting-item-info">
               <div class="setting-item-label">公共库名</div>
               <div class="setting-item-desc">公共资源、全局配置等</div>
             </div>
-            <input type="text" class="setting-input" id="pg-public-db" value="sht_mes_tool" placeholder="例：sht_mes_tool" autocomplete="off">
+            <input type="text" class="setting-input" id="pg-public-db" placeholder="公共库名（可选）" autocomplete="off">
           </div>
 
           <div class="setting-item" style="justify-content:flex-end;gap:8px;margin-top:4px;">
@@ -474,15 +477,15 @@
           </div>
 
           <div class="setting-group" style="margin-top:20px">
-            <div class="setting-group-title">从 URL 安装</div>
+            <div class="setting-group-title">安装已签名市场发布</div>
             <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px">
-              直接输入插件 zip 包的下载地址安装
+              粘贴市场提供的已签名发布信息（插件 ID、版本、SHA-256 和明确授权）。URL 安装不可用。
             </p>
             <div style="display:flex;gap:8px;align-items:center">
-              <input type="text" id="pm-install-url"
-                     placeholder="https://example.com/my-plugin.zip"
+              <input type="text" id="pm-install-release"
+                     placeholder='{"plugin_id":"example.plugin","release_version":"1.2.3","release_sha256":"sha256:…","requested_grants":[]}'
                      style="flex:1;padding:8px 12px;background:var(--bg-primary);border:1px solid var(--border-default);border-radius:6px;color:var(--text-normal);font-size:13px">
-              <button class="btn-primary" id="pm-btn-install-url" style="white-space:nowrap">安装</button>
+              <button class="btn-primary" id="pm-btn-install-release" style="white-space:nowrap">安装</button>
             </div>
             <div id="pm-install-feedback" style="margin-top:8px;font-size:12px;min-height:16px"></div>
           </div>
@@ -782,6 +785,6 @@
   </div><!-- .settings-body -->
 
   <script src="/web/event_bus.js"></script>
-  <script src="settings.js?v=9"></script>
+  <script src="settings.js?v=11"></script>
 </body>
 </html>

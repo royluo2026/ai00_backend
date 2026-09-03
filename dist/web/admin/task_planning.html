@@ -1009,7 +1009,8 @@ function _remapTask(t) {
 // ── API wrappers (cloud-only) ──
 async function _apiListLists() {
   try {
-    const d = await _cf('/api/lists?item_type=task');
+    const d = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+      .call('project.lists.search', { itemType: 'task' });
     return (d?.data ?? []).map(l => ({ ...l, _source: 'cloud' }));
   } catch (e) { console.warn('[TaskCanvas] 清单加载失败:', e); return []; }
 }
@@ -1064,16 +1065,9 @@ async function _apiDeleteDep(gid) {
 }
 
 async function _apiListViews(listGid) {
-  try {
-    const d = await _cf(`/api/views?module=task&list_gid=${listGid}`);
-    if (d?.data?.length) return d.data;
-  } catch(e) {}
-  try {
-    const stored = JSON.parse(localStorage.getItem(`vm_views_task_${listGid}`) || '[]');
-    const global  = JSON.parse(localStorage.getItem('vm_views_task_global') || '[]');
-    return [...stored, ...global];
-  } catch(e) {}
-  return [];
+  const client = window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
+  if (!client) throw new Error('保存视图服务不可用');
+  return client.call('base.savedViews.search', { module: 'task', listGid });
 }
 
 function _getViewDefaultFields() {

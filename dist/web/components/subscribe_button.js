@@ -104,20 +104,20 @@
   async function _onSave() {
     if (!_ctx) return;
     const checks = [..._panel.querySelectorAll('.sub-cond-chk:checked')].map(c => c.value);
-    const { itemType, itemGid, itemTitle, followed, followGid, cf, onSave } = _ctx;
+    const { itemType, itemGid, itemTitle, followed, followGid, cf: _cloudFetch, onSave } = _ctx;
 
     _setLoading(true);
     try {
       if (followed && followGid) {
         // 更新条件
-        await cf(`/api/follows/${followGid}`, {
+        await _cloudFetch(`/api/follows/${followGid}`, {
           method: 'PATCH',
           body: JSON.stringify({ notify_on: checks }),
         });
         onSave({ followed: true, followGid, conditions: checks });
       } else {
         // 新建关注
-        const res = await cf('/api/follows', {
+        const res = await _cloudFetch('/api/follows', {
           method: 'POST',
           body: JSON.stringify({ item_type: itemType, item_gid: itemGid, item_title: itemTitle, notify_on: checks }),
         });
@@ -134,12 +134,12 @@
 
   async function _onUnfollow() {
     if (!_ctx) return;
-    const { followGid, cf, onSave } = _ctx;
+    const { followGid, cf: _cloudFetch, onSave } = _ctx;
     if (!followGid) { SubscribeButton.close(); return; }
 
     _setLoading(true);
     try {
-      await cf(`/api/follows/${followGid}`, { method: 'DELETE' });
+      await _cloudFetch(`/api/follows/${followGid}`, { method: 'DELETE' });
       onSave({ followed: false, followGid: null, conditions: [] });
       SubscribeButton.close();
     } catch (err) {

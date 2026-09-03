@@ -1,4 +1,6 @@
 'use strict';
+const _resourceResolvePayload = (item, resourceGid) => ({ resource_gid: resourceGid, expected_staging_version: item.resource_version });
+const _resourceIgnorePayload = item => ({ expected_staging_version: item.resource_version });
 /**
  * staging_panel.js — BOP Lineage 暂存箱面板
  *
@@ -29,6 +31,7 @@ class StagingPanel {
     this._layoutMode = opts.layoutMode || null;
     this._showDetailPopover = opts.showDetailPopover || null; // LayoutMode 实例引用
     this._items     = [];
+    this._resourceItems = [];
     this._dragPending = null; // { item, startX, startY }
 
     this._initDropZone();
@@ -38,25 +41,69 @@ class StagingPanel {
   /** 设置/更新 LayoutMode 引用（延迟初始化时调用） */
   setLayoutMode(lm) { this._layoutMode = lm; }
 
+  async _invokeCapability(id, payload) {
+    const _cloudFetch = this._cf;
+    const requestBody = {
+      version: 1,
+      payload,
+      idempotency_key: `${id}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    };
+    const request = (suffix, body) => _cloudFetch(`/api/v1/capabilities/${id}:${suffix}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    let response = await request('invoke', requestBody);
+    if (response?.data?.error?.code === 'confirmation_required') {
+      const confirmation = await request('confirm', requestBody);
+      const token = confirmation?.data?.confirmation_token;
+      if (!token) throw new Error(`能力确认失败：${id}@1`);
+      response = await request('invoke', { ...requestBody, confirmation_token: token });
+    }
+    const result = response?.data;
+    if (response?.success !== true || result?.ok !== true) {
+      const detail = result?.error || response?.error || {};
+      const error = new Error(detail.message || `能力调用失败：${id}@1`);
+      error.code = detail.code || 'capability_invocation_failed';
+      throw error;
+    }
+    return result.data;
+  }
+
   /** 加载暂存数据 */
   async load() {
     try {
-      const res = await this._cf(`/api/bop/versions/${this._versionGid}/staging`);
-      this._items = res.data || [];
+      const res = await this._invokeCapability('craft.bop.staging.read', {
+        operation: 'list',
+        version_gid: this._versionGid,
+      });
+      this._items = res?.data || [];
     } catch (e) {
       this._items = [];
       console.warn('[StagingPanel] load failed:', e);
+    }
+    try {
+      const response = await this._invokeCapability('craft.resource_requirement.staging.search', {
+        version_gid: this._versionGid,
+        match_status: 'pending',
+        page_size: 200,
+      });
+      this._resourceItems = response?.items || [];
+    } catch (e) {
+      this._resourceItems = [];
+      console.warn('[StagingPanel] resource staging load failed:', e);
     }
     this._render();
   }
 
   /** 渲染暂存项列表 */
   _render() {
-    this._countEl.textContent = this._items.length;
-    this._onCountChange(this._items.length);
+    const total = this._items.length + this._resourceItems.length;
+    this._countEl.textContent = total;
+    this._onCountChange(total);
     this._bodyEl.innerHTML = '';
 
-    if (this._items.length === 0) {
+    if (total === 0) {
       this._bodyEl.innerHTML = '<div class="lv-staging-empty">拖入卡片或点击 + 新建</div>';
       return;
     }
@@ -121,6 +168,74 @@ class StagingPanel {
       });
 
       this._bodyEl.appendChild(el);
+    }
+    this._renderResourceReviews();
+  }
+
+  _renderResourceReviews() {
+    if (!this._resourceItems.length) return;
+    const heading = document.createElement('div');
+    heading.className = 'lv-staging-empty';
+    heading.textContent = 'TC 资源待匹配';
+    this._bodyEl.appendChild(heading);
+    for (const item of this._resourceItems) {
+      const el = document.createElement('div');
+      el.className = 'lv-staging-item';
+      const title = document.createElement('span');
+      title.className = 'lv-stg-title';
+      title.textContent = `${item.raw_name || '(未命名)'} · ${item.resource_type}`;
+      el.appendChild(title);
+      const resolve = document.createElement('button');
+      resolve.className = 'lv-stg-del';
+      resolve.textContent = '匹配';
+      resolve.title = '选择同类型资源标准';
+      resolve.addEventListener('click', () => this.resolveResourceItem(item));
+      el.appendChild(resolve);
+      const ignore = document.createElement('button');
+      ignore.className = 'lv-stg-del';
+      ignore.textContent = '忽略';
+      ignore.title = '忽略此资源需求';
+      ignore.addEventListener('click', () => this.ignoreResourceItem(item));
+      el.appendChild(ignore);
+      this._bodyEl.appendChild(el);
+    }
+  }
+
+  async resolveResourceItem(item) {
+    try {
+      const response = await this._invokeCapability('craft.resource_requirement.search', {
+        resource_type: item.resource_type,
+        status: 'active',
+        page_size: 200,
+      });
+      const candidates = response?.items || [];
+      if (!candidates.length) return this._toast('没有可用的同类型资源标准', 'error');
+      const choice = window.prompt(
+        `输入资源代号或 GID：\n${candidates.map(value => `${value.code} · ${value.name} · ${value.gid}`).join('\n')}`,
+        candidates[0].code,
+      );
+      if (!choice) return;
+      const selected = candidates.find(value => value.gid === choice.trim() || value.code === choice.trim());
+      if (!selected) return this._toast('未找到所选资源标准', 'error');
+      await this._invokeCapability('craft.resource_requirement.staging.resolve', {
+        staging_gid: item.gid,
+        ..._resourceResolvePayload(item, selected.gid),
+      });
+      await this.load();
+    } catch (error) {
+      this._toast('资源匹配失败: ' + error.message, 'error');
+    }
+  }
+
+  async ignoreResourceItem(item) {
+    try {
+      await this._invokeCapability('craft.resource_requirement.staging.ignore', {
+        staging_gid: item.gid,
+        ..._resourceIgnorePayload(item),
+      });
+      await this.load();
+    } catch (error) {
+      this._toast('忽略失败: ' + error.message, 'error');
     }
   }
 
@@ -202,16 +317,14 @@ class StagingPanel {
 
   /** 从关联面板拖入 → 创建暂存项 */
   async addFromAssociation(info) {
-    await this._cf(`/api/bop/versions/${this._versionGid}/staging`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        node_type:      info.nodeType || 'process',
-        title:          info.title || '',
-        source_type:    info.listType || null,
-        source_ref_gid: info.refGid || null,
-        meta:           { link_type: info.linkType || null, is_primary: info.isPrimary ?? false },
-      }),
+    await this._invokeCapability('craft.bop.staging.change.apply', {
+      operation:       'create',
+      version_gid:     this._versionGid,
+      node_type:       info.nodeType || 'process',
+      title:           info.title || '',
+      source_type:     info.listType || null,
+      source_ref_gid:  info.refGid || null,
+      meta:            { link_type: info.linkType || null, is_primary: info.isPrimary ?? false },
     });
     this._toast('已添加到暂存箱', 'ok');
     await this.load();
@@ -219,10 +332,9 @@ class StagingPanel {
 
   /** 主视图 entry → soft-delete + 创建暂存项 */
   async demoteEntry(entryGid) {
-    await this._cf(`/api/bop/entries/${entryGid}/demote`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: '{}',
+    await this._invokeCapability('craft.bop.staging.lifecycle.change.apply', {
+      operation: 'demote',
+      entry_gid: entryGid,
     });
     this._toast('已移至暂存箱', 'ok');
     await this.load();
@@ -231,24 +343,25 @@ class StagingPanel {
 
   /** 暂存项 → promote 到主视图 bop_entry */
   async promoteItem(stagingGid, parentBopGid, seqNo = 0) {
-    const res = await this._cf(`/api/bop/staging/${stagingGid}/promote`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        parent_bop_gid: parentBopGid || null,
-        seq_no: seqNo,
-      }),
+    const res = await this._invokeCapability('craft.bop.staging.lifecycle.change.apply', {
+      operation: 'promote',
+      staging_gid: stagingGid,
+      parent_gid: parentBopGid || null,
+      sort_order: seqNo,
     });
     this._toast('已恢复到主视图', 'ok');
     await this.load();
-    this._onPromote(res.data?.entry_gid);
-    return res.data?.entry_gid;
+    this._onPromote(res?.entry_gid);
+    return res?.entry_gid;
   }
 
   /** 删除暂存项 */
   async removeItem(stagingGid) {
     try {
-      await this._cf(`/api/bop/staging/${stagingGid}`, { method: 'DELETE' });
+      await this._invokeCapability('craft.bop.staging.change.apply', {
+        operation: 'delete',
+        staging_gid: stagingGid,
+      });
       this._toast('已删除暂存项', 'ok');
       await this.load();
     } catch (e) {
@@ -258,10 +371,11 @@ class StagingPanel {
 
   /** 手动新建暂存项 */
   async createManual(title = '新暂存项', nodeType = 'process') {
-    await this._cf(`/api/bop/versions/${this._versionGid}/staging`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, node_type: nodeType }),
+    await this._invokeCapability('craft.bop.staging.change.apply', {
+      operation: 'create',
+      version_gid: this._versionGid,
+      title,
+      node_type: nodeType,
     });
     await this.load();
   }

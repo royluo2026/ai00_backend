@@ -42,7 +42,7 @@
     /* write-only active toolbar btn */
     .aa-btn-active { background:color-mix(in srgb,var(--color-mauve) 25%,var(--bg-surface)) !important; color:var(--color-mauve) !important; border-color:var(--color-mauve) !important; }
   </style>
-  <link rel="stylesheet" href="/assets/tree_list_shell-da642102.css">
+  <link rel="stylesheet" href="/assets/tree_list_shell-907216c5.css">
 </head>
 <body>
 <div id="appRoot"></div>
@@ -120,19 +120,18 @@ async function _fetchLogs() {
   try {
     const params = new URLSearchParams({ limit: 500, offset: 0 });
     if (_writesOnly) params.set('is_write', 'true');
-    const path = `/api/ai/audit-logs?${params}`;
-
     // Prefer window.top._cloudFetch (handles auth automatically)
-    const cloudFetch = window.top?._cloudFetch || window.parent?._cloudFetch;
-    if (cloudFetch) {
-      const data = await cloudFetch(path);
+    const _cloudFetch = window.top?._cloudFetch || window.parent?._cloudFetch;
+    if (_cloudFetch) {
+      const data = await _cloudFetch(`/api/ai/audit-logs?${params}`, { method: 'GET' });
       return data.logs || [];
     }
 
     // Fallback: manual fetch with token
     const token = window.top?._authToken || window.parent?.parent?._authToken || window.parent?._authToken || '';
     const baseUrl = 'http://127.0.0.1:8080';
-    const resp = await fetch(`${baseUrl}${path}`, {
+    const resp = await fetch(`${baseUrl}/api/ai/audit-logs?${params}`, {
+      method: 'GET',
       headers: token ? { 'X-AI00-Token': token } : { 'X-AI00-Token': '' },
     });
     if (!resp.ok) {

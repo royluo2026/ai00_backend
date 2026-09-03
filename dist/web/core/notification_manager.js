@@ -20,7 +20,7 @@ const NotifManager = (() => {
   async function pollCount() {
     if (window._authMode !== 'feishu') return;
     try {
-      const res = await _cloudFetch('/api/notifications/unread_count');
+      const res = await _cloudFetch('/api/notifications/unread_count', { method: 'GET' });
       const count = res?.data?.count || 0;
       const badge = document.getElementById('notif-badge');
       if (badge) {
@@ -45,7 +45,7 @@ const NotifManager = (() => {
     }
     list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-faint);font-size:12px;">加载中...</div>';
     try {
-      const res = await _cloudFetch('/api/notifications');
+      const res = await _cloudFetch('/api/notifications', { method: 'GET' });
       const items = res?.data || [];
       if (!items.length) {
         list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-faint,#6c7086);font-size:12px;">暂无通知</div>';

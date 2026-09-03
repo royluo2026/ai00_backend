@@ -7,6 +7,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const STORAGE_KEY = "feishu_login_data";
   const root = document.documentElement;
   let feishuConfig = null;
+  const DEFAULT_FEISHU_CONFIG = Object.freeze({
+    redirect_uri: 'chat_doc.html',
+    chat_url: 'about:blank',
+    doc_url: 'about:blank',
+  });
 
   // ===================== 1. 初始化：同步全局主题 =====================
   const initTheme = async () => {
@@ -17,15 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ===================== 2. 获取飞书配置 =====================
   const getFeishuConfig = async () => {
     if (feishuConfig) return feishuConfig;
-    const cf = window._cloudFetch || window.parent?._cloudFetch;
-    if (cf) {
-      try {
-        const res = await cf('/api/feishu/config');
-        feishuConfig = res?.data || res || {};
-      } catch { feishuConfig = {}; }
-    } else {
-      feishuConfig = {};
-    }
+    feishuConfig = { ...DEFAULT_FEISHU_CONFIG };
     return feishuConfig;
   };
 

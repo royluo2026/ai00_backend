@@ -8,7 +8,7 @@ Execute the reviewed project.task.read project outcome.
 - 不适用：The operation belongs to another domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_79ebfa43788065717b2a11476ede257f`
+- Catalog Release：`rel_94ba4f715fc3e8b6c9f617c4a5b05fe5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -340,7 +340,7 @@ Execute the reviewed project.task.read project outcome.
 ```json
 {
   "capability_id": "project.task.read",
-  "catalog_release": "rel_79ebfa43788065717b2a11476ede257f",
+  "catalog_release": "rel_94ba4f715fc3e8b6c9f617c4a5b05fe5",
   "major_version": 1,
   "payload": {
     "arguments": {},

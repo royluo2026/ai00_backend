@@ -252,6 +252,7 @@ function makeLayoutModeEnv() {
   const { window } = dom;
   window.console = console;
   window._cf = async () => ({ data: {} });
+  window._lineageVersionCf = (...args) => window._cf(...args);
   const code = fs.readFileSync(path.join(ROOT, 'packages/craft-plugin/web/lineage_view/layout_mode.js'), 'utf-8');
   const script = window.document.createElement('script');
   script.textContent = `${code}\nwindow.LayoutMode = LayoutMode;`;
@@ -564,8 +565,11 @@ async function runTests() {
   _assert('Operator Process → operator_process', TCT['Operator Process'] === 'operator_process');
   _assert('Process → process', TCT['Process'] === 'process');
   _assert('Operation → operation', TCT['Operation'] === 'operation');
-  _assert('中文"工位" → station_process', TCT['工位'] === 'station_process');
+  _assert('TC 物理工位 → station_factory', TCT['工位'] === 'station_factory');
   _assert('中文"工序" → process', TCT['工序'] === 'process');
+  _assert('生产 TC 总装产品 BOP → factory_bop', TCT['总装产品BOP'] === 'factory_bop');
+  _assert('生产 TC Product 操作 → operation', TCT['总装操作（Product）'] === 'operation');
+  _assert('生产 TC 人员 → man', TCT['人'] === 'man');
 
   _assert('_TC_COL_MAP 存在', typeof TCC === 'object');
   _assert('Level → _level', TCC['Level'] === '_level');
@@ -590,6 +594,16 @@ async function runTests() {
   _assert('allVersions 初始为空数组', Array.isArray(mgr.allVersions) && mgr.allVersions.length === 0);
   _assert('currentVersionGid 初始为 null', mgr.currentVersionGid === null);
   _assert('currentVersionStatus 初始为 "active"', mgr.currentVersionStatus === 'active');
+
+  mgr._tcSep = ',';
+  mgr._tcRawHeaders = ['Level', 'Type', 'Name', '父级VPPS'];
+  mgr._tcRawLines = ['1,Line Process,Line A,'];
+  mgr._tcFieldMap = {
+    Level: '_level', Type: '_tc_raw_type', Name: 'title', '父级VPPS': '_parent_vpps',
+  };
+  const mappedTcRows = mgr._tcApplyColMap();
+  _assert('TC 空父级临时字段不会越过 Capability 契约边界',
+    mappedTcRows.length === 1 && !Object.hasOwn(mappedTcRows[0], '_parent_vpps'));
 
   // ── 7. 公开方法存在性 ─────────────────────────────────────────────
   console.log(section('LineageVersionManager: 公开方法'));
@@ -618,6 +632,25 @@ async function runTests() {
   await mgrLoad.loadVersions();
   _assert('allVersions 填充 2 项', mgrLoad.allVersions.length === 2);
   _assert('allVersions[0].gid = v001', mgrLoad.allVersions[0].gid === 'v001');
+
+  // capability 治理后的规范字段必须在页面边界归一化，不能把 undefined 当版本标识。
+  const wCanonicalLoad = makeEnv();
+  const mgrCanonicalLoad = new wCanonicalLoad.LineageVersionManager({
+    cf: async () => ({ data: { items: [
+      { version_gid: 'cv001', family_gid: 'cf001', bop_name: 'CanonicalBOP', version_tag: 'v1', status: 'active' },
+      { version_gid: 'cv002', family_gid: 'cf001', bop_name: 'CanonicalBOP', version_tag: 'v2', status: 'active' },
+    ] } }),
+    toast: mockToast,
+    onVersionSelected: () => {}, onStatusChange: () => {}, onReloadNeeded: () => {},
+  });
+  await mgrCanonicalLoad.loadVersions();
+  _assert('规范 version_gid 归一化为页面 gid', mgrCanonicalLoad.allVersions[0].gid === 'cv001');
+  _assert('规范 family_gid 归一化为页面 version_family_gid', mgrCanonicalLoad.allVersions[0].version_family_gid === 'cf001');
+  mgrCanonicalLoad.selectVersion('cv002', 'v2');
+  mgrCanonicalLoad.renderMenu();
+  const canonicalActive = wCanonicalLoad.document.querySelectorAll('.lv-vp-ver-item.active');
+  _assert('规范版本列表只把所选版本标为当前版本',
+    canonicalActive.length > 0 && [...canonicalActive].every(item => item.textContent.includes('v2')));
 
   // API 失败：不抛出，而是 toast error
   const toastCalls = [];
@@ -660,7 +693,7 @@ async function runTests() {
   });
   mgrFreeze.currentVersionGid = 'v001';
   await mgrFreeze.freeze('v001');
-  _assert('freeze: URL 正确', freezeCalls.some(c => c.url === '/api/bop/versions/v001/freeze'));
+  _assert('freeze: Capability URL 正确', freezeCalls.some(c => c.url === '/api/v1/capabilities/craft.bop.version.freeze.change.apply:invoke'));
   _assert('freeze: method=POST', freezeCalls.some(c => c.opts?.method === 'POST'));
   _assert('freeze: status → baseline', mgrFreeze.currentVersionStatus === 'baseline');
   _assert('freeze: onStatusChange("baseline") 触发', statusChanges.includes('baseline'));
@@ -674,7 +707,7 @@ async function runTests() {
   });
   mgrUnfreeze.currentVersionGid = 'v001';
   await mgrUnfreeze.unfreeze('v001');
-  _assert('unfreeze: URL 正确', unfreezeCalls.some(c => c.url === '/api/bop/versions/v001/unfreeze'));
+  _assert('unfreeze: Capability URL 正确', unfreezeCalls.some(c => c.url === '/api/v1/capabilities/craft.bop.version.freeze.change.apply:invoke'));
   _assert('unfreeze: method=POST', unfreezeCalls.some(c => c.opts?.method === 'POST'));
   _assert('unfreeze: status → active', mgrUnfreeze.currentVersionStatus === 'active');
 
@@ -687,7 +720,7 @@ async function runTests() {
   });
   mgrPublish.currentVersionGid = 'v001';
   await mgrPublish.publish('v001');
-  _assert('publish: URL 正确', publishCalls.some(c => c.url === '/api/bop/versions/v001/publish'));
+  _assert('publish: Capability URL 正确', publishCalls.some(c => c.url === '/api/v1/capabilities/craft.bop.version.lifecycle.change.apply:invoke'));
   _assert('publish: method=POST', publishCalls.some(c => c.opts?.method === 'POST'));
   _assert('publish: status → M', mgrPublish.currentVersionStatus === 'M');
 
@@ -702,7 +735,7 @@ async function runTests() {
     toast: mockToast, onVersionSelected: () => {}, onStatusChange: () => {}, onReloadNeeded: () => {},
   });
   await mgrArchive.archiveFamily('f001');
-  _assert('archiveFamily: URL 正确', archiveCalls.some(c => c.url === '/api/bop/version-families/f001/archive'));
+  _assert('archiveFamily: Capability URL 正确', archiveCalls.some(c => c.url === '/api/v1/capabilities/craft.bop.version.lifecycle.change.apply:invoke'));
   _assert('archiveFamily: method=POST', archiveCalls.some(c => c.opts?.method === 'POST'));
 
   // 用户取消确认 → 不发请求
@@ -723,8 +756,8 @@ async function runTests() {
     toast: mockToast, onVersionSelected: () => {}, onStatusChange: () => {}, onReloadNeeded: () => {},
   });
   await mgrUnarchive.unarchiveFamily('f001');
-  _assert('unarchiveFamily: URL 正确', unarchiveCalls.some(c => c.url === '/api/bop/version-families/f001/archive'));
-  _assert('unarchiveFamily: method=DELETE', unarchiveCalls.some(c => c.opts?.method === 'DELETE'));
+  _assert('unarchiveFamily: Capability URL 正确', unarchiveCalls.some(c => c.url === '/api/v1/capabilities/craft.bop.version.lifecycle.change.apply:invoke'));
+  _assert('unarchiveFamily: method=POST', unarchiveCalls.some(c => c.opts?.method === 'POST'));
 
   // ── 12. renderMenu DOM 输出 ───────────────────────────────────────
   console.log(section('LineageVersionManager: renderMenu'));
@@ -888,6 +921,90 @@ async function runTests() {
     }
   });
 
+  await _assertAsync('生产数据库配置全部通过 Base capability 治理', async () => {
+    const src = fs.readFileSync(path.join(ROOT, 'web/settings/settings.js'), 'utf-8');
+    const html = fs.readFileSync(path.join(ROOT, 'web/settings/index.html'), 'utf-8');
+    for (const id of [
+      'base.runtime.database_config.get',
+      'base.runtime.database_config.change.apply',
+      'base.runtime.database_connection.test',
+    ]) {
+      if (!src.includes(id)) throw new Error(`settings 缺少能力调用 ${id}`);
+    }
+    if (src.includes("_backendFetch('/admin/cloud-db-config")) {
+      throw new Error('settings 仍直接调用未治理数据库配置 REST 路由');
+    }
+    if (!src.includes("fb.textContent = r?.saved ? '已保存'")) {
+      throw new Error('settings 未按 Base 保存能力的 saved 输出展示成功态');
+    }
+    if (!src.includes("res.textContent = r?.connected ? '连接成功'")) {
+      throw new Error('settings 未按 Base 连接能力的 connected 输出展示成功态');
+    }
+    if (html.includes('value="sam-bdmsdb01-test.chj.cloud"')) {
+      throw new Error('settings 仍预填测试主机');
+    }
+    if (src.includes("d.host || 'sam-bdmsdb01-test.chj.cloud'")) {
+      throw new Error('settings 仍回退测试主机');
+    }
+    for (const code of [
+      'password_required',
+      'authentication_failed',
+      'database_not_found',
+      'network_unreachable',
+      'tls_or_server_config_failed',
+    ]) {
+      if (!src.includes(code)) throw new Error(`settings 缺少脱敏错误映射 ${code}`);
+    }
+    if (!src.includes('!window.electronAPI')) {
+      throw new Error('Web 部署模式未禁止保存数据库配置');
+    }
+    if (!src.includes('window.self !== window.top')) {
+      throw new Error('iframe 设置页未识别为 Web 部署模式');
+    }
+    if (!html.includes('只读连接检测') || !html.includes('AI00_*_DB_URL')) {
+      throw new Error('settings 未说明生产数据库由部署配置管理');
+    }
+    if (!html.includes('settings.js?v=11')) {
+      throw new Error('settings 修改后未更新脚本缓存版本');
+    }
+  });
+
+  await _assertAsync('本体属性写入使用 Craft 原子属性能力', async () => {
+    const src = fs.readFileSync(path.join(ROOT, 'packages/craft-plugin/web/lineage_view/layout_detail_panel.js'), 'utf-8');
+    if (!src.includes("'craft.bop.entry.change.apply'")) throw new Error('缺少 Craft 条目变更能力');
+    if (!src.includes("properties: [{ name: propName, value: val }]")) throw new Error('属性未按封闭的名称/值列表提交');
+    if (src.includes('实体属性编辑暂未开放')) throw new Error('实体属性仍被前端拒绝');
+    if (src.includes('updates: { meta: metaVals }')) throw new Error('仍在覆盖写入整块 meta');
+  });
+
+  await _assertAsync('Craft 写能力经用户确认后复用幂等键重试', async () => {
+    const w = makeLayoutDetailPanelEnv();
+    const calls = [];
+    w.confirm = () => true;
+    const panel = new w.LayoutDetailPanel({
+      containerEl: w.document.getElementById('llDetailPanel'),
+      cf: async (url, opts = {}) => {
+        const body = JSON.parse(opts.body || '{}');
+        calls.push({ url, body });
+        if (url.endsWith(':confirm')) return { success: true, data: { confirmation_token: 'confirm-1' } };
+        if (!body.confirmation_token) return { success: false, data: { ok: false, error: { code: 'confirmation_required' } } };
+        return { success: true, data: { ok: true, data: { saved: true } } };
+      },
+      toast() {}, patchEntry: async () => {}, reloadData: async () => {}, getLineageData: () => null,
+    });
+    await panel._invokeCapability('craft.bop.entry.change.apply', { operation: 'update' });
+    if (calls.length !== 3) throw new Error(`期望 invoke/confirm/invoke，实际 ${calls.length} 次`);
+    if (!calls[0].body.idempotency_key) throw new Error('首次调用缺少幂等键');
+    if (calls[0].body.idempotency_key !== calls[2].body.idempotency_key) throw new Error('重试未复用幂等键');
+    if (calls[2].body.confirmation_token !== 'confirm-1') throw new Error('重试缺少确认令牌');
+  });
+
+  await _assertAsync('本体 schema 修改后广播缓存失效', async () => {
+    const src = fs.readFileSync(path.join(ROOT, 'web/ontology/ontology.js'), 'utf-8');
+    if (!src.includes('ai00:ontology-schema-version')) throw new Error('缺少 schema 版本广播键');
+    if (!src.includes('localStorage.setItem')) throw new Error('schema 修改成功后未广播缓存失效');
+  });
+
   await _assertAsync('vite dev proxy包含 teams 路由', async () => {
     const viteSrc = fs.readFileSync(path.join(ROOT, 'vite.config.js'), 'utf-8');
     if (!viteSrc.includes("'/teams':   { target: BACKEND_DEV_TARGET, changeOrigin: true }")) {
@@ -984,9 +1101,10 @@ async function runTests() {
     };
     const panel = new w.BopLifecyclePanel({
       cf: async (path, opts = {}) => {
-        if (path === '/api/bop/versions?include_archived=true') return { data: [] };
-        if (path === '/api/bop/versions') return { data: { gid: 'new-ver-gid' } };
-        if (path === '/api/bop/versions/new-ver-gid/lifecycle/init-state') return { success: true };
+        const ok = data => ({ success: true, data: { ok: true, data } });
+        if (path === '/api/v1/capabilities/craft.bop.version.list:invoke') return ok({ items: [] });
+        if (path === '/api/v1/capabilities/craft.bop.version.create:invoke') return ok({ version_gid: 'new-ver-gid' });
+        if (path === '/api/v1/capabilities/craft.bop.lifecycle.state.change.apply:invoke') return ok({ lifecycle_state: {} });
         throw new Error('unexpected path ' + path);
       },
       toast() {},
@@ -1028,10 +1146,9 @@ async function runTests() {
     const panel = new w.LayoutDetailPanel({
       containerEl: w.document.getElementById('llDetailPanel'),
       cf: async (url) => {
-        if (url === '/api/ontology/schema/process') {
-          return { properties: [{ name: 'cycle_time', label_zh: '节拍', prop_kind: 'data', show_in_detail: true, storage_hint: 'meta', data_type: 'string' }] };
-        }
-        if (url.startsWith('/api/bop/entry-links?')) return { data: [] };
+        const ok = data => ({ success: true, data: { ok: true, data } });
+        if (url === '/api/v1/capabilities/ontology.concept.resolve:invoke') return ok({ concept: { concept_ref: { concept_id: 'concept.process' } }, release_gid: 'release-1' });
+        if (url === '/api/v1/capabilities/ontology.concept.get:invoke') return ok({ concept: { properties: [{ name: 'cycle_time', label_zh: '节拍', prop_kind: 'data', show_in_detail: true, storage_hint: 'meta', data_type: 'string' }] } });
         throw new Error('unexpected path ' + url);
       },
       toast() {},
@@ -1087,16 +1204,18 @@ async function runTests() {
     const panel = new w.LayoutDetailPanel({
       containerEl: w.document.getElementById('llDetailPanel'),
       cf: async (url) => {
-        if (url === '/api/ontology/schema/process') {
-          return {
+        const ok = data => ({ success: true, data: { ok: true, data } });
+        if (url === '/api/v1/capabilities/ontology.concept.resolve:invoke') return ok({ concept: { concept_ref: { concept_id: 'concept.process' } }, release_gid: 'release-1' });
+        if (url === '/api/v1/capabilities/ontology.concept.get:invoke') {
+          return ok({ concept: {
             relations: [
               { link_type_binding: 'knowledge', label_zh: '引用知识', range_node_type: 'knowledge', sort_order: 20, show_in_detail: true },
               { link_type_binding: 'issue', label_zh: '关联问题', range_node_type: 'issue', sort_order: 10, show_in_detail: false },
             ],
-          };
+          } });
         }
-        if (url.startsWith('/api/bop/entry-links?')) {
-          return { data: [{ gid: 'l1', link_type: 'knowledge', entity_gid: 'k1', entity_title: '知识A', source_entry_gid: 'gid-1' }] };
+        if (url === '/api/v1/capabilities/craft.bop.entry.legacy_read:invoke') {
+          return ok({ data: [{ gid: 'l1', link_type: 'knowledge', entity_gid: 'k1', entity_title: '知识A', source_entry_gid: 'gid-1' }] });
         }
         throw new Error('unexpected path ' + url);
       },
@@ -1156,10 +1275,9 @@ async function runTests() {
       containerEl: w.document.getElementById('llDetailPanel'),
       cf: async (url, opts = {}) => {
         calls.push({ url, opts });
-        if (url === '/api/bop/entries/search?node_types=tool_need&limit=20') {
-          return { data: [{ gid: 'tool-need-1', title: '扭力扳手需求' }] };
+        if (url === '/api/v1/capabilities/craft.bop.entry.search:invoke') {
+          return { success: true, data: { ok: true, data: [{ gid: 'tool-need-1', title: '扭力扳手需求' }] } };
         }
-        if (url.startsWith('/api/bop/entry-links?')) return { data: [] };
         throw new Error('unexpected path ' + url);
       },
       toast() {},
@@ -1177,12 +1295,7 @@ async function runTests() {
     });
     panel._currentRow = { gid: 'gid-1', node_type: 'process', parent_gid: 'line-1' };
     await panel._openAddDetail('link:needsTool', 'gid-1', 'needsTool', '需求工具');
-    if (!calls.some(c => c.url === '/api/bop/entries/search?node_types=tool_need&limit=20')) {
-      throw new Error('needsTool 未走 BOP 工具需求候选加载');
-    }
-    if (calls.some(c => c.url === '/api/bop/factory/tools?limit=20')) {
-      throw new Error('needsTool 不应走工厂实物工具候选');
-    }
+    if (!calls.some(c => c.url === '/api/v1/capabilities/craft.bop.entry.search:invoke')) throw new Error('needsTool 未走 BOP 工具需求能力');
     const text = w.document.getElementById('llDetDrawerBody').textContent || '';
     if (!text.includes('扭力扳手需求')) throw new Error('BOP 工具需求候选未渲染');
   });
@@ -1204,11 +1317,15 @@ async function runTests() {
     await panel._renderRules('gid-1', { node_type: 'process' });
   });
 
-  await _assertAsync('layout_mode 只读线体下复制粘贴仍走创建接口', async () => {
+  await _assertAsync('layout_mode 只读线体下复制粘贴仍走创建能力', async () => {
     const w = makeLayoutModeEnv();
     const container = w.document.getElementById('lvLayoutCanvas');
     const mode = new w.LayoutMode(container);
     const calls = [];
+    w._cf = async (url, opts = {}) => {
+      calls.push({ url, opts });
+      return { success: true, data: { ok: true, data: { gid: 'new-entry' } } };
+    };
     mode._data = {
       versionGid: 'ver-1',
       rowByGid: new Map([
@@ -1219,10 +1336,7 @@ async function runTests() {
       lineGrantSet: new Set(),
       toast() {},
       reloadData() {},
-      cf: async (url, opts = {}) => {
-        calls.push({ url, opts });
-        return { data: { gid: 'new-entry' } };
-      },
+      cf: w._cf,
     };
     mode._activeGid = 'process-1';
     const srcEl = w.document.createElement('div');
@@ -1233,9 +1347,9 @@ async function runTests() {
     mode._activeGid = 'station-1';
     w.document.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'v', ctrlKey: true, bubbles: true }));
     await new Promise(resolve => setTimeout(resolve, 0));
-    if (calls.length !== 1) throw new Error('复制粘贴未触发创建接口');
-    if (calls[0].url !== '/api/bop/entries') throw new Error('创建接口错误: ' + calls[0].url);
-    const body = JSON.parse(calls[0].opts.body || '{}');
+    if (calls.length !== 1) throw new Error('复制粘贴未触发创建能力');
+    if (calls[0].url !== '/api/v1/capabilities/craft.bop.entry.bulk.change.apply:invoke') throw new Error('创建能力错误: ' + calls[0].url);
+    const body = JSON.parse(calls[0].opts.body || '{}').payload || {};
     if (body.parent_gid !== 'station-1') throw new Error('parent_gid 未指向目标工位: ' + body.parent_gid);
     if (body.node_type !== 'process') throw new Error('复制节点类型错误: ' + body.node_type);
   });

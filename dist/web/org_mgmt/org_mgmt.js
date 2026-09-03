@@ -10,16 +10,44 @@ window.addEventListener('message', e => {
 });
 
 // ── cloudFetch 桥接 ────────────────────────────────────────────
-async function api(path, opts) {
+async function _cf(method, path, opts = {}) {
   const cf = window.parent?._cloudFetch || window.top?._cloudFetch || window._cloudFetch;
   if (typeof cf !== 'function') {
     console.warn('[org_mgmt] _cloudFetch 不可用');
     return null;
   }
   try {
-    return await cf(path, opts);
+    return await cf(path, { ...opts, method });
   } catch (e) {
     console.warn('[org_mgmt] API 失败:', e.message);
+    return null;
+  }
+}
+
+async function invokeCapability(id, payload = {}) {
+  const _cloudFetch = window.parent?._cloudFetch || window.top?._cloudFetch || window._cloudFetch;
+  if (typeof _cloudFetch !== 'function') throw new Error('云端服务未连接');
+  const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version: 1, payload }),
+  });
+  const envelope = response?.data;
+  if (response?.success !== true || envelope?.ok !== true) {
+    const detail = envelope?.error || response?.error || {};
+    throw new Error(detail.message || `能力调用失败：${id}@1`);
+  }
+  const value = envelope.data;
+  return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+}
+
+async function _baseCall(operation, args = {}, options = {}) {
+  const client = window.top?.AI00ExistingCapabilityClient || window.parent?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
+  if (!client) return null;
+  try { return await client.call(operation, args, options); }
+  catch (e) {
+    if (e?.code === 'capability_confirmation_cancelled') return { cancelled: true };
+    console.warn('[org_mgmt] capability failed:', e.message);
     return null;
   }
 }
@@ -72,8 +100,8 @@ document.querySelectorAll('.org-tab').forEach(btn => {
 
 async function loadStruct() {
   const [teamsRes, usersRes] = await Promise.all([
-    api('/api/org/teams'),
-    _allUsers.length ? Promise.resolve({ data: _allUsers }) : api('/api/users/'),
+    _baseCall('base.orgTeams.list'),
+    _allUsers.length ? Promise.resolve({ data: _allUsers }) : _baseCall('base.users.list'),
   ]);
   _allTeams = Array.isArray(teamsRes) ? teamsRes : (teamsRes?.data || []);
   if (usersRes?.data) _allUsers = usersRes.data;
@@ -87,7 +115,7 @@ document.getElementById('btn-sync-feishu').addEventListener('click', async () =>
   btn.disabled = true;
   btn.innerHTML = '<svg class="icon" width="13" height="13"><use href="#icon-refresh"/></svg> 同步中…';
   try {
-    const res = await api('/feishu/sync/org', { method: 'POST' });
+    const res = await _cf('POST', '/feishu/sync/org', { method: 'POST' });
     if (res?.status === 'syncing' || res?.success) {
       banner.textContent = '组织架构与成员同步已在后台启动，完成后请刷新页面查看';
       banner.className = 'sync-banner sync-ok';
@@ -186,7 +214,7 @@ function _renderStructTree() {
   document.getElementById('stManualAddOk')?.addEventListener('click', async () => {
     const name = addInp.value.trim();
     if (!name) return _toast('请输入团队名称', 'err');
-    const res = await api('/teams', { method: 'POST', body: JSON.stringify({ name }) });
+    const res = await _cf('POST', '/teams', { method: 'POST', body: JSON.stringify({ name }) });
     if (res?.success) {
       _toast('团队已创建');
       addRow.style.display = 'none'; addInp.value = '';
@@ -311,9 +339,8 @@ async function _syncTeamMembers(team) {
   banner.className = 'sync-banner sync-ok';
 
   try {
-    const res = await api('/api/org/sync-from-feishu', {
-      method: 'POST',
-      body: JSON.stringify({ dept_id: team.feishu_dept_id }),
+    const res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('base.directory.feishu.sync', {
+      departmentId: team.feishu_dept_id,
     });
     if (res?.ok || res?.created != null) {
       const { created = 0, updated = 0 } = res;
@@ -322,7 +349,7 @@ async function _syncTeamMembers(team) {
       // 只刷新成员列表，不重载整棵树（避免展开状态丢失）
       if (_selectedTeamGid === team.gid) {
         // 先更新 _allUsers 缓存再刷新列表
-        const usersRes = await api('/api/users/');
+        const usersRes = await _baseCall('base.users.list');
         if (usersRes?.data) _allUsers = usersRes.data;
         _loadTeamMembers(team.gid);
       }
@@ -356,10 +383,10 @@ async function _loadTeamDetail(gid) {
 async function _loadTeamMembers(gid) {
   // 先刷新 _allUsers 缓存，确保新添加的成员可用
   try {
-    const usersRes = await api('/api/users/');
+    const usersRes = await _baseCall('base.users.list');
     if (usersRes?.data) _allUsers = usersRes.data;
   } catch {}
-  const res = await api(`/teams/${gid}/members`);
+  const res = await _cf('GET', `/teams/${gid}/members`);
   const members = res?.data || [];
   document.getElementById('struct-members-count').textContent = `成员（${members.length} 人）`;
 
@@ -394,7 +421,7 @@ async function _loadTeamMembers(gid) {
 
 window.removeTeamMember = async function(teamGid, userGid) {
   if (!confirm('确定将该成员移出团队？')) return;
-  const res = await api(`/teams/${teamGid}/members/${userGid}`, { method: 'DELETE' });
+  const res = await _cf('DELETE', `/teams/${teamGid}/members/${userGid}`, { method: 'DELETE' });
   if (res?.success) _loadTeamMembers(teamGid);
 };
 
@@ -406,7 +433,7 @@ document.getElementById('struct-save-btn').addEventListener('click', async () =>
   const newName = document.getElementById('struct-name-input').value.trim();
   if (!newName) return _toast('团队名称不能为空', 'err');
   if (newName === team.name) return _toast('未做任何修改');
-  const res = await api(`/teams/${_selectedTeamGid}`, {
+  const res = await _cf('PATCH', `/teams/${_selectedTeamGid}`, {
     method: 'PATCH',
     body: JSON.stringify({ name: newName }),
   });
@@ -423,7 +450,7 @@ document.getElementById('struct-save-btn').addEventListener('click', async () =>
 document.getElementById('struct-delete-btn').addEventListener('click', async () => {
   if (!_selectedTeamGid) return;
   if (!confirm('确定删除该团队？此操作不可恢复。')) return;
-  const res = await api(`/teams/${_selectedTeamGid}`, { method: 'DELETE' });
+  const res = await _cf('DELETE', `/teams/${_selectedTeamGid}`, { method: 'DELETE' });
   if (res?.success) {
     _expandedTeams.delete(_selectedTeamGid);
     _selectedTeamGid = null;
@@ -471,10 +498,12 @@ document.getElementById('btn-confirm-role').addEventListener('click', async () =
   const body = { new_role: newRole };
   if (newRole === 'external' && extSubtype) body.external_subtype = extSubtype;
 
-  const res = await api(`/api/users/${_editingUserId}/role`, {
-    method: 'PATCH',
-    body: JSON.stringify(body),
+  const res = await _baseCall('base.users.assignRole', {
+    userGid: _editingUserId, newRole, externalSubtype: body.external_subtype || null,
+  }, {
+    confirm: () => window.confirm(`确认将该成员的角色修改为「${newRole}」？`),
   });
+  if (res?.cancelled) return;
   if (res?.success) {
     document.getElementById('modal-edit-role').classList.add('hidden');
     // 更新本地缓存
@@ -515,7 +544,7 @@ function _makeUserSearchWidget({ inputId, resultsId, selectedId, onSelect }) {
   });
 
   async function _doSearch(q) {
-    const res = await api(`/feishu/org/users/search?q=${encodeURIComponent(q)}`);
+    const res = await _cf('GET', `/feishu/org/users/search?q=${encodeURIComponent(q)}`);
     const users = res?.data || [];
     if (!users.length) {
       results.innerHTML = '<div class="user-search-empty">未找到用户</div>';
@@ -613,7 +642,7 @@ document.getElementById('btn-confirm-team-member').addEventListener('click', asy
   const body = d.gid
     ? { user_gid: d.gid }
     : { feishu_open_id: d.openId || '', name: d.name || '', email: d.email || '', avatar_url: d.avatar || '' };
-  const res = await api(`/teams/${_selectedTeamGid}/members`, {
+  const res = await _cf('POST', `/teams/${_selectedTeamGid}/members`, {
     method: 'POST',
     body: JSON.stringify(body),
   });
@@ -668,16 +697,16 @@ async function loadProjects() {
   // 确保 teams/users 已加载（供 person picker 使用）
   if (!_allTeams.length || !_allUsers.length) {
     const [teamsRes, usersRes] = await Promise.all([
-      api('/api/org/teams'),
-      api('/api/users/'),
+      _baseCall('base.orgTeams.list'),
+      _baseCall('base.users.list'),
     ]);
     _allTeams = Array.isArray(teamsRes) ? teamsRes : (teamsRes?.data || []);
     if (usersRes?.data) _allUsers = usersRes.data;
   }
   _computeTsoSubtree();
 
-  const res = await api('/api/projects');
-  _allProjects = res?.data || [];
+  const value = await invokeCapability('project.project.read.atomic.projects_search', {}).catch(() => []);
+  _allProjects = Array.isArray(value) ? value : (value?.data || value?.projects || []);
   const sel = document.getElementById('filter-project');
   sel.innerHTML = '<option value="">— 选择项目 —</option>';
   _allProjects.forEach(p => {
@@ -708,8 +737,8 @@ async function _loadProjectConfig(projectGid) {
   // 确保 teams/users 已加载
   if (!_allTeams.length || !_allUsers.length) {
     const [teamsRes, usersRes] = await Promise.all([
-      api('/api/org/teams'),
-      api('/api/users/'),
+      _baseCall('base.orgTeams.list'),
+      _baseCall('base.users.list'),
     ]);
     _allTeams = Array.isArray(teamsRes) ? teamsRes : (teamsRes?.data || []);
     if (usersRes?.data) _allUsers = usersRes.data;
@@ -717,11 +746,15 @@ async function _loadProjectConfig(projectGid) {
   }
 
   const [linesRes, membersRes] = await Promise.all([
-    api(`/api/projects/${projectGid}/bop-lines`),
-    api(`/api/projects/${projectGid}/members`),
+    invokeCapability('craft.bop.entry.legacy_read', {
+      operation: 'project_bop_lines', project_gid: projectGid, limit: 500,
+    }).catch(() => []),
+    invokeCapability('project.member.read', {
+      arguments: { operation: 'members.list', arguments: { project_gid: projectGid } },
+    }).catch(() => []),
   ]);
-  _projectBopLines  = linesRes?.data  || [];
-  _projectMembers   = membersRes?.data || [];
+  _projectBopLines  = Array.isArray(linesRes) ? linesRes : (linesRes?.data || linesRes?.items || []);
+  _projectMembers   = Array.isArray(membersRes) ? membersRes : (membersRes?.data || membersRes?.members || []);
   _renderProjectConfig();
 }
 
@@ -878,13 +911,21 @@ function _closePersonPicker() {
 
 async function _assignSlot(slot, sectionGid, userGid) {
   if (!_selectedProjectGid) return;
-  const res = await api(`/api/projects/${_selectedProjectGid}/line-assignment`, {
-    method: 'PUT',
-    body: JSON.stringify({ line_gid: sectionGid || null, user_gid: userGid || null }),
+  const res = await invokeCapability('project.member.change.apply', {
+    operation: 'members.line_assignment.replace',
+    arguments: {
+      project_gid: _selectedProjectGid,
+      line_gid: sectionGid || null,
+      user_gid: userGid || null,
+    },
   });
-  if (res?.success) {
-    const membersRes = await api(`/api/projects/${_selectedProjectGid}/members`);
-    _projectMembers = membersRes?.data || [];
+  if (res?.success || res === true) {
+    const membersRes = await invokeCapability('project.member.read', {
+      arguments: { operation: 'members.list', arguments: { project_gid: _selectedProjectGid } },
+    });
+    _projectMembers = Array.isArray(membersRes)
+      ? membersRes
+      : (membersRes?.data || membersRes?.items || membersRes?.members || []);
     _renderProjectConfig();
   } else {
     _toast(res?.detail || '操作失败', 'err');
@@ -899,8 +940,34 @@ async function _loadMatrix() {
   const wrap = document.getElementById('pm-matrix-wrap');
   wrap.innerHTML = '<div class="empty-hint">加载中…</div>';
 
-  const res  = await api('/api/projects/members/matrix');
-  const data = res?.data || [];
+  // Compose the matrix from governed project/member/line capabilities.  The
+  // former aggregate REST endpoint is only a compatibility projection and
+  // cannot be called from a capability-only consumer.
+  const projectCatalog = _allProjects.length
+    ? _allProjects
+    : await invokeCapability('project.project.read.atomic.projects_search', {})
+      .then(value => Array.isArray(value) ? value : (value?.data || value?.projects || []))
+      .catch(() => []);
+  const projectRows = await Promise.all(projectCatalog.map(async project => {
+    const [members, lines] = await Promise.all([
+      invokeCapability('project.member.read', {
+        arguments: { operation: 'members.list', arguments: { project_gid: project.gid } },
+      }).catch(() => []),
+      invokeCapability('craft.bop.entry.legacy_read', {
+        operation: 'project_bop_lines', project_gid: project.gid, limit: 500,
+      }).catch(() => []),
+    ]);
+    const memberRows = Array.isArray(members) ? members : (members?.data || members?.members || []);
+    const lineRows = Array.isArray(lines) ? lines : (lines?.data || lines?.items || []);
+    const lineTitles = new Map(lineRows.map(line => [line.gid, line.title || line.name || line.code || line.gid]));
+    return memberRows.map(member => ({
+      ...member,
+      project_name: project.name,
+      project_role: member.project_role || member.role,
+      line_title: lineTitles.get(member.scope_gid) || member.line_title || '',
+    }));
+  }));
+  const data = projectRows.flat();
 
   if (!data.length) {
     wrap.innerHTML = '<div class="empty-hint">暂无项目成员数据</div>';

@@ -223,6 +223,7 @@ class ImportExportManager {
       `;
       // 选完文件自动解析上传 → 跳过下一步按钮，直接在这个 handler 里完成
       const fileInput = wrap.querySelector('#ie-excel-file-input');
+      const _cf = this._cf.bind(this);
       fileInput.addEventListener('change', async () => {
         const file = fileInput.files?.[0];
         fileInput.value = '';
@@ -233,7 +234,7 @@ class ImportExportManager {
         try {
           const b64 = await _readBrowserFile(file);
           if (!b64) throw new Error('文件读取结果为空');
-          const data = await this._cloudPost('/api/import-export/import/parse-excel', {
+          const data = await _cf('POST', '/api/import-export/import/parse-excel', {
             file_b64: b64,
             filename: file.name,
           });
@@ -299,6 +300,7 @@ class ImportExportManager {
   }
 
   async _parseExcelFile() {
+    const _cf = this._cf.bind(this);
     const eAPI = _getElectronAPI();
     let fileB64  = null;
     let filename = 'unknown.xlsx';
@@ -321,7 +323,7 @@ class ImportExportManager {
 
     if (!fileB64) throw new Error('无法读取文件');
 
-    const data = await this._cloudPost('/api/import-export/import/parse-excel', {
+    const data = await _cf('POST', '/api/import-export/import/parse-excel', {
       file_b64: fileB64,
       filename,
     });
@@ -329,12 +331,13 @@ class ImportExportManager {
   }
 
   async _parseLarkSheet() {
+    const _cf = this._cf.bind(this);
     const token = this._overlay.querySelector('#ie-lark-token')?.value.trim();
     const range = this._overlay.querySelector('#ie-lark-range')?.value.trim() || 'Sheet1!A1:Z1000';
     if (!token) throw new Error('请输入飞书电子表格 Token');
     const userToken = _getLarkToken();
     if (!userToken) throw new Error('请先飞书登录后再导入飞书表格');
-    const data = await this._cloudPost('/api/import-export/lark-sheets/read', {
+    const data = await _cf('POST', '/api/import-export/lark-sheets/read', {
       user_access_token: userToken,
       spreadsheet_token: token,
       sheet_range: range,
@@ -343,12 +346,13 @@ class ImportExportManager {
   }
 
   async _parseLarkBitable() {
+    const _cf = this._cf.bind(this);
     const appToken   = this._overlay.querySelector('#ie-bitable-app')?.value.trim();
     const tableId    = this._overlay.querySelector('#ie-bitable-table')?.value.trim();
     if (!appToken || !tableId) throw new Error('请填写 App Token 和 Table ID');
     const userToken = _getLarkToken();
     if (!userToken) throw new Error('请先飞书登录后再导入飞书多维表');
-    const data = await this._cloudPost('/api/import-export/lark-bitable/read', {
+    const data = await _cf('POST', '/api/import-export/lark-bitable/read', {
       user_access_token: userToken,
       app_token: appToken,
       table_id: tableId,
@@ -555,9 +559,13 @@ class ImportExportManager {
       const total = mappedRows.length;
       progLabel.textContent = `正在导入 ${total} 条数据…`;
       progBar.style.width = '50%';
-      await this._onImport(mappedRows, fieldMap, conflict, signal);
+      const outcome = await this._onImport(mappedRows, fieldMap, conflict, signal);
       if (signal.aborted) return;
-      progLabel.textContent = `导入完成，共 ${total} 条`;
+      if (outcome && Number.isInteger(outcome.created_count)) {
+        progLabel.textContent = `导入完成：新增 ${outcome.created_count} 条，更新 ${outcome.updated_count || 0} 条，跳过 ${outcome.skipped_count || 0} 条`;
+      } else {
+        progLabel.textContent = `导入完成，共 ${total} 条`;
+      }
       progBar.style.width = '100%';
       this._setFooter(`<button class="ie-btn ie-btn-primary" id="ie-done-btn">完成</button>`);
       this._overlay.querySelector('#ie-done-btn').addEventListener('click', () => this._close());
@@ -574,8 +582,9 @@ class ImportExportManager {
   // ────────────────────────────────────────────────────────────────────────────
 
   async _loadTemplates() {
+    const _cf = this._cf.bind(this);
     try {
-      const data = await this._cloudGet(`/api/import-export/templates?module=${encodeURIComponent(this._moduleId)}`);
+      const data = await _cf('GET', `/api/import-export/templates?module=${encodeURIComponent(this._moduleId)}`);
       this._exportState.templates = data || [];
     } catch {
       this._exportState.templates = [];
@@ -744,14 +753,15 @@ class ImportExportManager {
       this._setTitle('导出数据');
     });
     this._overlay.querySelector('#ie-tmpl-save').addEventListener('click', async () => {
+      const _cf = this._cf.bind(this);
       const config   = editor.getConfig();
       const name     = editor.getName() || '未命名模板';
       const isShared = editor.getIsShared();
       try {
         if (gid) {
-          await this._cloudPatch(`/api/import-export/templates/${gid}`, { name, config, is_shared: isShared });
+          await _cf('PATCH', `/api/import-export/templates/${gid}`, { name, config, is_shared: isShared });
         } else {
-          const resp = await this._cloudPost('/api/import-export/templates', {
+          const resp = await _cf('POST', '/api/import-export/templates', {
             name, module: this._moduleId, config, is_shared: isShared,
           });
           if (resp?.gid) this._exportState.templateGid = resp.gid;
@@ -806,7 +816,8 @@ class ImportExportManager {
   }
 
   async _exportToExcel(tmplConfig, rows) {
-    const resp = await this._cloudPost('/api/import-export/export/excel', {
+    const _cf = this._cf.bind(this);
+    const resp = await _cf('POST', '/api/import-export/export/excel', {
       template_config: tmplConfig,
       rows,
     });
@@ -831,6 +842,7 @@ class ImportExportManager {
   }
 
   async _exportToLarkSheet(tmplConfig, rows) {
+    const _cf = this._cf.bind(this);
     const token   = this._overlay.querySelector('#ie-exp-lark-token')?.value.trim();
     const sheetId = this._overlay.querySelector('#ie-exp-lark-sheet')?.value.trim() || 'Sheet1';
     if (!token) throw new Error('请输入飞书电子表格 Token');
@@ -844,7 +856,7 @@ class ImportExportManager {
       return typeof v === 'object' ? JSON.stringify(v) : (v ?? '');
     }));
 
-    await this._cloudPost('/api/import-export/lark-sheets/write', {
+    await _cf('POST', '/api/import-export/lark-sheets/write', {
       user_access_token: userToken,
       spreadsheet_token: token,
       sheet_id: sheetId,
@@ -854,6 +866,7 @@ class ImportExportManager {
   }
 
   async _exportToLarkBitable(tmplConfig, rows) {
+    const _cf = this._cf.bind(this);
     const appToken = this._overlay.querySelector('#ie-exp-bitable-app')?.value.trim();
     const tableId  = this._overlay.querySelector('#ie-exp-bitable-table')?.value.trim();
     if (!appToken || !tableId) throw new Error('请填写 App Token 和 Table ID');
@@ -867,7 +880,7 @@ class ImportExportManager {
       return fields;
     });
 
-    await this._cloudPost('/api/import-export/lark-bitable/write', {
+    await _cf('POST', '/api/import-export/lark-bitable/write', {
       user_access_token: userToken,
       app_token: appToken,
       table_id: tableId,
@@ -879,26 +892,12 @@ class ImportExportManager {
   // 工具：云端 API 调用
   // ────────────────────────────────────────────────────────────────────────────
 
-  async _cloudGet(path) {
-    const fn = window.parent?._cloudFetch || window._cloudFetch;
+  async _cf(method, path, body) {
+    const fn = window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
     if (!fn) throw new Error('_cloudFetch 未就绪');
-    const resp = await fn(path);
-    if (!resp?.success) throw new Error(resp?.message || 'API 调用失败');
-    return resp.data;
-  }
-
-  async _cloudPost(path, body) {
-    const fn = window.parent?._cloudFetch || window._cloudFetch;
-    if (!fn) throw new Error('_cloudFetch 未就绪');
-    const resp = await fn(path, { method: 'POST', body: JSON.stringify(body) });
-    if (!resp?.success) throw new Error(resp?.message || 'API 调用失败');
-    return resp.data;
-  }
-
-  async _cloudPatch(path, body) {
-    const fn = window.parent?._cloudFetch || window._cloudFetch;
-    if (!fn) throw new Error('_cloudFetch 未就绪');
-    const resp = await fn(path, { method: 'PATCH', body: JSON.stringify(body) });
+    const opts = { method };
+    if (body !== undefined) opts.body = JSON.stringify(body);
+    const resp = await fn(path, opts);
     if (!resp?.success) throw new Error(resp?.message || 'API 调用失败');
     return resp.data;
   }

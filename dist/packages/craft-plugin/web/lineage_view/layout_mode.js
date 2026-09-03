@@ -45,6 +45,54 @@ const HIDDEN_TYPES = ['part', 'non_standard_part', 'standard_part', 'support_mat
   'knowledge', 'rule', 'issue', 'standard_task', 'non_standard_task',
   'contral_plan', 'process_chart', 'operation', 'floor_height_factory', 'jack_pos'];
 
+const _PROCESS_SEQ_COLORS = new Set(['red', 'yellow', 'green', 'gray', 'blue']);
+
+function _getProcessCardPresentation(row) {
+  const meta = row?.meta && typeof row.meta === 'object' ? row.meta : {};
+  const entity = row?.entity_data && typeof row.entity_data === 'object' ? row.entity_data : {};
+  const ext = entity.ext && typeof entity.ext === 'object' ? entity.ext : {};
+  const modifiedType = entity.modified_type ?? ext.modified_type ?? meta.modified_type;
+  const criticalProcess = entity.critical_process ?? ext.critical_process ?? meta.critical_process;
+  const savedColor = entity.sequence_color ?? ext.sequence_color ?? meta.sequence_color;
+  let changeClass = '';
+  if (['工艺修改', '变更工序', '改变工序'].includes(modifiedType)) changeClass = 'll-process-change-operation';
+  else if (['仅零件修改', '仅改零件'].includes(modifiedType)) changeClass = 'll-process-change-parts';
+  return {
+    changeClass,
+    isCritical: criticalProcess === true || criticalProcess === 'true' || criticalProcess === '是',
+    seqColor: _PROCESS_SEQ_COLORS.has(savedColor) ? savedColor : 'blue',
+  };
+}
+
+async function _layoutInvokeCapability(id, payload) {
+  const _cloudFetch = _lineageVersionCf;
+  const requestBody = {
+    version: 1,
+    payload,
+    idempotency_key: `${id}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+  };
+  const request = (suffix, body) => _cloudFetch(`/api/v1/capabilities/${id}:${suffix}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  let response = await request('invoke', requestBody);
+  if (response?.data?.error?.code === 'confirmation_required') {
+    const confirmation = await request('confirm', requestBody);
+    const token = confirmation?.data?.confirmation_token;
+    if (!token) throw new Error(`能力确认失败：${id}@1`);
+    response = await request('invoke', { ...requestBody, confirmation_token: token });
+  }
+  const result = response?.data;
+  if (response?.success !== true || result?.ok !== true) {
+    const detail = result?.error || response?.error || {};
+    const error = new Error(detail.message || `能力调用失败：${id}@1`);
+    error.code = detail.code || 'capability_invocation_failed';
+    throw error;
+  }
+  return result.data;
+}
+
 
 class LayoutMode {
   /**
@@ -98,11 +146,16 @@ class LayoutMode {
     this._demotePending   = null; // { el, row, startX, startY }
     this._demoteDrag      = null; // { row, ghostEl }
     this._preserveView    = false; // true 时 render() 跳过 _fitToScreen
+    this._hasRendered     = false; // 同一 BOP 的后续数据重绘始终保持视点
+    this._positionSaveQueue = Promise.resolve();
+    this._positionSaveSeq = new Map();
+    this._positionConfirmed = new Map();
     this._html5DragHovered = null; // HTML5 拖拽高亮的卡片元素
     this._stagingDrag     = null; // { info, ghostEl, validTargets, hoveredGid }
 
     // 虚拟渲染：记录已渲染卡片的线体 gid，避免重复渲染
     this._renderedLineGids = new Set();
+    this._loadingLineGids = new Set();
     this._vrTimer = null; // 防抖定时器
 
     // 工序卡片复制粘贴（Ctrl+C / Ctrl+V）
@@ -178,12 +231,13 @@ class LayoutMode {
     this._updateWorldSize();
 
     // 自动适配到视口：让所有元素在初始视图内完整可见
-    if (this._preserveView) {
+    if (this._hasRendered || this._preserveView) {
       this._preserveView = false;
       this._setTransform(); // 保持当前 zoom/pan，只重新应用变换
     } else {
       this._fitToScreen();
     }
+    this._hasRendered = true;
 
     // 恢复选中
     if (this._activeGid) this.highlightNode(this._activeGid);
@@ -207,7 +261,7 @@ class LayoutMode {
    * version switch or refresh. The LayoutMode instance and its event wiring
    * remain reusable for the next bounded projection.
    */
-  destroyHeavyState() {
+  destroyHeavyState({ preserveView = false } = {}) {
     if (this._vrTimer !== null) clearTimeout(this._vrTimer);
     this._vrTimer = null;
     if (this._edgeScrollRaf !== null && typeof cancelAnimationFrame === 'function') {
@@ -225,6 +279,7 @@ class LayoutMode {
     this._lineCarAreas.clear();
     this._stationDirection.clear();
     this._renderedLineGids.clear();
+    this._loadingLineGids.clear();
     this._mergeData = null;
     this._multiMode = false;
     this._activeGid = null;
@@ -238,7 +293,8 @@ class LayoutMode {
     this._html5DragHovered = null;
     this._stagingDrag = null;
     this._edgeMouseClient = { x: 0, y: 0 };
-    this._preserveView = false;
+    this._preserveView = preserveView;
+    this._hasRendered = preserveView;
   }
 
   /**
@@ -469,6 +525,10 @@ class LayoutMode {
       this._layoutLineStations(gid);
     }
 
+    this._restackLineBoxes(lines);
+  }
+
+  _restackLineBoxes(lines = this._world.querySelectorAll('.ll-line-box')) {
     // 重新堆叠线框位置，确保互不重叠
     let autoY = LL_LINE_PAD;
     for (const lineEl of lines) {
@@ -655,12 +715,24 @@ class LayoutMode {
     const buffer = this._viewport.clientHeight;
     let anyNew = false;
     for (const line of this._filteredLines) {
-      if (this._renderedLineGids.has(line.gid)) continue;
       if (!this._isLineVisible(line.gid, buffer)) continue;
+      this._requestVisibleLineData(line);
+      if (this._renderedLineGids.has(line.gid)) continue;
       this._renderLineCards(line.gid);
       anyNew = true;
     }
     if (anyNew) this._updateMinimap();
+  }
+
+  _requestVisibleLineData(line, force = false) {
+    if (!line?.gid || typeof this._data?.ensureScopeLoaded !== 'function') return;
+    if (!force && this._zoom < LL_LOD_THRESHOLD) return;
+    if ((this._data.childMap.get(line.gid) || []).length > 0) return;
+    if (this._loadingLineGids.has(line.gid)) return;
+    this._loadingLineGids.add(line.gid);
+    Promise.resolve(this._data.ensureScopeLoaded(line))
+      .catch(error => console.error('[LayoutMode] progressive line load failed:', error))
+      .finally(() => this._loadingLineGids.delete(line.gid));
   }
 
   /**
@@ -1046,14 +1118,16 @@ class LayoutMode {
       const sortOrder  = (row.sort_order ?? 0) + 1;
       const versionGid = row.version_gid || this._data?.versionGid;
       try {
-        await cf('/api/bop/entries', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ version_gid: versionGid, parent_gid: parentGid, node_type: 'station_process', title: newTitle, sort_order: sortOrder }),
+        const created = await _layoutInvokeCapability('craft.bop.entry.bulk.change.apply', {
+          operation: 'create',
+          version_gid: versionGid,
+          parent_gid: parentGid,
+          node_type: 'station_process',
+          title: newTitle,
+          sort_order: sortOrder,
         });
         this._data?.toast?.('已创建工位「' + newTitle + '」', 'ok');
-        this._preserveView = true;
-        await this._data?.reloadData?.();
+        if (!this._data?.insertCreatedEntry?.(_createdEntryFromResult(created))) await this._data?.reloadData?.();
       } catch (err) {
         this._data?.toast?.('创建工位失败: ' + err.message, 'error');
       }
@@ -1078,18 +1152,15 @@ class LayoutMode {
     const targetVersionGid = target.version_gid || this._data.versionGid;
 
     try {
-      await cf('/api/bop/entries', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          version_gid:      targetVersionGid,
-          parent_gid:       target.gid,
-          node_type:        srcRow.node_type,
-          title:            srcRow.title      || '',
-          vpps:             srcRow.vpps       || '',
-          vpps_desc:        srcRow.vpps_desc  || '',
-          sort_order:       0,
-        }),
+      await _layoutInvokeCapability('craft.bop.entry.bulk.change.apply', {
+        operation: 'create',
+        version_gid: targetVersionGid,
+        parent_gid: target.gid,
+        node_type: srcRow.node_type,
+        title: srcRow.title || '',
+        vpps: srcRow.vpps || '',
+        vpps_desc: srcRow.vpps_desc || '',
+        sort_order: 0,
       });
 
       this._data?.toast?.(`已粘贴「${srcRow.title || srcRow.node_type}」`, 'ok');
@@ -1515,6 +1586,20 @@ class LayoutMode {
    * 创建工位子卡片 — 复用列视图卡片结构（lv-card-main + lv-stats-box）
    */
 
+  refreshProcessCard(gid) {
+    const row = this._data?.rowByGid?.get(gid);
+    if (!row || row.node_type !== 'process') return false;
+    const oldCard = this._world?.querySelector(`.ll-ring-card[data-gid="${gid}"]`);
+    if (!oldCard) return false;
+    const newCard = this._createRingCard(row);
+    newCard.style.cssText = oldCard.style.cssText;
+    for (const stateClass of ['active-node', 'active-child', 'll-copied']) {
+      if (oldCard.classList.contains(stateClass)) newCard.classList.add(stateClass);
+    }
+    oldCard.replaceWith(newCard);
+    return true;
+  }
+
   _createRingCard(row) {
     const el = document.createElement('div');
     el.className = 'll-ring-card' + (this._editMode ? ' ll-draggable' : '');
@@ -1523,12 +1608,14 @@ class LayoutMode {
     const isProcess  = row.node_type === 'process';
 
     if (isProcess) {
+      const presentation = _getProcessCardPresentation(row);
       // ── 工序卡片专属布局 ──────────────────────────────────────────
       // 左侧：徽标+标题（可换行）+ 底部统计小字
       // 右侧：统计面板（保留，用于图片）
       el.style.cssText = 'display:flex;align-items:stretch;padding:0;overflow:hidden';
 
       const leftEl = document.createElement('div');
+      leftEl.className = 'll-process-card-left' + (presentation.changeClass ? ' ' + presentation.changeClass : '');
       leftEl.style.cssText = 'display:flex;flex-direction:column;justify-content:space-between;padding:5px 4px 4px 8px;flex:1;min-width:0;overflow:hidden';
 
       // 徽标 + 标题内联
@@ -1536,9 +1623,14 @@ class LayoutMode {
       titleRow.style.cssText = 'display:flex;align-items:flex-start;gap:4px';
 
       const typeEl = document.createElement('span');
-      typeEl.className = 'lv-type lv-nt-process';
+      typeEl.className = `lv-type lv-nt-process ll-process-seq-badge ll-seq-${presentation.seqColor}`;
       typeEl.style.cssText = 'flex-shrink:0;margin-top:1px;font-size:11px;line-height:1.35';
       typeEl.textContent = '序';
+      typeEl.title = '点击选择序字颜色';
+      typeEl.addEventListener('click', e => {
+        e.stopPropagation();
+        this._openProcessSeqColorPicker(typeEl, row);
+      });
       titleRow.appendChild(typeEl);
 
       const titleEl = document.createElement('span');
@@ -1573,7 +1665,14 @@ class LayoutMode {
       {
         const statsRow = document.createElement('div');
         statsRow.style.cssText = 'font-size:9px;color:var(--subtext0,#a6adc8);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
-        statsRow.textContent = statParts.join('  ');
+        if (presentation.isCritical) {
+          const criticalMark = document.createElement('span');
+          criticalMark.className = 'll-process-critical-mark';
+          criticalMark.textContent = 'G';
+          criticalMark.title = '关键工艺';
+          statsRow.appendChild(criticalMark);
+        }
+        statsRow.appendChild(document.createTextNode(statParts.join('  ')));
         leftEl.appendChild(statsRow);
       }
 
@@ -1697,6 +1796,48 @@ class LayoutMode {
     }
 
     return el;
+  }
+
+  _openProcessSeqColorPicker(badgeEl, row) {
+    document.querySelector('.ll-seq-color-picker')?.remove();
+    const picker = document.createElement('div');
+    picker.className = 'll-seq-color-picker';
+    const labels = { red: '红', yellow: '黄', green: '绿', gray: '灰', blue: '蓝' };
+    const current = _getProcessCardPresentation(row).seqColor;
+    for (const color of _PROCESS_SEQ_COLORS) {
+      const option = document.createElement('button');
+      option.type = 'button';
+      option.className = `ll-seq-color-option ll-seq-${color}` + (color === current ? ' active' : '');
+      option.dataset.color = color;
+      option.title = labels[color];
+      option.setAttribute('aria-label', labels[color]);
+      option.addEventListener('click', async event => {
+        event.stopPropagation();
+        try {
+          await _layoutInvokeCapability('craft.bop.entry.change.apply', {
+            operation: 'update', entry_gid: row.gid, properties: [{ name: 'sequence_color', value: color }],
+          });
+          if (!row.entity_data || typeof row.entity_data !== 'object') row.entity_data = {};
+          if (!row.entity_data.ext || typeof row.entity_data.ext !== 'object') row.entity_data.ext = {};
+          row.entity_data.ext.sequence_color = color;
+          badgeEl.classList.remove('ll-seq-red', 'll-seq-yellow', 'll-seq-green', 'll-seq-gray', 'll-seq-blue');
+          badgeEl.classList.add(`ll-seq-${color}`);
+          picker.remove();
+        } catch (error) {
+          this._data?.toast?.('序字颜色保存失败: ' + (error?.message || error), 'error');
+        }
+      });
+      picker.appendChild(option);
+    }
+    document.body.appendChild(picker);
+    const rect = badgeEl.getBoundingClientRect();
+    picker.style.left = `${Math.max(6, rect.left)}px`;
+    picker.style.top = `${rect.bottom + 6}px`;
+    setTimeout(() => {
+      document.addEventListener('click', event => {
+        if (!picker.contains(event.target) && event.target !== badgeEl) picker.remove();
+      }, { once: true });
+    }, 0);
   }
 
   /**
@@ -2647,15 +2788,12 @@ class LayoutMode {
         try {
           const info = JSON.parse(assocData);
           if (!info.refGid || !info.linkType) throw new Error('缺少关联信息');
-          await cf('/api/bop/entry-links', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              bop_entry_gid: targetGid,
-              link_type:     info.linkType,
-              ref_gid:       info.refGid,
-              is_primary:    info.isPrimary ?? false,
-            }),
+          await _layoutInvokeCapability('craft.bop.entry_link.change.apply', {
+            operation: 'attach',
+            entry_gid: targetGid,
+            link_type: info.linkType,
+            entity_gid: info.refGid,
+            is_primary: info.isPrimary ?? false,
           });
           if (toast) toast('已创建关联', 'ok');
           if (reloadData) await reloadData();
@@ -3031,6 +3169,8 @@ class LayoutMode {
   _scrollToLine(lineGid) {
     const pos = this._linePositions.get(lineGid);
     if (!pos) return;
+    const line = this._filteredLines.find(item => item.gid === lineGid);
+    if (line) this._requestVisibleLineData(line, true);
     const vw = this._viewport.clientWidth;
     const vh = this._viewport.clientHeight;
     const lineCX = pos.x + pos.w / 2;
@@ -3637,13 +3777,10 @@ class LayoutMode {
           return;
         }
       }
-      await _cf(`/api/bop/entries/${drag.row.gid}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ parent_gid: drag.hoveredGid }),
-      });
-      this._preserveView = true;
-      if (this._data?.reloadData) await this._data.reloadData();
+      const sortOrder = this._positionOrder(drag.hoveredGid, drag.row.node_type, drag.row.gid);
+      const body = { parent_gid: drag.hoveredGid, sort_order: sortOrder };
+      const previous = this._moveRowLocally(drag.row, body.parent_gid, body.sort_order);
+      return this._queuePositionSave(drag.row, body, previous, '移动失败');
     } catch (err) {
       if (this._data?.toast) this._data.toast('移动失败: ' + err.message, 'error');
       else console.error('[LayoutMode] _commitParentChange error:', err);
@@ -3660,6 +3797,96 @@ class LayoutMode {
     return null;
   }
 
+  _positionOrder(parentGid, nodeType, dragGid, afterGid = null) {
+    const orderOf = row => {
+      const value = Number(row.sort_order);
+      return Number.isFinite(value) ? value : 0;
+    };
+    const siblings = (this._data?.childMap.get(parentGid) || [])
+      .filter(row => row.node_type === nodeType && row.gid !== dragGid)
+      .sort((a, b) => orderOf(a) - orderOf(b));
+    if (!afterGid) return siblings.length ? orderOf(siblings[siblings.length - 1]) + 1 : 1;
+
+    const index = siblings.findIndex(row => row.gid === afterGid);
+    if (index < 0) return siblings.length ? orderOf(siblings[siblings.length - 1]) + 1 : 1;
+    const current = orderOf(siblings[index]);
+    const next = siblings[index + 1];
+    return next && orderOf(next) > current ? (current + orderOf(next)) / 2 : current + 1;
+  }
+
+  _queuePositionSave(row, body, previous, errorLabel) {
+    const seq = (this._positionSaveSeq.get(row.gid) || 0) + 1;
+    this._positionSaveSeq.set(row.gid, seq);
+    if (!this._positionConfirmed.has(row.gid)) this._positionConfirmed.set(row.gid, previous);
+
+    const request = this._positionSaveQueue.then(() => _layoutInvokeCapability('craft.bop.entry.change.apply', {
+      operation: 'update',
+      entry_gid: row.gid,
+      updates: body,
+    }));
+    this._positionSaveQueue = request.catch(err => {
+      if (this._positionSaveSeq.get(row.gid) === seq) {
+        const confirmed = this._positionConfirmed.get(row.gid);
+        if (confirmed) this._moveRowLocally(row, confirmed.parentGid, confirmed.sortOrder);
+        this._positionSaveSeq.delete(row.gid);
+        this._positionConfirmed.delete(row.gid);
+      }
+      if (this._data?.toast) this._data.toast(`${errorLabel}: ${err.message}`, 'error');
+      else console.error(`[LayoutMode] ${errorLabel}:`, err);
+    }).then(() => {
+      if (this._positionSaveSeq.get(row.gid) === seq) {
+        this._positionSaveSeq.delete(row.gid);
+        this._positionConfirmed.delete(row.gid);
+      }
+    });
+    return this._positionSaveQueue;
+  }
+
+  _moveRowLocally(row, parentGid, sortOrder) {
+    const previous = {
+      parentGid: row.parent_gid || null,
+      sortOrder: row.sort_order,
+      lineGid: this._findAncestorLineGid(row.gid),
+    };
+    const oldSiblings = this._data?.childMap.get(previous.parentGid);
+    if (oldSiblings) {
+      const index = oldSiblings.indexOf(row);
+      if (index >= 0) oldSiblings.splice(index, 1);
+    }
+
+    row.parent_gid = parentGid;
+    row.sort_order = sortOrder;
+    let newSiblings = this._data?.childMap.get(parentGid);
+    if (!newSiblings) {
+      newSiblings = [];
+      this._data?.childMap.set(parentGid, newSiblings);
+    }
+    if (!newSiblings.includes(row)) newSiblings.push(row);
+    newSiblings.sort((a, b) => (Number(a.sort_order) || 0) - (Number(b.sort_order) || 0));
+    this._refreshAfterPositionChange(new Set([
+      previous.lineGid,
+      this._findAncestorLineGid(row.gid),
+    ].filter(Boolean)));
+    return previous;
+  }
+
+  _refreshAfterPositionChange(lineGids) {
+    for (const lineGid of lineGids) {
+      this._layoutLineStations(lineGid);
+      const layoutEl = this._world.querySelector(`.ll-line-box[data-gid="${lineGid}"] .ll-line-layout`);
+      if (layoutEl) {
+        layoutEl.innerHTML = '';
+        delete layoutEl.dataset.rendered;
+      }
+      this._renderedLineGids.delete(lineGid);
+      this._renderLineCards(lineGid);
+    }
+    this._restackLineBoxes();
+    this._updateWorldSize();
+    this._renderMinimap();
+    if (this._activeGid) this.highlightNode(this._activeGid);
+  }
+
   async _commitPositionAfter(drag) {
     const targetRow  = this._data?.rowByGid.get(drag.hoveredGid);
     if (!targetRow) return;
@@ -3674,47 +3901,15 @@ class LayoutMode {
       }
     }
 
-    const nodeType   = drag.row.node_type;
-    const dragParent = drag.row.parent_gid || null;
     const destParent = targetRow.parent_gid || null;
 
     try {
-      // Step 1：跨父时先换挂
-      if (dragParent !== destParent) {
-        await _cf(`/api/bop/entries/${drag.row.gid}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ parent_gid: targetRow.parent_gid }),
-        });
-      }
-
-      // Step 2：在目标父级的同类子节点中计算新顺序
-      // childMap 尚未刷新，跨父时手动排除拖拽行，再追加到末尾
-      const destSiblings = (this._data?.childMap.get(destParent) || [])
-        .filter(r => r.node_type === nodeType && r.gid !== drag.row.gid)
-        .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
-
-      // 插到目标后面
-      const targetIdx = destSiblings.findIndex(r => r.gid === drag.hoveredGid);
-      destSiblings.splice(targetIdx + 1, 0, drag.row);
-
-      // 只 PATCH 序号变化的行（拖拽行强制包含，以便在跨父时也写入新 seq_no）
-      const patches = destSiblings
-        .map((r, i) => ({ gid: r.gid, newSeq: i + 1, oldSeq: r.sort_order }))
-        .filter(p => p.newSeq !== p.oldSeq || p.gid === drag.row.gid);
-
-      if (patches.length) {
-        await Promise.all(patches.map(p =>
-          _cf(`/api/bop/entries/${p.gid}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sort_order: p.newSeq }),
-          })
-        ));
-      }
-
-      this._preserveView = true;
-      if (this._data?.reloadData) await this._data.reloadData();
+      const sortOrder = this._positionOrder(
+        destParent, drag.row.node_type, drag.row.gid, drag.hoveredGid,
+      );
+      const body = { parent_gid: destParent, sort_order: sortOrder };
+      const previous = this._moveRowLocally(drag.row, body.parent_gid, body.sort_order);
+      return this._queuePositionSave(drag.row, body, previous, '操作失败');
     } catch (err) {
       if (this._data?.toast) this._data.toast('操作失败: ' + err.message, 'error');
       else console.error('[LayoutMode] _commitPositionAfter error:', err);

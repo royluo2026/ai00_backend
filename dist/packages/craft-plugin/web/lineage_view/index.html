@@ -32,7 +32,7 @@
     })();
   </script>
   <script src="/web/components/iframe_error_bridge.js"></script>
-  <link rel="stylesheet" href="/assets/index-368853c6.css">
+  <link rel="stylesheet" href="/assets/index-a198f6c4.css">
   <link rel="stylesheet" href="/assets/main-921414fe.css">
   <link rel="stylesheet" href="/assets/lineage-3c29cb03.css">
   <link rel="stylesheet" href="/assets/import_export-97b455f2.css">
@@ -370,22 +370,28 @@
         <div class="ll-detail-panel" id="llDetailPanel">
           <button class="ll-dp-panel-toggle" id="llDpPanelToggle" title="折叠面板">◀</button>
           <div class="ll-dp-columns" id="llDpColumns">
-            <!-- 上：节点树 -->
+            <!-- 左：节点树 -->
             <div class="ll-dp-col ll-dp-col-tree" id="llDpTree">
               <div class="ll-dp-col-hdr">节点树<button class="ll-dp-hdr-btn" id="llDpTreeCollapse" title="折叠全部" style="margin-left:auto">⊟</button></div>
               <div id="llDpVerSlot" style="flex-shrink:0"></div>
               <div id="llDpLineSlot" style="flex-shrink:0"></div>
               <div id="llDpSearchSlot" style="flex-shrink:0;padding:4px 8px;border-bottom:1px solid var(--surface1,#45475a)">
-                <input id="llDpSearchInp" type="search" placeholder="搜索节点…" style="width:100%;box-sizing:border-box;padding:4px 8px;font-size:11px;background:var(--base,#1e1e2e);color:var(--text,#cdd6f4);border:1px solid var(--surface2,#585b70);border-radius:4px;outline:none">
+                <input id="llDpSearchInp" type="search" placeholder="搜索节点（名称/零件号/VPPS…）" style="width:100%;box-sizing:border-box;padding:4px 8px;font-size:11px;background:var(--base,#1e1e2e);color:var(--text,#cdd6f4);border:1px solid var(--surface2,#585b70);border-radius:4px;outline:none">
               </div>
               <div class="ll-dp-col-body" id="llDpTreeBody"></div>
             </div>
-            <!-- 分割条 -->
-            <div class="ll-dp-v-divider" id="llDpVDivider"></div>
-            <!-- 下：属性与关系 -->
-            <div class="ll-dp-col ll-dp-col-props" id="llDpProps">
-              <div class="ll-dp-col-hdr">属性与关系</div>
-              <div class="ll-dp-col-body" id="llDpPropsBody"></div>
+            <div class="ll-dp-v-divider" id="llDpVDivider" title="拖动调整结构树高度"></div>
+            <!-- 下：属性与关系纵向共用一个检查面板 -->
+            <div class="ll-dp-inspector" id="llDpInspector">
+              <div class="ll-dp-col ll-dp-col-props" id="llDpProps">
+                <div class="ll-dp-col-hdr">属性</div>
+                <div class="ll-dp-col-body" id="llDpPropsBody"></div>
+              </div>
+              <div class="ll-dp-section-divider" id="llDpPropsRelsDivider"></div>
+              <div class="ll-dp-col ll-dp-col-rels" id="llDpRels">
+                <div class="ll-dp-col-hdr">关系</div>
+                <div class="ll-dp-col-body" id="llDpRelsBody"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -506,9 +512,9 @@
   
   <script src="/web/components/miller_columns.js?v=20260623"></script>
   <script src="/web/components/diff_nav_tree.js?v=20260623"></script>
-  <script src="staging_panel.js?v=20260623"></script>
-  <script src="assoc_panel.js?v=20260623"></script>
-  <script src="layout_detail_panel.js?v=20260623"></script>
+  <script src="staging_panel.js?v=20260903h"></script>
+  <script src="assoc_panel.js?v=20260902a"></script>
+  <script src="layout_detail_panel.js?v=20260903m"></script>
   
   <style>
     /* 桥接 import_export.css 的 CSS 变量到 lineage 主题体系 */
@@ -537,13 +543,13 @@
   </style>
   <script src="/web/components/import_export.js"></script>
   <script src="/web/shared/lv_utils.js?v=20260623"></script>
-  <script src="lineage_version_mgr.js?v=20260722d"></script>
-  <script src="lifecycle_panel.js?v=20260722d"></script>
+  <script src="lineage_version_mgr.js?v=20260902d"></script>
+  <script src="lifecycle_panel.js?v=20260902f"></script>
   <script src="lineage_load_coordinator.js?v=20260818"></script>
   <script src="lineage_projection_store.js?v=20260818"></script>
   <script src="lineage_progressive_loader.js?v=20260818"></script>
-  <script src="lineage.js?v=20260722d"></script>
-  <script src="layout_mode.js?v=20260722d"></script>
+  <script src="lineage.js?v=20260903m"></script>
+  <script src="layout_mode.js?v=20260903m"></script>
 
   <!-- ═══ LV: 新建 / 导入 BOP Modal ═══ -->
   <div id="lv-modal-create" class="lv-modal-overlay hidden">

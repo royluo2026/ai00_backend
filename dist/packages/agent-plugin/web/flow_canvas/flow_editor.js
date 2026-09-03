@@ -6,12 +6,54 @@
  */
 
 // ── API 调用 ──────────────────────────────────────────────────────────────────
-const _cf  = () => window.parent?._cloudFetch || window._cloudFetch || null;
+const _cloudFetchFn = () => window.parent?._cloudFetch || window._cloudFetch || null;
 
-async function _apiCall(path, opts = {}) {
-  const fn = _cf();
+async function _cf(method, path, opts = {}) {
+  const fn = _cloudFetchFn();
   if (!fn) throw new Error('云端服务未连接');
-  return fn(path, opts);
+  return fn(path, { ...opts, method });
+}
+
+async function _invokeCapability(id, payload, options = {}) {
+  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version: 1, payload }),
+    signal: options.signal,
+  });
+  const envelope = response?.data;
+  if (response?.success !== true || envelope?.ok !== true) {
+    const detail = envelope?.error || response?.error || {};
+    throw new Error(detail.message || `能力调用失败：${id}@1`);
+  }
+  const value = envelope.data;
+  return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+}
+
+function _capabilityClient() {
+  const client = window.parent?.AI00ExistingCapabilityClient
+    || window.top?.AI00ExistingCapabilityClient
+    || window.AI00ExistingCapabilityClient;
+  if (!client?.invoke) throw new Error('能力客户端未就绪');
+  return client;
+}
+
+function _inputValues(values) {
+  return Object.entries(values || {}).map(([name, value]) => ({ name, value }));
+}
+
+function _newNodeTestOperation(payload) {
+  const copy = JSON.parse(JSON.stringify(payload));
+  copy.input_values.forEach(Object.freeze);
+  Object.freeze(copy.input_values);
+  return Object.freeze({
+    payload: Object.freeze(copy),
+    idempotencyKey: window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+  });
+}
+
+function _nodeTestPending(result) {
+  return ['accepted', 'outcome_unknown', 'reconciling'].includes(result?.status);
 }
 
 // ── 状态 ─────────────────────────────────────────────────────────────────────
@@ -24,6 +66,7 @@ let _runGid     = null;
 let _pollTimer  = null;
 let _stepMode   = false;
 let _pendingScriptNodeId = null;
+let _nodeTestOperation = null;
 
 const CATEGORY_COLORS = {
   data: 'cat-data', logic: 'cat-logic', notify: 'cat-notify',
@@ -56,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Load manifest
   try {
-    const res = await _apiCall('/api/flows/capability-manifest');
+    const res = await _cf('GET', '/api/flows/capability-manifest');
     _manifest = res?.manifest || [];
   } catch (e) {
     console.warn('[FlowEditor] manifest 加载失败:', e);
@@ -498,7 +541,7 @@ function _yamlVal(v) {
 
 async function _loadFlow(gid) {
   try {
-    const res = await _apiCall(`/api/flows/${gid}`);
+    const res = await _invokeCapability('agent.flow.read', { operation: 'get', flow_gid: gid });
     if (!res) { _setSaveStatus('加载失败'); return; }
     _flowData = res.data || res;
 
@@ -540,7 +583,7 @@ async function _saveFlow() {
   try {
     if (!_flowGid) {
       // 新建
-      const res = await _apiCall('/api/flows', { method: 'POST', body: JSON.stringify({ name, flowdef, description: intent }) });
+      const res = await _invokeCapability('agent.flow.change.apply', { operation: 'create', name, flowdef, description: intent });
       if (res) {
         _flowGid = res.gid || res.data?.gid;
         _flowData = { ..._flowData, gid: _flowGid, name, flowdef };
@@ -550,7 +593,7 @@ async function _saveFlow() {
         alert('保存失败');
       }
     } else {
-      await _apiCall(`/api/flows/${_flowGid}`, { method: 'PUT', body: JSON.stringify({ name, flowdef, description: intent }) });
+      await _invokeCapability('agent.flow.change.apply', { operation: 'update', flow_gid: _flowGid, name, flowdef, description: intent });
       if (_flowData) _flowData.name = name;
       _setSaveStatus('已保存');
     }
@@ -577,7 +620,7 @@ async function _runFlow() {
   if (btn) { btn.disabled = true; btn.textContent = '运行中…'; }
 
   try {
-    const res = await _apiCall(`/api/flows/${_flowGid}/run`, { method: 'POST', body: JSON.stringify({ mode: 'auto' }) });
+    const res = await _invokeCapability('agent.flow.change.apply', { operation: 'run', flow_gid: _flowGid, mode: 'auto' });
     if (res) {
       _runGid = res.run_gid || res.data?.run_gid;
       _startPolling();
@@ -594,7 +637,7 @@ async function _runFlowStep() {
   _stepMode = true;
 
   try {
-    const res = await _apiCall(`/api/flows/${_flowGid}/run`, { method: 'POST', body: JSON.stringify({ mode: 'step' }) });
+    const res = await _invokeCapability('agent.flow.change.apply', { operation: 'run', flow_gid: _flowGid, mode: 'step' });
     if (res) {
       _runGid = res.run_gid || res.data?.run_gid;
       document.getElementById('feDebugBar')?.classList.remove('hidden');
@@ -608,7 +651,7 @@ async function _runFlowStep() {
 async function _stepFlow() {
   if (!_runGid) return;
   try {
-    const res = await _apiCall(`/api/flows/runs/${_runGid}/step`, { method: 'POST' });
+    const res = await _invokeCapability('agent.flow.read', { operation: 'get_run', run_gid: _runGid });
     _updateRunState(res?.data || res);
   } catch (e) {
     console.error('[FlowEditor] step error:', e);
@@ -627,7 +670,7 @@ function _stopPolling() {
 async function _pollRunState() {
   if (!_runGid) { _stopPolling(); return; }
   try {
-    const res = await _apiCall(`/api/flows/runs/${_runGid}`);
+    const res = await _invokeCapability('agent.flow.read', { operation: 'get_run', run_gid: _runGid });
     _updateRunState(res);
     if (res?.status === 'completed' || res?.status === 'failed') {
       _stopPolling();
@@ -674,7 +717,7 @@ function _updateRunState(state) {
 async function _loadHistory() {
   if (!_flowGid) return;
   try {
-    const res = await _apiCall(`/api/flows/runs?flow_gid=${_flowGid}&limit=10`);
+    const res = await _invokeCapability('agent.flow.read', { operation: 'list_runs', flow_gid: _flowGid, limit: 10 });
     _renderHistory(res?.items || []);
   } catch (_) {}
 }
@@ -717,15 +760,12 @@ function _testNode(nodeId) {
   if (inputsEl) inputsEl.value = JSON.stringify(nodeData.data?.config || {}, null, 2);
 
   document.getElementById('feTestResult')?.classList.add('hidden');
-  modal.dataset.nodeType   = nodeData.data?.type || '';
-  modal.dataset.nodeConfig = JSON.stringify(nodeData.data?.config || {});
+  modal.dataset.nodeId = nodeData.data?.id || `node_${nodeId}`;
   modal.classList.remove('hidden');
 }
 
 async function _runTest() {
   const modal = document.getElementById('feTestModal');
-  const type   = modal?.dataset.nodeType;
-  const config = JSON.parse(modal?.dataset.nodeConfig || '{}');
   const inputsEl = document.getElementById('feTestInputs');
 
   let inputs = {};
@@ -735,13 +775,34 @@ async function _runTest() {
   if (btn) { btn.disabled = true; btn.textContent = '执行中…'; }
 
   try {
-    const res = await _apiCall('/api/flows/test-node', { method: 'POST', body: JSON.stringify({ type, config, inputs }) });
+    const payload = {
+      flow_gid: _flowGid,
+      node_id: modal?.dataset.nodeId || '',
+      input_values: _inputValues(inputs),
+    };
+    if (!_nodeTestOperation || JSON.stringify(_nodeTestOperation.payload) !== JSON.stringify(payload)) {
+      _nodeTestOperation = _newNodeTestOperation(payload);
+    }
+    const operation = _nodeTestOperation;
+    const res = await _capabilityClient().invoke('agent.workflow.node.test.execute', operation.payload, {
+      write: true, confirmed: true, idempotencyKey: operation.idempotencyKey,
+    });
     const outEl = document.getElementById('feTestOutput');
     const resEl = document.getElementById('feTestResult');
+    if (_nodeTestPending(res)) {
+      if (outEl) outEl.textContent = res.status === 'accepted'
+        ? '测试已受理，正在协调；使用相同输入可重试。'
+        : '测试结果未知，正在协调；使用相同输入可重试。';
+      resEl?.classList.remove('hidden');
+      return;
+    }
+    _nodeTestOperation = null;
     if (outEl) outEl.textContent = JSON.stringify(res?.output || res, null, 2);
     resEl?.classList.remove('hidden');
   } catch (e) {
-    alert('测试失败: ' + e);
+    const unknown = !e?.code || e.code === 'outcome_unknown';
+    if (!unknown) _nodeTestOperation = null;
+    alert(unknown ? '测试结果未知，可使用相同输入重试。' : '测试失败: ' + e);
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '执行测试'; }
   }
@@ -777,7 +838,7 @@ async function _generateScript() {
   if (btn) { btn.disabled = true; btn.textContent = 'AI 生成中…'; }
 
   try {
-    const res = await _apiCall('/api/flows/gen-script', {
+    const res = await _cf('POST', '/api/flows/gen-script', {
       method: 'POST',
       body: JSON.stringify({ description: desc, inputs_schema: {}, outputs_schema: {} }),
     });

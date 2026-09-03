@@ -8,7 +8,7 @@ Governed Craft resource requirement staging.resolve outcome.
 - 不适用：The object is a physical Factory asset or a legacy VPPS template row.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_79ebfa43788065717b2a11476ede257f`
+- Catalog Release：`rel_94ba4f715fc3e8b6c9f617c4a5b05fe5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -101,7 +101,7 @@ Governed Craft resource requirement staging.resolve outcome.
 ```json
 {
   "capability_id": "craft.resource_requirement.staging.resolve",
-  "catalog_release": "rel_79ebfa43788065717b2a11476ede257f",
+  "catalog_release": "rel_94ba4f715fc3e8b6c9f617c4a5b05fe5",
   "major_version": 1,
   "payload": {
     "expected_staging_version": 1,

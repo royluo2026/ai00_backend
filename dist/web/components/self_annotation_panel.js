@@ -14,12 +14,23 @@ const SelfAnnotationPanel = (() => {
   let _panelEl           = null;
   let _currentGid        = null;
   let _currentTitle      = '';
-  let _currentAttachments = [];   // 从后端加载，保存时原样写回
+  let _currentAttachments = [];
+  let _currentRevision = 1;
 
-  /* ── 内部：通过宿主窗口 _cloudFetch 发请求 ─────────────────── */
-  function _cf(path, opts) {
-    const fn = window.parent?._cloudFetch || window._cloudFetch;
-    return fn ? fn(path, opts).catch(() => null) : Promise.resolve(null);
+  function _client() {
+    return window.top?.AI00ExistingCapabilityClient || window.parent?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
+  }
+
+  function _typedAttachments(value) {
+    const keys = ['attachment_gid', 'media_type', 'display_name', 'size', 'checksum'];
+    return Array.isArray(value) ? value.filter(item => item && typeof item === 'object'
+      && Object.keys(item).length === keys.length && keys.every(key => Object.hasOwn(item, key))
+      && typeof item.attachment_gid === 'string' && typeof item.media_type === 'string'
+      && typeof item.display_name === 'string' && Number.isInteger(item.size)
+      && /^sha256:[0-9a-f]{64}$/.test(item.checksum)).map(item => ({
+        attachment_gid: item.attachment_gid, media_type: item.media_type, display_name: item.display_name,
+        size: item.size, checksum: item.checksum,
+      })) : [];
   }
 
   /* ── 公开：打开面板 ─────────────────────────────────────────── */
@@ -143,15 +154,15 @@ const SelfAnnotationPanel = (() => {
 
   /* ── 内部：从后端加载数据填入表单 ─────────────────────────── */
   async function _load(gid) {
-    const data = await _cf(`/api/self_ann/${gid}`);
+    const data = await _client().call('base.annotations.get', { itemGid: gid }).catch(() => null);
     if (!data) return;
 
-    _panelEl.querySelector('.sap-status').value   = data.self_status   || '';
-    _panelEl.querySelector('.sap-schedule').value = data.self_schedule || '';
-    _panelEl.querySelector('.sap-note').value     = data.self_note     || '';
+    _panelEl.querySelector('.sap-status').value   = data.status   || '';
+    _panelEl.querySelector('.sap-schedule').value = data.schedule || '';
+    _panelEl.querySelector('.sap-note').value     = data.note     || '';
 
-    // 保存附件引用（不展示，但保存时原样写回以保留数据）
-    _currentAttachments = Array.isArray(data.self_attachments) ? data.self_attachments : [];
+    _currentRevision = data.revision || 1;
+    _currentAttachments = _typedAttachments(data.attachments);
   }
 
   /* ── 内部：保存 ────────────────────────────────────────────── */
@@ -161,23 +172,15 @@ const SelfAnnotationPanel = (() => {
     const scheduleVal = _panelEl.querySelector('.sap-schedule').value;
     const noteVal     = _panelEl.querySelector('.sap-note').value;
 
-    const body = {
-      item_title:       _currentTitle,
-      self_status:      statusVal,
-      self_schedule:    scheduleVal,
-      self_note:        noteVal,
-      self_attachments: _currentAttachments,   // 保留已有附件
-    };
-
     const msgEl = _panelEl.querySelector('.sap-save-msg');
     msgEl.textContent = '保存中…';
+    const res = await _client().call('base.annotations.apply', {
+      itemGid: _currentGid, expectedRevision: _currentRevision, status: statusVal || 'open',
+      schedule: scheduleVal || null, note: noteVal, attachments: _currentAttachments,
+    }, { confirm: () => window.confirm('确认保存此自我标注？') }).catch(() => null);
 
-    const res = await _cf(`/api/self_ann/${_currentGid}`, {
-      method: 'PUT',
-      body:   JSON.stringify(body),
-    });
-
-    if (res?.success) {
+    if (res) {
+      _currentRevision = res.revision;
       msgEl.textContent = '已保存';
       setTimeout(() => { if (msgEl) msgEl.textContent = ''; }, 1800);
       window.dispatchEvent(new CustomEvent('sap-saved', {
@@ -218,10 +221,7 @@ const SapAnnotList = (() => {
   const STATUS_FILTERS = ['', '待关注', '进行中', '已完成', '已搁置'];
   const STATUS_LABELS  = { '': '全部', '待关注': '待关注', '进行中': '进行中', '已完成': '已完成', '已搁置': '已搁置' };
 
-  function _cf(path) {
-    const fn = window.parent?._cloudFetch || window._cloudFetch;
-    return fn ? fn(path).catch(() => null) : Promise.resolve(null);
-  }
+  function _client() { return window.top?.AI00ExistingCapabilityClient || window.parent?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient; }
 
   function _esc(s) {
     return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -289,11 +289,13 @@ const SapAnnotList = (() => {
   async function _load() {
     const listEl = _el.querySelector('.sao-list');
     listEl.innerHTML = '<div class="sao-loading">加载中…</div>';
-    const url = _module
-      ? `/api/self_ann/list?module=${encodeURIComponent(_module)}`
-      : '/api/self_ann/list';
-    const res = await _cf(url);
-    _allItems = Array.isArray(res) ? res : [];
+    const res = _module
+      ? await _client().call('base.annotations.search', { limit: 200, module: _module }).catch(() => null)
+      : await _client().call('base.annotations.search', { limit: 200, module: null }).catch(() => null);
+    _allItems = Array.isArray(res) ? res.map(item => ({
+      item_gid: item.item_gid, self_status: item.status, self_schedule: item.schedule || '',
+      self_note: item.note, self_attachments: item.attachments, revision: item.revision,
+    })) : [];
     _render();
   }
 

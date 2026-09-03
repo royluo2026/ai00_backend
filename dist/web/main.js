@@ -351,12 +351,13 @@ const LogPanel = (() => {
   }
 
   async function refresh() {
+    const _cloudFetch = window._cloudFetch?.bind(window);
     try {
       const lines = [];
 
       // 1. 后端服务日志（/admin/debug-logs）
       if (window._cloudFetch) {
-        const res = await window._cloudFetch('/admin/debug-logs?limit=200').catch(() => null);
+        const res = await _cloudFetch('/admin/debug-logs?limit=200', { method: 'GET' }).catch(() => null);
         if (res?.data) lines.push(...res.data.map(l => '[Backend] ' + l));
       }
 
@@ -637,6 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── 深链接处理 ─────────────────────────────────────────────────────────────────
 async function _handleDeepLink(url) {
+  const _cloudFetch = window._cloudFetch?.bind(window);
   if (!url) return;
   try {
     const u = new URL(url);
@@ -652,7 +654,7 @@ async function _handleDeepLink(url) {
     if (!match) return;
     const token = match[1];
     if (window._authMode !== 'feishu') return;
-    const data = await window._cloudFetch(`/api/share-links/${token}`);
+    const data = await _cloudFetch(`/api/share-links/${token}`, { method: 'GET' });
     if (data.current_permission && data.current_permission !== 'none') {
       // 有权限直接打开
       if (data.target_type === 'list') {
@@ -689,11 +691,12 @@ function _showPermissionRequestDialog(token, displayName) {
   document.body.appendChild(dlg);
   dlg.querySelector('#_prd-cancel').onclick = () => dlg.remove();
   dlg.querySelector('#_prd-submit').onclick = async () => {
+    const _cloudFetch = window._cloudFetch?.bind(window);
     const btn = dlg.querySelector('#_prd-submit');
     const message = dlg.querySelector('#_prd-message').value.trim();
     btn.disabled = true; btn.textContent = '提交中...';
     try {
-      await window._cloudFetch('/api/permission-requests', {
+      await _cloudFetch('/api/permission-requests', {
         method: 'POST',
         body: JSON.stringify({ target_type: 'list', target_gid: token, message }),
       });
@@ -758,9 +761,10 @@ function _applyStatusbarFlags() {
 }
 
 async function _loadFeatureFlags() {
+  const _cloudFetch = window._cloudFetch?.bind(window);
   try {
     if (window._cloudFetch) {
-      const res = await window._cloudFetch('/admin/config/feature_flags');
+      const res = await _cloudFetch('/admin/config/feature_flags', { method: 'GET' });
       if (res?.data?.value) {
         const parsed = JSON.parse(res.data.value);
         Object.assign(window._featureFlags, parsed);
@@ -843,10 +847,11 @@ window._addCrumb = _addCrumb;
 let _healthCheckTimer = null;
 
 async function _runHealthCheck() {
+  const _cloudFetch = window._cloudFetch?.bind(window);
   const dot = document.getElementById('health-dot');
   if (!dot || !window._cloudFetch) return;
   try {
-    const r = await window._cloudFetch('/health');
+    const r = await _cloudFetch('/health', { method: 'GET' });
     const ok = r?.status === 'ok';
     dot.style.background = ok ? '#a6e3a1' : '#f9e2af';
     dot.title = ok
@@ -1184,6 +1189,7 @@ const TaskTimeline = {
   },
 
   async _loadAll() {
+    const _cloudFetch = window._cloudFetch?.bind(window);
     if (window._authMode !== 'feishu') {
       this._tasks = []; this._overdueTasks = []; this._calEvents = []; return;
     }
@@ -1200,8 +1206,8 @@ const TaskTimeline = {
 
     // 并行拉取任务 + 飞书日历
     const [taskRes, calRes] = await Promise.allSettled([
-      _taskEnabled ? window._cloudFetch(`/api/tasks?scheduled_date_from=${from30}&page_size=300`) : Promise.resolve({ data: [] }),
-      _feishuEnabled ? window._cloudFetch('/feishu/calendar/today') : Promise.resolve({ data: [] }),
+      _taskEnabled ? _cloudFetch(`/api/tasks?scheduled_date_from=${from30}&page_size=300`, { method: 'GET' }) : Promise.resolve({ data: [] }),
+      _feishuEnabled ? _cloudFetch('/feishu/calendar/today', { method: 'GET' }) : Promise.resolve({ data: [] }),
     ]);
 
     const all = taskRes.status === 'fulfilled' ? (taskRes.value?.data || []) : [];
@@ -1473,8 +1479,9 @@ const TaskTimeline = {
   },
 
   async _save(gid, fields) {
+    const _cloudFetch = window._cloudFetch?.bind(window);
     try {
-      await window._cloudFetch(`/api/tasks/${gid}`, {
+      await _cloudFetch(`/api/tasks/${gid}`, {
         method: 'PUT', body: JSON.stringify({ gid, ...fields }),
       });
       await this.refresh();
@@ -1482,9 +1489,10 @@ const TaskTimeline = {
   },
 
   async _openEntries(task) {
+    const _cloudFetch = window._cloudFetch?.bind(window);
     let entries = [];
     try {
-      const r = await window._cloudFetch(`/api/tasks/${task.gid}/entries`);
+      const r = await window.AI00ExistingCapabilityClient.call('project.itemEntries.get', { itemGid: task.gid });
       entries = r?.data || [];
     } catch (_) {}
 
@@ -1517,8 +1525,10 @@ const TaskTimeline = {
         onChange: () => {},
         onSave: async (updated) => {
           try {
-            await window._cloudFetch(`/api/tasks/${task.gid}/entries`,
-              { method: 'PUT', body: JSON.stringify(updated) });
+            await window.AI00ExistingCapabilityClient.call('project.itemEntries.replace', {
+              itemGid: task.gid,
+              entries: updated,
+            });
           } catch (_) {}
         },
       });

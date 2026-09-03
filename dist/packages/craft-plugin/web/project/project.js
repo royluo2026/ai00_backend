@@ -7,16 +7,29 @@ let _editingGid = null;       // 编辑中的项目 GID（null 表示新建）
 let _vehicleModels = [];      // 车型列表缓存
 let _factories = [];          // 工厂列表缓存
 
-// ── 云端 API 封装 ──────────────────────────────────────────
-async function api(path, opts) {
-  try {
-    const fn = window.parent?._cloudFetch || window._cloudFetch;
-    if (!fn) return null;
-    return await fn(path, opts);
-  } catch (e) {
-    console.warn(`[project] API ${path} 失败:`, e.message);
-    return null;
+// ── Capability Gateway 封装 ───────────────────────────────
+function _cloudFetchFn() {
+  return window.parent?._cloudFetch || window._cloudFetch;
+}
+async function invokeCapability(id, payload = {}) {
+  const _cloudFetch = _cloudFetchFn();
+  if (!_cloudFetch) throw new Error('云端服务未连接');
+  const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version: 1, payload }),
+  });
+  const envelope = response?.data;
+  if (response?.success !== true || envelope?.ok !== true) {
+    const detail = envelope?.error || response?.error || {};
+    throw new Error(detail.message || `能力调用失败：${id}@1`);
   }
+  const value = envelope.data;
+  return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+}
+
+async function apiCapability(id, argumentsValue = {}) {
+  return invokeCapability(id, { arguments: argumentsValue });
 }
 
 // ── 主题同步 ──────────────────────────────────────────────
@@ -110,7 +123,7 @@ async function loadTasksForProject(projectGid) {
   list.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">加载中…</div>';
   let tasks = [];
   try {
-    tasks = await api(`/api/tasks?project_gid=${projectGid}`) || [];
+    tasks = (await apiCapability('project.task.read.atomic.tasks_search', { project_gid: projectGid }))?.data || [];
   } catch (_) {}
   list.innerHTML = '';
   if (!tasks || !tasks.length) {
@@ -132,7 +145,7 @@ async function loadIssuesForProject(projectGid) {
   list.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">加载中…</div>';
   let issues = [];
   try {
-    issues = await api(`/api/issues?project_gid=${projectGid}`) || [];
+    issues = (await apiCapability('project.issue.read.atomic.issues_search', { project_gid: projectGid }))?.data || [];
   } catch (_) {}
   list.innerHTML = '';
   if (!issues || !issues.length) {
@@ -170,14 +183,12 @@ async function confirmProjectDialog() {
   const factoryGid = document.getElementById('selectFactory').value;
 
   if (_editingGid) {
-    await api(`/api/projects/${_editingGid}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ name, vehicle_model_gid: vmGid || null, factory_gid: factoryGid || null }),
+    await apiCapability('project.project.change.apply.atomic.projects_update', {
+      gid: _editingGid, updates: { name, vehicle_model_gid: vmGid || null, factory_gid: factoryGid || null },
     });
   } else {
-    await api('/api/projects', {
-      method: 'POST',
-      body: JSON.stringify({ name, vehicle_model_gid: vmGid || null, factory_gid: factoryGid || null }),
+    await apiCapability('project.project.change.apply.atomic.projects_create', {
+      name, vehicle_model_gid: vmGid || null, factory_gid: factoryGid || null,
     });
   }
   closeProjectDialog();
@@ -203,9 +214,9 @@ async function confirmTaskDialog() {
   const due      = document.getElementById('taskDue').value;
 
   try {
-    await api('/api/tasks', { method: 'POST', body: JSON.stringify({
+    await apiCapability('project.task.change.apply.atomic.tasks_create', {
       title, project_gid: _selectedProject.gid, priority, due_date: due || null,
-    })});
+    });
   } catch (e) { alert('创建失败: ' + (e?.message || e)); return; }
   closeTaskDialog();
   await loadTasksForProject(_selectedProject.gid);
@@ -213,13 +224,13 @@ async function confirmTaskDialog() {
 
 // ── 加载数据 ─────────────────────────────────────────────
 async function loadProjects() {
-  const res = await api('/api/projects');
+  const res = await apiCapability('project.project.read.atomic.projects_search');
   _projects = res?.data || [];
   renderProjects(_projects);
 }
 
 async function loadVehicleModels() {
-  const res = await api('/api/projects/vehicle_models');
+  const res = await apiCapability('project.project.read.atomic.vehicle_models_list');
   _vehicleModels = res?.data || [];
   const sel = document.getElementById('selectVehicle');
   // 清除旧选项（保留第一个默认选项）
@@ -231,7 +242,7 @@ async function loadVehicleModels() {
 }
 
 async function loadFactories() {
-  const res = await api('/api/bop/factories');
+  const res = await apiCapability('factory.asset.search', { asset_type: 'factory' });
   _factories = res?.data || [];
   const sel = document.getElementById('selectFactory');
   if (!sel) return;
@@ -280,9 +291,8 @@ async function advanceProjectStatus() {
   if (!_selectedProject) return;
   const nextStatus = STATUS_ADV[_selectedProject.status];
   if (!nextStatus) { alert('当前状态无法继续推进'); return; }
-  await api(`/api/projects/${_selectedProject.gid}`, {
-    method: 'PATCH',
-    body: JSON.stringify({ status: nextStatus }),
+  await apiCapability('project.project.change.apply.atomic.projects_update', {
+    gid: _selectedProject.gid, updates: { status: nextStatus },
   });
   await loadProjects();
   const updated = _projects.find(p => p.gid === _selectedProject.gid);
@@ -316,10 +326,11 @@ async function loadProjectMembers(projectGid) {
   const isCloud = (window.parent?._authMode || window._authMode || 'local') === 'feishu';
   if (!isCloud) { section.style.display = 'none'; return; }
   section.style.display = '';
+  const _cloudFetch = cloudFetch;
 
   let isOwner = false;
   try {
-    const me = await cloudFetch('/users/me').then(r => r.json());
+    const me = await _cloudFetch('/users/me', { method: 'GET' }).then(r => r.json());
     const grants = me.grants || [];
     const orgRole = me.org_role || me.system_role || '';
     isOwner = orgRole === 'super_admin' ||
@@ -330,12 +341,14 @@ async function loadProjectMembers(projectGid) {
   listEl.innerHTML = '<div style="color:var(--text-muted)">加载中…</div>';
   try {
     const [memberResp, lineResp, grantResp] = await Promise.all([
-      cloudFetch(`/api/projects/${encodeURIComponent(projectGid)}/members`).then(r => r.json()),
-      cloudFetch(`/api/projects/${encodeURIComponent(projectGid)}/bop-lines`).then(r => r.json()),
-      cloudFetch('/api/grants').then(r => r.json()).catch(() => ({ grants: [] })),
+      apiCapability('project.member.read', { operation: 'members.list', arguments: { project_gid: projectGid } }),
+      invokeCapability('craft.bop.entry.legacy_read', {
+        operation: 'project_bop_lines', project_gid: projectGid, limit: 500,
+      }),
+      (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('base.grants.list', { userGid: null }).catch(() => ({ grants: [] })),
     ]);
-    const members = Array.isArray(memberResp) ? memberResp : (memberResp.members || memberResp.data || []);
-    const lines = lineResp?.data || [];
+    const members = Array.isArray(memberResp) ? memberResp : (memberResp?.members || memberResp?.data || []);
+    const lines = Array.isArray(lineResp) ? lineResp : (lineResp?.data || lineResp?.items || []);
     const grants = Array.isArray(grantResp?.grants) ? grantResp.grants : [];
     const lineLeadsByLine = new Map();
     for (const grant of grants) {
@@ -390,9 +403,9 @@ window._assignLineLead = async function (projectGid, lineGid, currentUserGid, cu
     if (currentUserGid) {
       const clear = confirm('确定清空当前线体管理员吗？点击“取消”可改派他人。');
       if (clear) {
-        await cloudFetch(`/api/projects/${encodeURIComponent(projectGid)}/line-assignment`, {
-          method: 'PUT', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ line_gid: lineGid, user_gid: null }),
+        await apiCapability('project.member.change.apply', {
+          operation: 'members.line_assignment.replace',
+          arguments: { project_gid: projectGid, line_gid: lineGid, user_gid: null },
         });
         await loadProjectMembers(projectGid);
         return;
@@ -400,9 +413,9 @@ window._assignLineLead = async function (projectGid, lineGid, currentUserGid, cu
     }
     nextUserGid = prompt('输入要设为线体管理员的 user_gid') || '';
     if (!nextUserGid.trim()) return;
-    await cloudFetch(`/api/projects/${encodeURIComponent(projectGid)}/line-assignment`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ line_gid: lineGid, user_gid: nextUserGid.trim() }),
+    await apiCapability('project.member.change.apply', {
+      operation: 'members.line_assignment.replace',
+      arguments: { project_gid: projectGid, line_gid: lineGid, user_gid: nextUserGid.trim() },
     });
     await loadProjectMembers(projectGid);
   } catch (e) {

@@ -159,6 +159,10 @@
     return `${base}${p}`;
   }
 
+  async function _cf(method, path, opts = {}) {
+    return fetch(await _backendUrl(path), { ...opts, method });
+  }
+
   // ── 飞书 OAuth Web 流程（开新标签 + 轮询 JWT）───────────────────────────
   async function _webFeishuLogin() {
     let r;
@@ -274,30 +278,38 @@
     // ── 插件管理（走后端 API）─────────────────────────────────────────────
     listInstalledPlugins() {
       const token = localStorage.getItem('ai00_token') || '';
-      return _backendUrl('/api/plugin/list').then(url =>
-        fetch(url, { headers: { 'X-AI00-Token': token } })
-      )
-        .then(r => r.json()).then(r => r.data || []).catch(() => []);
+      return (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+        .call('base.plugins.list').then(r => r.installations || []).catch(() => []);
     },
-    // 从 URL 安装插件（Phase 7A 已有后端实现）
-    installPluginFromUrl(url) {
-      const token = localStorage.getItem('ai00_token') || '';
-      return _backendUrl('/api/plugin/install').then(apiUrl =>
-        fetch(apiUrl, {
-          method:  'POST',
-          headers: { 'X-AI00-Token': token, 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ url }),
-        })
-      ).then(r => r.json()).catch(e => ({ success: false, error: e.message }));
+    // Browser installs are signed marketplace identities only; URLs never reach an adapter.
+    installPluginRelease(release) {
+      const client = window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
+      if (!release || typeof release !== 'object' || !client) {
+        return Promise.resolve({ ok: false, error: '需要已签名的市场发布信息' });
+      }
+      return client.call('base.plugins.install', {
+        pluginId: release.plugin_id,
+        releaseVersion: release.release_version || release.version,
+        releaseSha256: release.release_sha256 || release.sha256,
+        requestedGrants: release.requested_grants || release.grants,
+      }, { confirm: () => window.confirm(`确认安装已签名插件「${release.plugin_id}」？`) })
+        .then(data => ({ ok: true, ...data }))
+        .catch(error => ({ ok: false, error: error?.message || String(error) }));
     },
-    uninstallUserPlugin(pluginId) {
-      const token = localStorage.getItem('ai00_token') || '';
-      return _backendUrl(`/api/plugin/uninstall/${pluginId}`).then(apiUrl =>
-        fetch(apiUrl, {
-          method:  'DELETE',
-          headers: { 'X-AI00-Token': token },
-        })
-      ).then(r => r.json()).catch(e => ({ success: false, error: e.message }));
+    installPluginFromUrl() {
+      return Promise.resolve({ ok: false, error: '浏览器版只接受已签名的市场发布，不支持 URL 安装' });
+    },
+    uninstallUserPlugin(installation) {
+      const client = window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
+      if (!installation || typeof installation !== 'object' || !Number.isInteger(installation.revision) || !client) {
+        return Promise.resolve({ ok: false, error: '卸载需要当前安装 revision' });
+      }
+      return client.call('base.plugins.uninstall', {
+        pluginId: installation.plugin_id,
+        expectedRevision: installation.revision,
+      }, { confirm: () => window.confirm(`确认卸载插件「${installation.plugin_id}」？其租户数据将被保留。`) })
+        .then(data => ({ ok: true, ...data }))
+        .catch(error => ({ ok: false, error: error?.message || String(error) }));
     },
     onPluginRegistryUpdated() {},   // 静默：网页版靠轮询
 
@@ -332,7 +344,7 @@
     // ── 日志（浏览器无主进程日志）─────────────────────────────────────────
     getMainLog()        { return Promise.resolve(null); },
 
-    // ── 文件操作（浏览器版静默降级；attachments_widget 已走 /api/uploads）
+    // ── 文件操作（浏览器版静默降级；附件由专用上传组件处理）
     openFileDialog(_filters, _opts) { return Promise.resolve(null); },
     showOpenDialog(_opts)           { return Promise.resolve(null); },
     readTextFile(_path)             { return Promise.resolve(null); },

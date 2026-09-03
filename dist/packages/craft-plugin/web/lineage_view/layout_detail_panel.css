@@ -6,7 +6,7 @@
 .ll-detail-panel {
   position: absolute;
   left: 0; top: 0; bottom: 0;
-  width: 320px;
+  width: min(420px, calc(100% - 24px));
   border-right: 1px solid var(--surface1, #45475a);
   border-radius: 0;
   background: var(--surface0, #313244);
@@ -38,7 +38,7 @@
 /* 把手条（折叠时） */
 .ll-dp-handle-bar { display: none; }
 
-/* 列容器垂直堆叠 */
+/* 单侧栏：结构树在上，属性/关系共用下方面板 */
 .ll-dp-columns {
   display: flex; flex-direction: column;
   overflow: hidden; flex: 1; min-height: 0;
@@ -46,8 +46,17 @@
 .ll-dp-col { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
 .ll-dp-col-body { flex: 1; overflow-y: auto; min-height: 0; }
 
-.ll-dp-col-tree     { flex: none; height: var(--ll-tree-h, 40%); width: 100%; min-height: 120px; }
-.ll-dp-col-props    { flex: 1; width: 100%; min-height: 100px; }
+.ll-dp-col-tree { flex: 0 0 var(--ll-tree-h, 52%); width: 100%; min-height: 180px; }
+.ll-dp-inspector { display: flex; flex: 1; flex-direction: column; min-height: 240px; overflow: hidden; }
+.ll-dp-inspector > .ll-dp-col {
+  display: flex !important; width: 100%; min-width: 0; min-height: 100px; overflow: hidden;
+}
+.ll-dp-col-props { flex: 1 1 45%; }
+.ll-dp-col-rels { flex: 1 1 55%; }
+.ll-dp-section-divider {
+  height: 4px; flex-shrink: 0; background: var(--surface0,#313244);
+  border-top: 1px solid var(--surface1,#45475a);
+}
 
 /* 垂直分割条 */
 .ll-dp-v-divider {
@@ -65,8 +74,8 @@
 :root[data-lv-theme="light"] .ll-dp-v-divider:hover,
 :root[data-lv-theme="light"] .ll-dp-v-divider.active { background: #1e66f5; }
 
-/* 隐藏不需要的列 */
-.ll-dp-col-detail, .ll-dp-col-rels, .ll-dp-col-rules, .ll-dp-col-know,
+/* 详情使用受控抽屉；规则、知识后续仍由各自能力面板承载 */
+.ll-dp-col-detail, .ll-dp-col-rules, .ll-dp-col-know,
 .ll-dp-columns .ll-dp-col-divider { display: none !important; }
 
 /* ── col header ── */
@@ -91,7 +100,8 @@
 /* ── 详情抽屉（从左侧面板右侧向右弹出，底部对齐） ── */
 .ll-det-drawer {
   position: fixed;
-  left: 320px;
+  left: auto;
+  right: 0;
   bottom: 0;
   width: 380px;
   height: 55vh;

@@ -3,6 +3,14 @@
  */
 'use strict';
 
+function _cf(method, path, opts = {}) {
+  return ListShell._cf(path, { ...opts, method });
+}
+
+function _safe(request) {
+  return request.catch(e => { console.warn('[ListShell._cfSafe]', e.message); return null; });
+}
+
 // ── 列定义 ────────────────────────────────────────────────────────────────────
 const STD_OP_COLS = [
   { key: 'display_id',    label: 'ID',          type: 'text',   width: 90,  editable: false },
@@ -32,7 +40,7 @@ function _openContainerCard(row) {
 // ── 操作函数（inline onclick 需要全局暴露）────────────────────────────────────
 async function publishOp(gid) {
   try {
-    await ListShell._cfSafe(`/api/std_op/operations/${gid}/publish`, { method: 'POST' });
+    await _safe(_cf('POST', `/api/std_op/operations/${gid}/publish`));
     await loadOps();
   } catch (e) { alert('发布失败: ' + e.message); }
 }
@@ -40,7 +48,7 @@ async function publishOp(gid) {
 async function deprecateOp(gid) {
   if (!confirm('确认废弃该工序？')) return;
   try {
-    await ListShell._cfSafe(`/api/std_op/operations/${gid}/deprecate`, { method: 'POST' });
+    await _safe(_cf('POST', `/api/std_op/operations/${gid}/deprecate`));
     await loadOps();
   } catch (e) { alert('废弃失败: ' + e.message); }
 }
@@ -69,7 +77,7 @@ const EXTRA_CTX = (row) => [
 // ── 加载数据 ──────────────────────────────────────────────────────────────────
 const loadOps = ListShell.buildLoadHandler({
   bridgeNs:         null,                       // cloud-only
-  cloudPath:        '/api/std_op/operations',
+  cloudRequest:     (query) => _safe(_cf('GET', `/api/std_op/operations?${query}`)),
   getCurrentList:   () => _currentList,
   getAllLists:       () => _allLists,
   getShell:         () => _shell,
@@ -83,8 +91,8 @@ const _getViewRows = () => (_shell && _shell.vm ? _shell.vm.applyView(_ops) : _o
 const _onRowsChange = ListShell.buildRowsChangeHandler({
   editableKeys:     ['code', 'name', 'standard_time', 'importance'],
   primaryKey:       'code',
-  cloudUpdatePath:  (gid) => `/api/std_op/operations/${gid}`,
-  cloudCreatePath:  '/api/std_op/operations',
+  cloudUpdate:      (gid, body) => _cf('PATCH', `/api/std_op/operations/${gid}`, { body: JSON.stringify(body) }),
+  cloudCreate:      (body) => _cf('POST', '/api/std_op/operations', { body: JSON.stringify(body) }),
   bridgeNs:         null,           // cloud-only
   buildCreateBody:  (row) => ({
     code: row.code, name: row.name || row.code,
@@ -111,23 +119,27 @@ async function init() {
     onListsChange:     (lists) => { _allLists = lists; },
     onSelect:          (gid)   => { _currentList = gid; loadOps(); },
     initListGid:       null,
-    rdpSaveOpts:       { cloudPath: '/api/std_op/operations' },  // cloud-only module
+    rdpSaveOpts:       { savePatch: (row, patch) => _cf('PATCH', `/api/std_op/operations/${row.gid}`, { body: JSON.stringify(patch) }) },
     rowClass:          (row)   => row._source === 'cloud' ? 'ge-row-cloud' : '',
     extraContextItems: EXTRA_CTX,
     onContextAction:   (action, row) => {
       if (action === 'open_detail') _openContainerCard(row);
     },
-    importExport: ListShell.makeImportExport('std_op_lib', _getViewRows, async (rows, _fm, _c, signal) => {
-        for (const r of rows) {
-          if (signal?.aborted) break;
-          if (!r.name && !r.code) continue;
-          await ListShell._cfSafe('/api/std_op/operations', {
-            method: 'POST',
-            body: JSON.stringify({ code: r.code || '', name: r.name || r.code || '', standard_time: parseFloat(r.standard_time) || 0 }),
-            signal,
-          }).catch(e => console.error('[import std_op]', e));
-        }
-        if (!signal?.aborted) await loadOps();
+    importExport: ListShell.makeImportExport('std_op_lib', _getViewRows, async (rows, _fm, conflict, signal) => {
+        const importRecords = rows
+          .filter(r => r.name || r.code)
+          .map(r => ({
+            code: r.code || '',
+            name: r.name || r.code || '',
+            standard_time: parseFloat(r.standard_time) || 0,
+          }));
+        if (!importRecords.length || signal?.aborted) return;
+        const result = await _cf('POST', '/api/std_op/operations/import', {
+          body: JSON.stringify({ records: importRecords, conflict }),
+          signal,
+        });
+        await loadOps();
+        return result;
       }),
     diffManager: ListShell.makeDiffManager('std_op_lib', _getViewRows, 'code'),
     onRowsChange: _onRowsChange,

@@ -8,7 +8,7 @@ Read legacy GBOP matching previews and ready PBOM version choices.
 - 不适用：The request confirms matches, writes links, or performs auto-link mutations.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_79ebfa43788065717b2a11476ede257f`
+- Catalog Release：`rel_94ba4f715fc3e8b6c9f617c4a5b05fe5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -96,7 +96,7 @@ Read legacy GBOP matching previews and ready PBOM version choices.
 ```json
 {
   "capability_id": "craft.bop.gbop.legacy_read",
-  "catalog_release": "rel_79ebfa43788065717b2a11476ede257f",
+  "catalog_release": "rel_94ba4f715fc3e8b6c9f617c4a5b05fe5",
   "major_version": 1,
   "payload": {
     "operation": "match_preview"

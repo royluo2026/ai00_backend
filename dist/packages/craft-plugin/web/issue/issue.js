@@ -1,5 +1,9 @@
 'use strict';
 
+function _cf(method, path, opts = {}) {
+  return ListShell._cf(path, { ...opts, method });
+}
+
 // ── 列定义 ──────────────────────────────────────────────────
 const ISSUE_COLS = [
   { key: 'display_id',    label: 'ID',      type: 'text', width: 90,  editable: false },
@@ -42,6 +46,21 @@ let shell         = null;  // ListShell 实例
 // BOP 条目标题缓存 { gid → {title, version_tag} }
 const _bopCache   = {};
 
+async function _invokeBopCapability(id, payload = {}) {
+  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version: 1, payload }),
+  });
+  const envelope = response?.data;
+  if (response?.success !== true || envelope?.ok !== true) {
+    const detail = envelope?.error || response?.error || {};
+    throw new Error(detail.message || `能力调用失败：${id}@1`);
+  }
+  const value = envelope.data;
+  return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+}
+
 window.addEventListener('message', e => {
   // 认证状态变化（登录/登出）时，重新加载清单列表和条目数据
   if (e.data?.type === 'auth-state' && shell) {
@@ -72,19 +91,6 @@ window.addEventListener('message', e => {
 });
 
 // ── BOP 条目缓存与选择器 ─────────────────────────────────────
-async function _prefetchBopLabels(gids) {
-  const missing = gids.filter(g => g && !_bopCache[g]);
-  if (!missing.length) return;
-  try {
-    await Promise.all(missing.map(async gid => {
-      const res = await ListShell._cf(`/api/bop/entries/${gid}`).catch(() => null);
-      if (res?.data) {
-        _bopCache[gid] = { title: res.data.title || gid, version_tag: res.data.version_tag || '' };
-      }
-    }));
-  } catch (_) {}
-}
-
 let _bopPickerCallback = null;  // (entry) => void
 
 async function _openBopPicker(issueGid, currentEntryGid) {
@@ -98,10 +104,10 @@ async function _openBopPicker(issueGid, currentEntryGid) {
   let _allEntries = [];
 
   async function _doSearch(q) {
-    const params = new URLSearchParams({ node_types: 'operation', limit: '200' });
-    if (q) params.set('q', q);
-    const res = await ListShell._cf(`/api/bop/entries/search?${params}`).catch(() => null);
-    _allEntries = res?.data || [];
+    const value = await _invokeBopCapability('craft.bop.entry.search', {
+      q: q || '', node_types: ['operation'], limit: 200,
+    }).catch(() => []);
+    _allEntries = Array.isArray(value) ? value : (value?.data || []);
     _renderBopList(_allEntries);
   }
 
@@ -151,7 +157,7 @@ function _closeBopPicker() {
 async function _linkBopEntry(issueRow) {
   _bopPickerCallback = async (entry) => {
     try {
-      await ListShell._cf(`/api/issues/${issueRow.gid}`, {
+      await _cf('PUT', `/api/issues/${issueRow.gid}`, {
         method: 'PUT',
         body: JSON.stringify({ bop_entry_gid: entry.gid || null }),
       });
@@ -165,7 +171,7 @@ async function _linkBopEntry(issueRow) {
 
 async function loadFollows() {
   try {
-    const res = await ListShell._cf('/api/follows?item_type=issue');
+    const res = await _cf('GET', '/api/follows?item_type=issue');
     _followedMap.clear();
     for (const f of (res?.data || [])) {
       _followedMap.set(f.item_gid, { gid: f.gid, conditions: f.notify_on || [] });
@@ -185,12 +191,12 @@ async function _onRowsChange(newRows) {
       if (!changed) continue;
       const fields = {};
       for (const k of editableKeys) { if (row[k] !== undefined) fields[k] = row[k]; }
-      await ListShell._cf(`/api/issues/${row.gid}`, { method: 'PUT', body: JSON.stringify(fields) })
+      await _cf('PUT', `/api/issues/${row.gid}`, { method: 'PUT', body: JSON.stringify(fields) })
         .catch(e => console.error('[update issue cloud]', e));
       didSave = true;
     } else if (row.title) {
       const _listGid = ListShell._canonListGid(_currentList);
-      await ListShell._cf('/api/issues', { method: 'POST', body: JSON.stringify({
+      await _cf('POST', '/api/issues', { method: 'POST', body: JSON.stringify({
         title: row.title, severity: row.severity || 'low',
         list_gid: _listGid,
         owner_gid: window.top?._authUser?.gid || window._authUser?.gid || '',
@@ -219,7 +225,7 @@ async function load() {
   const isNoList = _currentList === ListShell.NO_LIST;
   try {
     const qs = (_currentList && !isNoList) ? `?list_gid=${_currentList}` : '';
-    const res = await ListShell._cf(`/api/issues${qs}`).catch(() => null);
+    const res = await _cf('GET', '/api/issues' + qs).catch(() => null);
     const _toTime = v => {
       if (!v) return 0;
       if (typeof v === 'number') return v;
@@ -232,9 +238,9 @@ async function load() {
     combined = ListShell.filterByList(combined, _currentList);
     _all = combined;
     await loadFollows();
-    // 预加载已关联的 BOP 条目标题
-    const linkedGids = [...new Set(_all.map(r => r.bop_entry_gid).filter(Boolean))];
-    if (linkedGids.length) await _prefetchBopLabels(linkedGids);
+    // Existing associations remain readable by gid.  Titles are populated by
+    // the governed picker/search path when the user edits a link; there is no
+    // unbounded per-row detail REST prefetch here.
     if (shell) shell.setRows(_all);
     setTimeout(() => _loadSapIndicators(_all.map(r => r.gid).filter(Boolean)), 0);
     // 若有待高亮条目，load 完毕后滚动到该行
@@ -253,7 +259,8 @@ async function _loadSapIndicators(gids) {
   if (!gids.length) return;
   for (let i = 0; i < gids.length; i += 500) {
     const chunk = gids.slice(i, i + 500);
-    const res = await ListShell._cf(`/api/self_ann/batch?gids=${chunk.join(',')}`).catch(() => null);
+    const res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+      .call('base.annotations.batch', { gids: chunk }).catch(() => null);
     if (!res) return;
     Object.entries(res).forEach(([gid, info]) => {
       document.querySelectorAll(`.sap-row-pin[data-gid="${gid}"]`).forEach(el => {
@@ -283,7 +290,7 @@ async function init() {
       async (rows, _fm, _c, signal) => {
         for (const r of rows) {
           if (signal?.aborted) break;
-          await ListShell._cf('/api/issues', { method: 'POST', body: JSON.stringify({
+          await _cf('POST', '/api/issues', { method: 'POST', body: JSON.stringify({
             title: r.title || '导入问题',
             severity: r.severity || 'low',
             list_gid: shell?.currentListGid || null,
@@ -381,7 +388,7 @@ async function init() {
           const patch = result.type === 'user'
             ? { feishu_assignee_open_id: result.open_id, feishu_assignee_name: result.name }
             : { feishu_group_chat_id: result.chat_id, feishu_group_name: result.name };
-          await ListShell._cf(`/api/issues/${gid}`, { method: 'PUT', body: JSON.stringify(patch) })
+          await _cf('PUT', `/api/issues/${gid}`, { method: 'PUT', body: JSON.stringify(patch) })
             .catch(e => console.error('[fm patch issue]', e));
           Object.assign(row, patch);
           shell.setRows(_all);
@@ -390,7 +397,7 @@ async function init() {
           const patch = field === 'feishu_assignee'
             ? { feishu_assignee_open_id: null, feishu_assignee_name: null }
             : { feishu_group_chat_id: null, feishu_group_name: null };
-          await ListShell._cf(`/api/issues/${gid}`, { method: 'PUT', body: JSON.stringify(patch) })
+          await _cf('PUT', `/api/issues/${gid}`, { method: 'PUT', body: JSON.stringify(patch) })
             .catch(e => console.error('[fm clear issue]', e));
           Object.assign(row, patch);
           shell.setRows(_all);
@@ -416,7 +423,7 @@ async function init() {
       followed: _followedMap.has(gid),
       followGid: state.gid,
       conditions: state.conditions,
-      cf: _cf,
+      cf: ListShell._cf,
       onSave: (newState) => {
         if (newState.followed) {
           _followedMap.set(gid, { gid: newState.followGid, conditions: newState.conditions });

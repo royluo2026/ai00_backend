@@ -8,7 +8,7 @@ Reject one Project approval order and durably enqueue its notification.
 - 不适用：The caller needs another approval transition or a Craft-owned outcome.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_79ebfa43788065717b2a11476ede257f`
+- Catalog Release：`rel_94ba4f715fc3e8b6c9f617c4a5b05fe5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -99,7 +99,7 @@ Reject one Project approval order and durably enqueue its notification.
 ```json
 {
   "capability_id": "project.approval.order.reject",
-  "catalog_release": "rel_79ebfa43788065717b2a11476ede257f",
+  "catalog_release": "rel_94ba4f715fc3e8b6c9f617c4a5b05fe5",
   "major_version": 1,
   "payload": {
     "comment": "example",

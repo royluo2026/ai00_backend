@@ -8,7 +8,7 @@ Execute the governed agent.skill.read Agent outcome.
 - 不适用：The outcome belongs to another business domain; invoke that domain Capability instead.
 - 生命周期：`stable`
 - 所属领域：`agent`
-- Catalog Release：`rel_79ebfa43788065717b2a11476ede257f`
+- Catalog Release：`rel_94ba4f715fc3e8b6c9f617c4a5b05fe5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -207,7 +207,7 @@ Execute the governed agent.skill.read Agent outcome.
 ```json
 {
   "capability_id": "agent.skill.read",
-  "catalog_release": "rel_79ebfa43788065717b2a11476ede257f",
+  "catalog_release": "rel_94ba4f715fc3e8b6c9f617c4a5b05fe5",
   "major_version": 1,
   "payload": {}
 }

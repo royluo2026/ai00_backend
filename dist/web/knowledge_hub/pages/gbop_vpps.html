@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <title>VPPS 管理</title>
 
+
+
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -108,7 +110,9 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 }
 @keyframes fade-in { from { opacity: 0; transform: translateX(-50%) translateY(6px); } }
 </style>
-  <link rel="stylesheet" href="/assets/tree_list_shell-da642102.css">
+  <link rel="stylesheet" href="/assets/gbop_vpps-cfff51d1.css">
+  <link rel="stylesheet" href="/assets/view_manager-0b5250e9.css">
+  <link rel="stylesheet" href="/assets/tree_list_shell-907216c5.css">
 </head>
 <body>
 <div class="md-root">
@@ -127,6 +131,10 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
         <circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
       </svg>
       标准件规格
+    </div>
+    <div class="md-nav-item" data-section="vpps_sockets">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16v10H4z"/><path d="M8 7V4h8v3M8 17v3h8v-3"/></svg>
+      VPPS 套筒
     </div>
     <div class="md-nav-item" data-section="vpps_tools">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -192,6 +200,7 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 
 <script src="/web/components/view_manager.js"></script>
 <script src="/web/components/tree_list_shell.js"></script>
+<script src="/web/knowledge/knowledge_resource_model.js"></script>
 <script>
 'use strict';
 
@@ -241,8 +250,8 @@ const SECTIONS = {
     title: 'VPPS 零件', desc: '标准零件名称库',
     addLabel: '新建零件名',
 
-    async load(cf) {
-      const r = await cf('/api/craft_lib/part_names');
+    async load(_cloudFetch) {
+      const r = await _cloudFetch('/api/craft_lib/part_names', { method: 'GET' });
       return r?.data || [];
     },
 
@@ -330,9 +339,9 @@ const SECTIONS = {
       };
     },
 
-    async create(cf, body) { return cf('/api/craft_lib/part_names', { method:'POST', body: JSON.stringify(body) }); },
-    async update(cf, gid, body) { return cf(`/api/craft_lib/part_names/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
-    async remove(cf, gid) { return cf(`/api/craft_lib/part_names/${gid}`, { method:'DELETE' }); },
+    async create(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/part_names', { method:'POST', body: JSON.stringify(body) }); },
+    async update(_cloudFetch, gid, body) { return _cloudFetch(`/api/craft_lib/part_names/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
+    async remove(_cloudFetch, gid) { return _cloudFetch(`/api/craft_lib/part_names/${gid}`, { method:'DELETE' }); },
 
     buildImportBody(row) {
       const raw = row._raw || row;
@@ -370,7 +379,32 @@ const SECTIONS = {
     importRequiredFn(body) {
       return !!(body.vpps_description || body.vpps_desc_cn || body.vpps);
     },
-    async importOne(cf, body) { return cf('/api/craft_lib/part_names', { method:'POST', body: JSON.stringify(body) }); },
+    async importOne(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/part_names', { method:'POST', body: JSON.stringify(body) }); },
+    async importMany(_cloudFetch, items) {
+      const payload = { operation:'part_names.bulk_import', items, conflict:'skip' };
+      const idempotencyKey = `vpps-part-import:${crypto.randomUUID()}`;
+      const confirmation = await _cloudFetch('/api/v1/capabilities/craft.library.change.apply:confirm', {
+        method:'POST',
+        body: JSON.stringify({ version:1, payload, idempotency_key:idempotencyKey }),
+      });
+      const confirmationToken = confirmation?.data?.confirmation_token || confirmation?.confirmation_token;
+      if (!confirmationToken) throw new Error('Gateway 未返回导入确认令牌');
+      const response = await _cloudFetch('/api/v1/capabilities/craft.library.change.apply:invoke', {
+        method:'POST',
+        body: JSON.stringify({
+          version:1,
+          payload,
+          idempotency_key:idempotencyKey,
+          confirmation_token:confirmationToken,
+        }),
+      });
+      const result = response?.data?.ok !== undefined ? response.data : response;
+      if (result?.ok !== true) {
+        const detail = result?.error || response?.error || {};
+        throw new Error(detail.message || detail.code || 'Capability 导入失败');
+      }
+      return result.data || {};
+    },
   },
 
   // ── 标准件规格（fastener_spec） ───────────────────────────────
@@ -378,8 +412,8 @@ const SECTIONS = {
     title: '标准件规格', desc: '标准紧固件规格库',
     addLabel: '新建标准件',
 
-    async load(cf) {
-      const r = await cf('/api/craft_lib/fasteners');
+    async load(_cloudFetch) {
+      const r = await _cloudFetch('/api/craft_lib/fasteners', { method: 'GET' });
       return r?.data || [];
     },
 
@@ -477,9 +511,9 @@ const SECTIONS = {
       };
     },
 
-    async create(cf, body) { return cf('/api/craft_lib/fasteners', { method:'POST', body: JSON.stringify(body) }); },
-    async update(cf, gid, body) { return cf(`/api/craft_lib/fasteners/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
-    async remove(cf, gid) { return cf(`/api/craft_lib/fasteners/${gid}`, { method:'DELETE' }); },
+    async create(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/fasteners', { method:'POST', body: JSON.stringify(body) }); },
+    async update(_cloudFetch, gid, body) { return _cloudFetch(`/api/craft_lib/fasteners/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
+    async remove(_cloudFetch, gid) { return _cloudFetch(`/api/craft_lib/fasteners/${gid}`, { method:'DELETE' }); },
 
     buildImportBody(row) {
       return {
@@ -497,7 +531,7 @@ const SECTIONS = {
         first_vehicle: row.first_vehicle || '',
       };
     },
-    async importOne(cf, body) { return cf('/api/craft_lib/fasteners', { method:'POST', body: JSON.stringify(body) }); },
+    async importOne(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/fasteners', { method:'POST', body: JSON.stringify(body) }); },
   },
 
   // ── VPPS Tools（工具模板） ──────────────────────────────────────
@@ -505,8 +539,8 @@ const SECTIONS = {
     title: 'VPPS 工具', desc: '拧紧工具模板库',
     addLabel: '新建工具',
 
-    async load(cf) {
-      const r = await cf('/api/craft_lib/tools');
+    async load(_cloudFetch) {
+      const r = await _cloudFetch('/api/craft_lib/tools', { method: 'GET' });
       return r?.data || [];
     },
 
@@ -637,9 +671,9 @@ const SECTIONS = {
       };
     },
 
-    async create(cf, body) { return cf('/api/craft_lib/tools', { method:'POST', body: JSON.stringify(body) }); },
-    async update(cf, gid, body) { return cf(`/api/craft_lib/tools/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
-    async remove(cf, gid) { return cf(`/api/craft_lib/tools/${gid}`, { method:'DELETE' }); },
+    async create(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/tools', { method:'POST', body: JSON.stringify(body) }); },
+    async update(_cloudFetch, gid, body) { return _cloudFetch(`/api/craft_lib/tools/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
+    async remove(_cloudFetch, gid) { return _cloudFetch(`/api/craft_lib/tools/${gid}`, { method:'DELETE' }); },
 
     buildImportBody(row) {
       return {
@@ -662,7 +696,7 @@ const SECTIONS = {
         extension_cad_no: row.extension_cad_no || '',
       };
     },
-    async importOne(cf, body) { return cf('/api/craft_lib/tools', { method:'POST', body: JSON.stringify(body) }); },
+    async importOne(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/tools', { method:'POST', body: JSON.stringify(body) }); },
   },
 
   // ── VPPS Fixtures（工装模板） ───────────────────────────────────
@@ -670,8 +704,8 @@ const SECTIONS = {
     title: 'VPPS 工装', desc: '标准工装模板库',
     addLabel: '新建工装',
 
-    async load(cf) {
-      const r = await cf('/api/craft_lib/fixtures');
+    async load(_cloudFetch) {
+      const r = await _cloudFetch('/api/craft_lib/fixtures', { method: 'GET' });
       return r?.data || [];
     },
 
@@ -710,16 +744,14 @@ const SECTIONS = {
       return { name, category: _val('fFixtureCat').trim(), spec };
     },
 
-    async create(cf, body) { return cf('/api/craft_lib/fixtures', { method:'POST', body: JSON.stringify(body) }); },
-    async update(cf, gid, body) { return cf(`/api/craft_lib/fixtures/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
-    async remove(cf, gid) { return cf(`/api/craft_lib/fixtures/${gid}`, { method:'DELETE' }); },
-
+    async create(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/fixtures', { method:'POST', body: JSON.stringify(body) }); },
+    async update(_cloudFetch, gid, body) { return _cloudFetch(`/api/craft_lib/fixtures/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
     buildImportBody(row) {
       let spec = {};
       if (row.spec) { try { spec = typeof row.spec === 'string' ? JSON.parse(row.spec) : row.spec; } catch (_) {} }
       return { name: row.name || '', category: row.category || '', spec };
     },
-    async importOne(cf, body) { return cf('/api/craft_lib/fixtures', { method:'POST', body: JSON.stringify(body) }); },
+    async importOne(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/fixtures', { method:'POST', body: JSON.stringify(body) }); },
   },
 
   // ── VPPS Equipments（设备模板） ─────────────────────────────────
@@ -727,8 +759,8 @@ const SECTIONS = {
     title: 'VPPS 设备', desc: '标准设备模板库',
     addLabel: '新建设备',
 
-    async load(cf) {
-      const r = await cf('/api/craft_lib/equipments');
+    async load(_cloudFetch) {
+      const r = await _cloudFetch('/api/craft_lib/equipments', { method: 'GET' });
       return r?.data || [];
     },
 
@@ -767,18 +799,81 @@ const SECTIONS = {
       return { name, category: _val('fEquipCat').trim(), spec };
     },
 
-    async create(cf, body) { return cf('/api/craft_lib/equipments', { method:'POST', body: JSON.stringify(body) }); },
-    async update(cf, gid, body) { return cf(`/api/craft_lib/equipments/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
-    async remove(cf, gid) { return cf(`/api/craft_lib/equipments/${gid}`, { method:'DELETE' }); },
-
+    async create(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/equipments', { method:'POST', body: JSON.stringify(body) }); },
+    async update(_cloudFetch, gid, body) { return _cloudFetch(`/api/craft_lib/equipments/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
     buildImportBody(row) {
       let spec = {};
       if (row.spec) { try { spec = typeof row.spec === 'string' ? JSON.parse(row.spec) : row.spec; } catch (_) {} }
       return { name: row.name || '', category: row.category || '', spec };
     },
-    async importOne(cf, body) { return cf('/api/craft_lib/equipments', { method:'POST', body: JSON.stringify(body) }); },
+    async importOne(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/equipments', { method:'POST', body: JSON.stringify(body) }); },
   },
 };
+
+// Four VPPS process-resource standards share one governed Craft model.
+const {
+  resourceTypeForSection, canManageResources, resourcePatchBody, resourceRetireBody,
+} = KnowledgeResourceModel;
+const RESOURCE_SECTION_TITLES = {
+  vpps_sockets: 'VPPS 套筒', vpps_tools: 'VPPS 工具',
+  vpps_fixtures: 'VPPS 工装', vpps_equipments: 'VPPS 设备',
+};
+const _isResourceSection = key => !!resourceTypeForSection(key);
+function _resourceRole() {
+  try {
+    let w = window;
+    for (let i = 0; i < 6; i++) {
+      const user = w._authUser;
+      if (user) return user.system_role || user.org_role || user.role || 'member';
+      if (w.parent === w) break;
+      w = w.parent;
+    }
+  } catch (_) {}
+  return 'member';
+}
+const _canManageResourceRequirements = () => canManageResources(_resourceRole());
+const _resourceRows = response => Array.isArray(response) ? response : (response?.data || response?.items || []);
+function _resourceRequirementSection(section) {
+  const resourceType = resourceTypeForSection(section);
+  const title = RESOURCE_SECTION_TITLES[section];
+  return {
+    title, desc: `${title}标准库`, addLabel: '新建资源',
+    async load(cf) {
+      return _resourceRows(await cf(`/api/craft/resource-requirements?resource_type=${resourceType}`));
+    },
+    formHtml() {
+      return `<div class="md-form-grid"><div class="md-field"><label>代号 *</label><input id="fResourceCode" type="text"></div><div class="md-field"><label>名称 *</label><input id="fResourceName" type="text"></div><div class="md-field full"><label>属性（JSON）</label><textarea id="fResourceAttributes" placeholder='{}'></textarea></div></div>`;
+    },
+    fillForm(row) {
+      document.getElementById('fResourceCode').value = row?.code || '';
+      document.getElementById('fResourceName').value = row?.name || '';
+      document.getElementById('fResourceAttributes').value = JSON.stringify(row?.attributes || {}, null, 2);
+    },
+    readForm() {
+      const code = _val('fResourceCode').trim(), name = _val('fResourceName').trim();
+      if (!code || !name) { _toast('代号和名称不能为空'); return null; }
+      try {
+        const attributes = JSON.parse(_val('fResourceAttributes').trim() || '{}');
+        if (!attributes || Array.isArray(attributes) || typeof attributes !== 'object') throw new Error();
+        return { resource_type: resourceType, code, name, attributes, source: 'manual' };
+      } catch (_) { _toast('属性必须是 JSON 对象'); return null; }
+    },
+    async create(cf, body) {
+      return cf('/api/craft/resource-requirements', { method: 'POST', body: JSON.stringify(body) });
+    },
+    async update(cf, gid, body) {
+      return cf(`/api/craft/resource-requirements/${gid}`, {
+        method: 'PATCH', body: JSON.stringify(resourcePatchBody(_rawRowsMap[gid], body)),
+      });
+    },
+    async remove(cf, gid) {
+      return cf(`/api/craft/resource-requirements/${gid}/retire`, {
+        method: 'POST', body: JSON.stringify(resourceRetireBody(_rawRowsMap[gid])),
+      });
+    },
+  };
+}
+Object.keys(RESOURCE_SECTION_TITLES).forEach(key => { SECTIONS[key] = _resourceRequirementSection(key); });
 
 // ── TLS 每个 section 的列定义 ─────────────────────────────────────
 const SECTION_COLS = {
@@ -842,6 +937,15 @@ const SECTION_COLS = {
   ],
 };
 
+const RESOURCE_SECTION_COLS = [
+  { key:'code', label:'代号', type:'text', width:160 },
+  { key:'name', label:'名称', type:'text', width:220 },
+  { key:'attributes', label:'属性', type:'text', width:300 },
+  { key:'source', label:'来源', type:'text', width:90 },
+  { key:'status', label:'状态', type:'text', width:80 },
+];
+Object.keys(RESOURCE_SECTION_TITLES).forEach(key => { SECTION_COLS[key] = RESOURCE_SECTION_COLS; });
+
 // ── 默认显示列（精简，其余通过字段配置面板开启）─────────────────
 const SECTION_DEFAULT_COLS = {
   vpps_parts:     ['level','vpps','vpps_description','part_category','parent_vpps','status'],
@@ -850,6 +954,9 @@ const SECTION_DEFAULT_COLS = {
   vpps_fixtures:  ['name','category','status','spec'],
   vpps_equipments:['name','category','status','spec'],
 };
+Object.keys(RESOURCE_SECTION_TITLES).forEach(key => {
+  SECTION_DEFAULT_COLS[key] = ['code', 'name', 'attributes', 'source', 'status'];
+});
 
 // ══════════════════════════════════════════════════════════════════
 // 状态 & 运行时
@@ -883,6 +990,7 @@ async function _initTls(key) {
   // 默认显示列 = defaultKeys 对应的 col 对象
   const defaultCols = defaultKeys.map(k => allCols.find(c => c.key === k)).filter(Boolean);
   const mount = document.getElementById('tlsMount');
+  const canManage = !_isResourceSection(key) || _canManageResourceRequirements();
 
   _tls = new TreeListShell({
     mountEl:      mount,
@@ -891,14 +999,17 @@ async function _initTls(key) {
     parentField:  key === 'vpps_parts' ? 'parent_vpps' : 'level',
     onLoadLists:  async () => [{ gid: '__all__', name: sec.title }],
     onLoadData:   async (type, listGid) => {
-      const cf = _cf();
-      if (!cf) return [];
+      const _cloudFetch = _cf();
+      if (!_cloudFetch) return [];
       try {
-        const rows = await sec.load(cf);
+        const rows = await sec.load(_cloudFetch);
         // 缓存原始行（供编辑时使用）
         _rawRowsMap = {};
         rows.forEach(r => { if (r.gid) _rawRowsMap[r.gid] = r; });
         // 对 spec 字段做展示转换
+        if (_isResourceSection(key)) {
+          return rows.map(r => ({ ...r, attributes: _specSummary(r.attributes) }));
+        }
         if (key === 'vpps_fixtures' || key === 'vpps_equipments') {
           return rows.map(r => ({ ...r, spec: _specSummary(r.spec) }));
         }
@@ -914,24 +1025,30 @@ async function _initTls(key) {
     detailMode:   'readonly',
     detailFields: allCols.map(c => ({ key: c.key, label: c.label })),
     rowTitle:     (row) => row.name || row.vpps_description || row.vpps || '详情',
-    rowContextMenu: (row) => [
-      {
+    rowContextMenu: (row) => {
+      if (!canManage) return [];
+      const actions = [{
         label: '编辑',
         onClick: (p) => { const rawRow = _rawRowsMap[p.gid] || p; _openModal(rawRow); },
-      },
-      { separator: true },
-      {
-        label: '删除',
-        danger: true,
-        onClick: (p) => _deleteRow(p.gid, p.name || p.vpps_description || p.gid),
-      },
-    ],
-    categoryField: key === 'vpps_parts' ? 'part_category'
+      }];
+      if (_isResourceSection(key)) {
+        actions.push({ label: '管理别名', onClick: p => _editResourceAliases(p.gid) });
+      }
+      if (_isResourceSection(key) || (key !== 'vpps_fixtures' && key !== 'vpps_equipments')) {
+        actions.push({ separator: true }, {
+          label: _isResourceSection(key) ? '停用' : '删除',
+          danger: true,
+          onClick: (p) => _deleteRow(p.gid, p.name || p.vpps_description || p.gid),
+        });
+      }
+      return actions;
+    },
+    categoryField: _isResourceSection(key) ? null : key === 'vpps_parts' ? 'part_category'
                  : key === 'vpps_tools' ? 'gun_type'
                  : key === 'fastener_spec' ? 'fastener_type'
                  : 'category',
     moduleId:     'vpps_section_' + key,
-    extraToolbarBtns: [
+    extraToolbarBtns: (canManage ? [
       {
         html: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="feat-label">导入</span>`,
         title: '导入数据',
@@ -942,7 +1059,7 @@ async function _initTls(key) {
         title: sec.addLabel || '新建',
         onClick: () => _openModal(null),
       },
-    ],
+    ] : []).filter((_, index) => !_isResourceSection(key) || index > 0),
   });
 
   await _tls.init();
@@ -950,6 +1067,7 @@ async function _initTls(key) {
 
 // ── 新建/编辑弹窗 ────────────────────────────────────────────────
 function _openModal(row) {
+  if (_isResourceSection(_section) && !_canManageResourceRequirements()) return _toast('仅知识库管理员可编辑');
   const sec = SECTIONS[_section];
   _editGid  = row?.gid || null;
   document.getElementById('mdModalTitle').textContent = _editGid
@@ -969,14 +1087,14 @@ async function _saveModal() {
   const sec  = SECTIONS[_section];
   const body = sec.readForm();
   if (!body) return;
-  const cf = _cf();
-  if (!cf) { _toast('未连接云端'); return; }
+  const _cloudFetch = _cf();
+  if (!_cloudFetch) { _toast('未连接云端'); return; }
   try {
     if (_editGid) {
-      await sec.update(cf, _editGid, body);
+      await sec.update(_cloudFetch, _editGid, body);
       _toast('已更新');
     } else {
-      await sec.create(cf, body);
+      await sec.create(_cloudFetch, body);
       _toast('已创建');
     }
     _closeModal();
@@ -987,16 +1105,40 @@ async function _saveModal() {
 }
 
 async function _deleteRow(gid, name) {
+  if (_isResourceSection(_section) && !_canManageResourceRequirements()) return _toast('仅知识库管理员可停用');
   if (!confirm(`确定要删除「${name}」吗？`)) return;
-  const cf = _cf();
-  if (!cf) { _toast('未连接云端'); return; }
+  const _cloudFetch = _cf();
+  if (!_cloudFetch) { _toast('未连接云端'); return; }
   try {
-    await SECTIONS[_section].remove(cf, gid);
+    await SECTIONS[_section].remove(_cloudFetch, gid);
     _toast('已删除');
     await _tls?.refresh();
   } catch (e) {
     _toast('删除失败：' + (e.message || e));
   }
+}
+
+async function _editResourceAliases(gid) {
+  if (!_canManageResourceRequirements()) return _toast('仅知识库管理员可维护别名');
+  const row = _rawRowsMap[gid];
+  if (!row) return;
+  const current = row.aliases || [];
+  const input = prompt('别名（每行一个）', current.map(alias => alias.alias_value).join('\n'));
+  if (input === null) return;
+  const wanted = [...new Set(input.split(/\r?\n/).map(value => value.trim()).filter(Boolean))];
+  const cf = _cf();
+  if (!cf) return _toast('未连接云端');
+  try {
+    for (const alias of current.filter(alias => !wanted.includes(alias.alias_value))) {
+      await cf(`/api/craft/resource-requirements/${gid}/aliases/${alias.gid}`, { method: 'DELETE' });
+    }
+    for (const aliasValue of wanted.filter(value => !current.some(alias => alias.alias_value === value))) {
+      await cf(`/api/craft/resource-requirements/${gid}/aliases`, {
+        method: 'POST', body: JSON.stringify({ alias_value: aliasValue }),
+      });
+    }
+    await _tls?.refresh();
+  } catch (e) { _toast('别名保存失败：' + (e.message || e)); }
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -1066,12 +1208,12 @@ function _splitCSVLine(line) {
 }
 
 async function _parseXLSX(file) {
-  const cf = _cf();
-  if (!cf) { _toast('未连接云端，无法解析 Excel'); return; }
+  const _cloudFetch = _cf();
+  if (!_cloudFetch) { _toast('未连接云端，无法解析 Excel'); return; }
   const buf = await file.arrayBuffer();
   const b64 = _arrayBufferToBase64(buf);
   try {
-    const res = await cf('/api/import-export/import/parse-excel', {
+    const res = await _cloudFetch('/api/import-export/import/parse-excel', {
       method: 'POST',
       body: JSON.stringify({ file_b64: b64, filename: file.name }),
     });
@@ -1187,30 +1329,47 @@ function _showImportPreview(headers, rows) {
 }
 
 async function _doImport() {
-  const cf = _cf();
+  const _cloudFetch = _cf();
   const sec = SECTIONS[_section];
-  if (!cf || !_importParsedRows.length) return;
+  if (!_cloudFetch || !_importParsedRows.length) return;
 
   document.getElementById('importConfirm').disabled = true;
   document.getElementById('importConfirm').textContent = '导入中…';
 
-  let ok = 0, fail = 0, lastErr = '';
+  let ok = 0, fail = 0, skipped = 0, lastErr = '';
+  const bodies = [];
   for (const row of _importParsedRows) {
     const body = sec.buildImportBody(row);
     const requiredCheck = sec.importRequiredFn
       ? sec.importRequiredFn(body)
       : !!body[sec.importFields[0]];
     if (!requiredCheck) { fail++; lastErr = '必填字段为空'; continue; }
+    bodies.push(body);
+  }
+
+  if (sec.importMany) {
     try {
-      await sec.importOne(cf, body);
-      ok++;
+      const result = await sec.importMany(_cloudFetch, bodies);
+      ok = Number(result?.created_count || 0);
+      skipped = Number(result?.skipped_count || 0);
     } catch (e) {
-      fail++;
+      fail += bodies.length;
       lastErr = e.message || '未知错误';
+    }
+  } else {
+    for (const body of bodies) {
+      try {
+        await sec.importOne(_cloudFetch, body);
+        ok++;
+      } catch (e) {
+        fail++;
+        lastErr = e.message || '未知错误';
+      }
     }
   }
 
   let msg = `导入完成：成功 ${ok} 条`;
+  if (skipped) msg += `，跳过 ${skipped} 条`;
   if (fail) msg += `，失败 ${fail} 条`;
   if (fail && lastErr) msg += `（${lastErr}）`;
   _toast(msg, 4000);

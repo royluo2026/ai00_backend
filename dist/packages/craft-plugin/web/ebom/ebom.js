@@ -27,10 +27,28 @@ if (_standaloneMode) {
 }
 
 /* ── helpers ─────────────────────────────────────────────── */
-function _cf(path, opts) {
+function _cf(method, path, opts = {}) {
   const fn = window.parent?._cloudFetch || window._cloudFetch;
   if (!fn) return Promise.resolve(null);
-  return fn(path, opts).catch(err => { console.warn('[PBOM] fetch error', err); return null; });
+  return fn(path, { ...opts, method }).catch(err => { console.warn('[PBOM] fetch error', err); return null; });
+}
+
+async function _invokeCapability(id, payload, options = {}) {
+  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version: 1, payload }),
+    signal: options.signal,
+  });
+  const result = response?.data;
+  if (response?.success !== true || result?.ok !== true) {
+    const detail = result?.error || response?.error || {};
+    throw new Error(detail.message || `能力调用失败：${id}@1`);
+  }
+  // Native providers historically return {data: {success, data}}; unwrap
+  // that compatibility envelope while keeping read capability results intact.
+  const value = result.data;
+  return value?.data?.success !== undefined ? value.data : value;
 }
 
 // localStorage 账号隔离
@@ -265,7 +283,7 @@ let _vppsIgnoredOps     = [];        // 已忽略操作详情数组（含 origin
 
 /* ── 数据加载 ─────────────────────────────────────────────── */
 async function loadProjects() {
-  const res = await _cf('/api/projects');
+  const res = await _invokeCapability('project.project.read.atomic.projects_search', {});
   _projects = res?.data || [];
   const selProj = document.getElementById('sel-project');
   selProj.innerHTML = '<option value="">全部项目</option>';
@@ -282,10 +300,9 @@ function _autoVersionName(projectGid, suffix) {
 
 async function loadVersions() {
   const projGid = document.getElementById('sel-project').value;
-  const path = projGid
-    ? `/api/ebom/snapshots?project_gid=${encodeURIComponent(projGid)}`
-    : '/api/ebom/snapshots';
-  const res = await _cf(path);
+  const res = projGid
+    ? await _cf('GET', `/api/ebom/snapshots?project_gid=${encodeURIComponent(projGid)}`)
+    : await _cf('GET', '/api/ebom/snapshots');
   _versions = res?.data || [];
   if (_shell?.getBaseTLS())   _shell.getBaseTLS().refreshItems();
   if (_shell?.getTargetTLS()) _shell.getTargetTLS().refreshItems();
@@ -294,17 +311,16 @@ async function loadVersions() {
 async function _loadPbomLists() {
   if (!_versions.length) {
     const projGid = document.getElementById('sel-project').value;
-    const path = projGid
-      ? `/api/ebom/snapshots?project_gid=${encodeURIComponent(projGid)}`
-      : '/api/ebom/snapshots';
-    const res = await _cf(path);
+    const res = projGid
+      ? await _cf('GET', `/api/ebom/snapshots?project_gid=${encodeURIComponent(projGid)}`)
+      : await _cf('GET', '/api/ebom/snapshots');
     _versions = res?.data || [];
   }
   return _versions.map(v => ({ gid: v.gid, name: v.name || v.version_tag || '未命名' }));
 }
 
 async function _loadPbomParts(itemType, listGid) {
-  const res = await _cf(`/api/ebom/snapshots/${listGid}/parts`);
+  const res = await _cf('GET', `/api/ebom/snapshots/${listGid}/parts`);
   const rows = res?.data || [];
   setTimeout(() => _loadSapIndicators(rows.map(r => r.gid).filter(Boolean)), 0);
   return rows;
@@ -335,9 +351,7 @@ async function _updatePbomStatusBadge(versionGid) {
   if (status === 'ready') {
     btn.textContent = '取消就绪';
     btn.onclick = async () => {
-      const res = await _cf(`/api/ebom/snapshots/${versionGid}/status`, {
-        method: 'PATCH', body: JSON.stringify({ status: 'raw' }),
-      });
+      const res = await _invokeCapability('craft.ebom.snapshot.status.update', { snapshot_gid: versionGid, status: 'raw' });
       if (res?.success) {
         const v = _versions.find(v2 => v2.gid === versionGid);
         if (v) v.status = 'raw';
@@ -347,9 +361,7 @@ async function _updatePbomStatusBadge(versionGid) {
   } else {
     btn.textContent = '标记为可用';
     btn.onclick = async () => {
-      const res = await _cf(`/api/ebom/snapshots/${versionGid}/status`, {
-        method: 'PATCH', body: JSON.stringify({ status: 'ready' }),
-      });
+      const res = await _invokeCapability('craft.ebom.snapshot.status.update', { snapshot_gid: versionGid, status: 'ready' });
       if (res?.success) {
         const v = _versions.find(v2 => v2.gid === versionGid);
         if (v) v.status = 'ready';
@@ -379,7 +391,8 @@ async function _loadSapIndicators(gids) {
   // 分批，每批 500 条
   for (let i = 0; i < gids.length; i += 500) {
     const chunk = gids.slice(i, i + 500);
-    const res = await _cf(`/api/self_ann/batch?gids=${chunk.join(',')}`);
+    const res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+      .call('base.annotations.batch', { gids: chunk });
     if (!res) return;
     Object.entries(res).forEach(([gid, info]) => {
       document.querySelectorAll(`.sap-row-pin[data-gid="${gid}"]`).forEach(el => {
@@ -585,7 +598,7 @@ function _renderVppsCheckTable(checkResult, targetRows) {
           revertBtn.textContent = '撤销中…';
           try {
             const user = window._currentUser || {};
-            await _cf(`/api/vpps-operations/${ignoredOp.gid}/revert`, {
+            await _cf('POST', `/api/vpps-operations/${ignoredOp.gid}/revert`, {
               method: 'POST',
               body: JSON.stringify({ reverted_by_gid: user.gid || '', reverted_by_name: user.name || '' }),
             });
@@ -758,7 +771,7 @@ function _queueVppsAlias({ vppsPartGid, alias, pbomPartGid }) {
     key,
     desc: `别名 "${alias}"`,
     fn: async () => {
-      const res = await _cf(`/api/craft_lib/part_names/${vppsPartGid}/accept_alias`, {
+      const res = await _cf('POST', `/api/craft_lib/part_names/${vppsPartGid}/accept_alias`, {
         method: 'POST',
         body: JSON.stringify({ alias, pbom_part_gid: pbomPartGid }),
       });
@@ -787,7 +800,7 @@ const vppsCheckDef = {
     const _pbomVersionGid = _shell?.getTargetTLS()?.getSelectedList() || '';
     try {
       if (_pbomVersionGid) {
-        const ignRes = await _cf(`/api/vpps-operations/rule4-ignores?pbom_version_gid=${encodeURIComponent(_pbomVersionGid)}`);
+        const ignRes = await _cf('GET', `/api/vpps-operations/rule4-ignores?pbom_version_gid=${encodeURIComponent(_pbomVersionGid)}`);
         _vppsIgnoredRowGids = new Set(ignRes?.ignored_row_gids || []);
         _vppsIgnoredOps     = ignRes?.operations || [];
       } else {
@@ -801,7 +814,7 @@ const vppsCheckDef = {
 
     let vppsRef = [];
     try {
-      const res = await _cf('/api/craft_lib/part_names');
+      const res = await _cf('GET', '/api/craft_lib/part_names');
       vppsRef = res?.data || [];
     } catch (e) {
       return {
@@ -1386,7 +1399,7 @@ const vppsCheckDef = {
             vpps_desc_cn:     (p.vpps_desc || '').trim(),
             vpps_description: (p.vpps_desc || '').trim(),
           }));
-          const res = await _cf('/api/craft_lib/part_names/batch_add_from_pbom', {
+          const res = await _cf('POST', '/api/craft_lib/part_names/batch_add_from_pbom', {
             method: 'POST', body: JSON.stringify({ entries, meta }),
           });
           if (!res?.success) throw new Error(res?.detail || '批量添加失败');
@@ -1403,7 +1416,7 @@ const vppsCheckDef = {
             alias:         d.alias,
             pbom_part_gid: d.pbomPartGid,
           }));
-          const res = await _cf('/api/craft_lib/part_names/batch_accept_alias', {
+          const res = await _cf('POST', '/api/craft_lib/part_names/batch_accept_alias', {
             method: 'POST', body: JSON.stringify({ items, meta }),
           });
           if (!res?.success) throw new Error(res?.detail || '批量别名提交失败');
@@ -1426,7 +1439,7 @@ const vppsCheckDef = {
             pbom_row_gid:       r.gid,
             original_vpps_desc: r.vpps_desc,
           }));
-          const res = await _cf('/api/vpps-operations/rule4-bulk-ignore', {
+          const res = await _cf('POST', '/api/vpps-operations/rule4-bulk-ignore', {
             method: 'POST',
             body: JSON.stringify({ pbom_version_gid: _pbomVersionGid, rows, actor_gid, actor_name }),
           });
@@ -1440,7 +1453,7 @@ const vppsCheckDef = {
           let failed = 0;
           for (const op of ops) {
             try {
-              const res = await _cf(`/api/vpps-operations/${op.gid}/revert`, {
+              const res = await _cf('POST', `/api/vpps-operations/${op.gid}/revert`, {
                 method: 'POST',
                 body: JSON.stringify({ reverted_by_gid: user.gid || '', reverted_by_name: user.name || '' }),
               });
@@ -1566,13 +1579,9 @@ const vppsCheckDef = {
     if (_pbomVersionGid) {
       const nokCount = (rule1Errors.length + rule2Errors.length + rule3Errors.length)
         + (result.rule4Nok?.items?.length || 0);
-      _cf(`/api/ebom/snapshots/${_pbomVersionGid}/vpps-stats`, {
-        method: 'PATCH',
-        body: JSON.stringify({
-          nok:     nokCount,
-          ignored: _vppsIgnoredRowGids.size,
-          total:   targetRows.length,
-        }),
+      _invokeCapability('craft.ebom.snapshot.vpps_stats.update', {
+        snapshot_gid: _pbomVersionGid, nok: nokCount,
+        ignored: _vppsIgnoredRowGids.size, total: targetRows.length,
       }).catch(() => {});   // fire-and-forget，不阻塞 UI
     }
 
@@ -1628,15 +1637,15 @@ async function confirmPartModal() {
   const targetGid = targetTLS ? targetTLS.getSelectedList() : null;
   let res;
   if (_editingPartGid) {
-    res = await _cf(`/api/ebom/parts/${_editingPartGid}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ part_no, name, quantity, unit, material, temp_vpps, remark }),
+    res = await _invokeCapability('craft.ebom.part.update', {
+      part_gid: _editingPartGid,
+      changes: { part_no, name, quantity, unit, material, temp_vpps, remark },
     });
   } else {
     if (!targetGid) return;
-    res = await _cf(`/api/ebom/snapshots/${targetGid}/parts`, {
-      method: 'POST',
-      body: JSON.stringify({ part_no, name, quantity, unit, material, parent_gid, temp_vpps, remark }),
+    res = await _invokeCapability('craft.ebom.part.create', {
+      snapshot_gid: targetGid,
+      part: { part_no, name, quantity, unit, material, parent_gid, temp_vpps, remark },
     });
   }
   if (res?.success) {
@@ -1689,9 +1698,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const name = nvNameInp?.value.trim();
     const projectGid = nvProjectSel?.value || null;
     if (!name) { alert('版本名称不能为空'); return; }
-    const res = await _cf('/api/ebom/snapshots', {
-      method: 'POST',
-      body: JSON.stringify({ name, version_tag: name, project_gid: projectGid, source_type: 'manual' }),
+    const res = await _invokeCapability('craft.pbom.version.create', {
+      name, version_tag: name, project_gid: projectGid, source_type: 'manual',
     });
     if (!res?.success) { alert('创建失败'); return; }
     document.getElementById('modal-new-ver').classList.add('hidden');
@@ -1770,9 +1778,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const verName    = impVerPreview?.value.trim();
       const sourceType = document.getElementById('imp-source')?.value || 'import';
       if (!verName) { alert('版本名称不能为空'); return; }
-      const res = await _cf('/api/ebom/snapshots', {
-        method: 'POST',
-        body: JSON.stringify({ name: verName, version_tag: verName, project_gid: projectGid, source_type: sourceType }),
+      const res = await _invokeCapability('craft.pbom.version.create', {
+        name: verName, version_tag: verName, project_gid: projectGid, source_type: sourceType,
       });
       if (!res?.success) { alert('创建版本失败'); return; }
       const newGid = res.data?.gid;
@@ -1894,20 +1901,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       const skipped  = mapped.length - filtered.length;
       if (skipped) console.log(`[PBOM] 已跳过 ${skipped} 行 (level ≥ 4)`);
       if (!filtered.length) throw new Error('没有可导入的数据行');
-      const cf = window.parent?._cloudFetch || window._cloudFetch;
-      if (!cf) throw new Error('_cloudFetch 未就绪');
       const BATCH = 100;
       let totalInserted = 0;
       for (let i = 0; i < filtered.length; i += BATCH) {
         if (signal?.aborted) break;
         const chunk = filtered.slice(i, i + BATCH);
-        const res = await cf(`/api/ebom/snapshots/${targetGid}/parts/batch`, {
-          method: 'POST',
-          body: JSON.stringify(chunk),
-          signal,
-        });
-        if (!res?.success) throw new Error(`批量导入失败(${i}~${i+chunk.length}): ${res?.detail || JSON.stringify(res)}`);
-        totalInserted += res.data?.inserted || 0;
+        const res = await _invokeCapability('craft.ebom.part.bulk_create', {
+          snapshot_gid: targetGid, parts: chunk,
+        }, { signal });
+        totalInserted += res?.inserted || res?.data?.inserted || 0;
       }
       if (!signal?.aborted) {
         console.log(`[PBOM] 导入完成, inserted=${totalInserted}`);

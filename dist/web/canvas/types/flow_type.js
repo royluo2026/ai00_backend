@@ -105,30 +105,91 @@
   }
 
   // ── Bridge 调用（云端 REST）─────────────────────────────────────────────
+  function _capabilityClient() {
+    const client = window.parent?.AI00ExistingCapabilityClient
+      || window.top?.AI00ExistingCapabilityClient
+      || window.AI00ExistingCapabilityClient;
+    if (!client?.invoke) throw new Error('能力客户端未就绪');
+    return client;
+  }
+
+  function _inputValues(values) {
+    return Object.entries(values || {}).map(([name, value]) => ({ name, value }));
+  }
+
+  function _newNodeTestOperation(payload) {
+    const copy = JSON.parse(JSON.stringify(payload));
+    copy.input_values.forEach(Object.freeze);
+    Object.freeze(copy.input_values);
+    return Object.freeze({
+      payload: Object.freeze(copy),
+      idempotencyKey: window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    });
+  }
+
+  function _nodeTestPending(result) {
+    return ['accepted', 'outcome_unknown', 'reconciling'].includes(result?.status);
+  }
+
+  let _nodeTestOperation = null;
+
   async function _bridge(method, args) {
-    const cf = _cf()?._cloudFetch;
-    if (!cf) throw new Error('cloudFetch not available');
     const gid = args?.gid;
+    if (method === 'test_node') {
+      const payload = {
+        flow_gid: gid,
+        node_id: args.node_id,
+        input_values: _inputValues(args.inputs),
+      };
+      if (!_nodeTestOperation || JSON.stringify(_nodeTestOperation.payload) !== JSON.stringify(payload)) {
+        _nodeTestOperation = _newNodeTestOperation(payload);
+      }
+      const operation = _nodeTestOperation;
+      try {
+        const result = await _capabilityClient().invoke('agent.workflow.node.test.execute', operation.payload, {
+          write: true, confirmed: true, idempotencyKey: operation.idempotencyKey,
+        });
+        if (!_nodeTestPending(result)) _nodeTestOperation = null;
+        return result;
+      } catch (error) {
+        if (error?.code && error.code !== 'outcome_unknown') _nodeTestOperation = null;
+        throw error;
+      }
+    }
+    const _cloudFetch = _cf()?._cloudFetch;
+    if (!_cloudFetch) throw new Error('cloudFetch not available');
+    async function capability(id, payload) {
+      const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ version: 1, payload }),
+      });
+      const envelope = response?.data;
+      if (response?.success !== true || envelope?.ok !== true) {
+        const detail = envelope?.error || response?.error || {};
+        throw new Error(detail.message || `能力调用失败：${id}@1`);
+      }
+      const value = envelope.data;
+      return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+    }
     const runGid = args?.run_gid;
     switch (method) {
       case 'get_node_manifest':
-        return cf('/api/flows/capability-manifest');
+        return _cloudFetch('/api/flows/capability-manifest', { method: 'GET' });
       case 'get_flow':
-        return cf(`/api/flows/${gid}`);
+        return capability('agent.flow.read', { operation: 'get', flow_gid: gid });
       case 'create_flow':
-        return cf('/api/flows', { method: 'POST', body: JSON.stringify(args) });
+        return capability('agent.flow.change.apply', { operation: 'create', name: args.name, flowdef: args.flowdef, description: args.description });
       case 'update_flow':
-        return cf(`/api/flows/${gid}`, { method: 'PUT', body: JSON.stringify(args) });
+        return capability('agent.flow.change.apply', { operation: 'update', flow_gid: gid, name: args.name, flowdef: args.flowdef, description: args.description });
       case 'run_flow':
-        return cf(`/api/flows/${gid}/run`, { method: 'POST', body: JSON.stringify({ mode: args.mode }) });
+        return capability('agent.flow.change.apply', { operation: 'run', flow_gid: gid, mode: args.mode || 'auto' });
       case 'step_flow':
-        return cf(`/api/flows/runs/${runGid}/step`, { method: 'POST' });
+        return capability('agent.flow.change.apply', { operation: 'run', run_gid: runGid, mode: 'step' });
       case 'get_run_state':
-        return cf(`/api/flows/runs/${runGid}`);
+        return capability('agent.flow.read', { operation: 'get_run', run_gid: runGid });
       case 'list_run_history':
-        return cf(`/api/flows/${gid}/runs?limit=${args.limit || 10}`);
-      case 'test_node':
-        return cf('/api/flows/test-node', { method: 'POST', body: JSON.stringify(args) });
+        return capability('agent.flow.read', { operation: 'list_runs', flow_gid: gid, limit: args.limit || 10 });
       default:
         throw new Error(`Unknown flow method: ${method}`);
     }
@@ -731,14 +792,20 @@
         try { inputs = JSON.parse(document.getElementById('csFlowTestInput').value); } catch {}
         try {
           const res = await _bridge('test_node', {
-            node_type: config.node_type || config.type,
-            config,
+            gid: FlowPlugin._flowGid,
+            node_id: config.node_id,
             inputs,
           });
-          resultEl.textContent    = JSON.stringify(res, null, 2);
+          resultEl.textContent    = _nodeTestPending(res)
+            ? (res.status === 'accepted'
+              ? '测试已受理，正在协调；使用相同输入可重试。'
+              : '测试结果未知，正在协调；使用相同输入可重试。')
+            : JSON.stringify(res, null, 2);
           resultEl.style.display  = 'block';
         } catch (err) {
-          resultEl.textContent   = `错误: ${err}`;
+          resultEl.textContent   = (!err?.code || err.code === 'outcome_unknown')
+            ? '测试结果未知，可使用相同输入重试。'
+            : `错误: ${err}`;
           resultEl.style.display = 'block';
         }
       });
@@ -765,7 +832,8 @@
       try {
         const cfObj = _cf();
         if (!cfObj) throw new Error('cloudFetch 不可用');
-        const res = await cfObj._cloudFetch('/api/flows/gen-script', {
+        const _cloudFetch = cfObj._cloudFetch;
+        const res = await _cloudFetch('/api/flows/gen-script', {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({ prompt, context: FlowPlugin._genScriptConfig }),

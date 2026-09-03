@@ -46,6 +46,35 @@ class BopLifecyclePanel {
     this._creationMode = false;  // true = 新建模式（无 versionGid）
   }
 
+  async _invokeCapability(id, payload) {
+    const _cloudFetch = this._cf;
+    const requestBody = {
+      version: 1,
+      payload,
+      idempotency_key: `${id}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    };
+    const request = (suffix, body) => _cloudFetch(`/api/v1/capabilities/${id}:${suffix}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    let response = await request('invoke', requestBody);
+    if (response?.data?.error?.code === 'confirmation_required') {
+      const confirmation = await request('confirm', requestBody);
+      const token = confirmation?.data?.confirmation_token;
+      if (!token) throw new Error(`能力确认失败：${id}@1`);
+      response = await request('invoke', { ...requestBody, confirmation_token: token });
+    }
+    const result = response?.data;
+    if (response?.success !== true || result?.ok !== true) {
+      const detail = result?.error || response?.error || {};
+      const error = new Error(detail.message || `能力调用失败：${id}@1`);
+      error.code = detail.code || 'capability_invocation_failed';
+      throw error;
+    }
+    return result.data;
+  }
+
   // ── 公开 API ───────────────────────────────────────────────────────────────
 
   async init() {
@@ -79,12 +108,11 @@ class BopLifecyclePanel {
     const lineGid = this._selectedLine || '';
     if (!lineGid) { this._toast?.('请先选择线体', 'warn'); return; }
     try {
-      const resp = await this._cf(
-        `/api/bop/versions/${this._versionGid}/lifecycle/lines/${lineGid}/undo`,
-        { method: 'POST' }
-      );
+      const resp = await this._invokeCapability('craft.bop.lifecycle.history.change.apply', {
+        operation: 'undo', version_gid: this._versionGid, line_gid: lineGid,
+      });
       this._toast?.('已撤销', 'ok');
-      if (resp.operation_log) this._lastOperationLog = resp.operation_log;
+      if (resp?.data?.operation_log || resp?.operation_log) this._lastOperationLog = resp.data?.operation_log || resp.operation_log;
       this._renderSideHistoryPanel();
       await this._load();
       if (this._onBopTreeChange) this._onBopTreeChange();
@@ -97,12 +125,11 @@ class BopLifecyclePanel {
     const lineGid = this._selectedLine || '';
     if (!lineGid) { this._toast?.('请先选择线体', 'warn'); return; }
     try {
-      const resp = await this._cf(
-        `/api/bop/versions/${this._versionGid}/lifecycle/lines/${lineGid}/redo`,
-        { method: 'POST' }
-      );
+      const resp = await this._invokeCapability('craft.bop.lifecycle.history.change.apply', {
+        operation: 'redo', version_gid: this._versionGid, line_gid: lineGid,
+      });
       this._toast?.('已重做', 'ok');
-      if (resp.operation_log) this._lastOperationLog = resp.operation_log;
+      if (resp?.data?.operation_log || resp?.operation_log) this._lastOperationLog = resp.data?.operation_log || resp.operation_log;
       this._renderSideHistoryPanel();
       await this._load();
       if (this._onBopTreeChange) this._onBopTreeChange();
@@ -148,10 +175,9 @@ class BopLifecyclePanel {
     const now = Date.now();
     if (!force && now - this._lastRefresh < 10 * 60 * 1000) return;
     try {
-      await this._cf(
-        `/api/bop/versions/${this._versionGid}/lifecycle/refresh-stats`,
-        { method: 'POST' }
-      );
+      await this._invokeCapability('craft.bop.lifecycle.stats.refresh.apply', {
+        version_gid: this._versionGid,
+      });
       await this._load();
       this._lastRefresh = Date.now();
     } catch (e) {
@@ -190,9 +216,9 @@ class BopLifecyclePanel {
 
   async _load() {
     try {
-      this._data = await this._cf(
-        `/api/bop/versions/${this._versionGid}/lifecycle`
-      );
+      this._data = await this._invokeCapability('craft.bop.lifecycle.state.read', {
+        version_gid: this._versionGid,
+      });
       // 兼容老 lifecycle_phase：refine/publish_cycle 视为 promote
       let ph = this._data.lifecycle_phase;
       if (ph && !_LC_PHASE_ORDER.includes(ph)) {
@@ -354,20 +380,19 @@ class BopLifecyclePanel {
       const orig = btn.textContent;
       btn.textContent = '升版中…';
       try {
-        const resp = await this._cf(`/api/bop/versions/${this._versionGid}/promote`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            target_data_stage: target || null,
-            same_stage: sameStage,
-            change_note: noteInput.value || null,
-            bump_version_tag: true,
-            promote_to_m: false,
-          }),
+        const resp = await this._invokeCapability('craft.bop.version.snapshot.change.apply', {
+          operation: 'promote',
+          version_gid: this._versionGid,
+          target_data_stage: target || null,
+          same_stage: sameStage,
+          change_note: noteInput.value || null,
+          bump_version_tag: true,
+          promote_to_m: false,
         });
+        const promoted = resp?.data || resp || {};
         const msg = sameStage
-          ? `已升版至 ${resp.new_version_tag}（保留 ${resp.new_data_stage}）`
-          : `已升版至 ${resp.new_version_tag}（${resp.new_data_stage}）`;
+          ? `已升版至 ${promoted.new_version_tag}（保留 ${promoted.new_data_stage}）`
+          : `已升版至 ${promoted.new_version_tag}（${promoted.new_data_stage}）`;
         this._toast?.(msg, 'ok');
         await this._load();
         if (this._onBopTreeChange) this._onBopTreeChange();
@@ -716,10 +741,10 @@ class BopLifecyclePanel {
           // 降级：读 BOP 版本关联的 pbom_version_gid
           if (!pbomGid) {
             try {
-              const res = await (window.parent?._cloudFetch || window._cloudFetch)?.(
-                `/api/bop/versions/${this._versionGid}`
-              );
-              pbomGid = res?.data?.pbom_version_gid || '';
+              const res = await this._invokeCapability('craft.bop.version.get', {
+                version_gid: this._versionGid,
+              });
+              pbomGid = res?.pbom_version_gid || '';
             } catch (_) {}
           }
           api.showPbomCheckWindow({ pbomGid, bopGid: this._versionGid || '' });
@@ -1279,6 +1304,8 @@ class BopLifecyclePanel {
       refreshFamilyByProject();
       const famGid    = famSel.value || null;
       const facGid    = hidFactory.value.trim() || null;
+      const selOpt    = projSel?.options[projSel.selectedIndex];
+      const factoryNameVal = selOpt?.dataset.factoryName || '';
       const dataStage = stageSel.value || null;
       const srcGid    = getSourceGid();
 
@@ -1290,13 +1317,15 @@ class BopLifecyclePanel {
       createBtn.textContent = '检测版本号…';
       let tag, bopName, effectiveFamGid;
       try {
-        const freshRes = await this._cf('/api/bop/versions?include_archived=true');
-        const freshVers = freshRes.data || [];
+        const freshRes = await this._invokeCapability('craft.bop.version.list', {
+          include_archived: true, page_size: 100,
+        });
+        const freshVers = freshRes?.items || [];
         this._allVersionsCache = freshVers;   // 更新缓存
 
         let projName;
-        const selOpt = projSel?.options[projSel.selectedIndex];
-        projName = selOpt?.dataset.projectName || '';
+        const freshSelectedOption = projSel?.options[projSel.selectedIndex];
+        projName = freshSelectedOption?.dataset.projectName || '';
         bopName = projName ? projName : '';
         if (!bopName) { this._toast('版本名称获取失败，请重选项目', 'warn'); createBtn.disabled = false; createBtn.textContent = submitLabel; return; }
 
@@ -1339,41 +1368,33 @@ class BopLifecyclePanel {
           // Fork from source (template or existing version)
           const extraParams = typeof getExtraForkParams === 'function'
             ? getExtraForkParams() : {};
-          const res = await this._cf(`/api/bop/versions/${srcGid}/fork`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              target_version_tag:        tag,
-              target_bop_name:           bopName,
-              target_version_family_gid: effectiveFamGid,
-              version_type:              'working',
-              ...extraParams,
-            }),
+          const res = await this._invokeCapability('craft.bop.fork.change.apply', {
+            operation: 'fork',
+            source_version_gid: srcGid,
+            target_version_tag: tag,
+            target_bop_name: bopName,
+            ...(effectiveFamGid ? { target_version_family_gid: effectiveFamGid } : {}),
+            version_type: 'working',
+            ...extraParams,
           });
           newGid = res.data?.gid || res.gid;
         } else {
           // Create blank version
-          const res = await this._cf('/api/bop/versions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              version_tag: tag, bop_name: bopName,
-              version_family_gid: effectiveFamGid,
-              project_gid: projGid, factory_gid: facGid,
-              data_stage: dataStage,
-            }),
+          const res = await this._invokeCapability('craft.bop.version.create', {
+            source: 'empty', version_tag: tag, bop_name: bopName,
+            ...(effectiveFamGid ? { version_family_gid: effectiveFamGid } : {}),
+            project_gid: projGid,
+            ...(facGid && factoryNameVal ? { factory_gid: facGid } : {}),
+            data_stage: dataStage,
           });
-          newGid = res.data?.gid || res.gid;
+          newGid = res.version_gid || res.gid;
         }
 
         // 保存路线到新版本
         if (newGid) {
-          await this._cf(`/api/bop/versions/${newGid}/lifecycle/init-state`, {
-            method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              route: route,
-              checklist: { version_created: true, ...extraChecklist },
-            }),
+          await this._invokeCapability('craft.bop.lifecycle.state.change.apply', {
+            operation: 'init.update', version_gid: newGid,
+            route, checklist: { version_created: true, ...extraChecklist },
           });
         }
 
@@ -1402,12 +1423,12 @@ class BopLifecyclePanel {
 
   async _ensureCaches() {
     const [projRes, facRes, verRes] = await Promise.allSettled([
-      this._projectsCache ? null : this._cf('/api/projects?limit=200'),
-      this._factoriesCache ? null : this._cf('/api/bop/factories'),
-      this._allVersionsCache ? null : this._cf('/api/bop/versions?include_archived=true'),
+      this._projectsCache ? null : this._invokeCapability('project.project.read.atomic.projects_search', {}),
+      this._factoriesCache ? null : this._invokeCapability('factory.asset.search', { asset_type: 'factory' }),
+      this._allVersionsCache ? null : this._invokeCapability('craft.bop.version.list', { include_archived: true, page_size: 100 }),
     ]);
     if (!this._projectsCache && projRes.status === 'fulfilled' && projRes.value) {
-      this._projectsCache = (projRes.value.data || []).filter(
+      this._projectsCache = (projRes.value?.data?.data || projRes.value?.data || []).filter(
         p => !p.is_deleted && p.project_type !== 'gbop'
       );
     }
@@ -1415,7 +1436,7 @@ class BopLifecyclePanel {
       this._factoriesCache = facRes.value.data || [];
     }
     if (!this._allVersionsCache && verRes.status === 'fulfilled' && verRes.value) {
-      this._allVersionsCache = verRes.value.data || [];
+      this._allVersionsCache = verRes.value.items || [];
     }
     if (!this._projectsCache)    this._projectsCache    = [];
     if (!this._factoriesCache)   this._factoriesCache   = [];
@@ -1473,16 +1494,11 @@ class BopLifecyclePanel {
     }
 
     try {
-      const res = await this._cf(
-        `/api/bop/versions/${this._versionGid}/lifecycle/undo-step`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ step_key: stepKey, pbom_version_gid: pbomVersionGid || null }),
-        }
-      );
-      const d = res?.deleted_entries || 0;
-      const l = res?.deleted_links   || 0;
+      const res = await this._invokeCapability('craft.bop.lifecycle.step.rollback.apply', {
+        version_gid: this._versionGid, step_key: stepKey, pbom_version_gid: pbomVersionGid || null,
+      });
+      const d = res?.data?.deleted_entries || res?.deleted_entries || 0;
+      const l = res?.data?.deleted_links || res?.deleted_links || 0;
       const detail = (d || l) ? `（条目 ${d} 条，链接 ${l} 条已软删）` : '';
       this._toast(`步骤已撤销${detail}`, 'ok');
       await this._load();
@@ -1496,13 +1512,11 @@ class BopLifecyclePanel {
       const body = {};
       if ('route' in updates)     body.route     = updates.route;
       if ('checklist' in updates) body.checklist  = updates.checklist;
-      const res = await this._cf(
-        `/api/bop/versions/${this._versionGid}/lifecycle/init-state`,
-        { method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body) }
-      );
+      const res = await this._invokeCapability('craft.bop.lifecycle.state.change.apply', {
+        operation: 'init.update', version_gid: this._versionGid, ...body,
+      });
       // 更新本地缓存
-      if (this._data) this._data.lifecycle_state = res.lifecycle_state;
+      if (this._data) this._data.lifecycle_state = res?.data?.lifecycle_state || res?.lifecycle_state;
       this._render();
     } catch (e) {
       this._toast('保存失败: ' + e.message, 'error');
@@ -1586,7 +1600,9 @@ class BopLifecyclePanel {
     // 加载 PBOM 版本列表
     const cf = window.parent?._cloudFetch || window._cloudFetch;
     if (cf) {
-      cf('/api/ebom/snapshots').then(res => {
+      this._invokeCapability('craft.bop.entry.legacy_read', {
+        operation: 'pbom_snapshots', limit: 200,
+      }).then(res => {
         (res?.data || []).forEach(v => {
           const opt = document.createElement('option');
           opt.value = v.gid;
@@ -1601,10 +1617,9 @@ class BopLifecyclePanel {
         genBtn.disabled = true; genBtn.textContent = '生成中…';
         try {
           const baseMeta = this._data?.pbom_match?.pbom_version_gid || '';
-          await cf(`/api/bop/versions/${this._versionGid}/pbom-diff-queue`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ pbom_base_gid: baseMeta || null, pbom_target_gid: targetGid }),
+          await this._invokeCapability('craft.bop.lifecycle.change.apply', {
+            operation: 'pbom_diff_queue.generate', version_gid: this._versionGid,
+            pbom_base_gid: baseMeta || null, pbom_target_gid: targetGid,
           });
           this._toast('差异队列已生成', 'ok');
           await this._load();
@@ -1620,7 +1635,9 @@ class BopLifecyclePanel {
       const listEl = document.createElement('div');
       listEl.innerHTML = '<div style="font-size:10px;color:var(--subtext0,#a6adc8)">加载中…</div>';
       diffBody.appendChild(listEl);
-      cf(`/api/bop/versions/${this._versionGid}/pbom-diff-queue?status=pending`).then(res => {
+      this._invokeCapability('craft.bop.pbom_lifecycle.read', {
+        operation: 'diff_queue', gid: this._versionGid, status: 'pending',
+      }).then(res => {
         const items = res?.data || [];
         if (!items.length) { listEl.innerHTML = ''; return; }
         listEl.innerHTML = items.slice(0, 10).map(it => {
@@ -1973,15 +1990,10 @@ class BopLifecyclePanel {
       if (!confirm(`确认冻结切片？活动版本将继续，副本变为 ${mChk.checked ? 'M' : 'baseline'}。`)) return;
       btn.disabled = true; btn.textContent = '冻结中…';
       try {
-        const cf = window.parent?._cloudFetch || window._cloudFetch;
-        await cf(`/api/bop/versions/${this._versionGid}/freeze-snapshot`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            target_data_stage: stageSel.value,
-            change_note: noteInp.value || null,
-            promote_to_m: mChk.checked,
-          }),
+        await this._invokeCapability('craft.bop.version.snapshot.change.apply', {
+          operation: 'freeze_snapshot', version_gid: this._versionGid,
+          target_data_stage: stageSel.value, change_note: noteInp.value || null,
+          promote_to_m: mChk.checked,
         });
         this._toast(`切片已完成，data_stage 推进到 ${stageSel.value}`, 'ok');
         await this._load();
@@ -2010,9 +2022,10 @@ class BopLifecyclePanel {
 
   async _loadSnapshotHistory(container) {
     try {
-      const cf = window.parent?._cloudFetch || window._cloudFetch;
-      const res = await cf('/api/bop/versions?include_archived=true');
-      const allVers = res?.data || [];
+      const res = await this._invokeCapability('craft.bop.version.list', {
+        include_archived: true, page_size: 100,
+      });
+      const allVers = res?.items || [];
       const curVer  = allVers.find(v => v.gid === this._versionGid);
       const famGid  = curVer?.version_family_gid || this._versionGid;
       const snapshots = allVers
@@ -2069,8 +2082,10 @@ class BopLifecyclePanel {
 
   async _loadPublishedVersions(container) {
     try {
-      const res = await this._cf('/api/bop/versions?include_archived=true');
-      const allVers = res.data || [];
+      const res = await this._invokeCapability('craft.bop.version.list', {
+        include_archived: true, page_size: 100,
+      });
+      const allVers = res?.items || [];
       const curVer  = allVers.find(v => v.gid === this._versionGid);
       const famGid  = curVer?.version_family_gid || this._versionGid;
       const published = allVers
@@ -2108,8 +2123,12 @@ class BopLifecyclePanel {
   async _publishCurrentVersion() {
     if (!confirm('确认冻结并发布当前版本？')) return;
     try {
-      await this._cf(`/api/bop/versions/${this._versionGid}/freeze`,  { method: 'POST' });
-      await this._cf(`/api/bop/versions/${this._versionGid}/publish`, { method: 'POST' });
+      await this._invokeCapability('craft.bop.version.freeze.change.apply', {
+        operation: 'freeze', version_gid: this._versionGid,
+      });
+      await this._invokeCapability('craft.bop.version.lifecycle.change.apply', {
+        operation: 'publish', version_gid: this._versionGid,
+      });
       this._toast('版本已发布（M 状态）', 'ok');
       await this._load();
     } catch (e) {
@@ -2153,14 +2172,22 @@ class BopLifecyclePanel {
         this._lastOperationLog = null;
       } else {
         const [logRes, ckptRes] = await Promise.all([
-          this._cf(`/api/bop/versions/${this._versionGid}/lifecycle/lines/${lineGid}/operation-log`),
-          this._cf(`/api/bop/versions/${this._versionGid}/lifecycle/lines/${lineGid}/checkpoints`),
+          this._invokeCapability('craft.bop.lifecycle.read', {
+            operation: 'operation_log', gid: this._versionGid, line_gid: lineGid, limit: 200,
+          }),
+          this._invokeCapability('craft.bop.lifecycle.read', {
+            operation: 'checkpoints', gid: this._versionGid, line_gid: lineGid, limit: 200,
+          }),
         ]);
         logs  = logRes.data  || [];
         var ckpts = ckptRes.data || [];
       }
       if (typeof ckpts === 'undefined') {
-        try { ckpts = (await this._cf(`/api/bop/versions/${this._versionGid}/lifecycle/lines/${lineGid}/checkpoints`)).data || []; } catch { ckpts = []; }
+        try {
+          ckpts = (await this._invokeCapability('craft.bop.lifecycle.read', {
+            operation: 'checkpoints', gid: this._versionGid, line_gid: lineGid, limit: 200,
+          })).data || [];
+        } catch { ckpts = []; }
       }
 
       container.innerHTML = '';
@@ -2311,15 +2338,16 @@ class BopLifecyclePanel {
   async _renderVehicleOpsStep(stepKey) {
     const el  = this._actionEl;
     const api = window.top?.electronAPI || window.parent?.electronAPI || window.electronAPI;
-    const cf  = window.parent?._cloudFetch || window._cloudFetch;
 
     // 获取 PBOM 版本 GID
     const _getPbomGid = async () => {
       try {
         const saved = JSON.parse(localStorage.getItem(`lc:pbom_import:${this._versionGid}`) || 'null');
         if (saved?.gid) return saved.gid;
-        const res = await cf?.(`/api/bop/versions/${this._versionGid}`);
-        return res?.data?.pbom_version_gid || '';
+        const res = await this._invokeCapability('craft.bop.version.get', {
+          version_gid: this._versionGid,
+        });
+        return res?.pbom_version_gid || '';
       } catch { return ''; }
     };
 
@@ -2379,7 +2407,9 @@ class BopLifecyclePanel {
     // 刷新统计
     const _refresh = async () => {
       try {
-        const res = await this._cf(`/api/bop/versions/${this._versionGid}/pbom-link-stats`);
+        const res = await this._invokeCapability('craft.bop.pbom_lifecycle.read', {
+          operation: 'link_stats', gid: this._versionGid,
+        });
         const linked = res?.linked ?? 0;
         const total  = res?.total  ?? 0;
         const pct    = total > 0 ? Math.round(linked / total * 100) : 0;
@@ -2413,10 +2443,9 @@ class BopLifecyclePanel {
       const saved = JSON.parse(localStorage.getItem(lsKey) || 'null');
       if (saved?.gid) {
         try {
-          await this._cf(`/api/bop/versions/${this._versionGid}/pbom-match`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ pbom_version_gid: saved.gid, unlinked_ignored: n }),
+          await this._invokeCapability('craft.bop.lifecycle.change.apply', {
+            operation: 'pbom_match.update', version_gid: this._versionGid,
+            pbom_version_gid: saved.gid, unlinked_ignored: n,
           });
           this._toast('忽略数已保存', 'ok');
         } catch (e) { this._toast('保存失败: ' + e.message, 'error'); }
@@ -2538,8 +2567,8 @@ class BopLifecyclePanel {
         }
       };
 
-      cf?.('/api/projects').then(res => {
-        const projects = (res?.data || []).filter(p => !p.is_deleted);
+      this._invokeCapability('project.project.read.atomic.projects_search', {}).then(res => {
+        const projects = (res?.data?.data || res?.data || []).filter(p => !p.is_deleted);
         projSel.innerHTML = '<option value="">— 请选择项目 —</option>' +
           projects.map(p => `<option value="${p.gid}" data-name="${p.name}">${p.name}</option>`).join('');
         projSel.addEventListener('change', _updatePreview);
@@ -2556,12 +2585,10 @@ class BopLifecyclePanel {
         createVerBtn.textContent = '创建中…';
         try {
           const verName = `${projName}-${stage}-${_ts()}`;
-          const res = await cf('/api/ebom/snapshots', {
-            method: 'POST',
-            body: JSON.stringify({ name: verName, version_tag: verName, project_gid: projGid, source_type: 'import' }),
+          const res = await this._invokeCapability('craft.pbom.version.create', {
+            project_gid: projGid, name: verName, version_tag: verName, source_type: 'import',
           });
-          if (!res?.success) throw new Error(res?.detail || '创建失败');
-          _pbomVersionGid = res.data?.gid;
+          _pbomVersionGid = res?.gid;
           _save(_pbomVersionGid, verName);
           createVerBtn.textContent = `✓ 已创建：${verName}`;
           if (projSel) { projSel.disabled = true; }
@@ -2717,19 +2744,18 @@ class BopLifecyclePanel {
           const BATCH = 100;
           let inserted = 0;
           for (let i = 0; i < mapped.length; i += BATCH) {
-            const res = await cf(`/api/ebom/snapshots/${_pbomVersionGid}/parts/batch`, {
-              method: 'POST', body: JSON.stringify(mapped.slice(i, i + BATCH)),
+            const res = await this._invokeCapability('craft.ebom.part.bulk_create', {
+              snapshot_gid: _pbomVersionGid, parts: mapped.slice(i, i + BATCH),
             });
-            if (!res?.success) throw new Error(`批量导入失败: ${res?.detail || ''}`);
-            inserted += res.data?.inserted || 0;
+            inserted += res?.inserted || res?.data?.inserted || mapped.slice(i, i + BATCH).length;
           }
           importBtn.textContent = `✓ 导入完成（${inserted} 行）`;
           // 将 PBOM 版本绑定到 BOP 版本（pbom_version_gid），便于关系面板关联
           if (this._versionGid && _pbomVersionGid) {
             try {
-              await cf(`/api/bop/versions/${this._versionGid}`, {
-                method: 'PATCH',
-                body: JSON.stringify({ pbom_version_gid: _pbomVersionGid }),
+              await this._invokeCapability('craft.bop.lifecycle.change.apply', {
+                operation: 'pbom_match.update', version_gid: this._versionGid,
+                pbom_version_gid: _pbomVersionGid, unlinked_ignored: 0,
               });
             } catch (bindErr) {
               this._toast('PBOM 绑定到 BOP 版本失败: ' + bindErr.message, 'warn');
@@ -2784,13 +2810,12 @@ class BopLifecyclePanel {
         btn.disabled    = true;
         btn.textContent = '推进中…';
         try {
-          const res = await this._cf(
-            `/api/bop/versions/${this._versionGid}/lifecycle/confirm-phase`,
-            { method: 'POST', headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ note: null }) }
-          );
-          this._viewPhase = res.lifecycle_phase;
-          this._toast('阶段已推进：' + (_LC_PHASE_LABELS[res.lifecycle_phase] || res.lifecycle_phase), 'ok');
+          const res = await this._invokeCapability('craft.bop.lifecycle.state.change.apply', {
+            operation: 'phase.confirm', version_gid: this._versionGid, note: null,
+          });
+          const phaseValue = res?.data?.lifecycle_phase || res?.lifecycle_phase;
+          this._viewPhase = phaseValue;
+          this._toast('阶段已推进：' + (_LC_PHASE_LABELS[phaseValue] || phaseValue), 'ok');
           await this._load();
         } catch (e) {
           this._toast('确认失败: ' + e.message, 'error');
@@ -2808,11 +2833,9 @@ class BopLifecyclePanel {
     const label = prompt('快照标签（可留空）：');
     if (label === null) return;
     try {
-      await this._cf(
-        `/api/bop/versions/${this._versionGid}/lifecycle/lines/${lineGid}/checkpoints`,
-        { method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ label }) }
-      );
+      await this._invokeCapability('craft.bop.lifecycle.checkpoint.change.apply', {
+        operation: 'create', version_gid: this._versionGid, line_gid: lineGid, label,
+      });
       this._toast('快照已创建', 'ok');
       this._render();
     } catch (e) {
@@ -2823,11 +2846,11 @@ class BopLifecyclePanel {
   async _rollback(lineGid, checkpointGid, label) {
     if (!confirm(`确认回滚到快照「${label}」？当前修改将丢失。`)) return;
     try {
-      const res = await this._cf(
-        `/api/bop/versions/${this._versionGid}/lifecycle/lines/${lineGid}/rollback/${checkpointGid}`,
-        { method: 'POST' }
-      );
-      this._toast(`已回滚：恢复 ${res.restored_entries} 条节点`, 'ok');
+      const res = await this._invokeCapability('craft.bop.lifecycle.checkpoint.rollback.apply', {
+        version_gid: this._versionGid, line_gid: lineGid, checkpoint_gid: checkpointGid,
+      });
+      const restored = res?.data?.restored_entries || res?.restored_entries || 0;
+      this._toast(`已回滚：恢复 ${restored} 条节点`, 'ok');
       // 触发 lineage.js 重新加载（全局函数）
       if (typeof _load === 'function') _load();
       await this._load();

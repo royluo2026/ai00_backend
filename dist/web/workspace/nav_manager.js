@@ -345,9 +345,6 @@ const NavManager = (() => {
 
   function _startBalancePolling() {
     _stopBalancePolling();
-    _fetchBalance();
-    _balanceTimer     = setInterval(_fetchBalance,      5 * 60 * 1000);
-    _balanceTickTimer = setInterval(_updateBalanceTime, 60 * 1000);
   }
 
   function _stopBalancePolling() {
@@ -360,16 +357,7 @@ const NavManager = (() => {
   }
 
   async function _fetchBalance() {
-    const userGid = window._authUser?.gid || '';
-    if (!userGid) return;
-    try {
-      const res = await window._cloudFetch?.(`/api/ai/balance?user_gid=${userGid}`);
-      if (res && res.supported) {
-        _lastBalanceVal  = parseFloat(res.balance);
-        _lastBalanceTime = Date.now();
-        _updateBalanceDisplay();
-      }
-    } catch (_) {}
+    return null;
   }
 
   function _updateBalanceTime() {

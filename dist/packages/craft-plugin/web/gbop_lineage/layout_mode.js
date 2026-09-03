@@ -45,6 +45,16 @@ const HIDDEN_TYPES = ['part', 'non_standard_part', 'standard_part', 'support_mat
   'knowledge', 'rule', 'issue', 'standard_task', 'non_standard_task',
   'contral_plan', 'process_chart', 'operation', 'floor_height_factory', 'jack_pos'];
 
+// BOP 重挂/排序统一走稳定 Capability；旧 /api/bop/entries PATCH 已不再作为前端写入口。
+async function _patchBopEntry(entryGid, updates) {
+  if (typeof _invokeCapability !== 'function') {
+    throw new Error('BOP capability gateway 未就绪');
+  }
+  return _invokeCapability('craft.bop.entry.change.apply', {
+    operation: 'update', entry_gid: entryGid, updates,
+  });
+}
+
 
 class LayoutMode {
   /**
@@ -1809,11 +1819,7 @@ class LayoutMode {
 
   async _commitParentChange(drag) {
     try {
-      await _cf(`/api/bop/entries/${drag.row.gid}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ parent_bop_gid: drag.hoveredGid }),
-      });
+      await _patchBopEntry(drag.row.gid, { parent_gid: drag.hoveredGid });
       this._preserveView = true;
       if (this._data?.reloadData) await this._data.reloadData();
     } catch (err) {
@@ -1834,11 +1840,7 @@ class LayoutMode {
     try {
       // Step 1：跨父时先换挂
       if (dragParent !== destParent) {
-        await _cf(`/api/bop/entries/${drag.row.gid}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ parent_bop_gid: targetRow.parent_bop_gid }),
-        });
+        await _patchBopEntry(drag.row.gid, { parent_gid: targetRow.parent_bop_gid || null });
       }
 
       // Step 2：在目标父级的同类子节点中计算新顺序
@@ -1858,11 +1860,7 @@ class LayoutMode {
 
       if (patches.length) {
         await Promise.all(patches.map(p =>
-          _cf(`/api/bop/entries/${p.gid}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ seq_no: p.newSeq }),
-          })
+          _patchBopEntry(p.gid, { sort_order: p.newSeq })
         ));
       }
 

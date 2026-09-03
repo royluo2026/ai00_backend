@@ -41,6 +41,33 @@ async function _apiCall(_method, ..._args) {
   return null;
 }
 
+async function _invokeCapability(id, payload = {}) {
+  const requestBody = {
+    version: 1,
+    payload,
+    idempotency_key: `${id}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+  };
+  const request = (suffix, body) => _cf('POST', `/api/v1/capabilities/${id}:${suffix}`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+  let response = await request('invoke', requestBody);
+  if (response?.data?.error?.code === 'confirmation_required') {
+    if (!window.confirm('确认保存服务端数据库连接配置？')) throw new Error('已取消保存');
+    const confirmation = await request('confirm', requestBody);
+    const token = confirmation?.data?.confirmation_token;
+    if (!token) throw new Error(`能力确认失败：${id}@1`);
+    response = await request('invoke', { ...requestBody, confirmation_token: token });
+  }
+  const envelope = response?.data;
+  if (response?.success !== true || envelope?.ok !== true) {
+    const detail = envelope?.error || response?.error || response || {};
+    throw new Error(detail.message || detail.msg || `能力调用失败：${id}@1`);
+  }
+  const value = envelope.data;
+  return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+}
+
 // ===================== 外观/主题面板 =====================
 function _initAppearance(config) {
   const theme = config?.theme || localStorage.getItem('system.theme') || 'light';
@@ -111,6 +138,37 @@ function _setChk(id, checked) {
 }
 
 // ===================== 数据库面板 =====================
+let _cloudDbPasswordConfigured = false;
+
+const _DATABASE_ERROR_MESSAGES = Object.freeze({
+  password_required: '请输入数据库密码',
+  authentication_failed: '认证失败，请检查用户名、密码和账号权限',
+  database_not_found: '数据库不存在，请检查协作库名',
+  network_unreachable: '无法连接数据库主机，请检查地址、端口和网络',
+  tls_or_server_config_failed: 'TLS 或服务端配置不兼容，请联系数据库管理员',
+  connection_failed: '连接失败，请检查数据库配置',
+});
+
+function _cloudDbPayload() {
+  return {
+    host:      document.getElementById('pg-host')?.value?.trim()      || '',
+    port:      Number(document.getElementById('pg-port')?.value),
+    user:      document.getElementById('pg-user')?.value?.trim()      || '',
+    password:  document.getElementById('pg-password')?.value          || '',
+    collab_db: document.getElementById('pg-collab-db')?.value?.trim() || '',
+    public_db: document.getElementById('pg-public-db')?.value?.trim() || '',
+  };
+}
+
+function _cloudDbValidationMessage(payload) {
+  if (!payload.host) return '请输入数据库主机地址';
+  if (!Number.isInteger(payload.port) || payload.port < 1 || payload.port > 65535) return '请输入有效端口';
+  if (!payload.user) return '请输入数据库用户名';
+  if (!payload.collab_db) return '请输入协作库名';
+  if (!payload.password && !_cloudDbPasswordConfigured) return _DATABASE_ERROR_MESSAGES.password_required;
+  return '';
+}
+
 function _initDatabase(config) {
   // 本地 SQLite 路径（来自 get_all_settings 初始包）
   const dbPath = config?.system?.local_db_path;
@@ -165,30 +223,32 @@ function _initDatabase(config) {
   // 加载云端数据库配置字段（单独请求，不阻塞页面初始化）
   _loadCloudDbConfig();
 
+  if (window.self !== window.top || !window.electronAPI) {
+    const saveButton = document.getElementById('btn-save-pg');
+    if (saveButton) {
+      saveButton.disabled = true;
+      saveButton.title = 'Web 部署由环境变量管理数据库配置';
+    }
+  }
+
   // 保存云端数据库配置
   document.getElementById('btn-save-pg')?.addEventListener('click', async () => {
-    const password = document.getElementById('pg-password')?.value || '';
-    const payload  = {
-      host:      document.getElementById('pg-host')?.value?.trim()      || '',
-      port:      parseInt(document.getElementById('pg-port')?.value)    || 2883,
-      user:      document.getElementById('pg-user')?.value?.trim()      || '',
-      password:  password,
-      collab_db: document.getElementById('pg-collab-db')?.value?.trim() || '',
-      public_db: document.getElementById('pg-public-db')?.value?.trim() || '',
-    };
-    console.log('[settings.cloud-db.save] payload', {
-      ...payload,
-      password: payload.password ? `len=${payload.password.length}` : '',
-    });
-    const r  = await _backendFetch('/admin/cloud-db-config', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    });
-    console.log('[settings.cloud-db.save] response', r);
+    const payload = _cloudDbPayload();
+    const validationMessage = _cloudDbValidationMessage(payload);
     const fb = document.getElementById('pg-feedback');
+    if (validationMessage) {
+      if (fb) fb.textContent = validationMessage;
+      return;
+    }
+    let r;
+    try {
+      r = await _invokeCapability('base.runtime.database_config.change.apply', payload);
+    } catch (error) {
+      r = { saved: false, msg: error?.message || String(error) };
+    }
     if (fb) {
-      fb.textContent = r?.msg || r?.detail || JSON.stringify(r || {}) || (r?.success ? '已保存' : '保存失败');
-      fb.style.color = r?.success ? 'var(--color-green, #a6e3a1)' : 'var(--color-red, #f38ba8)';
+      fb.textContent = r?.saved ? '已保存' : (r?.msg || r?.detail || '生产数据库配置由部署环境管理');
+      fb.style.color = r?.saved ? 'var(--color-green, #a6e3a1)' : 'var(--color-red, #f38ba8)';
       setTimeout(() => { if (fb) fb.textContent = ''; }, 5000);
     }
   });
@@ -197,44 +257,48 @@ function _initDatabase(config) {
   document.getElementById('btn-test-pg')?.addEventListener('click', async () => {
     const btn = document.getElementById('btn-test-pg');
     const res  = document.getElementById('pg-result');
-    const password = document.getElementById('pg-password')?.value || '';
-    const payload = {
-      host:      document.getElementById('pg-host')?.value?.trim()      || '',
-      port:      parseInt(document.getElementById('pg-port')?.value)    || 2883,
-      user:      document.getElementById('pg-user')?.value?.trim()      || '',
-      password:  password,
-      collab_db: document.getElementById('pg-collab-db')?.value?.trim() || '',
-      public_db: document.getElementById('pg-public-db')?.value?.trim() || '',
-    };
-    console.log('[settings.cloud-db.test] payload', {
-      ...payload,
-      password: payload.password ? `len=${payload.password.length}` : '',
-    });
+    const payload = _cloudDbPayload();
+    const validationMessage = _cloudDbValidationMessage(payload);
+    if (validationMessage) {
+      if (res) {
+        res.textContent = validationMessage;
+        res.className = 'db-test-result err';
+      }
+      return;
+    }
     btn.disabled = true; btn.textContent = '测试中...';
-    const r = await _backendFetch('/admin/cloud-db-config/test', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    });
-    console.log('[settings.cloud-db.test] response', r);
+    let r;
+    try {
+      r = await _invokeCapability('base.runtime.database_connection.test', payload);
+    } catch (error) {
+      r = { connected: false, msg: error?.message || String(error) };
+    }
     btn.disabled = false; btn.textContent = '测试连接';
     if (res) {
-      res.textContent = r?.msg || r?.detail || JSON.stringify(r || {}) || (r?.success ? '连接成功' : '连接失败');
-      res.className = 'db-test-result ' + (r?.success ? 'ok' : 'err');
+      res.textContent = r?.connected ? '连接成功' : (_DATABASE_ERROR_MESSAGES[r?.error_code] || r?.msg || r?.detail || '连接失败');
+      res.className = 'db-test-result ' + (r?.connected ? 'ok' : 'err');
     }
   });
 }
 
 async function _loadCloudDbConfig() {
-  const r = await _backendFetch('/admin/cloud-db-config');
-  if (!r?.success || !r?.data) return;
-  const d = r.data;
+  let d;
+  try {
+    d = await _invokeCapability('base.runtime.database_config.get');
+  } catch (_) {
+    return;
+  }
+  if (!d) return;
   const _v = (id, val) => { const el = document.getElementById(id); if (el) el.value = val ?? ''; };
-  _v('pg-host',      d.host || 'sam-bdmsdb01-test.chj.cloud');
+  _v('pg-host',      d.host || '');
   _v('pg-port',      d.port || 2883);
-  _v('pg-user',      d.user || 'sht_mes_tool@mom#test_bdms01');
-  _v('pg-password',  d.password_configured ? '●●●●' : '');
-  _v('pg-collab-db', d.collab_db || 'sht_mes_tool');
-  _v('pg-public-db', d.public_db || 'sht_mes_tool');
+  _v('pg-user',      d.user || '');
+  _v('pg-password',  '');
+  _cloudDbPasswordConfigured = Boolean(d.password_configured);
+  const passwordInput = document.getElementById('pg-password');
+  if (passwordInput) passwordInput.placeholder = d.password_configured ? '已配置；留空保持不变' : '请输入密码';
+  _v('pg-collab-db', d.collab_db || '');
+  _v('pg-public-db', d.public_db || '');
   if (d.local_db_path) {
     const el = document.getElementById('local-db-path-input');
     if (el && !el.value) el.value = d.local_db_path;
@@ -262,7 +326,7 @@ async function _initFileStore() {
       secret_key: document.getElementById('minio-secret-key')?.value             || '',
       bucket:     document.getElementById('minio-public-bucket')?.value?.trim()  || 'ai00',
     };
-    const res = await _backendFetch('/api/file-store/config', {
+    const res = await _cf('POST', '/api/file-store/config', {
       method: 'POST',
       body:   JSON.stringify(payload),
     });
@@ -279,7 +343,7 @@ async function _initFileStore() {
     const btn = document.getElementById('btn-test-minio');
     const res = document.getElementById('minio-result');
     btn.disabled = true; btn.textContent = '测试中...';
-    const r = await _backendFetch('/api/file-store/test', { method: 'POST', body: '{}' });
+    const r = await _cf('POST', '/api/file-store/test', { method: 'POST', body: '{}' });
     btn.disabled = false; btn.textContent = '测试连接';
     if (res) {
       res.textContent = r?.msg || (r?.success ? '连接成功 ✓' : '连接失败');
@@ -304,7 +368,7 @@ async function _initFileStore() {
       idaas_service_id:    document.getElementById('ois-service-id')?.value?.trim()     || '',
       public_base_url:     document.getElementById('ois-public-base-url')?.value?.trim() || '',
     };
-    const res = await _backendFetch('/api/file-store/ois-config', {
+    const res = await _cf('POST', '/api/file-store/ois-config', {
       method: 'POST',
       body:   JSON.stringify(payload),
     });
@@ -327,7 +391,7 @@ async function _initFileStore() {
     try {
       const ctrl = new AbortController();
       const tid  = setTimeout(() => ctrl.abort(), 12000);
-      r = await _backendFetch('/api/file-store/ois-test', { method: 'POST', body: '{}', signal: ctrl.signal });
+      r = await _cf('POST', '/api/file-store/ois-test', { method: 'POST', body: '{}', signal: ctrl.signal });
       clearTimeout(tid);
     } catch (e) {
       r = { success: false, msg: e.name === 'AbortError' ? '请求超时（>12s），请检查网络' : (e.message || '请求异常') };
@@ -356,14 +420,10 @@ async function _initFileStore() {
   });
 
   // ── 异步加载：读取已保存的配置填入表单 ────────────────────────────────────
-  const r = await _backendFetch('/api/file-store/config');
+  const r = await _invokeCapability('base.file_store.public_config.get');
   if (r?.success && r.is_admin) {
     if (r.endpoint)      _setVal('minio-endpoint',     r.endpoint);
     if (r.bucket)        _setVal('minio-public-bucket', r.bucket);
-    if (r.key_preview) {
-      const keyEl = document.getElementById('minio-access-key');
-      if (keyEl) keyEl.placeholder = r.key_preview + '（留空保留）';
-    }
   }
   if (r?.success && r.is_admin && r.ois) {
     const o = r.ois;
@@ -377,10 +437,6 @@ async function _initFileStore() {
     _setVal('ois-client-id',     o.idaas_client_id  ?? '');
     _setVal('ois-service-id',    o.idaas_service_id ?? '');
     _setVal('ois-public-base-url', o.public_base_url ?? '');
-    if (o.secret_preview) {
-      const el = document.getElementById('ois-client-secret');
-      if (el) el.placeholder = o.secret_preview + '（留空保留）';
-    }
   }
 }
 
@@ -472,6 +528,33 @@ async function _initShortcuts(config) {
 
 // ===================== 插件市场面板 =====================
 // ===================== 插件管理（Phase 7A：Obsidian 风格）=====================
+function _pluginCapabilityClient() {
+  return window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
+}
+
+async function _installSignedPluginRelease(release) {
+  const client = _pluginCapabilityClient();
+  if (!client) return { ok: false, error: '能力网关不可用' };
+  try {
+    const installation = await client.call('base.plugins.install', {
+      pluginId: release.plugin_id, releaseVersion: release.release_version || release.version,
+      releaseSha256: release.release_sha256, requestedGrants: release.requested_grants,
+    }, { confirm: () => confirm(`确认安装已签名插件「${release.plugin_id}」？`) });
+    return { ok: true, ...installation };
+  } catch (error) { return { ok: false, error: error?.message || String(error) }; }
+}
+
+async function _uninstallGovernedPlugin(installation) {
+  const client = _pluginCapabilityClient();
+  if (!client || !Number.isInteger(installation?.revision)) return { ok: false, error: '缺少当前安装 revision' };
+  try {
+    const result = await client.call('base.plugins.uninstall', {
+      pluginId: installation.plugin_id, expectedRevision: installation.revision,
+    }, { confirm: () => true });
+    return { ok: true, ...result };
+  } catch (error) { return { ok: false, error: error?.message || String(error) }; }
+}
+
 async function _initPluginMarket() {
   await _renderPluginList();
 
@@ -494,22 +577,26 @@ async function _initPluginMarket() {
     });
   });
 
-  // ── 从 URL 安装 ─────────────────────────────────────────────────────────
-  const btnInstall = document.getElementById('pm-btn-install-url');
-  const urlInput   = document.getElementById('pm-install-url');
+  // ── 已签名市场发布安装 ───────────────────────────────────────────────────
+  const btnInstall = document.getElementById('pm-btn-install-release');
+  const releaseInput = document.getElementById('pm-install-release');
   const feedback   = document.getElementById('pm-install-feedback');
 
   btnInstall?.addEventListener('click', async () => {
-    const url = urlInput?.value?.trim();
-    if (!url) { _pmFeedback(feedback, '请输入插件 URL', 'error'); return; }
+    let release;
+    try { release = JSON.parse(releaseInput?.value?.trim() || ''); } catch (_) {}
+    if (!release || typeof release !== 'object' || !release.plugin_id || !release.release_version
+        || !/^sha256:[0-9a-f]{64}$/.test(release.release_sha256 || '') || !Array.isArray(release.requested_grants)) {
+      _pmFeedback(feedback, '请输入完整的已签名市场发布信息', 'error'); return;
+    }
     btnInstall.disabled = true;
     btnInstall.textContent = '安装中...';
-    _pmFeedback(feedback, '正在下载并安装...', 'info');
+    _pmFeedback(feedback, '正在确认已签名发布...', 'info');
 
-    const res = await window.electronAPI?.installPluginFromUrl?.(url) || { ok: false, error: '不支持' };
+    const res = await _installSignedPluginRelease(release);
     if (res.ok) {
       _pmFeedback(feedback, `✅ 插件「${res.name}」安装成功`, 'success');
-      urlInput.value = '';
+      releaseInput.value = '';
       await _renderPluginList();
     } else {
       _pmFeedback(feedback, `❌ 安装失败：${res.error}`, 'error');
@@ -595,8 +682,8 @@ function _pmRenderMarketList(plugins, errorMsg) {
 
     const installBtnHtml = plugin.installed
       ? `<button disabled style="padding:5px 12px;font-size:12px;border-radius:6px;border:none;background:var(--bg-tertiary);color:var(--text-muted);white-space:nowrap;">已安装</button>`
-      : plugin.download_url
-        ? `<button class="btn-primary pm-btn-market-install" data-id="${plugin.plugin_id}" data-url="${plugin.download_url}" data-name="${plugin.name}"
+      : plugin.release_sha256 && Array.isArray(plugin.requested_grants)
+        ? `<button class="btn-primary pm-btn-market-install" data-id="${plugin.plugin_id}" data-name="${plugin.name}"
                style="padding:5px 12px;font-size:12px;white-space:nowrap;">安装</button>`
         : `<button disabled style="padding:5px 12px;font-size:12px;border-radius:6px;border:none;background:var(--bg-tertiary);color:var(--text-muted);white-space:nowrap;">暂无下载</button>`;
 
@@ -620,9 +707,12 @@ function _pmRenderMarketList(plugins, errorMsg) {
       const fbId = `pm-market-fb-${btn.dataset.id.replace(/\./g, '-')}`;
       const fbEl = document.getElementById(fbId);
       btn.disabled = true; btn.textContent = '安装中...';
-      _pmFeedback(fbEl, '正在下载...', 'info');
+      _pmFeedback(fbEl, '正在确认已签名发布...', 'info');
 
-      const res = await window.electronAPI?.installPluginFromUrl?.(btn.dataset.url) || { ok: false, error: '不支持' };
+      const res = await _installSignedPluginRelease({
+        plugin_id: plugin.plugin_id, release_version: plugin.release_version || plugin.version,
+        release_sha256: plugin.release_sha256, requested_grants: plugin.requested_grants,
+      }) || { ok: false, error: '不支持' };
       if (res.ok) {
         btn.textContent = '已安装';
         _pmFeedback(fbEl, '✅ 安装成功', 'success');
@@ -663,8 +753,19 @@ async function _renderPluginList() {
     registry = await window.electronAPI?.getPluginRegistry?.();
   } catch (_) {}
 
+  let installations = [];
+  try {
+    const governed = await _pluginCapabilityClient()?.call('base.plugins.list', {});
+    installations = governed?.installations || [];
+  } catch (_) {}
+  const installationById = new Map(installations.map(item => [item.plugin_id, item]));
+
   // showInUI=false 的插件（如 official.core 基座）不在此界面显示
-  const plugins = (registry?.plugins || []).filter(p => p.showInUI !== false);
+  const plugins = (registry?.plugins || []).filter(p => p.showInUI !== false).map(plugin => ({
+    ...plugin,
+    ...(installationById.get(plugin.plugin_id) || {}),
+    canUninstall: plugin.canUninstall && Number.isInteger(installationById.get(plugin.plugin_id)?.revision),
+  }));
   if (!plugins.length) {
     container.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-muted)">暂无插件</div>';
     return;
@@ -734,9 +835,9 @@ async function _renderPluginList() {
       // 卸载按钮
       row.querySelector('[data-uninstall]')?.addEventListener('click', async (e) => {
         const btn = e.currentTarget;
-        if (!confirm(`确定卸载插件「${plugin.name}」？此操作无法撤销。`)) return;
+        if (!confirm(`确定卸载插件「${plugin.name}」？其租户数据将被保留。`)) return;
         btn.disabled = true; btn.textContent = '卸载中...';
-        const res = await window.electronAPI?.uninstallUserPlugin?.(plugin.plugin_id) || { ok: false, error: '不支持' };
+        const res = await _uninstallGovernedPlugin(plugin);
         if (res.ok) {
           row.style.opacity = '0.5';
           btn.textContent = '已卸载';
@@ -904,7 +1005,7 @@ async function _buildPluginNavAndPanel(plugin, navEl, panelsEl, sourceType) {
 // ===================== 飞书集成面板 =====================
 async function _initFeishu() {
   // --- 读取当前 app_id（判断凭证是否已配置，同时填入输入框）---
-  const appIdRes = await _backendFetch('/admin/config/FEISHU_APP_ID');
+  const appIdRes = await _cf('GET', '/admin/config/FEISHU_APP_ID');
   const appId    = appIdRes?.data?.value || '';
   const hasCreds = !!appId;
 
@@ -924,10 +1025,10 @@ async function _initFeishu() {
     btnSave.disabled = true;
     btnSave.textContent = '保存中...';
     // 分两次写入：App ID 和 App Secret
-    const r1 = await _backendFetch('/admin/config/FEISHU_APP_ID', {
+    const r1 = await _cf('PUT', '/admin/config/FEISHU_APP_ID', {
       method: 'PUT', body: JSON.stringify({ value: id, description: '飞书应用 ID' }),
     });
-    const r2 = secret ? await _backendFetch('/admin/config/FEISHU_APP_SECRET', {
+    const r2 = secret ? await _cf('PUT', '/admin/config/FEISHU_APP_SECRET', {
       method: 'PUT', body: JSON.stringify({ value: secret, description: '飞书应用 Secret' }),
     }) : { success: true };
     btnSave.disabled = false;
@@ -1196,7 +1297,7 @@ const EXT_LABELS = {
 };
 
 // 直接调 backend FastAPI，带 JWT。比走 Python bridge 更可靠（用户数据在 PG）。
-async function _backendFetch(path, opts = {}) {
+async function _cf(method, path, opts = {}) {
   const config = (await window.electronAPI?.getConfig?.()) || {};
   const state  = (await window.electronAPI?.authGetState?.()) || {};
   const runtimeBase = await window.AI00RuntimeConfig?.getRuntimeBackendBase?.(config?.backendUrl || '')
@@ -1215,6 +1316,7 @@ async function _backendFetch(path, opts = {}) {
   try {
     const res = await fetch(`${baseUrl}${path}`, {
       ...opts,
+      method,
       headers: {
         'Content-Type': 'application/json',
         'X-AI00-Token': token,
@@ -1241,7 +1343,7 @@ async function _initUserManagement() {
 
   async function _loadUsers() {
     container.innerHTML = '<div class="empty-state">加载中...</div>';
-    const res = await _backendFetch('/users/');
+    const res = await _cf('GET', '/users/');
     if (!res.success) {
       container.innerHTML = `<div class="empty-state">${res.msg || '权限不足'}</div>`;
       return;
@@ -1345,7 +1447,7 @@ function _initFollowsCleanup() {
       const kDays      = parseInt(kDaysInput?.value) || 0;
 
       // 拉取当前用户所有关注
-      const res     = await _backendFetch('/api/follows');
+      const res     = await _cf('GET', '/api/follows');
       const follows = res?.data || [];
 
       const toDelete = [];
@@ -1354,12 +1456,12 @@ function _initFollowsCleanup() {
         const { gid: followGid, item_type, item_gid, created_at } = f;
 
         if (item_type === 'task' && cleanTask) {
-          const r      = await _backendFetch(`/api/tasks/${item_gid}`);
+          const r      = await _cf('GET', `/api/tasks/${item_gid}`);
           const status = r?.data?.status || r?.status || '';
           if (['completed', 'closed'].includes(status)) toDelete.push(followGid);
 
         } else if (item_type === 'issue' && cleanIssue) {
-          const r      = await _backendFetch(`/api/issues/${item_gid}`);
+          const r      = await _cf('GET', `/api/issues/${item_gid}`);
           const status = r?.data?.status || r?.status || '';
           if (['resolved', 'closed'].includes(status)) toDelete.push(followGid);
 
@@ -1371,7 +1473,7 @@ function _initFollowsCleanup() {
 
       // 批量删除
       for (const fGid of toDelete) {
-        await _backendFetch(`/api/follows/${fGid}`, { method: 'DELETE' });
+        await _cf('DELETE', `/api/follows/${fGid}`, { method: 'DELETE' });
       }
 
       if (resultEl) {
@@ -1405,7 +1507,7 @@ async function _initNotifPrefs() {
     return;
   }
 
-  const res   = await _backendFetch('/api/notifications/prefs');
+  const res   = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('base.notifications.preferences.get');
   const prefs = res?.data || {};
 
   document.querySelectorAll('.np-toggle').forEach(checkbox => {
@@ -1416,10 +1518,7 @@ async function _initNotifPrefs() {
     checkbox.addEventListener('change', async () => {
       checkbox.disabled = true;
       const patch = { [type]: checkbox.checked };
-      const r = await _backendFetch('/api/notifications/prefs', {
-        method: 'PATCH',
-        body: JSON.stringify(patch),
-      });
+      const r = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('base.notifications.preferences.update', { preferences: patch });
       checkbox.disabled = false;
       const fb = document.getElementById('np-feedback');
       if (fb) {
@@ -1508,7 +1607,7 @@ let _cachedFeatureFlags = null;
 async function _initFeatureFlags() {
   // 从后端读取功能开关（存储在 admin/config feature_flags 条目中）
   let flags = {};
-  const res = await _backendFetch('/admin/config/feature_flags');
+  const res = await _cf('GET', '/admin/config/feature_flags');
   if (res?.success && res?.data?.value) {
     try { flags = JSON.parse(res.data.value); } catch (_) {}
   }
@@ -1521,7 +1620,7 @@ async function _initFeatureFlags() {
     checkbox.addEventListener('change', async () => {
       checkbox.disabled = true;
       const updated = { ...(_cachedFeatureFlags || {}), [key]: checkbox.checked };
-      const r = await _backendFetch('/admin/config/feature_flags', {
+      const r = await _cf('PUT', '/admin/config/feature_flags', {
         method: 'PUT',
         body: JSON.stringify({ value: JSON.stringify(updated), description: '功能开关' }),
       });
@@ -1577,7 +1676,7 @@ async function _initFeatureFlags() {
     checkbox.addEventListener('change', async () => {
       checkbox.disabled = true;
       const updated = { ...(_cachedFeatureFlags || {}), [flagKey]: checkbox.checked };
-      const r = await _backendFetch('/admin/config/feature_flags', {
+      const r = await _cf('PUT', '/admin/config/feature_flags', {
         method: 'PUT',
         body: JSON.stringify({ value: JSON.stringify(updated), description: '功能开关' }),
       });
@@ -1606,10 +1705,21 @@ async function _saveUserRole(userGid, btn) {
   btn.disabled = true;
   btn.textContent = '保存中…';
 
-  const res = await _backendFetch(`/api/users/${userGid}/role`, {
-    method: 'PATCH',
-    body: JSON.stringify({ new_role: newRole, external_subtype: extSub }),
-  });
+  let res;
+  try {
+    res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('base.users.assignRole', {
+      userGid, newRole, externalSubtype: extSub || null,
+    }, {
+      confirm: () => window.confirm(`确认将该成员的角色修改为「${newRole}」？`),
+    });
+  } catch (error) {
+    if (error?.code === 'capability_confirmation_cancelled') {
+      btn.disabled = false;
+      btn.textContent = '保存';
+      return;
+    }
+    res = { success: false, msg: error?.message || '保存失败' };
+  }
 
   if (res.success) {
     btn.textContent = '✓ 已保存';
