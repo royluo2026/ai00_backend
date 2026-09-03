@@ -118,9 +118,13 @@ def test_native_local_provider_is_stable_and_exposed_to_plugins_and_agents():
         assert descriptor.exposure.plugin and descriptor.exposure.agent and descriptor.exposure.mcp
         expected_operation_policy = (
             "none"
-            if capability_id in {"local.command.get", "local.device.read"}
+            if capability_id in {
+                "local.command.get", "local.device.read", "device.connector.health.get",
+            }
             else "optional"
-            if capability_id == "local.device.change.apply"
+            if capability_id in {
+                "local.device.change.apply", "device.connector.plan.queue",
+            }
             else "required"
         )
         assert descriptor.operation_policy == expected_operation_policy

@@ -23,7 +23,7 @@ def test_plan_hash_matches_checked_in_cross_language_vector():
     plan = contracts.ConnectorExecutionPlanV1.model_validate(VECTOR["plan"])
 
     assert plan.plan_hash == VECTOR["plan_hash"]
-    assert plan.compute_hash() == "sha256:d364d115e2ff3827befdc5ed8d4ab536de05a5e4e335ea23370464f33369531c"
+    assert plan.compute_hash() == "sha256:5ea603d81f75cf818269f050254afb60e324493c4a5faecdacbca7a31a4278b4"
 
 
 def test_plan_rejects_duplicate_step_ids():
@@ -106,3 +106,13 @@ def test_plan_outcome_requires_aware_report_time():
             "protocol": "ai00.connector.execution-plan.v1", "plan_id": "plan-001",
             "status": "cancelled", "steps": [], "reported_at": "2026-09-03T00:00:02",
         })
+
+
+def test_target_product_rejects_an_empty_or_reversed_version_range():
+    contracts = _contracts()
+    with pytest.raises(ValidationError, match="target_product_version_range_invalid"):
+        contracts.ConnectorTargetProductV1(
+            product_id="siemens.vismockup",
+            minimum_version="15.0.0",
+            maximum_version_exclusive="14.0.0",
+        )

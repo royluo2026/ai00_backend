@@ -9,6 +9,11 @@
     "business_definition_hash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
     "adapter_id": "ai00.vismockup",
     "adapter_major": 1,
+    "target_product": {
+      "product_id": "siemens.vismockup",
+      "minimum_version": "14.0.0",
+      "maximum_version_exclusive": "15.0.0"
+    },
     "steps": [
       {
         "step_id": "step-1",
@@ -22,7 +27,7 @@
     ],
     "issued_at": "2026-09-03T00:00:00Z",
     "expires_at": "2026-09-03T00:05:00Z",
-    "plan_hash": "sha256:d364d115e2ff3827befdc5ed8d4ab536de05a5e4e335ea23370464f33369531c"
+    "plan_hash": "sha256:5ea603d81f75cf818269f050254afb60e324493c4a5faecdacbca7a31a4278b4"
   },
-  "plan_hash": "sha256:d364d115e2ff3827befdc5ed8d4ab536de05a5e4e335ea23370464f33369531c"
+  "plan_hash": "sha256:5ea603d81f75cf818269f050254afb60e324493c4a5faecdacbca7a31a4278b4"
 }

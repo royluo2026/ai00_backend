@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+import hmac
 from typing import Any, Literal, Mapping
 
 from pydantic import Field, model_validator
@@ -17,6 +18,23 @@ def canonical_hash(value: Any) -> str:
     import hashlib
 
     return "sha256:" + hashlib.sha256(canonical_json_bytes(value)).hexdigest()
+
+
+def sign_connector_outcome(outcome: "ConnectorPlanOutcomeV1", secret: str) -> str:
+    import hashlib
+
+    digest = hmac.new(
+        secret.encode("utf-8"),
+        canonical_json_bytes(outcome.model_dump(mode="json")),
+        hashlib.sha256,
+    ).hexdigest()
+    return "hmac-sha256:" + digest
+
+
+def verify_connector_outcome(
+    outcome: "ConnectorPlanOutcomeV1", signature: str, secret: str,
+) -> bool:
+    return hmac.compare_digest(sign_connector_outcome(outcome, secret), signature)
 
 
 class ConnectorStepV1(FrozenModel):
@@ -37,6 +55,19 @@ class ConnectorStepV1(FrozenModel):
         return self
 
 
+class ConnectorTargetProductV1(FrozenModel):
+    product_id: str = Field(pattern=r"^[a-z][a-z0-9_.-]{2,127}$")
+    minimum_version: str = Field(pattern=r"^[0-9]+(?:\.[0-9]+){1,3}$")
+    maximum_version_exclusive: str = Field(pattern=r"^[0-9]+(?:\.[0-9]+){1,3}$")
+
+    @model_validator(mode="after")
+    def verify_range(self) -> "ConnectorTargetProductV1":
+        parse = lambda value: tuple(int(part) for part in value.split("."))
+        if parse(self.minimum_version) >= parse(self.maximum_version_exclusive):
+            raise ValueError("target_product_version_range_invalid")
+        return self
+
+
 class ConnectorExecutionPlanV1(FrozenModel):
     protocol: Literal["ai00.connector.execution-plan.v1"]
     plan_id: str = Field(pattern=IDENTITY_PATTERN)
@@ -47,6 +78,7 @@ class ConnectorExecutionPlanV1(FrozenModel):
     business_definition_hash: str = Field(pattern=HASH_PATTERN)
     adapter_id: str = Field(pattern=r"^[a-z][a-z0-9_.-]{2,127}$")
     adapter_major: Literal[1]
+    target_product: ConnectorTargetProductV1
     steps: tuple[ConnectorStepV1, ...] = Field(min_length=1, max_length=10_000)
     issued_at: datetime
     expires_at: datetime
@@ -114,5 +146,6 @@ class ConnectorPlanOutcomeV1(FrozenModel):
 
 __all__ = [
     "ConnectorExecutionPlanV1", "ConnectorPlanOutcomeV1", "ConnectorStepResultV1",
-    "ConnectorStepV1", "PROTOCOL_V1", "canonical_hash",
+    "ConnectorStepV1", "ConnectorTargetProductV1", "PROTOCOL_V1", "canonical_hash",
+    "sign_connector_outcome", "verify_connector_outcome",
 ]

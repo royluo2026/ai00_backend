@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "registry_version": 1,
-  "table_count": 250,
+  "table_count": 253,
   "tables": [
     {
       "table": "workmanship_agent_canvas_audit_events",
@@ -872,6 +872,24 @@
       "owner": "base",
       "runtime_domain": "base",
       "legacy_name": true
+    },
+    {
+      "table": "workmanship_device_connector_health",
+      "owner": "device",
+      "runtime_domain": "device",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_device_connector_heartbeat_audit",
+      "owner": "device",
+      "runtime_domain": "device",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_device_connector_plans",
+      "owner": "device",
+      "runtime_domain": "device",
+      "legacy_name": false
     },
     {
       "table": "workmanship_factory_assets",

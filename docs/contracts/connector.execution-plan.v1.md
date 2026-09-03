@@ -5,6 +5,8 @@ Owner: Device control plane. Primary producer: Simulation. Primary consumer: AI0
 The plan is immutable and closed. It binds one tenant, user, device, governed
 Capability version, business-definition hash, Adapter major version, ordered
 steps, operation contract hashes, payload hashes, issue time and expiry time.
+`target_product` additionally binds the product identity and its inclusive
+minimum/exclusive maximum dotted-numeric version range.
 
 Canonical JSON is UTF-8, uses lexicographically sorted object keys, preserves
 array order, emits no insignificant whitespace, rejects NaN and Infinity, and

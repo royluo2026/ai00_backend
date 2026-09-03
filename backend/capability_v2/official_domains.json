@@ -122,7 +122,7 @@
         "plugin_id": "official.device",
         "module": "device_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:34e21eb2cddd975d511c2ed55a2add066c9315ca10d44f7b2929bcaf8ae4d233"
+        "artifact_hash": "sha256:85c7ee0aa82ed02b3c9a09e0121a7271966b471655e95421702db19ff0aeec2c"
       },
       "artifact_path": "plugins/device/device_backend",
       "allowed_owners": [

@@ -32,7 +32,9 @@ def descriptor_for(spec: Any):
     descriptor = descriptor_from_provider_spec(governed)
     is_local = governed.id.startswith("vismockup.")
     is_write = descriptor.side_effect_level is not SideEffectLevel.READ
-    selectors = [ResourceSelector(resource_type="device", payload_path="device_id")] if is_local else ([ResourceSelector(resource_type="local-operation", payload_path="command_id")] if governed.id == "local.command.get" else [])
+    selectors = [ResourceSelector(resource_type="device", payload_path="device_id")] if (is_local or governed.id == "device.connector.health.get") else ([ResourceSelector(resource_type="local-operation", payload_path="command_id")] if governed.id == "local.command.get" else [])
+    if governed.id == "device.connector.plan.queue":
+        selectors.append(ResourceSelector(resource_type="device", payload_path="plan.device_id"))
     if governed.id == "vismockup.model.open":
         selectors.append(ResourceSelector(resource_type="artifact", payload_path="artifact_ref.artifact_id"))
     return descriptor.model_copy(update={
