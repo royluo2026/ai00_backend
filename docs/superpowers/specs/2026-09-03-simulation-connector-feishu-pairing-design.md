@@ -32,6 +32,7 @@ AI00 Connector、数模工作站、VisMockup Adapter、心跳、执行计划、�
 | Capability | 原子业务效果 | 调用者 |
 |---|---|---|
 | `simulation.connector.pairing.request@1` | 为一个 Connector 安装实例创建短期、未绑定用户的数模工作站配对申请 | Connector bootstrap consumer |
+| `simulation.connector.pairing.get@1` | 返回待确认申请的安全、掩码展示摘要 | AI00 Web 用户 |
 | `simulation.connector.pairing.approve@1` | 将一个待确认申请绑定到当前飞书登录对应的 AI00 用户和租户 | AI00 Web 用户 |
 | `simulation.connector.pairing.complete@1` | 在已批准申请上向原始安装实例交付一次可重复读取的加密设备凭证包 | 同一 Connector bootstrap consumer |
 | `simulation.connector.binding.read@1` | 返回当前用户唯一数模 Connector 的绑定和在线状态 | AI00 Web 用户 |
@@ -71,7 +72,21 @@ AI00 Connector、数模工作站、VisMockup Adapter、心跳、执行计划、�
 - audit event: `simulation.connector.pairing.requested`。
 - sensitive-data scope: confidential；verifier 仅存哈希，短码仅存服务端 keyed hash。
 
-### 5.2 `simulation.connector.pairing.approve@1`
+### 5.2 `simulation.connector.pairing.get@1`
+
+- `capability_version_gid`: unverified。
+- lifecycle status: `experimental`
+- `business_effect`: 向当前飞书登录用户返回一个待确认 Connector 申请的安全展示摘要。
+- invariants: `simulation.connector.pairing.get.safe_projection` 只返回短码、设备名、Connector 版本、过期时间、资源版本和掩码 Windows 用户；过期或终态申请不可作为确认目标。
+- inputs: `user_code`。
+- outputs: `pairing_id`, `user_code`, `device_name`, `runtime_version`, `masked_windows_user`, `status`, `expires_at`, `resource_version`。
+- stable errors: `pairing_not_found`, `pairing_expired`, `pairing_already_decided`。
+- permissions and resource scope: `simulation.use`；任意已认证用户只能读取尚未归属用户的安全摘要，读取本身不产生绑定。
+- transaction/idempotency/side effects: read-only；不需要幂等键；无副作用。
+- audit event: `simulation.connector.pairing.read`。
+- sensitive-data scope: internal；不返回 SID、公钥、challenge、verifier 或凭证。
+
+### 5.3 `simulation.connector.pairing.approve@1`
 
 - `capability_version_gid`: unverified。
 - lifecycle status: `experimental`
@@ -90,7 +105,7 @@ AI00 Connector、数模工作站、VisMockup Adapter、心跳、执行计划、�
 - audit event: `simulation.connector.pairing.approved`。
 - sensitive-data scope: confidential。
 
-### 5.3 `simulation.connector.pairing.complete@1`
+### 5.4 `simulation.connector.pairing.complete@1`
 
 - `capability_version_gid`: unverified。
 - lifecycle status: `experimental`
@@ -109,7 +124,7 @@ AI00 Connector、数模工作站、VisMockup Adapter、心跳、执行计划、�
 - audit event: `simulation.connector.pairing.completed`；审计只记录哈希和标识符。
 - sensitive-data scope: restricted secret envelope。
 
-### 5.4 `simulation.connector.binding.read@1`
+### 5.5 `simulation.connector.binding.read@1`
 
 - `capability_version_gid`: unverified。
 - lifecycle status: `experimental`
@@ -125,7 +140,7 @@ AI00 Connector、数模工作站、VisMockup Adapter、心跳、执行计划、�
 - audit event: `simulation.connector.binding.read`。
 - sensitive-data scope: confidential；不返回 Windows SID、设备令牌或密钥。
 
-### 5.5 既有 Connector 能力迁域
+### 5.6 既有 Connector 能力迁域
 
 #### `simulation.connector.health.get@1`
 
@@ -149,7 +164,7 @@ AI00 Connector、数模工作站、VisMockup Adapter、心跳、执行计划、�
 - transaction/idempotency: external consistency；以 `plan_id + plan_hash` 幂等，Device 域不参与。
 - side effects/audit/sensitivity: 写入 Simulation plan/outbox，供 Connector 出站领取；`simulation.connector.plan.queued`；confidential。
 
-### 5.6 VisMockup 原子能力迁域
+### 5.7 VisMockup 原子能力迁域
 
 所有 VisMockup Capability 的 owner 为 `simulation`、lifecycle 为 `experimental`、execution mode 为 `LOCAL`、local-runtime exposure 为 true，Web/API/plugin/agent/MCP 默认 false。它们只供已治理的 Simulation workflow 编排，不能绕过环境搭建或截图运行直接从 Web 调用。
 
@@ -172,7 +187,7 @@ AI00 Connector、数模工作站、VisMockup Adapter、心跳、执行计划、�
 - audit: 使用对应 `simulation.vismockup.*` 事件，记录标识符与哈希，不记录密钥或完整敏感 payload。
 - sensitive-data scope: confidential；截图制品按既有 Simulation/Craft artifact policy 管理。
 
-### 5.7 旧能力关闭映射
+### 5.8 旧能力关闭映射
 
 | 旧 Capability | 处理 | 替代 Capability |
 |---|---|---|
@@ -195,7 +210,7 @@ Simulation 新增领域迁移，拥有：
 - `workmanship_sim_connector_pairings`：申请、challenge/keyed-code hash、临时公钥、安装实例、Windows SID 摘要、状态、版本、批准主体、租户、过期时间、加密回执及哈希。
 - `workmanship_sim_connector_bindings`：`user_gid` 唯一的有效数模 Connector、安装实例、设备令牌哈希、状态与审计时间。
 - `workmanship_sim_connector_health` 与 `workmanship_sim_connector_heartbeat_audit`：当前健康投影和追加式心跳审计。
-- `workmanship_sim_connector_plans` 与 `workmanship_sim_connector_projection_outbox`：签名执行计划、租约、结果与跨步骤投影 outbox。
+- `workmanship_sim_connector_plans` 与 `workmanship_sim_connector_projection_outbox`：签名执行计划、租约、结果与跨步骤投影 outbox。计划 outcome 与 pending outbox intent 必须在同一数据库事务提交；outbox claim 必须持久化 `lease_owner/lease_until` 并允许过期 reclaim。
 - 如旧 command 协议仍需迁移期兼容，则使用 `workmanship_sim_connector_legacy_commands`；新业务不得继续写 `workmanship_runtime_commands`。
 
 配对状态机：`pending → approved → completing → completed`。终态还有 `rejected`、`expired`、`reconciliation_required`。只有 `pending` 可被批准；只有 `approved` 或可恢复的 `completing` 可完成；完成失败但外部效果未知时不得退回 `approved`。
@@ -222,6 +237,8 @@ Simulation 新增领域迁移，拥有：
 - 浏览器重复确认：相同用户幂等返回；不同用户或已有绑定返回冲突。
 - 完成响应丢失：相同 verifier 可在短领取窗口内重新取得相同密文，不创建第二个 Connector 绑定。
 - Connector 凭证密文已创建但状态未完成：记录 `reconciliation_required`，后台只读取/对账同一 pairing 的既有密文和哈希，不重放凭证创建。
+- Connector outcome 完成与投影 intent 不允许分两次提交；任一失败必须一起回滚。下游投影幂等身份固定为 `plan_id + outcome_hash`，重试 attempt 只用于调度/审计，不能进入幂等键。
+- outbox worker 在 claim 后崩溃：`lease_until` 到期后由明确 worker/reclaimer 重新领取；旧 `lease_owner` 不得完成或覆盖新租约。
 - Windows 提权：配对必须记录安装后实际运行 SessionHost 的 SID；若安装程序使用不同管理员账号，不得把管理员 SID 当作目标用户 SID。
 - 用户退出飞书或 AI00：不立即吊销设备；解绑/吊销属于后续独立 Capability。调度仍要求当前 AI00 用户与绑定一致。
 
@@ -234,6 +251,7 @@ Simulation 新增领域迁移，拥有：
 - 现有 `/api/v1/devices/enrollments`、`/api/v1/device-runtime/*`、`/api/v1/connector/*` 与 `AI00.Connector.Service.exe pair --token-stdin` 暂时保留为兼容适配；其实现改为调用 Simulation Provider，不得再引用 Device Provider 或 Device 数据库。完成一次发布迁移后返回明确 deprecation headers，再按审核期限关闭。
 - Canonical HTTP path 使用 `/api/v1/simulation/connector/*`；Connector 新版本只调用 canonical path。
 - 新 Web 不展示旧长令牌，不依赖旧入口。
+- 生产 Web 删除所有 `127.0.0.1` Bridge 代码和可达绑定，包括截图、全显/全隐、选择/高亮、打开文件、reset、树读取和调试入口；当前无治理 workflow 的控件从生产页面移除，不保留隐藏的 `window.top` 调用旁路。
 - 数模截图页删除手工 `device_id` prompt，改为 binding.read；没有唯一有效绑定时拒绝创建执行计划。
 - `device.connector.plan.queue@2` 被关闭并迁移到 `simulation.connector.plan.queue@1`；Connector execution-plan v1 的签名线协议暂时不变，旧 `device_id` JSON 字段只表示 `connector_id` 的兼容别名，下一线协议版本再更名。
 
@@ -245,6 +263,7 @@ Simulation 新增领域迁移，拥有：
 - Provider：真实状态机、唯一用户约束、权限拒绝、确认令牌、过期、并发批准、外部效果未知与对账。
 - 迁域合同：旧 Capability 全部 fail-closed，新 Simulation ID 解析到 Simulation Provider；旧 ID 不得通过任何 exposure 或 Local Runtime 身份执行。
 - 数据迁移：空库、正常数据、部分已迁移、目标冲突、租约中计划和 outbox reconciliation；逐表行数与规范化哈希核对。
+- 真实 MySQL/OceanBase：双 complete 并发、相同/冲突 outcome、outcome commit 后进程终止、claim 后进程终止、stale reclaim 和旧 lease owner 拒绝；不得用 mock/SQLite 替代。
 - 安全：短码不能领取、错误 verifier 被拒绝、密钥不进入 URL/日志/Simulation 明文字段、跨用户读取被拒绝。
 - 领域边界：Simulation Connector 代码、路由和运行时测试不得导入 `device_backend`、`get_device_conn` 或 `AI00_DEVICE_*`；Device 领域依赖图中不得再出现 Connector/VisMockup。
 - Connector .NET：临时密钥生成、浏览器 URL、轮询节流、密文解密、DPAPI 保存、SID 匹配、响应丢失重试。
@@ -268,6 +287,8 @@ Simulation 新增领域迁移，拥有：
 - finding: 现有 enrollment 创建要求 `system.tech_config`，不适合作为普通数模用户日常绑定流程。
 - finding: 当前数模 Web 仍通过 prompt 接收 `device_id`，无法证明设备属于当前飞书用户。
 - finding: `device.connector.*`、`vismockup.*`、Connector Provider/路由以及七组运行时表的现有 owner 与业务归属冲突，必须整体迁移，不能只增加 Simulation facade。
+- finding: 现有 outcome 与 projection intent 分离提交、projecting 无租约回收且 Gateway 幂等键包含 attempt，存在丢失投影、永久卡死和重复下游效果风险。
+- finding: 现有生产数模页面除截图主入口外仍有多个 localhost Bridge 直连入口，必须全部移除或改走治理 workflow。
 - unverified: Gateway 是否已有可表达无用户 bootstrap consumer 与 proof-of-possession 的认证策略；实现前必须读取并复用，不能伪造用户 actor。
 - unverified: 旧 Device 数据库是否已有生产 Connector 数据；若存在，部署前必须生成迁移清单、行数/哈希核对和可恢复切换证据。
 - blocked: stable 发布、治理审批与 runtime_verified；不阻塞 experimental 实现和机器验证。
