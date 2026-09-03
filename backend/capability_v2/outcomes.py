@@ -167,7 +167,7 @@ class InMemoryOutcomeStore:
             if record is None:
                 raise OutcomeConflict("outcome_not_found")
             durable = durable_result(result)
-            if record.status == "completed" and record.result == durable:
+            if record.status == "completed":
                 return record
             if record.status not in {"started", "outcome_unknown"}:
                 raise OutcomeConflict("outcome_already_final")
@@ -388,7 +388,7 @@ class SqlOutcomeStore:
                     raise OutcomeConflict("outcome_not_found")
                 record = _record_from_row(row)
                 durable = durable_result(result)
-                if record.status == "completed" and record.result == durable:
+                if record.status == "completed":
                     return record
                 if record.status not in {"started", "outcome_unknown"}:
                     raise OutcomeConflict("outcome_already_final")
