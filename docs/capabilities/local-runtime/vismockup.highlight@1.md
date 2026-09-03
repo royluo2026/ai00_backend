@@ -8,7 +8,7 @@ Highlight occurrences by CATIA occurrence name.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`deprecated`
 - 所属领域：`device`
-- Catalog Release：`rel_f91a658427dcd1990d752a720f0a7493`
+- Catalog Release：`rel_6aa108ced57d29b4cb35d05266369c04`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -22,7 +22,7 @@ Highlight occurrences by CATIA occurrence name.
 | api | 不可用 |
 | mcp | 不可用 |
 | worker | 不可用 |
-| local_runtime | 可用 |
+| local_runtime | 不可用 |
 
 插件和 Agent 只有在上表对应值为“可用”，且安装/Mount 或 Delegation 明确授权时才可调用。
 
@@ -35,7 +35,7 @@ Highlight occurrences by CATIA occurrence name.
 - 认证新鲜度：0 秒
 
 资源选择器：
-- `device` ← `device_id`（必填）
+- 无资源选择器；仍受租户、身份与权限策略约束。
 
 ## 执行与可靠性
 
@@ -97,7 +97,7 @@ Highlight occurrences by CATIA occurrence name.
 ```json
 {
   "capability_id": "vismockup.highlight",
-  "catalog_release": "rel_f91a658427dcd1990d752a720f0a7493",
+  "catalog_release": "rel_6aa108ced57d29b4cb35d05266369c04",
   "major_version": 1,
   "payload": {
     "catia_names": [

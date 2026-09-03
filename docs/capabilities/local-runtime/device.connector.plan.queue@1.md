@@ -1,14 +1,14 @@
 # device.connector.plan.queue@1
 
-Queue one immutable compatible ExecutionPlan for an owned AI00 Connector.
+Deprecated Connector compatibility identity.
 
 ## 使用判断
 
-- 适用：A governed workflow is ready to execute a version-pinned local plan.
-- 不适用：Compatibility or user-session preflight has not passed.
+- 适用：Never for new work; migrate to Simulation Connector capabilities.
+- 不适用：For every executable Connector or VisMockup operation.
 - 生命周期：`deprecated`
 - 所属领域：`device`
-- Catalog Release：`rel_f91a658427dcd1990d752a720f0a7493`
+- Catalog Release：`rel_6aa108ced57d29b4cb35d05266369c04`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -35,7 +35,7 @@ Queue one immutable compatible ExecutionPlan for an owned AI00 Connector.
 - 认证新鲜度：0 秒
 
 资源选择器：
-- `device` ← `plan.device_id`（必填）
+- 无资源选择器；仍受租户、身份与权限策略约束。
 
 ## 执行与可靠性
 
@@ -229,7 +229,7 @@ Queue one immutable compatible ExecutionPlan for an owned AI00 Connector.
 ```json
 {
   "capability_id": "device.connector.plan.queue",
-  "catalog_release": "rel_f91a658427dcd1990d752a720f0a7493",
+  "catalog_release": "rel_6aa108ced57d29b4cb35d05266369c04",
   "major_version": 1,
   "payload": {
     "plan": {

@@ -514,6 +514,13 @@
     "simulation/simulation.capture_run.start@1.md",
     "simulation/simulation.capture_run.start@2.md",
     "simulation/simulation.capture_step.retry@1.md",
+    "simulation/simulation.connector.binding.get@1.md",
+    "simulation/simulation.connector.health.get@1.md",
+    "simulation/simulation.connector.pairing.approve@1.md",
+    "simulation/simulation.connector.pairing.complete@1.md",
+    "simulation/simulation.connector.pairing.request@1.md",
+    "simulation/simulation.connector.pairing.summary.get@1.md",
+    "simulation/simulation.connector.plan.queue@1.md",
     "simulation/simulation.connector_capture_outcome.apply@1.md",
     "simulation/simulation.connector_document_snapshot_outcome.apply@1.md",
     "simulation/simulation.connector_materialization_outcome.apply@1.md",
@@ -524,6 +531,7 @@
     "simulation/simulation.document_snapshot.request@2.md",
     "simulation/simulation.environment.archive@1.md",
     "simulation/simulation.environment.compose@1.md",
+    "simulation/simulation.environment.compose@2.md",
     "simulation/simulation.environment.create@1.md",
     "simulation/simulation.environment.get@1.md",
     "simulation/simulation.environment.manifest.archive@1.md",
@@ -545,7 +553,14 @@
     "simulation/simulation.run.start@1.md",
     "simulation/simulation.solver_profile.create@1.md",
     "simulation/simulation.solver_profile.get@1.md",
-    "simulation/simulation.solver_profile.search@1.md"
+    "simulation/simulation.solver_profile.search@1.md",
+    "simulation/simulation.vismockup.application.launch@1.md",
+    "simulation/simulation.vismockup.capture.create@1.md",
+    "simulation/simulation.vismockup.model.open@1.md",
+    "simulation/simulation.vismockup.selection.highlight@1.md",
+    "simulation/simulation.vismockup.status.get@1.md",
+    "simulation/simulation.vismockup.tree.get@1.md",
+    "simulation/simulation.vismockup.visibility.change.apply@1.md"
   ],
   "schema_version": 1
 }

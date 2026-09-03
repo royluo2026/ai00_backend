@@ -1,26 +1,26 @@
 # device.connector.plan.queue@2
 
-Queue one immutable compatible ExecutionPlan using external Connector consistency.
+Deprecated Connector compatibility identity.
 
 ## 使用判断
 
-- 适用：A governed workflow is ready to execute a version-pinned local plan.
-- 不适用：Compatibility or user-session preflight has not passed.
-- 生命周期：`experimental`
+- 适用：Never for new work; migrate to Simulation Connector capabilities.
+- 不适用：For every executable Connector or VisMockup operation.
+- 生命周期：`deprecated`
 - 所属领域：`device`
-- Catalog Release：`rel_f91a658427dcd1990d752a720f0a7493`
+- Catalog Release：`rel_6aa108ced57d29b4cb35d05266369c04`
 - Schema 精度：`typed`
-- 暂未开放原因：`experimental_lifecycle`
+- 暂未开放原因：无
 
 ## 消费者可用性
 
 | 消费者 | 状态 |
 |---|---|
-| web | 可用 |
-| plugin | 可用 |
-| agent | 可用 |
-| api | 可用 |
-| mcp | 可用 |
+| web | 不可用 |
+| plugin | 不可用 |
+| agent | 不可用 |
+| api | 不可用 |
+| mcp | 不可用 |
 | worker | 不可用 |
 | local_runtime | 不可用 |
 
@@ -35,7 +35,7 @@ Queue one immutable compatible ExecutionPlan using external Connector consistenc
 - 认证新鲜度：0 秒
 
 资源选择器：
-- `device` ← `plan.device_id`（必填）
+- 无资源选择器；仍受租户、身份与权限策略约束。
 
 ## 执行与可靠性
 
@@ -229,7 +229,7 @@ Queue one immutable compatible ExecutionPlan using external Connector consistenc
 ```json
 {
   "capability_id": "device.connector.plan.queue",
-  "catalog_release": "rel_f91a658427dcd1990d752a720f0a7493",
+  "catalog_release": "rel_6aa108ced57d29b4cb35d05266369c04",
   "major_version": 2,
   "payload": {
     "plan": {

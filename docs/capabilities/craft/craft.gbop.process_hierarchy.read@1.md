@@ -8,7 +8,7 @@ Read the bounded GBOP process-operation-part hierarchy for a PBOM version.
 - 不适用：The request mutates GBOP/PBOM bindings or creates BOP entries.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_f91a658427dcd1990d752a720f0a7493`
+- Catalog Release：`rel_6aa108ced57d29b4cb35d05266369c04`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -86,7 +86,7 @@ Read the bounded GBOP process-operation-part hierarchy for a PBOM version.
 ```json
 {
   "capability_id": "craft.gbop.process_hierarchy.read",
-  "catalog_release": "rel_f91a658427dcd1990d752a720f0a7493",
+  "catalog_release": "rel_6aa108ced57d29b4cb35d05266369c04",
   "major_version": 1,
   "payload": {
     "pbom_version_gid": "example"

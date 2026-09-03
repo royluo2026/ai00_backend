@@ -2,9 +2,9 @@
 
 本目录由不可变 Catalog Release 自动生成，不接受手工修改。
 
-- Catalog Release：`rel_f91a658427dcd1990d752a720f0a7493`
-- Catalog Hash：`sha256:f91a658427dcd1990d752a720f0a749317e7d3d9e2d028757fde03bc1ed1c23e`
-- 描述符数量：537
+- Catalog Release：`rel_6aa108ced57d29b4cb35d05266369c04`
+- Catalog Hash：`sha256:6aa108ced57d29b4cb35d05266369c0491ffb8a51a14bcaf35a7e3a28e63404a`
+- 描述符数量：552
 
 ## 重要边界
 
@@ -26,19 +26,19 @@
 | `knowledge` | 56 |
 | `ontology` | 15 |
 | `project_management` | 124 |
-| `simulation` | 39 |
+| `simulation` | 54 |
 
 ## 消费者可用数量
 
 | 消费者 | 能力数 |
 |---|---:|
-| web | 523 |
-| plugin | 515 |
-| agent | 499 |
-| api | 522 |
-| mcp | 499 |
+| web | 527 |
+| plugin | 519 |
+| agent | 503 |
+| api | 526 |
+| mcp | 503 |
 | worker | 3 |
-| local_runtime | 10 |
+| local_runtime | 12 |
 
 ## 文件
 
