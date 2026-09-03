@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Ai00.Connector.Contracts;
 
 namespace Ai00.Connector.Adapters.VisMockup;
 
@@ -105,9 +106,13 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
             dynamic node = Traverse().SingleOrDefault(item => string.Equals(NodeKey(item), nodeKey, StringComparison.Ordinal))
                 ?? throw new InvalidOperationException("VisMockup node not found");
             try { node.Visible = visible; }
-            catch { node.Selected = visible; }
+            catch { throw new ConnectorException("visibility_control_unsupported"); }
         }
-        public void ApplyCaptureProfile(CaptureProfile profile) { }
+        public void ApplyCaptureProfile(CaptureProfile profile)
+        {
+            if (profile is not { Format: "png", Width: 1920, Height: 1080, Background: "current" })
+                throw new ConnectorException("capture_profile_unsupported");
+        }
         public string AttachModel(string path)
         {
             dynamic view = Value.ActiveView;
@@ -139,7 +144,7 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         {
             dynamic node = value;
             try { return Convert.ToBoolean(node.Visible); }
-            catch { try { return Convert.ToBoolean(node.Selected); } catch { return false; } }
+            catch { throw new ConnectorException("visibility_read_unsupported"); }
         }
         private string ReadString(string primary, string fallback)
         {

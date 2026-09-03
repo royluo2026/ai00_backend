@@ -24,7 +24,7 @@ public sealed class ServerContractTests : IDisposable
             var payload = JsonSerializer.SerializeToElement(new
             {
                 capture_run_id = "capture-1", operation_id = operationId, attempt = 1,
-                format = "png", width = 1, height = 1, background = "current",
+                format = "png", width = 1920, height = 1080, background = "current",
             });
             return new ConnectorStep(
                 $"capture-{operationId}", contract.OperationId, contract.ContractHash,

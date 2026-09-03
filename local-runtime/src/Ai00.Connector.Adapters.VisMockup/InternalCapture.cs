@@ -31,7 +31,8 @@ public sealed class InternalCapture(string root)
     {
         if (!SafeIdentity.IsMatch(request.CaptureRunId) || !SafeIdentity.IsMatch(request.StepId) || request.Attempt < 1)
             throw new ConnectorException("capture_request_invalid");
-        if (request.Profile.Format != "png") throw new ConnectorException("capture_format_unsupported");
+        if (request.Profile is not { Format: "png", Width: 1920, Height: 1080, Background: "current" })
+            throw new ConnectorException("capture_profile_unsupported");
         var directory = Path.Combine(_root, request.CaptureRunId);
         Directory.CreateDirectory(directory);
         var path = Path.Combine(directory, $"{request.StepId}-attempt-{request.Attempt}.png");

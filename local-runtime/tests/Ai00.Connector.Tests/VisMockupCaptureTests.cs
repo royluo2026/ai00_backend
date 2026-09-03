@@ -17,12 +17,12 @@ public sealed class VisMockupCaptureTests : IDisposable
         using var sta = new StaDispatcher();
         var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([Path.GetTempPath()]), fake, _directory);
 
-        var artifact = await adapter.CaptureAsync(new CaptureRequest("run-1", "step-1", "op-10", 1, new("png", 1, 1, "current")));
+        var artifact = await adapter.CaptureAsync(new CaptureRequest("run-1", "step-1", "op-10", 1, new("png", 1920, 1080, "current")));
 
         Assert.Equal(1, document.CaptureImageCalls);
         Assert.Equal("image/png", artifact.MediaType);
-        Assert.Equal(1, artifact.Width);
-        Assert.Equal(1, artifact.Height);
+        Assert.Equal(1920, artifact.Width);
+        Assert.Equal(1080, artifact.Height);
         Assert.True(File.Exists(artifact.Path));
     }
 
@@ -36,7 +36,7 @@ public sealed class VisMockupCaptureTests : IDisposable
         var payload = JsonSerializer.SerializeToElement(new
         {
             capture_run_id = "run-1", operation_id = "op-10", attempt = 2,
-            format = "png", width = 1, height = 1, background = "current",
+            format = "png", width = 1920, height = 1080, background = "current",
         });
 
         var result = await adapter.ExecuteAsync(
