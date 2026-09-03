@@ -148,7 +148,8 @@ class SqlCaptureWorkflowRepository:
                     "INSERT INTO workmanship_sim_capture_artifact_refs "
                     "(capture_run_id,step_id,operation_id,artifact_id,artifact_version,artifact_sha256,artifact_ref_json,craft_attachment_status,owner_gid,team_gid,created_at) "
                     "SELECT capture_run_id,step_id,operation_id,%s,%s,%s,%s,'pending',%s,%s,NOW(6) "
-                    "FROM workmanship_sim_capture_steps WHERE capture_run_id=%s AND operation_id=%s",
+                    "FROM workmanship_sim_capture_steps WHERE capture_run_id=%s AND operation_id=%s "
+                    "ON DUPLICATE KEY UPDATE artifact_ref_json=VALUES(artifact_ref_json)",
                     (artifact["artifact_id"], artifact["version"], artifact["sha256"], json.dumps(artifact, sort_keys=True), owner["owner_gid"], owner["team_gid"], capture_run_id, operation_id),
                 )
             if changes.get("artifact_attached") is True:

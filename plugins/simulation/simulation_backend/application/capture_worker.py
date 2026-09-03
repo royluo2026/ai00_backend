@@ -3,10 +3,14 @@ from __future__ import annotations
 
 import secrets
 from datetime import UTC, datetime
-from typing import Any, Callable
+from typing import Any, Callable, Mapping
 
 from backend.capability_v2.contracts import ArtifactRef
 from backend.capability_v2.provider_contracts import CapabilityContext
+from backend.contracts.connector_execution_plan_v1 import (
+    ConnectorExecutionPlanV1,
+    ConnectorPlanOutcomeV1,
+)
 
 from .connector_plans import build_capture_plan, build_materialization_plan
 
@@ -162,6 +166,64 @@ class CaptureWorkflow:
             refreshed = self.repository.get_capture_run(capture_run_id, context)
         return refreshed
 
+    def apply_connector_outcome(
+        self,
+        plan: ConnectorExecutionPlanV1,
+        outcome: ConnectorPlanOutcomeV1,
+        context: CapabilityContext,
+    ) -> dict[str, Any]:
+        """Project a verified Device-domain outcome into the capture aggregate."""
+        if outcome.plan_id != plan.plan_id or outcome.protocol != plan.protocol:
+            raise SimulationWorkflowError("plan_outcome_invalid")
+        run = self.repository.get_capture_run(plan.plan_id, context)
+        if run is None:
+            raise SimulationWorkflowError("capture_run_not_found")
+
+        results = {item.step_id: item for item in outcome.steps}
+        known_steps = {item.step_id for item in plan.steps}
+        if len(results) != len(outcome.steps) or any(item not in known_steps for item in results):
+            raise SimulationWorkflowError("plan_outcome_invalid")
+
+        current = {item["operation_id"]: item for item in run["steps"]}
+        projected = 0
+        for step in plan.steps:
+            if step.operation_id != "vismockup.view.capture@1":
+                continue
+            operation_id = str(step.payload.get("operation_id") or "")
+            if operation_id not in current:
+                raise SimulationWorkflowError("capture_step_not_found")
+            result = results.get(step.step_id)
+            if result is None:
+                continue
+            existing = current[operation_id]
+            if existing["status"] == "completed" and existing.get("artifact_attached"):
+                continue
+            if result.status == "completed":
+                value = result.result
+                artifact = value.get("artifact") if isinstance(value, Mapping) else None
+                if not isinstance(artifact, Mapping):
+                    raise SimulationWorkflowError("artifact_upload_unconfirmed")
+                self.record_step_result(
+                    plan.plan_id, operation_id, status="completed", artifact_ref=dict(artifact),
+                )
+            else:
+                self.record_step_result(plan.plan_id, operation_id, status=result.status)
+            projected += 1
+
+        refreshed = run
+        for _ in range(projected):
+            refreshed = self.advance(plan.plan_id, context)
+        statuses = {item["status"] for item in refreshed["steps"]}
+        if "outcome_unknown" in statuses:
+            self.repository.update_capture_run(plan.plan_id, status="outcome_unknown")
+        elif "failed" in statuses:
+            terminal = statuses <= {"completed", "failed", "cancelled"}
+            self.repository.update_capture_run(
+                plan.plan_id,
+                status="partial" if terminal and "completed" in statuses else "failed",
+            )
+        return self.repository.get_capture_run(plan.plan_id, context)
+
     def retry_step(
         self, capture_run_id: str, operation_id: str, context: CapabilityContext,
     ) -> dict[str, Any]:
@@ -207,4 +269,19 @@ class CaptureWorkflow:
         return {"capture_run_id": capture_run_id, "status": status}
 
 
-__all__ = ["CaptureWorkflow", "SimulationWorkflowError"]
+class ConnectorOutcomeProjection:
+    def __init__(self, workflow: CaptureWorkflow) -> None:
+        self.workflow = workflow
+
+    def apply(
+        self, plan: ConnectorExecutionPlanV1, outcome: ConnectorPlanOutcomeV1,
+    ) -> dict[str, Any] | None:
+        if plan.capability_version_gid != "simulation.capture_run.start@1":
+            return None
+        context = CapabilityContext(
+            user_gid=plan.user_id, team_gid=plan.tenant_id, source="connector",
+        )
+        return self.workflow.apply_connector_outcome(plan, outcome, context)
+
+
+__all__ = ["CaptureWorkflow", "ConnectorOutcomeProjection", "SimulationWorkflowError"]

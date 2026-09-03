@@ -18,6 +18,7 @@ from backend.contracts.connector_execution_plan_v1 import (
 )
 from backend.domain_ports.local_integration import HASH_PATTERN
 from backend.domain_ports.local_integration import canonical_json_bytes
+from backend.domain_ports.simulation_runtime import ConnectorOutcomePortProxy
 
 from ..data.connection import get_device_conn
 
@@ -124,8 +125,9 @@ def require_compatible(plan: ConnectorExecutionPlanV1, health: ConnectorHealth) 
 
 
 class ConnectorControlPlane:
-    def __init__(self, repository, *, clock=lambda: datetime.now(UTC)):
+    def __init__(self, repository, *, outcome_port=None, clock=lambda: datetime.now(UTC)):
         self.repository = repository
+        self.outcome_port = outcome_port
         self.clock = clock
 
     def record_heartbeat(
@@ -192,6 +194,8 @@ class ConnectorControlPlane:
         ):
             raise ConnectorError("plan_outcome_invalid")
         self.repository.complete_plan(device_id, plan_id, lease_id, outcome)
+        if self.outcome_port is not None:
+            self.outcome_port.apply(plan, outcome)
 
 
 class SqlConnectorRepository:
@@ -317,8 +321,10 @@ class SqlConnectorRepository:
         with get_device_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
                 "SELECT plan_json FROM workmanship_device_connector_plans "
-                "WHERE plan_id=%s AND device_gid=%s AND status='leased' AND lease_id=%s "
-                "AND lease_until>NOW(6) AND expires_at>NOW(6) LIMIT 1",
+                "WHERE plan_id=%s AND device_gid=%s AND lease_id=%s AND ("
+                "(status='leased' AND lease_until>NOW(6) AND expires_at>NOW(6)) OR "
+                "(status IN ('completed','failed','cancelled','outcome_unknown') AND outcome_hash IS NOT NULL)"
+                ") LIMIT 1",
                 (plan_id, device_id, lease_id),
             )
             row = cursor.fetchone()
@@ -337,20 +343,40 @@ class SqlConnectorRepository:
 
         data = outcome.model_dump(mode="json")
         encoded = json.dumps(data, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        digest = canonical_hash(data)
         with get_device_conn() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute(
-                    "UPDATE workmanship_device_connector_plans SET status=%s,outcome_json=%s,"
-                    "outcome_hash=%s,updated_at=NOW(6) WHERE plan_id=%s AND device_gid=%s "
-                    "AND status='leased' AND lease_id=%s AND lease_until>NOW(6)",
-                    (outcome.status, encoded, canonical_hash(data), plan_id, device_id, lease_id),
-                )
-                if cursor.rowcount != 1:
-                    raise ConnectorError("plan_lease_invalid")
-            conn.commit()
+            try:
+                with conn.cursor() as cursor:
+                    cursor.execute(
+                        "SELECT status,outcome_hash FROM workmanship_device_connector_plans "
+                        "WHERE plan_id=%s AND device_gid=%s AND lease_id=%s FOR UPDATE",
+                        (plan_id, device_id, lease_id),
+                    )
+                    current = cursor.fetchone()
+                    if not current:
+                        raise ConnectorError("plan_lease_invalid")
+                    if current["outcome_hash"] is not None:
+                        if current["outcome_hash"] != digest:
+                            raise ConnectorError("idempotency_conflict")
+                        conn.commit()
+                        return
+                    cursor.execute(
+                        "UPDATE workmanship_device_connector_plans SET status=%s,outcome_json=%s,"
+                        "outcome_hash=%s,updated_at=NOW(6) WHERE plan_id=%s AND device_gid=%s "
+                        "AND status='leased' AND lease_id=%s AND lease_until>NOW(6)",
+                        (outcome.status, encoded, digest, plan_id, device_id, lease_id),
+                    )
+                    if cursor.rowcount != 1:
+                        raise ConnectorError("plan_lease_invalid")
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
 
 
-connector_control_plane = ConnectorControlPlane(SqlConnectorRepository())
+connector_control_plane = ConnectorControlPlane(
+    SqlConnectorRepository(), outcome_port=ConnectorOutcomePortProxy(),
+)
 
 
 def record_connector_heartbeat(device_id: str, owner_user_id: str, health: ConnectorHealth) -> None:

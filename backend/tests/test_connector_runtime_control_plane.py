@@ -8,7 +8,12 @@ import pytest
 
 from backend.capability_v2.contracts import OperationStatus
 from backend.capability_v2.provider_contracts import CapabilityContext
-from backend.contracts.connector_execution_plan_v1 import ConnectorExecutionPlanV1
+from backend.contracts.connector_execution_plan_v1 import (
+    ConnectorExecutionPlanV1,
+    ConnectorPlanOutcomeV1,
+    ConnectorStepResultV1,
+    canonical_hash,
+)
 from plugins.device.device_backend.capabilities.connector_runtime import (
     ConnectorControlPlane,
     ConnectorError,
@@ -71,6 +76,60 @@ class MemoryRepository:
     def lease_plan(self, device_id, lease_seconds):
         self.leased = (device_id, lease_seconds)
         return {"lease_id": "lease-1", "plan": VECTOR["plan"]}
+
+
+def completed_outcome():
+    current = plan()
+    value = {"product_version": "14.2.0"}
+    step = ConnectorStepResultV1(
+        step_id=current.steps[0].step_id,
+        status="completed",
+        result=value,
+        result_hash=canonical_hash(value),
+        started_at=NOW,
+        completed_at=NOW,
+    )
+    return ConnectorPlanOutcomeV1(
+        protocol=current.protocol,
+        plan_id=current.plan_id,
+        status="completed",
+        steps=(step,),
+        reported_at=NOW,
+    )
+
+
+def test_completion_can_retry_domain_projection_after_device_outcome_is_stored():
+    class Repository(MemoryRepository):
+        def __init__(self):
+            super().__init__()
+            self.saved_outcome = None
+
+        def get_plan(self, plan_id, *, device_id, lease_id):
+            return plan()
+
+        def complete_plan(self, device_id, plan_id, lease_id, outcome):
+            if self.saved_outcome is not None and self.saved_outcome != outcome:
+                raise ConnectorError("idempotency_conflict")
+            self.saved_outcome = outcome
+
+    class Projection:
+        def __init__(self):
+            self.calls = 0
+
+        def apply(self, current_plan, outcome):
+            self.calls += 1
+            if self.calls == 1:
+                raise RuntimeError("projection_temporarily_unavailable")
+
+    repository, projection = Repository(), Projection()
+    control_plane = ConnectorControlPlane(repository, outcome_port=projection, clock=lambda: NOW)
+
+    with pytest.raises(RuntimeError, match="projection_temporarily_unavailable"):
+        control_plane.complete_plan("device-001", "plan-001", "lease-1", completed_outcome())
+    control_plane.complete_plan("device-001", "plan-001", "lease-1", completed_outcome())
+
+    assert repository.saved_outcome == completed_outcome()
+    assert projection.calls == 2
 
 
 def test_heartbeat_is_closed_and_records_adapter_contract_hashes():

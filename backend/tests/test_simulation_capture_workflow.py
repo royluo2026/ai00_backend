@@ -5,6 +5,11 @@ from datetime import UTC, datetime
 import pytest
 
 from backend.capability_v2.provider_contracts import CapabilityContext
+from backend.contracts.connector_execution_plan_v1 import (
+    ConnectorPlanOutcomeV1,
+    ConnectorStepResultV1,
+    canonical_hash,
+)
 from backend.capabilities.registry_next import CapabilityRegistry
 from plugins.simulation.simulation_backend.capabilities import register_capabilities
 from plugins.simulation.simulation_backend.capabilities.capture_runs import CaptureRunProvider
@@ -203,3 +208,26 @@ def test_queue_failure_is_persisted_as_failed_before_error_returns():
         workflow.start_capture("env-1", 1, "device-1", _context())
 
     assert repository.runs["run-offline"]["status"] == "failed"
+
+
+def test_signed_connector_outcome_advances_capture_and_attaches_artifact_once():
+    workflow, _, connector, craft = _workflow()
+    workflow.start_capture("env-1", 1, "device-1", _context())
+    plan = connector.last_plan
+    now = datetime(2026, 9, 3, tzinfo=UTC)
+    results = []
+    for step in plan.steps:
+        value = {"artifact": ARTIFACT} if step.operation_id == "vismockup.view.capture@1" else {}
+        results.append(ConnectorStepResultV1(
+            step_id=step.step_id, status="completed", result=value,
+            result_hash=canonical_hash(value), started_at=now, completed_at=now,
+        ))
+    outcome = ConnectorPlanOutcomeV1(
+        protocol=plan.protocol, plan_id=plan.plan_id, status="completed",
+        steps=tuple(results), reported_at=now,
+    )
+
+    workflow.apply_connector_outcome(plan, outcome, _context())
+    workflow.apply_connector_outcome(plan, outcome, _context())
+
+    assert [call[1] for call in craft.calls] == ["op-30", "op-20", "op-10"]

@@ -51,12 +51,17 @@ class ConnectorPortProxy:
         return simulation_runtime_ports.require("device.connector").queue_plan(plan, context)
 
 
+class ConnectorOutcomePortProxy:
+    def apply(self, plan, outcome):
+        return simulation_runtime_ports.require("simulation.connector_outcome").apply(plan, outcome)
+
+
 class KnowledgeMappingPortProxy:
     def resolve_resource_models(self, items, context):
         return simulation_runtime_ports.require("knowledge.resource_model_mapping").resolve_resource_models(items, context)
 
 
 __all__ = [
-    "ConnectorPortProxy", "CraftExecutionPlanPortProxy", "CraftScreenshotPortProxy",
+    "ConnectorOutcomePortProxy", "ConnectorPortProxy", "CraftExecutionPlanPortProxy", "CraftScreenshotPortProxy",
     "KnowledgeMappingPortProxy", "SimulationRuntimePorts", "simulation_runtime_ports",
 ]
