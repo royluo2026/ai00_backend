@@ -1,0 +1,28 @@
+{
+  "plan": {
+    "protocol": "ai00.connector.execution-plan.v1",
+    "plan_id": "plan-001",
+    "tenant_id": "tenant-001",
+    "user_id": "user-001",
+    "device_id": "device-001",
+    "capability_version_gid": "capability-version-001",
+    "business_definition_hash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+    "adapter_id": "ai00.vismockup",
+    "adapter_major": 1,
+    "steps": [
+      {
+        "step_id": "step-1",
+        "operation_id": "vismockup.application.probe@1",
+        "contract_hash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "depends_on": [],
+        "payload": {},
+        "payload_hash": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "timeout_seconds": 30
+      }
+    ],
+    "issued_at": "2026-09-03T00:00:00Z",
+    "expires_at": "2026-09-03T00:05:00Z",
+    "plan_hash": "sha256:d364d115e2ff3827befdc5ed8d4ab536de05a5e4e335ea23370464f33369531c"
+  },
+  "plan_hash": "sha256:d364d115e2ff3827befdc5ed8d4ab536de05a5e4e335ea23370464f33369531c"
+}

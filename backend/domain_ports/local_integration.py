@@ -13,6 +13,7 @@ from backend.capability_v2.contracts import FrozenModel, IDENTITY_PATTERN
 
 
 PROTOCOL_V2 = "ai00.local-operation.v2"
+CONNECTOR_PLAN_PROTOCOL_V1 = "ai00.connector.execution-plan.v1"
 HASH_PATTERN = r"^sha256:[0-9a-f]{64}$"
 
 
@@ -96,6 +97,6 @@ def verify_operation_outcome(outcome: LocalOperationOutcome, signature: str, dev
 
 
 __all__ = [
-    "LocalOperationEnvelope", "LocalOperationOutcome", "PROTOCOL_V2", "canonical_json_bytes", "content_hash",
+    "CONNECTOR_PLAN_PROTOCOL_V1", "LocalOperationEnvelope", "LocalOperationOutcome", "PROTOCOL_V2", "canonical_json_bytes", "content_hash",
     "sign_operation_envelope", "sign_operation_outcome", "verify_operation_outcome", "verify_operation_signature",
 ]
