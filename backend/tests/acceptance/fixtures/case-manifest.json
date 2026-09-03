@@ -81,6 +81,15 @@
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[agent.interaction.chat.change.apply@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[agent.interaction.chat.change.apply@1]"
     },
+    "agent.interaction.chat.change.apply@2": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[agent.interaction.chat.change.apply@2]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[agent.interaction.chat.change.apply@2]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[agent.interaction.chat.change.apply@2]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[agent.interaction.chat.change.apply@2]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[agent.interaction.chat.change.apply@2]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[agent.interaction.chat.change.apply@2]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[agent.interaction.chat.change.apply@2]"
+    },
     "agent.interaction.request@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[agent.interaction.request@1]",
       "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[agent.interaction.request@1]",
@@ -4474,7 +4483,7 @@
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[system.search@1]"
     }
   },
-  "catalog_release": "rel_38f8bdbb827c5ff822916b1242deb40a",
+  "catalog_release": "rel_277fca49891059b565473ae614a948cf",
   "mandatory_cases": [
     "success",
     "invalid_input",

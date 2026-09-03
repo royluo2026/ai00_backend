@@ -15,6 +15,7 @@
     "agent/agent.flow.read@1.md",
     "agent/agent.interaction.cancel@1.md",
     "agent/agent.interaction.chat.change.apply@1.md",
+    "agent/agent.interaction.chat.change.apply@2.md",
     "agent/agent.interaction.request@1.md",
     "agent/agent.memory.change.apply@1.md",
     "agent/agent.memory.read@1.md",

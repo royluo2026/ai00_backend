@@ -8,7 +8,7 @@ craft.gbop.draft.change.apply
 - 不适用：The subject is a project BOP.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_38f8bdbb827c5ff822916b1242deb40a`
+- Catalog Release：`rel_277fca49891059b565473ae614a948cf`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -101,7 +101,7 @@ craft.gbop.draft.change.apply
 ```json
 {
   "capability_id": "craft.gbop.draft.change.apply",
-  "catalog_release": "rel_38f8bdbb827c5ff822916b1242deb40a",
+  "catalog_release": "rel_277fca49891059b565473ae614a948cf",
   "major_version": 1,
   "payload": {}
 }

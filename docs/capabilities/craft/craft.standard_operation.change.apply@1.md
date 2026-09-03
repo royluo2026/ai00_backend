@@ -8,7 +8,7 @@ Apply bounded Craft standard operation lifecycle and content changes.
 - 不适用：The change belongs to a GBOP release or BOP execution operation.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_38f8bdbb827c5ff822916b1242deb40a`
+- Catalog Release：`rel_277fca49891059b565473ae614a948cf`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -234,7 +234,7 @@ Apply bounded Craft standard operation lifecycle and content changes.
 ```json
 {
   "capability_id": "craft.standard_operation.change.apply",
-  "catalog_release": "rel_38f8bdbb827c5ff822916b1242deb40a",
+  "catalog_release": "rel_277fca49891059b565473ae614a948cf",
   "major_version": 1,
   "payload": {
     "operation": "create"

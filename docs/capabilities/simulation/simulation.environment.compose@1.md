@@ -8,7 +8,7 @@ Compose an immutable Connector environment from pinned owning-domain sources.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_38f8bdbb827c5ff822916b1242deb40a`
+- Catalog Release：`rel_277fca49891059b565473ae614a948cf`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -76,28 +76,26 @@ Compose an immutable Connector environment from pinned owning-domain sources.
       "properties": {
         "background": {
           "enum": [
-            "current",
-            "transparent",
-            "white",
-            "black"
+            "current"
           ],
           "type": "string"
         },
         "format": {
           "enum": [
-            "png",
-            "jpeg"
+            "png"
           ],
           "type": "string"
         },
         "height": {
-          "maximum": 16384,
-          "minimum": 1,
+          "enum": [
+            1080
+          ],
           "type": "integer"
         },
         "width": {
-          "maximum": 16384,
-          "minimum": 1,
+          "enum": [
+            1920
+          ],
           "type": "integer"
         }
       },
@@ -154,14 +152,14 @@ Compose an immutable Connector environment from pinned owning-domain sources.
 ```json
 {
   "capability_id": "simulation.environment.compose",
-  "catalog_release": "rel_38f8bdbb827c5ff822916b1242deb40a",
+  "catalog_release": "rel_277fca49891059b565473ae614a948cf",
   "major_version": 1,
   "payload": {
     "capture_profile": {
       "background": "current",
       "format": "png",
-      "height": 1,
-      "width": 1
+      "height": 1080,
+      "width": 1920
     },
     "device_id": "example",
     "execution_plan_ref": {
@@ -187,28 +185,26 @@ Compose an immutable Connector environment from pinned owning-domain sources.
       "properties": {
         "background": {
           "enum": [
-            "current",
-            "transparent",
-            "white",
-            "black"
+            "current"
           ],
           "type": "string"
         },
         "format": {
           "enum": [
-            "png",
-            "jpeg"
+            "png"
           ],
           "type": "string"
         },
         "height": {
-          "maximum": 16384,
-          "minimum": 1,
+          "enum": [
+            1080
+          ],
           "type": "integer"
         },
         "width": {
-          "maximum": 16384,
-          "minimum": 1,
+          "enum": [
+            1920
+          ],
           "type": "integer"
         }
       },
@@ -397,28 +393,26 @@ Compose an immutable Connector environment from pinned owning-domain sources.
                 "properties": {
                   "background": {
                     "enum": [
-                      "current",
-                      "transparent",
-                      "white",
-                      "black"
+                      "current"
                     ],
                     "type": "string"
                   },
                   "format": {
                     "enum": [
-                      "png",
-                      "jpeg"
+                      "png"
                     ],
                     "type": "string"
                   },
                   "height": {
-                    "maximum": 16384,
-                    "minimum": 1,
+                    "enum": [
+                      1080
+                    ],
                     "type": "integer"
                   },
                   "width": {
-                    "maximum": 16384,
-                    "minimum": 1,
+                    "enum": [
+                      1920
+                    ],
                     "type": "integer"
                   }
                 },

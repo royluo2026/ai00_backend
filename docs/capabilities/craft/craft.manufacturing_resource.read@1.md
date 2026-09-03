@@ -8,7 +8,7 @@ Execute the reviewed craft.manufacturing_resource.read Craft outcome.
 - 不适用：The operation belongs to another business domain.
 - 生命周期：`deprecated`
 - 所属领域：`craft`
-- Catalog Release：`rel_38f8bdbb827c5ff822916b1242deb40a`
+- Catalog Release：`rel_277fca49891059b565473ae614a948cf`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -96,7 +96,7 @@ Execute the reviewed craft.manufacturing_resource.read Craft outcome.
 ```json
 {
   "capability_id": "craft.manufacturing_resource.read",
-  "catalog_release": "rel_38f8bdbb827c5ff822916b1242deb40a",
+  "catalog_release": "rel_277fca49891059b565473ae614a948cf",
   "major_version": 1,
   "payload": {
     "arguments": {},

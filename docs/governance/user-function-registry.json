@@ -1838,7 +1838,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/capabilities/bop_entry_change.py",
-        "plugins/craft/craft_backend/capabilities/contracts.py"
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
     "capability:craft.bop.entry.detail.get": {
@@ -2497,7 +2498,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/capabilities/bop_picture_upload.py",
-        "plugins/craft/craft_backend/capabilities/contracts.py"
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
     "capability:craft.bop.staging.change.apply": {
@@ -8593,6 +8595,7 @@
       "owner": "Simulation",
       "exclusion_reason": null,
       "source_paths": [
+        "plugins/device/device_backend/capabilities/provider.py",
         "plugins/simulation/simulation_backend/capabilities/capture_runs.py",
         "plugins/simulation/simulation_backend/capabilities/contracts.py",
         "plugins/simulation/simulation_backend/capabilities/provider.py"
@@ -8812,6 +8815,7 @@
       "owner": "Simulation",
       "exclusion_reason": null,
       "source_paths": [
+        "plugins/device/device_backend/capabilities/provider.py",
         "plugins/simulation/simulation_backend/capabilities/capture_runs.py",
         "plugins/simulation/simulation_backend/capabilities/contracts.py",
         "plugins/simulation/simulation_backend/capabilities/provider.py"
@@ -9341,6 +9345,7 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/device/device_backend/capabilities/contracts.py",
+        "plugins/device/device_backend/capabilities/provider.py",
         "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
@@ -9365,6 +9370,7 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/device/device_backend/capabilities/contracts.py",
+        "plugins/device/device_backend/capabilities/provider.py",
         "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
@@ -9414,6 +9420,7 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/device/device_backend/capabilities/contracts.py",
+        "plugins/device/device_backend/capabilities/provider.py",
         "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
@@ -9438,6 +9445,7 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/device/device_backend/capabilities/contracts.py",
+        "plugins/device/device_backend/capabilities/provider.py",
         "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
@@ -9462,6 +9470,7 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/device/device_backend/capabilities/contracts.py",
+        "plugins/device/device_backend/capabilities/provider.py",
         "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
@@ -13332,7 +13341,8 @@
       "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
-        "REST"
+        "REST",
+        "Web"
       ],
       "target_capability": null,
       "exposure": "Web/REST",
@@ -13346,6 +13356,7 @@
       "owner": "Agent",
       "exclusion_reason": "rest:GET:/api/flows/capability-manifest is a generated manifest or system seed maintenance endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
+        "dist/web/canvas/types/flow_type.js",
         "plugins/agent/agent_backend/routers/flows.py"
       ]
     },
@@ -13855,7 +13866,9 @@
       "function_id": "rest:GET:/api/knowledge_hub/favorites",
       "domain": "Knowledge",
       "stability": "deprecated",
-      "current_consumers": [],
+      "current_consumers": [
+        "Web"
+      ],
       "target_capability": "knowledge.personalization.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -13868,14 +13881,16 @@
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
-        "backend/routers/knowledge_hub.py"
+        "dist/web/knowledge_hub/knowledge_hub.js"
       ]
     },
     "rest:GET:/api/knowledge_hub/folders": {
       "function_id": "rest:GET:/api/knowledge_hub/folders",
       "domain": "Knowledge",
       "stability": "deprecated",
-      "current_consumers": [],
+      "current_consumers": [
+        "Web"
+      ],
       "target_capability": "knowledge.space.list",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -13888,7 +13903,51 @@
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
-        "backend/routers/knowledge_hub.py"
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "rest:GET:/api/knowledge_hub/folders?scope_type=personal": {
+      "function_id": "rest:GET:/api/knowledge_hub/folders?scope_type=personal",
+      "domain": "Knowledge",
+      "stability": "stable",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "rest:GET:/api/knowledge_hub/folders?scope_type=public": {
+      "function_id": "rest:GET:/api/knowledge_hub/folders?scope_type=public",
+      "domain": "Knowledge",
+      "stability": "stable",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
       ]
     },
     "rest:GET:/api/knowledge_hub/items": {
@@ -13951,11 +14010,79 @@
         "backend/routers/knowledge_hub.py"
       ]
     },
+    "rest:GET:/api/knowledge_hub/items?scope_type=personal": {
+      "function_id": "rest:GET:/api/knowledge_hub/items?scope_type=personal",
+      "domain": "Knowledge",
+      "stability": "stable",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "rest:GET:/api/knowledge_hub/items?scope_type=public": {
+      "function_id": "rest:GET:/api/knowledge_hub/items?scope_type=public",
+      "domain": "Knowledge",
+      "stability": "stable",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "rest:GET:/api/knowledge_hub/items?scope_type=public&show_hidden=true": {
+      "function_id": "rest:GET:/api/knowledge_hub/items?scope_type=public&show_hidden=true",
+      "domain": "Knowledge",
+      "stability": "stable",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
     "rest:GET:/api/knowledge_hub/recent": {
       "function_id": "rest:GET:/api/knowledge_hub/recent",
       "domain": "Knowledge",
       "stability": "deprecated",
-      "current_consumers": [],
+      "current_consumers": [
+        "Web"
+      ],
       "target_capability": "knowledge.personalization.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -13968,7 +14095,7 @@
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
-        "backend/routers/knowledge_hub.py"
+        "dist/web/knowledge_hub/knowledge_hub.js"
       ]
     },
     "rest:GET:/api/lists": {
@@ -14723,6 +14850,28 @@
         "plugins/agent/agent_backend/routers/skills_v2.py"
       ]
     },
+    "rest:GET:/api/skills?limit=50": {
+      "function_id": "rest:GET:/api/skills?limit=50",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
     "rest:GET:/api/std_op/operations": {
       "function_id": "rest:GET:/api/std_op/operations",
       "domain": "Craft",
@@ -15344,7 +15493,8 @@
       "domain": "Project Management",
       "stability": "deprecated",
       "current_consumers": [
-        "REST"
+        "REST",
+        "Web"
       ],
       "target_capability": "project.workbench.read",
       "exposure": "Web/REST",
@@ -15358,7 +15508,8 @@
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
-        "backend/routers/workbench_home.py"
+        "backend/routers/workbench_home.py",
+        "dist/web/workbench/workbench.js"
       ]
     },
     "rest:GET:/api/workbench/panel1": {
@@ -20704,7 +20855,9 @@
       "function_id": "rest:POST:/api/knowledge_hub/items",
       "domain": "Knowledge",
       "stability": "deprecated",
-      "current_consumers": [],
+      "current_consumers": [
+        "Web"
+      ],
       "target_capability": "knowledge.document.create",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -20717,7 +20870,8 @@
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
-        "backend/routers/knowledge_hub.py"
+        "dist/web/knowledge_hub/knowledge_hub.js",
+        "dist/web/workbench/workbench.js"
       ]
     },
     "rest:POST:/api/knowledge_hub/items/{gid}/favorite": {
@@ -20765,7 +20919,8 @@
       "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
-        "REST"
+        "REST",
+        "Web"
       ],
       "target_capability": "project.list.change.apply",
       "exposure": "Web/REST",
@@ -20779,6 +20934,7 @@
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
+        "dist/web/workbench/workbench.js",
         "plugins/craft/craft_backend/routers/lists.py"
       ]
     },
@@ -22934,8 +23090,8 @@
         "dist/web/assets/lib/occt/occt-import-js.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/canvas/types/flow_type.js:768": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/canvas/types/flow_type.js:768",
+    "web_gap:dynamic_fetch:dist/web/canvas/types/flow_type.js:162": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/canvas/types/flow_type.js:162",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -22956,8 +23112,8 @@
         "dist/web/canvas/types/flow_type.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:109": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:109",
+    "web_gap:dynamic_fetch:dist/web/canvas/types/flow_type.js:836": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/canvas/types/flow_type.js:836",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -22975,11 +23131,11 @@
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
-        "dist/web/components/bitable_sync_manager.js"
+        "dist/web/canvas/types/flow_type.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:163": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:163",
+    "web_gap:dynamic_fetch:dist/web/components/attachments_widget.js:162": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/attachments_widget.js:162",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -22997,11 +23153,11 @@
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
-        "dist/web/components/bitable_sync_manager.js"
+        "dist/web/components/attachments_widget.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:246": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:246",
+    "web_gap:dynamic_fetch:dist/web/components/attachments_widget.js:171": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/attachments_widget.js:171",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23019,117 +23175,7 @@
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
-        "dist/web/components/bitable_sync_manager.js"
-      ]
-    },
-    "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:262": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:262",
-      "domain": "Base Platform",
-      "stability": "experimental",
-      "current_consumers": [
-        "Web"
-      ],
-      "target_capability": null,
-      "exposure": "Web/REST",
-      "automation_level": "interactive",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "dist/web/components/bitable_sync_manager.js"
-      ]
-    },
-    "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:271": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:271",
-      "domain": "Base Platform",
-      "stability": "experimental",
-      "current_consumers": [
-        "Web"
-      ],
-      "target_capability": null,
-      "exposure": "Web/REST",
-      "automation_level": "interactive",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "dist/web/components/bitable_sync_manager.js"
-      ]
-    },
-    "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:50": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:50",
-      "domain": "Base Platform",
-      "stability": "experimental",
-      "current_consumers": [
-        "Web"
-      ],
-      "target_capability": null,
-      "exposure": "Web/REST",
-      "automation_level": "interactive",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "dist/web/components/bitable_sync_manager.js"
-      ]
-    },
-    "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:79": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:79",
-      "domain": "Base Platform",
-      "stability": "experimental",
-      "current_consumers": [
-        "Web"
-      ],
-      "target_capability": null,
-      "exposure": "Web/REST",
-      "automation_level": "interactive",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "dist/web/components/bitable_sync_manager.js"
-      ]
-    },
-    "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:94": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:94",
-      "domain": "Base Platform",
-      "stability": "experimental",
-      "current_consumers": [
-        "Web"
-      ],
-      "target_capability": null,
-      "exposure": "Web/REST",
-      "automation_level": "interactive",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "dist/web/components/bitable_sync_manager.js"
+        "dist/web/components/attachments_widget.js"
       ]
     },
     "web_gap:dynamic_fetch:dist/web/components/feishu_mention_chip.js:18": {
@@ -23154,8 +23200,8 @@
         "dist/web/components/feishu_mention_chip.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/components/import_export.js:976": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/components/import_export.js:976",
+    "web_gap:dynamic_fetch:dist/web/components/import_export.js:975": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/import_export.js:975",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23176,8 +23222,8 @@
         "dist/web/components/import_export.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1151": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1151",
+    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1065": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1065",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23198,8 +23244,8 @@
         "dist/web/components/list_shell.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1165": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1165",
+    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1166": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1166",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23220,8 +23266,316 @@
         "dist/web/components/list_shell.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1228": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1228",
+    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1195": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1195",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/list_shell.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1209": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1209",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/list_shell.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1272": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1272",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/list_shell.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:565": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:565",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/list_shell.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:566": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:566",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/list_shell.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:568": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:568",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/list_shell.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:573": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:573",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/list_shell.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:574": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:574",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/list_shell.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:576": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:576",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/list_shell.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:654": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:654",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/list_shell.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:655": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:655",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/list_shell.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:656": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:656",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/list_shell.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:657": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:657",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/list_shell.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:676": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:676",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/list_shell.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/list_shell.js:725": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:725",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23308,8 +23662,228 @@
         "dist/web/components/overlay_edit_modal.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/container_card/modes/container_item_detail.js:91": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/container_item_detail.js:91",
+    "web_gap:dynamic_fetch:dist/web/components/scope_badge.js:124": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/scope_badge.js:124",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/scope_badge.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/scope_badge.js:221": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/scope_badge.js:221",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/scope_badge.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/scope_badge.js:232": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/scope_badge.js:232",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/scope_badge.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/scope_badge.js:272": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/scope_badge.js:272",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/scope_badge.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/sidebar_detail_panel.js:611": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/sidebar_detail_panel.js:611",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/sidebar_detail_panel.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/sidebar_detail_panel.js:653": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/sidebar_detail_panel.js:653",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/sidebar_detail_panel.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/subscribe_button.js:113": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/subscribe_button.js:113",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/subscribe_button.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/subscribe_button.js:120": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/subscribe_button.js:120",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/subscribe_button.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/subscribe_button.js:142": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/subscribe_button.js:142",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/subscribe_button.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/components/visibility_selector.js:52": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/components/visibility_selector.js:52",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/components/visibility_selector.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/container_card/modes/container_item_detail.js:92": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/container_item_detail.js:92",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23328,6 +23902,160 @@
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/container_card/modes/container_item_detail.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_field_detail.js:65": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_field_detail.js:65",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/container_card/modes/mode_field_detail.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_field_detail.js:66": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_field_detail.js:66",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/container_card/modes/mode_field_detail.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_field_detail.js:68": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_field_detail.js:68",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/container_card/modes/mode_field_detail.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_field_detail.js:77": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_field_detail.js:77",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/container_card/modes/mode_field_detail.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_field_detail.js:78": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_field_detail.js:78",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/container_card/modes/mode_field_detail.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_image_gallery.js:29": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_image_gallery.js:29",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/container_card/modes/mode_image_gallery.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_image_gallery.js:45": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_image_gallery.js:45",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/container_card/modes/mode_image_gallery.js"
       ]
     },
     "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_markdown.js:62": {
@@ -23372,6 +24100,50 @@
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/container_card/modes/mode_markdown.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_richtext.js:66": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_richtext.js:66",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/container_card/modes/mode_richtext.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_richtext.js:75": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_richtext.js:75",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/container_card/modes/mode_richtext.js"
       ]
     },
     "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_spreadsheet.js:115": {
@@ -23440,6 +24212,72 @@
         "dist/web/container_card/modes/mode_spreadsheet.js"
       ]
     },
+    "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_text_image.js:26": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_text_image.js:26",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/container_card/modes/mode_text_image.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_text_image.js:27": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_text_image.js:27",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/container_card/modes/mode_text_image.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_text_image.js:29": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_text_image.js:29",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/container_card/modes/mode_text_image.js"
+      ]
+    },
     "web_gap:dynamic_fetch:dist/web/core/auth_state.js:104": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/auth_state.js:104",
       "domain": "Base Platform",
@@ -23462,8 +24300,30 @@
         "dist/web/core/auth_state.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:117": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:117",
+    "web_gap:dynamic_fetch:dist/web/core/existing_capability_client.js:315": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/existing_capability_client.js:315",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/core/existing_capability_client.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:118": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:118",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23484,8 +24344,30 @@
         "dist/web/core/global_search.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:118": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:118",
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:119": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:119",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/core/global_search.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:137": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:137",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23528,8 +24410,8 @@
         "dist/web/core/global_search.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:139": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:139",
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:158": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:158",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23550,8 +24432,8 @@
         "dist/web/core/global_search.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:177": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:177",
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:159": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:159",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23572,8 +24454,8 @@
         "dist/web/core/global_search.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:180": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:180",
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:197": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:197",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23594,8 +24476,8 @@
         "dist/web/core/global_search.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:183": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:183",
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:200": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:200",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23616,8 +24498,8 @@
         "dist/web/core/global_search.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:191": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:191",
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:203": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:203",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23638,8 +24520,8 @@
         "dist/web/core/global_search.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:198": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:198",
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:224": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:224",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23660,8 +24542,8 @@
         "dist/web/core/global_search.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:205": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:205",
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:227": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:227",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23682,8 +24564,8 @@
         "dist/web/core/global_search.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:208": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:208",
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:234": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:234",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23704,8 +24586,8 @@
         "dist/web/core/global_search.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:215": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:215",
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:237": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:237",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23726,8 +24608,8 @@
         "dist/web/core/global_search.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:218": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:218",
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:245": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:245",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23748,8 +24630,8 @@
         "dist/web/core/global_search.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:226": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:226",
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:248": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:248",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23770,8 +24652,8 @@
         "dist/web/core/global_search.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:229": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:229",
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:33": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:33",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23792,8 +24674,8 @@
         "dist/web/core/global_search.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:60": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:60",
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:34": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:34",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23814,8 +24696,8 @@
         "dist/web/core/global_search.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:61": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:61",
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:38": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:38",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23836,8 +24718,8 @@
         "dist/web/core/global_search.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:62": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:62",
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:79": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:79",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23858,8 +24740,8 @@
         "dist/web/core/global_search.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:88": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:88",
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:80": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:80",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23880,30 +24762,8 @@
         "dist/web/core/global_search.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:98": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:98",
-      "domain": "Base Platform",
-      "stability": "experimental",
-      "current_consumers": [
-        "Web"
-      ],
-      "target_capability": null,
-      "exposure": "Web/REST",
-      "automation_level": "interactive",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "dist/web/core/global_search.js"
-      ]
-    },
-    "web_gap:dynamic_fetch:dist/web/core/global_search.js:99": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:99",
+    "web_gap:dynamic_fetch:dist/web/core/global_search.js:81": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:81",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -23990,8 +24850,8 @@
         "dist/web/core/notification_manager.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:167": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:167",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:163": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:163",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -24012,8 +24872,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:197": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:197",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:171": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:171",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -24034,8 +24894,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:236": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:236",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:201": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:201",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -24056,8 +24916,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:278": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:278",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:240": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:240",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -24078,52 +24938,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:286": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:286",
-      "domain": "Base Platform",
-      "stability": "experimental",
-      "current_consumers": [
-        "Web"
-      ],
-      "target_capability": null,
-      "exposure": "Web/REST",
-      "automation_level": "interactive",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "dist/web/core/web_compat.js"
-      ]
-    },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:296": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:296",
-      "domain": "Base Platform",
-      "stability": "experimental",
-      "current_consumers": [
-        "Web"
-      ],
-      "target_capability": null,
-      "exposure": "Web/REST",
-      "automation_level": "interactive",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "dist/web/core/web_compat.js"
-      ]
-    },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:306": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:306",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:318": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:318",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -24166,8 +24982,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:361": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:361",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:373": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:373",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -24188,8 +25004,668 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/main.js:1063": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1063",
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1005": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1005",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1040": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1040",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1130": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1130",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1153": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1153",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1175": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1175",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1206": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1206",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1245": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1245",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1275": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1275",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1418": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1418",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1436": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:1436",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:180": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:180",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:361": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:361",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:44": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:44",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:49": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:49",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:52": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:52",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:544": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:544",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:56": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:56",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:59": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:59",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:61": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:61",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:63": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:63",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:65": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:65",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:67": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:67",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:70": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:70",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:729": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:729",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:73": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:73",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:765": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:765",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:795": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:795",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:819": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:819",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:839": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:839",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:858": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/knowledge_hub/knowledge_hub.js:858",
+      "domain": "Knowledge",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/knowledge_hub/knowledge_hub.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/main.js:1068": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1068",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -24210,8 +25686,8 @@
         "dist/web/main.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/main.js:1093": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1093",
+    "web_gap:dynamic_fetch:dist/web/main.js:1098": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1098",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -24232,8 +25708,8 @@
         "dist/web/main.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/main.js:1203": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1203",
+    "web_gap:dynamic_fetch:dist/web/main.js:1209": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1209",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -24254,8 +25730,8 @@
         "dist/web/main.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/main.js:1477": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1477",
+    "web_gap:dynamic_fetch:dist/web/main.js:1484": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1484",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -24276,8 +25752,8 @@
         "dist/web/main.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/main.js:1487": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1487",
+    "web_gap:dynamic_fetch:dist/web/main.js:657": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:657",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -24298,8 +25774,8 @@
         "dist/web/main.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/main.js:1520": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1520",
+    "web_gap:dynamic_fetch:dist/web/main.js:699": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:699",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -24320,8 +25796,8 @@
         "dist/web/main.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/main.js:655": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:655",
+    "web_gap:dynamic_fetch:dist/web/org_mgmt/org_mgmt.js:30": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/org_mgmt/org_mgmt.js:30",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -24339,29 +25815,7 @@
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
-        "dist/web/main.js"
-      ]
-    },
-    "web_gap:dynamic_fetch:dist/web/main.js:696": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/main.js:696",
-      "domain": "Base Platform",
-      "stability": "experimental",
-      "current_consumers": [
-        "Web"
-      ],
-      "target_capability": null,
-      "exposure": "Web/REST",
-      "automation_level": "interactive",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "dist/web/main.js"
+        "dist/web/org_mgmt/org_mgmt.js"
       ]
     },
     "web_gap:dynamic_fetch:dist/web/settings/plugin_center.js:128": {
@@ -24386,8 +25840,8 @@
         "dist/web/settings/plugin_center.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/settings/settings.js:1216": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/settings/settings.js:1216",
+    "web_gap:dynamic_fetch:dist/web/settings/settings.js:1317": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/settings/settings.js:1317",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -24430,8 +25884,448 @@
         "dist/web/team_space/team_space.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5630": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5630",
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:1005": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:1005",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:1187": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:1187",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:190": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:190",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:191": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:191",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:2736": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:2736",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:3221": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:3221",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:3380": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:3380",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:3386": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:3386",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:3688": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:3688",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:3696": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:3696",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:3771": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:3771",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:4442": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:4442",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:4618": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:4618",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:4986": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:4986",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5075": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5075",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5079": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5079",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5082": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5082",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5085": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5085",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5239": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5239",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5668": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5668",
+      "domain": "Base Platform",
+      "stability": "experimental",
+      "current_consumers": [
+        "Web"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ]
+    },
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:918": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:918",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [

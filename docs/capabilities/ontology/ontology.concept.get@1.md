@@ -8,7 +8,7 @@ Read a summary or schema view pinned to an immutable release.
 - 不适用：The caller only has an ambiguous term.
 - 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_38f8bdbb827c5ff822916b1242deb40a`
+- Catalog Release：`rel_277fca49891059b565473ae614a948cf`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -106,7 +106,7 @@ Read a summary or schema view pinned to an immutable release.
 ```json
 {
   "capability_id": "ontology.concept.get",
-  "catalog_release": "rel_38f8bdbb827c5ff822916b1242deb40a",
+  "catalog_release": "rel_277fca49891059b565473ae614a948cf",
   "major_version": 1,
   "payload": {
     "stable_gid": "example"

@@ -1,13 +1,13 @@
-# plugin.storage.list@1
+# agent.interaction.chat.change.apply@2
 
-List keys in the caller plugin namespace.
+Execute governed Agent chat and confirmation interactions with bounded event projection.
 
 ## 使用判断
 
-- 适用：List keys in the caller plugin namespace.
-- 不适用：Use the owning domain's governed Capability.
+- 适用：A governed Agent consumer sends a chat turn or confirms a pending tool interaction.
+- 不适用：The request only cancels an interaction or manages Agent sessions directly.
 - 生命周期：`stable`
-- 所属领域：`base`
+- 所属领域：`agent`
 - Catalog Release：`rel_277fca49891059b565473ae614a948cf`
 - Schema 精度：`typed`
 - 暂未开放原因：无
@@ -28,8 +28,8 @@ List keys in the caller plugin namespace.
 
 ## 授权与数据边界
 
-- 授权策略：`base.v2:authenticated`
-- 自动化等级：`A2`
+- 授权策略：`agent.v2:agent.interact`
+- 自动化等级：`A1`
 - 数据分类：`confidential`
 - Delegation：`scoped`
 - 认证新鲜度：0 秒
@@ -39,15 +39,15 @@ List keys in the caller plugin namespace.
 
 ## 执行与可靠性
 
-- 副作用：`read`
+- 副作用：`write`
 - 执行模式：`cloud_sync`
 - 超时：30 秒
 - 审批：`none`
-- 幂等：`none`
+- 幂等：`required`
 - 并发：`none`
 - 无预期版本信封要求。
-- 一致性：`strong`
-- Operation：`none`
+- 一致性：`eventual`
+- Operation：`optional`
 - Artifact：`none`
 - 审计：`standard`
 - Evidence：`optional`
@@ -70,13 +70,60 @@ List keys in the caller plugin namespace.
 {
   "additionalProperties": false,
   "properties": {
-    "limit": {
-      "type": "integer"
+    "ai00_token": {
+      "type": "string"
     },
-    "prefix": {
+    "body": {
+      "additionalProperties": false,
+      "properties": {
+        "auth_token": {
+          "type": "string"
+        },
+        "confirm_token": {
+          "type": "string"
+        },
+        "context_json": {
+          "maxLength": 65536,
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "session_gid": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "session_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tool_name": {
+          "type": "string"
+        },
+        "tool_use_id": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "operation": {
+      "enum": [
+        "chat_stream",
+        "chat_sync",
+        "confirm",
+        "confirm_sync"
+      ],
       "type": "string"
     }
   },
+  "required": [
+    "operation",
+    "body"
+  ],
   "type": "object"
 }
 ```
@@ -85,10 +132,13 @@ List keys in the caller plugin namespace.
 
 ```json
 {
-  "capability_id": "plugin.storage.list",
+  "capability_id": "agent.interaction.chat.change.apply",
   "catalog_release": "rel_277fca49891059b565473ae614a948cf",
-  "major_version": 1,
-  "payload": {}
+  "major_version": 2,
+  "payload": {
+    "body": {},
+    "operation": "chat_stream"
+  }
 }
 ```
 
@@ -100,36 +150,29 @@ List keys in the caller plugin namespace.
 {
   "additionalProperties": false,
   "properties": {
-    "items": {
-      "items": {
-        "additionalProperties": false,
-        "properties": {
-          "key": {
+    "data": {
+      "additionalProperties": false,
+      "properties": {
+        "events": {
+          "items": {
             "type": "string"
           },
-          "updated_at": {
-            "type": "string"
-          },
-          "version": {
-            "type": "integer"
-          }
+          "maxItems": 500,
+          "type": "array"
         },
-        "required": [
-          "key",
-          "version",
-          "updated_at"
-        ],
-        "type": "object"
+        "media_type": {
+          "type": "string"
+        },
+        "response_json": {
+          "maxLength": 1048576,
+          "type": "string"
+        }
       },
-      "type": "array"
-    },
-    "limit": {
-      "type": "integer"
+      "type": "object"
     }
   },
   "required": [
-    "items",
-    "limit"
+    "data"
   ],
   "type": "object"
 }
@@ -167,17 +210,20 @@ List keys in the caller plugin namespace.
 
 领域错误：
 
-- `resource_not_found`：The requested Base resource does not exist or is not visible.（retryable=false）
-- `permission_denied`：The caller lacks a required Base Platform permission.（retryable=false）
-- `approval_required`：The governed operation requires a valid approval.（retryable=false）
-- `authentication_stale`：The caller must authenticate again before this high-risk operation.（retryable=false）
-- `idempotency_conflict`：The idempotency key is bound to a different request.（retryable=false）
-- `version_conflict`：The resource version differs from the expected version.（retryable=false）
-- `provider_unavailable`：A required domain provider is not registered.（retryable=true）
-- `plugin_state_conflict`：The plugin installation cannot perform this lifecycle transition.（retryable=false）
+- `invalid_input`：The Agent request is invalid.（retryable=false）
+- `permission_denied`：The caller cannot access the Agent resource.（retryable=false）
+- `resource_not_found`：The Agent resource does not exist.（retryable=false）
+- `version_conflict`：The Agent resource changed concurrently.（retryable=false）
+- `catalog_release_unavailable`：The pinned Catalog release is unavailable.（retryable=true）
+- `delegation_expired`：The Agent delegation is missing or expired.（retryable=false）
+- `approval_required`：The delegated operation requires Base approval.（retryable=false）
+- `provider_unavailable`：The Agent canvas runtime adapter is unavailable.（retryable=true）
+- `runtime_timeout`：The bounded Agent canvas runtime timed out.（retryable=true）
+- `idempotency_conflict`：The Agent canvas invocation conflicts with an earlier request.（retryable=false）
+- `outcome_unknown`：The Agent canvas outcome must be reconciled.（retryable=true）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 
 ## 版本与迁移
 
-主版本固定为 `1`。同一稳定主版本不得破坏 Schema 或 Agent 投影；升级时并行声明新主版本，调用方显式迁移，不允许“latest”回退。
+主版本固定为 `2`。同一稳定主版本不得破坏 Schema 或 Agent 投影；升级时并行声明新主版本，调用方显式迁移，不允许“latest”回退。
