@@ -8625,6 +8625,54 @@
         "plugins/simulation/simulation_backend/capabilities/provider.py"
       ]
     },
+    "capability:simulation.document_snapshot.get": {
+      "function_id": "capability:simulation.document_snapshot.get",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.document_snapshot.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/document_snapshots.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:simulation.document_snapshot.request": {
+      "function_id": "capability:simulation.document_snapshot.request",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.document_snapshot.request",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/document_snapshots.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
     "capability:simulation.environment.archive": {
       "function_id": "capability:simulation.environment.archive",
       "domain": "Simulation",

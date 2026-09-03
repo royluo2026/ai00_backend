@@ -8,7 +8,7 @@ Read one immutable Connector environment manifest.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_277fca49891059b565473ae614a948cf`
+- Catalog Release：`rel_2a6666b7b028b0ac07b3f5dd1b2108a3`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -91,7 +91,7 @@ Read one immutable Connector environment manifest.
 ```json
 {
   "capability_id": "simulation.environment.manifest.get",
-  "catalog_release": "rel_277fca49891059b565473ae614a948cf",
+  "catalog_release": "rel_2a6666b7b028b0ac07b3f5dd1b2108a3",
   "major_version": 1,
   "payload": {
     "environment_id": "example",
@@ -572,6 +572,9 @@ Read one immutable Connector environment manifest.
 - `idempotency_conflict`：The idempotency key is bound to a different Simulation request.（retryable=false）
 - `execution_plan_unavailable`：The pinned Craft execution plan is unavailable.（retryable=true）
 - `active_document_unavailable`：The Connector has no readable active document.（retryable=true）
+- `active_document_snapshot_required`：A confirmed asynchronous active-document snapshot is required.（retryable=false）
+- `document_snapshot_not_found`：The document snapshot request is unavailable or not visible.（retryable=false）
+- `bom_snapshot_invalid`：The Connector returned an invalid active BOM snapshot.（retryable=false）
 - `bom_identity_mismatch`：The active BOM identity does not match the requested source.（retryable=false）
 - `bom_snapshot_limit_exceeded`：The active BOM exceeds the governed snapshot limit.（retryable=false）
 - `product_binding_not_found`：A process product reference has no active BOM node.（retryable=false）

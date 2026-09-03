@@ -8,7 +8,7 @@ Read the bounded aggregate lifecycle state for one BOP version.
 - 不适用：The request changes lifecycle state or refreshes lifecycle statistics.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_277fca49891059b565473ae614a948cf`
+- Catalog Release：`rel_2a6666b7b028b0ac07b3f5dd1b2108a3`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -86,7 +86,7 @@ Read the bounded aggregate lifecycle state for one BOP version.
 ```json
 {
   "capability_id": "craft.bop.lifecycle.state.read",
-  "catalog_release": "rel_277fca49891059b565473ae614a948cf",
+  "catalog_release": "rel_2a6666b7b028b0ac07b3f5dd1b2108a3",
   "major_version": 1,
   "payload": {
     "version_gid": "example"

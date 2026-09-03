@@ -509,6 +509,8 @@
     "simulation/simulation.capture_run.get@1.md",
     "simulation/simulation.capture_run.start@1.md",
     "simulation/simulation.capture_step.retry@1.md",
+    "simulation/simulation.document_snapshot.get@1.md",
+    "simulation/simulation.document_snapshot.request@1.md",
     "simulation/simulation.environment.archive@1.md",
     "simulation/simulation.environment.compose@1.md",
     "simulation/simulation.environment.create@1.md",

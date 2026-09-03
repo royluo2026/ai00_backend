@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_277fca49891059b565473ae614a948cf",
-  "catalog_hash": "sha256:277fca49891059b565473ae614a948cf23103b618b6f97c82c985547ea613daf",
+  "release_id": "rel_2a6666b7b028b0ac07b3f5dd1b2108a3",
+  "catalog_hash": "sha256:2a6666b7b028b0ac07b3f5dd1b2108a32d0aa2df1029c667bd3bd232ac01716b",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -6108,9 +6108,38 @@
       "description": "Execute governed Agent chat and confirmation interactions with bounded event projection.",
       "use_when": "A governed Agent consumer sends a chat turn or confirms a pending tool interaction.",
       "do_not_use_when": "The request only cancels an interaction or manages Agent sessions directly.",
-      "business_effect": "Execute governed Agent chat and confirmation interactions with bounded event projection.",
-      "business_acceptance_criteria": [],
-      "business_invariants": [],
+      "business_effect": "Authenticated internal users can continue or confirm their own Xiaorou conversations while downstream tool writes remain governed by their owning capabilities.",
+      "business_acceptance_criteria": [
+        "Each accepted request executes as the authenticated actor and never as a caller-supplied user identity.",
+        "A supplied chat session is used only when it belongs to the authenticated actor.",
+        "The caller receives a schema-valid bounded synchronous result or at most 500 serialized stream events."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "agent.interaction.chat.actor_bound",
+          "version": 1,
+          "statement": "Every chat or confirmation interaction executes as the authenticated Gateway actor.",
+          "applies_when": "an Agent chat or confirmation request is accepted",
+          "enforcement_ref": "plugins/agent/agent_backend/routers/ai_chat.py:_normalize_interaction_payload",
+          "error_code": "permission_denied",
+          "test_refs": [
+            "backend/tests/test_agent_interaction_chat_change_boundary.py::test_web_chat_pins_v2_and_normalizes_trusted_payload"
+          ],
+          "machine_constraints": null
+        },
+        {
+          "rule_id": "agent.interaction.chat.session_owned",
+          "version": 1,
+          "statement": "A supplied chat session can be continued or confirmed only by its authenticated owner.",
+          "applies_when": "the request supplies a session identifier",
+          "enforcement_ref": "plugins/agent/agent_backend/routers/ai_chat.py:_require_legacy_session_owner",
+          "error_code": "resource_not_found",
+          "test_refs": [
+            "backend/tests/test_agent_interaction_chat_change_boundary.py::test_agent_chat_rejects_a_foreign_session"
+          ],
+          "machine_constraints": null
+        }
+      ],
       "no_business_invariant_reason": null,
       "side_effect_level": "write",
       "side_effects": "Writes agent domain state through its Provider and records a capability audit event.",
@@ -6127,7 +6156,18 @@
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
       "authorization_policy": "agent.v2:agent.interact",
-      "resource_selectors": [],
+      "resource_selectors": [
+        {
+          "resource_type": "agent-session",
+          "payload_path": "body.session_id",
+          "required": false
+        },
+        {
+          "resource_type": "agent-session",
+          "payload_path": "body.session_gid",
+          "required": false
+        }
+      ],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
       "delegation_policy": "scoped",
@@ -6464,7 +6504,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:f7ea22c152900f1445c851a757cfc87edeb427e4dc0168e2e49d58a31fbea1a0"
+      "business_definition_hash": "sha256:bf22e434c40c3cdf9986c15254ff65e188b599860d4e0b811a55026a4919ce78"
     },
     {
       "id": "agent.interaction.request",
@@ -248725,6 +248765,24 @@
           "is_caller_error": false
         },
         {
+          "code": "active_document_snapshot_required",
+          "meaning": "A confirmed asynchronous active-document snapshot is required.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_snapshot_not_found",
+          "meaning": "The document snapshot request is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_invalid",
+          "meaning": "The Connector returned an invalid active BOM snapshot.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "bom_identity_mismatch",
           "meaning": "The active BOM identity does not match the requested source.",
           "retryable": false,
@@ -248918,6 +248976,24 @@
           "error_code": "active_document_unavailable",
           "message_template": "The Connector has no readable active document.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "active_document_snapshot_required",
+          "message_template": "A confirmed asynchronous active-document snapshot is required.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_snapshot_not_found",
+          "message_template": "The document snapshot request is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_invalid",
+          "message_template": "The Connector returned an invalid active BOM snapshot.",
+          "is_retryable": false,
           "is_caller_error": false
         },
         {
@@ -249590,6 +249666,24 @@
           "is_caller_error": false
         },
         {
+          "code": "active_document_snapshot_required",
+          "meaning": "A confirmed asynchronous active-document snapshot is required.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_snapshot_not_found",
+          "meaning": "The document snapshot request is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_invalid",
+          "meaning": "The Connector returned an invalid active BOM snapshot.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "bom_identity_mismatch",
           "meaning": "The active BOM identity does not match the requested source.",
           "retryable": false,
@@ -249783,6 +249877,24 @@
           "error_code": "active_document_unavailable",
           "message_template": "The Connector has no readable active document.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "active_document_snapshot_required",
+          "message_template": "A confirmed asynchronous active-document snapshot is required.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_snapshot_not_found",
+          "message_template": "The document snapshot request is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_invalid",
+          "message_template": "The Connector returned an invalid active BOM snapshot.",
+          "is_retryable": false,
           "is_caller_error": false
         },
         {
@@ -250482,6 +250594,24 @@
           "is_caller_error": false
         },
         {
+          "code": "active_document_snapshot_required",
+          "meaning": "A confirmed asynchronous active-document snapshot is required.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_snapshot_not_found",
+          "meaning": "The document snapshot request is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_invalid",
+          "meaning": "The Connector returned an invalid active BOM snapshot.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "bom_identity_mismatch",
           "meaning": "The active BOM identity does not match the requested source.",
           "retryable": false,
@@ -250675,6 +250805,24 @@
           "error_code": "active_document_unavailable",
           "message_template": "The Connector has no readable active document.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "active_document_snapshot_required",
+          "message_template": "A confirmed asynchronous active-document snapshot is required.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_snapshot_not_found",
+          "message_template": "The document snapshot request is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_invalid",
+          "message_template": "The Connector returned an invalid active BOM snapshot.",
+          "is_retryable": false,
           "is_caller_error": false
         },
         {
@@ -251088,6 +251236,24 @@
           "is_caller_error": false
         },
         {
+          "code": "active_document_snapshot_required",
+          "meaning": "A confirmed asynchronous active-document snapshot is required.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_snapshot_not_found",
+          "meaning": "The document snapshot request is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_invalid",
+          "meaning": "The Connector returned an invalid active BOM snapshot.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "bom_identity_mismatch",
           "meaning": "The active BOM identity does not match the requested source.",
           "retryable": false,
@@ -251284,6 +251450,24 @@
           "is_caller_error": false
         },
         {
+          "error_code": "active_document_snapshot_required",
+          "message_template": "A confirmed asynchronous active-document snapshot is required.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_snapshot_not_found",
+          "message_template": "The document snapshot request is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_invalid",
+          "message_template": "The Connector returned an invalid active BOM snapshot.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
           "error_code": "bom_identity_mismatch",
           "message_template": "The active BOM identity does not match the requested source.",
           "is_retryable": false,
@@ -251465,6 +251649,1669 @@
         }
       ],
       "business_definition_hash": "sha256:d2c90702765fd3ad7bf819e0877043c9ae37a105f106144bf2cccd7e5ae74c1d"
+    },
+    {
+      "id": "simulation.document_snapshot.get",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.document_snapshot.get",
+      "description": "Read authoritative progress and the confirmed active VisMockup BOM snapshot.",
+      "use_when": "Read authoritative progress and the confirmed active VisMockup BOM snapshot.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Return authoritative status and the immutable confirmed BOM snapshot for one caller-visible request.",
+      "business_acceptance_criteria": [
+        "The result is scoped to the caller-visible immutable environment or capture-run identity.",
+        "Inputs and outputs satisfy the closed published contract and retain exact source version pins.",
+        "Rejected or uncertain local outcomes return a governed error and durable reconciliation evidence."
+      ],
+      "business_invariants": [],
+      "no_business_invariant_reason": "This capability returns a bounded projection or compatibility diagnosis and does not decide or mutate domain state.",
+      "side_effect_level": "read",
+      "side_effects": "Reads simulation domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-document-snapshot",
+          "payload_path": "snapshot_request_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "snapshot_request_id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "snapshot_request_id"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "snapshot_request_id": {
+            "type": "string"
+          },
+          "device_id": {
+            "type": "string"
+          },
+          "plan_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "completed",
+              "failed",
+              "outcome_unknown"
+            ]
+          },
+          "snapshot": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "document_id": {
+                    "type": "string"
+                  },
+                  "root_node_key": {
+                    "type": "string"
+                  },
+                  "source_identity": {
+                    "type": "string"
+                  },
+                  "snapshot_hash": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$",
+                    "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                  },
+                  "nodes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "node_key": {
+                          "type": "string"
+                        },
+                        "parent_key": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "product_ref": {
+                          "type": "string"
+                        },
+                        "child_order": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "node_key",
+                        "parent_key",
+                        "product_ref",
+                        "child_order"
+                      ]
+                    },
+                    "maxItems": 10000
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "document_id",
+                  "root_node_key",
+                  "source_identity",
+                  "snapshot_hash",
+                  "nodes"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "failure_code": {
+            "type": "string"
+          },
+          "operation_ref": {
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "running",
+                  "completed",
+                  "failed",
+                  "cancelled",
+                  "outcome_unknown"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "snapshot_request_id",
+          "device_id",
+          "plan_id",
+          "status",
+          "snapshot",
+          "failure_code",
+          "operation_ref"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "snapshot_request_id": {
+            "type": "string"
+          },
+          "device_id": {
+            "type": "string"
+          },
+          "plan_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "completed",
+              "failed",
+              "outcome_unknown"
+            ]
+          },
+          "snapshot": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "document_id": {
+                    "type": "string"
+                  },
+                  "root_node_key": {
+                    "type": "string"
+                  },
+                  "source_identity": {
+                    "type": "string"
+                  },
+                  "snapshot_hash": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$",
+                    "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                  },
+                  "nodes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "node_key": {
+                          "type": "string"
+                        },
+                        "parent_key": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "product_ref": {
+                          "type": "string"
+                        },
+                        "child_order": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "node_key",
+                        "parent_key",
+                        "product_ref",
+                        "child_order"
+                      ]
+                    },
+                    "maxItems": 10000
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "document_id",
+                  "root_node_key",
+                  "source_identity",
+                  "snapshot_hash",
+                  "nodes"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "failure_code": {
+            "type": "string"
+          },
+          "operation_ref": {
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "running",
+                  "completed",
+                  "failed",
+                  "cancelled",
+                  "outcome_unknown"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "snapshot_request_id",
+          "device_id",
+          "plan_id",
+          "status",
+          "snapshot",
+          "failure_code",
+          "operation_ref"
+        ]
+      },
+      "schema_hash": "sha256:20d802c73f51b1b3cc15e9421cb447bc0aebb5fd99a57cacaca18312d930fb9d",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "execution_plan_unavailable",
+          "meaning": "The pinned Craft execution plan is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "active_document_unavailable",
+          "meaning": "The Connector has no readable active document.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "active_document_snapshot_required",
+          "meaning": "A confirmed asynchronous active-document snapshot is required.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_snapshot_not_found",
+          "meaning": "The document snapshot request is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_invalid",
+          "meaning": "The Connector returned an invalid active BOM snapshot.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_identity_mismatch",
+          "meaning": "The active BOM identity does not match the requested source.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_limit_exceeded",
+          "meaning": "The active BOM exceeds the governed snapshot limit.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "product_binding_not_found",
+          "meaning": "A process product reference has no active BOM node.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "product_binding_ambiguous",
+          "meaning": "A process product reference resolves to multiple BOM nodes.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_model_not_found",
+          "meaning": "A typed resource code has no model mapping.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_model_ambiguous",
+          "meaning": "A typed resource code has multiple active model mappings.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "environment_source_changed",
+          "meaning": "A pinned environment source changed before composition.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "connector_offline",
+          "meaning": "The bound Connector is offline or stale.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "connector_version_incompatible",
+          "meaning": "The Connector protocol or target product version is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "adapter_unavailable",
+          "meaning": "The required Connector Adapter is unavailable.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "adapter_contract_mismatch",
+          "meaning": "An Adapter operation contract hash does not match.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "interactive_session_missing",
+          "meaning": "The bound user's interactive SessionHost is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "interactive_session_conflict",
+          "meaning": "More than one fresh SessionHost claims the bound user.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bound_user_mismatch",
+          "meaning": "The Connector is bound to a different AI00 user.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "vismockup_unavailable",
+          "meaning": "VisMockup is unavailable to the bound SessionHost.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "vismockup_document_changed",
+          "meaning": "The active VisMockup document changed during execution.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "scene_verification_failed",
+          "meaning": "The actual VisMockup scene does not match the manifest.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "capture_failed",
+          "meaning": "VisMockup internal view capture failed.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "artifact_upload_unconfirmed",
+          "meaning": "A captured Artifact upload has not been reconciled.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "craft_screenshot_attach_failed",
+          "meaning": "Craft rejected or failed the screenshot association.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "local_execution_outcome_unknown",
+          "meaning": "The local side effect outcome requires reconciliation.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_e5dbbaa3266d6a396d73aeaf",
+      "error_schema": [
+        {
+          "error_code": "source_resolver_unavailable",
+          "message_template": "A required owning-domain resolver is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "source_version_mismatch",
+          "message_template": "A referenced source no longer matches its immutable hash or version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "parameter_set_not_found",
+          "message_template": "The immutable parameter set is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_profile_not_found",
+          "message_template": "The immutable Simulation profile is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "solver_not_allowed",
+          "message_template": "The requested solver coordinate is not in the governed allowlist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_environment_not_found",
+          "message_template": "The Simulation environment is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_run_not_found",
+          "message_template": "The Simulation run is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_result_not_ready",
+          "message_template": "The Simulation run has no completed result artifacts.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different Simulation request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "execution_plan_unavailable",
+          "message_template": "The pinned Craft execution plan is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "active_document_unavailable",
+          "message_template": "The Connector has no readable active document.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "active_document_snapshot_required",
+          "message_template": "A confirmed asynchronous active-document snapshot is required.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_snapshot_not_found",
+          "message_template": "The document snapshot request is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_invalid",
+          "message_template": "The Connector returned an invalid active BOM snapshot.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_identity_mismatch",
+          "message_template": "The active BOM identity does not match the requested source.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_limit_exceeded",
+          "message_template": "The active BOM exceeds the governed snapshot limit.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "product_binding_not_found",
+          "message_template": "A process product reference has no active BOM node.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "product_binding_ambiguous",
+          "message_template": "A process product reference resolves to multiple BOM nodes.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_model_not_found",
+          "message_template": "A typed resource code has no model mapping.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_model_ambiguous",
+          "message_template": "A typed resource code has multiple active model mappings.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "environment_source_changed",
+          "message_template": "A pinned environment source changed before composition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "connector_offline",
+          "message_template": "The bound Connector is offline or stale.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "connector_version_incompatible",
+          "message_template": "The Connector protocol or target product version is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "adapter_unavailable",
+          "message_template": "The required Connector Adapter is unavailable.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "adapter_contract_mismatch",
+          "message_template": "An Adapter operation contract hash does not match.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "interactive_session_missing",
+          "message_template": "The bound user's interactive SessionHost is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "interactive_session_conflict",
+          "message_template": "More than one fresh SessionHost claims the bound user.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bound_user_mismatch",
+          "message_template": "The Connector is bound to a different AI00 user.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "vismockup_unavailable",
+          "message_template": "VisMockup is unavailable to the bound SessionHost.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "vismockup_document_changed",
+          "message_template": "The active VisMockup document changed during execution.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "scene_verification_failed",
+          "message_template": "The actual VisMockup scene does not match the manifest.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capture_failed",
+          "message_template": "VisMockup internal view capture failed.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "artifact_upload_unconfirmed",
+          "message_template": "A captured Artifact upload has not been reconciled.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "craft_screenshot_attach_failed",
+          "message_template": "Craft rejected or failed the screenshot association.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "local_execution_outcome_unknown",
+          "message_template": "The local side effect outcome requires reconciliation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.document_snapshot.get:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.document_snapshot.get@1]",
+          "code_revision": "sha256:578d5843eb4b4bf06d74b3954220f41a6073171c414b0ad52f88dfda7436a802",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.document_snapshot.get@1]",
+          "code_revision": "sha256:578d5843eb4b4bf06d74b3954220f41a6073171c414b0ad52f88dfda7436a802",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.document_snapshot.get@1]",
+          "code_revision": "sha256:578d5843eb4b4bf06d74b3954220f41a6073171c414b0ad52f88dfda7436a802",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.document_snapshot.get@1]",
+          "code_revision": "sha256:578d5843eb4b4bf06d74b3954220f41a6073171c414b0ad52f88dfda7436a802",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.document_snapshot.get@1]",
+          "code_revision": "sha256:578d5843eb4b4bf06d74b3954220f41a6073171c414b0ad52f88dfda7436a802",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.document_snapshot.get@1]",
+          "code_revision": "sha256:578d5843eb4b4bf06d74b3954220f41a6073171c414b0ad52f88dfda7436a802",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.document_snapshot.get@1]",
+          "code_revision": "sha256:578d5843eb4b4bf06d74b3954220f41a6073171c414b0ad52f88dfda7436a802",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:5c3f5ddaff7a04030b6ecfd950587e8ec5626ecb8dfdeda072d56ffb2ab7c82e"
+    },
+    {
+      "id": "simulation.document_snapshot.request",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.document_snapshot.request",
+      "description": "Request an immutable snapshot of the bound user's active VisMockup BOM.",
+      "use_when": "Request an immutable snapshot of the bound user's active VisMockup BOM.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Queue one bounded immutable snapshot of the bound user's currently active VisMockup BOM for later environment composition.",
+      "business_acceptance_criteria": [
+        "The result is scoped to the caller-visible immutable environment or capture-run identity.",
+        "Inputs and outputs satisfy the closed published contract and retain exact source version pins.",
+        "Rejected or uncertain local outcomes return a governed error and durable reconciliation evidence."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "simulation.document_snapshot.confirmed_only",
+          "version": 1,
+          "statement": "A document snapshot becomes completed only from a validated Connector outcome containing a bounded tree with product references.",
+          "applies_when": "an active VisMockup document snapshot is requested",
+          "enforcement_ref": "plugins/simulation/simulation_backend/application/document_snapshots.py:DocumentSnapshotWorkflow.apply_connector_outcome",
+          "error_code": "bom_snapshot_invalid",
+          "test_refs": [
+            "backend/tests/test_simulation_document_snapshot_workflow.py::test_snapshot_request_is_idempotent_and_completes_only_from_connector_outcome"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_async",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "device",
+          "payload_path": "device_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "device_id": {
+            "type": "string"
+          },
+          "request_key": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "device_id",
+          "request_key"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "snapshot_request_id": {
+            "type": "string"
+          },
+          "device_id": {
+            "type": "string"
+          },
+          "plan_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "completed",
+              "failed",
+              "outcome_unknown"
+            ]
+          },
+          "snapshot": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "document_id": {
+                    "type": "string"
+                  },
+                  "root_node_key": {
+                    "type": "string"
+                  },
+                  "source_identity": {
+                    "type": "string"
+                  },
+                  "snapshot_hash": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$",
+                    "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                  },
+                  "nodes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "node_key": {
+                          "type": "string"
+                        },
+                        "parent_key": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "product_ref": {
+                          "type": "string"
+                        },
+                        "child_order": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "node_key",
+                        "parent_key",
+                        "product_ref",
+                        "child_order"
+                      ]
+                    },
+                    "maxItems": 10000
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "document_id",
+                  "root_node_key",
+                  "source_identity",
+                  "snapshot_hash",
+                  "nodes"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "failure_code": {
+            "type": "string"
+          },
+          "operation_ref": {
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "running",
+                  "completed",
+                  "failed",
+                  "cancelled",
+                  "outcome_unknown"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "snapshot_request_id",
+          "device_id",
+          "plan_id",
+          "status",
+          "snapshot",
+          "failure_code",
+          "operation_ref"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "snapshot_request_id": {
+            "type": "string"
+          },
+          "device_id": {
+            "type": "string"
+          },
+          "plan_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "completed",
+              "failed",
+              "outcome_unknown"
+            ]
+          },
+          "snapshot": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "document_id": {
+                    "type": "string"
+                  },
+                  "root_node_key": {
+                    "type": "string"
+                  },
+                  "source_identity": {
+                    "type": "string"
+                  },
+                  "snapshot_hash": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$",
+                    "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                  },
+                  "nodes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "node_key": {
+                          "type": "string"
+                        },
+                        "parent_key": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "product_ref": {
+                          "type": "string"
+                        },
+                        "child_order": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "node_key",
+                        "parent_key",
+                        "product_ref",
+                        "child_order"
+                      ]
+                    },
+                    "maxItems": 10000
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "document_id",
+                  "root_node_key",
+                  "source_identity",
+                  "snapshot_hash",
+                  "nodes"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "failure_code": {
+            "type": "string"
+          },
+          "operation_ref": {
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "running",
+                  "completed",
+                  "failed",
+                  "cancelled",
+                  "outcome_unknown"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "snapshot_request_id",
+          "device_id",
+          "plan_id",
+          "status",
+          "snapshot",
+          "failure_code",
+          "operation_ref"
+        ]
+      },
+      "schema_hash": "sha256:6b2a2648b32b52390cb7bd8388ed59c41b562c8522099cd907267d2ad132a3a5",
+      "artifact_policy": "none",
+      "operation_policy": "required",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "execution_plan_unavailable",
+          "meaning": "The pinned Craft execution plan is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "active_document_unavailable",
+          "meaning": "The Connector has no readable active document.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "active_document_snapshot_required",
+          "meaning": "A confirmed asynchronous active-document snapshot is required.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_snapshot_not_found",
+          "meaning": "The document snapshot request is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_invalid",
+          "meaning": "The Connector returned an invalid active BOM snapshot.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_identity_mismatch",
+          "meaning": "The active BOM identity does not match the requested source.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_limit_exceeded",
+          "meaning": "The active BOM exceeds the governed snapshot limit.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "product_binding_not_found",
+          "meaning": "A process product reference has no active BOM node.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "product_binding_ambiguous",
+          "meaning": "A process product reference resolves to multiple BOM nodes.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_model_not_found",
+          "meaning": "A typed resource code has no model mapping.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_model_ambiguous",
+          "meaning": "A typed resource code has multiple active model mappings.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "environment_source_changed",
+          "meaning": "A pinned environment source changed before composition.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "connector_offline",
+          "meaning": "The bound Connector is offline or stale.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "connector_version_incompatible",
+          "meaning": "The Connector protocol or target product version is incompatible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "adapter_unavailable",
+          "meaning": "The required Connector Adapter is unavailable.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "adapter_contract_mismatch",
+          "meaning": "An Adapter operation contract hash does not match.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "interactive_session_missing",
+          "meaning": "The bound user's interactive SessionHost is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "interactive_session_conflict",
+          "meaning": "More than one fresh SessionHost claims the bound user.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bound_user_mismatch",
+          "meaning": "The Connector is bound to a different AI00 user.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "vismockup_unavailable",
+          "meaning": "VisMockup is unavailable to the bound SessionHost.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "vismockup_document_changed",
+          "meaning": "The active VisMockup document changed during execution.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "scene_verification_failed",
+          "meaning": "The actual VisMockup scene does not match the manifest.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "capture_failed",
+          "meaning": "VisMockup internal view capture failed.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "artifact_upload_unconfirmed",
+          "meaning": "A captured Artifact upload has not been reconciled.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "craft_screenshot_attach_failed",
+          "meaning": "Craft rejected or failed the screenshot association.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "local_execution_outcome_unknown",
+          "meaning": "The local side effect outcome requires reconciliation.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_fed7bec1b267b79371bd918d",
+      "error_schema": [
+        {
+          "error_code": "source_resolver_unavailable",
+          "message_template": "A required owning-domain resolver is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "source_version_mismatch",
+          "message_template": "A referenced source no longer matches its immutable hash or version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "parameter_set_not_found",
+          "message_template": "The immutable parameter set is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_profile_not_found",
+          "message_template": "The immutable Simulation profile is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "solver_not_allowed",
+          "message_template": "The requested solver coordinate is not in the governed allowlist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_environment_not_found",
+          "message_template": "The Simulation environment is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_run_not_found",
+          "message_template": "The Simulation run is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_result_not_ready",
+          "message_template": "The Simulation run has no completed result artifacts.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different Simulation request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "execution_plan_unavailable",
+          "message_template": "The pinned Craft execution plan is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "active_document_unavailable",
+          "message_template": "The Connector has no readable active document.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "active_document_snapshot_required",
+          "message_template": "A confirmed asynchronous active-document snapshot is required.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_snapshot_not_found",
+          "message_template": "The document snapshot request is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_invalid",
+          "message_template": "The Connector returned an invalid active BOM snapshot.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_identity_mismatch",
+          "message_template": "The active BOM identity does not match the requested source.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_limit_exceeded",
+          "message_template": "The active BOM exceeds the governed snapshot limit.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "product_binding_not_found",
+          "message_template": "A process product reference has no active BOM node.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "product_binding_ambiguous",
+          "message_template": "A process product reference resolves to multiple BOM nodes.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_model_not_found",
+          "message_template": "A typed resource code has no model mapping.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_model_ambiguous",
+          "message_template": "A typed resource code has multiple active model mappings.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "environment_source_changed",
+          "message_template": "A pinned environment source changed before composition.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "connector_offline",
+          "message_template": "The bound Connector is offline or stale.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "connector_version_incompatible",
+          "message_template": "The Connector protocol or target product version is incompatible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "adapter_unavailable",
+          "message_template": "The required Connector Adapter is unavailable.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "adapter_contract_mismatch",
+          "message_template": "An Adapter operation contract hash does not match.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "interactive_session_missing",
+          "message_template": "The bound user's interactive SessionHost is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "interactive_session_conflict",
+          "message_template": "More than one fresh SessionHost claims the bound user.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bound_user_mismatch",
+          "message_template": "The Connector is bound to a different AI00 user.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "vismockup_unavailable",
+          "message_template": "VisMockup is unavailable to the bound SessionHost.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "vismockup_document_changed",
+          "message_template": "The active VisMockup document changed during execution.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "scene_verification_failed",
+          "message_template": "The actual VisMockup scene does not match the manifest.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "capture_failed",
+          "message_template": "VisMockup internal view capture failed.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "artifact_upload_unconfirmed",
+          "message_template": "A captured Artifact upload has not been reconciled.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "craft_screenshot_attach_failed",
+          "message_template": "Craft rejected or failed the screenshot association.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "local_execution_outcome_unknown",
+          "message_template": "The local side effect outcome requires reconciliation.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.document_snapshot.request:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.document_snapshot.request@1]",
+          "code_revision": "sha256:578d5843eb4b4bf06d74b3954220f41a6073171c414b0ad52f88dfda7436a802",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.document_snapshot.request@1]",
+          "code_revision": "sha256:578d5843eb4b4bf06d74b3954220f41a6073171c414b0ad52f88dfda7436a802",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.document_snapshot.request@1]",
+          "code_revision": "sha256:578d5843eb4b4bf06d74b3954220f41a6073171c414b0ad52f88dfda7436a802",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.document_snapshot.request@1]",
+          "code_revision": "sha256:578d5843eb4b4bf06d74b3954220f41a6073171c414b0ad52f88dfda7436a802",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.document_snapshot.request@1]",
+          "code_revision": "sha256:578d5843eb4b4bf06d74b3954220f41a6073171c414b0ad52f88dfda7436a802",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.document_snapshot.request@1]",
+          "code_revision": "sha256:578d5843eb4b4bf06d74b3954220f41a6073171c414b0ad52f88dfda7436a802",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.document_snapshot.request@1]",
+          "code_revision": "sha256:578d5843eb4b4bf06d74b3954220f41a6073171c414b0ad52f88dfda7436a802",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:ed3424d7fba01ed8c2a2b572e42e2917b7d2bd3f1efe30c1b519b125fd12efae"
     },
     {
       "id": "simulation.environment.archive",
@@ -252260,6 +254107,9 @@
               "content_hash"
             ]
           },
+          "snapshot_request_id": {
+            "type": "string"
+          },
           "capture_profile": {
             "type": "object",
             "properties": {
@@ -252302,6 +254152,7 @@
           "name",
           "device_id",
           "execution_plan_ref",
+          "snapshot_request_id",
           "capture_profile"
         ]
       },
@@ -253229,7 +255080,7 @@
           "problems"
         ]
       },
-      "schema_hash": "sha256:fad3d7b267e07a8eec2b08f9972b69be69c1c881cc837d647e933802cb73e173",
+      "schema_hash": "sha256:a9dd653ce5bd00029d8d98866adce82bbbe634aff86dca2bce89ee4a91afe1f6",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -253318,6 +255169,24 @@
           "code": "active_document_unavailable",
           "meaning": "The Connector has no readable active document.",
           "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "active_document_snapshot_required",
+          "meaning": "A confirmed asynchronous active-document snapshot is required.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_snapshot_not_found",
+          "meaning": "The document snapshot request is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_invalid",
+          "meaning": "The Connector returned an invalid active BOM snapshot.",
+          "retryable": false,
           "is_caller_error": false
         },
         {
@@ -253517,6 +255386,24 @@
           "is_caller_error": false
         },
         {
+          "error_code": "active_document_snapshot_required",
+          "message_template": "A confirmed asynchronous active-document snapshot is required.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_snapshot_not_found",
+          "message_template": "The document snapshot request is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_invalid",
+          "message_template": "The Connector returned an invalid active BOM snapshot.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
           "error_code": "bom_identity_mismatch",
           "message_template": "The active BOM identity does not match the requested source.",
           "is_retryable": false,
@@ -253697,7 +255584,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:0800e9f482d0a4290c6c9e2907bb785dea210a946275d713444c5c31dd71fe70"
+      "business_definition_hash": "sha256:d3dad70de632bad78251cc80270e7a1aa21e42f39eb20194be2475d1752438af"
     },
     {
       "id": "simulation.environment.create",
@@ -255447,6 +257334,24 @@
           "is_caller_error": false
         },
         {
+          "code": "active_document_snapshot_required",
+          "meaning": "A confirmed asynchronous active-document snapshot is required.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_snapshot_not_found",
+          "meaning": "The document snapshot request is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_invalid",
+          "meaning": "The Connector returned an invalid active BOM snapshot.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "bom_identity_mismatch",
           "meaning": "The active BOM identity does not match the requested source.",
           "retryable": false,
@@ -255640,6 +257545,24 @@
           "error_code": "active_document_unavailable",
           "message_template": "The Connector has no readable active document.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "active_document_snapshot_required",
+          "message_template": "A confirmed asynchronous active-document snapshot is required.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_snapshot_not_found",
+          "message_template": "The document snapshot request is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_invalid",
+          "message_template": "The Connector returned an invalid active BOM snapshot.",
+          "is_retryable": false,
           "is_caller_error": false
         },
         {
@@ -256821,6 +258744,24 @@
           "is_caller_error": false
         },
         {
+          "code": "active_document_snapshot_required",
+          "meaning": "A confirmed asynchronous active-document snapshot is required.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_snapshot_not_found",
+          "meaning": "The document snapshot request is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_invalid",
+          "meaning": "The Connector returned an invalid active BOM snapshot.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "bom_identity_mismatch",
           "meaning": "The active BOM identity does not match the requested source.",
           "retryable": false,
@@ -257014,6 +258955,24 @@
           "error_code": "active_document_unavailable",
           "message_template": "The Connector has no readable active document.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "active_document_snapshot_required",
+          "message_template": "A confirmed asynchronous active-document snapshot is required.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_snapshot_not_found",
+          "message_template": "The document snapshot request is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_invalid",
+          "message_template": "The Connector returned an invalid active BOM snapshot.",
+          "is_retryable": false,
           "is_caller_error": false
         },
         {
@@ -258219,6 +260178,24 @@
           "is_caller_error": false
         },
         {
+          "code": "active_document_snapshot_required",
+          "meaning": "A confirmed asynchronous active-document snapshot is required.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_snapshot_not_found",
+          "meaning": "The document snapshot request is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_invalid",
+          "meaning": "The Connector returned an invalid active BOM snapshot.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "bom_identity_mismatch",
           "meaning": "The active BOM identity does not match the requested source.",
           "retryable": false,
@@ -258412,6 +260389,24 @@
           "error_code": "active_document_unavailable",
           "message_template": "The Connector has no readable active document.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "active_document_snapshot_required",
+          "message_template": "A confirmed asynchronous active-document snapshot is required.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_snapshot_not_found",
+          "message_template": "The document snapshot request is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_invalid",
+          "message_template": "The Connector returned an invalid active BOM snapshot.",
+          "is_retryable": false,
           "is_caller_error": false
         },
         {
@@ -258915,6 +260910,24 @@
           "is_caller_error": false
         },
         {
+          "code": "active_document_snapshot_required",
+          "meaning": "A confirmed asynchronous active-document snapshot is required.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_snapshot_not_found",
+          "meaning": "The document snapshot request is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_invalid",
+          "meaning": "The Connector returned an invalid active BOM snapshot.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "bom_identity_mismatch",
           "meaning": "The active BOM identity does not match the requested source.",
           "retryable": false,
@@ -259108,6 +261121,24 @@
           "error_code": "active_document_unavailable",
           "message_template": "The Connector has no readable active document.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "active_document_snapshot_required",
+          "message_template": "A confirmed asynchronous active-document snapshot is required.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_snapshot_not_found",
+          "message_template": "The document snapshot request is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_invalid",
+          "message_template": "The Connector returned an invalid active BOM snapshot.",
+          "is_retryable": false,
           "is_caller_error": false
         },
         {
@@ -259540,6 +261571,24 @@
           "is_caller_error": false
         },
         {
+          "code": "active_document_snapshot_required",
+          "meaning": "A confirmed asynchronous active-document snapshot is required.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_snapshot_not_found",
+          "meaning": "The document snapshot request is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "bom_snapshot_invalid",
+          "meaning": "The Connector returned an invalid active BOM snapshot.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
           "code": "bom_identity_mismatch",
           "meaning": "The active BOM identity does not match the requested source.",
           "retryable": false,
@@ -259733,6 +261782,24 @@
           "error_code": "active_document_unavailable",
           "message_template": "The Connector has no readable active document.",
           "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "active_document_snapshot_required",
+          "message_template": "A confirmed asynchronous active-document snapshot is required.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_snapshot_not_found",
+          "message_template": "The document snapshot request is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "bom_snapshot_invalid",
+          "message_template": "The Connector returned an invalid active BOM snapshot.",
+          "is_retryable": false,
           "is_caller_error": false
         },
         {
@@ -268961,7 +271028,7 @@
       "plugin_id": "official.agent",
       "module": "agent_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:6f3fa638c9b6bd48cad65df5f04718adb6e33ea071c749a881cf45087868de21"
+      "artifact_hash": "sha256:f991ad3f90d9a9d6e1deb5e83970f15e05b5db3bb4d435f833e24013d6ae4215"
     },
     {
       "plugin_id": "official.base",
@@ -269021,8 +271088,8 @@
       "plugin_id": "official.simulation",
       "module": "simulation_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:83d5df4e03e85f660cb66edfb084c8565a684e3e89ba9af92480f3df95e3dd7b"
+      "artifact_hash": "sha256:1bdcc1ccbdc2f0d6942f2ac87bdb1310a88627984d4e646941a9f912415cf349"
     }
   ],
-  "created_at": "2026-09-03T07:30:23.971187Z"
+  "created_at": "2026-09-03T07:44:17.939636Z"
 }

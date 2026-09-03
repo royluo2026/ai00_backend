@@ -8,7 +8,7 @@ Execute the governed integration.field_mapping.batch.update Integration outcome.
 - 不适用：The caller can use an owning domain Capability directly without external integration.
 - 生命周期：`stable`
 - 所属领域：`integration`
-- Catalog Release：`rel_277fca49891059b565473ae614a948cf`
+- Catalog Release：`rel_2a6666b7b028b0ac07b3f5dd1b2108a3`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -126,7 +126,7 @@ Execute the governed integration.field_mapping.batch.update Integration outcome.
 ```json
 {
   "capability_id": "integration.field_mapping.batch.update",
-  "catalog_release": "rel_277fca49891059b565473ae614a948cf",
+  "catalog_release": "rel_2a6666b7b028b0ac07b3f5dd1b2108a3",
   "major_version": 1,
   "payload": {
     "expected_revision": 1,
