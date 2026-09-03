@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
-namespace Ai00.LocalRuntime.Service;
+namespace Ai00.Connector.Service;
 
 public enum UpdateState { Idle, Downloading, Verifying, Draining, Switching, HealthChecking, Completed, RolledBack }
 public sealed record UpdateManifest(string Version, string Channel, string Url, string Sha256, string Signature);

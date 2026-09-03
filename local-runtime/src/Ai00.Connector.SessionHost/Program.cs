@@ -1,4 +1,5 @@
-using Ai00.LocalRuntime.SessionHost;
+using Ai00.Connector.Adapters.VisMockup;
+using Ai00.Connector.SessionHost;
 
 var options = SessionHostOptions.FromEnvironment();
 using var sta = new StaDispatcher();

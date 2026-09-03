@@ -1,9 +1,9 @@
 using System.IO.Pipes;
 using System.Text.Json;
-using Ai00.LocalRuntime.Contracts;
-using ContractPipeSecurity = Ai00.LocalRuntime.Contracts.PipeSecurity;
+using Ai00.Connector.Contracts;
+using ContractPipeSecurity = Ai00.Connector.Contracts.PipeSecurity;
 
-namespace Ai00.LocalRuntime.SessionHost;
+namespace Ai00.Connector.SessionHost;
 
 public sealed class CommandPipeHost(CommandDispatcher dispatcher, IReadOnlyDictionary<string, string> signingKeys)
 {

@@ -1,7 +1,8 @@
 using System.Security.Cryptography;
-using Ai00.LocalRuntime.Contracts;
+using Ai00.Connector.Adapters.VisMockup;
+using Ai00.Connector.Contracts;
 
-namespace Ai00.LocalRuntime.SessionHost;
+namespace Ai00.Connector.SessionHost;
 
 public sealed class CommandDispatcher(VisMockupAdapter visMockup, CommandLedger ledger, string artifactCacheRoot)
 {

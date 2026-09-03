@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Ai00.LocalRuntime.SessionHost;
+namespace Ai00.Connector.SessionHost;
 
 public sealed class CommandLedger
 {

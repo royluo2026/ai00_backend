@@ -1,7 +1,7 @@
-using Ai00.LocalRuntime.Contracts;
+using Ai00.Connector.Contracts;
 using Microsoft.Extensions.Options;
 
-namespace Ai00.LocalRuntime.Service;
+namespace Ai00.Connector.Service;
 
 public sealed class RuntimeWorker(DeviceGatewayClient gateway, SessionHostClient sessionHost, IOptions<RuntimeOptions> options, ILogger<RuntimeWorker> logger) : BackgroundService
 {

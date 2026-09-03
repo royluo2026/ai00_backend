@@ -1,4 +1,4 @@
-namespace Ai00.LocalRuntime.Service;
+namespace Ai00.Connector.Service;
 
 public sealed class RuntimeOptions
 {

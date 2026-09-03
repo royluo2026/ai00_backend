@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace Ai00.LocalRuntime.SessionHost;
+namespace Ai00.Connector.Adapters.VisMockup;
 
 public sealed class StaDispatcher : IDisposable
 {

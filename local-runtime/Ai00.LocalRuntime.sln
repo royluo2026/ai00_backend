@@ -2,13 +2,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ai00.LocalRuntime.Contracts", "src\Ai00.LocalRuntime.Contracts\Ai00.LocalRuntime.Contracts.csproj", "{F1AA1880-35EB-4BCE-A62E-DB7C8C6EF001}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ai00.Connector.Contracts", "src\Ai00.Connector.Contracts\Ai00.Connector.Contracts.csproj", "{F1AA1880-35EB-4BCE-A62E-DB7C8C6EF001}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ai00.LocalRuntime.Service", "src\Ai00.LocalRuntime.Service\Ai00.LocalRuntime.Service.csproj", "{F1AA1880-35EB-4BCE-A62E-DB7C8C6EF002}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ai00.Connector.Service", "src\Ai00.Connector.Service\Ai00.Connector.Service.csproj", "{F1AA1880-35EB-4BCE-A62E-DB7C8C6EF002}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ai00.LocalRuntime.SessionHost", "src\Ai00.LocalRuntime.SessionHost\Ai00.LocalRuntime.SessionHost.csproj", "{F1AA1880-35EB-4BCE-A62E-DB7C8C6EF003}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ai00.Connector.SessionHost", "src\Ai00.Connector.SessionHost\Ai00.Connector.SessionHost.csproj", "{F1AA1880-35EB-4BCE-A62E-DB7C8C6EF003}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ai00.LocalRuntime.Tests", "tests\Ai00.LocalRuntime.Tests\Ai00.LocalRuntime.Tests.csproj", "{F1AA1880-35EB-4BCE-A62E-DB7C8C6EF004}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ai00.Connector.Tests", "tests\Ai00.Connector.Tests\Ai00.Connector.Tests.csproj", "{F1AA1880-35EB-4BCE-A62E-DB7C8C6EF004}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ai00.Connector.Adapters.VisMockup", "src\Ai00.Connector.Adapters.VisMockup\Ai00.Connector.Adapters.VisMockup.csproj", "{F1AA1880-35EB-4BCE-A62E-DB7C8C6EF005}"
 EndProject
 Global
   GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,5 +34,9 @@ Global
     {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF004}.Debug|Any CPU.Build.0 = Debug|Any CPU
     {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF004}.Release|Any CPU.ActiveCfg = Release|Any CPU
     {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF004}.Release|Any CPU.Build.0 = Release|Any CPU
+    {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF005}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF005}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF005}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF005}.Release|Any CPU.Build.0 = Release|Any CPU
   EndGlobalSection
 EndGlobal

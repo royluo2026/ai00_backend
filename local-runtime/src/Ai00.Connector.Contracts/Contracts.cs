@@ -3,7 +3,24 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Ai00.LocalRuntime.Contracts;
+namespace Ai00.Connector.Contracts;
+
+public sealed record ConnectorExecutionPlan(string PlanId);
+
+public sealed record AdapterManifest(string AdapterId, int MajorVersion);
+
+public sealed record AdapterHealth(bool Ready, string Status);
+
+public sealed record AdapterOperation(string OperationId, JsonElement Payload);
+
+public sealed record AdapterResult(bool Ok, object? Data = null, string ErrorCode = "");
+
+public interface IConnectorAdapter
+{
+    AdapterManifest Manifest { get; }
+    Task<AdapterHealth> ProbeAsync(CancellationToken cancellationToken);
+    Task<AdapterResult> ExecuteAsync(AdapterOperation operation, CancellationToken cancellationToken);
+}
 
 public sealed record OperationEnvelope(
     [property: JsonPropertyName("protocol")] string Protocol,

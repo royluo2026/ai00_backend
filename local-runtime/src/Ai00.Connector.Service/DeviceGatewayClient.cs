@@ -1,10 +1,10 @@
 using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text.Json;
-using Ai00.LocalRuntime.Contracts;
+using Ai00.Connector.Contracts;
 using Microsoft.Extensions.Options;
 
-namespace Ai00.LocalRuntime.Service;
+namespace Ai00.Connector.Service;
 
 public sealed class DeviceGatewayClient(HttpClient http, IOptions<RuntimeOptions> options)
 {

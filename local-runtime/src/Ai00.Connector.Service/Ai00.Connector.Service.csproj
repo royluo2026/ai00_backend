@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Worker">
   <ItemGroup>
-    <ProjectReference Include="..\Ai00.LocalRuntime.Contracts\Ai00.LocalRuntime.Contracts.csproj" />
+    <ProjectReference Include="..\Ai00.Connector.Contracts\Ai00.Connector.Contracts.csproj" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.1" />
   </ItemGroup>

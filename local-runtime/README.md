@@ -1,14 +1,15 @@
-# AI00 Local Runtime（Windows）
+# AI00 Connector（Windows）
 
 这不是桌面 UI，也不替代 Web。只有需要控制 VisMockup 或运行本地插件的工作站安装它。
 
 ## 进程边界
 
-- `Ai00.LocalRuntime.Service`：Windows Service，主动向云端 heartbeat/lease，不开放本地 HTTP 端口。
-- `Ai00.LocalRuntime.SessionHost`：运行在交互式用户 Session 的独立进程，通过固定 named pipe 接收白名单命令并执行 COM。
-- `Ai00.LocalRuntime.Contracts`：命令、租约和回执契约。
+- `Ai00.Connector.Service`：Windows Service，主动向 AI00 heartbeat/lease，不开放本地 HTTP 端口。
+- `Ai00.Connector.SessionHost`：运行在唯一绑定用户 Session 的独立进程，通过固定 named pipe 接收白名单计划。
+- `Ai00.Connector.Contracts`：版本化计划、Adapter、租约和回执契约；程序集版本不代表协议或 Adapter 版本。
+- `Ai00.Connector.Adapters.VisMockup`：内置 VisMockup COM Adapter，所有调用串行进入 STA 队列。
 
-当前 .NET Adapter 只广告并实现 `vismockup.status`、`launch`、`open_file`、`visibility`、`capture`。结构树和 CATIA 高亮仍保留在 Python Bridge，等完成 COM 行为对照测试后再加入广告列表；云端即使注册了这些能力，也不会向未广告的设备排队。
+第一阶段仅启用签名清单明确广告的 VisMockup 操作；后续软件通过相同的 `IConnectorAdapter` 边界接入。外部 MCP Adapter 默认拒绝执行，只有管理员允许且签名、契约哈希和操作白名单全部匹配时才能加载。
 
 ## 安全约束
 
@@ -24,8 +25,8 @@
 需要 Windows 与 .NET 8 SDK：
 
 ```powershell
-dotnet build .\Ai00.LocalRuntime.sln -c Release
-dotnet test .\Ai00.LocalRuntime.sln -c Release --no-build
+dotnet build .\Ai00.LocalRuntime.sln -c Release -m:1
+dotnet test .\Ai00.LocalRuntime.sln -c Release --no-build -m:1
 ```
 
 仓库级验收必须在 Windows 与 .NET 8 SDK 上完成 Release 全解决方案构建和测试。发布 MSI 前仍必须在 Windows CI 重跑，并在安装 VisMockup 的试点机执行 COM 行为对照测试。

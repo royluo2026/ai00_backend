@@ -1,12 +1,39 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Ai00.Connector.Contracts;
 
-namespace Ai00.LocalRuntime.SessionHost;
+namespace Ai00.Connector.Adapters.VisMockup;
 
-public sealed class VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, string executable)
+public sealed class VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, string executable) : IConnectorAdapter
 {
     private const string ProgId = "VFFrame.Application";
     private object? _application;
+    public AdapterManifest Manifest { get; } = new("ai00.vismockup", 1);
+
+    public async Task<AdapterHealth> ProbeAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var status = await StatusAsync();
+        var ready = (bool)(status.GetType().GetProperty("connected")?.GetValue(status) ?? false);
+        return new AdapterHealth(ready, ready ? "ready" : "unavailable");
+    }
+
+    public async Task<AdapterResult> ExecuteAsync(AdapterOperation operation, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        object result = operation.OperationId switch
+        {
+            "vismockup.status" => await StatusAsync(),
+            "vismockup.launch" => await LaunchAsync(),
+            "vismockup.model.open" => await OpenFileAsync(operation.Payload.GetProperty("file_path").GetString() ?? ""),
+            "vismockup.visibility" => await VisibilityAsync(operation.Payload.GetProperty("action").GetString() ?? ""),
+            "vismockup.tree" => await TreeAsync(operation.Payload.TryGetProperty("max_depth", out var depth) ? depth.GetInt32() : 3),
+            "vismockup.highlight" => await HighlightAsync(operation.Payload.GetProperty("catia_names").EnumerateArray().Select(item => item.GetString() ?? "").Where(item => item.Length > 0).ToHashSet(StringComparer.Ordinal)),
+            "vismockup.capture" => await CaptureAsync(),
+            _ => throw new InvalidOperationException("adapter_operation_not_allowed"),
+        };
+        return new AdapterResult(true, result);
+    }
     private dynamic Connect()
     {
         var type = Type.GetTypeFromProgID(ProgId, throwOnError: true)!;

@@ -1,4 +1,4 @@
-using Ai00.LocalRuntime.Service;
+using Ai00.Connector.Service;
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddWindowsService(options => options.ServiceName = "AI00 Local Runtime");

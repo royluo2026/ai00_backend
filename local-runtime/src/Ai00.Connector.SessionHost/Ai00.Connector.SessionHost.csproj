@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Ai00.Connector.Contracts\Ai00.Connector.Contracts.csproj" />
+    <ProjectReference Include="..\Ai00.Connector.Adapters.VisMockup\Ai00.Connector.Adapters.VisMockup.csproj" />
+  </ItemGroup>
+</Project>

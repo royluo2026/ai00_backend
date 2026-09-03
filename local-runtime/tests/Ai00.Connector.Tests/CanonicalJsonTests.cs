@@ -1,9 +1,9 @@
 using System.Security.Cryptography;
 using System.Text.Json;
-using Ai00.LocalRuntime.Contracts;
+using Ai00.Connector.Contracts;
 using Xunit;
 
-namespace Ai00.LocalRuntime.Tests;
+namespace Ai00.Connector.Tests;
 
 public sealed class CanonicalJsonTests
 {
