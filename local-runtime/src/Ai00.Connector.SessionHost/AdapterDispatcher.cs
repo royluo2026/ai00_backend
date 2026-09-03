@@ -26,7 +26,7 @@ public sealed class AdapterDispatcher(IEnumerable<IConnectorAdapter> adapters)
                 try
                 {
                     var result = await adapter.ExecuteAsync(
-                        new AdapterOperation(step.OperationId, step.Payload, step.StepId), cancellationToken);
+                        new AdapterOperation(step.OperationId, step.Payload, step.StepId, step.ContractHash), cancellationToken);
                     var completedAt = WholeSecond(DateTimeOffset.UtcNow);
                     if (!result.Ok)
                     {
