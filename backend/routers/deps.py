@@ -343,6 +343,8 @@ def build_profile(user: dict) -> dict:
         v2_perms.add("knowledge.read")
     if "knowledge.manage" in perms:
         v2_perms.add("knowledge.write")
+    if org_role != "external":
+        v2_perms.add("agent.interact")
     # Physical factory topology is an independent Capability V2 domain.  The
     # legacy UI exposed its read routes to every role that could view craft,
     # so project that existing entitlement instead of making the Factory
