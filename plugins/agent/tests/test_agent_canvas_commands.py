@@ -493,8 +493,8 @@ def test_default_provider_registers_canvas_worker_lifecycle_and_replays_terminal
     replay = asyncio.run(registry.get("agent.canvas.execution.start").handler(payload, context))
 
     assert registry.lifecycle_names() == ("agent.canvas-execution-worker",)
-    assert accepted["data"]["status"] == "accepted"
-    assert replay["data"]["status"] == "completed"
+    assert accepted["status"] == "accepted"
+    assert replay["status"] == "completed"
     assert registry.lifecycle_health("agent.canvas-execution-worker")["status"] == "stopped"
 
 

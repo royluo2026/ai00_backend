@@ -174,7 +174,7 @@ def test_default_registered_query_composes_runtime_and_uniformly_denies_cross_te
     payload = {"flow_gid": "flow-1", "node_id": "node-1", "input_values": []}
 
     assert asyncio.run(registry.handlers["agent.workflow.node.test.execute"](payload, SameTeam())) == {
-        "data": {"status": "completed", "output_values": [], "summary": "ok"},
+        "status": "completed", "output_values": [], "summary": "ok",
     }
     denials = []
     for context in (OtherTeam(), SameTeam()):

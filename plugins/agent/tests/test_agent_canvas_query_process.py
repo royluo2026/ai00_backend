@@ -170,11 +170,11 @@ def test_default_registered_handlers_use_production_repository_and_executor_path
 
     node = asyncio.run(registry.handlers["agent.workflow.node.test.execute"](node_payload, SameTeam()))
     options = asyncio.run(registry.handlers["agent.canvas.options.resolve"](options_payload, SameTeam()))
-    assert node["data"]["status"] == "completed"
-    assert options == {"data": {
+    assert node["status"] == "completed"
+    assert options == {
         "revision": 4,
         "options": [{"value": "a", "label": "Alpha"}, {"value": "b", "label": "Zulu"}],
-    }}
+    }
 
     denials = []
     for context, payload in ((OtherTeam(), node_payload), (SameTeam(), {**node_payload, "flow_gid": "missing"})):
