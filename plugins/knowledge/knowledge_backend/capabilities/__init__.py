@@ -12,6 +12,7 @@ from .proposals_next import register_proposal_capability
 from .review_next import register_review_capability
 from .reviewed import register_reviewed_capabilities
 from .reference_data import register_reference_data_capabilities
+from .resource_model_mapping import register_resource_model_mapping_capability
 
 
 def register_capabilities(registry) -> None:
@@ -26,6 +27,7 @@ def register_capabilities(registry) -> None:
     register_retry_capability(registry)
     register_reviewed_capabilities(registry)
     register_reference_data_capabilities(registry)
+    register_resource_model_mapping_capability(registry)
 
 
 __all__ = ["register_capabilities"]

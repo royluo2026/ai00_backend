@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "registry_version": 1,
-  "table_count": 248,
+  "table_count": 249,
   "tables": [
     {
       "table": "workmanship_agent_canvas_audit_events",
@@ -1100,6 +1100,12 @@
       "owner": "knowledge",
       "runtime_domain": "knowledge",
       "legacy_name": true
+    },
+    {
+      "table": "workmanship_knowledge_resource_model_mappings",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": false
     },
     {
       "table": "workmanship_knowledge_schema_migrations",

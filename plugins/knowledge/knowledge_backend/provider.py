@@ -60,6 +60,30 @@ _DOMAIN_ERRORS = (
         code="self_review_forbidden",
         meaning="Proposal creators cannot approve or reject their own proposal.",
     ),
+    DomainErrorContract(
+        code="resource_type_invalid",
+        meaning="The supplied resource type is not tool, equipment, or fixture.",
+    ),
+    DomainErrorContract(
+        code="resource_code_invalid",
+        meaning="The supplied resource code is blank after normalization.",
+    ),
+    DomainErrorContract(
+        code="mapping_batch_limit_exceeded",
+        meaning="The resolver request contains more than 500 unique typed codes.",
+    ),
+    DomainErrorContract(
+        code="mapping_snapshot_changed",
+        meaning="The requested mapping snapshot is no longer current.",
+    ),
+    DomainErrorContract(
+        code="mapping_data_invalid",
+        meaning="A stored resource mapping is not a valid immutable Digital Model reference.",
+    ),
+    DomainErrorContract(
+        code="tenant_context_required",
+        meaning="Resource mappings cannot be resolved without an authenticated tenant scope.",
+    ),
 )
 
 
@@ -83,6 +107,7 @@ def descriptor_for(spec):
             mcp=not deprecated,
             worker=spec.id in {
                 "knowledge.proposal.outbox.retry", "knowledge.reference_dataset.publish",
+                "knowledge.resource_model_mapping.resolve",
             },
         ),
         "exposure_policy_source": "provider_explicit",
@@ -108,7 +133,10 @@ def descriptor_for(spec):
         # Reliability therefore records an externally consistent outcome and never
         # pretends to enlist that commit in the Base outcome transaction.
         "consistency_policy": "external" if is_write else "strong",
-        "evidence_policy": "required" if spec.id.startswith("knowledge.document.") else "optional",
+        "evidence_policy": "required" if (
+            spec.id.startswith("knowledge.document.")
+            or spec.id == "knowledge.resource_model_mapping.resolve"
+        ) else "optional",
         "domain_errors": _DOMAIN_ERRORS,
         "domain_errors_complete": True,
         "deprecation_message": (
