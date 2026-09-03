@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from backend.domain_ports.resource_authorization import resource_authorizers
 from backend.domain_ports.simulation_runtime import simulation_runtime_ports
 
 from .models import specs
@@ -15,10 +16,20 @@ from .document_snapshots import specs as document_snapshot_specs
 from .provider import register
 
 
+def _authorize_document_snapshot(resource_id, identity) -> bool:
+    user_gid = identity.actor.user_id
+    return bool(user_gid) and default_snapshot_workflow.repository.can_read_request(
+        resource_id,
+        user_gid=user_gid or "",
+        team_gid=identity.tenant.tenant_id,
+    )
+
+
 def register_capabilities(
     registry: Any, *, composition_provider: EnvironmentCompositionProvider | None = None,
     capture_provider: CaptureRunProvider | None = None,
 ) -> None:
+    resource_authorizers.register("simulation-document-snapshot", _authorize_document_snapshot)
     selected_capture_provider = capture_provider or default_capture_provider
     simulation_runtime_ports.register(
         "simulation.connector_outcome",

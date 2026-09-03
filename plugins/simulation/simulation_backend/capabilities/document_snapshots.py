@@ -21,10 +21,13 @@ class DocumentSnapshotProvider:
         except SimulationWorkflowError as exc:
             raise CapabilityBusinessError(str(exc), str(exc)) from exc
 
-    def request(self, payload, context):
-        row = self._call(
-            self.workflow.request, payload["device_id"], payload["request_key"], context,
-        )
+    async def request(self, payload, context):
+        try:
+            row = await self.workflow.request(
+                payload["device_id"], payload["request_key"], context,
+            )
+        except SimulationWorkflowError as exc:
+            raise CapabilityBusinessError(str(exc), str(exc)) from exc
         return CapabilityOutput(data=self._project(row), evidence=(EvidenceRef(
             kind="simulation.document_snapshot",
             reference=f"simulation://document-snapshot/{row['snapshot_request_id']}",

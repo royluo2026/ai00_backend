@@ -79,12 +79,12 @@ class Repository:
 
 class CraftPort:
     def __init__(self, execution=None): self.execution = execution or _execution()
-    def get_execution_plan(self, ref, context): return self.execution
+    async def get_execution_plan(self, ref, context): return self.execution
 
 
 class KnowledgePort:
     def __init__(self, *, unresolved=False): self.unresolved = unresolved
-    def resolve_resource_models(self, items, context):
+    async def resolve_resource_models(self, items, context):
         if self.unresolved:
             return {
                 "resolved": [],
@@ -98,7 +98,7 @@ class KnowledgePort:
 
 
 class ConnectorPort:
-    def get_health(self, device_id, context):
+    async def get_health(self, device_id, context):
         return {
             "protocol_versions": ["ai00.connector.execution-plan.v1"],
             "bound_user_id": context.user_gid,
@@ -137,7 +137,7 @@ def _context():
 def test_compose_persists_one_manifest_when_all_bindings_resolve():
     provider, repository = _provider()
 
-    output = provider.compose(_payload(), _context()).data
+    output = asyncio.run(provider.compose(_payload(), _context())).data
 
     assert output["status"] == "composed"
     assert output["manifest_hash"].startswith("sha256:")
@@ -148,7 +148,7 @@ def test_compose_returns_every_problem_and_persists_nothing():
     provider, repository = _provider(unresolved=True)
     provider.craft_port = CraftPort(_execution(product="P-X"))
 
-    output = provider.compose(_payload(), _context()).data
+    output = asyncio.run(provider.compose(_payload(), _context())).data
 
     assert output["status"] == "unresolved"
     assert {item["source_code"] for item in output["problems"]} == {"P-X", "T-10"}
@@ -157,13 +157,13 @@ def test_compose_returns_every_problem_and_persists_nothing():
 
 def test_preflight_checks_exact_connector_contracts_without_queueing_work():
     provider, _ = _provider()
-    composed = provider.compose(_payload(), _context()).data
+    composed = asyncio.run(provider.compose(_payload(), _context())).data
 
-    report = provider.preflight({
+    report = asyncio.run(provider.preflight({
         "environment_id": composed["environment_id"],
         "environment_version": composed["environment_version"],
         "device_id": "device-1",
-    }, _context()).data
+    }, _context())).data
 
     assert report == {"compatible": True, "problems": []}
 

@@ -39,6 +39,7 @@ def _plan(
     tenant_id: str,
     user_id: str,
     capability_version_gid: str,
+    business_definition_hash: str,
     steps: Iterable[ConnectorStepV1],
     issued_at: datetime,
 ) -> ConnectorExecutionPlanV1:
@@ -50,9 +51,7 @@ def _plan(
         "user_id": user_id,
         "device_id": device_id,
         "capability_version_gid": capability_version_gid,
-        "business_definition_hash": canonical_hash({
-            "capability": capability_version_gid, "manifest_hash": manifest.manifest_hash,
-        }),
+        "business_definition_hash": business_definition_hash,
         "adapter_id": requirement.adapter_id,
         "adapter_major": requirement.adapter_major,
         "target_product": ConnectorTargetProductV1(**{
@@ -73,6 +72,7 @@ def _plan(
 def build_materialization_plan(
     manifest: SimulationEnvironmentManifestV1,
     *, plan_id: str, device_id: str, tenant_id: str, user_id: str, issued_at: datetime,
+    capability_version_gid: str, business_definition_hash: str,
 ) -> ConnectorExecutionPlanV1:
     requirements = {
         item.operation_id: item.contract_hash for item in manifest.connector_requirement.operations
@@ -104,7 +104,8 @@ def build_materialization_plan(
     })
     return _plan(
         manifest, plan_id=plan_id, device_id=device_id, tenant_id=tenant_id,
-        user_id=user_id, capability_version_gid="simulation.environment.materialize@1",
+        user_id=user_id, capability_version_gid=capability_version_gid,
+        business_definition_hash=business_definition_hash,
         steps=steps, issued_at=issued_at,
     )
 
@@ -114,6 +115,7 @@ def build_capture_plan(
     *, plan_id: str, device_id: str, tenant_id: str, user_id: str, issued_at: datetime,
     operations: Iterable[str] | None = None, attempt: int = 1,
     capture_run_id: str | None = None,
+    capability_version_gid: str, business_definition_hash: str,
 ) -> ConnectorExecutionPlanV1:
     requirements = {
         item.operation_id: item.contract_hash for item in manifest.connector_requirement.operations
@@ -157,13 +159,15 @@ def build_capture_plan(
         })
     return _plan(
         manifest, plan_id=plan_id, device_id=device_id, tenant_id=tenant_id,
-        user_id=user_id, capability_version_gid="simulation.capture_run.start@1",
+        user_id=user_id, capability_version_gid=capability_version_gid,
+        business_definition_hash=business_definition_hash,
         steps=steps, issued_at=issued_at,
     )
 
 
 def build_document_snapshot_plan(
     *, plan_id: str, device_id: str, tenant_id: str, user_id: str, issued_at: datetime,
+    capability_version_gid: str, business_definition_hash: str,
 ) -> ConnectorExecutionPlanV1:
     operation_id = "vismockup.document.snapshot@1"
     step = _step(
@@ -174,11 +178,8 @@ def build_document_snapshot_plan(
         "protocol": "ai00.connector.execution-plan.v1",
         "plan_id": plan_id, "tenant_id": tenant_id, "user_id": user_id,
         "device_id": device_id,
-        "capability_version_gid": "simulation.document_snapshot.request@1",
-        "business_definition_hash": canonical_hash({
-            "capability": "simulation.document_snapshot.request@1",
-            "device_id": device_id,
-        }),
+        "capability_version_gid": capability_version_gid,
+        "business_definition_hash": business_definition_hash,
         "adapter_id": "ai00.vismockup", "adapter_major": 1,
         "target_product": ConnectorTargetProductV1(
             product_id="siemens.vismockup", minimum_version="14.0.0",

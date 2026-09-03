@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import os
 import tempfile
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
@@ -117,7 +118,13 @@ def connector_heartbeat(body: ConnectorHeartbeatBody, device: dict = Depends(_de
 
 @router.post("/connector/activate")
 def connector_activate(body: ActivateBody):
-    return activate(body)
+    key_id = os.environ.get("AI00_CONNECTOR_PLAN_SIGNING_KEY_ID", "")
+    secret = os.environ.get("AI00_CONNECTOR_PLAN_SIGNING_SECRET", "")
+    if not key_id or len(secret.encode("utf-8")) < 32:
+        raise HTTPException(status_code=503, detail={"code": "connector_plan_signing_key_unavailable"})
+    response = activate(body)
+    response["data"].update({"plan_signing_key_id": key_id, "plan_signing_secret": secret})
+    return response
 
 @router.post("/connector/plans/lease")
 def connector_plan_lease(body: ConnectorLeaseBody, device: dict = Depends(_device_auth)):
@@ -128,7 +135,7 @@ def connector_plan_lease(body: ConnectorLeaseBody, device: dict = Depends(_devic
     return {"success": True, "data": value}
 
 @router.post("/connector/plans/{plan_id}/complete")
-def connector_plan_complete(
+async def connector_plan_complete(
     plan_id: str,
     body: ConnectorCompleteBody,
     device: dict = Depends(_device_auth),
@@ -138,7 +145,7 @@ def connector_plan_complete(
             body.outcome, body.signature, device["_request_token"]
         ):
             raise PermissionError("invalid_outcome_signature")
-        complete_connector_plan(
+        await complete_connector_plan(
             device["gid"], plan_id, body.lease_id, body.outcome
         )
     except PermissionError as exc:

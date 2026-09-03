@@ -188,13 +188,20 @@ class CaptureRunProvider:
         except SimulationWorkflowError as exc:
             raise CapabilityBusinessError(str(exc), str(exc)) from exc
 
-    def materialize(self, payload, context):
-        row = self._call(self.workflow.start_materialization, payload["environment_id"], payload["environment_version"], payload["device_id"], context)
+    @staticmethod
+    async def _call_async(function, *args):
+        try:
+            return await function(*args)
+        except SimulationWorkflowError as exc:
+            raise CapabilityBusinessError(str(exc), str(exc)) from exc
+
+    async def materialize(self, payload, context):
+        row = await self._call_async(self.workflow.start_materialization, payload["environment_id"], payload["environment_version"], payload["device_id"], context)
         data = {key: row[key] for key in ("run_id", "environment_id", "environment_version", "manifest_hash", "device_id", "plan_id", "status", "operation_ref")}
         return CapabilityOutput(data=data, evidence=(EvidenceRef(kind="simulation.materialization", reference=f"simulation://materialization/{row['run_id']}", digest=row["manifest_hash"]),))
 
-    def start(self, payload, context):
-        row = self._call(self.workflow.start_capture, payload["environment_id"], payload["environment_version"], payload["device_id"], context)
+    async def start(self, payload, context):
+        row = await self._call_async(self.workflow.start_capture, payload["environment_id"], payload["environment_version"], payload["device_id"], context)
         return CapabilityOutput(data=_project_capture(row), evidence=(EvidenceRef(kind="simulation.capture_run", reference=f"simulation://capture/{row['capture_run_id']}", digest=row["manifest_hash"]),))
 
     def get(self, payload, context):
@@ -203,8 +210,8 @@ class CaptureRunProvider:
     def cancel(self, payload, context):
         return CapabilityOutput(data=self._call(self.workflow.cancel, payload["capture_run_id"], context))
 
-    def retry(self, payload, context):
-        return CapabilityOutput(data=self._call(self.workflow.retry_step, payload["capture_run_id"], payload["operation_id"], context))
+    async def retry(self, payload, context):
+        return CapabilityOutput(data=await self._call_async(self.workflow.retry_step, payload["capture_run_id"], payload["operation_id"], context))
 
 
 default_provider = CaptureRunProvider(CaptureWorkflow(

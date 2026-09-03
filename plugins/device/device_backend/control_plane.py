@@ -149,7 +149,10 @@ def activate_device(enrollment_token: str, runtime_version: str, capabilities: l
             )
             cur.execute("UPDATE workmanship_runtime_enrollments SET used_at=NOW() WHERE gid=%s", (enrollment["gid"],))
         conn.commit()
-    return {"device_gid": device_gid, "device_token": device_token}
+    return {
+        "device_gid": device_gid, "device_token": device_token,
+        "owner_user_gid": enrollment["created_by"],
+    }
 
 
 def authenticate_device(device_gid: str, device_token: str) -> dict:

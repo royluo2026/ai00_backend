@@ -38,11 +38,20 @@ class CaptureWorkflow:
             raise SimulationWorkflowError("tenant_context_required")
         return context.team_gid, context.user_gid
 
-    def start_materialization(
+    @staticmethod
+    def _provenance(context: CapabilityContext) -> tuple[str, str]:
+        version_gid = str(getattr(context, "capability_version_gid", "") or "")
+        definition_hash = str(getattr(context, "business_definition_hash", "") or "")
+        if not version_gid.startswith("cv2_") or not definition_hash.startswith("sha256:"):
+            raise SimulationWorkflowError("capability_provenance_required")
+        return version_gid, definition_hash
+
+    async def start_materialization(
         self, environment_id: str, environment_version: int, device_id: str,
         context: CapabilityContext,
     ) -> dict[str, Any]:
         tenant_id, user_id = self._identity(context)
+        version_gid, definition_hash = self._provenance(context)
         manifest = self.repository.get_manifest(environment_id, environment_version, context)
         if manifest is None:
             raise SimulationWorkflowError("simulation_environment_not_found")
@@ -50,6 +59,7 @@ class CaptureWorkflow:
         plan = build_materialization_plan(
             manifest, plan_id=run_id, device_id=device_id, tenant_id=tenant_id,
             user_id=user_id, issued_at=self.clock(),
+            capability_version_gid=version_gid, business_definition_hash=definition_hash,
         )
         row = {
             "run_id": run_id, "environment_id": environment_id,
@@ -60,7 +70,7 @@ class CaptureWorkflow:
         }
         self.repository.create_materialization_run(row)
         try:
-            self.connector_port.queue_plan(plan, context)
+            await self.connector_port.queue_plan(plan, context)
         except Exception as exc:
             self.repository.update_materialization_run(run_id, status="failed")
             if isinstance(exc, SimulationWorkflowError):
@@ -68,11 +78,12 @@ class CaptureWorkflow:
             raise SimulationWorkflowError(str(exc)) from exc
         return dict(row)
 
-    def start_capture(
+    async def start_capture(
         self, environment_id: str, environment_version: int, device_id: str,
         context: CapabilityContext,
     ) -> dict[str, Any]:
         tenant_id, user_id = self._identity(context)
+        version_gid, definition_hash = self._provenance(context)
         manifest = self.repository.get_manifest(environment_id, environment_version, context)
         if manifest is None:
             raise SimulationWorkflowError("simulation_environment_not_found")
@@ -85,6 +96,7 @@ class CaptureWorkflow:
             plan_id=capture_run_id if index == 1 else f"{capture_run_id}-op-{index:05d}",
             capture_run_id=capture_run_id, device_id=device_id, tenant_id=tenant_id,
             user_id=user_id, issued_at=self.clock(), operations=(item.operation_id,),
+            capability_version_gid=version_gid, business_definition_hash=definition_hash,
         ) for index, item in enumerate(ordered, start=1))
         row = {
             "capture_run_id": capture_run_id, "environment_id": environment_id,
@@ -101,7 +113,7 @@ class CaptureWorkflow:
         self.repository.create_capture_run(row)
         try:
             for plan in plans:
-                self.connector_port.queue_plan(plan, context)
+                await self.connector_port.queue_plan(plan, context)
         except Exception as exc:
             self.repository.update_capture_run(capture_run_id, status="failed")
             if isinstance(exc, SimulationWorkflowError):
@@ -134,7 +146,7 @@ class CaptureWorkflow:
         self.repository.update_capture_step(capture_run_id, operation_id, **changes)
         self.repository.update_capture_run(capture_run_id, status="running")
 
-    def advance(self, capture_run_id: str, context: CapabilityContext) -> dict[str, Any]:
+    async def advance(self, capture_run_id: str, context: CapabilityContext) -> dict[str, Any]:
         run = self.repository.get_capture_run(capture_run_id, context)
         if run is None:
             raise SimulationWorkflowError("capture_run_not_found")
@@ -144,7 +156,7 @@ class CaptureWorkflow:
                 if artifact_ref is None:
                     raise SimulationWorkflowError("artifact_upload_unconfirmed")
                 try:
-                    self.craft_port.attach_screenshot(
+                    await self.craft_port.attach_screenshot(
                         bop_version_gid=run.get("bop_version_gid") or self.repository.get_manifest(
                             run["environment_id"], run["environment_version"], context,
                         ).execution_source.bop_version_gid,
@@ -169,7 +181,7 @@ class CaptureWorkflow:
             refreshed = self.repository.get_capture_run(capture_run_id, context)
         return refreshed
 
-    def apply_connector_outcome(
+    async def apply_connector_outcome(
         self,
         plan: ConnectorExecutionPlanV1,
         outcome: ConnectorPlanOutcomeV1,
@@ -219,7 +231,7 @@ class CaptureWorkflow:
 
         refreshed = run
         for _ in range(projected):
-            refreshed = self.advance(capture_run_id, context)
+            refreshed = await self.advance(capture_run_id, context)
         statuses = {item["status"] for item in refreshed["steps"]}
         if "outcome_unknown" in statuses:
             self.repository.update_capture_run(capture_run_id, status="outcome_unknown")
@@ -231,7 +243,7 @@ class CaptureWorkflow:
             )
         return self.repository.get_capture_run(capture_run_id, context)
 
-    def retry_step(
+    async def retry_step(
         self, capture_run_id: str, operation_id: str, context: CapabilityContext,
     ) -> dict[str, Any]:
         run = self.repository.get_capture_run(capture_run_id, context)
@@ -248,18 +260,20 @@ class CaptureWorkflow:
         if manifest is None or manifest.manifest_hash != run["manifest_hash"]:
             raise SimulationWorkflowError("environment_source_changed")
         tenant_id, user_id = self._identity(context)
+        version_gid, definition_hash = self._provenance(context)
         retry_plan_id = self.id_factory("retry")
         attempt = int(step.get("attempt") or 1) + 1
         plan = build_capture_plan(
             manifest, plan_id=retry_plan_id, device_id=run["device_id"], tenant_id=tenant_id,
             user_id=user_id, issued_at=self.clock(), operations=(operation_id,), attempt=attempt,
             capture_run_id=capture_run_id,
+            capability_version_gid=version_gid, business_definition_hash=definition_hash,
         )
         self.repository.update_capture_step(
             capture_run_id, operation_id, status="queued", attempt=attempt,
             artifact_ref=None, artifact_attached=False,
         )
-        self.connector_port.queue_plan(plan, context)
+        await self.connector_port.queue_plan(plan, context)
         return {"capture_run_id": capture_run_id, "operation_id": operation_id, "attempt": attempt, "plan_id": retry_plan_id, "status": "queued"}
 
     def cancel(self, capture_run_id: str, context: CapabilityContext) -> dict[str, Any]:
@@ -282,19 +296,20 @@ class ConnectorOutcomeProjection:
         self.workflow = workflow
         self.snapshot_workflow = snapshot_workflow
 
-    def apply(
+    async def apply(
         self, plan: ConnectorExecutionPlanV1, outcome: ConnectorPlanOutcomeV1,
     ) -> dict[str, Any] | None:
-        if plan.capability_version_gid == "simulation.document_snapshot.request@1":
+        operations = {step.operation_id for step in plan.steps}
+        if operations == {"vismockup.document.snapshot@1"}:
             if self.snapshot_workflow is None:
                 raise SimulationWorkflowError("document_snapshot_projection_unavailable")
             self.snapshot_workflow.apply_connector_outcome(plan, outcome)
             return None
-        if plan.capability_version_gid != "simulation.capture_run.start@1": return None
+        if "vismockup.view.capture@1" not in operations: return None
         context = CapabilityContext(
             user_gid=plan.user_id, team_gid=plan.tenant_id, source="connector",
         )
-        return self.workflow.apply_connector_outcome(plan, outcome, context)
+        return await self.workflow.apply_connector_outcome(plan, outcome, context)
 
 
 __all__ = ["CaptureWorkflow", "ConnectorOutcomeProjection", "SimulationWorkflowError"]

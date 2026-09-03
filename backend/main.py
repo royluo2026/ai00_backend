@@ -265,6 +265,8 @@ _capability_gateway = _configure_capability_gateway(
     ),
     operations=_OperationService(_SqlOperationStore(_capability_connection)),
 )
+from backend.domain_ports.simulation_runtime import configure_simulation_runtime_gateway as _configure_simulation_runtime_gateway
+_configure_simulation_runtime_gateway(_capability_gateway)
 
 # 收集所有插件声明的 OWNED_MODULES（这些模块由插件管理，不走 auto-scan）
 _plugin_owned: set[str] = set()

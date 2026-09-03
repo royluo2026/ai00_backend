@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -116,7 +117,7 @@ def test_completion_can_retry_domain_projection_after_device_outcome_is_stored()
         def __init__(self):
             self.calls = 0
 
-        def apply(self, current_plan, outcome):
+        async def apply(self, current_plan, outcome):
             self.calls += 1
             if self.calls == 1:
                 raise RuntimeError("projection_temporarily_unavailable")
@@ -125,11 +126,27 @@ def test_completion_can_retry_domain_projection_after_device_outcome_is_stored()
     control_plane = ConnectorControlPlane(repository, outcome_port=projection, clock=lambda: NOW)
 
     with pytest.raises(RuntimeError, match="projection_temporarily_unavailable"):
-        control_plane.complete_plan("device-001", "plan-001", "lease-1", completed_outcome())
-    control_plane.complete_plan("device-001", "plan-001", "lease-1", completed_outcome())
+        asyncio.run(control_plane.complete_plan("device-001", "plan-001", "lease-1", completed_outcome()))
+    asyncio.run(control_plane.complete_plan("device-001", "plan-001", "lease-1", completed_outcome()))
 
     assert repository.saved_outcome == completed_outcome()
     assert projection.calls == 2
+
+
+def test_failed_plan_outcome_requires_a_failed_step():
+    class Repository(MemoryRepository):
+        def get_plan(self, plan_id, *, device_id, lease_id):
+            return plan()
+
+        def complete_plan(self, device_id, plan_id, lease_id, outcome):
+            raise AssertionError("invalid outcome must not be persisted")
+
+    completed = completed_outcome()
+    inconsistent = completed.model_copy(update={"status": "failed"})
+    control_plane = ConnectorControlPlane(Repository(), clock=lambda: NOW)
+
+    with pytest.raises(ConnectorError, match="plan_outcome_invalid"):
+        asyncio.run(control_plane.complete_plan("device-001", "plan-001", "lease-1", inconsistent))
 
 
 def test_heartbeat_is_closed_and_records_adapter_contract_hashes():
@@ -305,3 +322,28 @@ def test_connector_v1_transport_routes_are_separate_from_legacy_runtime_routes()
         "/api/v1/connector/plans/{plan_id}/steps/{step_id}/result-artifact",
     } <= paths
     assert "/api/v1/device-runtime/commands/lease" in paths
+
+
+def test_connector_activation_provisions_the_plan_verification_key_before_consuming_token(monkeypatch):
+    from backend.routers import device_runtime
+
+    body = device_runtime.ActivateBody(enrollment_token="x" * 32, runtime_version="1.0.0")
+    consumed = []
+    monkeypatch.delenv("AI00_CONNECTOR_PLAN_SIGNING_KEY_ID", raising=False)
+    monkeypatch.delenv("AI00_CONNECTOR_PLAN_SIGNING_SECRET", raising=False)
+    with pytest.raises(Exception) as missing:
+        device_runtime.connector_activate(body)
+    assert getattr(missing.value, "status_code", None) == 503
+    assert consumed == []
+
+    monkeypatch.setenv("AI00_CONNECTOR_PLAN_SIGNING_KEY_ID", "plan-key-1")
+    monkeypatch.setenv("AI00_CONNECTOR_PLAN_SIGNING_SECRET", "s" * 32)
+    monkeypatch.setattr(device_runtime, "activate", lambda value: consumed.append(value) or {
+        "success": True,
+        "data": {"device_gid": "device-1", "device_token": "token", "owner_user_gid": "user-1"},
+    })
+    response = device_runtime.connector_activate(body)
+
+    assert len(consumed) == 1
+    assert response["data"]["plan_signing_key_id"] == "plan-key-1"
+    assert response["data"]["plan_signing_secret"] == "s" * 32

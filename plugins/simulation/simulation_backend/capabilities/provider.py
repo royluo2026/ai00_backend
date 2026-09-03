@@ -5,6 +5,7 @@ from typing import Any
 
 from backend.capability_v2.contracts import AutomationLevel, BusinessInvariantContract, CapabilityDescriptorV2, DomainErrorContract, ExecutionMode, ExposurePolicy, LifecycleStatus, ResourceSelector, SideEffectLevel
 from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
+from backend.capability_v2.business_definition import business_definition_hash
 
 from .contracts import INPUT_SCHEMAS, OUTPUT_SCHEMAS
 
@@ -215,15 +216,9 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         "resource_selectors": tuple(ResourceSelector(resource_type=t, payload_path=p) for t, p in _RESOURCES.get(governed.id, ())),
         "data_classification": "confidential", "delegation_policy": "scoped",
         "agent_output_schema": descriptor.output_schema,
-        "execution_mode": ExecutionMode.CLOUD_ASYNC if governed.id in {
-            "simulation.run.start", "simulation.environment.materialize", "simulation.capture_run.start",
-            "simulation.capture_step.retry", "simulation.document_snapshot.request",
-        } else descriptor.execution_mode,
+        "execution_mode": ExecutionMode.CLOUD_ASYNC if governed.id == "simulation.run.start" else descriptor.execution_mode,
         "artifact_policy": "output" if governed.id == "simulation.result.get" else "none",
-        "operation_policy": "required" if governed.id in {
-            "simulation.run.start", "simulation.environment.materialize", "simulation.capture_run.start",
-            "simulation.capture_step.retry", "simulation.document_snapshot.request",
-        } else ("optional" if is_write else "none"),
+        "operation_policy": "required" if governed.id == "simulation.run.start" else ("optional" if is_write else "none"),
         "concurrency_policy": "none", "idempotency_policy": "required" if is_write else "none",
         "consistency_policy": "external" if is_write else "strong", "evidence_policy": "required",
         "domain_errors": _errors(connector_environment="connector_environment" in governed.tags),
@@ -246,7 +241,16 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
 
 def register(registry: Any, spec: Any, handler: Any) -> None:
     governed = governed_spec(spec)
-    registry.register(governed, handler, descriptor=descriptor_for(governed))
+    descriptor = descriptor_for(governed)
+    definition_hash = business_definition_hash(descriptor)
+
+    def governed_handler(payload, context):
+        return handler(payload, context.model_copy(update={
+            "capability_version_gid": descriptor.capability_version_gid,
+            "business_definition_hash": definition_hash,
+        }))
+
+    registry.register(governed, governed_handler, descriptor=descriptor)
 
 
 __all__ = ["descriptor_for", "register"]

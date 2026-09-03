@@ -13,14 +13,9 @@ from .review_next import register_review_capability
 from .reviewed import register_reviewed_capabilities
 from .reference_data import register_reference_data_capabilities
 from .resource_model_mapping import register_resource_model_mapping_capability
-from backend.domain_ports.simulation_runtime import simulation_runtime_ports
-from ..public_ports import KnowledgeResourceModelMappingAdapter
 
 
 def register_capabilities(registry) -> None:
-    simulation_runtime_ports.register(
-        "knowledge.resource_model_mapping", KnowledgeResourceModelMappingAdapter(),
-    )
     register_knowledge_capabilities(registry)
     register_knowledge_document_capabilities(registry)
     register_knowledge_context_capability(registry)

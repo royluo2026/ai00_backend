@@ -178,7 +178,7 @@ class ConnectorControlPlane:
         plan = ConnectorExecutionPlanV1.model_validate(lease["plan"])
         return {**lease, **sign_connector_plan_lease(plan)}
 
-    def complete_plan(
+    async def complete_plan(
         self, device_id: str, plan_id: str, lease_id: str,
         outcome: ConnectorPlanOutcomeV1,
     ) -> None:
@@ -187,15 +187,21 @@ class ConnectorControlPlane:
         plan = self.repository.get_plan(plan_id, device_id=device_id, lease_id=lease_id)
         expected = [step.step_id for step in plan.steps]
         actual = [step.step_id for step in outcome.steps]
-        if len(actual) != len(set(actual)) or any(step not in expected for step in actual):
+        if len(actual) != len(set(actual)) or actual != expected[:len(actual)]:
             raise ConnectorError("plan_outcome_invalid")
         if outcome.status == "completed" and (
             actual != expected or any(step.status != "completed" for step in outcome.steps)
         ):
             raise ConnectorError("plan_outcome_invalid")
+        if outcome.status == "failed" and not any(step.status == "failed" for step in outcome.steps):
+            raise ConnectorError("plan_outcome_invalid")
+        if outcome.status == "outcome_unknown" and outcome.steps and not any(
+            step.status == "outcome_unknown" for step in outcome.steps
+        ):
+            raise ConnectorError("plan_outcome_invalid")
         self.repository.complete_plan(device_id, plan_id, lease_id, outcome)
         if self.outcome_port is not None:
-            self.outcome_port.apply(plan, outcome)
+            await self.outcome_port.apply(plan, outcome)
 
 
 class SqlConnectorRepository:
@@ -391,8 +397,8 @@ def lease_connector_plan(device_id: str, lease_seconds: int = 60):
     return connector_control_plane.lease_plan(device_id, lease_seconds)
 
 
-def complete_connector_plan(device_id, plan_id, lease_id, outcome):
-    connector_control_plane.complete_plan(device_id, plan_id, lease_id, outcome)
+async def complete_connector_plan(device_id, plan_id, lease_id, outcome):
+    await connector_control_plane.complete_plan(device_id, plan_id, lease_id, outcome)
 
 
 def get_leased_connector_plan(device_id, plan_id, lease_id):

@@ -26,6 +26,17 @@ def _project(row):
 
 
 class DocumentSnapshotRepository:
+    def can_read_request(self, request_id: str, *, user_gid: str, team_gid: str) -> bool:
+        if not request_id or not user_gid or not team_gid:
+            return False
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT 1 FROM workmanship_sim_document_snapshot_requests "
+                "WHERE snapshot_request_id=%s AND (owner_gid=%s OR team_gid=%s) LIMIT 1",
+                (request_id, user_gid, team_gid),
+            )
+            return cursor.fetchone() is not None
+
     def create_request(self, row, context: CapabilityContext):
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(

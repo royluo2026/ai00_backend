@@ -1,5 +1,11 @@
 using Ai00.Connector.Service;
 
+if (args.Length > 0 && string.Equals(args[0], "pair", StringComparison.OrdinalIgnoreCase))
+{
+    await ConnectorPairing.RunAsync(args[1..]);
+    return;
+}
+
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddWindowsService(options => options.ServiceName = "AI00 Connector");
 builder.Services.Configure<RuntimeOptions>(builder.Configuration.GetSection("Connector"));

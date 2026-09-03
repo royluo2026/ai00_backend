@@ -7,9 +7,7 @@ from .provider import register
 from .runtime import specs
 from .reviewed import register_reviewed_capabilities
 from backend.domain_ports.resource_authorization import resource_authorizers
-from backend.domain_ports.simulation_runtime import simulation_runtime_ports
 from .. import control_plane
-from ..public_ports import SimulationConnectorAdapter
 from .connector_runtime import connector_control_plane, register_connector_runtime_capabilities
 
 
@@ -21,7 +19,6 @@ def _authorize_owned_device(device_id, identity) -> bool:
 
 def register_capabilities(registry: Any) -> None:
     resource_authorizers.register("device", _authorize_owned_device)
-    simulation_runtime_ports.register("device.connector", SimulationConnectorAdapter())
     for spec, handler in specs():
         register(registry, spec, handler)
     register_reviewed_capabilities(registry)

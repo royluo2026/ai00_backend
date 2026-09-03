@@ -74,9 +74,9 @@ class EnvironmentCompositionProvider:
         self.connector_port = connector_port
         self.snapshot_repository = snapshot_repository
 
-    def compose(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+    async def compose(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
         reference = dict(payload["execution_plan_ref"])
-        execution = dict(self.craft_port.get_execution_plan(reference, context))
+        execution = dict(await self.craft_port.get_execution_plan(reference, context))
         source = execution.get("source") or {}
         actual = (
             source.get("bop_version_gid"), source.get("revision"), execution.get("content_hash")
@@ -98,7 +98,7 @@ class EnvironmentCompositionProvider:
         if snapshot_row.get("device_id") != str(payload["device_id"]):
             raise CapabilityBusinessError("bom_identity_mismatch", "The snapshot belongs to another Connector")
         document = snapshot_row["snapshot"]
-        mappings = self.knowledge_port.resolve_resource_models(_resources(execution), context)
+        mappings = await self.knowledge_port.resolve_resource_models(_resources(execution), context)
         result = compose_manifest(execution, document, mappings, payload["capture_profile"])
         problems = [item.model_dump(mode="json") for item in result.problems]
         if result.manifest is None:
@@ -138,13 +138,13 @@ class EnvironmentCompositionProvider:
             raise CapabilityBusinessError("simulation_environment_not_found", "Simulation environment not found")
         return CapabilityOutput(data={"environment_id": environment_id, "status": "archived"})
 
-    def preflight(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+    async def preflight(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
         manifest = self.repository.get_manifest(
             str(payload["environment_id"]), int(payload["environment_version"]), context,
         )
         if manifest is None:
             raise CapabilityBusinessError("simulation_environment_not_found", "Simulation environment manifest not found")
-        raw_health = self.connector_port.get_health(str(payload["device_id"]), context)
+        raw_health = await self.connector_port.get_health(str(payload["device_id"]), context)
         health = raw_health.model_dump(mode="json") if hasattr(raw_health, "model_dump") else dict(raw_health)
         requirement = manifest.connector_requirement
         problems: list[dict[str, str | None]] = []

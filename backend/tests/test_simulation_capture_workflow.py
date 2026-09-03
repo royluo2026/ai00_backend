@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from datetime import UTC, datetime
 
 import pytest
@@ -11,6 +12,8 @@ from backend.contracts.connector_execution_plan_v1 import (
     canonical_hash,
 )
 from backend.capabilities.registry_next import CapabilityRegistry
+from backend.capabilities.confirmation_next import confirmation_manager
+from backend.capability_v2.business_definition import business_definition_hash
 from plugins.simulation.simulation_backend.capabilities import register_capabilities
 from plugins.simulation.simulation_backend.capabilities.capture_runs import CaptureRunProvider
 from plugins.simulation.simulation_backend.application.capture_worker import (
@@ -90,19 +93,19 @@ class Repository:
 
 class Connector:
     def __init__(self): self.plans = []
-    def queue_plan(self, plan, context): self.plans.append(plan); return {"operation_id": plan.plan_id, "status": "accepted"}
+    async def queue_plan(self, plan, context): self.plans.append(plan); return {"operation_id": plan.plan_id, "status": "accepted"}
     @property
     def last_plan(self): return self.plans[-1]
 
 
 class OfflineConnector(Connector):
-    def queue_plan(self, plan, context):
+    async def queue_plan(self, plan, context):
         raise SimulationWorkflowError("connector_offline")
 
 
 class Craft:
     def __init__(self): self.calls = []
-    def attach_screenshot(self, *, bop_version_gid, operation_id, artifact_ref, capture_run_id, context):
+    async def attach_screenshot(self, *, bop_version_gid, operation_id, artifact_ref, capture_run_id, context):
         self.calls.append((bop_version_gid, operation_id, artifact_ref["artifact_id"], capture_run_id))
 
 
@@ -117,13 +120,16 @@ def _workflow():
 
 
 def _context():
-    return CapabilityContext(user_gid="user-1", team_gid="team-1", source="agent")
+    return CapabilityContext(
+        user_gid="user-1", team_gid="team-1", source="agent",
+        capability_version_gid="cv2_test", business_definition_hash="sha256:" + "d" * 64,
+    )
 
 
 def test_capture_plan_orders_operations_descending():
     workflow, _, connector, _ = _workflow()
 
-    workflow.start_capture("env-1", 1, "device-1", _context())
+    asyncio.run(workflow.start_capture("env-1", 1, "device-1", _context()))
 
     captures = [step.payload["operation_id"] for plan in connector.plans for step in plan.steps
                 if step.operation_id == "vismockup.view.capture@1"]
@@ -139,7 +145,7 @@ def test_capture_plan_orders_operations_descending():
 def test_materialization_plan_attaches_models_before_scene_verification():
     workflow, _, connector, _ = _workflow()
 
-    workflow.start_materialization("env-1", 1, "device-1", _context())
+    asyncio.run(workflow.start_materialization("env-1", 1, "device-1", _context()))
 
     operation_ids = [step.operation_id for step in connector.last_plan.steps]
     assert operation_ids[0] == "vismockup.application.probe@1"
@@ -150,27 +156,27 @@ def test_materialization_plan_attaches_models_before_scene_verification():
 
 def test_completed_artifact_is_attached_once_before_later_completed_step():
     workflow, _, _, craft = _workflow()
-    workflow.start_capture("env-1", 1, "device-1", _context())
+    asyncio.run(workflow.start_capture("env-1", 1, "device-1", _context()))
     workflow.record_step_result("run-1", "op-30", status="completed", artifact_ref=ARTIFACT)
 
-    workflow.advance("run-1", _context())
-    workflow.advance("run-1", _context())
+    asyncio.run(workflow.advance("run-1", _context()))
+    asyncio.run(workflow.advance("run-1", _context()))
 
     assert craft.calls == [("bop-v1", "op-30", "artifact-30", "run-1")]
 
 
 def test_outcome_unknown_requires_reconciliation_before_retry():
     workflow, _, _, _ = _workflow()
-    workflow.start_capture("env-1", 1, "device-1", _context())
+    asyncio.run(workflow.start_capture("env-1", 1, "device-1", _context()))
     workflow.record_step_result("run-1", "op-30", status="outcome_unknown")
 
     with pytest.raises(SimulationWorkflowError, match="local_execution_outcome_unknown"):
-        workflow.retry_step("run-1", "op-30", _context())
+        asyncio.run(workflow.retry_step("run-1", "op-30", _context()))
 
 
 def test_cancel_stops_only_unstarted_steps():
     workflow, repository, _, _ = _workflow()
-    workflow.start_capture("env-1", 1, "device-1", _context())
+    asyncio.run(workflow.start_capture("env-1", 1, "device-1", _context()))
     workflow.record_step_result("run-1", "op-30", status="running")
 
     workflow.cancel("run-1", _context())
@@ -180,7 +186,7 @@ def test_cancel_stops_only_unstarted_steps():
     ]
 
 
-def test_capture_capabilities_are_closed_async_and_delegate_to_workflow():
+def test_capture_enqueue_returns_domain_run_identity_without_gateway_shadow_operation():
     workflow, _, _, _ = _workflow()
     registry = CapabilityRegistry()
     register_capabilities(registry, capture_provider=CaptureRunProvider(workflow))
@@ -197,8 +203,9 @@ def test_capture_capabilities_are_closed_async_and_delegate_to_workflow():
     for item in registrations.values():
         assert item.spec.input_schema["additionalProperties"] is False
         assert item.spec.output_schema["additionalProperties"] is False
-    assert registrations["simulation.capture_run.start"].descriptor.execution_mode == "cloud_async"
-    assert registrations["simulation.environment.materialize"].descriptor.operation_policy == "required"
+    assert registrations["simulation.capture_run.start"].descriptor.execution_mode == "cloud_sync"
+    assert registrations["simulation.capture_run.start"].descriptor.operation_policy == "optional"
+    assert registrations["simulation.environment.materialize"].descriptor.operation_policy == "optional"
 
 
 def test_queue_failure_is_persisted_as_failed_before_error_returns():
@@ -209,14 +216,32 @@ def test_queue_failure_is_persisted_as_failed_before_error_returns():
     )
 
     with pytest.raises(SimulationWorkflowError, match="connector_offline"):
-        workflow.start_capture("env-1", 1, "device-1", _context())
+        asyncio.run(workflow.start_capture("env-1", 1, "device-1", _context()))
 
     assert repository.runs["run-offline"]["status"] == "failed"
 
 
+def test_gateway_bound_capture_plan_uses_exact_descriptor_provenance():
+    workflow, _, connector, _ = _workflow()
+    registry = CapabilityRegistry()
+    register_capabilities(registry, capture_provider=CaptureRunProvider(workflow))
+    payload = {"environment_id": "env-1", "environment_version": 1, "device_id": "device-1"}
+    token = confirmation_manager.issue("simulation.capture_run.start", 1, "user-1", payload)
+    context = CapabilityContext(
+        user_gid="user-1", team_gid="team-1", permissions=("simulation.use",),
+        confirmation_token=token,
+    )
+
+    asyncio.run(registry.invoke("simulation.capture_run.start", payload, context, version=1))
+
+    descriptor = registry.get("simulation.capture_run.start", 1).descriptor
+    assert connector.plans[0].capability_version_gid == descriptor.capability_version_gid
+    assert connector.plans[0].business_definition_hash == business_definition_hash(descriptor)
+
+
 def test_signed_connector_outcome_advances_capture_and_attaches_artifact_once():
     workflow, _, connector, craft = _workflow()
-    workflow.start_capture("env-1", 1, "device-1", _context())
+    asyncio.run(workflow.start_capture("env-1", 1, "device-1", _context()))
     plans = tuple(connector.plans)
     now = datetime(2026, 9, 3, tzinfo=UTC)
     results = []
@@ -232,7 +257,7 @@ def test_signed_connector_outcome_advances_capture_and_attaches_artifact_once():
             protocol=plan.protocol, plan_id=plan.plan_id, status="completed",
             steps=tuple(results), reported_at=now,
         )
-        workflow.apply_connector_outcome(plan, outcome, _context())
-        workflow.apply_connector_outcome(plan, outcome, _context())
+        asyncio.run(workflow.apply_connector_outcome(plan, outcome, _context()))
+        asyncio.run(workflow.apply_connector_outcome(plan, outcome, _context()))
 
     assert [call[1] for call in craft.calls] == ["op-30", "op-20", "op-10"]

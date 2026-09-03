@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import asyncio
 from datetime import UTC, datetime
+from types import SimpleNamespace
 
 import pytest
 
@@ -12,6 +14,8 @@ from plugins.simulation.simulation_backend.application.document_snapshots import
     DocumentSnapshotWorkflow,
 )
 from plugins.simulation.simulation_backend.application.capture_worker import SimulationWorkflowError
+from plugins.simulation.simulation_backend.capabilities import _authorize_document_snapshot
+from plugins.simulation.simulation_backend.capabilities import default_snapshot_workflow
 
 
 NOW = datetime(2026, 9, 3, tzinfo=UTC)
@@ -39,11 +43,14 @@ class Repository:
 
 class Connector:
     def __init__(self): self.plans = []
-    def queue_plan(self, plan, context): self.plans.append(plan)
+    async def queue_plan(self, plan, context): self.plans.append(plan)
 
 
 def context(user="user-1", team="team-1"):
-    return CapabilityContext(user_gid=user, team_gid=team)
+    return CapabilityContext(
+        user_gid=user, team_gid=team, capability_version_gid="cv2_test",
+        business_definition_hash="sha256:" + "d" * 64,
+    )
 
 
 def test_snapshot_request_is_idempotent_and_completes_only_from_connector_outcome():
@@ -54,8 +61,8 @@ def test_snapshot_request_is_idempotent_and_completes_only_from_connector_outcom
         id_factory=lambda _prefix: next(ids), clock=lambda: NOW,
     )
 
-    first = workflow.request("device-1", "web-request-1", context())
-    second = workflow.request("device-1", "web-request-1", context())
+    first = asyncio.run(workflow.request("device-1", "web-request-1", context()))
+    second = asyncio.run(workflow.request("device-1", "web-request-1", context()))
     assert first["status"] == second["status"] == "queued"
     assert len(connector.plans) == 1
 
@@ -85,7 +92,23 @@ def test_snapshot_visibility_is_owner_or_team_scoped():
         repository=ScopedRepository(), connector_port=Connector(),
         id_factory=lambda _prefix: "snapshot-1", clock=lambda: NOW,
     )
-    workflow.request("device-1", "web-request-1", context())
+    asyncio.run(workflow.request("device-1", "web-request-1", context()))
     assert workflow.get("snapshot-1", context("user-2"))["snapshot_request_id"] == "snapshot-1"
     with pytest.raises(SimulationWorkflowError, match="document_snapshot_not_found"):
         workflow.get("snapshot-1", context("user-3", "team-2"))
+
+
+def test_snapshot_resource_authorizer_delegates_visibility_to_simulation_repository(monkeypatch):
+    calls = []
+    monkeypatch.setattr(
+        default_snapshot_workflow.repository,
+        "can_read_request",
+        lambda request_id, **identity: calls.append((request_id, identity)) or True,
+    )
+    identity = SimpleNamespace(
+        actor=SimpleNamespace(user_id="user-1"),
+        tenant=SimpleNamespace(tenant_id="team-1"),
+    )
+
+    assert _authorize_document_snapshot("snapshot-1", identity) is True
+    assert calls == [("snapshot-1", {"user_gid": "user-1", "team_gid": "team-1"})]

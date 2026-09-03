@@ -44,15 +44,20 @@ class DocumentSnapshotWorkflow:
         self.id_factory = id_factory or (lambda prefix: f"{prefix}-{secrets.token_hex(16)}")
         self.clock = clock or (lambda: datetime.now(UTC))
 
-    def request(
+    async def request(
         self, device_id: str, request_key: str, context: CapabilityContext,
     ) -> dict[str, Any]:
         if not context.team_gid:
             raise SimulationWorkflowError("tenant_context_required")
+        version_gid = str(getattr(context, "capability_version_gid", "") or "")
+        definition_hash = str(getattr(context, "business_definition_hash", "") or "")
+        if not version_gid.startswith("cv2_") or not definition_hash.startswith("sha256:"):
+            raise SimulationWorkflowError("capability_provenance_required")
         request_id = self.id_factory("snapshot")
         plan = build_document_snapshot_plan(
             plan_id=request_id, device_id=device_id, tenant_id=context.team_gid,
             user_id=context.user_gid, issued_at=self.clock(),
+            capability_version_gid=version_gid, business_definition_hash=definition_hash,
         )
         row = {
             "snapshot_request_id": request_id, "request_key": request_key,
@@ -65,7 +70,7 @@ class DocumentSnapshotWorkflow:
         if persisted["snapshot_request_id"] != request_id:
             return persisted
         try:
-            self.connector_port.queue_plan(plan, context)
+            await self.connector_port.queue_plan(plan, context)
         except Exception:
             self.repository.complete_request(
                 request_id, status="failed", failure_code="connector_offline",
