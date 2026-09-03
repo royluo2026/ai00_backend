@@ -8,7 +8,7 @@ Execute the governed integration.mapping_target.upsert Integration outcome.
 - 不适用：The caller can use an owning domain Capability directly without external integration.
 - 生命周期：`stable`
 - 所属领域：`integration`
-- Catalog Release：`rel_81acffa84ca2a65a2390a086d605e708`
+- Catalog Release：`rel_79ebfa43788065717b2a11476ede257f`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -145,7 +145,7 @@ Execute the governed integration.mapping_target.upsert Integration outcome.
 ```json
 {
   "capability_id": "integration.mapping_target.upsert",
-  "catalog_release": "rel_81acffa84ca2a65a2390a086d605e708",
+  "catalog_release": "rel_79ebfa43788065717b2a11476ede257f",
   "major_version": 1,
   "payload": {
     "binding_id": "example",

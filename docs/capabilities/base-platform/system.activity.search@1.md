@@ -8,7 +8,7 @@ Search immutable activity summaries.
 - 不适用：A domain-specific stable ref is already known.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_81acffa84ca2a65a2390a086d605e708`
+- Catalog Release：`rel_79ebfa43788065717b2a11476ede257f`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -83,7 +83,7 @@ Search immutable activity summaries.
 ```json
 {
   "capability_id": "system.activity.search",
-  "catalog_release": "rel_81acffa84ca2a65a2390a086d605e708",
+  "catalog_release": "rel_79ebfa43788065717b2a11476ede257f",
   "major_version": 1,
   "payload": {}
 }

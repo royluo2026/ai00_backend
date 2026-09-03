@@ -8,7 +8,7 @@ Update or soft-delete an active BOP main-tree entry with linked-entity and audit
 - 不适用：The request creates/copies/imports entries, changes links only, or operates on staging.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_81acffa84ca2a65a2390a086d605e708`
+- Catalog Release：`rel_79ebfa43788065717b2a11476ede257f`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -153,7 +153,7 @@ Update or soft-delete an active BOP main-tree entry with linked-entity and audit
 ```json
 {
   "capability_id": "craft.bop.entry.change.apply",
-  "catalog_release": "rel_81acffa84ca2a65a2390a086d605e708",
+  "catalog_release": "rel_79ebfa43788065717b2a11476ede257f",
   "major_version": 1,
   "payload": {
     "entry_gid": "example",
@@ -172,7 +172,77 @@ Update or soft-delete an active BOP main-tree entry with linked-entity and audit
   "properties": {
     "data": {
       "additionalProperties": false,
-      "properties": {},
+      "properties": {
+        "ai00_level": {
+          "description": "Provider-validated transport value."
+        },
+        "child_vpps": {
+          "description": "Provider-validated transport value."
+        },
+        "created_at": {
+          "description": "Provider-validated transport value."
+        },
+        "created_by": {
+          "description": "Provider-validated transport value."
+        },
+        "deleted": {
+          "type": "boolean"
+        },
+        "entity_data": {
+          "description": "Provider-validated transport value."
+        },
+        "entity_gid": {
+          "description": "Provider-validated transport value."
+        },
+        "gid": {
+          "description": "Provider-validated transport value."
+        },
+        "level": {
+          "description": "Provider-validated transport value."
+        },
+        "link_gid": {
+          "description": "Provider-validated transport value."
+        },
+        "link_type": {
+          "description": "Provider-validated transport value."
+        },
+        "meta": {
+          "description": "Provider-validated transport value."
+        },
+        "node_type": {
+          "description": "Provider-validated transport value."
+        },
+        "owner_gid": {
+          "description": "Provider-validated transport value."
+        },
+        "parent_bop_title": {
+          "description": "Provider-validated transport value."
+        },
+        "parent_gid": {
+          "description": "Provider-validated transport value."
+        },
+        "process_flow_pic": {
+          "description": "Provider-validated transport value."
+        },
+        "sort_order": {
+          "description": "Provider-validated transport value."
+        },
+        "title": {
+          "description": "Provider-validated transport value."
+        },
+        "updated_at": {
+          "description": "Provider-validated transport value."
+        },
+        "version_gid": {
+          "description": "Provider-validated transport value."
+        },
+        "vpps": {
+          "description": "Provider-validated transport value."
+        },
+        "vpps_desc": {
+          "description": "Provider-validated transport value."
+        }
+      },
       "type": "object"
     },
     "version_gid": {

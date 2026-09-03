@@ -853,7 +853,16 @@ INPUT_SCHEMAS[("craft.bop.entry.change.apply", 1)] = _object({
     "properties": {"type": "array", "minItems": 1, "maxItems": 200, "items": _BOP_PROPERTY_UPDATE},
 }, required=("operation", "entry_gid"))
 OUTPUT_SCHEMAS[("craft.bop.entry.change.apply", 1)] = _object({
-    "data": {"type": "object", "additionalProperties": True},
+    "data": _object({
+        **_fields(
+            "gid", "version_gid", "parent_gid", "node_type", "sort_order", "level",
+            "ai00_level", "title", "vpps", "vpps_desc", "parent_bop_title",
+            "child_vpps", "owner_gid", "created_by", "meta", "created_at",
+            "updated_at", "process_flow_pic", "link_gid", "link_type",
+            "entity_gid", "entity_data",
+        ),
+        "deleted": BOOLEAN,
+    }),
     "version_gid": STRING,
     "warnings": {"type": "array", "maxItems": 200, "items": {"description": "Advisory rule violation."}},
 }, required=("data",))

@@ -13,7 +13,7 @@ from plugins.ontology.public import active_projection
 
 from ..data.connection import get_craft_conn
 from ..rule_engine.checker import validate_with_proposed
-from ..routers._bop._constants import _AI00_LEVEL, _LINK_TARGET_TABLES
+from ..routers._bop._constants import _AI00_LEVEL, _ENTRY_BY_GID_SQL, _LINK_TARGET_TABLES
 from ..routers._bop._helpers import _check_line_editable, _log_entry_op, _sync_child_vpps
 
 
@@ -369,7 +369,7 @@ def apply_bop_entry_change(payload: dict[str, Any], context: CapabilityContext) 
                 _sync_child_vpps(cur, updates["parent_gid"], version_gid)
             _log_entry_op(cur, version_gid=version_gid, entry_gid=entry_gid, entry_title=str(updates.get("title") or entry.get("title") or ""), op_type="update_entry",
                           old_state=entry, new_state={**updates, "properties": properties} if properties else updates, user_gid=context.user_gid, user_name=context.user_gid)
-            cur.execute("SELECT * FROM workmanship_bop_bop_entries WHERE gid=%s", (entry_gid,))
+            cur.execute(_ENTRY_BY_GID_SQL, (entry_gid,))
             result = jsonable_encoder({"data": dict(cur.fetchone() or {}), "version_gid": version_gid})
             if properties and advisory:
                 result["warnings"] = jsonable_encoder(advisory)
