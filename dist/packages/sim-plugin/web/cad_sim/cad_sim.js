@@ -1937,7 +1937,7 @@ function _initGovernedCapture() {
       return;
     }
     try {
-      const result = await _governedCapture.compose({
+      const result = await _governedCapture.composeFromActiveDocument({
         name: $('connectorEnvironmentName').value.trim() || '工艺倒序截图环境',
         device_id: deviceId,
         execution_plan_ref: { version_gid: version.gid, revision, content_hash: contentHash },

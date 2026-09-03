@@ -6,12 +6,14 @@
   if (root) root.SimulationCaptureWorkflow = api;
 })(typeof window !== 'undefined' ? window : globalThis, function() {
   const ALLOWED_CALLS = Object.freeze([
+    'simulation.document_snapshot.request', 'simulation.document_snapshot.get',
     'simulation.environment.preflight', 'simulation.environment.compose',
     'simulation.environment.materialize', 'simulation.capture_run.start',
     'simulation.capture_run.get', 'simulation.capture_run.cancel',
     'simulation.capture_step.retry',
   ]);
   const WRITE_CALLS = new Set([
+    'simulation.document_snapshot.request',
     'simulation.environment.compose', 'simulation.environment.materialize',
     'simulation.capture_run.start', 'simulation.capture_run.cancel',
     'simulation.capture_step.retry',
@@ -68,7 +70,7 @@
     if (typeof invoke !== 'function') throw new TypeError('invoke is required');
     const state = {
       environmentId: '', environmentVersion: 0, deviceId: '', preflight: null,
-      captureRun: null, error: null, polling: false,
+      snapshotRequest: null, captureRun: null, error: null, polling: false,
     };
     const publish = () => onChange({ ...state });
     const call = async (id, payload, options) => {
@@ -103,9 +105,33 @@
         publish();
       },
       async compose(payload) {
+        if (!payload?.snapshot_request_id) throw new Error('active_document_snapshot_required');
         const result = await call('simulation.environment.compose', payload, { idempotencyKey: randomKey('compose') });
         if (result.status === 'composed') workflow.setEnvironment(result.environment_id, result.environment_version);
         return result;
+      },
+      async composeFromActiveDocument(payload) {
+        const deviceId = String(payload?.device_id || '');
+        if (!deviceId) throw new Error('connector_required');
+        state.deviceId = deviceId;
+        state.snapshotRequest = await call('simulation.document_snapshot.request', {
+          device_id: deviceId, request_key: randomKey('document-snapshot'),
+        }, { idempotencyKey: randomKey('document-snapshot-request') });
+        let polls = 0;
+        while (state.snapshotRequest.status === 'queued' && polls++ < 150) {
+          await new Promise(resolve => setTimer(resolve, 2000));
+          state.snapshotRequest = await call('simulation.document_snapshot.get', {
+            snapshot_request_id: state.snapshotRequest.snapshot_request_id,
+          });
+        }
+        if (state.snapshotRequest.status !== 'completed') {
+          const error = new Error(state.snapshotRequest.failure_code || 'active_document_snapshot_required');
+          error.code = state.snapshotRequest.failure_code || 'active_document_snapshot_required';
+          throw error;
+        }
+        return workflow.compose({
+          ...payload, snapshot_request_id: state.snapshotRequest.snapshot_request_id,
+        });
       },
       async selectConnector(deviceId) {
         state.deviceId = String(deviceId || '');

@@ -31,6 +31,7 @@ test('start is disabled until connector preflight passes', async () => {
 
 test('browser only calls governed gateway capabilities', () => {
   assert.deepEqual(ALLOWED_CALLS, [
+    'simulation.document_snapshot.request', 'simulation.document_snapshot.get',
     'simulation.environment.preflight', 'simulation.environment.compose',
     'simulation.environment.materialize', 'simulation.capture_run.start',
     'simulation.capture_run.get', 'simulation.capture_run.cancel',
@@ -39,6 +40,29 @@ test('browser only calls governed gateway capabilities', () => {
   const source = fs.readFileSync(path.join(__dirname, 'capture_workflow.js'), 'utf8');
   assert.equal(source.includes('127.0.0.1'), false);
   assert.equal(source.includes('/bridge/'), false);
+});
+
+
+test('environment composition waits for a confirmed active document snapshot', async () => {
+  const calls = [];
+  const workflow = createCaptureWorkflow({
+    invoke: async (id, payload) => {
+      calls.push([id, payload]);
+      if (id === 'simulation.document_snapshot.request') return { snapshot_request_id: 'snapshot-1', status: 'queued' };
+      if (id === 'simulation.document_snapshot.get') return { snapshot_request_id: 'snapshot-1', status: 'completed' };
+      if (id === 'simulation.environment.compose') return { status: 'composed', environment_id: 'env-1', environment_version: 1 };
+      throw new Error(`unexpected ${id}`);
+    },
+    setTimer: callback => { callback(); return 1; },
+  });
+
+  await workflow.composeFromActiveDocument({ device_id: 'device-1', name: 'environment' });
+
+  assert.deepEqual(calls.map(item => item[0]), [
+    'simulation.document_snapshot.request', 'simulation.document_snapshot.get',
+    'simulation.environment.compose',
+  ]);
+  assert.equal(calls[2][1].snapshot_request_id, 'snapshot-1');
 });
 
 
