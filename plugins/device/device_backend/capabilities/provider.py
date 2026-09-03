@@ -11,6 +11,11 @@ from .contracts import INPUT_SCHEMAS, OUTPUT_SCHEMAS
 DEPRECATED_LOCAL_DEVICE_CAPABILITIES = frozenset({
     "local.device.change.apply", "local.device.read",
 })
+DEPRECATED_DIRECT_VISMOCKUP_CAPABILITIES = frozenset({
+    "vismockup.status", "vismockup.launch", "vismockup.model.open",
+    "vismockup.tree", "vismockup.highlight", "vismockup.visibility",
+    "vismockup.capture",
+})
 
 
 _ERRORS = tuple(DomainErrorContract(code=code, meaning=meaning, retryable=retryable) for code, meaning, retryable in (
@@ -24,7 +29,10 @@ _ERRORS = tuple(DomainErrorContract(code=code, meaning=meaning, retryable=retrya
 
 
 def governed_spec(spec: Any) -> Any:
-    return spec.model_copy(update={"plugin_callable": True, "input_schema": INPUT_SCHEMAS[spec.id], "output_schema": OUTPUT_SCHEMAS[spec.id]})
+    return spec.model_copy(update={
+        "plugin_callable": spec.id not in DEPRECATED_DIRECT_VISMOCKUP_CAPABILITIES,
+        "input_schema": INPUT_SCHEMAS[spec.id], "output_schema": OUTPUT_SCHEMAS[spec.id],
+    })
 
 
 def descriptor_for(spec: Any):
@@ -40,15 +48,25 @@ def descriptor_for(spec: Any):
     updates = {
         "lifecycle_status": (
             LifecycleStatus.DEPRECATED
-            if governed.id in DEPRECATED_LOCAL_DEVICE_CAPABILITIES
+            if governed.id in DEPRECATED_LOCAL_DEVICE_CAPABILITIES | DEPRECATED_DIRECT_VISMOCKUP_CAPABILITIES
             else LifecycleStatus.STABLE
         ),
         "deprecation_message": (
             "Legacy device lifecycle identity retained for compatibility; no "
             "bound Local Runtime application outcome is currently registered."
-            if governed.id in DEPRECATED_LOCAL_DEVICE_CAPABILITIES else None
+            if governed.id in DEPRECATED_LOCAL_DEVICE_CAPABILITIES else (
+                "Use simulation.capture_run.start; direct VisMockup commands remain an internal AI00 Connector compatibility path only."
+                if governed.id == "vismockup.capture" else (
+                    "Use simulation.environment.materialize; direct VisMockup commands remain an internal AI00 Connector compatibility path only."
+                    if governed.id in DEPRECATED_DIRECT_VISMOCKUP_CAPABILITIES else None
+                )
+            )
         ),
-        "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True, local_runtime=is_local),
+        "exposure": (
+            ExposurePolicy(web=False, api=False, plugin=False, agent=False, mcp=False, local_runtime=True)
+            if governed.id in DEPRECATED_DIRECT_VISMOCKUP_CAPABILITIES
+            else ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True, local_runtime=is_local)
+        ),
         "exposure_policy_source": "provider_explicit",
         "automation_level": AutomationLevel.A1 if is_write else AutomationLevel.A2,
         "authorization_policy": "local-runtime.v2:agent.run",
@@ -100,4 +118,4 @@ def register(registry: Any, spec: Any, handler: Any) -> None:
     registry.register(governed, handler, descriptor=descriptor_for(governed))
 
 
-__all__ = ["DEPRECATED_LOCAL_DEVICE_CAPABILITIES", "descriptor_for", "register"]
+__all__ = ["DEPRECATED_DIRECT_VISMOCKUP_CAPABILITIES", "DEPRECATED_LOCAL_DEVICE_CAPABILITIES", "descriptor_for", "register"]

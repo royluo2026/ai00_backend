@@ -56,12 +56,12 @@ def test_envelope_is_closed_and_payload_hash_is_verified():
 
 
 def test_dotnet_contract_declares_canonical_json_key_rotation_and_crash_recovery():
-    contracts = (ROOT / "local-runtime/src/Ai00.LocalRuntime.Contracts/Contracts.cs").read_text(encoding="utf-8")
-    ledger = (ROOT / "local-runtime/src/Ai00.LocalRuntime.SessionHost/CommandLedger.cs").read_text(encoding="utf-8")
-    worker = (ROOT / "local-runtime/src/Ai00.LocalRuntime.Service/RuntimeWorker.cs").read_text(encoding="utf-8")
-    pipe_host = (ROOT / "local-runtime/src/Ai00.LocalRuntime.SessionHost/CommandPipeHost.cs").read_text(encoding="utf-8")
-    gateway = (ROOT / "local-runtime/src/Ai00.LocalRuntime.Service/DeviceGatewayClient.cs").read_text(encoding="utf-8")
-    dispatcher = (ROOT / "local-runtime/src/Ai00.LocalRuntime.SessionHost/CommandDispatcher.cs").read_text(encoding="utf-8")
+    contracts = (ROOT / "local-runtime/src/Ai00.Connector.Contracts/Contracts.cs").read_text(encoding="utf-8")
+    ledger = (ROOT / "local-runtime/src/Ai00.Connector.SessionHost/CommandLedger.cs").read_text(encoding="utf-8")
+    worker = (ROOT / "local-runtime/src/Ai00.Connector.Service/RuntimeWorker.cs").read_text(encoding="utf-8")
+    pipe_host = (ROOT / "local-runtime/src/Ai00.Connector.SessionHost/CommandPipeHost.cs").read_text(encoding="utf-8")
+    gateway = (ROOT / "local-runtime/src/Ai00.Connector.Service/DeviceGatewayClient.cs").read_text(encoding="utf-8")
+    dispatcher = (ROOT / "local-runtime/src/Ai00.Connector.SessionHost/CommandDispatcher.cs").read_text(encoding="utf-8")
     assert "CanonicalJson" in contracts
     assert "KeyId" in contracts
     assert "ai00.local-operation.v2" in contracts
@@ -102,7 +102,7 @@ def test_cloud_lease_is_signed_and_binds_lease_to_operation(monkeypatch):
         control_plane.build_signed_lease({**row, "payload_hash": "0" * 64}, "lease-2")
 
 
-def test_native_local_provider_is_stable_and_exposed_to_plugins_and_agents():
+def test_native_local_provider_deprecates_direct_vismockup_exposure():
     registry = CapabilityRegistry()
     register_capabilities(registry)
     registrations = {item.spec.id: item for item in registry.snapshot()}
@@ -113,9 +113,15 @@ def test_native_local_provider_is_stable_and_exposed_to_plugins_and_agents():
         if capability_id.startswith("local.device."):
             assert descriptor.lifecycle_status.value == "deprecated"
             assert descriptor.input_schema["properties"]["operation"]["enum"] == []
+        elif capability_id.startswith("vismockup."):
+            assert descriptor.lifecycle_status.value == "deprecated"
+            assert descriptor.exposure.local_runtime
+            assert not descriptor.exposure.plugin
+            assert not descriptor.exposure.agent
+            assert not descriptor.exposure.mcp
         else:
             assert descriptor.lifecycle_status.value == "stable"
-        assert descriptor.exposure.plugin and descriptor.exposure.agent and descriptor.exposure.mcp
+            assert descriptor.exposure.plugin and descriptor.exposure.agent and descriptor.exposure.mcp
         expected_operation_policy = (
             "none"
             if capability_id in {
