@@ -107,3 +107,12 @@ public static class RuntimeCapabilities
         "vismockup.tree", "vismockup.highlight", "vismockup.visibility", "vismockup.capture"
     };
 }
+
+public static class ConnectorPipeName
+{
+    public static string For(string deviceId, string windowsSid)
+    {
+        var digest = SHA256.HashData(Encoding.UTF8.GetBytes(deviceId + "\n" + windowsSid));
+        return "ai00-connector-v1-" + Convert.ToHexString(digest).ToLowerInvariant()[..24];
+    }
+}

@@ -6,17 +6,18 @@ using Microsoft.Extensions.Options;
 
 namespace Ai00.Connector.Service;
 
-public sealed class DeviceGatewayClient(HttpClient http, IOptions<RuntimeOptions> options)
+public sealed class DeviceGatewayClient(HttpClient http, IOptions<RuntimeOptions> options, IDeviceCredentialStore credentialStore)
 {
     private readonly RuntimeOptions _options = options.Value;
 
     private HttpRequestMessage Request(HttpMethod method, string path, object? body = null)
     {
-        if (string.IsNullOrWhiteSpace(_options.DeviceId) || string.IsNullOrWhiteSpace(_options.DeviceToken))
-            throw new InvalidOperationException("Device enrollment is required");
+        var credential = credentialStore.Load();
+        if (!string.IsNullOrWhiteSpace(_options.DeviceId) && _options.DeviceId != credential.DeviceId)
+            throw new InvalidOperationException("device_identity_mismatch");
         var request = new HttpRequestMessage(method, new Uri(new Uri(_options.GatewayUrl.TrimEnd('/') + "/"), path.TrimStart('/')));
-        request.Headers.Add("X-AI00-Device-ID", _options.DeviceId);
-        request.Headers.Add("X-AI00-Device-Token", _options.DeviceToken);
+        request.Headers.Add("X-AI00-Device-ID", credential.DeviceId);
+        request.Headers.Add("X-AI00-Device-Token", credential.DeviceToken);
         if (body is not null) request.Content = JsonContent.Create(body);
         return request;
     }
@@ -44,7 +45,7 @@ public sealed class DeviceGatewayClient(HttpClient http, IOptions<RuntimeOptions
         var outcome = new OperationOutcome(OperationEnvelope.ProtocolVersion, operationId, completion.Status, completion.Result, completion.ErrorCode, reportedAt);
         using var request = Request(HttpMethod.Post, $"/api/v1/device-runtime/commands/{Uri.EscapeDataString(operationId)}/complete", new
         {
-            lease_id = leaseId, outcome, signature = OutcomeSecurity.Sign(outcome, _options.DeviceToken)
+            lease_id = leaseId, outcome, signature = OutcomeSecurity.Sign(outcome, credentialStore.Load().DeviceToken)
         });
         using var response = await http.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
