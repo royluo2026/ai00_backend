@@ -120,20 +120,20 @@ AI00 Connector（单工作站、单绑定用户）
 
 #### 5.3.1 复用现有能力
 
-- `simulation.environment.get@1`
-- `simulation.environment.search@1`
-- `simulation.environment.archive@1`
 - `digital_model.version.get@1`
 - `digital_model.component.search@1`
 - 设备注册、读取和撤销能力
 
-现有 `simulation.environment.create@1` 只固定工艺计划、数模快照、参数集和求解器配置，不能表达当前 VisMockup BOM、资源数模绑定或 Connector 兼容约束。不得在 `@1` 上静默改变业务语义。
+现有 `simulation.environment.create/get/search/archive@1` 只表达由工艺计划、数模快照、参数集和求解器配置组成的旧环境，不能表达当前 VisMockup BOM、资源数模绑定或 Connector 兼容约束。不得在 `@1` 上静默改变业务语义或输出 Schema。
 
 #### 5.3.2 新增或补齐能力
 
 | Capability | 所有者 | 原子业务效果 |
 |---|---|---|
 | `simulation.environment.compose@1` | simulation | 从已固定的工艺、BOM 和资源数模解析结果生成一个不可变环境版本，或返回完整未解析项而不创建环境。 |
+| `simulation.environment.manifest.get@1` | simulation | 读取一个可见的、不可变 Connector 环境 Manifest 版本。 |
+| `simulation.environment.manifest.search@1` | simulation | 有界查询调用者可见的 Connector 环境 Manifest。 |
+| `simulation.environment.manifest.archive@1` | simulation | 归档一个 Connector 环境身份，不修改其历史 Manifest 版本。 |
 | `simulation.environment.preflight@1` | simulation | 验证指定环境在目标 Connector/VisMockup 上可物化，并返回无副作用的兼容性报告。 |
 | `simulation.environment.materialize@1` | simulation | 创建一次异步物化运行，使指定环境在目标 VisMockup 会话中成为已验证场景。 |
 | `simulation.capture_run.start@1` | simulation | 为一个已物化环境创建倒序工艺截图运行。 |
