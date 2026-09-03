@@ -1,4 +1,8 @@
-"""Live recovery coverage for the Agent and Simulation durable workers."""
+"""Live-database recovery coverage for Agent and Simulation durable workers.
+
+These tests exercise the production repositories and worker implementations. They do
+not claim to boot the complete HTTP application or prove a deployed Gateway runtime.
+"""
 from __future__ import annotations
 
 import asyncio
@@ -58,13 +62,33 @@ def _unique_plan() -> ConnectorExecutionPlanV1:
     return ConnectorExecutionPlanV1.model_validate(value)
 
 
-def test_agent_lifespan_reconciles_committed_outbox_once(base_db, agent_db):
-    """A committed Agent event converges through the production lifecycle once."""
+def test_agent_outbox_worker_reconciles_committed_outbox_once(
+    base_db, agent_db, request
+):
+    """The production Agent outbox worker reconciles one committed event once."""
     token = uuid.uuid4().hex
     operation_id = "op_" + token
     request_id = "req-p0-" + token
     event_id = "evt-p0-" + token
     payload = {"data": {"interaction_id": "interaction-p0-" + token}, "evidence": []}
+
+    def cleanup():
+        with agent_db() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "DELETE FROM workmanship_agent_capability_outbox WHERE event_id=%s",
+                (event_id,),
+            )
+        with base_db() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "DELETE FROM workmanship_base_capability_audit_outbox WHERE operation_id=%s",
+                (operation_id,),
+            )
+            cursor.execute(
+                "DELETE FROM workmanship_base_capability_outcomes WHERE operation_id=%s",
+                (operation_id,),
+            )
+
+    request.addfinalizer(cleanup)
     with base_db() as conn, conn.cursor() as cursor:
         cursor.execute(
             "INSERT INTO workmanship_base_capability_outcomes "
@@ -120,46 +144,30 @@ def test_agent_lifespan_reconciles_committed_outbox_once(base_db, agent_db):
         finally:
             await registry.stop_lifecycles()
 
-    try:
-        asyncio.run(exercise())
-        assert registry.lifecycle_health("agent.capability-outbox")["status"] == "stopped"
-        assert _row(
-            base_db,
-            "SELECT status FROM workmanship_base_capability_outcomes WHERE operation_id=%s",
-            (operation_id,),
-        )["status"] == "completed"
-        assert _row(
-            base_db,
-            "SELECT COUNT(*) AS count FROM workmanship_base_capability_audit_outbox WHERE operation_id=%s",
-            (operation_id,),
-        )["count"] == 1
-        gateway.reconcile_committed_agent_outcome({
-            "outcome_operation_id": operation_id,
-            "request_id": request_id,
-            "capability_id": "agent.interaction.request",
-            "major_version": 1,
-            "payload": payload,
-        })
-        assert _row(
-            base_db,
-            "SELECT COUNT(*) AS count FROM workmanship_base_capability_audit_outbox WHERE operation_id=%s",
-            (operation_id,),
-        )["count"] == 1
-    finally:
-        with agent_db() as conn, conn.cursor() as cursor:
-            cursor.execute(
-                "DELETE FROM workmanship_agent_capability_outbox WHERE event_id=%s",
-                (event_id,),
-            )
-        with base_db() as conn, conn.cursor() as cursor:
-            cursor.execute(
-                "DELETE FROM workmanship_base_capability_audit_outbox WHERE operation_id=%s",
-                (operation_id,),
-            )
-            cursor.execute(
-                "DELETE FROM workmanship_base_capability_outcomes WHERE operation_id=%s",
-                (operation_id,),
-            )
+    asyncio.run(exercise())
+    assert registry.lifecycle_health("agent.capability-outbox")["status"] == "stopped"
+    assert _row(
+        base_db,
+        "SELECT status FROM workmanship_base_capability_outcomes WHERE operation_id=%s",
+        (operation_id,),
+    )["status"] == "completed"
+    assert _row(
+        base_db,
+        "SELECT COUNT(*) AS count FROM workmanship_base_capability_audit_outbox WHERE operation_id=%s",
+        (operation_id,),
+    )["count"] == 1
+    gateway.reconcile_committed_agent_outcome({
+        "outcome_operation_id": operation_id,
+        "request_id": request_id,
+        "capability_id": "agent.interaction.request",
+        "major_version": 1,
+        "payload": payload,
+    })
+    assert _row(
+        base_db,
+        "SELECT COUNT(*) AS count FROM workmanship_base_capability_audit_outbox WHERE operation_id=%s",
+        (operation_id,),
+    )["count"] == 1
 
 
 class _ProjectionCatalog:
@@ -209,9 +217,9 @@ class _FailOnceProjectionGateway:
 
 
 def test_simulation_projection_recovers_without_duplicate_effect(
-    simulation_db, monkeypatch
+    simulation_db, monkeypatch, request
 ):
-    """A failed Simulation projection retries without duplicating its effect."""
+    """The production projection worker retries without duplicate dispatch."""
     from plugins.simulation.simulation_backend.data import connection
 
     monkeypatch.setenv(
@@ -222,6 +230,20 @@ def test_simulation_projection_recovers_without_duplicate_effect(
     lease_id = "lease-p0-" + uuid.uuid4().hex
     outcome = completed_outcome().model_copy(update={"plan_id": current.plan_id})
     repository = SimulationConnectorRepository()
+
+    def cleanup():
+        with simulation_db() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "DELETE FROM workmanship_sim_connector_projection_outbox WHERE plan_id=%s",
+                (current.plan_id,),
+            )
+            cursor.execute(
+                "DELETE FROM workmanship_sim_connector_plans WHERE plan_id=%s",
+                (current.plan_id,),
+            )
+        connection._pool = None
+
+    request.addfinalizer(cleanup)
     with simulation_db() as conn, conn.cursor() as cursor:
         cursor.execute(
             "INSERT INTO workmanship_sim_connector_plans "
@@ -252,37 +274,25 @@ def test_simulation_projection_recovers_without_duplicate_effect(
         owner="integration-p0-simulation",
         lease_seconds=15,
     )
-    try:
-        assert asyncio.run(worker.run_once()) is True
-        assert _row(
-            simulation_db,
-            "SELECT status FROM workmanship_sim_connector_projection_outbox WHERE plan_id=%s",
-            (current.plan_id,),
-        )["status"] == "retryable_failed"
-        with simulation_db() as conn, conn.cursor() as cursor:
-            cursor.execute(
-                "UPDATE workmanship_sim_connector_projection_outbox "
-                "SET next_retry_at=DATE_SUB(NOW(6),INTERVAL 1 SECOND) WHERE plan_id=%s",
-                (current.plan_id,),
-            )
-        assert asyncio.run(worker.run_once()) is True
-        assert asyncio.run(worker.run_once()) is False
-        result = _row(
-            simulation_db,
-            "SELECT status,attempt FROM workmanship_sim_connector_projection_outbox WHERE plan_id=%s",
+    assert asyncio.run(worker.run_once()) is True
+    assert _row(
+        simulation_db,
+        "SELECT status FROM workmanship_sim_connector_projection_outbox WHERE plan_id=%s",
+        (current.plan_id,),
+    )["status"] == "retryable_failed"
+    with simulation_db() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            "UPDATE workmanship_sim_connector_projection_outbox "
+            "SET next_retry_at=DATE_SUB(NOW(6),INTERVAL 1 SECOND) WHERE plan_id=%s",
             (current.plan_id,),
         )
-        assert result == {"status": "projected", "attempt": 2}
-        assert gateway.calls == 2
-        assert gateway.completed == 1
-    finally:
-        with simulation_db() as conn, conn.cursor() as cursor:
-            cursor.execute(
-                "DELETE FROM workmanship_sim_connector_projection_outbox WHERE plan_id=%s",
-                (current.plan_id,),
-            )
-            cursor.execute(
-                "DELETE FROM workmanship_sim_connector_plans WHERE plan_id=%s",
-                (current.plan_id,),
-            )
-        connection._pool = None
+    assert asyncio.run(worker.run_once()) is True
+    assert asyncio.run(worker.run_once()) is False
+    result = _row(
+        simulation_db,
+        "SELECT status,attempt FROM workmanship_sim_connector_projection_outbox WHERE plan_id=%s",
+        (current.plan_id,),
+    )
+    assert result == {"status": "projected", "attempt": 2}
+    assert gateway.calls == 2
+    assert gateway.completed == 1
