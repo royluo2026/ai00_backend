@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-import hashlib
 import json
 from threading import RLock
 from typing import Any
@@ -13,6 +12,7 @@ from backend.capability_v2.contracts import (
 )
 from backend.capability_v2.domain_client import DomainCapabilityClient, DomainInvocation
 from backend.capability_v2.provider_contracts import CapabilityBusinessError
+from backend.contracts.connector_execution_plan_v1 import canonical_hash
 
 
 class SimulationRuntimePorts:
@@ -132,9 +132,8 @@ class GovernedSimulationRuntimeClient:
             "plan_json": json.dumps(plan.model_dump(mode="json"), sort_keys=True, separators=(",", ":")),
             "outcome_json": json.dumps(outcome_value, sort_keys=True, separators=(",", ":")),
         }
-        digest = hashlib.sha256(
-            payload["outcome_json"].encode("utf-8")
-        ).hexdigest()
+        outcome_hash = canonical_hash(outcome_value)
+        digest = outcome_hash.removeprefix("sha256:")
         identity = ConsumerIdentity(
             actor=ActorIdentity(
                 user_id=plan.user_id,
@@ -154,7 +153,7 @@ class GovernedSimulationRuntimeClient:
         )
         result = await self.client.invoke(DomainInvocation(
             capability_id, 1, payload,
-            idempotency_key=f"{plan.plan_id}:{digest}:{attempt}",
+            idempotency_key=f"{plan.plan_id}:{outcome_hash}",
         ), identity, correlation)
         if result.status is not CapabilityStatus.COMPLETED or result.error is not None:
             error = result.error

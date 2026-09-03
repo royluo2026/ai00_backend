@@ -21,7 +21,10 @@ from backend.contracts.connector_execution_plan_v1 import (
     canonical_hash,
 )
 from backend.domain_ports.local_integration import canonical_json_bytes
-from backend.domain_ports.simulation_runtime import ConnectorOutcomePortProxy
+from backend.domain_ports.simulation_runtime import (
+    ConnectorOutcomePortProxy,
+    GovernedSimulationRuntimeClient,
+)
 
 from ..data.connector_repository import (
     ConnectorRepositoryError,
@@ -184,35 +187,17 @@ class ConnectorControlPlane:
                 raise ConnectorError("plan_outcome_invalid")
             if any(step.status != "completed" for step in outcome.steps[:-1]):
                 raise ConnectorError("plan_outcome_invalid")
+        target = (
+            self.outcome_port.target(plan)
+            if self.outcome_port is not None and hasattr(self.outcome_port, "target")
+            else GovernedSimulationRuntimeClient.connector_outcome_target(plan)[0]
+        )
         try:
-            self.repository.complete_plan(connector_id, plan_id, lease_id, outcome)
+            self.repository.complete_with_projection_intent(
+                connector_id, plan_id, lease_id, outcome, target,
+            )
         except ConnectorRepositoryError as exc:
             raise ConnectorError(str(exc)) from exc
-        if self.outcome_port is not None:
-            target = (
-                self.outcome_port.target(plan)
-                if hasattr(self.outcome_port, "target")
-                else "simulation.connector_outcome.apply"
-            )
-            attempt = 1
-            if hasattr(self.repository, "begin_projection"):
-                attempt = self.repository.begin_projection(
-                    plan_id, canonical_hash(outcome.model_dump(mode="json")), target,
-                )
-                if attempt is None:
-                    return
-            try:
-                await self.outcome_port.apply(plan, outcome, attempt=attempt)
-            except Exception as exc:
-                if hasattr(self.repository, "fail_projection"):
-                    self.repository.fail_projection(
-                        plan_id, attempt,
-                        retryable=bool(getattr(exc, "retryable", True)),
-                        error_code=str(exc)[:128],
-                    )
-                raise
-            if hasattr(self.repository, "complete_projection"):
-                self.repository.complete_projection(plan_id, attempt)
 
 
 connector_control_plane = ConnectorControlPlane(

@@ -11,13 +11,14 @@ import json
 from pathlib import Path
 import sys
 from typing import Any, Mapping, Protocol, Sequence
+from urllib.parse import unquote, urlparse
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
-from backend.capability_v2.domain_database import connect_domain_database
+from backend.capability_v2.domain_database import DomainDatabaseUrl, connect_domain_database
 
 
 @dataclass(frozen=True)
@@ -60,6 +61,22 @@ class RowStore(Protocol):
 
 class MigrationConflict(RuntimeError):
     pass
+
+
+def _database_url(value: str, option: str) -> DomainDatabaseUrl:
+    parsed = urlparse(value)
+    database = unquote(parsed.path.removeprefix("/"))
+    if (
+        parsed.scheme not in {"mysql", "mysql+pymysql"}
+        or not parsed.hostname or not parsed.username or parsed.password is None
+        or not database or "/" in database or parsed.query or parsed.fragment
+    ):
+        raise ValueError(f"invalid_database_url:{option}")
+    return DomainDatabaseUrl(
+        scheme=parsed.scheme, host=parsed.hostname, port=parsed.port or 3306,
+        username=unquote(parsed.username), password=unquote(parsed.password),
+        database=database,
+    )
 
 
 @dataclass(frozen=True)
@@ -208,8 +225,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.source_device_db_url == args.target_simulation_db_url:
         parser.error("source and target database URLs must differ")
-    source_connection = connect_domain_database(args.source_device_db_url)
-    target_connection = connect_domain_database(args.target_simulation_db_url)
+    try:
+        source_url = _database_url(args.source_device_db_url, "source")
+        target_url = _database_url(args.target_simulation_db_url, "target")
+    except ValueError as exc:
+        parser.error(str(exc))
+    source_connection = connect_domain_database(source_url)
+    target_connection = connect_domain_database(target_url)
     try:
         report = migrate_connector_rows(
             MySqlRowStore(source_connection, TABLE_MAPPINGS),

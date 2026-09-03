@@ -8,6 +8,8 @@ import pytest
 
 from backend.scripts.migrate_connector_to_simulation import (
     MigrationConflict,
+    MigrationReport,
+    main,
     migrate_connector_rows,
 )
 
@@ -193,3 +195,37 @@ def test_connector_tables_are_declared_in_simulation_migration_and_ownership() -
         if rows.get(table, {}).get("owner") == "simulation"
         and rows[table].get("runtime_domain") == "simulation"
     }
+
+
+def test_cli_parses_explicit_database_urls_before_connecting(monkeypatch, capsys) -> None:
+    from backend.capability_v2.domain_database import DomainDatabaseUrl
+    from backend.scripts import migrate_connector_to_simulation as module
+
+    connected = []
+
+    class Connection:
+        def close(self):
+            pass
+
+        def commit(self):
+            pass
+
+        def rollback(self):
+            pass
+
+    def connect(url):
+        connected.append(url)
+        return Connection()
+
+    empty = MigrationReport({}, {}, {}, {})
+    monkeypatch.setattr(module, "connect_domain_database", connect)
+    monkeypatch.setattr(module, "migrate_connector_rows", lambda _source, _target: empty)
+
+    assert main([
+        "--source-device-db-url", "mysql://source:secret@db.local/device_db",
+        "--target-simulation-db-url", "mysql://target:secret@db.local/simulation_db",
+    ]) == 0
+
+    assert all(isinstance(item, DomainDatabaseUrl) for item in connected)
+    assert [item.database for item in connected] == ["device_db", "simulation_db"]
+    assert "secret" not in capsys.readouterr().out

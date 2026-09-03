@@ -10,6 +10,7 @@ from backend.capability_v2.contracts import (
 )
 from backend.domain_ports.simulation_runtime import GovernedSimulationRuntimeClient
 from backend.contracts.connector_execution_plan_v1 import ConnectorExecutionPlanV1
+from backend.contracts.connector_execution_plan_v1 import canonical_hash
 from backend.tests.test_connector_runtime_control_plane import VECTOR, completed_outcome
 
 
@@ -85,3 +86,18 @@ def test_connector_outcome_uses_local_runtime_identity_and_governed_simulation_p
     assert identity.consumer.installation_id == plan.device_id
     assert correlation.request_id.startswith("connector-outcome-")
     assert result["status"] == "applied"
+
+
+def test_connector_outcome_idempotency_is_stable_across_retry_attempts():
+    adapter = GovernedSimulationRuntimeClient(Gateway())
+    adapter.client = DomainClient()
+    plan = ConnectorExecutionPlanV1.model_validate(VECTOR["plan"])
+    outcome = completed_outcome()
+
+    asyncio.run(adapter.apply_connector_outcome(plan, outcome, attempt=1))
+    asyncio.run(adapter.apply_connector_outcome(plan, outcome, attempt=2))
+
+    expected = f"{plan.plan_id}:{canonical_hash(outcome.model_dump(mode='json'))}"
+    assert [call[0].idempotency_key for call in adapter.client.calls] == [
+        expected, expected,
+    ]

@@ -99,54 +99,42 @@ def completed_outcome():
     )
 
 
-def test_completion_can_retry_domain_projection_after_device_outcome_is_stored():
+def test_completion_persists_durable_intent_without_inline_projection():
     class Repository(MemoryRepository):
         def __init__(self):
             super().__init__()
             self.saved_outcome = None
-            self.projection_attempts = []
+            self.intents = []
 
         def get_plan(self, plan_id, *, connector_id, lease_id):
             return plan()
 
-        def complete_plan(self, connector_id, plan_id, lease_id, outcome):
-            if self.saved_outcome is not None and self.saved_outcome != outcome:
-                raise ConnectorError("idempotency_conflict")
+        def complete_with_projection_intent(
+            self, connector_id, plan_id, lease_id, outcome, target,
+        ):
             self.saved_outcome = outcome
-
-        def begin_projection(self, plan_id, outcome_hash, target):
-            attempt = len(self.projection_attempts) + 1
-            self.projection_attempts.append([attempt, "projecting"])
-            return attempt
-
-        def fail_projection(self, plan_id, attempt, **failure):
-            self.projection_attempts[-1][1] = "retryable_failed"
-
-        def complete_projection(self, plan_id, attempt):
-            self.projection_attempts[-1][1] = "projected"
+            self.intents.append((plan_id, target, canonical_hash(outcome.model_dump(mode="json"))))
 
     class Projection:
         def __init__(self):
             self.calls = 0
 
-        async def apply(self, current_plan, outcome, *, attempt=1):
-            self.calls += 1
-            assert attempt == self.calls
-            if self.calls == 1:
-                raise RuntimeError("projection_temporarily_unavailable")
+        def target(self, _plan):
+            return "simulation.connector_materialization_outcome.apply"
+
+        async def apply(self, *_args, **_kwargs):
+            raise AssertionError("durable worker must own projection")
 
     repository, projection = Repository(), Projection()
     control_plane = ConnectorControlPlane(repository, outcome_port=projection, clock=lambda: NOW)
 
-    with pytest.raises(RuntimeError, match="projection_temporarily_unavailable"):
-        asyncio.run(control_plane.complete_plan("device-001", "plan-001", "lease-1", completed_outcome()))
     asyncio.run(control_plane.complete_plan("device-001", "plan-001", "lease-1", completed_outcome()))
 
     assert repository.saved_outcome == completed_outcome()
-    assert projection.calls == 2
-    assert repository.projection_attempts == [
-        [1, "retryable_failed"], [2, "projected"],
-    ]
+    assert repository.intents == [(
+        "plan-001", "simulation.connector_materialization_outcome.apply",
+        canonical_hash(completed_outcome().model_dump(mode="json")),
+    )]
 
 
 def test_failed_plan_outcome_requires_a_failed_step():
@@ -154,7 +142,9 @@ def test_failed_plan_outcome_requires_a_failed_step():
         def get_plan(self, plan_id, *, connector_id, lease_id):
             return plan()
 
-        def complete_plan(self, connector_id, plan_id, lease_id, outcome):
+        def complete_with_projection_intent(
+            self, connector_id, plan_id, lease_id, outcome, target,
+        ):
             raise AssertionError("invalid outcome must not be persisted")
 
     completed = completed_outcome()
@@ -174,7 +164,9 @@ def test_reconciliation_can_report_unknown_outcome_without_fabricating_step_resu
         def get_plan(self, plan_id, *, connector_id, lease_id):
             return plan()
 
-        def complete_plan(self, connector_id, plan_id, lease_id, outcome):
+        def complete_with_projection_intent(
+            self, connector_id, plan_id, lease_id, outcome, target,
+        ):
             self.saved = outcome
 
     outcome = ConnectorPlanOutcomeV1(
