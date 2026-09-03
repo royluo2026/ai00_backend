@@ -1085,13 +1085,9 @@ def _legacy_import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_
                     )
                     previous_tc_links = [dict(r) for r in cur.fetchall()]
 
-                    # TC 自建的资源实体和 PBOM 实体随本批数据一起下线。
-                    tc_entity_tables = {
-                        'project_equipment': 'workmanship_bop_bop_equipments',
-                        'project_tooling': 'workmanship_bop_bop_fixtures',
-                        'project_tools': 'workmanship_bop_bop_tools',
-                    }
-                    for link_type, table_name in tc_entity_tables.items():
+                    # 所有通过本批 entry 的私有 link 创建的实体随本批数据一起下线。
+                    # 标准资源使用 resource_* link，不在私有实体映射中，绝不删除。
+                    for link_type, (table_name, _file_cols) in _DEEP_COPY_ENTITY_TABLES.items():
                         entity_gids_for_type = [
                             link['entity_gid'] for link in previous_tc_links
                             if link['link_type'] == link_type
@@ -1236,13 +1232,12 @@ def _legacy_import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_
                         elif node_type == 'operator_process':
                             cur.execute(
                                 "INSERT IGNORE INTO workmanship_bop_bop_operator "
-                                "(gid, project_gid, title, vpps, role_type,"
-                                " factory_role_ref_gid, headcount, version_no, ext,"
+                                "(gid, project_gid, title, vpps, operator_code,"
+                                " headcount, version_no, ext,"
                                 " is_deleted, is_archived)"
-                                " VALUES (%s,%s,%s,%s,%s,%s,%s,'01',JSON_OBJECT(),FALSE,FALSE)",
+                                " VALUES (%s,%s,%s,%s,%s,%s,'01',JSON_OBJECT(),FALSE,FALSE)",
                                 (ent_gid, project_gid, title, vpps,
-                                 r.get('role_type', ''),
-                                 r.get('factory_role_ref_gid') or None,
+                                 r.get('operator_code') or r.get('role_type', ''),
                                  r.get('headcount', 1))
                             )
                         elif node_type == 'process':

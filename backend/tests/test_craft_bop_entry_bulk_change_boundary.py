@@ -55,6 +55,7 @@ class _ImportCursor:
         self._many = []
         self.entry_rows = []
         self.link_rows = []
+        self.executed = []
 
     def __enter__(self):
         return self
@@ -64,6 +65,7 @@ class _ImportCursor:
 
     def execute(self, sql, params=()):
         normalized = " ".join(sql.split())
+        self.executed.append((normalized, params))
         self._one = None
         self._many = []
         if normalized.startswith("SELECT project_gid, frozen_at"):
@@ -201,6 +203,52 @@ def test_tc_import_links_every_normal_entity_as_primary(monkeypatch) -> None:
     assert [row[3] for row in connection.cursor_value.link_rows] == [
         f"gid-{index}" for index in range(len(rows), len(rows) * 2)
     ]
+
+
+def test_reimport_retires_every_linked_tc_owned_entity(monkeypatch) -> None:
+    """Replacing a TC batch must not orphan its line/station/process entities."""
+    from plugins.craft.craft_backend.routers._bop import entries
+
+    class Cursor(_ImportCursor):
+        def execute(self, sql, params=()):
+            super().execute(sql, params)
+            normalized = " ".join(sql.split())
+            if normalized.startswith("SELECT gid FROM workmanship_bop_bop_entries"):
+                self._many = [{"gid": "old-entry"}]
+            elif normalized.startswith("SELECT entity_gid, link_type"):
+                self._many = [
+                    {"entity_gid": f"old-{link_type}", "link_type": link_type}
+                    for link_type in (
+                        "bop_line", "bop_station", "bop_process", "bop_steps", "bop_operator",
+                        "project_equipment", "project_tooling", "project_tools", "pbom_part",
+                    )
+                ]
+
+    connection = _ImportConnection()
+    connection.cursor_value = Cursor()
+    gids = iter(f"gid-{index}" for index in range(100))
+    monkeypatch.setattr(entries, "get_conn", lambda: connection)
+    monkeypatch.setattr(entries, "next_gid", lambda: next(gids))
+
+    apply_bop_entry_bulk_change(
+        {"operation": "import_tc", "version_gid": "version-1", "rows": [
+            {"_level": 1, "node_type": "line_process", "title": "Replacement"},
+        ]},
+        _context(),
+    )
+
+    retired_tables = {
+        sql.split(" SET", 1)[0].removeprefix("UPDATE ")
+        for sql, _params in connection.cursor_value.executed
+        if sql.startswith("UPDATE ") and " WHERE gid IN (" in sql
+    }
+    assert retired_tables >= {
+        "workmanship_bop_bop_line", "workmanship_bop_bop_station",
+        "workmanship_bop_bop_process", "workmanship_bop_bop_steps",
+        "workmanship_bop_bop_operator", "workmanship_bop_bop_equipments",
+        "workmanship_bop_bop_fixtures", "workmanship_bop_bop_tools",
+        "workmanship_bop_pbom",
+    }
 
 
 def test_tc_import_rolls_back_entries_when_resource_link_write_fails(monkeypatch) -> None:
