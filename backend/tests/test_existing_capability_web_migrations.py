@@ -27,6 +27,12 @@ WEB_ROOT = Path(
 CATALOG = ROOT / "docs/capabilities/catalog.v2.json"
 
 
+def test_migration_source_hashes_are_newline_invariant():
+    assert migration_audit._sha256_bytes(b"first\nsecond\n") == migration_audit._sha256_bytes(
+        b"first\r\nsecond\r\n"
+    )
+
+
 def _frontend_payloads() -> dict[str, dict[str, object]]:
     saved_view_config = {
         "field_gids": ["status"],

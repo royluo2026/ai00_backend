@@ -104,7 +104,8 @@ def load_existing_capability_migrations(path: Path) -> ExistingCapabilityMigrati
 
 
 def _sha256_bytes(value: bytes) -> str:
-    return hashlib.sha256(value).hexdigest()
+    normalized = value.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(normalized).hexdigest()
 
 
 def _sha256(path: Path) -> str:
