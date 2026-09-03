@@ -42,10 +42,10 @@ class ModelSnapshotRefV1(FrozenModel):
 
 
 class CaptureProfileV1(FrozenModel):
-    format: Literal["png", "jpeg"]
-    width: int = Field(ge=1, le=16384)
-    height: int = Field(ge=1, le=16384)
-    background: Literal["current", "transparent", "white", "black"] = "current"
+    format: Literal["png"]
+    width: Literal[1920]
+    height: Literal[1080]
+    background: Literal["current"] = "current"
 
 
 _OPERATION_FIELDS = {
@@ -320,8 +320,8 @@ def compose_manifest(
             adapter_id="ai00.vismockup",
             adapter_major=1,
             product_id="siemens.vismockup",
-            minimum_product_version="1.0.0",
-            maximum_product_version_exclusive="2.0.0",
+            minimum_product_version="14.0.0",
+            maximum_product_version_exclusive="15.0.0",
             operations=tuple(
                 ConnectorOperationRequirementV1(operation_id=operation_id, contract_hash=contract_hash)
                 for operation_id, contract_hash in sorted(REQUIRED_CONNECTOR_OPERATIONS.items())

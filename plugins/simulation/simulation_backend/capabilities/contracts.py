@@ -53,10 +53,10 @@ RESULT_CHANGE = obj({
 }, ("artifact_id", "change_type", "before_sha256", "after_sha256"))
 
 CAPTURE_PROFILE = obj({
-    "format": {"type": "string", "enum": ["png", "jpeg"]},
-    "width": {"type": "integer", "minimum": 1, "maximum": 16384},
-    "height": {"type": "integer", "minimum": 1, "maximum": 16384},
-    "background": {"type": "string", "enum": ["current", "transparent", "white", "black"]},
+    "format": {"type": "string", "enum": ["png"]},
+    "width": {"type": "integer", "enum": [1920]},
+    "height": {"type": "integer", "enum": [1080]},
+    "background": {"type": "string", "enum": ["current"]},
 }, ("format", "width", "height", "background"))
 BINDING_PROBLEM = obj({
     "kind": {"type": "string", "enum": ["not_found", "ambiguous"]},

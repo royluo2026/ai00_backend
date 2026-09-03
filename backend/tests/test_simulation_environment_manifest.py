@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+from pydantic import ValidationError
+
 from plugins.simulation.simulation_backend.domain.environment_manifest import compose_manifest
 
 
@@ -149,3 +152,27 @@ def test_environment_repository_depends_only_on_simulation_connection():
     assert "plugins.craft" not in source
     assert "plugins.knowledge" not in source
     assert "plugins.digital_model" not in source
+
+
+def test_manifest_targets_the_advertised_vismockup_14_major():
+    manifest = compose_manifest(**_fixture()).manifest
+
+    assert manifest.connector_requirement.minimum_product_version == "14.0.0"
+    assert manifest.connector_requirement.maximum_product_version_exclusive == "15.0.0"
+
+
+@pytest.mark.parametrize(
+    "profile",
+    [
+        {"format": "jpeg", "width": 1920, "height": 1080, "background": "current"},
+        {"format": "png", "width": 1280, "height": 1080, "background": "current"},
+        {"format": "png", "width": 1920, "height": 720, "background": "current"},
+        {"format": "png", "width": 1920, "height": 1080, "background": "transparent"},
+    ],
+)
+def test_first_release_rejects_unverified_capture_profiles(profile):
+    fixture = _fixture()
+    fixture["capture_profile"] = profile
+
+    with pytest.raises(ValidationError):
+        compose_manifest(**fixture)

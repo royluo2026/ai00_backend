@@ -105,7 +105,7 @@ class ConnectorPort:
             "user_session_present": True, "session_host_ready": True, "system_awake": True,
             "adapters": [{
                 "adapter_id": "ai00.vismockup", "adapter_major": 1,
-                "product_id": "siemens.vismockup", "product_version": "1.5.0",
+                "product_id": "siemens.vismockup", "product_version": "14.0.0",
                 "operations": [
                     {"operation_id": operation_id, "contract_hash": contract_hash}
                     for operation_id, contract_hash in REQUIRED_CONNECTOR_OPERATIONS.items()
