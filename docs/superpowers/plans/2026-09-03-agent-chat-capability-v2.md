@@ -10,6 +10,21 @@
 
 **Spec:** `docs/superpowers/specs/2026-09-03-agent-chat-v2-design.md`
 
+## Review remediation (2026-09-03)
+
+The first implementation review rejected the combined chat/confirmation contract. Before release:
+
+- Keep `agent.interaction.chat.change.apply@2` limited to `chat_stream` and `chat_sync`.
+- Route confirmed writes through a separate user-confirmed Capability and execute only a Catalog-stored reverse mapping through `DomainCapabilityClient`.
+- Bind pending confirmations to the authenticated actor, session, and tool; validate before atomic consumption.
+- Replace the bounded session-list ownership check with an exact `(session_gid, user_gid)` repository lookup and raise `CapabilityBusinessError("resource_not_found", ...)`.
+- Build Agent Web envelopes in the Base compatibility adapter with consumer id `ai00.web.agent`, and publish verified consumer references.
+- Represent chat success and failure as distinct schema-valid outputs; never wrap legacy `{error: ...}` payloads as successful opaque JSON.
+- Project `agent.read` to authenticated internal users so the documented read-only AI settings route is usable, while keeping external identities denied.
+- Default the optional Pi proxy to legacy mode when no runtime mode is configured; an explicitly selected Pi mode remains fail-closed without a URL.
+
+Implementation continues test-first, then regenerates Catalog/Descriptor/route evidence and performs browser verification against a restarted local backend.
+
 ## Global Constraints
 
 - Preserve `agent.interaction.chat.change.apply@1` as a concurrently registered stable major with business definition hash `sha256:cd4e5f972aeffa4be59487b94163c985098a720c7c09e23825f617d704e13805`.

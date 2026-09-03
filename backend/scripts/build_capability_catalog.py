@@ -43,7 +43,7 @@ def _load_release(path: Path) -> CatalogRelease:
     return load_catalog_release(path.read_text(encoding="utf-8"))
 
 
-def _verified_consumer_refs(capability_id: str) -> tuple[dict[str, str], ...]:
+def _verified_consumer_refs(capability_id: str, major_version: int = 1) -> tuple[dict[str, str], ...]:
     """Return only consumers proven by migrated source files in this release."""
     consumers: list[dict[str, str]] = []
     if capability_id.startswith("craft.ebom.") or capability_id.startswith("craft.pbom."):
@@ -104,6 +104,17 @@ def _verified_consumer_refs(capability_id: str) -> tuple[dict[str, str], ...]:
             {"consumer_id": "agent-plugin/flow_canvas/flow_editor.js", "consumer_type": "web", "version_constraint": ">=1"},
             {"consumer_id": "web/canvas/types/flow_type.js", "consumer_type": "web", "version_constraint": ">=1"},
         ))
+    if capability_id == "agent.interaction.chat.change.apply" and major_version == 2:
+        consumers.extend((
+            {"consumer_id": "dist/web/workbench/workbench.js", "consumer_type": "web", "version_constraint": "==2"},
+            {"consumer_id": "dist/packages/agent-plugin/web/wfc_window/wfc_window.js", "consumer_type": "web", "version_constraint": "==2"},
+            {"consumer_id": "dist/packages/agent-plugin/web/automation_hub/ai_assistant.js", "consumer_type": "web", "version_constraint": "==2"},
+        ))
+    if capability_id == "agent.runtime.config.read":
+        consumers.extend((
+            {"consumer_id": "dist/packages/agent-plugin/web/automation_hub/ai_settings.html", "consumer_type": "web", "version_constraint": ">=1"},
+            {"consumer_id": "dist/packages/agent-plugin/web/automation_hub/ai_assistant.js", "consumer_type": "web", "version_constraint": ">=1"},
+        ))
     return tuple(consumers)
 
 
@@ -126,7 +137,7 @@ def current_release() -> CatalogRelease:
         complete_governance_metadata(
             registrations[key].descriptor or descriptor_from_provider_spec(registrations[key].spec),
             provider_ref=f"{registrations[key].spec.owner}.provider",
-            consumer_refs=_verified_consumer_refs(registrations[key].spec.id),
+            consumer_refs=_verified_consumer_refs(registrations[key].spec.id, registrations[key].spec.version),
             test_refs=coverage_declarations(
                 registrations[key].spec.id,
                 registrations[key].spec.version,

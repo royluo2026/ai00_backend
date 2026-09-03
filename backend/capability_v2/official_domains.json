@@ -7,7 +7,7 @@
         "plugin_id": "official.agent",
         "module": "agent_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:f991ad3f90d9a9d6e1deb5e83970f15e05b5db3bb4d435f833e24013d6ae4215"
+        "artifact_hash": "sha256:82a13c6853766094b4648bd23733e4b9a6bb02bd430c63a6e138ddae7e4f7a84"
       },
       "artifact_path": "plugins/agent/agent_backend",
       "allowed_owners": [
@@ -173,7 +173,7 @@
         "plugin_id": "official.factory",
         "module": "factory_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:c230aa6e978b10ffbaec07a571998470d58578ad4bddf2ceb25ee957392a59fa"
+        "artifact_hash": "sha256:343cde2d59c26c71a7cad4f09cfb114befac956cbd66b87d4bdb112adf160bec"
       },
       "artifact_path": "plugins/factory/factory_backend",
       "allowed_owners": [

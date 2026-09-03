@@ -48,12 +48,16 @@ class CatalogToolRegistry:
     def tools(self) -> tuple[CatalogTool, ...]:
         return tuple(self._tools[name] for name in self.names())
 
-    async def execute(self, name: str, payload: dict, *, identity, correlation, idempotency_key: str | None = None):
-        if self.client is None:
-            raise RuntimeError("Agent DomainCapabilityClient is unavailable")
+    def resolve(self, name: str) -> CatalogTool:
         tool = self._tools.get(name)
         if tool is None:
             raise ValueError("unknown Catalog-generated Agent tool")
+        return tool
+
+    async def execute(self, name: str, payload: dict, *, identity, correlation, idempotency_key: str | None = None):
+        if self.client is None:
+            raise RuntimeError("Agent DomainCapabilityClient is unavailable")
+        tool = self.resolve(name)
         invocation = DomainInvocation(
             capability_id=tool.capability_id, major_version=tool.major_version,
             payload=dict(payload), idempotency_key=idempotency_key,

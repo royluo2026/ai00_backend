@@ -1,5 +1,9 @@
 # Agent Chat Capability V2 Design
 
+## Review correction
+
+`agent.interaction.chat.change.apply@2` governs chat transport only (`chat_stream`, `chat_sync`). The Web confirmation endpoints are not operations of that Capability: after validating an actor/session/tool-bound pending token, they resolve the submitted generated tool name from the pinned Catalog and invoke that target Capability through the Gateway, then continue the conversation through chat @2. Legacy tool names are rejected rather than inferred. Agent Web envelopes use the Base adapter and the fixed consumer id `ai00.web.agent`; legacy error dictionaries become declared business errors instead of successful opaque output.
+
 ## Change classification
 
 - Type: breaking contract correction delivered as a new major Capability version.

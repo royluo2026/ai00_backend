@@ -25,6 +25,7 @@ from fastapi.responses import StreamingResponse
 from backend.platform_sdk.auth import get_current_user, require_role
 from ..ai_assistant.session_store import _store
 from ..ai_assistant import tool_executor as _te
+from ..ai_assistant.catalog_tools import CatalogToolRegistry
 from ..ai_assistant import system_prompt as _sp
 from . import agent_runtime_proxy_next as _pi_proxy
 from ..ai_assistant.tool_registry import (
@@ -34,8 +35,9 @@ from ..ai_assistant.tool_registry import (
 from ..api.compatibility import invoke_agent_capability
 from ..application.interaction_state import consume_abort
 from backend.capability_v2.gateway import get_default_gateway
+from backend.capability_v2.provider_contracts import CapabilityBusinessError
 from backend.platform_sdk.auth import get_authenticated_principal
-from backend.platform_sdk.factory import build_web_compatibility_envelope, invoke_compatibility
+from backend.capability_v2.web_compatibility import build_trusted_web_envelope, invoke_trusted_web_compatibility
 
 router = APIRouter(prefix="/api/ai", tags=["ai_chat"])
 _log = __import__('logging').getLogger(__name__)
@@ -50,9 +52,9 @@ _TOOL_MAX_CALLS   = 3
 
 async def _invoke_interaction_chat(request, user, principal, gateway, payload):
     request_id = request.headers.get("X-Request-ID") or f"agent_interaction_chat_{uuid.uuid4().hex}"
-    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+    result = await invoke_trusted_web_compatibility(gateway, build_trusted_web_envelope(
         gateway, capability_id="agent.interaction.chat.change.apply", payload=_normalize_interaction_payload(payload),
-        current_user=user, principal=principal, request_id=request_id,
+        current_user=user, principal=principal, consumer_id="ai00.web.agent", request_id=request_id,
         trace_id=request.headers.get("X-Trace-ID") or request_id,
         idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
         approval_reference=request.headers.get("X-Capability-Approval"),
@@ -62,6 +64,47 @@ async def _invoke_interaction_chat(request, user, principal, gateway, payload):
         code = result.error.code if result.error else "provider_error"
         raise HTTPException(status_code={"invalid_input": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
     return _project_interaction_response(payload, result.data.get("data", result.data))
+
+
+async def _invoke_confirmed_catalog_tool(request, user, principal, gateway, body):
+    session_gid = body.get("session_gid") or body.get("session_id", "")
+    user_gid = str(user.get("gid") or "")
+    _require_legacy_session_owner(session_gid, user_gid)
+    tool_name = str(body.get("tool_name") or "")
+    try:
+        tool = CatalogToolRegistry(gateway.catalog(gateway.catalog_release)).resolve(tool_name)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    valid, pending = _te.consume_confirm_token(
+        str(body.get("confirm_token") or ""), tool_name, session_gid, user_gid,
+    )
+    if not valid:
+        raise HTTPException(status_code=400, detail="确认令牌无效或已过期，请重新操作")
+
+    request_id = request.headers.get("X-Request-ID") or f"agent_confirm_{uuid.uuid4().hex}"
+    envelope = build_trusted_web_envelope(
+        gateway, capability_id=tool.capability_id, major_version=tool.major_version,
+        payload=dict(pending["inputs"]), current_user=user, principal=principal,
+        consumer_id="ai00.web.agent", request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") or request_id,
+    )
+    result = await invoke_trusted_web_compatibility(gateway, envelope)
+    if not result.ok:
+        code = result.error.code if result.error else "provider_error"
+        raise HTTPException(
+            status_code={"invalid_input": 400, "permission_denied": 403, "resource_not_found": 404}.get(code, 422),
+            detail=result.error.model_dump(mode="json") if result.error else None,
+        )
+    write_result = result.data.get("data", result.data) if isinstance(result.data, dict) else result.data
+    _store.add_turn(session_gid, "tool_result", "", tool_calls=[{
+        "name": tool_name, "input": pending["inputs"], "result": write_result,
+        "tool_use_id": body.get("tool_use_id", ""), "confirmed": True,
+    }])
+    return await _invoke_interaction_chat(
+        request, user, principal, gateway,
+        {"operation": "chat_stream" if body.get("stream", True) else "chat_sync", "body": {"message": "", "session_gid": session_gid}},
+    )
 _TOOL_RESULT_MAX  = 12_000
 
 _CHJ_GATEWAY_HOST     = "api-hub.inner.chj.cloud"
@@ -451,7 +494,7 @@ def _chat_stream_gen(
         if write_calls:
             wtc     = write_calls[0]
             inputs  = json.loads(wtc.function.arguments or "{}")
-            token   = _te.issue_confirm_token(wtc.function.name, inputs, session_gid)
+            token   = _te.issue_confirm_token(wtc.function.name, inputs, session_gid, user_gid)
             preview = _te.build_preview(wtc.function.name, inputs)
             intent  = answer or f"即将执行：{preview}"
             _store.add_turn(session_gid, "assistant", intent)
@@ -550,9 +593,7 @@ def _pi_call(fn, *args):
 def _require_legacy_session_owner(session_gid: str | None, user_gid: str) -> None:
     if not session_gid:
         return
-    owned = {row.get("gid") for row in _store.list_sessions(user_gid=user_gid)}
-    if session_gid not in owned:
-        raise HTTPException(status_code=404, detail="Session not found")
+    _store.require_owned_session(session_gid, user_gid)
 
 # ── FastAPI 路由 ──────────────────────────────────────────────────────────────
 
@@ -748,7 +789,7 @@ async def confirm_tool(
     _user: dict = Depends(get_current_user),
     principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway),
 ):
-    return await _invoke_interaction_chat(request, _user, principal, gateway, {"operation": "confirm", "body": body})
+    return await _invoke_confirmed_catalog_tool(request, _user, principal, gateway, {**body, "stream": True})
 
 
 def _legacy_confirm_tool(
@@ -766,17 +807,15 @@ def _legacy_confirm_tool(
     user_gid      = _user.get("gid", "")
     auth_token    = body.get("auth_token", "")
 
-    valid, pending = _te.consume_confirm_token(confirm_token, tool_name, session_gid)
+    valid, pending = _te.consume_confirm_token(confirm_token, tool_name, session_gid, user_gid)
     if not valid:
         return {"error": "确认令牌无效或已过期，请重新操作"}
 
     inputs = pending["inputs"]
 
     def _confirm_gen():
-        write_result = _te.execute_tool(
-            tool_name, inputs, "feishu",
-            auth_token=auth_token, user_gid=user_gid,
-            session_gid=session_gid, is_confirmed=True,
+        raise CapabilityBusinessError(
+            "provider_unavailable", "legacy Agent confirmation execution is retired",
         )
         tc_record = {"name": tool_name, "input": inputs, "result": write_result,
                      "tool_use_id": tool_use_id, "confirmed": True}
@@ -796,10 +835,8 @@ def _legacy_confirm_tool(
         )
 
     # 简化：直接执行并返回结果（不再走 stream）
-    write_result = _te.execute_tool(
-        tool_name, inputs, "feishu",
-        auth_token=auth_token, user_gid=user_gid,
-        session_gid=session_gid, is_confirmed=True,
+    raise CapabilityBusinessError(
+        "provider_unavailable", "legacy Agent confirmation execution is retired",
     )
     tc_record = {"name": tool_name, "input": inputs, "result": write_result,
                  "tool_use_id": tool_use_id, "confirmed": True}
@@ -825,7 +862,7 @@ async def confirm_tool_sync(
     _user: dict = Depends(get_current_user),
     principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway),
 ):
-    return await _invoke_interaction_chat(request, _user, principal, gateway, {"operation": "confirm_sync", "body": body})
+    return await _invoke_confirmed_catalog_tool(request, _user, principal, gateway, {**body, "stream": False})
 
 
 def _legacy_confirm_tool_sync(
@@ -843,15 +880,13 @@ def _legacy_confirm_tool_sync(
     user_gid      = _user.get("gid", "")
     auth_token    = body.get("auth_token", "")
 
-    valid, pending = _te.consume_confirm_token(confirm_token, tool_name, session_gid)
+    valid, pending = _te.consume_confirm_token(confirm_token, tool_name, session_gid, user_gid)
     if not valid:
         return {"error": "确认令牌无效或已过期，请重新操作"}
 
     inputs = pending["inputs"]
-    write_result = _te.execute_tool(
-        tool_name, inputs, "feishu",
-        auth_token=auth_token, user_gid=user_gid,
-        session_gid=session_gid, is_confirmed=True,
+    raise CapabilityBusinessError(
+        "provider_unavailable", "legacy Agent confirmation execution is retired",
     )
     tc_record = {"name": tool_name, "input": inputs, "result": write_result,
                  "tool_use_id": tool_use_id, "confirmed": True}

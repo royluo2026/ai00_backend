@@ -6,34 +6,39 @@ backend/ai_assistant/tool_executor.py
 from __future__ import annotations
 import time
 import uuid
+from threading import Lock
 from typing import Any
 
 # ── 确认令牌（5 分钟 TTL，内存存储，单进程 OK）────────────────────────────────
 _CONFIRM_TOKENS: dict[str, dict] = {}
+_CONFIRM_TOKENS_LOCK = Lock()
 _TOKEN_TTL = 300  # seconds
 
 
-def issue_confirm_token(tool_name: str, inputs: dict, session_gid: str) -> str:
+def issue_confirm_token(tool_name: str, inputs: dict, session_gid: str, user_gid: str) -> str:
     token = str(uuid.uuid4())
-    _CONFIRM_TOKENS[token] = {
-        "tool_name":   tool_name,
-        "inputs":      inputs,
-        "session_gid": session_gid,
-        "expires_at":  time.time() + _TOKEN_TTL,
-    }
+    with _CONFIRM_TOKENS_LOCK:
+        _CONFIRM_TOKENS[token] = {
+            "tool_name": tool_name, "inputs": inputs, "session_gid": session_gid,
+            "user_gid": user_gid, "expires_at": time.time() + _TOKEN_TTL,
+        }
     return token
 
 
-def consume_confirm_token(token: str, tool_name: str, session_gid: str) -> tuple[bool, dict]:
+def consume_confirm_token(token: str, tool_name: str, session_gid: str, user_gid: str) -> tuple[bool, dict]:
     """验证并消费 token。返回 (valid, pending_info)。"""
-    pending = _CONFIRM_TOKENS.pop(token, None)
-    if not pending:
-        return False, {}
-    if time.time() > pending["expires_at"]:
-        return False, {}
-    if pending["tool_name"] != tool_name:
-        return False, {}
-    return True, pending
+    with _CONFIRM_TOKENS_LOCK:
+        pending = _CONFIRM_TOKENS.get(token)
+        if not pending:
+            return False, {}
+        if time.time() > pending["expires_at"]:
+            _CONFIRM_TOKENS.pop(token, None)
+            return False, {}
+        if pending["tool_name"] != tool_name:
+            return False, {}
+        if pending["session_gid"] != session_gid or pending["user_gid"] != user_gid:
+            return False, {}
+        return True, _CONFIRM_TOKENS.pop(token)
 
 
 def build_preview(tool_name: str, inputs: dict) -> str:

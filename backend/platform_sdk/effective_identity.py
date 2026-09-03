@@ -67,7 +67,7 @@ def build_effective_profile(user: dict[str, Any], grants: list[dict[str, Any]]) 
     if "knowledge.manage" in permissions:
         permissions.add("knowledge.write")
     if org_role != "external":
-        permissions.add("agent.interact")
+        permissions.update({"agent.interact", "agent.read"})
     if org_role == "super_admin" or role in {"super_admin", "team_admin", "project_admin", "knowledge_admin"} or any(g.get("grant_type") == "team_admin" for g in grants):
         permissions.add("factory.write")
     if org_role != "external":

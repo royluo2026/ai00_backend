@@ -10,7 +10,7 @@ import httpx
 
 
 def enabled() -> bool:
-    return os.getenv("AI00_AGENT_RUNTIME_MODE", "pi").strip().lower() == "pi"
+    return os.getenv("AI00_AGENT_RUNTIME_MODE", "legacy").strip().lower() == "pi"
 
 
 def _base_url() -> str:

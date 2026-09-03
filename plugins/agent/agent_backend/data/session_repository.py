@@ -89,6 +89,19 @@ class SessionRepository:
             for row in rows
         ]
 
+    def require_owned_session(self, session_gid: str, user_gid: str) -> None:
+        """Require exact ownership without relying on the bounded recent-session list."""
+        with self._connection_factory() as conn, conn.cursor() as cur:
+            cur.execute(
+                f"SELECT 1 FROM {SESSIONS_TABLE} WHERE gid=%s AND user_gid=%s",
+                (session_gid, user_gid),
+            )
+            if not cur.fetchone():
+                raise CapabilityBusinessError(
+                    "resource_not_found", "Agent session was not found",
+                    details={"session_gid": session_gid},
+                )
+
     def delete_session(self, session_gid: str) -> None:
         with self._connection_factory() as conn, conn.cursor() as cur:
             cur.execute(f"DELETE FROM {SESSIONS_TABLE} WHERE gid=%s", (session_gid,))

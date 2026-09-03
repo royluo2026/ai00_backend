@@ -5,9 +5,10 @@ import json
 from typing import Any
 
 from backend.capability_v2.contracts import BusinessInvariantContract, ResourceSelector
-from backend.capability_v2.provider_contracts import CapabilityContext, CapabilitySpec
+from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilitySpec
 
 OPERATIONS = ("chat_stream", "chat_sync", "confirm", "confirm_sync")
+CHAT_OPERATIONS = ("chat_stream", "chat_sync")
 
 
 async def _collect_v1(value: Any) -> dict[str, Any]:
@@ -24,6 +25,10 @@ async def _collect_v1(value: Any) -> dict[str, Any]:
 
 async def _collect_v2(value: Any) -> dict[str, Any]:
     if isinstance(value, dict):
+        if value.get("error"):
+            raise CapabilityBusinessError(
+                "provider_unavailable", str(value["error"]), retryable=True,
+            )
         encoded = json.dumps(value, ensure_ascii=False, separators=(",", ":"))
         if len(encoded) > 1_048_576:
             raise ValueError("synchronous response exceeds 1048576 characters")
@@ -56,8 +61,9 @@ async def _apply_interaction_chat_change(
     payload: dict[str, Any], context: CapabilityContext, *, version: int,
 ) -> dict[str, Any]:
     operation = str(payload.get("operation") or "").strip()
-    if operation not in OPERATIONS:
-        raise ValueError(f"operation must be one of: {', '.join(OPERATIONS)}")
+    allowed = CHAT_OPERATIONS if version == 2 else OPERATIONS
+    if operation not in allowed:
+        raise ValueError(f"operation must be one of: {', '.join(allowed)}")
     from ..routers import ai_chat as legacy
     body = payload.get("body")
     if not isinstance(body, dict):
@@ -110,7 +116,7 @@ def register_interaction_chat_change_capability(registry: Any) -> None:
         do_not_use_when="The request only cancels an interaction or manages Agent sessions directly.",
         risk="write", confirmation="none", idempotent=False, permissions=("agent.interact",),
         input_schema={"type": "object", "required": ["operation", "body"], "properties": {
-            "operation": {"type": "string", "enum": list(OPERATIONS)},
+            "operation": {"type": "string", "enum": list(CHAT_OPERATIONS)},
             "body": {"type": "object", "properties": {
                 "message": {"type": "string"},
                 "session_id": {"type": ["string", "null"]},
@@ -152,8 +158,8 @@ def register_interaction_chat_change_capability(registry: Any) -> None:
             ),
         ),
         "business_effect": (
-            "Authenticated internal users can continue or confirm their own Xiaorou conversations "
-            "while downstream tool writes remain governed by their owning capabilities."
+            "Authenticated internal users can continue their own Xiaorou conversations while "
+            "downstream tool writes remain governed by their owning capabilities."
         ),
         "business_acceptance_criteria": (
             "Each accepted request executes as the authenticated actor and never as a caller-supplied user identity.",
@@ -164,8 +170,8 @@ def register_interaction_chat_change_capability(registry: Any) -> None:
             BusinessInvariantContract(
                 rule_id="agent.interaction.chat.actor_bound",
                 version=1,
-                statement="Every chat or confirmation interaction executes as the authenticated Gateway actor.",
-                applies_when="an Agent chat or confirmation request is accepted",
+                statement="Every chat interaction executes as the authenticated Gateway actor.",
+                applies_when="an Agent chat request is accepted",
                 enforcement_ref="plugins/agent/agent_backend/routers/ai_chat.py:_normalize_interaction_payload",
                 error_code="permission_denied",
                 test_refs=(

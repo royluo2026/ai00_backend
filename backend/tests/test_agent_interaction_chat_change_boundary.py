@@ -6,6 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 from fastapi import HTTPException
+from backend.capability_v2.provider_contracts import CapabilityBusinessError
 
 from backend.capabilities.registry_next import CapabilityRegistry
 from backend.capabilities.validation_next import validate_payload
@@ -25,11 +26,13 @@ from backend.capability_v2.outcomes import InMemoryOutcomeStore
 from backend.capability_v2.reliability import InMemoryRateLimiter, ReliabilityCoordinator
 from backend.platform_sdk.effective_identity import build_effective_profile
 from backend.routers import deps
+from backend.scripts.build_capability_catalog import _verified_consumer_refs
 from plugins.agent.agent_backend.capabilities.interaction_chat_change import (
     apply_interaction_chat_change,
     register_interaction_chat_change_capability,
 )
 from plugins.agent.agent_backend.routers import ai_chat
+from plugins.agent.agent_backend.ai_assistant import tool_executor
 
 
 ROUTER = Path("plugins/agent/agent_backend/routers/ai_chat.py")
@@ -40,6 +43,16 @@ def test_agent_chat_routes_use_gateway_capability() -> None:
     assert source.count('capability_id="agent.interaction.chat.change.apply"') == 1
     for name in ("chat_stream", "chat_sync", "confirm_tool", "confirm_tool_sync"):
         assert f"def _legacy_{name}" in source
+
+
+def test_agent_chat_v2_has_verified_web_consumers() -> None:
+    refs = _verified_consumer_refs("agent.interaction.chat.change.apply", 2)
+    assert {item["consumer_id"] for item in refs} == {
+        "dist/web/workbench/workbench.js",
+        "dist/packages/agent-plugin/web/wfc_window/wfc_window.js",
+        "dist/packages/agent-plugin/web/automation_hub/ai_assistant.js",
+    }
+    assert _verified_consumer_refs("agent.interaction.chat.change.apply", 1) == ()
 
 
 def test_agent_chat_validates_operation_before_io() -> None:
@@ -61,6 +74,7 @@ def test_agent_chat_registers_frozen_v1_and_corrected_v2() -> None:
         "events", "media_type", "answer", "session_id",
     }
     assert v2.spec.version == 2
+    assert v2.spec.input_schema["properties"]["operation"]["enum"] == ["chat_stream", "chat_sync"]
     assert v2.spec.confirmation == "none"
     assert v2.descriptor.consistency_policy == "eventual"
     assert v2.descriptor.evidence_policy == "optional"
@@ -173,18 +187,28 @@ def test_agent_chat_v2_rejects_oversized_sync_response(monkeypatch) -> None:
         ))
 
 
+def test_agent_chat_v2_projects_legacy_failure_as_business_error(monkeypatch) -> None:
+    monkeypatch.setattr(ai_chat, "_legacy_chat_sync", lambda *_args: {"error": "runtime down"})
+
+    with pytest.raises(CapabilityBusinessError) as exc_info:
+        asyncio.run(apply_interaction_chat_change(
+            {"operation": "chat_sync", "body": {"message": "hi"}},
+            SimpleNamespace(user_gid="user-1"),
+        ))
+
+    assert exc_info.value.code == "provider_unavailable"
+
+
 def test_agent_chat_rejects_a_foreign_session(monkeypatch) -> None:
-    monkeypatch.setattr(
-        ai_chat._store,
-        "list_sessions",
-        lambda *, user_gid: [{"gid": "owned-session", "user_gid": user_gid}],
-    )
+    checked = []
+    monkeypatch.setattr(ai_chat._store, "require_owned_session", lambda session_gid, user_gid: checked.append((session_gid, user_gid)) if session_gid == "owned-session" else (_ for _ in ()).throw(CapabilityBusinessError("resource_not_found", "Agent session was not found")))
 
     ai_chat._require_legacy_session_owner("owned-session", "admin-1")
-    with pytest.raises(HTTPException) as exc_info:
+    with pytest.raises(CapabilityBusinessError) as exc_info:
         ai_chat._require_legacy_session_owner("foreign-session", "admin-1")
 
-    assert exc_info.value.status_code == 404
+    assert exc_info.value.code == "resource_not_found"
+    assert checked == [("owned-session", "admin-1")]
 
 
 def test_web_chat_pins_v2_and_normalizes_trusted_payload() -> None:
@@ -224,6 +248,7 @@ def test_web_chat_pins_v2_and_normalizes_trusted_payload() -> None:
     validate_payload(dict(descriptor.input_schema), dict(envelope.payload))
     assert envelope.major_version == 2
     assert envelope.identity.actor.user_id == "admin-1"
+    assert envelope.identity.consumer.consumer_id == "ai00.web.agent"
     assert "user_gid" not in envelope.payload["body"]
     assert json.loads(envelope.payload["body"]["context_json"]) == {
         "current_page": "workbench"
@@ -282,6 +307,48 @@ def test_web_sync_chat_restores_the_bounded_response() -> None:
     assert response == {"answer": "ok", "tool_calls": []}
 
 
+def test_confirm_route_uses_catalog_reverse_mapping_then_governed_chat(monkeypatch) -> None:
+    calls = []
+    stored = []
+    monkeypatch.setattr(ai_chat, "_require_legacy_session_owner", lambda *_args: None)
+    monkeypatch.setattr(ai_chat._store, "add_turn", lambda *args, **kwargs: stored.append((args, kwargs)))
+    monkeypatch.setattr(
+        ai_chat,
+        "CatalogToolRegistry",
+        lambda _release: SimpleNamespace(resolve=lambda name: SimpleNamespace(
+            name=name, capability_id="project.task.change.apply", major_version=1,
+        )),
+    )
+
+    class Gateway:
+        catalog_release = "release-1"
+
+        def catalog(self, _release_id):
+            return object()
+
+        async def invoke(self, envelope):
+            calls.append(envelope)
+            data = {"data": {"gid": "task-1"}} if len(calls) == 1 else {"data": {"response_json": '{"answer":"continued"}'}}
+            return SimpleNamespace(ok=True, data=data, error=None)
+
+    tool_name = "cap__project__task__change__apply__v1"
+    token = tool_executor.issue_confirm_token(tool_name, {"name": "x"}, "session-1", "admin-1")
+    response = asyncio.run(ai_chat._invoke_confirmed_catalog_tool(
+        SimpleNamespace(headers={}),
+        {"gid": "admin-1", "team_id": "team-1", "org_role": "super_admin"},
+        ActorIdentity(user_id="admin-1", authentication_method="jwt", authenticated_at=datetime.now(UTC)),
+        Gateway(),
+        {"confirm_token": token, "tool_name": tool_name, "session_gid": "session-1", "stream": False},
+    ))
+
+    assert [call.capability_id for call in calls] == [
+        "project.task.change.apply", "agent.interaction.chat.change.apply",
+    ]
+    assert calls[0].identity.consumer.consumer_id == "ai00.web.agent"
+    assert response == {"answer": "continued"}
+    assert stored
+
+
 def test_web_chat_rejects_non_object_context_before_gateway() -> None:
     with pytest.raises(HTTPException) as raised:
         ai_chat._normalize_interaction_payload({
@@ -321,3 +388,19 @@ def test_external_user_cannot_authorize_agent_chat(monkeypatch) -> None:
 
     assert "agent.interact" not in deps.build_profile(user)["permissions"]
     assert "agent.interact" not in build_effective_profile(user, [])["permissions"]
+
+
+def test_internal_user_can_read_agent_settings(monkeypatch) -> None:
+    user = {"gid": "admin-1", "system_role": "super_admin", "org_role": "super_admin", "is_active": True}
+    monkeypatch.setattr(deps, "_get_user_grants", lambda _gid: [])
+
+    assert "agent.read" in deps.build_profile(user)["permissions"]
+    assert "agent.read" in build_effective_profile(user, [])["permissions"]
+
+
+def test_external_user_cannot_read_agent_settings(monkeypatch) -> None:
+    user = {"gid": "external-1", "system_role": "member", "org_role": "external", "is_active": True}
+    monkeypatch.setattr(deps, "_get_user_grants", lambda _gid: [])
+
+    assert "agent.read" not in deps.build_profile(user)["permissions"]
+    assert "agent.read" not in build_effective_profile(user, [])["permissions"]

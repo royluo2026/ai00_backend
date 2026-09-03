@@ -48,3 +48,13 @@ def test_runtime_registry_and_executor_use_catalog_records_without_name_inferenc
     definitions = tool_registry.catalog_tools_openai(registry)
     assert {item["function"]["name"] for item in definitions} == set(registry.names())
     assert hasattr(tool_executor, "execute_catalog_tool")
+
+
+def test_catalog_registry_resolves_only_stored_reverse_mappings():
+    release = load_catalog_release(open("docs/governance/capability-catalog-release.json", encoding="utf-8").read())
+    registry = CatalogToolRegistry(release)
+    known = registry.names()[0]
+
+    assert registry.resolve(known).name == known
+    with pytest.raises(ValueError, match="unknown Catalog-generated Agent tool"):
+        registry.resolve("create_task")
