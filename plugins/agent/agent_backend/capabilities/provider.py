@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+import hashlib
+import json
+
+from backend.capability_v2.provider_contracts import EvidenceRef
+from backend.capability_v2.reliability import TransactionalCapabilityOutput
 from backend.capability_v2.contracts import AutomationLevel, CapabilityDescriptorV2, DomainErrorContract, ExecutionMode, ExposurePolicy, LifecycleStatus, SideEffectLevel
 from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
 
@@ -48,4 +53,31 @@ def descriptor_for(spec) -> CapabilityDescriptorV2:
         "domain_errors": ERRORS, "domain_errors_complete": True,
     })
 
-__all__ = ["descriptor_for"]
+
+def transactional_write_output(
+    capability_id: str, value, context, transaction,
+) -> TransactionalCapabilityOutput:
+    """Return an Agent write plus its still-open owning-domain transaction and evidence."""
+    if isinstance(value, TransactionalCapabilityOutput):
+        return value
+    canonical = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    digest = "sha256:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    candidates = value if isinstance(value, dict) else {}
+    resource_id = next((
+        str(candidates[key]) for key in (
+            "resource_gid", "session_gid", "run_id", "run_gid", "skill_gid",
+            "flow_gid", "interaction_id", "gid",
+        ) if candidates.get(key)
+    ), str(getattr(context, "request_id", "") or digest.removeprefix("sha256:")))
+    return TransactionalCapabilityOutput(
+        data=value,
+        transaction=transaction,
+        evidence=(EvidenceRef(
+            kind="agent.change",
+            reference=f"agent://{capability_id}/{resource_id}",
+            digest=digest,
+            summary="Provider-owned Agent write result.",
+        ),),
+    )
+
+__all__ = ["descriptor_for", "transactional_write_output"]

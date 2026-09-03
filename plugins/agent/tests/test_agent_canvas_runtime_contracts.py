@@ -444,6 +444,10 @@ def test_registered_handlers_propagate_principal_and_serialize_schema_valid_resu
         assert registered_descriptor.confirmation_policy == confirmation
         assert registered_descriptor.authorization_policy == f"agent.v2:{permission}"
         result = asyncio.run(handler(payload, Context()))
+        if registered_descriptor.side_effect_level.value != "read":
+            output = result
+            result = output.data
+            output.transaction.rollback(); output.transaction.close()
         validate(result, OUTPUT_SCHEMAS[capability_id])
         results[capability_id] = result
 

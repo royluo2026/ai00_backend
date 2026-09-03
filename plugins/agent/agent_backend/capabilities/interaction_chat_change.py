@@ -6,6 +6,8 @@ from typing import Any
 
 from backend.capability_v2.contracts import BusinessInvariantContract, CorrelationRef, ExposurePolicy, ResourceSelector
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilitySpec, CapabilityStreamOutput
+from backend.capability_v2.reliability import transactional_provider
+from ..data.connection import begin_agent_transaction
 
 OPERATIONS = ("chat_stream", "chat_sync", "confirm", "confirm_sync")
 CHAT_OPERATIONS = ("chat_stream", "chat_sync")
@@ -162,11 +164,22 @@ def register_interaction_chat_change_capability(registry: Any) -> None:
         }, "additionalProperties": False},
         tags=("agent", "interaction", "chat", "write"),
     )
-    from .provider import descriptor_for
+    from .provider import descriptor_for, transactional_write_output
+
+    @transactional_provider
+    async def governed_v1(payload, context):
+        transaction = begin_agent_transaction()
+        try:
+            value = await apply_interaction_chat_change_v1(payload, context)
+            return transactional_write_output(v1.id, value, context, transaction)
+        except BaseException:
+            transaction.rollback(); transaction.close()
+            raise
+
     v1_governed = v1.model_copy(update={"plugin_callable": True})
     registry.register(
         v1_governed,
-        apply_interaction_chat_change_v1,
+        governed_v1,
         descriptor=descriptor_for(v1_governed).model_copy(update={
             "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=False, mcp=False),
         }),

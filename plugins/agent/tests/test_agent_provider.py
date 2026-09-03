@@ -68,3 +68,19 @@ def test_agent_is_official_and_database_independent():
     assert "workmanship_agent_confirmation_tokens" in confirmation_sql
     assert "token_hash" in confirmation_sql
     assert "state VARCHAR(16) NOT NULL" in confirmation_sql
+
+
+def test_every_strong_agent_write_registers_a_transactional_handler():
+    class Registry:
+        def __init__(self): self.items = []
+        def register(self, spec, handler, *, descriptor=None):
+            self.items.append((handler, descriptor))
+
+    registry = Registry(); register_capabilities(registry)
+    strong_writes = [
+        handler for handler, descriptor in registry.items
+        if descriptor.side_effect_level.value != "read"
+        and descriptor.consistency_policy == "strong"
+    ]
+    assert strong_writes
+    assert all(getattr(handler, "__capability_transactional__", False) for handler in strong_writes)

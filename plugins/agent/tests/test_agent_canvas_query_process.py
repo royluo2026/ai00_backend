@@ -168,7 +168,9 @@ def test_default_registered_handlers_use_production_repository_and_executor_path
         "field_key": "project_gid", "input_values": [],
     }
 
-    node = asyncio.run(registry.handlers["agent.workflow.node.test.execute"](node_payload, SameTeam()))
+    node_output = asyncio.run(registry.handlers["agent.workflow.node.test.execute"](node_payload, SameTeam()))
+    node = node_output.data
+    node_output.transaction.rollback(); node_output.transaction.close()
     options = asyncio.run(registry.handlers["agent.canvas.options.resolve"](options_payload, SameTeam()))
     assert node["status"] == "completed"
     assert options == {

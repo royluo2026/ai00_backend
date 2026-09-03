@@ -479,7 +479,9 @@ def test_default_provider_registers_canvas_worker_lifecycle_and_replays_terminal
     context = SimpleNamespace(user_gid="actor-1", team_gid="team-1", idempotency_key="start-key")
     payload = {"skill_gid": "skill-1", "expected_revision": 7, "input_values": []}
 
-    accepted = asyncio.run(registry.get("agent.canvas.execution.start").handler(payload, context))
+    accepted_output = asyncio.run(registry.get("agent.canvas.execution.start").handler(payload, context))
+    accepted = accepted_output.data
+    accepted_output.transaction.rollback(); accepted_output.transaction.close()
 
     async def run():
         await registry.start_lifecycles()
@@ -490,7 +492,9 @@ def test_default_provider_registers_canvas_worker_lifecycle_and_replays_terminal
         await registry.stop_lifecycles()
 
     asyncio.run(run())
-    replay = asyncio.run(registry.get("agent.canvas.execution.start").handler(payload, context))
+    replay_output = asyncio.run(registry.get("agent.canvas.execution.start").handler(payload, context))
+    replay = replay_output.data
+    replay_output.transaction.rollback(); replay_output.transaction.close()
 
     assert registry.lifecycle_names() == ("agent.canvas-execution-worker",)
     assert accepted["status"] == "accepted"

@@ -10,12 +10,14 @@ from ..application.service import (
 )
 from ..infrastructure import AgentCapabilityRepository
 from ..data.audit_repository import AuditRepository
+from ..data.connection import begin_agent_transaction
 from ..data.session_repository import SessionRepository
 from .descriptors import specs
-from .provider import descriptor_for
+from .provider import descriptor_for, transactional_write_output
 from .interaction_chat_change import register_interaction_chat_change_capability
 from .catalog_tool_confirmation import register_catalog_tool_confirmation_capability
 from backend.domain_ports.resource_authorization import resource_authorizers
+from backend.capability_v2.reliability import transactional_provider
 
 
 _DEFAULT_RUNTIME = object()
@@ -89,12 +91,31 @@ def register_capabilities(registry, *, canvas_runtime=_DEFAULT_RUNTIME) -> None:
     )
     for spec in specs():
         capability_id = spec.id
+        write = spec.risk.value != "read"
         if capability_id in _CANVAS_CAPABILITIES:
-            async def handler(payload, context, *, _capability_id=capability_id):
-                return await provider.invoke(_capability_id, payload, context)
+            async def handler(payload, context, *, _capability_id=capability_id, _write=write):
+                if not _write:
+                    return await provider.invoke(_capability_id, payload, context)
+                transaction = begin_agent_transaction()
+                try:
+                    value = await provider.invoke(_capability_id, payload, context)
+                    return transactional_write_output(_capability_id, value, context, transaction)
+                except BaseException:
+                    transaction.rollback(); transaction.close()
+                    raise
         else:
-            def handler(payload, context, *, _capability_id=capability_id):
-                return provider.invoke(_capability_id, payload, context)
+            def handler(payload, context, *, _capability_id=capability_id, _write=write):
+                if not _write:
+                    return provider.invoke(_capability_id, payload, context)
+                transaction = begin_agent_transaction()
+                try:
+                    value = provider.invoke(_capability_id, payload, context)
+                    return transactional_write_output(_capability_id, value, context, transaction)
+                except BaseException:
+                    transaction.rollback(); transaction.close()
+                    raise
+        if write:
+            handler = transactional_provider(handler)
         governed = spec.model_copy(update={"plugin_callable": True})
         registry.register(governed, handler, descriptor=descriptor_for(governed))
     register_interaction_chat_change_capability(registry)

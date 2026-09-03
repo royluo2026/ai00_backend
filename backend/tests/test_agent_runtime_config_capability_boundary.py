@@ -1,11 +1,24 @@
 from __future__ import annotations
 
+import asyncio
 import ast
+from datetime import UTC, datetime
 from pathlib import Path
 from types import SimpleNamespace
 
 from backend.capabilities.registry_next import CapabilityRegistry
 from backend.capabilities.validation_next import validate_payload
+from backend.capability_v2.catalog import CatalogResolver, build_release
+from backend.capability_v2.catalog_store import InMemoryCatalogStore
+from backend.capability_v2.contracts import (
+    ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType,
+    InvocationEnvelope, TenantIdentity,
+)
+from backend.capability_v2.gateway import CapabilityGatewayService
+from backend.capability_v2.outcomes import InMemoryOutcomeStore
+from backend.capability_v2.reliability import (
+    InMemoryRateLimiter, ReliabilityCoordinator, TransactionalCapabilityOutput,
+)
 from plugins.agent.agent_backend.application.service import AgentApplication
 from plugins.agent.agent_backend.capabilities import register_capabilities
 from plugins.agent.agent_backend.capabilities.descriptors import specs
@@ -56,3 +69,65 @@ def test_registered_runtime_config_handler_matches_its_output_contract(monkeypat
     )
     assert "data" not in value
     validate_payload(dict(provider.descriptor.output_schema), value, label="output")
+
+
+def test_registered_write_handler_matches_strong_transaction_and_evidence_contract(monkeypatch):
+    monkeypatch.setattr(
+        "plugins.agent.agent_backend.capabilities.AgentCapabilityRepository.apply",
+        lambda _self, _payload: {"resource_gid": "run-1"},
+    )
+    registry = CapabilityRegistry()
+    register_capabilities(registry, canvas_runtime=None)
+    provider = registry.get("agent.run.change.apply", 1)
+
+    assert provider.descriptor.consistency_policy == "strong"
+    assert provider.descriptor.evidence_policy == "required"
+    value = provider.handler(
+        {}, SimpleNamespace(
+            user_gid="u1", team_gid="t1", request_id="req-1",
+            active_roles=("super_admin",),
+        ),
+    )
+
+    assert getattr(provider.handler, "__capability_transactional__", False) is True
+    assert isinstance(value, TransactionalCapabilityOutput)
+    assert value.evidence
+    validate_payload(dict(provider.descriptor.output_schema), value.data, label="output")
+    value.transaction.rollback()
+    value.transaction.close()
+
+
+def test_real_gateway_commits_registered_agent_write_with_evidence(monkeypatch):
+    monkeypatch.setattr(
+        "plugins.agent.agent_backend.capabilities.AgentCapabilityRepository.apply",
+        lambda _self, _payload: {"resource_gid": "run-1"},
+    )
+    registry = CapabilityRegistry()
+    register_capabilities(registry, canvas_runtime=None)
+    provider = registry.get("agent.run.change.apply", 1)
+    release = build_release([provider.descriptor])
+    store = InMemoryCatalogStore(); store.publish(release)
+
+    class Policy:
+        def authorize(self, *_args): return None
+        def approve(self, *_args): return None
+        def project(self, _descriptor, _identity, data): return data
+
+    gateway = CapabilityGatewayService(
+        CatalogResolver(store, registry), Policy(),
+        reliability=ReliabilityCoordinator(InMemoryOutcomeStore(), InMemoryRateLimiter(limit=10)),
+    ).bind_release(release.release_id)
+    result = asyncio.run(gateway.invoke(InvocationEnvelope(
+        capability_id=provider.spec.id, major_version=provider.spec.version,
+        catalog_release=release.release_id, payload={},
+        identity=ConsumerIdentity(
+            actor=ActorIdentity(user_id="u1", authentication_method="jwt", authenticated_at=datetime.now(UTC)),
+            tenant=TenantIdentity(tenant_id="t1", membership="member"),
+            consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web.agent"),
+        ),
+        request_id="req-write-1", trace_id="req-write-1", idempotency_key="idem-write-1",
+    )))
+
+    assert result.ok is True
+    assert result.data["resource_gid"] == "run-1"
+    assert result.evidence[0].kind == "agent.change"

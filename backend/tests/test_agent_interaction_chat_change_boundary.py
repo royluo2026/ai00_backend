@@ -1,6 +1,6 @@
 import asyncio
 import json
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -352,8 +352,70 @@ def test_gateway_expires_unclaimed_stream_and_closes_iterator() -> None:
         await asyncio.sleep(0.13)
         assert closed == 2
         assert len(gateway.recent_metrics()) == 2
+        replay = await gateway.invoke(envelope)
+        assert replay.error.code == "cancelled"
         with pytest.raises(ValueError, match="expired"):
             await gateway.claim_stream(stream_id)
+
+    asyncio.run(exercise())
+
+
+@pytest.mark.parametrize("claim", [False, True])
+def test_gateway_deadline_finalizes_stream_even_if_response_body_never_starts(claim) -> None:
+    registered = CapabilityRegistry(); register_interaction_chat_change_capability(registered)
+    chat = registered.get("agent.interaction.chat.change.apply", 2)
+    closed = 0
+
+    class Events:
+        def __aiter__(self): return self
+        async def __anext__(self): return "data: pending\n\n"
+        async def aclose(self):
+            nonlocal closed
+            closed += 1
+
+    registry = CapabilityRegistry()
+    registry.register(
+        chat.spec,
+        lambda *_args: CapabilityStreamOutput(
+            iterator=Events(), output={"data": {"media_type": "text/event-stream"}},
+        ), descriptor=chat.descriptor,
+    )
+    release = build_release([chat.descriptor]); store = InMemoryCatalogStore(); store.publish(release)
+
+    class Policy:
+        def authorize(self, *_args): return None
+        def approve(self, *_args): return None
+        def project(self, _descriptor, _identity, data): return data
+
+    gateway = CapabilityGatewayService(
+        CatalogResolver(store, registry), Policy(),
+        reliability=ReliabilityCoordinator(InMemoryOutcomeStore(), InMemoryRateLimiter(limit=10)),
+        stream_claim_ttl_seconds=10,
+    ).bind_release(release.release_id)
+    envelope = InvocationEnvelope(
+        capability_id=chat.spec.id, major_version=2, catalog_release=release.release_id,
+        payload={"operation": "chat_stream", "body": {"message": "hello"}, "ai00_token": "token"},
+        identity=ConsumerIdentity(
+            actor=ActorIdentity(user_id="admin-1", authentication_method="jwt", authenticated_at=datetime.now(UTC)),
+            tenant=TenantIdentity(tenant_id="team-1", membership="member"),
+            consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web.agent"),
+        ),
+        request_id=f"stream-deadline-{claim}", trace_id=f"stream-deadline-{claim}",
+        idempotency_key=f"stream-deadline-{claim}",
+        deadline=datetime.now(UTC) + timedelta(milliseconds=50),
+    )
+
+    async def exercise():
+        result = await gateway.invoke(envelope)
+        if claim:
+            await gateway.claim_stream(result.data["data"]["stream_id"])
+        await asyncio.sleep(0.15)
+        assert closed == 1
+        assert len(gateway.recent_metrics()) == 1
+        replay = await gateway.invoke(envelope.model_copy(update={
+            "deadline": datetime.now(UTC) + timedelta(seconds=1),
+        }))
+        assert replay.error.code == "runtime_timeout"
 
     asyncio.run(exercise())
 

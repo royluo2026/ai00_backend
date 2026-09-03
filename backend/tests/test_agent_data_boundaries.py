@@ -4,6 +4,7 @@ from pathlib import Path
 
 from plugins.agent.agent_backend.data.audit_repository import AuditRepository
 from plugins.agent.agent_backend.data.memory_repository import MemoryRepository
+from plugins.agent.agent_backend.data import connection as agent_connection
 
 
 class Cursor:
@@ -78,6 +79,40 @@ class AgentDataBoundaryTests(unittest.TestCase):
         self.assertNotIn("CREATE TABLE", text.upper())
         repository = (root / "plugins/agent/agent_backend/infrastructure/repository.py").read_text(encoding="utf-8")
         self.assertIn("owner_gid=%s OR scope='team' OR (scope='global' AND status='active')", repository)
+
+
+def test_agent_transaction_reuses_domain_connection_and_enlists_base_outcome(monkeypatch):
+    cursor = Cursor()
+
+    class TransactionConnection(Connection):
+        committed = False
+        rolled_back = False
+        closed = False
+
+        def commit(self): self.committed = True
+        def rollback(self): self.rolled_back = True
+        def close(self): self.closed = True
+
+    connection = TransactionConnection(cursor)
+
+    class Pool:
+        def connection(self): return connection
+
+    monkeypatch.setenv("AI00_BASE_DB_URL", "mysql://user:password@localhost/ai00_base")
+    monkeypatch.setattr(agent_connection, "_get_pool", lambda: Pool())
+    transaction = agent_connection.begin_agent_transaction()
+    with agent_connection.get_agent_conn() as owned:
+        assert owned is connection
+    with transaction.cursor() as tx_cursor:
+        tx_cursor.execute(
+            "UPDATE workmanship_base_capability_outcomes SET status=%s",
+            ("completed",),
+        )
+    transaction.commit(); transaction.close()
+
+    assert "`ai00_base`.`workmanship_base_capability_outcomes`" in cursor.executed[0][0]
+    assert connection.committed is True
+    assert connection.closed is True
 
 
 if __name__ == "__main__":
