@@ -65,6 +65,13 @@ def test_agent_chat_registers_frozen_v1_and_corrected_v2() -> None:
     assert v2.descriptor.consistency_policy == "eventual"
     assert v2.descriptor.evidence_policy == "optional"
     assert v2.descriptor.idempotency_policy == "required"
+    assert {
+        (selector.resource_type, selector.payload_path, selector.required)
+        for selector in v2.descriptor.resource_selectors
+    } == {
+        ("agent-session", "body.session_id", False),
+        ("agent-session", "body.session_gid", False),
+    }
     assert substantive_business_definition_errors(v2.descriptor) == ()
     assert {rule.rule_id for rule in v2.descriptor.business_invariants} == {
         "agent.interaction.chat.actor_bound",

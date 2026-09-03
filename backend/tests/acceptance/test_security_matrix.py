@@ -2,6 +2,7 @@ from .support import key, stable_capabilities
 
 
 _CONFIRMATION_EXEMPT_MUTATIONS = {
+    "agent.interaction.chat.change.apply": "agent-session",
     "knowledge.personalization.change.apply.atomic.recent_record": "knowledge-item",
 }
 

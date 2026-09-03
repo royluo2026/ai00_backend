@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from backend.capability_v2.contracts import BusinessInvariantContract
+from backend.capability_v2.contracts import BusinessInvariantContract, ResourceSelector
 from backend.capability_v2.provider_contracts import CapabilityContext, CapabilitySpec
 
 OPERATIONS = ("chat_stream", "chat_sync", "confirm", "confirm_sync")
@@ -143,6 +143,14 @@ def register_interaction_chat_change_capability(registry: Any) -> None:
     v2_descriptor = descriptor_for(v2_governed).model_copy(update={
         "consistency_policy": "eventual",
         "evidence_policy": "optional",
+        "resource_selectors": (
+            ResourceSelector(
+                resource_type="agent-session", payload_path="body.session_id", required=False,
+            ),
+            ResourceSelector(
+                resource_type="agent-session", payload_path="body.session_gid", required=False,
+            ),
+        ),
         "business_effect": (
             "Authenticated internal users can continue or confirm their own Xiaorou conversations "
             "while downstream tool writes remain governed by their owning capabilities."
