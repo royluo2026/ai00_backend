@@ -54,7 +54,7 @@ _OPERATION_FIELDS = {
     "vismockup.model.attach@1": (("document_id", "baseline_snapshot_hash", "binding",), ("node_key", "binding_id")),
     "vismockup.scene.apply@1": (("document_id", "baseline_snapshot_hash", "operation_id", "scene"), ("actual_scene_hash",)),
     "vismockup.scene.verify@1": (("document_id", "operation_id", "expected_scene_hash"), ("actual_scene_hash", "matches")),
-    "vismockup.view.capture@1": (("operation_id", "capture_run_id", "attempt", "format", "width", "height", "background"), ("artifact",)),
+    "vismockup.view.capture@1": (("operation_id", "capture_run_id", "attempt", "format", "width", "height", "background", "artifact_resource_refs"), ("artifact",)),
 }
 REQUIRED_CONNECTOR_OPERATIONS = {
     operation_id: _canonical_hash({

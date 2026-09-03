@@ -150,6 +150,9 @@ def build_capture_plan(
         add("vismockup.view.capture@1", {
             "operation_id": operation.operation_id,
             "capture_run_id": capture_run_id or plan_id, "attempt": attempt,
+            "artifact_resource_refs": [
+                f"craft-bop-version:{manifest.execution_source.bop_version_gid}"
+            ],
             **manifest.capture_profile.model_dump(mode="json"),
         })
     return _plan(

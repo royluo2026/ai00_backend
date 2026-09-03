@@ -45,7 +45,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             new("vismockup.model.attach@1", "sha256:444b6b8a963b5a7e04d6b607cfe53699a5c93196a5bf78c98843d12d073fe844"),
             new("vismockup.scene.apply@1", "sha256:fce8ff3a33d996a26c3121d015839e2d68bc3c631a8c8c1091201e95d0bcabd3"),
             new("vismockup.scene.verify@1", "sha256:e99bf5896c3f655afc7470fc140d261225d6f37a1d8224b7e9438a2e7b7a211a"),
-            new("vismockup.view.capture@1", "sha256:9c37c00be78afd4590be9fa128b1cddd2d84536d07f24bb690d0a176468c14e5"),
+            new("vismockup.view.capture@1", "sha256:10a4b5540a34fb32a2e6a4d24fd1efbe7afb929e2cc3c9fed44f6b4d9893962d"),
         ]);
 
     public async Task<AdapterHealth> ProbeAsync(CancellationToken cancellationToken)

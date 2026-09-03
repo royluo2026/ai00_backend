@@ -129,6 +129,11 @@ def test_capture_plan_orders_operations_descending():
                 if step.operation_id == "vismockup.view.capture@1"]
     assert captures == ["op-30", "op-20", "op-10"]
     assert all(len(plan.steps) == 3 for plan in connector.plans)
+    assert all(
+        step.payload["artifact_resource_refs"] == ["craft-bop-version:bop-v1"]
+        for plan in connector.plans for step in plan.steps
+        if step.operation_id == "vismockup.view.capture@1"
+    )
 
 
 def test_materialization_plan_attaches_models_before_scene_verification():
