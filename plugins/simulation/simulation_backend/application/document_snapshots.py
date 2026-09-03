@@ -65,18 +65,38 @@ class DocumentSnapshotWorkflow:
             "snapshot": None, "failure_code": "", "owner_gid": context.user_gid,
             "team_gid": context.team_gid,
             "operation_ref": {"operation_id": plan.plan_id, "status": "accepted", "version": 1},
+            "plan": plan.model_dump(mode="json"), "dispatched": False,
         }
         persisted = self.repository.create_request(row, context)
-        if persisted["snapshot_request_id"] != request_id:
-            return persisted
-        try:
-            await self.connector_port.queue_plan(plan, context)
-        except Exception:
-            self.repository.complete_request(
-                request_id, status="failed", failure_code="connector_offline",
-            )
-            raise
         return persisted
+
+    def next_action(
+        self, request_id: str, context: CapabilityContext,
+    ) -> dict[str, Any] | None:
+        row = self.get(request_id, context)
+        if row["status"] != "queued" or row.get("dispatched"):
+            return None
+        plan = ConnectorExecutionPlanV1.model_validate(row.get("plan"))
+        return {
+            "capability_id": "device.connector.plan.queue", "major_version": 2,
+            "payload": {"plan": plan.model_dump(mode="json")},
+            "idempotency_key": plan.plan_id,
+        }
+
+    async def dispatch(
+        self, request_id: str, approval_reference: str, context: CapabilityContext,
+    ) -> dict[str, Any]:
+        if not approval_reference:
+            raise SimulationWorkflowError("downstream_confirmation_required")
+        action = self.next_action(request_id, context)
+        if action is None:
+            raise SimulationWorkflowError("document_snapshot_action_not_ready")
+        plan = ConnectorExecutionPlanV1.model_validate(action["payload"]["plan"])
+        await self.connector_port.queue_plan(
+            plan, context, approval_reference=approval_reference,
+        )
+        self.repository.mark_dispatched(request_id)
+        return self.get(request_id, context)
 
     def get(self, request_id: str, context: CapabilityContext) -> dict[str, Any]:
         row = self.repository.get_request(request_id, context)

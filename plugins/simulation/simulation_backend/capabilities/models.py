@@ -53,6 +53,32 @@ class RegisteredSourceResolver:
 
 
 class SimulationRepository:
+    def _can_read_owned(self, table: str, id_column: str, resource_id: str, *, user_gid: str, team_gid: str) -> bool:
+        if not resource_id or not user_gid or not team_gid:
+            return False
+        with get_simulation_conn() as conn, conn.cursor() as cur:
+            cur.execute(
+                f"SELECT 1 FROM `{table}` WHERE `{id_column}`=%s "
+                "AND (owner_gid=%s OR team_gid=%s) LIMIT 1",
+                (resource_id, user_gid, team_gid),
+            )
+            return cur.fetchone() is not None
+
+    def can_read_parameter_set(self, resource_id: str, **scope) -> bool:
+        return self._can_read_owned(
+            "workmanship_sim_parameter_sets", "parameter_set_id", resource_id, **scope,
+        )
+
+    def can_read_profile(self, resource_id: str, **scope) -> bool:
+        return self._can_read_owned(
+            "workmanship_sim_profiles", "profile_id", resource_id, **scope,
+        )
+
+    def can_read_run(self, resource_id: str, **scope) -> bool:
+        return self._can_read_owned(
+            "workmanship_sim_runs", "run_id", resource_id, **scope,
+        )
+
     def can_read_environment(self, environment_id: str, *, user_gid: str, team_gid: str) -> bool:
         if not environment_id or not user_gid or not team_gid:
             return False

@@ -77,7 +77,9 @@ def descriptor_for(spec: Any):
         "operation_policy": "required" if is_local else ("optional" if is_write else "none"),
         "concurrency_policy": "none", "idempotency_policy": "required" if is_write else ("optional" if is_local else "none"),
         "consistency_policy": (
-            "external" if is_local or governed.id == "device.connector.plan.queue" else "strong"
+            "external" if is_local or (
+                governed.id == "device.connector.plan.queue" and governed.version >= 2
+            ) else "strong"
         ), "evidence_policy": "required",
         "domain_errors": _ERRORS, "domain_errors_complete": True,
     }

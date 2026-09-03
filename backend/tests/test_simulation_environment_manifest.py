@@ -154,6 +154,18 @@ def test_environment_repository_depends_only_on_simulation_connection():
     assert "plugins.digital_model" not in source
 
 
+def test_two_phase_dispatch_migration_persists_exact_prepared_plans():
+    root = Path(__file__).resolve().parents[2]
+    sql = (
+        root / "backend/db/migrations/domains/simulation/0004_capture_dispatch_plans.sql"
+    ).read_text(encoding="utf-8")
+
+    assert "workmanship_sim_capture_steps" in sql and "plan_json" in sql
+    assert "workmanship_sim_materialization_runs" in sql
+    assert "workmanship_sim_document_snapshot_requests" in sql
+    assert "dispatched_at" in sql
+
+
 def test_manifest_targets_the_advertised_vismockup_14_major():
     manifest = compose_manifest(**_fixture()).manifest
 

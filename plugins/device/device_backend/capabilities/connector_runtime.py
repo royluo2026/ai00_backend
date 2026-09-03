@@ -205,7 +205,10 @@ class ConnectorControlPlane:
         ):
             raise ConnectorError("plan_outcome_invalid")
         if outcome.status in {"failed", "outcome_unknown", "cancelled"}:
-            if not outcome.steps or outcome.steps[-1].status != outcome.status:
+            reconciliation_unknown = outcome.status == "outcome_unknown" and not outcome.steps
+            if not reconciliation_unknown and (
+                not outcome.steps or outcome.steps[-1].status != outcome.status
+            ):
                 raise ConnectorError("plan_outcome_invalid")
             if any(step.status != "completed" for step in outcome.steps[:-1]):
                 raise ConnectorError("plan_outcome_invalid")
@@ -449,6 +452,14 @@ def register_connector_runtime_capabilities(registry, control_plane: ConnectorCo
     register(registry, CapabilitySpec(
         id="device.connector.plan.queue", owner="device", version=1,
         description="Queue one immutable compatible ExecutionPlan for an owned AI00 Connector.",
+        use_when="A governed workflow is ready to execute a version-pinned local plan.",
+        do_not_use_when="Compatibility or user-session preflight has not passed.",
+        risk=CapabilityRisk.WRITE, confirmation="user", permissions=("agent.run",),
+        input_schema={}, output_schema={}, tags=("device", "connector", "plan"),
+    ), queue_plan)
+    register(registry, CapabilitySpec(
+        id="device.connector.plan.queue", owner="device", version=2,
+        description="Queue one immutable compatible ExecutionPlan using external Connector consistency.",
         use_when="A governed workflow is ready to execute a version-pinned local plan.",
         do_not_use_when="Compatibility or user-session preflight has not passed.",
         risk=CapabilityRisk.WRITE, confirmation="user", permissions=("agent.run",),

@@ -38,15 +38,36 @@ CAPABILITY_IDS = {
     "simulation.environment.compose",
     "simulation.document_snapshot.request",
     "simulation.document_snapshot.get",
+    "simulation.document_snapshot.action.get",
+    "simulation.document_snapshot.dispatch",
     "simulation.environment.manifest.get",
     "simulation.environment.manifest.search",
     "simulation.environment.manifest.archive",
     "simulation.environment.preflight",
     "simulation.environment.materialize",
+    "simulation.materialization_run.action.get",
+    "simulation.materialization_run.dispatch",
     "simulation.capture_run.start",
     "simulation.capture_run.get",
+    "simulation.capture_run.action.get",
+    "simulation.capture_run.dispatch",
     "simulation.capture_run.cancel",
     "simulation.capture_step.retry",
+    "simulation.connector_capture_outcome.apply",
+    "simulation.connector_materialization_outcome.apply",
+    "simulation.connector_document_snapshot_outcome.apply",
+}
+EXPERIMENTAL_IDS = {
+    capability_id for capability_id in CAPABILITY_IDS
+    if capability_id.startswith("simulation.document_snapshot.")
+} | {
+    "simulation.materialization_run.action.get",
+    "simulation.materialization_run.dispatch",
+    "simulation.capture_run.action.get",
+    "simulation.capture_run.dispatch",
+    "simulation.connector_capture_outcome.apply",
+    "simulation.connector_materialization_outcome.apply",
+    "simulation.connector_document_snapshot_outcome.apply",
 }
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -101,9 +122,14 @@ def test_provider_publishes_native_stable_plugin_agent_and_mcp_contracts():
     for capability_id, registration in registrations.items():
         descriptor = registration.descriptor
         assert descriptor.owner_domain == "simulation", capability_id
-        expected_lifecycle = "experimental" if capability_id.startswith("simulation.document_snapshot.") else "stable"
+        expected_lifecycle = "experimental" if capability_id in EXPERIMENTAL_IDS else "stable"
         assert descriptor.lifecycle_status == expected_lifecycle, capability_id
-        assert descriptor.exposure.plugin and descriptor.exposure.agent and descriptor.exposure.mcp
+        if capability_id.startswith("simulation.connector_") and capability_id.endswith("_outcome.apply"):
+            assert descriptor.exposure.local_runtime
+            assert not descriptor.exposure.web and not descriptor.exposure.plugin
+            assert not descriptor.exposure.agent and not descriptor.exposure.mcp
+        else:
+            assert descriptor.exposure.plugin and descriptor.exposure.agent and descriptor.exposure.mcp
         assert descriptor.input_schema["additionalProperties"] is False
         assert descriptor.output_schema["additionalProperties"] is False
         assert descriptor.output_schema["properties"]

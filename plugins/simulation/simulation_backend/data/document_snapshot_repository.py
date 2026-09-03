@@ -13,6 +13,9 @@ def _project(row):
     value = dict(row)
     raw = value.pop("snapshot_json", None)
     value["snapshot"] = json.loads(raw) if isinstance(raw, str) else raw
+    raw_plan = value.pop("plan_json", None)
+    value["plan"] = json.loads(raw_plan) if isinstance(raw_plan, str) else raw_plan
+    value["dispatched"] = value.pop("dispatched_at", None) is not None
     value["failure_code"] = value.get("failure_code") or ""
     value["operation_ref"] = {
         "operation_id": value["plan_id"],
@@ -40,7 +43,7 @@ class DocumentSnapshotRepository:
     def create_request(self, row, context: CapabilityContext):
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
-                "SELECT snapshot_request_id,request_key,device_id,plan_id,status,snapshot_json,"
+                "SELECT snapshot_request_id,request_key,device_id,plan_id,plan_json,dispatched_at,status,snapshot_json,"
                 "failure_code,owner_gid,team_gid FROM workmanship_sim_document_snapshot_requests "
                 "WHERE owner_gid=%s AND team_gid<=>%s AND request_key=%s FOR UPDATE",
                 (context.user_gid, context.team_gid, row["request_key"]),
@@ -52,9 +55,10 @@ class DocumentSnapshotRepository:
                 return _project(current)
             cursor.execute(
                 "INSERT INTO workmanship_sim_document_snapshot_requests "
-                "(snapshot_request_id,request_key,device_id,plan_id,status,owner_gid,team_gid) "
-                "VALUES (%s,%s,%s,%s,'queued',%s,%s)",
+                "(snapshot_request_id,request_key,device_id,plan_id,plan_json,status,owner_gid,team_gid) "
+                "VALUES (%s,%s,%s,%s,%s,'queued',%s,%s)",
                 (row["snapshot_request_id"], row["request_key"], row["device_id"], row["plan_id"],
+                 json.dumps(row["plan"], sort_keys=True, separators=(",", ":")),
                  context.user_gid, context.team_gid),
             )
         return dict(row)
@@ -62,13 +66,23 @@ class DocumentSnapshotRepository:
     def get_request(self, request_id: str, context: CapabilityContext):
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
-                "SELECT snapshot_request_id,request_key,device_id,plan_id,status,snapshot_json,"
+                "SELECT snapshot_request_id,request_key,device_id,plan_id,plan_json,dispatched_at,status,snapshot_json,"
                 "failure_code,owner_gid,team_gid FROM workmanship_sim_document_snapshot_requests "
                 "WHERE snapshot_request_id=%s AND (owner_gid=%s OR (%s IS NOT NULL AND team_gid=%s))",
                 (request_id, context.user_gid, context.team_gid, context.team_gid),
             )
             row = cursor.fetchone()
         return _project(row) if row else None
+
+    def mark_dispatched(self, request_id: str) -> None:
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "UPDATE workmanship_sim_document_snapshot_requests SET dispatched_at=COALESCE(dispatched_at,NOW(6)),"
+                "updated_at=NOW(6) WHERE snapshot_request_id=%s AND status='queued'",
+                (request_id,),
+            )
+            if cursor.rowcount != 1:
+                raise SimulationWorkflowError("document_snapshot_action_not_ready")
 
     def complete_request(self, request_id: str, *, snapshot=None, status="completed", failure_code=""):
         encoded = json.dumps(snapshot, ensure_ascii=False, sort_keys=True, separators=(",", ":")) if snapshot else None

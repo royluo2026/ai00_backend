@@ -134,6 +134,26 @@ CAPTURE_RUN = obj({
     "operation_ref": OPERATION_REF,
     "steps": {"type": "array", "items": CAPTURE_STEP, "maxItems": 3000},
 }, ("capture_run_id", "environment_id", "environment_version", "manifest_hash", "device_id", "plan_id", "status", "operation_ref", "steps"))
+MATERIALIZATION_RUN = obj({
+    "run_id": STRING, "environment_id": STRING, "environment_version": POSITIVE_INTEGER,
+    "manifest_hash": HASH, "device_id": STRING, "plan_id": STRING,
+    "status": {"type": "string", "enum": [
+        "queued", "leased", "running", "completed", "failed", "cancelled", "outcome_unknown",
+    ]},
+    "operation_ref": OPERATION_REF,
+}, ("run_id", "environment_id", "environment_version", "manifest_hash", "device_id", "plan_id", "status", "operation_ref"))
+DOWNSTREAM_ACTION = obj({
+    "capability_id": {"type": "string", "enum": [
+        "device.connector.plan.queue", "craft.process_screenshot.attach",
+    ]},
+    "major_version": POSITIVE_INTEGER,
+    "payload_json": STRING,
+    "payload_hash": HASH,
+    "idempotency_key": STRING,
+}, ("capability_id", "major_version", "payload_json", "payload_hash", "idempotency_key"))
+OUTCOME_APPLY_OUTPUT = obj({
+    "resource_id": STRING, "status": {"type": "string", "enum": ["applied"]},
+}, ("resource_id", "status"))
 DOCUMENT_SNAPSHOT_NODE = obj({
     "node_key": STRING, "parent_key": {"type": ["string", "null"]},
     "product_ref": STRING, "child_order": NONNEGATIVE_INTEGER,
@@ -173,20 +193,39 @@ INPUT_SCHEMAS = {
     }, ("name", "device_id", "execution_plan_ref", "snapshot_request_id", "capture_profile")),
     "simulation.document_snapshot.request": obj({"device_id": STRING, "request_key": STRING}, ("device_id", "request_key")),
     "simulation.document_snapshot.get": obj({"snapshot_request_id": STRING}, ("snapshot_request_id",)),
+    "simulation.document_snapshot.action.get": obj({"snapshot_request_id": STRING}, ("snapshot_request_id",)),
+    "simulation.document_snapshot.dispatch": obj({"snapshot_request_id": STRING}, ("snapshot_request_id",)),
     "simulation.environment.manifest.get": obj({"environment_id": STRING, "environment_version": POSITIVE_INTEGER}, ("environment_id", "environment_version")),
     "simulation.environment.manifest.search": obj({"limit": {"type": "integer", "minimum": 1, "maximum": 200}}),
     "simulation.environment.manifest.archive": obj({"environment_id": STRING}, ("environment_id",)),
     "simulation.environment.preflight": obj({"environment_id": STRING, "environment_version": POSITIVE_INTEGER, "device_id": STRING}, ("environment_id", "environment_version", "device_id")),
     "simulation.environment.materialize": obj({"environment_id": STRING, "environment_version": POSITIVE_INTEGER, "device_id": STRING}, ("environment_id", "environment_version", "device_id")),
+    "simulation.materialization_run.action.get": obj({"run_id": STRING}, ("run_id",)),
+    "simulation.materialization_run.dispatch": obj({"run_id": STRING}, ("run_id",)),
     "simulation.capture_run.start": obj({"environment_id": STRING, "environment_version": POSITIVE_INTEGER, "device_id": STRING}, ("environment_id", "environment_version", "device_id")),
     "simulation.capture_run.get": obj({"capture_run_id": STRING}, ("capture_run_id",)),
+    "simulation.capture_run.action.get": obj({"capture_run_id": STRING}, ("capture_run_id",)),
+    "simulation.capture_run.dispatch": obj({"capture_run_id": STRING}, ("capture_run_id",)),
     "simulation.capture_run.cancel": obj({"capture_run_id": STRING}, ("capture_run_id",)),
     "simulation.capture_step.retry": obj({"capture_run_id": STRING, "operation_id": STRING}, ("capture_run_id", "operation_id")),
+    "simulation.connector_capture_outcome.apply": obj({
+        "capture_run_id": STRING, "plan_json": STRING, "outcome_json": STRING,
+    }, ("capture_run_id", "plan_json", "outcome_json")),
+    "simulation.connector_materialization_outcome.apply": obj({
+        "run_id": STRING, "plan_json": STRING, "outcome_json": STRING,
+    }, ("run_id", "plan_json", "outcome_json")),
+    "simulation.connector_document_snapshot_outcome.apply": obj({
+        "snapshot_request_id": STRING, "plan_json": STRING, "outcome_json": STRING,
+    }, ("snapshot_request_id", "plan_json", "outcome_json")),
 }
 
 OUTPUT_SCHEMAS = {
     "simulation.document_snapshot.request": DOCUMENT_SNAPSHOT_REQUEST,
     "simulation.document_snapshot.get": DOCUMENT_SNAPSHOT_REQUEST,
+    "simulation.document_snapshot.action.get": obj({
+        "action": {"anyOf": [DOWNSTREAM_ACTION, {"type": "null"}]},
+    }, ("action",)),
+    "simulation.document_snapshot.dispatch": DOCUMENT_SNAPSHOT_REQUEST,
     "simulation.parameter_set.create": PARAMETER_SET,
     "simulation.parameter_set.get": PARAMETER_SET,
     "simulation.parameter_set.search": obj({"items": {"type": "array", "items": PARAMETER_SET}, "total": INTEGER, "query": STRING}, ("items", "total", "query")),
@@ -212,13 +251,24 @@ OUTPUT_SCHEMAS = {
         "manifest_hash": HASH, "device_id": STRING, "plan_id": STRING,
         "status": {"type": "string", "enum": ["queued"]}, "operation_ref": OPERATION_REF,
     }, ("run_id", "environment_id", "environment_version", "manifest_hash", "device_id", "plan_id", "status", "operation_ref")),
+    "simulation.materialization_run.action.get": obj({
+        "action": {"anyOf": [DOWNSTREAM_ACTION, {"type": "null"}]},
+    }, ("action",)),
+    "simulation.materialization_run.dispatch": MATERIALIZATION_RUN,
     "simulation.capture_run.start": CAPTURE_RUN,
     "simulation.capture_run.get": CAPTURE_RUN,
+    "simulation.capture_run.action.get": obj({
+        "action": {"anyOf": [DOWNSTREAM_ACTION, {"type": "null"}]},
+    }, ("action",)),
+    "simulation.capture_run.dispatch": CAPTURE_RUN,
     "simulation.capture_run.cancel": obj({"capture_run_id": STRING, "status": {"type": "string", "enum": ["cancelling", "cancelled"]}}, ("capture_run_id", "status")),
     "simulation.capture_step.retry": obj({
         "capture_run_id": STRING, "operation_id": STRING, "attempt": POSITIVE_INTEGER,
         "plan_id": STRING, "status": {"type": "string", "enum": ["queued"]},
     }, ("capture_run_id", "operation_id", "attempt", "plan_id", "status")),
+    "simulation.connector_capture_outcome.apply": OUTCOME_APPLY_OUTPUT,
+    "simulation.connector_materialization_outcome.apply": OUTCOME_APPLY_OUTPUT,
+    "simulation.connector_document_snapshot_outcome.apply": OUTCOME_APPLY_OUTPUT,
 }
 
 __all__ = ["INPUT_SCHEMAS", "OUTPUT_SCHEMAS"]

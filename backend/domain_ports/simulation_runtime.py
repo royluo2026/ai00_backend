@@ -1,11 +1,15 @@
 """Governed cross-domain client used by Simulation orchestration."""
 from __future__ import annotations
 
+from datetime import UTC, datetime
+import hashlib
+import json
 from threading import RLock
 from typing import Any
 
 from backend.capability_v2.contracts import (
-    CapabilityStatus, CorrelationRef, InvocationEnvelope,
+    ActorIdentity, CapabilityStatus, ConsumerDescriptor, ConsumerIdentity,
+    ConsumerType, CorrelationRef, TenantIdentity,
 )
 from backend.capability_v2.domain_client import DomainCapabilityClient, DomainInvocation
 from backend.capability_v2.provider_contracts import CapabilityBusinessError
@@ -59,34 +63,9 @@ class GovernedSimulationRuntimeClient:
             raise CapabilityBusinessError("request_identity_required", "A request id is required.")
         return CorrelationRef(request_id=request_id, trace_id=request_id)
 
-    def _envelope(self, invocation, identity, correlation) -> InvocationEnvelope:
-        return InvocationEnvelope(
-            capability_id=invocation.capability_id,
-            major_version=invocation.major_version,
-            catalog_release=self.gateway.catalog_release,
-            payload=dict(invocation.payload),
-            identity=identity,
-            idempotency_key=invocation.idempotency_key,
-            expected_resource_version=invocation.expected_resource_version,
-            request_id=correlation.request_id,
-            trace_id=correlation.trace_id or correlation.request_id,
-        )
-
-    async def _invoke(self, invocation: DomainInvocation, context, *, confirm=False):
+    async def _invoke(self, invocation: DomainInvocation, context):
         identity = self._identity(context)
         correlation = self._correlation(context)
-        if confirm:
-            issued = await self.gateway.request_approval(
-                self._envelope(invocation, identity, correlation)
-            )
-            invocation = DomainInvocation(
-                capability_id=invocation.capability_id,
-                major_version=invocation.major_version,
-                payload=invocation.payload,
-                idempotency_key=invocation.idempotency_key,
-                expected_resource_version=invocation.expected_resource_version,
-                approval_reference=issued.token,
-            )
         result = await self.client.invoke(invocation, identity, correlation)
         if result.status is not CapabilityStatus.COMPLETED or result.error is not None:
             error = result.error
@@ -113,22 +92,79 @@ class GovernedSimulationRuntimeClient:
             "device.connector.health.get", 1, {"device_id": device_id},
         ), context)
 
-    async def queue_plan(self, plan, context):
+    async def queue_plan(self, plan, context, *, approval_reference):
         return await self._invoke(DomainInvocation(
-            "device.connector.plan.queue", 1,
+            "device.connector.plan.queue", 2,
             {"plan": plan.model_dump(mode="json")}, idempotency_key=plan.plan_id,
-        ), context, confirm=True)
+            approval_reference=approval_reference,
+        ), context)
 
-    async def attach_screenshot(self, *, context, **payload):
+    async def attach_screenshot(self, *, context, approval_reference, **payload):
         key = f"{payload['capture_run_id']}:{payload['operation_id']}"
         return await self._invoke(DomainInvocation(
             "craft.process_screenshot.attach", 1, payload, idempotency_key=key,
-        ), context, confirm=True)
+            approval_reference=approval_reference,
+        ), context)
+
+    async def apply_connector_outcome(self, plan, outcome):
+        operations = {step.operation_id for step in plan.steps}
+        if operations == {"vismockup.document.snapshot@1"}:
+            capability_id = "simulation.connector_document_snapshot_outcome.apply"
+            resource_payload = {"snapshot_request_id": plan.plan_id}
+        elif "vismockup.view.capture@1" in operations:
+            capture_steps = [
+                step for step in plan.steps if step.operation_id == "vismockup.view.capture@1"
+            ]
+            capture_run_id = str(capture_steps[0].payload.get("capture_run_id") or "") if len(capture_steps) == 1 else ""
+            capability_id = "simulation.connector_capture_outcome.apply"
+            resource_payload = {"capture_run_id": capture_run_id}
+        else:
+            capability_id = "simulation.connector_materialization_outcome.apply"
+            resource_payload = {"run_id": plan.plan_id}
+        outcome_value = outcome.model_dump(mode="json")
+        payload = {
+            **resource_payload,
+            "plan_json": json.dumps(plan.model_dump(mode="json"), sort_keys=True, separators=(",", ":")),
+            "outcome_json": json.dumps(outcome_value, sort_keys=True, separators=(",", ":")),
+        }
+        digest = hashlib.sha256(
+            payload["outcome_json"].encode("utf-8")
+        ).hexdigest()
+        identity = ConsumerIdentity(
+            actor=ActorIdentity(
+                user_id=plan.user_id,
+                authentication_method="connector_plan_lease",
+                authenticated_at=datetime.now(UTC),
+            ),
+            tenant=TenantIdentity(tenant_id=plan.tenant_id, membership="member"),
+            consumer=ConsumerDescriptor(
+                type=ConsumerType.LOCAL_RUNTIME,
+                consumer_id="ai00.connector",
+                installation_id=plan.device_id,
+            ),
+        )
+        correlation = CorrelationRef(
+            request_id=f"connector-outcome-{digest}",
+            trace_id=f"connector-plan-{plan.plan_id}",
+        )
+        result = await self.client.invoke(DomainInvocation(
+            capability_id, 1, payload,
+            idempotency_key=f"{plan.plan_id}:{digest}",
+        ), identity, correlation)
+        if result.status is not CapabilityStatus.COMPLETED or result.error is not None:
+            error = result.error
+            raise CapabilityBusinessError(
+                error.code if error else "downstream_capability_failed",
+                error.message if error else "The Connector outcome projection did not complete.",
+                retryable=bool(error and error.retryable),
+            )
+        return result.data
 
 
 def configure_simulation_runtime_gateway(gateway) -> None:
     client = GovernedSimulationRuntimeClient(gateway)
     simulation_runtime_ports.register("governed.domain_client", client)
+    simulation_runtime_ports.register("simulation.connector_outcome", client)
 
 
 class CraftExecutionPlanPortProxy:
@@ -145,13 +181,15 @@ class ConnectorPortProxy:
     async def get_health(self, device_id, context):
         return await simulation_runtime_ports.require("governed.domain_client").get_health(device_id, context)
 
-    async def queue_plan(self, plan, context):
-        return await simulation_runtime_ports.require("governed.domain_client").queue_plan(plan, context)
+    async def queue_plan(self, plan, context, *, approval_reference):
+        return await simulation_runtime_ports.require("governed.domain_client").queue_plan(
+            plan, context, approval_reference=approval_reference,
+        )
 
 
 class ConnectorOutcomePortProxy:
     async def apply(self, plan, outcome):
-        return await simulation_runtime_ports.require("simulation.connector_outcome").apply(plan, outcome)
+        return await simulation_runtime_ports.require("simulation.connector_outcome").apply_connector_outcome(plan, outcome)
 
 
 class KnowledgeMappingPortProxy:

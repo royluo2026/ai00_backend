@@ -1,9 +1,12 @@
 """Governed asynchronous active-document snapshot capabilities."""
 from __future__ import annotations
 
+import json
+
 from backend.capability_v2.provider_contracts import (
     CapabilityBusinessError, CapabilityOutput, CapabilityRisk, CapabilitySpec, EvidenceRef,
 )
+from backend.contracts.connector_execution_plan_v1 import canonical_hash
 
 from ..application.capture_worker import SimulationWorkflowError
 from ..application.document_snapshots import DocumentSnapshotWorkflow
@@ -41,6 +44,29 @@ class DocumentSnapshotProvider:
             reference=f"simulation://document-snapshot/{row['snapshot_request_id']}", digest=digest,
         ),))
 
+    def action(self, payload, context):
+        action = self._call(
+            self.workflow.next_action, payload["snapshot_request_id"], context,
+        )
+        if action is not None:
+            action = {
+                "capability_id": action["capability_id"],
+                "major_version": action["major_version"],
+                "payload_json": json.dumps(action["payload"], sort_keys=True, separators=(",", ":")),
+                "payload_hash": canonical_hash(action["payload"]),
+                "idempotency_key": action["idempotency_key"],
+            }
+        return CapabilityOutput(data={"action": action})
+
+    async def dispatch(self, payload, context):
+        try:
+            row = await self.workflow.dispatch(
+                payload["snapshot_request_id"], context.confirmation_token, context,
+            )
+        except SimulationWorkflowError as exc:
+            raise CapabilityBusinessError(str(exc), str(exc)) from exc
+        return CapabilityOutput(data=self._project(row))
+
     @staticmethod
     def _project(row):
         return {key: row.get(key) for key in (
@@ -59,6 +85,8 @@ def specs(provider=default_provider):
     return (
         (CapabilitySpec(id="simulation.document_snapshot.request", description="Request an immutable snapshot of the bound user's active VisMockup BOM.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.request),
         (CapabilitySpec(id="simulation.document_snapshot.get", description="Read authoritative progress and the confirmed active VisMockup BOM snapshot.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.get),
+        (CapabilitySpec(id="simulation.document_snapshot.action.get", description="Read the exact snapshot action awaiting user confirmation.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.action),
+        (CapabilitySpec(id="simulation.document_snapshot.dispatch", description="Dispatch the prepared snapshot action using its separate user confirmation.", risk=CapabilityRisk.WRITE, confirmation="none", **common), provider.dispatch),
     )
 
 

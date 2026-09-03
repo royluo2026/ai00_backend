@@ -149,6 +149,34 @@ def test_failed_plan_outcome_requires_a_failed_step():
         asyncio.run(control_plane.complete_plan("device-001", "plan-001", "lease-1", inconsistent))
 
 
+def test_reconciliation_can_report_unknown_outcome_without_fabricating_step_results():
+    class Repository(MemoryRepository):
+        def __init__(self):
+            super().__init__()
+            self.saved = None
+
+        def get_plan(self, plan_id, *, device_id, lease_id):
+            return plan()
+
+        def complete_plan(self, device_id, plan_id, lease_id, outcome):
+            self.saved = outcome
+
+    outcome = ConnectorPlanOutcomeV1(
+        protocol=plan().protocol,
+        plan_id=plan().plan_id,
+        status="outcome_unknown",
+        steps=(),
+        reported_at=NOW,
+    )
+    repository = Repository()
+
+    asyncio.run(ConnectorControlPlane(repository, clock=lambda: NOW).complete_plan(
+        "device-001", "plan-001", "lease-1", outcome,
+    ))
+
+    assert repository.saved == outcome
+
+
 def test_heartbeat_is_closed_and_records_adapter_contract_hashes():
     health = healthy()
 
@@ -277,14 +305,19 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
     registry = Registry()
     register_connector_runtime_capabilities(registry, ConnectorControlPlane(MemoryRepository()))
 
-    by_id = {spec.id: (spec, descriptor) for spec, descriptor in registry.items}
-    assert set(by_id) == {"device.connector.health.get", "device.connector.plan.queue"}
+    by_id = {(spec.id, spec.version): (spec, descriptor) for spec, descriptor in registry.items}
+    assert set(by_id) == {
+        ("device.connector.health.get", 1),
+        ("device.connector.plan.queue", 1),
+        ("device.connector.plan.queue", 2),
+    }
     for spec, descriptor in by_id.values():
         assert spec.input_schema["additionalProperties"] is False
         assert spec.output_schema["additionalProperties"] is False
         assert descriptor.evidence_policy == "required"
         assert substantive_business_definition_errors(descriptor) == ()
-    assert by_id["device.connector.plan.queue"][1].consistency_policy == "external"
+    assert by_id[("device.connector.plan.queue", 1)][1].consistency_policy == "strong"
+    assert by_id[("device.connector.plan.queue", 2)][1].consistency_policy == "external"
 
 
 def test_connector_heartbeat_route_passes_authenticated_device_identity(monkeypatch):

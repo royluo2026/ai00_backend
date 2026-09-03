@@ -12,6 +12,7 @@ from backend.capability_v2.provider_contracts import (
     CapabilitySpec,
     EvidenceRef,
 )
+from backend.contracts.connector_execution_plan_v1 import canonical_hash
 
 from ..application.capture_worker import CaptureWorkflow, SimulationWorkflowError
 from ..application.runtime_ports import connector_port, craft_screenshot_port
@@ -37,6 +38,17 @@ class SqlCaptureWorkflowRepository:
             )
             return cursor.fetchone() is not None
 
+    def can_read_materialization_run(self, run_id, *, user_gid, team_gid):
+        if not run_id or not user_gid or not team_gid:
+            return False
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT 1 FROM workmanship_sim_materialization_runs "
+                "WHERE run_id=%s AND (owner_gid=%s OR team_gid=%s) LIMIT 1",
+                (run_id, user_gid, team_gid),
+            )
+            return cursor.fetchone() is not None
+
     def get_manifest(self, environment_id, environment_version, context):
         return manifest_repository.get_manifest(environment_id, environment_version, context)
 
@@ -44,13 +56,41 @@ class SqlCaptureWorkflowRepository:
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
                 "INSERT INTO workmanship_sim_materialization_runs "
-                "(run_id,environment_id,environment_version,manifest_hash,device_id,plan_id,status,owner_gid,team_gid,created_at,updated_at) "
-                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW(6),NOW(6))",
+                "(run_id,environment_id,environment_version,manifest_hash,device_id,plan_id,plan_json,status,owner_gid,team_gid,created_at,updated_at) "
+                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW(6),NOW(6))",
                 tuple(row[key] for key in (
                     "run_id", "environment_id", "environment_version", "manifest_hash", "device_id",
-                    "plan_id", "status", "owner_gid", "team_gid",
-                )),
+                    "plan_id",
+                )) + (json.dumps(row["plan"], sort_keys=True, separators=(",", ":")),) + tuple(
+                    row[key] for key in ("status", "owner_gid", "team_gid")
+                ),
             )
+
+    def get_materialization_run(self, run_id, context):
+        visibility = "" if context is None else " AND (owner_gid=%s OR (%s IS NOT NULL AND team_gid=%s))"
+        params: tuple[Any, ...] = (run_id,)
+        if context is not None:
+            params += (context.user_gid, context.team_gid, context.team_gid)
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT run_id,environment_id,environment_version,manifest_hash,device_id,plan_id,plan_json,status "
+                "FROM workmanship_sim_materialization_runs WHERE run_id=%s" + visibility + " LIMIT 1",
+                params,
+            )
+            row = cursor.fetchone()
+        if not row:
+            return None
+        value = dict(row)
+        value["plan"] = _loads(value.pop("plan_json"), None)
+        operation_status = {
+            "queued": "accepted", "leased": "running", "running": "running",
+            "completed": "completed", "failed": "failed", "cancelled": "cancelled",
+            "outcome_unknown": "outcome_unknown",
+        }[value["status"]]
+        value["operation_ref"] = {
+            "operation_id": value["plan_id"], "status": operation_status, "version": 1,
+        }
+        return value
 
     def create_capture_run(self, row):
         with get_simulation_conn() as conn, conn.cursor() as cursor:
@@ -65,11 +105,13 @@ class SqlCaptureWorkflowRepository:
             )
             cursor.executemany(
                 "INSERT INTO workmanship_sim_capture_steps "
-                "(capture_run_id,step_id,operation_id,sequence,status,attempt,expected_scene_hash,artifact_attached,owner_gid,team_gid,created_at,updated_at) "
-                "VALUES (%s,%s,%s,%s,%s,%s,%s,FALSE,%s,%s,NOW(6),NOW(6))",
+                "(capture_run_id,step_id,operation_id,sequence,status,attempt,expected_scene_hash,plan_json,artifact_attached,owner_gid,team_gid,created_at,updated_at) "
+                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,FALSE,%s,%s,NOW(6),NOW(6))",
                 [(
                     row["capture_run_id"], f"capture-{index:05d}", step["operation_id"], step["sequence"],
-                    step["status"], step["attempt"], step["expected_scene_hash"], row["owner_gid"], row["team_gid"],
+                    step["status"], step["attempt"], step["expected_scene_hash"],
+                    json.dumps(step["plan"], sort_keys=True, separators=(",", ":")),
+                    row["owner_gid"], row["team_gid"],
                 ) for index, step in enumerate(row["steps"], start=1)],
             )
 
@@ -99,7 +141,7 @@ class SqlCaptureWorkflowRepository:
             if not run:
                 return None
             cursor.execute(
-                "SELECT operation_id,sequence,status,attempt,artifact_ref_json,artifact_attached,expected_scene_hash "
+                "SELECT operation_id,sequence,status,attempt,artifact_ref_json,plan_json,artifact_attached,expected_scene_hash "
                 "FROM workmanship_sim_capture_steps WHERE capture_run_id=%s ORDER BY sequence DESC,operation_id DESC",
                 (capture_run_id,),
             )
@@ -107,6 +149,7 @@ class SqlCaptureWorkflowRepository:
         value = dict(run)
         for step in steps:
             step["artifact_ref"] = _loads(step.pop("artifact_ref_json"), None)
+            step["plan"] = _loads(step.pop("plan_json"), None)
             step["artifact_attached"] = bool(step["artifact_attached"])
         operation_status = {
             "queued": "accepted", "leased": "running", "running": "running",
@@ -129,16 +172,16 @@ class SqlCaptureWorkflowRepository:
                 raise SimulationWorkflowError("capture_run_not_found")
 
     def update_capture_step(self, capture_run_id, operation_id, **changes):
-        allowed = {"status", "attempt", "artifact_ref", "artifact_attached", "actual_scene_hash", "failure_code"}
+        allowed = {"status", "attempt", "plan", "artifact_ref", "artifact_attached", "actual_scene_hash", "failure_code"}
         if not changes or set(changes) - allowed:
             raise ValueError("capture_step_update_not_allowed")
         assignments, params = [], []
         for key, value in changes.items():
-            column = "artifact_ref_json" if key == "artifact_ref" else key
+            column = {"artifact_ref": "artifact_ref_json", "plan": "plan_json"}.get(key, key)
             assignments.append(f"`{column}`=%s")
             params.append(
                 json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-                if key == "artifact_ref" and value is not None else value
+                if key in {"artifact_ref", "plan"} and value is not None else value
             )
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
@@ -172,7 +215,7 @@ class SqlCaptureWorkflowRepository:
 
 
 class _UnavailableConnectorPort:
-    def queue_plan(self, plan, context):
+    def queue_plan(self, plan, context, *, approval_reference):
         raise SimulationWorkflowError("connector_offline")
 
 
@@ -182,10 +225,15 @@ class _UnavailableCraftPort:
 
 
 def _project_capture(row: dict[str, Any]) -> dict[str, Any]:
-    return {key: row[key] for key in (
+    projected = {key: row[key] for key in (
         "capture_run_id", "environment_id", "environment_version", "manifest_hash",
         "device_id", "plan_id", "status", "operation_ref", "steps",
     )}
+    projected["steps"] = [
+        {key: value for key, value in step.items() if key != "plan"}
+        for step in projected["steps"]
+    ]
+    return projected
 
 
 class CaptureRunProvider:
@@ -211,12 +259,54 @@ class CaptureRunProvider:
         data = {key: row[key] for key in ("run_id", "environment_id", "environment_version", "manifest_hash", "device_id", "plan_id", "status", "operation_ref")}
         return CapabilityOutput(data=data, evidence=(EvidenceRef(kind="simulation.materialization", reference=f"simulation://materialization/{row['run_id']}", digest=row["manifest_hash"]),))
 
+    @staticmethod
+    def _project_action(action):
+        if action is None:
+            return None
+        return {
+            "capability_id": action["capability_id"],
+            "major_version": action["major_version"],
+            "payload_json": json.dumps(action["payload"], sort_keys=True, separators=(",", ":")),
+            "payload_hash": canonical_hash(action["payload"]),
+            "idempotency_key": action["idempotency_key"],
+        }
+
+    def materialization_action(self, payload, context):
+        action = self._call(
+            self.workflow.next_materialization_action, payload["run_id"], context,
+        )
+        return CapabilityOutput(data={"action": self._project_action(action)})
+
+    async def dispatch_materialization(self, payload, context):
+        row = await self._call_async(
+            self.workflow.dispatch_materialization,
+            payload["run_id"], context.confirmation_token, context,
+        )
+        data = {key: row[key] for key in (
+            "run_id", "environment_id", "environment_version", "manifest_hash",
+            "device_id", "plan_id", "status", "operation_ref",
+        )}
+        return CapabilityOutput(data=data)
+
     async def start(self, payload, context):
         row = await self._call_async(self.workflow.start_capture, payload["environment_id"], payload["environment_version"], payload["device_id"], context)
         return CapabilityOutput(data=_project_capture(row), evidence=(EvidenceRef(kind="simulation.capture_run", reference=f"simulation://capture/{row['capture_run_id']}", digest=row["manifest_hash"]),))
 
     def get(self, payload, context):
         return CapabilityOutput(data=_project_capture(self._call(self.workflow.get, payload["capture_run_id"], context)))
+
+    def action(self, payload, context):
+        action = self._call(self.workflow.next_action, payload["capture_run_id"], context)
+        return CapabilityOutput(data={"action": self._project_action(action)})
+
+    async def dispatch(self, payload, context):
+        row = await self._call_async(
+            self.workflow.dispatch_next,
+            payload["capture_run_id"],
+            context.confirmation_token,
+            context,
+        )
+        return CapabilityOutput(data=_project_capture(row))
 
     def cancel(self, payload, context):
         return CapabilityOutput(data=self._call(self.workflow.cancel, payload["capture_run_id"], context))
@@ -235,8 +325,12 @@ def specs(provider: CaptureRunProvider = default_provider):
     common = {"owner": "simulation", "version": 1, "permissions": ("simulation.use",), "plugin_callable": True, "tags": ("simulation", "connector_environment")}
     return (
         (CapabilitySpec(id="simulation.environment.materialize", description="Queue exact Connector materialization for an immutable environment.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.materialize),
+        (CapabilitySpec(id="simulation.materialization_run.action.get", description="Read the exact materialization action awaiting user confirmation.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.materialization_action),
+        (CapabilitySpec(id="simulation.materialization_run.dispatch", description="Dispatch one prepared materialization action using its separate user confirmation.", risk=CapabilityRisk.WRITE, confirmation="none", **common), provider.dispatch_materialization),
         (CapabilitySpec(id="simulation.capture_run.start", description="Queue internal VisMockup captures in reverse process order.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.start),
         (CapabilitySpec(id="simulation.capture_run.get", description="Read authoritative reverse-capture progress.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.get),
+        (CapabilitySpec(id="simulation.capture_run.action.get", description="Read the exact next downstream action awaiting user confirmation.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.action),
+        (CapabilitySpec(id="simulation.capture_run.dispatch", description="Dispatch exactly one downstream action using its separately issued user confirmation.", risk=CapabilityRisk.WRITE, confirmation="none", **common), provider.dispatch),
         (CapabilitySpec(id="simulation.capture_run.cancel", description="Cancel unstarted capture steps and reconcile active work.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.cancel),
         (CapabilitySpec(id="simulation.capture_step.retry", description="Retry one proven-failed capture step with a new attempt.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.retry),
     )

@@ -67,16 +67,40 @@ class CaptureWorkflow:
             "device_id": device_id, "plan_id": plan.plan_id, "status": "queued",
             "owner_gid": user_id, "team_gid": tenant_id,
             "operation_ref": {"operation_id": plan.plan_id, "status": "accepted", "version": 1},
+            "plan": plan.model_dump(mode="json"),
         }
         self.repository.create_materialization_run(row)
-        try:
-            await self.connector_port.queue_plan(plan, context)
-        except Exception as exc:
-            self.repository.update_materialization_run(run_id, status="failed")
-            if isinstance(exc, SimulationWorkflowError):
-                raise
-            raise SimulationWorkflowError(str(exc)) from exc
         return dict(row)
+
+    def next_materialization_action(
+        self, run_id: str, context: CapabilityContext,
+    ) -> dict[str, Any] | None:
+        run = self.repository.get_materialization_run(run_id, context)
+        if run is None:
+            raise SimulationWorkflowError("materialization_run_not_found")
+        if run["status"] != "queued":
+            return None
+        plan = ConnectorExecutionPlanV1.model_validate(run["plan"])
+        return {
+            "capability_id": "device.connector.plan.queue", "major_version": 2,
+            "payload": {"plan": plan.model_dump(mode="json")},
+            "idempotency_key": plan.plan_id,
+        }
+
+    async def dispatch_materialization(
+        self, run_id: str, approval_reference: str, context: CapabilityContext,
+    ) -> dict[str, Any]:
+        if not approval_reference:
+            raise SimulationWorkflowError("downstream_confirmation_required")
+        action = self.next_materialization_action(run_id, context)
+        if action is None:
+            raise SimulationWorkflowError("materialization_action_not_ready")
+        plan = ConnectorExecutionPlanV1.model_validate(action["payload"]["plan"])
+        await self.connector_port.queue_plan(
+            plan, context, approval_reference=approval_reference,
+        )
+        self.repository.update_materialization_run(run_id, status="running")
+        return self.repository.get_materialization_run(run_id, context)
 
     async def start_capture(
         self, environment_id: str, environment_version: int, device_id: str,
@@ -108,18 +132,84 @@ class CaptureWorkflow:
                 "operation_id": item.operation_id, "sequence": item.sequence,
                 "status": "queued", "attempt": 1, "artifact_ref": None,
                 "artifact_attached": False, "expected_scene_hash": item.scene.scene_hash,
-            } for item in ordered],
+                "plan": plan.model_dump(mode="json"),
+            } for item, plan in zip(ordered, plans, strict=True)],
         }
         self.repository.create_capture_run(row)
-        try:
-            for plan in plans:
-                await self.connector_port.queue_plan(plan, context)
-        except Exception as exc:
-            self.repository.update_capture_run(capture_run_id, status="failed")
-            if isinstance(exc, SimulationWorkflowError):
-                raise
-            raise SimulationWorkflowError(str(exc)) from exc
         return dict(row)
+
+    def next_action(self, capture_run_id: str, context: CapabilityContext) -> dict[str, Any] | None:
+        run = self.repository.get_capture_run(capture_run_id, context)
+        if run is None:
+            raise SimulationWorkflowError("capture_run_not_found")
+        manifest = self.repository.get_manifest(
+            run["environment_id"], run["environment_version"], context,
+        )
+        if manifest is None or manifest.manifest_hash != run["manifest_hash"]:
+            raise SimulationWorkflowError("environment_source_changed")
+        for step in run["steps"]:
+            if step["status"] == "completed" and not step.get("artifact_attached"):
+                artifact_ref = step.get("artifact_ref")
+                if artifact_ref is None:
+                    raise SimulationWorkflowError("artifact_upload_unconfirmed")
+                payload = {
+                    "bop_version_gid": manifest.execution_source.bop_version_gid,
+                    "operation_id": step["operation_id"], "artifact_ref": artifact_ref,
+                    "capture_run_id": capture_run_id,
+                }
+                return {
+                    "capability_id": "craft.process_screenshot.attach", "major_version": 1,
+                    "payload": payload,
+                    "idempotency_key": f"{capture_run_id}:{step['operation_id']}",
+                }
+        if any(step["status"] == "running" for step in run["steps"]):
+            return None
+        step = next((item for item in run["steps"] if item["status"] == "queued"), None)
+        if step is None:
+            return None
+        plan = ConnectorExecutionPlanV1.model_validate(step["plan"])
+        return {
+            "capability_id": "device.connector.plan.queue", "major_version": 2,
+            "payload": {"plan": plan.model_dump(mode="json")},
+            "idempotency_key": plan.plan_id,
+        }
+
+    async def dispatch_next(
+        self, capture_run_id: str, approval_reference: str, context: CapabilityContext,
+    ) -> dict[str, Any]:
+        if not approval_reference:
+            raise SimulationWorkflowError("downstream_confirmation_required")
+        action = self.next_action(capture_run_id, context)
+        if action is None:
+            raise SimulationWorkflowError("capture_action_not_ready")
+        payload = action["payload"]
+        if action["capability_id"] == "device.connector.plan.queue":
+            plan = ConnectorExecutionPlanV1.model_validate(payload["plan"])
+            await self.connector_port.queue_plan(
+                plan, context, approval_reference=approval_reference,
+            )
+            operation_id = next(
+                str(step.payload["operation_id"]) for step in plan.steps
+                if step.operation_id == "vismockup.view.capture@1"
+            )
+            self.repository.update_capture_step(
+                capture_run_id, operation_id, status="running",
+            )
+            self.repository.update_capture_run(capture_run_id, status="running")
+        else:
+            await self.craft_port.attach_screenshot(
+                **payload, context=context, approval_reference=approval_reference,
+            )
+            self.repository.update_capture_step(
+                capture_run_id, payload["operation_id"], artifact_attached=True,
+            )
+            refreshed = self.repository.get_capture_run(capture_run_id, context)
+            if all(
+                step["status"] == "completed" and step.get("artifact_attached")
+                for step in refreshed["steps"]
+            ):
+                self.repository.update_capture_run(capture_run_id, status="completed")
+        return self.repository.get_capture_run(capture_run_id, context)
 
     def get(self, capture_run_id: str, context: CapabilityContext) -> dict[str, Any]:
         run = self.repository.get_capture_run(capture_run_id, context)
@@ -166,41 +256,6 @@ class CaptureWorkflow:
         if status is None:
             raise SimulationWorkflowError("plan_outcome_invalid")
         self.repository.update_materialization_run(plan.plan_id, status=status)
-
-    async def advance(self, capture_run_id: str, context: CapabilityContext) -> dict[str, Any]:
-        run = self.repository.get_capture_run(capture_run_id, context)
-        if run is None:
-            raise SimulationWorkflowError("capture_run_not_found")
-        for step in run["steps"]:
-            if step["status"] == "completed" and not step.get("artifact_attached"):
-                artifact_ref = step.get("artifact_ref")
-                if artifact_ref is None:
-                    raise SimulationWorkflowError("artifact_upload_unconfirmed")
-                try:
-                    await self.craft_port.attach_screenshot(
-                        bop_version_gid=run.get("bop_version_gid") or self.repository.get_manifest(
-                            run["environment_id"], run["environment_version"], context,
-                        ).execution_source.bop_version_gid,
-                        operation_id=step["operation_id"], artifact_ref=artifact_ref,
-                        capture_run_id=capture_run_id, context=context,
-                    )
-                except Exception as exc:
-                    if isinstance(exc, SimulationWorkflowError):
-                        raise
-                    raise SimulationWorkflowError("craft_screenshot_attach_failed") from exc
-                self.repository.update_capture_step(
-                    capture_run_id, step["operation_id"], artifact_attached=True,
-                )
-                break
-        refreshed = self.repository.get_capture_run(capture_run_id, context)
-        if all(
-            item["status"] == "cancelled"
-            or (item["status"] == "completed" and item.get("artifact_attached"))
-            for item in refreshed["steps"]
-        ):
-            self.repository.update_capture_run(capture_run_id, status="completed")
-            refreshed = self.repository.get_capture_run(capture_run_id, context)
-        return refreshed
 
     async def apply_connector_outcome(
         self,
@@ -250,9 +305,7 @@ class CaptureWorkflow:
                 self.record_step_result(capture_run_id, operation_id, status=result.status)
             projected += 1
 
-        refreshed = run
-        for _ in range(projected):
-            refreshed = await self.advance(capture_run_id, context)
+        refreshed = self.repository.get_capture_run(capture_run_id, context)
         statuses = {item["status"] for item in refreshed["steps"]}
         if "outcome_unknown" in statuses:
             self.repository.update_capture_run(capture_run_id, status="outcome_unknown")
@@ -292,9 +345,8 @@ class CaptureWorkflow:
         )
         self.repository.update_capture_step(
             capture_run_id, operation_id, status="queued", attempt=attempt,
-            artifact_ref=None, artifact_attached=False,
+            plan=plan.model_dump(mode="json"), artifact_ref=None, artifact_attached=False,
         )
-        await self.connector_port.queue_plan(plan, context)
         return {"capture_run_id": capture_run_id, "operation_id": operation_id, "attempt": attempt, "plan_id": retry_plan_id, "status": "queued"}
 
     def cancel(self, capture_run_id: str, context: CapabilityContext) -> dict[str, Any]:
@@ -312,32 +364,4 @@ class CaptureWorkflow:
         return {"capture_run_id": capture_run_id, "status": status}
 
 
-class ConnectorOutcomeProjection:
-    def __init__(self, workflow: CaptureWorkflow, snapshot_workflow=None) -> None:
-        self.workflow = workflow
-        self.snapshot_workflow = snapshot_workflow
-
-    async def apply(
-        self, plan: ConnectorExecutionPlanV1, outcome: ConnectorPlanOutcomeV1,
-    ) -> dict[str, Any] | None:
-        operations = {step.operation_id for step in plan.steps}
-        if operations == {"vismockup.document.snapshot@1"}:
-            if self.snapshot_workflow is None:
-                raise SimulationWorkflowError("document_snapshot_projection_unavailable")
-            self.snapshot_workflow.apply_connector_outcome(plan, outcome)
-            return None
-        materialization_operations = {
-            "vismockup.application.probe@1", "vismockup.model.attach@1",
-            "vismockup.scene.apply@1", "vismockup.scene.verify@1",
-        }
-        if operations and operations <= materialization_operations:
-            self.workflow.apply_materialization_outcome(plan, outcome)
-            return None
-        if "vismockup.view.capture@1" not in operations: return None
-        context = CapabilityContext(
-            user_gid=plan.user_id, team_gid=plan.tenant_id, source="connector",
-        )
-        return await self.workflow.apply_connector_outcome(plan, outcome, context)
-
-
-__all__ = ["CaptureWorkflow", "ConnectorOutcomeProjection", "SimulationWorkflowError"]
+__all__ = ["CaptureWorkflow", "SimulationWorkflowError"]
