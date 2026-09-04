@@ -409,6 +409,20 @@ def build_capability_authorization_grants(
             tenant_id=tenant_id,
         )
     resource_scopes = {f"tenant:{tenant_id}"}
+    # Project membership is authoritative in Base's project-access facade;
+    # ordinary members must receive the scoped project reference just like
+    # project owners.  A lookup failure intentionally yields no project
+    # grants (fail closed) rather than trusting a client-supplied project_gid.
+    try:
+        from backend.platform_sdk.project_access import list_user_project_memberships
+        member_projects = list_user_project_memberships(str(user.get("gid") or ""))
+    except Exception:
+        _log.warning("project membership lookup failed; denying project resource scopes", exc_info=True)
+        member_projects = []
+    for membership in member_projects:
+        scope_gid = str(membership.get("project_gid") or "").strip()
+        if scope_gid:
+            resource_scopes.add(f"project:{scope_gid}")
     for grant in profile.get("grants", ()):
         scope_gid = str(grant.get("scope_gid") or "").strip()
         if not scope_gid:

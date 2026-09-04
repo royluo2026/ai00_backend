@@ -41,6 +41,11 @@ class BusinessNode(Contract):
     inputs: list[dict[str, Any]] = Field(default_factory=list)
     outputs: list[dict[str, Any]] = Field(default_factory=list)
     acceptance_criteria: list[str] = Field(default_factory=list)
+    # Tri-state governance evidence is projected by the server; null means
+    # that an authoritative evidence source has not been supplied yet.
+    governance_status: dict[str, bool | None] = Field(default_factory=lambda: {
+        "machine_passed": None, "human_approved": None, "runtime_verified": None,
+    })
     position: Point = Field(default_factory=lambda: Point(x=0, y=0))
 
 

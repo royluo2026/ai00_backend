@@ -8,7 +8,7 @@ Dispatch exactly one downstream action using its separately issued user confirma
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
-- Catalog Release：`rel_09f1c9d790ff36d54188ce27f40c64af`
+- Catalog Release：`rel_06852473caf7d60a5e8f30b9b0c075e0`
 - Schema 精度：`typed`
 - 暂未开放原因：`experimental_lifecycle`
 
@@ -86,7 +86,7 @@ Dispatch exactly one downstream action using its separately issued user confirma
 ```json
 {
   "capability_id": "simulation.capture_run.dispatch",
-  "catalog_release": "rel_09f1c9d790ff36d54188ce27f40c64af",
+  "catalog_release": "rel_06852473caf7d60a5e8f30b9b0c075e0",
   "major_version": 1,
   "payload": {
     "capture_run_id": "example"

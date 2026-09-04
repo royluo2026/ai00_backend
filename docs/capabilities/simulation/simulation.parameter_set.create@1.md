@@ -8,7 +8,7 @@ Create an immutable Simulation parameter set.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_09f1c9d790ff36d54188ce27f40c64af`
+- Catalog Release：`rel_06852473caf7d60a5e8f30b9b0c075e0`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -114,7 +114,7 @@ Create an immutable Simulation parameter set.
 ```json
 {
   "capability_id": "simulation.parameter_set.create",
-  "catalog_release": "rel_09f1c9d790ff36d54188ce27f40c64af",
+  "catalog_release": "rel_06852473caf7d60a5e8f30b9b0c075e0",
   "major_version": 1,
   "payload": {
     "name": "example",

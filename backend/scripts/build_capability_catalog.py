@@ -64,6 +64,15 @@ def _verified_consumer_refs(capability_id: str, major_version: int = 1) -> tuple
             "consumer_type": "web",
             "version_constraint": ">=1",
         })
+        # The governed admin hub uses the same project scope capability to
+        # populate its orchestration-center selector.  Keep this reference
+        # authoritative here so the generated catalog proves the consumer
+        # rather than relying on a demo/local-state path.
+        consumers.append({
+            "consumer_id": "web/admin_hub/index.html",
+            "consumer_type": "web",
+            "version_constraint": ">=1",
+        })
     if capability_id == "craft.bop.version.list":
         consumers.append({
             "consumer_id": "web/my_files/my_files.js",

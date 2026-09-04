@@ -58,17 +58,30 @@ def _validate(schema: dict[str, Any], payload: Any, label: str) -> None:
     if not isinstance(payload, dict):
         return
     properties = schema.get("properties") or {}
+    if "maxProperties" in schema and len(payload) > int(schema["maxProperties"]):
+        raise ValueError(f"{label} has more properties than allowed")
+    if "minProperties" in schema and len(payload) < int(schema["minProperties"]):
+        raise ValueError(f"{label} has fewer properties than allowed")
     for name in schema.get("required") or []:
         if name not in payload:
             raise ValueError(f"{label} missing required field: {name}")
     if schema.get("additionalProperties") is False:
-        unknown = sorted(set(payload) - set(properties))
+        patterns = [re.compile(str(pattern)) for pattern in (schema.get("patternProperties") or {})]
+        unknown = sorted(
+            name for name in set(payload) - set(properties)
+            if not any(pattern.fullmatch(name) for pattern in patterns)
+        )
         if unknown:
             raise ValueError(f"{label} contains unknown field: {unknown[0]}")
     for name, value in payload.items():
         field = properties.get(name)
         if isinstance(field, dict):
             _validate(field, value, f"{label}.{name}")
+            continue
+        for pattern, field_schema in (schema.get("patternProperties") or {}).items():
+            if re.fullmatch(str(pattern), name):
+                _validate(field_schema, value, f"{label}.{name}")
+                break
 
 
 def _matching_branches(branches: list[dict[str, Any]], payload: Any, label: str) -> int:

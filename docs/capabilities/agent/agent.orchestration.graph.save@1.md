@@ -6,21 +6,21 @@
 
 - 适用：A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.
 - 不适用：The outcome belongs to another business domain; invoke that domain Capability instead.
-- 生命周期：`stable`
+- 生命周期：`experimental`
 - 所属领域：`agent`
-- Catalog Release：`rel_09f1c9d790ff36d54188ce27f40c64af`
+- Catalog Release：`rel_06852473caf7d60a5e8f30b9b0c075e0`
 - Schema 精度：`typed`
-- 暂未开放原因：无
+- 暂未开放原因：`experimental_lifecycle`
 
 ## 消费者可用性
 
 | 消费者 | 状态 |
 |---|---|
-| web | 可用 |
-| plugin | 可用 |
-| agent | 可用 |
-| api | 可用 |
-| mcp | 可用 |
+| web | 不可用 |
+| plugin | 不可用 |
+| agent | 不可用 |
+| api | 不可用 |
+| mcp | 不可用 |
 | worker | 不可用 |
 | local_runtime | 不可用 |
 
@@ -752,6 +752,35 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "governance_status": {
+                "additionalProperties": false,
+                "properties": {
+                  "human_approved": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  "machine_passed": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  "runtime_verified": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "machine_passed",
+                  "human_approved",
+                  "runtime_verified"
+                ],
+                "type": "object"
+              },
               "inputs": {
                 "items": {
                   "additionalProperties": false,
@@ -1018,7 +1047,7 @@
 ```json
 {
   "capability_id": "agent.orchestration.graph.save",
-  "catalog_release": "rel_09f1c9d790ff36d54188ce27f40c64af",
+  "catalog_release": "rel_06852473caf7d60a5e8f30b9b0c075e0",
   "major_version": 1,
   "payload": {
     "expected_revision": 1,

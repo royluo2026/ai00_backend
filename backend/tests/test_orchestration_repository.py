@@ -85,9 +85,9 @@ def test_save_graph_guards_owned_draft_revision_before_replacing_children():
     ownership_sql, ownership_params = cursor.executions[0]
     update_sql, update_params = cursor.executions[1]
     assert "p.owner_user_gid=%s" in ownership_sql and "FOR UPDATE" in ownership_sql
-    assert ownership_params == ("version-1", "user-1", "tenant-1", "project-1")
+    assert ownership_params == ("version-1", "tenant-1", "project-1", "user-1", "tenant-1", "project-1")
     assert "status='draft'" in update_sql and "revision=%s" in update_sql
-    assert update_params == ("fixed", "user-1", "version-1", 7)
+    assert update_params == ("fixed", "user-1", "version-1", 7, "tenant-1", "project-1")
     assert revision == 8
 
 
@@ -103,7 +103,7 @@ def test_save_graph_requires_tenant_and_project_scope_in_owner_guard():
     ownership_sql, ownership_params = cursor.executions[0]
     assert "p.tenant_gid=%s" in ownership_sql
     assert "p.project_gid=%s" in ownership_sql
-    assert ownership_params == ("version-1", "user-1", "tenant-1", "project-1")
+    assert ownership_params == ("version-1", "tenant-1", "project-1", "user-1", "tenant-1", "project-1")
 
 
 def test_write_rejects_missing_scope_before_opening_transaction():
@@ -205,7 +205,7 @@ def test_create_run_requires_owned_matching_published_version_and_writes_started
     guard_sql, guard_params = cursor.executions[0]
     assert "v.panorama_gid=%s" in guard_sql and "v.status='published'" in guard_sql
     assert "p.owner_user_gid=%s" in guard_sql and "FOR UPDATE" in guard_sql
-    assert guard_params == ("ver-1", "pan-1", "user-1", "tenant-1", "project-1")
+    assert guard_params == ("ver-1", "pan-1", "tenant-1", "project-1", "user-1", "tenant-1", "project-1")
     assert any("INSERT INTO workmanship_agent_orch_runs" in sql for sql, _ in cursor.executions)
     assert any("INSERT INTO workmanship_agent_orch_run_events" in sql for sql, _ in cursor.executions)
     assert run_gid

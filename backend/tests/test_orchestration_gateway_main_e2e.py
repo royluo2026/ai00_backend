@@ -13,6 +13,7 @@ from backend.capability_v2.gateway import CapabilityGatewayService
 from backend.capability_v2.identity import AuthenticatedPrincipal
 from backend.routers.deps import get_authenticated_principal, get_current_user
 from backend.routers.capabilities import get_default_gateway
+from plugins.agent.agent_backend.orchestration.models import GraphDraft, BusinessNode
 
 
 class _Repository:
@@ -21,6 +22,40 @@ class _Repository:
 
     def list_panoramas_for_user(self, actor_gid, *, tenant_gid, project_gid, limit=50):
         self.calls.append((actor_gid, tenant_gid, project_gid, limit))
+        return []
+
+    def get_graph(self, version_gid, *, actor_gid, tenant_gid, project_gid):
+        return GraphDraft(nodes=[BusinessNode(
+            gid="node-1", node_key="node-1", title="受治理节点",
+            x_item_key="TG0", y_item_key="项目管理",
+            objective="verify", owner_ref="owner", inputs=[{"name": "in"}],
+            outputs=[{"name": "out"}], acceptance_criteria=["ok"],
+        )], edges=[])
+
+    def save_graph(self, version_gid, graph, *, expected_revision, actor_gid, tenant_gid, project_gid):
+        return expected_revision + 1
+
+    def publish_version(self, version_gid, *, expected_revision, actor_gid, resolved_bindings, tenant_gid, project_gid):
+        return {"version_gid": version_gid, "revision": expected_revision + 1, "status": "published"}
+
+    def delete_binding(self, binding_gid, *, actor_gid, tenant_gid, project_gid):
+        return None
+
+    def create_run_with_started_event(self, *, panorama_gid, version_gid, frozen_context, actor_gid, tenant_gid, project_gid):
+        return "run-1"
+
+    def transition_run_with_event(self, run_gid, *, target_status, authorized_principal_gid, actor_type, event_actor_gid, payload, tenant_gid, project_gid, **kwargs):
+        return {"run_gid": run_gid, "status": target_status, "sequence_no": 2, "event_gid": "event-1"}
+
+    def get_metric_for_user(self, panorama_gid, period_key, actor_gid, *, tenant_gid, project_gid):
+        return {
+            "panorama_gid": panorama_gid, "version_gid": "ver-1", "period_key": period_key,
+            "total_workload_hours": 0, "effective_agent_workload_hours": 0,
+            "effective_intelligent_work_rate": 0, "automated_workflow_count": 0,
+            "total_workflow_count": 0, "automation_ratio": 0, "calculated_at": "2026-01-01T00:00:00+00:00",
+        }
+
+    def list_workload_measurements_for_user(self, panorama_gid, period_key, actor_gid, *, tenant_gid, project_gid):
         return []
 
 
@@ -92,5 +127,36 @@ def test_backend_main_gateway_provider_repository_for_orchestration(monkeypatch)
         assert response.json()["success"] is True
         assert response.json()["data"]["data"] == {"items": []}
         assert repository.calls == [("u-orch", "tenant-orch", "project-orch", 10)]
+
+        common = {"tenant_gid": "tenant-orch", "project_gid": "project-orch"}
+        requests = {
+            "agent.orchestration.graph.read": {**common, "version_gid": "ver-1"},
+            "agent.orchestration.metric.read": {**common, "panorama_gid": "pan-1", "period_key": "2026"},
+        }
+        for capability_id, payload in requests.items():
+            result = TestClient(app).post(
+                f"/api/v1/capabilities/{capability_id}:invoke",
+                json={"version": 1, "payload": payload},
+            )
+            assert result.status_code == 200, (capability_id, result.text)
+            assert result.json()["success"] is True, (capability_id, result.json())
     finally:
         app.dependency_overrides.clear()
+
+
+def test_orchestration_write_surface_is_deferred_and_not_exposed():
+    from backend.capability_v2.catalog import load_catalog_release
+    release = load_catalog_release(
+        (__import__("pathlib").Path(__file__).resolve().parents[2]
+         / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
+    )
+    deferred = {
+        "agent.orchestration.graph.save", "agent.orchestration.version.publish",
+        "agent.orchestration.binding.delete", "agent.orchestration.run.start",
+        "agent.orchestration.run.transition",
+    }
+    for descriptor in release.descriptors:
+        if descriptor.id in deferred:
+            assert descriptor.lifecycle_status.value == "experimental"
+            assert not any(descriptor.exposure.model_dump().values())
+            assert descriptor.no_consumer_reason

@@ -8,7 +8,7 @@ Write bounded rows to user-authorized Lark Sheets or Bitable tables.
 - 不适用：The request reads Lark data or mutates Craft business entities.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_09f1c9d790ff36d54188ce27f40c64af`
+- Catalog Release：`rel_06852473caf7d60a5e8f30b9b0c075e0`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -127,7 +127,7 @@ Write bounded rows to user-authorized Lark Sheets or Bitable tables.
 ```json
 {
   "capability_id": "craft.data_exchange.lark.write",
-  "catalog_release": "rel_09f1c9d790ff36d54188ce27f40c64af",
+  "catalog_release": "rel_06852473caf7d60a5e8f30b9b0c075e0",
   "major_version": 1,
   "payload": {
     "operation": "sheets.write",

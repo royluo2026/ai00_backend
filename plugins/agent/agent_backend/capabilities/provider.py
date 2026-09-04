@@ -38,6 +38,11 @@ _ORCHESTRATION_EFFECTS = {
     "agent.orchestration.run.transition": "追加运行实例的受授权状态事件并保持状态机一致。",
     "agent.orchestration.metric.read": "读取项目版本的有效智能作业率与自动化流程统计快照。",
 }
+_ORCHESTRATION_WRITE = {
+    "agent.orchestration.graph.save", "agent.orchestration.version.publish",
+    "agent.orchestration.binding.delete", "agent.orchestration.run.start",
+    "agent.orchestration.run.transition",
+}
 _ORCHESTRATION_INVARIANTS = {
     "agent.orchestration.panorama.read": ("读取结果必须受租户与项目作用域约束。", "agent.orchestration.repository.scope", "orchestration_scope_denied"),
     "agent.orchestration.graph.read": ("读取图必须对应授权项目的现行版本。", "agent.orchestration.repository.scope", "orchestration_scope_denied"),
@@ -53,12 +58,18 @@ _ORCHESTRATION_INVARIANTS = {
 def descriptor_for(spec) -> CapabilityDescriptorV2:
     base = descriptor_from_provider_spec(spec); write = base.side_effect_level is not SideEffectLevel.READ
     interaction = spec.id in {"agent.interaction.request", "agent.script.generate", *_CANVAS_COMMANDS}
+    deferred_write = spec.id in _ORCHESTRATION_WRITE
     values = {
-        **base.model_dump(), "owner_domain": "agent", "lifecycle_status": LifecycleStatus.STABLE,
+        **base.model_dump(), "owner_domain": "agent",
+        "lifecycle_status": LifecycleStatus.EXPERIMENTAL if deferred_write else LifecycleStatus.STABLE,
         "exposure": ExposurePolicy(
-            web=True, api=True, plugin=True,
-            agent=spec.id not in _MODEL_HIDDEN,
-            mcp=spec.id not in _MODEL_HIDDEN,
+            web=not deferred_write, api=not deferred_write, plugin=not deferred_write,
+            agent=(not deferred_write) and spec.id not in _MODEL_HIDDEN,
+            mcp=(not deferred_write) and spec.id not in _MODEL_HIDDEN,
+        ),
+        "no_consumer_reason": (
+            "MVP write surface deferred until agent.write authorization, durable reliability, and DB E2E are configured."
+            if deferred_write else None
         ),
         "exposure_policy_source": "provider_explicit",
         "automation_level": AutomationLevel.A1 if write else AutomationLevel.A2,

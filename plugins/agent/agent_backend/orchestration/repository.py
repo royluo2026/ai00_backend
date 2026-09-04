@@ -77,8 +77,9 @@ class OrchestrationRepository:
             """SELECT v.panorama_gid,v.status,v.revision
                FROM workmanship_agent_orch_versions v
                JOIN workmanship_agent_orch_panoramas p ON p.gid=v.panorama_gid
-               WHERE v.gid=%s AND p.owner_user_gid=%s""" + scope_sql + " FOR UPDATE",
-            (version_gid, actor_gid, *scope_params),
+               WHERE v.gid=%s AND v.tenant_gid=%s AND v.project_gid=%s
+                 AND p.owner_user_gid=%s""" + scope_sql + " FOR UPDATE",
+            (version_gid, tenant_gid, project_gid, actor_gid, *scope_params),
         )
         version = cur.fetchone()
         if not version:
@@ -90,6 +91,8 @@ class OrchestrationRepository:
         cur: Any,
         *,
         run_gid: str,
+        tenant_gid: str,
+        project_gid: str,
         sequence_no: int,
         event_type: str,
         actor_type: str,
@@ -102,9 +105,11 @@ class OrchestrationRepository:
         event_gid = str(uuid.uuid4())
         cur.execute(
             """INSERT INTO workmanship_agent_orch_run_events
-               (gid,run_gid,sequence_no,event_type,item_gid,actor_type,actor_gid,payload_json,
+               (tenant_gid,project_gid,gid,run_gid,sequence_no,event_type,item_gid,actor_type,actor_gid,payload_json,
                 capability_call_id,evidence_id,occurred_at,created_at)
-               VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW(6),NOW(6))""",
+               SELECT r.tenant_gid,r.project_gid,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW(6),NOW(6)
+                 FROM workmanship_agent_orch_runs r
+                WHERE r.gid=%s AND r.tenant_gid=%s AND r.project_gid=%s""",
             (
                 event_gid,
                 run_gid,
@@ -116,6 +121,9 @@ class OrchestrationRepository:
                 _json(payload),
                 capability_call_id,
                 evidence_id,
+                run_gid,
+                tenant_gid,
+                project_gid,
             ),
         )
         return event_gid
@@ -151,10 +159,11 @@ class OrchestrationRepository:
                           m.total_workflow_count,m.automation_ratio,m.calculated_at
                    FROM workmanship_agent_orch_metric_snapshots m
                    JOIN workmanship_agent_orch_panoramas p ON p.gid=m.panorama_gid
-                   WHERE m.panorama_gid=%s AND m.period_key=%s AND p.owner_user_gid=%s
+                   WHERE m.panorama_gid=%s AND m.period_key=%s
+                     AND m.tenant_gid=%s AND m.project_gid=%s AND p.owner_user_gid=%s
                      AND p.tenant_gid=%s AND p.project_gid=%s
                    ORDER BY m.calculated_at DESC LIMIT 1""",
-                (panorama_gid, period_key, actor_gid, tenant_gid, project_gid),
+                (panorama_gid, period_key, tenant_gid, project_gid, actor_gid, tenant_gid, project_gid),
             )
             row = cur.fetchone()
         if not row:
@@ -193,19 +202,24 @@ class OrchestrationRepository:
                           a.acceptance_valid_from, a.acceptance_valid_until
                    FROM workmanship_agent_orch_acceptance_facts a
                    JOIN workmanship_agent_orch_workload_baselines b
-                     ON b.panorama_gid=a.panorama_gid
+                    ON b.panorama_gid=a.panorama_gid
                     AND b.version_gid=a.version_gid
                     AND b.task_key=a.task_key
                     AND b.period_key=a.period_key
+                    AND b.catalog_release_gid=a.catalog_release_gid
+                    AND b.tenant_gid=a.tenant_gid AND b.project_gid=a.project_gid
                    JOIN workmanship_agent_orch_panoramas p ON p.gid=a.panorama_gid
                    JOIN workmanship_agent_orch_runs r ON r.gid=a.run_gid
-                   WHERE a.gid=%s AND p.owner_user_gid=%s
+                   WHERE a.gid=%s AND a.tenant_gid=%s AND a.project_gid=%s
+                     AND b.tenant_gid=%s AND b.project_gid=%s
+                     AND r.tenant_gid=%s AND r.project_gid=%s
+                     AND p.owner_user_gid=%s
                      AND p.tenant_gid=%s AND p.project_gid=%s
                      AND r.panorama_gid=a.panorama_gid
                      AND r.version_gid=a.version_gid
                      AND r.status='succeeded'
                    LIMIT 1""",
-                (evidence_gid, actor_gid, tenant_gid, project_gid),
+                (evidence_gid, tenant_gid, project_gid, tenant_gid, project_gid, tenant_gid, project_gid, actor_gid, tenant_gid, project_gid),
             )
             row = cur.fetchone()
         if not row:
@@ -225,10 +239,12 @@ class OrchestrationRepository:
                    JOIN workmanship_agent_orch_panoramas p ON p.gid=a.panorama_gid
                    JOIN workmanship_agent_orch_runs r ON r.gid=a.run_gid
                    WHERE a.panorama_gid=%s AND a.period_key=%s
+                     AND a.tenant_gid=%s AND a.project_gid=%s
+                     AND r.tenant_gid=%s AND r.project_gid=%s
                      AND p.owner_user_gid=%s AND p.tenant_gid=%s AND p.project_gid=%s
                      AND r.status='succeeded'
                    ORDER BY a.gid""",
-                (panorama_gid, period_key, actor_gid, tenant_gid, project_gid),
+                (panorama_gid, period_key, tenant_gid, project_gid, tenant_gid, project_gid, actor_gid, tenant_gid, project_gid),
             )
             return [{"evidence_gid": row["evidence_gid"]} for row in cur.fetchall()]
 
@@ -241,9 +257,11 @@ class OrchestrationRepository:
                    FROM workmanship_agent_orch_versions v
                    JOIN workmanship_agent_orch_panoramas p ON p.gid=v.panorama_gid
                    LEFT JOIN workmanship_agent_orch_runs r ON r.version_gid=v.gid
-                   WHERE v.status='published' AND p.tenant_gid=%s AND p.project_gid=%s
+                     AND r.tenant_gid=v.tenant_gid AND r.project_gid=v.project_gid
+                   WHERE v.status='published' AND v.tenant_gid=%s AND v.project_gid=%s
+                     AND p.tenant_gid=%s AND p.project_gid=%s
                    GROUP BY v.gid""",
-                (tenant_gid, project_gid),
+                (tenant_gid, project_gid, tenant_gid, project_gid),
             )
             rows = cur.fetchall()
         published = {str(row["gid"]) for row in rows}
@@ -261,21 +279,22 @@ class OrchestrationRepository:
             cur.execute(
                 """SELECT v.mode FROM workmanship_agent_orch_versions v
                    JOIN workmanship_agent_orch_panoramas p ON p.gid=v.panorama_gid
-                   WHERE v.gid=%s AND p.owner_user_gid=%s""" + scope_sql,
-                (version_gid, actor_gid, *scope_params),
+                   WHERE v.gid=%s AND v.tenant_gid=%s AND v.project_gid=%s
+                     AND p.owner_user_gid=%s""" + scope_sql,
+                (version_gid, tenant_gid, project_gid, actor_gid, *scope_params),
             )
             version = cur.fetchone()
             if not version:
                 raise ResourceNotAccessible("orchestration version is not accessible")
             cur.execute(
-                "SELECT x_items_json,y_items_json FROM workmanship_agent_orch_axis_views WHERE version_gid=%s ORDER BY created_at LIMIT 1",
-                (version_gid,),
+                "SELECT x_items_json,y_items_json FROM workmanship_agent_orch_axis_views WHERE version_gid=%s AND tenant_gid=%s AND project_gid=%s ORDER BY created_at LIMIT 1",
+                (version_gid, tenant_gid, project_gid),
             )
             axis = cur.fetchone() or {}
 
             cur.execute(
-                "SELECT gid,node_key,title,x_item_key,y_item_key,objective,owner_ref,position_json,inputs_json,outputs_json,acceptance_json FROM workmanship_agent_orch_business_nodes WHERE version_gid=%s ORDER BY created_at",
-                (version_gid,),
+                "SELECT gid,node_key,title,x_item_key,y_item_key,objective,owner_ref,position_json,inputs_json,outputs_json,acceptance_json FROM workmanship_agent_orch_business_nodes WHERE version_gid=%s AND tenant_gid=%s AND project_gid=%s ORDER BY created_at",
+                (version_gid, tenant_gid, project_gid),
             )
             nodes = [{
                 "gid": row["gid"], "node_key": row["node_key"], "title": row["title"],
@@ -285,11 +304,16 @@ class OrchestrationRepository:
                 "inputs": _decoded(row.get("inputs_json"), []),
                 "outputs": _decoded(row.get("outputs_json"), []),
                 "acceptance_criteria": _decoded(row.get("acceptance_json"), []),
+                "governance_status": {
+                    "machine_passed": None,
+                    "human_approved": None,
+                    "runtime_verified": None,
+                },
             } for row in cur.fetchall()]
 
             cur.execute(
-                "SELECT gid,edge_type,source_node_gid,target_node_gid,label,route_points_json FROM workmanship_agent_orch_flow_edges WHERE version_gid=%s ORDER BY created_at",
-                (version_gid,),
+                "SELECT gid,edge_type,source_node_gid,target_node_gid,label,route_points_json FROM workmanship_agent_orch_flow_edges WHERE version_gid=%s AND tenant_gid=%s AND project_gid=%s ORDER BY created_at",
+                (version_gid, tenant_gid, project_gid),
             )
             edges = [{
                 "gid": row["gid"], "edge_type": row["edge_type"],
@@ -298,8 +322,8 @@ class OrchestrationRepository:
             } for row in cur.fetchall()]
 
             cur.execute(
-                "SELECT gid,business_node_gid,item_type,title,sequence_no,config_json FROM workmanship_agent_orch_items WHERE version_gid=%s ORDER BY sequence_no,gid",
-                (version_gid,),
+                "SELECT gid,business_node_gid,item_type,title,sequence_no,config_json FROM workmanship_agent_orch_items WHERE version_gid=%s AND tenant_gid=%s AND project_gid=%s ORDER BY sequence_no,gid",
+                (version_gid, tenant_gid, project_gid),
             )
             items = [{
                 "gid": row["gid"], "business_node_gid": row.get("business_node_gid") or None,
@@ -308,14 +332,14 @@ class OrchestrationRepository:
             } for row in cur.fetchall()]
 
             cur.execute(
-                "SELECT gid,source_item_gid,target_item_gid,relation_type,sequence_no FROM workmanship_agent_orch_item_edges WHERE version_gid=%s ORDER BY sequence_no,gid",
-                (version_gid,),
+                "SELECT gid,source_item_gid,target_item_gid,relation_type,sequence_no FROM workmanship_agent_orch_item_edges WHERE version_gid=%s AND tenant_gid=%s AND project_gid=%s ORDER BY sequence_no,gid",
+                (version_gid, tenant_gid, project_gid),
             )
             item_edges = list(cur.fetchall())
 
             cur.execute(
-                "SELECT gid,source_item_gid,capability_id,capability_version_gid,purpose,version_constraint,input_mapping_json,output_mapping_json,authorization_scope_json,execution_policy_json,evidence_policy_json FROM workmanship_agent_orch_capability_bindings WHERE version_gid=%s ORDER BY created_at",
-                (version_gid,),
+                "SELECT gid,source_item_gid,capability_id,capability_version_gid,purpose,version_constraint,input_mapping_json,output_mapping_json,authorization_scope_json,execution_policy_json,evidence_policy_json FROM workmanship_agent_orch_capability_bindings WHERE version_gid=%s AND tenant_gid=%s AND project_gid=%s ORDER BY created_at",
+                (version_gid, tenant_gid, project_gid),
             )
             capability_bindings = []
             for row in cur.fetchall():
@@ -333,8 +357,8 @@ class OrchestrationRepository:
                 })
 
             cur.execute(
-                "SELECT gid,source_item_gid,ref_type,ref_gid,ref_version,snapshot_gid,purpose FROM workmanship_agent_orch_context_bindings WHERE version_gid=%s ORDER BY created_at",
-                (version_gid,),
+                "SELECT gid,source_item_gid,ref_type,ref_gid,ref_version,snapshot_gid,purpose FROM workmanship_agent_orch_context_bindings WHERE version_gid=%s AND tenant_gid=%s AND project_gid=%s ORDER BY created_at",
+                (version_gid, tenant_gid, project_gid),
             )
             context_bindings = list(cur.fetchall())
 
@@ -375,8 +399,8 @@ class OrchestrationRepository:
             cur.execute(
                 """SELECT gid,capability_version_gid
                    FROM workmanship_agent_orch_capability_bindings
-                   WHERE version_gid=%s ORDER BY gid FOR UPDATE""",
-                (version_gid,),
+                   WHERE version_gid=%s AND tenant_gid=%s AND project_gid=%s ORDER BY gid FOR UPDATE""",
+                (version_gid, tenant_gid, project_gid),
             )
             stored_bindings = list(cur.fetchall())
             resolved_by_gid = {
@@ -408,7 +432,8 @@ class OrchestrationRepository:
                 cur.execute(
                     """UPDATE workmanship_agent_orch_capability_bindings
                        SET capability_id=%s,version_constraint=%s,execution_policy_json=%s,updated_at=NOW(6)
-                       WHERE gid=%s AND version_gid=%s AND capability_version_gid=%s""",
+                       WHERE gid=%s AND version_gid=%s AND capability_version_gid=%s
+                         AND tenant_gid=%s AND project_gid=%s""",
                     (
                         binding["capability_id"],
                         f"={binding['major_version']}",
@@ -416,6 +441,8 @@ class OrchestrationRepository:
                         binding["binding_gid"],
                         version_gid,
                         binding["capability_version_gid"],
+                        tenant_gid,
+                        project_gid,
                     ),
                 )
                 if cur.rowcount != 1:
@@ -424,16 +451,19 @@ class OrchestrationRepository:
                 """UPDATE workmanship_agent_orch_versions
                    SET status='published', revision=revision+1, published_at=NOW(6),
                        updated_at=NOW(6), updated_by=%s
-                   WHERE gid=%s AND status='draft' AND revision=%s""",
-                (actor_gid, version_gid, expected_revision),
+                   WHERE gid=%s AND status='draft' AND revision=%s
+                     AND tenant_gid=%s AND project_gid=%s""",
+                (actor_gid, version_gid, expected_revision, tenant_gid, project_gid),
             )
             if cur.rowcount != 1:
                 raise RevisionConflict("orchestration version is published or stale")
             cur.execute(
                 """UPDATE workmanship_agent_orch_panoramas
                    SET current_version_gid=%s, revision=revision+1, updated_at=NOW(6)
-                   WHERE gid=(SELECT panorama_gid FROM workmanship_agent_orch_versions WHERE gid=%s)""",
-                (version_gid, version_gid),
+                   WHERE gid=(SELECT v.panorama_gid FROM workmanship_agent_orch_versions v
+                              WHERE v.gid=%s AND v.tenant_gid=%s AND v.project_gid=%s)
+                     AND tenant_gid=%s AND project_gid=%s""",
+                (version_gid, version_gid, tenant_gid, project_gid, tenant_gid, project_gid),
             )
         return {"version_gid": version_gid, "revision": expected_revision + 1, "status": "published"}
 
@@ -455,14 +485,17 @@ class OrchestrationRepository:
                 """SELECT b.gid FROM workmanship_agent_orch_capability_bindings b
                    JOIN workmanship_agent_orch_versions v ON v.gid=b.version_gid
                    JOIN workmanship_agent_orch_panoramas p ON p.gid=v.panorama_gid
-                   WHERE b.gid=%s AND v.status='draft' AND p.owner_user_gid=%s""" + scope_sql + " FOR UPDATE",
-                (binding_gid, actor_gid, *scope_params),
+                   WHERE b.gid=%s AND b.tenant_gid=%s AND b.project_gid=%s
+                     AND v.status='draft' AND v.tenant_gid=%s AND v.project_gid=%s
+                     AND p.owner_user_gid=%s""" + scope_sql + " FOR UPDATE",
+                (binding_gid, tenant_gid, project_gid, tenant_gid, project_gid, actor_gid, *scope_params),
             )
             if not cur.fetchone():
                 raise ResourceNotAccessible("orchestration binding is not accessible")
             cur.execute(
-                "DELETE FROM workmanship_agent_orch_capability_bindings WHERE gid=%s",
-                (binding_gid,),
+                """DELETE FROM workmanship_agent_orch_capability_bindings
+                 WHERE gid=%s AND tenant_gid=%s AND project_gid=%s""",
+                (binding_gid, tenant_gid, project_gid),
             )
 
     def create_run_with_started_event(
@@ -484,20 +517,23 @@ class OrchestrationRepository:
                 """SELECT v.gid FROM workmanship_agent_orch_versions v
                    JOIN workmanship_agent_orch_panoramas p ON p.gid=v.panorama_gid
                    WHERE v.gid=%s AND v.panorama_gid=%s AND v.status='published'
+                     AND v.tenant_gid=%s AND v.project_gid=%s
                      AND p.owner_user_gid=%s""" + scope_sql + " FOR UPDATE",
-                (version_gid, panorama_gid, actor_gid, *scope_params),
+                (version_gid, panorama_gid, tenant_gid, project_gid, actor_gid, *scope_params),
             )
             if not cur.fetchone():
                 raise ResourceNotAccessible("published orchestration version is not accessible")
             cur.execute(
                 """INSERT INTO workmanship_agent_orch_runs
-                   (gid,panorama_gid,version_gid,status,frozen_context_json,started_at,started_by,created_at,updated_at)
-                   VALUES (%s,%s,%s,'running',%s,NOW(6),%s,NOW(6),NOW(6))""",
-                (run_gid, panorama_gid, version_gid, _json(frozen_context), actor_gid),
+                   (tenant_gid,project_gid,gid,panorama_gid,version_gid,status,frozen_context_json,started_at,started_by,created_at,updated_at)
+                   VALUES (%s,%s,%s,%s,%s,'running',%s,NOW(6),%s,NOW(6),NOW(6))""",
+                (tenant_gid, project_gid, run_gid, panorama_gid, version_gid, _json(frozen_context), actor_gid),
             )
             self._insert_run_event(
                 cur,
                 run_gid=run_gid,
+                tenant_gid=tenant_gid,
+                project_gid=project_gid,
                 sequence_no=1,
                 event_type="started",
                 actor_type="human",
@@ -528,8 +564,9 @@ class OrchestrationRepository:
             cur.execute(
                 """SELECT r.status FROM workmanship_agent_orch_runs r
                    JOIN workmanship_agent_orch_panoramas p ON p.gid=r.panorama_gid
-                   WHERE r.gid=%s AND p.owner_user_gid=%s""" + scope_sql + " FOR UPDATE",
-                (run_gid, authorized_principal_gid, *scope_params),
+                   WHERE r.gid=%s AND r.tenant_gid=%s AND r.project_gid=%s
+                     AND p.owner_user_gid=%s""" + scope_sql + " FOR UPDATE",
+                (run_gid, tenant_gid, project_gid, authorized_principal_gid, *scope_params),
             )
             run = cur.fetchone()
             if not run:
@@ -541,21 +578,24 @@ class OrchestrationRepository:
                 )
             cur.execute(
                 """SELECT COALESCE(MAX(sequence_no),0) AS last_sequence_no
-                   FROM workmanship_agent_orch_run_events WHERE run_gid=%s""",
-                (run_gid,),
+                   FROM workmanship_agent_orch_run_events
+                  WHERE run_gid=%s AND tenant_gid=%s AND project_gid=%s""",
+                (run_gid, tenant_gid, project_gid),
             )
             sequence_no = int(cur.fetchone()["last_sequence_no"]) + 1
             terminal = target_status in {"succeeded", "failed"}
             cur.execute(
                 """UPDATE workmanship_agent_orch_runs
                    SET status=%s,finished_at=CASE WHEN %s THEN NOW(6) ELSE NULL END,updated_at=NOW(6)
-                   WHERE gid=%s""",
-                (target_status, terminal, run_gid),
+                   WHERE gid=%s AND tenant_gid=%s AND project_gid=%s""",
+                (target_status, terminal, run_gid, tenant_gid, project_gid),
             )
             event_payload = {"from": current_status, "to": target_status, **payload}
             event_gid = self._insert_run_event(
                 cur,
                 run_gid=run_gid,
+                tenant_gid=tenant_gid,
+                project_gid=project_gid,
                 sequence_no=sequence_no,
                 event_type="status_changed",
                 actor_type=actor_type,
@@ -579,11 +619,13 @@ class OrchestrationRepository:
                 """SELECT r.status,COALESCE(MAX(e.sequence_no),0) AS last_sequence_no
                    FROM workmanship_agent_orch_runs r
                    JOIN workmanship_agent_orch_panoramas p ON p.gid=r.panorama_gid
-                   LEFT JOIN workmanship_agent_orch_run_events e ON e.run_gid=r.gid
-                   WHERE r.gid=%s AND p.owner_user_gid=%s
+                   LEFT JOIN workmanship_agent_orch_run_events e
+                     ON e.run_gid=r.gid AND e.tenant_gid=r.tenant_gid AND e.project_gid=r.project_gid
+                   WHERE r.gid=%s AND r.tenant_gid=%s AND r.project_gid=%s
+                     AND p.owner_user_gid=%s
                      AND p.tenant_gid=%s AND p.project_gid=%s
                    GROUP BY r.gid,r.status""",
-                (run_gid, actor_gid, tenant_gid, project_gid),
+                (run_gid, tenant_gid, project_gid, actor_gid, tenant_gid, project_gid),
             )
             row = cur.fetchone()
         if not row:
@@ -609,8 +651,9 @@ class OrchestrationRepository:
             cur.execute(
                 """UPDATE workmanship_agent_orch_versions
                    SET mode=%s, revision=revision+1, updated_at=NOW(6), updated_by=%s
-                   WHERE gid=%s AND status='draft' AND revision=%s""",
-                (graph.mode, actor_gid, version_gid, expected_revision),
+                   WHERE gid=%s AND status='draft' AND revision=%s
+                     AND tenant_gid=%s AND project_gid=%s""",
+                (graph.mode, actor_gid, version_gid, expected_revision, tenant_gid, project_gid),
             )
             if cur.rowcount != 1:
                 raise RevisionConflict("orchestration version is published or stale")
@@ -624,13 +667,17 @@ class OrchestrationRepository:
                 "workmanship_agent_orch_items",
                 "workmanship_agent_orch_business_nodes",
             ):
-                cur.execute(f"DELETE FROM {table} WHERE version_gid=%s", (version_gid,))
+                cur.execute(
+                    f"DELETE FROM {table} WHERE version_gid=%s AND tenant_gid=%s AND project_gid=%s",
+                    (version_gid, tenant_gid, project_gid),
+                )
 
             cur.execute(
                 """INSERT INTO workmanship_agent_orch_axis_views
-                   (gid,version_gid,name,x_items_json,y_items_json,revision,created_at,updated_at)
-                   VALUES (%s,%s,%s,%s,%s,%s,NOW(6),NOW(6))""",
+                   (tenant_gid,project_gid,gid,version_gid,name,x_items_json,y_items_json,revision,created_at,updated_at)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,NOW(6),NOW(6))""",
                 (
+                    tenant_gid, project_gid,
                     str(uuid.uuid4()),
                     version_gid,
                     "默认视图",
@@ -642,11 +689,11 @@ class OrchestrationRepository:
             for node in graph.nodes:
                 cur.execute(
                     """INSERT INTO workmanship_agent_orch_business_nodes
-                       (gid,version_gid,node_key,title,objective,owner_ref,x_item_key,y_item_key,
+                       (tenant_gid,project_gid,gid,version_gid,node_key,title,objective,owner_ref,x_item_key,y_item_key,
                         position_json,inputs_json,outputs_json,acceptance_json,created_at,updated_at)
-                       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW(6),NOW(6))""",
+                       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW(6),NOW(6))""",
                     (
-                        node.gid, version_gid, node.node_key, node.title, node.objective,
+                        tenant_gid, project_gid, node.gid, version_gid, node.node_key, node.title, node.objective,
                         node.owner_ref, node.x_item_key, node.y_item_key,
                         _json(node.position.model_dump()), _json(node.inputs), _json(node.outputs),
                         _json(node.acceptance_criteria),
@@ -655,11 +702,11 @@ class OrchestrationRepository:
             for edge in graph.edges:
                 cur.execute(
                     """INSERT INTO workmanship_agent_orch_flow_edges
-                       (gid,version_gid,edge_type,source_node_gid,target_node_gid,label,
+                       (tenant_gid,project_gid,gid,version_gid,edge_type,source_node_gid,target_node_gid,label,
                         route_points_json,metadata_json,created_at,updated_at)
-                       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,NOW(6),NOW(6))""",
+                       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW(6),NOW(6))""",
                     (
-                        edge.gid, version_gid, edge.edge_type, edge.source_node_gid,
+                        tenant_gid, project_gid, edge.gid, version_gid, edge.edge_type, edge.source_node_gid,
                         edge.target_node_gid, edge.label,
                         _json([point.model_dump() for point in edge.route_points]), _json({}),
                     ),
@@ -667,20 +714,20 @@ class OrchestrationRepository:
             for item in graph.items:
                 cur.execute(
                     """INSERT INTO workmanship_agent_orch_items
-                       (gid,version_gid,business_node_gid,item_type,title,sequence_no,config_json,created_at,updated_at)
-                       VALUES (%s,%s,%s,%s,%s,%s,%s,NOW(6),NOW(6))""",
+                       (tenant_gid,project_gid,gid,version_gid,business_node_gid,item_type,title,sequence_no,config_json,created_at,updated_at)
+                       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW(6),NOW(6))""",
                     (
-                        item.gid, version_gid, item.business_node_gid or "", item.item_type,
+                        tenant_gid, project_gid, item.gid, version_gid, item.business_node_gid or "", item.item_type,
                         item.title, item.sequence_no, _json(item.config),
                     ),
                 )
             for edge in graph.item_edges:
                 cur.execute(
                     """INSERT INTO workmanship_agent_orch_item_edges
-                       (gid,version_gid,source_item_gid,target_item_gid,relation_type,sequence_no,created_at)
-                       VALUES (%s,%s,%s,%s,%s,%s,NOW(6))""",
+                       (tenant_gid,project_gid,gid,version_gid,source_item_gid,target_item_gid,relation_type,sequence_no,created_at)
+                       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,NOW(6))""",
                     (
-                        edge.gid, version_gid, edge.source_item_gid, edge.target_item_gid,
+                        tenant_gid, project_gid, edge.gid, version_gid, edge.source_item_gid, edge.target_item_gid,
                         edge.relation_type, edge.sequence_no,
                     ),
                 )
@@ -692,12 +739,12 @@ class OrchestrationRepository:
                 }
                 cur.execute(
                     """INSERT INTO workmanship_agent_orch_capability_bindings
-                       (gid,version_gid,source_item_gid,capability_id,capability_version_gid,purpose,
+                       (tenant_gid,project_gid,gid,version_gid,source_item_gid,capability_id,capability_version_gid,purpose,
                         version_constraint,input_mapping_json,output_mapping_json,authorization_scope_json,
                         execution_policy_json,evidence_policy_json,created_at,updated_at)
-                       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW(6),NOW(6))""",
+                       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW(6),NOW(6))""",
                     (
-                        binding.gid, version_gid, binding.source_item_gid, None,
+                        tenant_gid, project_gid, binding.gid, version_gid, binding.source_item_gid, None,
                         binding.capability_version_gid, binding.purpose, None,
                         _json(binding.input_mapping), _json(binding.output_mapping),
                         _json(binding.authorization_scope), _json(execution_policy),
@@ -707,11 +754,11 @@ class OrchestrationRepository:
             for binding in graph.context_bindings:
                 cur.execute(
                     """INSERT INTO workmanship_agent_orch_context_bindings
-                       (gid,version_gid,source_item_gid,ref_type,ref_gid,ref_version,snapshot_gid,purpose,
+                       (tenant_gid,project_gid,gid,version_gid,source_item_gid,ref_type,ref_gid,ref_version,snapshot_gid,purpose,
                         metadata_json,created_at,updated_at)
-                       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW(6),NOW(6))""",
+                       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW(6),NOW(6))""",
                     (
-                        binding.gid, version_gid, binding.source_item_gid, binding.ref_type,
+                        tenant_gid, project_gid, binding.gid, version_gid, binding.source_item_gid, binding.ref_type,
                         binding.ref_gid, binding.ref_version, binding.snapshot_gid, binding.purpose,
                         _json({}),
                     ),

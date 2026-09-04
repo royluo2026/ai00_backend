@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_945ad3c1048168e917667349a9916b8b",
-  "catalog_hash": "sha256:945ad3c1048168e917667349a9916b8bd142ec529cbb3c12d83fed7e6e37ae25",
+  "release_id": "rel_06852473caf7d60a5e8f30b9b0c075e0",
+  "catalog_hash": "sha256:06852473caf7d60a5e8f30b9b0c075e097edab46c1de58b02bb1f1b6dbf8c222",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -8795,7 +8795,7 @@
       "id": "agent.orchestration.binding.delete",
       "major_version": 1,
       "owner_domain": "agent",
-      "lifecycle_status": "stable",
+      "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "从项目草稿移除一个 Capability 绑定并记录变更审计。",
       "description": "编排中心原子能力：从项目草稿移除一个 Capability 绑定并记录变更审计。",
@@ -8824,11 +8824,11 @@
       "side_effects": "Writes agent domain state through its Provider and records a capability audit event.",
       "execution_mode": "cloud_sync",
       "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -9210,7 +9210,7 @@
         "boundary": "owning_domain"
       },
       "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "no_consumer_reason": "MVP write surface deferred until agent.write authorization, durable reliability, and DB E2E are configured.",
       "provider_ref": "agent.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/agent.orchestration.binding.delete:invoke"
@@ -9671,6 +9671,35 @@
                         "minLength": 1
                       }
                     },
+                    "governance_status": {
+                      "type": "object",
+                      "properties": {
+                        "machine_passed": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ]
+                        },
+                        "human_approved": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ]
+                        },
+                        "runtime_verified": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "machine_passed",
+                        "human_approved",
+                        "runtime_verified"
+                      ]
+                    },
                     "position": {
                       "type": "object",
                       "properties": {
@@ -10463,6 +10492,35 @@
                         "minLength": 1
                       }
                     },
+                    "governance_status": {
+                      "type": "object",
+                      "properties": {
+                        "machine_passed": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ]
+                        },
+                        "human_approved": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ]
+                        },
+                        "runtime_verified": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "machine_passed",
+                        "human_approved",
+                        "runtime_verified"
+                      ]
+                    },
                     "position": {
                       "type": "object",
                       "properties": {
@@ -11063,7 +11121,7 @@
           "graph"
         ]
       },
-      "schema_hash": "sha256:81b9f5e128c649a2b5b586021e470efc6733c5e2f7f32330ac8a48d1cfad32fd",
+      "schema_hash": "sha256:b9e0179280f88ec7b53a1bd4495e5dd3249ff9bca83e39fb9de88b9ae76dbc03",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -11285,13 +11343,13 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:5237235a1041dbdf24638d8646fa9e08b3b6aab9af410e5fdc579163a3d2880e"
+      "business_definition_hash": "sha256:42b60bb302fe278f2ea8c2e03a401340bea009bab475c455e9722ca543c2e04f"
     },
     {
       "id": "agent.orchestration.graph.save",
       "major_version": 1,
       "owner_domain": "agent",
-      "lifecycle_status": "stable",
+      "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "将项目编排草稿以新修订版本持久化，保留可审计的节点与连线关系。",
       "description": "编排中心原子能力：将项目编排草稿以新修订版本持久化，保留可审计的节点与连线关系。",
@@ -11320,11 +11378,11 @@
       "side_effects": "Writes agent domain state through its Provider and records a capability audit event.",
       "execution_mode": "cloud_sync",
       "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -11573,6 +11631,35 @@
                         "type": "string",
                         "minLength": 1
                       }
+                    },
+                    "governance_status": {
+                      "type": "object",
+                      "properties": {
+                        "machine_passed": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ]
+                        },
+                        "human_approved": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ]
+                        },
+                        "runtime_verified": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "machine_passed",
+                        "human_approved",
+                        "runtime_verified"
+                      ]
                     },
                     "position": {
                       "type": "object",
@@ -12311,7 +12398,7 @@
           "revision"
         ]
       },
-      "schema_hash": "sha256:64c012d62442feb6933b7194f5624a5e12793f4b4bb42df02df25a65a8250c39",
+      "schema_hash": "sha256:60273a5e6bb378e9bcb311021b9e775f5448ec4d51c7a862b90497f97626a06a",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -12478,7 +12565,7 @@
         "boundary": "owning_domain"
       },
       "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "no_consumer_reason": "MVP write surface deferred until agent.write authorization, durable reliability, and DB E2E are configured.",
       "provider_ref": "agent.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/agent.orchestration.graph.save:invoke"
@@ -12527,7 +12614,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:300897ee63236a781741ff1d0d8085c2093bc799283b201542598602991b7518"
+      "business_definition_hash": "sha256:1bff0ebdff3941d0a9f78a06636e8edfb8ca11dcf033e61840fd7c66309de16c"
     },
     {
       "id": "agent.orchestration.metric.read",
@@ -13631,7 +13718,7 @@
       "id": "agent.orchestration.run.start",
       "major_version": 1,
       "owner_domain": "agent",
-      "lifecycle_status": "stable",
+      "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "基于已发布编排版本创建一次冻结上下文的运行实例。",
       "description": "编排中心原子能力：基于已发布编排版本创建一次冻结上下文的运行实例。",
@@ -13660,11 +13747,11 @@
       "side_effects": "Writes agent domain state through its Provider and records a capability audit event.",
       "execution_mode": "cloud_sync",
       "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -14039,7 +14126,7 @@
         "boundary": "owning_domain"
       },
       "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "no_consumer_reason": "MVP write surface deferred until agent.write authorization, durable reliability, and DB E2E are configured.",
       "provider_ref": "agent.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/agent.orchestration.run.start:invoke"
@@ -14094,7 +14181,7 @@
       "id": "agent.orchestration.run.transition",
       "major_version": 1,
       "owner_domain": "agent",
-      "lifecycle_status": "stable",
+      "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "追加运行实例的受授权状态事件并保持状态机一致。",
       "description": "编排中心原子能力：追加运行实例的受授权状态事件并保持状态机一致。",
@@ -14123,11 +14210,11 @@
       "side_effects": "Writes agent domain state through its Provider and records a capability audit event.",
       "execution_mode": "cloud_sync",
       "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -14323,13 +14410,18 @@
           "run_gid": {
             "type": "string",
             "minLength": 1
+          },
+          "sequence_no": {
+            "type": "integer",
+            "minimum": 1
           }
         },
         "additionalProperties": false,
         "required": [
           "status",
           "event_gid",
-          "run_gid"
+          "run_gid",
+          "sequence_no"
         ]
       },
       "agent_output_schema": {
@@ -14346,16 +14438,21 @@
           "run_gid": {
             "type": "string",
             "minLength": 1
+          },
+          "sequence_no": {
+            "type": "integer",
+            "minimum": 1
           }
         },
         "additionalProperties": false,
         "required": [
           "status",
           "event_gid",
-          "run_gid"
+          "run_gid",
+          "sequence_no"
         ]
       },
-      "schema_hash": "sha256:aff75acb763d7485caf383ee394e1a6dbf1c61aff94704df17e15defa62ee57c",
+      "schema_hash": "sha256:9efc349a6ad6e3ec2a8f833a9aaec5f7cf8713011927c1d5f5e2b78fe27bb8cb",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -14522,7 +14619,7 @@
         "boundary": "owning_domain"
       },
       "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "no_consumer_reason": "MVP write surface deferred until agent.write authorization, durable reliability, and DB E2E are configured.",
       "provider_ref": "agent.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/agent.orchestration.run.transition:invoke"
@@ -14571,13 +14668,13 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:1b82c2349e82ffc372443c5961645920414f49d5efe2b40063e943e7676f6455"
+      "business_definition_hash": "sha256:528599f0418eae343c6864493d6cdf0b3908eb9c6f19532391ab1ae5a5c6b5ae"
     },
     {
       "id": "agent.orchestration.version.publish",
       "major_version": 1,
       "owner_domain": "agent",
-      "lifecycle_status": "stable",
+      "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "发布经过业务契约和 Capability 引用校验的项目编排版本。",
       "description": "编排中心原子能力：发布经过业务契约和 Capability 引用校验的项目编排版本。",
@@ -14606,11 +14703,11 @@
       "side_effects": "Writes agent domain state through its Provider and records a capability audit event.",
       "execution_mode": "cloud_sync",
       "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -14802,12 +14899,17 @@
           "status": {
             "type": "string",
             "minLength": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
           }
         },
         "additionalProperties": false,
         "required": [
           "version_gid",
-          "status"
+          "status",
+          "revision"
         ]
       },
       "agent_output_schema": {
@@ -14820,15 +14922,20 @@
           "status": {
             "type": "string",
             "minLength": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
           }
         },
         "additionalProperties": false,
         "required": [
           "version_gid",
-          "status"
+          "status",
+          "revision"
         ]
       },
-      "schema_hash": "sha256:a2a5d092144de0dadca73bf0d68075ab431e60c34536fe2b181996efc9c166e4",
+      "schema_hash": "sha256:ac6ca99b0ff2958462119def4b37656cd275bf3f1d06ad874ac065b73d3ab457",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -14995,7 +15102,7 @@
         "boundary": "owning_domain"
       },
       "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "no_consumer_reason": "MVP write surface deferred until agent.write authorization, durable reliability, and DB E2E are configured.",
       "provider_ref": "agent.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/agent.orchestration.version.publish:invoke"
@@ -15044,7 +15151,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:dcd70b620a3156b4ee27e7ab73997f7b9221496df4a63c9edd14f134b472da07"
+      "business_definition_hash": "sha256:e5c552b9bc81c0d53ab253b9b1582e5cde2336bcd68ad894a172c770d99688b2"
     },
     {
       "id": "agent.run.change.apply",
@@ -229885,6 +229992,11 @@
           "consumer_id": "knowledge-hub/project_info.html",
           "consumer_type": "web",
           "version_constraint": ">=1"
+        },
+        {
+          "consumer_id": "web/admin_hub/index.html",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
         }
       ],
       "no_consumer_reason": null,
@@ -230355,6 +230467,11 @@
       "consumer_refs": [
         {
           "consumer_id": "knowledge-hub/project_info.html",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        },
+        {
+          "consumer_id": "web/admin_hub/index.html",
           "consumer_type": "web",
           "version_constraint": ">=1"
         }
@@ -230829,6 +230946,11 @@
           "consumer_id": "knowledge-hub/project_info.html",
           "consumer_type": "web",
           "version_constraint": ">=1"
+        },
+        {
+          "consumer_id": "web/admin_hub/index.html",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
         }
       ],
       "no_consumer_reason": null,
@@ -231299,6 +231421,11 @@
       "consumer_refs": [
         {
           "consumer_id": "knowledge-hub/project_info.html",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        },
+        {
+          "consumer_id": "web/admin_hub/index.html",
           "consumer_type": "web",
           "version_constraint": ">=1"
         }
@@ -231773,6 +231900,11 @@
           "consumer_id": "knowledge-hub/project_info.html",
           "consumer_type": "web",
           "version_constraint": ">=1"
+        },
+        {
+          "consumer_id": "web/admin_hub/index.html",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
         }
       ],
       "no_consumer_reason": null,
@@ -232243,6 +232375,11 @@
       "consumer_refs": [
         {
           "consumer_id": "knowledge-hub/project_info.html",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        },
+        {
+          "consumer_id": "web/admin_hub/index.html",
           "consumer_type": "web",
           "version_constraint": ">=1"
         }
@@ -233190,6 +233327,11 @@
           "consumer_id": "knowledge-hub/project_info.html",
           "consumer_type": "web",
           "version_constraint": ">=1"
+        },
+        {
+          "consumer_id": "web/admin_hub/index.html",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
         }
       ],
       "no_consumer_reason": null,
@@ -233668,6 +233810,11 @@
       "consumer_refs": [
         {
           "consumer_id": "knowledge-hub/project_info.html",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        },
+        {
+          "consumer_id": "web/admin_hub/index.html",
           "consumer_type": "web",
           "version_constraint": ">=1"
         }
@@ -234212,6 +234359,11 @@
       "consumer_refs": [
         {
           "consumer_id": "knowledge-hub/project_info.html",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        },
+        {
+          "consumer_id": "web/admin_hub/index.html",
           "consumer_type": "web",
           "version_constraint": ">=1"
         }
@@ -303858,7 +304010,7 @@
       "plugin_id": "official.agent",
       "module": "agent_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:f9a24ed82063cc3a3eff296327c5f8edb6a70eaf59296c187991543188e880c4"
+      "artifact_hash": "sha256:03b56402a5954cf874b8400d614a11fc3e6ec7fa5969a6e763ef44919211aec2"
     },
     {
       "plugin_id": "official.base",
@@ -303921,5 +304073,5 @@
       "artifact_hash": "sha256:f35abbc9450b6fc1f91a5bb2cf73eb59e3cf019ccb0af0879cd3823e868b6097"
     }
   ],
-  "created_at": "2026-09-04T09:37:59.899003Z"
+  "created_at": "2026-09-04T10:57:17.105850Z"
 }
