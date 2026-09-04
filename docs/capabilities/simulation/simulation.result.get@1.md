@@ -8,7 +8,7 @@ Read completed Simulation result ArtifactRefs.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_1c166dc257d49f90409ae09165d23688`
+- Catalog Release：`rel_09f1c9d790ff36d54188ce27f40c64af`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -86,7 +86,7 @@ Read completed Simulation result ArtifactRefs.
 ```json
 {
   "capability_id": "simulation.result.get",
-  "catalog_release": "rel_1c166dc257d49f90409ae09165d23688",
+  "catalog_release": "rel_09f1c9d790ff36d54188ce27f40c64af",
   "major_version": 1,
   "payload": {
     "run_id": "example"

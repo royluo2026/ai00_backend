@@ -40,6 +40,12 @@ def make_handler(
         project_gid = payload.get("project_gid")
         if not project_gid:
             raise PermissionError("project scope is required")
+        # The fixed Gateway resolves project membership/ABAC before invoking
+        # the provider.  Require its server-derived resource reference here;
+        # a project_gid appearing only in the request body is never sufficient.
+        authorized_refs = set(getattr(context, "resource_refs", ()) or ())
+        if f"project:{project_gid}" not in authorized_refs:
+            raise PermissionError("project membership is not authorized")
         return {"tenant_gid": tenant_gid, "project_gid": project_gid}
 
     if capability_id == "agent.orchestration.panorama.read":
@@ -88,11 +94,16 @@ def make_handler(
             **scope(payload, context),
         )}
     if capability_id == "agent.orchestration.run.transition":
-        return lambda payload, context: runtime.advance(
-            payload["run_gid"], payload["target_status"],
-            authorized_principal_gid=context.user_gid, actor_type=payload.get("actor_type", "agent"),
-            actor_gid=context.user_gid, payload=payload.get("payload", {}), **scope(payload, context),
-        )
+        def transition(payload, context):
+            identity = getattr(context, "effective_identity", None)
+            consumer_type = getattr(getattr(identity, "consumer", None), "type", None)
+            actor_type = getattr(consumer_type, "value", consumer_type) or "user"
+            return runtime.advance(
+                payload["run_gid"], payload["target_status"],
+                authorized_principal_gid=context.user_gid, actor_type=actor_type,
+                actor_gid=context.user_gid, payload=payload.get("payload", {}), **scope(payload, context),
+            )
+        return transition
     if capability_id == "agent.orchestration.metric.read":
         def metric(payload, context):
             bounded_scope = scope(payload, context)
@@ -103,6 +114,15 @@ def make_handler(
                 payload["panorama_gid"], payload["period_key"], context.user_gid, **bounded_scope,
             )
             if not selectors:
+                # A projected snapshot is not evidence.  It may be returned
+                # only when it is an explicit zero baseline; positive values
+                # require selector rows whose source hashes/trust were checked
+                # by RepositoryWorkloadEvidenceResolver below.
+                if any(float(snapshot.get(key) or 0) > 0 for key in (
+                    "total_workload_hours", "effective_agent_workload_hours",
+                    "effective_intelligent_work_rate", "automation_ratio",
+                )):
+                    raise PermissionError("trusted workload evidence unavailable")
                 return snapshot
             evidence_resolver = RepositoryWorkloadEvidenceResolver(
                 repository, actor_gid=context.user_gid, **bounded_scope,

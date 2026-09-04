@@ -1,5 +1,5 @@
 {
-  "schema_sha256": "sha256:c9571bd6b7b7de67d9542020c7b75fb36a15bf8f4cdaf9249bb45524ecd1213e",
+  "schema_sha256": "sha256:5627421bb0b64c5e1450cce12a245a1e5d7c93c19ddcae1416f907f39fbd93aa",
   "schema_version": 1,
   "tables": [
     {
@@ -457,6 +457,9 @@
         "business_node_gid": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
         ],
+        "catalog_release_gid": [
+          "backend/db/migrations/domains/agent/0011_agent_orchestration_evidence_trust.sql"
+        ],
         "created_at": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
         ],
@@ -468,6 +471,9 @@
         ],
         "period_key": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
+        ],
+        "project_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
         ],
         "recorded_at": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
@@ -483,6 +489,9 @@
         ],
         "task_key": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
         ],
         "version_gid": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
@@ -502,6 +511,8 @@
       },
       "sources": [
         "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql",
+        "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
         "backend/db/migrations/domains/agent/0011_agent_orchestration_evidence_trust.sql"
       ],
       "table": "workmanship_agent_orch_acceptance_facts"
@@ -517,8 +528,14 @@
         "name": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
+        "project_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        ],
         "revision": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
         ],
         "updated_at": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
@@ -543,7 +560,9 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
+        "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
       ],
       "table": "workmanship_agent_orch_axis_views"
     },
@@ -576,6 +595,12 @@
         "position_json": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
+        "project_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        ],
         "title": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
@@ -605,7 +630,9 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
+        "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
       ],
       "table": "workmanship_agent_orch_business_nodes"
     },
@@ -638,11 +665,17 @@
         "output_mapping_json": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
+        "project_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        ],
         "purpose": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
         "source_item_gid": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
         ],
         "updated_at": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
@@ -667,7 +700,9 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
+        "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
       ],
       "table": "workmanship_agent_orch_capability_bindings"
     },
@@ -681,6 +716,9 @@
         ],
         "metadata_json": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        ],
+        "project_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
         ],
         "purpose": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
@@ -699,6 +737,9 @@
         ],
         "source_item_gid": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
         ],
         "updated_at": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
@@ -720,7 +761,9 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
+        "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
       ],
       "table": "workmanship_agent_orch_context_bindings"
     },
@@ -741,6 +784,9 @@
         "metadata_json": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
+        "project_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        ],
         "route_points_json": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
@@ -749,6 +795,9 @@
         ],
         "target_node_gid": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
         ],
         "updated_at": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
@@ -767,7 +816,9 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
+        "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
       ],
       "table": "workmanship_agent_orch_flow_edges"
     },
@@ -778,6 +829,9 @@
         ],
         "gid": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        ],
+        "project_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
         ],
         "relation_type": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
@@ -790,6 +844,9 @@
         ],
         "target_item_gid": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
         ],
         "version_gid": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
@@ -805,7 +862,9 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
+        "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
       ],
       "table": "workmanship_agent_orch_item_edges"
     },
@@ -826,8 +885,14 @@
         "item_type": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
+        "project_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        ],
         "sequence_no": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
         ],
         "title": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
@@ -849,7 +914,9 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
+        "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
       ],
       "table": "workmanship_agent_orch_items"
     },
@@ -885,6 +952,12 @@
         "period_key": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
         ],
+        "project_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        ],
         "total_workflow_count": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
         ],
@@ -905,7 +978,9 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
+        "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql",
+        "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
       ],
       "table": "workmanship_agent_orch_metric_snapshots"
     },
@@ -990,11 +1065,17 @@
         "payload_json": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
         ],
+        "project_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        ],
         "run_gid": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
         ],
         "sequence_no": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
         ]
       },
       "constraints": {},
@@ -1007,7 +1088,9 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
+        "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql",
+        "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
       ],
       "table": "workmanship_agent_orch_run_events"
     },
@@ -1028,6 +1111,9 @@
         "panorama_gid": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
         ],
+        "project_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        ],
         "started_at": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
         ],
@@ -1036,6 +1122,9 @@
         ],
         "status": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
         ],
         "updated_at": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
@@ -1057,7 +1146,9 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
+        "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql",
+        "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
       ],
       "table": "workmanship_agent_orch_runs"
     },
@@ -1081,6 +1172,9 @@
         "parent_version_gid": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
+        "project_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        ],
         "published_at": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
@@ -1092,6 +1186,9 @@
         ],
         "status": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
         ],
         "updated_at": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
@@ -1110,7 +1207,9 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
+        "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
       ],
       "table": "workmanship_agent_orch_versions"
     },
@@ -1140,6 +1239,9 @@
         "business_node_gid": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
         ],
+        "catalog_release_gid": [
+          "backend/db/migrations/domains/agent/0011_agent_orchestration_evidence_trust.sql"
+        ],
         "created_at": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
         ],
@@ -1158,11 +1260,17 @@
         "period_key": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
         ],
+        "project_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
+        ],
         "standard_manual_hours": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
         ],
         "task_key": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
         ],
         "updated_at": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
@@ -1185,6 +1293,8 @@
       },
       "sources": [
         "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql",
+        "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql",
         "backend/db/migrations/domains/agent/0011_agent_orchestration_evidence_trust.sql"
       ],
       "table": "workmanship_agent_orch_workload_baselines"

@@ -4,7 +4,7 @@ import hashlib
 import json
 
 from backend.capability_v2.provider_contracts import CapabilityOutput, EvidenceRef
-from backend.capability_v2.contracts import AutomationLevel, BusinessInvariantContract, CapabilityDescriptorV2, DomainErrorContract, ExecutionMode, ExposurePolicy, LifecycleStatus, SideEffectLevel
+from backend.capability_v2.contracts import AutomationLevel, BusinessInvariantContract, CapabilityDescriptorV2, DomainErrorContract, ExecutionMode, ExposurePolicy, LifecycleStatus, ResourceSelector, SideEffectLevel
 from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
 
 
@@ -65,6 +65,10 @@ def descriptor_for(spec) -> CapabilityDescriptorV2:
         "authorization_policy": "agent.v2:" + ",".join(spec.permissions),
         "data_classification": "confidential", "delegation_policy": "scoped",
         "agent_output_schema": base.output_schema,
+        "resource_selectors": (
+            (ResourceSelector(resource_type="project", payload_path="project_gid", required=True),)
+            if spec.id in _ORCHESTRATION_EFFECTS else base.resource_selectors
+        ),
         "execution_mode": ExecutionMode.CLOUD_ASYNC if interaction else base.execution_mode,
         "operation_policy": "required" if interaction else ("optional" if write and spec.id not in _CANVAS_SYNC else "none"),
         "idempotency_policy": "required" if write else "none",

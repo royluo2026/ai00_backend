@@ -26,7 +26,9 @@ class _Repository:
 
 class _AllowPolicy:
     def authorize(self, descriptor, envelope, provider):
-        return AuthorizationDecision(allowed=True, code="allowed", policy_version="test-policy")
+        project_gid = envelope.payload.get("project_gid")
+        refs = (f"project:{project_gid}",) if project_gid else ()
+        return AuthorizationDecision(allowed=True, code="allowed", policy_version="test-policy", resource_refs=refs)
 
     def approve(self, descriptor, envelope, provider, authorization=None):
         return None

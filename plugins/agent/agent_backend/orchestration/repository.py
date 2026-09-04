@@ -181,6 +181,7 @@ class OrchestrationRepository:
             cur.execute(
                 """SELECT a.gid AS evidence_gid, b.task_key, a.run_gid,
                           b.version_gid, b.gid AS workload_baseline_gid,
+                          COALESCE(b.catalog_release_gid, a.catalog_release_gid) AS catalog_release_gid,
                           b.authorization_evidence_gid, a.acceptance_evidence_gid,
                           b.authorization_artifact_hash, a.acceptance_artifact_hash,
                           b.annual_task_volume, b.standard_manual_hours,
@@ -200,6 +201,8 @@ class OrchestrationRepository:
                    JOIN workmanship_agent_orch_runs r ON r.gid=a.run_gid
                    WHERE a.gid=%s AND p.owner_user_gid=%s
                      AND p.tenant_gid=%s AND p.project_gid=%s
+                     AND r.panorama_gid=a.panorama_gid
+                     AND r.version_gid=a.version_gid
                      AND r.status='succeeded'
                    LIMIT 1""",
                 (evidence_gid, actor_gid, tenant_gid, project_gid),

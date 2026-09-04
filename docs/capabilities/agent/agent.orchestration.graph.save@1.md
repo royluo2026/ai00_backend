@@ -8,7 +8,7 @@
 - 不适用：The outcome belongs to another business domain; invoke that domain Capability instead.
 - 生命周期：`stable`
 - 所属领域：`agent`
-- Catalog Release：`rel_1c166dc257d49f90409ae09165d23688`
+- Catalog Release：`rel_09f1c9d790ff36d54188ce27f40c64af`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -35,7 +35,7 @@
 - 认证新鲜度：0 秒
 
 资源选择器：
-- 无资源选择器；仍受租户、身份与权限策略约束。
+- `project` ← `project_gid`（必填）
 
 ## 执行与可靠性
 
@@ -80,112 +80,57 @@
     },
     "frozen_context": {
       "additionalProperties": false,
+      "maxProperties": 64,
+      "patternProperties": {
+        "^[A-Za-z][A-Za-z0-9_.:-]{0,127}$": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "maxLength": 4096,
+                  "type": "string"
+                },
+                {
+                  "maximum": 1000000000000,
+                  "minimum": -1000000000000,
+                  "type": "number"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "maxLength": 4096,
+                    "type": "string"
+                  },
+                  {
+                    "maximum": 1000000000000,
+                    "minimum": -1000000000000,
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "maxItems": 64,
+              "type": "array"
+            }
+          ]
+        }
+      },
       "properties": {},
       "type": "object"
-    },
-    "graph": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
-    },
-    "limit": {
-      "maximum": 100,
-      "minimum": 1,
-      "type": "integer"
-    },
-    "panorama_gid": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "payload": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
-    },
-    "period_key": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "project_gid": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "run_gid": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "target_status": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "tenant_gid": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "version_gid": {
-      "minLength": 1,
-      "type": "string"
-    }
-  },
-  "required": [
-    "tenant_gid",
-    "project_gid",
-    "version_gid",
-    "expected_revision",
-    "graph"
-  ],
-  "type": "object"
-}
-```
-
-最小结构示例：
-
-```json
-{
-  "capability_id": "agent.orchestration.graph.save",
-  "catalog_release": "rel_1c166dc257d49f90409ae09165d23688",
-  "major_version": 1,
-  "payload": {
-    "expected_revision": 1,
-    "graph": {},
-    "project_gid": "example",
-    "tenant_gid": "example",
-    "version_gid": "example"
-  }
-}
-```
-
-## 输出 Schema
-
-领域数据必须符合下列 Schema，并封装在完整 `CapabilityResultV2` 中：
-
-```json
-{
-  "additionalProperties": false,
-  "properties": {
-    "automated_workflow_count": {
-      "minimum": 0,
-      "type": "integer"
-    },
-    "automation_ratio": {
-      "type": "number"
-    },
-    "binding_gid": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "calculated_at": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "deleted": {
-      "type": "boolean"
-    },
-    "effective_agent_workload_hours": {
-      "type": "number"
-    },
-    "effective_intelligent_work_rate": {
-      "type": "number"
     },
     "graph": {
       "additionalProperties": false,
@@ -218,6 +163,55 @@
             "properties": {
               "authorization_scope": {
                 "additionalProperties": false,
+                "maxProperties": 64,
+                "patternProperties": {
+                  "^[A-Za-z][A-Za-z0-9_.:-]{0,127}$": {
+                    "anyOf": [
+                      {
+                        "anyOf": [
+                          {
+                            "maxLength": 4096,
+                            "type": "string"
+                          },
+                          {
+                            "maximum": 1000000000000,
+                            "minimum": -1000000000000,
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      {
+                        "items": {
+                          "anyOf": [
+                            {
+                              "maxLength": 4096,
+                              "type": "string"
+                            },
+                            {
+                              "maximum": 1000000000000,
+                              "minimum": -1000000000000,
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "maxItems": 64,
+                        "type": "array"
+                      }
+                    ]
+                  }
+                },
                 "properties": {},
                 "type": "object"
               },
@@ -227,11 +221,109 @@
               },
               "evidence_policy": {
                 "additionalProperties": false,
+                "maxProperties": 64,
+                "patternProperties": {
+                  "^[A-Za-z][A-Za-z0-9_.:-]{0,127}$": {
+                    "anyOf": [
+                      {
+                        "anyOf": [
+                          {
+                            "maxLength": 4096,
+                            "type": "string"
+                          },
+                          {
+                            "maximum": 1000000000000,
+                            "minimum": -1000000000000,
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      {
+                        "items": {
+                          "anyOf": [
+                            {
+                              "maxLength": 4096,
+                              "type": "string"
+                            },
+                            {
+                              "maximum": 1000000000000,
+                              "minimum": -1000000000000,
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "maxItems": 64,
+                        "type": "array"
+                      }
+                    ]
+                  }
+                },
                 "properties": {},
                 "type": "object"
               },
               "fallback_policy": {
                 "additionalProperties": false,
+                "maxProperties": 64,
+                "patternProperties": {
+                  "^[A-Za-z][A-Za-z0-9_.:-]{0,127}$": {
+                    "anyOf": [
+                      {
+                        "anyOf": [
+                          {
+                            "maxLength": 4096,
+                            "type": "string"
+                          },
+                          {
+                            "maximum": 1000000000000,
+                            "minimum": -1000000000000,
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      {
+                        "items": {
+                          "anyOf": [
+                            {
+                              "maxLength": 4096,
+                              "type": "string"
+                            },
+                            {
+                              "maximum": 1000000000000,
+                              "minimum": -1000000000000,
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "maxItems": 64,
+                        "type": "array"
+                      }
+                    ]
+                  }
+                },
                 "properties": {},
                 "type": "object"
               },
@@ -241,11 +333,109 @@
               },
               "input_mapping": {
                 "additionalProperties": false,
+                "maxProperties": 64,
+                "patternProperties": {
+                  "^[A-Za-z][A-Za-z0-9_.:-]{0,127}$": {
+                    "anyOf": [
+                      {
+                        "anyOf": [
+                          {
+                            "maxLength": 4096,
+                            "type": "string"
+                          },
+                          {
+                            "maximum": 1000000000000,
+                            "minimum": -1000000000000,
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      {
+                        "items": {
+                          "anyOf": [
+                            {
+                              "maxLength": 4096,
+                              "type": "string"
+                            },
+                            {
+                              "maximum": 1000000000000,
+                              "minimum": -1000000000000,
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "maxItems": 64,
+                        "type": "array"
+                      }
+                    ]
+                  }
+                },
                 "properties": {},
                 "type": "object"
               },
               "output_mapping": {
                 "additionalProperties": false,
+                "maxProperties": 64,
+                "patternProperties": {
+                  "^[A-Za-z][A-Za-z0-9_.:-]{0,127}$": {
+                    "anyOf": [
+                      {
+                        "anyOf": [
+                          {
+                            "maxLength": 4096,
+                            "type": "string"
+                          },
+                          {
+                            "maximum": 1000000000000,
+                            "minimum": -1000000000000,
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      {
+                        "items": {
+                          "anyOf": [
+                            {
+                              "maxLength": 4096,
+                              "type": "string"
+                            },
+                            {
+                              "maximum": 1000000000000,
+                              "minimum": -1000000000000,
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "maxItems": 64,
+                        "type": "array"
+                      }
+                    ]
+                  }
+                },
                 "properties": {},
                 "type": "object"
               },
@@ -255,6 +445,55 @@
               },
               "retry_policy": {
                 "additionalProperties": false,
+                "maxProperties": 64,
+                "patternProperties": {
+                  "^[A-Za-z][A-Za-z0-9_.:-]{0,127}$": {
+                    "anyOf": [
+                      {
+                        "anyOf": [
+                          {
+                            "maxLength": 4096,
+                            "type": "string"
+                          },
+                          {
+                            "maximum": 1000000000000,
+                            "minimum": -1000000000000,
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      {
+                        "items": {
+                          "anyOf": [
+                            {
+                              "maxLength": 4096,
+                              "type": "string"
+                            },
+                            {
+                              "maximum": 1000000000000,
+                              "minimum": -1000000000000,
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "maxItems": 64,
+                        "type": "array"
+                      }
+                    ]
+                  }
+                },
                 "properties": {},
                 "type": "object"
               },
@@ -266,6 +505,19 @@
                 "type": "integer"
               }
             },
+            "required": [
+              "gid",
+              "source_item_gid",
+              "capability_version_gid",
+              "purpose",
+              "input_mapping",
+              "output_mapping",
+              "authorization_scope",
+              "timeout_seconds",
+              "retry_policy",
+              "fallback_policy",
+              "evidence_policy"
+            ],
             "type": "object"
           },
           "maxItems": 4000,
@@ -399,6 +651,55 @@
               },
               "config": {
                 "additionalProperties": false,
+                "maxProperties": 64,
+                "patternProperties": {
+                  "^[A-Za-z][A-Za-z0-9_.:-]{0,127}$": {
+                    "anyOf": [
+                      {
+                        "anyOf": [
+                          {
+                            "maxLength": 4096,
+                            "type": "string"
+                          },
+                          {
+                            "maximum": 1000000000000,
+                            "minimum": -1000000000000,
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      {
+                        "items": {
+                          "anyOf": [
+                            {
+                              "maxLength": 4096,
+                              "type": "string"
+                            },
+                            {
+                              "maximum": 1000000000000,
+                              "minimum": -1000000000000,
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "maxItems": 64,
+                        "type": "array"
+                      }
+                    ]
+                  }
+                },
                 "properties": {},
                 "type": "object"
               },
@@ -418,6 +719,14 @@
                 "type": "string"
               }
             },
+            "required": [
+              "gid",
+              "item_type",
+              "title",
+              "business_node_gid",
+              "sequence_no",
+              "config"
+            ],
             "type": "object"
           },
           "maxItems": 2000,
@@ -606,76 +915,136 @@
       },
       "type": "object"
     },
-    "items": {
-      "items": {
-        "additionalProperties": false,
-        "properties": {
-          "current_version_gid": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "gid": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "name": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "revision": {
-            "minimum": 1,
-            "type": "integer"
-          },
-          "updated_at": {
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "maxItems": 100,
-      "type": "array"
-    },
-    "last_sequence_no": {
-      "minimum": 0,
+    "limit": {
+      "maximum": 100,
+      "minimum": 1,
       "type": "integer"
     },
     "panorama_gid": {
       "minLength": 1,
       "type": "string"
     },
+    "payload": {
+      "additionalProperties": false,
+      "maxProperties": 64,
+      "patternProperties": {
+        "^[A-Za-z][A-Za-z0-9_.:-]{0,127}$": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "maxLength": 4096,
+                  "type": "string"
+                },
+                {
+                  "maximum": 1000000000000,
+                  "minimum": -1000000000000,
+                  "type": "number"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "maxLength": 4096,
+                    "type": "string"
+                  },
+                  {
+                    "maximum": 1000000000000,
+                    "minimum": -1000000000000,
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "maxItems": 64,
+              "type": "array"
+            }
+          ]
+        }
+      },
+      "properties": {},
+      "type": "object"
+    },
     "period_key": {
       "minLength": 1,
       "type": "string"
     },
-    "revision": {
-      "minimum": 1,
-      "type": "integer"
+    "project_gid": {
+      "minLength": 1,
+      "type": "string"
     },
     "run_gid": {
       "minLength": 1,
       "type": "string"
     },
-    "sequence_no": {
-      "minimum": 1,
-      "type": "integer"
-    },
-    "status": {
+    "target_status": {
       "minLength": 1,
       "type": "string"
     },
-    "total_workflow_count": {
-      "minimum": 0,
-      "type": "integer"
-    },
-    "total_workload_hours": {
-      "type": "number"
+    "tenant_gid": {
+      "minLength": 1,
+      "type": "string"
     },
     "version_gid": {
       "minLength": 1,
       "type": "string"
     }
   },
+  "required": [
+    "project_gid",
+    "version_gid",
+    "expected_revision",
+    "graph"
+  ],
+  "type": "object"
+}
+```
+
+最小结构示例：
+
+```json
+{
+  "capability_id": "agent.orchestration.graph.save",
+  "catalog_release": "rel_09f1c9d790ff36d54188ce27f40c64af",
+  "major_version": 1,
+  "payload": {
+    "expected_revision": 1,
+    "graph": {},
+    "project_gid": "example",
+    "version_gid": "example"
+  }
+}
+```
+
+## 输出 Schema
+
+领域数据必须符合下列 Schema，并封装在完整 `CapabilityResultV2` 中：
+
+```json
+{
+  "additionalProperties": false,
+  "properties": {
+    "revision": {
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "revision"
+  ],
   "type": "object"
 }
 ```

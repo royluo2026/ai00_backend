@@ -8,7 +8,7 @@ Apply governed PBOM VPPS operation audit changes.
 - 不适用：The request changes PBOM structure or version content.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_1c166dc257d49f90409ae09165d23688`
+- Catalog Release：`rel_09f1c9d790ff36d54188ce27f40c64af`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -135,7 +135,7 @@ Apply governed PBOM VPPS operation audit changes.
 ```json
 {
   "capability_id": "craft.vpps_audit.change.apply",
-  "catalog_release": "rel_1c166dc257d49f90409ae09165d23688",
+  "catalog_release": "rel_09f1c9d790ff36d54188ce27f40c64af",
   "major_version": 1,
   "payload": {
     "operation": "rule4_bulk_ignore"

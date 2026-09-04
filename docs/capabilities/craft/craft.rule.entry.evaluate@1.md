@@ -8,7 +8,7 @@ Evaluate one visible Craft rule against a bounded entry projection.
 - 不适用：The caller supplies rule source, executable code, or a mutable rule definition.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_1c166dc257d49f90409ae09165d23688`
+- Catalog Release：`rel_09f1c9d790ff36d54188ce27f40c64af`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -327,7 +327,7 @@ Evaluate one visible Craft rule against a bounded entry projection.
 ```json
 {
   "capability_id": "craft.rule.entry.evaluate",
-  "catalog_release": "rel_1c166dc257d49f90409ae09165d23688",
+  "catalog_release": "rel_09f1c9d790ff36d54188ce27f40c64af",
   "major_version": 1,
   "payload": {
     "entry": {},

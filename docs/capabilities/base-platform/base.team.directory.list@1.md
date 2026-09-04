@@ -8,7 +8,7 @@ Execute exact Base outcome base.team.directory.list.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_1c166dc257d49f90409ae09165d23688`
+- Catalog Release：`rel_09f1c9d790ff36d54188ce27f40c64af`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -79,7 +79,7 @@ Execute exact Base outcome base.team.directory.list.
 ```json
 {
   "capability_id": "base.team.directory.list",
-  "catalog_release": "rel_1c166dc257d49f90409ae09165d23688",
+  "catalog_release": "rel_09f1c9d790ff36d54188ce27f40c64af",
   "major_version": 1,
   "payload": {}
 }

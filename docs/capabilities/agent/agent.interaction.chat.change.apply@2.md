@@ -8,7 +8,7 @@ Execute governed Agent chat and confirmation interactions with bounded event pro
 - 不适用：The request only cancels an interaction or manages Agent sessions directly.
 - 生命周期：`stable`
 - 所属领域：`agent`
-- Catalog Release：`rel_1c166dc257d49f90409ae09165d23688`
+- Catalog Release：`rel_09f1c9d790ff36d54188ce27f40c64af`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -132,7 +132,7 @@ Execute governed Agent chat and confirmation interactions with bounded event pro
 ```json
 {
   "capability_id": "agent.interaction.chat.change.apply",
-  "catalog_release": "rel_1c166dc257d49f90409ae09165d23688",
+  "catalog_release": "rel_09f1c9d790ff36d54188ce27f40c64af",
   "major_version": 2,
   "payload": {
     "body": {},

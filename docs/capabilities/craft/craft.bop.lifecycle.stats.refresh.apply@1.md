@@ -8,7 +8,7 @@ Recompute and persist the current BOP lifecycle statistics snapshot.
 - 不适用：The request only reads lifecycle state or changes a lifecycle resource.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_1c166dc257d49f90409ae09165d23688`
+- Catalog Release：`rel_09f1c9d790ff36d54188ce27f40c64af`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -87,7 +87,7 @@ Recompute and persist the current BOP lifecycle statistics snapshot.
 ```json
 {
   "capability_id": "craft.bop.lifecycle.stats.refresh.apply",
-  "catalog_release": "rel_1c166dc257d49f90409ae09165d23688",
+  "catalog_release": "rel_09f1c9d790ff36d54188ce27f40c64af",
   "major_version": 1,
   "payload": {
     "version_gid": "example"

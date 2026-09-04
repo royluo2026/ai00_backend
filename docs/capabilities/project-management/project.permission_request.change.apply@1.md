@@ -8,7 +8,7 @@ Execute the reviewed project.permission_request.change.apply project outcome.
 - 不适用：The operation belongs to another domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_1c166dc257d49f90409ae09165d23688`
+- Catalog Release：`rel_09f1c9d790ff36d54188ce27f40c64af`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -340,7 +340,7 @@ Execute the reviewed project.permission_request.change.apply project outcome.
 ```json
 {
   "capability_id": "project.permission_request.change.apply",
-  "catalog_release": "rel_1c166dc257d49f90409ae09165d23688",
+  "catalog_release": "rel_09f1c9d790ff36d54188ce27f40c64af",
   "major_version": 1,
   "payload": {
     "arguments": {},

@@ -29,6 +29,7 @@ class AuthorizationDecision(FrozenModel):
     policy_version: str
     resource_refs: tuple[str, ...] = ()
     data_scopes: tuple[str, ...] = ()
+    permissions: tuple[str, ...] = ()
 
 
 GrantResolver = Callable[[ConsumerIdentity], AuthorizationGrants]
@@ -82,6 +83,7 @@ class CapabilityAuthorizer:
             policy_version=policy_version,
             resource_refs=resource_refs,
             data_scopes=_effective_data_scopes(identity, grants.data_scopes),
+            permissions=grants.permissions,
         )
 
     @staticmethod
