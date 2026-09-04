@@ -125,21 +125,16 @@ async function init() {
     onContextAction:   (action, row) => {
       if (action === 'open_detail') _openContainerCard(row);
     },
-    importExport: ListShell.makeImportExport('std_op_lib', _getViewRows, async (rows, _fm, conflict, signal) => {
-        const importRecords = rows
-          .filter(r => r.name || r.code)
-          .map(r => ({
-            code: r.code || '',
-            name: r.name || r.code || '',
-            standard_time: parseFloat(r.standard_time) || 0,
+    importExport: ListShell.makeImportExport('std_op_lib', _getViewRows, async (rows, _fm, _c, signal) => {
+        for (const r of rows) {
+          if (signal?.aborted) break;
+          if (!r.name && !r.code) continue;
+          await _safe(_cf('POST', '/api/std_op/operations', {
+            body: JSON.stringify({ code: r.code || '', name: r.name || r.code || '', standard_time: parseFloat(r.standard_time) || 0 }),
+            signal,
           }));
-        if (!importRecords.length || signal?.aborted) return;
-        const result = await _cf('POST', '/api/std_op/operations/import', {
-          body: JSON.stringify({ records: importRecords, conflict }),
-          signal,
-        });
-        await loadOps();
-        return result;
+        }
+        if (!signal?.aborted) await loadOps();
       }),
     diffManager: ListShell.makeDiffManager('std_op_lib', _getViewRows, 'code'),
     onRowsChange: _onRowsChange,

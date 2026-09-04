@@ -104,7 +104,7 @@ const ASSOC_ADAPTERS = {
     fetchData: async (cf, _vgid, filterGid) => {
       const q = filterGid ? `?list_gid=${filterGid}&limit=500` : '?limit=500';
       const res = await _assocInvoke(cf, 'project.issue.read.atomic.issues_search', {
-        ...(filterGid ? { list_gid: filterGid } : {}), page_size: 500,
+        arguments: { ...(filterGid ? { list_gid: filterGid } : {}), page_size: 500 },
       });
       return res?.data || [];
     },
@@ -137,7 +137,7 @@ const ASSOC_ADAPTERS = {
     fetchData: async (cf, _vgid, filterGid) => {
       const q = filterGid ? `?list_gid=${filterGid}&limit=500` : '?limit=500';
       const res = await _assocInvoke(cf, 'project.task.read.atomic.tasks_search', {
-        ...(filterGid ? { list_gid: filterGid } : {}), page_size: 500,
+        arguments: { ...(filterGid ? { list_gid: filterGid } : {}), page_size: 500 },
       });
       return res?.data || [];
     },
@@ -444,13 +444,11 @@ const ASSOC_ADAPTERS = {
           toast('工序截图已启动…');
           // progressCb：每完成一个工序即更新状态栏 + 内联刷新缩略图
           let captureCount = 0;
-          capture(lineGid, (op, url) => {
+          capture(lineGid, async op => {
             captureCount++;
             const topWin = window.top || window.parent;
             topWin?._showCaptureProgress?.(`工序截图 ${captureCount} ✓  ${op.title}`);
-            // 直接更新 picMap 并重渲行，无需重载数据
-            panel._picMap.set(op.bop_entry_gid, url);
-            panel._reRenderBody();
+            await panel._refreshPicMap();
           });
         },
       },

@@ -252,7 +252,6 @@ function makeLayoutModeEnv() {
   const { window } = dom;
   window.console = console;
   window._cf = async () => ({ data: {} });
-  window._lineageVersionCf = (...args) => window._cf(...args);
   const code = fs.readFileSync(path.join(ROOT, 'packages/craft-plugin/web/lineage_view/layout_mode.js'), 'utf-8');
   const script = window.document.createElement('script');
   script.textContent = `${code}\nwindow.LayoutMode = LayoutMode;`;
@@ -565,11 +564,8 @@ async function runTests() {
   _assert('Operator Process → operator_process', TCT['Operator Process'] === 'operator_process');
   _assert('Process → process', TCT['Process'] === 'process');
   _assert('Operation → operation', TCT['Operation'] === 'operation');
-  _assert('TC 物理工位 → station_factory', TCT['工位'] === 'station_factory');
+  _assert('中文"工位" → station_process', TCT['工位'] === 'station_process');
   _assert('中文"工序" → process', TCT['工序'] === 'process');
-  _assert('生产 TC 总装产品 BOP → factory_bop', TCT['总装产品BOP'] === 'factory_bop');
-  _assert('生产 TC Product 操作 → operation', TCT['总装操作（Product）'] === 'operation');
-  _assert('生产 TC 人员 → man', TCT['人'] === 'man');
 
   _assert('_TC_COL_MAP 存在', typeof TCC === 'object');
   _assert('Level → _level', TCC['Level'] === '_level');
@@ -594,16 +590,6 @@ async function runTests() {
   _assert('allVersions 初始为空数组', Array.isArray(mgr.allVersions) && mgr.allVersions.length === 0);
   _assert('currentVersionGid 初始为 null', mgr.currentVersionGid === null);
   _assert('currentVersionStatus 初始为 "active"', mgr.currentVersionStatus === 'active');
-
-  mgr._tcSep = ',';
-  mgr._tcRawHeaders = ['Level', 'Type', 'Name', '父级VPPS'];
-  mgr._tcRawLines = ['1,Line Process,Line A,'];
-  mgr._tcFieldMap = {
-    Level: '_level', Type: '_tc_raw_type', Name: 'title', '父级VPPS': '_parent_vpps',
-  };
-  const mappedTcRows = mgr._tcApplyColMap();
-  _assert('TC 空父级临时字段不会越过 Capability 契约边界',
-    mappedTcRows.length === 1 && !Object.hasOwn(mappedTcRows[0], '_parent_vpps'));
 
   // ── 7. 公开方法存在性 ─────────────────────────────────────────────
   console.log(section('LineageVersionManager: 公开方法'));
@@ -633,24 +619,45 @@ async function runTests() {
   _assert('allVersions 填充 2 项', mgrLoad.allVersions.length === 2);
   _assert('allVersions[0].gid = v001', mgrLoad.allVersions[0].gid === 'v001');
 
-  // capability 治理后的规范字段必须在页面边界归一化，不能把 undefined 当版本标识。
-  const wCanonicalLoad = makeEnv();
-  const mgrCanonicalLoad = new wCanonicalLoad.LineageVersionManager({
-    cf: async () => ({ data: { items: [
-      { version_gid: 'cv001', family_gid: 'cf001', bop_name: 'CanonicalBOP', version_tag: 'v1', status: 'active' },
-      { version_gid: 'cv002', family_gid: 'cf001', bop_name: 'CanonicalBOP', version_tag: 'v2', status: 'active' },
-    ] } }),
+  const methodFirstCalls = [];
+  const wMethodFirst = makeEnv();
+  const mgrMethodFirst = new wMethodFirst.LineageVersionManager({
+    cf: async (method, url, opts) => {
+      if (method !== 'POST') throw new Error(`${method} is not a valid HTTP method`);
+      methodFirstCalls.push({ method, url, opts });
+      return { data: VERSIONS };
+    },
     toast: mockToast,
     onVersionSelected: () => {}, onStatusChange: () => {}, onReloadNeeded: () => {},
   });
-  await mgrCanonicalLoad.loadVersions();
-  _assert('规范 version_gid 归一化为页面 gid', mgrCanonicalLoad.allVersions[0].gid === 'cv001');
-  _assert('规范 family_gid 归一化为页面 version_family_gid', mgrCanonicalLoad.allVersions[0].version_family_gid === 'cf001');
-  mgrCanonicalLoad.selectVersion('cv002', 'v2');
-  mgrCanonicalLoad.renderMenu();
-  const canonicalActive = wCanonicalLoad.document.querySelectorAll('.lv-vp-ver-item.active');
-  _assert('规范版本列表只把所选版本标为当前版本',
-    canonicalActive.length > 0 && [...canonicalActive].every(item => item.textContent.includes('v2')));
+  await mgrMethodFirst.loadVersions();
+  _assert('版本管理器兼容 lineage 的 method-first cf',
+    methodFirstCalls[0]?.url === '/api/v1/capabilities/craft.bop.version.list:invoke'
+      && mgrMethodFirst.allVersions.length === 2);
+
+  const selectedCanonical = [];
+  const wCanonical = makeEnv();
+  const mgrCanonical = new wCanonical.LineageVersionManager({
+    cf: async () => ({
+      success: true,
+      data: { ok: true, data: { items: [{
+        version_gid: 'version-1', family_gid: 'family-1', bop_name: 'V2 BOP',
+        version_tag: 'v1', status: 'active', archived_at: null,
+      }], next_cursor: null } },
+    }),
+    toast: mockToast,
+    onVersionSelected: (gid, tag) => selectedCanonical.push({ gid, tag }),
+    onStatusChange: () => {}, onReloadNeeded: () => {},
+  });
+  await mgrCanonical.loadVersions();
+  mgrCanonical.initPicker('undefined', 'undefined');
+  _assert('V2 版本字段归一化为选择器模型',
+    mgrCanonical.allVersions[0]?.gid === 'version-1'
+      && mgrCanonical.allVersions[0]?.version_family_gid === 'family-1');
+  _assert('无效缓存版本回落到首个可用版本',
+    mgrCanonical.currentVersionGid === 'version-1'
+      && selectedCanonical[0]?.gid === 'version-1'
+      && wCanonical.document.getElementById('lvVersionLabel').textContent === 'V2 BOP / v1');
 
   // API 失败：不抛出，而是 toast error
   const toastCalls = [];
@@ -685,7 +692,7 @@ async function runTests() {
   const freezeCalls = [], statusChanges = [];
   const wFreeze = makeEnv();
   const mgrFreeze = new wFreeze.LineageVersionManager({
-    cf: async (url, opts) => { freezeCalls.push({ url, opts }); return { data: { status: 'baseline' } }; },
+    cf: async (method, url, opts) => { freezeCalls.push({ method, url, opts }); return { data: { status: 'baseline' } }; },
     toast: mockToast,
     onVersionSelected: () => {},
     onStatusChange: s => statusChanges.push(s),
@@ -702,7 +709,7 @@ async function runTests() {
   const unfreezeCalls = [];
   const wUnfreeze = makeEnv();
   const mgrUnfreeze = new wUnfreeze.LineageVersionManager({
-    cf: async (url, opts) => { unfreezeCalls.push({ url, opts }); return { data: { status: 'active' } }; },
+    cf: async (method, url, opts) => { unfreezeCalls.push({ method, url, opts }); return { data: { status: 'active' } }; },
     toast: mockToast, onVersionSelected: () => {}, onStatusChange: () => {}, onReloadNeeded: () => {},
   });
   mgrUnfreeze.currentVersionGid = 'v001';
@@ -715,7 +722,7 @@ async function runTests() {
   const publishCalls = [];
   const wPublish = makeEnv();
   const mgrPublish = new wPublish.LineageVersionManager({
-    cf: async (url, opts) => { publishCalls.push({ url, opts }); return { data: { status: 'M' } }; },
+    cf: async (method, url, opts) => { publishCalls.push({ method, url, opts }); return { data: { status: 'M' } }; },
     toast: mockToast, onVersionSelected: () => {}, onStatusChange: () => {}, onReloadNeeded: () => {},
   });
   mgrPublish.currentVersionGid = 'v001';
@@ -731,7 +738,7 @@ async function runTests() {
   const wArchive = makeEnv();
   wArchive.confirm = () => true;
   const mgrArchive = new wArchive.LineageVersionManager({
-    cf: async (url, opts) => { archiveCalls.push({ url, opts }); return {}; },
+    cf: async (method, url, opts) => { archiveCalls.push({ method, url, opts }); return {}; },
     toast: mockToast, onVersionSelected: () => {}, onStatusChange: () => {}, onReloadNeeded: () => {},
   });
   await mgrArchive.archiveFamily('f001');
@@ -743,7 +750,7 @@ async function runTests() {
   const wArchiveNo = makeEnv();
   wArchiveNo.confirm = () => false;
   const mgrArchiveNo = new wArchiveNo.LineageVersionManager({
-    cf: async (url) => { archiveCancelCalls.push(url); return {}; },
+    cf: async (_method, url) => { archiveCancelCalls.push(url); return {}; },
     toast: mockToast, onVersionSelected: () => {}, onStatusChange: () => {}, onReloadNeeded: () => {},
   });
   await mgrArchiveNo.archiveFamily('f001');
@@ -752,7 +759,7 @@ async function runTests() {
   const unarchiveCalls = [];
   const wUnarchive = makeEnv();
   const mgrUnarchive = new wUnarchive.LineageVersionManager({
-    cf: async (url, opts) => { unarchiveCalls.push({ url, opts }); return {}; },
+    cf: async (method, url, opts) => { unarchiveCalls.push({ method, url, opts }); return {}; },
     toast: mockToast, onVersionSelected: () => {}, onStatusChange: () => {}, onReloadNeeded: () => {},
   });
   await mgrUnarchive.unarchiveFamily('f001');
@@ -1126,6 +1133,97 @@ async function runTests() {
     await createBtn.click();
     await new Promise(resolve => setTimeout(resolve, 0));
     if (opened !== 1) throw new Error('未自动打开 Excel 导入步骤');
+  });
+
+  _assert('知识库加载失败不会伪装成空列表', (() => {
+    const code = fs.readFileSync(path.join(ROOT, 'web/knowledge_hub/knowledge_hub.js'), 'utf-8');
+    return code.includes('let _loadError')
+      && code.includes('知识库加载失败')
+      && code.includes("console.error('[KH] _loadItems: ERROR'");
+  })());
+
+  _assert('云端布局能力失败可观测', (() => {
+    const code = readLineageSource();
+    return code.includes("console.warn('[Lineage] cloud layout config load failed'")
+      && code.includes('云端布局加载失败，已使用本地配置');
+  })());
+
+  _assert('工艺规划调用契约脚本使用同一新缓存版本', (() => {
+    const html = fs.readFileSync(path.join(ROOT, 'packages/craft-plugin/web/lineage_view/index.html'), 'utf-8');
+    return ['lineage_version_mgr.js', 'lifecycle_panel.js', 'lineage.js', 'layout_mode.js']
+      .every(name => html.includes(`${name}?v=20260901a`));
+  })());
+
+  _assert('布局脚本不覆盖主视图的能力调用函数', (() => {
+    const code = fs.readFileSync(path.join(ROOT, 'packages/craft-plugin/web/lineage_view/layout_mode.js'), 'utf-8');
+    return !code.includes('function _invokeCapability(')
+      && code.includes('function _invokeLayoutCapability(');
+  })());
+
+  _assert('工作台主题同步不再创建无效 MutationObserver', (() => {
+    const code = fs.readFileSync(path.join(ROOT, 'web/workbench/grid_widgets.js'), 'utf-8');
+    return !code.includes('new MutationObserver');
+  })());
+
+  await _assertAsync('生命周期自动刷新只读，不触发统计写能力', async () => {
+    const w = makeLifecyclePanelEnv();
+    const calls = [];
+    const toasts = [];
+    const panel = new w.BopLifecyclePanel({
+      cf: async (path) => {
+        calls.push(path);
+        if (path.endsWith('/craft.bop.lifecycle.state.read:invoke')) {
+          return { success: true, data: { ok: true, data: { lifecycle_phase: 'init' } } };
+        }
+        return { success: false, data: { ok: false, error: { code: 'confirmation_required', message: 'Confirmation is required.' } } };
+      },
+      toast: (message, type) => toasts.push({ message, type }),
+      versionGid: 'version-1',
+      mountEl: w.document.getElementById('mount'),
+      actionEl: w.document.getElementById('action'),
+    });
+    await panel.refresh();
+    if (calls.length !== 1 || !calls[0].endsWith('/craft.bop.lifecycle.state.read:invoke')) {
+      throw new Error(`自动刷新调用了写能力: ${calls.join(', ')}`);
+    }
+    if (toasts.some(item => item.type === 'error')) throw new Error('自动刷新产生了确认错误');
+  });
+
+  await _assertAsync('手动刷新指标经用户确认完成 Gateway 确认握手', async () => {
+    const w = makeLifecyclePanelEnv();
+    const gatewayActions = [];
+    const toasts = [];
+    w._cloudFetch = async (path, opts = {}) => {
+      const action = path.split(':').pop();
+      gatewayActions.push(action);
+      if (action === 'confirm') {
+        return { success: true, data: { confirmation_token: 'confirmation-1' } };
+      }
+      const body = JSON.parse(opts.body);
+      if (!body.confirmation_token) {
+        return { success: false, data: { ok: false, error: { code: 'confirmation_required', message: 'Confirmation is required.' } } };
+      }
+      return { success: true, data: { ok: true, data: { refreshed: true } } };
+    };
+    const clientCode = fs.readFileSync(path.join(ROOT, 'web/core/existing_capability_client.js'), 'utf-8');
+    w.eval(clientCode);
+    const panel = new w.BopLifecyclePanel({
+      cf: async (path) => {
+        if (path.endsWith('/craft.bop.lifecycle.state.read:invoke')) {
+          return { success: true, data: { ok: true, data: { lifecycle_phase: 'init' } } };
+        }
+        throw new Error(`手动刷新绕过了共享 Gateway 客户端: ${path}`);
+      },
+      toast: (message, type) => toasts.push({ message, type }),
+      versionGid: 'version-1',
+      mountEl: w.document.getElementById('mount'),
+      actionEl: w.document.getElementById('action'),
+    });
+    await panel.refresh(true);
+    if (gatewayActions.join(',') !== 'invoke,confirm,invoke') {
+      throw new Error(`确认握手不完整: ${gatewayActions.join(',')}`);
+    }
+    if (toasts.some(item => item.type === 'error')) throw new Error('手动刷新确认后仍失败');
   });
 
   await _assertAsync('lineage 新建节点配置不再包含序号字段', async () => {

@@ -123,17 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
     syncGlobalTheme() {
       const savedTheme = localStorage.getItem('appTheme') || 'light';
       document.documentElement.setAttribute('data-theme', savedTheme);
-
-      // 监听主题变化
-      const observer = new MutationObserver(mutations => {
-        mutations.forEach(mutation => {
-          if (mutation.attributeName === 'data-theme') {
-            const theme = document.documentElement.getAttribute('data-theme');
-            document.documentElement.setAttribute('data-theme', theme);
-          }
-        });
-      });
-      observer.observe(document.documentElement, { attributes: true });
     }
   }
 

@@ -559,13 +559,9 @@ class ImportExportManager {
       const total = mappedRows.length;
       progLabel.textContent = `正在导入 ${total} 条数据…`;
       progBar.style.width = '50%';
-      const outcome = await this._onImport(mappedRows, fieldMap, conflict, signal);
+      await this._onImport(mappedRows, fieldMap, conflict, signal);
       if (signal.aborted) return;
-      if (outcome && Number.isInteger(outcome.created_count)) {
-        progLabel.textContent = `导入完成：新增 ${outcome.created_count} 条，更新 ${outcome.updated_count || 0} 条，跳过 ${outcome.skipped_count || 0} 条`;
-      } else {
-        progLabel.textContent = `导入完成，共 ${total} 条`;
-      }
+      progLabel.textContent = `导入完成，共 ${total} 条`;
       progBar.style.width = '100%';
       this._setFooter(`<button class="ie-btn ie-btn-primary" id="ie-done-btn">完成</button>`);
       this._overlay.querySelector('#ie-done-btn').addEventListener('click', () => this._close());
@@ -893,7 +889,7 @@ class ImportExportManager {
   // ────────────────────────────────────────────────────────────────────────────
 
   async _cf(method, path, body) {
-    const fn = window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
+    const fn = window.parent?._cloudFetch || window._cloudFetch;
     if (!fn) throw new Error('_cloudFetch 未就绪');
     const opts = { method };
     if (body !== undefined) opts.body = JSON.stringify(body);

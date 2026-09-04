@@ -66,29 +66,18 @@ const _TC_TYPE_MAP = {
   'Tool': 'tool_need', 'Fixture': 'fixture_need', 'Equipment': 'equipment_need',
   'Manufacturing Tool': 'tool_need', 'Manufacturing Fixture': 'fixture_need',
   'Manufacturing Equipment': 'equipment_need',
-  '总装工厂BOP': 'factory_bop', '总装产品BOP': 'factory_bop', '总装产品bop': 'factory_bop',
-  '总装BOP': 'factory_bop', '工厂BOP': 'factory_bop', '产品BOP': 'factory_bop',
-  'BOP': 'factory_bop', '整车BOP': 'factory_bop', '总装': 'factory_bop',
-  '总装线体工艺': 'line_process', '产线工艺': 'line_process', '线体工艺': 'line_process', '线体': 'line_process',
-  '总装工位工艺': 'station_process', '工位工艺': 'station_process',
+  '总装工厂BOP': 'factory_bop', '整车BOP': 'factory_bop', '总装': 'factory_bop',
+  '总装线体工艺': 'line_process', '线体工艺': 'line_process', '线体': 'line_process',
+  '总装工位工艺': 'station_process', '工位工艺': 'station_process', '工位': 'station_process',
   '总装岗位工艺': 'operator_process', '岗位工艺': 'operator_process',
-  '人': 'man', '工位': 'station_factory',
   '总装工序': 'process', '工艺过程': 'process', '工序': 'process',
-  '总装操作（Product）': 'operation', '总装操作(Product)': 'operation',
-  '总装操作（product）': 'operation', '总装操作(product)': 'operation',
   '总装操作': 'operation', '操作': 'operation',
-  '问题': 'issue', '标准任务': 'standard_task', '非标任务': 'non_standard_task',
-  '控制计划': 'contral_plan', '工艺卡': 'process_chart',
   '零件': 'part', '零组件': 'part', '零部件': 'part',
   '非标零件': 'non_standard_part', '非标件': 'non_standard_part',
   '标准零件': 'standard_part', '标准件': 'standard_part',
   '辅料': 'support_material',
-  '设备（现有）': 'equipment_factory', '设备（需求）': 'equipment_need',
-  '工具（现有）': 'tool_factory', '工具（需求）': 'tool_need',
-  '工装（现有）': 'fixture_factory', '工装（需求）': 'fixture_need',
   '工具': 'tool_need', '工装': 'fixture_need', '设备': 'equipment_need',
   '工具需求': 'tool_need', '工装需求': 'fixture_need', '设备需求': 'equipment_need',
-  '地面高度(现有）': 'floor_height_factory', '人机姿态': 'jack_pos',
 };
 
 // ── LineageVersionManager ──────────────────────────────────────────────────
@@ -96,7 +85,7 @@ const _TC_TYPE_MAP = {
 class LineageVersionManager {
   /**
    * @param {object} deps
-   * @param {Function} deps.cf          - async fetch wrapper: cf(url, opts?) → json
+   * @param {Function} deps.cf          - async fetch wrapper: cf(method, url, opts?) → json
    * @param {Function} deps.toast       - toast(msg, type, dur?)
    * @param {Function} deps.onVersionSelected  - (gid, tag) → void，版本被选中时调用
    * @param {Function} deps.onStatusChange     - (status) → void，版本状态变更时调用
@@ -138,7 +127,7 @@ class LineageVersionManager {
 
   async _invokeCapability(id, payload = {}) {
     const _cloudFetch = this._cf;
-    const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
+    const response = await _cloudFetch('POST', `/api/v1/capabilities/${id}:invoke`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ version: 1, payload }),
@@ -168,12 +157,9 @@ class LineageVersionManager {
       const versions = Array.isArray(res) ? res : (res?.items || res?.data || []);
       this._allVersions = versions.map(ver => ({
         ...ver,
-        gid: ver.gid ?? ver.version_gid,
-        version_family_gid: ver.version_family_gid ?? ver.family_gid,
-      }));
-      if (this._allVersions.some(ver => !ver.gid)) {
-        throw new Error('版本列表返回缺少 version_gid');
-      }
+        gid: ver.gid || ver.version_gid,
+        version_family_gid: ver.version_family_gid || ver.family_gid,
+      })).filter(ver => typeof ver.gid === 'string' && ver.gid.length > 0);
     } catch (e) {
       this._toast('加载版本列表失败: ' + e.message, 'error');
     }
@@ -652,11 +638,17 @@ class LineageVersionManager {
     document.getElementById('lv-inp-tc-file')?.addEventListener('change', e => this._handleTcFile(e));
 
     // 从初始参数恢复版本标签
-    if (initialGid) {
-      this.currentVersionGid = initialGid;
+    const initialVersion = this._allVersions.find(ver => ver.gid === initialGid);
+    const selectedVersion = initialVersion || this._allVersions[0];
+    if (selectedVersion) {
+      this.currentVersionGid = selectedVersion.gid;
       if (this._$versionLbl) {
-        this._$versionLbl.textContent = this._versionLabel(initialGid, initialTag);
+        this._$versionLbl.textContent = this._versionLabel(
+          selectedVersion.gid,
+          initialVersion ? initialTag : selectedVersion.version_tag,
+        );
       }
+      if (!initialVersion) this._onVersionSelected(selectedVersion.gid, selectedVersion.version_tag);
     }
   }
 
@@ -669,8 +661,8 @@ class LineageVersionManager {
   async openCreateModal(prefillFamilyGid = null) {
     if (this._projectsCache.length === 0) {
       try {
-        const res = await this._invokeCapability('project.project.read.atomic.projects_search', {});
-        this._projectsCache = (res?.data || res || []).filter(p => !p.is_deleted && p.project_type !== 'gbop');
+        const res = await this._invokeCapability('project.project.read.atomic.projects_search', { arguments: {} });
+        this._projectsCache = (res || []).filter(p => !p.is_deleted && p.project_type !== 'gbop');
       } catch (_) { this._projectsCache = []; }
     }
     if (this._factoriesCache.length === 0) {
@@ -1070,8 +1062,8 @@ class LineageVersionManager {
       // 父级 VPPS 链接
       if (row._parent_vpps) {
         row.parent_vpps = row._parent_vpps;
+        delete row._parent_vpps;
       }
-      delete row._parent_vpps;
 
       parsed.push(row);
     }
@@ -1455,8 +1447,8 @@ class LineageVersionManager {
 
     if (this._projectsCache.length === 0) {
       try {
-        const res = await this._invokeCapability('project.project.read.atomic.projects_search', {});
-        this._projectsCache = (res?.data || res || []).filter(p => !p.is_deleted && p.project_type !== 'gbop');
+        const res = await this._invokeCapability('project.project.read.atomic.projects_search', { arguments: {} });
+        this._projectsCache = (res || []).filter(p => !p.is_deleted && p.project_type !== 'gbop');
       } catch (_) { this._projectsCache = []; }
     }
     if (this._factoriesCache.length === 0) {

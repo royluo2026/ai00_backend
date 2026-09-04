@@ -2474,7 +2474,7 @@
     const needVersions = fileType === 'bop_version';
 
     const [projRes, folderRes, verRes] = await Promise.allSettled([
-      (needProjects && _cloudFetch) ? _invokeWorkbenchCapability('project.project.read.atomic.projects_search', {}) : Promise.resolve(null),
+      (needProjects && _cloudFetch) ? _invokeWorkbenchCapability('project.project.read.atomic.projects_search', { arguments: {} }) : Promise.resolve(null),
       (needFolders  && _cloudFetch) ? _cloudFetch('/api/knowledge_hub/folders', { method: 'GET' }) : Promise.resolve(null),
       (needVersions && _cloudFetch) ? _invokeWorkbenchCapability('craft.bop.version.list', { include_archived: false, page_size: 100 }) : Promise.resolve(null),
     ]);
@@ -2972,7 +2972,7 @@
         _invokeWorkbenchCapability('craft.bop.version.list', { include_archived: false, page_size: 100 }),
         _cloudFetch('/api/knowledge_hub/items?scope_type=public', { method: 'GET' }),
         _cloudFetch('/api/knowledge_hub/folders?scope_type=public', { method: 'GET' }),
-        _invokeWorkbenchCapability('project.project.read.atomic.projects_search', {}),
+        _invokeWorkbenchCapability('project.project.read.atomic.projects_search', { arguments: {} }),
         _cloudFetch('/api/knowledge_hub/folders?scope_type=personal', { method: 'GET' }),
         _cloudFetch('/api/knowledge_hub/items?scope_type=personal', { method: 'GET' }),
       ]);
@@ -3451,7 +3451,7 @@
   async function _showListProjectDialog(list, _cloudFetch) {
     document.getElementById('_wbListProjCtx')?.remove();
     const projects = _allProjects?.length ? _allProjects
-      : await _invokeWorkbenchCapability('project.project.read.atomic.projects_search', {}).then(value => value?.data || value || []).catch(() => []);
+      : await _invokeWorkbenchCapability('project.project.read.atomic.projects_search', { arguments: {} }).catch(() => []);
 
     const dlg = document.createElement('div');
     dlg.id = '_wbListProjCtx';

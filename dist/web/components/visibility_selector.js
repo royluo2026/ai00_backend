@@ -84,7 +84,7 @@ window.VisibilitySelector = (() => {
     try {
       const _cloudFetch = _cf();
       if (!_cloudFetch) return [];
-      const data = await _invokeCapability('project.project.read.atomic.projects_search', {});
+      const data = await _invokeCapability('project.project.read.atomic.projects_search', { arguments: {} });
       const arr = Array.isArray(data) ? data : (data?.data || data?.projects || []);
       _projectsCache = arr;
     } catch (_) { _projectsCache = []; }

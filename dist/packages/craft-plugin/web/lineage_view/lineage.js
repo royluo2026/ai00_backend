@@ -139,27 +139,14 @@ function _mapPbomExcelRow(raw) {
 // ── 状态 ─────────────────────────────────────────────────────────────
 const _params   = Object.fromEntries(new URLSearchParams(location.search));
 function _cf(method, path, opts = {}) {
+  if (typeof path !== 'string') {
+    opts = path || {};
+    path = method;
+    method = opts.method || 'GET';
+  }
   const fn = window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
   if (!fn) throw new Error('cloudFetch not available');
   return fn(path, { ...opts, method });
-}
-async function _lineageVersionCf(path, opts = {}) {
-  const method = opts.method || 'GET';
-  if (method !== 'POST' || !path.endsWith(':invoke') || !opts.body) {
-    return _cf(method, path, opts);
-  }
-  let requestBody;
-  try { requestBody = JSON.parse(opts.body); }
-  catch { return _cf(method, path, opts); }
-  requestBody.idempotency_key ||= `lineage-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-  const requestOptions = body => ({ ...opts, body: JSON.stringify(body) });
-  let response = await _cf(method, path, requestOptions(requestBody));
-  if (response?.data?.error?.code !== 'confirmation_required') return response;
-  const confirmation = await _cf('POST', path.replace(/:invoke$/, ':confirm'), requestOptions(requestBody));
-  const token = confirmation?.data?.confirmation_token;
-  if (!token) throw new Error(`能力确认失败：${path}`);
-  response = await _cf(method, path, requestOptions({ ...requestBody, confirmation_token: token }));
-  return response;
 }
 // localStorage 账号隔离
 const _USER_GID = (() => {
@@ -192,18 +179,8 @@ const _comparisonLoaders = new Map();
 const _projectionStore = new LineageProjectionStore({ maxScopes: 3, maxNodes: 12_000, maxBytes: 16 * 1024 * 1024 });
 const _loadCoordinator = new LineageLoadCoordinator();
 
-function _isLayoutMutationCapability(id) {
-  return id === 'craft.bop.entry.change.apply'
-    || id === 'craft.bop.entry.bulk.change.apply'
-    || id === 'craft.bop.entry_link.change.apply';
-}
-
-function _preserveLayoutViewport() {
-  if (_viewMode === 'layout' && _layoutMode) _layoutMode._preserveView = true;
-}
-
 async function _invokeCapability(id, version, payload, options = {}) {
-  const response = await _lineageVersionCf(`/api/v1/capabilities/${id}:invoke`, {
+  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ version, payload }),
@@ -217,7 +194,6 @@ async function _invokeCapability(id, version, payload, options = {}) {
     error.retryable = detail.retryable === true;
     throw error;
   }
-  if (_isLayoutMutationCapability(id)) _preserveLayoutViewport();
   return result.data;
 }
 
@@ -238,42 +214,6 @@ function _rebuildProjectionRows() {
   _rows = _flattenMeta([...byGid.values()]);
   _buildIndexes(_rows);
   _buildStats();
-}
-
-function _insertCreatedEntry(rawRow) {
-  if (!rawRow?.gid) return false;
-  const row = _flattenMeta([{ ...rawRow, version_gid: rawRow.version_gid || _versionGid }])[0];
-  const buckets = [..._scopeRowsByKey.values(), ..._outlineRowsByVersion.values()];
-  const bucket = buckets.find(rows => rows.some(item => item.gid === row.parent_gid))
-    || _outlineRowsByVersion.get(row.version_gid);
-  if (bucket) {
-    const index = bucket.findIndex(item => item.gid === row.gid);
-    if (index >= 0) bucket[index] = row;
-    else bucket.push(row);
-    _rebuildProjectionRows();
-  } else {
-    const index = _rows.findIndex(item => item.gid === row.gid);
-    if (index >= 0) _rows[index] = row;
-    else _rows.push(row);
-    _buildIndexes(_rows);
-    _buildStats();
-  }
-  const lineGid = _getLineAncestorGid(row.gid);
-  if (_viewMode === 'layout' && _layoutMode && lineGid && lineGid !== row.gid) {
-    const data = _buildLineageData();
-    _layoutMode._data = data;
-    _layoutMode._refreshAfterPositionChange(new Set([lineGid]));
-    _layoutDetailPanel?.updateData(data);
-  } else {
-    if (_viewMode === 'layout' && _layoutMode) _layoutMode._preserveView = true;
-    _render();
-  }
-  return true;
-}
-
-function _createdEntryFromResult(result) {
-  return [result?.data?.data, result?.data, result]
-    .find(candidate => candidate?.gid) || null;
 }
 
 // 视图设置（从 localStorage 恢复）
@@ -395,7 +335,7 @@ function _pbomAutoVerName(projectGid, suffix) {
 async function _loadPbomProjects() {
   try {
     const res = await _invokeCapability('project.project.read.atomic.projects_search', 1, {
-      limit: 200,
+      arguments: { limit: 200 },
     });
     _pbomProjects = res?.data || [];
   } catch (_) { _pbomProjects = []; }
@@ -575,10 +515,9 @@ async function _loadLineGrants(projectGid = '') {
   try {
     const client = window.top?.AI00ExistingCapabilityClient || window.parent?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
     const profile = await client.call('base.identity.session.profile.get');
-    const actorGid = profile?.profile?.actor_gid || profile?.actor_gid;
     // The closed profile proves an authenticated actor; this legacy view grants
     // line edits to every organization member and needs no role disclosure.
-    if (actorGid) return;
+    if (profile?.actor_gid) return;
     if (!projectGid) return;
     // There is no governed line-permission projection in the current test
     // backend. Unknown roles therefore remain read-only until a dedicated
@@ -712,12 +651,7 @@ async function _load() {
   $columns.innerHTML = '<div class="lv-loading"><div class="lv-spinner"></div>加载中…</div>';
 
   try {
-    // 写操作在调用 _load() 前会标记保留画布视点。先捕获该标记，避免清理
-    // 旧投影时丢失；BOP 切换、首次加载和普通刷新仍按原行为自动适配视图。
-    const preserveLayoutView = _viewMode === 'layout' && _layoutMode?._preserveView;
-    if (_layoutMode && typeof _layoutMode.destroyHeavyState === 'function') {
-      _layoutMode.destroyHeavyState({ preserveView: preserveLayoutView });
-    }
+    if (_layoutMode && typeof _layoutMode.destroyHeavyState === 'function') _layoutMode.destroyHeavyState();
     _progressiveLoader.clearHeavyData();
     for (const loader of _comparisonLoaders.values()) loader.dispose();
     _comparisonLoaders.clear();
@@ -727,9 +661,7 @@ async function _load() {
     _loadedVersionGids = new Set([_versionGid]);
     _versionTagMap.set(_versionGid, _versionTag);
     let firstCommit = true;
-    const versionSummary = _verMgr?.allVersions?.find(version => version.gid === _versionGid);
     const loaded = await _progressiveLoader.loadVersion(_versionGid, {
-      revision: Number(versionSummary?.revision),
       onCommit: snapshot => {
         _currentRevision = snapshot.revision;
         _versionStatus = snapshot.version?.lifecycle?.status || snapshot.version?.status || 'active';
@@ -739,9 +671,7 @@ async function _load() {
         _rebuildProjectionRows();
         if (firstCommit) {
           _initCollapsed();
-          // A mutation refresh already owns the live viewport. Restoring the
-          // older session snapshot here would overwrite the preserved pan/zoom.
-          if (!preserveLayoutView) _restoreView();
+          _restoreView();
           firstCommit = false;
         }
         _render();
@@ -750,7 +680,6 @@ async function _load() {
     if (loaded?.cancelled) return;
     _loadLineGrants(loaded.version?.project_gid || '').then(() => {
       _updateVersionStatusUI();
-      if (_viewMode === 'layout' && _layoutMode) _layoutMode._preserveView = true;
       if (_viewMode === 'layout') _render();
     });
     _loadCloudConfig(); // 异步拉取云端共享布局配置（覆盖本地，team 共享）
@@ -1242,8 +1171,6 @@ function _buildLineageData() {
     renderPicArea:     _renderPicArea,
     patchEntry:        _patchEntry,
     startInlineRename: _startInlineRename,
-    insertCreatedEntry: _insertCreatedEntry,
-    ensureScopeLoaded: _ensureScopeLoaded,
     preserveView: () => { if (_viewMode === 'layout' && _layoutMode) _layoutMode._preserveView = true; },
     onLineFilterChange: (newFilter) => {
       _level1Filter = newFilter;
@@ -1378,23 +1305,6 @@ function _syncLayoutUI() {
   if (isLayout && _lifecyclePanel && _versionGid) {
     _lifecyclePanel.refresh();
   }
-}
-
-function _ensureLifecyclePanel() {
-  if (!_lifecyclePanel) {
-    _lifecyclePanel = new BopLifecyclePanel({
-      cf:         _lineageVersionCf,
-      toast:      _toast,
-      versionGid: _versionGid,
-      mountEl:    document.getElementById('lvLifecycleTop'),
-      actionEl:   document.getElementById('lvLifecycleAction'),
-      onBopTreeChange: () => {
-        if (_viewMode === 'layout' && _layoutMode) _layoutMode._preserveView = true;
-        _reload();
-      },
-    });
-  }
-  return _lifecyclePanel;
 }
 
 /**
@@ -1969,7 +1879,7 @@ function _initSidebarPanels() {
     bodyEl:     $stagingBody,
     countEl:    $stagingCount,
     versionGid: _versionGid,
-    cf:         _lineageVersionCf,
+    cf:         _cf,
     toast:      _toast,
     onPromote:  async () => { await _reload(); if (_assocPanel) _assocPanel.refresh(); },
     onDemote:   async () => { await _reload(); if (_assocPanel) _assocPanel.refresh(); },
@@ -1999,7 +1909,7 @@ function _initSidebarPanels() {
     tabsEl:     $assocTabs,
     bodyEl:     $assocBody,
     versionGid: _versionGid,
-    cf:         _lineageVersionCf,
+    cf:         _cf,
     toast:      _toast,
     onActionComplete: () => _reload(),
     applyActiveState: _applyActiveState,
@@ -2724,7 +2634,7 @@ async function _uploadBopPic(file) {
       const b64     = dataUrl.slice(comma + 1);
       try {
         const res = await _invokeCapability('craft.bop.picture.upload', 1, {
-          filename: file.name || `clipboard-${Date.now()}.png`,
+          filename: file.name,
           mime,
           data_b64: b64,
         });
@@ -3068,8 +2978,7 @@ async function _createNodeFromDialog(action, refGid) {
       operation: 'create',
       ...body,
     });
-    const createdEntry = _createdEntryFromResult(resp);
-    const newGid = createdEntry?.gid;
+    const newGid = resp?.data?.gid || resp?.gid;
     // 上传图片（如有）
     if (newGid && (process_flow_pic?.length || process_chart_pic?.length)) {
       const picPatch = {};
@@ -3081,7 +2990,8 @@ async function _createNodeFromDialog(action, refGid) {
         updates: picPatch,
       });
     }
-    if (!_insertCreatedEntry(createdEntry)) await _reload();
+    if (_viewMode === 'layout' && _layoutMode) _layoutMode._preserveView = true;
+    await _reload();
     _toast('节点已创建', 'ok');
   } catch (e) {
     _toast('创建失败: ' + e.message, 'error');
@@ -3939,7 +3849,10 @@ async function _loadCloudConfig() {
     if (_layoutMode && cloudCfg.layout) {
       _layoutMode.applyConfig(cloudCfg.layout);
     }
-  } catch { /* 网络失败静默忽略，本地数据继续使用 */ }
+  } catch (error) {
+    console.warn('[Lineage] cloud layout config load failed', error);
+    _toast('云端布局加载失败，已使用本地配置', 'warn', 2500);
+  }
 }
 
 function _restoreView() {
@@ -4169,7 +4082,6 @@ function _localMoveApply(gid, patchBody) {
   siblings.forEach((r, i) => { r.sort_order = i; });
   _buildIndexes(_rows);
   _buildStats();
-  if (_viewMode === 'layout' && _layoutMode) _layoutMode._preserveView = true;
   _render();
   if (_activeGid) _applyActiveState(_activeGid);
 }
@@ -4201,9 +4113,6 @@ async function _addBlankLine() {
 }
 
 async function _reload() {
-  if (_viewMode === 'layout' && _layoutMode) {
-    _layoutMode._preserveView = true;
-  }
   _closeOverlayPanel();
   try {
     const comparisons = [..._loadedVersionGids]
@@ -4728,12 +4637,12 @@ async function init() {
   // 初始化暂存箱 + 关联面板
   _initSidebarPanels();
 
-  // 初始化布局视图侧面板（结构树、属性、关系纵向排列）
+  // 初始化布局视图底部详情面板（v2：七列可调宽）
   const dpEl = document.getElementById('llDetailPanel');
   if (dpEl) {
     _layoutDetailPanel = new LayoutDetailPanel({
       containerEl: dpEl,
-      cf: _lineageVersionCf,
+      cf: _cf,
       toast: _toast,
       patchEntry: _patchEntry,
       reloadData: _reload,
@@ -4791,7 +4700,6 @@ async function init() {
         if (_viewMode === 'layout' && _layoutMode) {
           // 若节点是隐藏类型（零件/操作等），尝试跳转到其父节点
           const row = _rowByGid.get(gid);
-          if (row) void _ensureScopeLoaded(row);
           let targetGid = gid;
           const hiddenSet = typeof HIDDEN_TYPES !== 'undefined' ? new Set(HIDDEN_TYPES) : new Set();
           if (row && hiddenSet.has(row.node_type)) {
@@ -4808,7 +4716,7 @@ async function init() {
 
   // 初始化版本管理器（LineageVersionManager）
   _verMgr = new LineageVersionManager({
-    cf: _lineageVersionCf,
+    cf: _cf,
     toast: _toast,
     onVersionSelected: (gid, tag) => {
       _versionGid = gid;
@@ -4833,7 +4741,7 @@ async function init() {
         if (_layoutMode) _layoutMode.activate?.();
       }
       // 进入新建模式
-      _ensureLifecyclePanel().enterCreationMode();
+      if (_lifecyclePanel) _lifecyclePanel.enterCreationMode();
     },
   });
   await _verMgr.loadVersions();
@@ -4871,7 +4779,17 @@ async function init() {
   _initCompareBtn();
 
   // 初始化生命周期面板
-  _ensureLifecyclePanel();
+  _lifecyclePanel = new BopLifecyclePanel({
+    cf:         _cf,
+    toast:      _toast,
+    versionGid: _versionGid,
+    mountEl:    document.getElementById('lvLifecycleTop'),
+    actionEl:   document.getElementById('lvLifecycleAction'),
+    onBopTreeChange: () => {
+      if (_viewMode === 'layout' && _layoutMode) _layoutMode._preserveView = true;
+      _reload();
+    },
+  });
   if (_viewMode === 'layout' && _versionGid) await _lifecyclePanel.init();
 
   // 初始化 PBOM 导入 modal

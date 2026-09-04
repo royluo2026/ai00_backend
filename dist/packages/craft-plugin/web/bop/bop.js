@@ -479,8 +479,8 @@ async function _openNewVersionModal(prefillFamilyGid = null, prefillProjectGid =
   // 加载项目列表（缓存）
   if (_projectsForModal.length === 0) {
     try {
-      const res = await _bopInvokeCapability('project.project.read.atomic.projects_search', {});
-      _projectsForModal = (res?.data || res || []).filter(p => !p.is_deleted && p.project_type !== 'gbop');
+      const res = await _bopInvokeCapability('project.project.read.atomic.projects_search', { arguments: {} });
+      _projectsForModal = (res || []).filter(p => !p.is_deleted && p.project_type !== 'gbop');
     } catch (_) { _projectsForModal = []; }
   }
   // 加载工厂列表（缓存）

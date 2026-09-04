@@ -42,29 +42,16 @@ class BopLifecyclePanel {
     this._selectedItem = null;
     this._pillView     = 'publish';
     this._activeEntryGid = null;
-    this._lastRefresh  = 0;
     this._creationMode = false;  // true = 新建模式（无 versionGid）
   }
 
   async _invokeCapability(id, payload) {
     const _cloudFetch = this._cf;
-    const requestBody = {
-      version: 1,
-      payload,
-      idempotency_key: `${id}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    };
-    const request = (suffix, body) => _cloudFetch(`/api/v1/capabilities/${id}:${suffix}`, {
+    const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ version: 1, payload }),
     });
-    let response = await request('invoke', requestBody);
-    if (response?.data?.error?.code === 'confirmation_required') {
-      const confirmation = await request('confirm', requestBody);
-      const token = confirmation?.data?.confirmation_token;
-      if (!token) throw new Error(`能力确认失败：${id}@1`);
-      response = await request('invoke', { ...requestBody, confirmation_token: token });
-    }
     const result = response?.data;
     if (response?.success !== true || result?.ok !== true) {
       const detail = result?.error || response?.error || {};
@@ -172,15 +159,23 @@ class BopLifecyclePanel {
   }
 
   async refresh(force = false) {
-    if (!force) return;
-    const now = Date.now();
-    if (!force && now - this._lastRefresh < 10 * 60 * 1000) return;
-    try {
-      await this._invokeCapability('craft.bop.lifecycle.stats.refresh.apply', {
-        version_gid: this._versionGid,
-      });
+    if (!this._versionGid) return;
+    if (!force) {
       await this._load();
-      this._lastRefresh = Date.now();
+      return;
+    }
+    if (!window.confirm('确认重新计算并保存当前 BOP 版本的生命周期统计？')) return;
+    try {
+      const client = window.top?.AI00ExistingCapabilityClient
+        || window.parent?.AI00ExistingCapabilityClient
+        || window.AI00ExistingCapabilityClient;
+      if (!client) throw new Error('Capability 客户端未就绪');
+      await client.invoke(
+        'craft.bop.lifecycle.stats.refresh.apply',
+        { version_gid: this._versionGid },
+        { write: true, confirmed: true },
+      );
+      await this._load();
     } catch (e) {
       this._toast('刷新失败: ' + e.message, 'error');
     }
@@ -204,7 +199,6 @@ class BopLifecyclePanel {
     this._selectedLine = '';
     this._selectedItem = null;
     this._activeEntryGid = null;
-    this._lastRefresh  = 0;
     this._renderSideHistoryPanel();
     if (gid) {
       this.init();
@@ -1305,8 +1299,6 @@ class BopLifecyclePanel {
       refreshFamilyByProject();
       const famGid    = famSel.value || null;
       const facGid    = hidFactory.value.trim() || null;
-      const selOpt    = projSel?.options[projSel.selectedIndex];
-      const factoryNameVal = selOpt?.dataset.factoryName || '';
       const dataStage = stageSel.value || null;
       const srcGid    = getSourceGid();
 
@@ -1325,8 +1317,8 @@ class BopLifecyclePanel {
         this._allVersionsCache = freshVers;   // 更新缓存
 
         let projName;
-        const freshSelectedOption = projSel?.options[projSel.selectedIndex];
-        projName = freshSelectedOption?.dataset.projectName || '';
+        const selOpt = projSel?.options[projSel.selectedIndex];
+        projName = selOpt?.dataset.projectName || '';
         bopName = projName ? projName : '';
         if (!bopName) { this._toast('版本名称获取失败，请重选项目', 'warn'); createBtn.disabled = false; createBtn.textContent = submitLabel; return; }
 
@@ -1374,7 +1366,7 @@ class BopLifecyclePanel {
             source_version_gid: srcGid,
             target_version_tag: tag,
             target_bop_name: bopName,
-            ...(effectiveFamGid ? { target_version_family_gid: effectiveFamGid } : {}),
+            target_version_family_gid: effectiveFamGid,
             version_type: 'working',
             ...extraParams,
           });
@@ -1383,9 +1375,8 @@ class BopLifecyclePanel {
           // Create blank version
           const res = await this._invokeCapability('craft.bop.version.create', {
             source: 'empty', version_tag: tag, bop_name: bopName,
-            ...(effectiveFamGid ? { version_family_gid: effectiveFamGid } : {}),
-            project_gid: projGid,
-            ...(facGid && factoryNameVal ? { factory_gid: facGid } : {}),
+            version_family_gid: effectiveFamGid,
+            project_gid: projGid, factory_gid: facGid,
             data_stage: dataStage,
           });
           newGid = res.version_gid || res.gid;
@@ -1424,12 +1415,12 @@ class BopLifecyclePanel {
 
   async _ensureCaches() {
     const [projRes, facRes, verRes] = await Promise.allSettled([
-      this._projectsCache ? null : this._invokeCapability('project.project.read.atomic.projects_search', {}),
+      this._projectsCache ? null : this._invokeCapability('project.project.read.atomic.projects_search', { arguments: {} }),
       this._factoriesCache ? null : this._invokeCapability('factory.asset.search', { asset_type: 'factory' }),
       this._allVersionsCache ? null : this._invokeCapability('craft.bop.version.list', { include_archived: true, page_size: 100 }),
     ]);
     if (!this._projectsCache && projRes.status === 'fulfilled' && projRes.value) {
-      this._projectsCache = (projRes.value?.data?.data || projRes.value?.data || []).filter(
+      this._projectsCache = (projRes.value.data || []).filter(
         p => !p.is_deleted && p.project_type !== 'gbop'
       );
     }
@@ -2568,8 +2559,8 @@ class BopLifecyclePanel {
         }
       };
 
-      this._invokeCapability('project.project.read.atomic.projects_search', {}).then(res => {
-        const projects = (res?.data?.data || res?.data || []).filter(p => !p.is_deleted);
+      this._invokeCapability('project.project.read.atomic.projects_search', { arguments: {} }).then(res => {
+        const projects = (res?.data || []).filter(p => !p.is_deleted);
         projSel.innerHTML = '<option value="">— 请选择项目 —</option>' +
           projects.map(p => `<option value="${p.gid}" data-name="${p.name}">${p.name}</option>`).join('');
         projSel.addEventListener('change', _updatePreview);

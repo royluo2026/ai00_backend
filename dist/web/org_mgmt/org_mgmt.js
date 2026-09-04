@@ -705,7 +705,7 @@ async function loadProjects() {
   }
   _computeTsoSubtree();
 
-  const value = await invokeCapability('project.project.read.atomic.projects_search', {}).catch(() => []);
+  const value = await invokeCapability('project.project.read.atomic.projects_search', { arguments: {} }).catch(() => []);
   _allProjects = Array.isArray(value) ? value : (value?.data || value?.projects || []);
   const sel = document.getElementById('filter-project');
   sel.innerHTML = '<option value="">— 选择项目 —</option>';
@@ -945,7 +945,7 @@ async function _loadMatrix() {
   // cannot be called from a capability-only consumer.
   const projectCatalog = _allProjects.length
     ? _allProjects
-    : await invokeCapability('project.project.read.atomic.projects_search', {})
+    : await invokeCapability('project.project.read.atomic.projects_search', { arguments: {} })
       .then(value => Array.isArray(value) ? value : (value?.data || value?.projects || []))
       .catch(() => []);
   const projectRows = await Promise.all(projectCatalog.map(async project => {

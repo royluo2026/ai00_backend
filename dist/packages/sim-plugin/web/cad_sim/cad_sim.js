@@ -1274,12 +1274,13 @@ function _bindVisPanel() {
       _cmdShow(r?.error || '扫描失败', 'err');
     }
   });
-  $('btnCaptureOps')?.addEventListener('click', _openGovernedCapture);
+  $('btnCaptureOps')?.addEventListener('click', () => _openGovernedCapture());
 
   // 跨面板入口：assoc_panel 通过 window.top._cadSimCapture(lineGid, progressCb) 触发
   // 注意：lineage_view 可能嵌套在 craft_hub 内，window.parent 不是 workspace，需用 window.top
   const _topWin = window.top || window.parent || window;
-  _topWin._cadSimCapture = () => _openGovernedCapture();
+  _topWin._cadSimCapture = (lineGid, progressCb) =>
+    _openGovernedCapture(lineGid, progressCb);
 }
 
 async function _loadVisTree(force = false) {
@@ -1861,6 +1862,9 @@ function _esc(s) {
 
 // ── AI00 Connector 受治理环境与截图流程 ──────────────────────────────────────
 let _governedCapture = null;
+let _governedCaptureScopeLineGid = null;
+let _governedCaptureProgressCb = null;
+let _governedCaptureReportedOps = new Set();
 
 function _renderGovernedCapture(state) {
   const progress = $('connectorProgress');
@@ -1872,8 +1876,17 @@ function _renderGovernedCapture(state) {
     ? `${state.error.code}: ${state.error.message}`
     : issues.map(item => `${item.code}（期望 ${item.expected ?? '—'}，实际 ${item.actual ?? '—'}）`).join('\n');
   const run = state.captureRun;
+  for (const step of run?.steps || []) {
+    if (!step.artifact_attached || _governedCaptureReportedOps.has(step.operation_id)) continue;
+    _governedCaptureReportedOps.add(step.operation_id);
+    _governedCaptureProgressCb?.({
+      bop_entry_gid: step.operation_id, title: step.operation_id,
+    }, step.artifact_ref);
+  }
   if (!run) {
-    progress.textContent = state.preflight?.compatible ? 'Connector 预检通过，可以开始。' : '尚未通过 Connector 预检。';
+    progress.textContent = state.materializationRun
+      ? `环境构建已提交（${state.materializationRun.status}）。构建完成后再次点击“开始截图”；服务端会在完成前拒绝截图。`
+      : (state.preflight?.compatible ? 'Connector 预检通过，可以开始。' : '尚未通过 Connector 预检。');
   } else {
     const rows = (run.steps || []).map(step =>
       `${step.operation_id}  ·  ${step.status}  ·  attempt ${step.attempt}`
@@ -1885,10 +1898,13 @@ function _renderGovernedCapture(state) {
   $('connectorCancel').disabled = !run || ['completed', 'failed', 'cancelled', 'outcome_unknown'].includes(run.status);
 }
 
-function _openGovernedCapture() {
+function _openGovernedCapture(lineGid = null, progressCb = null) {
+  _governedCaptureScopeLineGid = lineGid;
+  _governedCaptureProgressCb = typeof progressCb === 'function' ? progressCb : null;
+  _governedCaptureReportedOps = new Set();
   const version = _bopVersions.find(item => item.gid === _selectedBopGid);
   $('connectorSource').textContent = version
-    ? `${version.gid} · revision ${version.revision ?? '未知'} · ${version.content_hash || version.structure_hash || '缺少 content hash'}`
+    ? `${version.gid} · revision ${version.revision ?? '未知'} · ${version.content_hash || version.structure_hash || '缺少 content hash'}${lineGid ? ` · 选中线体 ${lineGid}` : ''}`
     : '请先选择已发布的 BOP 版本';
   $('connectorCaptureOverlay').classList.remove('hidden');
 }
@@ -1898,7 +1914,13 @@ function _initGovernedCapture() {
   const cloudFetch = window.parent?._cloudFetch || window._cloudFetch;
   if (!library || typeof cloudFetch !== 'function') return;
   const api = library.createGatewayApi(cloudFetch, {
-    approve: async capabilityId => window.confirm(`确认执行受治理能力 ${capabilityId}@1？`),
+    approve: async (capabilityId, majorVersion, payload, metadata = {}) => {
+      const fields = Object.keys(payload || {}).sort().join('、') || '无';
+      const digest = metadata.payloadHash ? `\n负载哈希：${metadata.payloadHash}` : '';
+      return window.confirm(
+        `确认执行受治理能力 ${capabilityId}@${majorVersion}？\n负载字段：${fields}${digest}`,
+      );
+    },
   });
   _governedCapture = library.createCaptureWorkflow({
     invoke: (id, payload, options) => api.invoke(id, payload, options),
@@ -1921,6 +1943,8 @@ function _initGovernedCapture() {
         device_id: deviceId,
         execution_plan_ref: { version_gid: version.gid, revision, content_hash: contentHash },
         capture_profile: { format: 'png', width: 1920, height: 1080, background: 'current' },
+        ...(_governedCaptureScopeLineGid
+          ? { scope: { kind: 'line', gid: _governedCaptureScopeLineGid } } : {}),
       });
       if (result.status === 'composed') await _governedCapture.selectConnector(deviceId);
     } catch (_) { /* state renderer displays stable code */ }

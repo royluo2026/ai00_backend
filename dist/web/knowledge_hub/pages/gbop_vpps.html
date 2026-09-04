@@ -112,7 +112,7 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 </style>
   <link rel="stylesheet" href="/assets/gbop_vpps-cfff51d1.css">
   <link rel="stylesheet" href="/assets/view_manager-0b5250e9.css">
-  <link rel="stylesheet" href="/assets/tree_list_shell-907216c5.css">
+  <link rel="stylesheet" href="/assets/tree_list_shell-da642102.css">
 </head>
 <body>
 <div class="md-root">
@@ -838,8 +838,8 @@ function _resourceRequirementSection(section) {
   const title = RESOURCE_SECTION_TITLES[section];
   return {
     title, desc: `${title}标准库`, addLabel: '新建资源',
-    async load(cf) {
-      return _resourceRows(await cf(`/api/craft/resource-requirements?resource_type=${resourceType}`));
+    async load(_cloudFetch) {
+      return _resourceRows(await _cloudFetch(`/api/craft/resource-requirements?resource_type=${resourceType}`, { method: 'GET' }));
     },
     formHtml() {
       return `<div class="md-form-grid"><div class="md-field"><label>代号 *</label><input id="fResourceCode" type="text"></div><div class="md-field"><label>名称 *</label><input id="fResourceName" type="text"></div><div class="md-field full"><label>属性（JSON）</label><textarea id="fResourceAttributes" placeholder='{}'></textarea></div></div>`;
@@ -858,16 +858,16 @@ function _resourceRequirementSection(section) {
         return { resource_type: resourceType, code, name, attributes, source: 'manual' };
       } catch (_) { _toast('属性必须是 JSON 对象'); return null; }
     },
-    async create(cf, body) {
-      return cf('/api/craft/resource-requirements', { method: 'POST', body: JSON.stringify(body) });
+    async create(_cloudFetch, body) {
+      return _cloudFetch('/api/craft/resource-requirements', { method: 'POST', body: JSON.stringify(body) });
     },
-    async update(cf, gid, body) {
-      return cf(`/api/craft/resource-requirements/${gid}`, {
+    async update(_cloudFetch, gid, body) {
+      return _cloudFetch(`/api/craft/resource-requirements/${gid}`, {
         method: 'PATCH', body: JSON.stringify(resourcePatchBody(_rawRowsMap[gid], body)),
       });
     },
-    async remove(cf, gid) {
-      return cf(`/api/craft/resource-requirements/${gid}/retire`, {
+    async remove(_cloudFetch, gid) {
+      return _cloudFetch(`/api/craft/resource-requirements/${gid}/retire`, {
         method: 'POST', body: JSON.stringify(resourceRetireBody(_rawRowsMap[gid])),
       });
     },
@@ -1126,14 +1126,14 @@ async function _editResourceAliases(gid) {
   const input = prompt('别名（每行一个）', current.map(alias => alias.alias_value).join('\n'));
   if (input === null) return;
   const wanted = [...new Set(input.split(/\r?\n/).map(value => value.trim()).filter(Boolean))];
-  const cf = _cf();
-  if (!cf) return _toast('未连接云端');
+  const _cloudFetch = _cf();
+  if (!_cloudFetch) return _toast('未连接云端');
   try {
     for (const alias of current.filter(alias => !wanted.includes(alias.alias_value))) {
-      await cf(`/api/craft/resource-requirements/${gid}/aliases/${alias.gid}`, { method: 'DELETE' });
+      await _cloudFetch(`/api/craft/resource-requirements/${gid}/aliases/${alias.gid}`, { method: 'DELETE' });
     }
     for (const aliasValue of wanted.filter(value => !current.some(alias => alias.alias_value === value))) {
-      await cf(`/api/craft/resource-requirements/${gid}/aliases`, {
+      await _cloudFetch(`/api/craft/resource-requirements/${gid}/aliases`, {
         method: 'POST', body: JSON.stringify({ alias_value: aliasValue }),
       });
     }

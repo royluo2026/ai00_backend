@@ -227,32 +227,14 @@ function _cf() {
   } catch (_) {}
   return null;
 }
-async function _invokeCapability(id, payload, options = {}) {
+async function _invokeCapability(id, payload) {
   const _cloudFetch = _cf();
   if (!_cloudFetch) throw new Error('云端服务未连接');
-  const idempotencyKey = options.write
-    ? `${id}-${Date.now()}-${Math.random().toString(16).slice(2)}`
-    : null;
-  const requestBody = { version: 1, payload };
-  if (idempotencyKey) requestBody.idempotency_key = idempotencyKey;
-  const request = (action, body) => _cloudFetch(`/api/v1/capabilities/${id}:${action}`, {
+  const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ version: 1, payload }),
   });
-  let response = await request('invoke', requestBody);
-  if (response?.data?.error?.code === 'confirmation_required') {
-    if (!options.write) throw new Error(`能力意外要求确认：${id}@1`);
-    if (!window.confirm(options.confirmMessage || '确认执行这次业务数据变更？')) {
-      throw new Error('已取消变更');
-    }
-    const confirmation = await request('confirm', requestBody);
-    const token = confirmation?.success === true
-      ? confirmation?.data?.confirmation_token
-      : null;
-    if (!token) throw new Error(`能力确认失败：${id}@1`);
-    response = await request('invoke', { ...requestBody, confirmation_token: token });
-  }
   const envelope = response?.data;
   if (response?.success !== true || envelope?.ok !== true) {
     const detail = envelope?.error || response?.error || {};
@@ -292,7 +274,7 @@ const SECTIONS = {
     addLabel: '新建项目',
 
     async load() {
-      const r = await _invokeCapability('project.project.read.atomic.projects_search', {});
+      const r = await _invokeCapability('project.project.read.atomic.projects_search', { arguments: {} });
       return r?.data || [];
     },
 
@@ -404,9 +386,9 @@ const SECTIONS = {
       };
     },
 
-    async create(_cf, body) { return _invokeCapability('project.project.change.apply.atomic.projects_create', body, { write: true, confirmMessage: '确认新建这个项目？' }); },
-    async update(_cf, gid, body) { return _invokeCapability('project.project.change.apply.atomic.projects_update', { gid, updates: body }, { write: true, confirmMessage: '确认保存这个项目的修改？' }); },
-    async remove(_cf, gid) { return _invokeCapability('project.project.change.apply.atomic.projects_delete', { gid }, { write: true, confirmMessage: '确认删除这个项目？' }); },
+    async create(_cf, body) { return _invokeCapability('project.project.change.apply.atomic.projects_create', { arguments: body }); },
+    async update(_cf, gid, body) { return _invokeCapability('project.project.change.apply.atomic.projects_update', { arguments: { gid, updates: body } }); },
+    async remove(_cf, gid) { return _invokeCapability('project.project.change.apply.atomic.projects_delete', { arguments: { gid } }); },
 
     searchFn(r, q) {
       return (r.name||'').toLowerCase().includes(q)
@@ -421,7 +403,7 @@ const SECTIONS = {
     addLabel: '新建车型',
 
     async load() {
-      const r = await _invokeCapability('project.project.read.atomic.vehicle_models_list', {});
+      const r = await _invokeCapability('project.project.read.atomic.vehicle_models_list', { arguments: {} });
       return r?.data || [];
     },
 
@@ -468,9 +450,9 @@ const SECTIONS = {
       return { name, brand: _val('fVmBrand').trim(), platform: _val('fVmPlatform').trim(), vehicle_type: _val('fVmType').trim() };
     },
 
-    async create(_cf, body) { return _invokeCapability('project.project.change.apply.atomic.vehicle_models_create', body, { write: true, confirmMessage: '确认新建这个车型？' }); },
-    async update(_cf, gid, body) { return _invokeCapability('project.project.change.apply.atomic.vehicle_models_update', { gid, ...body }, { write: true, confirmMessage: '确认保存这个车型的修改？' }); },
-    async remove(_cf, gid) { return _invokeCapability('project.project.change.apply.atomic.vehicle_models_delete', { gid }, { write: true, confirmMessage: '确认删除这个车型？' }); },
+    async create(_cf, body) { return _invokeCapability('project.project.change.apply.atomic.vehicle_models_create', { arguments: body }); },
+    async update(_cf, gid, body) { return _invokeCapability('project.project.change.apply.atomic.vehicle_models_update', { arguments: { gid, ...body } }); },
+    async remove(_cf, gid) { return _invokeCapability('project.project.change.apply.atomic.vehicle_models_delete', { arguments: { gid } }); },
 
     searchFn(r, q) {
       return (r.name||'').toLowerCase().includes(q)
@@ -516,19 +498,19 @@ const SECTIONS = {
     },
 
     async create(_cf, body) {
-      return _invokeCapability('factory.structure.create', { kind: 'factory', name: body.name }, { write: true, confirmMessage: '确认新建这个工厂？' });
+      return _invokeCapability('factory.structure.create', { kind: 'factory', name: body.name });
     },
     async update(_cf, gid, body) {
       const current = _rows.find(row => row.gid === gid);
       return _invokeCapability('factory.structure.update', {
         gid, expected_version: Number(current?.version || 1), updates: body,
-      }, { write: true, confirmMessage: '确认保存这个工厂的修改？' });
+      });
     },
     async remove(_cf, gid) {
       const current = _rows.find(row => row.gid === gid);
       return _invokeCapability('factory.structure.archive', {
         gid, expected_version: Number(current?.version || 1),
-      }, { write: true, confirmMessage: '确认归档这个工厂？' });
+      });
     },
 
     searchFn(r, q) { return (r.name||'').toLowerCase().includes(q); },
@@ -558,7 +540,7 @@ async function _loadShared() {
   if (!cf) return;
   try {
     const [vmRes, userRes, factoryRes] = await Promise.all([
-      _invokeCapability('project.project.read.atomic.vehicle_models_list', {}).catch(() => null),
+      _invokeCapability('project.project.read.atomic.vehicle_models_list', { arguments: {} }).catch(() => null),
       cf('/users/').catch(() => null),
       _invokeCapability('factory.structure.search', { kind: 'factory' }).catch(() => null),
     ]);

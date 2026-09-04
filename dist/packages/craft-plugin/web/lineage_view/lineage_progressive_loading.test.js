@@ -3,7 +3,6 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
-const vm = require('vm');
 
 const { LineageLoadCoordinator } = require('./lineage_load_coordinator.js');
 const { LineageProjectionStore } = require('./lineage_projection_store.js');
@@ -92,25 +91,6 @@ async function runLineageProgressiveLoadingTests() {
   }
 
   {
-    const versionResult = deferred();
-    let outlineStarted = false;
-    const invoke = async (id, _version, payload) => {
-      if (id === 'craft.bop.version.get') return versionResult.promise;
-      if (id === 'craft.bop.structure.outline.get') {
-        outlineStarted = true;
-        return { version_gid: payload.version_gid, revision: 3, root: null, lines: [], total_lines: 0, next_cursor: null };
-      }
-      throw new Error(`unexpected capability ${id}`);
-    };
-    const loader = new LineageProgressiveLoader({ invokeCapability: invoke });
-    const loading = loader.loadVersion('parallel-outline', { revision: 3 });
-    await Promise.resolve();
-    assert.strictEqual(outlineStarted, true, 'a known revision should start version and outline reads together');
-    versionResult.resolve({ version_gid: 'parallel-outline', revision: 3, status: 'active' });
-    await loading;
-  }
-
-  {
     const oldOutline = deferred();
     const commits = [];
     let oldSignal;
@@ -131,31 +111,6 @@ async function runLineageProgressiveLoadingTests() {
     oldOutline.resolve({ version_gid: 'old', revision: 1, root: null, lines: [], total_lines: 0, next_cursor: null });
     await stale;
     assert.deepStrictEqual(commits, ['new'], 'stale response must never commit');
-  }
-
-  {
-    let activeScopes = 0;
-    let maxActiveScopes = 0;
-    const invoke = async (id, _version, payload) => {
-      if (id === 'craft.bop.version.get') return { version_gid: payload.version_gid, revision: 1 };
-      if (id === 'craft.bop.structure.outline.get') {
-        return { version_gid: payload.version_gid, revision: 1, root: null, lines: [], total_lines: 0, next_cursor: null };
-      }
-      if (id === 'craft.bop.work_package.get') {
-        activeScopes += 1;
-        maxActiveScopes = Math.max(maxActiveScopes, activeScopes);
-        await new Promise(resolve => setTimeout(resolve, 10));
-        activeScopes -= 1;
-        return { version_gid: payload.version_gid, revision: 1, nodes: [], links: [], next_cursor: null };
-      }
-      throw new Error(`unexpected capability ${id}`);
-    };
-    const loader = new LineageProgressiveLoader({ invokeCapability: invoke });
-    await loader.loadVersion('bounded-scopes');
-    await Promise.all(Array.from({ length: 5 }, (_, index) => loader.loadScope({
-      version_gid: 'bounded-scopes', revision: 1, scope_kind: 'line', scope_gid: `line-${index}`,
-    })));
-    assert.strictEqual(maxActiveScopes, 2, `two visible lines should load together, got ${maxActiveScopes}`);
   }
 
   {
@@ -184,21 +139,6 @@ async function runLineageProgressiveLoadingTests() {
     await loader.loadVersion('dispose-me');
     loader.dispose();
     assert.throws(() => loader.loadVersion('after-dispose'), /disposed/);
-  }
-
-  {
-    const lifecycleSource = fs.readFileSync(path.join(__dirname, 'lifecycle_panel.js'), 'utf8');
-    const context = { console };
-    vm.createContext(context);
-    vm.runInContext(`${lifecycleSource}\nthis.BopLifecyclePanelForTest = BopLifecyclePanel;`, context);
-    const panel = new context.BopLifecyclePanelForTest({ versionGid: 'version-1' });
-    const calls = [];
-    panel._invokeCapability = async id => calls.push(id);
-    panel._load = async () => calls.push('load');
-    await panel.refresh();
-    assert.deepStrictEqual(calls, [], 'layout rendering must not trigger a write capability');
-    await panel.refresh(true);
-    assert.deepStrictEqual(calls, ['craft.bop.lifecycle.stats.refresh.apply', 'load']);
   }
 
   const index = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');

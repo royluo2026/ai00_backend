@@ -909,7 +909,7 @@ class ListSidebar {
     // 加载项目列表
     let projects = [];
     try {
-      const value = await this._invokeCapability('project.project.read.atomic.projects_search', {});
+      const value = await this._invokeCapability('project.project.read.atomic.projects_search', { arguments: {} });
       projects = Array.isArray(value) ? value : (value?.data || value?.projects || []);
     } catch (e) {
       alert('加载项目列表失败：' + e.message);

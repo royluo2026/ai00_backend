@@ -309,7 +309,7 @@ async function _load() {
   _vehicles = [];
   try {
     if (_cloudFetch) {
-      const value = await invokeCapability('project.project.read.atomic.vehicle_models_list', {});
+      const value = await invokeCapability('project.project.read.atomic.vehicle_models_list', { arguments: {} });
       _vehicles = Array.isArray(value) ? value : (value?.data || value?.items || []);
     }
   } catch (_) {}
@@ -318,7 +318,7 @@ async function _load() {
   _projects = [];
   try {
     if (_cloudFetch) {
-      const value = await invokeCapability('project.project.read.atomic.projects_search', {});
+      const value = await invokeCapability('project.project.read.atomic.projects_search', { arguments: {} });
       const rows = Array.isArray(value) ? value : (value?.data || value?.projects || []);
       _projects = rows.filter(p => !p.is_deleted && !p.is_archived);
     }

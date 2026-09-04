@@ -104,6 +104,7 @@ let _currentItem      = null;
 let _personalFolders  = [];           // 本地文件夹列表
 let _cloudFolders     = {};           // { scope_key: [] }
 let _items            = [];           // 当前 Left2 条目列表
+let _loadError        = null;         // 最近一次列表加载错误；不得伪装成空列表
 let _searchQuery      = '';
 let _groupBy          = 'none';       // none | date | status
 let _sortBy           = 'updated';    // updated | created | title
@@ -492,21 +493,21 @@ async function _selectNode(scope, folderGid, teamGid) {
 // ── Left2 文件列表 ────────────────────────────────────────────────────────────
 async function _loadItems() {
   _items = [];
+  _loadError = null;
   try {
     if (_currentScope === 'annotated') {
       const client = window.top?.AI00ExistingCapabilityClient || window.parent?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
-      if (client) {
-        const anns = await client.call('base.annotations.search', { limit: 200 }).catch(() => []);
-        // 将标注记录映射为 file-row 可渲染的 item 结构
-        _items = anns.map(a => ({
-          gid:        a.item_gid,
-          title:      a.item_gid,
-          item_type:  'richtext',
-          status:     '',
-          updated_at: '',
-          _annotation: { self_status: a.status, self_schedule: a.schedule, self_note: a.note, self_attachments: a.attachments },
-        }));
-      }
+      if (!client) throw new Error('Capability 客户端未就绪');
+      const anns = await client.call('base.annotations.search', { limit: 200 });
+      // 将标注记录映射为 file-row 可渲染的 item 结构
+      _items = anns.map(a => ({
+        gid:        a.item_gid,
+        title:      a.item_gid,
+        item_type:  'richtext',
+        status:     '',
+        updated_at: '',
+        _annotation: { self_status: a.status, self_schedule: a.schedule, self_note: a.note, self_attachments: a.attachments },
+      }));
       return;
     }
     if (_currentScope === 'favorites') {
@@ -543,11 +544,19 @@ async function _loadItems() {
       if (_getAuthRole() === 'super_admin') query.set('show_hidden', 'true');
       _items = (await _cloudFetch(`/api/knowledge_hub/items?${query}`, { method: 'GET' })) || [];
     }
-  } catch (_) {}
+  } catch (e) {
+    _loadError = e;
+    console.error('[KH] _loadItems: ERROR', e);
+  }
 }
 
 function _renderLeft2() {
   _listScroll.innerHTML = '';
+
+  if (_loadError) {
+    _listScroll.innerHTML = `<div class="kh-empty-hint kh-load-error">知识库加载失败<br>${_esc(_loadError.message || '请稍后重试')}</div>`;
+    return;
+  }
 
   let items = _items;
 
@@ -923,7 +932,7 @@ async function _openItem(item) {
     _centerBody.style.cssText = '';
     const iframe = document.createElement('iframe');
     iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;';
-    iframe.src = resolveKnowledgeSitePageUrl(path);
+    iframe.src = path ? `../${path}` : 'about:blank';
     _centerBody.appendChild(iframe);
     _loadThread(item);
     return;
@@ -1590,17 +1599,14 @@ async function _createSitePage() {
   if (!picked || !picked.length) return;
 
   // 批量添加
-  let added = 0;
   for (const page of picked) {
-    const item = await _doCreateItem({
+    await _doCreateItem({
       item_type: 'site_page',
       title: page.title,
-      site_ref: { path: page.path },
-      _visOverride: { scope_type: 'public' },
+      site_ref: { path: page.path, label: page.title },
     });
-    if (item) added += 1;
   }
-  if (added) _showToast(`已添加 ${added} 个页面`);
+  _showToast(`已添加 ${picked.length} 个页面`);
 }
 
 // ── 页面选择器弹窗（多选） ───────────────────────────────────────────────────
@@ -1709,12 +1715,7 @@ async function _doCreateItem(fields) {
       _renderLeft2();
       _openItem(item);
     }
-    return item || null;
-  } catch (error) {
-    console.error('[KnowledgeHub] 创建条目失败', error);
-    _showToast(`创建失败：${error?.message || error}`);
-    return null;
-  }
+  } catch (_) {}
 }
 
 // ── 下拉菜单 ──────────────────────────────────────────────────────────────────

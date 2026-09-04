@@ -43,23 +43,11 @@ class StagingPanel {
 
   async _invokeCapability(id, payload) {
     const _cloudFetch = this._cf;
-    const requestBody = {
-      version: 1,
-      payload,
-      idempotency_key: `${id}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    };
-    const request = (suffix, body) => _cloudFetch(`/api/v1/capabilities/${id}:${suffix}`, {
+    const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ version: 1, payload }),
     });
-    let response = await request('invoke', requestBody);
-    if (response?.data?.error?.code === 'confirmation_required') {
-      const confirmation = await request('confirm', requestBody);
-      const token = confirmation?.data?.confirmation_token;
-      if (!token) throw new Error(`能力确认失败：${id}@1`);
-      response = await request('invoke', { ...requestBody, confirmation_token: token });
-    }
     const result = response?.data;
     if (response?.success !== true || result?.ok !== true) {
       const detail = result?.error || response?.error || {};
@@ -83,12 +71,9 @@ class StagingPanel {
       console.warn('[StagingPanel] load failed:', e);
     }
     try {
-      const response = await this._invokeCapability('craft.resource_requirement.staging.search', {
-        version_gid: this._versionGid,
-        match_status: 'pending',
-        page_size: 200,
-      });
-      this._resourceItems = response?.items || [];
+      const _cloudFetch = this._cf;
+      const response = await _cloudFetch(`/api/craft/tc-resource-staging?version_gid=${encodeURIComponent(this._versionGid)}`, { method: 'GET' });
+      this._resourceItems = response?.data || response?.items || [];
     } catch (e) {
       this._resourceItems = [];
       console.warn('[StagingPanel] resource staging load failed:', e);
@@ -203,12 +188,9 @@ class StagingPanel {
 
   async resolveResourceItem(item) {
     try {
-      const response = await this._invokeCapability('craft.resource_requirement.search', {
-        resource_type: item.resource_type,
-        status: 'active',
-        page_size: 200,
-      });
-      const candidates = response?.items || [];
+      const _cloudFetch = this._cf;
+      const response = await _cloudFetch(`/api/craft/resource-requirements?resource_type=${encodeURIComponent(item.resource_type)}`, { method: 'GET' });
+      const candidates = response?.data || response?.items || [];
       if (!candidates.length) return this._toast('没有可用的同类型资源标准', 'error');
       const choice = window.prompt(
         `输入资源代号或 GID：\n${candidates.map(value => `${value.code} · ${value.name} · ${value.gid}`).join('\n')}`,
@@ -217,9 +199,9 @@ class StagingPanel {
       if (!choice) return;
       const selected = candidates.find(value => value.gid === choice.trim() || value.code === choice.trim());
       if (!selected) return this._toast('未找到所选资源标准', 'error');
-      await this._invokeCapability('craft.resource_requirement.staging.resolve', {
-        staging_gid: item.gid,
-        ..._resourceResolvePayload(item, selected.gid),
+      await _cloudFetch(`/api/craft/tc-resource-staging/${item.gid}/resolve`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(_resourceResolvePayload(item, selected.gid)),
       });
       await this.load();
     } catch (error) {
@@ -229,9 +211,10 @@ class StagingPanel {
 
   async ignoreResourceItem(item) {
     try {
-      await this._invokeCapability('craft.resource_requirement.staging.ignore', {
-        staging_gid: item.gid,
-        ..._resourceIgnorePayload(item),
+      const _cloudFetch = this._cf;
+      await _cloudFetch(`/api/craft/tc-resource-staging/${item.gid}/ignore`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(_resourceIgnorePayload(item)),
       });
       await this.load();
     } catch (error) {

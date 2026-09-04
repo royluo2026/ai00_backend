@@ -1123,7 +1123,7 @@ function _applyTheme() {
   // 加载项目列表
   try {
     const d = await _invokeCapability('project.project.read.atomic.projects_search', {
-      limit: 200,
+      arguments: { limit: 200 },
     });
     _projects = (d?.data || d || []).filter(p => !p.is_deleted && p.project_type !== 'gbop');
   } catch (e) { console.warn('[BopNav] 加载项目失败:', e); }

@@ -32,8 +32,6 @@
       this._store = options.store || new LineageProjectionStore();
       this._versions = new Map();
       this._loadedScopes = new Set();
-      this._activeScopeLoads = 0;
-      this._scopeWaiters = [];
       this._disposed = false;
     }
 
@@ -51,21 +49,9 @@
     async _loadVersion(versionGid, options) {
       const token = this._coordinator.begin(versionGid);
       try {
-        const versionPromise = this._invokeCapability(
+        const version = await this._invokeCapability(
           'craft.bop.version.get', 1, { version_gid: versionGid }, { signal: token.signal },
         );
-        const hintedRevision = Number(options.revision);
-        const firstPagePromise = Number.isInteger(hintedRevision) && hintedRevision > 0
-          ? this._invokeCapability(
-              'craft.bop.structure.outline.get', 1,
-              { version_gid: versionGid, revision: hintedRevision, page_size: 100 },
-              { signal: token.signal },
-            )
-          : null;
-        const [version, firstPage] = await Promise.all([
-          versionPromise,
-          firstPagePromise || Promise.resolve(null),
-        ]);
         const revision = Number(version?.revision);
         if (!Number.isInteger(revision) || revision < 1) throw new Error('version capability returned an invalid revision');
         if (!this._coordinator.setRevision(token, revision)) return { cancelled: true };
@@ -73,14 +59,12 @@
         const roots = new Map();
         const lines = new Map();
         let cursor = null;
-        let prefetchedPage = firstPage;
         do {
           const payload = { version_gid: versionGid, revision, page_size: 100 };
           if (cursor) payload.cursor = cursor;
-          const page = prefetchedPage || await this._invokeCapability(
-              'craft.bop.structure.outline.get', 1, payload, { signal: token.signal },
-            );
-          prefetchedPage = null;
+          const page = await this._invokeCapability(
+            'craft.bop.structure.outline.get', 1, payload, { signal: token.signal },
+          );
           if (!this._coordinator.isCurrent(token, revision)) return { cancelled: true };
           if (page?.root?.gid) roots.set(page.root.gid, page.root);
           for (const line of page?.lines || []) if (line?.gid) lines.set(line.gid, line);
@@ -115,22 +99,8 @@
       }
       return this._coordinator.runSingleFlight(
         `scope:${scopeKey(scope)}`,
-        () => this._withScopeSlot(() => this._loadScope(state, scope, options)),
+        () => this._loadScope(state, scope, options),
       );
-    }
-
-    async _withScopeSlot(load) {
-      if (this._activeScopeLoads >= 2) {
-        await new Promise(resolve => this._scopeWaiters.push(resolve));
-      }
-      this._assertActive();
-      this._activeScopeLoads += 1;
-      try {
-        return await load();
-      } finally {
-        this._activeScopeLoads -= 1;
-        this._scopeWaiters.shift()?.();
-      }
     }
 
     async _loadScope(state, scope, options) {
@@ -208,7 +178,6 @@
       this._versions.clear();
       this._loadedScopes.clear();
       this._disposed = true;
-      for (const resume of this._scopeWaiters.splice(0)) resume();
     }
   }
 

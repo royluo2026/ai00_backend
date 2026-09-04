@@ -2,7 +2,7 @@
 /**
  * layout_detail_panel.js  —  布局视图底部详情面板 v2
  *
- * 单侧栏纵向布局：节点树、属性、关系；详情编辑使用独立抽屉
+ * 七列可调宽布局：节点树 | 属性 | 关系 | 详情 | 规则 | 知识
  * 支持从零建树：空树引导 → 新建线体 → 新建工位 → 逐层新建子节点
  */
 
@@ -72,6 +72,10 @@ const CRAFT_RESOURCE_TYPE_BY_LINK_TYPE = Object.freeze(Object.fromEntries(
   CRAFT_RESOURCE_GROUPS.flatMap(group => [[group.linkType, group.resourceType], ...group.legacyLinkTypes.map(linkType => [linkType, group.resourceType])]),
 ));
 const _craftResourceType = linkType => CRAFT_RESOURCE_TYPE_BY_LINK_TYPE[linkType] || null;
+const _craftResourceArguments = linkType => {
+  const resourceType = _craftResourceType(linkType);
+  return resourceType ? { resource_type: resourceType } : null;
+};
 function _buildRuntimeRelationGroups(relationConfigs) {
   const groups = [];
   const resourceTypes = new Set();
@@ -268,9 +272,6 @@ class LayoutDetailPanel {
     this._loadVersionProjection = loadVersionProjection || null;
     this._detailGeneration = 0;
 
-    const _isLayoutMutationCapability = id => id === 'craft.bop.entry.change.apply'
-      || id === 'craft.bop.entry.bulk.change.apply'
-      || id === 'craft.bop.entry_link.change.apply';
     this._invokeCapability = async (id, payload = {}) => {
       const _cloudFetch = this._cf;
       const requestBody = {
@@ -295,7 +296,6 @@ class LayoutDetailPanel {
         const detail = envelope?.error || response?.error || {};
         throw new Error(detail.message || `能力调用失败：${id}@1`);
       }
-      if (_isLayoutMutationCapability(id)) this._preserveLayoutView();
       const value = envelope.data;
       return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
     };
@@ -373,6 +373,7 @@ class LayoutDetailPanel {
     // 面板 toggle
     const panelToggle = this._el.querySelector('#llDpPanelToggle');
     if (panelToggle) panelToggle.addEventListener('click', () => this.toggle());
+    if (this._toolbarToggle) this._toolbarToggle.addEventListener('click', () => this.toggle());
     // 抽屉按钮
     document.getElementById('llDetDrawerClose')?.addEventListener('click', () => this._closeDetDrawer());
     document.getElementById('llDetDrawerCancel')?.addEventListener('click', () => this._closeDetDrawer());
@@ -735,11 +736,9 @@ class LayoutDetailPanel {
       btn.addEventListener('click', e => {
         e.stopPropagation();
         const gid = btn.dataset.gid;
-        const expanding = !this._treeExpanded.has(gid);
-        if (expanding) this._treeExpanded.add(gid);
-        else this._treeExpanded.delete(gid);
+        if (this._treeExpanded.has(gid)) this._treeExpanded.delete(gid);
+        else this._treeExpanded.add(gid);
         this._renderTree(this._currentGid);
-        if (expanding) this._onNodeActivate?.(gid);
       });
     });
 
@@ -767,11 +766,9 @@ class LayoutDetailPanel {
         e.stopPropagation();
         if (this._inlineAddPending) return; // inline add 进行中，不触发重渲染
         const gid = btn.dataset.gid;
-        const expanding = !this._treeExpanded.has(gid);
-        if (expanding) this._treeExpanded.add(gid);
-        else this._treeExpanded.delete(gid);
+        if (this._treeExpanded.has(gid)) this._treeExpanded.delete(gid);
+        else this._treeExpanded.add(gid);
         this._renderTree(this._currentGid);
-        if (expanding) this._onNodeActivate?.(gid);
       });
     });
 
@@ -927,13 +924,11 @@ class LayoutDetailPanel {
     this._currentGid = null;
     this._currentRow = null;
     this._show();
-    const data = this._getLineageData();
-    if (data?.rowByGid?.size) this._renderTree(null);
-    else this._renderEmptyTree();
-    if (this._propsBody) this._propsBody.innerHTML = '';
-    if (this._relsBody) this._relsBody.innerHTML = '';
-    if (this._rulesBody) this._rulesBody.innerHTML = '';
-    if (this._knowBody) this._knowBody.innerHTML = '';
+    this._renderEmptyTree();
+    this._propsBody.innerHTML = '';
+    this._relsBody.innerHTML = '';
+    this._rulesBody.innerHTML = '';
+    this._knowBody.innerHTML = '';
     this._renderDetailEmpty();
   }
 
@@ -945,7 +940,7 @@ class LayoutDetailPanel {
 
   toggle() {
     if (this._isOpen) this.close(false);
-    else { this._userClosed = false; if (this._currentGid) this.open(this._currentGid); else this.openEmpty(); }
+    else { this._userClosed = false; if (this._currentGid) this.open(this._currentGid); else this._show(); }
   }
 
   refresh() {
@@ -1271,7 +1266,6 @@ class LayoutDetailPanel {
           <span class="ll-props-nt">${_he(nodeTypeLabel)}</span>
           <input class="ll-props-title-inp" id="llPropsTitleInp"
                  value="${_he(row.title || '')}" placeholder="标题…">
-          <button class="ll-dp-hdr-btn" id="llPropsLocateBtn" title="在主视图定位">⊙</button>
         </div>
         <div class="ll-props-parent">
           <span class="ll-props-parent-lbl">父级</span>
@@ -1280,7 +1274,9 @@ class LayoutDetailPanel {
       </div>
       ${canEditCurrentLine ? '' : '<div class="ll-props-sec" style="color:var(--yellow,#f9e2af)">当前线体为只读，复制相关操作仍可用</div>'}
       <div class="ll-props-sec">属性</div>
-      <div id="llPropsOntoArea"><div style="color:var(--surface2);font-size:11px;padding:8px 4px">加载中…</div></div>`;
+      <div id="llPropsOntoArea"><div style="color:var(--surface2);font-size:11px;padding:8px 4px">加载中…</div></div>
+      <div class="ll-props-sec">关系</div>
+      <div id="llPropsRelsArea"><div style="color:var(--surface2);font-size:11px;padding:8px 4px">加载中…</div></div>`;
 
     this._propsBody.innerHTML = html;
 
@@ -1304,12 +1300,10 @@ class LayoutDetailPanel {
     };
     titleInp?.addEventListener('blur', saveTitleFn);
     titleInp?.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); titleInp.blur(); } });
-    this._propsBody.querySelector('#llPropsLocateBtn')?.addEventListener('click', () => {
-      this._onNodeActivate?.(gid);
-    });
 
     // 加载本体属性
     this._loadOntoProps(gid, row);
+    this._relsBody = this._propsBody.querySelector('#llPropsRelsArea');
     this._renderRels(gid, this._relsBody);
   }
 
@@ -1545,7 +1539,7 @@ class LayoutDetailPanel {
       });
 
     } catch (e) {
-      area.innerHTML = `<div style="color:var(--subtext0);font-size:11px;padding:4px">本体属性暂不可用</div>`;
+      area.innerHTML = `<div style="color:var(--red);font-size:11px;padding:4px">属性加载失败</div>`;
     }
   }
 
@@ -1911,23 +1905,18 @@ class LayoutDetailPanel {
     });
   }
 
-  _getCraftResourceRequirements(resourceType = null) {
-    if (!(this._craftResourceCache instanceof Map)) this._craftResourceCache = new Map();
-    const cacheKey = resourceType || '*';
-    if (!this._craftResourceCache.has(cacheKey)) {
-      const request = this._invokeCapability('craft.resource_requirement.search', {
-        ...(resourceType ? { resource_type: resourceType } : {}),
-        status: 'active',
-        page_size: 200,
+  _getCraftResourceRequirements() {
+    if (!this._craftResourceCache) {
+      this._craftResourceCache = this._invokeCapability('craft.resource_requirement.search', {
+        status: 'active', page_size: 200,
       })
-        .then(response => response?.items || [])
+        .then(response => response?.data || response?.items || response || [])
         .catch(error => {
-          this._craftResourceCache.delete(cacheKey);
+          this._craftResourceCache = null;
           throw error;
         });
-      this._craftResourceCache.set(cacheKey, request);
     }
-    return this._craftResourceCache.get(cacheKey);
+    return this._craftResourceCache;
   }
 
   async _openAddDetail(key, parentGid, nodeType, typeLabel) {
@@ -1953,7 +1942,8 @@ class LayoutDetailPanel {
 
     try {
       if (isResourceGroup) {
-        candidates = await this._getCraftResourceRequirements(grp.resourceType);
+        candidates = (await this._getCraftResourceRequirements())
+          .filter(item => item.resource_type === grp.resourceType);
         candSrcLabel = `${typeLabel}标准库`;
         selLinkType = grp.linkType;
       } else if (isPbomType) {
@@ -2307,7 +2297,6 @@ class LayoutDetailPanel {
   // ── 列5：知识 ─────────────────────────────────────────────────────────────
 
   async _renderKnowledge(gid) {
-    if (!this._knowBody) return;
     this._knowBody.innerHTML = '';
     try {
       const resp = await this._invokeCapability('craft.bop.entry.legacy_read', {
@@ -2564,8 +2553,6 @@ class LayoutDetailPanel {
         this._el.classList.add('open');
         this._toolbarToggle?.classList.add('active');
         if (this._currentGid) this.refresh();
-        else if (this._getLineageData()?.rowByGid?.size) this._renderTree(null);
-        else this._renderEmptyTree();
       }
     };
     this._handleBar?.addEventListener('click', _toggle);
@@ -2738,7 +2725,6 @@ class LayoutDetailPanel {
           <span class="ll-props-nt">${_he(nodeTypeLabel)}</span>
           <input class="ll-props-title-inp" id="llPropsTitleInp"
                  value="${_he(row.title || '')}" placeholder="标题…">
-          <button class="ll-dp-hdr-btn" id="llPropsLocateBtn" title="在主视图定位">⊙</button>
         </div>
         <div class="ll-props-parent">
           <span class="ll-props-parent-lbl">父级</span>
@@ -2747,7 +2733,9 @@ class LayoutDetailPanel {
       </div>
       ${canEditCurrentLine ? '' : '<div class="ll-props-sec" style="color:var(--yellow,#f9e2af)">当前线体为只读，复制相关操作仍可用</div>'}
       <div class="ll-props-sec">属性</div>
-      <div id="llPropsOntoArea"><div style="color:var(--surface2);font-size:11px;padding:8px 4px">加载中…</div></div>`;
+      <div id="llPropsOntoArea"><div style="color:var(--surface2);font-size:11px;padding:8px 4px">加载中…</div></div>
+      <div class="ll-props-sec">关系</div>
+      <div id="llPropsRelsArea"><div style="color:var(--surface2);font-size:11px;padding:8px 4px">加载中…</div></div>`;
 
     this._propsBody.innerHTML = html;
 
@@ -2771,12 +2759,10 @@ class LayoutDetailPanel {
     };
     titleInp?.addEventListener('blur', saveTitleFn);
     titleInp?.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); titleInp.blur(); } });
-    this._propsBody.querySelector('#llPropsLocateBtn')?.addEventListener('click', () => {
-      this._onNodeActivate?.(gid);
-    });
 
     // 加载本体属性
     this._loadOntoProps(gid, row);
+    this._relsBody = this._propsBody.querySelector('#llPropsRelsArea');
     this._renderRels(gid, this._relsBody);
   }
 
@@ -2915,7 +2901,7 @@ class LayoutDetailPanel {
       });
 
     } catch (e) {
-      area.innerHTML = `<div style="color:var(--subtext0);font-size:11px;padding:4px">本体属性暂不可用</div>`;
+      area.innerHTML = `<div style="color:var(--red);font-size:11px;padding:4px">属性加载失败</div>`;
     }
   }
 
@@ -3654,7 +3640,6 @@ class LayoutDetailPanel {
   // ── 列5：知识 ─────────────────────────────────────────────────────────────
 
   async _renderKnowledge(gid) {
-    if (!this._knowBody) return;
     this._knowBody.innerHTML = '';
     try {
       const resp = await this._invokeCapability('craft.bop.entry.legacy_read', {
@@ -3773,9 +3758,11 @@ class LayoutDetailPanel {
         this._el.classList.remove('open');
         this._toolbarToggle?.classList.remove('active');
       } else {
+        this._isOpen = true;
         this._userClosed = false;
-        if (this._currentGid) this.open(this._currentGid);
-        else this.openEmpty();
+        this._el.classList.add('open');
+        this._toolbarToggle?.classList.add('active');
+        if (this._currentGid) this.refresh();
       }
     };
     this._handleBar?.addEventListener('click', _toggle);

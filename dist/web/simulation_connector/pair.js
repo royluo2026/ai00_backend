@@ -16,11 +16,40 @@ async function request(path, options = {}) {
   return body.data;
 }
 
+async function invokeCapability(capabilityId, payload, { confirm = false } = {}) {
+  const version = 1;
+  const idempotencyKey = confirm ? `connector-pairing:${crypto.randomUUID()}` : undefined;
+  let confirmationToken;
+  if (confirm) {
+    const approval = await request(
+      `/api/v1/capabilities/${encodeURIComponent(capabilityId)}:confirm`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ version, payload, idempotency_key: idempotencyKey }),
+      },
+    );
+    confirmationToken = approval?.confirmation_token;
+    if (!confirmationToken) throw new Error('confirmation_token_missing');
+  }
+  const result = await request(
+    `/api/v1/capabilities/${encodeURIComponent(capabilityId)}:invoke`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        version, payload, idempotency_key: idempotencyKey,
+        confirmation_token: confirmationToken,
+      }),
+    },
+  );
+  if (result?.ok !== true) throw new Error(result?.error?.code || 'capability_invocation_failed');
+  return result.data;
+}
+
 async function load() {
   if (!token) { message('请先在 AI00 中使用飞书登录，再重新打开此页面。'); return; }
   if (!code) { message('缺少配对码，请从 Connector 重新发起绑定。'); return; }
   try {
-    const data = await request(`/api/v1/simulation/connectors/pairings/${encodeURIComponent(code)}`);
+    const data = await invokeCapability('simulation.connector.pairing.summary.get', { user_code: code });
     resourceVersion = data.resource_version;
     document.getElementById('code').textContent = data.user_code;
     document.getElementById('device').textContent = data.device_name;
@@ -35,9 +64,9 @@ async function load() {
 approveButton.addEventListener('click', async () => {
   approveButton.disabled = true;
   try {
-    await request(`/api/v1/simulation/connectors/pairings/${encodeURIComponent(code)}/approve`, {
-      method: 'POST', body: JSON.stringify({ expected_version: resourceVersion }),
-    });
+    await invokeCapability('simulation.connector.pairing.approve', {
+      user_code: code, expected_version: resourceVersion,
+    }, { confirm: true });
     message('绑定已确认，可以关闭此页面。');
   } catch (error) { message(`绑定失败：${error.message}`); approveButton.disabled = false; }
 });

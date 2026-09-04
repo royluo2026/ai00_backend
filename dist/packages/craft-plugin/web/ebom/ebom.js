@@ -283,7 +283,7 @@ let _vppsIgnoredOps     = [];        // 已忽略操作详情数组（含 origin
 
 /* ── 数据加载 ─────────────────────────────────────────────── */
 async function loadProjects() {
-  const res = await _invokeCapability('project.project.read.atomic.projects_search', {});
+  const res = await _invokeCapability('project.project.read.atomic.projects_search', { arguments: {} });
   _projects = res?.data || [];
   const selProj = document.getElementById('sel-project');
   selProj.innerHTML = '<option value="">全部项目</option>';
