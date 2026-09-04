@@ -172,6 +172,7 @@ class BopLifecyclePanel {
   }
 
   async refresh(force = false) {
+    if (!force) return;
     const now = Date.now();
     if (!force && now - this._lastRefresh < 10 * 60 * 1000) return;
     try {

@@ -24,7 +24,7 @@ def test_navigation_descriptors_are_closed_versioned_and_resource_bounded():
     registrations = _registrations()
     expected = {
         ("craft.bop.structure.outline.get", 1): (512 * 1024, 100, 1, 8),
-        ("craft.bop.work_package.get", 2): (1024 * 1024, 200, 1, 4),
+        ("craft.bop.work_package.get", 2): (1024 * 1024, 200, 2, 4),
         ("craft.bop.entry.detail.get", 1): (512 * 1024, None, 4, 16),
     }
 

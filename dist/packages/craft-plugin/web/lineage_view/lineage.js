@@ -727,7 +727,9 @@ async function _load() {
     _loadedVersionGids = new Set([_versionGid]);
     _versionTagMap.set(_versionGid, _versionTag);
     let firstCommit = true;
+    const versionSummary = _verMgr?.allVersions?.find(version => version.gid === _versionGid);
     const loaded = await _progressiveLoader.loadVersion(_versionGid, {
+      revision: Number(versionSummary?.revision),
       onCommit: snapshot => {
         _currentRevision = snapshot.revision;
         _versionStatus = snapshot.version?.lifecycle?.status || snapshot.version?.status || 'active';

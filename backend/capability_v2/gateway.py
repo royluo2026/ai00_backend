@@ -378,19 +378,23 @@ class CapabilityGatewayService:
         defer_stream = False
         try:
             try:
-                value = provider.handler(dict(envelope.payload), context)
-                if inspect.isawaitable(value):
-                    try:
+                timeout_seconds = self._provider_timeout_seconds(descriptor, envelope)
+                try:
+                    if inspect.iscoroutinefunction(provider.handler):
+                        value = provider.handler(dict(envelope.payload), context)
+                    else:
                         value = await asyncio.wait_for(
-                            value,
-                            timeout=self._provider_timeout_seconds(descriptor, envelope),
+                            asyncio.to_thread(provider.handler, dict(envelope.payload), context),
+                            timeout=timeout_seconds,
                         )
-                    except TimeoutError as exc:
-                        raise CapabilityBusinessError(
-                            "runtime_timeout",
-                            "Capability provider exceeded its execution deadline.",
-                            retryable=True,
-                        ) from exc
+                    if inspect.isawaitable(value):
+                        value = await asyncio.wait_for(value, timeout=timeout_seconds)
+                except TimeoutError as exc:
+                    raise CapabilityBusinessError(
+                        "runtime_timeout",
+                        "Capability provider exceeded its execution deadline.",
+                        retryable=True,
+                    ) from exc
             except LookupError as exc:
                 raise CapabilityBusinessError(
                     "resource_not_found", "The requested resource was not found."

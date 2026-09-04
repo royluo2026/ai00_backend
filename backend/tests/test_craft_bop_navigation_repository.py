@@ -66,7 +66,6 @@ def test_work_package_uses_keyset_page_and_batches_links_for_returned_gids_only(
         {"one": {"revision": 7}},
         {"one": {"gid": "line1", "node_type": "line_process"}},
         {"all": rows},
-        {"one": {"total_count": 3}},
         {"all": [
             {"entry_gid": "e1", "link_type": "project_tools", "entity_gid": "tool1", "is_primary": 1},
             {"entry_gid": "e2", "link_type": "pbom_part", "entity_gid": "part1", "is_primary": 1},
@@ -83,12 +82,31 @@ def test_work_package_uses_keyset_page_and_batches_links_for_returned_gids_only(
     assert result["nodes"][1]["part_refs"] == ["part:part1"]
     assert result["next_cursor"] == encode_cursor(1.0, "e2")
     page_sql, page_params = cursor.statements[2]
-    assert "sort_order > %s OR (e.sort_order = %s AND e.gid > %s)" in page_sql
-    assert page_params[-1] == 3
-    link_sql, link_params = cursor.statements[4]
+    assert "WITH RECURSIVE" not in page_sql
+    assert page_params == ("version1",)
+    link_sql, link_params = cursor.statements[3]
     assert "entry_gid IN (%s,%s)" in link_sql
     assert "e3" not in link_params
     assert link_params[-2:] == ("e1", "e2")
+
+
+def test_work_package_avoids_recursive_database_queries():
+    repository, cursor = _repository([
+        {"one": {"revision": 7}},
+        {"one": {"gid": "line1", "node_type": "line_process"}},
+        {"all": [{
+            "gid": "e1", "parent_gid": "line1", "node_type": "process",
+            "sort_order": 1.0, "title": "P1", "vpps": None,
+        }]},
+        {"all": []},
+        {"one": {"revision": 7}},
+    ])
+
+    repository.get_work_package_page(
+        "version1", 7, "line", "line1", cursor=None, page_size=10,
+    )
+
+    assert all("WITH RECURSIVE" not in sql for sql, _params in cursor.statements)
 
 
 def test_work_package_projects_bounded_primary_entity_cards_and_entry_fields():
@@ -110,7 +128,6 @@ def test_work_package_projects_bounded_primary_entity_cards_and_entry_fields():
         {"one": {"revision": 7}},
         {"one": {"gid": "line1", "node_type": "line_process"}},
         {"all": rows},
-        {"one": {"total_count": 2}},
         {"all": [
             {
                 "link_gid": "link-1", "entry_gid": "e1", "version_gid": "version1",
@@ -152,7 +169,6 @@ def test_revision_change_after_page_assembly_returns_conflict():
         {"one": {"revision": 7}},
         {"one": {"gid": "line1", "node_type": "line_process"}},
         {"all": []},
-        {"one": {"total_count": 0}},
         {"one": {"revision": 8}},
     ])
 
@@ -176,10 +192,10 @@ def test_work_package_pages_preserve_cross_page_parent_child_identity_without_du
     }
     repository, _cursor = _repository([
         {"one": {"revision": 9}}, {"one": {"gid": "line1", "node_type": "line_process"}},
-        {"all": [parent, child]}, {"one": {"total_count": 2}}, {"all": []},
+        {"all": [parent, child]}, {"all": []},
         {"one": {"revision": 9}},
         {"one": {"revision": 9}}, {"one": {"gid": "line1", "node_type": "line_process"}},
-        {"all": [child]}, {"one": {"total_count": 2}}, {"all": []},
+        {"all": [parent, child]}, {"all": []},
         {"one": {"revision": 9}},
     ])
 
@@ -208,8 +224,15 @@ def test_outline_is_bounded_and_counts_only_current_page_lines():
         {"all": lines},
         {"one": {"total_count": 2}},
         {"all": [
-            {"root_gid": "line1", "node_type": "station_process", "node_count": 10},
-            {"root_gid": "line2", "node_type": "operation", "node_count": 20},
+            *lines,
+            {"gid": "station1", "parent_gid": "line1", "node_type": "station_process"},
+            {"gid": "process1", "parent_gid": "station1", "node_type": "process"},
+            {"gid": "operation1", "parent_gid": "process1", "node_type": "operation"},
+            {"gid": "part1", "parent_gid": "operation1", "node_type": "part"},
+            {"gid": "tool1", "parent_gid": "operation1", "node_type": "tool_need"},
+            {"gid": "operation2", "parent_gid": "line2", "node_type": "operation"},
+            {"gid": "line3", "parent_gid": "root", "node_type": "line_process"},
+            {"gid": "station3", "parent_gid": "line3", "node_type": "station_process"},
         ]},
         {"one": {"revision": 3}},
     ])
@@ -218,11 +241,13 @@ def test_outline_is_bounded_and_counts_only_current_page_lines():
 
     assert result["total_lines"] == 2
     assert result["lines"][0]["counts"] == {
-        "stations": 10, "roles": 0, "processes": 0,
-        "operations": 0, "parts": 0, "resources": 0,
+        "stations": 1, "roles": 0, "processes": 1,
+        "operations": 1, "parts": 1, "resources": 1,
     }
-    count_params = cursor.statements[4][1]
-    assert count_params[1:-1] == ("line1", "line2")
+    assert result["lines"][1]["counts"]["operations"] == 1
+    count_sql, count_params = cursor.statements[4]
+    assert "WITH RECURSIVE" not in count_sql
+    assert count_params == ("version1",)
 
 
 def test_page_size_and_scope_kind_are_rejected_before_sql():

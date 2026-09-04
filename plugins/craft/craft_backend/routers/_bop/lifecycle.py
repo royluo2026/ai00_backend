@@ -178,18 +178,30 @@ class InitStateBody(BaseModel):
 
 def _get_line_subtree_gids(cur, version_gid: str, line_gid: str) -> List[str]:
     """递归获取某条线体下所有 bop_entries 的 gid（包含线体自身）"""
-    cur.execute("""
-        WITH RECURSIVE subtree AS (
-            SELECT gid FROM workmanship_bop_bop_entries
-            WHERE gid = %s AND version_gid = %s AND is_deleted = FALSE
-            UNION ALL
-            SELECT e.gid FROM workmanship_bop_bop_entries e
-            JOIN subtree s ON e.parent_gid = s.gid
-            WHERE e.version_gid = %s AND e.is_deleted = FALSE
-        )
-        SELECT gid FROM subtree
-    """, (line_gid, version_gid, version_gid))
-    return [r['gid'] for r in cur.fetchall()]
+    cur.execute(
+        "SELECT gid,parent_gid FROM workmanship_bop_bop_entries "
+        "WHERE version_gid=%s AND is_deleted=FALSE",
+        (version_gid,),
+    )
+    rows = cur.fetchall()
+    gids = {str(row["gid"]) for row in rows}
+    if line_gid not in gids:
+        return []
+    children: dict[str, list[str]] = {}
+    for row in rows:
+        parent_gid = str(row["parent_gid"]) if row.get("parent_gid") else ""
+        children.setdefault(parent_gid, []).append(str(row["gid"]))
+    result: list[str] = []
+    pending = [line_gid]
+    seen: set[str] = set()
+    while pending:
+        gid = pending.pop()
+        if gid in seen:
+            continue
+        seen.add(gid)
+        result.append(gid)
+        pending.extend(reversed(children.get(gid, [])))
+    return result
 
 
 def _get_family_phase(cur, family_gid: str) -> str:

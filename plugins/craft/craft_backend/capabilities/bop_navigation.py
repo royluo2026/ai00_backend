@@ -130,7 +130,7 @@ def register_bop_navigation_capabilities(registry: Any) -> None:
         execution_budget=CapabilityExecutionBudget(
             memory_class="medium", max_input_bytes=64 * 1024,
             max_output_bytes=1024 * 1024, collection_policy="paged", max_page_size=200,
-            max_parallel_per_consumer=1, max_parallel_per_tenant=4,
+            max_parallel_per_consumer=2, max_parallel_per_tenant=4,
         ),
         **common,
     ), get_work_package_page)

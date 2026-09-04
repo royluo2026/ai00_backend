@@ -269,22 +269,29 @@ class BopNavigationRepository:
                     str(row["gid"]): {name: 0 for name in _COUNT_NAMES} for row in page
                 }
                 if page:
-                    placeholders = ",".join("%s" for _ in page)
                     db.execute(
-                        "WITH RECURSIVE scoped(root_gid,gid,node_type) AS ("
-                        " SELECT e.gid,e.gid,e.node_type FROM workmanship_bop_bop_entries e"
-                        f" WHERE e.version_gid=%s AND e.is_deleted=0 AND e.gid IN ({placeholders})"
-                        " UNION ALL SELECT s.root_gid,c.gid,c.node_type"
-                        " FROM workmanship_bop_bop_entries c JOIN scoped s ON c.parent_gid=s.gid"
-                        " WHERE c.version_gid=%s AND c.is_deleted=0)"
-                        " SELECT root_gid,node_type,COUNT(*) AS node_count FROM scoped"
-                        " WHERE gid<>root_gid GROUP BY root_gid,node_type",
-                        (version_gid, *(row["gid"] for row in page), version_gid),
+                        "SELECT gid,parent_gid,node_type FROM workmanship_bop_bop_entries "
+                        "WHERE version_gid=%s AND is_deleted=0",
+                        (version_gid,),
                     )
-                    for row in db.fetchall():
+                    rows = [dict(row) for row in db.fetchall()]
+                    parents = {str(row["gid"]): row.get("parent_gid") for row in rows}
+                    roots: dict[str, str | None] = {gid: gid for gid in counts}
+                    for row in rows:
+                        gid = str(row["gid"])
+                        current = gid
+                        trail: list[str] = []
+                        seen: set[str] = set()
+                        while current in parents and current not in roots and current not in seen:
+                            seen.add(current)
+                            trail.append(current)
+                            current = str(parents[current]) if parents[current] else ""
+                        root_gid = roots.get(current)
+                        for item in trail:
+                            roots[item] = root_gid
                         group = _COUNT_GROUP.get(str(row["node_type"]))
-                        if group:
-                            counts[str(row["root_gid"])][group] += int(row["node_count"])
+                        if group and gid not in counts and root_gid in counts:
+                            counts[root_gid][group] += 1
                 self._assert_revision(db, version_gid, revision)
         lines = [{**row, "counts": counts[str(row["gid"])]} for row in page]
         next_cursor = (
@@ -318,32 +325,37 @@ class BopNavigationRepository:
                 expected_type = "line_process" if scope_kind == "line" else "station_process"
                 if not scope or scope.get("node_type") != expected_type:
                     raise _error("scope_not_found", "BOP scope was not found", scope_gid=scope_gid)
-                cte = (
-                    "WITH RECURSIVE scoped(gid) AS ("
-                    " SELECT gid FROM workmanship_bop_bop_entries"
-                    " WHERE version_gid=%s AND gid=%s AND is_deleted=0"
-                    " UNION ALL SELECT e.gid FROM workmanship_bop_bop_entries e"
-                    " JOIN scoped s ON e.parent_gid=s.gid"
-                    " WHERE e.version_gid=%s AND e.is_deleted=0) "
-                )
                 db.execute(
-                    cte +
-                    "SELECT e.gid,e.parent_gid,e.node_type,e.sort_order,e.title,e.vpps,"
-                    "e.meta,e.process_flow_pic,e.process_chart_pic,"
-                    "JSON_UNQUOTE(JSON_EXTRACT(e.meta,'$.tc_key')) AS bom_row_id "
-                    "FROM workmanship_bop_bop_entries e JOIN scoped s ON s.gid=e.gid "
-                    "WHERE e.version_gid=%s "
-                    "AND (e.sort_order > %s OR (e.sort_order = %s AND e.gid > %s)) "
-                    "ORDER BY e.sort_order,e.gid LIMIT %s",
-                    (version_gid, scope_gid, version_gid, version_gid,
-                     cursor_sort, cursor_sort, cursor_gid, size + 1),
+                    "SELECT gid,parent_gid,node_type,sort_order,title,vpps,"
+                    "meta,process_flow_pic,process_chart_pic,"
+                    "JSON_UNQUOTE(JSON_EXTRACT(meta,'$.tc_key')) AS bom_row_id "
+                    "FROM workmanship_bop_bop_entries "
+                    "WHERE version_gid=%s AND is_deleted=0 ORDER BY sort_order,gid",
+                    (version_gid,),
                 )
-                raw_nodes = [dict(row) for row in db.fetchall()]
-                db.execute(
-                    cte + "SELECT COUNT(*) AS total_count FROM scoped",
-                    (version_gid, scope_gid, version_gid),
+                all_rows = [dict(row) for row in db.fetchall()]
+                children: dict[str, list[str]] = {}
+                rows_by_gid = {str(row["gid"]): row for row in all_rows}
+                for row in all_rows:
+                    parent_gid = str(row["parent_gid"]) if row.get("parent_gid") else ""
+                    children.setdefault(parent_gid, []).append(str(row["gid"]))
+                scoped_gids: set[str] = set()
+                pending = [scope_gid]
+                while pending:
+                    gid = pending.pop()
+                    if gid in scoped_gids:
+                        continue
+                    scoped_gids.add(gid)
+                    pending.extend(children.get(gid, ()))
+                scoped_rows = sorted(
+                    (rows_by_gid[gid] for gid in scoped_gids if gid in rows_by_gid),
+                    key=lambda row: (float(row.get("sort_order") or 0), str(row["gid"])),
                 )
-                total_row = db.fetchone() or {}
+                raw_nodes = [
+                    row for row in scoped_rows
+                    if (float(row.get("sort_order") or 0), str(row["gid"]))
+                    > (cursor_sort, cursor_gid)
+                ][:size + 1]
                 page = raw_nodes[:size]
                 links: list[dict[str, Any]] = []
                 if page:
@@ -381,7 +393,7 @@ class BopNavigationRepository:
             "version_gid": version_gid, "revision": revision,
             "scope": {"kind": scope_kind, "gid": scope_gid},
             "nodes": nodes, "links": [_public_link(link) for link in links],
-            "total_count": int(total_row.get("total_count") or 0),
+            "total_count": len(scoped_rows),
             "next_cursor": next_cursor,
         }
 

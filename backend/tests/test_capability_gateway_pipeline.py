@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import threading
 from datetime import UTC, datetime, timedelta
 
 import pytest
@@ -129,6 +130,38 @@ def test_gateway_executes_fixed_validate_authorize_approve_dispatch_project_orde
     assert result.ok is True
     assert result.data == {"routing_id": "routing_1"}
     assert events == ["authorize", "approve", "dispatch", "project"]
+
+
+def test_gateway_sync_provider_does_not_block_the_event_loop():
+    release_provider = threading.Event()
+    provider_observed_release = []
+
+    class Policy:
+        def authorize(self, *_args):
+            return AuthorizationDecision(allowed=True, code="allowed", policy_version="p1")
+
+        def approve(self, *_args):
+            return None
+
+        def project(self, _descriptor, _identity, data):
+            return data
+
+    def handler(_payload, _context):
+        provider_observed_release.append(release_provider.wait(timeout=0.2))
+        return {"routing_id": "routing_1"}
+
+    gateway, catalog_release = _gateway(_descriptor(), handler, Policy())
+
+    async def invoke_while_loop_stays_responsive():
+        invocation = asyncio.create_task(gateway.invoke(_envelope(catalog_release)))
+        await asyncio.sleep(0)
+        release_provider.set()
+        return await invocation
+
+    result = asyncio.run(invoke_while_loop_stays_responsive())
+
+    assert result.ok is True
+    assert provider_observed_release == [True]
 
 
 def test_gateway_rejects_stored_but_inactive_catalog_release_before_dispatch():

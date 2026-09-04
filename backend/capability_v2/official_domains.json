@@ -90,7 +90,7 @@
         "plugin_id": "official.craft",
         "module": "craft_backend.capabilities",
         "version": "1.2.0",
-        "artifact_hash": "sha256:0c1e1e928ee08946359a3983013e08b74fe1eb24641b44454c2768f1e3dcf837"
+        "artifact_hash": "sha256:b701f7f4fd4cdc0fd3e5e9110dd07c8b7889583b8af8f5ba05202fc37f4c853f"
       },
       "artifact_path": "plugins/craft/craft_backend",
       "allowed_owners": [
@@ -278,7 +278,7 @@
         "plugin_id": "official.project-management",
         "module": "project_management_backend.capabilities",
         "version": "1.0.0",
-          "artifact_hash": "sha256:6914095a86ad2ff8bd90b90daac64ccb66190392ae8fda9f207b12d376d7914b"
+        "artifact_hash": "sha256:6914095a86ad2ff8bd90b90daac64ccb66190392ae8fda9f207b12d376d7914b"
       },
       "artifact_path": "plugins/project_management/project_management_backend",
       "allowed_owners": [
