@@ -412,8 +412,8 @@ class AgentCapabilityRepository:
         return dict(row) if row else None
 
     def runtime_config(self, data: dict) -> dict:
-        import os
         from ..runtime_mode import pi_enabled
+        from .runtime_secret_store import resolve_runtime_config
 
         is_admin = "super_admin" in set(data.get("active_roles", ()))
         if pi_enabled():
@@ -424,12 +424,13 @@ class AgentCapabilityRepository:
                 "key_preview": "",
                 "is_admin": is_admin,
             }
-        key = os.getenv("AI_API_KEY") or os.getenv("ANTHROPIC_API_KEY") or os.getenv("OPENAI_API_KEY") or ""
-        model = os.getenv("AI_MODEL", "anthropic/claude-sonnet-4-6")
-        api_base = os.getenv("AI_API_BASE", "")
+        config = resolve_runtime_config()
+        key = config["api_key"]
+        model = config["model"]
+        api_base = config["api_base"]
         key_preview = (key[:4] + "••••" + key[-4:]) if len(key) > 8 else ("•" * len(key))
         result = {
-            "source": "env" if key else "none",
+            "source": config["source"],
             "model": model if key else "",
             "has_key": bool(key),
             "key_preview": key_preview,

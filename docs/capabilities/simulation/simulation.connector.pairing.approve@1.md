@@ -8,7 +8,7 @@ Bind one pending Connector to the current AI00 user.
 - 不适用：The user or resource version does not match.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
-- Catalog Release：`rel_c4a99d9707731f20957fc5029360031a`
+- Catalog Release：`rel_af8416a36dceaafab609f21a76c7884c`
 - Schema 精度：`typed`
 - 暂未开放原因：`experimental_lifecycle`
 
@@ -92,7 +92,7 @@ Bind one pending Connector to the current AI00 user.
 ```json
 {
   "capability_id": "simulation.connector.pairing.approve",
-  "catalog_release": "rel_c4a99d9707731f20957fc5029360031a",
+  "catalog_release": "rel_af8416a36dceaafab609f21a76c7884c",
   "major_version": 1,
   "payload": {
     "expected_version": 1,

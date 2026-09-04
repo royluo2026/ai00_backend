@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_c4a99d9707731f20957fc5029360031a",
-  "catalog_hash": "sha256:c4a99d9707731f20957fc5029360031aeba9c64a0ea91261c61fa53942a828e5",
+  "release_id": "rel_af8416a36dceaafab609f21a76c7884c",
+  "catalog_hash": "sha256:af8416a36dceaafab609f21a76c7884cb1f0da5bc9e794a47b2cddf35bda7bda",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -301611,7 +301611,7 @@
       "plugin_id": "official.agent",
       "module": "agent_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:9c8b90406165d21afbeb92741f8f74ee5b3d394c4865b918cae6a8e9bc55e946"
+      "artifact_hash": "sha256:38e390abf991cf3fa833c341d66d5fec15835d549c79ddaea688830bae6249ac"
     },
     {
       "plugin_id": "official.base",
@@ -301674,5 +301674,5 @@
       "artifact_hash": "sha256:6e07ea783c75b056b3f1e93122ff1c002874fb4eee4ccd0604efc131f105d9cd"
     }
   ],
-  "created_at": "2026-09-04T10:48:02.911150Z"
+  "created_at": "2026-09-04T12:17:10.986494Z"
 }

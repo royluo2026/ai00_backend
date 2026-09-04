@@ -33,6 +33,7 @@ from ..ai_assistant.tool_registry import (
 )
 from ..api.compatibility import invoke_agent_capability
 from ..application.interaction_state import consume_abort
+from ..infrastructure.runtime_secret_store import resolve_runtime_config, runtime_secret_store
 from backend.capability_v2.gateway import get_default_gateway
 from backend.capability_v2.provider_contracts import CapabilityBusinessError
 from backend.platform_sdk.auth import get_authenticated_principal
@@ -103,15 +104,7 @@ _CHJ_BASE_COMPLETIONS = "http://api-hub.inner.chj.cloud/llm-gateway/v1/chat/comp
 
 def _get_ai_config(user_gid: str | None = None) -> dict:
     """Model credentials are deployment secrets, never business-database records."""
-    key = os.getenv("AI_API_KEY") or os.getenv("ANTHROPIC_API_KEY") or os.getenv("OPENAI_API_KEY")
-    if key:
-        return {
-            "model": os.getenv("AI_MODEL", _DEFAULT_MODEL),
-            "api_key": key,
-            "api_base": os.getenv("AI_API_BASE", ""),
-            "source": "env",
-        }
-    return {"model": "", "api_key": "", "api_base": "", "source": "none"}
+    return resolve_runtime_config(default_model=_DEFAULT_MODEL)
 
 
 def _get_admin_config_raw() -> dict:
@@ -268,7 +261,7 @@ def _chat_stream_gen(
     """生成 SSE 事件的生成器函数。"""
     ai_cfg = _get_ai_config(user_gid)
     if not ai_cfg["api_key"]:
-        yield f'data: {json.dumps({"type":"error","message":"未配置 AI API Key，请在「AI 设置」中配置"})}\n\n'
+        yield f'data: {json.dumps({"type":"error","message":"未配置 AI API Key；请在 Agent Runtime 部署 Secret 中配置"})}\n\n'
         return
 
     is_new = not session_gid
@@ -286,17 +279,17 @@ def _chat_stream_gen(
         owner_gid=user_gid,
     )
 
-    try:
-        import litellm
-        litellm.set_verbose = False
-    except ImportError:
-        yield f'data: {json.dumps({"type":"error","message":"litellm 未安装，请执行 pip install litellm"})}\n\n'
-        return
-
     model    = _normalize_model(ai_cfg["model"], ai_cfg.get("api_base", ""))
     api_key  = ai_cfg["api_key"]
     api_base = ai_cfg.get("api_base") or None
     is_chj   = _is_chj(model, api_base or "")
+    if not is_chj:
+        try:
+            import litellm
+            litellm.set_verbose = False
+        except ImportError:
+            yield f'data: {json.dumps({"type":"error","message":"litellm 未安装，请执行 pip install litellm"})}\n\n'
+            return
 
     # ── Phase 0 任务分类 + Orchestrator 检查 ─────────────────────────────────
     from ..ai_assistant.orchestrator import should_orchestrate, OrchestratorRunner
@@ -1055,15 +1048,34 @@ async def get_admin_config(
     return await invoke_agent_capability("agent.runtime.config.read", {}, _user)
 
 
-@router.post("/admin-config", status_code=410)
+@router.post("/admin-config")
 def save_admin_config(
     body: dict,
+    request: Request,
     _user: dict = Depends(require_role("super_admin")),
 ):
-    raise HTTPException(
-        status_code=410,
-        detail="模型密钥由 Agent Runtime 部署 Secret 管理；旧配置写入入口已退役",
-    )
+    if os.getenv("ALLOW_LOCAL_RUNTIME_SECRET_ADMIN") != "1":
+        raise HTTPException(status_code=403, detail="local_runtime_secret_admin_disabled")
+    if request.client is None or request.client.host not in {"127.0.0.1", "::1"}:
+        raise HTTPException(status_code=403, detail="local_runtime_secret_admin_loopback_only")
+
+    model = str(body.get("model") or "").strip()
+    api_base = str(body.get("api_base") or "").strip()
+    api_key = str(body.get("api_key") or "").strip()
+    if not model or len(model) > 200 or len(api_base) > 500 or len(api_key) > 8192:
+        raise HTTPException(status_code=422, detail="invalid_runtime_config")
+
+    store = runtime_secret_store()
+    current = store.load()
+    api_key = api_key or current.get("api_key", "")
+    if not api_key:
+        raise HTTPException(status_code=422, detail="invalid_runtime_config")
+    config = {"model": model, "api_key": api_key, "api_base": api_base}
+    store.save(config)
+    return {
+        "source": "local_secret", "model": model, "api_base": api_base,
+        "has_key": True, "key_preview": _mask_key(api_key), "is_admin": True,
+    }
 
 @router.post("/test-connection")
 def test_connection(
@@ -1081,16 +1093,17 @@ def test_connection(
         return {"success": False, "error": "未配置 API Key"}
 
     try:
-        import litellm
-        litellm.set_verbose = False
         model_id = _normalize_model(cfg["model"], cfg.get("api_base", ""))
-        if _is_chj(cfg["model"], cfg.get("api_base") or ""):
+        is_chj = _is_chj(cfg["model"], cfg.get("api_base") or "")
+        if is_chj:
             data = _chj_completion(
                 messages=[{"role": "user", "content": "reply: ok"}],
                 model_id=model_id, api_key=cfg["api_key"], max_tokens=16,
             )
             reply = data["choices"][0]["message"].get("content", "")[:80]
         else:
+            import litellm
+            litellm.set_verbose = False
             call_kwargs: dict = {
                 "model": model_id,
                 "messages": [{"role": "user", "content": "reply: ok"}],

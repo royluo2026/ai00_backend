@@ -8,7 +8,7 @@ Read BOP staging entries for a version.
 - 不适用：The request creates, edits, deletes, demotes, or promotes staging entries.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_c4a99d9707731f20957fc5029360031a`
+- Catalog Release：`rel_af8416a36dceaafab609f21a76c7884c`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -93,7 +93,7 @@ Read BOP staging entries for a version.
 ```json
 {
   "capability_id": "craft.bop.staging.read",
-  "catalog_release": "rel_c4a99d9707731f20957fc5029360031a",
+  "catalog_release": "rel_af8416a36dceaafab609f21a76c7884c",
   "major_version": 1,
   "payload": {
     "operation": "list",

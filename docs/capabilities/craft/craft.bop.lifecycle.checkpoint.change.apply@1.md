@@ -8,7 +8,7 @@ Create an immutable snapshot checkpoint for a BOP line subtree.
 - 不适用：The request restores, undoes, or redoes a checkpoint or history batch.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_c4a99d9707731f20957fc5029360031a`
+- Catalog Release：`rel_af8416a36dceaafab609f21a76c7884c`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -105,7 +105,7 @@ Create an immutable snapshot checkpoint for a BOP line subtree.
 ```json
 {
   "capability_id": "craft.bop.lifecycle.checkpoint.change.apply",
-  "catalog_release": "rel_c4a99d9707731f20957fc5029360031a",
+  "catalog_release": "rel_af8416a36dceaafab609f21a76c7884c",
   "major_version": 1,
   "payload": {
     "line_gid": "example",

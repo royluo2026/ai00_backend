@@ -8,7 +8,7 @@ Read bounded GBOP entries, processes, operations and entry links.
 - 不适用：The request mutates GBOP state or imports/forks a version.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_c4a99d9707731f20957fc5029360031a`
+- Catalog Release：`rel_af8416a36dceaafab609f21a76c7884c`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -100,7 +100,7 @@ Read bounded GBOP entries, processes, operations and entry links.
 ```json
 {
   "capability_id": "craft.gbop.catalog.read",
-  "catalog_release": "rel_c4a99d9707731f20957fc5029360031a",
+  "catalog_release": "rel_af8416a36dceaafab609f21a76c7884c",
   "major_version": 1,
   "payload": {
     "operation": "entries.list"

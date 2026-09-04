@@ -8,7 +8,7 @@ Read one bounded page of the navigable BOP structure outline.
 - 不适用：A consumer needs an official complete execution structure.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_c4a99d9707731f20957fc5029360031a`
+- Catalog Release：`rel_af8416a36dceaafab609f21a76c7884c`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -101,7 +101,7 @@ Read one bounded page of the navigable BOP structure outline.
 ```json
 {
   "capability_id": "craft.bop.structure.outline.get",
-  "catalog_release": "rel_c4a99d9707731f20957fc5029360031a",
+  "catalog_release": "rel_af8416a36dceaafab609f21a76c7884c",
   "major_version": 1,
   "payload": {
     "revision": 1,

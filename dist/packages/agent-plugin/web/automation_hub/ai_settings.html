@@ -209,24 +209,24 @@ html, body { height: 100%; background: var(--bg); color: var(--text);
       </div>
     </div>
     <p style="font-size:12px;color:var(--text-muted);margin-top:4px">
-      当前模型为公司内部部署私有化模型，无泄密风险。
+      所有用户共用同一个 Agent Runtime 模型配置，密钥不会被页面回显。
     </p>
   </div>
 
-  <!-- ── 管理员全局配置（仅超管可见） ── -->
+  <!-- ── 管理员运行时配置（仅超管可见） ── -->
   <div class="section" id="adminSection">
     <div class="section-title">
-      系统默认配置
+      Agent Runtime 部署配置
       <span class="section-badge admin">仅超级管理员</span>
     </div>
     <div class="form-hint" style="margin-bottom:14px;color:var(--text-muted)">
-      配置后所有用户均可使用 AI 功能，无需自行填写 API Key。
+      保存后立即供所有用户的小柔使用。API Key 使用本机 DPAPI 加密，仅超级管理员可以替换。
     </div>
 
     <!-- Provider 快选 -->
     <div class="section" style="margin-bottom:12px;padding:0">
       <div class="section-title" style="font-size:11px;border-bottom:none;padding-bottom:4px;margin-bottom:8px">
-        快速选择 Provider
+        当前 Provider
       </div>
       <div class="provider-grid" id="adminProviderGrid">
         <div class="provider-card" data-model="anthropic/claude-sonnet-4-6" data-base="">
@@ -293,7 +293,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text);
       <div class="field-wrap">
         <input id="adminKeyInput" type="password"
                class="has-action"
-               placeholder="留空保留已有密钥"
+               placeholder="输入新 Key；留空则保留当前 Key"
                autocomplete="new-password">
         <div class="field-action">
           <button class="icon-btn" id="toggleAdminKeyBtn" title="显示/隐藏">
@@ -316,17 +316,17 @@ html, body { height: 100%; background: var(--bg); color: var(--text);
                placeholder="留空使用 provider 默认地址"
                autocomplete="off">
       </div>
-      <div class="form-hint">Ollama 本地：<code>http://localhost:11434</code> &nbsp;·&nbsp; OpenAI 兼容接口：填入自定义 API 地址</div>
+      <div class="form-hint">留空时使用 Provider 默认地址。</div>
     </div>
 
     <div class="action-row">
+      <button class="btn btn-primary" id="adminSaveBtn">保存共享配置</button>
       <button class="btn btn-outline" id="adminTestBtn">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px;vertical-align:-1px">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
         </svg>
         测试连接
       </button>
-      <button class="btn btn-primary" id="adminSaveBtn">保存系统默认</button>
       <div class="status-bar" id="adminStatusBar"></div>
     </div>
   </div>
@@ -345,8 +345,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text);
   const $adminModel   = document.getElementById('adminModelInput');
   const $adminKey     = document.getElementById('adminKeyInput');
   const $adminBase    = document.getElementById('adminBaseInput');
-  const $adminTestBtn = document.getElementById('adminTestBtn');
   const $adminSaveBtn = document.getElementById('adminSaveBtn');
+  const $adminTestBtn = document.getElementById('adminTestBtn');
   const $adminStatus  = document.getElementById('adminStatusBar');
 
   // ── 云端 Fetch 帮助函数 ──────────────────────────────────────────────────
@@ -373,8 +373,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text);
     }
   }
 
-  const SOURCE_LABEL = { admin: '来自系统配置', env: '来自环境变量', none: '未配置' };
-  const SOURCE_CLASS = { admin: 'src-admin', env: 'src-env', none: 'src-none' };
+  const SOURCE_LABEL = { pi_runtime: '由 Agent Runtime 管理', env: '来自部署环境', local_secret: '本机加密共享配置', none: '未配置' };
+  const SOURCE_CLASS = { pi_runtime: 'src-admin', env: 'src-env', local_secret: 'src-admin', none: 'src-none' };
 
   function updatePreview(cfg) {
     if (!cfg) return;
@@ -399,42 +399,37 @@ html, body { height: 100%; background: var(--bg); color: var(--text);
     });
   }
 
-  document.getElementById('adminProviderGrid').addEventListener('click', e => {
-    const card = e.target.closest('.provider-card');
-    if (!card) return;
-    document.querySelectorAll('#adminProviderGrid .provider-card').forEach(c => c.classList.remove('selected'));
-    card.classList.add('selected');
-    $adminModel.value   = card.dataset.model || '';
-    $adminBase.value    = card.dataset.base  || '';
-    const isChj = card.dataset.provider === 'chj_admin';
-    $adminChjModelRow.classList.toggle('show', isChj);
-    if (isChj) _syncAdminChjChips($adminModel.value);
+  document.querySelectorAll('#adminProviderGrid .provider-card').forEach(card => {
+    card.addEventListener('click', () => {
+      $adminModel.value = card.dataset.model || '';
+      $adminBase.value = card.dataset.base || '';
+      document.querySelectorAll('#adminProviderGrid .provider-card').forEach(c => c.classList.toggle('selected', c === card));
+      $adminChjModelRow.classList.toggle('show', card.dataset.provider === 'chj_admin');
+      _syncAdminChjChips($adminModel.value);
+    });
   });
-
-  $adminChjModelRow.addEventListener('click', e => {
-    const chip = e.target.closest('.chj-model-chip');
-    if (!chip) return;
-    $adminModel.value = chip.dataset.model;
-    _syncAdminChjChips(chip.dataset.model);
+  $adminChjModelRow.querySelectorAll('.chj-model-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      $adminModel.value = chip.dataset.model || '';
+      _syncAdminChjChips($adminModel.value);
+    });
   });
-
-  // ── 保存管理员配置 ────────────────────────────────────────────────────
 
   $adminSaveBtn.addEventListener('click', async () => {
     $adminSaveBtn.disabled = true;
-    showStatus($adminStatus, '保存中…', 'info');
+    showStatus($adminStatus, '正在保存…', 'info');
     try {
-      await _cf('POST', '/api/ai/admin-config', {
-        model:    $adminModel.value.trim(),
-        api_key:  $adminKey.value.trim(),
+      const cfg = await _cf('POST', '/api/ai/admin-config', {
+        model: $adminModel.value.trim(),
+        api_key: $adminKey.value.trim(),
         api_base: $adminBase.value.trim(),
       });
       $adminKey.value = '';
-      showStatus($adminStatus, '✓ 系统默认配置已保存', 'ok');
-      const cfg = await _cf('GET', '/api/ai/admin-config');
       updatePreview(cfg);
+      _showAdminSection(cfg);
+      showStatus($adminStatus, '✓ 保存成功，已供所有用户使用', 'ok');
     } catch (e) {
-      showStatus($adminStatus, '保存失败：' + e, 'err');
+      showStatus($adminStatus, '✗ 保存失败：' + e, 'err');
     }
     $adminSaveBtn.disabled = false;
   });
@@ -445,14 +440,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text);
     $adminTestBtn.disabled = true;
     showStatus($adminStatus, '连接测试中…', 'info');
     try {
-      if ($adminKey.value.trim()) {
-        await _cf('POST', '/api/ai/admin-config', {
-          model:    $adminModel.value.trim(),
-          api_key:  $adminKey.value.trim(),
-          api_base: $adminBase.value.trim(),
-        });
-        $adminKey.value = '';
-      }
       const res = await _cf('POST', '/api/ai/test-connection', {});
       if (res && res.success) {
         showStatus($adminStatus, '✓ 连接成功：' + res.model, 'ok');
@@ -501,9 +488,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text);
     if (cfg) {
       $adminModel.value = cfg.model || '';
       $adminBase.value  = cfg.api_base || '';
-      if (cfg.has_key) {
-        $adminKey.placeholder = (cfg.key_preview || '已配置') + '（留空保留）';
-      }
+      $adminKey.value = '';
+      $adminKey.placeholder = cfg.has_key ? `已配置 ${cfg.key_preview || ''}；留空则保留` : '输入共享 API Key';
       // 同步 Provider 卡片高亮
       if (cfg.model) {
         document.querySelectorAll('#adminProviderGrid .provider-card').forEach(c => {

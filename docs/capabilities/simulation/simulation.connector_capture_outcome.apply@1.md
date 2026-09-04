@@ -8,7 +8,7 @@ Project one authenticated Connector capture outcome into its exact Simulation ca
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
-- Catalog Release：`rel_c4a99d9707731f20957fc5029360031a`
+- Catalog Release：`rel_af8416a36dceaafab609f21a76c7884c`
 - Schema 精度：`typed`
 - 暂未开放原因：`experimental_lifecycle`
 
@@ -94,7 +94,7 @@ Project one authenticated Connector capture outcome into its exact Simulation ca
 ```json
 {
   "capability_id": "simulation.connector_capture_outcome.apply",
-  "catalog_release": "rel_c4a99d9707731f20957fc5029360031a",
+  "catalog_release": "rel_af8416a36dceaafab609f21a76c7884c",
   "major_version": 1,
   "payload": {
     "capture_run_id": "example",

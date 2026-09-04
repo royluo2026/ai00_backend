@@ -49,7 +49,7 @@ htmlcov/
 /packages/plugin-sdk/**/dist/
 
 # Local schema snapshots and DBeaver execution packages
-/.runtime/schema-audit/
+/.runtime/
 /.test-tmp/
 /.test-runs/
 /.tmp-schema-*/

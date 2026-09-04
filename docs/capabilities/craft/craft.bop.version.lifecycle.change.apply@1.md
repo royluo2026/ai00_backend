@@ -8,7 +8,7 @@ Publish a BOP version or archive/unarchive a BOP version family.
 - 不适用：The request freezes/unfreezes links, creates a snapshot, or changes draft content.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_c4a99d9707731f20957fc5029360031a`
+- Catalog Release：`rel_af8416a36dceaafab609f21a76c7884c`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -97,7 +97,7 @@ Publish a BOP version or archive/unarchive a BOP version family.
 ```json
 {
   "capability_id": "craft.bop.version.lifecycle.change.apply",
-  "catalog_release": "rel_c4a99d9707731f20957fc5029360031a",
+  "catalog_release": "rel_af8416a36dceaafab609f21a76c7884c",
   "major_version": 1,
   "payload": {
     "operation": "publish"

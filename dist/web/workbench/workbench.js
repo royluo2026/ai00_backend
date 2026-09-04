@@ -5672,14 +5672,25 @@
       });
 
       if (!res.ok) {
-        aiBubbleInner.textContent = `请求失败：HTTP ${res.status}`;
+        let governedError = null;
+        try { governedError = await res.json(); } catch (_) {}
+        const detail = governedError?.detail ?? governedError?.error ?? governedError;
+        const message = typeof detail === 'string'
+          ? detail
+          : (detail?.message || detail?.code || '');
+        const code = typeof detail === 'object' && detail?.code && detail.code !== message
+          ? `（${detail.code}）`
+          : '';
+        aiBubbleInner.textContent = message
+          ? `请求失败：${message}${code}`
+          : `请求失败：HTTP ${res.status}`;
         inp.disabled = false;
         return;
       }
-
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let answer = '';
+      let streamError = false;
       aiBubbleInner.textContent = '';
 
       while (true) {
@@ -5695,12 +5706,13 @@
               aiBubbleInner.textContent = answer;
               msgs.scrollTop = msgs.scrollHeight;
             } else if (evt.type === 'error') {
+              streamError = true;
               aiBubbleInner.textContent = '错误：' + (evt.message || '未知');
             }
           } catch (_) {}
         }
       }
-      if (!answer) aiBubbleInner.textContent = '（无回复）';
+      if (!answer && !streamError) aiBubbleInner.textContent = '（无回复）';
     } catch (e) {
       aiBubbleInner.textContent = '请求失败：' + e.message;
     }

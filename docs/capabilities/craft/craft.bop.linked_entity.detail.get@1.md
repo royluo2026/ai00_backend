@@ -8,7 +8,7 @@ Read one allowlisted linked-entity card through its BOP link identity.
 - 不适用：A consumer has only an arbitrary table name or needs to mutate the entity.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_c4a99d9707731f20957fc5029360031a`
+- Catalog Release：`rel_af8416a36dceaafab609f21a76c7884c`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -97,7 +97,7 @@ Read one allowlisted linked-entity card through its BOP link identity.
 ```json
 {
   "capability_id": "craft.bop.linked_entity.detail.get",
-  "catalog_release": "rel_c4a99d9707731f20957fc5029360031a",
+  "catalog_release": "rel_af8416a36dceaafab609f21a76c7884c",
   "major_version": 1,
   "payload": {
     "link_gid": "example",
