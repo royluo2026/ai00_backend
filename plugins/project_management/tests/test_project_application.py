@@ -778,6 +778,24 @@ def test_task_issue_and_dependency_lifecycle_are_project_owned():
     assert application._repository.last_update_events == ["any_change", "status_change", "resolved"]
 
 
+def test_task_search_decodes_json_columns_returned_as_text():
+    repository = InMemoryItemEntryRepository()
+    repository.tasks["task-1"] = {
+        "gid": "task-1", "title": "Build", "source_ref": '{"kind":"local"}',
+        "attachments": '[{"gid":"attachment-1"}]',
+    }
+    application = ProjectManagementApplication(repository=repository)
+
+    task = application.invoke(
+        "project.task.read",
+        {"operation": "tasks.search", "arguments": {"scope": {"user_gid": "user-1"}}},
+        CONTEXT,
+    )["data"][0]
+
+    assert task["source_ref"] == {"kind": "local"}
+    assert task["attachments"] == [{"gid": "attachment-1"}]
+
+
 def test_workbench_annotations_round_trip_through_project_capability():
     application = ProjectManagementApplication(repository=InMemoryItemEntryRepository())
     application.invoke("project.workbench.change.apply", {"operation": "annotations.put", "arguments": {"key": "canvas", "data": {"x": 1}}}, CONTEXT)

@@ -1,7 +1,7 @@
 {
   "artifact_id": "task-3b3c-atomic-web-contracts",
   "baseline_frontend_revision": "fbd86ad7065d91b1740dbcb25889b3430bb8e452",
-  "content_sha256": "sha256:47d56f304f1c2f236cbfff1ecabf228fd184d29ff4cb47e7a7ee4f5e242c333b",
+  "content_sha256": "sha256:c07dc0843975b26da9f6b68a7a9acedeb5ad0b0575ffef699b8cc882b81f07e0",
   "counts_by_owner": {
     "agent": {
       "groups": 4,
@@ -85,7 +85,7 @@
       "owner_domain": "agent",
       "owner_prefix": "agent",
       "provider_anchor": "plugins/agent/agent_backend/routers/flows.py",
-      "provider_source_sha256": "sha256:b7451e4b3a5537ec078bad85d9c1131b6ce4e20d608d07b8cde116e159b48ad8",
+      "provider_source_sha256": "sha256:fb315f5b06ccc78ea709f2b25bb76fbc586be2f4b3f94305aa8aea74d2bc9155",
       "reclassification_reason": "No node-test handler or runtime service exists in the Agent provider.",
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -138,7 +138,7 @@
       "owner_domain": "agent",
       "owner_prefix": "agent",
       "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
-      "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
+      "provider_source_sha256": "sha256:7070f39d229570a4cd54ee2b8ad856986cb34aa52ce795ff959fd28b5daaa2bb",
       "reclassification_reason": "No bounded canvas-option resolver exists in the Agent provider.",
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -191,7 +191,7 @@
       "owner_domain": "agent",
       "owner_prefix": "agent",
       "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
-      "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
+      "provider_source_sha256": "sha256:7070f39d229570a4cd54ee2b8ad856986cb34aa52ce795ff959fd28b5daaa2bb",
       "reclassification_reason": "No canvas execution provider exists; generic run mutation is not provider-equivalent.",
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -244,7 +244,7 @@
       "owner_domain": "agent",
       "owner_prefix": "agent",
       "provider_anchor": "plugins/agent/agent_backend/routers/skills_v2.py",
-      "provider_source_sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df",
+      "provider_source_sha256": "sha256:7070f39d229570a4cd54ee2b8ad856986cb34aa52ce795ff959fd28b5daaa2bb",
       "reclassification_reason": "No pause-token resume provider exists; generic run mutation is not provider-equivalent.",
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -392,7 +392,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -589,7 +589,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -673,7 +673,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -777,7 +777,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -905,7 +905,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1015,7 +1015,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [
         "system.tech_config"
@@ -1155,7 +1155,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1321,7 +1321,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [
         "system.plugin.manage"
@@ -1446,7 +1446,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1594,7 +1594,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [
         "system.plugin.manage"
@@ -1764,7 +1764,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -1992,7 +1992,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -2190,7 +2190,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -2482,7 +2482,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -2588,7 +2588,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -2784,7 +2784,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -2916,7 +2916,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -3061,7 +3061,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -3254,7 +3254,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [
         "system.user.manage"
@@ -3595,7 +3595,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -4110,7 +4110,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -4457,7 +4457,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -4983,7 +4983,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -5327,7 +5327,7 @@
       "owner_domain": "base",
       "owner_prefix": "base",
       "provider_anchor": "backend/base/web_atomic.py:HANDLERS: dict",
-      "provider_source_sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad",
+      "provider_source_sha256": "sha256:e2194ba7c9789e8b665ee4088da30aa21e3c7a578ff11e127aa22c789fb4b215",
       "reclassification_reason": null,
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -5382,7 +5382,7 @@
       "owner_domain": "craft",
       "owner_prefix": "craft",
       "provider_anchor": "plugins/craft/craft_backend/routers/craft_library.py",
-      "provider_source_sha256": "sha256:30c275048c808550f27bbdcf2da96871936a4b6a53f7eda3aefa0ee3d522eed3",
+      "provider_source_sha256": "sha256:18b5dc882352ad55cd2c0051ea2d7ea0cff7213b7f90baa52d3a1b0d2314e251",
       "reclassification_reason": "No delete provider exists; the available obsolete transition is a different lifecycle outcome.",
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -5435,7 +5435,7 @@
       "owner_domain": "craft",
       "owner_prefix": "craft",
       "provider_anchor": "plugins/craft/craft_backend/routers/craft_library.py",
-      "provider_source_sha256": "sha256:30c275048c808550f27bbdcf2da96871936a4b6a53f7eda3aefa0ee3d522eed3",
+      "provider_source_sha256": "sha256:18b5dc882352ad55cd2c0051ea2d7ea0cff7213b7f90baa52d3a1b0d2314e251",
       "reclassification_reason": "No delete provider exists; the available obsolete transition is a different lifecycle outcome.",
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -5499,7 +5499,7 @@
       "owner_domain": "craft",
       "owner_prefix": "craft",
       "provider_anchor": "plugins/craft/craft_backend/routers/rule_engine.py",
-      "provider_source_sha256": "sha256:ac258d5ffc6531a5da259750f8b637fea6e467c0a50d4f64a379069aa660f86a",
+      "provider_source_sha256": "sha256:b2bfe1c5a9edd9849ae5dc12add55ce1b3ffe5c1b8f8dd2bfe2721da113f7775",
       "reclassification_reason": "No entry-check provider exists; CEL evaluation and BOP audit are different outcomes.",
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -5563,7 +5563,7 @@
       "owner_domain": "craft",
       "owner_prefix": "craft",
       "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
-      "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+      "provider_source_sha256": "sha256:d4bee068b40eb2b95d5495ec23c9ffbf80b96b4f764d1fb7b6af118ad4f9ae0a",
       "reclassification_reason": "Rule definition changes contain dynamic rule_definition data without a governed closed nested contract.",
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -5616,7 +5616,7 @@
       "owner_domain": "craft",
       "owner_prefix": "craft",
       "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
-      "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+      "provider_source_sha256": "sha256:d4bee068b40eb2b95d5495ec23c9ffbf80b96b4f764d1fb7b6af118ad4f9ae0a",
       "reclassification_reason": "No mutable-rule activation provider exists; immutable release activation is a different lifecycle outcome.",
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -5669,7 +5669,7 @@
       "owner_domain": "craft",
       "owner_prefix": "craft",
       "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
-      "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+      "provider_source_sha256": "sha256:d4bee068b40eb2b95d5495ec23c9ffbf80b96b4f764d1fb7b6af118ad4f9ae0a",
       "reclassification_reason": "No legacy deviation provider exists; governed release waiver creation has a different evidence contract.",
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -5722,7 +5722,7 @@
       "owner_domain": "craft",
       "owner_prefix": "craft",
       "provider_anchor": "plugins/craft/craft_backend/routers/rules.py",
-      "provider_source_sha256": "sha256:fce8648e258906e5cfd15a4cae54bbb4a3dda22c6bd9c5cec1bbd03ca0256365",
+      "provider_source_sha256": "sha256:d4bee068b40eb2b95d5495ec23c9ffbf80b96b4f764d1fb7b6af118ad4f9ae0a",
       "reclassification_reason": "No mutable-rule suspension handler or domain service exists.",
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",
@@ -5849,7 +5849,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
+      "provider_source_sha256": "sha256:241e99785a910201581859a61d5f79549e8727d3beede098441bd158875d92aa",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.read"
@@ -6044,7 +6044,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
+      "provider_source_sha256": "sha256:241e99785a910201581859a61d5f79549e8727d3beede098441bd158875d92aa",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.write"
@@ -6222,7 +6222,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
+      "provider_source_sha256": "sha256:241e99785a910201581859a61d5f79549e8727d3beede098441bd158875d92aa",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.write"
@@ -6356,7 +6356,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
+      "provider_source_sha256": "sha256:241e99785a910201581859a61d5f79549e8727d3beede098441bd158875d92aa",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.read"
@@ -6478,7 +6478,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
+      "provider_source_sha256": "sha256:241e99785a910201581859a61d5f79549e8727d3beede098441bd158875d92aa",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.write"
@@ -6592,7 +6592,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
+      "provider_source_sha256": "sha256:241e99785a910201581859a61d5f79549e8727d3beede098441bd158875d92aa",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.read"
@@ -6775,7 +6775,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
+      "provider_source_sha256": "sha256:241e99785a910201581859a61d5f79549e8727d3beede098441bd158875d92aa",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.write"
@@ -6919,7 +6919,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
+      "provider_source_sha256": "sha256:241e99785a910201581859a61d5f79549e8727d3beede098441bd158875d92aa",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.read"
@@ -7101,7 +7101,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
+      "provider_source_sha256": "sha256:241e99785a910201581859a61d5f79549e8727d3beede098441bd158875d92aa",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.write"
@@ -7239,7 +7239,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
+      "provider_source_sha256": "sha256:241e99785a910201581859a61d5f79549e8727d3beede098441bd158875d92aa",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.read"
@@ -7357,7 +7357,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
+      "provider_source_sha256": "sha256:241e99785a910201581859a61d5f79549e8727d3beede098441bd158875d92aa",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.write"
@@ -7518,7 +7518,7 @@
       "owner_domain": "integration",
       "owner_prefix": "integration",
       "provider_anchor": "plugins/integration/integration_backend/capabilities/provider.py:def descriptor_for",
-      "provider_source_sha256": "sha256:d16dbea20f3a4156200b171af7c819e2fbba382f2a3e88e59ae07fd8726c4260",
+      "provider_source_sha256": "sha256:241e99785a910201581859a61d5f79549e8727d3beede098441bd158875d92aa",
       "reclassification_reason": null,
       "required_permissions": [
         "integration.read"
@@ -7575,7 +7575,7 @@
       "owner_domain": "project_management",
       "owner_prefix": "project",
       "provider_anchor": "plugins/craft/craft_backend/routers/approval.py",
-      "provider_source_sha256": "sha256:1b6d618b9562ad4509f81a848234af9c02f75e17392fe26ed9ca203bf1c7569a",
+      "provider_source_sha256": "sha256:1650e2e85f2bbf2fe558c42e4dcea33d11e429486e0561be5b9ae830f38f3500",
       "reclassification_reason": "The Project outcome omits the legacy notification publication side effect.",
       "required_permissions": [],
       "review_reference": "task-3b3c:exact-provider-review",

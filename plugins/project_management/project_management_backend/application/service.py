@@ -356,8 +356,12 @@ def _work_item_values(item_type: str, args: Mapping[str, Any], user_gid: str, di
 
 def _work_item_output(item_type: str, row: Mapping[str, Any]) -> dict[str, Any]:
     result = dict(row)
-    for key in ("source_ref",): result[key] = result.get(key) or {}
-    for key in ("progress_logs", "tracking_refs", "attachments", "feishu_groups", "feishu_docs"): result[key] = result.get(key) or []
+    for key, empty in (("source_ref", {}), *((key, []) for key in ("progress_logs", "tracking_refs", "attachments", "feishu_groups", "feishu_docs"))):
+        value = result.get(key)
+        if isinstance(value, str):
+            try: value = json.loads(value)
+            except ValueError: value = empty
+        result[key] = value if isinstance(value, type(empty)) else empty
     result["created_at"] = str(result.get("created_at") or ""); result["updated_at"] = str(result.get("updated_at") or "")
     if item_type == "task":
         result.setdefault("owner_name", ""); result["is_deleted"] = bool(result.get("is_deleted", False)); result["completion"] = result.get("completion") or 0; result["node_type"] = result.get("node_type") or "normal"; result["canvas_icon"] = result.get("canvas_icon") or "star"
