@@ -1,5 +1,5 @@
 {
-  "schema_sha256": "sha256:a83db7002498c769b19631ea538b727e272bf96e9bf9473947e6faa45680f6c1",
+  "schema_sha256": "sha256:c9571bd6b7b7de67d9542020c7b75fb36a15bf8f4cdaf9249bb45524ecd1213e",
   "schema_version": 1,
   "tables": [
     {
@@ -433,11 +433,23 @@
     },
     {
       "columns": {
+        "acceptance_artifact_hash": [
+          "backend/db/migrations/domains/agent/0011_agent_orchestration_evidence_trust.sql"
+        ],
         "acceptance_evidence_gid": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
         ],
         "acceptance_pass_rate": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
+        ],
+        "acceptance_revoked": [
+          "backend/db/migrations/domains/agent/0011_agent_orchestration_evidence_trust.sql"
+        ],
+        "acceptance_valid_from": [
+          "backend/db/migrations/domains/agent/0011_agent_orchestration_evidence_trust.sql"
+        ],
+        "acceptance_valid_until": [
+          "backend/db/migrations/domains/agent/0011_agent_orchestration_evidence_trust.sql"
         ],
         "agent_share": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
@@ -489,7 +501,8 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
+        "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql",
+        "backend/db/migrations/domains/agent/0011_agent_orchestration_evidence_trust.sql"
       ],
       "table": "workmanship_agent_orch_acceptance_facts"
     },
@@ -914,7 +927,7 @@
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
         "project_gid": [
-          "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql"
+          "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
         ],
         "revision": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
@@ -940,7 +953,8 @@
       },
       "sources": [
         "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
-        "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql"
+        "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql",
+        "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
       ],
       "table": "workmanship_agent_orch_panoramas"
     },
@@ -1108,8 +1122,20 @@
         "annual_task_volume": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
         ],
+        "authorization_artifact_hash": [
+          "backend/db/migrations/domains/agent/0011_agent_orchestration_evidence_trust.sql"
+        ],
         "authorization_evidence_gid": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
+        ],
+        "authorization_revoked": [
+          "backend/db/migrations/domains/agent/0011_agent_orchestration_evidence_trust.sql"
+        ],
+        "authorization_valid_from": [
+          "backend/db/migrations/domains/agent/0011_agent_orchestration_evidence_trust.sql"
+        ],
+        "authorization_valid_until": [
+          "backend/db/migrations/domains/agent/0011_agent_orchestration_evidence_trust.sql"
         ],
         "business_node_gid": [
           "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
@@ -1158,7 +1184,8 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
+        "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql",
+        "backend/db/migrations/domains/agent/0011_agent_orchestration_evidence_trust.sql"
       ],
       "table": "workmanship_agent_orch_workload_baselines"
     },

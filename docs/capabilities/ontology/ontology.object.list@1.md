@@ -8,7 +8,7 @@ Read a bounded page of immutable ontology objects.
 - 不适用：A stable object identity is already known or an unbounded export is requested.
 - 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_b29ec309ee7aaa692bd89420063c443e`
+- Catalog Release：`rel_6ac873e4c4c86df0d99516fa45fed4a0`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -110,7 +110,7 @@ Read a bounded page of immutable ontology objects.
 ```json
 {
   "capability_id": "ontology.object.list",
-  "catalog_release": "rel_b29ec309ee7aaa692bd89420063c443e",
+  "catalog_release": "rel_6ac873e4c4c86df0d99516fa45fed4a0",
   "major_version": 1,
   "payload": {}
 }

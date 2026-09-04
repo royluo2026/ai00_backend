@@ -3,6 +3,9 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any, TypedDict
 from urllib.parse import quote
+from pathlib import Path
+
+from backend.capability_v2.catalog import load_catalog_release
 
 
 Lookup = Callable[[str, str], dict[str, Any]]
@@ -94,4 +97,56 @@ class ReferenceResolver:
             "deep_link": f"{prefix}{quote(ref_gid)}",
             "resolved": projected.get("resolved", False),
             "read_only": True,
+        }
+
+
+class CatalogReferenceResolver(ReferenceResolver):
+    """Production resolver backed by the server-owned Catalog snapshot.
+
+    No caller-provided dictionary is accepted for capability identity. Other
+    domain references remain fail-closed until their owner exposes a governed
+    reader through an explicit adapter.
+    """
+
+    def __init__(self, registry, *, catalog_path: Path | None = None):
+        self._registry = registry
+        self._catalog_path = catalog_path or Path(__file__).resolve().parents[4] / "docs/governance/capability-catalog-release.json"
+        super().__init__(lookups={"capability": self._lookup_capability})
+
+    def _lookup_capability(self, version_gid: str, _actor_gid: str) -> dict[str, Any]:
+        release = load_catalog_release(self._catalog_path.read_text(encoding="utf-8"))
+        if "@" in version_gid:
+            capability_id, major_text = version_gid.rsplit("@", 1)
+        else:
+            member = next((item for item in release.descriptors if item.capability_version_gid == version_gid), None)
+            if member is None:
+                return {}
+            capability_id, major_text = member.id, str(member.major_version)
+        try:
+            major = int(major_text)
+            registered = self._registry.get(capability_id, major)
+        except (ValueError, KeyError):
+            return {}
+        descriptor = registered.descriptor
+        if descriptor is None:
+            return {}
+        member = release.descriptor(capability_id, major)
+        artifact = self._registry.provider_artifact("agent")
+        if member is None or artifact is None:
+            return {}
+        return {
+            "capability_version_gid": version_gid,
+            "capability_id": capability_id,
+            "major_version": major,
+            "lifecycle_status": getattr(member.lifecycle_status, "value", member.lifecycle_status),
+            "provider_ref": member.provider_ref or "agent.provider",
+            "gateway_ref": "backend.capability_v2.gateway",
+            "catalog_release_gid": release.release_id,
+            "artifact_hash": artifact.artifact_hash,
+            "catalog_member": True,
+            "artifact_match": artifact.artifact_hash == next(
+                (item.artifact_hash for item in release.provider_artifacts if item.plugin_id == artifact.plugin_id),
+                artifact.artifact_hash,
+            ),
+            "authorized": True,
         }

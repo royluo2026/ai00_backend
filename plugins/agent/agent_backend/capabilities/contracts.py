@@ -106,6 +106,10 @@ CAPABILITY_IDS = (
     "agent.skill.change.apply", "agent.skill.read",
     "agent.workflow.node.test.execute", "agent.canvas.options.resolve",
     "agent.canvas.execution.start", "agent.canvas.execution.resume",
+    "agent.orchestration.panorama.read", "agent.orchestration.graph.read",
+    "agent.orchestration.graph.save", "agent.orchestration.version.publish",
+    "agent.orchestration.binding.delete", "agent.orchestration.run.start",
+    "agent.orchestration.run.transition", "agent.orchestration.metric.read",
 )
 INPUT_SCHEMAS = {capability_id: INPUT for capability_id in CAPABILITY_IDS}
 OUTPUT_SCHEMAS = {capability_id: OUTPUT for capability_id in CAPABILITY_IDS}
@@ -121,6 +125,38 @@ OUTPUT_SCHEMAS["agent.tool_catalog.read"] = obj({
     "system": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}},
     "total": {"type": "integer", "minimum": 0},
 })
+
+_ORCHESTRATION_INPUT = obj({
+    "tenant_gid": STRING, "project_gid": STRING, "panorama_gid": STRING,
+    "version_gid": STRING, "binding_gid": STRING, "run_gid": STRING,
+    "period_key": STRING, "target_status": STRING,
+    "expected_revision": REVISION, "limit": {"type": "integer", "minimum": 1, "maximum": 100},
+    "graph": {"type": "object", "additionalProperties": True},
+    "frozen_context": {"type": "object", "additionalProperties": True},
+    "payload": {"type": "object", "additionalProperties": True},
+}, required=("tenant_gid", "project_gid"))
+_ORCHESTRATION_ITEM = obj({
+    "gid": STRING, "name": STRING, "current_version_gid": STRING,
+    "revision": REVISION, "updated_at": STRING,
+})
+_ORCHESTRATION_OUTPUT = obj({
+    "items": {"type": "array", "maxItems": 100, "items": _ORCHESTRATION_ITEM},
+    "revision": REVISION, "deleted": {"type": "boolean"},
+    "binding_gid": STRING, "run_gid": STRING, "status": STRING,
+    "version_gid": STRING, "panorama_gid": STRING,
+    "last_sequence_no": {"type": "integer", "minimum": 0},
+    "total_workload_hours": {"type": "number"},
+    "effective_agent_workload_hours": {"type": "number"},
+    "effective_intelligent_work_rate": {"type": "number"},
+    "automated_workflow_count": {"type": "integer", "minimum": 0},
+    "total_workflow_count": {"type": "integer", "minimum": 0},
+    "automation_ratio": {"type": "number"},
+    "period_key": STRING, "calculated_at": STRING,
+})
+for _id in CAPABILITY_IDS:
+    if _id.startswith("agent.orchestration."):
+        INPUT_SCHEMAS[_id] = _ORCHESTRATION_INPUT
+        OUTPUT_SCHEMAS[_id] = _ORCHESTRATION_OUTPUT
 INPUT_SCHEMAS["agent.workflow.node.test.execute"] = obj({
     "flow_gid": IDENTITY, "node_id": IDENTITY, "input_values": INPUT_VALUES,
 }, required=("flow_gid", "node_id", "input_values"))

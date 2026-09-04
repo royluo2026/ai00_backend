@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_b29ec309ee7aaa692bd89420063c443e",
-  "catalog_hash": "sha256:b29ec309ee7aaa692bd89420063c443e7137c5c97ea4c511e3eef88d24b0648b",
+  "release_id": "rel_6ac873e4c4c86df0d99516fa45fed4a0",
+  "catalog_hash": "sha256:6ac873e4c4c86df0d99516fa45fed4a0914f288aa7c99e17c8b2d69610a14ced",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -8790,6 +8790,4150 @@
         }
       ],
       "business_definition_hash": "sha256:05a5c46641a5c1df1b77c87d70ce22c23823224c7345e8cfc726b0ca1d46c05b"
+    },
+    {
+      "id": "agent.orchestration.binding.delete",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.orchestration.binding.delete",
+      "description": "Execute the governed agent.orchestration.binding.delete Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "business_effect": "Execute the governed agent.orchestration.binding.delete Agent outcome.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Writes agent domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "agent.v2:agent.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "tenant_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "project_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "graph": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "frozen_context": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "tenant_gid",
+          "project_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "current_version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "updated_at": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "last_sequence_no": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workload_hours": {
+            "type": "number"
+          },
+          "effective_agent_workload_hours": {
+            "type": "number"
+          },
+          "effective_intelligent_work_rate": {
+            "type": "number"
+          },
+          "automated_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "automation_ratio": {
+            "type": "number"
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "calculated_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "current_version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "updated_at": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "last_sequence_no": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workload_hours": {
+            "type": "number"
+          },
+          "effective_agent_workload_hours": {
+            "type": "number"
+          },
+          "effective_intelligent_work_rate": {
+            "type": "number"
+          },
+          "automated_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "automation_ratio": {
+            "type": "number"
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "calculated_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:6e1fd687eb55aecad2d06ebb9981736cac56b7c46884c44e1070cc582bc67780",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "eventual",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Agent canvas runtime adapter is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "runtime_timeout",
+          "meaning": "The bounded Agent canvas runtime timed out.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The Agent canvas invocation conflicts with an earlier request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "outcome_unknown",
+          "meaning": "The Agent canvas outcome must be reconciled.",
+          "retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_3d27a4d85587fa77a7f63b28",
+      "error_schema": [
+        {
+          "error_code": "invalid_input",
+          "message_template": "The Agent request is invalid.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller cannot access the Agent resource.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The Agent resource does not exist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The Agent resource changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "catalog_release_unavailable",
+          "message_template": "The pinned Catalog release is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "delegation_expired",
+          "message_template": "The Agent delegation is missing or expired.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The delegated operation requires Base approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "The Agent canvas runtime adapter is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "runtime_timeout",
+          "message_template": "The bounded Agent canvas runtime timed out.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The Agent canvas invocation conflicts with an earlier request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "outcome_unknown",
+          "message_template": "The Agent canvas outcome must be reconciled.",
+          "is_retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [
+        {
+          "consumer_id": "packages/agent-plugin/web/orchestration_center/api.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        },
+        {
+          "consumer_id": "packages/agent-plugin/web/orchestration_center/bootstrap.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "no_consumer_reason": null,
+      "provider_ref": "agent.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/agent.orchestration.binding.delete:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[agent.orchestration.binding.delete@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[agent.orchestration.binding.delete@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[agent.orchestration.binding.delete@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[agent.orchestration.binding.delete@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[agent.orchestration.binding.delete@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[agent.orchestration.binding.delete@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[agent.orchestration.binding.delete@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:36d33faa62323dd2695e6998375a0f34b0b7a502eeae20fe00c9fa538c44d26c"
+    },
+    {
+      "id": "agent.orchestration.graph.read",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.orchestration.graph.read",
+      "description": "Execute the governed agent.orchestration.graph.read Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "business_effect": "Execute the governed agent.orchestration.graph.read Agent outcome.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "read",
+      "side_effects": "Reads agent domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "agent.v2:agent.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "tenant_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "project_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "graph": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "frozen_context": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "tenant_gid",
+          "project_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "current_version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "updated_at": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "last_sequence_no": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workload_hours": {
+            "type": "number"
+          },
+          "effective_agent_workload_hours": {
+            "type": "number"
+          },
+          "effective_intelligent_work_rate": {
+            "type": "number"
+          },
+          "automated_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "automation_ratio": {
+            "type": "number"
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "calculated_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "current_version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "updated_at": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "last_sequence_no": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workload_hours": {
+            "type": "number"
+          },
+          "effective_agent_workload_hours": {
+            "type": "number"
+          },
+          "effective_intelligent_work_rate": {
+            "type": "number"
+          },
+          "automated_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "automation_ratio": {
+            "type": "number"
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "calculated_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:6e1fd687eb55aecad2d06ebb9981736cac56b7c46884c44e1070cc582bc67780",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Agent canvas runtime adapter is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "runtime_timeout",
+          "meaning": "The bounded Agent canvas runtime timed out.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The Agent canvas invocation conflicts with an earlier request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "outcome_unknown",
+          "meaning": "The Agent canvas outcome must be reconciled.",
+          "retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_22abad02f4f600570338a59d",
+      "error_schema": [
+        {
+          "error_code": "invalid_input",
+          "message_template": "The Agent request is invalid.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller cannot access the Agent resource.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The Agent resource does not exist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The Agent resource changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "catalog_release_unavailable",
+          "message_template": "The pinned Catalog release is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "delegation_expired",
+          "message_template": "The Agent delegation is missing or expired.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The delegated operation requires Base approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "The Agent canvas runtime adapter is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "runtime_timeout",
+          "message_template": "The bounded Agent canvas runtime timed out.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The Agent canvas invocation conflicts with an earlier request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "outcome_unknown",
+          "message_template": "The Agent canvas outcome must be reconciled.",
+          "is_retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [
+        {
+          "consumer_id": "packages/agent-plugin/web/orchestration_center/api.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        },
+        {
+          "consumer_id": "packages/agent-plugin/web/orchestration_center/bootstrap.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "no_consumer_reason": null,
+      "provider_ref": "agent.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/agent.orchestration.graph.read:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[agent.orchestration.graph.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[agent.orchestration.graph.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[agent.orchestration.graph.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[agent.orchestration.graph.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[agent.orchestration.graph.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[agent.orchestration.graph.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[agent.orchestration.graph.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:9de31021dee6c9df460754b184b25ed876d1e6417b86b8c030e31c073ef00cbd"
+    },
+    {
+      "id": "agent.orchestration.graph.save",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.orchestration.graph.save",
+      "description": "Execute the governed agent.orchestration.graph.save Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "business_effect": "Execute the governed agent.orchestration.graph.save Agent outcome.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Writes agent domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "agent.v2:agent.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "tenant_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "project_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "graph": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "frozen_context": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "tenant_gid",
+          "project_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "current_version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "updated_at": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "last_sequence_no": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workload_hours": {
+            "type": "number"
+          },
+          "effective_agent_workload_hours": {
+            "type": "number"
+          },
+          "effective_intelligent_work_rate": {
+            "type": "number"
+          },
+          "automated_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "automation_ratio": {
+            "type": "number"
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "calculated_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "current_version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "updated_at": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "last_sequence_no": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workload_hours": {
+            "type": "number"
+          },
+          "effective_agent_workload_hours": {
+            "type": "number"
+          },
+          "effective_intelligent_work_rate": {
+            "type": "number"
+          },
+          "automated_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "automation_ratio": {
+            "type": "number"
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "calculated_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:6e1fd687eb55aecad2d06ebb9981736cac56b7c46884c44e1070cc582bc67780",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "eventual",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Agent canvas runtime adapter is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "runtime_timeout",
+          "meaning": "The bounded Agent canvas runtime timed out.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The Agent canvas invocation conflicts with an earlier request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "outcome_unknown",
+          "meaning": "The Agent canvas outcome must be reconciled.",
+          "retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_92753ff27c6e5eda9e5790a0",
+      "error_schema": [
+        {
+          "error_code": "invalid_input",
+          "message_template": "The Agent request is invalid.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller cannot access the Agent resource.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The Agent resource does not exist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The Agent resource changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "catalog_release_unavailable",
+          "message_template": "The pinned Catalog release is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "delegation_expired",
+          "message_template": "The Agent delegation is missing or expired.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The delegated operation requires Base approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "The Agent canvas runtime adapter is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "runtime_timeout",
+          "message_template": "The bounded Agent canvas runtime timed out.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The Agent canvas invocation conflicts with an earlier request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "outcome_unknown",
+          "message_template": "The Agent canvas outcome must be reconciled.",
+          "is_retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [
+        {
+          "consumer_id": "packages/agent-plugin/web/orchestration_center/api.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        },
+        {
+          "consumer_id": "packages/agent-plugin/web/orchestration_center/bootstrap.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "no_consumer_reason": null,
+      "provider_ref": "agent.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/agent.orchestration.graph.save:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[agent.orchestration.graph.save@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[agent.orchestration.graph.save@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[agent.orchestration.graph.save@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[agent.orchestration.graph.save@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[agent.orchestration.graph.save@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[agent.orchestration.graph.save@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[agent.orchestration.graph.save@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:35c5dce2b729883cf8002a447db95b2008604d0e7aae06849f11f8f36aef7bf0"
+    },
+    {
+      "id": "agent.orchestration.metric.read",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.orchestration.metric.read",
+      "description": "Execute the governed agent.orchestration.metric.read Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "business_effect": "Execute the governed agent.orchestration.metric.read Agent outcome.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "read",
+      "side_effects": "Reads agent domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "agent.v2:agent.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "tenant_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "project_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "graph": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "frozen_context": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "tenant_gid",
+          "project_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "current_version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "updated_at": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "last_sequence_no": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workload_hours": {
+            "type": "number"
+          },
+          "effective_agent_workload_hours": {
+            "type": "number"
+          },
+          "effective_intelligent_work_rate": {
+            "type": "number"
+          },
+          "automated_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "automation_ratio": {
+            "type": "number"
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "calculated_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "current_version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "updated_at": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "last_sequence_no": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workload_hours": {
+            "type": "number"
+          },
+          "effective_agent_workload_hours": {
+            "type": "number"
+          },
+          "effective_intelligent_work_rate": {
+            "type": "number"
+          },
+          "automated_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "automation_ratio": {
+            "type": "number"
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "calculated_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:6e1fd687eb55aecad2d06ebb9981736cac56b7c46884c44e1070cc582bc67780",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Agent canvas runtime adapter is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "runtime_timeout",
+          "meaning": "The bounded Agent canvas runtime timed out.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The Agent canvas invocation conflicts with an earlier request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "outcome_unknown",
+          "meaning": "The Agent canvas outcome must be reconciled.",
+          "retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_8411baf32e6338cf4126a977",
+      "error_schema": [
+        {
+          "error_code": "invalid_input",
+          "message_template": "The Agent request is invalid.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller cannot access the Agent resource.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The Agent resource does not exist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The Agent resource changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "catalog_release_unavailable",
+          "message_template": "The pinned Catalog release is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "delegation_expired",
+          "message_template": "The Agent delegation is missing or expired.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The delegated operation requires Base approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "The Agent canvas runtime adapter is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "runtime_timeout",
+          "message_template": "The bounded Agent canvas runtime timed out.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The Agent canvas invocation conflicts with an earlier request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "outcome_unknown",
+          "message_template": "The Agent canvas outcome must be reconciled.",
+          "is_retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [
+        {
+          "consumer_id": "packages/agent-plugin/web/orchestration_center/api.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        },
+        {
+          "consumer_id": "packages/agent-plugin/web/orchestration_center/bootstrap.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "no_consumer_reason": null,
+      "provider_ref": "agent.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/agent.orchestration.metric.read:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[agent.orchestration.metric.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[agent.orchestration.metric.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[agent.orchestration.metric.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[agent.orchestration.metric.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[agent.orchestration.metric.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[agent.orchestration.metric.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[agent.orchestration.metric.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:85171b6ba7f3cc39a63fe77fd3b20dd619064c425f30487d13a495d7b255bdc5"
+    },
+    {
+      "id": "agent.orchestration.panorama.read",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.orchestration.panorama.read",
+      "description": "Execute the governed agent.orchestration.panorama.read Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "business_effect": "Execute the governed agent.orchestration.panorama.read Agent outcome.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "read",
+      "side_effects": "Reads agent domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "agent.v2:agent.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "tenant_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "project_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "graph": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "frozen_context": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "tenant_gid",
+          "project_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "current_version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "updated_at": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "last_sequence_no": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workload_hours": {
+            "type": "number"
+          },
+          "effective_agent_workload_hours": {
+            "type": "number"
+          },
+          "effective_intelligent_work_rate": {
+            "type": "number"
+          },
+          "automated_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "automation_ratio": {
+            "type": "number"
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "calculated_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "current_version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "updated_at": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "last_sequence_no": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workload_hours": {
+            "type": "number"
+          },
+          "effective_agent_workload_hours": {
+            "type": "number"
+          },
+          "effective_intelligent_work_rate": {
+            "type": "number"
+          },
+          "automated_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "automation_ratio": {
+            "type": "number"
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "calculated_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:6e1fd687eb55aecad2d06ebb9981736cac56b7c46884c44e1070cc582bc67780",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Agent canvas runtime adapter is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "runtime_timeout",
+          "meaning": "The bounded Agent canvas runtime timed out.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The Agent canvas invocation conflicts with an earlier request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "outcome_unknown",
+          "meaning": "The Agent canvas outcome must be reconciled.",
+          "retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_0a86d22be2508b177ded231f",
+      "error_schema": [
+        {
+          "error_code": "invalid_input",
+          "message_template": "The Agent request is invalid.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller cannot access the Agent resource.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The Agent resource does not exist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The Agent resource changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "catalog_release_unavailable",
+          "message_template": "The pinned Catalog release is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "delegation_expired",
+          "message_template": "The Agent delegation is missing or expired.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The delegated operation requires Base approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "The Agent canvas runtime adapter is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "runtime_timeout",
+          "message_template": "The bounded Agent canvas runtime timed out.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The Agent canvas invocation conflicts with an earlier request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "outcome_unknown",
+          "message_template": "The Agent canvas outcome must be reconciled.",
+          "is_retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [
+        {
+          "consumer_id": "packages/agent-plugin/web/orchestration_center/api.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        },
+        {
+          "consumer_id": "packages/agent-plugin/web/orchestration_center/bootstrap.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "no_consumer_reason": null,
+      "provider_ref": "agent.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/agent.orchestration.panorama.read:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[agent.orchestration.panorama.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[agent.orchestration.panorama.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[agent.orchestration.panorama.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[agent.orchestration.panorama.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[agent.orchestration.panorama.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[agent.orchestration.panorama.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[agent.orchestration.panorama.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:b66689845b9236b99429353ca4ae16c15eedcae29ba6987768098b1d4cde1778"
+    },
+    {
+      "id": "agent.orchestration.run.start",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.orchestration.run.start",
+      "description": "Execute the governed agent.orchestration.run.start Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "business_effect": "Execute the governed agent.orchestration.run.start Agent outcome.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Writes agent domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "agent.v2:agent.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "tenant_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "project_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "graph": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "frozen_context": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "tenant_gid",
+          "project_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "current_version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "updated_at": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "last_sequence_no": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workload_hours": {
+            "type": "number"
+          },
+          "effective_agent_workload_hours": {
+            "type": "number"
+          },
+          "effective_intelligent_work_rate": {
+            "type": "number"
+          },
+          "automated_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "automation_ratio": {
+            "type": "number"
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "calculated_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "current_version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "updated_at": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "last_sequence_no": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workload_hours": {
+            "type": "number"
+          },
+          "effective_agent_workload_hours": {
+            "type": "number"
+          },
+          "effective_intelligent_work_rate": {
+            "type": "number"
+          },
+          "automated_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "automation_ratio": {
+            "type": "number"
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "calculated_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:6e1fd687eb55aecad2d06ebb9981736cac56b7c46884c44e1070cc582bc67780",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "eventual",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Agent canvas runtime adapter is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "runtime_timeout",
+          "meaning": "The bounded Agent canvas runtime timed out.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The Agent canvas invocation conflicts with an earlier request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "outcome_unknown",
+          "meaning": "The Agent canvas outcome must be reconciled.",
+          "retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_ab160be2bbdb99f28aa6f82e",
+      "error_schema": [
+        {
+          "error_code": "invalid_input",
+          "message_template": "The Agent request is invalid.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller cannot access the Agent resource.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The Agent resource does not exist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The Agent resource changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "catalog_release_unavailable",
+          "message_template": "The pinned Catalog release is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "delegation_expired",
+          "message_template": "The Agent delegation is missing or expired.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The delegated operation requires Base approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "The Agent canvas runtime adapter is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "runtime_timeout",
+          "message_template": "The bounded Agent canvas runtime timed out.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The Agent canvas invocation conflicts with an earlier request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "outcome_unknown",
+          "message_template": "The Agent canvas outcome must be reconciled.",
+          "is_retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [
+        {
+          "consumer_id": "packages/agent-plugin/web/orchestration_center/api.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        },
+        {
+          "consumer_id": "packages/agent-plugin/web/orchestration_center/bootstrap.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "no_consumer_reason": null,
+      "provider_ref": "agent.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/agent.orchestration.run.start:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[agent.orchestration.run.start@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[agent.orchestration.run.start@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[agent.orchestration.run.start@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[agent.orchestration.run.start@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[agent.orchestration.run.start@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[agent.orchestration.run.start@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[agent.orchestration.run.start@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:1b59245d2b0c7ee10384e8b411b7fc50c65291a5159ed7264a94b82ea692c076"
+    },
+    {
+      "id": "agent.orchestration.run.transition",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.orchestration.run.transition",
+      "description": "Execute the governed agent.orchestration.run.transition Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "business_effect": "Execute the governed agent.orchestration.run.transition Agent outcome.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Writes agent domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "agent.v2:agent.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "tenant_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "project_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "graph": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "frozen_context": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "tenant_gid",
+          "project_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "current_version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "updated_at": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "last_sequence_no": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workload_hours": {
+            "type": "number"
+          },
+          "effective_agent_workload_hours": {
+            "type": "number"
+          },
+          "effective_intelligent_work_rate": {
+            "type": "number"
+          },
+          "automated_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "automation_ratio": {
+            "type": "number"
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "calculated_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "current_version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "updated_at": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "last_sequence_no": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workload_hours": {
+            "type": "number"
+          },
+          "effective_agent_workload_hours": {
+            "type": "number"
+          },
+          "effective_intelligent_work_rate": {
+            "type": "number"
+          },
+          "automated_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "automation_ratio": {
+            "type": "number"
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "calculated_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:6e1fd687eb55aecad2d06ebb9981736cac56b7c46884c44e1070cc582bc67780",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "eventual",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Agent canvas runtime adapter is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "runtime_timeout",
+          "meaning": "The bounded Agent canvas runtime timed out.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The Agent canvas invocation conflicts with an earlier request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "outcome_unknown",
+          "meaning": "The Agent canvas outcome must be reconciled.",
+          "retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_9416828ba07bed9748e06c5b",
+      "error_schema": [
+        {
+          "error_code": "invalid_input",
+          "message_template": "The Agent request is invalid.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller cannot access the Agent resource.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The Agent resource does not exist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The Agent resource changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "catalog_release_unavailable",
+          "message_template": "The pinned Catalog release is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "delegation_expired",
+          "message_template": "The Agent delegation is missing or expired.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The delegated operation requires Base approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "The Agent canvas runtime adapter is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "runtime_timeout",
+          "message_template": "The bounded Agent canvas runtime timed out.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The Agent canvas invocation conflicts with an earlier request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "outcome_unknown",
+          "message_template": "The Agent canvas outcome must be reconciled.",
+          "is_retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [
+        {
+          "consumer_id": "packages/agent-plugin/web/orchestration_center/api.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        },
+        {
+          "consumer_id": "packages/agent-plugin/web/orchestration_center/bootstrap.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "no_consumer_reason": null,
+      "provider_ref": "agent.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/agent.orchestration.run.transition:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[agent.orchestration.run.transition@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[agent.orchestration.run.transition@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[agent.orchestration.run.transition@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[agent.orchestration.run.transition@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[agent.orchestration.run.transition@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[agent.orchestration.run.transition@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[agent.orchestration.run.transition@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:673b572b8bc0eedce7902ff10c2156df9251f53d4d96141a5e2d9841bd501057"
+    },
+    {
+      "id": "agent.orchestration.version.publish",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.orchestration.version.publish",
+      "description": "Execute the governed agent.orchestration.version.publish Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "business_effect": "Execute the governed agent.orchestration.version.publish Agent outcome.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Writes agent domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "agent.v2:agent.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "tenant_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "project_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "graph": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "frozen_context": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "tenant_gid",
+          "project_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "current_version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "updated_at": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "last_sequence_no": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workload_hours": {
+            "type": "number"
+          },
+          "effective_agent_workload_hours": {
+            "type": "number"
+          },
+          "effective_intelligent_work_rate": {
+            "type": "number"
+          },
+          "automated_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "automation_ratio": {
+            "type": "number"
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "calculated_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "current_version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "updated_at": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "binding_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "panorama_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "last_sequence_no": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workload_hours": {
+            "type": "number"
+          },
+          "effective_agent_workload_hours": {
+            "type": "number"
+          },
+          "effective_intelligent_work_rate": {
+            "type": "number"
+          },
+          "automated_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "automation_ratio": {
+            "type": "number"
+          },
+          "period_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "calculated_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:6e1fd687eb55aecad2d06ebb9981736cac56b7c46884c44e1070cc582bc67780",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "eventual",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Agent canvas runtime adapter is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "runtime_timeout",
+          "meaning": "The bounded Agent canvas runtime timed out.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The Agent canvas invocation conflicts with an earlier request.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "outcome_unknown",
+          "meaning": "The Agent canvas outcome must be reconciled.",
+          "retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_dfa20aeabf73d8c7ad7b0d58",
+      "error_schema": [
+        {
+          "error_code": "invalid_input",
+          "message_template": "The Agent request is invalid.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller cannot access the Agent resource.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The Agent resource does not exist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The Agent resource changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "catalog_release_unavailable",
+          "message_template": "The pinned Catalog release is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "delegation_expired",
+          "message_template": "The Agent delegation is missing or expired.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The delegated operation requires Base approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "The Agent canvas runtime adapter is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "runtime_timeout",
+          "message_template": "The bounded Agent canvas runtime timed out.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The Agent canvas invocation conflicts with an earlier request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "outcome_unknown",
+          "message_template": "The Agent canvas outcome must be reconciled.",
+          "is_retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [
+        {
+          "consumer_id": "packages/agent-plugin/web/orchestration_center/api.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        },
+        {
+          "consumer_id": "packages/agent-plugin/web/orchestration_center/bootstrap.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "no_consumer_reason": null,
+      "provider_ref": "agent.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/agent.orchestration.version.publish:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[agent.orchestration.version.publish@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[agent.orchestration.version.publish@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[agent.orchestration.version.publish@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[agent.orchestration.version.publish@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[agent.orchestration.version.publish@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[agent.orchestration.version.publish@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[agent.orchestration.version.publish@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:e1bf9c01c88941dd2f70aaf66a079313960fd1fd8b114d7df44bf64004e68d75"
     },
     {
       "id": "agent.run.change.apply",
@@ -297603,7 +301747,7 @@
       "plugin_id": "official.agent",
       "module": "agent_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:91b0124e4328a1dba0b04caae85f7a4fe82f6e1ced6077cd9432a39c77d43fe5"
+      "artifact_hash": "sha256:d9f5985eb2accf0f470eb3fe5a18cd0ee22e0c34866390e6b6596a5072b9d35a"
     },
     {
       "plugin_id": "official.base",
@@ -297666,5 +301810,5 @@
       "artifact_hash": "sha256:f35abbc9450b6fc1f91a5bb2cf73eb59e3cf019ccb0af0879cd3823e868b6097"
     }
   ],
-  "created_at": "2026-09-04T07:07:22.493989Z"
+  "created_at": "2026-09-04T08:11:33.230329Z"
 }

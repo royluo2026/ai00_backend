@@ -74,6 +74,8 @@ def test_graph_rejects_capability_binding_from_non_task_tool(valid_graph_dict):
         ("duplicate_item_gid", "duplicate item gid"),
         ("decomposition_cycle", "cycle"),
         ("excessive_depth", "depth"),
+        ("business_cycle", "business flow graph contains a cycle"),
+        ("business_excessive_depth", "business flow depth exceeds limit"),
     ],
 )
 def test_graph_rejects_invalid_topology(valid_graph_dict, mutation, message):
@@ -99,6 +101,24 @@ def test_graph_rejects_invalid_topology(valid_graph_dict, mutation, message):
         graph["context_bindings"] = []
         graph["items"] = [{"gid": f"item-{index}", "item_type": "skill", "title": str(index)} for index in range(MAX_GRAPH_DEPTH + 2)]
         graph["item_edges"] = [{"gid": f"edge-{index}", "source_item_gid": f"item-{index}", "target_item_gid": f"item-{index + 1}", "relation_type": "contains"} for index in range(MAX_GRAPH_DEPTH + 1)]
+    elif mutation == "business_cycle":
+        graph["edges"] = [
+            {"gid": "be-1", "edge_type": "business", "source_node_gid": "node-1", "target_node_gid": "node-2"},
+            {"gid": "be-2", "edge_type": "business", "source_node_gid": "node-2", "target_node_gid": "node-1"},
+        ]
+        graph["nodes"].append({"gid": "node-2", "node_key": "N2", "title": "分析", "x_item_key": "TG1", "y_item_key": "项目管理"})
+    elif mutation == "business_excessive_depth":
+        graph["items"] = []
+        graph["capability_bindings"] = []
+        graph["context_bindings"] = []
+        graph["nodes"] = [
+            {"gid": f"node-{index}", "node_key": f"N{index}", "title": str(index), "x_item_key": "TG0", "y_item_key": "项目管理"}
+            for index in range(MAX_GRAPH_DEPTH + 1)
+        ]
+        graph["edges"] = [
+            {"gid": f"be-{index}", "edge_type": "business", "source_node_gid": f"node-{index}", "target_node_gid": f"node-{index + 1}"}
+            for index in range(MAX_GRAPH_DEPTH)
+        ]
     with pytest.raises(ValidationError, match=message):
         GraphDraft.model_validate(graph)
 

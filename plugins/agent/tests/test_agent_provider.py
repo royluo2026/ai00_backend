@@ -13,6 +13,10 @@ EXPECTED = {
     "agent.memory.change.apply", "agent.memory.read", "agent.runtime.config.read", "agent.tool_catalog.read", "agent.script.generate",
     "agent.run.change.apply", "agent.run.read", "agent.session.change.apply", "agent.session.read",
     "agent.skill.change.apply", "agent.skill.read",
+    "agent.orchestration.panorama.read", "agent.orchestration.graph.read",
+    "agent.orchestration.graph.save", "agent.orchestration.version.publish",
+    "agent.orchestration.binding.delete", "agent.orchestration.run.start",
+    "agent.orchestration.run.transition", "agent.orchestration.metric.read",
 }
 ROOT = Path(__file__).parents[3]
 

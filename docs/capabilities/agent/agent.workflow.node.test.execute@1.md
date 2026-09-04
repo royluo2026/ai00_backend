@@ -8,7 +8,7 @@ Execute the governed agent.workflow.node.test.execute Agent outcome.
 - 不适用：The outcome belongs to another business domain; invoke that domain Capability instead.
 - 生命周期：`stable`
 - 所属领域：`agent`
-- Catalog Release：`rel_b29ec309ee7aaa692bd89420063c443e`
+- Catalog Release：`rel_6ac873e4c4c86df0d99516fa45fed4a0`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -165,7 +165,7 @@ Execute the governed agent.workflow.node.test.execute Agent outcome.
 ```json
 {
   "capability_id": "agent.workflow.node.test.execute",
-  "catalog_release": "rel_b29ec309ee7aaa692bd89420063c443e",
+  "catalog_release": "rel_6ac873e4c4c86df0d99516fa45fed4a0",
   "major_version": 1,
   "payload": {
     "flow_gid": "example",

@@ -7,7 +7,7 @@
         "plugin_id": "official.agent",
         "module": "agent_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:91b0124e4328a1dba0b04caae85f7a4fe82f6e1ced6077cd9432a39c77d43fe5"
+        "artifact_hash": "sha256:d9f5985eb2accf0f470eb3fe5a18cd0ee22e0c34866390e6b6596a5072b9d35a"
       },
       "artifact_path": "plugins/agent/agent_backend",
       "allowed_owners": [

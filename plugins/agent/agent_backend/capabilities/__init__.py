@@ -21,6 +21,9 @@ from .descriptors import specs
 from .provider import descriptor_for, write_output
 from .interaction_chat_change import register_interaction_chat_change_capability
 from .catalog_tool_confirmation import register_catalog_tool_confirmation_capability
+from ..orchestration.provider import ORCHESTRATION_CAPABILITIES, make_handler
+from ..orchestration.reference_resolver import CatalogReferenceResolver
+from ..orchestration.repository import OrchestrationRepository
 from backend.domain_ports.resource_authorization import resource_authorizers
 
 
@@ -50,6 +53,7 @@ def _validate_canvas_runtime(runtime) -> None:
 
 def register_capabilities(
     registry, *, canvas_runtime=_DEFAULT_RUNTIME, transaction_factory=None,
+    orchestration_repository_factory=None,
 ) -> None:
     transaction_factory = transaction_factory or begin_agent_transaction
     resource_authorizers.register("agent-session", _authorize_agent_session)
@@ -104,6 +108,23 @@ def register_capabilities(
         repository, AuditRepository(), SessionRepository(), runtime,
         canvas_execution=execution,
     )
+    # The production composition uses the domain repository directly.  The
+    # narrow factory seam is also used by the backend.main integration test to
+    # exercise the real Gateway→Provider→Repository path without replacing the
+    # provider with a fixed-success fake.
+    orchestration_repository = (
+        orchestration_repository_factory()
+        if orchestration_repository_factory is not None
+        else OrchestrationRepository()
+    )
+    orchestration_resolver = CatalogReferenceResolver(registry)
+    orchestration_handlers = {
+        capability_id: make_handler(
+            capability_id, repository=orchestration_repository,
+            resolver=orchestration_resolver,
+        )
+        for capability_id in ORCHESTRATION_CAPABILITIES
+    }
     for spec in specs():
         capability_id = spec.id
         write = spec.risk.value != "read"
@@ -132,10 +153,16 @@ def register_capabilities(
                 _major_version=spec.version, _write=write,
             ):
                 if not _write:
+                    if _capability_id in orchestration_handlers:
+                        return orchestration_handlers[_capability_id](payload, context)
                     return provider.invoke(_capability_id, payload, context)
                 transaction = transaction_factory()
                 try:
-                    value = provider.invoke(_capability_id, payload, context)
+                    value = (
+                        orchestration_handlers[_capability_id](payload, context)
+                        if _capability_id in orchestration_handlers
+                        else provider.invoke(_capability_id, payload, context)
+                    )
                     output = write_output(_capability_id, value, context)
                     transaction.record_outbox(_capability_id, _major_version, context, output)
                     transaction.commit()

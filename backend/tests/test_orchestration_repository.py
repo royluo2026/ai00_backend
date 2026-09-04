@@ -119,6 +119,19 @@ def test_write_rejects_missing_scope_before_opening_transaction():
     assert cursor.executions == []
 
 
+@pytest.mark.parametrize("reader,args", [
+    ("list_panoramas_for_user", ("user-1",)),
+    ("get_metric_for_user", ("pan-1", "2026" , "user-1")),
+    ("get_run_state_for_user", ("run-1", "user-1")),
+])
+def test_all_orchestration_reads_reject_missing_project_scope_before_query(reader, args):
+    cursor = RecordingCursor()
+    repo = OrchestrationRepository(connection_factory(cursor))
+    with pytest.raises(ResourceNotAccessible, match="tenant and project scope"):
+        getattr(repo, reader)(*args, tenant_gid="tenant-1", project_gid=None)
+    assert cursor.executions == []
+
+
 def test_save_graph_hides_foreign_version_and_rejects_stale_owned_version():
     foreign = OrchestrationRepository(connection_factory(RecordingCursor()))
     with pytest.raises(ResourceNotAccessible):
@@ -140,12 +153,14 @@ def test_get_graph_rehydrates_only_an_owned_version():
     })
     repo = OrchestrationRepository(connection_factory(cursor))
 
-    graph = repo.get_graph("version-1", actor_gid="user-1")
+    graph = repo.get_graph("version-1", actor_gid="user-1", tenant_gid="tenant-1", project_gid="project-1")
 
     assert graph.mode == "exploration"
     assert graph.axis.x_items == ["TG0"]
     assert graph.axis.y_items == ["工艺规划"]
     assert "p.owner_user_gid=%s" in cursor.executions[0][0]
+    assert "p.tenant_gid=%s" in cursor.executions[0][0]
+    assert "p.project_gid=%s" in cursor.executions[0][0]
 
 
 def test_publish_and_delete_binding_require_owner_inside_transaction():

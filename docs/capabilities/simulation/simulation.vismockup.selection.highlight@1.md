@@ -8,7 +8,7 @@ Highlight VisMockup occurrences.
 - 不适用：The caller is outside the trusted local Connector runtime.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
-- Catalog Release：`rel_b29ec309ee7aaa692bd89420063c443e`
+- Catalog Release：`rel_6ac873e4c4c86df0d99516fa45fed4a0`
 - Schema 精度：`typed`
 - 暂未开放原因：`experimental_lifecycle`
 
@@ -97,7 +97,7 @@ Highlight VisMockup occurrences.
 ```json
 {
   "capability_id": "simulation.vismockup.selection.highlight",
-  "catalog_release": "rel_b29ec309ee7aaa692bd89420063c443e",
+  "catalog_release": "rel_6ac873e4c4c86df0d99516fa45fed4a0",
   "major_version": 1,
   "payload": {
     "catia_names": [

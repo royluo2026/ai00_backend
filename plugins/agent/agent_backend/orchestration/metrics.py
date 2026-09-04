@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from decimal import Decimal
-from typing import Protocol
+from typing import Any, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -47,6 +47,36 @@ class WorkloadEvidenceResolver(Protocol):
     def resolve(self, evidence_gid: str) -> ResolvedWorkloadEvidence: ...
 
 
+class RepositoryWorkloadEvidenceResolver:
+    """Production resolver backed by the Agent-owned repository.
+
+    Callers provide only an evidence GID; tenant/project/actor scope is fixed
+    when the resolver is constructed and cannot be smuggled through KPI input.
+    """
+    def __init__(self, repository: Any, *, actor_gid: str, tenant_gid: str, project_gid: str):
+        self._repository = repository
+        self._actor_gid = actor_gid
+        self._tenant_gid = tenant_gid
+        self._project_gid = project_gid
+
+    def resolve(self, evidence_gid: str) -> ResolvedWorkloadEvidence:
+        row = self._repository.get_workload_evidence(
+            evidence_gid,
+            actor_gid=self._actor_gid,
+            tenant_gid=self._tenant_gid,
+            project_gid=self._project_gid,
+        )
+        # A legacy row without both independently hash-bound evidence records
+        # is deliberately unusable; no caller-supplied fallback is accepted.
+        for key in (
+            "authorization_artifact_hash", "acceptance_artifact_hash",
+            "valid_from", "valid_until",
+        ):
+            if not row.get(key):
+                raise UntrustedWorkloadEvidence(f"trusted evidence field missing: {key}")
+        return ResolvedWorkloadEvidence.model_validate(row)
+
+
 class EffectiveWorkTask(BaseModel):
     evidence_gid: str
     task_key: str
@@ -67,6 +97,22 @@ class AutomationRatio(BaseModel):
     automated_workflow_count: int
     total_workflow_count: int
     rate: Decimal
+
+
+class AutomationEvidenceResolver(Protocol):
+    def list_automation_workflows(self, *, tenant_gid: str, project_gid: str) -> tuple[set[str], set[str]]: ...
+
+
+def calculate_automation_ratio_from_evidence(
+    *, evidence_resolver: AutomationEvidenceResolver, tenant_gid: str, project_gid: str,
+) -> AutomationRatio:
+    """Calculate automation from server-derived publication/runtime evidence."""
+    published, successful = evidence_resolver.list_automation_workflows(
+        tenant_gid=tenant_gid, project_gid=project_gid,
+    )
+    if not isinstance(published, set) or not isinstance(successful, set):
+        raise UntrustedWorkloadEvidence("automation evidence resolver returned invalid collections")
+    return calculate_automation_ratio(published, successful)
 
 
 def _trusted_evidence(
@@ -120,6 +166,8 @@ def calculate_automation_ratio(
     published_workflow_gids: set[str],
     successful_run_workflow_gids: set[str],
 ) -> AutomationRatio:
+    if not isinstance(published_workflow_gids, set) or not isinstance(successful_run_workflow_gids, set):
+        raise UntrustedWorkloadEvidence("automation ratio requires repository-derived sets")
     total = len(published_workflow_gids)
     automated = len(published_workflow_gids & successful_run_workflow_gids)
     return AutomationRatio(

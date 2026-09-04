@@ -3,9 +3,33 @@ from pathlib import Path
 import pytest
 
 from plugins.agent.agent_backend.orchestration.reference_resolver import (
+    CatalogReferenceResolver,
     ReferenceResolver,
     UntrustedCapabilityReference,
 )
+
+
+def test_catalog_reference_resolver_uses_server_catalog_for_capability_gid():
+    from backend.capability_v2.bootstrap import build_capability_registry
+
+    root = Path(__file__).resolve().parents[2]
+    registry = build_capability_registry(root)
+    descriptor = next(
+        item.descriptor for item in registry.snapshot()
+        if item.spec.id == "agent.orchestration.panorama.read"
+    )
+    release = __import__("json").loads(
+        (root / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
+    )
+    artifact = next(item for item in release["provider_artifacts"] if item["plugin_id"] == "official.agent")
+    registry.bind_provider_artifact("agent", type("Artifact", (), artifact)())
+    resolver = CatalogReferenceResolver(registry)
+
+    resolved = resolver.resolve_capability_binding(descriptor.capability_version_gid, "u1")
+
+    assert resolved["capability_version_gid"] == descriptor.capability_version_gid
+    assert resolved["provider_ref"] == "agent.provider"
+    assert resolved["catalog_release_gid"] == release["release_id"]
 
 
 def trusted_capability(**overrides):

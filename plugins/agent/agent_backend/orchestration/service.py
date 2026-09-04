@@ -79,6 +79,8 @@ class OrchestrationService:
 
     @staticmethod
     def _validate_business_contract(graph: GraphDraft) -> None:
+        if not graph.nodes:
+            raise PublishBlocked("business graph must contain at least one node")
         required = ("objective", "owner_ref", "inputs", "outputs", "acceptance_criteria")
         for node in graph.nodes:
             missing = [field for field in required if not getattr(node, field)]

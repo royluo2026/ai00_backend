@@ -115,34 +115,93 @@ class OrchestrationRepository:
         )
         return event_gid
 
-    def list_panoramas_for_user(self, actor_gid: str, limit: int = 50) -> list[dict[str, Any]]:
+    def list_panoramas_for_user(self, actor_gid: str, *, tenant_gid: str, project_gid: str, limit: int = 50) -> list[dict[str, Any]]:
+        tenant_gid, project_gid = _require_scope(tenant_gid, project_gid)
         with self._connection_factory() as conn, conn.cursor() as cur:
             cur.execute(
                 """SELECT gid,name,current_version_gid,revision,updated_at
                    FROM workmanship_agent_orch_panoramas
-                   WHERE owner_user_gid=%s ORDER BY updated_at DESC LIMIT %s""",
-                (actor_gid, min(max(limit, 1), 100)),
+                   WHERE owner_user_gid=%s AND tenant_gid=%s AND project_gid=%s
+                   ORDER BY updated_at DESC LIMIT %s""",
+                (actor_gid, tenant_gid, project_gid, min(max(limit, 1), 100)),
             )
             return list(cur.fetchall())
 
-    def get_metric_for_user(self, panorama_gid: str, period_key: str, actor_gid: str) -> dict[str, Any]:
+    def get_metric_for_user(self, panorama_gid: str, period_key: str, actor_gid: str, *, tenant_gid: str, project_gid: str) -> dict[str, Any]:
+        tenant_gid, project_gid = _require_scope(tenant_gid, project_gid)
         with self._connection_factory() as conn, conn.cursor() as cur:
             cur.execute(
                 """SELECT m.* FROM workmanship_agent_orch_metric_snapshots m
                    JOIN workmanship_agent_orch_panoramas p ON p.gid=m.panorama_gid
                    WHERE m.panorama_gid=%s AND m.period_key=%s AND p.owner_user_gid=%s
+                     AND p.tenant_gid=%s AND p.project_gid=%s
                    ORDER BY m.calculated_at DESC LIMIT 1""",
-                (panorama_gid, period_key, actor_gid),
+                (panorama_gid, period_key, actor_gid, tenant_gid, project_gid),
             )
             row = cur.fetchone()
         if not row:
             raise KeyError(f"orchestration metric not found: {panorama_gid}/{period_key}")
         return dict(row)
 
+    def get_workload_evidence(
+        self, evidence_gid: str, *, actor_gid: str, tenant_gid: str, project_gid: str,
+    ) -> dict[str, Any]:
+        """Read KPI evidence only through the owning repository and scope."""
+        tenant_gid, project_gid = _require_scope(tenant_gid, project_gid)
+        with self._connection_factory() as conn, conn.cursor() as cur:
+            cur.execute(
+                """SELECT a.gid AS evidence_gid, b.task_key, a.run_gid,
+                          b.version_gid, b.gid AS workload_baseline_gid,
+                          b.authorization_evidence_gid, a.acceptance_evidence_gid,
+                          b.authorization_artifact_hash, a.acceptance_artifact_hash,
+                          b.annual_task_volume, b.standard_manual_hours,
+                          a.agent_share, a.acceptance_pass_rate,
+                          a.safety_gate_passed, b.mandatory_human,
+                          (b.authorization_revoked OR a.acceptance_revoked) AS revoked,
+                          b.authorization_valid_from AS valid_from,
+                          b.authorization_valid_until AS valid_until
+                   FROM workmanship_agent_orch_acceptance_facts a
+                   JOIN workmanship_agent_orch_workload_baselines b
+                     ON b.panorama_gid=a.panorama_gid
+                    AND b.version_gid=a.version_gid
+                    AND b.task_key=a.task_key
+                    AND b.period_key=a.period_key
+                   JOIN workmanship_agent_orch_panoramas p ON p.gid=a.panorama_gid
+                   LEFT JOIN workmanship_agent_orch_runs r ON r.gid=a.run_gid
+                   WHERE a.gid=%s AND p.owner_user_gid=%s
+                     AND p.tenant_gid=%s AND p.project_gid=%s
+                     AND (a.run_gid IS NULL OR r.status='succeeded')
+                   LIMIT 1""",
+                (evidence_gid, actor_gid, tenant_gid, project_gid),
+            )
+            row = cur.fetchone()
+        if not row:
+            raise KeyError(f"trusted workload evidence not found: {evidence_gid}")
+        return dict(row)
+
+    def list_automation_workflows(self, *, tenant_gid: str, project_gid: str) -> tuple[set[str], set[str]]:
+        """Return publication/runtime sets from the scoped Agent tables."""
+        tenant_gid, project_gid = _require_scope(tenant_gid, project_gid)
+        with self._connection_factory() as conn, conn.cursor() as cur:
+            cur.execute(
+                """SELECT v.gid, MAX(CASE WHEN r.status='succeeded' THEN 1 ELSE 0 END) AS ran
+                   FROM workmanship_agent_orch_versions v
+                   JOIN workmanship_agent_orch_panoramas p ON p.gid=v.panorama_gid
+                   LEFT JOIN workmanship_agent_orch_runs r ON r.version_gid=v.gid
+                   WHERE v.status='published' AND p.tenant_gid=%s AND p.project_gid=%s
+                   GROUP BY v.gid""",
+                (tenant_gid, project_gid),
+            )
+            rows = cur.fetchall()
+        published = {str(row["gid"]) for row in rows}
+        successful = {str(row["gid"]) for row in rows if int(row.get("ran") or 0) == 1}
+        return published, successful
+
     def get_graph(
         self, version_gid: str, *, actor_gid: str,
-        tenant_gid: str | None = None, project_gid: str | None = None,
+        tenant_gid: str, project_gid: str,
     ) -> GraphDraft:
+        tenant_gid, project_gid = _require_scope(tenant_gid, project_gid)
         scope_sql = (" AND p.tenant_gid=%s" if tenant_gid else "") + (" AND p.project_gid=%s" if project_gid else "")
         scope_params = tuple(value for value in (tenant_gid, project_gid) if value)
         with self._connection_factory() as conn, conn.cursor() as cur:
@@ -238,7 +297,7 @@ class OrchestrationRepository:
 
     def get_graph_for_user(
         self, version_gid: str, actor_gid: str,
-        tenant_gid: str | None = None, project_gid: str | None = None,
+        tenant_gid: str, project_gid: str,
     ) -> GraphDraft:
         return self.get_graph(
             version_gid, actor_gid=actor_gid,
@@ -460,15 +519,18 @@ class OrchestrationRepository:
             "event_gid": event_gid,
         }
 
-    def get_run_state_for_user(self, run_gid: str, actor_gid: str) -> dict[str, Any]:
+    def get_run_state_for_user(self, run_gid: str, actor_gid: str, *, tenant_gid: str, project_gid: str) -> dict[str, Any]:
+        tenant_gid, project_gid = _require_scope(tenant_gid, project_gid)
         with self._connection_factory() as conn, conn.cursor() as cur:
             cur.execute(
                 """SELECT r.status,COALESCE(MAX(e.sequence_no),0) AS last_sequence_no
                    FROM workmanship_agent_orch_runs r
                    JOIN workmanship_agent_orch_panoramas p ON p.gid=r.panorama_gid
                    LEFT JOIN workmanship_agent_orch_run_events e ON e.run_gid=r.gid
-                   WHERE r.gid=%s AND p.owner_user_gid=%s GROUP BY r.gid,r.status""",
-                (run_gid, actor_gid),
+                   WHERE r.gid=%s AND p.owner_user_gid=%s
+                     AND p.tenant_gid=%s AND p.project_gid=%s
+                   GROUP BY r.gid,r.status""",
+                (run_gid, actor_gid, tenant_gid, project_gid),
             )
             row = cur.fetchone()
         if not row:

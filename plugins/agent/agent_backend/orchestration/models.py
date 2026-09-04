@@ -142,6 +142,7 @@ class GraphDraft(Contract):
         for edge in self.edges:
             if edge.source_node_gid not in node_ids or edge.target_node_gid not in node_ids:
                 raise ValueError("flow edge points to missing node")
+        self._validate_business_dag(node_ids)
 
         items = {item.gid: item for item in self.items}
         if len(items) != len(self.items):
@@ -172,6 +173,31 @@ class GraphDraft(Contract):
         if len(payload.encode("utf-8")) > MAX_GRAPH_JSON_BYTES:
             raise ValueError("graph serialized payload exceeds limit")
         return self
+
+    def _validate_business_dag(self, node_ids: set[str]) -> None:
+        """Business-flow edges are a bounded DAG, just like decomposition edges."""
+        adjacency = {node_gid: [] for node_gid in node_ids}
+        indegree = {node_gid: 0 for node_gid in node_ids}
+        for edge in self.edges:
+            if edge.source_node_gid == edge.target_node_gid:
+                raise ValueError("business flow edge cannot reference itself")
+            adjacency[edge.source_node_gid].append(edge.target_node_gid)
+            indegree[edge.target_node_gid] += 1
+        queue = [node_gid for node_gid, degree in indegree.items() if degree == 0]
+        depth = {node_gid: 1 for node_gid in queue}
+        visited = 0
+        while queue:
+            node_gid = queue.pop()
+            visited += 1
+            if depth[node_gid] > MAX_GRAPH_DEPTH:
+                raise ValueError("business flow depth exceeds limit")
+            for target_gid in adjacency[node_gid]:
+                depth[target_gid] = max(depth.get(target_gid, 1), depth[node_gid] + 1)
+                indegree[target_gid] -= 1
+                if indegree[target_gid] == 0:
+                    queue.append(target_gid)
+        if visited != len(node_ids):
+            raise ValueError("business flow graph contains a cycle")
 
     def _validate_decomposition_dag(self, items: dict[str, DecompositionItem]) -> None:
         adjacency = {item_gid: [] for item_gid in items}
