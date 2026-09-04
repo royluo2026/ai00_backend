@@ -24,7 +24,7 @@
 本轮隔离复核证据：
 
 - 后端提交 `39092086`（包含 `f8d024e8`）基于最新 `test@655418f8`；Catalog Release 为 `rel_b29ec309ee7aaa692bd89420063c443e`，552 descriptors / 495 stable。
-- `140 passed, 5 skipped`：编排、schema/migration、Catalog/release-gate、Provider integration 与 HTTP harness；HTTP harness 使用每测试独立 fake connection，客户端关闭后连接对象即丢弃，不写共享数据库。
+- `141 passed, 5 skipped`：编排、schema/migration、Catalog/release-gate、Provider integration 与 HTTP harness；HTTP harness 使用每测试独立 fake connection，客户端关闭后连接对象即丢弃，不写共享数据库。
 - Catalog、Capability docs、acceptance manifest 的 `--check` 均通过；Provider integration `9 passed, 5 skipped`。
 - HTTP harness 验证 `POST /api/orchestration/runs` → `POST /api/orchestration/runs/{run_gid}/transition`，状态更新和审计事件分别在单事务中提交，且租户/项目作用域写入 guard 生效。
 
