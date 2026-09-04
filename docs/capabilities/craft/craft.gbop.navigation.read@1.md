@@ -8,7 +8,7 @@ Read bounded GBOP navigation binding projections.
 - 不适用：The request creates, confirms or mutates navigation bindings.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_6ac873e4c4c86df0d99516fa45fed4a0`
+- Catalog Release：`rel_eda0fd60f1f30070a4bf7beee6c05ad2`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -95,7 +95,7 @@ Read bounded GBOP navigation binding projections.
 ```json
 {
   "capability_id": "craft.gbop.navigation.read",
-  "catalog_release": "rel_6ac873e4c4c86df0d99516fa45fed4a0",
+  "catalog_release": "rel_eda0fd60f1f30070a4bf7beee6c05ad2",
   "major_version": 1,
   "payload": {
     "operation": "link_summary",

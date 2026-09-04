@@ -8,7 +8,7 @@ Create, update, delete or share Craft canvases.
 - 不适用：The change belongs to a BOP execution canvas.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_6ac873e4c4c86df0d99516fa45fed4a0`
+- Catalog Release：`rel_eda0fd60f1f30070a4bf7beee6c05ad2`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -101,7 +101,7 @@ Create, update, delete or share Craft canvases.
 ```json
 {
   "capability_id": "craft.canvas.change.apply",
-  "catalog_release": "rel_6ac873e4c4c86df0d99516fa45fed4a0",
+  "catalog_release": "rel_eda0fd60f1f30070a4bf7beee6c05ad2",
   "major_version": 1,
   "payload": {
     "operation": "save"

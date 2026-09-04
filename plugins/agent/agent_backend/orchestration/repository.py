@@ -159,7 +159,8 @@ class OrchestrationRepository:
                           a.safety_gate_passed, b.mandatory_human,
                           (b.authorization_revoked OR a.acceptance_revoked) AS revoked,
                           b.authorization_valid_from AS valid_from,
-                          b.authorization_valid_until AS valid_until
+                          b.authorization_valid_until AS valid_until,
+                          a.acceptance_valid_from, a.acceptance_valid_until
                    FROM workmanship_agent_orch_acceptance_facts a
                    JOIN workmanship_agent_orch_workload_baselines b
                      ON b.panorama_gid=a.panorama_gid
@@ -167,10 +168,10 @@ class OrchestrationRepository:
                     AND b.task_key=a.task_key
                     AND b.period_key=a.period_key
                    JOIN workmanship_agent_orch_panoramas p ON p.gid=a.panorama_gid
-                   LEFT JOIN workmanship_agent_orch_runs r ON r.gid=a.run_gid
+                   JOIN workmanship_agent_orch_runs r ON r.gid=a.run_gid
                    WHERE a.gid=%s AND p.owner_user_gid=%s
                      AND p.tenant_gid=%s AND p.project_gid=%s
-                     AND (a.run_gid IS NULL OR r.status='succeeded')
+                     AND r.status='succeeded'
                    LIMIT 1""",
                 (evidence_gid, actor_gid, tenant_gid, project_gid),
             )

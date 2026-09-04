@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 from decimal import Decimal
 from typing import Any, Protocol
 
@@ -74,6 +74,24 @@ class RepositoryWorkloadEvidenceResolver:
         ):
             if not row.get(key):
                 raise UntrustedWorkloadEvidence(f"trusted evidence field missing: {key}")
+        acceptance_from = row.pop("acceptance_valid_from", None)
+        acceptance_until = row.pop("acceptance_valid_until", None)
+        if acceptance_from is None or acceptance_until is None:
+            raise UntrustedWorkloadEvidence("trusted acceptance validity window missing")
+        # DB drivers commonly return naive DATETIME values.  The domain stores
+        # them in UTC; normalize before the validity comparison.
+        for key in ("valid_from", "valid_until"):
+            value = row[key]
+            if value.tzinfo is None:
+                row[key] = value.replace(tzinfo=UTC)
+        if acceptance_from.tzinfo is None:
+            acceptance_from = acceptance_from.replace(tzinfo=UTC)
+        if acceptance_until.tzinfo is None:
+            acceptance_until = acceptance_until.replace(tzinfo=UTC)
+        row["valid_from"] = max(row["valid_from"], acceptance_from)
+        row["valid_until"] = min(row["valid_until"], acceptance_until)
+        if row["valid_from"] > row["valid_until"]:
+            raise UntrustedWorkloadEvidence("authorization and acceptance validity windows do not overlap")
         return ResolvedWorkloadEvidence.model_validate(row)
 
 

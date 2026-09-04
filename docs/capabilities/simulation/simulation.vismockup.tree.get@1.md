@@ -8,7 +8,7 @@ Read the active VisMockup product tree.
 - 不适用：The caller is outside the trusted local Connector runtime.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
-- Catalog Release：`rel_6ac873e4c4c86df0d99516fa45fed4a0`
+- Catalog Release：`rel_eda0fd60f1f30070a4bf7beee6c05ad2`
 - Schema 精度：`typed`
 - 暂未开放原因：`experimental_lifecycle`
 
@@ -95,7 +95,7 @@ Read the active VisMockup product tree.
 ```json
 {
   "capability_id": "simulation.vismockup.tree.get",
-  "catalog_release": "rel_6ac873e4c4c86df0d99516fa45fed4a0",
+  "catalog_release": "rel_eda0fd60f1f30070a4bf7beee6c05ad2",
   "major_version": 1,
   "payload": {
     "connector_id": "example"

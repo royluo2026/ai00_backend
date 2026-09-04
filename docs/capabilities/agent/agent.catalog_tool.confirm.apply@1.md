@@ -8,7 +8,7 @@ Execute one previously proposed Catalog-generated Agent tool after explicit user
 - 不适用：Starting or continuing chat, or invoking a tool without a bound confirmation token.
 - 生命周期：`stable`
 - 所属领域：`agent`
-- Catalog Release：`rel_6ac873e4c4c86df0d99516fa45fed4a0`
+- Catalog Release：`rel_eda0fd60f1f30070a4bf7beee6c05ad2`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -104,7 +104,7 @@ Execute one previously proposed Catalog-generated Agent tool after explicit user
 ```json
 {
   "capability_id": "agent.catalog_tool.confirm.apply",
-  "catalog_release": "rel_6ac873e4c4c86df0d99516fa45fed4a0",
+  "catalog_release": "rel_eda0fd60f1f30070a4bf7beee6c05ad2",
   "major_version": 1,
   "payload": {
     "confirm_token": "example",
