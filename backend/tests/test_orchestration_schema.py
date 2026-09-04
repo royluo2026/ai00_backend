@@ -8,8 +8,8 @@ from backend.governance import load_registry
 
 
 ROOT = Path(__file__).resolve().parents[2]
-MIGRATION = ROOT / "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
-RUNTIME_MIGRATION = ROOT / "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+MIGRATION = ROOT / "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+RUNTIME_MIGRATION = ROOT / "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
 TABLES = {
     "workmanship_agent_orch_panoramas",
     "workmanship_agent_orch_versions",
@@ -44,7 +44,7 @@ def test_domain_runner_discovers_orchestration_migrations():
 
     migrations = discover_domain_migrations(ROOT, manifest)
 
-    assert [item.migration_id for item in migrations][-3:] == ["0004", "0005", "0006"]
+    assert [item.migration_id for item in migrations][-4:] == ["0005", "0006", "0007", "0008"]
 
 
 def test_orchestration_schema_is_agent_owned_and_replay_safe():

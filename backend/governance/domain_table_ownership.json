@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "registry_version": 1,
-  "table_count": 284,
+  "table_count": 293,
   "tables": [
     {
       "table": "workmanship_agent_canvas_audit_events",
@@ -1654,6 +1654,7 @@
       "legacy_name": true
     },
     {"table":"workmanship_device_connector_projection_outbox","owner":"device","runtime_domain":"device","legacy_name":false},
+    {"table":"workmanship_agent_capability_outbox","owner":"agent","runtime_domain":"agent","legacy_name":false},
     {"table":"workmanship_agent_confirmation_tokens","owner":"agent","runtime_domain":"agent","legacy_name":false},
     {"table":"workmanship_agent_orch_panoramas","owner":"agent","runtime_domain":"agent","legacy_name":false},
     {"table":"workmanship_agent_orch_versions","owner":"agent","runtime_domain":"agent","legacy_name":false},

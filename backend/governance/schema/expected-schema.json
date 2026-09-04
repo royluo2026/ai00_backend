@@ -1,7 +1,7 @@
 {
   "database_name": "ai00_test",
   "isolation_profile": "single_database_domain_tables",
-  "schema_sha256": "sha256:7e1cbc54625b6e59df2a9bb177fb6068689f19871f5692b85b87208f8c675a99",
+  "schema_sha256": "sha256:bbea8fe2a8e27b5fbdf20c2be1e59521b0e81077967006864a66d530e8b36e9c",
   "schema_version": 1,
   "tables": [
     {
@@ -758,6 +758,247 @@
     {
       "columns": [
         {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "event_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0005_capability_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": "''",
+          "extra": "",
+          "name": "operation_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0005_capability_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "request_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0005_capability_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "capability_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0005_capability_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "payload_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0005_capability_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(16)",
+          "default": "'pending'",
+          "extra": "",
+          "name": "state",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0005_capability_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": "0",
+          "extra": "",
+          "name": "attempt_count",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0005_capability_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "next_attempt_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0005_capability_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "delivered_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0005_capability_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0005_capability_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0005_capability_outbox.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "outcome_operation_id",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0006_capability_outbox_delivery.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "async_operation_id",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0006_capability_outbox_delivery.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": null,
+          "extra": "",
+          "name": "major_version",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0006_capability_outbox_delivery.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "lease_owner",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0006_capability_outbox_delivery.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "lease_token",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0006_capability_outbox_delivery.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "lease_expires_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0006_capability_outbox_delivery.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(500)",
+          "default": null,
+          "extra": "",
+          "name": "last_error",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0006_capability_outbox_delivery.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "event_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0005_capability_outbox.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "state",
+            "next_attempt_at",
+            "created_at"
+          ],
+          "name": "idx_agent_capability_outbox_dispatch",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0005_capability_outbox.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "operation_id"
+          ],
+          "name": "idx_agent_capability_outbox_operation",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0005_capability_outbox.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "outcome_operation_id"
+          ],
+          "name": "uq_agent_capability_outbox_outcome",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0006_capability_outbox_delivery.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_agent_capability_outbox",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "sources": [
+        "backend/db/migrations/domains/agent/0005_capability_outbox.sql",
+        "backend/db/migrations/domains/agent/0006_capability_outbox_delivery.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
           "data_type": "VARCHAR(128)",
           "default": null,
           "extra": "",
@@ -1091,7 +1332,7 @@
           "name": "gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -1101,7 +1342,7 @@
           "name": "panorama_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -1111,7 +1352,7 @@
           "name": "version_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -1121,7 +1362,7 @@
           "name": "run_gid",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -1131,7 +1372,7 @@
           "name": "business_node_gid",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -1141,7 +1382,7 @@
           "name": "task_key",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -1151,7 +1392,7 @@
           "name": "period_key",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -1161,7 +1402,7 @@
           "name": "agent_share",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -1171,7 +1412,7 @@
           "name": "acceptance_pass_rate",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -1181,7 +1422,7 @@
           "name": "safety_gate_passed",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -1191,7 +1432,7 @@
           "name": "acceptance_evidence_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -1201,7 +1442,7 @@
           "name": "recorded_by",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -1211,7 +1452,7 @@
           "name": "recorded_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -1221,7 +1462,7 @@
           "name": "created_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         }
       ],
@@ -1234,7 +1475,7 @@
           "name": "PRIMARY",
           "primary": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ],
           "unique": true
         },
@@ -1246,7 +1487,7 @@
           "name": "idx_agent_orch_acceptance_node",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ],
           "unique": false
         },
@@ -1258,7 +1499,7 @@
           "name": "idx_agent_orch_acceptance_period",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ],
           "unique": false
         }
@@ -1268,7 +1509,7 @@
       "owner": "agent",
       "runtime_domain": "agent",
       "sources": [
-        "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+        "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
       ]
     },
     {
@@ -1280,7 +1521,7 @@
           "name": "gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1290,7 +1531,7 @@
           "name": "version_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1300,7 +1541,7 @@
           "name": "name",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1310,7 +1551,7 @@
           "name": "x_items_json",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1320,7 +1561,7 @@
           "name": "y_items_json",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1330,7 +1571,7 @@
           "name": "revision",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1340,7 +1581,7 @@
           "name": "created_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1350,7 +1591,7 @@
           "name": "updated_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         }
       ],
@@ -1363,7 +1604,7 @@
           "name": "PRIMARY",
           "primary": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": true
         },
@@ -1374,7 +1615,7 @@
           "name": "idx_agent_orch_axis_version",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": false
         }
@@ -1384,7 +1625,7 @@
       "owner": "agent",
       "runtime_domain": "agent",
       "sources": [
-        "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
       ]
     },
     {
@@ -1396,7 +1637,7 @@
           "name": "gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1406,7 +1647,7 @@
           "name": "version_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1416,7 +1657,7 @@
           "name": "node_key",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1426,7 +1667,7 @@
           "name": "title",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1436,7 +1677,7 @@
           "name": "objective",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1446,7 +1687,7 @@
           "name": "owner_ref",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1456,7 +1697,7 @@
           "name": "x_item_key",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1466,7 +1707,7 @@
           "name": "y_item_key",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1476,7 +1717,7 @@
           "name": "position_json",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1486,7 +1727,7 @@
           "name": "inputs_json",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1496,7 +1737,7 @@
           "name": "outputs_json",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1506,7 +1747,7 @@
           "name": "acceptance_json",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1516,7 +1757,7 @@
           "name": "created_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1526,7 +1767,7 @@
           "name": "updated_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         }
       ],
@@ -1539,7 +1780,7 @@
           "name": "PRIMARY",
           "primary": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": true
         },
@@ -1552,7 +1793,7 @@
           "name": "idx_agent_orch_node_coordinates",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": false
         },
@@ -1564,7 +1805,7 @@
           "name": "uq_agent_orch_node_version_key",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": true
         }
@@ -1574,7 +1815,7 @@
       "owner": "agent",
       "runtime_domain": "agent",
       "sources": [
-        "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
       ]
     },
     {
@@ -1586,7 +1827,7 @@
           "name": "gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1596,7 +1837,7 @@
           "name": "version_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1606,7 +1847,7 @@
           "name": "source_item_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1616,7 +1857,7 @@
           "name": "capability_id",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1626,7 +1867,7 @@
           "name": "capability_version_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1636,7 +1877,7 @@
           "name": "purpose",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1646,7 +1887,7 @@
           "name": "version_constraint",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1656,7 +1897,7 @@
           "name": "input_mapping_json",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1666,7 +1907,7 @@
           "name": "output_mapping_json",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1676,7 +1917,7 @@
           "name": "authorization_scope_json",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1686,7 +1927,7 @@
           "name": "execution_policy_json",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1696,7 +1937,7 @@
           "name": "evidence_policy_json",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1706,7 +1947,7 @@
           "name": "created_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1716,7 +1957,7 @@
           "name": "updated_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         }
       ],
@@ -1729,7 +1970,7 @@
           "name": "PRIMARY",
           "primary": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": true
         },
@@ -1740,7 +1981,7 @@
           "name": "idx_agent_orch_capability_ref",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": false
         },
@@ -1754,7 +1995,7 @@
           "name": "uq_agent_orch_cap_binding",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": true
         }
@@ -1764,7 +2005,7 @@
       "owner": "agent",
       "runtime_domain": "agent",
       "sources": [
-        "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
       ]
     },
     {
@@ -1776,7 +2017,7 @@
           "name": "gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1786,7 +2027,7 @@
           "name": "version_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1796,7 +2037,7 @@
           "name": "source_item_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1806,7 +2047,7 @@
           "name": "ref_type",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1816,7 +2057,7 @@
           "name": "ref_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1826,7 +2067,7 @@
           "name": "ref_version",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1836,7 +2077,7 @@
           "name": "snapshot_gid",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1846,7 +2087,7 @@
           "name": "purpose",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1856,7 +2097,7 @@
           "name": "metadata_json",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1866,7 +2107,7 @@
           "name": "created_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1876,7 +2117,7 @@
           "name": "updated_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         }
       ],
@@ -1889,7 +2130,7 @@
           "name": "PRIMARY",
           "primary": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": true
         },
@@ -1901,7 +2142,7 @@
           "name": "idx_agent_orch_context_ref",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": false
         },
@@ -1916,7 +2157,7 @@
           "name": "uq_agent_orch_context_binding",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": true
         }
@@ -1926,7 +2167,7 @@
       "owner": "agent",
       "runtime_domain": "agent",
       "sources": [
-        "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
       ]
     },
     {
@@ -1938,7 +2179,7 @@
           "name": "gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1948,7 +2189,7 @@
           "name": "version_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1958,7 +2199,7 @@
           "name": "edge_type",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1968,7 +2209,7 @@
           "name": "source_node_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1978,7 +2219,7 @@
           "name": "target_node_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1988,7 +2229,7 @@
           "name": "label",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -1998,7 +2239,7 @@
           "name": "route_points_json",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2008,7 +2249,7 @@
           "name": "metadata_json",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2018,7 +2259,7 @@
           "name": "created_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2028,7 +2269,7 @@
           "name": "updated_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         }
       ],
@@ -2041,7 +2282,7 @@
           "name": "PRIMARY",
           "primary": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": true
         },
@@ -2053,7 +2294,7 @@
           "name": "idx_agent_orch_flow_version_type",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": false
         }
@@ -2063,7 +2304,7 @@
       "owner": "agent",
       "runtime_domain": "agent",
       "sources": [
-        "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
       ]
     },
     {
@@ -2075,7 +2316,7 @@
           "name": "gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2085,7 +2326,7 @@
           "name": "version_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2095,7 +2336,7 @@
           "name": "source_item_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2105,7 +2346,7 @@
           "name": "target_item_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2115,7 +2356,7 @@
           "name": "relation_type",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2125,7 +2366,7 @@
           "name": "sequence_no",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2135,7 +2376,7 @@
           "name": "created_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         }
       ],
@@ -2148,7 +2389,7 @@
           "name": "PRIMARY",
           "primary": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": true
         },
@@ -2161,7 +2402,7 @@
           "name": "idx_agent_orch_item_edge_source",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": false
         }
@@ -2171,7 +2412,7 @@
       "owner": "agent",
       "runtime_domain": "agent",
       "sources": [
-        "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
       ]
     },
     {
@@ -2183,7 +2424,7 @@
           "name": "gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2193,7 +2434,7 @@
           "name": "version_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2203,7 +2444,7 @@
           "name": "business_node_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2213,7 +2454,7 @@
           "name": "item_type",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2223,7 +2464,7 @@
           "name": "title",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2233,7 +2474,7 @@
           "name": "sequence_no",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2243,7 +2484,7 @@
           "name": "config_json",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2253,7 +2494,7 @@
           "name": "created_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2263,7 +2504,7 @@
           "name": "updated_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         }
       ],
@@ -2276,7 +2517,7 @@
           "name": "PRIMARY",
           "primary": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": true
         },
@@ -2288,7 +2529,7 @@
           "name": "idx_agent_orch_item_node_sequence",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": false
         }
@@ -2298,7 +2539,7 @@
       "owner": "agent",
       "runtime_domain": "agent",
       "sources": [
-        "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
       ]
     },
     {
@@ -2310,7 +2551,7 @@
           "name": "gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2320,7 +2561,7 @@
           "name": "panorama_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2330,7 +2571,7 @@
           "name": "version_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2340,7 +2581,7 @@
           "name": "period_key",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2350,7 +2591,7 @@
           "name": "total_workload_hours",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2360,7 +2601,7 @@
           "name": "effective_agent_workload_hours",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2370,7 +2611,7 @@
           "name": "effective_intelligent_work_rate",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2380,7 +2621,7 @@
           "name": "automated_workflow_count",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2390,7 +2631,7 @@
           "name": "total_workflow_count",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2400,7 +2641,7 @@
           "name": "automation_ratio",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2410,7 +2651,7 @@
           "name": "evidence_json",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2420,7 +2661,7 @@
           "name": "calculated_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2430,7 +2671,7 @@
           "name": "created_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         }
       ],
@@ -2443,7 +2684,7 @@
           "name": "PRIMARY",
           "primary": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ],
           "unique": true
         },
@@ -2456,7 +2697,7 @@
           "name": "uq_agent_orch_metric_period",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ],
           "unique": true
         }
@@ -2466,7 +2707,7 @@
       "owner": "agent",
       "runtime_domain": "agent",
       "sources": [
-        "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+        "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
       ]
     },
     {
@@ -2478,7 +2719,7 @@
           "name": "gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2488,7 +2729,7 @@
           "name": "tenant_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2498,7 +2739,7 @@
           "name": "owner_user_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2508,7 +2749,7 @@
           "name": "name",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2518,7 +2759,7 @@
           "name": "current_version_gid",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2528,7 +2769,7 @@
           "name": "revision",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2538,7 +2779,7 @@
           "name": "created_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2548,7 +2789,7 @@
           "name": "updated_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         }
       ],
@@ -2561,7 +2802,7 @@
           "name": "PRIMARY",
           "primary": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": true
         },
@@ -2573,7 +2814,7 @@
           "name": "idx_agent_orch_panorama_tenant_updated",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": false
         }
@@ -2583,7 +2824,7 @@
       "owner": "agent",
       "runtime_domain": "agent",
       "sources": [
-        "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
       ]
     },
     {
@@ -2595,7 +2836,7 @@
           "name": "gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2605,7 +2846,7 @@
           "name": "run_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2615,7 +2856,7 @@
           "name": "sequence_no",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2625,7 +2866,7 @@
           "name": "event_type",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2635,7 +2876,7 @@
           "name": "item_gid",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2645,7 +2886,7 @@
           "name": "actor_type",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2655,7 +2896,7 @@
           "name": "actor_gid",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2665,7 +2906,7 @@
           "name": "payload_json",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2675,7 +2916,7 @@
           "name": "capability_call_id",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2685,7 +2926,7 @@
           "name": "evidence_id",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2695,7 +2936,7 @@
           "name": "occurred_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2705,7 +2946,7 @@
           "name": "created_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         }
       ],
@@ -2718,7 +2959,7 @@
           "name": "PRIMARY",
           "primary": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ],
           "unique": true
         },
@@ -2730,7 +2971,7 @@
           "name": "uq_agent_orch_run_event_seq",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ],
           "unique": true
         }
@@ -2740,7 +2981,7 @@
       "owner": "agent",
       "runtime_domain": "agent",
       "sources": [
-        "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+        "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
       ]
     },
     {
@@ -2752,7 +2993,7 @@
           "name": "gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2762,7 +3003,7 @@
           "name": "panorama_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2772,7 +3013,7 @@
           "name": "version_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2782,7 +3023,7 @@
           "name": "status",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2792,7 +3033,7 @@
           "name": "frozen_context_json",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2802,7 +3043,7 @@
           "name": "started_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2812,7 +3053,7 @@
           "name": "finished_at",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2822,7 +3063,7 @@
           "name": "started_by",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2832,7 +3073,7 @@
           "name": "created_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -2842,7 +3083,7 @@
           "name": "updated_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         }
       ],
@@ -2855,7 +3096,7 @@
           "name": "PRIMARY",
           "primary": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ],
           "unique": true
         },
@@ -2868,7 +3109,7 @@
           "name": "idx_agent_orch_run_panorama",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ],
           "unique": false
         },
@@ -2880,7 +3121,7 @@
           "name": "idx_agent_orch_run_version",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ],
           "unique": false
         }
@@ -2890,7 +3131,7 @@
       "owner": "agent",
       "runtime_domain": "agent",
       "sources": [
-        "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+        "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
       ]
     },
     {
@@ -2902,7 +3143,7 @@
           "name": "gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2912,7 +3153,7 @@
           "name": "panorama_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2922,7 +3163,7 @@
           "name": "status",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2932,7 +3173,7 @@
           "name": "mode",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2942,7 +3183,7 @@
           "name": "revision",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2952,7 +3193,7 @@
           "name": "parent_version_gid",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2962,7 +3203,7 @@
           "name": "catalog_release",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2972,7 +3213,7 @@
           "name": "snapshot_gid",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2982,7 +3223,7 @@
           "name": "updated_by",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -2992,7 +3233,7 @@
           "name": "published_at",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -3002,7 +3243,7 @@
           "name": "created_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         },
         {
@@ -3012,7 +3253,7 @@
           "name": "updated_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
         }
       ],
@@ -3025,7 +3266,7 @@
           "name": "PRIMARY",
           "primary": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": true
         },
@@ -3037,7 +3278,7 @@
           "name": "idx_agent_orch_version_panorama_status",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": false
         }
@@ -3047,7 +3288,7 @@
       "owner": "agent",
       "runtime_domain": "agent",
       "sources": [
-        "backend/db/migrations/domains/agent/0005_agent_orchestration_mvp.sql"
+        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
       ]
     },
     {
@@ -3059,7 +3300,7 @@
           "name": "gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -3069,7 +3310,7 @@
           "name": "panorama_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -3079,7 +3320,7 @@
           "name": "version_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -3089,7 +3330,7 @@
           "name": "business_node_gid",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -3099,7 +3340,7 @@
           "name": "task_key",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -3109,7 +3350,7 @@
           "name": "period_key",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -3119,7 +3360,7 @@
           "name": "annual_task_volume",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -3129,7 +3370,7 @@
           "name": "standard_manual_hours",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -3139,7 +3380,7 @@
           "name": "agent_share",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -3149,7 +3390,7 @@
           "name": "authorization_evidence_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -3159,7 +3400,7 @@
           "name": "mandatory_human",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -3169,7 +3410,7 @@
           "name": "frozen_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -3179,7 +3420,7 @@
           "name": "created_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         },
         {
@@ -3189,7 +3430,7 @@
           "name": "updated_at",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ]
         }
       ],
@@ -3202,7 +3443,7 @@
           "name": "PRIMARY",
           "primary": true,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ],
           "unique": true
         },
@@ -3214,7 +3455,7 @@
           "name": "idx_agent_orch_baseline_node",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ],
           "unique": false
         },
@@ -3228,7 +3469,7 @@
           "name": "uq_agent_orch_baseline_period",
           "primary": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+            "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
           ],
           "unique": true
         }
@@ -3238,7 +3479,7 @@
       "owner": "agent",
       "runtime_domain": "agent",
       "sources": [
-        "backend/db/migrations/domains/agent/0006_agent_orchestration_runtime_metrics.sql"
+        "backend/db/migrations/domains/agent/0008_agent_orchestration_runtime_metrics.sql"
       ]
     },
     {
@@ -34317,7 +34558,323 @@
       "runtime_domain": "simulation",
       "sources": [
         "backend/db/migrations/domains/simulation/0002_connector_environments.sql",
-        "backend/db/migrations/domains/simulation/0004_capture_dispatch_plans.sql"
+        "backend/db/migrations/domains/simulation/0004_capture_dispatch_plans.sql",
+        "backend/db/migrations/domains/simulation/0006_capture_dispatch_compatibility.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "connector_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "owner_user_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "installation_id",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "windows_sid_hash",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "display_name",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": "'windows'",
+          "extra": "",
+          "name": "platform",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": "''",
+          "extra": "",
+          "name": "runtime_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "token_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "capabilities",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": "'offline'",
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "last_seen_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "connector_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "status",
+            "last_seen_at"
+          ],
+          "name": "idx_sim_connector_binding_status",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "installation_id"
+          ],
+          "name": "uq_sim_connector_binding_installation",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "owner_user_gid"
+          ],
+          "name": "uq_sim_connector_binding_owner",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_connector_bindings",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "token_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "created_by",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "display_name",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "expires_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "used_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "token_hash"
+          ],
+          "name": "uq_workmanship_sim_connector_enrollments_token_hash",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_connector_enrollments",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
       ]
     },
     {
@@ -34425,6 +34982,1095 @@
       "runtime_domain": "simulation",
       "sources": [
         "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "connector_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "bound_user_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "session_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "health_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "health_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "reported_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "connector_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "bound_user_id",
+            "reported_at"
+          ],
+          "name": "idx_sim_connector_health_user",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_connector_health",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "connector_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "health_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "health_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "reported_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "connector_id",
+            "created_at"
+          ],
+          "name": "idx_sim_connector_heartbeat_audit",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_connector_heartbeat_audit",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "connector_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "capability_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": null,
+          "extra": "",
+          "name": "capability_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "protocol_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "payload",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "payload_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "requested_by",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": "'queued'",
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": "0",
+          "extra": "",
+          "name": "attempts",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "expires_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "lease_id",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "lease_until",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "result",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "error",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "connector_id",
+            "status",
+            "expires_at",
+            "created_at"
+          ],
+          "name": "idx_sim_connector_legacy_lease",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "requested_by",
+            "created_at"
+          ],
+          "name": "idx_sim_connector_legacy_owner",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_connector_legacy_commands",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "pairing_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "installation_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "nonce_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "verifier_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "user_code_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "user_code_display",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "device_name",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "runtime_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "windows_sid_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "masked_windows_user",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "TEXT",
+          "default": null,
+          "extra": "",
+          "name": "ephemeral_public_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": "'pending'",
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": "1",
+          "extra": "",
+          "name": "resource_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "approved_user_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "team_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "connector_id",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "credential_envelope_json",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "credential_envelope_hash",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "expires_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "approved_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "completed_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [],
+          "expression": "`status` IN ('pending','approved','completing','completed','rejected','expired','reconciliation_required')",
+          "kind": "check",
+          "name": "check_workmanship_sim_connector_pairings_1",
+          "referenced_columns": [],
+          "referenced_table": null,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "pairing_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "status",
+            "expires_at"
+          ],
+          "name": "idx_sim_connector_pairing_expiry",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "user_code_hash"
+          ],
+          "name": "uq_sim_connector_pairing_code",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "installation_id",
+            "nonce_hash"
+          ],
+          "name": "uq_sim_connector_pairing_nonce",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_connector_pairings",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "plan_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "connector_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "user_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "plan_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "plan_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": "'queued'",
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": "0",
+          "extra": "",
+          "name": "attempts",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "lease_id",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "lease_until",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "outcome_json",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "outcome_hash",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "expires_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "plan_id"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "connector_id",
+            "status",
+            "expires_at",
+            "created_at"
+          ],
+          "name": "idx_sim_connector_plan_lease",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_connector_plans",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "plan_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "outcome_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "target_capability",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": "0",
+          "extra": "",
+          "name": "attempt",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": "'pending'",
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "lease_owner",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "lease_until",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "error_code",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "next_retry_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "projected_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "ON UPDATE CURRENT_TIMESTAMP(6)",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [],
+          "expression": "`status` IN ('pending','projecting','projected','retryable_failed','reconciliation_required')",
+          "kind": "check",
+          "name": "check_workmanship_sim_connector_projection_outbox_1",
+          "referenced_columns": [],
+          "referenced_table": null,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "plan_id",
+            "outcome_hash",
+            "target_capability"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "status",
+            "next_retry_at",
+            "lease_until",
+            "created_at"
+          ],
+          "name": "idx_sim_connector_projection_claim",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_connector_projection_outbox",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
       ]
     },
     {
@@ -34626,7 +36272,8 @@
       "runtime_domain": "simulation",
       "sources": [
         "backend/db/migrations/domains/simulation/0003_document_snapshots.sql",
-        "backend/db/migrations/domains/simulation/0004_capture_dispatch_plans.sql"
+        "backend/db/migrations/domains/simulation/0004_capture_dispatch_plans.sql",
+        "backend/db/migrations/domains/simulation/0006_capture_dispatch_compatibility.sql"
       ]
     },
     {
@@ -35269,7 +36916,8 @@
       "runtime_domain": "simulation",
       "sources": [
         "backend/db/migrations/domains/simulation/0002_connector_environments.sql",
-        "backend/db/migrations/domains/simulation/0004_capture_dispatch_plans.sql"
+        "backend/db/migrations/domains/simulation/0004_capture_dispatch_plans.sql",
+        "backend/db/migrations/domains/simulation/0006_capture_dispatch_compatibility.sql"
       ]
     },
     {
