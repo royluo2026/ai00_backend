@@ -21,4 +21,11 @@
 4. 前端测试证明 demo 来源显式、governed 缺少 loader 时 fail closed、写请求包含版本/幂等键/确认令牌并只走 Gateway。
 5. 运行态 E2E 需绑定真实 `capability_version_gid`、business-definition hash、代码提交、测试运行和结果摘要；未执行或无可信审批时分别记为 `unverified`。
 
+本轮隔离复核证据：
+
+- 后端提交 `39092086`（包含 `f8d024e8`）基于最新 `test@655418f8`；Catalog Release 为 `rel_b29ec309ee7aaa692bd89420063c443e`，552 descriptors / 495 stable。
+- `140 passed, 5 skipped`：编排、schema/migration、Catalog/release-gate、Provider integration 与 HTTP harness；HTTP harness 使用每测试独立 fake connection，客户端关闭后连接对象即丢弃，不写共享数据库。
+- Catalog、Capability docs、acceptance manifest 的 `--check` 均通过；Provider integration `9 passed, 5 skipped`。
+- HTTP harness 验证 `POST /api/orchestration/runs` → `POST /api/orchestration/runs/{run_gid}/transition`，状态更新和审计事件分别在单事务中提交，且租户/项目作用域写入 guard 生效。
+
 治理状态始终独立记录：`machine_passed`、`human_approved`、`runtime_verified`；AI 输出只作为 advisory，不能代替审批、发布或清除阻断。
