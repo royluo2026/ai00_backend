@@ -6,6 +6,7 @@ from contextlib import contextmanager
 from threading import Lock
 from urllib.parse import unquote, urlparse
 from backend.capability_v2.domain_resource_config import pool_limits
+from backend.platform_sdk.prefixed_connection import wrap_connection
 
 
 _pool = None
@@ -54,7 +55,7 @@ def _get_pool():
 
 @contextmanager
 def get_factory_conn():
-    conn = _get_pool().connection()
+    conn = wrap_connection(_get_pool().connection())
     try:
         yield conn
     finally:

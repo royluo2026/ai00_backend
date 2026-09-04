@@ -53,7 +53,10 @@ class PrefixedCursor:
         return self
 
     def __exit__(self, *exc):
-        self.close()
+        exit_method = getattr(self._inner, "__exit__", None)
+        if exit_method is not None:
+            return exit_method(*exc)
+        return self.close()
 
     def __getattr__(self, name):
         return getattr(self._inner, name)
@@ -66,7 +69,7 @@ def wrap_cursor(cursor):
 
 
 def wrap_connection(connection):
-    if getattr(connection, "_ai00_prefix_wrapped", False):
+    if not hasattr(connection, "cursor") or getattr(connection, "_ai00_prefix_wrapped", False):
         return connection
     original_cursor = connection.cursor
     connection.cursor = lambda *args, **kwargs: wrap_cursor(original_cursor(*args, **kwargs))

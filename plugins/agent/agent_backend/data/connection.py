@@ -8,6 +8,7 @@ from contextvars import ContextVar
 from threading import Lock
 from urllib.parse import unquote, urlparse
 from backend.capability_v2.domain_resource_config import pool_limits
+from backend.platform_sdk.prefixed_connection import wrap_connection
 
 _pool = None
 _pool_lock = Lock()
@@ -70,7 +71,7 @@ class AgentTransaction:
         if self._closed:
             raise RuntimeError("Agent transaction is closed")
         if self._connection is None:
-            self._connection = _get_pool().connection()
+            self._connection = wrap_connection(_get_pool().connection())
         return self._connection
 
     def record_outbox(self, capability_id, major_version, context, output):
@@ -143,7 +144,7 @@ def get_agent_conn():
     if transaction is not None:
         yield transaction.connection()
         return
-    conn = _get_pool().connection()
+    conn = wrap_connection(_get_pool().connection())
     try:
         yield conn
         conn.commit()

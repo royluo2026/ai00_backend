@@ -155,10 +155,7 @@ def load_ddl_database_url(
 
 def connect_domain_database(url: DomainDatabaseUrl):
     import pymysql
-    import os
-    from backend.db.table_prefix import configure_table_prefix
-    from backend.db.prefixed_cursor import wrap_cursor
-    configure_table_prefix(os.getenv("TABLE_PREFIX", ""))
+    from backend.db.prefixed_cursor import wrap_connection
 
     conn = pymysql.connect(
         host=url.host,
@@ -169,9 +166,7 @@ def connect_domain_database(url: DomainDatabaseUrl):
         charset="utf8mb4",
         autocommit=False,
     )
-    _orig_cursor = conn.cursor
-    conn.cursor = lambda *a, **k: wrap_cursor(_orig_cursor(*a, **k))
-    return conn
+    return wrap_connection(conn)
 
 
 def connect_runtime(config: DomainDatabaseConfig):
