@@ -118,10 +118,42 @@ def register_capabilities(
         else OrchestrationRepository()
     )
     orchestration_resolver = CatalogReferenceResolver(registry)
+    def orchestration_authorization_checker_factory(context):
+        # The Gateway has already evaluated the publish invocation against the
+        # authenticated permission set. Reuse that trusted decision for each
+        # Capability referenced by the draft; never treat a payload actor as
+        # authorization evidence.
+        permission_set = frozenset(getattr(context, "permissions", ()) or ())
+        actor_gid = context.user_gid
+
+        def checker(version_gid: str, requested_actor_gid: str) -> bool:
+            if requested_actor_gid != actor_gid:
+                return False
+            candidates = registry.snapshot()
+            registered = next(
+                (
+                    item for item in candidates
+                    if getattr(item.descriptor, "capability_version_gid", None) == version_gid
+                ),
+                None,
+            )
+            if registered is None and "@" in version_gid:
+                capability_id, major_text = version_gid.rsplit("@", 1)
+                try:
+                    registered = registry.get(capability_id, int(major_text))
+                except (KeyError, ValueError):
+                    registered = None
+            if registered is None:
+                return False
+            return set(registered.spec.permissions).issubset(permission_set)
+
+        return checker
+
     orchestration_handlers = {
         capability_id: make_handler(
             capability_id, repository=orchestration_repository,
             resolver=orchestration_resolver,
+            authorization_checker_factory=orchestration_authorization_checker_factory,
         )
         for capability_id in ORCHESTRATION_CAPABILITIES
     }

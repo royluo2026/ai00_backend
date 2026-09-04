@@ -1,6 +1,6 @@
 # agent.orchestration.run.transition@1
 
-Execute the governed agent.orchestration.run.transition Agent outcome.
+编排中心原子能力：追加运行实例的受授权状态事件并保持状态机一致。
 
 ## 使用判断
 
@@ -8,7 +8,7 @@ Execute the governed agent.orchestration.run.transition Agent outcome.
 - 不适用：The outcome belongs to another business domain; invoke that domain Capability instead.
 - 生命周期：`stable`
 - 所属领域：`agent`
-- Catalog Release：`rel_eda0fd60f1f30070a4bf7beee6c05ad2`
+- Catalog Release：`rel_1c166dc257d49f90409ae09165d23688`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -129,7 +129,9 @@ Execute the governed agent.orchestration.run.transition Agent outcome.
   },
   "required": [
     "tenant_gid",
-    "project_gid"
+    "project_gid",
+    "run_gid",
+    "target_status"
   ],
   "type": "object"
 }
@@ -140,10 +142,12 @@ Execute the governed agent.orchestration.run.transition Agent outcome.
 ```json
 {
   "capability_id": "agent.orchestration.run.transition",
-  "catalog_release": "rel_eda0fd60f1f30070a4bf7beee6c05ad2",
+  "catalog_release": "rel_1c166dc257d49f90409ae09165d23688",
   "major_version": 1,
   "payload": {
     "project_gid": "example",
+    "run_gid": "example",
+    "target_status": "example",
     "tenant_gid": "example"
   }
 }
@@ -180,6 +184,425 @@ Execute the governed agent.orchestration.run.transition Agent outcome.
     },
     "effective_intelligent_work_rate": {
       "type": "number"
+    },
+    "graph": {
+      "additionalProperties": false,
+      "properties": {
+        "axis": {
+          "additionalProperties": false,
+          "properties": {
+            "x_items": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 100,
+              "type": "array"
+            },
+            "y_items": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 100,
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "capability_bindings": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "authorization_scope": {
+                "additionalProperties": false,
+                "properties": {},
+                "type": "object"
+              },
+              "capability_version_gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "evidence_policy": {
+                "additionalProperties": false,
+                "properties": {},
+                "type": "object"
+              },
+              "fallback_policy": {
+                "additionalProperties": false,
+                "properties": {},
+                "type": "object"
+              },
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "input_mapping": {
+                "additionalProperties": false,
+                "properties": {},
+                "type": "object"
+              },
+              "output_mapping": {
+                "additionalProperties": false,
+                "properties": {},
+                "type": "object"
+              },
+              "purpose": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "retry_policy": {
+                "additionalProperties": false,
+                "properties": {},
+                "type": "object"
+              },
+              "source_item_gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "timeout_seconds": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "maxItems": 4000,
+          "type": "array"
+        },
+        "context_bindings": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "purpose": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "ref_gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "ref_type": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "ref_version": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "snapshot_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "source_item_gid": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "maxItems": 4000,
+          "type": "array"
+        },
+        "edges": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "edge_type": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "route_points": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "x": {
+                      "type": "number"
+                    },
+                    "y": {
+                      "type": "number"
+                    }
+                  },
+                  "type": "object"
+                },
+                "maxItems": 100,
+                "type": "array"
+              },
+              "source_node_gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "target_node_gid": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "maxItems": 2000,
+          "type": "array"
+        },
+        "item_edges": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "relation_type": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "sequence_no": {
+                "type": "integer"
+              },
+              "source_item_gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "target_item_gid": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "maxItems": 2000,
+          "type": "array"
+        },
+        "items": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "business_node_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "config": {
+                "additionalProperties": false,
+                "properties": {},
+                "type": "object"
+              },
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "item_type": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "sequence_no": {
+                "type": "integer"
+              },
+              "title": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "maxItems": 2000,
+          "type": "array"
+        },
+        "mode": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "nodes": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "acceptance_criteria": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 100,
+                "type": "array"
+              },
+              "gid": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "inputs": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "anyOf": [
+                            {
+                              "maxLength": 4096,
+                              "type": "string"
+                            },
+                            {
+                              "maximum": 1000000000000,
+                              "minimum": -1000000000000,
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        {
+                          "items": {
+                            "anyOf": [
+                              {
+                                "maxLength": 4096,
+                                "type": "string"
+                              },
+                              {
+                                "maximum": 1000000000000,
+                                "minimum": -1000000000000,
+                                "type": "number"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "maxItems": 64,
+                          "type": "array"
+                        }
+                      ]
+                    }
+                  },
+                  "type": "object"
+                },
+                "maxItems": 64,
+                "type": "array"
+              },
+              "node_key": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "objective": {
+                "type": "string"
+              },
+              "outputs": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "anyOf": [
+                            {
+                              "maxLength": 4096,
+                              "type": "string"
+                            },
+                            {
+                              "maximum": 1000000000000,
+                              "minimum": -1000000000000,
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        {
+                          "items": {
+                            "anyOf": [
+                              {
+                                "maxLength": 4096,
+                                "type": "string"
+                              },
+                              {
+                                "maximum": 1000000000000,
+                                "minimum": -1000000000000,
+                                "type": "number"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "maxItems": 64,
+                          "type": "array"
+                        }
+                      ]
+                    }
+                  },
+                  "type": "object"
+                },
+                "maxItems": 128,
+                "type": "array"
+              },
+              "owner_ref": {
+                "type": "string"
+              },
+              "position": {
+                "additionalProperties": false,
+                "properties": {
+                  "x": {
+                    "type": "number"
+                  },
+                  "y": {
+                    "type": "number"
+                  }
+                },
+                "type": "object"
+              },
+              "title": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "x_item_key": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "y_item_key": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "maxItems": 500,
+          "type": "array"
+        }
+      },
+      "type": "object"
     },
     "items": {
       "items": {
@@ -230,6 +653,10 @@ Execute the governed agent.orchestration.run.transition Agent outcome.
     "run_gid": {
       "minLength": 1,
       "type": "string"
+    },
+    "sequence_no": {
+      "minimum": 1,
+      "type": "integer"
     },
     "status": {
       "minLength": 1,

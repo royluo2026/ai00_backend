@@ -8,7 +8,7 @@ Create a governed Digital Model identity.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`digital_model`
-- Catalog Release：`rel_eda0fd60f1f30070a4bf7beee6c05ad2`
+- Catalog Release：`rel_1c166dc257d49f90409ae09165d23688`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -90,7 +90,7 @@ Create a governed Digital Model identity.
 ```json
 {
   "capability_id": "digital_model.model.create",
-  "catalog_release": "rel_eda0fd60f1f30070a4bf7beee6c05ad2",
+  "catalog_release": "rel_1c166dc257d49f90409ae09165d23688",
   "major_version": 1,
   "payload": {
     "name": "example",

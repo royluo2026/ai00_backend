@@ -108,10 +108,18 @@ class CatalogReferenceResolver(ReferenceResolver):
     reader through an explicit adapter.
     """
 
-    def __init__(self, registry, *, catalog_path: Path | None = None):
+    def __init__(self, registry, *, catalog_path: Path | None = None, authorization_checker: Callable[[str, str], bool] | None = None):
         self._registry = registry
         self._catalog_path = catalog_path or Path(__file__).resolve().parents[4] / "docs/governance/capability-catalog-release.json"
+        self._authorization_checker = authorization_checker
         super().__init__(lookups={"capability": self._lookup_capability})
+
+    def for_authorization(self, checker: Callable[[str, str], bool]) -> "CatalogReferenceResolver":
+        """Create a request-scoped resolver with a trusted Gateway decision."""
+        return CatalogReferenceResolver(
+            self._registry, catalog_path=self._catalog_path,
+            authorization_checker=checker,
+        )
 
     def _lookup_capability(self, version_gid: str, _actor_gid: str) -> dict[str, Any]:
         release = load_catalog_release(self._catalog_path.read_text(encoding="utf-8"))
@@ -131,11 +139,17 @@ class CatalogReferenceResolver(ReferenceResolver):
         if descriptor is None:
             return {}
         member = release.descriptor(capability_id, major)
-        artifact = self._registry.provider_artifact("agent")
+        if member is None:
+            return {}
+        # Provider identity is owned by the Catalog member.  Resolve the
+        # matching runtime artifact from that owner instead of assuming the
+        # Agent artifact can execute every bound Capability.
+        owner = member.owner_domain
+        artifact = self._registry.provider_artifact(owner)
         if member is None or artifact is None:
             return {}
         return {
-            "capability_version_gid": version_gid,
+            "capability_version_gid": member.capability_version_gid,
             "capability_id": capability_id,
             "major_version": major,
             "lifecycle_status": getattr(member.lifecycle_status, "value", member.lifecycle_status),
@@ -145,8 +159,20 @@ class CatalogReferenceResolver(ReferenceResolver):
             "artifact_hash": artifact.artifact_hash,
             "catalog_member": True,
             "artifact_match": artifact.artifact_hash == next(
-                (item.artifact_hash for item in release.provider_artifacts if item.plugin_id == artifact.plugin_id),
-                artifact.artifact_hash,
+                (item.artifact_hash for item in release.provider_artifacts
+                 if item.plugin_id == artifact.plugin_id and item.module == artifact.module),
+                None,
             ),
-            "authorized": True,
+            # Authorization is a separate server-side decision. Without an
+            # injected trusted authorizer this resolver must fail closed rather
+            # than treating an actor string as proof of permission.
+            # Read-only references may be projected for the resolver's
+            # standalone catalog inspection. Any write-capable binding must
+            # come through the request-scoped Gateway checker injected by the
+            # production publish handler.
+            "authorized": (
+                self._authorization_checker(version_gid, _actor_gid)
+                if self._authorization_checker is not None
+                else descriptor.side_effect_level.value == "read"
+            ),
         }

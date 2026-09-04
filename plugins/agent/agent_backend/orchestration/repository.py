@@ -45,6 +45,11 @@ def _decoded(value: Any, fallback: Any) -> Any:
     return json.loads(value) if isinstance(value, str) else value
 
 
+def _iso(value: Any) -> Any:
+    """Normalize DB datetime values at the repository boundary."""
+    return value.isoformat() if hasattr(value, "isoformat") else value
+
+
 def _require_scope(tenant_gid: str | None, project_gid: str | None) -> tuple[str, str]:
     if not tenant_gid or not project_gid:
         raise ResourceNotAccessible("tenant and project scope are required")
@@ -125,13 +130,26 @@ class OrchestrationRepository:
                    ORDER BY updated_at DESC LIMIT %s""",
                 (actor_gid, tenant_gid, project_gid, min(max(limit, 1), 100)),
             )
-            return list(cur.fetchall())
+            return [
+                {
+                    "gid": row["gid"],
+                    "name": row["name"],
+                    "current_version_gid": row["current_version_gid"],
+                    "revision": row["revision"],
+                    "updated_at": _iso(row["updated_at"]),
+                }
+                for row in cur.fetchall()
+            ]
 
     def get_metric_for_user(self, panorama_gid: str, period_key: str, actor_gid: str, *, tenant_gid: str, project_gid: str) -> dict[str, Any]:
         tenant_gid, project_gid = _require_scope(tenant_gid, project_gid)
         with self._connection_factory() as conn, conn.cursor() as cur:
             cur.execute(
-                """SELECT m.* FROM workmanship_agent_orch_metric_snapshots m
+                """SELECT m.panorama_gid,m.version_gid,m.period_key,
+                          m.total_workload_hours,m.effective_agent_workload_hours,
+                          m.effective_intelligent_work_rate,m.automated_workflow_count,
+                          m.total_workflow_count,m.automation_ratio,m.calculated_at
+                   FROM workmanship_agent_orch_metric_snapshots m
                    JOIN workmanship_agent_orch_panoramas p ON p.gid=m.panorama_gid
                    WHERE m.panorama_gid=%s AND m.period_key=%s AND p.owner_user_gid=%s
                      AND p.tenant_gid=%s AND p.project_gid=%s
@@ -141,7 +159,18 @@ class OrchestrationRepository:
             row = cur.fetchone()
         if not row:
             raise KeyError(f"orchestration metric not found: {panorama_gid}/{period_key}")
-        return dict(row)
+        return {
+            "panorama_gid": row["panorama_gid"],
+            "version_gid": row["version_gid"],
+            "period_key": row["period_key"],
+            "total_workload_hours": float(row["total_workload_hours"]),
+            "effective_agent_workload_hours": float(row["effective_agent_workload_hours"]),
+            "effective_intelligent_work_rate": float(row["effective_intelligent_work_rate"]),
+            "automated_workflow_count": int(row["automated_workflow_count"]),
+            "total_workflow_count": int(row["total_workflow_count"]),
+            "automation_ratio": float(row["automation_ratio"]),
+            "calculated_at": _iso(row["calculated_at"]),
+        }
 
     def get_workload_evidence(
         self, evidence_gid: str, *, actor_gid: str, tenant_gid: str, project_gid: str,
@@ -179,6 +208,26 @@ class OrchestrationRepository:
         if not row:
             raise KeyError(f"trusted workload evidence not found: {evidence_gid}")
         return dict(row)
+
+    def list_workload_measurements_for_user(
+        self, panorama_gid: str, period_key: str, actor_gid: str,
+        *, tenant_gid: str, project_gid: str,
+    ) -> list[dict[str, str]]:
+        """Return only evidence selectors; facts are resolved separately."""
+        tenant_gid, project_gid = _require_scope(tenant_gid, project_gid)
+        with self._connection_factory() as conn, conn.cursor() as cur:
+            cur.execute(
+                """SELECT a.gid AS evidence_gid
+                   FROM workmanship_agent_orch_acceptance_facts a
+                   JOIN workmanship_agent_orch_panoramas p ON p.gid=a.panorama_gid
+                   JOIN workmanship_agent_orch_runs r ON r.gid=a.run_gid
+                   WHERE a.panorama_gid=%s AND a.period_key=%s
+                     AND p.owner_user_gid=%s AND p.tenant_gid=%s AND p.project_gid=%s
+                     AND r.status='succeeded'
+                   ORDER BY a.gid""",
+                (panorama_gid, period_key, actor_gid, tenant_gid, project_gid),
+            )
+            return [{"evidence_gid": row["evidence_gid"]} for row in cur.fetchall()]
 
     def list_automation_workflows(self, *, tenant_gid: str, project_gid: str) -> tuple[set[str], set[str]]:
         """Return publication/runtime sets from the scoped Agent tables."""

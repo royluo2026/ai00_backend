@@ -126,7 +126,7 @@ OUTPUT_SCHEMAS["agent.tool_catalog.read"] = obj({
     "total": {"type": "integer", "minimum": 0},
 })
 
-_ORCHESTRATION_INPUT = obj({
+_ORCHESTRATION_PROPERTIES = {
     "tenant_gid": STRING, "project_gid": STRING, "panorama_gid": STRING,
     "version_gid": STRING, "binding_gid": STRING, "run_gid": STRING,
     "period_key": STRING, "target_status": STRING,
@@ -134,15 +134,31 @@ _ORCHESTRATION_INPUT = obj({
     "graph": {"type": "object", "additionalProperties": True},
     "frozen_context": {"type": "object", "additionalProperties": True},
     "payload": {"type": "object", "additionalProperties": True},
-}, required=("tenant_gid", "project_gid"))
+}
+def _orch_input(*required: str) -> dict:
+    return obj(_ORCHESTRATION_PROPERTIES, required=("tenant_gid", "project_gid", *required))
+
+_ORCHESTRATION_INPUT = _orch_input()
 _ORCHESTRATION_ITEM = obj({
     "gid": STRING, "name": STRING, "current_version_gid": STRING,
     "revision": REVISION, "updated_at": STRING,
 })
+_GRAPH_OUTPUT = obj({
+    "mode": STRING,
+    "axis": obj({"x_items": {"type": "array", "maxItems": 100, "items": STRING}, "y_items": {"type": "array", "maxItems": 100, "items": STRING}}),
+    "nodes": {"type": "array", "maxItems": 500, "items": obj({"gid": STRING, "node_key": STRING, "title": STRING, "x_item_key": STRING, "y_item_key": STRING, "objective": {"type": "string"}, "owner_ref": {"type": "string"}, "inputs": {"type": "array", "maxItems": 64, "items": obj({"name": STRING, "value": VALUE})}, "outputs": {"type": "array", "maxItems": 128, "items": obj({"name": STRING, "value": VALUE})}, "acceptance_criteria": {"type": "array", "maxItems": 100, "items": STRING}, "position": obj({"x": {"type": "number"}, "y": {"type": "number"}})})},
+    "edges": {"type": "array", "maxItems": 2000, "items": obj({"gid": STRING, "edge_type": STRING, "source_node_gid": STRING, "target_node_gid": STRING, "label": {"type": "string"}, "route_points": {"type": "array", "maxItems": 100, "items": obj({"x": {"type": "number"}, "y": {"type": "number"}})}})},
+    "items": {"type": "array", "maxItems": 2000, "items": obj({"gid": STRING, "item_type": STRING, "title": STRING, "business_node_gid": {"type": ["string", "null"]}, "sequence_no": {"type": "integer"}, "config": {"type": "object", "additionalProperties": False}})},
+    "item_edges": {"type": "array", "maxItems": 2000, "items": obj({"gid": STRING, "source_item_gid": STRING, "target_item_gid": STRING, "relation_type": STRING, "sequence_no": {"type": "integer"}})},
+    "capability_bindings": {"type": "array", "maxItems": 4000, "items": obj({"gid": STRING, "source_item_gid": STRING, "capability_version_gid": STRING, "purpose": STRING, "input_mapping": {"type": "object", "additionalProperties": False}, "output_mapping": {"type": "object", "additionalProperties": False}, "authorization_scope": {"type": "object", "additionalProperties": False}, "timeout_seconds": {"type": "integer"}, "retry_policy": {"type": "object", "additionalProperties": False}, "fallback_policy": {"type": "object", "additionalProperties": False}, "evidence_policy": {"type": "object", "additionalProperties": False}})},
+    "context_bindings": {"type": "array", "maxItems": 4000, "items": obj({"gid": STRING, "source_item_gid": STRING, "ref_type": STRING, "ref_gid": STRING, "ref_version": {"type": ["string", "null"]}, "snapshot_gid": {"type": ["string", "null"]}, "purpose": STRING})},
+})
 _ORCHESTRATION_OUTPUT = obj({
+    "graph": _GRAPH_OUTPUT,
     "items": {"type": "array", "maxItems": 100, "items": _ORCHESTRATION_ITEM},
     "revision": REVISION, "deleted": {"type": "boolean"},
     "binding_gid": STRING, "run_gid": STRING, "status": STRING,
+    "sequence_no": {"type": "integer", "minimum": 1},
     "version_gid": STRING, "panorama_gid": STRING,
     "last_sequence_no": {"type": "integer", "minimum": 0},
     "total_workload_hours": {"type": "number"},
@@ -157,6 +173,16 @@ for _id in CAPABILITY_IDS:
     if _id.startswith("agent.orchestration."):
         INPUT_SCHEMAS[_id] = _ORCHESTRATION_INPUT
         OUTPUT_SCHEMAS[_id] = _ORCHESTRATION_OUTPUT
+INPUT_SCHEMAS.update({
+    "agent.orchestration.panorama.read": _orch_input(),
+    "agent.orchestration.graph.read": _orch_input("version_gid"),
+    "agent.orchestration.graph.save": _orch_input("version_gid", "expected_revision", "graph"),
+    "agent.orchestration.version.publish": _orch_input("version_gid", "expected_revision"),
+    "agent.orchestration.binding.delete": _orch_input("binding_gid"),
+    "agent.orchestration.run.start": _orch_input("panorama_gid", "version_gid"),
+    "agent.orchestration.run.transition": _orch_input("run_gid", "target_status"),
+    "agent.orchestration.metric.read": _orch_input("panorama_gid", "period_key"),
+})
 INPUT_SCHEMAS["agent.workflow.node.test.execute"] = obj({
     "flow_gid": IDENTITY, "node_id": IDENTITY, "input_values": INPUT_VALUES,
 }, required=("flow_gid", "node_id", "input_values"))

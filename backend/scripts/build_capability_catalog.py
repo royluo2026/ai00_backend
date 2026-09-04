@@ -122,8 +122,8 @@ def _verified_consumer_refs(capability_id: str, major_version: int = 1) -> tuple
         ))
     if capability_id.startswith("agent.orchestration."):
         consumers.extend((
+            {"consumer_id": "packages/agent-plugin/web/orchestration_center/index.html", "consumer_type": "web", "version_constraint": "==1"},
             {"consumer_id": "packages/agent-plugin/web/orchestration_center/api.js", "consumer_type": "web", "version_constraint": "==1"},
-            {"consumer_id": "packages/agent-plugin/web/orchestration_center/bootstrap.js", "consumer_type": "web", "version_constraint": "==1"},
         ))
     return tuple(consumers)
 

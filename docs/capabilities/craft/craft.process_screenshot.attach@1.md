@@ -8,7 +8,7 @@ Associate one verified screenshot artifact with one BOP operation.
 - 不适用：The image has not been finalized by the Artifact Service.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_eda0fd60f1f30070a4bf7beee6c05ad2`
+- Catalog Release：`rel_1c166dc257d49f90409ae09165d23688`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -131,7 +131,7 @@ Associate one verified screenshot artifact with one BOP operation.
 ```json
 {
   "capability_id": "craft.process_screenshot.attach",
-  "catalog_release": "rel_eda0fd60f1f30070a4bf7beee6c05ad2",
+  "catalog_release": "rel_1c166dc257d49f90409ae09165d23688",
   "major_version": 1,
   "payload": {
     "artifact_ref": {

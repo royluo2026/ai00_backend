@@ -8,7 +8,7 @@ Update the bounded shared layout configuration for a BOP version.
 - 不适用：The request changes BOP entities, lifecycle state, or snapshot contents.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_eda0fd60f1f30070a4bf7beee6c05ad2`
+- Catalog Release：`rel_1c166dc257d49f90409ae09165d23688`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -93,7 +93,7 @@ Update the bounded shared layout configuration for a BOP version.
 ```json
 {
   "capability_id": "craft.bop.version.layout.change.apply",
-  "catalog_release": "rel_eda0fd60f1f30070a4bf7beee6c05ad2",
+  "catalog_release": "rel_1c166dc257d49f90409ae09165d23688",
   "major_version": 1,
   "payload": {
     "config": {},

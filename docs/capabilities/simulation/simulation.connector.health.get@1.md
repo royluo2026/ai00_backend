@@ -8,7 +8,7 @@ Read the latest authenticated AI00 Connector health advertisement.
 - 不适用：The caller needs to execute VisMockup work.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
-- Catalog Release：`rel_eda0fd60f1f30070a4bf7beee6c05ad2`
+- Catalog Release：`rel_1c166dc257d49f90409ae09165d23688`
 - Schema 精度：`typed`
 - 暂未开放原因：`experimental_lifecycle`
 
@@ -87,7 +87,7 @@ Read the latest authenticated AI00 Connector health advertisement.
 ```json
 {
   "capability_id": "simulation.connector.health.get",
-  "catalog_release": "rel_eda0fd60f1f30070a4bf7beee6c05ad2",
+  "catalog_release": "rel_1c166dc257d49f90409ae09165d23688",
   "major_version": 1,
   "payload": {
     "connector_id": "example"
