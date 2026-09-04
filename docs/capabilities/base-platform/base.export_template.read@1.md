@@ -8,7 +8,7 @@ Read the caller-visible Base export templates.
 - 不适用：The consumer needs to create, update, or delete an export template.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_909b49765f221187a4e1ecc5e367e56f`
+- Catalog Release：`rel_b29ec309ee7aaa692bd89420063c443e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -89,7 +89,7 @@ Read the caller-visible Base export templates.
 ```json
 {
   "capability_id": "base.export_template.read",
-  "catalog_release": "rel_909b49765f221187a4e1ecc5e367e56f",
+  "catalog_release": "rel_b29ec309ee7aaa692bd89420063c443e",
   "major_version": 1,
   "payload": {}
 }

@@ -8,7 +8,7 @@ Delete one PBOM part.
 - 不适用：The request changes a PBOM snapshot or crosses Craft domains.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_909b49765f221187a4e1ecc5e367e56f`
+- Catalog Release：`rel_b29ec309ee7aaa692bd89420063c443e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -87,7 +87,7 @@ Delete one PBOM part.
 ```json
 {
   "capability_id": "craft.ebom.part.delete",
-  "catalog_release": "rel_909b49765f221187a4e1ecc5e367e56f",
+  "catalog_release": "rel_b29ec309ee7aaa692bd89420063c443e",
   "major_version": 1,
   "payload": {
     "part_gid": "example"

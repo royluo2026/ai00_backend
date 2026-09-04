@@ -8,7 +8,7 @@ Compare two BOP versions as semantic structure changes.
 - 不适用：A raw database JSON diff is requested.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_909b49765f221187a4e1ecc5e367e56f`
+- Catalog Release：`rel_b29ec309ee7aaa692bd89420063c443e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -93,7 +93,7 @@ Compare two BOP versions as semantic structure changes.
 ```json
 {
   "capability_id": "craft.bop.version.compare",
-  "catalog_release": "rel_909b49765f221187a4e1ecc5e367e56f",
+  "catalog_release": "rel_b29ec309ee7aaa692bd89420063c443e",
   "major_version": 1,
   "payload": {
     "from_version_gid": "example",

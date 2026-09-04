@@ -8,7 +8,7 @@ Open one authorized model artifact in VisMockup.
 - 不适用：The caller is outside the trusted local Connector runtime.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
-- Catalog Release：`rel_909b49765f221187a4e1ecc5e367e56f`
+- Catalog Release：`rel_b29ec309ee7aaa692bd89420063c443e`
 - Schema 精度：`typed`
 - 暂未开放原因：`experimental_lifecycle`
 
@@ -128,7 +128,7 @@ Open one authorized model artifact in VisMockup.
 ```json
 {
   "capability_id": "simulation.vismockup.model.open",
-  "catalog_release": "rel_909b49765f221187a4e1ecc5e367e56f",
+  "catalog_release": "rel_b29ec309ee7aaa692bd89420063c443e",
   "major_version": 1,
   "payload": {
     "artifact_ref": {

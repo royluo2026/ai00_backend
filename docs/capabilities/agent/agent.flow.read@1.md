@@ -8,7 +8,7 @@ Execute the governed agent.flow.read Agent outcome.
 - 不适用：The outcome belongs to another business domain; invoke that domain Capability instead.
 - 生命周期：`stable`
 - 所属领域：`agent`
-- Catalog Release：`rel_909b49765f221187a4e1ecc5e367e56f`
+- Catalog Release：`rel_b29ec309ee7aaa692bd89420063c443e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -207,7 +207,7 @@ Execute the governed agent.flow.read Agent outcome.
 ```json
 {
   "capability_id": "agent.flow.read",
-  "catalog_release": "rel_909b49765f221187a4e1ecc5e367e56f",
+  "catalog_release": "rel_b29ec309ee7aaa692bd89420063c443e",
   "major_version": 1,
   "payload": {}
 }

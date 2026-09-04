@@ -8,7 +8,7 @@ Read owned and shared Craft canvases.
 - 不适用：The object is a BOP execution canvas.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_909b49765f221187a4e1ecc5e367e56f`
+- Catalog Release：`rel_b29ec309ee7aaa692bd89420063c443e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -94,7 +94,7 @@ Read owned and shared Craft canvases.
 ```json
 {
   "capability_id": "craft.canvas.read",
-  "catalog_release": "rel_909b49765f221187a4e1ecc5e367e56f",
+  "catalog_release": "rel_b29ec309ee7aaa692bd89420063c443e",
   "major_version": 1,
   "payload": {
     "operation": "list"

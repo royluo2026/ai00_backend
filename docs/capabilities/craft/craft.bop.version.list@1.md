@@ -8,7 +8,7 @@ Discover BOP version summaries with bounded cursor pagination.
 - 不适用：The caller already has one exact version GID.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_909b49765f221187a4e1ecc5e367e56f`
+- Catalog Release：`rel_b29ec309ee7aaa692bd89420063c443e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -107,7 +107,7 @@ Discover BOP version summaries with bounded cursor pagination.
 ```json
 {
   "capability_id": "craft.bop.version.list",
-  "catalog_release": "rel_909b49765f221187a4e1ecc5e367e56f",
+  "catalog_release": "rel_b29ec309ee7aaa692bd89420063c443e",
   "major_version": 1,
   "payload": {}
 }

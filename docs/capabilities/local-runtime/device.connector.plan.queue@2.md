@@ -8,7 +8,7 @@ Deprecated Connector compatibility identity.
 - 不适用：For every executable Connector or VisMockup operation.
 - 生命周期：`deprecated`
 - 所属领域：`device`
-- Catalog Release：`rel_909b49765f221187a4e1ecc5e367e56f`
+- Catalog Release：`rel_b29ec309ee7aaa692bd89420063c443e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -229,7 +229,7 @@ Deprecated Connector compatibility identity.
 ```json
 {
   "capability_id": "device.connector.plan.queue",
-  "catalog_release": "rel_909b49765f221187a4e1ecc5e367e56f",
+  "catalog_release": "rel_b29ec309ee7aaa692bd89420063c443e",
   "major_version": 2,
   "payload": {
     "plan": {
