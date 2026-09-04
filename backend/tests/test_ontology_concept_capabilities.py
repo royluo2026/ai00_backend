@@ -8,6 +8,7 @@ from backend.capabilities.ontology_concepts_next import (
     resolve_concept,
 )
 from backend.capabilities.registry_next import CapabilityRegistry
+from backend.capabilities.validation_next import validate_payload
 from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec as adapt_v1_spec
 
 
@@ -127,6 +128,32 @@ def test_get_schema_is_version_pinned_and_does_not_return_arbitrary_graph():
     assert result.data["ontology_version_ref"]["release_gid"] == "rel1"
 
 
+def test_get_concept_schema_composes_direct_and_inherited_fields():
+    original = list(Repository.objects)
+    Repository.objects[:] = [
+        {"kind": "concept", "stable_gid": "c-parent", "name": "Parent"},
+        {"kind": "concept", "stable_gid": "c-child", "parent_gid": "c-parent", "name": "Child", "ai00_level": 2},
+        {"kind": "property", "stable_gid": "p-parent", "class_gid": "c-parent", "name": "parent_prop", "sort_order": 1},
+        {"kind": "property", "stable_gid": "p-child", "class_gid": "c-child", "name": "child_prop", "sort_order": 2},
+        {"kind": "relation", "stable_gid": "r-parent", "domain_class_gid": "c-parent", "name": "parent_rel"},
+        {"kind": "relation", "stable_gid": "r-child", "domain_class_gid": "c-child", "name": "child_rel"},
+    ]
+    try:
+        with _repository():
+            result = get_concept({"stable_gid": "c-child", "kind": "concept", "view": "schema"}, CONTEXT)
+    finally:
+        Repository.objects[:] = original
+
+    schema = result.data["concept"]
+    assert [item["stable_gid"] for item in schema["properties"]] == ["p-parent", "p-child"]
+    assert [item["stable_gid"] for item in schema["relations"]] == ["r-parent", "r-child"]
+    assert schema["rules"] == []
+    registry = CapabilityRegistry()
+    register_ontology_concept_capabilities(registry)
+    descriptor = adapt_v1_spec(registry.get("ontology.concept.get").spec)
+    validate_payload(descriptor.output_schema, result.data, label="output")
+
+
 def test_get_schema_projects_only_durable_craft_rule_references():
     Repository.objects.append({
         "kind": "concept", "stable_gid": "c-rule", "name": "Rule host",
@@ -155,6 +182,23 @@ def test_list_objects_is_bounded_and_version_pinned():
     assert len(result.data["items"]) == 1
     assert result.data["items"][0]["stable_gid"] == "c-station-b"
     assert result.data["items"][0]["concept_ref"]["ontology_version"]["release_gid"] == "rel1"
+
+
+def test_list_objects_contract_accepts_real_concept_fields():
+    from backend.capabilities.ontology_concepts_next import list_objects
+
+    original = list(Repository.objects)
+    Repository.objects[0] = {**Repository.objects[0], "abbr": "工位", "ai00_level": 2}
+    try:
+        with _repository():
+            result = list_objects({"release_gid": "rel1", "kinds": ["concept"]}, CONTEXT)
+    finally:
+        Repository.objects[:] = original
+
+    registry = CapabilityRegistry()
+    register_ontology_concept_capabilities(registry)
+    descriptor = adapt_v1_spec(registry.get("ontology.object.list").spec)
+    validate_payload(descriptor.output_schema, result.data, label="output")
 
 
 def test_list_objects_rejects_unbounded_or_unknown_kinds():
@@ -231,3 +275,10 @@ def test_plugin_and_agent_contracts_declare_stable_ontology_refs():
         assert descriptor.exposure.agent is True
         assert "ontology_version_ref" in descriptor.output_schema["properties"]
         assert descriptor.output_schema["properties"]
+
+
+def test_resolution_contract_matches_provider_matched_by_value():
+    registry = CapabilityRegistry()
+    register_ontology_concept_capabilities(registry)
+    descriptor = adapt_v1_spec(registry.get("ontology.concept.resolve").spec)
+    assert descriptor.output_schema["properties"]["matched_by"] == {"type": ["string", "null"]}

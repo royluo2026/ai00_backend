@@ -8,7 +8,7 @@ Exchange the Connector proof for one encrypted credential envelope.
 - 不适用：Only the public user code is available.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
-- Catalog Release：`rel_909b49765f221187a4e1ecc5e367e56f`
+- Catalog Release：`rel_c4a99d9707731f20957fc5029360031a`
 - Schema 精度：`typed`
 - 暂未开放原因：`experimental_lifecycle`
 
@@ -97,7 +97,7 @@ Exchange the Connector proof for one encrypted credential envelope.
 ```json
 {
   "capability_id": "simulation.connector.pairing.complete",
-  "catalog_release": "rel_909b49765f221187a4e1ecc5e367e56f",
+  "catalog_release": "rel_c4a99d9707731f20957fc5029360031a",
   "major_version": 1,
   "payload": {
     "installation_id": "example",

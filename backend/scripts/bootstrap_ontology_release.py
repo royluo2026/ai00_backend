@@ -4,9 +4,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import sys
 from datetime import date, datetime
 from decimal import Decimal
+from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+if str(REPOSITORY_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPOSITORY_ROOT))
 
 from backend.ontology.canonical import canonicalize_release
 from backend.ontology.repository import OntologyReleaseRepository
@@ -97,6 +104,11 @@ def main() -> int:
     parser.add_argument("--actor-gid", required=True)
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
+    from dotenv import load_dotenv
+    from backend.db.table_prefix import configure_table_prefix
+
+    load_dotenv(Path(__file__).resolve().parents[1] / ".env", override=False)
+    configure_table_prefix(os.getenv("TABLE_PREFIX", ""))
     from plugins.ontology.ontology_backend.infrastructure.storage import put_immutable
     from plugins.ontology.ontology_backend.infrastructure.connection import get_ontology_conn
     with get_ontology_conn() as source_conn:

@@ -8,7 +8,7 @@ Resolve a term without guessing across an immutable release.
 - 不适用：The stable object identity is already known.
 - 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_909b49765f221187a4e1ecc5e367e56f`
+- Catalog Release：`rel_c4a99d9707731f20957fc5029360031a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -89,7 +89,7 @@ Resolve a term without guessing across an immutable release.
 ```json
 {
   "capability_id": "ontology.concept.resolve",
-  "catalog_release": "rel_909b49765f221187a4e1ecc5e367e56f",
+  "catalog_release": "rel_c4a99d9707731f20957fc5029360031a",
   "major_version": 1,
   "payload": {
     "term": "example"
@@ -108,20 +108,325 @@ Resolve a term without guessing across an immutable release.
     "candidates": {
       "items": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "concept_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "concept_id": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "concept",
+                  "property",
+                  "relation",
+                  "mapping",
+                  "constraint"
+                ],
+                "type": "string"
+              },
+              "ontology_version": {
+                "additionalProperties": false,
+                "properties": {
+                  "content_hash": {
+                    "pattern": "^sha256:[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "release_gid": {
+                    "type": "string"
+                  },
+                  "revision_ref": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "commit_id": {
+                            "pattern": "^cmt_[0-9a-f]{40}$",
+                            "type": "string"
+                          },
+                          "content_hash": {
+                            "pattern": "^sha256:[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "repository": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "owner_domain": {
+                                "type": "string"
+                              },
+                              "repository_id": {
+                                "type": "string"
+                              },
+                              "resource_id": {
+                                "type": "string"
+                              },
+                              "tenant_id": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "tenant_id",
+                              "repository_id",
+                              "owner_domain",
+                              "resource_id"
+                            ],
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "repository",
+                          "commit_id",
+                          "content_hash"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "release_gid",
+                  "content_hash",
+                  "revision_ref"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "concept_id",
+              "kind",
+              "ontology_version"
+            ],
+            "type": "object"
+          },
+          "deprecated": {
+            "type": [
+              "boolean",
+              "integer",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "external_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "kind": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "label_en": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "label_zh": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "node_type_binding": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "stable_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
         "type": "object"
       },
+      "maxItems": 20,
       "type": "array"
     },
     "concept": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "concept_ref": {
+              "additionalProperties": false,
+              "properties": {
+                "concept_id": {
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "concept",
+                    "property",
+                    "relation",
+                    "mapping",
+                    "constraint"
+                  ],
+                  "type": "string"
+                },
+                "ontology_version": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "content_hash": {
+                      "pattern": "^sha256:[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "release_gid": {
+                      "type": "string"
+                    },
+                    "revision_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "commit_id": {
+                              "pattern": "^cmt_[0-9a-f]{40}$",
+                              "type": "string"
+                            },
+                            "content_hash": {
+                              "pattern": "^sha256:[0-9a-f]{64}$",
+                              "type": "string"
+                            },
+                            "repository": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "owner_domain": {
+                                  "type": "string"
+                                },
+                                "repository_id": {
+                                  "type": "string"
+                                },
+                                "resource_id": {
+                                  "type": "string"
+                                },
+                                "tenant_id": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "tenant_id",
+                                "repository_id",
+                                "owner_domain",
+                                "resource_id"
+                              ],
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "repository",
+                            "commit_id",
+                            "content_hash"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "release_gid",
+                    "content_hash",
+                    "revision_ref"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "concept_id",
+                "kind",
+                "ontology_version"
+              ],
+              "type": "object"
+            },
+            "deprecated": {
+              "type": [
+                "boolean",
+                "integer",
+                "null"
+              ]
+            },
+            "description": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "external_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "kind": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "label_en": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "label_zh": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "name": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "node_type_binding": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "stable_gid": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "matched_by": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "ontology_version_ref": {
       "additionalProperties": false,

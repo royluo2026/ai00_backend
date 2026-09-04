@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_82e7775b228615e568a94c1090510b7d",
-  "catalog_hash": "sha256:82e7775b228615e568a94c1090510b7df776b9ed2f4e263ab4f31ec6d593b7b4",
+  "release_id": "rel_c4a99d9707731f20957fc5029360031a",
+  "catalog_hash": "sha256:c4a99d9707731f20957fc5029360031aeba9c64a0ea91261c61fa53942a828e5",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -183768,7 +183768,1298 @@
         "properties": {
           "concept": {
             "type": "object",
-            "properties": {},
+            "properties": {
+              "kind": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "stable_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "external_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "label_zh": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "label_en": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "description": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "node_type_binding": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "parent_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "abbr": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "display_layer": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "suggested_child_type": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "entity_table": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "class_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "prop_kind": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "data_type": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "range_class_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "storage_hint": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "field_widget": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "field_config": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "domain_class_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "inverse_of_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "link_type_binding": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "aliases": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "maxItems": 100,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "enum_values": {
+                "type": [
+                  "array",
+                  "string",
+                  "null"
+                ],
+                "maxItems": 500,
+                "items": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "null"
+                  ]
+                }
+              },
+              "deprecated": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "is_abstract": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "is_hidden_in_layout": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "required": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "show_in_create_dialog": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "show_in_detail": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "is_functional": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "deep_copy_on_fork": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "shared_on_fork": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "skip_on_fork": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "snapshot_on_freeze": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "sort_order": {
+                "type": [
+                  "number",
+                  "integer",
+                  "string",
+                  "null"
+                ]
+              },
+              "stats_priority": {
+                "type": [
+                  "number",
+                  "integer",
+                  "string",
+                  "null"
+                ]
+              },
+              "ai00_level": {
+                "type": [
+                  "number",
+                  "integer",
+                  "string",
+                  "null"
+                ]
+              },
+              "min_val": {
+                "type": [
+                  "number",
+                  "integer",
+                  "string",
+                  "null"
+                ]
+              },
+              "max_val": {
+                "type": [
+                  "number",
+                  "integer",
+                  "string",
+                  "null"
+                ]
+              },
+              "dialog_order": {
+                "type": [
+                  "number",
+                  "integer",
+                  "string",
+                  "null"
+                ]
+              },
+              "detail_order": {
+                "type": [
+                  "number",
+                  "integer",
+                  "string",
+                  "null"
+                ]
+              },
+              "color": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "icon": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "concept_ref": {
+                "type": "object",
+                "required": [
+                  "concept_id",
+                  "kind",
+                  "ontology_version"
+                ],
+                "properties": {
+                  "concept_id": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "concept",
+                      "property",
+                      "relation",
+                      "mapping",
+                      "constraint"
+                    ]
+                  },
+                  "ontology_version": {
+                    "type": "object",
+                    "required": [
+                      "release_gid",
+                      "content_hash",
+                      "revision_ref"
+                    ],
+                    "properties": {
+                      "release_gid": {
+                        "type": "string"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      },
+                      "revision_ref": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "required": [
+                              "repository",
+                              "commit_id",
+                              "content_hash"
+                            ],
+                            "properties": {
+                              "repository": {
+                                "type": "object",
+                                "required": [
+                                  "tenant_id",
+                                  "repository_id",
+                                  "owner_domain",
+                                  "resource_id"
+                                ],
+                                "properties": {
+                                  "tenant_id": {
+                                    "type": "string"
+                                  },
+                                  "repository_id": {
+                                    "type": "string"
+                                  },
+                                  "owner_domain": {
+                                    "type": "string"
+                                  },
+                                  "resource_id": {
+                                    "type": "string"
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              "commit_id": {
+                                "type": "string",
+                                "pattern": "^cmt_[0-9a-f]{40}$"
+                              },
+                              "content_hash": {
+                                "type": "string",
+                                "pattern": "^sha256:[0-9a-f]{64}$"
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              },
+              "properties": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "stable_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "external_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "label_zh": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "label_en": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "description": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "node_type_binding": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "parent_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "abbr": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "display_layer": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "suggested_child_type": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "entity_table": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "class_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "prop_kind": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "data_type": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "range_class_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "storage_hint": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "field_widget": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "field_config": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "domain_class_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "inverse_of_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "link_type_binding": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "aliases": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "maxItems": 100,
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "enum_values": {
+                      "type": [
+                        "array",
+                        "string",
+                        "null"
+                      ],
+                      "maxItems": 500,
+                      "items": {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean",
+                          "null"
+                        ]
+                      }
+                    },
+                    "deprecated": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "is_abstract": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "is_hidden_in_layout": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "required": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "show_in_create_dialog": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "show_in_detail": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "is_functional": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "deep_copy_on_fork": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "shared_on_fork": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "skip_on_fork": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "snapshot_on_freeze": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "sort_order": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "stats_priority": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "ai00_level": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "min_val": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "max_val": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "dialog_order": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "detail_order": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "color": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "icon": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "concept_ref": {
+                      "type": "object",
+                      "required": [
+                        "concept_id",
+                        "kind",
+                        "ontology_version"
+                      ],
+                      "properties": {
+                        "concept_id": {
+                          "type": "string"
+                        },
+                        "kind": {
+                          "type": "string",
+                          "enum": [
+                            "concept",
+                            "property",
+                            "relation",
+                            "mapping",
+                            "constraint"
+                          ]
+                        },
+                        "ontology_version": {
+                          "type": "object",
+                          "required": [
+                            "release_gid",
+                            "content_hash",
+                            "revision_ref"
+                          ],
+                          "properties": {
+                            "release_gid": {
+                              "type": "string"
+                            },
+                            "content_hash": {
+                              "type": "string",
+                              "pattern": "^sha256:[0-9a-f]{64}$"
+                            },
+                            "revision_ref": {
+                              "anyOf": [
+                                {
+                                  "type": "object",
+                                  "required": [
+                                    "repository",
+                                    "commit_id",
+                                    "content_hash"
+                                  ],
+                                  "properties": {
+                                    "repository": {
+                                      "type": "object",
+                                      "required": [
+                                        "tenant_id",
+                                        "repository_id",
+                                        "owner_domain",
+                                        "resource_id"
+                                      ],
+                                      "properties": {
+                                        "tenant_id": {
+                                          "type": "string"
+                                        },
+                                        "repository_id": {
+                                          "type": "string"
+                                        },
+                                        "owner_domain": {
+                                          "type": "string"
+                                        },
+                                        "resource_id": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "additionalProperties": false
+                                    },
+                                    "commit_id": {
+                                      "type": "string",
+                                      "pattern": "^cmt_[0-9a-f]{40}$"
+                                    },
+                                    "content_hash": {
+                                      "type": "string",
+                                      "pattern": "^sha256:[0-9a-f]{64}$"
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "additionalProperties": false
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "relations": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "stable_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "external_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "label_zh": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "label_en": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "description": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "node_type_binding": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "parent_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "abbr": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "display_layer": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "suggested_child_type": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "entity_table": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "class_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "prop_kind": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "data_type": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "range_class_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "storage_hint": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "field_widget": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "field_config": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "domain_class_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "inverse_of_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "link_type_binding": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "aliases": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "maxItems": 100,
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "enum_values": {
+                      "type": [
+                        "array",
+                        "string",
+                        "null"
+                      ],
+                      "maxItems": 500,
+                      "items": {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean",
+                          "null"
+                        ]
+                      }
+                    },
+                    "deprecated": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "is_abstract": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "is_hidden_in_layout": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "required": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "show_in_create_dialog": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "show_in_detail": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "is_functional": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "deep_copy_on_fork": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "shared_on_fork": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "skip_on_fork": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "snapshot_on_freeze": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "sort_order": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "stats_priority": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "ai00_level": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "min_val": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "max_val": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "dialog_order": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "detail_order": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "color": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "icon": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "concept_ref": {
+                      "type": "object",
+                      "required": [
+                        "concept_id",
+                        "kind",
+                        "ontology_version"
+                      ],
+                      "properties": {
+                        "concept_id": {
+                          "type": "string"
+                        },
+                        "kind": {
+                          "type": "string",
+                          "enum": [
+                            "concept",
+                            "property",
+                            "relation",
+                            "mapping",
+                            "constraint"
+                          ]
+                        },
+                        "ontology_version": {
+                          "type": "object",
+                          "required": [
+                            "release_gid",
+                            "content_hash",
+                            "revision_ref"
+                          ],
+                          "properties": {
+                            "release_gid": {
+                              "type": "string"
+                            },
+                            "content_hash": {
+                              "type": "string",
+                              "pattern": "^sha256:[0-9a-f]{64}$"
+                            },
+                            "revision_ref": {
+                              "anyOf": [
+                                {
+                                  "type": "object",
+                                  "required": [
+                                    "repository",
+                                    "commit_id",
+                                    "content_hash"
+                                  ],
+                                  "properties": {
+                                    "repository": {
+                                      "type": "object",
+                                      "required": [
+                                        "tenant_id",
+                                        "repository_id",
+                                        "owner_domain",
+                                        "resource_id"
+                                      ],
+                                      "properties": {
+                                        "tenant_id": {
+                                          "type": "string"
+                                        },
+                                        "repository_id": {
+                                          "type": "string"
+                                        },
+                                        "owner_domain": {
+                                          "type": "string"
+                                        },
+                                        "resource_id": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "additionalProperties": false
+                                    },
+                                    "commit_id": {
+                                      "type": "string",
+                                      "pattern": "^cmt_[0-9a-f]{40}$"
+                                    },
+                                    "content_hash": {
+                                      "type": "string",
+                                      "pattern": "^sha256:[0-9a-f]{64}$"
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "additionalProperties": false
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "rules": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "rule_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "revision": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "rule_reference": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "rule_gid": {
+                          "type": "string"
+                        },
+                        "rule_revision": {
+                          "type": "integer"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "rule_reference_unbound": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ]
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            },
             "additionalProperties": false
           },
           "view": {
@@ -183868,7 +185159,1298 @@
         "properties": {
           "concept": {
             "type": "object",
-            "properties": {},
+            "properties": {
+              "kind": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "stable_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "external_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "label_zh": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "label_en": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "description": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "node_type_binding": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "parent_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "abbr": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "display_layer": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "suggested_child_type": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "entity_table": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "class_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "prop_kind": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "data_type": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "range_class_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "storage_hint": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "field_widget": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "field_config": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "domain_class_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "inverse_of_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "link_type_binding": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "aliases": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "maxItems": 100,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "enum_values": {
+                "type": [
+                  "array",
+                  "string",
+                  "null"
+                ],
+                "maxItems": 500,
+                "items": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "null"
+                  ]
+                }
+              },
+              "deprecated": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "is_abstract": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "is_hidden_in_layout": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "required": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "show_in_create_dialog": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "show_in_detail": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "is_functional": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "deep_copy_on_fork": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "shared_on_fork": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "skip_on_fork": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "snapshot_on_freeze": {
+                "type": [
+                  "boolean",
+                  "integer",
+                  "null"
+                ]
+              },
+              "sort_order": {
+                "type": [
+                  "number",
+                  "integer",
+                  "string",
+                  "null"
+                ]
+              },
+              "stats_priority": {
+                "type": [
+                  "number",
+                  "integer",
+                  "string",
+                  "null"
+                ]
+              },
+              "ai00_level": {
+                "type": [
+                  "number",
+                  "integer",
+                  "string",
+                  "null"
+                ]
+              },
+              "min_val": {
+                "type": [
+                  "number",
+                  "integer",
+                  "string",
+                  "null"
+                ]
+              },
+              "max_val": {
+                "type": [
+                  "number",
+                  "integer",
+                  "string",
+                  "null"
+                ]
+              },
+              "dialog_order": {
+                "type": [
+                  "number",
+                  "integer",
+                  "string",
+                  "null"
+                ]
+              },
+              "detail_order": {
+                "type": [
+                  "number",
+                  "integer",
+                  "string",
+                  "null"
+                ]
+              },
+              "color": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "icon": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "concept_ref": {
+                "type": "object",
+                "required": [
+                  "concept_id",
+                  "kind",
+                  "ontology_version"
+                ],
+                "properties": {
+                  "concept_id": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "concept",
+                      "property",
+                      "relation",
+                      "mapping",
+                      "constraint"
+                    ]
+                  },
+                  "ontology_version": {
+                    "type": "object",
+                    "required": [
+                      "release_gid",
+                      "content_hash",
+                      "revision_ref"
+                    ],
+                    "properties": {
+                      "release_gid": {
+                        "type": "string"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      },
+                      "revision_ref": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "required": [
+                              "repository",
+                              "commit_id",
+                              "content_hash"
+                            ],
+                            "properties": {
+                              "repository": {
+                                "type": "object",
+                                "required": [
+                                  "tenant_id",
+                                  "repository_id",
+                                  "owner_domain",
+                                  "resource_id"
+                                ],
+                                "properties": {
+                                  "tenant_id": {
+                                    "type": "string"
+                                  },
+                                  "repository_id": {
+                                    "type": "string"
+                                  },
+                                  "owner_domain": {
+                                    "type": "string"
+                                  },
+                                  "resource_id": {
+                                    "type": "string"
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              "commit_id": {
+                                "type": "string",
+                                "pattern": "^cmt_[0-9a-f]{40}$"
+                              },
+                              "content_hash": {
+                                "type": "string",
+                                "pattern": "^sha256:[0-9a-f]{64}$"
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              },
+              "properties": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "stable_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "external_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "label_zh": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "label_en": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "description": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "node_type_binding": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "parent_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "abbr": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "display_layer": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "suggested_child_type": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "entity_table": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "class_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "prop_kind": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "data_type": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "range_class_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "storage_hint": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "field_widget": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "field_config": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "domain_class_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "inverse_of_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "link_type_binding": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "aliases": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "maxItems": 100,
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "enum_values": {
+                      "type": [
+                        "array",
+                        "string",
+                        "null"
+                      ],
+                      "maxItems": 500,
+                      "items": {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean",
+                          "null"
+                        ]
+                      }
+                    },
+                    "deprecated": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "is_abstract": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "is_hidden_in_layout": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "required": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "show_in_create_dialog": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "show_in_detail": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "is_functional": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "deep_copy_on_fork": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "shared_on_fork": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "skip_on_fork": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "snapshot_on_freeze": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "sort_order": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "stats_priority": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "ai00_level": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "min_val": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "max_val": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "dialog_order": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "detail_order": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "color": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "icon": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "concept_ref": {
+                      "type": "object",
+                      "required": [
+                        "concept_id",
+                        "kind",
+                        "ontology_version"
+                      ],
+                      "properties": {
+                        "concept_id": {
+                          "type": "string"
+                        },
+                        "kind": {
+                          "type": "string",
+                          "enum": [
+                            "concept",
+                            "property",
+                            "relation",
+                            "mapping",
+                            "constraint"
+                          ]
+                        },
+                        "ontology_version": {
+                          "type": "object",
+                          "required": [
+                            "release_gid",
+                            "content_hash",
+                            "revision_ref"
+                          ],
+                          "properties": {
+                            "release_gid": {
+                              "type": "string"
+                            },
+                            "content_hash": {
+                              "type": "string",
+                              "pattern": "^sha256:[0-9a-f]{64}$"
+                            },
+                            "revision_ref": {
+                              "anyOf": [
+                                {
+                                  "type": "object",
+                                  "required": [
+                                    "repository",
+                                    "commit_id",
+                                    "content_hash"
+                                  ],
+                                  "properties": {
+                                    "repository": {
+                                      "type": "object",
+                                      "required": [
+                                        "tenant_id",
+                                        "repository_id",
+                                        "owner_domain",
+                                        "resource_id"
+                                      ],
+                                      "properties": {
+                                        "tenant_id": {
+                                          "type": "string"
+                                        },
+                                        "repository_id": {
+                                          "type": "string"
+                                        },
+                                        "owner_domain": {
+                                          "type": "string"
+                                        },
+                                        "resource_id": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "additionalProperties": false
+                                    },
+                                    "commit_id": {
+                                      "type": "string",
+                                      "pattern": "^cmt_[0-9a-f]{40}$"
+                                    },
+                                    "content_hash": {
+                                      "type": "string",
+                                      "pattern": "^sha256:[0-9a-f]{64}$"
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "additionalProperties": false
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "relations": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "stable_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "external_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "label_zh": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "label_en": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "description": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "node_type_binding": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "parent_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "abbr": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "display_layer": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "suggested_child_type": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "entity_table": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "class_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "prop_kind": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "data_type": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "range_class_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "storage_hint": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "field_widget": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "field_config": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "domain_class_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "inverse_of_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "link_type_binding": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "aliases": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "maxItems": 100,
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "enum_values": {
+                      "type": [
+                        "array",
+                        "string",
+                        "null"
+                      ],
+                      "maxItems": 500,
+                      "items": {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean",
+                          "null"
+                        ]
+                      }
+                    },
+                    "deprecated": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "is_abstract": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "is_hidden_in_layout": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "required": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "show_in_create_dialog": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "show_in_detail": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "is_functional": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "deep_copy_on_fork": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "shared_on_fork": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "skip_on_fork": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "snapshot_on_freeze": {
+                      "type": [
+                        "boolean",
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "sort_order": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "stats_priority": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "ai00_level": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "min_val": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "max_val": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "dialog_order": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "detail_order": {
+                      "type": [
+                        "number",
+                        "integer",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "color": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "icon": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "concept_ref": {
+                      "type": "object",
+                      "required": [
+                        "concept_id",
+                        "kind",
+                        "ontology_version"
+                      ],
+                      "properties": {
+                        "concept_id": {
+                          "type": "string"
+                        },
+                        "kind": {
+                          "type": "string",
+                          "enum": [
+                            "concept",
+                            "property",
+                            "relation",
+                            "mapping",
+                            "constraint"
+                          ]
+                        },
+                        "ontology_version": {
+                          "type": "object",
+                          "required": [
+                            "release_gid",
+                            "content_hash",
+                            "revision_ref"
+                          ],
+                          "properties": {
+                            "release_gid": {
+                              "type": "string"
+                            },
+                            "content_hash": {
+                              "type": "string",
+                              "pattern": "^sha256:[0-9a-f]{64}$"
+                            },
+                            "revision_ref": {
+                              "anyOf": [
+                                {
+                                  "type": "object",
+                                  "required": [
+                                    "repository",
+                                    "commit_id",
+                                    "content_hash"
+                                  ],
+                                  "properties": {
+                                    "repository": {
+                                      "type": "object",
+                                      "required": [
+                                        "tenant_id",
+                                        "repository_id",
+                                        "owner_domain",
+                                        "resource_id"
+                                      ],
+                                      "properties": {
+                                        "tenant_id": {
+                                          "type": "string"
+                                        },
+                                        "repository_id": {
+                                          "type": "string"
+                                        },
+                                        "owner_domain": {
+                                          "type": "string"
+                                        },
+                                        "resource_id": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "additionalProperties": false
+                                    },
+                                    "commit_id": {
+                                      "type": "string",
+                                      "pattern": "^cmt_[0-9a-f]{40}$"
+                                    },
+                                    "content_hash": {
+                                      "type": "string",
+                                      "pattern": "^sha256:[0-9a-f]{64}$"
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "additionalProperties": false
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "rules": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "rule_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "revision": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "rule_reference": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "rule_gid": {
+                          "type": "string"
+                        },
+                        "rule_revision": {
+                          "type": "integer"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "rule_reference_unbound": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ]
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            },
             "additionalProperties": false
           },
           "view": {
@@ -183956,7 +186538,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:44fde9f0556c1ddabb5643640eb92fea203222f656b47c2e6ac64fd94e93b4aa",
+      "schema_hash": "sha256:f00bc60fd8db3f09ff945703b69a79c6ecc4dfd33210963fb36fa4e338edf7f9",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -184088,7 +186670,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:5cfc784d580ec3982b2dc64ff2abcf781d778faac2bf9ad9b14a1778cadd6022"
+      "business_definition_hash": "sha256:0ba3bf6812b1af5ac90735a1d899331ce75bb262755b74569f4c6e1bad41226d"
     },
     {
       "id": "ontology.concept.resolve",
@@ -184160,20 +186742,325 @@
             ]
           },
           "matched_by": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "concept": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "stable_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "external_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "node_type_binding": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "label_zh": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "label_en": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "deprecated": {
+                    "type": [
+                      "boolean",
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "concept_ref": {
+                    "type": "object",
+                    "required": [
+                      "concept_id",
+                      "kind",
+                      "ontology_version"
+                    ],
+                    "properties": {
+                      "concept_id": {
+                        "type": "string"
+                      },
+                      "kind": {
+                        "type": "string",
+                        "enum": [
+                          "concept",
+                          "property",
+                          "relation",
+                          "mapping",
+                          "constraint"
+                        ]
+                      },
+                      "ontology_version": {
+                        "type": "object",
+                        "required": [
+                          "release_gid",
+                          "content_hash",
+                          "revision_ref"
+                        ],
+                        "properties": {
+                          "release_gid": {
+                            "type": "string"
+                          },
+                          "content_hash": {
+                            "type": "string",
+                            "pattern": "^sha256:[0-9a-f]{64}$"
+                          },
+                          "revision_ref": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "required": [
+                                  "repository",
+                                  "commit_id",
+                                  "content_hash"
+                                ],
+                                "properties": {
+                                  "repository": {
+                                    "type": "object",
+                                    "required": [
+                                      "tenant_id",
+                                      "repository_id",
+                                      "owner_domain",
+                                      "resource_id"
+                                    ],
+                                    "properties": {
+                                      "tenant_id": {
+                                        "type": "string"
+                                      },
+                                      "repository_id": {
+                                        "type": "string"
+                                      },
+                                      "owner_domain": {
+                                        "type": "string"
+                                      },
+                                      "resource_id": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "additionalProperties": false
+                                  },
+                                  "commit_id": {
+                                    "type": "string",
+                                    "pattern": "^cmt_[0-9a-f]{40}$"
+                                  },
+                                  "content_hash": {
+                                    "type": "string",
+                                    "pattern": "^sha256:[0-9a-f]{64}$"
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "candidates": {
             "type": "array",
+            "maxItems": 20,
             "items": {
               "type": "object",
-              "properties": {},
+              "properties": {
+                "kind": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "stable_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "external_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type_binding": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "label_zh": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "label_en": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "deprecated": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "concept_ref": {
+                  "type": "object",
+                  "required": [
+                    "concept_id",
+                    "kind",
+                    "ontology_version"
+                  ],
+                  "properties": {
+                    "concept_id": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "type": "string",
+                      "enum": [
+                        "concept",
+                        "property",
+                        "relation",
+                        "mapping",
+                        "constraint"
+                      ]
+                    },
+                    "ontology_version": {
+                      "type": "object",
+                      "required": [
+                        "release_gid",
+                        "content_hash",
+                        "revision_ref"
+                      ],
+                      "properties": {
+                        "release_gid": {
+                          "type": "string"
+                        },
+                        "content_hash": {
+                          "type": "string",
+                          "pattern": "^sha256:[0-9a-f]{64}$"
+                        },
+                        "revision_ref": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "required": [
+                                "repository",
+                                "commit_id",
+                                "content_hash"
+                              ],
+                              "properties": {
+                                "repository": {
+                                  "type": "object",
+                                  "required": [
+                                    "tenant_id",
+                                    "repository_id",
+                                    "owner_domain",
+                                    "resource_id"
+                                  ],
+                                  "properties": {
+                                    "tenant_id": {
+                                      "type": "string"
+                                    },
+                                    "repository_id": {
+                                      "type": "string"
+                                    },
+                                    "owner_domain": {
+                                      "type": "string"
+                                    },
+                                    "resource_id": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                },
+                                "commit_id": {
+                                  "type": "string",
+                                  "pattern": "^cmt_[0-9a-f]{40}$"
+                                },
+                                "content_hash": {
+                                  "type": "string",
+                                  "pattern": "^sha256:[0-9a-f]{64}$"
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
               "additionalProperties": false
             }
           },
@@ -184277,20 +187164,325 @@
             ]
           },
           "matched_by": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "concept": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "stable_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "external_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "node_type_binding": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "label_zh": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "label_en": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "deprecated": {
+                    "type": [
+                      "boolean",
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "concept_ref": {
+                    "type": "object",
+                    "required": [
+                      "concept_id",
+                      "kind",
+                      "ontology_version"
+                    ],
+                    "properties": {
+                      "concept_id": {
+                        "type": "string"
+                      },
+                      "kind": {
+                        "type": "string",
+                        "enum": [
+                          "concept",
+                          "property",
+                          "relation",
+                          "mapping",
+                          "constraint"
+                        ]
+                      },
+                      "ontology_version": {
+                        "type": "object",
+                        "required": [
+                          "release_gid",
+                          "content_hash",
+                          "revision_ref"
+                        ],
+                        "properties": {
+                          "release_gid": {
+                            "type": "string"
+                          },
+                          "content_hash": {
+                            "type": "string",
+                            "pattern": "^sha256:[0-9a-f]{64}$"
+                          },
+                          "revision_ref": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "required": [
+                                  "repository",
+                                  "commit_id",
+                                  "content_hash"
+                                ],
+                                "properties": {
+                                  "repository": {
+                                    "type": "object",
+                                    "required": [
+                                      "tenant_id",
+                                      "repository_id",
+                                      "owner_domain",
+                                      "resource_id"
+                                    ],
+                                    "properties": {
+                                      "tenant_id": {
+                                        "type": "string"
+                                      },
+                                      "repository_id": {
+                                        "type": "string"
+                                      },
+                                      "owner_domain": {
+                                        "type": "string"
+                                      },
+                                      "resource_id": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "additionalProperties": false
+                                  },
+                                  "commit_id": {
+                                    "type": "string",
+                                    "pattern": "^cmt_[0-9a-f]{40}$"
+                                  },
+                                  "content_hash": {
+                                    "type": "string",
+                                    "pattern": "^sha256:[0-9a-f]{64}$"
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "candidates": {
             "type": "array",
+            "maxItems": 20,
             "items": {
               "type": "object",
-              "properties": {},
+              "properties": {
+                "kind": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "stable_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "external_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type_binding": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "label_zh": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "label_en": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "deprecated": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "concept_ref": {
+                  "type": "object",
+                  "required": [
+                    "concept_id",
+                    "kind",
+                    "ontology_version"
+                  ],
+                  "properties": {
+                    "concept_id": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "type": "string",
+                      "enum": [
+                        "concept",
+                        "property",
+                        "relation",
+                        "mapping",
+                        "constraint"
+                      ]
+                    },
+                    "ontology_version": {
+                      "type": "object",
+                      "required": [
+                        "release_gid",
+                        "content_hash",
+                        "revision_ref"
+                      ],
+                      "properties": {
+                        "release_gid": {
+                          "type": "string"
+                        },
+                        "content_hash": {
+                          "type": "string",
+                          "pattern": "^sha256:[0-9a-f]{64}$"
+                        },
+                        "revision_ref": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "required": [
+                                "repository",
+                                "commit_id",
+                                "content_hash"
+                              ],
+                              "properties": {
+                                "repository": {
+                                  "type": "object",
+                                  "required": [
+                                    "tenant_id",
+                                    "repository_id",
+                                    "owner_domain",
+                                    "resource_id"
+                                  ],
+                                  "properties": {
+                                    "tenant_id": {
+                                      "type": "string"
+                                    },
+                                    "repository_id": {
+                                      "type": "string"
+                                    },
+                                    "owner_domain": {
+                                      "type": "string"
+                                    },
+                                    "resource_id": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                },
+                                "commit_id": {
+                                  "type": "string",
+                                  "pattern": "^cmt_[0-9a-f]{40}$"
+                                },
+                                "content_hash": {
+                                  "type": "string",
+                                  "pattern": "^sha256:[0-9a-f]{64}$"
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
               "additionalProperties": false
             }
           },
@@ -184372,7 +187564,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:41712052fa26952463d3945803445e788bbdd13942c1eb47d7ec77f23964ff22",
+      "schema_hash": "sha256:9db0b6e83bdeb71d783ac303a5332a850f789e914f8cb82b4fde29079ba8a026",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -184504,7 +187696,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:a432321bfbbf05e0af862c9009858887842d07e4492194d2bab50c83a1053cc2"
+      "business_definition_hash": "sha256:4c1e9dcd5f1636da6e23f59f944efd0606cd5cbe771bb7813ab020e0f1656ec9"
     },
     {
       "id": "ontology.mapping.assess",
@@ -185090,7 +188282,415 @@
             "type": "array",
             "items": {
               "type": "object",
-              "properties": {},
+              "properties": {
+                "kind": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "stable_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "external_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "label_zh": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "label_en": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type_binding": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "abbr": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "display_layer": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "suggested_child_type": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "entity_table": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "class_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "prop_kind": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "data_type": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "range_class_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "storage_hint": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "field_widget": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "field_config": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "domain_class_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "inverse_of_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "link_type_binding": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "aliases": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "maxItems": 100,
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "enum_values": {
+                  "type": [
+                    "array",
+                    "string",
+                    "null"
+                  ],
+                  "maxItems": 500,
+                  "items": {
+                    "type": [
+                      "string",
+                      "number",
+                      "boolean",
+                      "null"
+                    ]
+                  }
+                },
+                "deprecated": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "is_abstract": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "is_hidden_in_layout": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "required": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "show_in_create_dialog": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "show_in_detail": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "is_functional": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "deep_copy_on_fork": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "shared_on_fork": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "skip_on_fork": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "snapshot_on_freeze": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "sort_order": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "null"
+                  ]
+                },
+                "stats_priority": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "null"
+                  ]
+                },
+                "ai00_level": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "null"
+                  ]
+                },
+                "min_val": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "null"
+                  ]
+                },
+                "max_val": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "null"
+                  ]
+                },
+                "dialog_order": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "null"
+                  ]
+                },
+                "detail_order": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "null"
+                  ]
+                },
+                "color": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "icon": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "concept_ref": {
+                  "type": "object",
+                  "required": [
+                    "concept_id",
+                    "kind",
+                    "ontology_version"
+                  ],
+                  "properties": {
+                    "concept_id": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "type": "string",
+                      "enum": [
+                        "concept",
+                        "property",
+                        "relation",
+                        "mapping",
+                        "constraint"
+                      ]
+                    },
+                    "ontology_version": {
+                      "type": "object",
+                      "required": [
+                        "release_gid",
+                        "content_hash",
+                        "revision_ref"
+                      ],
+                      "properties": {
+                        "release_gid": {
+                          "type": "string"
+                        },
+                        "content_hash": {
+                          "type": "string",
+                          "pattern": "^sha256:[0-9a-f]{64}$"
+                        },
+                        "revision_ref": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "required": [
+                                "repository",
+                                "commit_id",
+                                "content_hash"
+                              ],
+                              "properties": {
+                                "repository": {
+                                  "type": "object",
+                                  "required": [
+                                    "tenant_id",
+                                    "repository_id",
+                                    "owner_domain",
+                                    "resource_id"
+                                  ],
+                                  "properties": {
+                                    "tenant_id": {
+                                      "type": "string"
+                                    },
+                                    "repository_id": {
+                                      "type": "string"
+                                    },
+                                    "owner_domain": {
+                                      "type": "string"
+                                    },
+                                    "resource_id": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                },
+                                "commit_id": {
+                                  "type": "string",
+                                  "pattern": "^cmt_[0-9a-f]{40}$"
+                                },
+                                "content_hash": {
+                                  "type": "string",
+                                  "pattern": "^sha256:[0-9a-f]{64}$"
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
               "additionalProperties": false
             }
           },
@@ -185201,7 +188801,415 @@
             "type": "array",
             "items": {
               "type": "object",
-              "properties": {},
+              "properties": {
+                "kind": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "stable_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "external_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "label_zh": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "label_en": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type_binding": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "abbr": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "display_layer": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "suggested_child_type": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "entity_table": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "class_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "prop_kind": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "data_type": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "range_class_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "storage_hint": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "field_widget": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "field_config": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "domain_class_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "inverse_of_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "link_type_binding": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "aliases": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "maxItems": 100,
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "enum_values": {
+                  "type": [
+                    "array",
+                    "string",
+                    "null"
+                  ],
+                  "maxItems": 500,
+                  "items": {
+                    "type": [
+                      "string",
+                      "number",
+                      "boolean",
+                      "null"
+                    ]
+                  }
+                },
+                "deprecated": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "is_abstract": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "is_hidden_in_layout": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "required": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "show_in_create_dialog": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "show_in_detail": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "is_functional": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "deep_copy_on_fork": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "shared_on_fork": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "skip_on_fork": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "snapshot_on_freeze": {
+                  "type": [
+                    "boolean",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "sort_order": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "null"
+                  ]
+                },
+                "stats_priority": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "null"
+                  ]
+                },
+                "ai00_level": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "null"
+                  ]
+                },
+                "min_val": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "null"
+                  ]
+                },
+                "max_val": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "null"
+                  ]
+                },
+                "dialog_order": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "null"
+                  ]
+                },
+                "detail_order": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "null"
+                  ]
+                },
+                "color": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "icon": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "concept_ref": {
+                  "type": "object",
+                  "required": [
+                    "concept_id",
+                    "kind",
+                    "ontology_version"
+                  ],
+                  "properties": {
+                    "concept_id": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "type": "string",
+                      "enum": [
+                        "concept",
+                        "property",
+                        "relation",
+                        "mapping",
+                        "constraint"
+                      ]
+                    },
+                    "ontology_version": {
+                      "type": "object",
+                      "required": [
+                        "release_gid",
+                        "content_hash",
+                        "revision_ref"
+                      ],
+                      "properties": {
+                        "release_gid": {
+                          "type": "string"
+                        },
+                        "content_hash": {
+                          "type": "string",
+                          "pattern": "^sha256:[0-9a-f]{64}$"
+                        },
+                        "revision_ref": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "required": [
+                                "repository",
+                                "commit_id",
+                                "content_hash"
+                              ],
+                              "properties": {
+                                "repository": {
+                                  "type": "object",
+                                  "required": [
+                                    "tenant_id",
+                                    "repository_id",
+                                    "owner_domain",
+                                    "resource_id"
+                                  ],
+                                  "properties": {
+                                    "tenant_id": {
+                                      "type": "string"
+                                    },
+                                    "repository_id": {
+                                      "type": "string"
+                                    },
+                                    "owner_domain": {
+                                      "type": "string"
+                                    },
+                                    "resource_id": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                },
+                                "commit_id": {
+                                  "type": "string",
+                                  "pattern": "^cmt_[0-9a-f]{40}$"
+                                },
+                                "content_hash": {
+                                  "type": "string",
+                                  "pattern": "^sha256:[0-9a-f]{64}$"
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
               "additionalProperties": false
             }
           },
@@ -185296,7 +189304,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:f13ed600d7bf25dd21f6ec172324619f62b27075fe19610e744cbdf94954d87b",
+      "schema_hash": "sha256:8d04a9e9dc3f30ee5c140af17ce9fc35e37111d1f967bc27210009ce812eac0c",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -185428,7 +189436,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:1b65d66533682ec2fac3c7ecc81e80f51e9df4d61de04ffc0ebb850751bd58b2"
+      "business_definition_hash": "sha256:facc4cffc5cba9f12ebc88b3877fd2512ac166a8d5da809dfb9ce0f98fde4fb8"
     },
     {
       "id": "ontology.release.activate",
@@ -297651,7 +301659,7 @@
       "plugin_id": "official.ontology",
       "module": "ontology_backend.capabilities",
       "version": "2.0.0",
-      "artifact_hash": "sha256:6c84c7b3653f6fd91675e00347e963bdc8be55cafb13dcb0e650d2dc08217fb6"
+      "artifact_hash": "sha256:4edff76a02cb2aabc13a581556bcab0b0c22de4099b2d0c01431084960fd331f"
     },
     {
       "plugin_id": "official.project-management",
@@ -297666,5 +301674,5 @@
       "artifact_hash": "sha256:6e07ea783c75b056b3f1e93122ff1c002874fb4eee4ccd0604efc131f105d9cd"
     }
   ],
-  "created_at": "2026-09-04T09:52:47.747104Z"
+  "created_at": "2026-09-04T10:48:02.911150Z"
 }

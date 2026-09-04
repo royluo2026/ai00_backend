@@ -8,7 +8,7 @@ Read bounded PBOM VPPS operation audit records.
 - 不适用：The request changes PBOM content itself.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_909b49765f221187a4e1ecc5e367e56f`
+- Catalog Release：`rel_c4a99d9707731f20957fc5029360031a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -99,7 +99,7 @@ Read bounded PBOM VPPS operation audit records.
 ```json
 {
   "capability_id": "craft.vpps_audit.read",
-  "catalog_release": "rel_909b49765f221187a4e1ecc5e367e56f",
+  "catalog_release": "rel_c4a99d9707731f20957fc5029360031a",
   "major_version": 1,
   "payload": {
     "operation": "list",

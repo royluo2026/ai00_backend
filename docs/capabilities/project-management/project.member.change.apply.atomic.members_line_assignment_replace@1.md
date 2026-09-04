@@ -8,7 +8,7 @@ Execute Project Management operation members.line_assignment.replace.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_909b49765f221187a4e1ecc5e367e56f`
+- Catalog Release：`rel_c4a99d9707731f20957fc5029360031a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -329,7 +329,7 @@ Execute Project Management operation members.line_assignment.replace.
 ```json
 {
   "capability_id": "project.member.change.apply.atomic.members_line_assignment_replace",
-  "catalog_release": "rel_909b49765f221187a4e1ecc5e367e56f",
+  "catalog_release": "rel_c4a99d9707731f20957fc5029360031a",
   "major_version": 1,
   "payload": {
     "arguments": {}

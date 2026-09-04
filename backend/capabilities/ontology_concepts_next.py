@@ -20,15 +20,69 @@ ONTOLOGY_VERSION_REF_SCHEMA = {
     "properties": {
         "release_gid": {"type": "string"},
         "content_hash": {"type": "string", "pattern": r"^sha256:[0-9a-f]{64}$"},
-        "revision_ref": {},
-    },
+        "revision_ref": {"type": ["object", "null"], "properties": {}, "additionalProperties": False},
+    }, "additionalProperties": False,
 }
+
+_S = {"type": ["string", "null"]}
+_N = {"type": ["number", "integer", "string", "null"]}
+_B = {"type": ["boolean", "integer", "null"]}
+CONCEPT_REF_SCHEMA = {
+    "type": "object", "required": ["concept_id", "kind", "ontology_version"],
+    "properties": {
+        "concept_id": {"type": "string"},
+        "kind": {"type": "string", "enum": ["concept", "property", "relation", "mapping", "constraint"]},
+        "ontology_version": ONTOLOGY_VERSION_REF_SCHEMA,
+    }, "additionalProperties": False,
+}
+RULE_SCHEMA = {
+    "type": "object", "properties": {
+        "rule_gid": _S, "gid": _S, "revision": {"type": ["integer", "null"]},
+        "rule_reference": {"type": ["object", "null"], "properties": {
+            "rule_gid": {"type": "string"}, "rule_revision": {"type": "integer"},
+        }, "additionalProperties": False},
+        "rule_reference_unbound": {"type": ["boolean", "null"]},
+    }, "additionalProperties": False,
+}
+MEMBER_PROPERTIES = {
+    name: _S for name in (
+        "kind", "stable_gid", "gid", "external_id", "name", "label_zh", "label_en", "description",
+        "node_type_binding", "parent_gid", "abbr", "display_layer", "suggested_child_type",
+        "entity_table", "class_gid", "prop_kind", "data_type", "range_class_gid", "storage_hint",
+        "field_widget", "field_config", "domain_class_gid", "inverse_of_gid", "link_type_binding",
+    )
+}
+MEMBER_PROPERTIES.update({
+    "aliases": {"type": ["array", "null"], "maxItems": 100, "items": {"type": "string"}},
+    "enum_values": {"type": ["array", "string", "null"], "maxItems": 500, "items": {"type": ["string", "number", "boolean", "null"]}},
+    "deprecated": _B, "is_abstract": _B, "is_hidden_in_layout": _B, "required": _B,
+    "show_in_create_dialog": _B, "show_in_detail": _B, "is_functional": _B,
+    "deep_copy_on_fork": _B, "shared_on_fork": _B, "skip_on_fork": _B, "snapshot_on_freeze": _B,
+    "sort_order": _N, "stats_priority": _N, "ai00_level": _N, "min_val": _N, "max_val": _N,
+    "dialog_order": _N, "detail_order": _N, "color": _S, "icon": _S,
+    "concept_ref": CONCEPT_REF_SCHEMA,
+})
+MEMBER_SCHEMA = {"type": "object", "properties": MEMBER_PROPERTIES, "additionalProperties": False}
+ONTOLOGY_OBJECT_SCHEMA = {
+    "type": "object", "properties": {
+        **MEMBER_PROPERTIES,
+        "properties": {"type": "array", "maxItems": 1000, "items": MEMBER_SCHEMA},
+        "relations": {"type": "array", "maxItems": 1000, "items": MEMBER_SCHEMA},
+        "rules": {"type": "array", "maxItems": 1000, "items": RULE_SCHEMA},
+    }, "additionalProperties": False,
+}
+SUMMARY_SCHEMA = {"type": "object", "properties": {
+    name: MEMBER_PROPERTIES[name] for name in (
+        "kind", "stable_gid", "external_id", "node_type_binding", "name", "label_zh", "label_en",
+        "description", "deprecated", "concept_ref",
+    )
+}, "additionalProperties": False}
 
 CONCEPT_RESULT_SCHEMA = {
     "type": "object",
     "required": ["concept", "view", "release_gid", "release_sha256", "ontology_version_ref"],
     "properties": {
-        "concept": {},
+        "concept": ONTOLOGY_OBJECT_SCHEMA,
         "view": {"type": "string", "enum": ["summary", "schema"]},
         "release_gid": {"type": "string"},
         "release_sha256": {"type": "string", "pattern": r"^[0-9a-f]{64}$"},
@@ -44,9 +98,9 @@ RESOLUTION_RESULT_SCHEMA = {
     ],
     "properties": {
         "status": {"type": "string", "enum": ["resolved", "ambiguous", "candidates", "unresolved"]},
-        "matched_by": {},
-        "concept": {},
-        "candidates": {"type": "array", "items": {}},
+        "matched_by": {"type": ["string", "null"]},
+        "concept": {"anyOf": [SUMMARY_SCHEMA, {"type": "null"}]},
+        "candidates": {"type": "array", "maxItems": 20, "items": SUMMARY_SCHEMA},
         "release_gid": {"type": "string"},
         "release_sha256": {"type": "string", "pattern": r"^[0-9a-f]{64}$"},
         "ontology_version_ref": ONTOLOGY_VERSION_REF_SCHEMA,
@@ -70,7 +124,7 @@ OBJECT_LIST_SCHEMA = {
     "type": "object",
     "required": ["items", "total", "offset", "limit", "release_gid", "release_sha256", "ontology_version_ref"],
     "properties": {
-        "items": {"type": "array", "items": {"type": "object"}},
+        "items": {"type": "array", "items": MEMBER_SCHEMA},
         "total": {"type": "integer", "minimum": 0},
         "offset": {"type": "integer", "minimum": 0},
         "limit": {"type": "integer", "minimum": 1, "maximum": 100},
@@ -99,8 +153,8 @@ def _version_ref(release: dict[str, Any]) -> OntologyVersionRef:
     )
 
 
-def _project_with_ref(item: dict[str, Any], view: str, version: OntologyVersionRef) -> dict[str, Any]:
-    projected = project_concept(item, view)
+def _project_with_ref(item: dict[str, Any], view: str, version: OntologyVersionRef, objects=None) -> dict[str, Any]:
+    projected = project_concept(item, view, objects)
     if view == "schema" and isinstance(projected.get("rules"), list):
         for rule in projected["rules"]:
             if not isinstance(rule, dict):
@@ -153,9 +207,12 @@ def get_concept(payload: dict[str, Any], _context: CapabilityContext) -> Capabil
     item = repository.get_object(release["release_gid"], kind, stable_gid)
     if not item:
         raise LookupError("ontology object not found in the resolved release")
+    objects = None
+    if view == "schema" and kind == "concept":
+        objects = repository.list_objects(release["release_gid"], kinds={"concept", "property", "relation", "constraint"})
     return CapabilityOutput(
         data={
-            "concept": _project_with_ref(item, view, version), "view": view,
+            "concept": _project_with_ref(item, view, version, objects), "view": view,
             "release_gid": release["release_gid"], "release_sha256": release["content_sha256"],
             "ontology_version_ref": version.model_dump(mode="json"),
         },

@@ -72,10 +72,46 @@ def resolve_term(term: str, objects: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def project_concept(item: Mapping[str, Any], view: str) -> dict[str, Any]:
+def project_concept(
+    item: Mapping[str, Any], view: str, objects: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     if view == "summary":
         return concept_summary(item)
     if view != "schema":
         raise ValueError("view must be summary or schema")
     excluded = {"created_at", "updated_at", "created_by", "object_sha256"}
-    return {key: value for key, value in item.items() if key not in excluded}
+    projected = {key: value for key, value in item.items() if key not in excluded}
+    if item.get("kind") != "concept" or objects is None:
+        return projected
+
+    concepts = {
+        str(candidate.get("stable_gid")): candidate
+        for candidate in objects if candidate.get("kind") == "concept" and candidate.get("stable_gid")
+    }
+    lineage: list[str] = []
+    current: Mapping[str, Any] | None = item
+    visited: set[str] = set()
+    while current is not None:
+        gid = str(current.get("stable_gid") or "")
+        if not gid or gid in visited:
+            break
+        visited.add(gid)
+        lineage.append(gid)
+        current = concepts.get(str(current.get("parent_gid") or ""))
+    lineage.reverse()
+
+    def related(kind: str, owner_key: str) -> list[dict[str, Any]]:
+        rows: list[dict[str, Any]] = []
+        for owner_gid in lineage:
+            matches = [
+                candidate for candidate in objects
+                if candidate.get("kind") == kind and str(candidate.get(owner_key) or "") == owner_gid
+            ]
+            matches.sort(key=lambda row: (int(row.get("sort_order") or 0), str(row.get("name") or "")))
+            rows.extend({key: value for key, value in row.items() if key not in excluded} for row in matches)
+        return rows
+
+    projected["properties"] = related("property", "class_gid")
+    projected["relations"] = related("relation", "domain_class_gid")
+    projected.setdefault("rules", [])
+    return projected

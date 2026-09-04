@@ -8,7 +8,7 @@ Create a BOP draft from an empty, version, template or import preview source.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_909b49765f221187a4e1ecc5e367e56f`
+- Catalog Release：`rel_c4a99d9707731f20957fc5029360031a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -152,7 +152,7 @@ Create a BOP draft from an empty, version, template or import preview source.
 ```json
 {
   "capability_id": "craft.bop.version.create",
-  "catalog_release": "rel_909b49765f221187a4e1ecc5e367e56f",
+  "catalog_release": "rel_c4a99d9707731f20957fc5029360031a",
   "major_version": 1,
   "payload": {
     "source": "empty",
