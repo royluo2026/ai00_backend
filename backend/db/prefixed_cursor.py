@@ -63,3 +63,12 @@ def wrap_cursor(cursor):
     if table_prefix_active() and not isinstance(cursor, PrefixedCursor):
         return PrefixedCursor(cursor)
     return cursor
+
+
+def wrap_connection(connection):
+    if getattr(connection, "_ai00_prefix_wrapped", False):
+        return connection
+    original_cursor = connection.cursor
+    connection.cursor = lambda *args, **kwargs: wrap_cursor(original_cursor(*args, **kwargs))
+    connection._ai00_prefix_wrapped = True
+    return connection
