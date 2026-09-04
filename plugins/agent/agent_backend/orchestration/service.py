@@ -23,8 +23,18 @@ class OrchestrationService:
         self.repository = repository
         self.reference_resolver = reference_resolver
 
-    def publish(self, version_gid: str, *, expected_revision: int, actor_gid: str) -> Any:
-        graph: GraphDraft = self.repository.get_graph(version_gid, actor_gid=actor_gid)
+    def publish(
+        self, version_gid: str, *, expected_revision: int, actor_gid: str,
+        tenant_gid: str, project_gid: str,
+    ) -> Any:
+        scope = {
+            key: value for key, value in {
+                "tenant_gid": tenant_gid, "project_gid": project_gid,
+            }.items() if value is not None
+        }
+        graph: GraphDraft = self.repository.get_graph(
+            version_gid, actor_gid=actor_gid, **scope,
+        )
         self._validate_business_contract(graph)
         resolved_capabilities = {
             version: self.reference_resolver.resolve_capability_binding(version, actor_gid)
@@ -53,10 +63,19 @@ class OrchestrationService:
             expected_revision=expected_revision,
             actor_gid=actor_gid,
             resolved_bindings=trusted_bindings,
+            **scope,
         )
 
-    def delete_capability_binding(self, binding_gid: str, *, actor_gid: str) -> None:
-        self.repository.delete_binding(binding_gid, actor_gid=actor_gid)
+    def delete_capability_binding(
+        self, binding_gid: str, *, actor_gid: str,
+        tenant_gid: str, project_gid: str,
+    ) -> None:
+        scope = {
+            key: value for key, value in {
+                "tenant_gid": tenant_gid, "project_gid": project_gid,
+            }.items() if value is not None
+        }
+        self.repository.delete_binding(binding_gid, actor_gid=actor_gid, **scope)
 
     @staticmethod
     def _validate_business_contract(graph: GraphDraft) -> None:

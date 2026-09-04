@@ -54,7 +54,7 @@ def test_publish_rejects_untrusted_capability_reference():
     service = OrchestrationService(repo, resolver)
 
     with pytest.raises(UntrustedCapabilityReference, match="cv2_1"):
-        service.publish("v1", expected_revision=3, actor_gid="u1")
+        service.publish("v1", expected_revision=3, actor_gid="u1", tenant_gid="t1", project_gid="p1")
 
     repo.publish_version.assert_not_called()
 
@@ -68,7 +68,7 @@ def test_publish_rejects_incomplete_business_contract():
     service = OrchestrationService(repo, Mock())
 
     with pytest.raises(PublishBlocked, match="objective"):
-        service.publish("v1", expected_revision=1, actor_gid="u1")
+        service.publish("v1", expected_revision=1, actor_gid="u1", tenant_gid="t1", project_gid="p1")
 
 
 def test_publish_resolves_each_version_once_and_persists_only_trusted_projection():
@@ -79,9 +79,9 @@ def test_publish_resolves_each_version_once_and_persists_only_trusted_projection
     resolver.resolve_capability_binding.return_value = trusted_binding()
     service = OrchestrationService(repo, resolver)
 
-    result = service.publish("v1", expected_revision=3, actor_gid="u1")
+    result = service.publish("v1", expected_revision=3, actor_gid="u1", tenant_gid="t1", project_gid="p1")
 
-    repo.get_graph.assert_called_once_with("v1", actor_gid="u1")
+    repo.get_graph.assert_called_once_with("v1", actor_gid="u1", tenant_gid="t1", project_gid="p1")
     resolver.resolve_capability_binding.assert_called_once_with("cv2_1", "u1")
     call = repo.publish_version.call_args
     assert call.args == ("v1",)
@@ -92,10 +92,30 @@ def test_publish_resolves_each_version_once_and_persists_only_trusted_projection
     assert result["revision"] == 4
 
 
+def test_publish_forwards_tenant_and_project_scope_to_read_and_write_guards():
+    repo = Mock()
+    repo.get_graph.return_value = publishable_graph()
+    repo.publish_version.return_value = {"version_gid": "v1", "revision": 4}
+    resolver = Mock()
+    resolver.resolve_capability_binding.return_value = trusted_binding()
+    service = OrchestrationService(repo, resolver)
+
+    service.publish(
+        "v1", expected_revision=3, actor_gid="u1",
+        tenant_gid="tenant-1", project_gid="project-1",
+    )
+
+    repo.get_graph.assert_called_once_with(
+        "v1", actor_gid="u1", tenant_gid="tenant-1", project_gid="project-1",
+    )
+    assert repo.publish_version.call_args.kwargs["tenant_gid"] == "tenant-1"
+    assert repo.publish_version.call_args.kwargs["project_gid"] == "project-1"
+
+
 def test_delete_binding_only_removes_agent_owned_binding():
     repo = Mock()
     service = OrchestrationService(repo, Mock())
 
-    service.delete_capability_binding("bind-1", actor_gid="u1")
+    service.delete_capability_binding("bind-1", actor_gid="u1", tenant_gid="t1", project_gid="p1")
 
-    repo.delete_binding.assert_called_once_with("bind-1", actor_gid="u1")
+    repo.delete_binding.assert_called_once_with("bind-1", actor_gid="u1", tenant_gid="t1", project_gid="p1")

@@ -1,5 +1,5 @@
 {
-  "schema_sha256": "sha256:bbea8fe2a8e27b5fbdf20c2be1e59521b0e81077967006864a66d530e8b36e9c",
+  "schema_sha256": "sha256:a83db7002498c769b19631ea538b727e272bf96e9bf9473947e6faa45680f6c1",
   "schema_version": 1,
   "tables": [
     {
@@ -913,6 +913,9 @@
         "owner_user_gid": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
+        "project_gid": [
+          "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql"
+        ],
         "revision": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
@@ -928,12 +931,16 @@
         "PRIMARY": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ],
+        "idx_agent_orch_panorama_scope": [
+          "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql"
+        ],
         "idx_agent_orch_panorama_tenant_updated": [
           "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
+        "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql"
       ],
       "table": "workmanship_agent_orch_panoramas"
     },

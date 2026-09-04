@@ -45,18 +45,35 @@ def _decoded(value: Any, fallback: Any) -> Any:
     return json.loads(value) if isinstance(value, str) else value
 
 
+def _require_scope(tenant_gid: str | None, project_gid: str | None) -> tuple[str, str]:
+    if not tenant_gid or not project_gid:
+        raise ResourceNotAccessible("tenant and project scope are required")
+    return tenant_gid, project_gid
+
+
 class OrchestrationRepository:
     def __init__(self, connection_factory: Callable[[], AbstractContextManager] = get_agent_conn):
         self._connection_factory = connection_factory
 
     @staticmethod
-    def _owned_version_for_update(cur: Any, version_gid: str, actor_gid: str) -> dict[str, Any]:
+    def _owned_version_for_update(
+        cur: Any, version_gid: str, actor_gid: str,
+        tenant_gid: str | None = None, project_gid: str | None = None,
+    ) -> dict[str, Any]:
+        scope_sql = ""
+        scope_params: list[str] = []
+        if tenant_gid:
+            scope_sql += " AND p.tenant_gid=%s"
+            scope_params.append(tenant_gid)
+        if project_gid:
+            scope_sql += " AND p.project_gid=%s"
+            scope_params.append(project_gid)
         cur.execute(
             """SELECT v.panorama_gid,v.status,v.revision
                FROM workmanship_agent_orch_versions v
                JOIN workmanship_agent_orch_panoramas p ON p.gid=v.panorama_gid
-               WHERE v.gid=%s AND p.owner_user_gid=%s FOR UPDATE""",
-            (version_gid, actor_gid),
+               WHERE v.gid=%s AND p.owner_user_gid=%s""" + scope_sql + " FOR UPDATE",
+            (version_gid, actor_gid, *scope_params),
         )
         version = cur.fetchone()
         if not version:
@@ -122,13 +139,18 @@ class OrchestrationRepository:
             raise KeyError(f"orchestration metric not found: {panorama_gid}/{period_key}")
         return dict(row)
 
-    def get_graph(self, version_gid: str, *, actor_gid: str) -> GraphDraft:
+    def get_graph(
+        self, version_gid: str, *, actor_gid: str,
+        tenant_gid: str | None = None, project_gid: str | None = None,
+    ) -> GraphDraft:
+        scope_sql = (" AND p.tenant_gid=%s" if tenant_gid else "") + (" AND p.project_gid=%s" if project_gid else "")
+        scope_params = tuple(value for value in (tenant_gid, project_gid) if value)
         with self._connection_factory() as conn, conn.cursor() as cur:
             cur.execute(
                 """SELECT v.mode FROM workmanship_agent_orch_versions v
                    JOIN workmanship_agent_orch_panoramas p ON p.gid=v.panorama_gid
-                   WHERE v.gid=%s AND p.owner_user_gid=%s""",
-                (version_gid, actor_gid),
+                   WHERE v.gid=%s AND p.owner_user_gid=%s""" + scope_sql,
+                (version_gid, actor_gid, *scope_params),
             )
             version = cur.fetchone()
             if not version:
@@ -214,8 +236,14 @@ class OrchestrationRepository:
             "capability_bindings": capability_bindings, "context_bindings": context_bindings,
         })
 
-    def get_graph_for_user(self, version_gid: str, actor_gid: str) -> GraphDraft:
-        return self.get_graph(version_gid, actor_gid=actor_gid)
+    def get_graph_for_user(
+        self, version_gid: str, actor_gid: str,
+        tenant_gid: str | None = None, project_gid: str | None = None,
+    ) -> GraphDraft:
+        return self.get_graph(
+            version_gid, actor_gid=actor_gid,
+            tenant_gid=tenant_gid, project_gid=project_gid,
+        )
 
     def publish_version(
         self,
@@ -224,9 +252,12 @@ class OrchestrationRepository:
         expected_revision: int,
         actor_gid: str,
         resolved_bindings: list[dict[str, Any]],
+        tenant_gid: str | None = None,
+        project_gid: str | None = None,
     ) -> dict[str, Any]:
+        tenant_gid, project_gid = _require_scope(tenant_gid, project_gid)
         with self._connection_factory() as conn, conn.cursor() as cur:
-            version = self._owned_version_for_update(cur, version_gid, actor_gid)
+            version = self._owned_version_for_update(cur, version_gid, actor_gid, tenant_gid, project_gid)
             if version["status"] != "draft" or int(version["revision"]) != expected_revision:
                 raise RevisionConflict("orchestration version is published or stale")
             cur.execute(
@@ -294,14 +325,26 @@ class OrchestrationRepository:
             )
         return {"version_gid": version_gid, "revision": expected_revision + 1, "status": "published"}
 
-    def delete_binding(self, binding_gid: str, *, actor_gid: str) -> None:
+    def delete_binding(
+        self, binding_gid: str, *, actor_gid: str,
+        tenant_gid: str | None = None, project_gid: str | None = None,
+    ) -> None:
+        tenant_gid, project_gid = _require_scope(tenant_gid, project_gid)
+        scope_sql = ""
+        scope_params: list[str] = []
+        if tenant_gid:
+            scope_sql += " AND p.tenant_gid=%s"
+            scope_params.append(tenant_gid)
+        if project_gid:
+            scope_sql += " AND p.project_gid=%s"
+            scope_params.append(project_gid)
         with self._connection_factory() as conn, conn.cursor() as cur:
             cur.execute(
                 """SELECT b.gid FROM workmanship_agent_orch_capability_bindings b
                    JOIN workmanship_agent_orch_versions v ON v.gid=b.version_gid
                    JOIN workmanship_agent_orch_panoramas p ON p.gid=v.panorama_gid
-                   WHERE b.gid=%s AND v.status='draft' AND p.owner_user_gid=%s FOR UPDATE""",
-                (binding_gid, actor_gid),
+                   WHERE b.gid=%s AND v.status='draft' AND p.owner_user_gid=%s""" + scope_sql + " FOR UPDATE",
+                (binding_gid, actor_gid, *scope_params),
             )
             if not cur.fetchone():
                 raise ResourceNotAccessible("orchestration binding is not accessible")
@@ -317,15 +360,20 @@ class OrchestrationRepository:
         version_gid: str,
         frozen_context: dict[str, Any],
         actor_gid: str,
+        tenant_gid: str | None = None,
+        project_gid: str | None = None,
     ) -> str:
+        tenant_gid, project_gid = _require_scope(tenant_gid, project_gid)
         run_gid = str(uuid.uuid4())
+        scope_sql = (" AND p.tenant_gid=%s" if tenant_gid else "") + (" AND p.project_gid=%s" if project_gid else "")
+        scope_params = tuple(value for value in (tenant_gid, project_gid) if value)
         with self._connection_factory() as conn, conn.cursor() as cur:
             cur.execute(
                 """SELECT v.gid FROM workmanship_agent_orch_versions v
                    JOIN workmanship_agent_orch_panoramas p ON p.gid=v.panorama_gid
                    WHERE v.gid=%s AND v.panorama_gid=%s AND v.status='published'
-                     AND p.owner_user_gid=%s FOR UPDATE""",
-                (version_gid, panorama_gid, actor_gid),
+                     AND p.owner_user_gid=%s""" + scope_sql + " FOR UPDATE",
+                (version_gid, panorama_gid, actor_gid, *scope_params),
             )
             if not cur.fetchone():
                 raise ResourceNotAccessible("published orchestration version is not accessible")
@@ -358,13 +406,18 @@ class OrchestrationRepository:
         item_gid: str | None = None,
         capability_call_id: str | None = None,
         evidence_id: str | None = None,
+        tenant_gid: str | None = None,
+        project_gid: str | None = None,
     ) -> dict[str, Any]:
+        tenant_gid, project_gid = _require_scope(tenant_gid, project_gid)
+        scope_sql = (" AND p.tenant_gid=%s" if tenant_gid else "") + (" AND p.project_gid=%s" if project_gid else "")
+        scope_params = tuple(value for value in (tenant_gid, project_gid) if value)
         with self._connection_factory() as conn, conn.cursor() as cur:
             cur.execute(
                 """SELECT r.status FROM workmanship_agent_orch_runs r
                    JOIN workmanship_agent_orch_panoramas p ON p.gid=r.panorama_gid
-                   WHERE r.gid=%s AND p.owner_user_gid=%s FOR UPDATE""",
-                (run_gid, authorized_principal_gid),
+                   WHERE r.gid=%s AND p.owner_user_gid=%s""" + scope_sql + " FOR UPDATE",
+                (run_gid, authorized_principal_gid, *scope_params),
             )
             run = cur.fetchone()
             if not run:
@@ -429,10 +482,13 @@ class OrchestrationRepository:
         *,
         expected_revision: int,
         actor_gid: str,
+        tenant_gid: str | None = None,
+        project_gid: str | None = None,
     ) -> int:
+        tenant_gid, project_gid = _require_scope(tenant_gid, project_gid)
         next_revision = expected_revision + 1
         with self._connection_factory() as conn, conn.cursor() as cur:
-            version = self._owned_version_for_update(cur, version_gid, actor_gid)
+            version = self._owned_version_for_update(cur, version_gid, actor_gid, tenant_gid, project_gid)
             if version["status"] != "draft" or int(version["revision"]) != expected_revision:
                 raise RevisionConflict("orchestration version is published or stale")
             cur.execute(

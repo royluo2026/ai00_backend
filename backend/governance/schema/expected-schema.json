@@ -1,7 +1,7 @@
 {
   "database_name": "ai00_test",
   "isolation_profile": "single_database_domain_tables",
-  "schema_sha256": "sha256:bbea8fe2a8e27b5fbdf20c2be1e59521b0e81077967006864a66d530e8b36e9c",
+  "schema_sha256": "sha256:a83db7002498c769b19631ea538b727e272bf96e9bf9473947e6faa45680f6c1",
   "schema_version": 1,
   "tables": [
     {
@@ -2791,6 +2791,16 @@
           "sources": [
             "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "project_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql"
+          ]
         }
       ],
       "constraints": [],
@@ -2805,6 +2815,19 @@
             "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
           ],
           "unique": true
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "project_gid",
+            "updated_at"
+          ],
+          "name": "idx_agent_orch_panorama_scope",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql"
+          ],
+          "unique": false
         },
         {
           "columns": [
@@ -2824,7 +2847,8 @@
       "owner": "agent",
       "runtime_domain": "agent",
       "sources": [
-        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+        "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql",
+        "backend/db/migrations/domains/agent/0009_agent_orchestration_scope.sql"
       ]
     },
     {
