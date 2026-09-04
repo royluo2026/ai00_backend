@@ -243,6 +243,7 @@ class Settings:
         self.feishu_redirect_uri      = str(_feishu_saved.get("redirect_uri") or _require("FEISHU_REDIRECT_URI")).strip()
         self.jwt_secret               = _require("JWT_SECRET")
         self.users_db_url             = _configured_users_db_url()
+        self.table_prefix             = os.getenv("TABLE_PREFIX", "").strip()
         self.jwt_expire_hours         = int(_get_with_fallback("JWT_EXPIRE_HOURS") or "72")
         self.host                     = (_get_with_fallback("HOST") or "0.0.0.0").strip()
         self.port                     = int(_get_with_fallback("PORT") or "8080")

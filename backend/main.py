@@ -38,9 +38,11 @@ from fastapi.staticfiles import StaticFiles
 from backend.core.log_setup import setup_logging
 from backend.config import get_settings
 from backend.db.connection import init_pool
+from backend.db.table_prefix import configure_table_prefix
 
 # ── 日志初始化（必须在所有模块 import 之前完成）─────────────────────────────────
 setup_logging(os.getenv("LOG_LEVEL", "INFO"))
+configure_table_prefix(os.getenv("TABLE_PREFIX", ""))
 
 _log = logging.getLogger(__name__)
 

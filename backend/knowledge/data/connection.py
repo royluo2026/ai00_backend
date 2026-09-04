@@ -11,6 +11,14 @@ _pool = None
 _lock = Lock()
 
 
+from backend.db.table_prefix import configure_table_prefix
+from backend.db.prefixed_cursor import wrap_cursor
+
+import os
+
+configure_table_prefix(os.getenv("TABLE_PREFIX", ""))
+
+
 def _params() -> dict:
     raw = os.getenv("AI00_KNOWLEDGE_DB_URL", "")
     if not raw:
@@ -55,6 +63,8 @@ def _get_pool():
 @contextmanager
 def get_knowledge_conn():
     conn = _get_pool().connection()
+    _orig_cursor = conn.cursor
+    conn.cursor = lambda *a, **k: wrap_cursor(_orig_cursor(*a, **k))
     try:
         yield conn
     finally:

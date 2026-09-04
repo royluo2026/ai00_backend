@@ -55,6 +55,61 @@
     const hasCollection = response && (Array.isArray(response.items) || Array.isArray(response.findings) || Array.isArray(response.events) || response.release);
     return hasCollection ? response : (response && response.data && typeof response.data === 'object' ? response.data : (response || {}));
   };
+  const list = (value) => Array.isArray(value) ? value : [];
+  const textValue = (value) => typeof value === 'string' ? value : JSON.stringify(value);
+  const canonicalJson = (value) => {
+    if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+    if (value && typeof value === 'object') return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(',')}}`;
+    return JSON.stringify(value);
+  };
+  const businessIdentityMatches = (proposal, report) => {
+    const evidence = proposal && proposal.review_evidence;
+    const major = proposal && proposal.major_version;
+    const capabilityKey = `${proposal && proposal.capability_id || ''}@${major}`;
+    const hash = String(proposal && proposal.business_definition_hash || '');
+    const version = String(proposal && proposal.capability_version_gid || '');
+    const snapshot = String(proposal && proposal.base_snapshot_gid || '');
+    const evidenceBinding = evidence && evidence.evidence;
+    if (!proposal || proposal.business_identity_verified !== true || !report || !evidence
+      || proposal.review_type !== 'business_definition'
+      || !Number.isInteger(major) || major < 1 || !version || !snapshot
+      || !/^sha256:[0-9a-f]{64}$/.test(hash)
+      || String(proposal.proposed_descriptor_hash || '') !== hash
+      || evidence.capability_key !== capabilityKey || evidence.major_version !== major
+      || String(evidence.capability_version_gid || '') !== version
+      || String(evidence.definition_hash || '') !== hash
+      || snapshot !== String(report.snapshot_gid || '')
+      || !evidenceBinding || String(evidenceBinding.snapshot_gid || '') !== snapshot
+      || String(evidenceBinding.source_revision || '') !== String(report.source_revisions && report.source_revisions.source || '')
+      || String(evidenceBinding.catalog_release_id || '') !== String(report.catalog_binding && report.catalog_binding.catalog_release_id || '')) return false;
+    const authoritativeRelations = list(report.relations);
+    if (authoritativeRelations.some((item) => !['deterministic', 'advisory'].includes(item && item.source))) return false;
+    const relationByHash = new Map(authoritativeRelations.map((item) => [item.candidate_hash, item]));
+    const deterministicRelations = list(evidence.deterministic_relation_candidates);
+    const advisoryRelations = list(evidence.ai_advisory_relation_candidates);
+    const embeddedRelations = deterministicRelations.concat(advisoryRelations);
+    if (deterministicRelations.some((item) => !item || item.source !== 'deterministic')
+      || advisoryRelations.some((item) => !item || item.source !== 'advisory')
+      || new Set(embeddedRelations.map((item) => item && item.candidate_hash)).size !== embeddedRelations.length
+      || embeddedRelations.some((item) => !list(item.capability_keys).includes(capabilityKey)
+        || !relationByHash.has(item.candidate_hash)
+        || canonicalJson(item) !== canonicalJson(relationByHash.get(item.candidate_hash)))) return false;
+    const reviews = list(proposal.reviews);
+    const reviewIds = reviews.map((review) => String(review.review_gid || ''));
+    if (!Number.isInteger(proposal.review_total) || proposal.review_total < 0
+      || typeof proposal.reviews_truncated !== 'boolean'
+      || reviews.length !== Math.min(proposal.review_total, 20)
+      || proposal.reviews_truncated !== (proposal.review_total > reviews.length)
+      || reviewIds.some((value) => !/^[1-9][0-9]*$/.test(value))
+      || new Set(reviewIds).size !== reviewIds.length
+      || reviewIds.some((value, index) => index > 0 && BigInt(value) <= BigInt(reviewIds[index - 1]))) return false;
+    return reviews.every((review) => (
+      String(review.proposal_gid || '') === String(proposal.proposal_gid || '')
+      && review.capability_key === capabilityKey
+      && String(review.base_snapshot_gid || '') === snapshot
+      && String(review.definition_hash || '') === hash
+    ));
+  };
 
   class CapabilityGovernanceController {
     constructor({ root: mount, api, state, location, window: browserWindow } = {}) {
@@ -66,7 +121,15 @@
       this.window = browserWindow || root;
       this.refreshGeneration = 0;
       this.sectionGenerations = {};
+      this.businessDetailGeneration = 0;
       this.scanAttempt = 0;
+      if (!this.state.businessReviewReport) this.state.businessReviewReport = null;
+      if (!Array.isArray(this.state.businessReviewQueue)) this.state.businessReviewQueue = [];
+      if (!this.state.businessReviewDraft) this.state.businessReviewDraft = { decision: 'approved', reason: '' };
+      if (!Array.isArray(this.state.businessProposalCursorHistory)) this.state.businessProposalCursorHistory = [];
+      if (!this.state.businessQueuePage) this.state.businessQueuePage = 1;
+      if (!this.state.businessQueuePageLimit) this.state.businessQueuePageLimit = 50;
+      if (this.state.businessReviewQueueNextCursor === undefined) this.state.businessReviewQueueNextCursor = null;
       this.onClick = this.onClick.bind(this);
       this.onInput = this.onInput.bind(this);
       this.onHashChange = this.onHashChange.bind(this);
@@ -100,6 +163,14 @@
 
     onInput(event) {
       const target = event.target;
+      if (target.matches('[data-business-decision]')) {
+        this.state.businessReviewDraft = Object.assign({}, this.state.businessReviewDraft, { decision: target.value });
+        return;
+      }
+      if (target.matches('[data-business-decision-reason]')) {
+        this.state.businessReviewDraft = Object.assign({}, this.state.businessReviewDraft, { reason: target.value });
+        return;
+      }
       if (target.matches('[data-testid="governance-search"]')) {
         this.state.filters = Object.assign({}, this.state.filters, { query: target.value });
         this.state.inventoryPage = 1;
@@ -156,6 +227,26 @@
         }
         if (action.dataset.action === 'findings-next' || action.dataset.action === 'findings-prev') {
           return this.changePage('findings', action.dataset.action === 'findings-next' ? 1 : -1);
+        }
+        if (action.dataset.action === 'business-queue-next' || action.dataset.action === 'business-queue-prev') {
+          const delta = action.dataset.action === 'business-queue-next' ? 1 : -1;
+          return this.changeBusinessQueuePage(delta);
+        }
+        if (action.dataset.action === 'business-proposals-next') {
+          return this.loadBusinessReviewQueue({ cursor: this.state.businessProposalNextCursor, direction: 'next' });
+        }
+        if (action.dataset.action === 'business-proposals-prev') {
+          const history = this.state.businessProposalCursorHistory || [];
+          return this.loadBusinessReviewQueue({ cursor: history[history.length - 1] || null, direction: 'prev' });
+        }
+        if (action.dataset.action === 'load-business-review-detail') return this.loadBusinessReviewDetail(action.dataset.entityGid);
+        if (action.dataset.action === 'close-business-review-detail') {
+          this.state.selectedBusinessReview = null;
+          return this.render();
+        }
+        if (action.dataset.action === 'decide-business-review') {
+          const draft = this.state.businessReviewDraft || {};
+          return this.decideBusinessReview(draft.decision, draft.reason);
         }
         if (action.dataset.action === 'clear-section-filter') {
           const sectionName = action.dataset.section || this.state.section;
@@ -273,6 +364,9 @@
 
     async loadSection(section) {
       if (!this.api || !['findings', 'changes', 'health', 'audit'].includes(section)) return false;
+      if (section === 'changes' && this.state.selectedAnalysisRunGid && typeof this.api.loadBusinessReviewQueue === 'function') {
+        return this.loadBusinessReviewQueue();
+      }
       const methodMap = { findings: 'searchFindings', changes: 'loadProposals', health: 'loadHealth', audit: 'loadAudit' };
       const methodName = methodMap[section];
       if (typeof this.api[methodName] !== 'function') return false;
@@ -326,15 +420,147 @@
       }
     }
 
+    async changeBusinessQueuePage(delta) {
+      const current = Math.max(1, Number(this.state.businessQueuePage || 1));
+      const total = Number(this.state.businessReviewReport && this.state.businessReviewReport.review_queue_count || this.state.businessReviewQueue.length);
+      const pageSize = Number(this.state.businessQueuePageLimit || 50);
+      const next = Math.min(Math.max(1, Math.ceil(total / pageSize)), Math.max(1, current + delta));
+      if (next <= current || next * pageSize <= this.state.businessReviewQueue.length) {
+        this.state.businessQueuePage = next;
+        this.render();
+        return true;
+      }
+      if (!this.state.businessReviewQueueNextCursor) return false;
+      return this.loadBusinessReviewQueue({ direction: 'queue', queueTarget: next * pageSize, queuePage: next });
+    }
+
+    async loadBusinessReviewQueue({ cursor = null, direction = 'reset', queueTarget = null, queuePage = 1 } = {}) {
+      if (!this.api || typeof this.api.loadBusinessReviewQueue !== 'function' || !this.state.selectedAnalysisRunGid) return false;
+      if (this.state.sectionBusy.includes('changes')) return false;
+      const generation = (this.sectionGenerations.changes || 0) + 1;
+      this.sectionGenerations.changes = generation;
+      this.state.sectionBusy = this.state.sectionBusy.concat('changes');
+      this.render();
+      let failed = false;
+      try {
+        const filters = this.state.sectionFilters.changes || {};
+        const reviewQueueLimit = queueTarget || Math.max(200, this.state.businessReviewQueue.length);
+        const response = await this.api.loadBusinessReviewQueue({
+          analysisRunGid: this.state.selectedAnalysisRunGid,
+          query: filters.query || '', domain: filters.domain === 'all' ? '' : filters.domain,
+          stage: filters.stage === 'all' ? '' : filters.stage, limit: 200, cursor,
+          reviewQueueLimit,
+          includeUnboundEntries: direction === 'reset', includeProposals: direction !== 'queue',
+          expectedReport: direction === 'reset' ? undefined : this.state.businessReviewReport,
+        });
+        if (generation !== this.sectionGenerations.changes) return false;
+        this.state.businessReviewReport = Object.assign({}, this.state.businessReviewReport || {}, response.report || {});
+        this.state.businessReviewQueue = list(response.report && response.report.review_queue);
+        this.state.businessReviewQueueNextCursor = response.reviewQueueNextCursor || null;
+        if (direction !== 'queue') {
+          this.state.proposals = list(response.proposals);
+          this.state.businessProposalNextCursor = response.nextCursor || null;
+        }
+        if (direction === 'next') {
+          this.state.businessProposalCursorHistory = (this.state.businessProposalCursorHistory || []).concat(this.state.businessProposalCursor || null);
+        } else if (direction === 'prev') {
+          this.state.businessProposalCursorHistory = (this.state.businessProposalCursorHistory || []).slice(0, -1);
+        } else {
+          this.state.businessProposalCursorHistory = [];
+        }
+        if (direction !== 'queue') this.state.businessProposalCursor = cursor || null;
+        if (direction === 'queue') this.state.businessQueuePage = queuePage;
+        else if (direction === 'reset') this.state.businessQueuePage = 1;
+        this.state.sectionErrors.changes = null;
+        this.state.sectionStale.changes = false;
+        return true;
+      } catch (error) {
+        if (generation !== this.sectionGenerations.changes) return false;
+        failed = true;
+        this.state.sectionErrors.changes = error && error.message ? error.message : String(error);
+        this.state.lastError = this.state.sectionErrors.changes;
+        this.state.sectionStale.changes = true;
+        return false;
+      } finally {
+        if (generation === this.sectionGenerations.changes) this.state.sectionBusy = this.state.sectionBusy.filter((item) => item !== 'changes');
+        this.render();
+        if (failed) this.focusError();
+      }
+    }
+
+    loadBusinessReviewDetail(proposalGid) {
+      const proposal = (this.state.proposals || []).find((item) => rowGid(item) === normalizeGid(proposalGid));
+      if (!proposal) return false;
+      if (!this.api || typeof this.api.loadBusinessReviewDetail !== 'function' || !this.state.selectedAnalysisRunGid) {
+        this.state.lastError = 'business_review_detail_unavailable';
+        this.render();
+        this.focusError();
+        return false;
+      }
+      const generation = ++this.businessDetailGeneration;
+      return this.runAction('load-business-review-detail', proposal, async () => {
+        let detail;
+        try {
+          detail = await this.api.loadBusinessReviewDetail({
+            analysisRunGid: this.state.selectedAnalysisRunGid, proposalGid: rowGid(proposal),
+            expectedReport: this.state.businessReviewReport,
+          });
+        } catch (error) {
+          if (generation !== this.businessDetailGeneration) return false;
+          throw error;
+        }
+        if (generation !== this.businessDetailGeneration) return false;
+        this.state.businessReviewReport = Object.assign({}, this.state.businessReviewReport || {}, detail.report || {});
+        this.state.selectedBusinessReview = detail.proposal;
+        this.state.businessReviewDraft = { decision: 'approved', reason: '' };
+        return true;
+      });
+    }
+
+    decideBusinessReview(decision, decisionReason) {
+      const proposal = this.state.selectedBusinessReview;
+      if (!proposal || !businessIdentityMatches(proposal, this.state.businessReviewReport)
+        || !this.isSuperAdmin() || !this.api || typeof this.api.decideBusinessReview !== 'function') return false;
+      const reason = String(decisionReason || '').trim();
+      if (!reason) {
+        this.state.lastError = 'decision_reason is required';
+        this.render();
+        this.focusError();
+        return false;
+      }
+      const proposalGid = rowGid(proposal);
+      const rowVersion = String(valueOf(proposal, 'row_version', 'rowVersion') || '');
+      const evidence = proposal.review_evidence || proposal.reviewEvidence || {};
+      const definitionHash = String(valueOf(proposal, 'business_definition_hash', 'businessDefinitionHash') || evidence.definition_hash || '');
+      const idempotencyKey = `business-review-${proposalGid}-${rowVersion}-${decision}`;
+      return this.runAction('decide-business-review', proposal, async () => {
+        await this.api.decideBusinessReview({ proposalGid, rowVersion, definitionHash, decision, decisionReason: reason }, { idempotencyKey, expectedResourceVersion: rowVersion });
+        if (this.state.selectedAnalysisRunGid && typeof this.api.loadBusinessReviewDetail === 'function') await this.loadBusinessReviewDetail(proposalGid);
+        return true;
+      });
+    }
+
+    trustedRoles() {
+      return new Set(list(this.state.trustedRoles).map(String));
+    }
+
+    isSuperAdmin() { return this.trustedRoles().has('super_admin'); }
+
+    focusError() {
+      const error = this.root.querySelector('[data-testid="governance-error"]');
+      if (error && typeof error.focus === 'function') error.focus();
+    }
+
     async runAction(action, entity, executor) {
       const entityGid = normalizeGid(rowGid(entity) || (typeof entity === 'object' ? null : entity));
       const key = `${action}:${entityGid || 'global'}`;
       if (this.state.busyActionKeys.includes(key)) return false;
       this.state.busyActionKeys = this.state.busyActionKeys.concat(key);
       this.render();
+      let failed = false;
       try { return await executor(); }
-      catch (error) { this.state.lastError = error && error.message ? error.message : String(error); return false; }
-      finally { this.state.busyActionKeys = this.state.busyActionKeys.filter((item) => item !== key); this.render(); }
+      catch (error) { failed = true; this.state.lastError = error && error.message ? error.message : String(error); return false; }
+      finally { this.state.busyActionKeys = this.state.busyActionKeys.filter((item) => item !== key); this.render(); if (failed) this.focusError(); }
     }
 
     dispatchAction(action, entityGid) {
@@ -353,9 +579,19 @@
       const actionTarget = targetGid || 'global';
       const idempotencyKey = action === 'run-scan' ? `run-scan-global-${Date.now()}-${++this.scanAttempt}` : `${action}-${actionTarget}`;
       const options = { idempotencyKey, confirmationToken: entity.confirmationToken || entity.confirmation_token, expectedResourceVersion: rowVersion };
-      const payload = action === 'run-scan' ? { codeRevision: 'test-governance-ui' } : (['revoke-waiver', 'decide-review'].includes(action) ? { targetGid, rowVersion } : { targetGid });
+      const expectedWebRevision = this.state.businessReviewReport
+        && this.state.businessReviewReport.source_revisions
+        && this.state.businessReviewReport.source_revisions.web;
+      const payload = action === 'run-scan' ? { codeRevision: 'test-governance-ui' }
+        : action === 'run-analysis' && expectedWebRevision ? { targetGid, webRevision: expectedWebRevision }
+          : (['revoke-waiver', 'decide-review'].includes(action) ? { targetGid, rowVersion } : { targetGid });
       return this.runAction(action, entity, async () => {
         const result = await this.api[method](payload, options);
+        if (action === 'run-analysis') {
+          const data = unwrap(result);
+          const run = data.run || data;
+          this.state.selectedAnalysisRunGid = normalizeGid(run.run_gid || run.runGid);
+        }
         if (action === 'evaluate-release') this.state.releaseGate = unwrap(result).release || unwrap(result);
         if (action === 'run-scan') await this.refresh({ supersede: true });
         return true;
@@ -425,13 +661,80 @@
       return `<section><h2>Finding 中心</h2><p class="finding-summary">根因组 ${escapeHtml(rootTotal)} 个；当前页 ${escapeHtml(findings.length)} 条 Finding。根因键 = 原因类别 + 具体 Capability，便于定位修复对象。</p><div class="filters"><label>搜索 <input data-filter-section="findings" data-filter-key="query" value="${escapeHtml(filters.query || '')}" placeholder="规则、指纹、原因、Capability"></label><label>领域 <select data-filter-section="findings" data-filter-key="domain"><option value="all">全部领域</option>${DOMAINS.map((domain) => `<option value="${domain.id}"${filters.domain === domain.id ? ' selected' : ''}>${escapeHtml(domain.label)}</option>`).join('')}</select></label><label>级别 <select data-filter-section="findings" data-filter-key="severity"><option value="all">全部级别</option><option value="blocking"${filters.severity === 'blocking' ? ' selected' : ''}>blocking</option><option value="critical"${filters.severity === 'critical' ? ' selected' : ''}>critical</option><option value="error"${filters.severity === 'error' ? ' selected' : ''}>error</option><option value="warning"${filters.severity === 'warning' ? ' selected' : ''}>warning</option></select></label><label>NOK 原因类别 <select data-filter-section="findings" data-filter-key="reasonCode"><option value="all">全部原因</option>${reasonCodes.map((code) => `<option value="${escapeHtml(code)}"${filters.reasonCode === code ? ' selected' : ''}>${escapeHtml(reasonLabel(code))}</option>`).join('')}</select></label><button type="button" data-action="clear-section-filter" data-section="findings">清除筛选</button></div>${findings.map((finding) => { const reasonCode = String(finding.reason_code || finding.reasonCode || finding.code || ''); const subject = finding.subject_summary || finding.subjectSummary || (finding.subjectVersionGids || finding.subject_version_gids || []).map(normalizeGid).join('、') || '—'; const rootLabel = finding.root_cause_label || finding.rootCauseLabel || `${reasonLabel(reasonCode)} · ${subject}`; return `<article class="finding"><h3>${escapeHtml(finding.code || finding.findingType || 'finding')} ${statusLabel(finding.status)}</h3><p>根因：${escapeHtml(rootLabel)}${finding.root_cause_count ? `（影响 ${escapeHtml(finding.root_cause_count)} 条证据）` : ''}</p><p>主体：${escapeHtml(subject)}</p><p>领域：${(finding.domains || []).map(escapeHtml).join('、') || '跨领域'}</p><p>严重级别：${escapeHtml(finding.severity || 'warning')}</p><p>原因类别：${escapeHtml(reasonLabel(reasonCode))}</p><p>判定原因：${escapeHtml(finding.reason || '未提供判定原因')}</p><p>证据：${(finding.evidence || []).map(escapeHtml).join('、') || '—'}</p></article>`; }).join('') || '<p class="empty">没有符合条件的 Finding。</p>'}${this.renderPager('findings', Number(this.state.findingTotal || findings.length), this.state.findingPage, pageSize)}</section>`;
     }
 
+    renderBusinessReviewSummary(report) {
+      const sources = report.source_revisions || report.sourceRevisions || {};
+      const maturity = report.maturity_counts || report.maturityCounts || {};
+      const layers = report.layer_counts || report.layerCounts || {};
+      const domains = list(report.affected_domains || report.affectedDomains);
+      const unbound = list(report.unbound_entries || report.unboundEntries);
+      const stateCard = (label, value, falseLabel) => {
+        const known = typeof value === 'boolean';
+        const status = !known ? 'unverified' : value ? 'pass' : falseLabel;
+        const text = !known ? '未返回' : value ? '通过' : falseLabel === 'unverified' ? '未验证' : '未通过';
+        return `<article class="review-state"><b>${label}</b>${statusLabel(status)}<small>${text}</small></article>`;
+      };
+      return `<section class="review-summary" aria-label="业务评审证据绑定"><h3>证据绑定</h3><dl class="review-binding"><dt>Snapshot</dt><dd class="gid">${escapeHtml(report.snapshot_gid || report.snapshotGid || '未返回')}</dd><dt>Backend revision</dt><dd class="gid">${escapeHtml(sources.backend || '未返回')}</dd><dt>Source revision</dt><dd class="gid">${escapeHtml(sources.source || '未返回')}</dd><dt>Web revision</dt><dd class="gid">${escapeHtml(sources.web || '未返回')}</dd></dl><p class="review-counts"><b>Finding 证据行 ${escapeHtml(report.finding_count ?? '未返回')} 条</b> · <b>根因组 ${escapeHtml(report.root_cause_group_count ?? '未返回')} 个</b></p><p class="review-warning">Finding 证据行不等于独立修复任务；请按根因组和共享修复族处理。</p><div class="review-states">${stateCard('机器检查', report.machine_passed, 'fail')}${stateCard('超管批准', report.human_approved, 'fail')}${stateCard('运行验证', report.runtime_verified, 'unverified')}</div><p class="review-warning">机器检查通过不代表整项 Capability 已合规；超管批准与运行验证必须独立满足。</p><div class="review-facts"><article><h4>领域状态</h4><p>${domains.map(escapeHtml).join('、') || '未返回'}</p></article><article><h4>成熟度 L0–L6</h4><p>${Object.entries(maturity).map(([key, value]) => `${escapeHtml(key)}：${escapeHtml(value)}`).join(' · ') || '未返回'}</p></article><article><h4>七层 A–G</h4><p>${Object.entries(layers).map(([key, value]) => `${escapeHtml(key)}：${escapeHtml(value)}`).join(' · ') || '未返回'}</p></article><article><h4>Legacy backlog</h4><p>legacy_pending_review ${escapeHtml(report.legacy_pending_review_count ?? '未返回')}</p></article></div><details class="unbound-entries"><summary>公开但未绑定的入口（${escapeHtml(unbound.length)}）</summary>${unbound.map((item) => `<article><b>${escapeHtml(item.canonical_key || item.canonicalKey)}</b><p>${escapeHtml(item.entry_type || item.entryType)} · ${escapeHtml(item.domain)} · ${escapeHtml(item.location || item.source_path || item.sourcePath)}</p></article>`).join('') || '<p>当前投影未返回条目。</p>'}</details></section>`;
+    }
+
+    renderBusinessReviewQueue() {
+      const queue = this.state.businessReviewQueue || [];
+      const pageSize = Number(this.state.businessQueuePageLimit || 50);
+      const total = Number(this.state.businessReviewReport && this.state.businessReviewReport.review_queue_count || queue.length);
+      const pages = Math.max(1, Math.ceil(total / pageSize));
+      const page = Math.min(pages, Math.max(1, Number(this.state.businessQueuePage || 1)));
+      const items = queue.slice((page - 1) * pageSize, page * pageSize);
+      const busy = this.state.sectionBusy.includes('changes');
+      return `<section class="review-queue" aria-busy="${busy ? 'true' : 'false'}"><h3>风险排序评审队列</h3>${items.map((item) => `<article><b>${escapeHtml(item.capability_key || item.capabilityKey)}</b><p>优先级 ${escapeHtml(item.priority)} · ${escapeHtml(item.domain)} · ${escapeHtml(item.maturity)} · ${escapeHtml(item.reason)}</p></article>`).join('') || '<p class="empty">当前分析未返回评审队列。</p>'}<div class="pager" aria-label="业务评审队列分页"><button type="button" data-action="business-queue-prev"${busy || page <= 1 ? ' disabled' : ''}>上一页</button><span>第 ${page} 页 / 共 ${pages} 页 · 共 ${total} 项</span><button type="button" data-action="business-queue-next"${busy || page >= pages ? ' disabled' : ''}>下一页</button></div></section>`;
+    }
+
+    renderBusinessReviewDetail(proposal) {
+      if (!proposal) return '';
+      if (!businessIdentityMatches(proposal, this.state.businessReviewReport)) {
+        return '<aside class="business-review-detail"><p class="notice" role="alert">评审主体身份与固定 Snapshot 不一致，详情与决定控件已关闭。</p></aside>';
+      }
+      const evidence = proposal.review_evidence || proposal.reviewEvidence || {};
+      const capabilityId = proposal.capability_id || proposal.capabilityId || '未返回';
+      const major = valueOf(proposal, 'major_version', 'majorVersion') || valueOf(evidence, 'major_version', 'majorVersion') || '未返回';
+      const versionGid = valueOf(proposal, 'capability_version_gid', 'capabilityVersionGid') || '未返回';
+      const definitionHash = valueOf(proposal, 'business_definition_hash', 'businessDefinitionHash') || evidence.definition_hash || '未返回';
+      const acceptance = list(evidence.business_acceptance_criteria || evidence.acceptance_criteria);
+      const accepted = list(evidence.accepted_examples);
+      const rejected = list(evidence.rejected_examples);
+      const rules = list(evidence.business_rules);
+      const capabilityKey = evidence.capability_key || `${capabilityId}@${major}`;
+      const report = this.state.businessReviewReport || {};
+      const roots = list(report.root_causes).filter((item) => list(item.capability_keys).includes(capabilityKey));
+      const analysisRelations = list(report.relations).filter((item) => list(item.capability_keys).includes(capabilityKey));
+      const uniqueRelations = (values) => Array.from(new Map(values.map((item) => [item.candidate_hash || item.candidateHash, item])).values());
+      const deterministic = uniqueRelations(list(evidence.deterministic_relation_candidates).concat(analysisRelations.filter((item) => item.source === 'deterministic')));
+      const advisory = uniqueRelations(list(evidence.ai_advisory_relation_candidates).concat(analysisRelations.filter((item) => item.source === 'advisory')));
+      const reviews = list(proposal.reviews);
+      const reviewTotal = Number(proposal.review_total || reviews.length);
+      const historyWarning = proposal.reviews_truncated
+        ? `<p class="review-warning">评审历史共 ${escapeHtml(reviewTotal)} 条；当前仅显示最新 20 条中的 ${escapeHtml(reviews.length)} 条。</p>` : '';
+      const ownerDomains = list(evidence.owner_domains).length ? list(evidence.owner_domains) : [proposal.domain].filter(Boolean);
+      const stale = ['stale', 'expired'].includes(String(proposal.status));
+      const pending = this.state.busyActionKeys.includes(`decide-business-review:${rowGid(proposal)}`);
+      const draft = this.state.businessReviewDraft || { decision: 'approved', reason: '' };
+      const items = (values, empty) => values.length ? `<ul>${values.map((item) => `<li>${escapeHtml(textValue(item))}</li>`).join('')}</ul>` : `<p>${empty}</p>`;
+      const relationCards = (values) => values.map((item) => `<article><b>${escapeHtml(item.relation_type || item.relationType)} · ${escapeHtml(item.candidate_hash || item.candidateHash)}</b><p>${list(item.capability_keys || item.capabilityKeys).map(escapeHtml).join(' ↔ ')}</p><pre>${escapeHtml(textValue(item.evidence || {}))}</pre></article>`).join('') || '<p>无候选。</p>';
+      const decisionForm = this.isSuperAdmin() ? `<fieldset class="review-decision"${stale || pending ? ' disabled' : ''}><legend>超管批准（仅绑定当前 hash 与 row version）</legend><label>决定 <select data-business-decision><option value="approved"${draft.decision === 'approved' ? ' selected' : ''}>approved</option><option value="rejected"${draft.decision === 'rejected' ? ' selected' : ''}>rejected</option><option value="changes_requested"${draft.decision === 'changes_requested' ? ' selected' : ''}>changes_requested</option></select></label><label>理由 <textarea data-business-decision-reason required>${escapeHtml(draft.reason || '')}</textarea></label><button type="button" data-action="decide-business-review" data-entity-gid="${escapeHtml(rowGid(proposal))}"${pending ? ' aria-busy="true"' : ''}>${pending ? '提交中…' : '提交评审决定'}</button></fieldset>` : '<p class="review-warning">只有可信身份中的 super_admin 可以提交评审决定。</p>';
+      return `<aside class="business-review-detail" data-testid="business-review-detail" aria-label="Capability 业务评审详情"><button type="button" class="detail-close" data-action="close-business-review-detail">关闭</button><h3>${escapeHtml(capabilityId)}@${escapeHtml(major)}</h3><p>Version GID ${escapeHtml(versionGid)} · Proposal ${escapeHtml(rowGid(proposal))} · Row version ${escapeHtml(proposal.row_version || proposal.rowVersion || '未返回')}</p><p class="gid">${escapeHtml(definitionHash)}</p>${stale ? '<p class="notice">当前提案已过期；服务端 CAS 会拒绝旧 hash/row version，不能批准。</p>' : ''}<section><h4>业务目的与效果</h4><p>${escapeHtml(evidence.business_effect || '未返回')}</p><h5>验收条件</h5>${items(acceptance, '未返回验收条件。')}<h5>接受示例</h5>${items(accepted, '未返回接受示例。')}<h5>拒绝示例</h5>${items(rejected, '未返回拒绝示例。')}</section><section><h4>不变量与规则</h4>${rules.map((rule) => `<article class="business-rule"><b>${escapeHtml(rule.rule_id)}</b><p>${escapeHtml(rule.statement)} · 适用：${escapeHtml(rule.applies_when)}</p><p>执行：${escapeHtml(rule.enforcement_ref)} · 错误码：${escapeHtml(rule.error_code)}</p><p>测试：${list(rule.test_refs).map(escapeHtml).join('、') || '未返回'}</p></article>`).join('') || `<p>${escapeHtml(evidence.no_business_invariant_reason || '未返回业务规则或无规则理由。')}</p>`}<h5>该版本根因组</h5>${roots.map((item) => `<article><b>${escapeHtml(item.root_cause_key)}</b><p>${escapeHtml(item.finding_count)} 条 Finding · ${escapeHtml(item.remediation_family)} · ${escapeHtml(item.severity)}</p></article>`).join('') || '<p>未返回该版本的根因组。</p>'}</section><section><h4>成熟度</h4><pre>${escapeHtml(textValue(evidence.business_maturity || {}))}</pre></section><section><h4>机器证据（只读 / 已脱敏投影）</h4><pre>${escapeHtml(textValue(evidence.evidence || evidence.redacted_evidence || {}))}</pre></section><section><h4>Owner domains</h4><p>${ownerDomains.map(escapeHtml).join('、') || '未返回'}</p></section><section><h4>确定性关系候选</h4>${relationCards(deterministic)}<p class="review-warning">关系提示只辅助人工判断，绝不会自动批准。</p><h4>AI 辅助建议（不参与自动批准）</h4>${relationCards(advisory)}</section><section><h4>既往追加式评审</h4>${historyWarning}${reviews.map((review) => `<article><b>${escapeHtml(review.decision)} · ${escapeHtml(review.review_gid)}</b><p>${escapeHtml(review.reviewer_gid)}：${escapeHtml(review.decision_reason)}</p></article>`).join('') || '<p>尚无既往评审。</p>'}</section>${decisionForm}</aside>`;
+    }
+
     renderChanges() {
       const canReview = actionsFor(this.state.permissions).includes('decide-review');
       const filters = this.state.sectionFilters.changes || {};
       const proposals = (this.state.proposals || []).filter((proposal) => !filters.query || `${proposal.capability_id || proposal.capabilityId || ''} ${proposal.status || ''}`.toLowerCase().includes(filters.query.toLowerCase()));
       const availability = this.state.sectionMeta.changes;
       const metaNotice = availability && availability.available === false ? `<p class="notice">workflow 数据源未接入：${escapeHtml(availability.reason || 'governance_dependency_unavailable')}。当前仅显示已缓存提案。</p>` : '';
-      return `<section><h2>变更与评审</h2>${metaNotice}<div class="filters"><label>搜索 <input data-filter-section="changes" data-filter-key="query" value="${escapeHtml(filters.query || '')}" placeholder="能力或提案 GID"></label><button type="button" data-action="clear-section-filter" data-section="changes">清除筛选</button></div>${proposals.map((proposal) => { const stale = ['stale', 'expired'].includes(String(proposal.status)); const gid = rowGid(proposal); return `<article class="proposal"><h3>${escapeHtml(proposal.capability_id || proposal.capabilityId || proposal.title || gid)}</h3><p class="gid">Proposal ${escapeHtml(gid)}</p>${statusLabel(proposal.status)}<p>Snapshot：${escapeHtml(normalizeGid(proposal.base_snapshot_gid || proposal.snapshotGid || proposal.snapshot_gid) || this.state.selectedSnapshotGid || '—')}</p><p>版本：${escapeHtml(proposal.capability_version_gid || '—')} · Row version：${escapeHtml(proposal.row_version || proposal.rowVersion || '—')}</p>${stale ? '<p class="notice">哈希或证据已过期，需重新生成提案。</p>' : ''}${canReview ? `<button type="button" data-action="decide-review" data-entity-gid="${escapeHtml(gid)}"${stale ? ' disabled title="哈希已变更，不能审批"' : ''}>决定评审</button>` : ''}</article>`; }).join('') || '<p class="empty">没有待评审变更。</p>'}</section>`;
+      const changesBusy = this.state.sectionBusy.includes('changes');
+      const detailLoadBusy = this.state.busyActionKeys.some((key) => key.startsWith('load-business-review-detail:'));
+      const proposalCards = proposals.map((proposal) => { const stale = ['stale', 'expired'].includes(String(proposal.status)); const gid = rowGid(proposal); const detailBusy = this.state.busyActionKeys.includes(`load-business-review-detail:${gid}`); const business = proposal.review_type === 'business_definition' || proposal.business_definition_hash || proposal.review_evidence; return `<article class="proposal"><h3>${escapeHtml(proposal.capability_id || proposal.capabilityId || proposal.title || gid)}</h3><p class="gid">Proposal ${escapeHtml(gid)}</p>${statusLabel(proposal.status)}<p>Snapshot：${escapeHtml(normalizeGid(proposal.base_snapshot_gid || proposal.snapshotGid || proposal.snapshot_gid) || this.state.selectedSnapshotGid || '—')}</p><p>版本：${escapeHtml(proposal.capability_version_gid || '—')} · Row version：${escapeHtml(proposal.row_version || proposal.rowVersion || '—')}</p>${stale ? '<p class="notice">哈希或证据已过期，需重新生成提案。</p>' : ''}${business ? `<button type="button" data-action="load-business-review-detail" data-entity-gid="${escapeHtml(gid)}"${changesBusy || detailBusy ? ` disabled${detailBusy ? ' aria-busy="true"' : ''}` : ''}>${detailBusy ? '加载中…' : '查看评审证据'}</button>` : canReview ? `<button type="button" data-action="decide-review" data-entity-gid="${escapeHtml(gid)}"${stale || changesBusy ? ' disabled title="当前不可审批"' : ''}>决定评审</button>` : ''}</article>`; }).join('') || '<p class="empty">没有待评审变更。</p>';
+      const report = this.state.businessReviewReport;
+      if (!report) return `<section><h2>变更与评审</h2>${metaNotice}<p class="review-warning">运行业务分析后，此处将显示绑定快照和源码修订的评审队列；当前仅显示提案投影。</p><div class="filters"><label>搜索 <input data-filter-section="changes" data-filter-key="query" value="${escapeHtml(filters.query || '')}" placeholder="能力或提案 GID"></label><button type="button" data-action="clear-section-filter" data-section="changes">清除筛选</button></div>${proposalCards}${this.state.selectedBusinessReview ? this.renderBusinessReviewDetail(this.state.selectedBusinessReview) : ''}</section>`;
+      const proposalPage = (this.state.businessProposalCursorHistory || []).length + 1;
+      return `<section><h2>业务治理评审工作台</h2>${metaNotice}${this.renderBusinessReviewSummary(report)}${this.renderBusinessReviewQueue()}<section class="review-proposals" aria-busy="${changesBusy || detailLoadBusy ? 'true' : 'false'}"><h3>可决定的业务定义提案</h3>${detailLoadBusy ? '<p role="status">正在加载评审详情…</p>' : ''}${proposalCards}<div class="pager" aria-label="业务定义提案分页"><button type="button" data-action="business-proposals-prev"${changesBusy || detailLoadBusy || proposalPage <= 1 ? ' disabled' : ''}>上一页</button><span>第 ${proposalPage} 页（稳定游标）</span><button type="button" data-action="business-proposals-next"${changesBusy || detailLoadBusy || !this.state.businessProposalNextCursor ? ' disabled' : ''}>下一页</button></div></section>${this.state.selectedBusinessReview ? this.renderBusinessReviewDetail(this.state.selectedBusinessReview) : ''}</section>`;
     }
 
     renderHealth() {
@@ -462,7 +765,9 @@
       const scanBusy = this.state.busyActionKeys.includes('run-scan:global');
       const scanLabel = scanBusy ? '扫描中…' : (this.state.selectedSnapshotGid ? '重新扫描' : '首次扫描');
       const sectionError = this.state.sectionErrors && this.state.sectionErrors[this.state.section];
-      this.root.innerHTML = `<div class="governance-shell"><header><div><p class="eyebrow">TEST-ONLY GOVERNANCE CENTER</p><h1>能力治理中心</h1></div><div class="header-actions">${canScan ? `<button class="scan" type="button" data-action="run-scan"${scanBusy ? ' disabled aria-busy="true"' : ''}>${scanLabel}</button>` : ''}<button class="refresh" type="button" data-action="refresh">刷新</button></div></header><nav aria-label="治理中心导航">${this.renderNav()}</nav>${this.state.lastError ? `<p class="notice" role="status">◷ ${escapeHtml(this.state.lastError)}；正在显示上次成功数据。</p>` : ''}${sectionError ? `<p class="notice" role="status">◷ ${escapeHtml(sectionError)}；正在显示上次成功数据。</p>` : ''}<main>${views[this.state.section]}</main></div>`;
+      const detailBusy = this.state.section === 'changes' && this.state.busyActionKeys.some((key) => key.startsWith('load-business-review-detail:'));
+      const sectionBusy = this.state.sectionBusy.includes(this.state.section) || detailBusy;
+      this.root.innerHTML = `<div class="governance-shell"><header><div><p class="eyebrow">CAPABILITY GOVERNANCE CENTER</p><h1>能力治理中心</h1></div><div class="header-actions">${canScan ? `<button class="scan" type="button" data-action="run-scan"${scanBusy ? ' disabled aria-busy="true"' : ''}>${scanLabel}</button>` : ''}<button class="refresh" type="button" data-action="refresh"${sectionBusy ? ' disabled' : ''}>刷新</button></div></header><nav aria-label="治理中心导航">${this.renderNav()}</nav>${this.state.lastError ? `<p class="notice" role="alert" tabindex="-1" data-testid="governance-error">◷ ${escapeHtml(this.state.lastError)}；正在显示上次成功数据。</p>` : ''}${sectionError && sectionError !== this.state.lastError ? `<p class="notice" role="status">◷ ${escapeHtml(sectionError)}；正在显示上次成功数据。</p>` : ''}<main aria-busy="${sectionBusy ? 'true' : 'false'}">${views[this.state.section]}</main></div>`;
     }
   }
 

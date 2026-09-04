@@ -1,5 +1,6 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>能力治理中心（测试）</title><link rel="stylesheet" href="governance.css?v=20260819-health-layout"></head>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>能力治理中心</title>  <link rel="stylesheet" href="/assets/index-f4512495.css">
+</head>
 <body><div id="auth-status" data-testid="auth-status" style="margin:12px 24px 0;padding:8px 12px;border:1px solid #315777;border-radius:7px;background:#102337;color:#d7e7f5;font-size:13px" title="正在确认登录状态">正在确认登录状态…</div><div id="app"></div><script src="/web/core/web_compat.js"></script><script src="/web/core/auth_state.js"></script><script src="governance_model.js"></script><script src="governance_api.js"></script><script src="governance_controller_next.js"></script><script src="governance_controller.js"></script><script>
   (() => {
     const app = document.getElementById('app');
@@ -39,34 +40,42 @@
       return value.data && typeof value.data === 'object' ? value.data : value;
     };
     const readPermissions = (user) => Array.isArray(user && user.permissions) ? user.permissions.slice() : [];
+    const readTrustedRoles = (user) => window.CapabilityGovernanceModel.trustedRolesFromProfile(user);
     const controller = new window.CapabilityGovernanceController({
       root: app,
       api: window.CapabilityGovernanceApi,
-      state: window.CapabilityGovernanceModel.createState({ permissions: readPermissions(readUser()) }),
+      state: window.CapabilityGovernanceModel.createState({
+        permissions: readPermissions(readUser()), trustedRoles: [],
+      }),
     });
     controller.render();
     controller.refresh();
 
     // auth_state.js refreshes /users/me asynchronously. If the iframe was
     // created first, fetch the same trusted profile and update the action matrix.
-    (async () => {
+    const refreshTrustedProfile = async () => {
       const host = parentWindow();
       let fetcher;
       try { fetcher = host._cloudFetch || window._cloudFetch; } catch (_) { fetcher = window._cloudFetch; }
       if (typeof fetcher !== 'function') fetcher = standaloneProfileFetch;
-      if (readPermissions(readUser()).length) return;
       try {
         const profile = profileFrom(await fetcher('/users/me'));
         const permissions = readPermissions(profile);
         renderAuthStatus(profile, 'feishu');
-        if (permissions.length) {
-          controller.state.permissions = permissions;
-          controller.render();
-        }
+        controller.state.permissions = permissions;
+        controller.state.trustedRoles = readTrustedRoles(profile);
+        controller.render();
       } catch (_) { /* dashboard/API error state remains visible */ }
-    })();
+    };
+    refreshTrustedProfile();
     try {
-      parentWindow().addEventListener('ai00-auth-user-updated', () => renderAuthStatus(readUser(), readMode()));
+      parentWindow().addEventListener('ai00-auth-user-updated', () => {
+        const user = readUser();
+        renderAuthStatus(user, readMode());
+        controller.state.permissions = readPermissions(user);
+        controller.render();
+        refreshTrustedProfile();
+      });
     } catch (_) {}
   })();
 </script></body></html>

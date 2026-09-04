@@ -137,6 +137,11 @@ def _normalize_pic_item(item: Any) -> dict[str, str]:
 
 
 def _normalize_pic_list(items: Any) -> list[dict[str, str]]:
+    if isinstance(items, str):
+        try:
+            items = json.loads(items)
+        except (json.JSONDecodeError, ValueError):
+            items = []
     out: list[dict[str, str]] = []
     for item in items or []:
         normalized = _normalize_pic_item(item)

@@ -51,6 +51,15 @@
     return { rows: previousRows || [], staleData: true, lastError: error && error.message ? error.message : String(error || 'load failed') };
   }
 
+  function trustedRolesFromProfile(profile) {
+    const user = profile && typeof profile === 'object' ? profile : {};
+    const values = Array.isArray(user.active_roles) ? user.active_roles.slice() : [];
+    for (const key of ['org_role', 'system_role']) {
+      if (typeof user[key] === 'string' && user[key].trim()) values.push(user[key].trim());
+    }
+    return Array.from(new Set(values.map(String).filter(Boolean))).sort();
+  }
+
   function createState(overrides) {
     return Object.assign({
       selectedSnapshotGid: null,
@@ -89,9 +98,10 @@
       busyActionKeys: [],
       lastError: null,
       permissions: [],
+      trustedRoles: [],
       section: 'overview',
     }, overrides || {});
   }
 
-  return { DOMAINS, SECTIONS, normalizeGid, actionsFor, filterRows, mergeLoadFailure, createState };
+  return { DOMAINS, SECTIONS, normalizeGid, actionsFor, filterRows, mergeLoadFailure, trustedRolesFromProfile, createState };
 });

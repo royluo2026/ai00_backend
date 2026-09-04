@@ -16,3 +16,24 @@
 .finding-summary { color:var(--gc-muted); margin:4px 0 10px; }
 .pager { display:flex; align-items:center; justify-content:center; gap:12px; margin:14px 0 4px; color:var(--gc-muted); }
 .pager button { padding:7px 12px; }
+
+.review-summary,.review-queue,.review-proposals,.business-review-detail { margin-top:14px; padding:16px; border:1px solid var(--gc-line); border-radius:9px; background:var(--gc-panel); }
+.review-binding { grid-template-columns:minmax(140px,.22fr) 1fr; }
+.review-counts,.review-warning { margin-top:10px; }
+.review-warning { color:var(--gc-amber); }
+.review-states,.review-facts { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin-top:12px; }
+.review-state,.review-facts article,.review-queue article,.unbound-entries article,.business-review-detail section,.business-review-detail article { padding:10px; border:1px solid #315777; border-radius:7px; }
+.review-state { display:grid; gap:4px; }
+.review-state small { color:var(--gc-muted); }
+.review-facts h4,.business-review-detail h4,.business-review-detail h5 { margin:0 0 6px; }
+.unbound-entries { margin-top:12px; }
+.unbound-entries summary { cursor:pointer; font-weight:800; }
+.review-queue article,.review-proposals .proposal,.business-review-detail section { margin-top:10px; }
+.business-review-detail { position:relative; border-color:var(--gc-blue); }
+.detail-close { position:absolute; top:12px; right:12px; padding:6px 10px; }
+.business-review-detail pre { max-width:100%; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; color:var(--gc-muted); }
+.review-decision { display:grid; gap:10px; margin-top:14px; border:1px solid var(--gc-blue); }
+.review-decision label { display:grid; gap:5px; font-weight:700; }
+.review-decision textarea { min-height:88px; resize:vertical; color:var(--gc-text); background:#06101c; border:1px solid var(--gc-line); border-radius:5px; padding:8px; font:inherit; }
+textarea:focus-visible,[tabindex="-1"]:focus { outline:3px solid var(--gc-amber); outline-offset:2px; }
+@media (max-width:680px) { .review-binding { grid-template-columns:1fr; } .review-states,.review-facts { grid-template-columns:1fr; } }
