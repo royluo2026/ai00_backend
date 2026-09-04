@@ -112,6 +112,28 @@ def test_publish_forwards_tenant_and_project_scope_to_read_and_write_guards():
     assert repo.publish_version.call_args.kwargs["project_gid"] == "project-1"
 
 
+def test_publish_ignores_client_supplied_provider_and_gateway_metadata():
+    repo = Mock()
+    graph = publishable_graph()
+    graph.capability_bindings[0].authorization_scope = {
+        "provider_ref": "client.evil.provider",
+        "gateway_ref": "client.evil.gateway",
+        "catalog_release_gid": "client-release",
+        "artifact_hash": "sha256:" + "0" * 64,
+    }
+    repo.get_graph.return_value = graph
+    resolver = Mock()
+    resolver.resolve_capability_binding.return_value = trusted_binding()
+    service = OrchestrationService(repo, resolver)
+
+    service.publish("v1", expected_revision=3, actor_gid="u1", tenant_gid="t1", project_gid="p1")
+
+    persisted = repo.publish_version.call_args.kwargs["resolved_bindings"][0]
+    assert persisted["provider_ref"] == "craft.provider"
+    assert persisted["gateway_ref"] == "agent.gateway.v1"
+    assert persisted["catalog_release_gid"] == "release-1"
+
+
 def test_delete_binding_only_removes_agent_owned_binding():
     repo = Mock()
     service = OrchestrationService(repo, Mock())
