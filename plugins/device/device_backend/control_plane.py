@@ -229,7 +229,7 @@ def lease_command(device_gid: str, lease_seconds: int = 60) -> dict | None:
             cur.execute("UPDATE workmanship_runtime_commands SET status='queued', lease_id=NULL, lease_until=NULL, updated_at=NOW() WHERE device_gid=%s AND status='leased' AND lease_until<=NOW() AND expires_at>NOW() AND attempts<3", (device_gid,))
             cur.execute("UPDATE workmanship_runtime_commands SET status='pending_failed', error='lease_retry_limit_reached', updated_at=NOW() WHERE device_gid=%s AND status='leased' AND lease_until<=NOW() AND attempts>=3", (device_gid,))
             cur.execute(
-                "SELECT c.*,d.team_gid FROM workmanship_runtime_commands c JOIN workmanship_runtime_devices d ON d.gid=c.device_gid WHERE c.device_gid=%s AND c.status='queued' AND c.expires_at>NOW() ORDER BY c.created_at LIMIT 1 FOR UPDATE SKIP LOCKED",
+                "SELECT c.*,d.team_gid FROM workmanship_runtime_commands c JOIN workmanship_runtime_devices d ON d.gid=c.device_gid WHERE c.device_gid=%s AND c.status='queued' AND c.expires_at>NOW() ORDER BY c.created_at LIMIT 1 FOR UPDATE",
                 (device_gid,),
             )
             row = cur.fetchone()

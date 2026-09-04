@@ -22,7 +22,7 @@ class AgentCapabilityOutboxRepository:
                 "SELECT * FROM workmanship_agent_capability_outbox WHERE "
                 "(state='pending' AND (next_attempt_at IS NULL OR next_attempt_at<=NOW(6))) OR "
                 "(state='processing' AND lease_expires_at<NOW(6)) "
-                "ORDER BY created_at,event_id LIMIT 1 FOR UPDATE SKIP LOCKED"
+                "ORDER BY created_at,event_id LIMIT 1 FOR UPDATE"
             )
             row = cursor.fetchone()
             if row is None:

@@ -156,7 +156,7 @@ class SimulationConnectorRepository:
                 cursor.execute(
                     "SELECT plan_id,plan_json FROM workmanship_sim_connector_plans "
                     "WHERE connector_id=%s AND status='queued' AND expires_at>NOW(6) "
-                    "ORDER BY created_at LIMIT 1 FOR UPDATE SKIP LOCKED",
+                    "ORDER BY created_at LIMIT 1 FOR UPDATE",
                     (connector_id,),
                 )
                 row = cursor.fetchone()
@@ -275,7 +275,7 @@ class SimulationConnectorRepository:
                     "FROM workmanship_sim_connector_projection_outbox "
                     "WHERE status IN ('pending','retryable_failed') "
                     "AND (next_retry_at IS NULL OR next_retry_at<=NOW(6)) "
-                    "ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1"
+                    "ORDER BY created_at LIMIT 1 FOR UPDATE"
                 )
                 row = cursor.fetchone()
                 if not row:

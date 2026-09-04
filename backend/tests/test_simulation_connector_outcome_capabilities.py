@@ -246,7 +246,7 @@ def test_projection_claim_uses_owner_lease_and_increments_attempt(monkeypatch):
     assert lease.owner == "worker-1"
     assert lease.attempt == 3
     statements = [sql for sql, _params in cursor.executed]
-    assert "FOR UPDATE SKIP LOCKED" in statements[0]
+    assert statements[0].endswith("LIMIT 1 FOR UPDATE")
     assert "lease_owner=%s" in statements[1]
     assert "lease_until=DATE_ADD(NOW(6),INTERVAL %s SECOND)" in statements[1]
 

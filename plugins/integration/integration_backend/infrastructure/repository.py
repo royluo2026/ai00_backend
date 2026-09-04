@@ -474,7 +474,7 @@ class IntegrationRepository:
                     "WHERE r.status='accepted' OR "
                     "(r.status='reconcile_pending' AND r.next_attempt_at<=NOW(6) AND r.attempt_count<3) OR "
                     "(r.status='claimed' AND r.claimed_at < DATE_SUB(NOW(6), INTERVAL 5 MINUTE)) "
-                    "ORDER BY r.created_at,r.run_id LIMIT 1 FOR UPDATE SKIP LOCKED"
+                    "ORDER BY r.created_at,r.run_id LIMIT 1 FOR UPDATE"
                 )
                 row = cur.fetchone()
                 if row is None:

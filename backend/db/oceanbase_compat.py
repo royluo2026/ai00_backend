@@ -145,6 +145,13 @@ def audit_sql(path: Path, sql: str, *, check_postgres: bool = True) -> list[Comp
         name = match.group(1)
         if len(name.encode("utf-8")) > 64:
             issues.append(CompatibilityIssue("OB011", str(path), cleaned.count("\n", 0, match.start()) + 1, f"index name exceeds 64 bytes: {name}"))
+    for match in re.finditer(r"\bSKIP\s+LOCKED\b", cleaned, re.I):
+        issues.append(CompatibilityIssue(
+            "OB012",
+            str(path),
+            cleaned.count("\n", 0, match.start()) + 1,
+            "unsupported OceanBase syntax: SKIP LOCKED",
+        ))
     return issues
 
 

@@ -12,6 +12,8 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from backend.db.oceanbase_compat import verify_live_server
+from backend.db.prefixed_cursor import wrap_connection
+from backend.db.table_prefix import configure_table_prefix
 from backend.db.versioned_migrations import apply_bootstrap_schema, apply_migrations
 
 
@@ -28,7 +30,8 @@ def main() -> int:
         raise SystemExit("AI00_DDL_DB_URL must be a mysql:// URL with an explicit database")
     import pymysql
 
-    conn = pymysql.connect(
+    configure_table_prefix(os.environ.get("TABLE_PREFIX", ""))
+    conn = wrap_connection(pymysql.connect(
         host=parsed.hostname,
         port=parsed.port or 3306,
         user=unquote(parsed.username or ""),
@@ -37,7 +40,7 @@ def main() -> int:
         charset="utf8mb4",
         autocommit=False,
         cursorclass=pymysql.cursors.DictCursor,
-    )
+    ))
     try:
         profile = verify_live_server(conn)
         print(f"OceanBase compatibility verified: {profile['version']} ({profile['compatibility_mode']})")

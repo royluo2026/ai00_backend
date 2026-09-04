@@ -222,7 +222,7 @@ class AgentCapabilityRepository:
                 "i.status='accepted' OR "
                 "(i.status='reconcile_pending' AND i.next_attempt_at<=NOW(6) AND i.attempt_count<3) OR "
                 "(i.status='claimed' AND i.lease_expires_at<NOW(6)) "
-                "ORDER BY i.created_at,i.invocation_id LIMIT 1 FOR UPDATE SKIP LOCKED"
+                "ORDER BY i.created_at,i.invocation_id LIMIT 1 FOR UPDATE"
             )
             row = cur.fetchone()
             if row is None:

@@ -68,6 +68,13 @@ class OceanBaseCompatibilityTests(unittest.TestCase):
         sql = "CREATE TABLE IF NOT EXISTS workmanship_app_ok (message TEXT NOT NULL, status VARCHAR(32) DEFAULT 'open');"
         self.assertEqual(text_columns_with_defaults(sql), [])
 
+    def test_skip_locked_is_rejected_for_runtime_sql(self):
+        issues = audit_sql(
+            Path("worker.py"),
+            "SELECT * FROM workmanship_jobs FOR UPDATE SKIP LOCKED",
+        )
+        self.assertEqual([issue.code for issue in issues], ["OB012"])
+
     def test_minimum_version_and_mysql_mode_are_enforced(self):
         assert_supported_server("OceanBase_CE 4.3.5.1", "MYSQL")
         with self.assertRaises(RuntimeError):
