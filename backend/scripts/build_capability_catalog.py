@@ -120,11 +120,15 @@ def _verified_consumer_refs(capability_id: str, major_version: int = 1) -> tuple
             {"consumer_id": "dist/packages/agent-plugin/web/automation_hub/ai_settings.html", "consumer_type": "web", "version_constraint": ">=1"},
             {"consumer_id": "dist/packages/agent-plugin/web/automation_hub/ai_assistant.js", "consumer_type": "web", "version_constraint": ">=1"},
         ))
-    if capability_id.startswith("agent.orchestration."):
-        consumers.extend((
-            {"consumer_id": "packages/agent-plugin/web/orchestration_center/index.html", "consumer_type": "web", "version_constraint": "==1"},
-            {"consumer_id": "packages/agent-plugin/web/orchestration_center/api.js", "consumer_type": "web", "version_constraint": "==1"},
-        ))
+    if capability_id in {
+        "agent.orchestration.panorama.read",
+        "agent.orchestration.graph.read",
+        "agent.orchestration.metric.read",
+    }:
+        consumers.append({
+            "consumer_id": "packages/agent-plugin/web/orchestration_center/index.html",
+            "consumer_type": "web", "version_constraint": "==1",
+        })
     return tuple(consumers)
 
 

@@ -1,7 +1,7 @@
 {
   "database_name": "ai00_test",
   "isolation_profile": "single_database_domain_tables",
-  "schema_sha256": "sha256:5627421bb0b64c5e1450cce12a245a1e5d7c93c19ddcae1416f907f39fbd93aa",
+  "schema_sha256": "sha256:c365506653358578e88b9204f0c20b3114b9c77df75b70172f10b2fb92eb23ba",
   "schema_version": 1,
   "tables": [
     {
@@ -2978,7 +2978,7 @@
           "name": "tenant_gid",
           "nullable": false,
           "sources": [
-            "backend/db/migrations/domains/agent/0007_agent_orchestration_mvp.sql"
+            "backend/db/migrations/domains/agent/0010_agent_orchestration_scope_backfill.sql"
           ]
         },
         {

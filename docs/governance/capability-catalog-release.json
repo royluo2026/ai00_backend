@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_09f1c9d790ff36d54188ce27f40c64af",
-  "catalog_hash": "sha256:09f1c9d790ff36d54188ce27f40c64afc7dd255919d4be69472388d49d7a34f4",
+  "release_id": "rel_945ad3c1048168e917667349a9916b8b",
+  "catalog_hash": "sha256:945ad3c1048168e917667349a9916b8bd142ec529cbb3c12d83fed7e6e37ae25",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -9209,19 +9209,8 @@
         "mode": "provider",
         "boundary": "owning_domain"
       },
-      "consumer_refs": [
-        {
-          "consumer_id": "packages/agent-plugin/web/orchestration_center/index.html",
-          "consumer_type": "web",
-          "version_constraint": "==1"
-        },
-        {
-          "consumer_id": "packages/agent-plugin/web/orchestration_center/api.js",
-          "consumer_type": "web",
-          "version_constraint": "==1"
-        }
-      ],
-      "no_consumer_reason": null,
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
       "provider_ref": "agent.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/agent.orchestration.binding.delete:invoke"
@@ -11245,11 +11234,6 @@
           "consumer_id": "packages/agent-plugin/web/orchestration_center/index.html",
           "consumer_type": "web",
           "version_constraint": "==1"
-        },
-        {
-          "consumer_id": "packages/agent-plugin/web/orchestration_center/api.js",
-          "consumer_type": "web",
-          "version_constraint": "==1"
         }
       ],
       "no_consumer_reason": null,
@@ -12493,19 +12477,8 @@
         "mode": "provider",
         "boundary": "owning_domain"
       },
-      "consumer_refs": [
-        {
-          "consumer_id": "packages/agent-plugin/web/orchestration_center/index.html",
-          "consumer_type": "web",
-          "version_constraint": "==1"
-        },
-        {
-          "consumer_id": "packages/agent-plugin/web/orchestration_center/api.js",
-          "consumer_type": "web",
-          "version_constraint": "==1"
-        }
-      ],
-      "no_consumer_reason": null,
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
       "provider_ref": "agent.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/agent.orchestration.graph.save:invoke"
@@ -13052,11 +13025,6 @@
       "consumer_refs": [
         {
           "consumer_id": "packages/agent-plugin/web/orchestration_center/index.html",
-          "consumer_type": "web",
-          "version_constraint": "==1"
-        },
-        {
-          "consumer_id": "packages/agent-plugin/web/orchestration_center/api.js",
           "consumer_type": "web",
           "version_constraint": "==1"
         }
@@ -13606,11 +13574,6 @@
           "consumer_id": "packages/agent-plugin/web/orchestration_center/index.html",
           "consumer_type": "web",
           "version_constraint": "==1"
-        },
-        {
-          "consumer_id": "packages/agent-plugin/web/orchestration_center/api.js",
-          "consumer_type": "web",
-          "version_constraint": "==1"
         }
       ],
       "no_consumer_reason": null,
@@ -14075,19 +14038,8 @@
         "mode": "provider",
         "boundary": "owning_domain"
       },
-      "consumer_refs": [
-        {
-          "consumer_id": "packages/agent-plugin/web/orchestration_center/index.html",
-          "consumer_type": "web",
-          "version_constraint": "==1"
-        },
-        {
-          "consumer_id": "packages/agent-plugin/web/orchestration_center/api.js",
-          "consumer_type": "web",
-          "version_constraint": "==1"
-        }
-      ],
-      "no_consumer_reason": null,
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
       "provider_ref": "agent.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/agent.orchestration.run.start:invoke"
@@ -14569,19 +14521,8 @@
         "mode": "provider",
         "boundary": "owning_domain"
       },
-      "consumer_refs": [
-        {
-          "consumer_id": "packages/agent-plugin/web/orchestration_center/index.html",
-          "consumer_type": "web",
-          "version_constraint": "==1"
-        },
-        {
-          "consumer_id": "packages/agent-plugin/web/orchestration_center/api.js",
-          "consumer_type": "web",
-          "version_constraint": "==1"
-        }
-      ],
-      "no_consumer_reason": null,
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
       "provider_ref": "agent.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/agent.orchestration.run.transition:invoke"
@@ -15053,19 +14994,8 @@
         "mode": "provider",
         "boundary": "owning_domain"
       },
-      "consumer_refs": [
-        {
-          "consumer_id": "packages/agent-plugin/web/orchestration_center/index.html",
-          "consumer_type": "web",
-          "version_constraint": "==1"
-        },
-        {
-          "consumer_id": "packages/agent-plugin/web/orchestration_center/api.js",
-          "consumer_type": "web",
-          "version_constraint": "==1"
-        }
-      ],
-      "no_consumer_reason": null,
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
       "provider_ref": "agent.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/agent.orchestration.version.publish:invoke"
@@ -303991,5 +303921,5 @@
       "artifact_hash": "sha256:f35abbc9450b6fc1f91a5bb2cf73eb59e3cf019ccb0af0879cd3823e868b6097"
     }
   ],
-  "created_at": "2026-09-04T09:11:14.796791Z"
+  "created_at": "2026-09-04T09:37:59.899003Z"
 }
