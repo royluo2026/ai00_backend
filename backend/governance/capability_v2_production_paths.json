@@ -8,6 +8,30 @@
       "contract": "factory.resource.read@1",
       "source_modules": ["plugins/craft/craft_backend/infrastructure/domain_clients.py"],
       "test_node": "plugins/craft/tests/test_bop_domain_sharing.py::test_bop_binding_uses_gateway"
+    },
+    {
+      "path_id": "agent-orchestration-governed-read",
+      "caller": "agent-orchestration-web",
+      "callee": "agent",
+      "contract": "agent.orchestration.panorama.read@1",
+      "source_modules": ["plugins/agent/agent_backend/capabilities/__init__.py", "plugins/agent/agent_backend/orchestration/provider.py"],
+      "test_node": "backend/tests/test_orchestration_gateway_main_e2e.py::test_backend_main_gateway_provider_repository_for_orchestration"
+    },
+    {
+      "path_id": "agent-orchestration-governed-graph-read",
+      "caller": "agent-orchestration-web",
+      "callee": "agent",
+      "contract": "agent.orchestration.graph.read@1",
+      "source_modules": ["plugins/agent/agent_backend/capabilities/__init__.py", "plugins/agent/agent_backend/orchestration/provider.py", "plugins/agent/agent_backend/orchestration/repository.py"],
+      "test_node": "backend/tests/test_orchestration_gateway_main_e2e.py::test_backend_main_gateway_provider_repository_for_orchestration"
+    },
+    {
+      "path_id": "agent-orchestration-governed-metric-read",
+      "caller": "agent-orchestration-web",
+      "callee": "agent",
+      "contract": "agent.orchestration.metric.read@1",
+      "source_modules": ["plugins/agent/agent_backend/capabilities/__init__.py", "plugins/agent/agent_backend/orchestration/provider.py", "plugins/agent/agent_backend/orchestration/repository.py"],
+      "test_node": "backend/tests/test_orchestration_gateway_main_e2e.py::test_backend_main_gateway_provider_repository_for_orchestration"
     }
   ],
   "async": [

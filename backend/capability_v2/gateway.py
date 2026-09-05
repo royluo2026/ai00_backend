@@ -345,6 +345,8 @@ class CapabilityGatewayService:
             async_operation_id=(
                 async_operation.operation_id if async_operation is not None else None
             ),
+            permissions=authorization.permissions if authorization is not None else (),
+            resource_refs=authorization.resource_refs if authorization is not None else (),
         )
         capability_key = f"{descriptor.id}@{descriptor.major_version}"
         started = time.perf_counter()
@@ -978,6 +980,8 @@ class CapabilityGatewayService:
         self, envelope: InvocationEnvelope, *, operation_id: str | None = None,
         outcome_operation_id: str | None = None,
         async_operation_id: str | None = None,
+        permissions: tuple[str, ...] = (),
+        resource_refs: tuple[str, ...] = (),
     ) -> CapabilityContext:
         actor = envelope.identity.actor
         return CapabilityContext(
@@ -988,6 +992,8 @@ class CapabilityGatewayService:
             request_id=envelope.request_id,
             confirmation_token=envelope.approval_reference,
             idempotency_key=envelope.idempotency_key,
+            permissions=permissions,
+            resource_refs=resource_refs,
             operation_id=operation_id,
             outcome_operation_id=outcome_operation_id,
             async_operation_id=async_operation_id,

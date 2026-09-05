@@ -8,7 +8,7 @@ Confirm or execute bounded GBOP/PBOM navigation auto-link changes.
 - 不适用：The request only reads navigation projections or mutates unrelated GBOP catalog objects.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_af8416a36dceaafab609f21a76c7884c`
+- Catalog Release：`rel_052a820799b9df56f233d3475547c8fa`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -94,7 +94,7 @@ Confirm or execute bounded GBOP/PBOM navigation auto-link changes.
 ```json
 {
   "capability_id": "craft.gbop.navigation.change.apply",
-  "catalog_release": "rel_af8416a36dceaafab609f21a76c7884c",
+  "catalog_release": "rel_052a820799b9df56f233d3475547c8fa",
   "major_version": 1,
   "payload": {
     "operation": "confirm",

@@ -1491,6 +1491,190 @@
         "plugins/agent/agent_backend/capabilities/contracts.py"
       ]
     },
+    "capability:agent.orchestration.binding.delete": {
+      "function_id": "capability:agent.orchestration.binding.delete",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.orchestration.binding.delete",
+      "exposure": "Web/REST",
+      "automation_level": "assisted",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "confidential",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/agent/agent_backend/capabilities/contracts.py",
+        "plugins/agent/agent_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:agent.orchestration.graph.read": {
+      "function_id": "capability:agent.orchestration.graph.read",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.orchestration.graph.read",
+      "exposure": "Web/REST",
+      "automation_level": "assisted",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "confidential",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/agent/agent_backend/capabilities/contracts.py",
+        "plugins/agent/agent_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:agent.orchestration.graph.save": {
+      "function_id": "capability:agent.orchestration.graph.save",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.orchestration.graph.save",
+      "exposure": "Web/REST",
+      "automation_level": "assisted",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "confidential",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/agent/agent_backend/capabilities/contracts.py",
+        "plugins/agent/agent_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:agent.orchestration.metric.read": {
+      "function_id": "capability:agent.orchestration.metric.read",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.orchestration.metric.read",
+      "exposure": "Web/REST",
+      "automation_level": "assisted",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "confidential",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/agent/agent_backend/capabilities/contracts.py",
+        "plugins/agent/agent_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:agent.orchestration.panorama.read": {
+      "function_id": "capability:agent.orchestration.panorama.read",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.orchestration.panorama.read",
+      "exposure": "Web/REST",
+      "automation_level": "assisted",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "confidential",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/agent/agent_backend/capabilities/contracts.py",
+        "plugins/agent/agent_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:agent.orchestration.run.start": {
+      "function_id": "capability:agent.orchestration.run.start",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.orchestration.run.start",
+      "exposure": "Web/REST",
+      "automation_level": "assisted",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "confidential",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/agent/agent_backend/capabilities/contracts.py",
+        "plugins/agent/agent_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:agent.orchestration.run.transition": {
+      "function_id": "capability:agent.orchestration.run.transition",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.orchestration.run.transition",
+      "exposure": "Web/REST",
+      "automation_level": "assisted",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "confidential",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/agent/agent_backend/capabilities/contracts.py",
+        "plugins/agent/agent_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:agent.orchestration.version.publish": {
+      "function_id": "capability:agent.orchestration.version.publish",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.orchestration.version.publish",
+      "exposure": "Web/REST",
+      "automation_level": "assisted",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "confidential",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/agent/agent_backend/capabilities/contracts.py",
+        "plugins/agent/agent_backend/capabilities/provider.py"
+      ]
+    },
     "capability:agent.run.change.apply": {
       "function_id": "capability:agent.run.change.apply",
       "domain": "Agent",

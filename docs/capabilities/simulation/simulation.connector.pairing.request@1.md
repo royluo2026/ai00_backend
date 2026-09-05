@@ -8,7 +8,7 @@ Request a five-minute Connector browser pairing code.
 - 不适用：The installation already has a valid binding.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
-- Catalog Release：`rel_af8416a36dceaafab609f21a76c7884c`
+- Catalog Release：`rel_052a820799b9df56f233d3475547c8fa`
 - Schema 精度：`typed`
 - 暂未开放原因：`experimental_lifecycle`
 
@@ -117,7 +117,7 @@ Request a five-minute Connector browser pairing code.
 ```json
 {
   "capability_id": "simulation.connector.pairing.request",
-  "catalog_release": "rel_af8416a36dceaafab609f21a76c7884c",
+  "catalog_release": "rel_052a820799b9df56f233d3475547c8fa",
   "major_version": 1,
   "payload": {
     "device_name": "example",

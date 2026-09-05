@@ -8,7 +8,7 @@ List governed access grants for a document the caller administers.
 - 不适用：Only document content is required.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_af8416a36dceaafab609f21a76c7884c`
+- Catalog Release：`rel_052a820799b9df56f233d3475547c8fa`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -86,7 +86,7 @@ List governed access grants for a document the caller administers.
 ```json
 {
   "capability_id": "knowledge.document.acl.list",
-  "catalog_release": "rel_af8416a36dceaafab609f21a76c7884c",
+  "catalog_release": "rel_052a820799b9df56f233d3475547c8fa",
   "major_version": 1,
   "payload": {
     "document_gid": "example"

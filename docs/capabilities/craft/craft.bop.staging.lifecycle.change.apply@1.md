@@ -8,7 +8,7 @@ Promote a BOP staging item into the main tree or demote an entry into staging.
 - 不适用：The request edits staging metadata, copies a hierarchy, or changes version lifecycle state.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_af8416a36dceaafab609f21a76c7884c`
+- Catalog Release：`rel_052a820799b9df56f233d3475547c8fa`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -107,7 +107,7 @@ Promote a BOP staging item into the main tree or demote an entry into staging.
 ```json
 {
   "capability_id": "craft.bop.staging.lifecycle.change.apply",
-  "catalog_release": "rel_af8416a36dceaafab609f21a76c7884c",
+  "catalog_release": "rel_052a820799b9df56f233d3475547c8fa",
   "major_version": 1,
   "payload": {
     "operation": "demote"

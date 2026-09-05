@@ -100,9 +100,15 @@ def test_applied_0005_upgrades_through_0006_without_checksum_rewrite():
 
     applied = apply_domain_migrations(connection, manifest, migrations)
 
-    assert applied == ("0006",)
+    # An already-applied 0005 must upgrade through every subsequent Agent
+    # migration.  In particular, orchestration 0007–0009 must not be skipped
+    # just because the legacy outbox upgrade was the original test fixture.
+    assert applied == tuple(item.migration_id for item in migrations if item.migration_id > "0005")
     assert connection.ledger["0005"]["checksum"] == old_checksum
     assert connection.ledger["0006"]["checksum"] == migration_0006.checksum
+    for item in migrations:
+        if item.migration_id > "0006":
+            assert connection.ledger[item.migration_id]["checksum"] == item.checksum
     assert {
         "outcome_operation_id", "async_operation_id", "major_version",
         "lease_owner", "lease_token", "lease_expires_at", "last_error",

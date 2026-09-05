@@ -13,6 +13,10 @@ EXPECTED = {
     "agent.memory.change.apply", "agent.memory.read", "agent.runtime.config.read", "agent.tool_catalog.read", "agent.script.generate",
     "agent.run.change.apply", "agent.run.read", "agent.session.change.apply", "agent.session.read",
     "agent.skill.change.apply", "agent.skill.read",
+    "agent.orchestration.panorama.read", "agent.orchestration.graph.read",
+    "agent.orchestration.graph.save", "agent.orchestration.version.publish",
+    "agent.orchestration.binding.delete", "agent.orchestration.run.start",
+    "agent.orchestration.run.transition", "agent.orchestration.metric.read",
 }
 ROOT = Path(__file__).parents[3]
 
@@ -24,19 +28,34 @@ def test_agent_provider_matches_frozen_review_and_is_stable():
     registry = Registry(); register_capabilities(registry)
     assert {spec.id for spec, _ in registry.items} == EXPECTED
     assert {descriptor.owner_domain for _, descriptor in registry.items} == {"agent"}
-    assert all(descriptor.lifecycle_status == "stable" for _, descriptor in registry.items)
+    orchestration_writes = {
+        "agent.orchestration.graph.save", "agent.orchestration.version.publish",
+        "agent.orchestration.binding.delete", "agent.orchestration.run.start",
+        "agent.orchestration.run.transition",
+    }
+    assert all(
+        descriptor.lifecycle_status.value == ("experimental" if spec.id in orchestration_writes else "stable")
+        for spec, descriptor in registry.items
+    )
+    assert all(
+        any(descriptor.exposure.model_dump().values()) if spec.id not in orchestration_writes else not any(descriptor.exposure.model_dump().values())
+        for spec, descriptor in registry.items
+    )
+    assert all(
+        descriptor.no_consumer_reason for spec, descriptor in registry.items if spec.id in orchestration_writes
+    )
     model_hidden = {
         "agent.interaction.chat.change.apply",
         "agent.catalog_tool.confirm.apply",
         "agent.runtime.config.read",
     }
     assert all(
-        descriptor.exposure.plugin == (spec.id != "agent.catalog_tool.confirm.apply")
+        descriptor.exposure.plugin == (spec.id not in orchestration_writes and spec.id != "agent.catalog_tool.confirm.apply")
         for spec, descriptor in registry.items
     )
     assert all(
-        descriptor.exposure.agent == (spec.id not in model_hidden)
-        and descriptor.exposure.mcp == (spec.id not in model_hidden)
+        descriptor.exposure.agent == (spec.id not in orchestration_writes and spec.id not in model_hidden)
+        and descriptor.exposure.mcp == (spec.id not in orchestration_writes and spec.id not in model_hidden)
         for spec, descriptor in registry.items
     )
     chat_versions = {

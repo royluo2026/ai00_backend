@@ -8,7 +8,7 @@ Execute Project Management operation item_entries.replace.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_af8416a36dceaafab609f21a76c7884c`
+- Catalog Release：`rel_052a820799b9df56f233d3475547c8fa`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -329,7 +329,7 @@ Execute Project Management operation item_entries.replace.
 ```json
 {
   "capability_id": "project.list.change.apply.atomic.item_entries_replace",
-  "catalog_release": "rel_af8416a36dceaafab609f21a76c7884c",
+  "catalog_release": "rel_052a820799b9df56f233d3475547c8fa",
   "major_version": 1,
   "payload": {
     "arguments": {}

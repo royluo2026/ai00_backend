@@ -83,6 +83,10 @@ class CapabilityContext(BaseModel):
     team_gid: str | None = None
     confirmation_token: str | None = None
     permissions: tuple[str, ...] = ()
+    # Server-derived resource references authorized by the fixed Gateway.
+    # Providers must never treat a caller-supplied project_gid as membership
+    # evidence on its own.
+    resource_refs: tuple[str, ...] = ()
     active_roles: tuple[str, ...] = ()
     outcome_operation_id: str | None = None
     async_operation_id: str | None = None

@@ -64,6 +64,15 @@ def _verified_consumer_refs(capability_id: str, major_version: int = 1) -> tuple
             "consumer_type": "web",
             "version_constraint": ">=1",
         })
+        # The governed admin hub uses the same project scope capability to
+        # populate its orchestration-center selector.  Keep this reference
+        # authoritative here so the generated catalog proves the consumer
+        # rather than relying on a demo/local-state path.
+        consumers.append({
+            "consumer_id": "web/admin_hub/index.html",
+            "consumer_type": "web",
+            "version_constraint": ">=1",
+        })
     if capability_id == "craft.bop.version.list":
         consumers.append({
             "consumer_id": "web/my_files/my_files.js",
@@ -120,6 +129,15 @@ def _verified_consumer_refs(capability_id: str, major_version: int = 1) -> tuple
             {"consumer_id": "dist/packages/agent-plugin/web/automation_hub/ai_settings.html", "consumer_type": "web", "version_constraint": ">=1"},
             {"consumer_id": "dist/packages/agent-plugin/web/automation_hub/ai_assistant.js", "consumer_type": "web", "version_constraint": ">=1"},
         ))
+    if capability_id in {
+        "agent.orchestration.panorama.read",
+        "agent.orchestration.graph.read",
+        "agent.orchestration.metric.read",
+    }:
+        consumers.append({
+            "consumer_id": "packages/agent-plugin/web/orchestration_center/index.html",
+            "consumer_type": "web", "version_constraint": "==1",
+        })
     return tuple(consumers)
 
 

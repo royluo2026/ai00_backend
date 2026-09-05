@@ -36,6 +36,11 @@ SCALAR = {"anyOf": [
     {"type": "boolean"}, {"type": "null"},
 ]}
 VALUE = {"anyOf": [SCALAR, {"type": "array", "maxItems": 64, "items": SCALAR}]}
+BOUNDED_MAP = {
+    "type": "object", "maxProperties": 64,
+    "patternProperties": {"^[A-Za-z][A-Za-z0-9_.:-]{0,127}$": VALUE},
+    "additionalProperties": False,
+}
 NAMED_VALUE = obj({
     "name": INPUT_NAME,
     "value": VALUE,
@@ -106,6 +111,10 @@ CAPABILITY_IDS = (
     "agent.skill.change.apply", "agent.skill.read",
     "agent.workflow.node.test.execute", "agent.canvas.options.resolve",
     "agent.canvas.execution.start", "agent.canvas.execution.resume",
+    "agent.orchestration.panorama.read", "agent.orchestration.graph.read",
+    "agent.orchestration.graph.save", "agent.orchestration.version.publish",
+    "agent.orchestration.binding.delete", "agent.orchestration.run.start",
+    "agent.orchestration.run.transition", "agent.orchestration.metric.read",
 )
 INPUT_SCHEMAS = {capability_id: INPUT for capability_id in CAPABILITY_IDS}
 OUTPUT_SCHEMAS = {capability_id: OUTPUT for capability_id in CAPABILITY_IDS}
@@ -120,6 +129,85 @@ OUTPUT_SCHEMAS["agent.tool_catalog.read"] = obj({
     "write_no_confirm": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}},
     "system": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}},
     "total": {"type": "integer", "minimum": 0},
+})
+
+_ORCHESTRATION_PROPERTIES = {
+    "tenant_gid": STRING, "project_gid": STRING, "panorama_gid": STRING,
+    "version_gid": STRING, "binding_gid": STRING, "run_gid": STRING,
+    "period_key": STRING, "target_status": STRING,
+    "expected_revision": REVISION, "limit": {"type": "integer", "minimum": 1, "maximum": 100},
+    "graph": {"type": "object", "additionalProperties": False},
+    "frozen_context": BOUNDED_MAP,
+    "payload": BOUNDED_MAP,
+}
+def _orch_input(*required: str) -> dict:
+    # Tenant is derived from the authenticated Gateway identity.  The
+    # optional payload field is retained only for mismatch detection; it is
+    # never used as an authority source.
+    return obj(_ORCHESTRATION_PROPERTIES, required=("project_gid", *required))
+
+_ORCHESTRATION_INPUT = _orch_input()
+_ORCHESTRATION_ITEM = obj({
+    "gid": STRING, "name": STRING, "current_version_gid": {"anyOf": [STRING, {"type": "null"}]},
+    "revision": REVISION, "updated_at": STRING,
+}, required=("gid", "name", "current_version_gid", "revision", "updated_at"))
+_GRAPH_OUTPUT = obj({
+    "mode": STRING,
+    "axis": obj({"x_items": {"type": "array", "maxItems": 100, "items": STRING}, "y_items": {"type": "array", "maxItems": 100, "items": STRING}}),
+    "nodes": {"type": "array", "maxItems": 500, "items": obj({"gid": STRING, "node_key": STRING, "title": STRING, "x_item_key": STRING, "y_item_key": STRING, "objective": {"type": "string"}, "owner_ref": {"type": "string"}, "inputs": {"type": "array", "maxItems": 64, "items": obj({"name": STRING, "value": VALUE})}, "outputs": {"type": "array", "maxItems": 128, "items": obj({"name": STRING, "value": VALUE})}, "acceptance_criteria": {"type": "array", "maxItems": 100, "items": STRING}, "governance_status": obj({"machine_passed": {"type": ["boolean", "null"]}, "human_approved": {"type": ["boolean", "null"]}, "runtime_verified": {"type": ["boolean", "null"]}}, required=("machine_passed", "human_approved", "runtime_verified")), "position": obj({"x": {"type": "number"}, "y": {"type": "number"}})})},
+    "edges": {"type": "array", "maxItems": 2000, "items": obj({"gid": STRING, "edge_type": STRING, "source_node_gid": STRING, "target_node_gid": STRING, "label": {"type": "string"}, "route_points": {"type": "array", "maxItems": 100, "items": obj({"x": {"type": "number"}, "y": {"type": "number"}})}})},
+    "items": {"type": "array", "maxItems": 2000, "items": obj({"gid": STRING, "item_type": STRING, "title": STRING, "business_node_gid": {"type": ["string", "null"]}, "sequence_no": {"type": "integer"}, "config": BOUNDED_MAP}, required=("gid", "item_type", "title", "business_node_gid", "sequence_no", "config"))},
+    "item_edges": {"type": "array", "maxItems": 2000, "items": obj({"gid": STRING, "source_item_gid": STRING, "target_item_gid": STRING, "relation_type": STRING, "sequence_no": {"type": "integer"}})},
+    "capability_bindings": {"type": "array", "maxItems": 4000, "items": obj({"gid": STRING, "source_item_gid": STRING, "capability_version_gid": STRING, "purpose": STRING, "input_mapping": BOUNDED_MAP, "output_mapping": BOUNDED_MAP, "authorization_scope": BOUNDED_MAP, "timeout_seconds": {"type": "integer"}, "retry_policy": BOUNDED_MAP, "fallback_policy": BOUNDED_MAP, "evidence_policy": BOUNDED_MAP}, required=("gid", "source_item_gid", "capability_version_gid", "purpose", "input_mapping", "output_mapping", "authorization_scope", "timeout_seconds", "retry_policy", "fallback_policy", "evidence_policy"))},
+    "context_bindings": {"type": "array", "maxItems": 4000, "items": obj({"gid": STRING, "source_item_gid": STRING, "ref_type": STRING, "ref_gid": STRING, "ref_version": {"type": ["string", "null"]}, "snapshot_gid": {"type": ["string", "null"]}, "purpose": STRING})},
+})
+_ORCHESTRATION_OUTPUT = obj({
+    "graph": _GRAPH_OUTPUT,
+    "items": {"type": "array", "maxItems": 100, "items": _ORCHESTRATION_ITEM},
+    "revision": REVISION, "deleted": {"type": "boolean"},
+    "binding_gid": STRING, "run_gid": STRING, "status": STRING,
+    "sequence_no": {"type": "integer", "minimum": 1},
+    "version_gid": STRING, "panorama_gid": STRING,
+    "last_sequence_no": {"type": "integer", "minimum": 0},
+    "total_workload_hours": {"type": "number"},
+    "effective_agent_workload_hours": {"type": "number"},
+    "effective_intelligent_work_rate": {"type": "number"},
+    "automated_workflow_count": {"type": "integer", "minimum": 0},
+    "total_workflow_count": {"type": "integer", "minimum": 0},
+    "automation_ratio": {"type": "number"},
+    "period_key": STRING, "calculated_at": STRING,
+})
+for _id in CAPABILITY_IDS:
+    if _id.startswith("agent.orchestration."):
+        INPUT_SCHEMAS[_id] = _ORCHESTRATION_INPUT
+        OUTPUT_SCHEMAS[_id] = _ORCHESTRATION_OUTPUT
+INPUT_SCHEMAS.update({
+    "agent.orchestration.panorama.read": _orch_input(),
+    "agent.orchestration.graph.read": _orch_input("version_gid"),
+    "agent.orchestration.graph.save": _orch_input("version_gid", "expected_revision", "graph"),
+    "agent.orchestration.version.publish": _orch_input("version_gid", "expected_revision"),
+    "agent.orchestration.binding.delete": _orch_input("binding_gid"),
+    "agent.orchestration.run.start": _orch_input("panorama_gid", "version_gid"),
+    "agent.orchestration.run.transition": _orch_input("run_gid", "target_status"),
+    "agent.orchestration.metric.read": _orch_input("panorama_gid", "period_key"),
+})
+# The graph draft is a bounded, closed DTO; arbitrary JSON blobs are not
+# accepted at the orchestration boundary.
+_GRAPH_SAVE_INPUT = dict(_orch_input("version_gid", "expected_revision", "graph"))
+_GRAPH_SAVE_INPUT["properties"] = dict(_GRAPH_SAVE_INPUT["properties"])
+_GRAPH_SAVE_INPUT["properties"]["graph"] = _GRAPH_OUTPUT
+INPUT_SCHEMAS["agent.orchestration.graph.save"] = _GRAPH_SAVE_INPUT
+# Each handler exposes only the fields it actually returns, and every field is
+# required so a committed mutation cannot be mistaken for a partial response.
+OUTPUT_SCHEMAS.update({
+    "agent.orchestration.panorama.read": obj({"items": {"type": "array", "maxItems": 100, "items": _ORCHESTRATION_ITEM}}, required=("items",)),
+    "agent.orchestration.graph.read": obj({"graph": _GRAPH_OUTPUT}, required=("graph",)),
+    "agent.orchestration.graph.save": obj({"revision": REVISION}, required=("revision",)),
+    "agent.orchestration.version.publish": obj({"version_gid": STRING, "status": STRING, "revision": REVISION}, required=("version_gid", "status", "revision")),
+    "agent.orchestration.binding.delete": obj({"deleted": {"type": "boolean"}, "binding_gid": STRING}, required=("deleted", "binding_gid")),
+    "agent.orchestration.run.start": obj({"run_gid": STRING}, required=("run_gid",)),
+    "agent.orchestration.run.transition": obj({"status": STRING, "event_gid": STRING, "run_gid": STRING, "sequence_no": {"type": "integer", "minimum": 1}}, required=("status", "event_gid", "run_gid", "sequence_no")),
+    "agent.orchestration.metric.read": obj({"panorama_gid": STRING, "version_gid": STRING, "period_key": STRING, "total_workload_hours": {"type": "number"}, "effective_agent_workload_hours": {"type": "number"}, "effective_intelligent_work_rate": {"type": "number"}, "automated_workflow_count": {"type": "integer", "minimum": 0}, "total_workflow_count": {"type": "integer", "minimum": 0}, "automation_ratio": {"type": "number"}, "calculated_at": STRING}, required=("panorama_gid", "version_gid", "period_key", "total_workload_hours", "effective_agent_workload_hours", "effective_intelligent_work_rate", "automated_workflow_count", "total_workflow_count", "automation_ratio", "calculated_at")),
 })
 INPUT_SCHEMAS["agent.workflow.node.test.execute"] = obj({
     "flow_gid": IDENTITY, "node_id": IDENTITY, "input_values": INPUT_VALUES,

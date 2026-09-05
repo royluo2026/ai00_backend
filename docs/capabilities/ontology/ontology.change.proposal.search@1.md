@@ -8,7 +8,7 @@ Search proposal metadata by governed status.
 - 不适用：A proposal GID is known.
 - 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_af8416a36dceaafab609f21a76c7884c`
+- Catalog Release：`rel_052a820799b9df56f233d3475547c8fa`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -79,7 +79,7 @@ Search proposal metadata by governed status.
 ```json
 {
   "capability_id": "ontology.change.proposal.search",
-  "catalog_release": "rel_af8416a36dceaafab609f21a76c7884c",
+  "catalog_release": "rel_052a820799b9df56f233d3475547c8fa",
   "major_version": 1,
   "payload": {}
 }

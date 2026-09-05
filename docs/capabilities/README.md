@@ -2,9 +2,9 @@
 
 本目录由不可变 Catalog Release 自动生成，不接受手工修改。
 
-- Catalog Release：`rel_af8416a36dceaafab609f21a76c7884c`
-- Catalog Hash：`sha256:af8416a36dceaafab609f21a76c7884cb1f0da5bc9e794a47b2cddf35bda7bda`
-- 描述符数量：552
+- Catalog Release：`rel_052a820799b9df56f233d3475547c8fa`
+- Catalog Hash：`sha256:052a820799b9df56f233d3475547c8fa1f6614c1e305e5d5994ece02b1734f95`
+- 描述符数量：560
 
 ## 重要边界
 
@@ -16,7 +16,7 @@
 
 | 领域 | 已进入 V2 Catalog |
 |---|---:|
-| `agent` | 24 |
+| `agent` | 32 |
 | `base` | 75 |
 | `craft` | 145 |
 | `device` | 13 |
@@ -32,11 +32,11 @@
 
 | 消费者 | 能力数 |
 |---|---:|
-| web | 527 |
-| plugin | 519 |
-| agent | 503 |
-| api | 526 |
-| mcp | 503 |
+| web | 530 |
+| plugin | 522 |
+| agent | 506 |
+| api | 529 |
+| mcp | 506 |
 | worker | 3 |
 | local_runtime | 12 |
 
