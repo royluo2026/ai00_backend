@@ -205,8 +205,8 @@ OUTPUT_SCHEMAS = {
     "simulation.connector.pairing.approve": PAIRING_SUMMARY,
     "simulation.connector.pairing.complete": obj({
         "connector_id": STRING, "encrypted_credential_envelope": STRING,
-        "envelope_hash": HASH,
-    }, ("connector_id", "encrypted_credential_envelope", "envelope_hash")),
+        "envelope_hash": HASH, "activation_challenge": STRING,
+    }, ("connector_id", "encrypted_credential_envelope", "envelope_hash", "activation_challenge")),
     "simulation.connector.pairing.activate": PAIRING_SUMMARY,
     "simulation.connector.pairing.cancel": obj({
         "bootstrap_id": STRING, "status": STRING, "pairing_id": {"type": ["string", "null"]},

@@ -33,6 +33,7 @@ def _request(installation_id="install-1", verifier="proof-1"):
         serialization.PublicFormat.SubjectPublicKeyInfo,
     ).decode("ascii")
     return PairingRequest.from_verifier(
+        bootstrap_token="placeholder",
         installation_id=installation_id,
         verifier=verifier,
         device_name="工位 A",
@@ -50,6 +51,7 @@ def _request_with_private_key(installation_id="install-1", verifier="proof-1"):
         serialization.PublicFormat.SubjectPublicKeyInfo,
     ).decode("ascii")
     return PairingRequest.from_verifier(
+        bootstrap_token="placeholder",
         installation_id=installation_id, verifier=verifier, device_name="工位 A",
         runtime_version="1.0.0", windows_sid_hash="a" * 64,
         masked_windows_user="DOMAIN\\l***", ephemeral_public_key=public_key,
@@ -98,6 +100,11 @@ def _provider_contexts():
         CapabilityContext(user_gid="user-1", team_gid="team-1", source="web"),
         CapabilityContext(user_gid="connector-1", source="local_runtime"),
     )
+
+
+def _request_for(service, installation_id="install-1", verifier="proof-1", *, user="user-1", team="team-1"):
+    ticket = service.bootstrap_create(user, team)
+    return _request(installation_id, verifier).model_copy(update={"bootstrap_token": ticket.bootstrap_token})
 
 
 def test_bootstrap_is_user_scoped_and_pair_request_claims_it_once():
@@ -153,7 +160,7 @@ def test_pairing_rejects_invalid_ephemeral_public_key_before_approval():
 
 def test_user_code_cannot_complete_without_verifier():
     service = _service()
-    request = _request()
+    request = _request_for(service)
     created = service.request(request)
     service.approve(created.user_code, "user-1", "team-1", expected_version=1)
 
@@ -163,7 +170,7 @@ def test_user_code_cannot_complete_without_verifier():
 
 def test_pairing_summary_contains_only_safe_display_fields():
     service = _service()
-    created = service.request(_request())
+    created = service.request(_request_for(service))
 
     summary = service.get_summary(created.user_code, "user-1")
 
@@ -175,7 +182,7 @@ def test_pairing_summary_contains_only_safe_display_fields():
 
 def test_read_providers_return_required_governance_evidence():
     service = _service()
-    created = service.request(_request())
+    created = service.request(_request_for(service))
     provider = ConnectorPairingProvider(service)
     context = CapabilityContext(user_gid="user-1", source="web")
 
@@ -188,10 +195,10 @@ def test_read_providers_return_required_governance_evidence():
 
 def test_one_user_cannot_silently_replace_binding():
     service = _service()
-    first = service.request(_request("install-1", "proof-1"))
+    first = service.request(_request_for(service, "install-1", "proof-1"))
     service.approve(first.user_code, "user-1", "team-1", expected_version=1)
     service.complete(first.pairing_id, "install-1", "proof-1")
-    second = service.request(_request("install-2", "proof-2"))
+    second = service.request(_request_for(service, "install-2", "proof-2"))
 
     with pytest.raises(PairingError, match="connector_binding_conflict"):
         service.approve(second.user_code, "user-1", "team-1", expected_version=1)
@@ -210,7 +217,7 @@ def test_concurrent_pairing_approval_cannot_overwrite_first_feishu_user():
 
     repository = RacingRepository()
     service = PairingService(repository, clock=lambda: NOW)
-    created = service.request(_request())
+    created = service.request(_request_for(service, user="user-loser", team="team-loser"))
 
     with pytest.raises(PairingError, match="pairing_version_conflict"):
         service.approve(created.user_code, "user-loser", "team-loser", expected_version=1)
@@ -222,7 +229,7 @@ def test_concurrent_pairing_approval_cannot_overwrite_first_feishu_user():
 
 def test_completion_retry_returns_same_encrypted_envelope():
     service = _service()
-    created = service.request(_request())
+    created = service.request(_request_for(service))
     service.approve(created.user_code, "user-1", "team-1", expected_version=1)
 
     first = service.complete(created.pairing_id, "install-1", "proof-1")
@@ -235,7 +242,7 @@ def test_completion_retry_returns_same_encrypted_envelope():
 
 def test_credential_issue_does_not_claim_active_until_connector_ack():
     service = _service()
-    created = service.request(_request())
+    created = service.request(_request_for(service))
     service.approve(created.user_code, "user-1", "team-1", expected_version=1)
 
     issued = service.complete(created.pairing_id, "install-1", "proof-1")
@@ -247,7 +254,7 @@ def test_credential_issue_does_not_claim_active_until_connector_ack():
 
 def test_same_installation_retry_returns_same_envelope_without_second_binding():
     service = _service()
-    created = service.request(_request())
+    created = service.request(_request_for(service))
     service.approve(created.user_code, "user-1", "team-1", expected_version=1)
 
     first = service.complete(created.pairing_id, "install-1", "proof-1")
@@ -260,6 +267,9 @@ def test_same_installation_retry_returns_same_envelope_without_second_binding():
 def test_replayed_envelope_recovers_activation_proof_after_lost_first_response():
     service = _service()
     request, private_key = _request_with_private_key()
+    request = request.model_copy(update={
+        "bootstrap_token": service.bootstrap_create("user-1", "team-1").bootstrap_token,
+    })
     created = service.request(request)
     service.approve(created.user_code, "user-1", "team-1", expected_version=1)
     service.complete(created.pairing_id, "install-1", "proof-1")
@@ -282,9 +292,9 @@ def test_completion_returns_the_envelope_that_won_a_repository_race():
             return super().issue_credential(record, user_gid, binding)
 
     service = PairingService(RacingRepository(), clock=lambda: NOW, id_factory=lambda kind: {
-        "pairing": "pair-race", "code": "CODE-RACE", "connector": "connector-race", "token": "token-race",
+        "pairing": "pair-race", "code": "CODE-RACE", "connector": "connector-race", "token": "token-race", "bootstrap": "bootstrap-race",
     }[kind])
-    created = service.request(_request())
+    created = service.request(_request_for(service))
     service.approve(created.user_code, "user-1", "team-1", expected_version=1)
 
     completed = service.complete(created.pairing_id, "install-1", "proof-1")
@@ -295,7 +305,7 @@ def test_completion_returns_the_envelope_that_won_a_repository_race():
 
 def test_activation_acknowledgement_marks_the_binding_active():
     service = _service()
-    created = service.request(_request())
+    created = service.request(_request_for(service))
     service.approve(created.user_code, "user-1", "team-1", expected_version=1)
     issued = service.complete(created.pairing_id, "install-1", "proof-1")
 
@@ -328,9 +338,10 @@ def test_credential_issue_persists_binding_and_pairing_through_one_repository_op
             "code": "CODE-ATOMIC",
             "connector": "connector-atomic",
             "token": "token-atomic",
+            "bootstrap": "bootstrap-atomic",
         }[kind],
     )
-    created = service.request(_request())
+    created = service.request(_request_for(service))
     service.approve(created.user_code, "user-1", "team-1", expected_version=1)
 
     service.complete(created.pairing_id, "install-1", "proof-1")

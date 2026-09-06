@@ -131,6 +131,7 @@ _ERROR_PAIRS = (
     ("pairing_bootstrap_active", "An active Connector bootstrap ticket cannot be cancelled."),
     ("pairing_bootstrap_version_conflict", "The Connector bootstrap ticket changed after it was displayed."),
     ("pairing_bootstrap_conflict", "The Connector bootstrap ticket could not be created uniquely."),
+    ("pairing_bootstrap_owner_mismatch", "The Connector bootstrap ticket belongs to a different user or team scope."),
     ("pairing_expired", "The five-minute Connector pairing request expired."),
     ("pairing_proof_invalid", "The Connector did not prove the original verifier and installation identity."),
     ("pairing_activation_proof_invalid", "The Connector activation proof is invalid."),

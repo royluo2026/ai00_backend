@@ -27,7 +27,7 @@ class PairingError(RuntimeError):
 
 
 class PairingRequest(FrozenModel):
-    bootstrap_token: str | None = Field(default=None, min_length=1, max_length=512)
+    bootstrap_token: str = Field(min_length=1, max_length=512)
     installation_id: str = Field(min_length=1, max_length=191)
     verifier_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     device_name: str = Field(min_length=1, max_length=255)
@@ -269,10 +269,7 @@ class PairingService:
 
     def request(self, request: PairingRequest) -> PairingCreated:
         now = self.clock()
-        bootstrap = (
-            self.repository.claim_bootstrap(_hash(request.bootstrap_token), now)
-            if request.bootstrap_token else None
-        )
+        bootstrap = self.repository.claim_bootstrap(_hash(request.bootstrap_token), now)
         record = PairingRecord(
             pairing_id=self.id_factory("pairing"), user_code=self.id_factory("code"),
             installation_id=request.installation_id,
@@ -284,13 +281,12 @@ class PairingService:
             status="pending", expires_at=now + timedelta(minutes=5),
         )
         self.repository.create_pairing(record)
-        if bootstrap:
-            self.repository.link_bootstrap_pairing(bootstrap.bootstrap_id, record.pairing_id)
+        self.repository.link_bootstrap_pairing(bootstrap.bootstrap_id, record.pairing_id)
         return PairingCreated(
             pairing_id=record.pairing_id, user_code=record.user_code,
             verification_uri=self.verification_uri, status=record.status,
             expires_at=record.expires_at, resource_version=record.resource_version,
-            bootstrap_id=bootstrap.bootstrap_id if bootstrap else None,
+            bootstrap_id=bootstrap.bootstrap_id,
         )
 
     def bootstrap_create(self, owner_user_gid: str, team_gid: str) -> BootstrapTicket:
@@ -354,6 +350,9 @@ class PairingService:
         record = self._active(self.repository.by_code(user_code))
         if record.resource_version != expected_version or record.status != "pending":
             raise PairingError("pairing_version_conflict")
+        bootstrap = self.repository.bootstrap_for_pairing(record.pairing_id)
+        if bootstrap and (bootstrap.owner_user_gid != actor_user_gid or bootstrap.team_gid != team_gid):
+            raise PairingError("pairing_bootstrap_owner_mismatch")
         existing = self.repository.binding_for_user(actor_user_gid)
         if existing and existing["installation_id"] != record.installation_id:
             raise PairingError("connector_binding_conflict")

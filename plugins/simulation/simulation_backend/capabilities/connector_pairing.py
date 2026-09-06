@@ -55,7 +55,9 @@ class ConnectorPairingProvider:
 
     def bootstrap_create(self, _payload, context):
         self._require_web_user(context)
-        result = _translate(lambda: self.service.bootstrap_create(context.user_gid, context.team_gid or ""))
+        result = _translate(lambda: self.service.bootstrap_create(
+            context.user_gid, context.team_gid or f"personal:{context.user_gid}",
+        ))
         data = result.model_dump(mode="json")
         return CapabilityOutput(data=data, evidence=(EvidenceRef(
             kind="simulation.connector.pairing_bootstrap",
