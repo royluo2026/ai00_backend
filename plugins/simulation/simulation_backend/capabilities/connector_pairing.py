@@ -45,8 +45,12 @@ class ConnectorPairingProvider:
         ),))
 
     def summary(self, payload, context):
-        result = _translate(lambda: self.service.get_summary(
-            payload["user_code"], context.user_gid, self._team_scope(context),
+        result = _translate(lambda: (
+            self.service.get_summary_by_pairing_id(
+                payload["pairing_id"], context.user_gid, self._team_scope(context),
+            ) if payload.get("pairing_id") else self.service.get_summary(
+                payload["user_code"], context.user_gid, self._team_scope(context),
+            )
         ))
         data = result.model_dump(mode="json")
         return CapabilityOutput(data=data, evidence=(EvidenceRef(
@@ -81,9 +85,14 @@ class ConnectorPairingProvider:
 
     def approve(self, payload, context):
         self._require_web_user(context)
-        result = _translate(lambda: self.service.approve(
-            payload["user_code"], context.user_gid, self._team_scope(context),
-            expected_version=payload["expected_version"],
+        result = _translate(lambda: (
+            self.service.approve_by_pairing_id(
+                payload["pairing_id"], context.user_gid, self._team_scope(context),
+                expected_version=payload["expected_version"],
+            ) if payload.get("pairing_id") else self.service.approve(
+                payload["user_code"], context.user_gid, self._team_scope(context),
+                expected_version=payload["expected_version"],
+            )
         ))
         data = result.model_dump(mode="json")
         return CapabilityOutput(data=data, evidence=(EvidenceRef(

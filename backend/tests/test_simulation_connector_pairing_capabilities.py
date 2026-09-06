@@ -152,6 +152,22 @@ def test_bootstrap_projection_is_owner_scoped_and_never_exposes_secret_material(
         )
 
 
+def test_claimed_pairing_can_be_reviewed_and_approved_by_pairing_id_without_a_user_code():
+    provider, web, local = _provider_contexts()
+    ticket = provider.bootstrap_create({}, web).data
+    request = _request().model_copy(update={"bootstrap_token": ticket["bootstrap_token"]})
+    claimed = provider.request(request.model_dump(), local).data
+
+    summary = provider.summary({"pairing_id": claimed["pairing_id"]}, web).data
+    approved = provider.approve({
+        "pairing_id": claimed["pairing_id"],
+        "expected_version": summary["resource_version"],
+    }, web).data
+
+    assert summary["device_name"] == "工位 A"
+    assert approved["status"] == "approved"
+
+
 def test_bootstrap_projection_and_cancel_require_the_original_team_scope():
     provider, web, _local = _provider_contexts()
     ticket = provider.bootstrap_create({}, web).data

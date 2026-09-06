@@ -136,10 +136,16 @@ INPUT_SCHEMAS = {
     }, ("bootstrap_token", "installation_id", "verifier_hash", "device_name", "runtime_version", "windows_sid_hash", "masked_windows_user", "ephemeral_public_key")),
     "simulation.connector.pairing.bootstrap.create": obj({}, ()),
     "simulation.connector.pairing.bootstrap.get": obj({"bootstrap_id": STRING}, ("bootstrap_id",)),
-    "simulation.connector.pairing.summary.get": obj({"user_code": STRING}, ("user_code",)),
+    "simulation.connector.pairing.summary.get": {
+        **obj({"user_code": STRING, "pairing_id": STRING}, ()),
+        "oneOf": [{"required": ["user_code"]}, {"required": ["pairing_id"]}],
+    },
     "simulation.connector.pairing.approve": obj({
-        "user_code": STRING, "expected_version": {"type": "integer", "minimum": 1},
-    }, ("user_code", "expected_version")),
+        "user_code": STRING, "pairing_id": STRING,
+        "expected_version": {"type": "integer", "minimum": 1},
+    }, ("expected_version",)) | {
+        "oneOf": [{"required": ["user_code"]}, {"required": ["pairing_id"]}],
+    },
     "simulation.connector.pairing.complete": obj({
         "pairing_id": STRING, "installation_id": STRING, "verifier": STRING,
     }, ("pairing_id", "installation_id", "verifier")),

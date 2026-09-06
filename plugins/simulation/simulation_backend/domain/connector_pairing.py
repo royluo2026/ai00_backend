@@ -388,7 +388,17 @@ class PairingService:
         return record
 
     def get_summary(self, user_code: str, actor_user_gid: str, team_gid: str) -> PairingSummary:
-        record = self._active(self.repository.by_code(user_code))
+        return self._get_summary(self.repository.by_code(user_code), actor_user_gid, team_gid)
+
+    def get_summary_by_pairing_id(
+        self, pairing_id: str, actor_user_gid: str, team_gid: str,
+    ) -> PairingSummary:
+        return self._get_summary(self.repository.by_id(pairing_id), actor_user_gid, team_gid)
+
+    def _get_summary(
+        self, value: PairingRecord | None, actor_user_gid: str, team_gid: str,
+    ) -> PairingSummary:
+        record = self._active(value)
         bootstrap = self.repository.bootstrap_for_pairing(record.pairing_id)
         if bootstrap is None or bootstrap.owner_user_gid != actor_user_gid or bootstrap.team_gid != team_gid:
             raise PairingError("pairing_not_found")
@@ -404,7 +414,25 @@ class PairingService:
         self, user_code: str, actor_user_gid: str, team_gid: str,
         *, expected_version: int,
     ) -> PairingSummary:
-        record = self._active(self.repository.by_code(user_code))
+        return self._approve(
+            self.repository.by_code(user_code), actor_user_gid, team_gid,
+            expected_version=expected_version,
+        )
+
+    def approve_by_pairing_id(
+        self, pairing_id: str, actor_user_gid: str, team_gid: str,
+        *, expected_version: int,
+    ) -> PairingSummary:
+        return self._approve(
+            self.repository.by_id(pairing_id), actor_user_gid, team_gid,
+            expected_version=expected_version,
+        )
+
+    def _approve(
+        self, value: PairingRecord | None, actor_user_gid: str, team_gid: str,
+        *, expected_version: int,
+    ) -> PairingSummary:
+        record = self._active(value)
         if record.resource_version != expected_version or record.status != "pending":
             raise PairingError("pairing_version_conflict")
         bootstrap = self.repository.bootstrap_for_pairing(record.pairing_id)
@@ -426,7 +454,7 @@ class PairingService:
             status="approved", resource_version=record.resource_version + 1,
         )
         self.repository.approve_pairing(approved, expected_version=expected_version)
-        return self.get_summary(user_code, actor_user_gid, team_gid)
+        return self._get_summary(approved, actor_user_gid, team_gid)
 
     def complete(
         self, pairing_id: str, installation_id: str, verifier: str,
