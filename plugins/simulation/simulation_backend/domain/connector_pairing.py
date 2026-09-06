@@ -175,6 +175,22 @@ class InMemoryPairingRepository:
         self.bootstraps[record.bootstrap_id] = claimed
         return claimed
 
+    def create_pairing_from_bootstrap(
+        self, token_hash: str, now: datetime, record: PairingRecord,
+    ) -> BootstrapRecord:
+        bootstrap = self.claim_bootstrap(token_hash, now)
+        try:
+            self.create_pairing(record)
+            self.link_bootstrap_pairing(bootstrap.bootstrap_id, record.pairing_id)
+        except Exception:
+            self.bootstraps[bootstrap.bootstrap_id] = replace(
+                bootstrap, status="created", resource_version=bootstrap.resource_version - 1,
+            )
+            self.pairings.pop(record.pairing_id, None)
+            self.codes.pop(record.user_code, None)
+            raise
+        return self.bootstraps[bootstrap.bootstrap_id]
+
     def link_bootstrap_pairing(self, bootstrap_id: str, pairing_id: str) -> None:
         record = self.bootstraps.get(bootstrap_id)
         if record is None:
@@ -192,9 +208,11 @@ class InMemoryPairingRepository:
             record, status=status, resource_version=record.resource_version + 1,
         )
 
-    def cancel_bootstrap(self, bootstrap_id: str, owner_user_gid: str, expected_version: int) -> BootstrapRecord:
+    def cancel_bootstrap(
+        self, bootstrap_id: str, owner_user_gid: str, team_gid: str, expected_version: int,
+    ) -> BootstrapRecord:
         record = self.bootstraps.get(bootstrap_id)
-        if record is None or record.owner_user_gid != owner_user_gid:
+        if record is None or record.owner_user_gid != owner_user_gid or record.team_gid != team_gid:
             raise PairingError("pairing_bootstrap_not_found")
         if record.status == "active":
             raise PairingError("pairing_bootstrap_active")
@@ -239,7 +257,6 @@ class InMemoryPairingRepository:
             raise PairingError("pairing_bootstrap_version_conflict")
         self.bindings[user_gid] = binding
         self.pairings[record.pairing_id] = record
-        self.bootstraps[bootstrap.bootstrap_id] = replace(bootstrap, status="credential_issued", resource_version=bootstrap.resource_version + 1)
         self.bootstraps[bootstrap.bootstrap_id] = replace(
             bootstrap, status="credential_issued", resource_version=bootstrap.resource_version + 1,
         )
@@ -256,6 +273,9 @@ class InMemoryPairingRepository:
         binding = self.bindings.get(current.approved_user_gid or "")
         if not binding or binding["connector_id"] != current.connector_id:
             raise PairingError("connector_binding_conflict")
+        bootstrap = self.bootstrap_for_pairing(current.pairing_id)
+        if bootstrap is None or bootstrap.status != "credential_issued":
+            raise PairingError("pairing_bootstrap_version_conflict")
         self.bindings[current.approved_user_gid or ""] = {
             **binding, "status": "offline",
         }
@@ -263,9 +283,6 @@ class InMemoryPairingRepository:
             current, status="completed", activation_status="active",
             resource_version=current.resource_version + 1,
         )
-        bootstrap = self.bootstrap_for_pairing(current.pairing_id)
-        if bootstrap is None or bootstrap.status != "credential_issued":
-            raise PairingError("pairing_bootstrap_version_conflict")
         self.bootstraps[bootstrap.bootstrap_id] = replace(
             bootstrap, status="active", resource_version=bootstrap.resource_version + 1,
         )
@@ -292,7 +309,6 @@ class PairingService:
 
     def request(self, request: PairingRequest) -> PairingCreated:
         now = self.clock()
-        bootstrap = self.repository.claim_bootstrap(_hash(request.bootstrap_token), now)
         record = PairingRecord(
             pairing_id=self.id_factory("pairing"), user_code=self.id_factory("code"),
             installation_id=request.installation_id,
@@ -303,8 +319,9 @@ class PairingService:
             ephemeral_public_key=request.ephemeral_public_key,
             status="pending", expires_at=now + timedelta(minutes=5),
         )
-        self.repository.create_pairing(record)
-        self.repository.link_bootstrap_pairing(bootstrap.bootstrap_id, record.pairing_id)
+        bootstrap = self.repository.create_pairing_from_bootstrap(
+            _hash(request.bootstrap_token), now, record,
+        )
         return PairingCreated(
             pairing_id=record.pairing_id, user_code=record.user_code,
             verification_uri=self.verification_uri, status=record.status,
@@ -326,9 +343,9 @@ class PairingService:
             expires_at=record.expires_at, resource_version=record.resource_version,
         )
 
-    def bootstrap_get(self, bootstrap_id: str, owner_user_gid: str) -> BootstrapSummary:
+    def bootstrap_get(self, bootstrap_id: str, owner_user_gid: str, team_gid: str) -> BootstrapSummary:
         record = self.repository.bootstrap_by_id(bootstrap_id)
-        if record is None or record.owner_user_gid != owner_user_gid:
+        if record is None or record.owner_user_gid != owner_user_gid or record.team_gid != team_gid:
             raise PairingError("pairing_bootstrap_not_found")
         if record.expires_at <= self.clock() and record.status not in {"active", "cancelled"}:
             self.repository.set_bootstrap_status(record.bootstrap_id, "expired")
@@ -339,9 +356,11 @@ class PairingService:
         )
 
     def bootstrap_cancel(
-        self, bootstrap_id: str, owner_user_gid: str, *, expected_version: int,
+        self, bootstrap_id: str, owner_user_gid: str, team_gid: str, *, expected_version: int,
     ) -> BootstrapSummary:
-        record = self.repository.cancel_bootstrap(bootstrap_id, owner_user_gid, expected_version)
+        record = self.repository.cancel_bootstrap(
+            bootstrap_id, owner_user_gid, team_gid, expected_version,
+        )
         return BootstrapSummary(
             bootstrap_id=record.bootstrap_id, status=record.status, pairing_id=record.pairing_id,
             expires_at=record.expires_at, resource_version=record.resource_version,
@@ -374,7 +393,9 @@ class PairingService:
         if record.resource_version != expected_version or record.status != "pending":
             raise PairingError("pairing_version_conflict")
         bootstrap = self.repository.bootstrap_for_pairing(record.pairing_id)
-        if bootstrap and (bootstrap.owner_user_gid != actor_user_gid or bootstrap.team_gid != team_gid):
+        if bootstrap is None:
+            raise PairingError("pairing_bootstrap_not_found")
+        if bootstrap.owner_user_gid != actor_user_gid or bootstrap.team_gid != team_gid:
             raise PairingError("pairing_bootstrap_owner_mismatch")
         existing = self.repository.binding_for_user(actor_user_gid)
         if existing and existing["installation_id"] != record.installation_id:

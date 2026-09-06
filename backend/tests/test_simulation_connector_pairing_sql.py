@@ -49,6 +49,14 @@ def _pairing_row(record):
     }
 
 
+def _bootstrap_row(record, status="credential_issued"):
+    return {
+        "bootstrap_id": "bootstrap-1", "owner_user_gid": "user-1", "team_gid": "team-1",
+        "token_hash": "e" * 64, "status": status, "pairing_id": record.pairing_id,
+        "expires_at": NOW, "resource_version": 3,
+    }
+
+
 class _Cursor:
     def __init__(self, connection):
         self.connection = connection
@@ -61,6 +69,11 @@ class _Cursor:
         self.rowcount = 0
         if normalized.startswith("select") and "connector_pairings" in normalized:
             self._row = self.connection.pairings.get(params[0])
+        elif normalized.startswith("select") and "connector_pairing_bootstraps" in normalized:
+            self._row = next((
+                row for row in self.connection.bootstraps.values()
+                if row["pairing_id"] == params[0] or row["bootstrap_id"] == params[0] or row["token_hash"] == params[0]
+            ), None)
         elif normalized.startswith("select") and "connector_bindings" in normalized:
             self._row = (
                 self.connection.bindings.get(params[0])
@@ -84,6 +97,27 @@ class _Cursor:
                 raise self.connection.integrity_error()
             self.connection.bindings[binding["connector_id"]] = binding
             self.rowcount = 1
+        elif normalized.startswith("insert into workmanship_sim_connector_pairings"):
+            if params[0] in self.connection.pairings:
+                raise self.connection.integrity_error()
+            self.connection.pairings[params[0]] = {"pairing_id": params[0]}
+            self.rowcount = 1
+        elif "set status='claimed'" in normalized and "connector_pairing_bootstraps" in normalized:
+            row = self.connection.bootstraps.get(params[1])
+            if (
+                not self.connection.fail_bootstrap_update and row
+                and row["status"] == "created" and row["resource_version"] == params[2]
+            ):
+                row.update({"status": "claimed", "pairing_id": params[0], "resource_version": row["resource_version"] + 1})
+                self.rowcount = 1
+        elif "set status='approved'" in normalized and "connector_pairings" in normalized:
+            row = self.connection.pairings.get(params[3])
+            if row and row["status"] == "pending" and row["resource_version"] == params[4]:
+                row.update({
+                    "status": "approved", "resource_version": params[0],
+                    "approved_user_gid": params[1], "team_gid": params[2],
+                })
+                self.rowcount = 1
         elif "set status='completing'" in normalized:
             row = self.connection.pairings.get(params[5])
             if not self.connection.fail_pairing_update and row and row["status"] == "approved" and row["resource_version"] == params[7]:
@@ -97,6 +131,28 @@ class _Cursor:
             row = self.connection.pairings.get(params[1])
             if row and row["status"] == "completing" and row["activation_status"] == "credential_issued" and row["resource_version"] == params[3]:
                 row.update({"status": "completed", "activation_status": "active", "resource_version": params[0]})
+                self.rowcount = 1
+        elif "update workmanship_sim_connector_pairing_bootstraps" in normalized:
+            row = self.connection.bootstraps.get(params[0])
+            expected_version = params[1] if len(params) > 1 else row["resource_version"]
+            assignment = normalized.split(" where ", 1)[0]
+            expected_status = (
+                "claimed" if "status='approved'" in assignment
+                else "approved" if "status='credential_issued'" in assignment
+                else "credential_issued" if "status='active'" in assignment
+                else row["status"]
+            )
+            next_status = (
+                "approved" if "status='approved'" in assignment
+                else "credential_issued" if "status='credential_issued'" in assignment
+                else "active" if "status='active'" in assignment
+                else row["status"]
+            )
+            if (
+                not self.connection.fail_bootstrap_update and row
+                and row["status"] == expected_status and row["resource_version"] == expected_version
+            ):
+                row.update({"status": next_status, "resource_version": row["resource_version"] + 1})
                 self.rowcount = 1
         elif "set team_gid=" in normalized:
             row = self.connection.bindings.get(params[5])
@@ -120,10 +176,12 @@ class _Cursor:
 
 
 class _Connection:
-    def __init__(self, record, *, fail_pairing_update=False):
+    def __init__(self, record, *, fail_pairing_update=False, fail_bootstrap_update=False):
         self.pairings = {record.pairing_id: _pairing_row(record)}
+        self.bootstraps = {"bootstrap-1": _bootstrap_row(record)}
         self.bindings = {}
         self.fail_pairing_update = fail_pairing_update
+        self.fail_bootstrap_update = fail_bootstrap_update
         self.queries = []
 
     @staticmethod
@@ -136,11 +194,11 @@ class _Connection:
 
     @contextmanager
     def transaction(self):
-        snapshot = (deepcopy(self.pairings), deepcopy(self.bindings))
+        snapshot = (deepcopy(self.pairings), deepcopy(self.bindings), deepcopy(self.bootstraps))
         try:
             yield self
         except Exception:
-            self.pairings, self.bindings = snapshot
+            self.pairings, self.bindings, self.bootstraps = snapshot
             raise
 
 
@@ -165,10 +223,43 @@ def _binding(installation_id="install-1"):
     }
 
 
+def test_request_creates_pairing_and_claims_bootstrap_in_one_transaction(sql_repository):
+    repository, connection = sql_repository
+    connection.pairings.clear()
+    connection.bootstraps["bootstrap-1"].update({
+        "status": "created", "pairing_id": None, "resource_version": 1,
+        "expires_at": datetime(2026, 9, 7, tzinfo=UTC),
+    })
+
+    bootstrap = repository.create_pairing_from_bootstrap("e" * 64, NOW, _record())
+
+    assert "pair-1" in connection.pairings
+    assert bootstrap.status == "claimed"
+    assert connection.bootstraps["bootstrap-1"]["pairing_id"] == "pair-1"
+
+
+def test_approval_updates_pairing_and_bootstrap_in_one_transaction(sql_repository):
+    repository, connection = sql_repository
+    pending = _record(version=1)
+    pending.status = "pending"
+    pending.activation_status = "not_issued"
+    connection.pairings["pair-1"] = _pairing_row(pending)
+    connection.bootstraps["bootstrap-1"].update({"status": "claimed", "resource_version": 2})
+    approved = _record(version=2)
+    approved.status = "approved"
+    approved.activation_status = "not_issued"
+
+    repository.approve_pairing(approved, expected_version=1)
+
+    assert connection.pairings["pair-1"]["status"] == "approved"
+    assert connection.bootstraps["bootstrap-1"]["status"] == "approved"
+
+
 def test_issue_replay_reuses_the_same_binding_and_locks_the_pairing(sql_repository):
     repository, connection = sql_repository
     record = _record()
     connection.pairings["pair-1"].update({"status": "approved", "activation_status": "not_issued", "resource_version": 1})
+    connection.bootstraps["bootstrap-1"].update({"status": "approved", "resource_version": 2})
 
     first = repository.issue_credential(record, "user-1", _binding())
     replay = repository.issue_credential(record, "user-1", _binding())
@@ -176,12 +267,14 @@ def test_issue_replay_reuses_the_same_binding_and_locks_the_pairing(sql_reposito
     assert replay.envelope_hash == first.envelope_hash
     assert list(connection.bindings) == ["connector-1"]
     assert connection.pairings["pair-1"]["credential_envelope_hash"] == "sha256:envelope-1"
+    assert connection.bootstraps["bootstrap-1"]["status"] == "credential_issued"
     assert any("for update" in query for query in connection.queries)
 
 
 def test_issue_for_a_conflicting_installation_returns_a_stable_error(sql_repository):
     repository, connection = sql_repository
     connection.pairings["pair-1"].update({"status": "approved", "activation_status": "not_issued", "resource_version": 1})
+    connection.bootstraps["bootstrap-1"].update({"status": "approved", "resource_version": 2})
     connection.bindings["connector-existing"] = {"connector_id": "connector-existing", "owner_user_gid": "user-1", "installation_id": "install-2", "status": "offline"}
 
     with pytest.raises(PairingError, match="connector_binding_conflict"):
@@ -202,6 +295,7 @@ def test_concurrent_activation_allows_only_one_transition(sql_repository):
 
     assert connection.pairings["pair-1"]["activation_status"] == "active"
     assert connection.bindings["connector-1"]["status"] == "offline"
+    assert connection.bootstraps["bootstrap-1"]["status"] == "active"
 
 
 def test_issue_rolls_back_insert_when_the_pairing_update_loses_its_race(monkeypatch):
@@ -210,6 +304,7 @@ def test_issue_rolls_back_insert_when_the_pairing_update_loses_its_race(monkeypa
     record.activation_status = "not_issued"
     record.resource_version = 1
     connection = _Connection(record, fail_pairing_update=True)
+    connection.bootstraps["bootstrap-1"].update({"status": "approved", "resource_version": 2})
 
     @contextmanager
     def get_connection():
@@ -224,10 +319,34 @@ def test_issue_rolls_back_insert_when_the_pairing_update_loses_its_race(monkeypa
     assert connection.pairings["pair-1"]["status"] == "approved"
 
 
+def test_issue_rolls_back_pairing_and_binding_when_bootstrap_transition_loses_its_race(monkeypatch):
+    approved = _record()
+    approved.status = "approved"
+    approved.activation_status = "not_issued"
+    approved.resource_version = 1
+    connection = _Connection(approved, fail_bootstrap_update=True)
+    connection.bootstraps["bootstrap-1"].update({"status": "approved", "resource_version": 2})
+    issued = _record()
+
+    @contextmanager
+    def get_connection():
+        with connection.transaction() as transaction:
+            yield transaction
+
+    monkeypatch.setattr(connector_repository, "get_simulation_conn", get_connection)
+    with pytest.raises(PairingError, match="pairing_bootstrap_version_conflict"):
+        SqlPairingRepository().issue_credential(issued, "user-1", _binding())
+
+    assert connection.bindings == {}
+    assert connection.pairings["pair-1"]["status"] == "approved"
+    assert connection.bootstraps["bootstrap-1"]["status"] == "approved"
+
+
 def test_issued_credential_cannot_authenticate_until_activation_and_rotation_revokes_old_token(sql_repository):
     pairing_repository, connection = sql_repository
     record = _record()
     connection.pairings["pair-1"].update({"status": "approved", "activation_status": "not_issued", "resource_version": 1})
+    connection.bootstraps["bootstrap-1"].update({"status": "approved", "resource_version": 2})
     binding = _binding()
     binding["token_hash"] = hashlib.sha256(b"new-token").hexdigest()
     connection.bindings["connector-1"] = {

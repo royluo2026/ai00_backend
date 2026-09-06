@@ -363,7 +363,10 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             if governed.id in {
                 "simulation.connector.pairing.bootstrap.create",
                 "simulation.connector.pairing.bootstrap.get",
+                "simulation.connector.pairing.summary.get",
+                "simulation.connector.pairing.approve",
                 "simulation.connector.pairing.cancel",
+                "simulation.connector.binding.get",
             }
             else ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True)
         ),

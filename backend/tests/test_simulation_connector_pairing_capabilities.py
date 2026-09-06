@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from datetime import UTC, datetime
 import base64
 import json
@@ -18,9 +19,21 @@ from plugins.simulation.simulation_backend.domain.connector_pairing import (
     PairingService,
 )
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext
+from backend.capabilities.registry_next import CapabilityRegistry
+from backend.capability_v2.catalog import CatalogResolver, build_release
+from backend.capability_v2.catalog_store import InMemoryCatalogStore
+from backend.capability_v2.contracts import (
+    ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType,
+    InvocationEnvelope, TenantIdentity,
+)
+from backend.capability_v2.gateway import CapabilityGatewayService
+from backend.capability_v2.outcomes import InMemoryOutcomeStore
+from backend.capability_v2.reliability import InMemoryRateLimiter, ReliabilityCoordinator
 from plugins.simulation.simulation_backend.capabilities.connector_pairing import (
     ConnectorPairingProvider,
+    specs,
 )
+from plugins.simulation.simulation_backend.capabilities.provider import descriptor_for, register
 
 
 NOW = datetime(2026, 9, 3, 8, 0, tzinfo=UTC)
@@ -134,6 +147,39 @@ def test_bootstrap_projection_is_owner_scoped_and_never_exposes_secret_material(
         )
 
 
+def test_bootstrap_projection_and_cancel_require_the_original_team_scope():
+    provider, web, _local = _provider_contexts()
+    ticket = provider.bootstrap_create({}, web).data
+    other_team = CapabilityContext(user_gid="user-1", team_gid="team-2", source="web")
+
+    with pytest.raises(CapabilityBusinessError, match="pairing_bootstrap_not_found"):
+        provider.bootstrap_get({"bootstrap_id": ticket["bootstrap_id"]}, other_team)
+    with pytest.raises(CapabilityBusinessError, match="pairing_bootstrap_not_found"):
+        provider.cancel({
+            "bootstrap_id": ticket["bootstrap_id"],
+            "expected_version": ticket["resource_version"],
+        }, other_team)
+
+
+def test_pairing_request_claims_ticket_and_creates_pairing_through_one_repository_operation():
+    class AtomicRequestRepository(InMemoryPairingRepository):
+        def __init__(self):
+            super().__init__()
+            self.atomic_request_called = False
+
+        def create_pairing_from_bootstrap(self, token_hash, now, record):
+            self.atomic_request_called = True
+            return super().create_pairing_from_bootstrap(token_hash, now, record)
+
+    repository = AtomicRequestRepository()
+    service = PairingService(repository, clock=lambda: NOW)
+    request = _request_for(service)
+
+    service.request(request)
+
+    assert repository.atomic_request_called is True
+
+
 def test_active_bootstrap_cannot_be_cancelled():
     service = _service()
     ticket = service.bootstrap_create("user-1", "team-1")
@@ -141,11 +187,11 @@ def test_active_bootstrap_cannot_be_cancelled():
     service.approve(created.user_code, "user-1", "team-1", expected_version=1)
     issued = service.complete(created.pairing_id, "install-1", "proof-1")
     service.activate(created.pairing_id, issued.connector_id, issued.activation_challenge)
-    bootstrap = service.bootstrap_get(ticket.bootstrap_id, "user-1")
+    bootstrap = service.bootstrap_get(ticket.bootstrap_id, "user-1", "team-1")
 
     with pytest.raises(PairingError, match="pairing_bootstrap_active"):
         service.bootstrap_cancel(
-            ticket.bootstrap_id, "user-1", expected_version=bootstrap.resource_version,
+            ticket.bootstrap_id, "user-1", "team-1", expected_version=bootstrap.resource_version,
         )
 
 
@@ -314,6 +360,90 @@ def test_activation_acknowledgement_marks_the_binding_active():
     assert summary.status == "active"
     assert service.repository.by_id(created.pairing_id).activation_status == "active"
     assert service.repository.binding_for_user("user-1")["status"] == "offline"
+
+
+def test_activation_rejects_invalid_bootstrap_before_mutating_pairing_or_binding():
+    service = _service()
+    created = service.request(_request_for(service))
+    service.approve(created.user_code, "user-1", "team-1", expected_version=1)
+    issued = service.complete(created.pairing_id, "install-1", "proof-1")
+    bootstrap = service.repository.bootstrap_for_pairing(created.pairing_id)
+    service.repository.bootstraps[bootstrap.bootstrap_id] = type(bootstrap)(
+        **{**bootstrap.__dict__, "status": "cancelled"}
+    )
+
+    with pytest.raises(PairingError, match="pairing_bootstrap_version_conflict"):
+        service.activate(created.pairing_id, issued.connector_id, issued.activation_challenge)
+
+    assert service.repository.by_id(created.pairing_id).activation_status == "credential_issued"
+    assert service.repository.binding_for_user("user-1")["status"] == "pending_activation"
+
+
+def test_pairing_browser_capabilities_are_not_exposed_to_api_agents_or_mcp():
+    descriptors = {spec.id: descriptor_for(spec) for spec, _handler in specs(ConnectorPairingProvider(_service()))}
+
+    for capability_id in {
+        "simulation.connector.pairing.bootstrap.create",
+        "simulation.connector.pairing.bootstrap.get",
+        "simulation.connector.pairing.summary.get",
+        "simulation.connector.pairing.approve",
+        "simulation.connector.pairing.cancel",
+        "simulation.connector.binding.get",
+    }:
+        exposure = descriptors[capability_id].exposure
+        assert exposure.web is True
+        assert exposure.api is False
+        assert exposure.agent is False
+        assert exposure.mcp is False
+
+
+def test_registered_pairing_completion_passes_the_real_gateway_output_contract():
+    service = _service()
+    request = _request_for(service)
+    created = service.request(request)
+    service.approve(created.user_code, "user-1", "team-1", expected_version=1)
+    registry = CapabilityRegistry()
+    for spec, handler in specs(ConnectorPairingProvider(service)):
+        register(registry, spec, handler)
+    registered = registry.get("simulation.connector.pairing.complete", 1)
+    release = build_release([registered.descriptor])
+    store = InMemoryCatalogStore()
+    store.publish(release)
+
+    class Policy:
+        def authorize(self, *_args): return None
+        def approve(self, *_args): return None
+        def project(self, _descriptor, _identity, data): return data
+
+    gateway = CapabilityGatewayService(
+        CatalogResolver(store, registry), Policy(),
+        reliability=ReliabilityCoordinator(InMemoryOutcomeStore(), InMemoryRateLimiter(limit=10)),
+    ).bind_release(release.release_id)
+    result = asyncio.run(gateway.invoke(InvocationEnvelope(
+        capability_id=registered.spec.id, major_version=registered.spec.version,
+        catalog_release=release.release_id,
+        payload={
+            "pairing_id": created.pairing_id,
+            "installation_id": request.installation_id,
+            "verifier": "proof-1",
+        },
+        identity=ConsumerIdentity(
+            actor=ActorIdentity(
+                user_id="connector-installer", authentication_method="connector_bootstrap",
+                authenticated_at=NOW,
+            ),
+            tenant=TenantIdentity(tenant_id="team-1", membership="member"),
+            consumer=ConsumerDescriptor(
+                type=ConsumerType.LOCAL_RUNTIME, consumer_id="ai00.connector.service",
+            ),
+        ),
+        request_id="req-pairing-complete", trace_id="trace-pairing-complete",
+        idempotency_key="idem-pairing-complete",
+    )))
+
+    assert result.ok is True
+    assert result.data["activation_challenge"]
+    assert result.evidence and result.evidence[0].kind == "simulation.connector.binding"
 
 
 def test_credential_issue_persists_binding_and_pairing_through_one_repository_operation():

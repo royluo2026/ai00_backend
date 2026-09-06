@@ -56,7 +56,7 @@ class ConnectorPairingProvider:
     def bootstrap_create(self, _payload, context):
         self._require_web_user(context)
         result = _translate(lambda: self.service.bootstrap_create(
-            context.user_gid, context.team_gid or f"personal:{context.user_gid}",
+            context.user_gid, self._team_scope(context),
         ))
         data = result.model_dump(mode="json")
         return CapabilityOutput(data=data, evidence=(EvidenceRef(
@@ -68,7 +68,9 @@ class ConnectorPairingProvider:
 
     def bootstrap_get(self, payload, context):
         self._require_web_user(context)
-        result = _translate(lambda: self.service.bootstrap_get(payload["bootstrap_id"], context.user_gid))
+        result = _translate(lambda: self.service.bootstrap_get(
+            payload["bootstrap_id"], context.user_gid, self._team_scope(context),
+        ))
         data = result.model_dump(mode="json")
         return CapabilityOutput(data=data, evidence=(EvidenceRef(
             kind="simulation.connector.pairing_bootstrap",
@@ -78,7 +80,7 @@ class ConnectorPairingProvider:
     def approve(self, payload, context):
         self._require_web_user(context)
         result = _translate(lambda: self.service.approve(
-            payload["user_code"], context.user_gid, context.team_gid or "",
+            payload["user_code"], context.user_gid, self._team_scope(context),
             expected_version=payload["expected_version"],
         ))
         data = result.model_dump(mode="json")
@@ -122,7 +124,7 @@ class ConnectorPairingProvider:
     def cancel(self, payload, context):
         self._require_web_user(context)
         result = _translate(lambda: self.service.bootstrap_cancel(
-            payload["bootstrap_id"], context.user_gid,
+            payload["bootstrap_id"], context.user_gid, self._team_scope(context),
             expected_version=payload["expected_version"],
         ))
         data = result.model_dump(mode="json")
@@ -138,6 +140,10 @@ class ConnectorPairingProvider:
                 "feishu_login_required",
                 "Pairing approval requires the user's Feishu-authenticated AI00 Web session.",
             )
+
+    @staticmethod
+    def _team_scope(context):
+        return context.team_gid or f"personal:{context.user_gid}"
 
 
 def specs(provider: ConnectorPairingProvider | None = None):
