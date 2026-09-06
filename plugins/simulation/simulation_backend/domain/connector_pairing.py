@@ -198,8 +198,14 @@ class InMemoryPairingRepository:
             raise PairingError("pairing_bootstrap_not_found")
         if record.status == "active":
             raise PairingError("pairing_bootstrap_active")
-        if record.resource_version != expected_version:
+        if record.resource_version != expected_version or record.status not in {"created", "claimed"}:
             raise PairingError("pairing_bootstrap_version_conflict")
+        if record.pairing_id:
+            pairing = self.pairings.get(record.pairing_id)
+            if pairing and pairing.status == "pending":
+                self.pairings[pairing.pairing_id] = replace(
+                    pairing, status="rejected", resource_version=pairing.resource_version + 1,
+                )
         cancelled = replace(record, status="cancelled", resource_version=record.resource_version + 1)
         self.bootstraps[bootstrap_id] = cancelled
         return cancelled
@@ -209,11 +215,15 @@ class InMemoryPairingRepository:
 
     def approve_pairing(self, record: PairingRecord, *, expected_version: int) -> None:
         current = self.pairings.get(record.pairing_id)
+        bootstrap = self.bootstrap_for_pairing(record.pairing_id)
         if current is None:
             raise PairingError("pairing_not_found")
         if current.status != "pending" or current.resource_version != expected_version:
             raise PairingError("pairing_version_conflict")
+        if bootstrap is None or bootstrap.status != "claimed":
+            raise PairingError("pairing_bootstrap_version_conflict")
         self.pairings[record.pairing_id] = record
+        self.bootstraps[bootstrap.bootstrap_id] = replace(bootstrap, status="approved", resource_version=bootstrap.resource_version + 1)
 
     def issue_credential(self, record: PairingRecord, user_gid: str, binding: dict) -> PairingRecord:
         current = self.pairings.get(record.pairing_id)
@@ -224,8 +234,15 @@ class InMemoryPairingRepository:
         existing = self.bindings.get(user_gid)
         if existing and existing["connector_id"] != binding["connector_id"]:
             raise PairingError("connector_binding_conflict")
+        bootstrap = self.bootstrap_for_pairing(record.pairing_id)
+        if bootstrap is None or bootstrap.status != "approved":
+            raise PairingError("pairing_bootstrap_version_conflict")
         self.bindings[user_gid] = binding
         self.pairings[record.pairing_id] = record
+        self.bootstraps[bootstrap.bootstrap_id] = replace(bootstrap, status="credential_issued", resource_version=bootstrap.resource_version + 1)
+        self.bootstraps[bootstrap.bootstrap_id] = replace(
+            bootstrap, status="credential_issued", resource_version=bootstrap.resource_version + 1,
+        )
         return record
 
     def activate_pairing(self, record: PairingRecord, *, expected_version: int) -> None:
@@ -245,6 +262,12 @@ class InMemoryPairingRepository:
         self.pairings[current.pairing_id] = replace(
             current, status="completed", activation_status="active",
             resource_version=current.resource_version + 1,
+        )
+        bootstrap = self.bootstrap_for_pairing(current.pairing_id)
+        if bootstrap is None or bootstrap.status != "credential_issued":
+            raise PairingError("pairing_bootstrap_version_conflict")
+        self.bootstraps[bootstrap.bootstrap_id] = replace(
+            bootstrap, status="active", resource_version=bootstrap.resource_version + 1,
         )
 
 
@@ -361,9 +384,6 @@ class PairingService:
             status="approved", resource_version=record.resource_version + 1,
         )
         self.repository.approve_pairing(approved, expected_version=expected_version)
-        bootstrap = self.repository.bootstrap_for_pairing(record.pairing_id)
-        if bootstrap:
-            self.repository.set_bootstrap_status(bootstrap.bootstrap_id, "approved")
         return self.get_summary(user_code, actor_user_gid)
 
     def complete(
@@ -425,9 +445,6 @@ class PairingService:
         )
         binding["status"] = "pending_activation"
         stored = self.repository.issue_credential(issued, record.approved_user_gid, binding)
-        bootstrap = self.repository.bootstrap_for_pairing(record.pairing_id)
-        if bootstrap:
-            self.repository.set_bootstrap_status(bootstrap.bootstrap_id, "credential_issued")
         if stored.envelope_hash != issued.envelope_hash:
             return self._stored_completion(stored)
         return PairingCompletion(
@@ -452,9 +469,6 @@ class PairingService:
         if not secrets.compare_digest(record.activation_challenge_hash or "", _hash(activation_proof)):
             raise PairingError("pairing_activation_proof_invalid")
         self.repository.activate_pairing(record, expected_version=record.resource_version)
-        bootstrap = self.repository.bootstrap_for_pairing(pairing_id)
-        if bootstrap:
-            self.repository.set_bootstrap_status(bootstrap.bootstrap_id, "active")
         activated = self.repository.by_id(pairing_id)
         if activated is None:
             raise PairingError("pairing_not_found")
