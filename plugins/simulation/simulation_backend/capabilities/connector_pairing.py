@@ -45,7 +45,9 @@ class ConnectorPairingProvider:
         ),))
 
     def summary(self, payload, context):
-        result = _translate(lambda: self.service.get_summary(payload["user_code"], context.user_gid))
+        result = _translate(lambda: self.service.get_summary(
+            payload["user_code"], context.user_gid, self._team_scope(context),
+        ))
         data = result.model_dump(mode="json")
         return CapabilityOutput(data=data, evidence=(EvidenceRef(
             kind="simulation.connector.pairing_summary",
@@ -100,7 +102,7 @@ class ConnectorPairingProvider:
         ),))
 
     def binding(self, _payload, context):
-        row = self.service.repository.binding_for_user(context.user_gid)
+        row = self.service.repository.binding_for_user(context.user_gid, self._team_scope(context))
         data = {
             "connector_id": row["connector_id"] if row else None,
             "installation_id": row["installation_id"] if row else None,

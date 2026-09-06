@@ -79,7 +79,11 @@ class _Cursor:
                 self.connection.bindings.get(params[0])
                 if "where connector_id=%s" in normalized
                 else next(
-                    (row for row in self.connection.bindings.values() if row["owner_user_gid"] == params[0]), None,
+                    (
+                        row for row in self.connection.bindings.values()
+                        if row["owner_user_gid"] == params[0]
+                        and (len(params) == 1 or row.get("team_gid") == params[1])
+                    ), None,
                 )
             )
         elif normalized.startswith("insert into workmanship_sim_connector_bindings"):
@@ -87,7 +91,7 @@ class _Cursor:
                 "connector_id": params[0], "owner_user_gid": params[1], "team_gid": params[2],
                 "installation_id": params[3], "windows_sid_hash": params[4],
                 "display_name": params[5], "runtime_version": params[6], "token_hash": params[7],
-                "status": "pending_activation",
+                "status": "pending_activation", "pending_pairing_id": params[8],
             }
             if any(
                 row["owner_user_gid"] == binding["owner_user_gid"]
@@ -155,14 +159,15 @@ class _Cursor:
                 row.update({"status": next_status, "resource_version": row["resource_version"] + 1})
                 self.rowcount = 1
         elif "set team_gid=" in normalized:
-            row = self.connection.bindings.get(params[5])
-            if row and row["owner_user_gid"] == params[6] and row["installation_id"] == params[7]:
-                row.update({"team_gid": params[0], "windows_sid_hash": params[1], "display_name": params[2], "runtime_version": params[3], "token_hash": params[4], "status": "pending_activation"})
+            row = self.connection.bindings.get(params[6])
+            if row and row["owner_user_gid"] == params[7] and row["installation_id"] == params[8]:
+                row.update({"team_gid": params[0], "windows_sid_hash": params[1], "display_name": params[2], "runtime_version": params[3], "token_hash": params[4], "pending_pairing_id": params[5], "status": "pending_activation"})
                 self.rowcount = 1
         elif "update workmanship_sim_connector_bindings" in normalized:
             row = self.connection.bindings.get(params[0])
-            if row and row["status"] == "pending_activation":
+            if row and row["status"] == "pending_activation" and row.get("pending_pairing_id") == params[2]:
                 row["status"] = "offline"
+                row["pending_pairing_id"] = None
                 self.rowcount = 1
 
     def fetchone(self):
@@ -220,6 +225,7 @@ def _binding(installation_id="install-1"):
         "connector_id": "connector-1", "installation_id": installation_id, "team_gid": "team-1",
         "windows_sid_hash": "b" * 64, "display_name": "Workstation",
         "runtime_version": "1.0.0", "token_hash": "d" * 64,
+        "pending_pairing_id": "pair-1",
     }
 
 
@@ -286,7 +292,7 @@ def test_issue_for_a_conflicting_installation_returns_a_stable_error(sql_reposit
 
 def test_concurrent_activation_allows_only_one_transition(sql_repository):
     repository, connection = sql_repository
-    connection.bindings["connector-1"] = {"connector_id": "connector-1", "owner_user_gid": "user-1", "installation_id": "install-1", "status": "pending_activation"}
+    connection.bindings["connector-1"] = {"connector_id": "connector-1", "owner_user_gid": "user-1", "installation_id": "install-1", "team_gid": "team-1", "pending_pairing_id": "pair-1", "status": "pending_activation"}
     record = _record()
 
     repository.activate_pairing(record, expected_version=2)
@@ -296,6 +302,32 @@ def test_concurrent_activation_allows_only_one_transition(sql_repository):
     assert connection.pairings["pair-1"]["activation_status"] == "active"
     assert connection.bindings["connector-1"]["status"] == "offline"
     assert connection.bootstraps["bootstrap-1"]["status"] == "active"
+
+
+def test_old_pairing_cannot_activate_the_binding_generation_for_a_new_pairing(sql_repository):
+    repository, connection = sql_repository
+    connection.bindings["connector-1"] = {
+        "connector_id": "connector-1", "owner_user_gid": "user-1",
+        "installation_id": "install-1", "team_gid": "team-1",
+        "pending_pairing_id": "pair-2", "status": "pending_activation",
+    }
+
+    with pytest.raises(PairingError, match="connector_binding_conflict"):
+        repository.activate_pairing(_record(), expected_version=2)
+
+    assert connection.pairings["pair-1"]["activation_status"] == "credential_issued"
+    assert connection.bindings["connector-1"]["pending_pairing_id"] == "pair-2"
+    assert connection.bootstraps["bootstrap-1"]["status"] == "credential_issued"
+
+
+def test_binding_lookup_is_scoped_to_user_and_team(sql_repository):
+    repository, connection = sql_repository
+    connection.bindings["connector-1"] = {
+        **_binding(), "owner_user_gid": "user-1", "status": "offline",
+    }
+
+    assert repository.binding_for_user("user-1", "team-1")["connector_id"] == "connector-1"
+    assert repository.binding_for_user("user-1", "team-2") is None
 
 
 def test_issue_rolls_back_insert_when_the_pairing_update_loses_its_race(monkeypatch):

@@ -181,6 +181,21 @@ def test_pairing_request_claims_ticket_and_creates_pairing_through_one_repositor
     assert repository.atomic_request_called is True
 
 
+def test_atomic_request_conflict_preserves_the_existing_pairing():
+    service = _service()
+    first = service.request(_request_for(service))
+    existing = service.repository.by_id(first.pairing_id)
+    ticket = service.bootstrap_create("user-1", "team-1")
+    conflicting = _request().model_copy(update={"bootstrap_token": ticket.bootstrap_token})
+    service.id_factory = lambda kind: first.pairing_id if kind == "pairing" else "CODE-OTHER"
+
+    with pytest.raises(PairingError, match="pairing_identity_conflict"):
+        service.request(conflicting)
+
+    assert service.repository.by_id(first.pairing_id) is existing
+    assert service.repository.bootstrap_by_id(ticket.bootstrap_id).status == "created"
+
+
 def test_active_bootstrap_cannot_be_cancelled():
     service = _service()
     ticket = service.bootstrap_create("user-1", "team-1")
@@ -219,7 +234,7 @@ def test_pairing_summary_contains_only_safe_display_fields():
     service = _service()
     created = service.request(_request_for(service))
 
-    summary = service.get_summary(created.user_code, "user-1")
+    summary = service.get_summary(created.user_code, "user-1", "team-1")
 
     assert set(summary.model_dump()) == {
         "pairing_id", "user_code", "device_name", "runtime_version",
@@ -231,7 +246,7 @@ def test_read_providers_return_required_governance_evidence():
     service = _service()
     created = service.request(_request_for(service))
     provider = ConnectorPairingProvider(service)
-    context = CapabilityContext(user_gid="user-1", source="web")
+    context = CapabilityContext(user_gid="user-1", team_gid="team-1", source="web")
 
     summary = provider.summary({"user_code": created.user_code}, context)
     binding = provider.binding({}, context)
@@ -249,6 +264,33 @@ def test_one_user_cannot_silently_replace_binding():
 
     with pytest.raises(PairingError, match="connector_binding_conflict"):
         service.approve(second.user_code, "user-1", "team-1", expected_version=1)
+
+
+def test_existing_binding_cannot_move_to_another_team():
+    service = _service()
+    first = service.request(_request_for(service, "install-1", "proof-1", team="team-1"))
+    service.approve(first.user_code, "user-1", "team-1", expected_version=1)
+    service.complete(first.pairing_id, "install-1", "proof-1")
+    second = service.request(_request_for(service, "install-1", "proof-2", team="team-2"))
+
+    with pytest.raises(PairingError, match="connector_binding_conflict"):
+        service.approve(second.user_code, "user-1", "team-2", expected_version=1)
+
+
+def test_old_pairing_proof_cannot_activate_a_new_credential_generation():
+    service = _service()
+    first = service.request(_request_for(service, "install-1", "proof-1"))
+    service.approve(first.user_code, "user-1", "team-1", expected_version=1)
+    first_issue = service.complete(first.pairing_id, "install-1", "proof-1")
+    second = service.request(_request_for(service, "install-1", "proof-2"))
+    service.approve(second.user_code, "user-1", "team-1", expected_version=1)
+    service.complete(second.pairing_id, "install-1", "proof-2")
+
+    with pytest.raises(PairingError, match="connector_binding_conflict"):
+        service.activate(first.pairing_id, first_issue.connector_id, first_issue.activation_challenge)
+
+    assert service.repository.binding_for_user("user-1")["status"] == "pending_activation"
+    assert service.repository.binding_for_user("user-1")["pending_pairing_id"] == second.pairing_id
 
 
 def test_concurrent_pairing_approval_cannot_overwrite_first_feishu_user():

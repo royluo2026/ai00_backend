@@ -464,13 +464,21 @@ class SqlPairingRepository:
             )
             return self._record(cursor.fetchone())
 
-    def binding_for_user(self, user_gid: str) -> dict | None:
+    def binding_for_user(self, user_gid: str, team_gid: str | None = None) -> dict | None:
         with get_simulation_conn() as conn, conn.cursor() as cursor:
-            cursor.execute(
-                "SELECT connector_id,installation_id,status FROM workmanship_sim_connector_bindings "
-                "WHERE owner_user_gid=%s LIMIT 1",
-                (user_gid,),
-            )
+            if team_gid is None:
+                cursor.execute(
+                    "SELECT connector_id,installation_id,team_gid,status,pending_pairing_id "
+                    "FROM workmanship_sim_connector_bindings WHERE owner_user_gid=%s LIMIT 1",
+                    (user_gid,),
+                )
+            else:
+                cursor.execute(
+                    "SELECT connector_id,installation_id,team_gid,status,pending_pairing_id "
+                    "FROM workmanship_sim_connector_bindings "
+                    "WHERE owner_user_gid=%s AND team_gid=%s LIMIT 1",
+                    (user_gid, team_gid),
+                )
             return cursor.fetchone()
 
     def create_bootstrap(self, record: BootstrapRecord) -> None:
@@ -576,15 +584,35 @@ class SqlPairingRepository:
             )
             return self._bootstrap(cursor.fetchone())
 
-    def set_bootstrap_status(self, bootstrap_id: str, status: str) -> None:
+    def expire_bootstrap(self, bootstrap_id: str, expected_version: int) -> BootstrapRecord:
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
-                "UPDATE workmanship_sim_connector_pairing_bootstraps SET status=%s,resource_version=resource_version+1,"
-                "updated_at=NOW(6) WHERE bootstrap_id=%s AND status NOT IN ('cancelled','expired')",
-                (status, bootstrap_id),
+                "UPDATE workmanship_sim_connector_pairing_bootstraps SET status='expired',"
+                "resource_version=resource_version+1,updated_at=NOW(6) "
+                "WHERE bootstrap_id=%s AND status='created' AND resource_version=%s",
+                (bootstrap_id, expected_version),
             )
             if cursor.rowcount != 1:
-                raise PairingError("pairing_bootstrap_not_found")
+                raise PairingError("pairing_bootstrap_version_conflict")
+        record = self.bootstrap_by_id(bootstrap_id)
+        if record is None:
+            raise PairingError("pairing_bootstrap_not_found")
+        return record
+
+    def expire_pairing(self, pairing_id: str, expected_version: int) -> PairingRecord:
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "UPDATE workmanship_sim_connector_pairings SET status='expired',"
+                "resource_version=resource_version+1,updated_at=NOW(6) "
+                "WHERE pairing_id=%s AND status IN ('pending','approved') AND resource_version=%s",
+                (pairing_id, expected_version),
+            )
+            if cursor.rowcount != 1:
+                raise PairingError("pairing_version_conflict")
+        record = self.by_id(pairing_id)
+        if record is None:
+            raise PairingError("pairing_not_found")
+        return record
 
     def cancel_bootstrap(
         self, bootstrap_id: str, owner_user_gid: str, team_gid: str, expected_version: int,
@@ -627,27 +655,6 @@ class SqlPairingRepository:
                 **existing.__dict__, "status": "cancelled",
                 "resource_version": existing.resource_version + 1,
             })
-
-    def save_pairing(self, record: PairingRecord) -> None:
-        envelope_json = (
-            json.dumps({"ciphertext": record.encrypted_envelope}, separators=(",", ":"))
-            if record.encrypted_envelope else None
-        )
-        with get_simulation_conn() as conn, conn.cursor() as cursor:
-            cursor.execute(
-                "UPDATE workmanship_sim_connector_pairings SET status=%s,resource_version=%s,"
-                "approved_user_gid=%s,team_gid=%s,connector_id=%s,credential_envelope_json=%s,"
-                "credential_envelope_hash=%s,approved_at=IF(%s='approved',NOW(6),approved_at),"
-                "completed_at=IF(%s='completed',NOW(6),completed_at),updated_at=NOW(6) "
-                "WHERE pairing_id=%s",
-                (
-                    record.status, record.resource_version, record.approved_user_gid,
-                    record.team_gid, record.connector_id, envelope_json,
-                    record.envelope_hash, record.status, record.status, record.pairing_id,
-                ),
-            )
-            if cursor.rowcount != 1:
-                raise PairingError("pairing_not_found")
 
     def approve_pairing(self, record: PairingRecord, *, expected_version: int) -> None:
         with get_simulation_conn() as conn, conn.cursor() as cursor:
@@ -715,7 +722,8 @@ class SqlPairingRepository:
                     raise PairingError("pairing_bootstrap_version_conflict")
                 return current
             cursor.execute(
-                "SELECT connector_id,installation_id FROM workmanship_sim_connector_bindings "
+                "SELECT connector_id,installation_id,team_gid,pending_pairing_id "
+                "FROM workmanship_sim_connector_bindings "
                 "WHERE owner_user_gid=%s FOR UPDATE",
                 (user_gid,),
             )
@@ -724,17 +732,20 @@ class SqlPairingRepository:
                 raise PairingError("connector_binding_conflict")
             if existing and existing["connector_id"] != binding["connector_id"]:
                 raise PairingError("connector_binding_conflict")
+            if existing and existing.get("team_gid") != binding.get("team_gid"):
+                raise PairingError("connector_binding_conflict")
             if not existing:
                 try:
                     cursor.execute(
                         "INSERT INTO workmanship_sim_connector_bindings "
                         "(connector_id,owner_user_gid,team_gid,installation_id,windows_sid_hash,display_name,"
-                        "platform,runtime_version,token_hash,capabilities,status) "
-                        "VALUES (%s,%s,%s,%s,%s,%s,'windows',%s,%s,JSON_ARRAY('ai00.vismockup@1'),'pending_activation')",
+                        "platform,runtime_version,token_hash,capabilities,status,pending_pairing_id) "
+                        "VALUES (%s,%s,%s,%s,%s,%s,'windows',%s,%s,JSON_ARRAY('ai00.vismockup@1'),'pending_activation',%s)",
                         (
                             binding["connector_id"], user_gid, binding.get("team_gid"),
                             binding["installation_id"], binding["windows_sid_hash"],
                             binding["display_name"], binding["runtime_version"], binding["token_hash"],
+                            record.pairing_id,
                         ),
                     )
                 except IntegrityError as exc:
@@ -742,13 +753,13 @@ class SqlPairingRepository:
             else:
                 cursor.execute(
                     "UPDATE workmanship_sim_connector_bindings SET team_gid=%s,windows_sid_hash=%s,"
-                    "display_name=%s,runtime_version=%s,token_hash=%s,status='pending_activation',"
+                    "display_name=%s,runtime_version=%s,token_hash=%s,status='pending_activation',pending_pairing_id=%s,"
                     "updated_at=NOW(6) WHERE connector_id=%s AND owner_user_gid=%s "
                     "AND installation_id=%s",
                     (
                         binding.get("team_gid"), binding["windows_sid_hash"], binding["display_name"],
-                        binding["runtime_version"], binding["token_hash"], binding["connector_id"],
-                        user_gid, binding["installation_id"],
+                        binding["runtime_version"], binding["token_hash"], record.pairing_id,
+                        binding["connector_id"], user_gid, binding["installation_id"],
                     ),
                 )
                 if cursor.rowcount != 1:
@@ -808,10 +819,10 @@ class SqlPairingRepository:
             if cursor.rowcount != 1:
                 raise PairingError("pairing_version_conflict")
             cursor.execute(
-                "UPDATE workmanship_sim_connector_bindings SET status='offline',activated_at=NOW(6),"
+                "UPDATE workmanship_sim_connector_bindings SET status='offline',pending_pairing_id=NULL,activated_at=NOW(6),"
                 "updated_at=NOW(6) WHERE connector_id=%s AND owner_user_gid=%s "
-                "AND status='pending_activation'",
-                (record.connector_id, current.approved_user_gid),
+                "AND pending_pairing_id=%s AND status='pending_activation'",
+                (record.connector_id, current.approved_user_gid, record.pairing_id),
             )
             if cursor.rowcount != 1:
                 raise PairingError("connector_binding_conflict")
