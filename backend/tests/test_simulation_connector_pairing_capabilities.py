@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+import base64
+import json
 
 import pytest
 from pydantic import ValidationError
-from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 from plugins.simulation.simulation_backend.domain.connector_pairing import (
     InMemoryPairingRepository,
@@ -33,6 +37,34 @@ def _request(installation_id="install-1", verifier="proof-1"):
         masked_windows_user="DOMAIN\\l***",
         ephemeral_public_key=public_key,
     )
+
+
+def _request_with_private_key(installation_id="install-1", verifier="proof-1"):
+    key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    public_key = key.public_key().public_bytes(
+        serialization.Encoding.PEM,
+        serialization.PublicFormat.SubjectPublicKeyInfo,
+    ).decode("ascii")
+    return PairingRequest.from_verifier(
+        installation_id=installation_id, verifier=verifier, device_name="工位 A",
+        runtime_version="1.0.0", windows_sid_hash="a" * 64,
+        masked_windows_user="DOMAIN\\l***", ephemeral_public_key=public_key,
+    ), key
+
+
+def _activation_proof(envelope: str, private_key) -> str:
+    value = json.loads(base64.b64decode(envelope))
+    key = private_key.decrypt(
+        base64.b64decode(value["encrypted_key"]),
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()), algorithm=hashes.SHA256(), label=None,
+        ),
+    )
+    plaintext = AESGCM(key).decrypt(
+        base64.b64decode(value["nonce"]),
+        base64.b64decode(value["ciphertext"]) + base64.b64decode(value["tag"]), None,
+    )
+    return json.loads(plaintext)["activation_proof"]
 
 
 def _service():
@@ -156,6 +188,42 @@ def test_same_installation_retry_returns_same_envelope_without_second_binding():
     assert len(service.repository.bindings) == 1
 
 
+def test_replayed_envelope_recovers_activation_proof_after_lost_first_response():
+    service = _service()
+    request, private_key = _request_with_private_key()
+    created = service.request(request)
+    service.approve(created.user_code, "user-1", "team-1", expected_version=1)
+    service.complete(created.pairing_id, "install-1", "proof-1")
+
+    replay = service.complete(created.pairing_id, "install-1", "proof-1")
+    proof = _activation_proof(replay.encrypted_credential_envelope, private_key)
+    summary = service.activate(created.pairing_id, replay.connector_id, proof)
+
+    assert replay.activation_challenge == ""
+    assert summary.status == "active"
+
+
+def test_completion_returns_the_envelope_that_won_a_repository_race():
+    class RacingRepository(InMemoryPairingRepository):
+        def issue_credential(self, record, user_gid, binding):
+            winner = type(record)(
+                **{**record.__dict__, "encrypted_envelope": "winner-envelope", "envelope_hash": "sha256:winner"}
+            )
+            super().issue_credential(winner, user_gid, binding)
+            return super().issue_credential(record, user_gid, binding)
+
+    service = PairingService(RacingRepository(), clock=lambda: NOW, id_factory=lambda kind: {
+        "pairing": "pair-race", "code": "CODE-RACE", "connector": "connector-race", "token": "token-race",
+    }[kind])
+    created = service.request(_request())
+    service.approve(created.user_code, "user-1", "team-1", expected_version=1)
+
+    completed = service.complete(created.pairing_id, "install-1", "proof-1")
+
+    assert completed.encrypted_credential_envelope == "winner-envelope"
+    assert completed.envelope_hash == "sha256:winner"
+
+
 def test_activation_acknowledgement_marks_the_binding_active():
     service = _service()
     created = service.request(_request())
@@ -180,7 +248,7 @@ def test_credential_issue_persists_binding_and_pairing_through_one_repository_op
 
         def issue_credential(self, record, user_gid, binding):
             self.atomic_completion_called = True
-            super().issue_credential(record, user_gid, binding)
+            return super().issue_credential(record, user_gid, binding)
 
     repository = AtomicRepository()
     service = PairingService(

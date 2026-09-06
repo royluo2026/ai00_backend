@@ -3,11 +3,15 @@ from __future__ import annotations
 from contextlib import contextmanager
 from copy import deepcopy
 from datetime import UTC, datetime
+import hashlib
 
 import pytest
 
 from plugins.simulation.simulation_backend.data import connector_repository
-from plugins.simulation.simulation_backend.data.connector_repository import SqlPairingRepository
+from plugins.simulation.simulation_backend.data.connector_repository import (
+    SimulationConnectorRepository,
+    SqlPairingRepository,
+)
 from plugins.simulation.simulation_backend.domain.connector_pairing import PairingError, PairingRecord
 
 
@@ -58,8 +62,12 @@ class _Cursor:
         if normalized.startswith("select") and "connector_pairings" in normalized:
             self._row = self.connection.pairings.get(params[0])
         elif normalized.startswith("select") and "connector_bindings" in normalized:
-            self._row = next(
-                (row for row in self.connection.bindings.values() if row["owner_user_gid"] == params[0]), None,
+            self._row = (
+                self.connection.bindings.get(params[0])
+                if "where connector_id=%s" in normalized
+                else next(
+                    (row for row in self.connection.bindings.values() if row["owner_user_gid"] == params[0]), None,
+                )
             )
         elif normalized.startswith("insert into workmanship_sim_connector_bindings"):
             binding = {
@@ -89,6 +97,11 @@ class _Cursor:
             row = self.connection.pairings.get(params[1])
             if row and row["status"] == "completing" and row["activation_status"] == "credential_issued" and row["resource_version"] == params[3]:
                 row.update({"status": "completed", "activation_status": "active", "resource_version": params[0]})
+                self.rowcount = 1
+        elif "set team_gid=" in normalized:
+            row = self.connection.bindings.get(params[5])
+            if row and row["owner_user_gid"] == params[6] and row["installation_id"] == params[7]:
+                row.update({"team_gid": params[0], "windows_sid_hash": params[1], "display_name": params[2], "runtime_version": params[3], "token_hash": params[4], "status": "pending_activation"})
                 self.rowcount = 1
         elif "update workmanship_sim_connector_bindings" in normalized:
             row = self.connection.bindings.get(params[0])
@@ -157,9 +170,10 @@ def test_issue_replay_reuses_the_same_binding_and_locks_the_pairing(sql_reposito
     record = _record()
     connection.pairings["pair-1"].update({"status": "approved", "activation_status": "not_issued", "resource_version": 1})
 
-    repository.issue_credential(record, "user-1", _binding())
-    repository.issue_credential(record, "user-1", _binding())
+    first = repository.issue_credential(record, "user-1", _binding())
+    replay = repository.issue_credential(record, "user-1", _binding())
 
+    assert replay.envelope_hash == first.envelope_hash
     assert list(connection.bindings) == ["connector-1"]
     assert connection.pairings["pair-1"]["credential_envelope_hash"] == "sha256:envelope-1"
     assert any("for update" in query for query in connection.queries)
@@ -208,3 +222,29 @@ def test_issue_rolls_back_insert_when_the_pairing_update_loses_its_race(monkeypa
 
     assert connection.bindings == {}
     assert connection.pairings["pair-1"]["status"] == "approved"
+
+
+def test_issued_credential_cannot_authenticate_until_activation_and_rotation_revokes_old_token(sql_repository):
+    pairing_repository, connection = sql_repository
+    record = _record()
+    connection.pairings["pair-1"].update({"status": "approved", "activation_status": "not_issued", "resource_version": 1})
+    binding = _binding()
+    binding["token_hash"] = hashlib.sha256(b"new-token").hexdigest()
+    connection.bindings["connector-1"] = {
+        **_binding(), "owner_user_gid": "user-1", "token_hash": hashlib.sha256(b"old-token").hexdigest(),
+        "status": "online",
+    }
+
+    pairing_repository.issue_credential(record, "user-1", binding)
+
+    assert connection.bindings["connector-1"]["status"] == "pending_activation"
+    assert connection.bindings["connector-1"]["token_hash"] == binding["token_hash"]
+    with pytest.raises(PermissionError, match="invalid_connector_credentials"):
+        SimulationConnectorRepository().authenticate_connector("connector-1", "new-token")
+    with pytest.raises(PermissionError, match="invalid_connector_credentials"):
+        SimulationConnectorRepository().authenticate_connector("connector-1", "old-token")
+    pairing_repository.activate_pairing(record, expected_version=2)
+
+    assert SimulationConnectorRepository().authenticate_connector("connector-1", "new-token")["status"] == "offline"
+    with pytest.raises(PermissionError, match="invalid_connector_credentials"):
+        SimulationConnectorRepository().authenticate_connector("connector-1", "old-token")

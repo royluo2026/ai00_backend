@@ -53,7 +53,7 @@ class SimulationConnectorRepository:
             )
             row = cursor.fetchone()
         if (
-            not row or row["status"] == "revoked"
+            not row or row["status"] not in {"offline", "online"}
             or not secrets.compare_digest(str(row["token_hash"]), digest)
         ):
             raise PermissionError("invalid_connector_credentials")
@@ -109,7 +109,7 @@ class SimulationConnectorRepository:
                 cursor.execute(
                     "UPDATE workmanship_sim_connector_bindings SET status='online',"
                     "runtime_version=%s,last_seen_at=%s,updated_at=NOW(6) "
-                    "WHERE connector_id=%s AND owner_user_gid=%s AND status<>'revoked'",
+                    "WHERE connector_id=%s AND owner_user_gid=%s AND status IN ('offline','online')",
                     (
                         health.connector_version, health.reported_at,
                         connector_id, health.bound_user_id,
@@ -486,7 +486,7 @@ class SqlPairingRepository:
             if cursor.rowcount != 1:
                 raise PairingError("pairing_version_conflict")
 
-    def issue_credential(self, record: PairingRecord, user_gid: str, binding: dict) -> None:
+    def issue_credential(self, record: PairingRecord, user_gid: str, binding: dict) -> PairingRecord:
         envelope_json = json.dumps(
             {"ciphertext": record.encrypted_envelope}, separators=(",", ":"),
         )
@@ -499,7 +499,7 @@ class SqlPairingRepository:
             if current is None:
                 raise PairingError("pairing_not_found")
             if current.activation_status in {"credential_issued", "active"}:
-                return
+                return current
             cursor.execute(
                 "SELECT connector_id,installation_id FROM workmanship_sim_connector_bindings "
                 "WHERE owner_user_gid=%s FOR UPDATE",
@@ -525,6 +525,20 @@ class SqlPairingRepository:
                     )
                 except IntegrityError as exc:
                     raise PairingError("connector_binding_conflict") from exc
+            else:
+                cursor.execute(
+                    "UPDATE workmanship_sim_connector_bindings SET team_gid=%s,windows_sid_hash=%s,"
+                    "display_name=%s,runtime_version=%s,token_hash=%s,status='pending_activation',"
+                    "updated_at=NOW(6) WHERE connector_id=%s AND owner_user_gid=%s "
+                    "AND installation_id=%s",
+                    (
+                        binding.get("team_gid"), binding["windows_sid_hash"], binding["display_name"],
+                        binding["runtime_version"], binding["token_hash"], binding["connector_id"],
+                        user_gid, binding["installation_id"],
+                    ),
+                )
+                if cursor.rowcount != 1:
+                    raise PairingError("connector_binding_conflict")
             cursor.execute(
                 "UPDATE workmanship_sim_connector_pairings SET status='completing',resource_version=%s,"
                 "connector_id=%s,credential_envelope_json=%s,credential_envelope_hash=%s,"
@@ -539,6 +553,7 @@ class SqlPairingRepository:
             )
             if cursor.rowcount != 1:
                 raise PairingError("pairing_version_conflict")
+            return record
 
     def activate_pairing(self, record: PairingRecord, *, expected_version: int) -> None:
         with get_simulation_conn() as conn, conn.cursor() as cursor:

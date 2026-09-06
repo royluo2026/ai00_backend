@@ -134,12 +134,18 @@ class InMemoryPairingRepository:
             raise PairingError("pairing_version_conflict")
         self.pairings[record.pairing_id] = record
 
-    def issue_credential(self, record: PairingRecord, user_gid: str, binding: dict) -> None:
+    def issue_credential(self, record: PairingRecord, user_gid: str, binding: dict) -> PairingRecord:
+        current = self.pairings.get(record.pairing_id)
+        if current is None:
+            raise PairingError("pairing_not_found")
+        if current.activation_status in {"credential_issued", "active"}:
+            return current
         existing = self.bindings.get(user_gid)
         if existing and existing["connector_id"] != binding["connector_id"]:
             raise PairingError("connector_binding_conflict")
         self.bindings[user_gid] = binding
         self.pairings[record.pairing_id] = record
+        return record
 
     def activate_pairing(self, record: PairingRecord, *, expected_version: int) -> None:
         current = self.pairings.get(record.pairing_id)
@@ -252,9 +258,11 @@ class PairingService:
             raise PairingError("connector_binding_conflict")
         connector_id = existing["connector_id"] if existing else self.id_factory("connector")
         connector_token = self.id_factory("token")
+        activation_challenge = secrets.token_urlsafe(32)
         plaintext = json.dumps({
             "connector_id": connector_id,
             "connector_token": connector_token,
+            "activation_proof": activation_challenge,
             "bound_user_id": record.approved_user_gid,
             "team_id": record.team_gid,
             **self.extra_credential_factory(connector_id),
@@ -284,7 +292,6 @@ class PairingService:
             "display_name": record.device_name,
             "runtime_version": record.runtime_version,
         }
-        activation_challenge = secrets.token_urlsafe(32)
         issued = replace(
             record, connector_id=connector_id, encrypted_envelope=envelope,
             envelope_hash=envelope_hash, activation_challenge_hash=_hash(activation_challenge),
@@ -292,7 +299,9 @@ class PairingService:
             resource_version=record.resource_version + 1,
         )
         binding["status"] = "pending_activation"
-        self.repository.issue_credential(issued, record.approved_user_gid, binding)
+        stored = self.repository.issue_credential(issued, record.approved_user_gid, binding)
+        if stored.envelope_hash != issued.envelope_hash:
+            return self._stored_completion(stored)
         return PairingCompletion(
             connector_id=connector_id, encrypted_credential_envelope=envelope,
             envelope_hash=envelope_hash, activation_challenge=activation_challenge,
