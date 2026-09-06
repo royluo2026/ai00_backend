@@ -75,6 +75,7 @@ class PairingCompletion(FrozenModel):
     connector_id: str
     encrypted_credential_envelope: str
     envelope_hash: str
+    activation_challenge: str
 
 
 @dataclass
@@ -96,6 +97,8 @@ class PairingRecord:
     connector_id: str | None = None
     encrypted_envelope: str | None = None
     envelope_hash: str | None = None
+    activation_challenge_hash: str | None = None
+    activation_status: str = "not_issued"
 
 
 class InMemoryPairingRepository:
@@ -131,12 +134,31 @@ class InMemoryPairingRepository:
             raise PairingError("pairing_version_conflict")
         self.pairings[record.pairing_id] = record
 
-    def complete_pairing(self, record: PairingRecord, user_gid: str, binding: dict) -> None:
+    def issue_credential(self, record: PairingRecord, user_gid: str, binding: dict) -> None:
         existing = self.bindings.get(user_gid)
         if existing and existing["connector_id"] != binding["connector_id"]:
             raise PairingError("connector_binding_conflict")
         self.bindings[user_gid] = binding
         self.pairings[record.pairing_id] = record
+
+    def activate_pairing(self, record: PairingRecord, *, expected_version: int) -> None:
+        current = self.pairings.get(record.pairing_id)
+        if (
+            current is None or current.status != "completing"
+            or current.activation_status != "credential_issued"
+            or current.resource_version != expected_version
+        ):
+            raise PairingError("pairing_version_conflict")
+        binding = self.bindings.get(current.approved_user_gid or "")
+        if not binding or binding["connector_id"] != current.connector_id:
+            raise PairingError("connector_binding_conflict")
+        self.bindings[current.approved_user_gid or ""] = {
+            **binding, "status": "offline",
+        }
+        self.pairings[current.pairing_id] = replace(
+            current, status="completed", activation_status="active",
+            resource_version=current.resource_version + 1,
+        )
 
 
 class PairingService:
@@ -191,7 +213,8 @@ class PairingService:
         return PairingSummary(
             pairing_id=record.pairing_id, user_code=record.user_code,
             device_name=record.device_name, runtime_version=record.runtime_version,
-            masked_windows_user=record.masked_windows_user, status=record.status,
+            masked_windows_user=record.masked_windows_user,
+            status=record.activation_status if record.activation_status != "not_issued" else record.status,
             expires_at=record.expires_at, resource_version=record.resource_version,
         )
 
@@ -220,18 +243,14 @@ class PairingService:
             record.verifier_hash, _hash(verifier),
         ):
             raise PairingError("pairing_proof_invalid")
-        if record.status == "completed":
-            return PairingCompletion(
-                connector_id=record.connector_id or "",
-                encrypted_credential_envelope=record.encrypted_envelope or "",
-                envelope_hash=record.envelope_hash or "",
-            )
+        if record.activation_status in {"credential_issued", "active"}:
+            return self._stored_completion(record)
         if record.status != "approved" or not record.approved_user_gid:
             raise PairingError("pairing_not_approved")
         existing = self.repository.binding_for_user(record.approved_user_gid)
         if existing and existing["installation_id"] != installation_id:
             raise PairingError("connector_binding_conflict")
-        connector_id = self.id_factory("connector")
+        connector_id = existing["connector_id"] if existing else self.id_factory("connector")
         connector_token = self.id_factory("token")
         plaintext = json.dumps({
             "connector_id": connector_id,
@@ -265,15 +284,45 @@ class PairingService:
             "display_name": record.device_name,
             "runtime_version": record.runtime_version,
         }
-        record.connector_id = connector_id
-        record.encrypted_envelope = envelope
-        record.envelope_hash = envelope_hash
-        record.status = "completed"
-        record.resource_version += 1
-        self.repository.complete_pairing(record, record.approved_user_gid, binding)
+        activation_challenge = secrets.token_urlsafe(32)
+        issued = replace(
+            record, connector_id=connector_id, encrypted_envelope=envelope,
+            envelope_hash=envelope_hash, activation_challenge_hash=_hash(activation_challenge),
+            activation_status="credential_issued", status="completing",
+            resource_version=record.resource_version + 1,
+        )
+        binding["status"] = "pending_activation"
+        self.repository.issue_credential(issued, record.approved_user_gid, binding)
         return PairingCompletion(
             connector_id=connector_id, encrypted_credential_envelope=envelope,
-            envelope_hash=envelope_hash,
+            envelope_hash=envelope_hash, activation_challenge=activation_challenge,
+        )
+
+    @staticmethod
+    def _stored_completion(record: PairingRecord) -> PairingCompletion:
+        return PairingCompletion(
+            connector_id=record.connector_id or "",
+            encrypted_credential_envelope=record.encrypted_envelope or "",
+            envelope_hash=record.envelope_hash or "", activation_challenge="",
+        )
+
+    def activate(
+        self, pairing_id: str, connector_id: str, activation_proof: str,
+    ) -> PairingSummary:
+        record = self.repository.by_id(pairing_id)
+        if record is None or record.connector_id != connector_id:
+            raise PairingError("pairing_not_found")
+        if not secrets.compare_digest(record.activation_challenge_hash or "", _hash(activation_proof)):
+            raise PairingError("pairing_activation_proof_invalid")
+        self.repository.activate_pairing(record, expected_version=record.resource_version)
+        activated = self.repository.by_id(pairing_id)
+        if activated is None:
+            raise PairingError("pairing_not_found")
+        return PairingSummary(
+            pairing_id=activated.pairing_id, user_code=activated.user_code,
+            device_name=activated.device_name, runtime_version=activated.runtime_version,
+            masked_windows_user=activated.masked_windows_user, status=activated.activation_status,
+            expires_at=activated.expires_at, resource_version=activated.resource_version,
         )
 
 

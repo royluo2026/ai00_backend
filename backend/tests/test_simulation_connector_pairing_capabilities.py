@@ -132,7 +132,44 @@ def test_completion_retry_returns_same_encrypted_envelope():
     assert "token-secret" not in second.encrypted_credential_envelope
 
 
-def test_completion_persists_binding_and_pairing_through_one_repository_operation():
+def test_credential_issue_does_not_claim_active_until_connector_ack():
+    service = _service()
+    created = service.request(_request())
+    service.approve(created.user_code, "user-1", "team-1", expected_version=1)
+
+    issued = service.complete(created.pairing_id, "install-1", "proof-1")
+
+    assert issued.activation_challenge
+    assert service.repository.by_id(created.pairing_id).activation_status == "credential_issued"
+    assert service.repository.binding_for_user("user-1")["status"] == "pending_activation"
+
+
+def test_same_installation_retry_returns_same_envelope_without_second_binding():
+    service = _service()
+    created = service.request(_request())
+    service.approve(created.user_code, "user-1", "team-1", expected_version=1)
+
+    first = service.complete(created.pairing_id, "install-1", "proof-1")
+    second = service.complete(created.pairing_id, "install-1", "proof-1")
+
+    assert second.encrypted_credential_envelope == first.encrypted_credential_envelope
+    assert len(service.repository.bindings) == 1
+
+
+def test_activation_acknowledgement_marks_the_binding_active():
+    service = _service()
+    created = service.request(_request())
+    service.approve(created.user_code, "user-1", "team-1", expected_version=1)
+    issued = service.complete(created.pairing_id, "install-1", "proof-1")
+
+    summary = service.activate(created.pairing_id, issued.connector_id, issued.activation_challenge)
+
+    assert summary.status == "active"
+    assert service.repository.by_id(created.pairing_id).activation_status == "active"
+    assert service.repository.binding_for_user("user-1")["status"] == "offline"
+
+
+def test_credential_issue_persists_binding_and_pairing_through_one_repository_operation():
     class AtomicRepository(InMemoryPairingRepository):
         def __init__(self):
             super().__init__()
@@ -141,9 +178,9 @@ def test_completion_persists_binding_and_pairing_through_one_repository_operatio
         def create_binding(self, *_args, **_kwargs):
             raise AssertionError("completion must not persist the binding separately")
 
-        def complete_pairing(self, record, user_gid, binding):
+        def issue_credential(self, record, user_gid, binding):
             self.atomic_completion_called = True
-            super().complete_pairing(record, user_gid, binding)
+            super().issue_credential(record, user_gid, binding)
 
     repository = AtomicRepository()
     service = PairingService(
@@ -163,4 +200,4 @@ def test_completion_persists_binding_and_pairing_through_one_repository_operatio
 
     assert repository.atomic_completion_called is True
     assert repository.binding_for_user("user-1")["connector_id"] == "connector-atomic"
-    assert repository.by_id(created.pairing_id).status == "completed"
+    assert repository.by_id(created.pairing_id).activation_status == "credential_issued"

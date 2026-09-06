@@ -8,6 +8,8 @@ import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime
 
+from pymysql.err import IntegrityError
+
 from backend.contracts.connector_execution_plan_v1 import (
     ConnectorExecutionPlanV1,
     ConnectorPlanOutcomeV1,
@@ -398,6 +400,8 @@ class SqlPairingRepository:
             connector_id=row.get("connector_id"),
             encrypted_envelope=(envelope or {}).get("ciphertext"),
             envelope_hash=row.get("credential_envelope_hash"),
+            activation_challenge_hash=row.get("activation_challenge_hash"),
+            activation_status=row.get("activation_status", "not_issued"),
         )
 
     def create_pairing(self, record: PairingRecord) -> None:
@@ -440,7 +444,7 @@ class SqlPairingRepository:
     def binding_for_user(self, user_gid: str) -> dict | None:
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
-                "SELECT connector_id,installation_id FROM workmanship_sim_connector_bindings "
+                "SELECT connector_id,installation_id,status FROM workmanship_sim_connector_bindings "
                 "WHERE owner_user_gid=%s LIMIT 1",
                 (user_gid,),
             )
@@ -482,36 +486,89 @@ class SqlPairingRepository:
             if cursor.rowcount != 1:
                 raise PairingError("pairing_version_conflict")
 
-    def complete_pairing(self, record: PairingRecord, user_gid: str, binding: dict) -> None:
+    def issue_credential(self, record: PairingRecord, user_gid: str, binding: dict) -> None:
         envelope_json = json.dumps(
             {"ciphertext": record.encrypted_envelope}, separators=(",", ":"),
         )
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
-                "INSERT INTO workmanship_sim_connector_bindings "
-                "(connector_id,owner_user_gid,team_gid,installation_id,windows_sid_hash,display_name,"
-                "platform,runtime_version,token_hash,capabilities,status) "
-                "VALUES (%s,%s,%s,%s,%s,%s,'windows',%s,%s,JSON_ARRAY('ai00.vismockup@1'),'offline')",
-                (
-                    binding["connector_id"], user_gid, binding.get("team_gid"),
-                    binding["installation_id"], binding["windows_sid_hash"],
-                    binding["display_name"], binding["runtime_version"], binding["token_hash"],
-                ),
+                "SELECT * FROM workmanship_sim_connector_pairings WHERE pairing_id=%s FOR UPDATE",
+                (record.pairing_id,),
             )
+            current = self._record(cursor.fetchone())
+            if current is None:
+                raise PairingError("pairing_not_found")
+            if current.activation_status in {"credential_issued", "active"}:
+                return
             cursor.execute(
-                "UPDATE workmanship_sim_connector_pairings SET status='completed',resource_version=%s,"
+                "SELECT connector_id,installation_id FROM workmanship_sim_connector_bindings "
+                "WHERE owner_user_gid=%s FOR UPDATE",
+                (user_gid,),
+            )
+            existing = cursor.fetchone()
+            if existing and existing["installation_id"] != binding["installation_id"]:
+                raise PairingError("connector_binding_conflict")
+            if existing and existing["connector_id"] != binding["connector_id"]:
+                raise PairingError("connector_binding_conflict")
+            if not existing:
+                try:
+                    cursor.execute(
+                        "INSERT INTO workmanship_sim_connector_bindings "
+                        "(connector_id,owner_user_gid,team_gid,installation_id,windows_sid_hash,display_name,"
+                        "platform,runtime_version,token_hash,capabilities,status) "
+                        "VALUES (%s,%s,%s,%s,%s,%s,'windows',%s,%s,JSON_ARRAY('ai00.vismockup@1'),'pending_activation')",
+                        (
+                            binding["connector_id"], user_gid, binding.get("team_gid"),
+                            binding["installation_id"], binding["windows_sid_hash"],
+                            binding["display_name"], binding["runtime_version"], binding["token_hash"],
+                        ),
+                    )
+                except IntegrityError as exc:
+                    raise PairingError("connector_binding_conflict") from exc
+            cursor.execute(
+                "UPDATE workmanship_sim_connector_pairings SET status='completing',resource_version=%s,"
                 "connector_id=%s,credential_envelope_json=%s,credential_envelope_hash=%s,"
-                "completed_at=NOW(6),updated_at=NOW(6) "
+                "activation_challenge_hash=%s,activation_status='credential_issued',updated_at=NOW(6) "
                 "WHERE pairing_id=%s AND status='approved' AND approved_user_gid=%s "
                 "AND resource_version=%s",
                 (
                     record.resource_version, record.connector_id, envelope_json,
-                    record.envelope_hash, record.pairing_id, user_gid,
+                    record.envelope_hash, record.activation_challenge_hash, record.pairing_id, user_gid,
                     record.resource_version - 1,
                 ),
             )
             if cursor.rowcount != 1:
                 raise PairingError("pairing_version_conflict")
+
+    def activate_pairing(self, record: PairingRecord, *, expected_version: int) -> None:
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT * FROM workmanship_sim_connector_pairings WHERE pairing_id=%s FOR UPDATE",
+                (record.pairing_id,),
+            )
+            current = self._record(cursor.fetchone())
+            if (
+                current is None or current.connector_id != record.connector_id
+                or current.activation_status != "credential_issued"
+            ):
+                raise PairingError("pairing_version_conflict")
+            cursor.execute(
+                "UPDATE workmanship_sim_connector_pairings SET status='completed',activation_status='active',"
+                "resource_version=%s,completed_at=NOW(6),activated_at=NOW(6),updated_at=NOW(6) "
+                "WHERE pairing_id=%s AND connector_id=%s AND status='completing' "
+                "AND activation_status='credential_issued' AND resource_version=%s",
+                (expected_version + 1, record.pairing_id, record.connector_id, expected_version),
+            )
+            if cursor.rowcount != 1:
+                raise PairingError("pairing_version_conflict")
+            cursor.execute(
+                "UPDATE workmanship_sim_connector_bindings SET status='offline',activated_at=NOW(6),"
+                "updated_at=NOW(6) WHERE connector_id=%s AND owner_user_gid=%s "
+                "AND status='pending_activation'",
+                (record.connector_id, current.approved_user_gid),
+            )
+            if cursor.rowcount != 1:
+                raise PairingError("connector_binding_conflict")
 
 
 __all__ = [
