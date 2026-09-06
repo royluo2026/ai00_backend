@@ -5,7 +5,7 @@ namespace Ai00.Connector.Tests;
 public sealed class InstallerContractTests
 {
     [Fact]
-    public void InstallerRegistersServiceAndPerUserSessionHostWithoutInboundPort()
+    public void InstallerRegistersAlwaysOnServiceTrayAndCustomProtocolWithoutIdleSessionHost()
     {
         var wix = File.ReadAllText(SourceFile("installer", "Product.wxs"));
 
@@ -16,7 +16,11 @@ public sealed class InstallerContractTests
         Assert.Contains("ComponentGroupRef Id=\"Ai00ConnectorServicePayload\"", wix, StringComparison.Ordinal);
         Assert.Contains("$(var.ServicePublishDir)\\**", wix, StringComparison.Ordinal);
         Assert.Contains("CurrentVersion\\Run", wix, StringComparison.Ordinal);
-        Assert.Contains("AI00 Connector SessionHost", wix, StringComparison.Ordinal);
+        Assert.Contains("Start=\"auto\"", wix, StringComparison.Ordinal);
+        Assert.Contains(@"Software\Classes\ai00connector", wix, StringComparison.Ordinal);
+        Assert.Contains("URL Protocol", wix, StringComparison.Ordinal);
+        Assert.Contains("AI00 Connector Tray", wix, StringComparison.Ordinal);
+        Assert.DoesNotContain("Name=\"AI00 Connector SessionHost\"", wix, StringComparison.Ordinal);
         Assert.DoesNotContain("FirewallException", wix, StringComparison.Ordinal);
 
         var settings = File.ReadAllText(SourceFile("appsettings.example.json"));

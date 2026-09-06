@@ -11,6 +11,7 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.1" />
     <ProjectReference Include="..\..\src\Ai00.Connector.Contracts\Ai00.Connector.Contracts.csproj" />
     <ProjectReference Include="..\..\src\Ai00.Connector.Service\Ai00.Connector.Service.csproj" />
+    <ProjectReference Include="..\..\src\Ai00.Connector.Tray\Ai00.Connector.Tray.csproj" />
     <ProjectReference Include="..\..\src\Ai00.Connector.SessionHost\Ai00.Connector.SessionHost.csproj" />
     <ProjectReference Include="..\..\src\Ai00.Connector.Adapters.Mcp\Ai00.Connector.Adapters.Mcp.csproj" />
     <None Include="..\..\..\backend\tests\fixtures\device_protocol_vectors.json" Link="device_protocol_vectors.json" CopyToOutputDirectory="PreserveNewest" />

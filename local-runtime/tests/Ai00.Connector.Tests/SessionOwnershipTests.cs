@@ -1,12 +1,23 @@
 using Ai00.Connector.Contracts;
 using Ai00.Connector.Service;
 using Ai00.Connector.SessionHost;
+using Ai00.Connector.Tray;
 using Xunit;
 
 namespace Ai00.Connector.Tests;
 
 public sealed class SessionOwnershipTests
 {
+    [Fact]
+    public void TrayRejectsMalformedOrRemoteHttpPairingUrisBeforePipeAccess()
+    {
+        Assert.False(PairingPipeClient.IsAllowed(new Uri("https://example.com/pair")));
+        Assert.False(PairingPipeClient.IsAllowed(new Uri(
+            "ai00connector://pair?gateway=http%3A%2F%2Fexample.com&bootstrap_id=b&bootstrap_token=t")));
+        Assert.True(PairingPipeClient.IsAllowed(new Uri(
+            "ai00connector://pair?gateway=https%3A%2F%2Fai00.example&bootstrap_id=b&bootstrap_token=t")));
+    }
+
     [Fact]
     public void SecondSessionHostForDeviceAndSidIsRejected()
     {

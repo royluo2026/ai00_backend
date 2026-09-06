@@ -11,11 +11,13 @@
         </Component>
         <Component Id="Ai00ConnectorSessionHost" Guid="*">
           <File Id="Ai00ConnectorSessionHostExe" Source="$(var.SessionHostPublishDir)\Ai00.Connector.SessionHost.exe" KeyPath="yes" />
-          <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Run" Name="AI00 Connector SessionHost" Value="&quot;[INSTALLFOLDER]Ai00.Connector.SessionHost.exe&quot;" Type="string" />
         </Component>
         <Component Id="Ai00ConnectorTray" Guid="*">
           <File Id="Ai00ConnectorTrayExe" Source="$(var.TrayPublishDir)\Ai00.Connector.Tray.exe" KeyPath="yes" />
           <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Run" Name="AI00 Connector Tray" Value="&quot;[INSTALLFOLDER]Ai00.Connector.Tray.exe&quot;" Type="string" />
+          <RegistryValue Root="HKLM" Key="Software\Classes\ai00connector" Value="URL:AI00 Connector Protocol" Type="string" />
+          <RegistryValue Root="HKLM" Key="Software\Classes\ai00connector" Name="URL Protocol" Value="" Type="string" />
+          <RegistryValue Root="HKLM" Key="Software\Classes\ai00connector\shell\open\command" Value="&quot;[INSTALLFOLDER]Ai00.Connector.Tray.exe&quot; &quot;%1&quot;" Type="string" />
         </Component>
       </Directory>
     </StandardDirectory>
@@ -24,7 +26,7 @@
         <Directory Id="Ai00ConnectorProgramData" Name="Connector">
           <Component Id="Ai00ConnectorProgramDataAcl" Guid="*">
             <CreateFolder />
-            <RegistryValue Root="HKLM" Key="Software\AI00\Connector" Name="BoundUserStartupTask" Value="AI00 Connector SessionHost" Type="string" KeyPath="yes" />
+            <RegistryValue Root="HKLM" Key="Software\AI00\Connector" Name="BoundUserStartupTask" Value="AI00 Connector Tray" Type="string" KeyPath="yes" />
           </Component>
         </Directory>
       </Directory>
