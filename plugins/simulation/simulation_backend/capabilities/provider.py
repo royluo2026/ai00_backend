@@ -125,8 +125,15 @@ _ERROR_PAIRS = (
     ("plan_outcome_invalid", "The Connector outcome does not match the immutable execution plan."),
     ("capability_migration_required", "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow."),
     ("pairing_not_found", "The Connector pairing request does not exist."),
+    ("pairing_bootstrap_not_found", "The Connector bootstrap ticket does not exist or is not visible to this user."),
+    ("pairing_bootstrap_expired", "The two-minute Connector bootstrap ticket expired."),
+    ("pairing_bootstrap_reused", "The Connector bootstrap ticket was already claimed or cancelled."),
+    ("pairing_bootstrap_active", "An active Connector bootstrap ticket cannot be cancelled."),
+    ("pairing_bootstrap_version_conflict", "The Connector bootstrap ticket changed after it was displayed."),
+    ("pairing_bootstrap_conflict", "The Connector bootstrap ticket could not be created uniquely."),
     ("pairing_expired", "The five-minute Connector pairing request expired."),
     ("pairing_proof_invalid", "The Connector did not prove the original verifier and installation identity."),
+    ("pairing_activation_proof_invalid", "The Connector activation proof is invalid."),
     ("pairing_not_approved", "The signed-in AI00 user has not approved this pairing."),
     ("pairing_version_conflict", "The pairing changed after it was displayed."),
     ("connector_binding_conflict", "The AI00 user already has a different Connector binding."),
@@ -349,6 +356,13 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             or governed.id in {
                 "simulation.connector.pairing.request",
                 "simulation.connector.pairing.complete",
+                "simulation.connector.pairing.activate",
+            }
+            else ExposurePolicy(web=True)
+            if governed.id in {
+                "simulation.connector.pairing.bootstrap.create",
+                "simulation.connector.pairing.bootstrap.get",
+                "simulation.connector.pairing.cancel",
             }
             else ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True)
         ),
@@ -364,6 +378,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             or governed.id in {
                 "simulation.connector.pairing.request",
                 "simulation.connector.pairing.complete",
+                "simulation.connector.pairing.activate",
             }
             else ExecutionMode.CLOUD_ASYNC
             if governed.id == "simulation.run.start"

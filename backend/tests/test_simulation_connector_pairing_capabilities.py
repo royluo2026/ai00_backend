@@ -17,6 +17,10 @@ from plugins.simulation.simulation_backend.domain.connector_pairing import (
     PairingRequest,
     PairingService,
 )
+from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext
+from plugins.simulation.simulation_backend.capabilities.connector_pairing import (
+    ConnectorPairingProvider,
+)
 
 
 NOW = datetime(2026, 9, 3, 8, 0, tzinfo=UTC)
@@ -77,6 +81,7 @@ def _service():
             "code": f"CODE-{counters[kind]}",
             "connector": f"connector-{counters[kind]}",
             "token": "token-secret" if counters[kind] == 1 else f"token-{counters[kind]}",
+            "bootstrap": f"bootstrap-{counters[kind]}",
         }
         return values[kind]
 
@@ -84,6 +89,57 @@ def _service():
         InMemoryPairingRepository(), clock=lambda: NOW,
         id_factory=identifier,
     )
+
+
+def _provider_contexts():
+    provider = ConnectorPairingProvider(_service())
+    return (
+        provider,
+        CapabilityContext(user_gid="user-1", team_gid="team-1", source="web"),
+        CapabilityContext(user_gid="connector-1", source="local_runtime"),
+    )
+
+
+def test_bootstrap_is_user_scoped_and_pair_request_claims_it_once():
+    provider, web, local = _provider_contexts()
+
+    ticket = provider.bootstrap_create({}, web).data
+    request = _request().model_copy(update={"bootstrap_token": ticket["bootstrap_token"]})
+
+    claimed = provider.request(request.model_dump(), local).data
+
+    assert claimed["bootstrap_id"] == ticket["bootstrap_id"]
+    with pytest.raises(CapabilityBusinessError, match="pairing_bootstrap_reused"):
+        provider.request(request.model_dump(), local)
+
+
+def test_bootstrap_projection_is_owner_scoped_and_never_exposes_secret_material():
+    provider, web, _local = _provider_contexts()
+    ticket = provider.bootstrap_create({}, web).data
+
+    value = provider.bootstrap_get({"bootstrap_id": ticket["bootstrap_id"]}, web).data
+
+    assert not ({"bootstrap_token", "token_hash", "verifier_hash", "ephemeral_public_key"} & value.keys())
+    with pytest.raises(CapabilityBusinessError, match="pairing_bootstrap_not_found"):
+        provider.bootstrap_get(
+            {"bootstrap_id": ticket["bootstrap_id"]},
+            CapabilityContext(user_gid="user-2", team_gid="team-1", source="web"),
+        )
+
+
+def test_active_bootstrap_cannot_be_cancelled():
+    service = _service()
+    ticket = service.bootstrap_create("user-1", "team-1")
+    created = service.request(_request().model_copy(update={"bootstrap_token": ticket.bootstrap_token}))
+    service.approve(created.user_code, "user-1", "team-1", expected_version=1)
+    issued = service.complete(created.pairing_id, "install-1", "proof-1")
+    service.activate(created.pairing_id, issued.connector_id, issued.activation_challenge)
+    bootstrap = service.bootstrap_get(ticket.bootstrap_id, "user-1")
+
+    with pytest.raises(PairingError, match="pairing_bootstrap_active"):
+        service.bootstrap_cancel(
+            ticket.bootstrap_id, "user-1", expected_version=bootstrap.resource_version,
+        )
 
 
 def test_pairing_rejects_invalid_ephemeral_public_key_before_approval():
@@ -115,6 +171,19 @@ def test_pairing_summary_contains_only_safe_display_fields():
         "pairing_id", "user_code", "device_name", "runtime_version",
         "masked_windows_user", "status", "expires_at", "resource_version",
     }
+
+
+def test_read_providers_return_required_governance_evidence():
+    service = _service()
+    created = service.request(_request())
+    provider = ConnectorPairingProvider(service)
+    context = CapabilityContext(user_gid="user-1", source="web")
+
+    summary = provider.summary({"user_code": created.user_code}, context)
+    binding = provider.binding({}, context)
+
+    assert summary.evidence and summary.evidence[0].digest
+    assert binding.evidence and binding.evidence[0].digest
 
 
 def test_one_user_cannot_silently_replace_binding():

@@ -7,6 +7,7 @@ import secrets
 import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 from pymysql.err import IntegrityError
 
@@ -16,9 +17,11 @@ from backend.contracts.connector_execution_plan_v1 import (
     canonical_hash,
 )
 
-from ..capabilities.connector_contracts import ConnectorHealth
-from ..domain.connector_pairing import PairingError, PairingRecord
+from ..domain.connector_pairing import BootstrapRecord, PairingError, PairingRecord
 from .connection import get_simulation_conn
+
+if TYPE_CHECKING:
+    from ..capabilities.connector_contracts import ConnectorHealth
 
 
 class ConnectorRepositoryError(RuntimeError):
@@ -66,12 +69,15 @@ class SimulationConnectorRepository:
             cursor.execute(
                 "SELECT 1 FROM workmanship_sim_connector_bindings "
                 "WHERE connector_id=%s AND owner_user_gid=%s "
-                "AND (team_gid=%s OR team_gid IS NULL) LIMIT 1",
+                "AND (team_gid=%s OR team_gid IS NULL) "
+                "AND status IN ('offline','online') LIMIT 1",
                 (connector_id, user_gid, team_gid),
             )
             return cursor.fetchone() is not None
 
     def get_health(self, connector_id: str) -> ConnectorHealth | None:
+        from ..capabilities.connector_contracts import ConnectorHealth
+
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
                 "SELECT health_json FROM workmanship_sim_connector_health "
@@ -380,6 +386,19 @@ class SimulationConnectorRepository:
 
 class SqlPairingRepository:
     @staticmethod
+    def _bootstrap(row) -> BootstrapRecord | None:
+        if not row:
+            return None
+        expires_at = row["expires_at"]
+        return BootstrapRecord(
+            bootstrap_id=row["bootstrap_id"], owner_user_gid=row["owner_user_gid"],
+            team_gid=row["team_gid"], token_hash=row["token_hash"], status=row["status"],
+            pairing_id=row.get("pairing_id"),
+            expires_at=expires_at.replace(tzinfo=UTC) if expires_at.tzinfo is None else expires_at,
+            resource_version=int(row.get("resource_version", 1)),
+        )
+
+    @staticmethod
     def _record(row) -> PairingRecord | None:
         if not row:
             return None
@@ -449,6 +468,107 @@ class SqlPairingRepository:
                 (user_gid,),
             )
             return cursor.fetchone()
+
+    def create_bootstrap(self, record: BootstrapRecord) -> None:
+        try:
+            with get_simulation_conn() as conn, conn.cursor() as cursor:
+                cursor.execute(
+                    "INSERT INTO workmanship_sim_connector_pairing_bootstraps "
+                    "(bootstrap_id,owner_user_gid,team_gid,token_hash,status,expires_at,resource_version) "
+                    "VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                    (
+                        record.bootstrap_id, record.owner_user_gid, record.team_gid,
+                        record.token_hash, record.status, record.expires_at, record.resource_version,
+                    ),
+                )
+        except IntegrityError as exc:
+            raise PairingError("pairing_bootstrap_conflict") from exc
+
+    def bootstrap_by_id(self, bootstrap_id: str) -> BootstrapRecord | None:
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT * FROM workmanship_sim_connector_pairing_bootstraps "
+                "WHERE bootstrap_id=%s LIMIT 1", (bootstrap_id,),
+            )
+            return self._bootstrap(cursor.fetchone())
+
+    def claim_bootstrap(self, token_hash: str, now: datetime) -> BootstrapRecord:
+        with get_simulation_conn() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    "SELECT * FROM workmanship_sim_connector_pairing_bootstraps "
+                    "WHERE token_hash=%s LIMIT 1 FOR UPDATE", (token_hash,),
+                )
+                record = self._bootstrap(cursor.fetchone())
+                if record is None:
+                    raise PairingError("pairing_bootstrap_not_found")
+                if record.expires_at <= now:
+                    cursor.execute(
+                        "UPDATE workmanship_sim_connector_pairing_bootstraps SET status='expired',updated_at=NOW(6) "
+                        "WHERE bootstrap_id=%s AND status NOT IN ('active','cancelled')",
+                        (record.bootstrap_id,),
+                    )
+                    raise PairingError("pairing_bootstrap_expired")
+                if record.status != "created":
+                    raise PairingError("pairing_bootstrap_reused")
+                cursor.execute(
+                    "UPDATE workmanship_sim_connector_pairing_bootstraps SET status='claimed',resource_version=resource_version+1,"
+                    "updated_at=NOW(6) WHERE bootstrap_id=%s AND status='created' AND resource_version=%s",
+                    (record.bootstrap_id, record.resource_version),
+                )
+                if cursor.rowcount != 1:
+                    raise PairingError("pairing_bootstrap_reused")
+                return BootstrapRecord(
+                    **{**record.__dict__, "status": "claimed", "resource_version": record.resource_version + 1},
+                )
+
+    def link_bootstrap_pairing(self, bootstrap_id: str, pairing_id: str) -> None:
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "UPDATE workmanship_sim_connector_pairing_bootstraps SET pairing_id=%s,updated_at=NOW(6) "
+                "WHERE bootstrap_id=%s AND status='claimed' AND pairing_id IS NULL",
+                (pairing_id, bootstrap_id),
+            )
+            if cursor.rowcount != 1:
+                raise PairingError("pairing_bootstrap_reused")
+
+    def bootstrap_for_pairing(self, pairing_id: str) -> BootstrapRecord | None:
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT * FROM workmanship_sim_connector_pairing_bootstraps "
+                "WHERE pairing_id=%s LIMIT 1", (pairing_id,),
+            )
+            return self._bootstrap(cursor.fetchone())
+
+    def set_bootstrap_status(self, bootstrap_id: str, status: str) -> None:
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "UPDATE workmanship_sim_connector_pairing_bootstraps SET status=%s,resource_version=resource_version+1,"
+                "updated_at=NOW(6) WHERE bootstrap_id=%s AND status NOT IN ('cancelled','expired')",
+                (status, bootstrap_id),
+            )
+            if cursor.rowcount != 1:
+                raise PairingError("pairing_bootstrap_not_found")
+
+    def cancel_bootstrap(self, bootstrap_id: str, owner_user_gid: str, expected_version: int) -> BootstrapRecord:
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "UPDATE workmanship_sim_connector_pairing_bootstraps SET status='cancelled',resource_version=resource_version+1,"
+                "updated_at=NOW(6) WHERE bootstrap_id=%s AND owner_user_gid=%s AND resource_version=%s "
+                "AND status NOT IN ('active','cancelled','expired')",
+                (bootstrap_id, owner_user_gid, expected_version),
+            )
+            if cursor.rowcount != 1:
+                existing = self.bootstrap_by_id(bootstrap_id)
+                if existing and existing.owner_user_gid == owner_user_gid and existing.status == "active":
+                    raise PairingError("pairing_bootstrap_active")
+                if existing and existing.owner_user_gid == owner_user_gid:
+                    raise PairingError("pairing_bootstrap_version_conflict")
+                raise PairingError("pairing_bootstrap_not_found")
+        record = self.bootstrap_by_id(bootstrap_id)
+        if record is None:
+            raise PairingError("pairing_bootstrap_not_found")
+        return record
 
     def save_pairing(self, record: PairingRecord) -> None:
         envelope_json = (

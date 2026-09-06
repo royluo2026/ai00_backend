@@ -129,11 +129,13 @@ INPUT_SCHEMAS = {
     "simulation.vismockup.visibility.change.apply": obj({**CONNECTOR, "action": {"type": "string", "enum": ["all_on", "all_off", "deselect"]}}, ("connector_id", "action")),
     "simulation.vismockup.capture.create": obj(CONNECTOR, ("connector_id",)),
     "simulation.connector.pairing.request": obj({
-        "installation_id": STRING, "verifier_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "bootstrap_token": STRING, "installation_id": STRING, "verifier_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
         "device_name": STRING, "runtime_version": STRING,
         "windows_sid_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
         "masked_windows_user": STRING, "ephemeral_public_key": STRING,
-    }, ("installation_id", "verifier_hash", "device_name", "runtime_version", "windows_sid_hash", "masked_windows_user", "ephemeral_public_key")),
+    }, ("bootstrap_token", "installation_id", "verifier_hash", "device_name", "runtime_version", "windows_sid_hash", "masked_windows_user", "ephemeral_public_key")),
+    "simulation.connector.pairing.bootstrap.create": obj({}, ()),
+    "simulation.connector.pairing.bootstrap.get": obj({"bootstrap_id": STRING}, ("bootstrap_id",)),
     "simulation.connector.pairing.summary.get": obj({"user_code": STRING}, ("user_code",)),
     "simulation.connector.pairing.approve": obj({
         "user_code": STRING, "expected_version": {"type": "integer", "minimum": 1},
@@ -141,6 +143,12 @@ INPUT_SCHEMAS = {
     "simulation.connector.pairing.complete": obj({
         "pairing_id": STRING, "installation_id": STRING, "verifier": STRING,
     }, ("pairing_id", "installation_id", "verifier")),
+    "simulation.connector.pairing.activate": obj({
+        "pairing_id": STRING, "connector_id": STRING, "activation_proof": STRING,
+    }, ("pairing_id", "connector_id", "activation_proof")),
+    "simulation.connector.pairing.cancel": obj({
+        "bootstrap_id": STRING, "expected_version": {"type": "integer", "minimum": 1},
+    }, ("bootstrap_id", "expected_version")),
     "simulation.connector.binding.get": obj({}, ()),
 }
 
@@ -181,14 +189,30 @@ OUTPUT_SCHEMAS = {
     "simulation.connector.pairing.request": obj({
         "pairing_id": STRING, "user_code": STRING, "verification_uri": STRING,
         "status": STRING, "expires_at": {"type": "string", "format": "date-time"},
+        "resource_version": {"type": "integer", "minimum": 1}, "bootstrap_id": STRING,
+    }, ("pairing_id", "user_code", "verification_uri", "status", "expires_at", "resource_version", "bootstrap_id")),
+    "simulation.connector.pairing.bootstrap.create": obj({
+        "bootstrap_id": STRING, "bootstrap_token": STRING, "status": STRING,
+        "expires_at": {"type": "string", "format": "date-time"},
         "resource_version": {"type": "integer", "minimum": 1},
-    }, ("pairing_id", "user_code", "verification_uri", "status", "expires_at", "resource_version")),
+    }, ("bootstrap_id", "bootstrap_token", "status", "expires_at", "resource_version")),
+    "simulation.connector.pairing.bootstrap.get": obj({
+        "bootstrap_id": STRING, "status": STRING, "pairing_id": {"type": ["string", "null"]},
+        "expires_at": {"type": "string", "format": "date-time"},
+        "resource_version": {"type": "integer", "minimum": 1},
+    }, ("bootstrap_id", "status", "pairing_id", "expires_at", "resource_version")),
     "simulation.connector.pairing.summary.get": PAIRING_SUMMARY,
     "simulation.connector.pairing.approve": PAIRING_SUMMARY,
     "simulation.connector.pairing.complete": obj({
         "connector_id": STRING, "encrypted_credential_envelope": STRING,
         "envelope_hash": HASH,
     }, ("connector_id", "encrypted_credential_envelope", "envelope_hash")),
+    "simulation.connector.pairing.activate": PAIRING_SUMMARY,
+    "simulation.connector.pairing.cancel": obj({
+        "bootstrap_id": STRING, "status": STRING, "pairing_id": {"type": ["string", "null"]},
+        "expires_at": {"type": "string", "format": "date-time"},
+        "resource_version": {"type": "integer", "minimum": 1},
+    }, ("bootstrap_id", "status", "pairing_id", "expires_at", "resource_version")),
     "simulation.connector.binding.get": obj({
         "connector_id": {"type": ["string", "null"]},
         "installation_id": {"type": ["string", "null"]},

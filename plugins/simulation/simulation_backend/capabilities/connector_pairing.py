@@ -46,14 +46,35 @@ class ConnectorPairingProvider:
 
     def summary(self, payload, context):
         result = _translate(lambda: self.service.get_summary(payload["user_code"], context.user_gid))
-        return CapabilityOutput(data=result.model_dump(mode="json"))
+        data = result.model_dump(mode="json")
+        return CapabilityOutput(data=data, evidence=(EvidenceRef(
+            kind="simulation.connector.pairing_summary",
+            reference=f"connector-pairing:{result.pairing_id}",
+            digest=canonical_hash(data),
+        ),))
+
+    def bootstrap_create(self, _payload, context):
+        self._require_web_user(context)
+        result = _translate(lambda: self.service.bootstrap_create(context.user_gid, context.team_gid or ""))
+        data = result.model_dump(mode="json")
+        return CapabilityOutput(data=data, evidence=(EvidenceRef(
+            kind="simulation.connector.pairing_bootstrap",
+            reference=f"connector-bootstrap:{result.bootstrap_id}", digest=canonical_hash({
+                key: value for key, value in data.items() if key != "bootstrap_token"
+            }),
+        ),))
+
+    def bootstrap_get(self, payload, context):
+        self._require_web_user(context)
+        result = _translate(lambda: self.service.bootstrap_get(payload["bootstrap_id"], context.user_gid))
+        data = result.model_dump(mode="json")
+        return CapabilityOutput(data=data, evidence=(EvidenceRef(
+            kind="simulation.connector.pairing_bootstrap",
+            reference=f"connector-bootstrap:{result.bootstrap_id}", digest=canonical_hash(data),
+        ),))
 
     def approve(self, payload, context):
-        if context.source != "web" or not context.user_gid:
-            raise CapabilityBusinessError(
-                "feishu_login_required",
-                "Pairing approval requires the user's Feishu-authenticated AI00 Web session.",
-            )
+        self._require_web_user(context)
         result = _translate(lambda: self.service.approve(
             payload["user_code"], context.user_gid, context.team_gid or "",
             expected_version=payload["expected_version"],
@@ -76,20 +97,69 @@ class ConnectorPairingProvider:
 
     def binding(self, _payload, context):
         row = self.service.repository.binding_for_user(context.user_gid)
-        return CapabilityOutput(data={
+        data = {
             "connector_id": row["connector_id"] if row else None,
             "installation_id": row["installation_id"] if row else None,
-        })
+        }
+        return CapabilityOutput(data=data, evidence=(EvidenceRef(
+            kind="simulation.connector.binding_summary",
+            reference=f"simulation-connector-binding:{context.user_gid}",
+            digest=canonical_hash(data),
+        ),))
+
+    def activate(self, payload, _context):
+        result = _translate(lambda: self.service.activate(
+            payload["pairing_id"], payload["connector_id"], payload["activation_proof"],
+        ))
+        data = result.model_dump(mode="json")
+        return CapabilityOutput(data=data, evidence=(EvidenceRef(
+            kind="simulation.connector.pairing_activation",
+            reference=f"connector-pairing:{result.pairing_id}", digest=canonical_hash(data),
+        ),))
+
+    def cancel(self, payload, context):
+        self._require_web_user(context)
+        result = _translate(lambda: self.service.bootstrap_cancel(
+            payload["bootstrap_id"], context.user_gid,
+            expected_version=payload["expected_version"],
+        ))
+        data = result.model_dump(mode="json")
+        return CapabilityOutput(data=data, evidence=(EvidenceRef(
+            kind="simulation.connector.pairing_bootstrap",
+            reference=f"connector-bootstrap:{result.bootstrap_id}", digest=canonical_hash(data),
+        ),))
+
+    @staticmethod
+    def _require_web_user(context):
+        if context.source != "web" or not context.user_gid:
+            raise CapabilityBusinessError(
+                "feishu_login_required",
+                "Pairing approval requires the user's Feishu-authenticated AI00 Web session.",
+            )
 
 
 def specs(provider: ConnectorPairingProvider | None = None):
     selected = provider or ConnectorPairingProvider()
     common = {
-        "owner": "simulation", "version": 1, "permissions": ("agent.run",),
+        "owner": "simulation", "version": 1, "permissions": ("simulation.use",),
         "input_schema": {}, "output_schema": {},
         "tags": ("simulation", "connector", "pairing"),
     }
     return (
+        (CapabilitySpec(
+            id="simulation.connector.pairing.bootstrap.create",
+            description="Create a short-lived one-time Connector bootstrap ticket for the signed-in user.",
+            use_when="The Simulation page is starting a local Connector handoff.",
+            do_not_use_when="A Connector is submitting device proof.",
+            risk=CapabilityRisk.WRITE, confirmation="none", **common,
+        ), selected.bootstrap_create),
+        (CapabilitySpec(
+            id="simulation.connector.pairing.bootstrap.get",
+            description="Read the signed-in user's safe bootstrap ticket state.",
+            use_when="The Simulation page is showing Connector handoff progress.",
+            do_not_use_when="Secret bootstrap material is required.",
+            risk=CapabilityRisk.READ, confirmation="none", **common,
+        ), selected.bootstrap_get),
         (CapabilitySpec(
             id="simulation.connector.pairing.request",
             description="Request a five-minute Connector browser pairing code.",
@@ -118,6 +188,20 @@ def specs(provider: ConnectorPairingProvider | None = None):
             do_not_use_when="Only the public user code is available.",
             risk=CapabilityRisk.WRITE, confirmation="none", **common,
         ), selected.complete),
+        (CapabilitySpec(
+            id="simulation.connector.pairing.activate",
+            description="A credentialed Connector acknowledges durable credential activation.",
+            use_when="The Connector has persisted and verified its issued credential.",
+            do_not_use_when="Only a bootstrap ticket or user session is available.",
+            risk=CapabilityRisk.WRITE, confirmation="none", **common,
+        ), selected.activate),
+        (CapabilitySpec(
+            id="simulation.connector.pairing.cancel",
+            description="Cancel the signed-in user's unfinished Connector bootstrap ticket.",
+            use_when="The user cancels a pending Connector handoff.",
+            do_not_use_when="The Connector binding is already active.",
+            risk=CapabilityRisk.WRITE, confirmation="none", **common,
+        ), selected.cancel),
         (CapabilitySpec(
             id="simulation.connector.binding.get",
             description="Read the current user's single Connector binding.",
