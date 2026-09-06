@@ -2,7 +2,15 @@ using Ai00.Connector.Service;
 
 if (args.Length > 0 && string.Equals(args[0], "pair", StringComparison.OrdinalIgnoreCase))
 {
-    await ConnectorPairing.RunAsync(args[1..]);
+    try
+    {
+        await ConnectorPairing.RunAsync(args[1..]);
+    }
+    catch (Exception error)
+    {
+        Console.Error.WriteLine($"Connector pairing failed: {error.Message}");
+        Environment.ExitCode = 1;
+    }
     return;
 }
 
