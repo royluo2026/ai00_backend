@@ -454,6 +454,7 @@ class PairingService:
         activation_challenge = secrets.token_urlsafe(32)
         plaintext = json.dumps({
             "connector_id": connector_id,
+            "installation_id": installation_id,
             "connector_token": connector_token,
             "activation_proof": activation_challenge,
             "bound_user_id": record.approved_user_gid,

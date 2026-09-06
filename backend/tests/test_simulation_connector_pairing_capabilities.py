@@ -72,7 +72,7 @@ def _request_with_private_key(installation_id="install-1", verifier="proof-1"):
     ), key
 
 
-def _activation_proof(envelope: str, private_key) -> str:
+def _credential_payload(envelope: str, private_key) -> dict:
     value = json.loads(base64.b64decode(envelope))
     key = private_key.decrypt(
         base64.b64decode(value["encrypted_key"]),
@@ -84,7 +84,11 @@ def _activation_proof(envelope: str, private_key) -> str:
         base64.b64decode(value["nonce"]),
         base64.b64decode(value["ciphertext"]) + base64.b64decode(value["tag"]), None,
     )
-    return json.loads(plaintext)["activation_proof"]
+    return json.loads(plaintext)
+
+
+def _activation_proof(envelope: str, private_key) -> str:
+    return _credential_payload(envelope, private_key)["activation_proof"]
 
 
 def _service():
@@ -339,6 +343,22 @@ def test_credential_issue_does_not_claim_active_until_connector_ack():
     assert issued.activation_challenge
     assert service.repository.by_id(created.pairing_id).activation_status == "credential_issued"
     assert service.repository.binding_for_user("user-1")["status"] == "pending_activation"
+
+
+def test_encrypted_credential_is_bound_to_the_requesting_installation():
+    service = _service()
+    request, private_key = _request_with_private_key(installation_id="install-1")
+    request = request.model_copy(update={
+        "bootstrap_token": service.bootstrap_create("user-1", "team-1").bootstrap_token,
+    })
+    created = service.request(request)
+    service.approve(created.user_code, "user-1", "team-1", expected_version=1)
+
+    issued = service.complete(created.pairing_id, "install-1", "proof-1")
+
+    assert _credential_payload(issued.encrypted_credential_envelope, private_key)[
+        "installation_id"
+    ] == "install-1"
 
 
 def test_same_installation_retry_returns_same_envelope_without_second_binding():
