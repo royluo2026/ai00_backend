@@ -62,8 +62,25 @@ class LegacyServerGatewayPolicy:
         self._approvals = approval_service
         self._resource_authorizer = resource_authorizer
 
-    def authorize(self, descriptor, envelope, provider) -> None:
+    def authorize(self, descriptor, envelope, provider) -> AuthorizationDecision:
         actor = envelope.identity.actor
+        if (
+            envelope.identity.consumer.type.value == "local_runtime"
+            and envelope.identity.consumer.consumer_id == "ai00.connector.bootstrap"
+            and envelope.identity.consumer.installation_id
+            and actor.service_id == "ai00.connector.bootstrap"
+            and actor.authentication_method == "connector_bootstrap"
+            and descriptor.id in {
+                "simulation.connector.pairing.request",
+                "simulation.connector.pairing.complete",
+                "simulation.connector.pairing.activate",
+            }
+            and tuple(provider.spec.permissions) == ("simulation.use",)
+        ):
+            return AuthorizationDecision(
+                allowed=True, code="allowed", policy_version="connector-bootstrap-v1",
+                data_scopes=("confidential",), permissions=("simulation.use",),
+            )
         if actor.user_id is None:
             raise GatewayPolicyError("service_authorization_unavailable", "Service grants are not configured.")
         user = self._user_loader(actor.user_id)

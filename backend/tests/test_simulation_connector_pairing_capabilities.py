@@ -28,6 +28,7 @@ from backend.capability_v2.contracts import (
 )
 from backend.capability_v2.gateway import CapabilityGatewayService
 from backend.capability_v2.outcomes import InMemoryOutcomeStore
+from backend.capability_v2.policies import LegacyServerGatewayPolicy
 from backend.capability_v2.reliability import InMemoryRateLimiter, ReliabilityCoordinator
 from plugins.simulation.simulation_backend.capabilities.connector_pairing import (
     ConnectorPairingProvider,
@@ -444,6 +445,47 @@ def test_registered_pairing_completion_passes_the_real_gateway_output_contract()
     assert result.ok is True
     assert result.data["activation_challenge"]
     assert result.evidence and result.evidence[0].kind == "simulation.connector.binding"
+
+
+def test_production_policy_allows_only_the_connector_bootstrap_capability_scope():
+    service = _service()
+    ticket = service.bootstrap_create("user-1", "team-1")
+    request = _request().model_copy(update={"bootstrap_token": ticket.bootstrap_token})
+    registry = CapabilityRegistry()
+    for spec, handler in specs(ConnectorPairingProvider(service)):
+        register(registry, spec, handler)
+    registered = registry.get("simulation.connector.pairing.request", 1)
+    release = build_release([registered.descriptor])
+    store = InMemoryCatalogStore()
+    store.publish(release)
+    policy = LegacyServerGatewayPolicy(
+        user_loader=lambda _user_id: (_ for _ in ()).throw(AssertionError("bootstrap must not load a user")),
+        grants_resolver=lambda *_args: (_ for _ in ()).throw(AssertionError("bootstrap must use a fixed scope")),
+    )
+    gateway = CapabilityGatewayService(
+        CatalogResolver(store, registry), policy,
+        reliability=ReliabilityCoordinator(InMemoryOutcomeStore(), InMemoryRateLimiter(limit=10)),
+    ).bind_release(release.release_id)
+    identity = ConsumerIdentity(
+        actor=ActorIdentity(
+            service_id="ai00.connector.bootstrap", authentication_method="connector_bootstrap",
+            authenticated_at=NOW,
+        ),
+        tenant=TenantIdentity(tenant_id="connector_bootstrap", membership="bootstrap"),
+        consumer=ConsumerDescriptor(
+            type=ConsumerType.LOCAL_RUNTIME, consumer_id="ai00.connector.bootstrap",
+            installation_id="install-1",
+        ),
+    )
+
+    result = asyncio.run(gateway.invoke(InvocationEnvelope(
+        capability_id=registered.spec.id, major_version=1,
+        catalog_release=release.release_id, payload=request.model_dump(mode="json"),
+        identity=identity, request_id="req-bootstrap", trace_id="trace-bootstrap",
+        idempotency_key="idem-bootstrap",
+    )))
+
+    assert result.ok is True
 
 
 def test_credential_issue_persists_binding_and_pairing_through_one_repository_operation():

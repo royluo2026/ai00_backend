@@ -2,20 +2,23 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import hashlib
 import tempfile
+import uuid
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from pydantic import BaseModel, ConfigDict, Field
 
-from backend.platform_sdk.auth import get_current_user
-from plugins.simulation.simulation_backend.capabilities.connector_pairing import default_service
+from backend.platform_sdk.auth import get_authenticated_principal, get_current_user
 from plugins.simulation.simulation_backend.capabilities.connector_runtime import (
     ConnectorHealth, complete_connector_plan, get_leased_connector_plan,
     lease_connector_plan, record_connector_heartbeat,
 )
 from plugins.simulation.simulation_backend.data.connector_repository import SimulationConnectorRepository
-from plugins.simulation.simulation_backend.domain.connector_pairing import PairingError, PairingRequest
-from backend.capability_v2.contracts import ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType, TenantIdentity
+from plugins.simulation.simulation_backend.domain.connector_pairing import PairingRequest
+from backend.capability_v2.contracts import ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType, InvocationEnvelope, TenantIdentity
+from backend.capability_v2.gateway import get_default_gateway
+from backend.capability_v2.web_compatibility import build_trusted_web_envelope, invoke_trusted_web_compatibility
 from backend.capability_v2.operations import SqlOperationStore
 from backend.contracts.connector_execution_plan_v1 import ConnectorPlanOutcomeV1, verify_connector_outcome
 from backend.db.connection import get_conn
@@ -35,6 +38,12 @@ class PairingCompleteBody(BaseModel):
     verifier: str = Field(min_length=16, max_length=1024)
 
 
+class PairingActivateBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    connector_id: str = Field(min_length=1, max_length=191)
+    activation_proof: str = Field(min_length=16, max_length=1024)
+
+
 class ConnectorHeartbeatBody(ConnectorHealth):
     pass
 
@@ -51,12 +60,68 @@ class ConnectorCompleteBody(BaseModel):
     signature: str = Field(pattern="^hmac-sha256:[0-9a-f]{64}$")
 
 
-def _error(exc: PairingError) -> HTTPException:
-    code = str(exc)
-    status = 404 if code == "pairing_not_found" else 409
-    if code == "pairing_proof_invalid":
+def _gateway_data(result):
+    if result.ok:
+        return {"success": True, "data": result.data}
+    code = result.error.code if result.error else "capability_unavailable"
+    if code in {"pairing_proof_invalid", "pairing_activation_proof_invalid", "permission_denied"}:
         status = 403
-    return HTTPException(status_code=status, detail={"code": code})
+    elif code in {"pairing_not_found", "pairing_bootstrap_not_found"}:
+        status = 404
+    elif code in {"pairing_expired", "pairing_bootstrap_expired"}:
+        status = 410
+    elif code in {"invalid_input"}:
+        status = 400
+    elif code in {
+        "catalog_resolution_failed", "provider_failed", "reliability_unavailable",
+        "reliability_failed", "authorization_failed",
+    }:
+        status = 503
+    else:
+        status = 409
+    raise HTTPException(status_code=status, detail={"code": code})
+
+
+def _request_id(request: Request) -> str:
+    candidate = str(request.headers.get("X-Request-ID") or "").strip()
+    return candidate if candidate and candidate.replace("-", "").replace("_", "").isalnum() else f"connector_{uuid.uuid4().hex}"
+
+
+def _bootstrap_identity(installation_id: str) -> ConsumerIdentity:
+    installation_ref = "install_" + hashlib.sha256(installation_id.encode("utf-8")).hexdigest()[:32]
+    return ConsumerIdentity(
+        actor=ActorIdentity(
+            service_id="ai00.connector.bootstrap", authentication_method="connector_bootstrap",
+            authenticated_at=datetime.now(timezone.utc),
+        ),
+        tenant=TenantIdentity(tenant_id="connector_bootstrap", membership="bootstrap"),
+        consumer=ConsumerDescriptor(
+            type=ConsumerType.LOCAL_RUNTIME, consumer_id="ai00.connector.bootstrap",
+            installation_id=installation_ref,
+        ),
+    )
+
+
+async def _invoke_local(capability_id: str, payload: dict, request: Request, installation_id: str, gateway):
+    request_id = _request_id(request)
+    result = await gateway.invoke(InvocationEnvelope(
+        capability_id=capability_id, major_version=1, catalog_release=gateway.catalog_release,
+        payload=payload, identity=_bootstrap_identity(installation_id),
+        request_id=request_id, trace_id=request_id,
+        idempotency_key=request.headers.get("Idempotency-Key") or request_id,
+    ))
+    return _gateway_data(result)
+
+
+async def _invoke_web(capability_id: str, payload: dict, request: Request, user: dict, principal, gateway):
+    request_id = _request_id(request)
+    result = await invoke_trusted_web_compatibility(gateway, build_trusted_web_envelope(
+        gateway, capability_id=capability_id, payload=payload,
+        current_user=user, principal=principal, consumer_id="ai00.web.simulation",
+        request_id=request_id, trace_id=request_id,
+        idempotency_key=request.headers.get("Idempotency-Key") or request_id,
+    ))
+    return _gateway_data(result)
 
 
 def _feishu_user(user: dict = Depends(get_current_user)) -> dict:
@@ -80,53 +145,71 @@ def _connector_auth(
 
 
 @router.post("/pairings")
-def request_pairing(body: PairingRequest):
-    try:
-        return {"success": True, "data": default_service.request(body).model_dump(mode="json")}
-    except PairingError as exc:
-        raise _error(exc) from exc
+async def request_pairing(
+    body: PairingRequest, request: Request, gateway=Depends(get_default_gateway),
+):
+    return await _invoke_local(
+        "simulation.connector.pairing.request", body.model_dump(mode="json"),
+        request, body.installation_id, gateway,
+    )
 
 
 @router.get("/pairings/{user_code}")
-def pairing_summary(user_code: str, user: dict = Depends(_feishu_user)):
-    try:
-        value = default_service.get_summary(user_code, user["gid"])
-        return {"success": True, "data": value.model_dump(mode="json")}
-    except PairingError as exc:
-        raise _error(exc) from exc
+async def pairing_summary(
+    user_code: str, request: Request, user: dict = Depends(_feishu_user),
+    principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway),
+):
+    return await _invoke_web(
+        "simulation.connector.pairing.summary.get", {"user_code": user_code},
+        request, user, principal, gateway,
+    )
 
 
 @router.post("/pairings/{user_code}/approve")
-def approve_pairing(
-    user_code: str, body: PairingApproveBody,
+async def approve_pairing(
+    user_code: str, body: PairingApproveBody, request: Request,
     user: dict = Depends(_feishu_user),
+    principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway),
 ):
-    try:
-        value = default_service.approve(
-            user_code, user["gid"], str(user.get("team_id") or f"user:{user['gid']}"),
-            expected_version=body.expected_version,
-        )
-        return {"success": True, "data": value.model_dump(mode="json")}
-    except PairingError as exc:
-        raise _error(exc) from exc
+    return await _invoke_web(
+        "simulation.connector.pairing.approve",
+        {"user_code": user_code, "expected_version": body.expected_version},
+        request, user, principal, gateway,
+    )
 
 
 @router.post("/pairings/{pairing_id}/complete")
-def complete_pairing(pairing_id: str, body: PairingCompleteBody):
-    try:
-        value = default_service.complete(pairing_id, body.installation_id, body.verifier)
-        return {"success": True, "data": value.model_dump(mode="json")}
-    except PairingError as exc:
-        raise _error(exc) from exc
+async def complete_pairing(
+    pairing_id: str, body: PairingCompleteBody, request: Request,
+    gateway=Depends(get_default_gateway),
+):
+    return await _invoke_local(
+        "simulation.connector.pairing.complete",
+        {"pairing_id": pairing_id, **body.model_dump(mode="json")},
+        request, body.installation_id, gateway,
+    )
+
+
+@router.post("/pairings/{pairing_id}/activate")
+async def activate_pairing(
+    pairing_id: str, body: PairingActivateBody, request: Request,
+    gateway=Depends(get_default_gateway),
+):
+    return await _invoke_local(
+        "simulation.connector.pairing.activate",
+        {"pairing_id": pairing_id, **body.model_dump(mode="json")},
+        request, body.connector_id, gateway,
+    )
 
 
 @router.get("/binding")
-def connector_binding(user: dict = Depends(_feishu_user)):
-    row = default_service.repository.binding_for_user(user["gid"])
-    return {"success": True, "data": {
-        "connector_id": row["connector_id"] if row else None,
-        "installation_id": row["installation_id"] if row else None,
-    }}
+async def connector_binding(
+    request: Request, user: dict = Depends(_feishu_user),
+    principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway),
+):
+    return await _invoke_web(
+        "simulation.connector.binding.get", {}, request, user, principal, gateway,
+    )
 
 
 @router.post("/heartbeat")
