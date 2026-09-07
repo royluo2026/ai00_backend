@@ -120,12 +120,46 @@ def require_compatible(plan: ConnectorExecutionPlanV1, health: ConnectorHealth) 
 class ConnectorControlPlane:
     def __init__(
         self, repository, *, outcome_port=None, clock=lambda: datetime.now(UTC),
-        wake_notifier=None,
+        wake_notifier=None, plan_signer=None,
     ):
         self.repository = repository
         self.outcome_port = outcome_port
         self.clock = clock
         self.wake_notifier = wake_notifier
+        self.plan_signer = plan_signer
+
+    def queue_v2(self, plan, context: CapabilityContext, session_token: str | None = None) -> OperationRef:
+        from backend.contracts.connector_execution_plan_v2 import ConnectorExecutionPlanV2
+        raw = plan.model_dump(mode='json') if isinstance(plan, ConnectorExecutionPlanV2) else dict(plan)
+        if (raw['actor_id'], raw['tenant_id']) != (context.user_gid, context.team_gid):
+            raise ConnectorError('plan_identity_mismatch')
+        if self.plan_signer is None:
+            raise ConnectorError('connector_plan_signing_key_unavailable')
+        try:
+            row = self.repository.runtime_device(raw['device_id'])
+            if (row['owner_user_gid'], row['tenant_gid']) != (context.user_gid, context.team_gid):
+                raise ConnectorError('plan_identity_mismatch')
+            if row['runtime_type'] != 'electron':
+                raise ConnectorError('runtime_type_invalid')
+            if session_token is not None:
+                self.repository.authenticate_runtime(raw['device_id'], row['runtime_generation'],
+                    row['current_runtime_instance_id'], session_token, self.clock(), 'electron')
+            raw.update(runtime_generation=row['runtime_generation'], runtime_instance_id=row['current_runtime_instance_id'])
+            signed = self.plan_signer.sign(raw)
+            self.repository.insert_v2_plan(signed, session_token, self.clock(),
+                expected_session_token_hash=row['session_token_hash'])
+        except (ConnectorRepositoryError, ValueError) as exc:
+            raise ConnectorError(str(exc)) from exc
+        if self.wake_notifier is not None:
+            self.wake_notifier.notify(signed.device_id)
+        return OperationRef(operation_id=signed.plan_id, status=OperationStatus.ACCEPTED)
+
+    def complete_v2(self, session_token, outcome, **pins):
+        from ..application.connector_runtime_sessions import RuntimeSessionService
+        try:
+            return RuntimeSessionService(self.repository, clock=self.clock).outcome(session_token, outcome, **pins)
+        except ConnectorRepositoryError as exc:
+            raise ConnectorError(str(exc)) from exc
 
     def record_heartbeat(
         self, connector_id: str, expected_user_id: str, health: ConnectorHealth,

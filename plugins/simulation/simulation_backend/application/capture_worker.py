@@ -1,6 +1,8 @@
 """Server-authoritative state machine for materialization and reverse capture."""
 from __future__ import annotations
 
+from .connector_protocol_v2 import parse_plan, projection_status, projection_result
+
 import secrets
 from datetime import UTC, datetime
 from typing import Any, Callable, Mapping
@@ -261,13 +263,13 @@ class CaptureWorkflow:
         persisted = self.repository.get_materialization_run(plan.plan_id, context)
         if persisted is None:
             raise SimulationWorkflowError("materialization_run_not_found")
-        expected_plan = ConnectorExecutionPlanV1.model_validate(persisted.get("plan"))
+        expected_plan = parse_plan(persisted.get("plan"))
         if expected_plan.plan_hash != plan.plan_hash or expected_plan != plan:
             raise SimulationWorkflowError("plan_outcome_invalid")
         status = {
             "completed": "completed", "failed": "failed",
             "outcome_unknown": "outcome_unknown", "cancelled": "failed",
-        }.get(outcome.status)
+        }.get(projection_status(outcome))
         if status is None:
             raise SimulationWorkflowError("plan_outcome_invalid")
         self.repository.update_materialization_run(plan.plan_id, status=status)
@@ -299,14 +301,18 @@ class CaptureWorkflow:
         persisted_step = current.get(capture_operation_id)
         if persisted_step is None:
             raise SimulationWorkflowError("capture_step_not_found")
-        expected_plan = ConnectorExecutionPlanV1.model_validate(persisted_step.get("plan"))
+        expected_plan = parse_plan(persisted_step.get("plan"))
         if expected_plan.plan_hash != plan.plan_hash or expected_plan != plan:
             raise SimulationWorkflowError("plan_outcome_invalid")
-        if outcome.status == "outcome_unknown" and not outcome.steps:
+        terminal_status = projection_status(outcome)
+        v2 = outcome.protocol == 'ai00.connector.execution-plan.v2'
+        if (terminal_status == 'outcome_unknown' and (not outcome.steps or v2)) or (
+            v2 and terminal_status == 'failed' and capture_steps[0].step_id not in results
+        ):
             self.record_step_result(
-                capture_run_id, capture_operation_id, status="outcome_unknown",
+                capture_run_id, capture_operation_id, status=terminal_status,
             )
-            self.repository.update_capture_run(capture_run_id, status="outcome_unknown")
+            self.repository.update_capture_run(capture_run_id, status=terminal_status)
             return self.repository.get_capture_run(capture_run_id, context)
         projected = 0
         for step in plan.steps:
@@ -321,8 +327,8 @@ class CaptureWorkflow:
             existing = current[operation_id]
             if existing["status"] == "completed" and existing.get("artifact_attached"):
                 continue
-            if result.status == "completed":
-                value = result.result
+            if projection_status(result) == "completed":
+                value = projection_result(result)
                 artifact = value.get("artifact") if isinstance(value, Mapping) else None
                 if not isinstance(artifact, Mapping):
                     raise SimulationWorkflowError("artifact_upload_unconfirmed")
@@ -330,7 +336,7 @@ class CaptureWorkflow:
                     capture_run_id, operation_id, status="completed", artifact_ref=dict(artifact),
                 )
             else:
-                self.record_step_result(capture_run_id, operation_id, status=result.status)
+                self.record_step_result(capture_run_id, operation_id, status=projection_status(result))
             projected += 1
 
         refreshed = self.repository.get_capture_run(capture_run_id, context)

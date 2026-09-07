@@ -7,7 +7,7 @@ import json
 import re
 import secrets
 
-from backend.contracts.connector_execution_plan_v2 import IDENTITY_PATTERN, verify_outcome_signature
+from backend.contracts.connector_execution_plan_v2 import IDENTITY_PATTERN
 from ..data.connector_repository import SimulationConnectorRepository, ConnectorRepositoryError
 from ..domain.connector_pairing import verify_possession
 
@@ -96,12 +96,10 @@ class RuntimeSessionService:
     def outcome(self, token, outcome, *, reconcile=False, **pins):
         if reconcile:
             self.authenticate_reconciliation(token, plan_id=outcome.plan_id, **pins)
-            row = self.repository.runtime_device(pins['device_id'])
         else:
-            row = self.authenticate(token, **pins)
-        jwk = json.loads(row['device_signing_jwk']) if isinstance(row['device_signing_jwk'], str) else row['device_signing_jwk']
-        if not verify_outcome_signature(outcome, jwk):
-            raise ConnectorRepositoryError('outcome_signature_invalid')
+            self.authenticate(token, **pins)
+        # The repository verifies the signature and registered key under the
+        # same device lock as journal fencing, outcome, and projection intent.
         method = self.repository.mark_reconciled if reconcile else self.repository.complete_v2_plan
         method(pins['device_id'], pins['generation'], pins['runtime_instance_id'], token, outcome, self.clock())
         return {'accepted': True}

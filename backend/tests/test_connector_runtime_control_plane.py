@@ -407,6 +407,7 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
 
     by_id = {(spec.id, spec.version): (spec, descriptor) for spec, descriptor in registry.items}
     assert set(by_id) == {
+        ("simulation.connector.runtime.takeover", 1),
         ("simulation.connector.health.get", 1),
         ("simulation.connector.plan.queue", 1),
         ("simulation.connector.plan.queue", 2),

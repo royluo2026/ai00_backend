@@ -33,6 +33,31 @@ from plugins.simulation.simulation_backend.data.connector_repository import (
 )
 
 
+@pytest.mark.parametrize('wire_status,aggregate_status', [
+    ('outcome_unknown','outcome_unknown'), ('manual_review_required','outcome_unknown'), ('failed_without_effect','failed')])
+def test_v2_terminal_outcome_before_capture_step_stops_the_workflow(wire_status, aggregate_status):
+    from copy import deepcopy
+    from backend.tests.test_connector_reconciliation_v2 import VECTOR
+    from backend.contracts.connector_execution_plan_v2 import ConnectorExecutionPlanV2, ConnectorPlanOutcomeV2, compute_plan_hash
+    workflow, repository, connector, _ = _workflow()
+    asyncio.run(workflow.start_capture('env-1', 1, 'device-1', _context()))
+    asyncio.run(workflow.dispatch_next('run-1', 'approval-device', _context()))
+    legacy = connector.plans[0][0]
+    raw = deepcopy(VECTOR['plan'])
+    raw.update(plan_id=legacy.plan_id, steps=[{**s.model_dump(mode='json'),
+        'side_effect_classification':'read', 'post_condition_probe_id':None} for s in legacy.steps])
+    raw['plan_hash'] = compute_plan_hash(raw)
+    plan = ConnectorExecutionPlanV2.model_validate(raw)
+    repository.runs['run-1']['steps'][0]['plan'] = plan.model_dump(mode='json')
+    raw_outcome = deepcopy(VECTOR['outcome'])
+    raw_outcome.update(plan_id=plan.plan_id, plan_hash=plan.plan_hash, overall_status=wire_status)
+    raw_outcome['steps'][0].update(step_id=plan.steps[0].step_id, status=wire_status, error_code='execution_uncertain')
+    outcome = ConnectorPlanOutcomeV2.model_validate(raw_outcome)
+    asyncio.run(workflow.apply_connector_outcome(plan, outcome, _context()))
+    assert repository.runs['run-1']['status'] == aggregate_status
+    assert repository.runs['run-1']['steps'][0]['status'] == aggregate_status
+
+
 def test_capture_outcome_is_projected_only_through_its_exact_simulation_resource():
     workflow, repository, connector, _ = _workflow()
     asyncio.run(workflow.start_capture("env-1", 1, "device-1", _context()))

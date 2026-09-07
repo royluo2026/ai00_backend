@@ -53,10 +53,11 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--lease-seconds", type=int, default=60)
     parser.add_argument("--idle-seconds", type=float, default=1.0)
+    parser.add_argument('--protocol', choices=('v1', 'v2'), default='v1')
     args = parser.parse_args(argv)
     owner = f"{socket.gethostname()}:{os.getpid()}:{uuid.uuid4().hex}"
     worker = ConnectorProjectionWorker(
-        SimulationConnectorRepository(),
+        SimulationConnectorRepository(projection_protocol='ai00.connector.execution-plan.' + args.protocol),
         GovernedSimulationRuntimeClient(get_default_gateway()),
         owner=owner,
         lease_seconds=args.lease_seconds,

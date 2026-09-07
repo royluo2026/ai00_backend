@@ -36,6 +36,10 @@ class SQLiteCursor:
         self.cursor = connection.cursor()
 
     def execute(self, query, params=()):
+        query = query.replace('DATE_ADD(NOW(6),INTERVAL %s SECOND)', "datetime('2026-09-07 12:00:00', '+' || %s || ' seconds')")
+        query = query.replace('DATE_ADD(NOW(6),INTERVAL 5 SECOND)', "datetime('2026-09-07 12:00:00', '+5 seconds')")
+        query = query.replace('NOW(6)', "'2026-09-07 12:00:00'")
+        query = query.replace('IF(%s,', 'IIF(%s,')
         query = query.replace("%s", "?").replace(" FOR UPDATE", "").replace("<=>", "IS")
         params = tuple(p.astimezone(UTC).replace(tzinfo=None).isoformat(" ") if isinstance(p, datetime) else p for p in params)
         self.cursor.execute(query, params)
@@ -104,7 +108,8 @@ def database(request, tmp_path, monkeypatch):
         finally:
             conn.close()
 
-    ddl = MIGRATION.read_text(encoding="utf-8") + "\n" + (MIGRATION.parent / "0009_connector_app_auth.sql").read_text(encoding="utf-8")
+    ddl = '\n'.join((MIGRATION.parent / name).read_text(encoding='utf-8') for name in
+        ('0008_connector_app_runtime_v2.sql', '0009_connector_app_auth.sql', '0010_connector_v2_projection.sql'))
     with transaction() as conn:
         if dialect == "mysql":
             from backend.db.versioned_migrations import prepare_resumable_statement
@@ -149,10 +154,12 @@ def database(request, tmp_path, monkeypatch):
         cur.execute("INSERT INTO workmanship_sim_connector_runtime_devices "
                     "(device_id,protocol,owner_user_gid,tenant_gid,credential_generation,runtime_generation,device_signing_jwk,device_key_id,status) "
                     "VALUES (%s,%s,'user-001','tenant-001',1,7,%s,'device-key-001','active')",
-                    (device, V2, '{}'))
+                    (device, V2, json.dumps(json.loads((ROOT / 'backend/tests/fixtures/connector_execution_plan_v2.json').read_text())['device_public_jwk'])))
     yield transaction, device
     if dialect == "mysql":
         with transaction() as conn, conn.cursor() as cur:
+            cur.execute('DELETE FROM workmanship_sim_connector_runtime_projection_outbox WHERE plan_id IN '
+                '(SELECT plan_id FROM workmanship_sim_connector_runtime_plans WHERE device_id=%s)', (device,))
             for table in ("app_pairings", "runtime_challenges", "runtime_recovery_sessions", "runtime_audit", "runtime_plans", "runtime_devices"):
                 cur.execute(f"DELETE FROM workmanship_sim_connector_{table} WHERE device_id=%s", (device,))
             cur.execute("DELETE FROM workmanship_sim_connector_plans WHERE connector_id=%s", (device,))
@@ -177,6 +184,8 @@ def queue(database, registered, *, now=NOW, idempotency_key=None, expires_at="20
                   issued_at="2026-09-07T12:00:00Z", expires_at=expires_at)
     if idempotency_key is not None:
         source["idempotency_key"] = idempotency_key
+        source['normalized_input_hash'] = 'sha256:' + hashlib.sha256(idempotency_key.encode()).hexdigest()
+    source['steps'][0]['post_condition_probe_id'] = 'vismockup.application.postcondition@1'
     source["plan_hash"] = compute_plan_hash(source)
     plan = ConnectorExecutionPlanV2.model_validate(source)
     SimulationConnectorRepository().insert_v2_plan(plan, registered.session_token, now)
@@ -191,8 +200,37 @@ def lease(database, registered, now=NOW):
 def outcome_for(plan, leased, status="succeeded"):
     source = json.loads((ROOT / "backend/tests/fixtures/connector_execution_plan_v2.json").read_text())["outcome"]
     source.update(device_id=plan.device_id, plan_id=plan.plan_id, plan_hash=plan.plan_hash,
-        lease_id=leased["lease_id"], overall_status=status, runtime_instance_id=plan.runtime_instance_id)
+        lease_id=leased["lease_id"], overall_status=status, runtime_instance_id=plan.runtime_instance_id, device_key_id='device-key-001')
+    source['steps'][0].update(status=status, error_code=None if status=='succeeded' else 'execution_uncertain')
+    source['signature'] = sign_outcome(source)
     return ConnectorPlanOutcomeV2.model_validate(source)
+
+
+def sign_outcome(source):
+    import base64
+    from cryptography.hazmat.primitives import hashes
+    from cryptography.hazmat.primitives.asymmetric import ec
+    from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature
+    from backend.contracts.connector_execution_plan_v2 import P256_ORDER, outcome_signature_bytes
+    vector = json.loads((ROOT / 'backend/tests/fixtures/connector_execution_plan_v2.json').read_text())
+    private = vector['test_only_private_keys']['device_private_jwk']['d']
+    key = ec.derive_private_key(int.from_bytes(base64.urlsafe_b64decode(private+'='), 'big'), ec.SECP256R1())
+    r, s = decode_dss_signature(key.sign(outcome_signature_bytes(source), ec.ECDSA(hashes.SHA256())))
+    return base64.urlsafe_b64encode(r.to_bytes(32, 'big')+min(s, P256_ORDER-s).to_bytes(32, 'big')).rstrip(b'=').decode()
+
+
+def reconciled_outcome(database, plan, leased):
+    from backend.contracts.connector_execution_plan_v2 import canonicalize_v2
+    from plugins.simulation.simulation_backend.application.connector_protocol_v2 import probe_context
+    row = read(database)
+    recovered = read(database, 'runtime_recovery_sessions') or {'token_hash': row['session_token_hash']}
+    context = probe_context(read(database, 'runtime_plans'), recovered)
+    value = outcome_for(plan, leased).model_dump(mode='json')
+    result = dict(probe_id='vismockup.application.postcondition@1', nonce=context['nonce'], classification='succeeded')
+    value['steps'][0].update(result=result, result_hash='sha256:'+hashlib.sha256(canonicalize_v2(result)).hexdigest())
+    value['journal_sequence'] = row['last_journal_sequence']+1
+    value['signature'] = sign_outcome(value)
+    return ConnectorPlanOutcomeV2.model_validate(value)
 
 
 def complete(database, registered, outcome, *, reconciled=False, now=NOW):
@@ -293,7 +331,7 @@ def test_completion_idempotency_conflict_and_reconciliation(database):
     unknown = outcome_for(current, leased, "outcome_unknown")
     complete(database, registered, unknown)
     complete(database, registered, unknown)
-    success = outcome_for(current, leased)
+    success = reconciled_outcome(database, current, leased)
     with pytest.raises(ConnectorRepositoryError, match="connector_outcome_conflict"):
         complete(database, registered, success)
     complete(database, registered, success, reconciled=True)
@@ -430,7 +468,7 @@ def test_recovery_registration_race_and_scope(database):
     with pytest.raises(ConnectorRepositoryError, match="plan_lease_invalid"):
         repo.mark_reconciled(database[1], 7, f"recovery-{winner}", f"token-{winner}",
             outcome_for(plan, leased).model_copy(update={"plan_id": "other-plan"}), now)
-    repo.mark_reconciled(database[1], 7, f"recovery-{winner}", f"token-{winner}", outcome_for(plan, leased), now)
+    repo.mark_reconciled(database[1], 7, f"recovery-{winner}", f"token-{winner}", reconciled_outcome(database, plan, leased), now)
     row = read(database)
     assert row["current_runtime_instance_id"] == registered.runtime_instance_id
     assert row["session_token_hash"] == hashlib.sha256(registered.session_token.encode()).hexdigest()
@@ -453,14 +491,14 @@ def test_recovery_rejects_expiry_wrong_generation_and_resolved_plan(database):
     with pytest.raises(ConnectorRepositoryError, match="runtime_session_invalid"):
         repo.mark_reconciled(database[1], 7, "recovery-1", "recovery-secret", outcome_for(plan, leased), NOW + timedelta(seconds=122))
     recovery(database, plan, instance="recovery-2", token="new-token", now=NOW + timedelta(seconds=122))
-    repo.mark_reconciled(database[1], 7, "recovery-2", "new-token", outcome_for(plan, leased), NOW + timedelta(seconds=123))
+    repo.mark_reconciled(database[1], 7, "recovery-2", "new-token", reconciled_outcome(database, plan, leased), NOW + timedelta(seconds=123))
     with pytest.raises(ConnectorRepositoryError, match="plan_reconciliation_invalid"):
         recovery(database, plan, now=NOW + timedelta(seconds=200))
 
 
 def test_reconciliation_preserves_original_signed_outcome_in_audit(database):
     registered, plan, leased = uncertain(database)
-    complete(database, registered, outcome_for(plan, leased), reconciled=True)
+    complete(database, registered, reconciled_outcome(database, plan, leased), reconciled=True)
     transaction, device = database
     with transaction() as conn, conn.cursor() as cur:
         cur.execute("SELECT outcome_json FROM workmanship_sim_connector_runtime_audit WHERE device_id=%s AND event_type='plan_outcome'", (device,))
@@ -504,7 +542,7 @@ def test_crash_before_report_can_recover_after_lease_and_session_expire(database
                     "WHERE device_id=%s AND plan_id=%s AND event_type='lease_expired'", (device, plan.plan_id))
         assert cur.fetchone() == {"runtime_instance_id": registered.runtime_instance_id,
             "session_token_hash": hashlib.sha256(registered.session_token.encode()).hexdigest()}
-    SimulationConnectorRepository().mark_reconciled(device, 7, "recovery-1", "recovery-secret", outcome_for(plan, leased), now)
+    SimulationConnectorRepository().mark_reconciled(device, 7, "recovery-1", "recovery-secret", reconciled_outcome(database, plan, leased), now)
     assert session(database, now=now, instance="new-normal").runtime_instance_id == "new-normal"
 
 

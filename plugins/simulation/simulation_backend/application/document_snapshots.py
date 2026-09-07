@@ -1,6 +1,8 @@
 """Asynchronous acquisition of the bound user's active VisMockup BOM."""
 from __future__ import annotations
 
+from .connector_protocol_v2 import parse_plan, projection_status, projection_result
+
 import secrets
 from datetime import UTC, datetime
 from typing import Any, Callable, Mapping
@@ -112,12 +114,12 @@ class DocumentSnapshotWorkflow:
         persisted = self.repository.get_request(plan.plan_id, context)
         if persisted is None:
             raise SimulationWorkflowError("document_snapshot_not_found")
-        expected_plan = ConnectorExecutionPlanV1.model_validate(persisted.get("plan"))
+        expected_plan = parse_plan(persisted.get("plan"))
         if expected_plan.plan_hash != plan.plan_hash or expected_plan != plan:
             raise SimulationWorkflowError("plan_outcome_invalid")
         if outcome.plan_id != plan.plan_id:
             raise SimulationWorkflowError("plan_outcome_invalid")
-        if outcome.status == "outcome_unknown" and not outcome.steps:
+        if projection_status(outcome) == "outcome_unknown" and not outcome.steps:
             self.repository.complete_request(
                 plan.plan_id, status="outcome_unknown",
                 failure_code="local_execution_outcome_unknown",
@@ -128,13 +130,13 @@ class DocumentSnapshotWorkflow:
         result = outcome.steps[0]
         if result.step_id != plan.steps[0].step_id:
             raise SimulationWorkflowError("plan_outcome_invalid")
-        if result.status == "completed":
+        if projection_status(result) == "completed":
             self.repository.complete_request(
-                plan.plan_id, snapshot=_validate_snapshot(result.result), status="completed",
+                plan.plan_id, snapshot=_validate_snapshot(projection_result(result)), status="completed",
             )
         else:
             self.repository.complete_request(
-                plan.plan_id, status=result.status, failure_code=result.error_code,
+                plan.plan_id, status=projection_status(result), failure_code=result.error_code,
             )
 
 

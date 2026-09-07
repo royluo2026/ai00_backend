@@ -66,6 +66,11 @@ class ProjectionLease:
 
 
 class SimulationConnectorRepository:
+    def __init__(self, *, projection_protocol=None):
+        self.projection_v2 = projection_protocol == PROTOCOL_V2
+        self.projection_table = ('workmanship_sim_connector_runtime_projection_outbox' if self.projection_v2
+                                 else 'workmanship_sim_connector_projection_outbox')
+
     def runtime_device(self, device_id):
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             return self._locked_runtime(cursor, device_id)
@@ -82,6 +87,8 @@ class SimulationConnectorRepository:
             row = self._locked_runtime(cursor, device_id)
             if runtime_type != 'electron' or row['runtime_type'] != runtime_type:
                 raise ConnectorRepositoryError('runtime_type_invalid')
+            if row['session_expires_at'] and _utc(row['session_expires_at']) > _utc(now):
+                return self._authenticated_runtime(cursor, device_id, generation, instance, token, now)
             return self._authenticated_recovery(cursor, row, generation, instance, token, plan_id, _utc(now))
 
     def create_runtime_challenge(self, row, challenge_hash, generation, instance, plan_id, expires_at):
@@ -123,13 +130,21 @@ class SimulationConnectorRepository:
             row = self._locked_runtime(cursor, device_id)
             if runtime_type != 'electron' or row['runtime_type'] != runtime_type:
                 raise ConnectorRepositoryError('runtime_type_invalid')
-            self._authenticated_recovery(cursor, row, generation, instance, token, plan_id, _utc(now))
-            cursor.execute('SELECT plan_json FROM workmanship_sim_connector_runtime_plans WHERE device_id=%s AND plan_id=%s AND protocol=%s',
+            if row['session_expires_at'] and _utc(row['session_expires_at']) > _utc(now):
+                self._authenticated_runtime(cursor, device_id, generation, instance, token, now)
+                recovery = {'token_hash': row['session_token_hash']}
+            else:
+                recovery = self._authenticated_recovery(cursor, row, generation, instance, token, plan_id, _utc(now))
+            cursor.execute('SELECT * FROM workmanship_sim_connector_runtime_plans WHERE device_id=%s AND plan_id=%s AND protocol=%s',
                            (device_id, plan_id, PROTOCOL_V2))
             plan = cursor.fetchone()
-            if not plan:
+            if (not plan or plan['status'] not in {'outcome_unknown', 'manual_review_required'}
+                    or plan['runtime_generation'] != row['runtime_generation']
+                    or plan['runtime_instance_id'] != row['current_runtime_instance_id']
+                    or plan['session_token_hash'] != row['session_token_hash']):
                 raise ConnectorRepositoryError('plan_reconciliation_invalid')
-            return json.loads(plan['plan_json']) if isinstance(plan['plan_json'], str) else plan['plan_json']
+            from ..application.connector_protocol_v2 import probe_context
+            return probe_context(plan, recovery)
 
     # Device rows serialize all v2 writers. Never acquire a plan lock before
     # its device lock, including queueing, recovery, and takeover.
@@ -364,16 +379,24 @@ class SimulationConnectorRepository:
             raise ConnectorRepositoryError("plan_lease_invalid")
         return recovery
 
-    def insert_v2_plan(self, plan: ConnectorExecutionPlanV2, session_token: str, now: datetime) -> None:
+    def insert_v2_plan(self, plan: ConnectorExecutionPlanV2, session_token: str | None, now: datetime,
+                       *, expected_session_token_hash: str | None = None) -> None:
         now = _utc(now)
         plan = ConnectorExecutionPlanV2.model_validate(plan)
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             row = self._locked_runtime(cursor, plan.device_id)
-            row = self._authenticated_runtime(cursor, plan.device_id, row["runtime_generation"],
-                row["current_runtime_instance_id"], session_token, now)
+            if session_token is not None:
+                row = self._authenticated_runtime(cursor, plan.device_id, row["runtime_generation"],
+                    row["current_runtime_instance_id"], session_token, now)
+            elif (not expected_session_token_hash or not row['session_expires_at']
+                  or _utc(row['session_expires_at']) <= now
+                  or not secrets.compare_digest(expected_session_token_hash, row['session_token_hash'] or '')):
+                # Cloud callers bind their server-read session snapshot; the
+                # Connector's plaintext session token never needs to leave it.
+                raise ConnectorRepositoryError('runtime_session_invalid')
             if (plan.runtime_generation, plan.runtime_instance_id) != (row["runtime_generation"], row["current_runtime_instance_id"]):
                 raise ConnectorRepositoryError("plan_session_mismatch")
-            if row["tenant_gid"] != plan.tenant_id:
+            if (row["tenant_gid"], row['owner_user_gid']) != (plan.tenant_id, plan.actor_id):
                 raise ConnectorRepositoryError("plan_lease_invalid")
             cursor.execute(
                 "SELECT plan_id,plan_hash,device_id,runtime_generation,runtime_instance_id,session_token_hash "
@@ -393,6 +416,16 @@ class SimulationConnectorRepository:
                 if current["plan_id"] != plan.plan_id or current["plan_hash"] != plan.plan_hash:
                     raise ConnectorRepositoryError("idempotency_conflict")
                 return
+            cursor.execute("SELECT plan_json FROM workmanship_sim_connector_runtime_plans WHERE device_id=%s "
+                "AND status IN ('queued','leased','executing','outcome_unknown','manual_review_required','succeeded') FOR UPDATE",
+                (plan.device_id,))
+            # ponytail: scan one device's plans under its writer lock; add indexed
+            # normalized-input columns if per-device history becomes large.
+            for previous in cursor.fetchall():
+                prior = json.loads(previous['plan_json']) if isinstance(previous['plan_json'], str) else previous['plan_json']
+                fields = ('tenant_id', 'actor_id', 'capability_id', 'major_version', 'normalized_input_hash')
+                if all(prior[f] == getattr(plan, f) for f in fields):
+                    raise ConnectorRepositoryError('reconciliation_required')
             cursor.execute(
                 "INSERT INTO workmanship_sim_connector_runtime_plans "
                 "(plan_id,protocol,device_id,runtime_generation,runtime_instance_id,session_token_hash,"
@@ -453,11 +486,7 @@ class SimulationConnectorRepository:
         self._write_v2_outcome(device_id, runtime_generation, runtime_instance_id, session_token, outcome, now, reconciled=True)
 
     def _write_v2_outcome(self, device_id, generation, instance, token, outcome, now, *, reconciled):
-        """Signature and probe authorization are provider responsibilities.
-
-        Storage still independently matches all lease, tenant, plan-hash and
-        session pins before persisting either an outcome or reconciliation.
-        """
+        """Verify under the device lock, then atomically persist outcome and intent."""
         outcome = ConnectorPlanOutcomeV2.model_validate(outcome)
         encoded = canonicalize_v2(outcome).decode("utf-8")
         digest = hashlib.sha256(encoded.encode("utf-8")).hexdigest()
@@ -481,9 +510,26 @@ class SimulationConnectorRepository:
             current = cursor.fetchone()
             if not current or current["plan_hash"] != outcome.plan_hash or current["tenant_gid"] != outcome.tenant_id:
                 raise ConnectorRepositoryError("plan_lease_invalid")
+            from ..application.connector_protocol_v2 import OutcomeVerifier, ReconciliationService
+            if outcome.device_key_id != row['device_key_id']:
+                raise ConnectorRepositoryError('device_key_invalid')
+            try:
+                jwk = json.loads(row['device_signing_jwk']) if isinstance(row['device_signing_jwk'], str) else row['device_signing_jwk']
+                OutcomeVerifier.verify(outcome, jwk)
+                plan = ConnectorExecutionPlanV2.model_validate(json.loads(current['plan_json']) if isinstance(current['plan_json'], str) else current['plan_json'])
+                OutcomeVerifier.verify_steps(plan, outcome)
+            except ValueError as exc:
+                raise ConnectorRepositoryError(str(exc)) from exc
             if current["outcome_hash"] == digest and (not reconciled or current["reconciled_at"] is not None):
                 return
+            if outcome.journal_sequence <= row['last_journal_sequence']:
+                raise ConnectorRepositoryError('journal_sequence_invalid')
             if reconciled:
+                try:
+                    # Live sessions also receive a context bound to their token.
+                    ReconciliationService().verify(current, recovery or {'token_hash': row['session_token_hash']}, outcome)
+                except ValueError as exc:
+                    raise ConnectorRepositoryError(str(exc)) from exc
                 if outcome.overall_status not in {"succeeded", "failed_without_effect", "manual_review_required"}:
                     raise ConnectorRepositoryError("reconciliation_result_invalid")
                 uncertain = current["status"] in {"outcome_unknown", "manual_review_required"}
@@ -497,6 +543,22 @@ class SimulationConnectorRepository:
                 if current["status"] not in {"leased", "executing"} or _utc(current["lease_until"]) <= now:
                     raise ConnectorRepositoryError("plan_lease_invalid")
                 reconciliation_state = {"outcome_unknown": "pending", "manual_review_required": "manual_review_required"}.get(outcome.overall_status, "not_required")
+            cursor.execute('SELECT status FROM workmanship_sim_connector_runtime_projection_outbox WHERE plan_id=%s FOR UPDATE', (outcome.plan_id,))
+            intent = cursor.fetchone()
+            if intent and intent['status'] == 'projecting':
+                raise ConnectorRepositoryError('projection_in_progress')
+            from backend.domain_ports.simulation_runtime import GovernedSimulationRuntimeClient
+            target = GovernedSimulationRuntimeClient.connector_outcome_target(plan)[0]
+            if intent:
+                cursor.execute("UPDATE workmanship_sim_connector_runtime_projection_outbox SET outcome_hash=%s,target_capability=%s,"
+                    "status='pending',attempt=0,next_retry_at=%s,lease_owner=NULL,lease_until=NULL,projected_at=NULL,updated_at=%s WHERE plan_id=%s",
+                    (digest, target, now, now, outcome.plan_id))
+            else:
+                cursor.execute("INSERT INTO workmanship_sim_connector_runtime_projection_outbox "
+                    "(plan_id,outcome_hash,target_capability,status,next_retry_at,created_at,updated_at) VALUES (%s,%s,%s,'pending',%s,%s,%s)",
+                    (outcome.plan_id, digest, target, now, now, now))
+            cursor.execute('UPDATE workmanship_sim_connector_runtime_devices SET last_journal_sequence=%s WHERE device_id=%s',
+                           (outcome.journal_sequence, device_id))
             cursor.execute(
                 "UPDATE workmanship_sim_connector_runtime_plans SET status=%s,outcome_json=%s,outcome_hash=%s,"
                 "reconciliation_state=%s,reconciled_at=%s,updated_at=%s WHERE " + scope + " AND status=%s",
@@ -788,7 +850,7 @@ class SimulationConnectorRepository:
             with conn.cursor() as cursor:
                 cursor.execute(
                     "SELECT plan_id,outcome_hash,target_capability,attempt "
-                    "FROM workmanship_sim_connector_projection_outbox "
+                    f"FROM {self.projection_table} "
                     "WHERE status IN ('pending','retryable_failed') "
                     "AND (next_retry_at IS NULL OR next_retry_at<=NOW(6)) "
                     "ORDER BY created_at LIMIT 1 FOR UPDATE"
@@ -797,7 +859,7 @@ class SimulationConnectorRepository:
                 if not row:
                     return None
                 cursor.execute(
-                    "UPDATE workmanship_sim_connector_projection_outbox "
+                    f"UPDATE {self.projection_table} "
                     "SET status='projecting',lease_owner=%s,"
                     "lease_until=DATE_ADD(NOW(6),INTERVAL %s SECOND),"
                     "attempt=attempt+1,error_code=NULL,updated_at=NOW(6) "
@@ -816,14 +878,24 @@ class SimulationConnectorRepository:
             attempt=int(row["attempt"]) + 1, owner=owner,
         )
 
+    def verified_v2_projection(self, plan, outcome):
+        digest = hashlib.sha256(canonicalize_v2(outcome)).hexdigest()
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute('SELECT p.plan_hash FROM workmanship_sim_connector_runtime_plans p '
+                'JOIN workmanship_sim_connector_runtime_projection_outbox o ON o.plan_id=p.plan_id AND o.outcome_hash=p.outcome_hash '
+                "WHERE p.plan_id=%s AND p.plan_hash=%s AND p.outcome_hash=%s AND o.status='projecting' AND o.lease_until>NOW(6)",
+                (plan.plan_id, plan.plan_hash, digest))
+            return cursor.fetchone() is not None
+
     def read_projection_payload(
         self, lease: ProjectionLease,
-    ) -> tuple[ConnectorExecutionPlanV1, ConnectorPlanOutcomeV1]:
+    ) -> tuple[ConnectorExecutionPlanV1 | ConnectorExecutionPlanV2, ConnectorPlanOutcomeV1 | ConnectorPlanOutcomeV2]:
+        plan_table = 'workmanship_sim_connector_runtime_plans' if self.projection_v2 else 'workmanship_sim_connector_plans'
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
                 "SELECT p.plan_json,p.outcome_json,p.outcome_hash "
-                "FROM workmanship_sim_connector_plans p "
-                "JOIN workmanship_sim_connector_projection_outbox o "
+                f"FROM {plan_table} p "
+                f"JOIN {self.projection_table} o "
                 "ON o.plan_id=p.plan_id AND o.outcome_hash=p.outcome_hash "
                 "WHERE o.plan_id=%s AND o.outcome_hash=%s AND o.target_capability=%s "
                 "AND o.status='projecting' AND o.lease_owner=%s "
@@ -843,15 +915,15 @@ class SimulationConnectorRepository:
         if isinstance(outcome_value, str):
             outcome_value = json.loads(outcome_value)
         return (
-            ConnectorExecutionPlanV1.model_validate(plan_value),
-            ConnectorPlanOutcomeV1.model_validate(outcome_value),
+            (ConnectorExecutionPlanV2 if self.projection_v2 else ConnectorExecutionPlanV1).model_validate(plan_value),
+            (ConnectorPlanOutcomeV2 if self.projection_v2 else ConnectorPlanOutcomeV1).model_validate(outcome_value),
         )
 
     def finish_projection(self, plan_id: str, owner: str) -> None:
         with get_simulation_conn() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
-                    "UPDATE workmanship_sim_connector_projection_outbox "
+                    f"UPDATE {self.projection_table} "
                     "SET status='projected',projected_at=NOW(6),lease_owner=NULL,"
                     "lease_until=NULL,updated_at=NOW(6) "
                     "WHERE plan_id=%s AND status='projecting' AND lease_owner=%s "
@@ -868,7 +940,7 @@ class SimulationConnectorRepository:
         with get_simulation_conn() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
-                    "UPDATE workmanship_sim_connector_projection_outbox "
+                    f"UPDATE {self.projection_table} "
                     "SET status=%s,error_code=%s,lease_owner=NULL,lease_until=NULL,"
                     "next_retry_at=IF(%s,DATE_ADD(NOW(6),INTERVAL 5 SECOND),NULL),"
                     "updated_at=NOW(6) WHERE plan_id=%s AND status='projecting' "
@@ -883,7 +955,7 @@ class SimulationConnectorRepository:
         with get_simulation_conn() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
-                    "UPDATE workmanship_sim_connector_projection_outbox "
+                    f"UPDATE {self.projection_table} "
                     "SET status='retryable_failed',lease_owner=NULL,lease_until=NULL,"
                     "next_retry_at=%s,error_code='projection_lease_expired',updated_at=NOW(6) "
                     "WHERE status='projecting' AND lease_until<=%s",

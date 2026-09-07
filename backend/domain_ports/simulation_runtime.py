@@ -159,7 +159,7 @@ class GovernedSimulationRuntimeClient:
         digest = outcome_hash.removeprefix("sha256:")
         identity = ConsumerIdentity(
             actor=ActorIdentity(
-                user_id=plan.user_id,
+                user_id=plan.actor_id if plan.protocol == 'ai00.connector.execution-plan.v2' else plan.user_id,
                 authentication_method="connector_plan_lease",
                 authenticated_at=plan.issued_at,
             ),
