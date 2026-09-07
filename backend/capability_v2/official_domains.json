@@ -90,7 +90,7 @@
         "plugin_id": "official.craft",
         "module": "craft_backend.capabilities",
         "version": "1.2.0",
-        "artifact_hash": "sha256:c4bc934c2fa32574164e11659a7ec8ffaed2f0ed016a11146f5012a672bf1566"
+        "artifact_hash": "sha256:702de27eb4b3627854c5888abde549d83e8ee7637188047a8f8ebaaf1d01947f"
       },
       "artifact_path": "plugins/craft/craft_backend",
       "allowed_owners": [
@@ -278,7 +278,7 @@
         "plugin_id": "official.project-management",
         "module": "project_management_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:cafe71a588b35a9b4c7c36839a828f69fc0cc040db2e239de4444b454da3cc1d"
+        "artifact_hash": "sha256:921e452331ea722370f68b42aeceeb61f6a8939bd98ef4e2151faf68a37e230e"
       },
       "artifact_path": "plugins/project_management/project_management_backend",
       "allowed_owners": [
@@ -304,7 +304,7 @@
         "plugin_id": "official.simulation",
         "module": "simulation_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:fd6ad61558cdcf3844b4babff64e7f38d61d30d09ea174f254655d3f6a1beeff"
+        "artifact_hash": "sha256:fc54097603d9927bab06298145bba748691ca4da1b68827bb9bfb386c235071b"
       },
       "artifact_path": "plugins/simulation/simulation_backend",
       "allowed_owners": [

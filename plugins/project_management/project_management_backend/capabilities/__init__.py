@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import Any
 
 from .projects import register_project_capabilities
-from .reviewed import register_reviewed_capabilities
+from .reviewed import register_reviewed_capabilities, register_desktop_v2_capabilities
 from ..application.outcomes import project_outcome_port
 from ..application.service import ProjectManagementApplication
 from ..infrastructure.repository import ProjectManagementRepository
@@ -17,3 +17,4 @@ def register_capabilities(registry: Any) -> None:
         )
     register_project_capabilities(registry)
     register_reviewed_capabilities(registry)
+    register_desktop_v2_capabilities(registry)

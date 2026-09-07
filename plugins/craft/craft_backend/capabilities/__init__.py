@@ -160,4 +160,7 @@ def register_capabilities(registry: Any) -> None:
     register_data_exchange_capability(native)
     register_lark_exchange_capabilities(native)
     register_reviewed_capabilities(registry)
+    for capability_id in ("craft.library.change.apply", "craft.rule.library.change.apply"):
+        original = registry.get(capability_id, 1)
+        native.register(original.spec.model_copy(update={"version": 2}), original.handler)
     versioned_resource_resolvers.register("craft.execution_plan", resolve_execution_plan_reference)

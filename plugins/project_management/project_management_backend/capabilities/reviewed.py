@@ -425,3 +425,17 @@ __all__ = [
     "PROJECT_CAPABILITY_IDS",
     "register_reviewed_capabilities",
 ]
+
+
+def register_desktop_v2_capabilities(registry: Any) -> None:
+    """Publish exact desktop create models without mutating their frozen v1."""
+    import json
+    from pathlib import Path
+    schemas = json.loads(Path(__file__).with_name("desktop_contracts_v2.json").read_text())
+    for capability_id, schema in schemas.items():
+        original = registry.get(capability_id, 1)
+        spec = original.spec.model_copy(update={
+            "version": 2, "input_schema": schema,
+            "output_schema": _object({"data": _application_result(_WORK_ITEM)}, required=("data",)),
+        })
+        register_capability(registry, spec, original.handler)

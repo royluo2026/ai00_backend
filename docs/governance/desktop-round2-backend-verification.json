@@ -1,0 +1,22 @@
+{
+  "base": "1c4049e767e8086526f6f591bc57a6c0b4dea47e",
+  "focused_tests": {
+    "command": "python -m pytest backend/tests/test_desktop_contract_v2.py backend/tests/test_native_capability_registration.py -q",
+    "passed": 19
+  },
+  "v1_full_descriptors_unchanged": 4,
+  "v2_registered_unpublished": 4,
+  "catalog_generation": "blocked by 16 existing Knowledge collection paths; published release retained",
+  "published_docs_check": "passed: 575 pages from retained release",
+  "registry_generated": true,
+  "registry_check_blockers": [
+    "rest:GET:/api/knowledge_hub/favorites: stability",
+    "rest:GET:/api/knowledge_hub/folders: stability",
+    "rest:GET:/api/knowledge_hub/recent: stability",
+    "rest:POST:/api/knowledge_hub/items: stability"
+  ],
+  "provider_hash_note": "simulation hash mismatch existed at clean base 1c4049e before changes; official freeze refreshes it alongside changed craft/project providers",
+  "machine_passed": false,
+  "human_approved": false,
+  "runtime_verified": false
+}

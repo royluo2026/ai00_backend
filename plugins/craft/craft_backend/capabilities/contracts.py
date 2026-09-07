@@ -1058,6 +1058,16 @@ OUTPUT_SCHEMAS[("craft.process_screenshot.attach", 1)] = _object({
 }, required=("screenshot_gid", "bop_version_gid", "operation_id", "capture_run_id", "artifact_ref"))
 
 
+# Desktop major 2 adds model-defined fields; major 1 schemas stay immutable.
+import json as _json
+from pathlib import Path as _Path
+for _id, _schema in _json.loads((_Path(__file__).with_name("desktop_contracts_v2.json")).read_text()).items():
+    INPUT_SCHEMAS[(_id, 2)] = _schema
+    from copy import deepcopy as _deepcopy
+    OUTPUT_SCHEMAS[(_id, 2)] = _deepcopy(OUTPUT_SCHEMAS[(_id, 1)])
+    OUTPUT_SCHEMAS[(_id, 2)]["properties"]["data"] = _object({"gid": STRING}, required=("gid",))
+
+
 def input_schema_for(capability_id: str, major_version: int) -> dict[str, Any]:
     return INPUT_SCHEMAS.get((capability_id, major_version)) or INPUT_SCHEMAS[capability_id]
 

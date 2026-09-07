@@ -1,0 +1,393 @@
+{
+  "project.task.change.apply.atomic.tasks_create": {
+    "type": "object",
+    "properties": {
+      "arguments": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "owner_gid": {
+            "type": "string"
+          },
+          "assignee_team_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "project_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "source_ref": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "review_date": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meeting_level": {
+            "type": "string"
+          },
+          "meeting_doc_link": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "progress_logs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            },
+            "maxItems": 200
+          },
+          "due_date": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "plan_start": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "plan_end": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "actual_start": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "actual_end": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "share_scope": {
+            "type": "string"
+          },
+          "list_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "local_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "local_created_at": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            },
+            "maxItems": 200
+          },
+          "scheduled_date": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "scheduled_start_time": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "time_estimate": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "is_deleted": {
+            "type": "boolean"
+          },
+          "parent_task_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "canvas_x": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "canvas_y": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "completion": {
+            "type": "integer"
+          },
+          "node_type": {
+            "type": "string"
+          },
+          "canvas_icon": {
+            "type": "string"
+          },
+          "feishu_assignee_open_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "feishu_assignee_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "feishu_group_chat_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "feishu_group_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "feishu_groups": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            },
+            "maxItems": 200
+          },
+          "feishu_docs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            },
+            "maxItems": 200
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "title"
+        ]
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "arguments"
+    ]
+  },
+  "project.issue.change.apply.atomic.issues_create": {
+    "type": "object",
+    "properties": {
+      "arguments": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "owner_gid": {
+            "type": "string"
+          },
+          "assignee_team_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "project_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tracking_refs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            },
+            "maxItems": 200
+          },
+          "occurrence_root_cause": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "escape_root_cause": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "interim_action": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "permanent_action": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_ref": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "related_task_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "related_knowledge_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "approval_order_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "bop_entry_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "share_scope": {
+            "type": "string"
+          },
+          "list_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            },
+            "maxItems": 200
+          },
+          "feishu_assignee_open_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "feishu_assignee_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "feishu_group_chat_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "feishu_group_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "feishu_groups": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            },
+            "maxItems": 200
+          },
+          "feishu_docs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            },
+            "maxItems": 200
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "title"
+        ]
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "arguments"
+    ]
+  }
+}

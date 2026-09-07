@@ -4192,6 +4192,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "plugins/craft/craft_backend/capabilities/__init__.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/library_change.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
@@ -5021,6 +5022,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "plugins/craft/craft_backend/capabilities/__init__.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/rule_library.py"
       ]
@@ -23836,6 +23838,29 @@
         "backend/routers/simulation_connector.py"
       ]
     },
+    "rest:POST:/api/v1/simulation/connectors/v2/plans/{plan_id}/acknowledge": {
+      "function_id": "rest:POST:/api/v1/simulation/connectors/v2/plans/{plan_id}/acknowledge",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "REST",
+        "ai00.connector"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/simulation_connector.py"
+      ]
+    },
     "rest:POST:/api/v1/simulation/connectors/v2/plans/{plan_id}/outcome": {
       "function_id": "rest:POST:/api/v1/simulation/connectors/v2/plans/{plan_id}/outcome",
       "domain": "Simulation",
@@ -24236,6 +24261,72 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/workbenches.py"
+      ]
+    },
+    "rest:POST:/auth/desktop/revoke": {
+      "function_id": "rest:POST:/auth/desktop/revoke",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/desktop_auth.py"
+      ]
+    },
+    "rest:POST:/auth/desktop/start": {
+      "function_id": "rest:POST:/auth/desktop/start",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/desktop_auth.py"
+      ]
+    },
+    "rest:POST:/auth/desktop/token": {
+      "function_id": "rest:POST:/auth/desktop/token",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/desktop_auth.py"
       ]
     },
     "rest:POST:/auth/logout": {
