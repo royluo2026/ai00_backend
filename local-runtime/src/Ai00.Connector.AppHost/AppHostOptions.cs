@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Ai00.Connector.Adapters.VisMockup;
+using Ai00.Connector.Contracts.V2;
 
 namespace Ai00.Connector.AppHost;
 
@@ -32,11 +33,31 @@ public sealed record HostManifest(string Protocol,string HostVersion,string Gate
     string HostExecutable,string HostSha256,string Publisher,string VisMockupExecutable,string VisMockupPublisher,
     Dictionary<string,TrustedPlanKey> PlanKeys)
 {
+    public static HostManifest Parse(string json)
+    {
+        // Canonical parsing walks the complete original tree before any typed
+        // projection can discard duplicate properties at a nested boundary.
+        var value=CanonicalJsonV2.Parse(json);
+        ProtocolV2Schema.Closed(value,"Protocol HostVersion GatewayOrigin ParentExecutable HostExecutable HostSha256 Publisher VisMockupExecutable VisMockupPublisher PlanKeys");
+        var keys=value.GetProperty("PlanKeys");
+        if(keys.ValueKind!=JsonValueKind.Object||!keys.EnumerateObject().Any())throw new InvalidDataException("plan_keys_missing");
+        foreach(var entry in keys.EnumerateObject())
+        {
+            if(!Regex.IsMatch(entry.Name,"\\A[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}\\z"))throw new InvalidDataException("plan_key_id_invalid");
+            ProtocolV2Schema.Closed(entry.Value,"PublicJwk NotBefore NotAfter Revoked");
+            var jwk=CanonicalJsonV2.Parse(entry.Value.GetProperty("PublicJwk").GetString()!);
+            ProtocolV2Schema.Closed(jwk,"kty crv x y");
+            if(jwk.GetProperty("kty").GetString()!="EC"||jwk.GetProperty("crv").GetString()!="P-256")throw new InvalidDataException("plan_key_jwk_invalid");
+            ProtocolV2Signatures.Decode(jwk.GetProperty("x").GetString()!,32);
+            ProtocolV2Signatures.Decode(jwk.GetProperty("y").GetString()!,32);
+        }
+        return JsonSerializer.Deserialize<HostManifest>(json)??throw new InvalidDataException("manifest_invalid");
+    }
     public static (HostManifest Manifest,string Digest,Process Parent) Verify(AppHostOptions options)
     {
         var bytes=File.ReadAllBytes(options.ManifestPath);
         if(bytes.Length>65536)throw new InvalidDataException("manifest_size_invalid");
-        var manifest=JsonSerializer.Deserialize<HostManifest>(bytes)??throw new InvalidDataException("manifest_invalid");
+        var manifest=Parse(System.Text.Encoding.UTF8.GetString(bytes));
         var hostPath=Environment.ProcessPath??throw new InvalidDataException("host_path_missing");
         using var certificate=ExecutableTrust.RequireSigned(hostPath);
         if(certificate.Thumbprint!=manifest.Publisher)throw new InvalidDataException("publisher_mismatch");

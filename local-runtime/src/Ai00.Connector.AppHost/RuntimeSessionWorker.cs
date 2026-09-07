@@ -17,10 +17,12 @@ public sealed class RuntimeTransport(HttpClient http,Uri origin)
     public async Task<JsonElement> SendAsync(HttpMethod method,string path,object? body,CancellationToken ct,RuntimeSession? session=null,string? credential=null)
     {
         using var request=new HttpRequestMessage(method,Endpoint(path));
-        if(body!=null)request.Content=JsonContent.Create(body);
+        if(body!=null)request.Content=body is string rawJson ? new StringContent(rawJson,Encoding.UTF8,"application/json") : JsonContent.Create(body);
         if(credential!=null)request.Headers.Add("X-AI00-Device-Credential",credential);
         if(session!=null)foreach(var header in Headers(session))request.Headers.Add(header.Key,header.Value);
         using var response=await http.SendAsync(request,HttpCompletionOption.ResponseHeadersRead,ct);
+        if((int)response.StatusCode>=500||response.StatusCode is HttpStatusCode.RequestTimeout or HttpStatusCode.TooManyRequests)
+            throw new RuntimeTransportException("cloud_temporarily_unavailable",true);
         await using var stream=await response.Content.ReadAsStreamAsync(ct);
         using var bytes=new MemoryStream();var buffer=new byte[8192];
         while(true){var count=await stream.ReadAsync(buffer,ct);if(count==0)break;if(bytes.Length+count>4*1024*1024)throw new InvalidDataException("cloud_response_size_invalid");bytes.Write(buffer,0,count);}
@@ -69,12 +71,78 @@ public sealed class RuntimeTransport(HttpClient http,Uri origin)
         catch(WebSocketException){await Task.Delay(TimeSpan.FromSeconds(5),ct);}
     }
 }
-public sealed class RuntimeTransportException(string code):Exception(code);
+public sealed class RuntimeTransportException(string code,bool transient=false):Exception(code)
+{
+    public bool Transient{get;}=transient;
+}
+
+public sealed class OutcomeDelivery(RuntimeTransport transport,AppPlanJournal journal,Func<DateTimeOffset>? clock=null)
+{
+    public async Task DeliverAsync(OutcomeV2 outcome,RuntimeSession? original,Func<CancellationToken,Task<RuntimeSession>> registerRecovery,CancellationToken ct)
+    {
+        DateTimeOffset Now()=>(clock??(()=>DateTimeOffset.UtcNow))();
+        RuntimeSession? recovery=null;
+        if(original is not null&&(original.DeviceId!=outcome.DeviceId||original.TenantId!=outcome.TenantId||original.Generation!=outcome.RuntimeGeneration||original.InstanceId!=outcome.RuntimeInstanceId))original=null;
+        while(true)
+        {
+            var useRecovery=original is null||original.ExpiresAt<=Now();
+            try
+            {
+                if(useRecovery&&(recovery is null||recovery.ExpiresAt<=Now()))recovery=await registerRecovery(ct);
+                if(await TryDeliverAsync(outcome,useRecovery?recovery!:original!,useRecovery,ct))return;
+            }
+            catch(RuntimeTransportException e)when(e.Message=="runtime_session_invalid")
+            {
+                if(useRecovery)recovery=null;else original=null;
+            }
+            catch(RuntimeTransportException e)when(e.Transient||e.Message is "runtime_session_active" or "reconciliation_session_active"){}
+            catch(HttpRequestException){}
+            await Task.Delay(TimeSpan.FromSeconds(5),ct);
+        }
+    }
+    public async Task<bool> TryDeliverAsync(OutcomeV2 outcome,RuntimeSession session,bool acknowledgementOnly,CancellationToken ct)
+    {
+        if(outcome.OverallStatus is not ("succeeded" or "failed_without_effect"))throw new InvalidDataException("normal_terminal_outcome_required");
+        var stored=journal.Events.Last(e=>e.PlanId==outcome.PlanId&&e.Kind=="outcome").Data;
+        if(stored!=outcome.ToJson())throw new InvalidDataException("stored_outcome_mismatch");
+        using var timeout=CancellationTokenSource.CreateLinkedTokenSource(ct);timeout.CancelAfter(TimeSpan.FromSeconds(15));
+        try
+        {
+            var result=await transport.SendAsync(HttpMethod.Post,"plans/"+Uri.EscapeDataString(outcome.PlanId)+(acknowledgementOnly?"/acknowledge":"/outcome"),stored,timeout.Token,session);
+            if(!result.TryGetProperty("accepted",out var accepted)||accepted.ValueKind!=JsonValueKind.True)throw new InvalidDataException("outcome_acknowledgement_invalid");
+            journal.Append("acknowledged",outcome.PlanId,"{}");return true;
+        }
+        catch(RuntimeTransportException e)when(e.Transient){return false;}
+        catch(HttpRequestException){return false;}
+        catch(IOException){return false;}
+        catch(OperationCanceledException)when(!ct.IsCancellationRequested){return false;}
+    }
+}
 
 public sealed class AppCredentialStore(string root,Uri origin)
 {
     private string Path=>System.IO.Path.Combine(root,"device.v2.dpapi");
     private byte[] Entropy=>SHA256.HashData(Encoding.UTF8.GetBytes("AI00 App credential v2\n"+origin.AbsoluteUri));
+    public RuntimeSession? LoadSession()
+    {
+        var path=System.IO.Path.Combine(root,"session.v2.dpapi");
+        if(!File.Exists(path))return null;
+        var clear=ProtectedData.Unprotect(File.ReadAllBytes(path),Entropy,DataProtectionScope.CurrentUser);
+        try{return JsonSerializer.Deserialize<RuntimeSession>(clear)??throw new InvalidDataException("stored_session_invalid");}
+        finally{CryptographicOperations.ZeroMemory(clear);}
+    }
+    public void SaveSession(RuntimeSession session)
+    {
+        var clear=JsonSerializer.SerializeToUtf8Bytes(session);
+        var path=System.IO.Path.Combine(root,"session.v2.dpapi");var temp=path+".tmp-"+Guid.NewGuid().ToString("N");
+        try
+        {
+            var cipher=ProtectedData.Protect(clear,Entropy,DataProtectionScope.CurrentUser);
+            using(var stream=new FileStream(temp,FileMode.CreateNew,FileAccess.Write,FileShare.None,4096,FileOptions.WriteThrough)){stream.Write(cipher);stream.Flush(true);}
+            File.Move(temp,path,true);
+        }
+        finally{CryptographicOperations.ZeroMemory(clear);if(File.Exists(temp))File.Delete(temp);}
+    }
     public JsonElement? Load()
     {
         if(!File.Exists(Path))return null;
@@ -103,34 +171,47 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
         var generation=credential.GetProperty("runtime_generation").GetInt64();var secret=credential.GetProperty("device_credential").GetString()!;
         var keyId=credential.GetProperty("device_key_id").GetString()!;
         var executor=new PlanExecutionWorker(journal,adapter,key,keyId,manifest.PlanKeys);
+        var savedSession=credentials.LoadSession();
         var recovered=executor.Recover();
         if(recovered.Count>0)
         {
             foreach(var outcome in recovered)
             {
+                if(outcome.OverallStatus is "succeeded" or "failed_without_effect")
+                {
+                    await DeliverNormalAsync(outcome,savedSession,deviceId,tenantId,generation,secret,ct);
+                    continue;
+                }
                 await diagnostics.SendAsync(new{type="diagnostic",code="recovery_required"},ct);
                 await ReconcileAsync(outcome,deviceId,tenantId,generation,secret,keyId,ct);
+                lifetime.StopApplication();return;
             }
-            // A fresh process/STA is required after recovery. No new lease in this process.
-            lifetime.StopApplication();return;
         }
-        var session=await RegisterAsync(deviceId,tenantId,generation,secret,null,ct);
+        var session=savedSession is not null&&savedSession.ExpiresAt>DateTimeOffset.UtcNow ? savedSession : await RegisterAsync(deviceId,tenantId,generation,secret,null,ct);
+        credentials.SaveSession(session);
         while(!ct.IsCancellationRequested)
         {
             if(session.ExpiresAt-DateTimeOffset.UtcNow<TimeSpan.FromMinutes(2))
             {
                 var renewed=await transport.SendAsync(HttpMethod.Post,"runtime/renew",null,ct,session);
                 session=session with{ExpiresAt=renewed.GetProperty("expires_at").GetDateTimeOffset()};
+                credentials.SaveSession(session);
             }
             await transport.SendAsync(HttpMethod.Post,"heartbeat",null,ct,session);
             var leased=await transport.SendAsync(HttpMethod.Post,"plans/lease",new{lease_seconds=120},ct,session);
             if(leased.ValueKind==JsonValueKind.Null){await transport.WaitForWakeAsync(session,ct);continue;}
             var lease=new LeasedPlan(leased.GetProperty("lease_id").GetString()!,leased.GetProperty("lease_until").GetDateTimeOffset(),leased.GetProperty("plan").GetRawText());
             var outcome=await executor.ExecuteAsync(lease,session,ct);
+            if(outcome.OverallStatus is "succeeded" or "failed_without_effect")
+            {
+                await DeliverNormalAsync(outcome,session,deviceId,tenantId,generation,secret,ct);
+                if(session.ExpiresAt<=DateTimeOffset.UtcNow){lifetime.StopApplication();return;}
+                continue;
+            }
             // Persisted first. A failed send leaves recovery work, never an execution retry.
             using var reportTimeout=new CancellationTokenSource(TimeSpan.FromSeconds(15));
             await transport.SendAsync(HttpMethod.Post,"plans/"+Uri.EscapeDataString(outcome.PlanId)+"/outcome",outcome.Document,reportTimeout.Token,session);
-            if(outcome.OverallStatus=="outcome_unknown")
+            if(outcome.OverallStatus is "outcome_unknown" or "manual_review_required")
             {
                 await diagnostics.SendAsync(new{type="diagnostic",code="recovery_required"},ct);
                 // COM may still run. Exit; a new process can acquire a recovery-only session after expiry.
@@ -139,6 +220,8 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
             journal.Append("acknowledged",outcome.PlanId,"{}");
         }
     }
+    private Task DeliverNormalAsync(OutcomeV2 outcome,RuntimeSession? original,string deviceId,string tenantId,long generation,string secret,CancellationToken ct) =>
+        new OutcomeDelivery(transport,journal).DeliverAsync(outcome,original,token=>RegisterAsync(deviceId,tenantId,generation,secret,outcome.PlanId,token),ct);
     private void ValidateCredential(JsonElement credential)
     {
         var keyId="device-key-"+CanonicalJsonV2.HexHash(CanonicalJsonV2.Serialize(key.PublicJwk));

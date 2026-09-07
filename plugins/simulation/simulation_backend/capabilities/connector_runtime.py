@@ -72,6 +72,7 @@ DESKTOP_TRANSPORT_BINDINGS = tuple(dict(method=method,
     ("POST", "plans/lease", "runtime_lease", "runtime_session"),
     ("WEBSOCKET", "plans/wake", "runtime_wake", "runtime_session"),
     ("POST", "plans/{plan_id}/outcome", "runtime_outcome", "runtime_session_and_signed_outcome"),
+    ("POST", "plans/{plan_id}/acknowledge", "runtime_outcome_acknowledge", "plan_scoped_session_and_exact_stored_outcome"),
     ("GET", "plans/{plan_id}/probe", "runtime_probe", "plan_scoped_reconciliation_session"),
     ("POST", "plans/{plan_id}/reconcile", "runtime_reconcile", "plan_scoped_session_and_signed_evidence"),
 ))

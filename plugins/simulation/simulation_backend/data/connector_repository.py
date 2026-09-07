@@ -331,7 +331,8 @@ class SimulationConnectorRepository:
             cursor.execute(
                 "SELECT plan_id FROM workmanship_sim_connector_runtime_plans WHERE plan_id=%s AND device_id=%s "
                 "AND protocol=%s AND runtime_generation=%s AND runtime_instance_id=%s AND session_token_hash=%s "
-                "AND status IN ('outcome_unknown','manual_review_required') FOR UPDATE",
+                "AND (status IN ('outcome_unknown','manual_review_required') OR "
+                "(status IN ('succeeded','failed_without_effect') AND outcome_hash IS NOT NULL AND reconciled_at IS NULL)) FOR UPDATE",
                 (plan_id, device_id, PROTOCOL_V2, generation, row["current_runtime_instance_id"], row["session_token_hash"]),
             )
             if cursor.fetchone() is None:
@@ -477,6 +478,40 @@ class SimulationConnectorRepository:
             self._runtime_audit(cursor, row, "plan_leased", now, plan_id=current["plan_id"])
             value = current["plan_json"]
             return {"lease_id": lease_id, "lease_until": lease_until, "plan": json.loads(value) if isinstance(value, str) else value}
+
+    def acknowledge_v2_outcome(self, device_id, generation, instance, token, outcome, now):
+        """Resolve a lost ACK only; recovery credentials can never create an Outcome."""
+        outcome = ConnectorPlanOutcomeV2.model_validate(outcome)
+        now = _utc(now)
+        encoded = canonicalize_v2(outcome).decode('utf-8')
+        digest = hashlib.sha256(encoded.encode('utf-8')).hexdigest()
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            row = self._locked_runtime(cursor, device_id)
+            recovery = self._authenticated_recovery(cursor, row, generation, instance, token, outcome.plan_id, now)
+            cursor.execute("SELECT * FROM workmanship_sim_connector_runtime_plans WHERE plan_id=%s AND device_id=%s FOR UPDATE",
+                           (outcome.plan_id, device_id))
+            plan = cursor.fetchone()
+            if (not plan or plan['status'] not in {'succeeded', 'failed_without_effect'}
+                    or plan['reconciled_at'] is not None or outcome.overall_status != plan['status']
+                    or (plan['protocol'], plan['runtime_generation'], plan['runtime_instance_id'], plan['session_token_hash'],
+                        plan['lease_id'], plan['plan_hash'], plan['tenant_gid']) !=
+                       (PROTOCOL_V2, generation, recovery['execution_instance_id'], recovery['execution_session_token_hash'],
+                        outcome.lease_id, outcome.plan_hash, outcome.tenant_id)
+                    or (outcome.device_id, outcome.runtime_generation, outcome.runtime_instance_id, outcome.device_key_id) !=
+                       (device_id, generation, recovery['execution_instance_id'], row['device_key_id'])
+                    or not secrets.compare_digest(plan['outcome_hash'] or '', digest)):
+                raise ConnectorRepositoryError('outcome_acknowledgement_conflict')
+            stored = json.loads(plan['outcome_json']) if isinstance(plan['outcome_json'], str) else plan['outcome_json']
+            if canonicalize_v2(stored).decode('utf-8') != encoded:
+                raise ConnectorRepositoryError('outcome_acknowledgement_conflict')
+            # Consume only the recovery credential; Outcome, journal cursor,
+            # projection and original signed audit records stay untouched.
+            cursor.execute("UPDATE workmanship_sim_connector_runtime_recovery_sessions SET consumed_at=%s "
+                           "WHERE device_id=%s AND token_hash=%s AND consumed_at IS NULL",
+                           (now, device_id, recovery['token_hash']))
+            if cursor.rowcount != 1:
+                raise ConnectorRepositoryError('runtime_session_conflict')
+            return {'accepted': True, 'already_applied': True}
 
     def complete_v2_plan(self, device_id, runtime_generation, runtime_instance_id, session_token,
                          outcome: ConnectorPlanOutcomeV2, now: datetime) -> None:

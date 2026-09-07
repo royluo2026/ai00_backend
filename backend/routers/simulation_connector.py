@@ -538,6 +538,13 @@ def runtime_probe(plan_id: str, pins: dict = Depends(_reconciliation_auth)):
     return _transport(lambda: runtime_session_service.probe(plan_id=plan_id, **pins))
 
 
+@router.post('/v2/plans/{plan_id}/acknowledge')
+def runtime_outcome_acknowledge(plan_id: str, body: ConnectorPlanOutcomeV2, pins: dict = Depends(_reconciliation_auth)):
+    if plan_id != body.plan_id:
+        raise HTTPException(status_code=409, detail={'code': 'plan_identity_mismatch'})
+    return _transport(lambda: runtime_session_service.acknowledge(outcome=body, **pins))
+
+
 @router.post('/v2/plans/{plan_id}/reconcile')
 def runtime_reconcile(plan_id: str, body: ConnectorReconciliationEvidenceV2, pins: dict = Depends(_reconciliation_auth)):
     if plan_id != body.plan_id:

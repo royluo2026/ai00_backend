@@ -4,6 +4,22 @@ using Xunit;
 namespace Ai00.Connector.Tests;
 public sealed class AppHostLifecycleTests
 {
+    [Theory]
+    [InlineData("top_duplicate")] [InlineData("key_duplicate")] [InlineData("key_unknown")]
+    [InlineData("jwk_duplicate")] [InlineData("jwk_unknown")] [InlineData("map_duplicate")]
+    public void ManifestRejectsEveryNestedAmbiguityBeforeDeserializing(string mutation)
+    {
+        var jwk=ProtocolV2VectorTests.Vector["plan_public_jwk"]!.ToJsonString();
+        if(mutation=="jwk_duplicate")jwk=jwk.Insert(1,"\"kty\":\"EC\",");
+        if(mutation=="jwk_unknown")jwk=jwk.Insert(1,"\"private\":\"no\",");
+        var manifest=new HostManifest("ai00.connector.execution-plan.v2","1.0.0","https://gateway.example.com","AI00.exe","AI00.ConnectorHost.exe",new string('a',64),"publisher",@"C:\Program Files\Vis.exe","publisher",new(){{"cloud-key",new(jwk,DateTimeOffset.UtcNow.AddDays(-1),DateTimeOffset.UtcNow.AddDays(1),false)}});
+        var json=JsonSerializer.Serialize(manifest);
+        if(mutation=="top_duplicate")json=json.Insert(1,"\"Protocol\":\"ignored\",");
+        if(mutation=="key_duplicate")json=json.Replace("\"Revoked\":false","\"Revoked\":true,\"Revoked\":false");
+        if(mutation=="key_unknown")json=json.Replace("\"Revoked\":false","\"Revoked\":false,\"Extra\":true");
+        if(mutation=="map_duplicate")json=json.Replace("\"PlanKeys\":{","\"PlanKeys\":{\"cloud-key\":{},");
+        Assert.ThrowsAny<Exception>(()=>HostManifest.Parse(json));
+    }
     [Fact] public async Task TransportUsesOnlyV2SessionHeadersAndDoesNotSendDeviceCredential()
     {
         using var http=new HttpClient(new InspectRequest(request=>

@@ -9,6 +9,46 @@ public sealed class OutcomeUnknownRecoveryTests : IDisposable
 {
     private readonly string root = Path.Combine(Path.GetTempPath(), "ai00-app-test-" + Guid.NewGuid().ToString("N"));
     private static readonly DateTimeOffset Now = DateTimeOffset.Parse("2026-09-07T01:03:00Z");
+    [Theory] [InlineData(false)] [InlineData(true)]
+    public async Task LostAckRestartResendsExactSignedOutcomeWithoutCom(bool expired)
+    {
+        using var key=new DeviceSigningKeyStore(root).GetOrCreate();
+        var journal=new AppPlanJournal(Path.Combine(root,"journal"));
+        var adapter=new FakeAdapter(()=>Task.FromResult(new AdapterResult(true,new{connected=true})));
+        var outcome=await Worker(journal,adapter,key).ExecuteAsync(Lease(),Session(),CancellationToken.None);
+        var credentials=new AppCredentialStore(root,new Uri("https://gateway.example.com"));
+        credentials.SaveSession(Session());
+        var first=new AcceptedThenDisconnected();using var http=new HttpClient(first);
+        var transport=new RuntimeTransport(http,new Uri("https://gateway.example.com"));
+        Assert.False(await new OutcomeDelivery(transport,journal).TryDeliverAsync(outcome,Session(),false,CancellationToken.None));
+        Assert.DoesNotContain(journal.Events,e=>e.Kind=="acknowledged");
+        var reopened=new AppPlanJournal(journal.Path);
+        var saved=Assert.Single(Worker(reopened,adapter,key).Recover());
+        var restored=new AppCredentialStore(root,new Uri("https://gateway.example.com")).LoadSession()!;
+        Assert.Equal(Session(),restored);
+        var recoveryRegistrations=0;
+        await new OutcomeDelivery(transport,reopened,()=>expired?Now.AddDays(1):Now).DeliverAsync(saved,restored,_=>
+        {
+            recoveryRegistrations++;
+            return Task.FromResult(restored with{InstanceId="recovery-instance",Token="recovery-secret",ExpiresAt=Now.AddDays(2)});
+        },CancellationToken.None);
+        Assert.Equal(expired?1:0,recoveryRegistrations);
+        Assert.Equal(first.Bodies[0],first.Bodies[1]);
+        Assert.Equal(outcome.ToJson(),first.Bodies[1]);
+        Assert.EndsWith(expired?"/acknowledge":"/outcome",first.Paths[1]);
+        Assert.Empty(Worker(new AppPlanJournal(journal.Path),adapter,key).Recover());
+        Assert.Equal(1,adapter.Calls);
+    }
+    private sealed class AcceptedThenDisconnected:HttpMessageHandler
+    {
+        public List<string> Bodies{get;}=[];public List<string> Paths{get;}=[];
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,CancellationToken ct)
+        {
+            Bodies.Add(await request.Content!.ReadAsStringAsync(ct));Paths.Add(request.RequestUri!.AbsolutePath);
+            if(Bodies.Count==1)throw new HttpRequestException("server accepted but ACK connection lost");
+            return new HttpResponseMessage(System.Net.HttpStatusCode.OK){Content=new StringContent("{\"success\":true,\"data\":{\"accepted\":true,\"already_applied\":true}}")};
+        }
+    }
     [Fact] public async Task TimeoutBecomesOutcomeUnknownAndStopsLaterSteps()
     {
         using var key = new DeviceSigningKeyStore(root).GetOrCreate();

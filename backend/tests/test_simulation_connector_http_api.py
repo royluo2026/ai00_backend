@@ -31,6 +31,7 @@ def test_pairing_http_surface_is_canonical_simulation_owned():
         "/api/v1/simulation/connectors/v2/plans/lease",
         "/api/v1/simulation/connectors/v2/plans/wake",
         "/api/v1/simulation/connectors/v2/plans/{plan_id}/outcome",
+        "/api/v1/simulation/connectors/v2/plans/{plan_id}/acknowledge",
         "/api/v1/simulation/connectors/v2/plans/{plan_id}/probe",
         "/api/v1/simulation/connectors/v2/plans/{plan_id}/reconcile",
         "/api/v1/simulation/connectors/plans/{plan_id}/complete",

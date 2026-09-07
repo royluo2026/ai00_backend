@@ -662,3 +662,76 @@ def test_recovery_expiry_does_not_change_a_nonmatching_or_unexpired_lease(databa
         recovery(database, plan)
     assert read(database, "runtime_plans")["status"] == "leased"
     assert read(database, "runtime_recovery_sessions") is None
+
+
+def test_terminal_acknowledgement_after_session_expiry_is_exact_and_side_effect_free(database):
+    registered = session(database)
+    plan = queue(database, registered)
+    leased = lease(database, registered)
+    outcome = outcome_for(plan, leased)
+    complete(database, registered, outcome)
+    before = read(database, 'runtime_plans')
+    now = NOW + timedelta(seconds=61)
+    repo = SimulationConnectorRepository()
+    recovery(database, plan, now=now)
+    with pytest.raises(ConnectorRepositoryError, match='runtime_session_invalid'):
+        repo.complete_v2_plan(database[1], 7, 'recovery-1', 'recovery-secret', outcome, now)
+    assert repo.acknowledge_v2_outcome(database[1], 7, 'recovery-1', 'recovery-secret', outcome, now) == {'accepted': True, 'already_applied': True}
+    assert read(database, 'runtime_plans') == before
+    assert read(database, 'runtime_recovery_sessions')['consumed_at'] is not None
+
+
+def test_terminal_acknowledgement_rejects_different_or_missing_outcome(database):
+    registered = session(database)
+    plan = queue(database, registered)
+    leased = lease(database, registered)
+    now = NOW + timedelta(seconds=61)
+    repo = SimulationConnectorRepository()
+    recovery(database, plan, now=now)
+    outcome = outcome_for(plan, leased)
+    with pytest.raises(ConnectorRepositoryError, match='outcome_acknowledgement_conflict'):
+        repo.acknowledge_v2_outcome(database[1], 7, 'recovery-1', 'recovery-secret', outcome, now)
+
+
+def test_terminal_acknowledgement_rejects_changed_signed_outcome(database):
+    registered = session(database)
+    plan = queue(database, registered)
+    leased = lease(database, registered)
+    outcome = outcome_for(plan, leased)
+    complete(database, registered, outcome)
+    now = NOW + timedelta(seconds=61)
+    recovery(database, plan, now=now)
+    before = read(database, 'runtime_plans')
+    changed = outcome.model_copy(update={'journal_sequence': outcome.journal_sequence + 1})
+    with pytest.raises(ConnectorRepositoryError, match='outcome_acknowledgement_conflict'):
+        SimulationConnectorRepository().acknowledge_v2_outcome(database[1], 7, 'recovery-1', 'recovery-secret', changed, now)
+    assert read(database, 'runtime_plans') == before
+
+
+def test_terminal_acknowledgement_http_recovery_auth_and_exact_response(database, monkeypatch):
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+    from backend.routers import simulation_connector
+    from plugins.simulation.simulation_backend.application.connector_runtime_sessions import RuntimeSessionService
+    registered = session(database)
+    plan = queue(database, registered)
+    leased = lease(database, registered)
+    outcome = outcome_for(plan, leased)
+    complete(database, registered, outcome)
+    now = NOW + timedelta(seconds=61)
+    recovery(database, plan, now=now)
+    monkeypatch.setattr(simulation_connector, 'runtime_session_service', RuntimeSessionService(SimulationConnectorRepository(), clock=lambda: now))
+    app = FastAPI()
+    app.include_router(simulation_connector.router)
+    headers = {'X-AI00-Device-ID': database[1], 'X-AI00-Runtime-Generation': '7',
+               'X-AI00-Runtime-Instance-ID': 'recovery-1', 'X-AI00-Runtime-Type': 'electron',
+               'X-AI00-Runtime-Session': 'recovery-secret'}
+    path = '/api/v1/simulation/connectors/v2/plans/' + plan.plan_id
+    body = outcome.model_dump(mode='json')
+    with TestClient(app) as client:
+        assert client.post(path + '/outcome', headers=headers, json=body).status_code == 401
+        changed = {**body, 'journal_sequence': body['journal_sequence'] + 1}
+        assert client.post(path + '/acknowledge', headers=headers, json=changed).status_code == 409
+        response = client.post(path + '/acknowledge', headers=headers, json=body)
+        assert response.status_code == 200
+        assert response.json() == {'success': True, 'data': {'accepted': True, 'already_applied': True}}

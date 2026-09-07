@@ -104,5 +104,10 @@ class RuntimeSessionService:
         method(pins['device_id'], pins['generation'], pins['runtime_instance_id'], token, outcome, self.clock())
         return {'accepted': True}
 
+    def acknowledge(self, token, outcome, **pins):
+        self.authenticate_reconciliation(token, plan_id=outcome.plan_id, **pins)
+        return self.repository.acknowledge_v2_outcome(pins['device_id'], pins['generation'],
+            pins['runtime_instance_id'], token, outcome, self.clock())
+
 
 runtime_session_service = RuntimeSessionService(SimulationConnectorRepository())
