@@ -26,7 +26,7 @@ PAYLOADS = {
     'agent.interaction.chat.change.apply': {'operation':'chat_sync','body':{'message':'Hello','context':{'text':'Fixture'}}},
 }
 
-def execute_agent_matrix():
+def execute_agent_matrix(invoke=None):
     rows = []
     for capability_id, version in [(d[0],d[1]) for d in DEFINITIONS] + [('agent.interaction.chat.change.apply',3)]:
         conn = MagicMock()
@@ -60,7 +60,7 @@ def execute_agent_matrix():
             entry = registry.get(capability_id,version)
             payload = PAYLOADS[capability_id]
             with authenticated_transport_scope('trusted-fixture-credential'):
-                result = entry.handler(payload,context)
+                result = invoke(entry,payload,context) if invoke else entry.handler(payload,context)
                 if asyncio.iscoroutine(result): result = asyncio.run(result)
             data = result.data if hasattr(result,'data') else result
             Draft202012Validator(entry.descriptor.input_schema).validate(payload)

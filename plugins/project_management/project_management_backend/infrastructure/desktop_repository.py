@@ -55,10 +55,11 @@ def transition(capability_id, action, payload, context):
         if action=='approve' and row.get('order_type')=='scope_upgrade':
             content = row.get('content') or {}
             if isinstance(content,str): content=json.loads(content)
-            table = {'project':'workmanship_proj_projects','approval':'workmanship_proj_approval_orders'}.get(content.get('item_type'))
-            if not table: error('invalid_input','This request requires the target domain scope workflow.')
-            cursor.execute(f'UPDATE {table} SET share_scope=%s WHERE gid=%s',(content['target_scope'],content['item_gid']))
-            if cursor.rowcount!=1: error('resource_not_found','The scope-upgrade target is unavailable.')
+            target_fields = {'project':('workmanship_proj_projects','owner_gid','team_id'),'approval':('workmanship_proj_approval_orders','applicant_gid','team_gid')}.get(content.get('item_type'))
+            if not target_fields: error('invalid_input','This request requires the target domain scope workflow.')
+            table,owner,tenant=target_fields
+            cursor.execute(f'UPDATE {table} SET share_scope=%s WHERE gid=%s AND {tenant}=%s AND {owner}=%s AND COALESCE(share_scope,\'local\')=%s',(content['target_scope'],content['item_gid'],context.team_gid,row['applicant_gid'],content['current_scope']))
+            if cursor.rowcount!=1: error('version_conflict','The target ownership, tenant or visibility changed after the request.')
         opinion = {'actor_gid':context.user_gid,'approver_gid':context.user_gid,'action':action,'decision':action,'comment':payload.get('comment','')}
         cursor.execute('UPDATE workmanship_proj_approval_orders SET status=%s,revision=revision+1,opinions=JSON_MERGE_PRESERVE(COALESCE(opinions,JSON_ARRAY()),%s),updated_at=NOW() WHERE gid=%s AND revision=%s',(target,json.dumps([opinion],ensure_ascii=False),payload['order_gid'],payload['expected_revision']))
         if cursor.rowcount!=1: error('version_conflict','The order changed concurrently.')

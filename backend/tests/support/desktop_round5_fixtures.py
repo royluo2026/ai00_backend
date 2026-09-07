@@ -41,7 +41,7 @@ PAYLOADS = {
 }
 
 
-def execute_base_matrix():
+def execute_base_matrix(invoke=None):
     registry = CapabilityRegistry()
     register_desktop_capabilities(registry)
     actor = {'gid': 'fixture-user', 'name': 'Fixture user', 'is_active': True, 'system_role': 'super_admin', 'org_role': 'super_admin', 'team_id': 'fixture-team'}
@@ -86,7 +86,7 @@ def execute_base_matrix():
             port('backend.services.feishu_service.feishu_service.send_message_to_chat', return_value=True)
             entry = registry.get(capability_id, 1)
             payload = deepcopy(PAYLOADS[capability_id])
-            result = entry.handler(payload, context)
+            result = invoke(entry,payload,context) if invoke else entry.handler(payload,context)
             Draft202012Validator(entry.descriptor.input_schema).validate(payload)
             Draft202012Validator(entry.descriptor.output_schema).validate(result)
             assert 'unknown_remote_secret' not in str(result)

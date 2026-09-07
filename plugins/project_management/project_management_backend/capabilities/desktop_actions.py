@@ -89,9 +89,9 @@ def follow(payload,context):
             cursor.execute('SELECT gid FROM workmanship_work_follows WHERE user_gid=%s AND item_type=%s AND item_gid=%s FOR UPDATE',(context.user_gid,payload['item_type'],payload['item_gid']))
             if cursor.fetchone(): db.error('already_exists','The item is already followed.')
             cursor.execute('INSERT INTO workmanship_work_follows (gid,user_gid,item_type,item_gid,item_title,notify_on) VALUES (%s,%s,%s,%s,%s,%s)',(gid,context.user_gid,payload['item_type'],payload['item_gid'],payload.get('item_title',''),json.dumps(payload.get('notify_on',['status_change','resolved']))))
-            target={'project':('workmanship_proj_projects','owner_gid'),'approval':('workmanship_proj_approval_orders','applicant_gid')}.get(payload['item_type'])
+            target={'project':('workmanship_proj_projects','owner_gid','team_id'),'approval':('workmanship_proj_approval_orders','applicant_gid','team_gid')}.get(payload['item_type'])
             if target:
-                cursor.execute(f'SELECT {target[1]} AS owner_gid FROM {target[0]} WHERE gid=%s',(payload['item_gid'],))
+                cursor.execute(f'SELECT {target[1]} AS owner_gid FROM {target[0]} WHERE gid=%s AND {target[2]}=%s',(payload['item_gid'],context.team_gid))
                 owner=(cursor.fetchone() or {}).get('owner_gid')
                 if owner and owner!=context.user_gid: db.notification(cursor,owner,'new_follower',payload['item_type'],payload['item_gid'],'有人关注了你的内容')
             result.update(success=True,data={'gid':gid})

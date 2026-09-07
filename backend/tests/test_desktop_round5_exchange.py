@@ -14,7 +14,7 @@ from backend.base.desktop_actions import register_desktop_capabilities
 from plugins.craft.craft_backend.capabilities.desktop_exchange import DEFINITIONS, register_desktop_exchange
 
 
-def execute_file_matrix():
+def execute_file_matrix(invoke=None):
     store=InMemoryArtifactStore();storage=InMemoryObjectStorage();service=ArtifactService(store,storage)
     ctx=SimpleNamespace(user_gid='fixture-user',team_gid='fixture-team',active_roles=('super_admin',))
     registry=CapabilityRegistry();register_desktop_capabilities(registry);register_desktop_exchange(registry)
@@ -26,7 +26,7 @@ def execute_file_matrix():
         def remote(request):
             calls.append((request.method,request.url.path))
             assert request.headers['Authorization']=='Bearer private-fixture-feishu-token'
-            return httpx.Response(200,json={'code':0,'data':{'valueRange':{'values':[['Name'],['Fixture']]}}})
+            return httpx.Response(200,json={'code':0,'data':{'valueRange':{'values':[['Name'],['Fixture']]},'items':[{'fields':{'Name':'Fixture'}}],'has_more':False}})
         real_client=httpx.Client
         stack.enter_context(patch('plugins.craft.craft_backend.capabilities.lark_exchange.httpx.Client',side_effect=lambda **kw:real_client(transport=httpx.MockTransport(remote))))
         stack.enter_context(patch('plugins.craft.craft_backend.capabilities.data_exchange.httpx.put',side_effect=lambda url,headers,json,timeout:real_client(transport=httpx.MockTransport(remote)).put(url,headers=headers,json=json)))
@@ -43,11 +43,13 @@ def execute_file_matrix():
             'craft.data_exchange.feishu_diff.write':{**diff,'spreadsheet_token':'sheet-one','sheet_id':'Sheet1'},
             'craft.data_exchange.feishu_sheet.write':{'spreadsheet_token':'sheet-one','sheet_id':'Sheet1','headers':['Name'],'rows':[['Fixture']]},
             'craft.data_exchange.feishu_sheet.read':{'spreadsheet_token':'sheet-one','sheet_range':'Sheet1!A1:Z1000'},
+            'craft.data_exchange.feishu_bitable.read':{'app_token':'app-one','table_id':'table-one','page_size':500},
+            'craft.data_exchange.feishu_bitable.write':{'app_token':'app-one','table_id':'table-one','headers':['Name'],'rows':[['Fixture']]},
         }
         rows=[]
         for capability_id,payload in payloads.items():
             entry=registry.get(capability_id,1)
-            result=entry.handler(payload,ctx)
+            result=invoke(entry,payload,ctx) if invoke else entry.handler(payload,ctx)
             Draft202012Validator(entry.descriptor.input_schema).validate(payload)
             Draft202012Validator(entry.descriptor.output_schema).validate(result)
             assert 'private-fixture-feishu-token' not in str(result)
@@ -65,4 +67,4 @@ def execute_file_matrix():
 
 
 def test_real_artifact_parse_export_feishu_handlers_and_foreign_or_tampered_rejection():
-    assert len(execute_file_matrix())==13
+    assert len(execute_file_matrix())==15

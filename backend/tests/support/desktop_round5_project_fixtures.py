@@ -50,7 +50,7 @@ class Database:
     def fetchall(self): return deepcopy(self.rows)
 
 
-def execute_project_matrix():
+def execute_project_matrix(invoke=None):
     database=Database();registry=CapabilityRegistry();rows=[]
     actor=lambda user,key:SimpleNamespace(user_gid=user,team_gid='fixture-team',active_roles=('super_admin',),idempotency_key=key,request_id=key)
     with ExitStack() as stack:
@@ -63,7 +63,8 @@ def execute_project_matrix():
         register_capabilities(registry)
         def call(name,payload,user='applicant',key=None):
             entry=registry.get(name,1);offset=len(database.statements)
-            result=entry.handler(payload,actor(user,key or name))
+            context=actor(user,key or name)
+            result=invoke(entry,payload,context) if invoke else entry.handler(payload,context)
             rows.append({'id':name,'version':1,'payload':payload,'provider_data':result,'input_schema':entry.descriptor.input_schema,'output_schema':entry.descriptor.output_schema,'sql_statements':database.statements[offset:]})
             return result
         created=call('project.approval.order.create',{'title':'Fixture approval','reviewer_gid':'reviewer','content':{'description':'Fixture request'}})
