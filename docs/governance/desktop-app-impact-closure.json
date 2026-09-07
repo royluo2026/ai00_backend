@@ -5,7 +5,7 @@
   "transport_classification": "authenticated interactive Gateway; single Windows x64 App product",
   "source_basis": "content-addressed source set; not a promoted release candidate",
   "source_hash_format": "UTF-8 source bytes with LF line endings, matching native Provider hashing",
-  "source_set_hash": "sha256:5748222c119b9f78f6b738decb33d9655d5f1be88702122ed07c9e087e302782",
+  "source_set_hash": "sha256:47d2a610a793955e93c2b9e28bb0ed2363338613d40d88f161081ecccd7ef80f",
   "published_catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
   "published_catalog_hash": "sha256:09e54550fcbaaab2df24bfa28d2c2478d9d47f455a27563405bce365efb2e2fd",
   "published_catalog_current": false,
@@ -4329,7 +4329,7 @@
     },
     {
       "path": "backend/scripts/build_desktop_app_governance.py",
-      "sha256": "sha256:a5ab99a9818e950584a065276a9d08ecbe571034a93ad8be0d0a7db7309345e7"
+      "sha256": "sha256:bee20d7c8b8fa3eed605b7d70c13b41ebc6a325d2c45f81813cf736e06b3027b"
     },
     {
       "path": "backend/scripts/build_user_function_registry.py",
@@ -4358,30 +4358,6 @@
     {
       "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/ModelAttacher.cs",
       "sha256": "sha256:45db4e47d3d9d842acb78281f37ad19a15a90fbce82e2544117c1f10f3d65b3e"
-    },
-    {
-      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/obj/Debug/net8.0-windows/.NETCoreApp,Version=v8.0.AssemblyAttributes.cs",
-      "sha256": "sha256:ae41ca1e67556e4b0622d82a2122a04f17722c0c19d3b2f1fbcab8a2aaf16d2e"
-    },
-    {
-      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/obj/Debug/net8.0-windows/Ai00.Connector.Adapters.VisMockup.AssemblyInfo.cs",
-      "sha256": "sha256:c21939bd7e8fad708c89d856f771cb1ca7a771bcc6f32e218590e0b81f54dda8"
-    },
-    {
-      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/obj/Debug/net8.0-windows/Ai00.Connector.Adapters.VisMockup.GlobalUsings.g.cs",
-      "sha256": "sha256:addb143f8c43b95f1bb73a0cba7c793281935c4ab8ccabbdf6b04d3e0f809e0e"
-    },
-    {
-      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/obj/Release/net8.0-windows/.NETCoreApp,Version=v8.0.AssemblyAttributes.cs",
-      "sha256": "sha256:ae41ca1e67556e4b0622d82a2122a04f17722c0c19d3b2f1fbcab8a2aaf16d2e"
-    },
-    {
-      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/obj/Release/net8.0-windows/Ai00.Connector.Adapters.VisMockup.AssemblyInfo.cs",
-      "sha256": "sha256:986bcb6a936123917f97b7256f48726e7a6250c79dc6ddf8a2d260b32d231847"
-    },
-    {
-      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/obj/Release/net8.0-windows/Ai00.Connector.Adapters.VisMockup.GlobalUsings.g.cs",
-      "sha256": "sha256:addb143f8c43b95f1bb73a0cba7c793281935c4ab8ccabbdf6b04d3e0f809e0e"
     },
     {
       "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/SceneController.cs",

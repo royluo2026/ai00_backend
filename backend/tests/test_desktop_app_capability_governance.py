@@ -3,6 +3,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 import json
 import hashlib
+import subprocess
 from types import SimpleNamespace
 
 import jwt
@@ -160,6 +161,12 @@ def test_impact_source_hashes_survive_git_line_ending_conversion():
         assert artifact["sha256"] == "sha256:" + hashlib.sha256(content).hexdigest(), artifact["path"]
 
 
+def test_impact_closure_contains_repository_sources_not_local_build_outputs():
+    document = json.loads((ROOT / "docs/governance/desktop-app-impact-closure.json").read_text(encoding="utf-8"))
+    tracked = set(subprocess.check_output(["git", "ls-files"], cwd=ROOT, text=True).splitlines())
+    assert all(artifact["path"] in tracked for artifact in document["artifacts"])
+
+
 def test_native_registry_includes_device_transport_consumer_and_owner():
     from backend.scripts.build_user_function_registry import discover_user_functions
     rows = {r["function_id"]: r for r in discover_user_functions()}
@@ -209,4 +216,3 @@ def test_gateway_rejects_payload_identity_before_catalog_resolution():
         request_id="req-1", trace_id="trace-1")
     result = asyncio.run(gateway.invoke(envelope))
     assert result.error.code == "consumer_identity_override_forbidden"
-

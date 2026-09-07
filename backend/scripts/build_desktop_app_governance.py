@@ -42,7 +42,8 @@ def build_impact_closure():
     sources = set()
     for pattern in ("plugins/simulation/simulation_backend/**/*.py", "backend/db/migrations/domains/simulation/*.sql",
                     "local-runtime/src/Ai00.Connector.Adapters.VisMockup/**/*.cs"):
-        sources.update(p for p in ROOT.glob(pattern) if p.is_file())
+        sources.update(p for p in ROOT.glob(pattern) if p.is_file()
+                       and not {"bin", "obj"}.intersection(part.lower() for part in p.parts))
     sources.update(ROOT / p for p in (
         "backend/capability_v2/identity.py", "backend/capability_v2/gateway.py",
         "backend/capability_v2/policies.py", "backend/capability_v2/authorization.py",
