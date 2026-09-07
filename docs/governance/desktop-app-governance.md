@@ -15,7 +15,21 @@ python backend/scripts/freeze_official_domains.py
 python backend/scripts/build_capability_catalog.py --write
 python backend/scripts/generate_capability_docs.py --write
 python backend/scripts/build_user_function_registry.py
-python backend/scripts/build_desktop_app_governance.py --write
 ```
 
-The desktop closure is a content-addressed candidate inventory derived from the trusted live Registry, actual source references and Provider bindings. It contains exact descriptor and source hashes, conservative transitive references, and the full Catalog generation errors. It is not a replacement Catalog release. `--check` recomputes it. Full Catalog generation currently fails on sixteen unbounded collection paths across nine Knowledge v1 Capabilities; the last valid published Catalog and its generated manual are retained. Existing route-governance blockers and missing authoritative approvals remain unresolved. Electron call sites, AppHost/installer artifacts, dynamic dispatch, native MySQL and production runtime evidence must be verified by their owning later tasks before promotion.
+Generate desktop evidence through an immutable bootstrap, with isolation active at Python startup. From the repository root in PowerShell:
+
+```powershell
+$desktopRevision = git rev-parse --verify 'HEAD^{commit}'
+if ($LASTEXITCODE -ne 0) { throw 'Cannot resolve desktop source commit' }
+$desktopBootstrap = git show "${desktopRevision}:backend/scripts/desktop_governance_bootstrap.py"
+if ($LASTEXITCODE -ne 0) { throw 'Cannot load committed desktop bootstrap' }
+$desktopBootstrap | python -I -S - --bootstrap-commit $desktopRevision --write
+if ($LASTEXITCODE -ne 0) { throw 'Desktop generation failed' }
+```
+
+Use `--check` instead of `--write` to reproduce the artifact's pinned source commit. The release gate uses `isolated_command()` to start the equivalent `python -I -S -c` Git-blob loader before it can report success. Neither path executes the working-directory generator or bootstrap, even if either file is replaced. The bootstrap and native implementation come from a commit resolved once; the source snapshot retains exact Git blobs, Python static imports, C# project dependencies and native Provider/Catalog checks. Installed dependency directories are added without running `.pth` or `sitecustomize` hooks.
+
+Direct `python backend/scripts/build_desktop_app_governance.py --write/--check` is unsupported and exits with `isolated_bootstrap_required`; direct isolated invocation of that mutable file is also rejected. A normal Python process may already execute `sitecustomize` before any script can inspect its flags. The rejection does not undo that startup code and is not an isolation guarantee. Arbitrary replacement of a directly executed file can replace its rejection too; only the documented immutable-blob entry and the controlled governance caller are evidence-producing trust boundaries.
+
+The desktop closure is a content-addressed candidate inventory derived from the fixed commit's trusted Registry, actual source references and Provider bindings. It contains exact descriptor/source hashes, conservative transitive references, and full Catalog generation errors. Full Catalog generation currently fails on sixteen unbounded collection paths across nine Knowledge v1 Capabilities; the last valid published Catalog and its generated manual are retained. Existing route-governance blockers and missing authoritative approvals remain unresolved. Electron call sites, AppHost/installer artifacts, nonliteral runtime dispatch, native MySQL and production runtime evidence require their owning later tasks' verification before promotion.

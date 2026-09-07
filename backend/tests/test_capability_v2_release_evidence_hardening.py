@@ -231,6 +231,7 @@ def test_release_gate_command_wires_explicit_exact_hash_approval_artifact(
         "--web-root", str(tmp_path), "--business-approvals", str(approvals),
     ])
 
+    monkeypatch.setattr(release_gate_command, "verify_desktop_evidence", lambda _root: True)
     assert release_gate_command.main() == 0
     assert json.loads(capsys.readouterr().out) == {"passed": True}
     assert captured["business_review_lookup"] == {(VERSION_GID, HASH_1): HASH_1}

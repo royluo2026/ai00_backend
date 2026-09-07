@@ -970,12 +970,13 @@ async def abort_stream(
     body: dict,
     _user: dict = Depends(get_current_user),
     x_ai00_token: str = Header(alias="X-AI00-Token"),
+    principal=Depends(get_authenticated_principal),
 ):
     if _pi_proxy.enabled():
         return {"ok": True}
     session_gid = body.get("session_gid") or body.get("session_id", "")
     if session_gid:
-        return await invoke_agent_capability("agent.interaction.cancel", {"session_gid": session_gid}, _user)
+        return await invoke_agent_capability("agent.interaction.cancel", {"session_gid": session_gid}, _user, principal=principal)
     return {"ok": True}
 
 
@@ -985,8 +986,9 @@ async def abort_stream(
 async def list_sessions(
     _user: dict = Depends(get_current_user),
     x_ai00_token: str = Header(alias="X-AI00-Token"),
+    principal=Depends(get_authenticated_principal),
 ):
-    data = await invoke_agent_capability("agent.session.read", {"operation": "list"}, _user)
+    data = await invoke_agent_capability("agent.session.read", {"operation": "list"}, _user, principal=principal)
     payload = data.get("data", data) if isinstance(data, dict) else {}
     return {"sessions": [s for s in payload.get("sessions", []) if "_sub_" not in s.get("gid", "")]}
 
@@ -996,9 +998,10 @@ async def delete_session(
     gid: str,
     _user: dict = Depends(get_current_user),
     x_ai00_token: str = Header(alias="X-AI00-Token"),
+    principal=Depends(get_authenticated_principal),
 ):
     data = await invoke_agent_capability(
-        "agent.session.change.apply", {"operation": "delete", "session_gid": gid}, _user
+        "agent.session.change.apply", {"operation": "delete", "session_gid": gid}, _user, principal=principal,
     )
     return data.get("data", data) if isinstance(data, dict) else data
 
@@ -1008,10 +1011,11 @@ async def get_session(
     gid: str,
     _user: dict = Depends(get_current_user),
     x_ai00_token: str = Header(alias="X-AI00-Token"),
+    principal=Depends(get_authenticated_principal),
 ):
     """返回会话的所有轮次（前端恢复历史对话用）。"""
     data = await invoke_agent_capability(
-        "agent.session.read", {"operation": "get", "session_gid": gid}, _user
+        "agent.session.read", {"operation": "get", "session_gid": gid}, _user, principal=principal,
     )
     return data.get("data", data) if isinstance(data, dict) else data
 
@@ -1021,8 +1025,9 @@ async def new_session(
     body: dict = {},
     _user: dict = Depends(get_current_user),
     x_ai00_token: str = Header(alias="X-AI00-Token"),
+    principal=Depends(get_authenticated_principal),
 ):
-    data = await invoke_agent_capability("agent.session.change.apply", {"operation": "create"}, _user)
+    data = await invoke_agent_capability("agent.session.change.apply", {"operation": "create"}, _user, principal=principal)
     return data.get("data", data) if isinstance(data, dict) else data
 
 
@@ -1032,10 +1037,11 @@ async def new_session(
 async def list_tools(
     _user: dict = Depends(get_current_user),
     x_ai00_token: str = Header(alias="X-AI00-Token"),
+    principal=Depends(get_authenticated_principal),
 ):
     if _pi_proxy.enabled():
         return _pi_call(_pi_proxy.list_tools, x_ai00_token)
-    return await invoke_agent_capability("agent.tool_catalog.read", {"operation": "list"}, _user)
+    return await invoke_agent_capability("agent.tool_catalog.read", {"operation": "list"}, _user, principal=principal)
 
 
 # ── AI 配置 ───────────────────────────────────────────────────────────────────
@@ -1043,9 +1049,10 @@ async def list_tools(
 @router.get("/admin-config")
 async def get_admin_config(
     _user: dict = Depends(get_current_user),
+    principal=Depends(get_authenticated_principal),
 ):
     """全局 AI 配置：由 Agent Runtime Capability 提供只读元数据。"""
-    return await invoke_agent_capability("agent.runtime.config.read", {}, _user)
+    return await invoke_agent_capability("agent.runtime.config.read", {}, _user, principal=principal)
 
 
 @router.post("/admin-config")

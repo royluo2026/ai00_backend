@@ -8,7 +8,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from backend.platform_sdk.auth import get_current_user
+from backend.platform_sdk.auth import get_authenticated_principal, get_current_user
 from ..api.compatibility import invoke_agent_capability
 
 router = APIRouter(prefix="/api/flows", tags=["flows"])
@@ -48,76 +48,78 @@ def _owner(user: dict) -> None:
 
 
 @router.get("")
-async def list_flows(user=Depends(get_current_user)):
-    return await invoke_agent_capability("agent.flow.read", {"operation": "list"}, user)
+async def list_flows(user=Depends(get_current_user), principal=Depends(get_authenticated_principal)):
+    return await invoke_agent_capability("agent.flow.read", {"operation": "list"}, user, principal=principal)
 
 
 @router.post("")
-async def create_flow(body: FlowBody, user=Depends(get_current_user)):
+async def create_flow(body: FlowBody, user=Depends(get_current_user), principal=Depends(get_authenticated_principal)):
     return await invoke_agent_capability(
-        "agent.flow.change.apply", {"operation": "create", **body.model_dump()}, user
+        "agent.flow.change.apply", {"operation": "create", **body.model_dump()}, user, principal=principal,
     )
 
 
 @router.get("/capability-manifest")
-async def capability_manifest(user=Depends(get_current_user)):
-    return await invoke_agent_capability("agent.flow.read", {"operation": "manifest"}, user)
+async def capability_manifest(user=Depends(get_current_user), principal=Depends(get_authenticated_principal)):
+    return await invoke_agent_capability("agent.flow.read", {"operation": "manifest"}, user, principal=principal)
 
 
 @router.get("/runs")
-async def list_run_history(flow_gid: str, limit: int = 10, user=Depends(get_current_user)):
+async def list_run_history(flow_gid: str, limit: int = 10, user=Depends(get_current_user), principal=Depends(get_authenticated_principal)):
     return await invoke_agent_capability(
-        "agent.flow.read", {"operation": "list_runs", "flow_gid": flow_gid, "limit": limit}, user
+        "agent.flow.read", {"operation": "list_runs", "flow_gid": flow_gid, "limit": limit}, user, principal=principal,
     )
 
 
 @router.get("/runs/{run_gid}")
-async def get_run_state(run_gid: str, user=Depends(get_current_user)):
+async def get_run_state(run_gid: str, user=Depends(get_current_user), principal=Depends(get_authenticated_principal)):
     return await invoke_agent_capability(
-        "agent.flow.read", {"operation": "get_run", "run_gid": run_gid}, user
+        "agent.flow.read", {"operation": "get_run", "run_gid": run_gid}, user, principal=principal,
     )
 
 
 @router.post("/runs/{run_gid}/step")
-async def step_run(run_gid: str, _body: StepBody = StepBody(), user=Depends(get_current_user)):
-    return await get_run_state(run_gid, user)
+async def step_run(run_gid: str, _body: StepBody = StepBody(), user=Depends(get_current_user), principal=Depends(get_authenticated_principal)):
+    return await get_run_state(run_gid, user, principal)
 
 
 @router.get("/{gid}")
-async def get_flow(gid: str, user=Depends(get_current_user)):
+async def get_flow(gid: str, user=Depends(get_current_user), principal=Depends(get_authenticated_principal)):
     return await invoke_agent_capability(
-        "agent.flow.read", {"operation": "get", "flow_gid": gid}, user
+        "agent.flow.read", {"operation": "get", "flow_gid": gid}, user, principal=principal,
     )
 
 
 @router.put("/{gid}")
-async def update_flow(gid: str, body: FlowPatch, user=Depends(get_current_user)):
+async def update_flow(gid: str, body: FlowPatch, user=Depends(get_current_user), principal=Depends(get_authenticated_principal)):
     return await invoke_agent_capability(
         "agent.flow.change.apply",
         {"operation": "update", "flow_gid": gid, **body.model_dump(exclude_none=True)},
         user,
+        principal=principal,
     )
 
 
 @router.delete("/{gid}")
-async def delete_flow(gid: str, user=Depends(get_current_user)):
+async def delete_flow(gid: str, user=Depends(get_current_user), principal=Depends(get_authenticated_principal)):
     return await invoke_agent_capability(
-        "agent.flow.change.apply", {"operation": "delete", "flow_gid": gid}, user
+        "agent.flow.change.apply", {"operation": "delete", "flow_gid": gid}, user, principal=principal,
     )
 
 
 @router.post("/{gid}/run")
-async def run_flow(gid: str, body: RunBody, user=Depends(get_current_user)):
+async def run_flow(gid: str, body: RunBody, user=Depends(get_current_user), principal=Depends(get_authenticated_principal)):
     return await invoke_agent_capability(
-        "agent.flow.change.apply", {"operation": "run", "flow_gid": gid, "mode": body.mode}, user
+        "agent.flow.change.apply", {"operation": "run", "flow_gid": gid, "mode": body.mode}, user, principal=principal,
     )
 
 
 @router.post("/gen-script")
-async def gen_script(body: GenScriptBody, user=Depends(get_current_user)):
+async def gen_script(body: GenScriptBody, user=Depends(get_current_user), principal=Depends(get_authenticated_principal)):
     _owner(user)
     return await invoke_agent_capability(
         "agent.script.generate",
         body.model_dump(),
         user,
+        principal=principal,
     )

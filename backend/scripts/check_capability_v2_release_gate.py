@@ -5,6 +5,7 @@ import argparse
 import json
 from pathlib import Path
 import sys
+import subprocess
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -21,6 +22,7 @@ from backend.capability_v2.catalog_audit import CatalogAuditConfigurationError
 from backend.capability_v2.completion import CompletionConfigurationError
 from backend.capability_v2.consumer_routes import RouteScanConfigurationError
 from backend.capability_v2.orchestration_audit import OrchestrationAuditConfigurationError
+from backend.scripts.desktop_governance_command import isolated_command
 
 
 CONFIGURATION_ERRORS = (
@@ -72,6 +74,11 @@ def evaluate_document(
     return report.serialized()
 
 
+def verify_desktop_evidence(root: Path) -> bool:
+    return subprocess.run(isolated_command(sys.executable, "--check"), cwd=root,
+        capture_output=True, text=True).returncode == 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=ROOT)
@@ -100,6 +107,11 @@ def main() -> int:
         args.root, args.web_root, args.catalog, args.legacy_baseline,
         args.business_approvals,
     )
+    if document.get("passed") is True and not verify_desktop_evidence(args.root):
+        document = {"passed": False, "configuration_blockers": [{
+            "reason_code": "desktop_impact_closure_invalid",
+            "message": "Isolated immutable desktop evidence verification failed",
+        }]}
     print(json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True))
     return 0 if document.get("passed") is True else 1
 

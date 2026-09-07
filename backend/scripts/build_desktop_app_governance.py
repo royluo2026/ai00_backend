@@ -5,6 +5,16 @@ failed full Catalog release or asserts that future Electron/binary work exists.
 """
 from __future__ import annotations
 
+import sys
+
+# Public generation must start through the immutable bootstrap. Even an
+# isolated direct-file invocation would still execute mutable workspace code.
+# Only the internal isolated snapshot worker is a supported direct invocation.
+if __name__ == "__main__" and not (
+        sys.flags.isolated and sys.flags.no_site
+        and len(sys.argv) == 3 and sys.argv[1] == "--snapshot"):
+    raise SystemExit("isolated_bootstrap_required: use the documented fixed Git blob entry")
+
 import argparse
 import ast
 import os
@@ -15,7 +25,6 @@ import hashlib
 import inspect
 import json
 from pathlib import Path
-import sys
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -170,6 +179,7 @@ def _snapshot_impact_closure(metadata):
         "backend/contracts/connector_execution_plan_v1.py", "backend/contracts/connector_execution_plan_v2.py",
         "backend/domain_ports/simulation_runtime.py", "backend/scripts/build_capability_catalog.py",
         "backend/scripts/build_user_function_registry.py", "backend/scripts/build_desktop_app_governance.py",
+        "backend/scripts/desktop_governance_bootstrap.py", "backend/scripts/desktop_governance_command.py",
     ))
     modules = _module_index(tracked)
     edges = set()

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Query
 
-from backend.platform_sdk.auth import get_current_user, require_role
+from backend.platform_sdk.auth import get_authenticated_principal, get_current_user, require_role
 from ..api.compatibility import invoke_agent_capability
 
 router = APIRouter(prefix="/api/ai", tags=["ai_audit"])
@@ -8,9 +8,9 @@ _SUPER_ONLY = require_role("super_admin")
 
 
 @router.post("/audit", include_in_schema=False)
-async def record_audit(body: dict, user: dict = Depends(get_current_user)):
+async def record_audit(body: dict, user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal)):
     """Authenticated audit ingestion; callers cannot forge another user's identity."""
-    data = await invoke_agent_capability("agent.audit.record", dict(body), user)
+    data = await invoke_agent_capability("agent.audit.record", dict(body), user, principal=principal)
     payload = data.get("data", data) if isinstance(data, dict) else {}
     return {"success": True, "gid": payload.get("gid")}
 
@@ -33,6 +33,7 @@ async def list_audit_logs(
     limit: int = Query(default=50, ge=1, le=500),
     offset: int = Query(default=0, ge=0),
     _user: dict = Depends(_SUPER_ONLY),
+    principal=Depends(get_authenticated_principal),
 ):
     data = await invoke_agent_capability(
         "agent.audit.read",
@@ -45,5 +46,6 @@ async def list_audit_logs(
             "offset": offset,
         },
         _user,
+        principal=principal,
     )
     return data.get("data", data) if isinstance(data, dict) else data

@@ -10,7 +10,7 @@ import re
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from backend.platform_sdk.auth import get_current_user
+from backend.platform_sdk.auth import get_authenticated_principal, get_current_user
 from ..api.compatibility import invoke_agent_capability
 
 router = APIRouter(prefix="/api/skills", tags=["skills"])
@@ -32,14 +32,14 @@ def _json_value(value, fallback):
 
 
 @router.get("")
-async def list_skills(scope_filter: str = "all", user=Depends(get_current_user)):
+async def list_skills(scope_filter: str = "all", user=Depends(get_current_user), principal=Depends(get_authenticated_principal)):
     return await invoke_agent_capability(
-        "agent.skill.read", {"operation": "list", "scope_filter": scope_filter}, user
+        "agent.skill.read", {"operation": "list", "scope_filter": scope_filter}, user, principal=principal,
     )
 
 
 @router.post("")
-async def create_skill(body: dict, user=Depends(get_current_user)):
+async def create_skill(body: dict, user=Depends(get_current_user), principal=Depends(get_authenticated_principal)):
     _owner(user)
     name = str(body.get("name") or "").strip()
     title = str(body.get("title") or "").strip()
@@ -58,11 +58,11 @@ async def create_skill(body: dict, user=Depends(get_current_user)):
         "icon": body.get("icon", ""), "tags": _json_value(body.get("tags"), []),
         "sort_order": body.get("sort_order", 0),
     }
-    return await invoke_agent_capability("agent.skill.change.apply", payload, user)
+    return await invoke_agent_capability("agent.skill.change.apply", payload, user, principal=principal)
 
 
 @router.put("/{gid}")
-async def update_skill(gid: str, body: dict, user=Depends(get_current_user)):
+async def update_skill(gid: str, body: dict, user=Depends(get_current_user), principal=Depends(get_authenticated_principal)):
     _owner(user)
     payload = {"operation": "update", "skill_gid": gid}
     for field in ("title", "description", "scope", "status", "icon", "sort_order", "is_pinned"):
@@ -72,12 +72,12 @@ async def update_skill(gid: str, body: dict, user=Depends(get_current_user)):
         payload["content"] = _json_value(body["content"], {})
     if "tags" in body:
         payload["tags"] = _json_value(body["tags"], [])
-    return await invoke_agent_capability("agent.skill.change.apply", payload, user)
+    return await invoke_agent_capability("agent.skill.change.apply", payload, user, principal=principal)
 
 
 @router.delete("/{gid}")
-async def delete_skill(gid: str, user=Depends(get_current_user)):
+async def delete_skill(gid: str, user=Depends(get_current_user), principal=Depends(get_authenticated_principal)):
     _owner(user)
     return await invoke_agent_capability(
-        "agent.skill.change.apply", {"operation": "delete", "skill_gid": gid}, user
+        "agent.skill.change.apply", {"operation": "delete", "skill_gid": gid}, user, principal=principal,
     )
