@@ -1,5 +1,5 @@
 {
-  "fixture_kind": "Real Project handlers/application/repositories; deterministic SQL driver; complete create/start/approve/withdraw/replay/notification",
+  "fixture_kind": "Real registered owner handler + Gateway + LegacyServerGatewayPolicy + actual approval/schema/reliability; deterministic identity and SQL/external I/O ports",
   "rows": [
     {
       "id": "project.approval.order.create",
@@ -14,7 +14,7 @@
       "provider_data": {
         "success": true,
         "data": {
-          "gid": "7e807d78-cb8f-4724-a213-5b42c8f2fbac"
+          "gid": "3b666658-ca65-4153-9ada-2cdc4a04ea5f"
         }
       },
       "input_schema": {
@@ -127,7 +127,58 @@
         "SELECT payload_hash,result_text FROM workmanship_proj_desktop_operations WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s FOR UPDATE",
         "INSERT INTO workmanship_proj_approval_orders (gid,title,order_type,project_gid,team_gid,applicant_gid,reviewer_gid,source_ref,content) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
         "UPDATE workmanship_proj_desktop_operations SET result_text=%s,completed_at=CURRENT_TIMESTAMP(6) WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s"
-      ]
+      ],
+      "request_id": "project.approval.order.create",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.approval.order.create",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": {
+            "gid": "3b666658-ca65-4153-9ada-2cdc4a04ea5f"
+          }
+        },
+        "operation_ref": {
+          "operation_id": "op_e925b6e1b0c244fc8996f3e4a3e8a14d",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "project.approval.order.create",
+          "trace_id": "project.approval.order.create"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "project.approval.order.create",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "project.approval.order.create",
+          "trace_id": "project.approval.order.create"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "project.approval.order.search",
@@ -137,7 +188,7 @@
         "success": true,
         "data": [
           {
-            "gid": "7e807d78-cb8f-4724-a213-5b42c8f2fbac",
+            "gid": "3b666658-ca65-4153-9ada-2cdc4a04ea5f",
             "project_gid": null,
             "team_gid": "fixture-team",
             "order_type": "general",
@@ -372,18 +423,60 @@
       },
       "sql_statements": [
         "SELECT o.* FROM workmanship_proj_approval_orders o LEFT JOIN workmanship_proj_projects p ON p.gid=o.project_gid WHERE COALESCE(o.team_gid,p.team_id)=%s ORDER BY o.updated_at DESC LIMIT 500"
-      ]
+      ],
+      "request_id": "project.approval.order.search",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.approval.order.search",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": [
+            {
+              "gid": "3b666658-ca65-4153-9ada-2cdc4a04ea5f",
+              "project_gid": null,
+              "team_gid": "fixture-team",
+              "order_type": "general",
+              "title": "Fixture approval",
+              "applicant_gid": "applicant",
+              "reviewer_gid": "reviewer",
+              "source_ref": null,
+              "status": "pending",
+              "revision": 1,
+              "content": {
+                "description": "Fixture request"
+              },
+              "opinions": []
+            }
+          ]
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "project.approval.order.search",
+          "trace_id": "project.approval.order.search"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "project.approval.order.get",
       "version": 1,
       "payload": {
-        "order_gid": "7e807d78-cb8f-4724-a213-5b42c8f2fbac"
+        "order_gid": "3b666658-ca65-4153-9ada-2cdc4a04ea5f"
       },
       "provider_data": {
         "success": true,
         "data": {
-          "gid": "7e807d78-cb8f-4724-a213-5b42c8f2fbac",
+          "gid": "3b666658-ca65-4153-9ada-2cdc4a04ea5f",
           "project_gid": null,
           "team_gid": "fixture-team",
           "order_type": "general",
@@ -607,18 +700,58 @@
       },
       "sql_statements": [
         "SELECT o.* FROM workmanship_proj_approval_orders o LEFT JOIN workmanship_proj_projects p ON p.gid=o.project_gid WHERE o.gid=%s AND COALESCE(o.team_gid,p.team_id)=%s FOR UPDATE"
-      ]
+      ],
+      "request_id": "project.approval.order.get",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.approval.order.get",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": {
+            "gid": "3b666658-ca65-4153-9ada-2cdc4a04ea5f",
+            "project_gid": null,
+            "team_gid": "fixture-team",
+            "order_type": "general",
+            "title": "Fixture approval",
+            "applicant_gid": "applicant",
+            "reviewer_gid": "reviewer",
+            "source_ref": null,
+            "status": "pending",
+            "revision": 1,
+            "content": {
+              "description": "Fixture request"
+            },
+            "opinions": []
+          }
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "project.approval.order.get",
+          "trace_id": "project.approval.order.get"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "project.approval.order.start",
       "version": 1,
       "payload": {
-        "order_gid": "7e807d78-cb8f-4724-a213-5b42c8f2fbac",
+        "order_gid": "3b666658-ca65-4153-9ada-2cdc4a04ea5f",
         "expected_revision": 1
       },
       "provider_data": {
         "success": true,
-        "order_gid": "7e807d78-cb8f-4724-a213-5b42c8f2fbac",
+        "order_gid": "3b666658-ca65-4153-9ada-2cdc4a04ea5f",
         "status": "in_review",
         "revision": 2
       },
@@ -685,19 +818,70 @@
         "UPDATE workmanship_proj_approval_orders SET status=%s,revision=revision+1,opinions=JSON_MERGE_PRESERVE(COALESCE(opinions,JSON_ARRAY()),%s),updated_at=NOW() WHERE gid=%s AND revision=%s",
         "INSERT INTO workmanship_proj_approval_audit_events (gid,order_gid,actor_gid,team_gid,operation,idempotency_key,status,revision) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
         "UPDATE workmanship_proj_desktop_operations SET result_text=%s,completed_at=CURRENT_TIMESTAMP(6) WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s"
-      ]
+      ],
+      "request_id": "project.approval.order.start",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.approval.order.start",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "order_gid": "3b666658-ca65-4153-9ada-2cdc4a04ea5f",
+          "status": "in_review",
+          "revision": 2
+        },
+        "operation_ref": {
+          "operation_id": "op_c320107e16c549509e1483652e335a2c",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "project.approval.order.start",
+          "trace_id": "project.approval.order.start"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "project.approval.order.start",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "project.approval.order.start",
+          "trace_id": "project.approval.order.start"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "project.approval.order.approve",
       "version": 1,
       "payload": {
-        "order_gid": "7e807d78-cb8f-4724-a213-5b42c8f2fbac",
+        "order_gid": "3b666658-ca65-4153-9ada-2cdc4a04ea5f",
         "expected_revision": 2,
         "comment": "Approved"
       },
       "provider_data": {
         "success": true,
-        "order_gid": "7e807d78-cb8f-4724-a213-5b42c8f2fbac",
+        "order_gid": "3b666658-ca65-4153-9ada-2cdc4a04ea5f",
         "status": "approved",
         "revision": 3
       },
@@ -765,7 +949,58 @@
         "INSERT INTO workmanship_proj_approval_audit_events (gid,order_gid,actor_gid,team_gid,operation,idempotency_key,status,revision) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
         "INSERT INTO workmanship_work_notifications (gid,user_gid,type,item_type,item_gid,title,body) VALUES (%s,%s,%s,%s,%s,%s,%s)",
         "UPDATE workmanship_proj_desktop_operations SET result_text=%s,completed_at=CURRENT_TIMESTAMP(6) WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s"
-      ]
+      ],
+      "request_id": "project.approval.order.approve",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.approval.order.approve",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "order_gid": "3b666658-ca65-4153-9ada-2cdc4a04ea5f",
+          "status": "approved",
+          "revision": 3
+        },
+        "operation_ref": {
+          "operation_id": "op_600d671c895849748c1a778fcd7cb021",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "project.approval.order.approve",
+          "trace_id": "project.approval.order.approve"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "project.approval.order.approve",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "project.approval.order.approve",
+          "trace_id": "project.approval.order.approve"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "project.approval.order.create",
@@ -777,7 +1012,7 @@
       "provider_data": {
         "success": true,
         "data": {
-          "gid": "625f8a3a-a0d3-46c4-8513-ccec141031ad"
+          "gid": "ddce0728-7334-4c07-a7ae-c2f5b606b767"
         }
       },
       "input_schema": {
@@ -890,18 +1125,69 @@
         "SELECT payload_hash,result_text FROM workmanship_proj_desktop_operations WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s FOR UPDATE",
         "INSERT INTO workmanship_proj_approval_orders (gid,title,order_type,project_gid,team_gid,applicant_gid,reviewer_gid,source_ref,content) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
         "UPDATE workmanship_proj_desktop_operations SET result_text=%s,completed_at=CURRENT_TIMESTAMP(6) WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s"
-      ]
+      ],
+      "request_id": "create-withdraw",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.approval.order.create",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": {
+            "gid": "ddce0728-7334-4c07-a7ae-c2f5b606b767"
+          }
+        },
+        "operation_ref": {
+          "operation_id": "op_69ac827e8989439ca2b8f98072cbe179",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "create-withdraw",
+          "trace_id": "create-withdraw"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "project.approval.order.create",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "create-withdraw",
+          "trace_id": "create-withdraw"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "project.approval.order.withdraw",
       "version": 1,
       "payload": {
-        "order_gid": "625f8a3a-a0d3-46c4-8513-ccec141031ad",
+        "order_gid": "ddce0728-7334-4c07-a7ae-c2f5b606b767",
         "expected_revision": 1
       },
       "provider_data": {
         "success": true,
-        "order_gid": "625f8a3a-a0d3-46c4-8513-ccec141031ad",
+        "order_gid": "ddce0728-7334-4c07-a7ae-c2f5b606b767",
         "status": "withdrawn",
         "revision": 2
       },
@@ -968,7 +1254,58 @@
         "UPDATE workmanship_proj_approval_orders SET status=%s,revision=revision+1,opinions=JSON_MERGE_PRESERVE(COALESCE(opinions,JSON_ARRAY()),%s),updated_at=NOW() WHERE gid=%s AND revision=%s",
         "INSERT INTO workmanship_proj_approval_audit_events (gid,order_gid,actor_gid,team_gid,operation,idempotency_key,status,revision) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
         "UPDATE workmanship_proj_desktop_operations SET result_text=%s,completed_at=CURRENT_TIMESTAMP(6) WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s"
-      ]
+      ],
+      "request_id": "project.approval.order.withdraw",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.approval.order.withdraw",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "order_gid": "ddce0728-7334-4c07-a7ae-c2f5b606b767",
+          "status": "withdrawn",
+          "revision": 2
+        },
+        "operation_ref": {
+          "operation_id": "op_fdd582a8b7f74becb2d934b7bbfc56e1",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "project.approval.order.withdraw",
+          "trace_id": "project.approval.order.withdraw"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "project.approval.order.withdraw",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "project.approval.order.withdraw",
+          "trace_id": "project.approval.order.withdraw"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "project.approval.scope_upgrade.create",
@@ -984,7 +1321,7 @@
       "provider_data": {
         "success": true,
         "data": {
-          "gid": "b12f1573-b670-44c4-b0fd-856e2b1feb4c",
+          "gid": "c3759462-4a23-4c76-8a59-312949e4ba6b",
           "reviewer_gid": "reviewer"
         }
       },
@@ -1073,7 +1410,59 @@
         "SELECT share_scope FROM workmanship_proj_projects WHERE gid=%s AND owner_gid=%s AND team_id=%s FOR UPDATE",
         "INSERT INTO workmanship_proj_approval_orders (gid,title,order_type,project_gid,team_gid,applicant_gid,reviewer_gid,content) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
         "UPDATE workmanship_proj_desktop_operations SET result_text=%s,completed_at=CURRENT_TIMESTAMP(6) WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s"
-      ]
+      ],
+      "request_id": "project.approval.scope_upgrade.create",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.approval.scope_upgrade.create",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": {
+            "gid": "c3759462-4a23-4c76-8a59-312949e4ba6b",
+            "reviewer_gid": "reviewer"
+          }
+        },
+        "operation_ref": {
+          "operation_id": "op_e42e53832ef44ed8aa095e335a1ee9de",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "project.approval.scope_upgrade.create",
+          "trace_id": "project.approval.scope_upgrade.create"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "project.approval.scope_upgrade.create",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "project.approval.scope_upgrade.create",
+          "trace_id": "project.approval.scope_upgrade.create"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "project.follow.create",
@@ -1086,7 +1475,7 @@
       "provider_data": {
         "success": true,
         "data": {
-          "gid": "32af9f1c-e428-4ac0-80e3-d6515bd27663"
+          "gid": "214c498b-171b-4dc6-9b58-7cdffe5f88a6"
         }
       },
       "input_schema": {
@@ -1166,10 +1555,61 @@
         "SELECT payload_hash,result_text FROM workmanship_proj_desktop_operations WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s FOR UPDATE",
         "SELECT gid FROM workmanship_work_follows WHERE user_gid=%s AND item_type=%s AND item_gid=%s FOR UPDATE",
         "INSERT INTO workmanship_work_follows (gid,user_gid,item_type,item_gid,item_title,notify_on) VALUES (%s,%s,%s,%s,%s,%s)",
-        "SELECT owner_gid AS owner_gid FROM workmanship_proj_projects WHERE gid=%s",
+        "SELECT owner_gid AS owner_gid FROM workmanship_proj_projects WHERE gid=%s AND team_id=%s",
         "INSERT INTO workmanship_work_notifications (gid,user_gid,type,item_type,item_gid,title,body) VALUES (%s,%s,%s,%s,%s,%s,%s)",
         "UPDATE workmanship_proj_desktop_operations SET result_text=%s,completed_at=CURRENT_TIMESTAMP(6) WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s"
-      ]
+      ],
+      "request_id": "project.follow.create",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.follow.create",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": {
+            "gid": "214c498b-171b-4dc6-9b58-7cdffe5f88a6"
+          }
+        },
+        "operation_ref": {
+          "operation_id": "op_1384075f5de34eba9a4b306cfad326aa",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "project.follow.create",
+          "trace_id": "project.follow.create"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "project.follow.create",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "project.follow.create",
+          "trace_id": "project.follow.create"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "project.share.list",
@@ -1290,7 +1730,42 @@
       "sql_statements": [
         "SELECT owner_gid,creator_gid FROM workmanship_work_lists WHERE gid=%s AND deleted_at IS NULL",
         "SELECT * FROM workmanship_work_list_shares WHERE list_gid=%s ORDER BY created_at"
-      ]
+      ],
+      "request_id": "project.share.list",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.share.list",
+        "major_version": 1,
+        "data": {
+          "shares": [
+            {
+              "gid": "share-one",
+              "list_gid": "list-one",
+              "shared_to": "reviewer",
+              "permission": "read",
+              "shared_by": "applicant",
+              "created_at": "2026-09-08",
+              "shared_to_name": "Reviewer",
+              "shared_to_avatar": ""
+            }
+          ]
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "project.share.list",
+          "trace_id": "project.share.list"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "project.change_log.search",
@@ -1431,7 +1906,31 @@
       "sql_statements": [
         "SELECT owner_gid FROM workmanship_work_lists WHERE gid = %s",
         "SELECT gid,item_type,item_gid,list_gid,changed_by,changed_at,field_name,old_value,new_value FROM workmanship_work_item_change_logs WHERE list_gid = %s ORDER BY changed_at DESC LIMIT %s OFFSET %s"
-      ]
+      ],
+      "request_id": "project.change_log.search",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.change_log.search",
+        "major_version": 1,
+        "data": {
+          "logs": []
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "project.change_log.search",
+          "trace_id": "project.change_log.search"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     }
   ]
 }

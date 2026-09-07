@@ -1,5 +1,5 @@
 {
-  "fixture_kind": "Real owner handlers/application/repositories; deterministic SQL/HTTP ports",
+  "fixture_kind": "Real registered owner handler + Gateway + LegacyServerGatewayPolicy + actual approval/schema/reliability; deterministic identity and SQL/external I/O ports",
   "rows": [
     {
       "id": "agent.skill.create",
@@ -14,7 +14,7 @@
         }
       },
       "provider_data": {
-        "gid": "c6f82f93-2ac1-4541-bc9e-9f8ab7cca38b",
+        "gid": "c4775102-7ade-4815-9f99-844183123d85",
         "success": true
       },
       "input_schema": {
@@ -582,7 +582,63 @@
         "INSERT INTO workmanship_app_skills (gid,name,title,description,skill_type,scope,status,owner_gid,team_gid,is_system,content,icon,tags,sort_order,is_pinned) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
       ],
       "runtime_requests": [],
-      "outbox_count": 1
+      "outbox_count": 1,
+      "request_id": "fixture-agent.skill.create",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "agent.skill.create",
+        "major_version": 1,
+        "data": {
+          "gid": "c4775102-7ade-4815-9f99-844183123d85",
+          "success": true
+        },
+        "operation_ref": {
+          "operation_id": "op_fdc58fc352094e60a432918cbbba9d3f",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [
+          {
+            "kind": "agent.change",
+            "reference": "agent://agent.skill.create/c4775102-7ade-4815-9f99-844183123d85",
+            "digest": "sha256:983f886ddd4c86193a8c12e9fc35a8e60e79a4fe5f0340e0821bad549439f7c0",
+            "summary": "Provider-owned Agent write result."
+          }
+        ],
+        "warnings": [],
+        "correlation": {
+          "request_id": "fixture-agent.skill.create",
+          "trace_id": "fixture-agent.skill.create"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "agent.skill.create",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "fixture-agent.skill.create",
+          "trace_id": "fixture-agent.skill.create"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.agent.agent_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "agent.skill.update",
@@ -1174,7 +1230,62 @@
         "UPDATE workmanship_app_skills SET title=%s,content=%s,revision=revision+1,updated_at=NOW() WHERE gid=%s AND team_gid=%s"
       ],
       "runtime_requests": [],
-      "outbox_count": 1
+      "outbox_count": 1,
+      "request_id": "fixture-agent.skill.update",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "agent.skill.update",
+        "major_version": 1,
+        "data": {
+          "success": true
+        },
+        "operation_ref": {
+          "operation_id": "op_3ab309ebd82541cab838fcb22b10028b",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [
+          {
+            "kind": "agent.change",
+            "reference": "agent://agent.skill.update/fixture-agent.skill.update",
+            "digest": "sha256:c955e57777ec0d73639dca6748560d00aa5eb8e12f13ebb2ed9656add3908f97",
+            "summary": "Provider-owned Agent write result."
+          }
+        ],
+        "warnings": [],
+        "correlation": {
+          "request_id": "fixture-agent.skill.update",
+          "trace_id": "fixture-agent.skill.update"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "agent.skill.update",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "fixture-agent.skill.update",
+          "trace_id": "fixture-agent.skill.update"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.agent.agent_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "agent.session.list",
@@ -1240,7 +1351,38 @@
         "SELECT gid, title, created_at, updated_at FROM workmanship_app_ai_sessions\n                    WHERE user_gid=%s ORDER BY updated_at DESC LIMIT 50"
       ],
       "runtime_requests": [],
-      "outbox_count": 0
+      "outbox_count": 0,
+      "request_id": "fixture-agent.session.list",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "agent.session.list",
+        "major_version": 1,
+        "data": {
+          "sessions": [
+            {
+              "gid": "session-one",
+              "title": "Fixture",
+              "created_at": "2026-09-08T00:00:00",
+              "updated_at": "2026-09-08T00:00:00"
+            }
+          ]
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "fixture-agent.session.list",
+          "trace_id": "fixture-agent.session.list"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.agent.agent_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "agent.audit.search",
@@ -1391,7 +1533,50 @@
         "SELECT id, gid, session_gid, user_gid, tool_name, is_write, is_confirmed,\n                    inputs_json, result_json, resource_gid, resource_type, status, created_at\n                    FROM workmanship_app_ai_audit_logs WHERE 1=1 ORDER BY created_at DESC LIMIT %s OFFSET %s"
       ],
       "runtime_requests": [],
-      "outbox_count": 0
+      "outbox_count": 0,
+      "request_id": "fixture-agent.audit.search",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "agent.audit.search",
+        "major_version": 1,
+        "data": {
+          "logs": [
+            {
+              "id": 1,
+              "gid": "audit-one",
+              "session_gid": "session-one",
+              "user_gid": "fixture-user",
+              "tool_name": "Fixture",
+              "is_write": false,
+              "is_confirmed": false,
+              "inputs_json": "{}",
+              "result_json": "{}",
+              "resource_gid": "",
+              "resource_type": "",
+              "status": "ok",
+              "created_at": "2026-09-08T00:00:00"
+            }
+          ],
+          "total": 1,
+          "limit": 5,
+          "offset": 0
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "fixture-agent.audit.search",
+          "trace_id": "fixture-agent.audit.search"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.agent.agent_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "agent.tool_catalog.list",
@@ -1996,7 +2181,435 @@
       },
       "sql_statements": [],
       "runtime_requests": [],
-      "outbox_count": 0
+      "outbox_count": 0,
+      "request_id": "fixture-agent.tool_catalog.list",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "agent.tool_catalog.list",
+        "major_version": 1,
+        "data": {
+          "read": [
+            {
+              "name": "global_search",
+              "description": "全局跨域搜索（等同于 Ctrl+O 全局搜索），一次调用同时搜索：BOP工艺节点、任务、问题、知识库文档、工艺规则、飞书联系人/群/文档/日程。当用户询问'有没有关于X的内容''搜一下X''找找X相关'时优先使用此工具。",
+              "category": "read",
+              "need_confirm": false,
+              "params": [
+                "q",
+                "categories",
+                "limit"
+              ]
+            },
+            {
+              "name": "search",
+              "description": "跨模块统一关键词搜索（任务/问题/知识库/规则/BOP）。",
+              "category": "read",
+              "need_confirm": false,
+              "params": [
+                "keyword",
+                "modules",
+                "limit"
+              ]
+            },
+            {
+              "name": "list_tasks",
+              "description": "列出任务，支持按状态/优先级/关键词/清单过滤。",
+              "category": "read",
+              "need_confirm": false,
+              "params": [
+                "keyword",
+                "list_gid",
+                "status",
+                "priority",
+                "limit"
+              ]
+            },
+            {
+              "name": "get_task",
+              "description": "获取单条任务详情。",
+              "category": "read",
+              "need_confirm": false,
+              "params": [
+                "gid"
+              ]
+            },
+            {
+              "name": "get_issue",
+              "description": "获取单条问题详情。",
+              "category": "read",
+              "need_confirm": false,
+              "params": [
+                "gid"
+              ]
+            },
+            {
+              "name": "list_task_lists",
+              "description": "列出所有任务清单。",
+              "category": "read",
+              "need_confirm": false,
+              "params": []
+            },
+            {
+              "name": "list_issue_lists",
+              "description": "列出所有问题清单。",
+              "category": "read",
+              "need_confirm": false,
+              "params": []
+            },
+            {
+              "name": "list_issues",
+              "description": "列出问题，支持按状态/关键词/清单过滤。",
+              "category": "read",
+              "need_confirm": false,
+              "params": [
+                "keyword",
+                "list_gid",
+                "status",
+                "severity",
+                "limit"
+              ]
+            },
+            {
+              "name": "list_projects",
+              "description": "列出所有项目。",
+              "category": "read",
+              "need_confirm": false,
+              "params": []
+            },
+            {
+              "name": "search_knowledge",
+              "description": "在知识库中全文搜索条目（标题/标签/描述）。",
+              "category": "read",
+              "need_confirm": false,
+              "params": [
+                "keyword",
+                "limit"
+              ]
+            },
+            {
+              "name": "get_knowledge_entry",
+              "description": "获取单条知识库条目的详细内容。",
+              "category": "read",
+              "need_confirm": false,
+              "params": [
+                "gid"
+              ]
+            },
+            {
+              "name": "get_knowledge_document",
+              "description": "读取有权访问的团队Markdown文档；可固定到指定revision，并返回可验证来源。",
+              "category": "read",
+              "need_confirm": false,
+              "params": [
+                "document_gid",
+                "revision_gid"
+              ]
+            },
+            {
+              "name": "list_rules",
+              "description": "列出工艺规则，支持按状态/类型过滤。",
+              "category": "read",
+              "need_confirm": false,
+              "params": [
+                "status",
+                "rule_type",
+                "limit"
+              ]
+            },
+            {
+              "name": "list_approval_orders",
+              "description": "列出审批单，支持按状态过滤。",
+              "category": "read",
+              "need_confirm": false,
+              "params": [
+                "status",
+                "limit"
+              ]
+            }
+          ],
+          "write_confirm": [
+            {
+              "name": "create_task",
+              "description": "创建新任务。需用户确认。",
+              "category": "write_confirm",
+              "need_confirm": true,
+              "params": [
+                "title",
+                "priority",
+                "description",
+                "due_date",
+                "list_gid"
+              ]
+            },
+            {
+              "name": "update_task",
+              "description": "更新任务字段（状态/标题/优先级/描述/截止日期等）。需用户确认。",
+              "category": "write_confirm",
+              "need_confirm": true,
+              "params": [
+                "gid",
+                "status",
+                "title",
+                "priority",
+                "description",
+                "due_date"
+              ]
+            },
+            {
+              "name": "create_issue",
+              "description": "创建新问题记录。需用户确认。",
+              "category": "write_confirm",
+              "need_confirm": true,
+              "params": [
+                "title",
+                "severity",
+                "description",
+                "list_gid"
+              ]
+            },
+            {
+              "name": "update_issue",
+              "description": "更新问题字段。需用户确认。",
+              "category": "write_confirm",
+              "need_confirm": true,
+              "params": [
+                "gid",
+                "status",
+                "title",
+                "severity",
+                "description"
+              ]
+            },
+            {
+              "name": "create_approval_order",
+              "description": "创建新审批单。需用户确认。",
+              "category": "write_confirm",
+              "need_confirm": true,
+              "params": [
+                "title",
+                "description",
+                "approver_gid"
+              ]
+            }
+          ],
+          "write_no_confirm": [
+            {
+              "name": "add_task_progress_log",
+              "description": "为任务追加进度备注（不修改任务状态）。",
+              "category": "write_no_confirm",
+              "need_confirm": false,
+              "params": [
+                "gid",
+                "content"
+              ]
+            },
+            {
+              "name": "run_skill_canvas",
+              "description": "执行一个 Skill 画布（按阶段执行所有节点）。",
+              "category": "write_no_confirm",
+              "need_confirm": false,
+              "params": [
+                "skill_gid",
+                "user_inputs",
+                "pause_token",
+                "resume_inputs"
+              ]
+            }
+          ],
+          "system": [
+            {
+              "name": "calculate",
+              "description": "执行安全的数学表达式计算。",
+              "category": "system",
+              "need_confirm": false,
+              "params": [
+                "expression"
+              ]
+            },
+            {
+              "name": "save_preference",
+              "description": "保存用户长期偏好记忆（如回复语言、风格）。",
+              "category": "system",
+              "need_confirm": false,
+              "params": [
+                "key",
+                "value"
+              ]
+            },
+            {
+              "name": "list_preferences",
+              "description": "查看当前用户已保存的所有长期偏好记忆。",
+              "category": "system",
+              "need_confirm": false,
+              "params": []
+            },
+            {
+              "name": "ask_for_clarification",
+              "description": "当需要更多信息才能完成任务时，向用户提问。",
+              "category": "system",
+              "need_confirm": false,
+              "params": [
+                "question"
+              ]
+            },
+            {
+              "name": "generate_canvas",
+              "description": "生成工作流画布（流程泳道图），前端自动渲染。用户说「在画布里规划」「生成画布」「转为工作流」时调用。纵轴=lanes[]（泳道/角色），横轴=step_labels[]（自定义列标题），节点用lane_id+step(1-based)定位到单元格。⚠️ 重要约束：同一 step 列的不同泳道节点表示【并行执行】，顺序流程中每个步骤必须占用不同的 step 编号，禁止把先后顺序的步骤放在同一 step 列。例如：A→B→C 三步顺序流程，A用step=1，B用step=2，C用step=3，不能共用同一个step。",
+              "category": "system",
+              "need_confirm": false,
+              "params": [
+                "title",
+                "step_labels",
+                "lanes",
+                "nodes",
+                "connections"
+              ]
+            },
+            {
+              "name": "open_in_container",
+              "description": "在 WFC 窗口底部容器中打开指定页面。",
+              "category": "system",
+              "need_confirm": false,
+              "params": [
+                "page_id",
+                "title",
+                "url"
+              ]
+            },
+            {
+              "name": "create_discussion_topic",
+              "description": "在画布话题讨论区创建结构化多层级话题卡（适合有父子层级的决策树）。",
+              "category": "system",
+              "need_confirm": false,
+              "params": [
+                "title",
+                "questions"
+              ]
+            },
+            {
+              "name": "save_memory",
+              "description": "保存结构化 AI 记忆条目（比 save_preference 更丰富，支持分类标签）。适合保存项目上下文、工程规律、领域知识等跨会话信息。",
+              "category": "system",
+              "need_confirm": false,
+              "params": [
+                "key",
+                "content",
+                "tag",
+                "overwrite"
+              ]
+            },
+            {
+              "name": "recall_memory",
+              "description": "检索历史 AI 记忆，支持关键词搜索和标签过滤。",
+              "category": "system",
+              "need_confirm": false,
+              "params": [
+                "query",
+                "tag_filter",
+                "limit"
+              ]
+            },
+            {
+              "name": "list_memories",
+              "description": "列出当前用户的所有 AI 记忆条目（按标签分组）。",
+              "category": "system",
+              "need_confirm": false,
+              "params": [
+                "limit"
+              ]
+            },
+            {
+              "name": "get_canvas_state",
+              "description": "读取当前会话关联的工作流画布状态（节点列表、连接关系等）。仅当用户在画布页面发起对话时有效。",
+              "category": "system",
+              "need_confirm": false,
+              "params": [
+                "canvas_id"
+              ]
+            },
+            {
+              "name": "get_selected_elements",
+              "description": "获取用户在画布/视图中当前选中的元素列表（gid、类型、标签等）。仅当用户在相关页面发起对话且有选中元素时有效。",
+              "category": "system",
+              "need_confirm": false,
+              "params": []
+            },
+            {
+              "name": "flag_for_review",
+              "description": "标记当前问题需要人工复核。当 AI 对结果不确定、发现潜在风险或无法给出可靠答案时使用。",
+              "category": "system",
+              "need_confirm": false,
+              "params": [
+                "reason",
+                "context",
+                "severity"
+              ]
+            },
+            {
+              "name": "find_similar_cases",
+              "description": "在任务/问题/知识库中语义搜索相似历史案例。比 search_knowledge 更聚焦于「相似情境」匹配，返回相似度评分。",
+              "category": "system",
+              "need_confirm": false,
+              "params": [
+                "query",
+                "item_types",
+                "limit"
+              ]
+            },
+            {
+              "name": "aggregate_history",
+              "description": "对任务或问题进行聚合统计分析（按状态/优先级/严重度/时间分组统计数量）。",
+              "category": "system",
+              "need_confirm": false,
+              "params": [
+                "item_type",
+                "group_by",
+                "filter_status",
+                "date_range"
+              ]
+            },
+            {
+              "name": "check_rules",
+              "description": "针对具体工艺场景，检索适用的工艺规则并判断强制/建议/参考级别。返回含置信度和规则强度的规则列表。",
+              "category": "system",
+              "need_confirm": false,
+              "params": [
+                "scenario",
+                "part_no",
+                "operation_type",
+                "limit"
+              ]
+            },
+            {
+              "name": "recommend_practice",
+              "description": "根据工艺场景推荐相关的最佳实践和经验教训。搜索 lesson_learned / guide 类型的知识条目。",
+              "category": "system",
+              "need_confirm": false,
+              "params": [
+                "scenario",
+                "context",
+                "limit"
+              ]
+            }
+          ],
+          "total": 38
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "fixture-agent.tool_catalog.list",
+          "trace_id": "fixture-agent.tool_catalog.list"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.agent.agent_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "agent.flow.capability_manifest.get",
@@ -2031,7 +2644,32 @@
       },
       "sql_statements": [],
       "runtime_requests": [],
-      "outbox_count": 0
+      "outbox_count": 0,
+      "request_id": "fixture-agent.flow.capability_manifest.get",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "agent.flow.capability_manifest.get",
+        "major_version": 1,
+        "data": {
+          "manifest": [],
+          "message": "Flow 节点必须从 Capability Catalog 选择；旧进程内 node_registry 已停用"
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "fixture-agent.flow.capability_manifest.get",
+          "trace_id": "fixture-agent.flow.capability_manifest.get"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.agent.agent_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "agent.interaction.cancel",
@@ -2080,7 +2718,43 @@
         "SELECT role, content, tool_calls FROM workmanship_app_ai_turns WHERE session_gid=%s ORDER BY sort_order ASC LIMIT %s"
       ],
       "runtime_requests": [],
-      "outbox_count": 1
+      "outbox_count": 1,
+      "request_id": "fixture-agent.interaction.cancel",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "agent.interaction.cancel",
+        "major_version": 2,
+        "data": {
+          "ok": true,
+          "session_gid": "session-one"
+        },
+        "operation_ref": {
+          "operation_id": "op_b7cd27eec67e4f2ab630d8cf25dbaa4e",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [
+          {
+            "kind": "agent.change",
+            "reference": "agent://agent.interaction.cancel/session-one",
+            "digest": "sha256:2530bebae1052883ae918603543bd70330d9977c9d5e23757e6e68d0d92d9b83",
+            "summary": "Provider-owned Agent write result."
+          }
+        ],
+        "warnings": [],
+        "correlation": {
+          "request_id": "fixture-agent.interaction.cancel",
+          "trace_id": "fixture-agent.interaction.cancel"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.agent.agent_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "agent.runtime.config.set",
@@ -2150,7 +2824,67 @@
       },
       "sql_statements": [],
       "runtime_requests": [],
-      "outbox_count": 1
+      "outbox_count": 1,
+      "request_id": "fixture-agent.runtime.config.set",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "agent.runtime.config.set",
+        "major_version": 1,
+        "data": {
+          "source": "local_secret",
+          "model": "pi",
+          "api_base": "https://runtime.invalid",
+          "has_key": true,
+          "key_preview": "",
+          "is_admin": true
+        },
+        "operation_ref": {
+          "operation_id": "op_ad85b501742f40d48a5becf90b9391c6",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [
+          {
+            "kind": "agent.change",
+            "reference": "agent://agent.runtime.config.set/fixture-agent.runtime.config.set",
+            "digest": "sha256:318a350d07f5a2bc243df04c9d6bcf6664726e1ffca114e9fc01d941d5bfac01",
+            "summary": "Provider-owned Agent write result."
+          }
+        ],
+        "warnings": [],
+        "correlation": {
+          "request_id": "fixture-agent.runtime.config.set",
+          "trace_id": "fixture-agent.runtime.config.set"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "agent.runtime.config.set",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "fixture-agent.runtime.config.set",
+          "trace_id": "fixture-agent.runtime.config.set"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.agent.agent_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "agent.runtime.connection.test",
@@ -2201,7 +2935,45 @@
           "path": "/health"
         }
       ],
-      "outbox_count": 1
+      "outbox_count": 1,
+      "request_id": "fixture-agent.runtime.connection.test",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "agent.runtime.connection.test",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "reply": "Pi Agent Runtime 可用",
+          "model": "pi",
+          "error": ""
+        },
+        "operation_ref": {
+          "operation_id": "op_6e487b95a2d642c297beaa070bf266b1",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [
+          {
+            "kind": "agent.change",
+            "reference": "agent://agent.runtime.connection.test/fixture-agent.runtime.connection.test",
+            "digest": "sha256:0f0dbf82573a6fb8cebf34c470e9cafa4cda98c2d5b5ea8aa3ca224d9aa06936",
+            "summary": "Provider-owned Agent write result."
+          }
+        ],
+        "warnings": [],
+        "correlation": {
+          "request_id": "fixture-agent.runtime.connection.test",
+          "trace_id": "fixture-agent.runtime.connection.test"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.agent.agent_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "agent.interaction.chat.change.apply",
@@ -2324,7 +3096,37 @@
           "path": "/v1/runs/run-one/messages"
         }
       ],
-      "outbox_count": 0
+      "outbox_count": 0,
+      "request_id": "fixture-agent.interaction.chat.change.apply",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "agent.interaction.chat.change.apply",
+        "major_version": 3,
+        "data": {
+          "data": {
+            "response_json": "{\"answer\":\"Fixture answer\",\"session_id\":\"session-one\",\"run_id\":\"run-one\",\"tool_calls\":[],\"model\":\"pi\"}"
+          }
+        },
+        "operation_ref": {
+          "operation_id": "op_5b168efc61b74106aafa6d47c4ec5afc",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "fixture-agent.interaction.chat.change.apply",
+          "trace_id": "fixture-agent.interaction.chat.change.apply"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.agent.agent_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     }
   ]
 }

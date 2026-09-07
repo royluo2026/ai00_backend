@@ -1,6 +1,6 @@
 {
   "status": "unpublished_candidate",
-  "source_revision": "6554952f146df3a2b846b1f6d7ed60ddd4c5ab66",
+  "source_revision": "37bd5fbea1e13aab2529472a999a9bd804a88daf",
   "published_catalog_changed": false,
   "machine_passed": false,
   "human_approved": false,
@@ -10979,7 +10979,7 @@
       },
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
-      "authorization_policy": "project_management.v2:project.view",
+      "authorization_policy": "project_management.v2:approval.submit",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -11261,7 +11261,7 @@
       },
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
-      "authorization_policy": "project_management.v2:project.view",
+      "authorization_policy": "project_management.v2:approval.submit",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -11500,7 +11500,7 @@
       },
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
-      "authorization_policy": "project_management.v2:project.manage_any",
+      "authorization_policy": "project_management.v2:approval.approve",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -11739,7 +11739,7 @@
       },
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
-      "authorization_policy": "project_management.v2:project.view",
+      "authorization_policy": "project_management.v2:approval.submit",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -11978,7 +11978,7 @@
       },
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
-      "authorization_policy": "project_management.v2:project.view",
+      "authorization_policy": "project_management.v2:approval.submit",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -13094,6 +13094,330 @@
       ],
       "domain_errors_complete": true,
       "capability_version_gid": "cv2_922a7ddcb03f2318f1332fed",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested project resource is unavailable.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller cannot access the project resource.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The project change requires Base approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The project resource changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "The Project Management provider is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "project_management.provider",
+      "api_refs": [],
+      "test_refs": []
+    },
+    {
+      "id": "project.knowledge_comment.list",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.knowledge_comment.list",
+      "description": "Read knowledge_comment list within the authenticated tenant and participant policy.",
+      "use_when": "Read knowledge_comment list within the authenticated tenant and participant policy.",
+      "do_not_use_when": "A different Project operation or domain effect is requested.",
+      "business_effect": "Read knowledge_comment list within the authenticated tenant and participant policy.",
+      "business_acceptance_criteria": [
+        "Read knowledge_comment list within the authenticated tenant and participant policy.",
+        "Writes persist their exact result with the actor, tenant, action and idempotency key in the same transaction.",
+        "Approval decisions enforce the assigned participant, expected revision, durable audit and notification."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "project.knowledge_comment.list.actor_bound",
+          "version": 1,
+          "statement": "Authenticated tenant and stored participation determine access.",
+          "applies_when": "The desktop action executes.",
+          "enforcement_ref": "plugins/project_management/project_management_backend/infrastructure/desktop_repository.py",
+          "error_code": "permission_denied",
+          "test_refs": [
+            "backend/tests/test_desktop_round5_project.py"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "read",
+      "side_effects": "Reads domain state without mutation.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "project_management.v2:project.view",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "item_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "item_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "section": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "author": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "author_name": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "author_gid": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "ai_status": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "id": {
+                  "type": [
+                    "integer",
+                    "string"
+                  ]
+                },
+                "parent_id": {
+                  "type": [
+                    "integer",
+                    "string",
+                    "null"
+                  ]
+                },
+                "content": {
+                  "type": "string",
+                  "maxLength": 65536
+                },
+                "resolved": {
+                  "type": "boolean"
+                },
+                "read_by_human": {
+                  "type": "boolean"
+                },
+                "sort_order": {
+                  "type": "number"
+                },
+                "created_at": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "gid",
+                "content"
+              ]
+            },
+            "maxItems": 500
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "entries"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "section": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "author": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "author_name": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "author_gid": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "ai_status": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "id": {
+                  "type": [
+                    "integer",
+                    "string"
+                  ]
+                },
+                "parent_id": {
+                  "type": [
+                    "integer",
+                    "string",
+                    "null"
+                  ]
+                },
+                "content": {
+                  "type": "string",
+                  "maxLength": 65536
+                },
+                "resolved": {
+                  "type": "boolean"
+                },
+                "read_by_human": {
+                  "type": "boolean"
+                },
+                "sort_order": {
+                  "type": "number"
+                },
+                "created_at": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "gid",
+                "content"
+              ]
+            },
+            "maxItems": 500
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "entries"
+        ]
+      },
+      "schema_hash": "sha256:a2ecb09a14b72704471dfadcd5fcb588af2c94c54478acb9038cd16425cf4757",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_2d0d43dc9e1d0707ea528daf",
       "error_schema": [
         {
           "error_code": "resource_not_found",
@@ -14846,6 +15170,632 @@
       "test_refs": []
     },
     {
+      "id": "craft.bop.picture.resolve",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.bop.picture.resolve",
+      "description": "Read craft bop picture resolve using owned immutable artifacts or the authenticated Feishu delegation.",
+      "use_when": "Read craft bop picture resolve using owned immutable artifacts or the authenticated Feishu delegation.",
+      "do_not_use_when": "Another export, import, resource or remote method is requested.",
+      "business_effect": "Read craft bop picture resolve using owned immutable artifacts or the authenticated Feishu delegation.",
+      "business_acceptance_criteria": [
+        "Read craft bop picture resolve using owned immutable artifacts or the authenticated Feishu delegation.",
+        "At most 5000 rows and 200 columns are accepted; raw credentials and filesystem paths are never input.",
+        "File output is an immutable ArtifactRef with verified hash and size."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "craft.bop.picture.resolve.owner_bound",
+          "version": 1,
+          "statement": "File and Feishu access are derived from authenticated context.",
+          "applies_when": "The data exchange action executes.",
+          "enforcement_ref": "backend/platform_sdk/artifacts.py; backend/platform_sdk/feishu.py",
+          "error_code": "permission_denied",
+          "test_refs": [
+            "backend/tests/test_desktop_round5_exchange.py"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "read",
+      "side_effects": "Reads domain state without mutation.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "adapter_default",
+      "automation_level": "A2",
+      "authorization_policy": "legacy:craft.read",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "version_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "reference_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "version_gid",
+          "reference_hash"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "schema_hash": "sha256:5fa357e36056d0b9bb4187c37c73f2a7a48dfd6feda98ae73ad2a895cd92c203",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_fb07c5c3cb92926a4b9a60a2",
+      "error_schema": [],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "craft.provider",
+      "api_refs": [],
+      "test_refs": []
+    },
+    {
+      "id": "craft.data_exchange.feishu_bitable.read",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.data_exchange.feishu_bitable.read",
+      "description": "Read feishu_bitable read using owned immutable artifacts or the authenticated Feishu delegation.",
+      "use_when": "Read feishu_bitable read using owned immutable artifacts or the authenticated Feishu delegation.",
+      "do_not_use_when": "Another export, import, resource or remote method is requested.",
+      "business_effect": "Read feishu_bitable read using owned immutable artifacts or the authenticated Feishu delegation.",
+      "business_acceptance_criteria": [
+        "Read feishu_bitable read using owned immutable artifacts or the authenticated Feishu delegation.",
+        "At most 5000 rows and 200 columns are accepted; raw credentials and filesystem paths are never input.",
+        "File output is an immutable ArtifactRef with verified hash and size."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "craft.data_exchange.feishu_bitable.read.owner_bound",
+          "version": 1,
+          "statement": "File and Feishu access are derived from authenticated context.",
+          "applies_when": "The data exchange action executes.",
+          "enforcement_ref": "backend/platform_sdk/artifacts.py; backend/platform_sdk/feishu.py",
+          "error_code": "permission_denied",
+          "test_refs": [
+            "backend/tests/test_desktop_round5_exchange.py"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "read",
+      "side_effects": "Reads domain state without mutation.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "adapter_default",
+      "automation_level": "A2",
+      "authorization_policy": "legacy:craft.read",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "app_token": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "table_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "page_size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "app_token",
+          "table_id"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "headers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "maxItems": 200,
+            "minItems": 0
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "maxItems": 200,
+              "minItems": 0
+            },
+            "maxItems": 5000,
+            "minItems": 0
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "maxItems": 20,
+            "minItems": 0
+          },
+          "import_preview": {
+            "type": "object",
+            "properties": {
+              "import_preview_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9_.-]+$"
+              },
+              "content_hash": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "entry_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "expires_at": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "headers",
+          "rows",
+          "warnings"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "headers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "maxItems": 200,
+            "minItems": 0
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "maxItems": 200,
+              "minItems": 0
+            },
+            "maxItems": 5000,
+            "minItems": 0
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "maxItems": 20,
+            "minItems": 0
+          },
+          "import_preview": {
+            "type": "object",
+            "properties": {
+              "import_preview_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9_.-]+$"
+              },
+              "content_hash": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "entry_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "expires_at": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "headers",
+          "rows",
+          "warnings"
+        ]
+      },
+      "schema_hash": "sha256:e3afc71f8213d3142debc65f86ff11857ca97577a2a65036b6ae7a4e0ee8d3c5",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_9bf147350419e1a0360ef494",
+      "error_schema": [],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "craft.provider",
+      "api_refs": [],
+      "test_refs": []
+    },
+    {
+      "id": "craft.data_exchange.feishu_bitable.write",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.data_exchange.feishu_bitable.write",
+      "description": "Write feishu_bitable write using owned immutable artifacts or the authenticated Feishu delegation.",
+      "use_when": "Write feishu_bitable write using owned immutable artifacts or the authenticated Feishu delegation.",
+      "do_not_use_when": "Another export, import, resource or remote method is requested.",
+      "business_effect": "Write feishu_bitable write using owned immutable artifacts or the authenticated Feishu delegation.",
+      "business_acceptance_criteria": [
+        "Write feishu_bitable write using owned immutable artifacts or the authenticated Feishu delegation.",
+        "At most 5000 rows and 200 columns are accepted; raw credentials and filesystem paths are never input.",
+        "File output is an immutable ArtifactRef with verified hash and size."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "craft.data_exchange.feishu_bitable.write.owner_bound",
+          "version": 1,
+          "statement": "File and Feishu access are derived from authenticated context.",
+          "applies_when": "The data exchange action executes.",
+          "enforcement_ref": "backend/platform_sdk/artifacts.py; backend/platform_sdk/feishu.py",
+          "error_code": "permission_denied",
+          "test_refs": [
+            "backend/tests/test_desktop_round5_exchange.py"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Writes domain state through the owning Provider.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "adapter_default",
+      "automation_level": "A1",
+      "authorization_policy": "legacy:craft.write",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "app_token": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "table_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "headers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "maxItems": 200,
+            "minItems": 1
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "maxItems": 200,
+              "minItems": 0
+            },
+            "maxItems": 5000,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "app_token",
+          "table_id",
+          "headers",
+          "rows"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "written_rows": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5000
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "written_rows"
+        ]
+      },
+      "agent_output_schema": null,
+      "schema_hash": "sha256:a95af3faf0a2749a0236d996e4590d1305c3eb4bd90b83b1fa12d7fcd36558f2",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_4a4d78748dfdb8610b3a4a7f",
+      "error_schema": [],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "craft.provider",
+      "api_refs": [],
+      "test_refs": []
+    },
+    {
       "id": "craft.data_exchange.excel.parse",
       "major_version": 1,
       "owner_domain": "craft",
@@ -15355,7 +16305,7 @@
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
       "replay_data_policy": "metadata_only",
-      "consistency_policy": "strong",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "execution_budget": {
@@ -15613,7 +16563,7 @@
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
       "replay_data_policy": "metadata_only",
-      "consistency_policy": "strong",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "execution_budget": {
@@ -15854,7 +16804,7 @@
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
       "replay_data_policy": "metadata_only",
-      "consistency_policy": "strong",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "execution_budget": {
@@ -16013,7 +16963,7 @@
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
       "replay_data_policy": "metadata_only",
-      "consistency_policy": "strong",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "execution_budget": {
@@ -16286,6 +17236,1510 @@
       "provider_ref": "craft.provider",
       "api_refs": [],
       "test_refs": []
+    },
+    {
+      "id": "base.export_template.list",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "base.export_template.list",
+      "description": "Lists the authenticated user’s visible export templates with a bounded, closed editor configuration.",
+      "use_when": "Lists the authenticated user’s visible export templates with a bounded, closed editor configuration.",
+      "do_not_use_when": "The requested effect belongs to another named action.",
+      "business_effect": "Lists the authenticated user’s visible export templates with a bounded, closed editor configuration.",
+      "business_acceptance_criteria": [
+        "Lists the authenticated user’s visible export templates with a bounded, closed editor configuration.",
+        "The real owner service enforces the authenticated user scope and emits only the closed public model."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "base.export_template.list.owner_bound",
+          "version": 1,
+          "statement": "Identity and current authorization come from the Base user and grant stores; callers cannot supply either.",
+          "applies_when": "this desktop action is invoked",
+          "enforcement_ref": "backend/base/desktop_actions.py:_actor",
+          "error_code": "permission_denied",
+          "test_refs": [
+            "backend/tests/test_desktop_round5_base.py"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "read",
+      "side_effects": "Lists the authenticated user’s visible export templates with a bounded, closed editor configuration.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "base.desktop:authenticated_owner",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "module": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "module": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "owner_gid": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "created_at": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "updated_at": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "is_shared": {
+                  "type": "boolean"
+                },
+                "config": {
+                  "type": "object",
+                  "properties": {
+                    "columns": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string",
+                            "maxLength": 4096
+                          },
+                          "label": {
+                            "type": "string",
+                            "maxLength": 4096
+                          },
+                          "width": {
+                            "type": "number",
+                            "minimum": 1,
+                            "maximum": 1000
+                          },
+                          "include": {
+                            "type": "boolean"
+                          }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                          "key"
+                        ]
+                      },
+                      "maxItems": 200
+                    },
+                    "styles": {
+                      "type": "object",
+                      "properties": {
+                        "headerBg": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "headerFg": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "altRowBg": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "borderStyle": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "fontSize": {
+                          "type": "integer",
+                          "minimum": 6,
+                          "maximum": 48
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "name",
+                "module",
+                "owner_gid",
+                "created_at",
+                "updated_at",
+                "is_shared",
+                "config"
+              ]
+            },
+            "maxItems": 500
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 500
+          },
+          "module": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total",
+          "module"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "module": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "owner_gid": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "created_at": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "updated_at": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "is_shared": {
+                  "type": "boolean"
+                },
+                "config": {
+                  "type": "object",
+                  "properties": {
+                    "columns": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string",
+                            "maxLength": 4096
+                          },
+                          "label": {
+                            "type": "string",
+                            "maxLength": 4096
+                          },
+                          "width": {
+                            "type": "number",
+                            "minimum": 1,
+                            "maximum": 1000
+                          },
+                          "include": {
+                            "type": "boolean"
+                          }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                          "key"
+                        ]
+                      },
+                      "maxItems": 200
+                    },
+                    "styles": {
+                      "type": "object",
+                      "properties": {
+                        "headerBg": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "headerFg": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "altRowBg": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "borderStyle": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "fontSize": {
+                          "type": "integer",
+                          "minimum": 6,
+                          "maximum": 48
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "name",
+                "module",
+                "owner_gid",
+                "created_at",
+                "updated_at",
+                "is_shared",
+                "config"
+              ]
+            },
+            "maxItems": 500
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 500
+          },
+          "module": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total",
+          "module"
+        ]
+      },
+      "schema_hash": "sha256:bf2ce635df1baf9399fc450988323a35249b4391db55ddd7a5e9f7f91841b31d",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_ec30a5dcee7479577e154d56",
+      "error_schema": [],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
+    },
+    {
+      "id": "base.export_template.create",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "base.export_template.create",
+      "description": "Creates one bounded export template with the authenticated user as its immutable owner.",
+      "use_when": "Creates one bounded export template with the authenticated user as its immutable owner.",
+      "do_not_use_when": "The requested effect belongs to another named action.",
+      "business_effect": "Creates one bounded export template with the authenticated user as its immutable owner.",
+      "business_acceptance_criteria": [
+        "Creates one bounded export template with the authenticated user as its immutable owner.",
+        "The real owner service enforces the authenticated user scope and emits only the closed public model."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "base.export_template.create.owner_bound",
+          "version": 1,
+          "statement": "Identity and current authorization come from the Base user and grant stores; callers cannot supply either.",
+          "applies_when": "this desktop action is invoked",
+          "enforcement_ref": "backend/base/desktop_actions.py:_actor",
+          "error_code": "permission_denied",
+          "test_refs": [
+            "backend/tests/test_desktop_round5_base.py"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Creates one bounded export template with the authenticated user as its immutable owner.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "base.desktop:authenticated_owner",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          },
+          "module": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          },
+          "config": {
+            "type": "object",
+            "properties": {
+              "columns": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "label": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "width": {
+                      "type": "number",
+                      "minimum": 1,
+                      "maximum": 1000
+                    },
+                    "include": {
+                      "type": "boolean"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "key"
+                  ]
+                },
+                "maxItems": 200
+              },
+              "styles": {
+                "type": "object",
+                "properties": {
+                  "headerBg": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "headerFg": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "altRowBg": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "borderStyle": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "fontSize": {
+                    "type": "integer",
+                    "minimum": 6,
+                    "maximum": 48
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "is_shared": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "module",
+          "config"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid"
+        ]
+      },
+      "agent_output_schema": null,
+      "schema_hash": "sha256:dce7505955399078e639051ce0ccdd3b8a04c560f1d0dad29b83ca5a8a468de5",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_426a03212d944a57bd5d4a72",
+      "error_schema": [],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
+    },
+    {
+      "id": "base.export_template.update",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "base.export_template.update",
+      "description": "Updates only the named fields of one stored template after proving owner or administrator authority.",
+      "use_when": "Updates only the named fields of one stored template after proving owner or administrator authority.",
+      "do_not_use_when": "The requested effect belongs to another named action.",
+      "business_effect": "Updates only the named fields of one stored template after proving owner or administrator authority.",
+      "business_acceptance_criteria": [
+        "Updates only the named fields of one stored template after proving owner or administrator authority.",
+        "The real owner service enforces the authenticated user scope and emits only the closed public model."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "base.export_template.update.owner_bound",
+          "version": 1,
+          "statement": "Identity and current authorization come from the Base user and grant stores; callers cannot supply either.",
+          "applies_when": "this desktop action is invoked",
+          "enforcement_ref": "backend/base/desktop_actions.py:_actor",
+          "error_code": "permission_denied",
+          "test_refs": [
+            "backend/tests/test_desktop_round5_base.py"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Updates only the named fields of one stored template after proving owner or administrator authority.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "base.desktop:authenticated_owner",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          },
+          "changes": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "maxLength": 128,
+                "minLength": 1
+              },
+              "module": {
+                "type": "string",
+                "maxLength": 128,
+                "minLength": 1
+              },
+              "config": {
+                "type": "object",
+                "properties": {
+                  "columns": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "label": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "width": {
+                          "type": "number",
+                          "minimum": 1,
+                          "maximum": 1000
+                        },
+                        "include": {
+                          "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "key"
+                      ]
+                    },
+                    "maxItems": 200
+                  },
+                  "styles": {
+                    "type": "object",
+                    "properties": {
+                      "headerBg": {
+                        "type": "string",
+                        "maxLength": 4096
+                      },
+                      "headerFg": {
+                        "type": "string",
+                        "maxLength": 4096
+                      },
+                      "altRowBg": {
+                        "type": "string",
+                        "maxLength": 4096
+                      },
+                      "borderStyle": {
+                        "type": "string",
+                        "maxLength": 4096
+                      },
+                      "fontSize": {
+                        "type": "integer",
+                        "minimum": 6,
+                        "maximum": 48
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              },
+              "is_shared": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false,
+            "minProperties": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "changes"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid"
+        ]
+      },
+      "agent_output_schema": null,
+      "schema_hash": "sha256:8f3cbeef067ade671886df90cf81f9f99a02197805f5c751f1a1f7f146794abd",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_49c33cf9b0b18b8d6c79d30c",
+      "error_schema": [],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "base.provider",
+      "api_refs": [],
+      "test_refs": []
+    },
+    {
+      "id": "craft.pbom.vpps_validation.get",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.pbom.vpps_validation.get",
+      "description": "Runs the four VPPS validation rules for one authenticated-readable Craft PBOM snapshot and returns bounded errors and concessions.",
+      "use_when": "Runs the four VPPS validation rules for one authenticated-readable Craft PBOM snapshot and returns bounded errors and concessions.",
+      "do_not_use_when": "Mutating a snapshot or its concessions.",
+      "business_effect": "Runs the four VPPS validation rules for one authenticated-readable Craft PBOM snapshot and returns bounded errors and concessions.",
+      "business_acceptance_criteria": [
+        "Runs the four VPPS validation rules for one authenticated-readable Craft PBOM snapshot and returns bounded errors and concessions.",
+        "At most 500 parts and 500 errors are returned."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "craft.pbom.vpps_validation.get.read_only",
+          "version": 1,
+          "statement": "The real validator performs no writes and uses a single snapshot identifier.",
+          "applies_when": "The validation runs.",
+          "enforcement_ref": "plugins/craft/craft_backend/capabilities/vpps_check.py:check_vpps",
+          "error_code": "resource_not_found",
+          "test_refs": [
+            "backend/tests/test_desktop_round5_remaining.py"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "read",
+      "side_effects": "Reads domain state without mutation.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "adapter_default",
+      "automation_level": "A2",
+      "authorization_policy": "legacy:craft.read",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "snapshot_gid": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "snapshot_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "snapshot": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "version_tag": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "name": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "version_tag",
+              "name"
+            ]
+          },
+          "summary": {
+            "type": "object",
+            "properties": {
+              "total_parts": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "parts_with_vpps": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "rule1_errors": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "rule2_errors": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "rule3_errors": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "rule4_errors": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "rule4_ignored": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "alias_matches": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "ok": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          },
+          "errors": {
+            "type": "object",
+            "properties": {
+              "rule1": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "rule": {
+                      "enum": [
+                        1,
+                        2,
+                        3,
+                        4
+                      ]
+                    },
+                    "row": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 500
+                    },
+                    "vpps": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "msg": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "gid": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "vpps_desc": {
+                      "type": "string",
+                      "maxLength": 4096
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "rule",
+                    "row",
+                    "vpps",
+                    "msg"
+                  ]
+                },
+                "maxItems": 500
+              },
+              "rule2": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "rule": {
+                      "enum": [
+                        1,
+                        2,
+                        3,
+                        4
+                      ]
+                    },
+                    "row": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 500
+                    },
+                    "vpps": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "msg": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "gid": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "vpps_desc": {
+                      "type": "string",
+                      "maxLength": 4096
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "rule",
+                    "row",
+                    "vpps",
+                    "msg"
+                  ]
+                },
+                "maxItems": 500
+              },
+              "rule3": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "rule": {
+                      "enum": [
+                        1,
+                        2,
+                        3,
+                        4
+                      ]
+                    },
+                    "row": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 500
+                    },
+                    "vpps": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "msg": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "gid": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "vpps_desc": {
+                      "type": "string",
+                      "maxLength": 4096
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "rule",
+                    "row",
+                    "vpps",
+                    "msg"
+                  ]
+                },
+                "maxItems": 500
+              },
+              "rule4": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "rule": {
+                      "enum": [
+                        1,
+                        2,
+                        3,
+                        4
+                      ]
+                    },
+                    "row": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 500
+                    },
+                    "vpps": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "msg": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "gid": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "vpps_desc": {
+                      "type": "string",
+                      "maxLength": 4096
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "rule",
+                    "row",
+                    "vpps",
+                    "msg"
+                  ]
+                },
+                "maxItems": 500
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "rule1",
+              "rule2",
+              "rule3",
+              "rule4"
+            ]
+          },
+          "alias_matches": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "vpps": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "row": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 500
+                },
+                "desc": {
+                  "type": "string",
+                  "maxLength": 4096
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "vpps",
+                "row",
+                "desc"
+              ]
+            },
+            "maxItems": 500
+          },
+          "rule4_ignored": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "vpps": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "row": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 500
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "vpps",
+                "row"
+              ]
+            },
+            "maxItems": 500
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "snapshot",
+          "summary",
+          "errors",
+          "alias_matches",
+          "rule4_ignored"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "snapshot": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "version_tag": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "name": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "version_tag",
+              "name"
+            ]
+          },
+          "summary": {
+            "type": "object",
+            "properties": {
+              "total_parts": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "parts_with_vpps": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "rule1_errors": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "rule2_errors": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "rule3_errors": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "rule4_errors": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "rule4_ignored": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "alias_matches": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "ok": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          },
+          "errors": {
+            "type": "object",
+            "properties": {
+              "rule1": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "rule": {
+                      "enum": [
+                        1,
+                        2,
+                        3,
+                        4
+                      ]
+                    },
+                    "row": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 500
+                    },
+                    "vpps": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "msg": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "gid": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "vpps_desc": {
+                      "type": "string",
+                      "maxLength": 4096
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "rule",
+                    "row",
+                    "vpps",
+                    "msg"
+                  ]
+                },
+                "maxItems": 500
+              },
+              "rule2": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "rule": {
+                      "enum": [
+                        1,
+                        2,
+                        3,
+                        4
+                      ]
+                    },
+                    "row": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 500
+                    },
+                    "vpps": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "msg": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "gid": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "vpps_desc": {
+                      "type": "string",
+                      "maxLength": 4096
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "rule",
+                    "row",
+                    "vpps",
+                    "msg"
+                  ]
+                },
+                "maxItems": 500
+              },
+              "rule3": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "rule": {
+                      "enum": [
+                        1,
+                        2,
+                        3,
+                        4
+                      ]
+                    },
+                    "row": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 500
+                    },
+                    "vpps": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "msg": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "gid": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "vpps_desc": {
+                      "type": "string",
+                      "maxLength": 4096
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "rule",
+                    "row",
+                    "vpps",
+                    "msg"
+                  ]
+                },
+                "maxItems": 500
+              },
+              "rule4": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "rule": {
+                      "enum": [
+                        1,
+                        2,
+                        3,
+                        4
+                      ]
+                    },
+                    "row": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 500
+                    },
+                    "vpps": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "msg": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "gid": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "vpps_desc": {
+                      "type": "string",
+                      "maxLength": 4096
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "rule",
+                    "row",
+                    "vpps",
+                    "msg"
+                  ]
+                },
+                "maxItems": 500
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "rule1",
+              "rule2",
+              "rule3",
+              "rule4"
+            ]
+          },
+          "alias_matches": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "vpps": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "row": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 500
+                },
+                "desc": {
+                  "type": "string",
+                  "maxLength": 4096
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "vpps",
+                "row",
+                "desc"
+              ]
+            },
+            "maxItems": 500
+          },
+          "rule4_ignored": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "vpps": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "row": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 500
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "vpps",
+                "row"
+              ]
+            },
+            "maxItems": 500
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "snapshot",
+          "summary",
+          "errors",
+          "alias_matches",
+          "rule4_ignored"
+        ]
+      },
+      "schema_hash": "sha256:1673db8d96aac637abcb3493cc04d24ebe8def5d8f1367a57d14f118173afec5",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_0e6f63f72938b7ef37b116a0",
+      "error_schema": [],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "craft.provider",
+      "api_refs": [],
+      "test_refs": []
     }
   ],
   "business_definition_hashes": {
@@ -16341,6 +18795,7 @@
     "project.follow.create@1": "sha256:309d460d6a636fe862f6c488b6b759612a15bf6145cbe43ee78c4e45f768a6c9",
     "project.share.list@1": "sha256:41efca27fc41af4763e727897b0ff1c2f610e9c50cea6d928d69d04afbec4eb3",
     "project.change_log.search@1": "sha256:ef8d2700ec4165f24aee19a097188b2c223da07fd916df43f08535661b74017e",
+    "project.knowledge_comment.list@1": "sha256:37c63c28def318371bdb7fe9d8715b721f27dc72ad9b44cb842c472b27b56a71",
     "base.artifact.batch.import@1": "sha256:7b2e22b417fc38182cc3864043660af9f75217ad2ca0288551959a8b1599a11a",
     "base.artifact.bytes.get@1": "sha256:5220b300c5dce093bf3ded8556f12f57493df92f62109d3221537cb77832939a",
     "base.artifact.import@1": "sha256:fa1e3ec67ff235620aecfc74a1b8398c54b43147f11c6033e5ec715a107e56de",
@@ -16348,12 +18803,19 @@
     "base.artifact.text.get@1": "sha256:4f484e2d73ac61b8e33f4e40d8b3958c4d72c878a6d3f485455ce250a91cb6e1",
     "base.artifact.text.create@1": "sha256:4b48139abaaf527dd267a8e7cb9c7c5d27b13bdc1298ff81cc2b61cde04984c8",
     "base.artifact.revise@1": "sha256:c6216ca6e86b00843f8815914df26abc2c92a6bc8eb5037e896580a655162d8a",
+    "craft.bop.picture.resolve@1": "sha256:edcb064006563879972073dcd097d53b715ecc043047018e31103ebedbee4cff",
+    "craft.data_exchange.feishu_bitable.read@1": "sha256:0252b2ec2d97afccc6dfa7c731c339141712d19db4ddbe8798ca7728e03d5bbb",
+    "craft.data_exchange.feishu_bitable.write@1": "sha256:f0c852341b050fce650c52a743aa8d5ee3cb4a7347c21603ed3acc9cbf5b2498",
     "craft.data_exchange.excel.parse@1": "sha256:04ba29a5de73f2e5f2e839630baa0ed660891e9adac253e04e3017113e7dada4",
     "craft.data_exchange.excel.export@1": "sha256:849cd26480e3b1c7a82a969f1b6c8d537bc633356f5fa1f90d35cde1004aa37b",
     "craft.data_exchange.diff_report.export@1": "sha256:6495ca4cee89ef730ec53e3a50142cb872e1d35a84e57bbc04770dede1bc3d75",
     "craft.data_exchange.feishu_diff.write@1": "sha256:322d6001cada679eae4c24dde5a1283afbfd4519bc58944498994c750d28c3e4",
     "craft.data_exchange.feishu_sheet.write@1": "sha256:ab056d180274716a3222fd58a6c3448e44b83c0bed0b3e99005cd53d814ecba9",
-    "craft.data_exchange.feishu_sheet.read@1": "sha256:4da65b7135316bb2731db5d4a2c713e87e55ad0e5ca01711144d2a7fdd3eb279"
+    "craft.data_exchange.feishu_sheet.read@1": "sha256:4da65b7135316bb2731db5d4a2c713e87e55ad0e5ca01711144d2a7fdd3eb279",
+    "base.export_template.list@1": "sha256:f3812cd1d1dd5dc83ef3808c249c5a57d292adbd8874304dd77e5c0db5b2fd78",
+    "base.export_template.create@1": "sha256:5cbef09d5405eb714181988fba4a84d591cd474c9c68c6c898e8377ea7940cee",
+    "base.export_template.update@1": "sha256:9dc379570811c5b364cd04dabc53d7e265049a3cbff2ad2fe07d7865cb89cb61",
+    "craft.pbom.vpps_validation.get@1": "sha256:f778a6085e5ea70a56cb54b19e2d6a14fc083c7eb53aeecb82d71ee4db7bf1a3"
   },
   "verification": "backend/tests/test_desktop_round5_base.py; deterministic SQL/external ports, not live runtime approval"
 }

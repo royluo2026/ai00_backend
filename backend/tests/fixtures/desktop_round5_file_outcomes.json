@@ -1,12 +1,12 @@
 {
-  "fixture_kind": "Real Artifact store, CSV/XLSX handlers and Feishu owner services; deterministic HTTP ports",
+  "fixture_kind": "Real registered owner handler + Gateway + LegacyServerGatewayPolicy + actual approval/schema/reliability; deterministic identity and SQL/external I/O ports",
   "rows": [
     {
       "id": "base.artifact.import",
       "version": 1,
       "payload": {
         "artifact_ref": {
-          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
           "media_type": "text/csv",
           "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
           "byte_size": 21,
@@ -16,7 +16,7 @@
       },
       "provider_data": {
         "artifact_ref": {
-          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
           "media_type": "text/csv",
           "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
           "byte_size": 21,
@@ -136,14 +136,45 @@
           "name"
         ]
       },
-      "runtime_requests": []
+      "runtime_requests": [],
+      "request_id": "matrix-53",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.artifact.import",
+        "major_version": 1,
+        "data": {
+          "artifact_ref": {
+            "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
+            "media_type": "text/csv",
+            "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+            "byte_size": 21,
+            "version": 1
+          },
+          "name": "fixture.csv"
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-53",
+          "trace_id": "matrix-53"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_artifacts",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.artifact.get",
       "version": 1,
       "payload": {
         "artifact_ref": {
-          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
           "media_type": "text/csv",
           "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
           "byte_size": 21,
@@ -153,7 +184,7 @@
       },
       "provider_data": {
         "artifact_ref": {
-          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
           "media_type": "text/csv",
           "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
           "byte_size": 21,
@@ -273,14 +304,45 @@
           "name"
         ]
       },
-      "runtime_requests": []
+      "runtime_requests": [],
+      "request_id": "matrix-54",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.artifact.get",
+        "major_version": 1,
+        "data": {
+          "artifact_ref": {
+            "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
+            "media_type": "text/csv",
+            "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+            "byte_size": 21,
+            "version": 1
+          },
+          "name": "fixture.csv"
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-54",
+          "trace_id": "matrix-54"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_artifacts",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.artifact.bytes.get",
       "version": 1,
       "payload": {
         "artifact_ref": {
-          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
           "media_type": "text/csv",
           "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
           "byte_size": 21,
@@ -289,7 +351,7 @@
       },
       "provider_data": {
         "artifact_ref": {
-          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
           "media_type": "text/csv",
           "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
           "byte_size": 21,
@@ -400,7 +462,38 @@
           "data_base64"
         ]
       },
-      "runtime_requests": []
+      "runtime_requests": [],
+      "request_id": "matrix-55",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.artifact.bytes.get",
+        "major_version": 1,
+        "data": {
+          "artifact_ref": {
+            "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
+            "media_type": "text/csv",
+            "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+            "byte_size": 21,
+            "version": 1
+          },
+          "data_base64": "TmFtZSxWYWx1ZQpGaXh0dXJlLDEK"
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-55",
+          "trace_id": "matrix-55"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_artifacts",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.artifact.batch.import",
@@ -409,7 +502,7 @@
         "artifacts": [
           {
             "artifact_ref": {
-              "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+              "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
               "media_type": "text/csv",
               "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
               "byte_size": 21,
@@ -423,7 +516,7 @@
         "artifacts": [
           {
             "artifact_ref": {
-              "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+              "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
               "media_type": "text/csv",
               "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
               "byte_size": 21,
@@ -573,14 +666,49 @@
           "artifacts"
         ]
       },
-      "runtime_requests": []
+      "runtime_requests": [],
+      "request_id": "matrix-56",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.artifact.batch.import",
+        "major_version": 1,
+        "data": {
+          "artifacts": [
+            {
+              "artifact_ref": {
+                "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
+                "media_type": "text/csv",
+                "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+                "byte_size": 21,
+                "version": 1
+              },
+              "name": "fixture.csv"
+            }
+          ]
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-56",
+          "trace_id": "matrix-56"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_artifacts",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.artifact.text.get",
       "version": 1,
       "payload": {
         "artifact_ref": {
-          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
           "media_type": "text/csv",
           "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
           "byte_size": 21,
@@ -589,7 +717,7 @@
       },
       "provider_data": {
         "artifact_ref": {
-          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
           "media_type": "text/csv",
           "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
           "byte_size": 21,
@@ -700,7 +828,38 @@
           "content"
         ]
       },
-      "runtime_requests": []
+      "runtime_requests": [],
+      "request_id": "matrix-57",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.artifact.text.get",
+        "major_version": 1,
+        "data": {
+          "artifact_ref": {
+            "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
+            "media_type": "text/csv",
+            "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+            "byte_size": 21,
+            "version": 1
+          },
+          "content": "Name,Value\nFixture,1\n"
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-57",
+          "trace_id": "matrix-57"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_artifacts",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.artifact.text.create",
@@ -712,7 +871,7 @@
       },
       "provider_data": {
         "artifact_ref": {
-          "artifact_id": "artifact_1a1b33ae14be56418d44fe85298cf133",
+          "artifact_id": "artifact_1f1ab6aae1ed535292119c26e351826b",
           "media_type": "text/markdown",
           "sha256": "3ecc582c62a6db5dbff58d7a5466c745d10a5a6f6c5ecccda93df0f3b4beb104",
           "byte_size": 9,
@@ -805,14 +964,69 @@
           "name"
         ]
       },
-      "runtime_requests": []
+      "runtime_requests": [],
+      "request_id": "matrix-58",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.artifact.text.create",
+        "major_version": 1,
+        "data": {
+          "artifact_ref": {
+            "artifact_id": "artifact_1f1ab6aae1ed535292119c26e351826b",
+            "media_type": "text/markdown",
+            "sha256": "3ecc582c62a6db5dbff58d7a5466c745d10a5a6f6c5ecccda93df0f3b4beb104",
+            "byte_size": 9,
+            "version": 1
+          },
+          "name": "fixture.md"
+        },
+        "operation_ref": {
+          "operation_id": "op_b17dfbc762a4479b80c353fe4ae88358",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-58",
+          "trace_id": "matrix-58"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.artifact.text.create",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-58",
+          "trace_id": "matrix-58"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_artifacts",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.artifact.revise",
       "version": 1,
       "payload": {
         "artifact_ref": {
-          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
           "media_type": "text/csv",
           "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
           "byte_size": 21,
@@ -820,7 +1034,7 @@
         },
         "name": "fixture.csv",
         "previous_artifact_ref": {
-          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
           "media_type": "text/csv",
           "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
           "byte_size": 21,
@@ -829,7 +1043,7 @@
       },
       "provider_data": {
         "artifact_ref": {
-          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
           "media_type": "text/csv",
           "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
           "byte_size": 21,
@@ -990,14 +1204,69 @@
           "name"
         ]
       },
-      "runtime_requests": []
+      "runtime_requests": [],
+      "request_id": "matrix-59",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.artifact.revise",
+        "major_version": 1,
+        "data": {
+          "artifact_ref": {
+            "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
+            "media_type": "text/csv",
+            "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+            "byte_size": 21,
+            "version": 1
+          },
+          "name": "fixture.csv"
+        },
+        "operation_ref": {
+          "operation_id": "op_6aa51a5416944c71b0b6bbb7a6dc3a15",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-59",
+          "trace_id": "matrix-59"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.artifact.revise",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-59",
+          "trace_id": "matrix-59"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_artifacts",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "craft.data_exchange.excel.parse",
       "version": 1,
       "payload": {
         "artifact_ref": {
-          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "artifact_id": "artifact_0c2a8bc3326350c990f176fab0176f72",
           "media_type": "text/csv",
           "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
           "byte_size": 21,
@@ -1160,7 +1429,44 @@
           "data"
         ]
       },
-      "runtime_requests": []
+      "runtime_requests": [],
+      "request_id": "matrix-60",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "craft.data_exchange.excel.parse",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": {
+            "headers": [
+              "Name",
+              "Value"
+            ],
+            "rows": [
+              [
+                "Fixture",
+                "1"
+              ]
+            ],
+            "warnings": []
+          }
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-60",
+          "trace_id": "matrix-60"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.craft.craft_backend.capabilities.desktop_exchange",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "craft.data_exchange.excel.export",
@@ -1182,10 +1488,10 @@
       },
       "provider_data": {
         "artifact_ref": {
-          "artifact_id": "artifact_08ca4ebb48c857fcb1b2559b5b7a3436",
+          "artifact_id": "artifact_3337e66e90dd5cc7ae254640770e1dd8",
           "media_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          "sha256": "63afaccae350d3811658e4da907b7f60fc819fba2d4d96de372449d1d2865976",
-          "byte_size": 5036,
+          "sha256": "e5c16c78e2845c404bc9f12347af425bad5ac06e76042868948c26c3a4b0b7be",
+          "byte_size": 5035,
           "version": 1
         },
         "name": "fixture.xlsx"
@@ -1335,7 +1641,62 @@
           "name"
         ]
       },
-      "runtime_requests": []
+      "runtime_requests": [],
+      "request_id": "matrix-61",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "craft.data_exchange.excel.export",
+        "major_version": 1,
+        "data": {
+          "artifact_ref": {
+            "artifact_id": "artifact_3337e66e90dd5cc7ae254640770e1dd8",
+            "media_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "sha256": "e5c16c78e2845c404bc9f12347af425bad5ac06e76042868948c26c3a4b0b7be",
+            "byte_size": 5035,
+            "version": 1
+          },
+          "name": "fixture.xlsx"
+        },
+        "operation_ref": {
+          "operation_id": "op_b0af9bb2fd9c489d825ac640ee9ed3ff",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-61",
+          "trace_id": "matrix-61"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "craft.data_exchange.excel.export",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-61",
+          "trace_id": "matrix-61"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.craft.craft_backend.capabilities.desktop_exchange",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "craft.data_exchange.diff_report.export",
@@ -1366,10 +1727,10 @@
       },
       "provider_data": {
         "artifact_ref": {
-          "artifact_id": "artifact_9bbc7787fcc25a3b8b7901e442206d7b",
+          "artifact_id": "artifact_e449c526376b56d9b5f836d7ad2d09da",
           "media_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          "sha256": "4e009560994c4e696b0fe823abfd9a1f3b61169a45b0f4b7725ea357db43f8f7",
-          "byte_size": 5308,
+          "sha256": "2427b98d34ccb5154bb6cef00c403ab1c948314e7a36dcab3553d826582b7fa2",
+          "byte_size": 5307,
           "version": 1
         },
         "name": "diff.xlsx"
@@ -1543,7 +1904,62 @@
           "name"
         ]
       },
-      "runtime_requests": []
+      "runtime_requests": [],
+      "request_id": "matrix-62",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "craft.data_exchange.diff_report.export",
+        "major_version": 1,
+        "data": {
+          "artifact_ref": {
+            "artifact_id": "artifact_e449c526376b56d9b5f836d7ad2d09da",
+            "media_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "sha256": "2427b98d34ccb5154bb6cef00c403ab1c948314e7a36dcab3553d826582b7fa2",
+            "byte_size": 5307,
+            "version": 1
+          },
+          "name": "diff.xlsx"
+        },
+        "operation_ref": {
+          "operation_id": "op_ff6011b1776547b4997df2500ff17fc7",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-62",
+          "trace_id": "matrix-62"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "craft.data_exchange.diff_report.export",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-62",
+          "trace_id": "matrix-62"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.craft.craft_backend.capabilities.desktop_exchange",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "craft.data_exchange.feishu_diff.write",
@@ -1735,7 +2151,57 @@
           "PUT",
           "/open-apis/sheets/v2/spreadsheets/sheet-one/values"
         ]
-      ]
+      ],
+      "request_id": "matrix-63",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "craft.data_exchange.feishu_diff.write",
+        "major_version": 1,
+        "data": {
+          "written_rows": 1,
+          "spreadsheet_token": "sheet-one",
+          "sheet_id": "Sheet1"
+        },
+        "operation_ref": {
+          "operation_id": "op_8b45fda19aeb4d0592c9862a86c53dcd",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-63",
+          "trace_id": "matrix-63"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "craft.data_exchange.feishu_diff.write",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-63",
+          "trace_id": "matrix-63"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.craft.craft_backend.capabilities.desktop_exchange",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "craft.data_exchange.feishu_sheet.write",
@@ -1835,7 +2301,56 @@
           "PUT",
           "/open-apis/sheets/v2/spreadsheets/sheet-one/values"
         ]
-      ]
+      ],
+      "request_id": "matrix-64",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "craft.data_exchange.feishu_sheet.write",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "written_rows": 1
+        },
+        "operation_ref": {
+          "operation_id": "op_b5235f84a5b84f48ae903fdd5e06e8f9",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-64",
+          "trace_id": "matrix-64"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "craft.data_exchange.feishu_sheet.write",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-64",
+          "trace_id": "matrix-64"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.craft.craft_backend.capabilities.desktop_exchange",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "craft.data_exchange.feishu_sheet.read",
@@ -1956,7 +2471,364 @@
           "GET",
           "/open-apis/sheets/v2/spreadsheets/sheet-one/values/Sheet1!A1:Z1000"
         ]
-      ]
+      ],
+      "request_id": "matrix-65",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "craft.data_exchange.feishu_sheet.read",
+        "major_version": 1,
+        "data": {
+          "headers": [
+            "Name"
+          ],
+          "rows": [
+            [
+              "Fixture"
+            ]
+          ],
+          "warnings": []
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-65",
+          "trace_id": "matrix-65"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.craft.craft_backend.capabilities.desktop_exchange",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "craft.data_exchange.feishu_bitable.read",
+      "version": 1,
+      "payload": {
+        "app_token": "app-one",
+        "table_id": "table-one",
+        "page_size": 500
+      },
+      "provider_data": {
+        "headers": [
+          "Name"
+        ],
+        "rows": [
+          [
+            "Fixture"
+          ]
+        ],
+        "warnings": []
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "app_token": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "table_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "page_size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "app_token",
+          "table_id"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "headers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "maxItems": 200,
+            "minItems": 0
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "maxItems": 200,
+              "minItems": 0
+            },
+            "maxItems": 5000,
+            "minItems": 0
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "maxItems": 20,
+            "minItems": 0
+          },
+          "import_preview": {
+            "type": "object",
+            "properties": {
+              "import_preview_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9_.-]+$"
+              },
+              "content_hash": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "entry_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "expires_at": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "headers",
+          "rows",
+          "warnings"
+        ]
+      },
+      "runtime_requests": [
+        [
+          "PUT",
+          "/open-apis/sheets/v2/spreadsheets/sheet-one/values"
+        ],
+        [
+          "PUT",
+          "/open-apis/sheets/v2/spreadsheets/sheet-one/values"
+        ],
+        [
+          "GET",
+          "/open-apis/sheets/v2/spreadsheets/sheet-one/values/Sheet1!A1:Z1000"
+        ],
+        [
+          "GET",
+          "/open-apis/bitable/v1/apps/app-one/tables/table-one/records"
+        ]
+      ],
+      "request_id": "matrix-66",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "craft.data_exchange.feishu_bitable.read",
+        "major_version": 1,
+        "data": {
+          "headers": [
+            "Name"
+          ],
+          "rows": [
+            [
+              "Fixture"
+            ]
+          ],
+          "warnings": []
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-66",
+          "trace_id": "matrix-66"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.craft.craft_backend.capabilities.desktop_exchange",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "craft.data_exchange.feishu_bitable.write",
+      "version": 1,
+      "payload": {
+        "app_token": "app-one",
+        "table_id": "table-one",
+        "headers": [
+          "Name"
+        ],
+        "rows": [
+          [
+            "Fixture"
+          ]
+        ]
+      },
+      "provider_data": {
+        "success": true,
+        "written_rows": 1
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "app_token": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "table_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "headers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "maxItems": 200,
+            "minItems": 1
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "maxItems": 200,
+              "minItems": 0
+            },
+            "maxItems": 5000,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "app_token",
+          "table_id",
+          "headers",
+          "rows"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "written_rows": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5000
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "written_rows"
+        ]
+      },
+      "runtime_requests": [
+        [
+          "PUT",
+          "/open-apis/sheets/v2/spreadsheets/sheet-one/values"
+        ],
+        [
+          "PUT",
+          "/open-apis/sheets/v2/spreadsheets/sheet-one/values"
+        ],
+        [
+          "GET",
+          "/open-apis/sheets/v2/spreadsheets/sheet-one/values/Sheet1!A1:Z1000"
+        ],
+        [
+          "GET",
+          "/open-apis/bitable/v1/apps/app-one/tables/table-one/records"
+        ],
+        [
+          "POST",
+          "/open-apis/bitable/v1/apps/app-one/tables/table-one/records/batch_create"
+        ]
+      ],
+      "request_id": "matrix-67",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "craft.data_exchange.feishu_bitable.write",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "written_rows": 1
+        },
+        "operation_ref": {
+          "operation_id": "op_c1cc77e33b0b4e1485bf5e765152f16e",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-67",
+          "trace_id": "matrix-67"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "craft.data_exchange.feishu_bitable.write",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-67",
+          "trace_id": "matrix-67"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.craft.craft_backend.capabilities.desktop_exchange",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     }
   ]
 }

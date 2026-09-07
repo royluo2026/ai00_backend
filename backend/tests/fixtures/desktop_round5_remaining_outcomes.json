@@ -1,0 +1,1287 @@
+{
+  "fixture_kind": "Real registered owner handler + Gateway + LegacyServerGatewayPolicy + actual approval/schema/reliability; deterministic identity and SQL/external I/O ports",
+  "rows": [
+    {
+      "id": "base.export_template.list",
+      "version": 1,
+      "payload": {
+        "module": "craft"
+      },
+      "provider_data": {
+        "items": [
+          {
+            "gid": "template-one",
+            "name": "Fixture",
+            "module": "craft",
+            "owner_gid": "fixture-user",
+            "is_shared": false,
+            "config": {
+              "columns": [
+                {
+                  "key": "name",
+                  "label": "Name"
+                }
+              ],
+              "styles": {
+                "fontSize": 12
+              }
+            },
+            "created_at": "",
+            "updated_at": ""
+          }
+        ],
+        "total": 1,
+        "module": "craft"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "module": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "module": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "owner_gid": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "created_at": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "updated_at": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "is_shared": {
+                  "type": "boolean"
+                },
+                "config": {
+                  "type": "object",
+                  "properties": {
+                    "columns": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string",
+                            "maxLength": 4096
+                          },
+                          "label": {
+                            "type": "string",
+                            "maxLength": 4096
+                          },
+                          "width": {
+                            "type": "number",
+                            "minimum": 1,
+                            "maximum": 1000
+                          },
+                          "include": {
+                            "type": "boolean"
+                          }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                          "key"
+                        ]
+                      },
+                      "maxItems": 200
+                    },
+                    "styles": {
+                      "type": "object",
+                      "properties": {
+                        "headerBg": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "headerFg": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "altRowBg": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "borderStyle": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "fontSize": {
+                          "type": "integer",
+                          "minimum": 6,
+                          "maximum": 48
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "name",
+                "module",
+                "owner_gid",
+                "created_at",
+                "updated_at",
+                "is_shared",
+                "config"
+              ]
+            },
+            "maxItems": 500
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 500
+          },
+          "module": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total",
+          "module"
+        ]
+      },
+      "request_id": "matrix-68",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.export_template.list",
+        "major_version": 1,
+        "data": {
+          "items": [
+            {
+              "gid": "template-one",
+              "name": "Fixture",
+              "module": "craft",
+              "owner_gid": "fixture-user",
+              "is_shared": false,
+              "config": {
+                "columns": [
+                  {
+                    "key": "name",
+                    "label": "Name"
+                  }
+                ],
+                "styles": {
+                  "fontSize": 12
+                }
+              },
+              "created_at": "",
+              "updated_at": ""
+            }
+          ],
+          "total": 1,
+          "module": "craft"
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-68",
+          "trace_id": "matrix-68"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_templates",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "base.export_template.create",
+      "version": 1,
+      "payload": {
+        "name": "New template",
+        "module": "craft",
+        "config": {
+          "columns": [
+            {
+              "key": "name"
+            }
+          ]
+        }
+      },
+      "provider_data": {
+        "gid": "template-created"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          },
+          "module": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          },
+          "config": {
+            "type": "object",
+            "properties": {
+              "columns": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "label": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "width": {
+                      "type": "number",
+                      "minimum": 1,
+                      "maximum": 1000
+                    },
+                    "include": {
+                      "type": "boolean"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "key"
+                  ]
+                },
+                "maxItems": 200
+              },
+              "styles": {
+                "type": "object",
+                "properties": {
+                  "headerBg": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "headerFg": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "altRowBg": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "borderStyle": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "fontSize": {
+                    "type": "integer",
+                    "minimum": 6,
+                    "maximum": 48
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "is_shared": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "module",
+          "config"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid"
+        ]
+      },
+      "request_id": "matrix-69",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.export_template.create",
+        "major_version": 1,
+        "data": {
+          "gid": "template-created"
+        },
+        "operation_ref": {
+          "operation_id": "op_8f4650055aef43f5a2e3d7690d202417",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-69",
+          "trace_id": "matrix-69"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.export_template.create",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-69",
+          "trace_id": "matrix-69"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_templates",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "base.export_template.update",
+      "version": 1,
+      "payload": {
+        "gid": "template-created",
+        "changes": {
+          "name": "Renamed"
+        }
+      },
+      "provider_data": {
+        "gid": "template-created"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          },
+          "changes": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "maxLength": 128,
+                "minLength": 1
+              },
+              "module": {
+                "type": "string",
+                "maxLength": 128,
+                "minLength": 1
+              },
+              "config": {
+                "type": "object",
+                "properties": {
+                  "columns": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "label": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "width": {
+                          "type": "number",
+                          "minimum": 1,
+                          "maximum": 1000
+                        },
+                        "include": {
+                          "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "key"
+                      ]
+                    },
+                    "maxItems": 200
+                  },
+                  "styles": {
+                    "type": "object",
+                    "properties": {
+                      "headerBg": {
+                        "type": "string",
+                        "maxLength": 4096
+                      },
+                      "headerFg": {
+                        "type": "string",
+                        "maxLength": 4096
+                      },
+                      "altRowBg": {
+                        "type": "string",
+                        "maxLength": 4096
+                      },
+                      "borderStyle": {
+                        "type": "string",
+                        "maxLength": 4096
+                      },
+                      "fontSize": {
+                        "type": "integer",
+                        "minimum": 6,
+                        "maximum": 48
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              },
+              "is_shared": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false,
+            "minProperties": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "changes"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid"
+        ]
+      },
+      "request_id": "matrix-70",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.export_template.update",
+        "major_version": 1,
+        "data": {
+          "gid": "template-created"
+        },
+        "operation_ref": {
+          "operation_id": "op_d241cafee55c4a438d1fb85be972fa01",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-70",
+          "trace_id": "matrix-70"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.export_template.update",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-70",
+          "trace_id": "matrix-70"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_templates",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "craft.pbom.vpps_validation.get",
+      "version": 1,
+      "payload": {
+        "snapshot_gid": "version-one"
+      },
+      "provider_data": {
+        "snapshot": {
+          "gid": "version-one",
+          "version_tag": "v1",
+          "name": "Fixture"
+        },
+        "summary": {
+          "total_parts": 1,
+          "parts_with_vpps": 1,
+          "rule1_errors": 1,
+          "rule2_errors": 0,
+          "rule3_errors": 0,
+          "rule4_errors": 0,
+          "rule4_ignored": 0,
+          "alias_matches": 0,
+          "ok": false
+        },
+        "errors": {
+          "rule1": [
+            {
+              "rule": 1,
+              "vpps": "missing",
+              "row": 1,
+              "msg": "VPPS \"missing\" 在主数据中不存在"
+            }
+          ],
+          "rule2": [],
+          "rule3": [],
+          "rule4": []
+        },
+        "alias_matches": [],
+        "rule4_ignored": []
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "snapshot_gid": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "snapshot_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "snapshot": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "version_tag": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "name": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "version_tag",
+              "name"
+            ]
+          },
+          "summary": {
+            "type": "object",
+            "properties": {
+              "total_parts": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "parts_with_vpps": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "rule1_errors": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "rule2_errors": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "rule3_errors": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "rule4_errors": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "rule4_ignored": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "alias_matches": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500
+              },
+              "ok": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          },
+          "errors": {
+            "type": "object",
+            "properties": {
+              "rule1": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "rule": {
+                      "enum": [
+                        1,
+                        2,
+                        3,
+                        4
+                      ]
+                    },
+                    "row": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 500
+                    },
+                    "vpps": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "msg": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "gid": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "vpps_desc": {
+                      "type": "string",
+                      "maxLength": 4096
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "rule",
+                    "row",
+                    "vpps",
+                    "msg"
+                  ]
+                },
+                "maxItems": 500
+              },
+              "rule2": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "rule": {
+                      "enum": [
+                        1,
+                        2,
+                        3,
+                        4
+                      ]
+                    },
+                    "row": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 500
+                    },
+                    "vpps": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "msg": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "gid": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "vpps_desc": {
+                      "type": "string",
+                      "maxLength": 4096
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "rule",
+                    "row",
+                    "vpps",
+                    "msg"
+                  ]
+                },
+                "maxItems": 500
+              },
+              "rule3": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "rule": {
+                      "enum": [
+                        1,
+                        2,
+                        3,
+                        4
+                      ]
+                    },
+                    "row": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 500
+                    },
+                    "vpps": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "msg": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "gid": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "vpps_desc": {
+                      "type": "string",
+                      "maxLength": 4096
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "rule",
+                    "row",
+                    "vpps",
+                    "msg"
+                  ]
+                },
+                "maxItems": 500
+              },
+              "rule4": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "rule": {
+                      "enum": [
+                        1,
+                        2,
+                        3,
+                        4
+                      ]
+                    },
+                    "row": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 500
+                    },
+                    "vpps": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "msg": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "gid": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "vpps_desc": {
+                      "type": "string",
+                      "maxLength": 4096
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "rule",
+                    "row",
+                    "vpps",
+                    "msg"
+                  ]
+                },
+                "maxItems": 500
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "rule1",
+              "rule2",
+              "rule3",
+              "rule4"
+            ]
+          },
+          "alias_matches": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "vpps": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "row": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 500
+                },
+                "desc": {
+                  "type": "string",
+                  "maxLength": 4096
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "vpps",
+                "row",
+                "desc"
+              ]
+            },
+            "maxItems": 500
+          },
+          "rule4_ignored": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "vpps": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "row": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 500
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "vpps",
+                "row"
+              ]
+            },
+            "maxItems": 500
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "snapshot",
+          "summary",
+          "errors",
+          "alias_matches",
+          "rule4_ignored"
+        ]
+      },
+      "request_id": "matrix-71",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "craft.pbom.vpps_validation.get",
+        "major_version": 1,
+        "data": {
+          "snapshot": {
+            "gid": "version-one",
+            "version_tag": "v1",
+            "name": "Fixture"
+          },
+          "summary": {
+            "total_parts": 1,
+            "parts_with_vpps": 1,
+            "rule1_errors": 1,
+            "rule2_errors": 0,
+            "rule3_errors": 0,
+            "rule4_errors": 0,
+            "rule4_ignored": 0,
+            "alias_matches": 0,
+            "ok": false
+          },
+          "errors": {
+            "rule1": [
+              {
+                "rule": 1,
+                "vpps": "missing",
+                "row": 1,
+                "msg": "VPPS \"missing\" 在主数据中不存在"
+              }
+            ],
+            "rule2": [],
+            "rule3": [],
+            "rule4": []
+          },
+          "alias_matches": [],
+          "rule4_ignored": []
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-71",
+          "trace_id": "matrix-71"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.craft.craft_backend.capabilities.desktop_vpps",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "project.knowledge_comment.list",
+      "version": 1,
+      "payload": {
+        "item_gid": "knowledge-one"
+      },
+      "provider_data": {
+        "entries": [
+          {
+            "id": 1,
+            "gid": "comment-one",
+            "parent_id": null,
+            "section": "detail",
+            "author": "human",
+            "author_name": "",
+            "author_gid": "",
+            "content": "Fixture comment",
+            "resolved": false,
+            "sort_order": 0.0,
+            "read_by_human": true,
+            "ai_status": "unread",
+            "created_at": 0
+          }
+        ]
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "item_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "item_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "section": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "author": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "author_name": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "author_gid": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "ai_status": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "id": {
+                  "type": [
+                    "integer",
+                    "string"
+                  ]
+                },
+                "parent_id": {
+                  "type": [
+                    "integer",
+                    "string",
+                    "null"
+                  ]
+                },
+                "content": {
+                  "type": "string",
+                  "maxLength": 65536
+                },
+                "resolved": {
+                  "type": "boolean"
+                },
+                "read_by_human": {
+                  "type": "boolean"
+                },
+                "sort_order": {
+                  "type": "number"
+                },
+                "created_at": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "gid",
+                "content"
+              ]
+            },
+            "maxItems": 500
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "entries"
+        ]
+      },
+      "request_id": "matrix-72",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.knowledge_comment.list",
+        "major_version": 1,
+        "data": {
+          "entries": [
+            {
+              "id": 1,
+              "gid": "comment-one",
+              "parent_id": null,
+              "section": "detail",
+              "author": "human",
+              "author_name": "",
+              "author_gid": "",
+              "content": "Fixture comment",
+              "resolved": false,
+              "sort_order": 0.0,
+              "read_by_human": true,
+              "ai_status": "unread",
+              "created_at": 0
+            }
+          ]
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-72",
+          "trace_id": "matrix-72"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "craft.bop.picture.resolve",
+      "version": 1,
+      "payload": {
+        "version_gid": "version-one",
+        "reference_hash": "5ebf36eae15175246e64eab7d170162074b81e85a844cc6772f89c9f3f08699f"
+      },
+      "provider_data": {
+        "artifact_ref": {
+          "artifact_id": "artifact_a844c3a8e2475cfc99098a8dd9a7702b",
+          "media_type": "image/png",
+          "sha256": "bd54b02fae14b6b9ed73887ded339b8ef846fbcba0d4e5f9d95470ac23ade242",
+          "byte_size": 15,
+          "version": 1
+        },
+        "name": "bop-picture.png"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "version_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "reference_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "version_gid",
+          "reference_hash"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "request_id": "matrix-73",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "craft.bop.picture.resolve",
+        "major_version": 1,
+        "data": {
+          "artifact_ref": {
+            "artifact_id": "artifact_a844c3a8e2475cfc99098a8dd9a7702b",
+            "media_type": "image/png",
+            "sha256": "bd54b02fae14b6b9ed73887ded339b8ef846fbcba0d4e5f9d95470ac23ade242",
+            "byte_size": 15,
+            "version": 1
+          },
+          "name": "bop-picture.png"
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-73",
+          "trace_id": "matrix-73"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.craft.craft_backend.capabilities.desktop_exchange",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    }
+  ]
+}

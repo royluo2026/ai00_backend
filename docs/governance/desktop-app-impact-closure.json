@@ -4,10 +4,10 @@
   "consumer_type": "web",
   "transport_classification": "authenticated interactive Gateway; single Windows x64 App product",
   "source_basis": "immutable Git commit tree; not a promoted release candidate",
-  "source_commit": "378a58c4f315797fb7d61fcca69c762a2a5279c7",
-  "source_tree": "57bbec026af398f75a40b0cae0ba2b8a0d8eea2a",
+  "source_commit": "37bd5fbea1e13aab2529472a999a9bd804a88daf",
+  "source_tree": "2e309d69ce27a81e1cac987d65acca9af13291e3",
   "source_hash_format": "exact Git blob bytes (no working directory normalization)",
-  "source_set_hash": "sha256:518ee2467d500f3203fa92d26883098210cc93e9fd54bb5eccebcd11f30cd88e",
+  "source_set_hash": "sha256:e6ffa9fd27a08133f3da5e27757b52c38c1f550660cfc906a53c66523c19c2f4",
   "published_catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
   "published_catalog_hash": "sha256:09e54550fcbaaab2df24bfa28d2c2478d9d47f455a27563405bce365efb2e2fd",
   "published_catalog_current": false,
@@ -92,6 +92,29 @@
       "execution_mode": "cloud_sync",
       "lifecycle_status": "stable",
       "descriptor_hash": "sha256:06671ae0dc8b7d1d16b2360d545b92b47bb0e2967af0734f5e70358cf57a896c"
+    },
+    {
+      "id": "agent.audit.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_b5d7b940a95882729167465f",
+      "business_definition_hash": "sha256:cc02a682f8e3851b48aa7b15d0a688cb42df778b58284799c5b59cf892177bed",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "agent.v2:agent.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:50e9cdbabf041311881ae23534b0d445ec3c6611413b0cafb2e46d7bee585add"
     },
     {
       "id": "agent.canvas.execution.resume",
@@ -197,6 +220,29 @@
       "descriptor_hash": "sha256:c7768238646a80f177f4d6f522156cbcacd264109b904fd2a887e498404aa03a"
     },
     {
+      "id": "agent.flow.capability_manifest.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_64cf0af197eb8bef6a5b7d1a",
+      "business_definition_hash": "sha256:d8ecbe14f3b316d4486869dd043341d772ae9389495cf8b80a6ea771f35636ad",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "agent.v2:agent.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:1bd910dc2379748e3e161b4c9ea733c3251f8ddfd88bd08d14f32b5afa999f7e"
+    },
+    {
       "id": "agent.flow.change.apply",
       "major_version": 1,
       "capability_version_gid": "cv2_f1f27112e425df9fb6eb77c6",
@@ -288,6 +334,29 @@
       "descriptor_hash": "sha256:fb40a913a91388068b0a008328bc5dd8bab50cdd9e5480cfb430a6e6d1f42865"
     },
     {
+      "id": "agent.interaction.cancel",
+      "major_version": 2,
+      "capability_version_gid": "cv2_7db39e7aa16c24f319b290ff",
+      "business_definition_hash": "sha256:c34d35c2adb461100af35be1a9e3f25d60c97a1b0a540b64ee3ac371c32cdee3",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "agent.v2:agent.interact",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:85d660d73de42632ae2c4a2a6a358da87c072a3bdbbaa3d851b1a2d6256a2ad3"
+    },
+    {
       "id": "agent.interaction.chat.change.apply",
       "major_version": 1,
       "capability_version_gid": "cv2_8335e9c791643fbf4536a58e",
@@ -348,6 +417,29 @@
       "execution_mode": "cloud_sync",
       "lifecycle_status": "stable",
       "descriptor_hash": "sha256:aaaa86150afe7d191bd798feacd752e6fdd9f6e53b1bad868aea69b2a1b91618"
+    },
+    {
+      "id": "agent.interaction.chat.change.apply",
+      "major_version": 3,
+      "capability_version_gid": "cv2_757aac6d56d39a886cbdf233",
+      "business_definition_hash": "sha256:9901c7012e28bfab5cd5da95d339f5dcc77570e51fdacbea09e7c4ce9774dc68",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "agent.v2:agent.interact",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:b585c920a584be3f06a51286678e0a1ed6624d328a5ef834960e7bfd1fdb0103"
     },
     {
       "id": "agent.interaction.request",
@@ -701,6 +793,52 @@
       "descriptor_hash": "sha256:716278f61f3400870b58f06fa642fc39f355c01b304e1e3c40ba8407c3c1e3c1"
     },
     {
+      "id": "agent.runtime.config.set",
+      "major_version": 1,
+      "capability_version_gid": "cv2_393b9dd467cef518394aecbb",
+      "business_definition_hash": "sha256:61773e36a085e6a4cad93acf488f1ad6edef17b05dc346115367bd6c03b72dfc",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "agent.v2:system.tech_config",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:af3f820b24ce156254c980912cbaf5eadb093c75483447748efe5dfefc132e5d"
+    },
+    {
+      "id": "agent.runtime.connection.test",
+      "major_version": 1,
+      "capability_version_gid": "cv2_92baaba1dfa8c037aaf3d3e0",
+      "business_definition_hash": "sha256:e4a532d7364ee1da7cacc62421058d60ff1f2825d778945b983d42f50c743f8f",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "agent.v2:agent.interact",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:729822c7654c7ca1e8932e0ac6f449fb96e77ae8d7838c2f5324432138912eec"
+    },
+    {
       "id": "agent.script.generate",
       "major_version": 1,
       "capability_version_gid": "cv2_fd5e8cb29dcb98c0d8ddd6cd",
@@ -745,6 +883,29 @@
       "execution_mode": "cloud_sync",
       "lifecycle_status": "stable",
       "descriptor_hash": "sha256:6bfba3b08c7480801e24a3e68a1bc66603ee1a1c6074bee02e0fe31ac9ff0da6"
+    },
+    {
+      "id": "agent.session.list",
+      "major_version": 1,
+      "capability_version_gid": "cv2_254f3c0e552d77def89a5a87",
+      "business_definition_hash": "sha256:3e161b24f0ac8199f34e3c2f2bdcb72fb1251abdfa33af7c9f232ae17ee7d61a",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "agent.v2:agent.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:fc88d947e73ca00747d57e7ed3a98b75cb165e17c0b396cfbeaaadaeae0aa108"
     },
     {
       "id": "agent.session.read",
@@ -793,6 +954,29 @@
       "descriptor_hash": "sha256:779836f287be3f5f858544c537a44c82bb54d6878de81781380e1c10caa0f38f"
     },
     {
+      "id": "agent.skill.create",
+      "major_version": 1,
+      "capability_version_gid": "cv2_ccca003846ca2c5e2f2d32ee",
+      "business_definition_hash": "sha256:342017a93861e3b91321cc58036cf1db45caba51bae8209781313c36abcb0eb5",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "agent.v2:agent.interact",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:19ceb696ea6a02b5080e742939c6c964cab00e79e126346bf367e763759e307d"
+    },
+    {
       "id": "agent.skill.read",
       "major_version": 1,
       "capability_version_gid": "cv2_13cf8aca2423ee09c0998c50",
@@ -814,6 +998,52 @@
       "execution_mode": "cloud_sync",
       "lifecycle_status": "stable",
       "descriptor_hash": "sha256:4fc09a41848f501be872d6b6f8e8cb13cc6af0c9bf1f0ac12d96323064a6ef08"
+    },
+    {
+      "id": "agent.skill.update",
+      "major_version": 1,
+      "capability_version_gid": "cv2_1d53992d1c232f59872a57bc",
+      "business_definition_hash": "sha256:1d8951ffd3d7cac033d4c7df90eeb093c7fca38875a00ec6c5dfab4d9c9061ef",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "agent.v2:agent.interact",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:fcdb9e4c2cf49fb544e33718b3f9217602ede157240e5bfe5bc5054b88892c54"
+    },
+    {
+      "id": "agent.tool_catalog.list",
+      "major_version": 1,
+      "capability_version_gid": "cv2_a982f714951fb0dfe323dbb8",
+      "business_definition_hash": "sha256:161b33d5dc68db2fb296e77ae0f1afc3c1f7d44a41d8111886228d650f705333",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "agent.v2:agent.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:cc615834ee1fa03b7e849f86ba77283eb77a82a194f0baf6cb22e9bd35902f3e"
     },
     {
       "id": "agent.tool_catalog.read",
@@ -2909,6 +3139,29 @@
       "descriptor_hash": "sha256:4ba4e48a6672436308fa541cc0c65d77478d26aa3ee02a32508b0ac82cf7d175"
     },
     {
+      "id": "craft.bop.picture.resolve",
+      "major_version": 1,
+      "capability_version_gid": "cv2_fb07c5c3cb92926a4b9a60a2",
+      "business_definition_hash": "sha256:97920bb765f7a5d4c1e50630a7096690e24a23378a2b597e059f99589bf6c5d5",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "legacy:craft.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:343a6fe281114cc3bddbd7b5fca2941b09bf7701e806c7e4d4feb6dc60cf5a14"
+    },
+    {
       "id": "craft.bop.picture.upload",
       "major_version": 1,
       "capability_version_gid": "cv2_f19574a3b11fe786f2c961d1",
@@ -3421,6 +3674,75 @@
       "descriptor_hash": "sha256:1465d647017d2ecd9fedcf00bbb0a4c03c5d08e382784a8c5ceda3372e41d510"
     },
     {
+      "id": "craft.data_exchange.diff_report.export",
+      "major_version": 1,
+      "capability_version_gid": "cv2_cbac736546df26562b001532",
+      "business_definition_hash": "sha256:4c2ed9c2ea0b94bea84369dc88c90ae3873d3066b2bb8c6fd3aa243eefd47c66",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "legacy:craft.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:b2282d0b1c3726e5c34700c3150381c42cf789bc30f15e9fdc71fccbb9c32edc"
+    },
+    {
+      "id": "craft.data_exchange.excel.export",
+      "major_version": 1,
+      "capability_version_gid": "cv2_c2a73b481910bb589f882dd5",
+      "business_definition_hash": "sha256:437f71a63d4ad1928397ade82e0050e8dbee88a547ad80880092642a155879a6",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "legacy:craft.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:471f1ae36c2c02d0d0ba071a5b0d33bafa1b6fcbbdf7257c0a3358e92ee1239e"
+    },
+    {
+      "id": "craft.data_exchange.excel.parse",
+      "major_version": 1,
+      "capability_version_gid": "cv2_35e22e3e732a3958957bf7da",
+      "business_definition_hash": "sha256:a205d1f0167cf2cd97740c8be21c53d9415ff6ac093242f2ce27bfc13188eb91",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "legacy:craft.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:ba96d327cda68ab2bbdb5612d631612a2006c2ad5bbff1ebef8722db171ec97c"
+    },
+    {
       "id": "craft.data_exchange.export",
       "major_version": 1,
       "capability_version_gid": "cv2_9848f75421207d7d0ebeeb1d",
@@ -3442,6 +3764,121 @@
       "execution_mode": "cloud_sync",
       "lifecycle_status": "stable",
       "descriptor_hash": "sha256:7afdfeb7d152f1a61a5fd54d2c64a61f80af75080cc8cdfd6758b3c30b07862a"
+    },
+    {
+      "id": "craft.data_exchange.feishu_bitable.read",
+      "major_version": 1,
+      "capability_version_gid": "cv2_9bf147350419e1a0360ef494",
+      "business_definition_hash": "sha256:4e4ef13f6e62f5d7ee7daf2e17ebad77e8339e3fbe2ffc8f99eafca3d58d4657",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "legacy:craft.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:1ff63342febd62de08ae0a6b8a478688bea26efe0af5c6312870e44d4055eb2a"
+    },
+    {
+      "id": "craft.data_exchange.feishu_bitable.write",
+      "major_version": 1,
+      "capability_version_gid": "cv2_4a4d78748dfdb8610b3a4a7f",
+      "business_definition_hash": "sha256:d92545f9c8e09101ff74e95f37d8802ab111905b5add7239c5a6e6a5802203d4",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "legacy:craft.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:46061597eafeb225d3d1af2427763a6c432251fbff2c30c45c81109b2af7b394"
+    },
+    {
+      "id": "craft.data_exchange.feishu_diff.write",
+      "major_version": 1,
+      "capability_version_gid": "cv2_c333f1f28172d40cc7da0e26",
+      "business_definition_hash": "sha256:159ff7395975ebaa1efe3d33896ed8f99aadb909516a0755d0e7e4b477553d53",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "legacy:craft.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:d8c49fd6c4d9b53926bc2fe99293d686b2ae8a598539350dc8dd0c3957b839fd"
+    },
+    {
+      "id": "craft.data_exchange.feishu_sheet.read",
+      "major_version": 1,
+      "capability_version_gid": "cv2_ee8c4897346bb3eae3464514",
+      "business_definition_hash": "sha256:911c65f76792f69bfcaf7c89d87a4cd8210fdb8dd0d47243e926b1504698f2b2",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "legacy:craft.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:2dc9340580c9843d296a922d8cda19ef46f898bec2c2ac198602cb618ec35c3e"
+    },
+    {
+      "id": "craft.data_exchange.feishu_sheet.write",
+      "major_version": 1,
+      "capability_version_gid": "cv2_96ad9628101dd9d8f37080b3",
+      "business_definition_hash": "sha256:482e04f4d5ea86a305367f2b2c16b0f73c7972cfa2e3e7ed1eb407be1b4e556d",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "legacy:craft.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:853b8d0c54755842d132ffffc200e39f0777eadf9abfae7cd3c25ed0fe41bb11"
     },
     {
       "id": "craft.data_exchange.lark.read",
@@ -4891,6 +5328,35 @@
       "execution_mode": "cloud_sync",
       "lifecycle_status": "stable",
       "descriptor_hash": "sha256:24f2d5acb29d45e91c688473bd4b5800e448307d4ac34fc99d79dc70433a137f"
+    },
+    {
+      "id": "craft.pbom.vpps_validation.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_0e6f63f72938b7ef37b116a0",
+      "business_definition_hash": "sha256:1d2cb4b12cbae8df260cc3b4d3797671588e5f39c1e6aa1182c616cfdb87d8ec",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "craft-plugin/ebom.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "legacy:craft.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:261b52af91d1fc91c1e9bc101c87d3cf2a0bc1325d3ef67cf4d5ae2077adc4f1"
     },
     {
       "id": "craft.process_screenshot.attach",
@@ -7929,6 +8395,52 @@
       "descriptor_hash": "sha256:7711400d8bada97194dd58ec5d4b7157492a9a0b3eaebc4b350520b6083c1834"
     },
     {
+      "id": "project.approval.order.create",
+      "major_version": 1,
+      "capability_version_gid": "cv2_65d59e73c43c4cf025b2cfec",
+      "business_definition_hash": "sha256:919828e7c2d3b6daf0f53d4611c4cf885f745f3bba0ed57a511391be43085729",
+      "owner_domain": "project_management",
+      "provider_ref": "project_management.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "project_management.v2:approval.submit",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:60cb23c19a2700fcd79be9badb928958f5baedda345540ecc853fde642f86d0f"
+    },
+    {
+      "id": "project.approval.order.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_e3457d180db0f5883083aeef",
+      "business_definition_hash": "sha256:8be5b5551842e76177106286db890feacb35d0d47c9d55a2eb8889a2361a1821",
+      "owner_domain": "project_management",
+      "provider_ref": "project_management.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "project_management.v2:project.view",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:cdd5d756949837050c47c6030a2ea21c5f34ba38010023f4226e40b51089e241"
+    },
+    {
       "id": "project.approval.order.reject",
       "major_version": 1,
       "capability_version_gid": "cv2_c7630a5e5eeb8b3faa2dbed6",
@@ -7952,6 +8464,29 @@
       "descriptor_hash": "sha256:8894b5ad684078b378f8a077d60bb0b62d208fc1a3aaaa4ebd5fe5d3ae3bcaad"
     },
     {
+      "id": "project.approval.order.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_73e3a839c89b05a68b74b717",
+      "business_definition_hash": "sha256:290fc6a5d00b6b8e313e04d61fc1e88598cd6ecc7fe2a75ad82efe3d46f1883b",
+      "owner_domain": "project_management",
+      "provider_ref": "project_management.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "project_management.v2:project.view",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:0ae406dd018f06b36d6c06a7eaa62a2feccee683569689e1baa1976d13c29752"
+    },
+    {
       "id": "project.approval.read",
       "major_version": 1,
       "capability_version_gid": "cv2_2eff3b72ff374f9ba2a77ef7",
@@ -7973,6 +8508,29 @@
       "execution_mode": "cloud_sync",
       "lifecycle_status": "stable",
       "descriptor_hash": "sha256:8053490c7ff422e64365e4fb8a3384578454de087696b83817f0b94c68b49ac1"
+    },
+    {
+      "id": "project.approval.scope_upgrade.create",
+      "major_version": 1,
+      "capability_version_gid": "cv2_895f6dd5ee0f865f0b8157fb",
+      "business_definition_hash": "sha256:8ec5d334b0930e0af6f3fb94d1d31d8472c1ab6187077a8c39f4fd7a9e0fe18b",
+      "owner_domain": "project_management",
+      "provider_ref": "project_management.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "project_management.v2:approval.submit",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:68919bd8db4fcf5304712ecf1d23b54db44528562030eaa4a1fee949e69a4ec6"
     },
     {
       "id": "project.bitable_binding.change.apply",
@@ -8042,6 +8600,29 @@
       "execution_mode": "cloud_sync",
       "lifecycle_status": "stable",
       "descriptor_hash": "sha256:328dbce37a204a7fed7d878d5f35be496904014527e216037a79e196b46085e4"
+    },
+    {
+      "id": "project.change_log.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_922a7ddcb03f2318f1332fed",
+      "business_definition_hash": "sha256:41017e05cca4576427dfe8219081595d94079eedf3305fc850fda7e4b6d1b1ec",
+      "owner_domain": "project_management",
+      "provider_ref": "project_management.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "project_management.v2:project.view",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:b1aed7cecfa7f6ee225e6287ab3630846e9124433394c0b746d7389f004e3ee6"
     },
     {
       "id": "project.collaboration.change.apply",
@@ -8136,6 +8717,29 @@
       "descriptor_hash": "sha256:e65e9d15609875df18097b42f0924541d763ea549d4c00f8f2bc49970edfc5ae"
     },
     {
+      "id": "project.follow.create",
+      "major_version": 1,
+      "capability_version_gid": "cv2_21f8bfdf75359cc3eb79bea4",
+      "business_definition_hash": "sha256:008cfa46773a454089cacc2a0600d87b6a6e038906930fdfb25a6f708f3e6937",
+      "owner_domain": "project_management",
+      "provider_ref": "project_management.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "project_management.v2:project.view",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:ba340dcb7e29a99a438667c57df5a04815e7056b3c6f028732b49f2b48c6e27f"
+    },
+    {
       "id": "project.follow.read",
       "major_version": 1,
       "capability_version_gid": "cv2_3eb29b90cc31af3e16fa67b3",
@@ -8226,6 +8830,29 @@
       "execution_mode": "cloud_sync",
       "lifecycle_status": "stable",
       "descriptor_hash": "sha256:7f796877eb8ffbe790e4b63bf86303db17a2a53c9e230cd82cbf4221afa24c47"
+    },
+    {
+      "id": "project.knowledge_comment.list",
+      "major_version": 1,
+      "capability_version_gid": "cv2_2d0d43dc9e1d0707ea528daf",
+      "business_definition_hash": "sha256:e53303be092a0f69dc929d7d51dd15173a7822f709ae92c2a6df3a449445a963",
+      "owner_domain": "project_management",
+      "provider_ref": "project_management.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "project_management.v2:project.view",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:142949954d7e2025033a2a09142814091088212d941f18840a4624eabcbee69a"
     },
     {
       "id": "project.list.change.apply",
@@ -8490,6 +9117,29 @@
       "execution_mode": "cloud_sync",
       "lifecycle_status": "stable",
       "descriptor_hash": "sha256:e1b45ea10860bd724c59765e8bfa121bd9991163a5d4160894d4897e38a2ea71"
+    },
+    {
+      "id": "project.share.list",
+      "major_version": 1,
+      "capability_version_gid": "cv2_08118ef49789d197db8d61f6",
+      "business_definition_hash": "sha256:4d6285d62694a5cf3c410c5951e74ad90d2ae5920dea82bd9dc72f3dc9550685",
+      "owner_domain": "project_management",
+      "provider_ref": "project_management.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "project_management.v2:project.view",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:d124443b1d10b89e2e792d7080d984ec9d21993624bd83df5d2f0c5db41fce70"
     },
     {
       "id": "project.sharing.change.apply",
@@ -10951,8 +11601,8 @@
     },
     {
       "path": "backend/capability_v2/artifacts.py",
-      "git_blob_oid": "f8b2b72b8d8b6918067d2be035dcd486cda0de33",
-      "sha256": "sha256:7144f1680b1e9f42fb4cbd630551e39e1ca536100d1b81a776b08391a134e7dc"
+      "git_blob_oid": "5f5b1ff3c045f7d703bc2633e552bdb383415c41",
+      "sha256": "sha256:a87388bc0379aab21009a128606098a92d8dfc80d4e12e96ee0606dd84693786"
     },
     {
       "path": "backend/capability_v2/atomic_web_contracts.py",
@@ -11081,8 +11731,8 @@
     },
     {
       "path": "backend/capability_v2/official_domains.json",
-      "git_blob_oid": "8310ef285ed0f02c2690fb7cc92bed2eaf5cb72e",
-      "sha256": "sha256:957bdd7e02192122a25cd2df4fdb726a5ebc25638c2b54d178c0f82a66ceb63c"
+      "git_blob_oid": "d4a38c5d317782ab3e274c0c75486ba47864b438",
+      "sha256": "sha256:61deb892ccf12ce3b1e2b035c289996fbdd166893560e512b5e968144d63b0ea"
     },
     {
       "path": "backend/capability_v2/operations.py",
@@ -11241,13 +11891,13 @@
     },
     {
       "path": "backend/core/ois_storage.py",
-      "git_blob_oid": "35c207b2932b22c5477e476d0d3d3f42d6c6a159",
-      "sha256": "sha256:13c39d80fc2daf34dbf7322ec333e7356c7e750c6d82687b6f92b1d88107f7c8"
+      "git_blob_oid": "6cacc2a35ba46b9e1c6c75ca78da45dabc986515",
+      "sha256": "sha256:a2d005cfbd33155041d0ad88ed1bda6a16e274113f00f7ba4a7bfe25aeaccbec"
     },
     {
       "path": "backend/core/storage.py",
-      "git_blob_oid": "8537aae42b9888fcdba0d5027992e44342a70807",
-      "sha256": "sha256:601537ac25aba12dfd2b611842c293959bcd267e1e7904c465ba904c9d6e9655"
+      "git_blob_oid": "5af78ee5ff0189fab2bd0eccad156fcc51e68f35",
+      "sha256": "sha256:127442f1c865c8bd991e0065f36d0e5fd3be17dbedcf66730ffc8c1ecccb96cc"
     },
     {
       "path": "backend/db/__init__.py",
@@ -11456,8 +12106,8 @@
     },
     {
       "path": "backend/platform_sdk/artifacts.py",
-      "git_blob_oid": "381657b96f54b6ed73035c4a6fbb20e091a0f071",
-      "sha256": "sha256:85e83563d6ce775fcf09ec3919a467246a969f75e701b47196aba6a86d7c05ff"
+      "git_blob_oid": "5b1cf5cc3da7011735ff2cce494a2b01d1b6b367",
+      "sha256": "sha256:485551b6f7793ff8b420ce0ee8876eea75efe3451f52323d5b62afde1bdb9d12"
     },
     {
       "path": "backend/platform_sdk/auth.py",
@@ -11468,6 +12118,11 @@
       "path": "backend/platform_sdk/blob_storage.py",
       "git_blob_oid": "e8fd243dfe7a19f7840de924793d54a6c017c3f9",
       "sha256": "sha256:da3e2fcb3e1af45543ad3c2700d46fbf0b703d12ded6a40618a9632cd1f43244"
+    },
+    {
+      "path": "backend/platform_sdk/business_images.py",
+      "git_blob_oid": "34ea3c1a3319417e52dea298eae495a67b70f0da",
+      "sha256": "sha256:ac93de9a75382ec50d8ab8d5f04822d2be37f68259adc7832754e6f7c5195863"
     },
     {
       "path": "backend/platform_sdk/capabilities.py",
@@ -11495,6 +12150,11 @@
       "sha256": "sha256:3ba389d134c780abddc35521d261f922dd768339f1b0426f727e3270d291ad6a"
     },
     {
+      "path": "backend/platform_sdk/feishu.py",
+      "git_blob_oid": "827a1b15c87dd829d9c6ed9fdb1b57fc96e0587a",
+      "sha256": "sha256:d99f5b6e0e7674e585179b744b99fc529d8f49bff480ac8c3a881187b11484ad"
+    },
+    {
       "path": "backend/platform_sdk/file_store_config.py",
       "git_blob_oid": "10f50ab4c8b678200e160babe73f57621aeef8b3",
       "sha256": "sha256:31445d5e2cb00b5eb28c890858220d88537617c694b552a442830a32ba0235fe"
@@ -11508,6 +12168,11 @@
       "path": "backend/platform_sdk/ids.py",
       "git_blob_oid": "8bc9868d50e66c2a952b6fe9708da088ad7c2bdc",
       "sha256": "sha256:604ddcadf9326f5b23b8632bb1d596054dfdf1027256694a0f0ad30c249ec9da"
+    },
+    {
+      "path": "backend/platform_sdk/knowledge.py",
+      "git_blob_oid": "cecf783ea821f29af48a1c54d4276c9e323d7fbb",
+      "sha256": "sha256:0ec089946f26fc05aff5f28b46e931a96a696f571d5aaa4ae97bbb407325b910"
     },
     {
       "path": "backend/platform_sdk/notification_preferences.py",
@@ -11538,6 +12203,11 @@
       "path": "backend/platform_sdk/project_management.py",
       "git_blob_oid": "eacb85af4be4877fa4780eba0660291ea40fa3eb",
       "sha256": "sha256:e5d2359553b1cfcf12506705ec74b3b23fb63e3c8cd88a8b08b7b38d67c203d9"
+    },
+    {
+      "path": "backend/platform_sdk/request_credentials.py",
+      "git_blob_oid": "d36a77f0bb9e7cf2bd71c280d1fd66ff6b1edd14",
+      "sha256": "sha256:9049cf9d808ed6cb8d3b589cc35f10cbee073d128cf3624c542ca10e15c4ee82"
     },
     {
       "path": "backend/platform_sdk/rules.py",
@@ -11626,13 +12296,13 @@
     },
     {
       "path": "backend/routers/capabilities.py",
-      "git_blob_oid": "24e65adffa3a50ab40afc043ada1f8b3e5490e40",
-      "sha256": "sha256:4578426f0f5f563baf4c3b95c4a82807cf06c671208d4049abb9959b560e43f6"
+      "git_blob_oid": "bc3b206ed48096003ce20d28e6fc3f4bf2a06e51",
+      "sha256": "sha256:435b3fb0cd796eb30684537fb02d0649e1f7b33c6c90ed443bd464527e61661f"
     },
     {
       "path": "backend/routers/capability_artifacts.py",
-      "git_blob_oid": "d139e42ec98bd05ca380463bc03cc53b9d2a7864",
-      "sha256": "sha256:b2d1e84853d97c144663273d736930dcc84c683222c6144e75a71cf8cd367c0a"
+      "git_blob_oid": "3995a03822df3db708b4fa9e3687654c75a6fc33",
+      "sha256": "sha256:4ab9dc751272e8ac61b764f63897c05556009a8dbb075660d4d749332cd1ce78"
     },
     {
       "path": "backend/routers/capability_operations.py",
@@ -11646,8 +12316,8 @@
     },
     {
       "path": "backend/routers/file_store.py",
-      "git_blob_oid": "8997baf49d86ece18bc70dc2cf1a151512535e41",
-      "sha256": "sha256:84ec58a6810ffec26360e718136256fafebbba78eb3cd1982dd2f0a170022d48"
+      "git_blob_oid": "f48100e96a6f1373650d7be3889cc4b6947db2a9",
+      "sha256": "sha256:d8167c036e7237e721cdd4f386ec33ad21157b57c3b02a920afc42872ddccaee"
     },
     {
       "path": "backend/routers/follows.py",
@@ -11961,8 +12631,8 @@
     },
     {
       "path": "plugins/agent/agent_backend/capabilities/__init__.py",
-      "git_blob_oid": "ce83855cd48bce3c6148bc4fe002256fb3f1a3d9",
-      "sha256": "sha256:67dea4fa65f520f0fcd187b6fdc5685774c9b47ca27dd3c1b78ec9eabecd061e"
+      "git_blob_oid": "8991ddd2df8a28ab2e32825153fe277eb8cfddab",
+      "sha256": "sha256:0e0b2a5b1c96499479aaa06515b12234cd017435124911c616976049bd405408"
     },
     {
       "path": "plugins/agent/agent_backend/capabilities/catalog_tool_confirmation.py",
@@ -11978,6 +12648,11 @@
       "path": "plugins/agent/agent_backend/capabilities/descriptors.py",
       "git_blob_oid": "5795da4f92eab51e982ff53788b0524e03ac2422",
       "sha256": "sha256:17ca29392c46989de387f89ceae0bfd3f1d13cda9c128e9f45a2f272d8c29f99"
+    },
+    {
+      "path": "plugins/agent/agent_backend/capabilities/desktop_actions.py",
+      "git_blob_oid": "6ed681b211bc209380ac6fd2a3168acf9255aa06",
+      "sha256": "sha256:a899568695a2e0d0b1a3635ae5f8a18c5446b73fd1cdf054fcdbbc2f44604868"
     },
     {
       "path": "plugins/agent/agent_backend/capabilities/interaction_chat_change.py",
@@ -12151,8 +12826,8 @@
     },
     {
       "path": "plugins/craft/craft_backend/capabilities/__init__.py",
-      "git_blob_oid": "dd81f638c33e52fe73a0813a3cad0c409d8dc206",
-      "sha256": "sha256:899a694c270c13694245605f43d2747c26c479b958227730ffc05fb321d50120"
+      "git_blob_oid": "ea13b29968d74f99b76a7604b60d585ad3e53514",
+      "sha256": "sha256:ef8f8896cc0bc288aafe5a0645157a11d6920d603124928133fc1ca7701dac61"
     },
     {
       "path": "plugins/craft/craft_backend/capabilities/bop_alt_hierarchy.py",
@@ -12360,9 +13035,24 @@
       "sha256": "sha256:f6baa3e844cab484c472ee14e8bbbaa86baf84547a9cfab1758a49f323f2d2ea"
     },
     {
+      "path": "plugins/craft/craft_backend/capabilities/desktop_exchange.py",
+      "git_blob_oid": "67e6e2d3ee04ec4b683516f5f95b2ac173d1d518",
+      "sha256": "sha256:91bfb5e5e0871c5e636422c7263008c322da66474ab3854ae44b4d54edec76b1"
+    },
+    {
       "path": "plugins/craft/craft_backend/capabilities/desktop_library_v2.py",
       "git_blob_oid": "52b48dc1c6e37fae1d6e5e1c64690dba2ef2d4c0",
       "sha256": "sha256:071a3ba74d802c89e1557006916f0334fcff59d49fc19585d01a8171ac1a97ba"
+    },
+    {
+      "path": "plugins/craft/craft_backend/capabilities/desktop_pictures.py",
+      "git_blob_oid": "31596905fc94f9b0122a06f45efc5138cea45ca3",
+      "sha256": "sha256:ff6c220e8ebb0ddf06198a18fa58dc9c568b1636fdfcac97ea6e779b83867dd3"
+    },
+    {
+      "path": "plugins/craft/craft_backend/capabilities/desktop_vpps.py",
+      "git_blob_oid": "85fc49da56db2f6ffcabcfcf39f4dff43880ba05",
+      "sha256": "sha256:3a1c5b87982f0056ccc69c7e880c4f4b1fa15a1242945cf59e6ea16fe93f2427"
     },
     {
       "path": "plugins/craft/craft_backend/capabilities/ebom_change.py",
@@ -12451,8 +13141,8 @@
     },
     {
       "path": "plugins/craft/craft_backend/capabilities/lark_exchange.py",
-      "git_blob_oid": "60e45726c5ad377721a642f13586895976606e37",
-      "sha256": "sha256:5f35ff227ef0e1b82ee415cb3bf884f6624d1d28aab61ec64391a91a783c5f73"
+      "git_blob_oid": "23863f96d86209b3dc39bbae3ad1b86a221eecce",
+      "sha256": "sha256:24e1ee07dd6edde3b92e77018840e8e158ee595e7ee20f0dcc6b0f231ad1c81c"
     },
     {
       "path": "plugins/craft/craft_backend/capabilities/library_change.py",
@@ -13065,6 +13755,11 @@
       "sha256": "sha256:5cbb43cceb6fdd3923207ea8f8afc22125a2cab66be13949707ce83456b7865a"
     },
     {
+      "path": "plugins/knowledge/knowledge_backend/public.py",
+      "git_blob_oid": "7f5e71dc1eb10760116bd1fa51e483c45accff85",
+      "sha256": "sha256:dcc0c35865787ca9f3fe14989bb9676dca6dd10660de7c13e7a9e2458bb57938"
+    },
+    {
       "path": "plugins/knowledge/knowledge_backend/revision_store.py",
       "git_blob_oid": "94f18b02bc3b53e48a6bb4e0a3619a4735d2371c",
       "sha256": "sha256:8b04e60abcf5e0a0dad3bbb7f13b0fc12467f0819970144f8a14ffb8aa1f1bb2"
@@ -13221,8 +13916,13 @@
     },
     {
       "path": "plugins/project_management/project_management_backend/capabilities/__init__.py",
-      "git_blob_oid": "ee5c7b6b64004073353b8355053d6f183648c557",
-      "sha256": "sha256:a46020e0b5b3252f17584e5a88d62d79b6f42a5d821a1dff64d899fd1fd7e86d"
+      "git_blob_oid": "b7b6075d87ed7300bb2ff47582eb734098408168",
+      "sha256": "sha256:4c9d13c902615005dd10ad8b2136c6efe3d19e50d486d3e0fcf934b4d14dc8e0"
+    },
+    {
+      "path": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py",
+      "git_blob_oid": "c8e10916faacbb102cf6503b3ceee7beac7c56ab",
+      "sha256": "sha256:94c83362385fac869d1c6cfa105531f423334ed915cc91802267bbf030b0a471"
     },
     {
       "path": "plugins/project_management/project_management_backend/capabilities/projects.py",
@@ -13253,6 +13953,11 @@
       "path": "plugins/project_management/project_management_backend/infrastructure/__init__.py",
       "git_blob_oid": "077166aab459982181bd1b0cff72243f278e6838",
       "sha256": "sha256:afd69d09ae9a247141c89a86c5fb8d0b827415fbdc9b3e434e0f39ae5a5d0f59"
+    },
+    {
+      "path": "plugins/project_management/project_management_backend/infrastructure/desktop_repository.py",
+      "git_blob_oid": "26f2b5f3b1571a8c026215c0ec24dbd7b6f7bb75",
+      "sha256": "sha256:00f476a46b3df6f53dd637cc92d876d998603c7425e24661b4f4168f651aa747"
     },
     {
       "path": "plugins/project_management/project_management_backend/infrastructure/repository.py",
@@ -16049,6 +16754,22 @@
       "dependency": "backend/core/storage.py"
     },
     {
+      "source": "backend/platform_sdk/business_images.py",
+      "dependency": "backend/__init__.py"
+    },
+    {
+      "source": "backend/platform_sdk/business_images.py",
+      "dependency": "backend/core/__init__.py"
+    },
+    {
+      "source": "backend/platform_sdk/business_images.py",
+      "dependency": "backend/core/ois_storage.py"
+    },
+    {
+      "source": "backend/platform_sdk/business_images.py",
+      "dependency": "backend/core/storage.py"
+    },
+    {
       "source": "backend/platform_sdk/capabilities.py",
       "dependency": "backend/__init__.py"
     },
@@ -16105,6 +16826,30 @@
       "dependency": "plugins/factory/factory_backend/api/compatibility.py"
     },
     {
+      "source": "backend/platform_sdk/feishu.py",
+      "dependency": "backend/__init__.py"
+    },
+    {
+      "source": "backend/platform_sdk/feishu.py",
+      "dependency": "backend/capability_v2/__init__.py"
+    },
+    {
+      "source": "backend/platform_sdk/feishu.py",
+      "dependency": "backend/capability_v2/provider_contracts.py"
+    },
+    {
+      "source": "backend/platform_sdk/feishu.py",
+      "dependency": "backend/services/__init__.py"
+    },
+    {
+      "source": "backend/platform_sdk/feishu.py",
+      "dependency": "backend/services/feishu_service.py"
+    },
+    {
+      "source": "backend/platform_sdk/feishu.py",
+      "dependency": "backend/services/user_service.py"
+    },
+    {
       "source": "backend/platform_sdk/file_store_config.py",
       "dependency": "backend/__init__.py"
     },
@@ -16151,6 +16896,14 @@
     {
       "source": "backend/platform_sdk/ids.py",
       "dependency": "backend/utils/gid.py"
+    },
+    {
+      "source": "backend/platform_sdk/knowledge.py",
+      "dependency": "plugins/knowledge/knowledge_backend/__init__.py"
+    },
+    {
+      "source": "backend/platform_sdk/knowledge.py",
+      "dependency": "plugins/knowledge/knowledge_backend/public.py"
     },
     {
       "source": "backend/platform_sdk/notification_preferences.py",
@@ -16607,6 +17360,14 @@
     {
       "source": "backend/routers/capabilities.py",
       "dependency": "backend/capability_v2/policies.py"
+    },
+    {
+      "source": "backend/routers/capabilities.py",
+      "dependency": "backend/platform_sdk/__init__.py"
+    },
+    {
+      "source": "backend/routers/capabilities.py",
+      "dependency": "backend/platform_sdk/request_credentials.py"
     },
     {
       "source": "backend/routers/capabilities.py",
@@ -17762,6 +18523,10 @@
     },
     {
       "source": "plugins/agent/agent_backend/capabilities/__init__.py",
+      "dependency": "plugins/agent/agent_backend/capabilities/desktop_actions.py"
+    },
+    {
+      "source": "plugins/agent/agent_backend/capabilities/__init__.py",
       "dependency": "plugins/agent/agent_backend/capabilities/interaction_chat_change.py"
     },
     {
@@ -17871,6 +18636,74 @@
     {
       "source": "plugins/agent/agent_backend/capabilities/descriptors.py",
       "dependency": "plugins/agent/agent_backend/capabilities/contracts.py"
+    },
+    {
+      "source": "plugins/agent/agent_backend/capabilities/desktop_actions.py",
+      "dependency": "backend/__init__.py"
+    },
+    {
+      "source": "plugins/agent/agent_backend/capabilities/desktop_actions.py",
+      "dependency": "backend/capability_v2/__init__.py"
+    },
+    {
+      "source": "plugins/agent/agent_backend/capabilities/desktop_actions.py",
+      "dependency": "backend/capability_v2/contracts.py"
+    },
+    {
+      "source": "plugins/agent/agent_backend/capabilities/desktop_actions.py",
+      "dependency": "backend/capability_v2/provider_contracts.py"
+    },
+    {
+      "source": "plugins/agent/agent_backend/capabilities/desktop_actions.py",
+      "dependency": "backend/platform_sdk/__init__.py"
+    },
+    {
+      "source": "plugins/agent/agent_backend/capabilities/desktop_actions.py",
+      "dependency": "backend/platform_sdk/request_credentials.py"
+    },
+    {
+      "source": "plugins/agent/agent_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/agent/agent_backend/__init__.py"
+    },
+    {
+      "source": "plugins/agent/agent_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/agent/agent_backend/capabilities/__init__.py"
+    },
+    {
+      "source": "plugins/agent/agent_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/agent/agent_backend/capabilities/contracts.py"
+    },
+    {
+      "source": "plugins/agent/agent_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/agent/agent_backend/capabilities/interaction_chat_change.py"
+    },
+    {
+      "source": "plugins/agent/agent_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/agent/agent_backend/capabilities/provider.py"
+    },
+    {
+      "source": "plugins/agent/agent_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/agent/agent_backend/data/__init__.py"
+    },
+    {
+      "source": "plugins/agent/agent_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/agent/agent_backend/data/connection.py"
+    },
+    {
+      "source": "plugins/agent/agent_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/agent/agent_backend/infrastructure/__init__.py"
+    },
+    {
+      "source": "plugins/agent/agent_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/agent/agent_backend/infrastructure/runtime_secret_store.py"
+    },
+    {
+      "source": "plugins/agent/agent_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/agent/agent_backend/routers/__init__.py"
+    },
+    {
+      "source": "plugins/agent/agent_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/agent/agent_backend/routers/ai_chat.py"
     },
     {
       "source": "plugins/agent/agent_backend/capabilities/interaction_chat_change.py",
@@ -18682,7 +19515,15 @@
     },
     {
       "source": "plugins/craft/craft_backend/capabilities/__init__.py",
+      "dependency": "plugins/craft/craft_backend/capabilities/desktop_exchange.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/__init__.py",
       "dependency": "plugins/craft/craft_backend/capabilities/desktop_library_v2.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/__init__.py",
+      "dependency": "plugins/craft/craft_backend/capabilities/desktop_vpps.py"
     },
     {
       "source": "plugins/craft/craft_backend/capabilities/__init__.py",
@@ -20057,6 +20898,66 @@
       "dependency": "backend/capability_v2/provider_contracts.py"
     },
     {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_exchange.py",
+      "dependency": "backend/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_exchange.py",
+      "dependency": "backend/capability_v2/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_exchange.py",
+      "dependency": "backend/capability_v2/atomic_web_contracts.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_exchange.py",
+      "dependency": "backend/capability_v2/contracts.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_exchange.py",
+      "dependency": "backend/capability_v2/descriptor_adapter.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_exchange.py",
+      "dependency": "backend/capability_v2/provider_contracts.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_exchange.py",
+      "dependency": "backend/platform_sdk/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_exchange.py",
+      "dependency": "backend/platform_sdk/artifacts.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_exchange.py",
+      "dependency": "backend/platform_sdk/feishu.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_exchange.py",
+      "dependency": "plugins/craft/craft_backend/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_exchange.py",
+      "dependency": "plugins/craft/craft_backend/capabilities/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_exchange.py",
+      "dependency": "plugins/craft/craft_backend/capabilities/bop_writes.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_exchange.py",
+      "dependency": "plugins/craft/craft_backend/capabilities/data_exchange.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_exchange.py",
+      "dependency": "plugins/craft/craft_backend/capabilities/desktop_pictures.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_exchange.py",
+      "dependency": "plugins/craft/craft_backend/capabilities/lark_exchange.py"
+    },
+    {
       "source": "plugins/craft/craft_backend/capabilities/desktop_library_v2.py",
       "dependency": "backend/__init__.py"
     },
@@ -20079,6 +20980,90 @@
     {
       "source": "plugins/craft/craft_backend/capabilities/desktop_library_v2.py",
       "dependency": "plugins/craft/craft_backend/capabilities/library_change.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_pictures.py",
+      "dependency": "backend/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_pictures.py",
+      "dependency": "backend/capability_v2/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_pictures.py",
+      "dependency": "backend/capability_v2/provider_contracts.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_pictures.py",
+      "dependency": "backend/platform_sdk/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_pictures.py",
+      "dependency": "backend/platform_sdk/artifacts.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_pictures.py",
+      "dependency": "backend/platform_sdk/business_images.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_pictures.py",
+      "dependency": "plugins/craft/craft_backend/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_pictures.py",
+      "dependency": "plugins/craft/craft_backend/data/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_pictures.py",
+      "dependency": "plugins/craft/craft_backend/data/connection.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_pictures.py",
+      "dependency": "plugins/craft/craft_backend/routers/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_pictures.py",
+      "dependency": "plugins/craft/craft_backend/routers/_bop/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_pictures.py",
+      "dependency": "plugins/craft/craft_backend/routers/_bop/_constants.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_vpps.py",
+      "dependency": "backend/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_vpps.py",
+      "dependency": "backend/capability_v2/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_vpps.py",
+      "dependency": "backend/capability_v2/atomic_web_contracts.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_vpps.py",
+      "dependency": "backend/capability_v2/contracts.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_vpps.py",
+      "dependency": "backend/capability_v2/descriptor_adapter.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_vpps.py",
+      "dependency": "backend/capability_v2/provider_contracts.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_vpps.py",
+      "dependency": "plugins/craft/craft_backend/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_vpps.py",
+      "dependency": "plugins/craft/craft_backend/capabilities/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_vpps.py",
+      "dependency": "plugins/craft/craft_backend/capabilities/vpps_check.py"
     },
     {
       "source": "plugins/craft/craft_backend/capabilities/ebom_change.py",
@@ -23641,6 +24626,38 @@
       "dependency": "backend/capability_v2/descriptor_adapter.py"
     },
     {
+      "source": "plugins/knowledge/knowledge_backend/public.py",
+      "dependency": "backend/__init__.py"
+    },
+    {
+      "source": "plugins/knowledge/knowledge_backend/public.py",
+      "dependency": "backend/capability_v2/__init__.py"
+    },
+    {
+      "source": "plugins/knowledge/knowledge_backend/public.py",
+      "dependency": "backend/capability_v2/provider_contracts.py"
+    },
+    {
+      "source": "plugins/knowledge/knowledge_backend/public.py",
+      "dependency": "plugins/knowledge/knowledge_backend/__init__.py"
+    },
+    {
+      "source": "plugins/knowledge/knowledge_backend/public.py",
+      "dependency": "plugins/knowledge/knowledge_backend/application/__init__.py"
+    },
+    {
+      "source": "plugins/knowledge/knowledge_backend/public.py",
+      "dependency": "plugins/knowledge/knowledge_backend/application/outcomes.py"
+    },
+    {
+      "source": "plugins/knowledge/knowledge_backend/public.py",
+      "dependency": "plugins/knowledge/knowledge_backend/data/__init__.py"
+    },
+    {
+      "source": "plugins/knowledge/knowledge_backend/public.py",
+      "dependency": "plugins/knowledge/knowledge_backend/data/connection.py"
+    },
+    {
       "source": "plugins/knowledge/knowledge_backend/revision_store.py",
       "dependency": "plugins/knowledge/knowledge_backend/__init__.py"
     },
@@ -24170,6 +25187,10 @@
     },
     {
       "source": "plugins/project_management/project_management_backend/capabilities/__init__.py",
+      "dependency": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/capabilities/__init__.py",
       "dependency": "plugins/project_management/project_management_backend/capabilities/projects.py"
     },
     {
@@ -24182,6 +25203,78 @@
     },
     {
       "source": "plugins/project_management/project_management_backend/capabilities/__init__.py",
+      "dependency": "plugins/project_management/project_management_backend/infrastructure/repository.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py",
+      "dependency": "backend/__init__.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py",
+      "dependency": "backend/capability_v2/__init__.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py",
+      "dependency": "backend/capability_v2/atomic_web_contracts.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py",
+      "dependency": "backend/capability_v2/contracts.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py",
+      "dependency": "backend/capability_v2/provider_contracts.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py",
+      "dependency": "backend/platform_sdk/__init__.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py",
+      "dependency": "backend/platform_sdk/identity.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py",
+      "dependency": "backend/platform_sdk/knowledge.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/project_management/project_management_backend/__init__.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/project_management/project_management_backend/application/__init__.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/project_management/project_management_backend/application/outcomes.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/project_management/project_management_backend/capabilities/__init__.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/project_management/project_management_backend/capabilities/provider.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/project_management/project_management_backend/data/__init__.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/project_management/project_management_backend/data/connection.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/project_management/project_management_backend/infrastructure/__init__.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py",
+      "dependency": "plugins/project_management/project_management_backend/infrastructure/desktop_repository.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/capabilities/desktop_actions.py",
       "dependency": "plugins/project_management/project_management_backend/infrastructure/repository.py"
     },
     {
@@ -24319,6 +25412,30 @@
     {
       "source": "plugins/project_management/project_management_backend/infrastructure/__init__.py",
       "dependency": "plugins/project_management/project_management_backend/infrastructure/repository.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/infrastructure/desktop_repository.py",
+      "dependency": "backend/__init__.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/infrastructure/desktop_repository.py",
+      "dependency": "backend/capability_v2/__init__.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/infrastructure/desktop_repository.py",
+      "dependency": "backend/capability_v2/provider_contracts.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/infrastructure/desktop_repository.py",
+      "dependency": "plugins/project_management/project_management_backend/__init__.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/infrastructure/desktop_repository.py",
+      "dependency": "plugins/project_management/project_management_backend/data/__init__.py"
+    },
+    {
+      "source": "plugins/project_management/project_management_backend/infrastructure/desktop_repository.py",
+      "dependency": "plugins/project_management/project_management_backend/data/connection.py"
     },
     {
       "source": "plugins/project_management/project_management_backend/infrastructure/repository.py",

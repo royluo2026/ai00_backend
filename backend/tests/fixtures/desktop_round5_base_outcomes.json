@@ -1,5 +1,5 @@
 {
-  "fixture_kind": "Real registered owner handlers and services; deterministic SQL/external I/O ports, no live approval",
+  "fixture_kind": "Real registered owner handler + Gateway + LegacyServerGatewayPolicy + actual approval/schema/reliability; deterministic identity and SQL/external I/O ports",
   "rows": [
     {
       "id": "base.team.create",
@@ -70,7 +70,59 @@
         ]
       },
       "sql_statements": 1,
-      "commits": 1
+      "commits": 1,
+      "request_id": "matrix-0",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.team.create",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": {
+            "gid": "created-team",
+            "name": "Fixture team"
+          }
+        },
+        "operation_ref": {
+          "operation_id": "op_f1a847de4a8c4cd7b53819d855c7f838",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-0",
+          "trace_id": "matrix-0"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.team.create",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-0",
+          "trace_id": "matrix-0"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.team.update",
@@ -127,7 +179,55 @@
         ]
       },
       "sql_statements": 1,
-      "commits": 1
+      "commits": 1,
+      "request_id": "matrix-1",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.team.update",
+        "major_version": 1,
+        "data": {
+          "success": true
+        },
+        "operation_ref": {
+          "operation_id": "op_3f04a3268aeb403e946db2b41419d9ae",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-1",
+          "trace_id": "matrix-1"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.team.update",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-1",
+          "trace_id": "matrix-1"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.team.archive",
@@ -165,7 +265,55 @@
         ]
       },
       "sql_statements": 1,
-      "commits": 1
+      "commits": 1,
+      "request_id": "matrix-2",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.team.archive",
+        "major_version": 1,
+        "data": {
+          "success": true
+        },
+        "operation_ref": {
+          "operation_id": "op_5548bff2cbfb4ed9a4f2435b99036140",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-2",
+          "trace_id": "matrix-2"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.team.archive",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-2",
+          "trace_id": "matrix-2"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.team.member.list",
@@ -256,7 +404,41 @@
         ]
       },
       "sql_statements": 1,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-3",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.team.member.list",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": [
+            {
+              "gid": "member-one",
+              "name": "Fixture member",
+              "email": "",
+              "avatar_url": "",
+              "org_role": "member",
+              "created_at": "2026-09-08"
+            }
+          ]
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-3",
+          "trace_id": "matrix-3"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.team.member.add",
@@ -339,7 +521,55 @@
         ]
       },
       "sql_statements": 1,
-      "commits": 1
+      "commits": 1,
+      "request_id": "matrix-4",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.team.member.add",
+        "major_version": 1,
+        "data": {
+          "success": true
+        },
+        "operation_ref": {
+          "operation_id": "op_8dcd46ccd2214820bf3e0e6715dc575d",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-4",
+          "trace_id": "matrix-4"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.team.member.add",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-4",
+          "trace_id": "matrix-4"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.team.member.remove",
@@ -384,7 +614,55 @@
         ]
       },
       "sql_statements": 1,
-      "commits": 1
+      "commits": 1,
+      "request_id": "matrix-5",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.team.member.remove",
+        "major_version": 1,
+        "data": {
+          "success": true
+        },
+        "operation_ref": {
+          "operation_id": "op_41a7deb4581a414aa8b13d679e27fb34",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-5",
+          "trace_id": "matrix-5"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.team.member.remove",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-5",
+          "trace_id": "matrix-5"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.identity.current.get",
@@ -405,35 +683,35 @@
           "updated_at": null,
           "is_active": true,
           "permissions": [
-            "digital_model.use",
-            "craft.write",
-            "approval.submit",
-            "template.view",
-            "project.create",
-            "knowledge.read",
-            "project.manage_any",
-            "rule.manage",
-            "simulation.use",
-            "craft.view",
-            "system.tech_config",
-            "knowledge.view",
-            "knowledge.manage",
-            "system.user.manage",
-            "craft.write_direct",
-            "approval.approve",
-            "knowledge.write",
-            "project.view",
             "system.plugin.manage",
-            "template.manage",
-            "factory.read",
-            "system.app_config",
-            "craft.write_draft",
-            "factory.write",
-            "rule.view",
+            "knowledge.view",
+            "project.create",
+            "knowledge.write",
             "agent.read",
-            "feishu.view",
+            "craft.view",
+            "digital_model.use",
+            "knowledge.read",
+            "template.manage",
+            "system.app_config",
+            "project.view",
+            "craft.write_draft",
             "craft.read",
-            "agent.interact"
+            "rule.manage",
+            "template.view",
+            "knowledge.manage",
+            "agent.interact",
+            "system.tech_config",
+            "craft.write_direct",
+            "rule.view",
+            "system.user.manage",
+            "feishu.view",
+            "approval.approve",
+            "factory.read",
+            "simulation.use",
+            "craft.write",
+            "project.manage_any",
+            "approval.submit",
+            "factory.write"
           ],
           "visible_panels": [
             "appearance",
@@ -627,7 +905,86 @@
         ]
       },
       "sql_statements": 0,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-6",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.identity.current.get",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": {
+            "gid": "fixture-user",
+            "name": "Fixture user",
+            "email": null,
+            "avatar_url": null,
+            "system_role": "super_admin",
+            "org_role": "super_admin",
+            "external_subtype": null,
+            "team_id": "fixture-team",
+            "created_at": null,
+            "updated_at": null,
+            "is_active": true,
+            "permissions": [
+              "system.plugin.manage",
+              "knowledge.view",
+              "project.create",
+              "knowledge.write",
+              "agent.read",
+              "craft.view",
+              "digital_model.use",
+              "knowledge.read",
+              "template.manage",
+              "system.app_config",
+              "project.view",
+              "craft.write_draft",
+              "craft.read",
+              "rule.manage",
+              "template.view",
+              "knowledge.manage",
+              "agent.interact",
+              "system.tech_config",
+              "craft.write_direct",
+              "rule.view",
+              "system.user.manage",
+              "feishu.view",
+              "approval.approve",
+              "factory.read",
+              "simulation.use",
+              "craft.write",
+              "project.manage_any",
+              "approval.submit",
+              "factory.write"
+            ],
+            "visible_panels": [
+              "appearance",
+              "shortcuts",
+              "general",
+              "database",
+              "file-store",
+              "feishu",
+              "plugin-market",
+              "user-management"
+            ],
+            "grants": []
+          }
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-6",
+          "trace_id": "matrix-6"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.runtime.feature_flags.get",
@@ -705,7 +1062,38 @@
         ]
       },
       "sql_statements": 1,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-7",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.runtime.feature_flags.get",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": {
+            "key": "feature_flags",
+            "value": "{\"ai_assistant\":true}",
+            "description": "Fixture",
+            "updated_at": "2026-09-08",
+            "source": "db"
+          }
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-7",
+          "trace_id": "matrix-7"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.runtime.feature_flags.replace",
@@ -777,7 +1165,55 @@
         ]
       },
       "sql_statements": 1,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-8",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.runtime.feature_flags.replace",
+        "major_version": 1,
+        "data": {
+          "success": true
+        },
+        "operation_ref": {
+          "operation_id": "op_f8dc59ecbd304e8eb3616cfa4d60dbb5",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-8",
+          "trace_id": "matrix-8"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.runtime.feature_flags.replace",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-8",
+          "trace_id": "matrix-8"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.runtime.annotation.search",
@@ -870,7 +1306,40 @@
         ]
       },
       "sql_statements": 1,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-9",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.runtime.annotation.search",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": [
+            {
+              "key": "lists.task.note",
+              "value": "Fixture note",
+              "description": "",
+              "updated_at": null,
+              "source": "db"
+            }
+          ]
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-9",
+          "trace_id": "matrix-9"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.runtime.capability_note.set",
@@ -915,7 +1384,55 @@
         ]
       },
       "sql_statements": 1,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-10",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.runtime.capability_note.set",
+        "major_version": 1,
+        "data": {
+          "success": true
+        },
+        "operation_ref": {
+          "operation_id": "op_93f913709f374da0a6ca6ef83e172405",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-10",
+          "trace_id": "matrix-10"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.runtime.capability_note.set",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-10",
+          "trace_id": "matrix-10"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.runtime.capability_status.set",
@@ -963,7 +1480,55 @@
         ]
       },
       "sql_statements": 1,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-11",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.runtime.capability_status.set",
+        "major_version": 1,
+        "data": {
+          "success": true
+        },
+        "operation_ref": {
+          "operation_id": "op_8475822fb37942d298ec5967a8b28fa4",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-11",
+          "trace_id": "matrix-11"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.runtime.capability_status.set",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-11",
+          "trace_id": "matrix-11"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.runtime.list_note.set",
@@ -1008,7 +1573,55 @@
         ]
       },
       "sql_statements": 1,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-12",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.runtime.list_note.set",
+        "major_version": 1,
+        "data": {
+          "success": true
+        },
+        "operation_ref": {
+          "operation_id": "op_404ad6350f2a4dd88298dafe9ec70c37",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-12",
+          "trace_id": "matrix-12"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.runtime.list_note.set",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-12",
+          "trace_id": "matrix-12"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.runtime.feishu_app_id.get",
@@ -1086,7 +1699,38 @@
         ]
       },
       "sql_statements": 1,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-13",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.runtime.feishu_app_id.get",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": {
+            "key": "feature_flags",
+            "value": "{\"ai_assistant\":true}",
+            "description": "Fixture",
+            "updated_at": "2026-09-08",
+            "source": "db"
+          }
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-13",
+          "trace_id": "matrix-13"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.runtime.feishu_app_id.set",
@@ -1124,7 +1768,55 @@
         ]
       },
       "sql_statements": 1,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-14",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.runtime.feishu_app_id.set",
+        "major_version": 1,
+        "data": {
+          "success": true
+        },
+        "operation_ref": {
+          "operation_id": "op_5c0e40b548464a60a915224d0504a8ba",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-14",
+          "trace_id": "matrix-14"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.runtime.feishu_app_id.set",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-14",
+          "trace_id": "matrix-14"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.runtime.feishu_app_secret.set",
@@ -1162,7 +1854,55 @@
         ]
       },
       "sql_statements": 1,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-15",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.runtime.feishu_app_secret.set",
+        "major_version": 1,
+        "data": {
+          "success": true
+        },
+        "operation_ref": {
+          "operation_id": "op_c1d3c8528ef4415f92e45287fe243580",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-15",
+          "trace_id": "matrix-15"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.runtime.feishu_app_secret.set",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-15",
+          "trace_id": "matrix-15"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.runtime.log.search",
@@ -1209,7 +1949,34 @@
         ]
       },
       "sql_statements": 0,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-16",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.runtime.log.search",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": [
+            "Fixture log"
+          ]
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-16",
+          "trace_id": "matrix-16"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.file_store.minio_config.set",
@@ -1266,7 +2033,55 @@
         ]
       },
       "sql_statements": 2,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-17",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.file_store.minio_config.set",
+        "major_version": 1,
+        "data": {
+          "success": true
+        },
+        "operation_ref": {
+          "operation_id": "op_dea027a406bd4026951e39035cf04ff5",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-17",
+          "trace_id": "matrix-17"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.file_store.minio_config.set",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-17",
+          "trace_id": "matrix-17"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.file_store.ois_config.set",
@@ -1342,7 +2157,55 @@
         ]
       },
       "sql_statements": 2,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-18",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.file_store.ois_config.set",
+        "major_version": 1,
+        "data": {
+          "success": true
+        },
+        "operation_ref": {
+          "operation_id": "op_9989a10abbbf4dfda67d4530beeec84b",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-18",
+          "trace_id": "matrix-18"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.file_store.ois_config.set",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-18",
+          "trace_id": "matrix-18"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.file_store.minio_connection.test",
@@ -1375,7 +2238,32 @@
         ]
       },
       "sql_statements": 0,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-19",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.file_store.minio_connection.test",
+        "major_version": 1,
+        "data": {
+          "success": false,
+          "msg": "连接失败，请检查服务端配置"
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-19",
+          "trace_id": "matrix-19"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.file_store.ois_connection.test",
@@ -1408,7 +2296,56 @@
         ]
       },
       "sql_statements": 0,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-20",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.file_store.ois_connection.test",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "msg": "连接成功"
+        },
+        "operation_ref": {
+          "operation_id": "op_ca721365ef384877906828dd1f261cc4",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-20",
+          "trace_id": "matrix-20"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.file_store.ois_connection.test",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-20",
+          "trace_id": "matrix-20"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.feishu.calendar.day.get",
@@ -1524,7 +2461,46 @@
         ]
       },
       "sql_statements": 0,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-21",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.feishu.calendar.day.get",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": [
+            {
+              "event_id": "event-one",
+              "summary": "Fixture event",
+              "description": "",
+              "start": "",
+              "end": "",
+              "start_ts": "",
+              "end_ts": "",
+              "rsvp": "",
+              "meeting_url": "",
+              "organizer": "",
+              "is_organizer": false
+            }
+          ]
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-21",
+          "trace_id": "matrix-21"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.feishu.calendar.event.get",
@@ -1591,7 +2567,36 @@
         ]
       },
       "sql_statements": 0,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-22",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.feishu.calendar.event.get",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "event": {
+            "event_id": "event-one",
+            "summary": "Fixture event",
+            "description": ""
+          }
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-22",
+          "trace_id": "matrix-22"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.feishu.calendar.event.update",
@@ -1649,7 +2654,55 @@
         ]
       },
       "sql_statements": 0,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-23",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.feishu.calendar.event.update",
+        "major_version": 1,
+        "data": {
+          "success": true
+        },
+        "operation_ref": {
+          "operation_id": "op_5936ad9e6971437a8efc809bba07a077",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-23",
+          "trace_id": "matrix-23"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.feishu.calendar.event.update",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-23",
+          "trace_id": "matrix-23"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.feishu.calendar.rsvp.set",
@@ -1696,7 +2749,55 @@
         ]
       },
       "sql_statements": 1,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-24",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.feishu.calendar.rsvp.set",
+        "major_version": 1,
+        "data": {
+          "success": true
+        },
+        "operation_ref": {
+          "operation_id": "op_efb06ef054ff4e20a7c6c8d144eed7e9",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-24",
+          "trace_id": "matrix-24"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.feishu.calendar.rsvp.set",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-24",
+          "trace_id": "matrix-24"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.feishu.user.search",
@@ -1792,7 +2893,41 @@
         ]
       },
       "sql_statements": 0,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-25",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.feishu.user.search",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": [
+            {
+              "open_id": "open-one",
+              "name": "Fixture record",
+              "email": "",
+              "avatar_url": "",
+              "entity_id": "",
+              "db_gid": ""
+            }
+          ]
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-25",
+          "trace_id": "matrix-25"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.feishu.chat.search",
@@ -1888,7 +3023,41 @@
         ]
       },
       "sql_statements": 0,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-26",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.feishu.chat.search",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": [
+            {
+              "chat_id": "chat-one",
+              "name": "Fixture record",
+              "avatar": "",
+              "description": "",
+              "entity_id": "",
+              "url": "https://feishu.invalid/item"
+            }
+          ]
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-26",
+          "trace_id": "matrix-26"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.feishu.document.search",
@@ -1978,7 +3147,40 @@
         ]
       },
       "sql_statements": 0,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-27",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.feishu.document.search",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": [
+            {
+              "name": "Fixture record",
+              "url": "https://feishu.invalid/item",
+              "type": "",
+              "owner_name": "",
+              "entity_id": ""
+            }
+          ]
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-27",
+          "trace_id": "matrix-27"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.feishu.event.search",
@@ -2086,7 +3288,43 @@
         ]
       },
       "sql_statements": 0,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-28",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.feishu.event.search",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": [
+            {
+              "name": "Fixture record",
+              "url": "https://feishu.invalid/item",
+              "entity_id": "",
+              "start_time": "",
+              "end_time": "",
+              "description": "",
+              "event_id": "event-one",
+              "summary": "Fixture event"
+            }
+          ]
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-28",
+          "trace_id": "matrix-28"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.feishu.meeting.search",
@@ -2188,7 +3426,42 @@
         ]
       },
       "sql_statements": 0,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-29",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.feishu.meeting.search",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": [
+            {
+              "name": "Fixture record",
+              "url": "https://feishu.invalid/item",
+              "entity_id": "",
+              "start_time": "",
+              "end_time": "",
+              "description": "",
+              "meeting_id": ""
+            }
+          ]
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-29",
+          "trace_id": "matrix-29"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.feishu.organization_user.search",
@@ -2278,7 +3551,41 @@
         ]
       },
       "sql_statements": 1,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-30",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.feishu.organization_user.search",
+        "major_version": 1,
+        "data": {
+          "success": true,
+          "data": [
+            {
+              "open_id": "open-one",
+              "name": "Fixture record",
+              "email": "",
+              "avatar_url": "",
+              "entity_id": "",
+              "db_gid": "member-one"
+            }
+          ]
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-30",
+          "trace_id": "matrix-30"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     },
     {
       "id": "base.feishu.list_share.send",
@@ -2330,7 +3637,55 @@
         ]
       },
       "sql_statements": 0,
-      "commits": 0
+      "commits": 0,
+      "request_id": "matrix-31",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.feishu.list_share.send",
+        "major_version": 1,
+        "data": {
+          "success": true
+        },
+        "operation_ref": {
+          "operation_id": "op_6f33e7b7d2764cc89c11220facc53151",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-31",
+          "trace_id": "matrix-31"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.feishu.list_share.send",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-31",
+          "trace_id": "matrix-31"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.desktop_actions",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
     }
   ]
 }
