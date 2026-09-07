@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "registry_version": 1,
-  "table_count": 293,
+  "table_count": 299,
   "tables": [
     {
       "table": "workmanship_agent_canvas_audit_events",
@@ -1670,6 +1670,12 @@
     {"table":"workmanship_agent_orch_workload_baselines","owner":"agent","runtime_domain":"agent","legacy_name":false},
     {"table":"workmanship_agent_orch_acceptance_facts","owner":"agent","runtime_domain":"agent","legacy_name":false},
     {"table":"workmanship_agent_orch_metric_snapshots","owner":"agent","runtime_domain":"agent","legacy_name":false},
-    {"table":"workmanship_sim_document_snapshot_requests","owner":"simulation","runtime_domain":"simulation","legacy_name":false}
+    {"table":"workmanship_sim_document_snapshot_requests","owner":"simulation","runtime_domain":"simulation","legacy_name":false},
+    {"table":"workmanship_sim_connector_runtime_devices","owner":"simulation","runtime_domain":"simulation","legacy_name":false},
+    {"table":"workmanship_sim_connector_runtime_plans","owner":"simulation","runtime_domain":"simulation","legacy_name":false},
+    {"table":"workmanship_sim_connector_app_pairings","owner":"simulation","runtime_domain":"simulation","legacy_name":false},
+    {"table":"workmanship_sim_connector_runtime_audit","owner":"simulation","runtime_domain":"simulation","legacy_name":false},
+    {"table":"workmanship_sim_connector_runtime_recovery_sessions","owner":"simulation","runtime_domain":"simulation","legacy_name":false},
+    {"table":"workmanship_sim_connector_pairing_bootstraps","owner":"simulation","runtime_domain":"simulation","legacy_name":false}
   ]
 }
