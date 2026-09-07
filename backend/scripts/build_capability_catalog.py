@@ -197,16 +197,8 @@ def current_release() -> CatalogRelease:
         for key in sorted(registrations)
     ]
     grandfathered: set[tuple[str, int, str]] = set()
-    candidate_hashes = {(item.id, item.major_version): business_definition_hash(item) for item in descriptors}
-    if DEFAULT_OUTPUT.is_file():
-        previous_document = json.loads(DEFAULT_OUTPUT.read_text(encoding="utf-8"))
-        for item in previous_document.get("descriptors", []):
-            if item.get("lifecycle_status") != "stable":
-                continue
-            if candidate_hashes.get((item["id"], int(item["major_version"]))) != business_definition_hash(item):
-                continue
-            for path in unbounded_collection_paths(item.get("output_schema") or {}):
-                grandfathered.add((item["id"], int(item["major_version"]), path))
+    # A previous Catalog is generated output, not authority to exempt a contract.
+    # Compatibility requires an exact validated immutable v1 baseline match.
     baseline_path = REPOSITORY_ROOT / "docs/governance/capability-business-governance-legacy-baseline.json"
     if baseline_path.is_file():
         baseline = load_legacy_baseline(baseline_path, catalog_path=DEFAULT_OUTPUT)

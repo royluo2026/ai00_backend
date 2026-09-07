@@ -152,3 +152,49 @@ def test_collection_grandfathering_requires_the_entire_immutable_definition(regi
         assert paths == set()
         with pytest.raises(ValueError, match="unbounded stable collection"):
             build_release([descriptor], grandfathered_unbounded_paths=paths, enforce_collection_boundaries=True)
+
+
+@pytest.mark.parametrize("mutation", [None, "changed_v1", "changed_v2", "new_identity", "partial_schema"])
+def test_current_release_cannot_grandfather_a_matching_untrusted_previous_catalog(
+    registry, monkeypatch, tmp_path, mutation,
+):
+    import json
+    from copy import deepcopy
+    from backend.capability_v2.catalog import build_release
+    from backend.scripts import build_capability_catalog as builder
+
+    # Validate the real immutable baseline before substituting provider discovery.
+    baseline = builder.load_legacy_baseline(
+        builder.REPOSITORY_ROOT / "docs/governance/capability-business-governance-legacy-baseline.json",
+        catalog_path=builder.DEFAULT_OUTPUT,
+    )
+    original = registry.get("ontology.concept.resolve", 1)
+    descriptor = complete_governance_metadata(original.descriptor)
+    if mutation in {"changed_v1", "changed_v2"}:
+        descriptor = descriptor.model_copy(update={
+            "business_effect": "Changed nonbaseline business meaning.",
+            "major_version": 2 if mutation == "changed_v2" else 1,
+        })
+    elif mutation == "new_identity":
+        descriptor = descriptor.model_copy(update={"id": "ontology.concept.new"})
+    elif mutation == "partial_schema":
+        schema = deepcopy(descriptor.input_schema)
+        schema["properties"]["new_selector"] = {"type": "string"}
+        descriptor = descriptor.model_copy(update={"input_schema": schema})
+
+    provider_registry = CapabilityRegistry()
+    provider_registry.register(original.spec.model_copy(update={
+        "id": descriptor.id, "version": descriptor.major_version,
+    }), original.handler, descriptor=descriptor)
+    previous = tmp_path / "previous-catalog.json"
+    previous.write_text(json.dumps(builder._release_document(build_release([descriptor]))), encoding="utf-8")
+    monkeypatch.setattr(builder, "DEFAULT_OUTPUT", previous)
+    monkeypatch.setattr(builder, "build_capability_registry", lambda *_args: provider_registry)
+    monkeypatch.setattr(builder, "load_legacy_baseline", lambda *_args, **_kwargs: baseline)
+
+    if mutation is None:
+        release = builder.current_release()
+        assert business_definition_hash(release.descriptors[0]) == LEGACY_HASHES["ontology.concept.resolve"]
+    else:
+        with pytest.raises(ValueError, match="unbounded stable collection"):
+            builder.current_release()
