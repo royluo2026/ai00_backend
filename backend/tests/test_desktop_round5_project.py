@@ -24,3 +24,21 @@ def test_approval_rejects_wrong_participant_and_revision_without_state_change(us
     assert caught.value.code==code
     assert database.orders['order']['status']=='in_review'
     assert not database.notifications and database.rollbacks==1
+
+
+def test_approval_creation_rejects_foreign_reviewer_before_writing():
+    from plugins.project_management.project_management_backend.capabilities import desktop_actions as actions
+    ctx=SimpleNamespace(user_gid='applicant',team_gid='team',active_roles=('member',),idempotency_key='create')
+    with patch.object(actions,'get_user_summaries',return_value={'foreign':{'team_id':'other'}}),patch.object(repository,'get_project_management_conn') as connection:
+        with pytest.raises(CapabilityBusinessError) as caught:
+            actions.create({'title':'Request','reviewer_gid':'foreign'},ctx)
+    assert caught.value.code=='permission_denied'
+    connection.assert_not_called()
+
+
+def test_approval_permissions_match_submitter_and_assigned_reviewer_roles():
+    from backend.capabilities.registry_next import CapabilityRegistry
+    from plugins.project_management.project_management_backend.capabilities import register_capabilities
+    registry=CapabilityRegistry();register_capabilities(registry)
+    assert registry.get('project.approval.order.approve',1).spec.permissions==('approval.approve',)
+    assert registry.get('project.approval.order.start',1).spec.permissions==('approval.submit',)

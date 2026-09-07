@@ -58,8 +58,14 @@ def get(payload,context):
     return {'success':True,'data':order(row)}
 
 def create(payload,context):
+    reviewer=payload.get('reviewer_gid')
+    if reviewer and str(get_user_summaries([reviewer]).get(reviewer,{}).get('team_id') or '')!=context.team_gid:
+        db.error('permission_denied','The assigned reviewer must be an active member of this tenant.')
     with db.transaction('project.approval.order.create',payload,context) as (cursor,result,replayed):
         if not replayed:
+            if payload.get('project_gid'):
+                cursor.execute('SELECT gid FROM workmanship_proj_projects WHERE gid=%s AND team_id=%s FOR UPDATE',(payload['project_gid'],context.team_gid))
+                if not cursor.fetchone(): db.error('resource_not_found','The project is unavailable in this tenant.')
             gid=str(uuid4())
             cursor.execute('INSERT INTO workmanship_proj_approval_orders (gid,title,order_type,project_gid,team_gid,applicant_gid,reviewer_gid,source_ref,content) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)',(gid,payload['title'],payload.get('order_type','general'),payload.get('project_gid'),context.team_gid,context.user_gid,payload.get('reviewer_gid'),payload.get('source_ref'),json.dumps(payload.get('content',{}),ensure_ascii=False)))
             result.update(success=True,data={'gid':gid})
@@ -133,6 +139,7 @@ def register_desktop_capabilities(registry):
             if not Draft202012Validator(_output).is_valid(result): db.error('provider_error','The Project result violates its closed model.')
             return result
         effect=('Commit ' if write else 'Read ')+capability_id.removeprefix('project.').replace('.',' ')+' within the authenticated tenant and participant policy.'
-        spec=CapabilitySpec(id=capability_id,version=1,owner='project_management',description=effect,use_when=effect,do_not_use_when='A different Project operation or domain effect is requested.',risk='write' if write else 'read',confirmation='user' if write else 'none',permissions=('project.manage_any',) if capability_id.endswith('.approve') else ('project.view',),idempotent=True,input_schema=input_schema,output_schema=output_schema,tags=('project_management','desktop','closed'))
+        permissions=('approval.approve',) if capability_id.endswith('.approve') else ('approval.submit',) if write and capability_id.startswith('project.approval.') else ('project.view',)
+        spec=CapabilitySpec(id=capability_id,version=1,owner='project_management',description=effect,use_when=effect,do_not_use_when='A different Project operation or domain effect is requested.',risk='write' if write else 'read',confirmation='user' if write else 'none',permissions=permissions,idempotent=True,input_schema=input_schema,output_schema=output_schema,tags=('project_management','desktop','closed'))
         descriptor=descriptor_for(spec).model_copy(update={'business_effect':effect,'exposure':ExposurePolicy(web=True,api=True,plugin=False,agent=False,mcp=False),'delegation_policy':'none','business_acceptance_criteria':(effect,'Writes persist their exact result with the actor, tenant, action and idempotency key in the same transaction.','Approval decisions enforce the assigned participant, expected revision, durable audit and notification.'),'business_invariants':(BusinessInvariantContract(rule_id=capability_id+'.actor_bound',version=1,statement='Authenticated tenant and stored participation determine access.',applies_when='The desktop action executes.',enforcement_ref='plugins/project_management/project_management_backend/infrastructure/desktop_repository.py',error_code='permission_denied',test_refs=('backend/tests/test_desktop_round5_project.py',)),),'no_business_invariant_reason':None})
         registry.register(spec,handler,descriptor=descriptor)

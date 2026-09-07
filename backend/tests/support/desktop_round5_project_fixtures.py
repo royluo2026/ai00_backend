@@ -58,7 +58,7 @@ def execute_project_matrix(invoke=None):
         stack.enter_context(patch('plugins.project_management.project_management_backend.infrastructure.repository.get_project_management_conn',return_value=database))
         stack.enter_context(patch('plugins.project_management.project_management_backend.data.connection.get_project_management_conn',return_value=database))
         stack.enter_context(patch('plugins.project_management.project_management_backend.capabilities.desktop_actions.find_active_user_by_role',return_value='reviewer'))
-        stack.enter_context(patch('plugins.project_management.project_management_backend.capabilities.desktop_actions.get_user_summaries',return_value={'reviewer':{'name':'Reviewer','avatar_url':''}}))
+        stack.enter_context(patch('plugins.project_management.project_management_backend.capabilities.desktop_actions.get_user_summaries',return_value={'reviewer':{'name':'Reviewer','avatar_url':'','team_id':'fixture-team'}}))
         stack.enter_context(patch.object(outcomes.project_outcome_port,'provider',ProjectManagementApplication(ProjectManagementRepository())))
         register_capabilities(registry)
         def call(name,payload,user='applicant',key=None):
