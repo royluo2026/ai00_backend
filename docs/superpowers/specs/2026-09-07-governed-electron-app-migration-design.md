@@ -66,13 +66,17 @@ The existing broad `electronAPI` surface is inventoried and divided into two cla
 - Platform operations: bounded window, dialog, notification, deep-link, update, and user-selected file operations. These remain IPC operations with closed request and response schemas.
 - Business operations: any call that reads or changes AI00 business state. These move to the cloud Capability client and are removed from Electron IPC.
 
-The Capability client adds the registered desktop web consumer identity and current Catalog Release to each invocation. It preserves idempotency and confirmation tokens across retriable calls. Authentication material remains outside page JavaScript. Page code receives normalized success or structured failure envelopes and cannot obtain the raw login or device credential.
+The preload Capability client calls the existing canonical route `/api/v1/capabilities/{capability_id}:invoke`. Its closed `InvocationEnvelope` carries `major_version`, Catalog Release, operation and idempotency identity, confirmation token, and resource selectors. No second Gateway URL is introduced by this migration. Authentication material remains outside page JavaScript. Page code receives normalized success or structured failure envelopes and cannot obtain the raw login or device credential.
+
+The Renderer receives only `{mode, user, expires_at}` authentication state. It cannot retrieve the access or refresh token. Electron main starts OAuth Authorization Code with PKCE in the system browser, stores `state` and the verifier in process memory, validates the `ai00://auth/callback` state, exchanges the short-lived code directly with the cloud, and rejects tokens or credentials embedded in the callback URL. The main process owns token refresh, logout, and multi-window authentication broadcasts. Preload replaces arbitrary-path `_cloudFetch(path, opts)` with `invokeCapability(capabilityId, envelope)` and the small set of separately reviewed non-business authentication operations. The cloud session contains a server-signed desktop consumer claim; the Gateway derives consumer identity from that claim and rejects a Renderer-supplied identity override.
 
 ### Electron main process
 
 The main process owns application lifecycle, windows, the single AI00 tray, deep links, global shortcuts, platform dialogs, updater orchestration, logging, and ConnectorHost supervision. It validates every IPC request against an allowlist and a closed schema. It restricts file access to paths selected by the user or application-owned directories and validates every external URL before opening it.
 
-At startup it launches the packaged ConnectorHost with an unguessable per-launch named-pipe name and the Electron parent process identifier. It does not send business payloads or user access tokens over that pipe. It receives only version, readiness, health, pairing-state, and bounded diagnostic events. On normal exit it requests a graceful ConnectorHost shutdown and then enforces termination. ConnectorHost independently exits when the parent process disappears.
+At startup it launches the packaged ConnectorHost with an unguessable per-launch named-pipe name, a per-launch nonce, and the Electron parent process identifier. It assigns ConnectorHost to a Windows Job Object configured with `KILL_ON_JOB_CLOSE`. The handshake validates both process IDs, the installed executable path, Authenticode signer, installer-manifest digest, and the launch nonce before accepting status messages. It does not send business payloads, user access tokens, bootstrap secrets, or device credentials over that pipe. It receives only version, readiness, health, non-secret pairing ID, pairing state, and bounded diagnostic events. On normal exit it requests graceful shutdown and then closes the Job Object. ConnectorHost also exits when the verified parent disappears.
+
+The App has one instance per Windows user and device identity. A second launch in the same user session activates the existing window. A different Windows user receives a different DPAPI identity and cannot share the first user's ConnectorHost. Fast user switching therefore creates separate inactive or active device identities rather than two runtimes leasing under one credential.
 
 ### AI00.ConnectorHost
 
@@ -83,7 +87,7 @@ ConnectorHost owns:
 - DPAPI-protected device credentials bound to the current Windows user.
 - Device pairing and activation state supplied by the cloud control plane.
 - Authenticated outbound WebSocket wake-up and bounded HTTP polling fallback.
-- Signed execution-plan leasing, validation, replay protection, and expiry checks.
+- Signed execution-plan v2 leasing, validation, generation fencing, replay protection, and expiry checks.
 - Adapter compatibility and contract-hash validation.
 - STA scheduling, VisMockup process detection, COM execution, step timeout, cancellation, and structured outcomes.
 - Durable recovery metadata needed to reconcile an interrupted lease after App restart.
@@ -94,7 +98,7 @@ ConnectorHost does not listen on TCP, expose a loopback API, display a tray icon
 
 The existing cloud backend remains the deployment and business authority. It continues to provide Capability discovery and invocation, authentication, device pairing, plan creation, explicit confirmation, signed plan queueing, leases, wake-up, outcome ingestion, audit, and business-state projection.
 
-Cloud additions are limited to App compatibility policy and evidence required by this design. The policy binds minimum supported App version, Connector protocol version, adapter version, and Catalog Release. An incompatible App may use non-device features when safe, but local execution fails closed with a structured upgrade requirement.
+Cloud additions comprise App compatibility policy, execution-plan/outcome v2, possession-based pairing, runtime-generation fencing, and evidence required by this design. The policy binds minimum supported App version, Connector protocol version, adapter version, and Catalog Release. An incompatible App may use non-device features when safe, but local execution fails closed with a structured upgrade requirement.
 
 ## Capability governance
 
@@ -102,30 +106,39 @@ The desktop migration is governed as a change of consumers and providers, not as
 
 ### Consumer and provider identities
 
-- The packaged Renderer is registered as a desktop web consumer with exact frontend source and build evidence.
+- The packaged Renderer is registered as a desktop web consumer with exact frontend source and build evidence. Its identity comes from a server-signed desktop session claim, not request JSON.
 - ConnectorHost is registered as a local-runtime consumer and execution provider with exact executable, protocol, adapter, and source evidence.
 - Electron main is a platform host. It is not registered as a business provider unless a future requirement introduces a real business Capability owned by a domain.
 - Each App release binds its frontend commit, backend Catalog Release, ConnectorHost build, adapter manifest, and installer digest.
 
 ### Invocation rules
 
-- Every business read and write starts at `/api/capabilities/{capability_id}/versions/{major_version}/invoke` or its governed streaming equivalent.
+- Every business read and write starts at the existing `/api/v1/capabilities/{capability_id}:invoke` route or its governed streaming equivalent. `major_version`, Catalog Release, consumer, operation, confirmation, and idempotency fields are carried in the closed `InvocationEnvelope`.
 - New direct REST routes, Electron IPC business methods, loopback methods, and Renderer-to-Connector commands are release blockers.
-- A local side effect requires a cloud-issued immutable execution plan bound to capability ID, major version, capability-version GID, Catalog Release, tenant, actor, device, adapter contract, normalized input hash, confirmation receipt when required, idempotency identity, issue time, and expiry time.
+- A local side effect requires the new closed `ai00.connector.execution-plan.v2` contract, bound to capability ID, major version, capability-version GID, business-definition hash, Catalog Release, tenant, actor, device, runtime generation, runtime instance ID, adapter contract, normalized input hash, confirmation receipt when required, idempotency identity, issue time, expiry time, and ordered steps. The matching closed Outcome v2 binds plan hash, lease, generation, runtime instance, step journal identity, result hashes, and reconciliation state.
+- Plan and Outcome v2 are new protocol versions. Their security fields are not added as optional v1 fields. The cloud can distinguish v1 and v2 during migration, while the Electron ConnectorHost accepts only v2. Unknown, removed, downgraded, or altered fields invalidate the canonical signature.
 - ConnectorHost verifies the plan signature and every binding before execution. Unknown fields, versions, operations, steps, or algorithms fail closed.
 - Results are authenticated and bound to the leased plan and step. Only the cloud Provider can apply the resulting business transition.
 - WebSocket messages are wake-up signals only. They cannot contain an executable plan or command.
 
+### Protocol v2 required records
+
+Execution-plan v2 is a closed record with these required fields: `protocol`, `plan_id`, `capability_id`, `major_version`, `capability_version_gid`, `business_definition_hash`, `catalog_release`, `tenant_id`, `actor_id`, `device_id`, `runtime_generation`, `runtime_instance_id`, `adapter_id`, `adapter_major`, `target_product`, `normalized_input_hash`, `confirmation_receipt_id`, `idempotency_key`, `steps`, `issued_at`, `expires_at`, and `plan_hash`. `confirmation_receipt_id` is an explicit JSON null only for a Capability whose descriptor does not require confirmation. Each step remains closed and binds `step_id`, `operation_id`, `contract_hash`, dependencies, payload, payload hash, timeout, side-effect classification, and post-condition probe ID.
+
+Outcome v2 is a closed record with `protocol`, `plan_id`, `plan_hash`, `lease_id`, `tenant_id`, `device_id`, `runtime_generation`, `runtime_instance_id`, `overall_status`, ordered step results, `journal_sequence`, `reported_at`, and signature. Each step result binds start and completion time, status, result and result hash, error code, and reconciliation state. Allowed terminal execution states are `succeeded`, `failed_without_effect`, `outcome_unknown`, and `manual_review_required`; transport failure is not an execution result.
+
+The cloud stores the current `runtime_generation` on the device row. A lease row records `(device_id, runtime_generation, runtime_instance_id, protocol, plan_id, lease_id, expires_at)`. Pairing records store `pairing_id`, public key, nonce hash, requested expiry, bound tenant/user after approval, state, and single-use activation timestamp. Migrations are additive during the pilot; v1 rows remain distinguishable and cannot be interpreted as v2.
+
 ### Release evidence
 
-An App release candidate cannot be promoted until the affected Capability set has current machine evidence, human approval, and runtime verification. The release must satisfy `machine_passed=true`, `human_approved=true`, and `runtime_verified=true`. Evidence binds immutable Git revisions and generated artifacts rather than a dirty working tree.
+An App release candidate cannot be promoted until its computed impact closure has current machine evidence, human approval, and runtime verification. The closure contains every changed Capability descriptor, Provider, consumer, policy, execution-plan/outcome protocol, adapter contract, database migration, Gateway route, IPC boundary, packaged executable, and transitive Capability dependency. The release must satisfy `machine_passed=true`, `human_approved=true`, and `runtime_verified=true` for that closure. Evidence binds immutable Git revisions and generated artifacts rather than a dirty working tree.
 
 The current historical blockers must be resolved before the first App release candidate:
 
 - The business-definition hashes for `ontology.concept.get@1`, `ontology.concept.resolve@1`, and `ontology.object.list@1` differ from the legacy governance baseline after the governed schema restoration commit.
 - The checked-in Agent runtime closure acceptance evidence does not contain the required `business_governance` section.
 
-Resolving these blockers requires corrected versioning or approved business-definition evidence and regenerated closure evidence. The App migration must not weaken the Release Gate or silently rewrite the legacy baseline.
+Stage 0 records an immutable baseline Snapshot containing the two Git commits named above, Catalog Release `rel_6b7ac7cd21ed113da5a033e433f09a37`, the exact Finding set for these blockers, and the resulting Release Gate report ID. Resolving the blockers requires corrected versioning or approved business-definition evidence and regenerated closure evidence. The App migration must not weaken the Release Gate or silently rewrite the legacy baseline.
 
 ## Runtime flows
 
@@ -136,7 +149,7 @@ Resolving these blockers requires corrected versioning or approved business-defi
 3. The App loads its packaged UI from a secure local application origin.
 4. After authentication, the Capability client obtains the cloud Catalog Release and compatibility policy.
 5. The client rejects capabilities absent from or incompatible with the pinned release.
-6. ConnectorHost authenticates with its device credential, reports its protocol and adapter versions, and starts the wake-up channel.
+6. ConnectorHost authenticates with its device credential, current runtime generation and runtime instance ID, reports execution-plan v2 and adapter versions, and starts the wake-up channel.
 7. The UI displays Connector readiness from cloud-owned pairing and health state. Local diagnostic state may enrich the display but cannot override cloud authorization.
 
 ### Governed VisMockup execution
@@ -146,24 +159,45 @@ Resolving these blockers requires corrected versioning or approved business-defi
 3. The Simulation Provider prepares an immutable plan and, where required, returns the exact downstream confirmation challenge.
 4. Renderer resubmits the approved challenge with the same operation and idempotency identity.
 5. Provider queues the signed device-bound plan and emits a wake-up signal.
-6. ConnectorHost leases the plan over authenticated HTTPS and verifies every signed binding.
-7. The adapter executes the bounded operation through the STA dispatcher.
-8. ConnectorHost submits the authenticated outcome. The Provider applies or rejects the state transition and records audit evidence.
-9. Renderer obtains the authoritative result from the cloud Capability state, never from an unaudited local success message.
+6. ConnectorHost leases the plan over authenticated HTTPS. The lease is fenced to the current device credential generation, runtime instance ID, and execution-plan v2 protocol. ConnectorHost verifies every signed binding.
+7. ConnectorHost writes the plan, lease, generation, step and pre-execution state to its durable journal before the adapter begins the bounded STA operation.
+8. The adapter executes the bounded operation through the STA dispatcher.
+9. ConnectorHost submits the authenticated Outcome v2. The Provider applies, rejects, or holds the state transition for reconciliation and records audit evidence.
+10. Renderer obtains the authoritative result from the cloud Capability state, never from an unaudited local success message.
 
 ### Pairing
 
-Pairing begins from an authenticated App Capability. The cloud returns a short-lived bootstrap identity that is bound to the intended tenant, user, and device activation. ConnectorHost completes activation and stores only the resulting device credential under DPAPI. Pairing secrets are not placed in Renderer storage, command-line arguments, log files, URLs retained in history, or the local named pipe.
+Pairing uses proof of possession and never transfers a bootstrap secret through Renderer, command-line arguments, URLs, logs, or the local named pipe:
+
+1. ConnectorHost generates a device key pair and a one-time nonce locally.
+2. ConnectorHost registers the public key and nonce with the cloud bootstrap endpoint and receives a short-lived non-secret `pairing_id`.
+3. ConnectorHost reports only `pairing_id` over the authenticated diagnostic pipe.
+4. Renderer invokes the authenticated pairing Capability with `pairing_id`; the cloud binds the pending record to the logged-in user and tenant.
+5. ConnectorHost polls activation while proving possession of the private key.
+6. The cloud encrypts the new device credential to the registered public key and atomically creates a new credential generation.
+7. ConnectorHost decrypts and stores the credential under current-user DPAPI, then discards the one-time private bootstrap material.
+
+The state machine is `created → user_bound → activated` with terminal `expired` and `cancelled` states. A `pairing_id` is single-use, expires after the configured bounded lifetime, and cannot be rebound to another user or tenant. Activation, cancellation, expiry, wrong-user, wrong-tenant, nonce replay, and possession failure are audited and tested.
+
+### Runtime generation and cutover fencing
+
+Each device record has a monotonically increasing `runtime_generation`. Activating the Electron ConnectorHost, switching back to the legacy Connector, repairing credentials, or rolling back creates a new generation transactionally. Each runtime launch also has a unique `runtime_instance_id`.
+
+Wake-up authentication, heartbeat, plan lease, lease renewal, Outcome v2, and reconciliation calls must match the current generation and permitted runtime type. The cloud rejects all calls from an older generation even if its old credential remains locally available. A rollback creates another generation; it never reactivates an old generation. This fencing, rather than a local process lock, prevents the old Windows Service and new App from executing the same device work during pilot migration.
 
 ### Update
 
-The signed release manifest describes the Electron version, ConnectorHost version, protocol versions, adapter manifest hash, installer digest, channel, and rollback compatibility. Electron owns update discovery and user interaction. Installation is atomic at the product level: App and ConnectorHost cannot be updated independently. ConnectorHost is stopped before replacement. Failed installation retains the previous complete version.
+The signed release manifest describes the Electron version, ConnectorHost version, protocol versions, adapter manifest hash, installer digest, channel, minimum security version, local-state schema versions, and rollback compatibility. Windows Authenticode proves publisher identity and binary integrity at installation and launch. The separately signed release manifest binds the approved component set and rollout policy. Their trust roots, key IDs, rotation overlap, revocation list, and emergency minimum version are part of the release configuration.
+
+Electron owns update discovery and user interaction. It verifies HTTPS origin, manifest signature, installer digest, Authenticode chain, anti-downgrade policy, and minimum security version before installation. Installation is atomic at the product level: App and ConnectorHost cannot be updated independently. ConnectorHost is stopped before replacement. On every launch, Electron verifies the ConnectorHost path is under the immutable installation directory and its digest matches the installed manifest before execution. ConnectorHost uses an application-owned working directory and absolute DLL resolution so the current directory and user-writable search paths cannot inject code.
+
+DPAPI credentials, execution journal, and updater state each carry an explicit schema version. Forward migrations are atomic and retain a rollback-readable copy only when the signed manifest declares backward compatibility. Otherwise rollback creates a new runtime generation and requires re-pairing rather than interpreting newer security state with older code. Failed installation retains the previous complete version.
 
 ## Cloud deployment impact
 
 The backend, Capability Gateway, domain Providers, database, and Connector control plane remain cloud deployed. No local backend or local database is introduced. The existing authenticated WebSocket endpoint remains a wake-up transport, with bounded HTTP polling as loss recovery.
 
-The cloud deployment gains an App compatibility policy and release metadata, but does not require a new independently scaled business service. Schema migrations are limited to fields or records that are demonstrably missing from the current device, plan, lease, outcome, audit, and compatibility models.
+The cloud deployment gains execution-plan/outcome v2, possession pairing, runtime-generation fencing, reconciliation state, App compatibility policy, and signed release metadata, but does not require a new independently scaled business service. These remain in the existing Simulation control plane and Capability governance deployment. Schema migrations are additive and limited to fields or records missing from the current device, plan, lease, outcome, audit, and compatibility models.
 
 During migration, the current web deployment remains available for rollback and users not yet moved to the App. After App adoption and runtime evidence meet the agreed threshold, ordinary user navigation to the web product can be retired separately. Administrative diagnostics may remain web hosted if they are explicitly governed and operationally required.
 
@@ -173,9 +207,10 @@ App binaries are published through a release-artifact channel rather than commit
 
 - ConnectorHost unavailable: App remains usable for cloud-only capabilities; device-dependent capabilities return an explicit unavailable state and a bounded repair action.
 - Wake-up connection unavailable: ConnectorHost reconnects with bounded backoff and uses the existing two-second poll as recovery. The plan lease remains authoritative.
-- App or ConnectorHost crash: ConnectorHost exits when its parent disappears. A leased plan is reconciled by idempotent outcome lookup or lease expiry after restart.
+- App or ConnectorHost crash: the Job Object stops ConnectorHost when its parent disappears. Any step whose COM invocation began without a committed terminal result becomes `outcome_unknown` and enters reconciliation after restart; it is not automatically replayed when the lease expires.
 - VisMockup absent or incompatible: the adapter returns a structured non-retriable compatibility error without launching an alternative executable or performing a partial command.
-- COM timeout or cancellation: the current step records a bounded failure or cancellation outcome. Later steps do not execute unless the signed plan explicitly permits that transition.
+- COM timeout, cancellation after invocation begins, or process loss: the current step records `outcome_unknown` because COM may have completed without returning. Later steps stop. The cloud blocks an equivalent side-effect plan until reconciliation reaches a terminal result.
+- Reconciliation: every side-effecting adapter operation declares a bounded post-condition probe. The probe classifies the prior step as `succeeded`, `failed_without_effect`, or `manual_review_required`. Only `failed_without_effect` permits a new equivalent plan. Operations without a reliable probe always require manual review after an unknown outcome.
 - Signature, hash, device, tenant, actor, Catalog, version, expiry, or replay failure: execution is rejected before COM invocation and a security audit event is submitted when authentication permits.
 - Cloud unavailable: no new local business operation begins. Pending UI intent remains uncommitted and is safe to retry with its original idempotency identity.
 - Update failure: the prior complete signed version remains runnable. An App/ConnectorHost version mismatch prevents local execution.
@@ -188,14 +223,34 @@ App binaries are published through a release-artifact channel rather than commit
 - Preload exposes named functions rather than `ipcRenderer`, `shell`, arbitrary channels, arbitrary filesystem paths, or arbitrary URLs.
 - The main process applies schema validation and sender-origin validation to every IPC handler.
 - Device credentials are DPAPI protected, never returned to Renderer, and redacted from logs and crash reports.
-- Named-pipe access is restricted to the current user and launch instance. The pipe protocol has a version and closed message schemas.
-- Connector plans and outcomes use the existing canonical serialization and signing rules. Compatibility changes require a new protocol or Capability version instead of permissive parsing.
+- Named-pipe access is restricted to the current user and launch instance. Its closed protocol uses mutual process checks, installed-path and signer verification, manifest-digest verification, and a per-launch nonce handshake in addition to the Windows ACL.
+- Connector plan/outcome v2 uses the existing canonical JSON and cryptographic primitives with the new required v2 fields. Compatibility changes require a new protocol or Capability version instead of permissive parsing.
+- Third-party Electron plugin windows are disabled in the first App release. Only signed official assets packaged in the immutable App manifest may open an App window. A future third-party window design requires its own signed package policy, isolated session partition, sandbox, zero `electronAPI` exposure, and Capability consumer allowlist.
 
 ## Packaging and lifecycle
 
 The supported artifact is one Windows x64 installer produced by Electron Builder. It contains the production web assets, Electron main and preload files, official desktop plugin assets, ConnectorHost, the required .NET runtime or self-contained output, and signed release metadata. It excludes backend source, test fixtures, local secrets, generated test directories, update installers from prior versions, and developer tools.
 
-Installation creates the AI00 App registration, deep-link protocol, shortcuts, and updater metadata. It does not create a Windows Service or a separate Connector startup entry. Uninstall removes application-owned binaries and registrations. User-owned documents remain unless the user explicitly chooses removal; device credentials and recovery state follow an explicit security deletion policy implemented by the uninstaller.
+Installation creates the AI00 App registration, deep-link protocol, shortcuts, and updater metadata. It does not create a Windows Service or a separate Connector startup entry. Uninstall removes application-owned binaries and registrations. User-owned documents remain unless the user explicitly chooses removal. Device credentials, execution journal, pairing state, and updater security state are deleted on full uninstall; an in-place update preserves and migrates them only under the signed compatibility rules above.
+
+## Planned source boundaries
+
+The implementation plan uses these project boundaries so the migration does not grow another parallel architecture:
+
+- `packages/core/electron/main.js`: composition root only; delegates security, authentication, protocol, update, and ConnectorHost lifecycle.
+- `packages/core/electron/capability_client.js`: canonical Gateway route, closed InvocationEnvelope, token custody, desktop session claim, confirmation, and retry identity.
+- `packages/core/electron/connector_host_manager.js`: signed-binary verification, Job Object lifecycle, launch nonce, diagnostic-pipe handshake, readiness, and shutdown.
+- `packages/core/electron/preload.js`: frozen Renderer API containing governed capability invocation and bounded platform functions.
+- `packages/core/electron/auth_manager.js`: OAuth callback validation, token refresh, redacted state, logout, and multi-window synchronization.
+- `packages/core/electron/plugin_manager.js`: official packaged-window enforcement; third-party Electron windows fail closed.
+- `local-runtime/src/Ai00.Connector.AppHost/`: the new application-owned executable and composition root.
+- `local-runtime/src/Ai00.Connector.Contracts.V2/`: closed plan, Outcome, pairing proof, generation, journal, and diagnostic contracts. Existing v1 types remain unchanged for the legacy runtime during migration.
+- `local-runtime/src/Ai00.Connector.Adapters.VisMockup/`: existing COM adapter plus explicit post-condition probes for side-effecting operations.
+- `plugins/simulation/simulation_backend/application/`: plan/outcome v2 issuance, possession pairing, generation fencing, reconciliation, and compatibility policy.
+- `backend/db/migrations/domains/simulation/`: additive device-generation, runtime-instance, pairing-proof, v2 plan/outcome, and reconciliation persistence.
+- `backend/capability_v2/` and generated governance documents: desktop consumer, provider, impact-closure, release evidence, and route enforcement.
+
+No business implementation is added to the Electron main process or named-pipe layer. Code currently located in Service, Tray, and SessionHost projects is moved or referenced by AppHost according to responsibility, then those deployment entry points are removed only after parity and cutover tests pass.
 
 ## Migration stages
 
@@ -207,15 +262,19 @@ Resolve the three Ontology business-definition baseline mismatches and regenerat
 
 Keep the UI unchanged. Inventory main/preload IPC and all Electron-only call sites, classify platform and business operations, remove direct business paths, restrict the application protocol and BrowserWindow settings, register desktop consumer identity, and add packaged UI regression coverage.
 
-### Stage 2: create the application-owned ConnectorHost
+### Stage 2: add cloud protocol v2 and migration fencing
 
-Build one .NET host from the existing Connector contracts, service worker, SessionHost, and VisMockup adapter code. Run it in the interactive user session, add parent-lifecycle supervision and diagnostic named-pipe messages, and retain cloud-only business command flow. Prove parity with existing Connector tests before removing old deployment projects.
+Add closed execution-plan and Outcome v2 contracts, possession-based pairing, runtime generation and instance fencing, reconciliation state, compatibility policy, additive migrations, and downgrade tests. Keep v1 available only for the identified legacy runtime during the pilot. The cloud must pass generation-race and unknown-outcome tests before AppHost can lease a production plan.
 
-### Stage 3: integrate product lifecycle
+### Stage 3: create the application-owned ConnectorHost
+
+Build one .NET host from the existing Connector contracts, service worker, SessionHost, and VisMockup adapter code. Run it in the interactive user session, accept only protocol v2, add the durable pre-execution journal, post-condition probes, parent-lifecycle supervision and authenticated diagnostic messages, and retain cloud-only business command flow. Prove parity with existing Connector tests before removing old deployment projects.
+
+### Stage 4: integrate product lifecycle
 
 Package ConnectorHost with Electron, implement coordinated startup, repair, update, rollback, and uninstall, and remove the Python Bridge, independent Service installer, separate Tray, and SessionHost launch paths from the App distribution.
 
-### Stage 4: pilot and cutover
+### Stage 5: pilot and cutover
 
 Release to a bounded Windows x64 pilot group. Collect runtime evidence for pairing, wake-up latency, plan execution, VisMockup lifecycle, crash recovery, upgrade, rollback, and uninstall. Promote only after governance approval and runtime verification. Retain web and old Connector rollback paths during the pilot, then retire independent Connector distribution after the cutover criteria pass.
 
@@ -225,7 +284,8 @@ Release to a bounded Windows x64 pilot group. Collect runtime evidence for pairi
 
 - Capability Catalog generation and Release Gate validation.
 - Desktop consumer and local-runtime provider coverage with immutable source hashes.
-- Direct REST, loopback, IPC business-route, and Renderer-to-Connector scans.
+- Canonical `/api/v1/capabilities/{id}:invoke` route enforcement and closed InvocationEnvelope validation.
+- Direct REST, arbitrary `_cloudFetch`, loopback, IPC business-route, and Renderer-to-Connector scans.
 - Closed JSON schemas for preload IPC, named-pipe diagnostics, execution plans, outcomes, and update manifests.
 - Installer-content allowlist and oversized or secret artifact scans.
 
@@ -233,10 +293,14 @@ Release to a bounded Windows x64 pilot group. Collect runtime evidence for pairi
 
 - Existing frontend test suite against both source and packaged production assets.
 - Screenshot and interaction regression tests for login, workspace, Craft lineage, standard operations, Simulation/VisMockup, settings, pop-out windows, and approval flows.
-- Electron main/preload tests for sender validation, navigation, protocol traversal, file bounds, token isolation, and process supervision.
-- ConnectorHost unit tests for parent exit, one-instance behavior, named-pipe ACL, startup failure, shutdown, recovery, and version mismatch.
+- Electron main/preload tests for PKCE state and callback validation, server-signed consumer claims, token isolation, refresh/logout synchronization, sender validation, navigation, protocol traversal, file bounds, official-only plugin windows, and process supervision.
+- ConnectorHost unit tests for Job Object parent exit, per-user/device single-instance behavior, fast user switching, named-pipe ACL and mutual handshake, binary digest validation, startup failure, shutdown, recovery, and version mismatch.
 - Existing Connector contract, DPAPI, plan, lease, signature, replay, STA, timeout, cancellation, and VisMockup adapter tests.
-- Cloud tests for App compatibility policy, device binding, confirmation, wake-up transport, lease recovery, outcome application, and audit.
+- Protocol v2 tests for missing and unknown fields, deletion and mutation of every signed binding, v1 downgrade attempts, Catalog mismatch, wrong confirmation, wrong normalized input, expired plans, and Outcome-to-plan mismatch.
+- Pairing tests for proof of possession, expiry, single use, cancellation, nonce replay, wrong user, wrong tenant, credential encryption, and DPAPI persistence.
+- Generation-fencing tests that race legacy and App runtimes and reject stale-generation wake-up, heartbeat, lease, renewal, outcome, reconciliation, and rollback calls.
+- Unknown-outcome tests that persist the journal before COM, stop later steps, block equivalent plan issuance, run each declared post-condition probe, and require manual review when reconciliation cannot prove absence or presence of the side effect.
+- Cloud tests for App compatibility policy, device binding, confirmation, wake-up transport, lease recovery, outcome application, reconciliation, and audit.
 - Installer tests on clean Windows x64 and upgrade tests from the last supported App version.
 
 ### Runtime evidence
@@ -261,7 +325,10 @@ Runtime verification records exact App, ConnectorHost, backend, Catalog, adapter
 - Broad legacy Electron IPC: inventory every exposed method, default deny, and remove business operations before enabling App release.
 - UI drift during packaging: reuse the existing build output and gate critical pages with screenshots and interaction tests.
 - Hidden command bypass through local diagnostics: keep the named pipe status-only and test that executable payload fields are rejected.
-- Connector lifecycle races: make the Electron parent identity and one-instance lock explicit, and test start, quit, crash, update, and recovery sequences.
+- Connector lifecycle races: combine Windows Job Object ownership, signed-path and digest verification, launch-nonce handshake, runtime-generation fencing, and per-user/device single-instance behavior; test start, quit, crash, fast user switching, update, rollback, and recovery sequences.
 - Version skew: publish App and ConnectorHost atomically and enforce cloud compatibility before leasing plans.
+- Irreversible COM uncertainty: journal before invocation, return `outcome_unknown`, stop the plan, reconcile by declared post-condition probe, and forbid automatic replay.
+- OAuth or consumer spoofing: use Authorization Code with PKCE, keep tokens in main, derive the desktop consumer from a server-signed session claim, and reject request overrides.
+- Untrusted plugin windows: disable third-party Electron windows in the first release and package only signed official assets.
 - Migration rollback complexity: preserve the web and old Connector rollout paths until pilot evidence passes, while preventing simultaneous leasing by old and new runtimes for the same device.
 - Governance debt: close existing Release Gate blockers in Stage 0 rather than weakening validation or treating the App migration as an exemption.
