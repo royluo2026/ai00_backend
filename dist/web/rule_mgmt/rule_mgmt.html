@@ -12,25 +12,6 @@
   <script src="/web/icons.js"></script>
   <div id="appRoot" style="height:100%;flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden"></div>
 
-  <!-- 背离记录弹窗 -->
-  <div class="modal-overlay" id="modal-deviation" style="display:none">
-    <div class="modal">
-      <div class="modal-hdr">记录背离 <span class="modal-close" id="btn-close-dev-modal">✕</span></div>
-      <div class="modal-body">
-        <label>工艺方案 GID</label>
-        <input type="text" id="dev-work-plan" placeholder="可选">
-        <label>工序 GID</label>
-        <input type="text" id="dev-operation" placeholder="可选">
-        <label>背离原因</label>
-        <textarea id="dev-reason" placeholder="描述背离原因"></textarea>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-accent" id="btn-save-deviation">保存</button>
-        <button class="btn" id="btn-cancel-dev-modal">取消</button>
-      </div>
-    </div>
-  </div>
-
   <script src="/web/components/scope_badge.js"></script>
   <script src="/web/components/list_sidebar.js"></script>
   <script src="/web/components/view_manager.js"></script>

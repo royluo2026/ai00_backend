@@ -7,6 +7,55 @@
  */
 const AuthStateManager = (() => {
   const _subscribers = [];
+  const _ROLE_LABELS = Object.freeze({
+    super_admin: '超级管理员',
+    team_admin: '团队管理员',
+    project_admin: '项目管理员',
+    member: '成员',
+    external: '外部用户',
+  });
+
+  // /users/me 的兼容路径返回 { success, data: profile }，而 /auth/me
+  // 返回 profile 本身。统一在这里解包，避免子页面看到空 permissions。
+  function _mergeUserProfile(user, response) {
+    const envelope = response && typeof response === 'object' ? response : {};
+    const profile = envelope.data && typeof envelope.data === 'object'
+      ? envelope.data
+      : envelope;
+    const current = user && typeof user === 'object' ? user : {};
+    return Object.assign({}, current, profile, {
+      permissions: Array.isArray(profile.permissions)
+        ? profile.permissions.slice()
+        : (Array.isArray(current.permissions) ? current.permissions.slice() : []),
+      grants: Array.isArray(profile.grants)
+        ? profile.grants.slice()
+        : (Array.isArray(current.grants) ? current.grants.slice() : []),
+    });
+  }
+
+  function _formatUserStatus(user, mode) {
+    const current = user && typeof user === 'object' ? user : null;
+    if (!current || !mode || mode === 'none') {
+      return { authenticated: false, text: '未登录', title: '未登录，尚未完成后端鉴权。' };
+    }
+    const name = current.name || current.display_name || current.email || current.gid || '当前用户';
+    const role = current.org_role || current.system_role || current.role || '';
+    const roleText = role ? `${_ROLE_LABELS[role] || role}（${role}）` : '角色待确认';
+    const permissionCount = Array.isArray(current.permissions) ? current.permissions.length : 0;
+    return {
+      authenticated: true,
+      text: `${name} · ${roleText}`,
+      title: `已通过后端鉴权\n身份：${role || '未返回'}\n有效权限：${permissionCount} 项`,
+    };
+  }
+
+  function _renderUserStatus(element, user, mode) {
+    if (!element) return;
+    const status = _formatUserStatus(user, mode);
+    element.textContent = status.text;
+    element.title = status.title;
+    element.dataset.authenticated = status.authenticated ? 'true' : 'false';
+  }
 
   function _publish(state) {
     // 更新全局变量（向后兼容）
@@ -58,8 +107,11 @@ const AuthStateManager = (() => {
       if (!res.ok) return;
       const data = await res.json();
       if (data && window._authUser) {
-        window._authUser.grants   = data.grants   || [];
-        window._authUser.org_role = data.org_role || window._authUser.org_role;
+        window._authUser = _mergeUserProfile(window._authUser, data);
+        // 已打开的 iframe 可能早于异步 profile 刷新；通知同源页面重新读取。
+        window.dispatchEvent(new CustomEvent('ai00-auth-user-updated', {
+          detail: window._authUser,
+        }));
       }
     } catch (_) {}
   }
@@ -68,9 +120,14 @@ const AuthStateManager = (() => {
     _subscribers.push(fn);
   }
 
-  return { init, subscribe, publish: _publish };
+  return {
+    init,
+    subscribe,
+    publish: _publish,
+    mergeUserProfile: _mergeUserProfile,
+    formatUserStatus: _formatUserStatus,
+    renderUserStatus: _renderUserStatus,
+  };
 })();
 
 window.AuthStateManager = AuthStateManager;
-
-

@@ -59,12 +59,35 @@ function _toast(msg, type = 'info') {
   setTimeout(() => el.remove(), 3000);
 }
 
+function _cf(method, path, opts = {}) {
+  return ListShell._cf(path, { ...opts, method });
+}
+
+async function _invokeCapability(id, payload) {
+  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version: 1, payload }),
+  });
+  const result = response?.data;
+  if (response?.success !== true || result?.ok !== true) {
+    const detail = result?.error || response?.error || {};
+    const error = new Error(detail.message || `能力调用失败：${id}@1`);
+    error.code = detail.code || 'capability_invocation_failed';
+    throw error;
+  }
+  return result.data;
+}
+
 // ── 加载条目 ─────────────────────────────────────────────────────
 async function load() {
   if (!_currentVersion) return;
   try {
-    const json = await ListShell._cf(`/api/gbop/versions/${_currentVersion}/entries`);
-    _shell.setRows(json.data || []);
+    const json = await _invokeCapability('craft.gbop.catalog.read', {
+      operation: 'entries.list',
+      version_gid: _currentVersion,
+    });
+    _shell.setRows(json?.items || json?.data || []);
   } catch (e) { _toast('加载失败: ' + e.message, 'error'); }
 }
 
@@ -120,10 +143,10 @@ function _initShell() {
       const { changedRow, action } = extra || {};
       if (action === 'edit' && changedRow?.gid) {
         try {
-          await ListShell._cf(`/api/gbop/entries/${changedRow.gid}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(changedRow),
+          await _invokeCapability('craft.gbop.entity.change.apply', {
+            operation: 'entry.update',
+            gid: changedRow.gid,
+            updates: changedRow,
           });
           await load();
         } catch (e) { _toast('保存失败: ' + e.message, 'error'); }
@@ -131,10 +154,11 @@ function _initShell() {
         if (!_currentVersion) { _toast('请先选择版本', 'warn'); return; }
         try {
           // 默认创建为通用 entry（非 process/operation）
-          await ListShell._cf('/api/gbop/entries', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ version_gid: _currentVersion, node_type: 'part', vpps_desc: changedRow.vpps_desc }),
+          await _invokeCapability('craft.gbop.entity.change.apply', {
+            operation: 'entry.create',
+            version_gid: _currentVersion,
+            node_type: 'part',
+            vpps_desc: changedRow.vpps_desc,
           });
           await load();
         } catch (e) { _toast('创建失败: ' + e.message, 'error'); }
@@ -160,8 +184,10 @@ function _initShell() {
 // ── 版本侧边栏（自定义分组渲染）──────────────────────────────────
 async function _loadVersions() {
   try {
-    const json = await ListShell._cf('/api/gbop/versions?include_archived=true');
-    _gbopVersions = json.data || [];
+    const json = await _invokeCapability('craft.gbop.release.search', {
+      include_archived: true,
+    });
+    _gbopVersions = json?.items || [];
   } catch (e) { console.warn('[GBOP] 加载版本失败:', e); }
 }
 
@@ -229,9 +255,15 @@ function _renderFamilyGroup(scrollEl, fgid, fam, isArchived) {
     e.stopPropagation();
     try {
       if (isArchived) {
-        await ListShell._cf(`/api/gbop/version-families/${fgid}/archive`, { method: 'DELETE' });
+        await _invokeCapability('craft.gbop.version.change.apply', {
+          operation: 'unarchive_family',
+          gid: fgid,
+        });
       } else {
-        await ListShell._cf(`/api/gbop/version-families/${fgid}/archive`, { method: 'POST' });
+        await _invokeCapability('craft.gbop.version.change.apply', {
+          operation: 'archive_family',
+          gid: fgid,
+        });
       }
       await _refreshSidebar();
     } catch (err) { _toast('操作失败: ' + err.message, 'error'); }
@@ -304,7 +336,10 @@ function _showVerCtxMenu(x, y, ver) {
 // ── 版本操作 ──────────────────────────────────────────────────────
 async function _freezeVersion(gid) {
   try {
-    await ListShell._cf(`/api/gbop/versions/${gid}/freeze`, { method: 'POST' });
+    await _invokeCapability('craft.gbop.version.change.apply', {
+      operation: 'freeze',
+      gid,
+    });
     _toast('版本已冻结', 'success');
     await _refreshSidebar();
   } catch (e) { _toast('冻结失败: ' + e.message, 'error'); }
@@ -372,7 +407,10 @@ function _openEditEntryModal(row) {
 async function _deleteEntry(gid) {
   if (!confirm('确定删除此节点及其所有子节点？')) return;
   try {
-    await ListShell._cf(`/api/gbop/entries/${gid}`, { method: 'DELETE' });
+    await _invokeCapability('craft.gbop.entity.change.apply', {
+      operation: 'entry.delete',
+      gid,
+    });
     await load();
     _toast('已删除', 'success');
   } catch (e) { _toast('删除失败: ' + e.message, 'error'); }
@@ -393,10 +431,11 @@ function _bindEvents() {
     const familyGid = document.getElementById('inp-ver-family-gid').value || null;
     if (!name) { _toast('请输入名称', 'warn'); return; }
     try {
-      await ListShell._cf('/api/gbop/versions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, vehicle_model: vehicle, version_family_gid: familyGid }),
+      await _invokeCapability('craft.gbop.version.change.apply', {
+        operation: 'create',
+        name,
+        vehicle_model: vehicle,
+        version_family_gid: familyGid,
       });
       closeModal('modal-new-version');
       document.getElementById('inp-ver-name').disabled = false;
@@ -414,10 +453,10 @@ function _bindEvents() {
     const vehicle = document.getElementById('inp-editver-vehicle').value.trim();
     const status = document.getElementById('inp-editver-status').value;
     try {
-      await ListShell._cf(`/api/gbop/versions/${gid}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, vehicle_model: vehicle, status }),
+      await _invokeCapability('craft.gbop.version.change.apply', {
+        operation: 'update',
+        gid,
+        updates: { name, vehicle_model: vehicle, status },
       });
       closeModal('modal-edit-version');
       await _refreshSidebar();
@@ -433,10 +472,10 @@ function _bindEvents() {
     if (document.getElementById('inp-import-l3').checked) levels.push(3);
     if (!levels.length) { _toast('请至少选择一个层级', 'warn'); return; }
     try {
-      const res = await ListShell._cf(`/api/gbop/versions/${_currentVersion}/import-vpps-parts`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ levels }),
+      const res = await _invokeCapability('craft.gbop.import.change.apply', {
+        operation: 'import_vpps_parts',
+        version_gid: _currentVersion,
+        levels,
       });
       closeModal('modal-import-vpps');
       await load();
@@ -455,13 +494,18 @@ function _bindEvents() {
     btn.textContent = '导入中…';
     resultEl.textContent = '';
     try {
-      const fd = new FormData();
-      fd.append('file', file);
-      const res = await ListShell._cfUpload(
-        `/api/gbop/versions/${_currentVersion}/import-tc-excel`,
-        fd
-      );
-      const d = res.data || {};
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      let binary = '';
+      for (let i = 0; i < bytes.length; i += 0x8000) {
+        binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+      }
+      const res = await _invokeCapability('craft.gbop.import.tc.change.apply', {
+        operation: 'import_tc_excel',
+        version_gid: _currentVersion,
+        filename: file.name,
+        content_b64: btoa(binary),
+      });
+      const d = res?.data || res || {};
       resultEl.textContent = `工序 +${d.processes_created ?? 0}  操作 +${d.operations_created ?? 0}  节点 +${d.entries_created ?? 0}  链接 +${d.links_created ?? 0}`;
       closeModal('modal-import-tc-excel');
       await load();
@@ -490,16 +534,20 @@ function _bindEvents() {
 
     try {
       if (editGid) {
-        await ListShell._cf(`/api/gbop/entries/${editGid}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ node_type, vpps_desc, vpps, seq_no }),
+        await _invokeCapability('craft.gbop.entity.change.apply', {
+          operation: 'entry.update',
+          gid: editGid,
+          updates: { node_type, vpps_desc, vpps, seq_no },
         });
       } else {
-        await ListShell._cf('/api/gbop/entries', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ version_gid: _currentVersion, parent_gid: parentGid, node_type, vpps_desc, vpps, seq_no }),
+        await _invokeCapability('craft.gbop.entity.change.apply', {
+          operation: 'entry.create',
+          version_gid: _currentVersion,
+          parent_gid: parentGid,
+          node_type,
+          vpps_desc,
+          vpps,
+          seq_no,
         });
       }
       closeModal('modal-new-entry');
@@ -517,10 +565,11 @@ function _bindEvents() {
     const name = document.getElementById('inp-fork-name').value.trim() || null;
     const familyGid = document.getElementById('inp-fork-family').value || null;
     try {
-      await ListShell._cf(`/api/gbop/versions/${sourceGid}/fork`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target_name: name, target_version_family_gid: familyGid }),
+      await _invokeCapability('craft.gbop.version.change.apply', {
+        operation: 'fork',
+        source_gid: sourceGid,
+        target_bop_name: name || undefined,
+        version_family_gid: familyGid,
       });
       closeModal('modal-fork');
       await _refreshSidebar();

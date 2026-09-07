@@ -561,8 +561,25 @@ class ListShell {
     });
   }
 
+  static _deleteFiniteItem(_cloudFetch, type, gid) {
+    if (type === 'task') return _cloudFetch(`/api/tasks/${gid}`, { method: 'DELETE' });
+    if (type === 'issue') return _cloudFetch(`/api/issues/${gid}`, { method: 'DELETE' });
+    if (type === 'knowledge') return (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('knowledge.delete', { gid });
+    if (type === 'rule') return _cloudFetch(`/api/rules/${gid}`, { method: 'DELETE' });
+    throw new Error(`不支持的条目类型: ${type}`);
+  }
+
+  static _patchFiniteItem(_cloudFetch, type, gid, patch) {
+    if (type === 'task') return _cloudFetch(`/api/tasks/${gid}`, { method: 'PATCH', body: JSON.stringify(patch) });
+    if (type === 'issue') return _cloudFetch(`/api/issues/${gid}`, { method: 'PATCH', body: JSON.stringify(patch) });
+    if (type === 'knowledge') return (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('knowledge.update', { gid, updates: patch });
+    if (type === 'rule') return _cloudFetch(`/api/rules/${gid}`, { method: 'PATCH', body: JSON.stringify(patch) });
+    throw new Error(`不支持的条目类型: ${type}`);
+  }
+
   // ── 删除行（软删除，owner 鉴权）───────────────────────────────────────────
   async _handleDeleteRow(row) {
+    const _cloudFetch = this.cf.bind(this);
     // 无 gid（未保存新行）：直接从 grid 移除即可
     if (!row.gid) {
       this.grid.setRows(this.grid.getRows().filter(r => r.gid !== row.gid));
@@ -578,7 +595,7 @@ class ListShell {
         return;
       }
       try {
-        await this.cf(`/api/${type}s/${row.gid}`, { method: 'DELETE' });
+        await ListShell._deleteFiniteItem(_cloudFetch, type, row.gid);
         if (this._onSelect) this._onSelect(this._currentList);
       } catch (err) {
         console.error('[ListShell._handleDeleteRow cloud]', err);
@@ -587,7 +604,7 @@ class ListShell {
     } else {
       // 非云端条目也通过云端删除
       try {
-        await this.cf(`/api/${type}s/${row.gid}`, { method: 'DELETE' });
+        await ListShell._deleteFiniteItem(_cloudFetch, type, row.gid);
         if (this._onSelect) this._onSelect(this._currentList);
       } catch (err) {
         console.error('[ListShell._handleDeleteRow]', err);
@@ -598,6 +615,7 @@ class ListShell {
 
   // ── 移至清单（内置，跨存储自动迁移）──────────────────────────────────────────
   _openMoveToListModal(row) {
+    const _cloudFetch = this.cf.bind(this);
     const type = this._itemType;   // 'task'|'issue'|'knowledge'|'rule'
     const allLists = this.sidebar?._lists || [];
     const sourceIsCloud = row._source === 'cloud';
@@ -631,14 +649,16 @@ class ListShell {
       mask.remove();
       try {
         // 直接改 list_gid（云端）
+        const body = JSON.stringify({ list_gid: selected || null });
         const _cloudUpdateMap = {
-          task:      { url: `/api/tasks/${row.gid}`,             method: 'PUT'   },
-          issue:     { url: `/api/issues/${row.gid}`,            method: 'PUT'   },
-          rule:      { url: `/api/rules/${row.gid}`,             method: 'PATCH' },
-          knowledge: { url: `/api/knowledge_entries/${row.gid}`, method: 'PATCH' },
+          task:      () => _cloudFetch(`/api/tasks/${row.gid}`,             { method: 'PUT',   body }),
+          issue:     () => _cloudFetch(`/api/issues/${row.gid}`,            { method: 'PUT',   body }),
+          rule:      () => _cloudFetch(`/api/rules/${row.gid}`,             { method: 'PATCH', body }),
+          knowledge: () => _cloudFetch(`/api/knowledge_entries/${row.gid}`, { method: 'PATCH', body }),
         };
-        const opt = _cloudUpdateMap[type] || { url: `/api/${type}s/${row.gid}`, method: 'PATCH' };
-        await this.cf(opt.url, { method: opt.method, body: JSON.stringify({ list_gid: selected || null }) });
+        const update = _cloudUpdateMap[type];
+        if (!update) throw new Error(`不支持的条目类型: ${type}`);
+        await update();
         // 通知页面刷新
         if (this._onSelect) this._onSelect(this._currentList);
       } catch (err) {
@@ -652,7 +672,8 @@ class ListShell {
     const row = this._allRows.find(r => r.gid === gid);
     if (!row) return;
     try {
-      const resp = await ListShell._cf(`/api/item-entries/${this._itemType}/${gid}`, {
+      const _cloudFetch = ListShell._cf;
+      const resp = await _cloudFetch(`/api/item-entries/${this._itemType}/${gid}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ entries }),
@@ -687,14 +708,25 @@ class ListShell {
       }
       if (!Object.keys(patch).length) return;
 
-      // 直接调用云端 API（不经过 _onRowsChange，确保报错能传播到 RDP 显示"保存失败"）
-      const rawCp = this._rdpSaveOpts?.cloudPath;
-      const cloudBase = typeof rawCp === 'function' ? rawCp(row) : (rawCp || `/api/${this._itemType}s`);
-      await ListShell._cf(`${cloudBase}/${fields.gid}`, {
-        method:  'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(patch),
-      });
+      // 能力治理页面可注入保存器；旧页面继续使用 cloudPath 兼容路径。
+      const savePatch = this._rdpSaveOpts?.savePatch;
+      if (typeof savePatch === 'function') {
+        await savePatch(row, patch);
+      } else {
+        const rawCp = this._rdpSaveOpts?.cloudPath;
+        const _cloudFetch = ListShell._cf;
+        const opts = {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(patch),
+        };
+        if (rawCp) {
+          const cloudBase = typeof rawCp === 'function' ? rawCp(row) : rawCp;
+          await _cloudFetch(`${cloudBase}/${fields.gid}`, opts);
+        } else {
+          await ListShell._patchFiniteItem(_cloudFetch, this._itemType, fields.gid, patch);
+        }
+      }
 
       // 更新缓存行
       Object.assign(row, patch);
@@ -1004,6 +1036,7 @@ class ListShell {
 
   /** 弹出居中 modal（RDP 弹出按钮触发，使用 RowEditModal 组件）*/
   async _openPopoutModal(params) {
+    const _cloudFetch = ListShell._cf;
     // 关闭侧边栏 RDP
     if (this.rdp) this.rdp.close();
 
@@ -1029,7 +1062,7 @@ class ListShell {
     const row = items[idx];
     if (row && (!Array.isArray(row.entries) || !row.entries.length)) {
       try {
-        const resp = await ListShell._cf(`/api/item-entries/${this._itemType}/${row.gid}`);
+        const resp = await _cloudFetch(`/api/item-entries/${this._itemType}/${row.gid}`, { method: 'GET' });
         const result = resp?.entries || [];
         if (Array.isArray(result) && result.length) {
           row.entries = result;
@@ -1117,13 +1150,24 @@ class ListShell {
         const row = shell._allRows.find(r => r.gid === gid);
         if (!row) throw new Error('条目不存在');
 
-        const rawCp = shell._rdpSaveOpts?.cloudPath;
-        const cloudBase = typeof rawCp === 'function' ? rawCp(row) : (rawCp || `/api/${shell._itemType}s`);
-        await ListShell._cf(`${cloudBase}/${gid}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(patch),
-        });
+        const savePatch = shell._rdpSaveOpts?.savePatch;
+        if (typeof savePatch === 'function') {
+          await savePatch(row, patch);
+        } else {
+          const rawCp = shell._rdpSaveOpts?.cloudPath;
+          const _cloudFetch = ListShell._cf;
+          const opts = {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(patch),
+          };
+          if (rawCp) {
+            const cloudBase = typeof rawCp === 'function' ? rawCp(row) : rawCp;
+            await _cloudFetch(`${cloudBase}/${gid}`, opts);
+          } else {
+            await ListShell._patchFiniteItem(_cloudFetch, shell._itemType, gid, patch);
+          }
+        }
 
         Object.assign(row, patch);
         shell._renderRows();
@@ -1257,22 +1301,24 @@ class ListShell {
   /**
    * 生成标准 load() 函数（云端模式）
    * @param {object} opts
-   * @param {string}   [opts.cloudPath]        云端 API 路径前缀（e.g. '/api/rules'）
+   * @param {string}   [opts.cloudPath]        云端 API 路径前缀（例如规则列表端点）
    * @param {()=>string|null} opts.getCurrentList  返回当前清单 GID
    * @param {()=>any[]}       opts.getAllLists      返回所有清单数组
    * @param {()=>ListShell}   opts.getShell         返回 ListShell 实例
    * @param {(rows:any[])=>void} opts.setData        设置数据变量
    */
-  static buildLoadHandler({ cloudPath, getCurrentList, getShell, setData }) {
+  static buildLoadHandler({ cloudPath, cloudRequest, getCurrentList, getShell, setData }) {
     return async function load() {
       const listGid  = getCurrentList?.();
       const canonGid = ListShell._canonListGid(listGid);
 
       let cloudData = [];
-      if (cloudPath) {
+      if (cloudPath || cloudRequest) {
         const qp = new URLSearchParams();
         if (canonGid) qp.set('list_gid', canonGid);
-        const cr = await ListShell._cfSafe(`${cloudPath}?${qp}`);
+        const cr = cloudRequest
+          ? await cloudRequest(qp)
+          : await ListShell._cfSafe(`${cloudPath}?${qp}`);
         cloudData = (cr?.data || []).map(r => ({ ...r, _source: 'cloud' }));
       }
 
@@ -1296,7 +1342,7 @@ class ListShell {
    * @param {()=>ListShell}   opts.getShell         返回 ListShell 实例
    * @param {()=>Promise<void>} opts.load          load() 函数引用（保存后刷新）
    */
-  static buildRowsChangeHandler({ editableKeys, primaryKey, cloudUpdatePath, cloudCreatePath, buildCreateBody, getData, getCurrentList, getShell, load }) {
+  static buildRowsChangeHandler({ editableKeys, primaryKey, cloudUpdatePath, cloudCreatePath, cloudUpdate, cloudCreate, buildCreateBody, getData, getCurrentList, getShell, load }) {
     return async function onRowsChange(newRows) {
       let didSave = false;
       const data     = getData?.() || [];
@@ -1311,10 +1357,14 @@ class ListShell {
           editableKeys.forEach(k => { if (String(row[k] ?? '') !== String(orig[k] ?? '')) body[k] = row[k]; });
           if (!Object.keys(body).length) continue;
           try {
-            const path = typeof cloudUpdatePath === 'function'
-              ? cloudUpdatePath(row.gid)
-              : `${cloudUpdatePath}/${row.gid}`;
-            await ListShell._cf(path, { method: 'PATCH', body: JSON.stringify(body) });
+            if (cloudUpdate) {
+              await cloudUpdate(row.gid, body);
+            } else {
+              const path = typeof cloudUpdatePath === 'function'
+                ? cloudUpdatePath(row.gid)
+                : `${cloudUpdatePath}/${row.gid}`;
+              await ListShell._cf(path, { method: 'PATCH', body: JSON.stringify(body) });
+            }
             didSave = true;
           } catch (err) { console.warn('[cloud save]', err); }
         } else if (primaryKey && row[primaryKey]) {
@@ -1322,7 +1372,9 @@ class ListShell {
             const cb = buildCreateBody
               ? buildCreateBody(row, canonGid)
               : { [primaryKey]: row[primaryKey], list_gid: canonGid };
-            if (cloudCreatePath) {
+            if (cloudCreate) {
+              await cloudCreate(cb);
+            } else if (cloudCreatePath) {
               await ListShell._cf(cloudCreatePath, { method: 'POST', body: JSON.stringify(cb) });
             }
             didSave = true;
@@ -1384,4 +1436,3 @@ ListShell.makeDiffManager = function(moduleId, getRows, matchKey = 'title') {
     }
   });
 }());
-

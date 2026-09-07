@@ -155,11 +155,11 @@ class AttachmentsWidget {
             data = await _readFileBase64(file);
           }
 
-          const cf = window._cloudFetch || window.parent?._cloudFetch;
-          if (!cf) throw new Error('_cloudFetch 未就绪');
+          const _cloudFetch = window._cloudFetch || window.parent?._cloudFetch;
+          if (!_cloudFetch) throw new Error('_cloudFetch 未就绪');
 
           // _cloudFetch 已处理 HTTP 错误（!res.ok 时抛出），直接返回解析后的 JSON 对象
-          const json = await cf('/api/uploads', {
+          const json = await _cloudFetch('/api/uploads', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
             body:    JSON.stringify({ filename: file.name, mime: effectiveMime, data_b64: data }),
@@ -168,7 +168,7 @@ class AttachmentsWidget {
           let resolvedUrl = json.url;
           if (json.storage === 'ois' && json.object_key) {
             try {
-              const resolved = await cf('/api/uploads/ois/resolve', {
+              const resolved = await _cloudFetch('/api/uploads/ois/resolve', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ object_key: json.object_key }),

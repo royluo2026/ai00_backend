@@ -73,10 +73,11 @@ window.ContainerModes['row_detail'] = (() => {
     return window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch || null;
   }
 
-  async function _cf(path, opts = {}) {
+  async function _cf(method, path, opts = {}) {
+    const requestOptions = { ...opts, method };
     // 优先用主窗口的 _cloudFetch 函数（与 ListShell._cf 完全一致）
     const cf = _getCF();
-    if (cf) return cf(path, opts);
+    if (cf) return cf(path, requestOptions);
 
     // 降级：直接使用 electronAPI 构建 fetch
     const eAPI = window.top?.electronAPI || window.parent?.electronAPI || window.electronAPI;
@@ -89,11 +90,11 @@ window.ContainerModes['row_detail'] = (() => {
     const baseUrl = (runtimeBase || config?.backendUrl || '').replace(/\/$/, '');
     const token = state?.token || '';
     const res = await fetch(`${baseUrl}${path}`, {
-      ...opts,
+      ...requestOptions,
       headers: {
         'Content-Type': 'application/json',
         ...(token ? { 'X-AI00-Token': token } : {}),
-        ...(opts.headers || {}),
+        ...(requestOptions.headers || {}),
       },
     });
     if (!res.ok) {
@@ -103,8 +104,57 @@ window.ContainerModes['row_detail'] = (() => {
     return res.json();
   }
 
+  const _ruleChangeOperations = new Map();
+  const _ruleChangeFields = new Set(['name', 'description', 'severity', 'enabled', 'condition', 'message', 'scope', 'tags', 'priority', 'category']);
+
+  function _closedRuleChanges(changes, rule) {
+    const closed = {};
+    for (const [field, value] of Object.entries(changes)) {
+      if (value === rule?.[field]) continue;
+      const target = field === 'expression' ? 'condition' : field;
+      if (!_ruleChangeFields.has(target)) throw new Error(`规则字段不支持受控更新：${field}`);
+      closed[target] = value;
+    }
+    if (!Object.keys(closed).length) throw new Error('没有可更新的规则字段');
+    return closed;
+  }
+
+  async function _saveRuleDefinition(rule, changes) {
+    const reference = rule?.rule_reference;
+    const expectedRevision = reference?.rule_revision;
+    const ruleGid = reference?.rule_gid;
+    if (!ruleGid || !Number.isInteger(expectedRevision)) throw new Error('规则引用未绑定，请刷新后重试');
+    const payload = { rule_gid: ruleGid, expected_revision: expectedRevision, changes: _closedRuleChanges(changes, rule) };
+    const operationKey = JSON.stringify(payload);
+    let operation = _ruleChangeOperations.get(operationKey);
+    if (!operation) {
+      const idempotencyKey = window.crypto?.randomUUID?.();
+      if (!idempotencyKey) throw new Error('无法安全生成规则变更操作标识');
+      operation = { idempotencyKey, payload };
+      _ruleChangeOperations.set(operationKey, operation);
+    }
+    if (!window.confirm('确认保存此规则定义变更？')) throw new Error('已取消规则定义变更');
+    try {
+      const result = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).invoke(
+        'craft.rule.definition.change.apply', operation.payload,
+        { write: true, confirmed: true, idempotencyKey: operation.idempotencyKey },
+      );
+      if (result?.status === 'outcome_unknown') throw new Error('规则变更结果未知，请刷新后核对操作结果');
+      return result;
+    } catch (error) {
+      if (error?.code === 'revision_conflict') throw new Error('规则已被更新，请刷新后再试');
+      if (error?.code === 'outcome_unknown') throw new Error('规则变更结果未知，请刷新后核对操作结果');
+      throw error;
+    }
+  }
+
   async function _load(itemType, gid, source) {
-    const res = await _cf(`/api/${itemType}s/${gid}`);
+    let res;
+    if (itemType === 'task') res = await _cf('GET', `/api/tasks/${gid}`);
+    else if (itemType === 'issue') res = await _cf('GET', `/api/issues/${gid}`);
+    else if (itemType === 'knowledge') res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('knowledge.get', { gid });
+    else if (itemType === 'rule') res = await _cf('GET', `/api/rules/${gid}`);
+    else throw new Error(`不支持的条目类型: ${itemType}`);
     return res?.data || res || null;
   }
 
@@ -113,24 +163,23 @@ window.ContainerModes['row_detail'] = (() => {
   // ── entries 持久化（调用 item_entries API，非 task/issue 字段）───
 
   async function _loadPopoutEntries(itemType, gid, source) {
-    const resp = await _cf(`/api/item-entries/${itemType}/${gid}`);
+    const resp = await _cf('GET', `/api/item-entries/${itemType}/${gid}`);
     return resp?.entries || [];
   }
 
   async function _savePopoutEntries(itemType, gid, source, entries) {
-    await _cf(`/api/item-entries/${itemType}/${gid}`, {
-      method: 'PUT',
+    await _cf('PUT', `/api/item-entries/${itemType}/${gid}`, {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ entries }),
     });
   }
 
-  async function _save(itemType, gid, source, changes) {
-    await _cf(`/api/${itemType}s/${gid}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(changes),
-    });
+  async function _save(itemType, gid, source, changes, currentItem) {
+    if (itemType === 'task') await _cf('PUT', `/api/tasks/${gid}`, { body: JSON.stringify(changes) });
+    else if (itemType === 'issue') await _cf('PUT', `/api/issues/${gid}`, { body: JSON.stringify(changes) });
+    else if (itemType === 'knowledge') await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('knowledge.update', { gid, updates: changes });
+    else if (itemType === 'rule') return _saveRuleDefinition(currentItem, changes);
+    else throw new Error(`不支持的条目类型: ${itemType}`);
   }
 
   // ── 新建条目 ─────────────────────────────────────────────────────────────
@@ -145,7 +194,12 @@ window.ContainerModes['row_detail'] = (() => {
       body.status = 'open';
     }
     body.description = fields.description || '';
-    const res = await _cf(`/api/${itemType}s`, { method: 'POST', body: JSON.stringify(body) });
+    let res;
+    if (itemType === 'task') res = await _cf('POST', '/api/tasks', { body: JSON.stringify(body) });
+    else if (itemType === 'issue') res = await _cf('POST', '/api/issues', { body: JSON.stringify(body) });
+    else if (itemType === 'knowledge') res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('knowledge.create', { record: body });
+    else if (itemType === 'rule') res = await _cf('POST', '/api/rules', { body: JSON.stringify(body) });
+    else throw new Error(`不支持的条目类型: ${itemType}`);
     return res?.data || res || null;
   }
 
@@ -320,11 +374,15 @@ window.ContainerModes['row_detail'] = (() => {
         saveBtn.disabled = true; saveBtn.textContent = '保存中…';
         try {
           const changes = _collectChanges(scrollArea, cardFields);
-          await _save(item_type, gid, source, changes);
+          const result = await _save(item_type, gid, source, changes, data);
+          if (item_type === 'rule' && Number.isInteger(result?.revision)) {
+            data.revision = result.revision;
+            data.rule_reference = { rule_gid: result.rule_gid || data.gid, rule_revision: result.revision };
+          }
           saveBtn.textContent = '已保存';
           setTimeout(() => { if (!destroyed) { saveBtn.textContent = '保存'; saveBtn.disabled = false; } }, 1500);
         } catch (e) {
-          saveBtn.textContent = '失败';
+          saveBtn.textContent = e?.message || '失败';
           setTimeout(() => { if (!destroyed) { saveBtn.textContent = '保存'; saveBtn.disabled = false; } }, 2000);
         }
       });
@@ -726,8 +784,12 @@ window.ContainerModes['row_detail'] = (() => {
       if (!_fullGid) return;
       _showSaveStatus('saving');
       try {
-        await _save(_fullItemType, _fullGid, _fullSource, { [key]: value });
         const cachedRow = _fullRowList[_fullRowIndex];
+        const result = await _save(_fullItemType, _fullGid, _fullSource, { [key]: value }, cachedRow);
+        if (_fullItemType === 'rule' && Number.isInteger(result?.revision) && cachedRow) {
+          cachedRow.revision = result.revision;
+          cachedRow.rule_reference = { rule_gid: result.rule_gid || cachedRow.gid, rule_revision: result.revision };
+        }
         if (cachedRow) cachedRow[key] = value;
         // 通知父窗口更新 grid 行数据（对象引用已更新，触发重渲染即可）
         window.parent?.postMessage({ type: 'cc:row-updated', gid: _fullGid, key, value }, '*');

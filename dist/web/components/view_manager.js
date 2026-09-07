@@ -533,25 +533,15 @@ class ViewManager {
   // ─── View management ─────────────────────────────────────────
 
   async _loadViews() {
-    // Try API
     try {
-      const fn = window.parent?._cloudFetch || window._cloudFetch;
-      if (fn) {
-        let url = `/api/views?module=${this.moduleId}`;
-        if (this._listGid) url += `&list_gid=${encodeURIComponent(this._listGid)}`;
-        const res = await fn(url);
-        if (res?.data) {
-          this._views = res.data;
-          this._syncLS();
-          return;
-        }
-      }
-    } catch (_) {}
-    // Fallback: localStorage
-    try {
-      const raw = localStorage.getItem(this._lsKey());
-      if (raw) this._views = JSON.parse(raw);
-    } catch (_) {}
+      const client = window.top?.AI00ExistingCapabilityClient || window.parent?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
+      if (!client) throw new Error('保存视图服务不可用');
+      this._views = await client.call('base.savedViews.search', { module: this.moduleId, listGid: this._listGid, limit: 200, offset: 0 });
+      return;
+    } catch (error) {
+      this._views = [];
+      this._notifyPersistenceError(error);
+    }
   }
 
   _activateView(gid) {
@@ -577,21 +567,18 @@ class ViewManager {
   }
 
   _applyConfig(cfg) {
-    if (cfg.columns) {
-      cfg.columns.forEach(cc => {
-        const col = this._cols.find(c => c.key === cc.key);
-        if (col) {
-          col.visible = cc.visible !== false;
-          if (cc.order !== undefined) col.order = cc.order;
-          if (cc.width)               col.width = cc.width;
-        }
-      });
-    }
-    this._filters        = cfg.filters    ? [...cfg.filters]    : [];
-    this._filterMode     = cfg.filterMode || 'and';
-    this._sorts          = cfg.sorts      ? [...cfg.sorts]      : [];
-    this._groupBy        = cfg.groupBy    || null;
-    this._treeParentField = cfg.treeParentField || null;
+    const fields = Array.isArray(cfg.field_gids) ? cfg.field_gids : [];
+    this._cols.forEach((col, index) => {
+      col.visible = fields.includes(col.key);
+      col.order = fields.includes(col.key) ? fields.indexOf(col.key) : fields.length + index;
+    });
+    this._filters = Array.isArray(cfg.filters) ? cfg.filters.map(item => ({
+      id: 'f' + (++this._filterIdCnt), field: item.field_gid, op: item.operator, value: item.value,
+    })) : [];
+    this._filterMode = 'and';
+    this._sorts = Array.isArray(cfg.sort) ? cfg.sort.map(item => ({ field: item.field_gid, dir: item.direction })) : [];
+    this._groupBy = null;
+    this._treeParentField = null;
     this._updateFilterBadge();
     this._updateSortBadge();
     this._updateGroupBadge();
@@ -630,102 +617,69 @@ class ViewManager {
       isShared = result.isShared;
     }
 
-    // Preserve viewType / treeParentField from existing view config so a re-save doesn't strip them
-    const existingConfig = this._activeViewGid
-      ? (this._views.find(x => x.gid === this._activeViewGid)?.config || {})
-      : {};
-    const config = {
-      columns:         this._cols.map(c => ({ key: c.key, visible: c.visible, order: c.order, width: c.width })),
-      filters:         [...this._filters],
-      filterMode:      this._filterMode,
-      sorts:           [...this._sorts],
-      groupBy:         this._groupBy || null,
-      viewType:        existingConfig.viewType || 'grid',
-      treeParentField: existingConfig.treeParentField || null,
-    };
+    let config;
+    try { config = this._governedConfig(); }
+    catch (error) { this._notifyPersistenceError(error); return; }
 
-    // Try API
     try {
-      const fn = window.parent?._cloudFetch || window._cloudFetch;
-      if (fn) {
-        if (this._activeViewGid && !this._activeViewGid.startsWith('local_')) {
-          await fn(`/api/views/${this._activeViewGid}`, {
-            method: 'PATCH', body: JSON.stringify({ name, config }),
+      const client = window.top?.AI00ExistingCapabilityClient || window.parent?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
+      if (client) {
+        if (this._activeViewGid) {
+          const current = this._views.find(x => x.gid === this._activeViewGid);
+          const saved = await client.call('base.savedViews.update', {
+            viewGid: this._activeViewGid, expectedRevision: current.revision, name,
+            module: current.module ?? this.moduleId, listGid: current.list_gid ?? this._listGid,
+            config, shareScope: current.share_scope ?? 'private',
+          }, {
+            confirm: () => this._vmConfirm('确认更新此视图？'),
           });
-          const v = this._views.find(x => x.gid === this._activeViewGid);
-          if (v) { v.name = name; v.config = config; }
+          if (current) Object.assign(current, saved);
         } else {
-          const res = await fn('/api/views', {
-            method: 'POST', body: JSON.stringify({ name, module: this.moduleId, list_gid: this._listGid, config, is_shared: isShared }),
+          const saved = await client.call('base.savedViews.create', {
+            name, module: this.moduleId, listGid: this._listGid, config,
+            shareScope: isShared ? 'shared' : 'private',
+          }, {
+            confirm: () => this._vmConfirm('确认创建此视图？'),
           });
-          if (res?.data?.gid) {
-            // Replace local ID with server ID
-            if (this._activeViewGid) {
-              const old = this._views.find(x => x.gid === this._activeViewGid);
-              if (old) { old.gid = res.data.gid; old.is_shared = isShared; }
-            } else {
-              this._views.push({ gid: res.data.gid, name, config, is_shared: isShared });
-            }
-            this._activeViewGid = res.data.gid;
+          if (saved?.gid) {
+            this._views.push(saved);
+            this._activeViewGid = saved.gid;
           }
         }
         this._activeViewName = name;
         this._isDirty        = false;
-        this._syncLS();
         this._updateName();
         this._updateSaveBtn();
         return;
       }
-    } catch (_) {}
-
-    // Local fallback
-    if (!this._activeViewGid) {
-      const newGid = 'local_' + Date.now();
-      this._views.push({ gid: newGid, name, config });
-      this._activeViewGid = newGid;
-    } else {
-      const v = this._views.find(x => x.gid === this._activeViewGid);
-      if (v) { v.name = name; v.config = config; }
-    }
-    this._activeViewName = name;
-    this._isDirty        = false;
-    this._syncLS();
-    this._updateName();
-    this._updateSaveBtn();
+      throw new Error('保存视图服务不可用');
+    } catch (error) { this._notifyPersistenceError(error); throw error; }
   }
 
   async _newView() {
     const result = await this._promptNewView();
     if (!result) return;
     const { name, viewType, treeParentField } = result;
-    const config = {
-      columns:         this._cols.map(c => ({ key: c.key, visible: c.visible, order: c.order, width: c.width })),
-      filters:         [...this._filters],
-      filterMode:      this._filterMode,
-      sorts:           [...this._sorts],
-      groupBy:         this._groupBy || null,
-      viewType:        viewType || 'grid',
-      treeParentField: treeParentField || null,
-    };
-    let gid = 'local_' + Date.now();
+    if (viewType === 'tree' || treeParentField) { this._notifyPersistenceError(new Error('保存视图暂不支持树形展示')); return; }
+    let config;
+    try { config = this._governedConfig(); }
+    catch (error) { this._notifyPersistenceError(error); return; }
     try {
-      const fn = window.parent?._cloudFetch || window._cloudFetch;
-      if (fn) {
-        const res = await fn('/api/views', {
-          method: 'POST', body: JSON.stringify({ name, module: this.moduleId, list_gid: this._listGid, config }),
-        });
-        if (res?.data?.gid) gid = res.data.gid;
-      }
-    } catch (_) {}
-    this._views.push({ gid, name, config });
-    this._activeViewGid  = gid;
-    this._activeViewName = name;
-    this._isDirty        = false;
-    this._syncLS();
-    this._updateName();
-    this._updateSaveBtn();
-    this._rerenderTabBar();
-    this._closePanel();
+      const client = window.top?.AI00ExistingCapabilityClient || window.parent?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
+      if (!client) throw new Error('保存视图服务不可用');
+      const savedView = await client.call('base.savedViews.create', {
+        name, module: this.moduleId, listGid: this._listGid, config, shareScope: 'private',
+      }, { confirm: () => this._vmConfirm('确认创建此视图？') });
+      if (!savedView?.gid) throw new Error('保存视图服务未返回资源标识');
+      this._views.push(savedView);
+      this._activeViewGid  = savedView.gid;
+      this._activeViewName = name;
+      this._isDirty        = false;
+      this._updateName();
+      this._updateSaveBtn();
+      this._rerenderTabBar();
+      this._closePanel();
+    } catch (error) { this._notifyPersistenceError(error); throw error; }
   }
 
   /** 新建视图对话框：name + viewType + 字段/筛选/排序/分组配置 */
@@ -759,7 +713,6 @@ class ViewManager {
           <select id="_vnType"
             style="width:100%;padding:6px 10px;border:1px solid var(--border-default,#313244);border-radius:6px;background:var(--bg-surface,#24273a);color:var(--text-normal,#cdd6f4);font-size:13px;margin-bottom:12px">
             <option value="grid">表格</option>
-            <option value="gantt">甘特图</option>
             <option value="tree">树形</option>
             <option value="card" disabled style="color:var(--text-faint,#6c7086)">卡片（暂未实现）</option>
             <option value="report" disabled style="color:var(--text-faint,#6c7086)">报表（暂未实现）</option>
@@ -946,47 +899,50 @@ class ViewManager {
 
   // ─────────────────────────────────────────────────────────────────────────────
 
-  _renameView(gid) {
+  async _renameView(gid) {
     const v = this._views.find(x => x.gid === gid);
     if (!v) return;
-    this._vmPromptText('重命名视图', v.name).then(name => {
-      if (!name || name === v.name) return;
+    const name = await this._vmPromptText('重命名视图', v.name);
+    if (!name || name === v.name) return;
+    try {
+      await this._apiPatch(gid, { name });
       v.name = name;
       if (this._activeViewGid === gid) {
         this._activeViewName = name;
         this._updateName();
       }
-      this._syncLS();
-      this._apiPatch(gid, { name });
       this._rerenderTabBar();
       this._closePanel();
-    });
+    } catch (error) { this._notifyPersistenceError(error); throw error; }
   }
 
-  _copyView(gid) {
+  async _copyView(gid) {
     const v = this._views.find(x => x.gid === gid);
     if (!v) return;
-    const copyGid = 'local_' + Date.now();
     const copyName = v.name + ' - 副本';
-    const copy     = { gid: copyGid, name: copyName, config: JSON.parse(JSON.stringify(v.config || {})) };
-    this._views.push(copy);
-    this._syncLS();
-    // try to persist on server
-    (async () => {
-      try {
-        const fn = window.parent?._cloudFetch || window._cloudFetch;
-        if (fn && !gid.startsWith('local_')) {
-          const res = await fn(`/api/views/${gid}/copy`, { method: 'POST' });
-          if (res?.data?.gid) { copy.gid = res.data.gid; this._syncLS(); }
-        }
-      } catch (_) {}
-    })();
-    this._closePanel();
+    try {
+      const client = window.top?.AI00ExistingCapabilityClient || window.parent?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
+      if (!client) throw new Error('保存视图服务不可用');
+      const saved = await client.call('base.savedViews.copy', { viewGid: gid, name: copyName }, {
+        confirm: () => this._vmConfirm('确认复制此视图？'),
+      });
+      if (!saved?.gid) throw new Error('保存视图服务未返回资源标识');
+      this._views.push(saved);
+      this._rerenderTabBar();
+      this._closePanel();
+    } catch (error) { this._notifyPersistenceError(error); throw error; }
   }
 
   async _deleteView(gid) {
     const ok = await this._vmConfirm('确认删除此视图？');
     if (!ok) return;
+    const deleting = this._views.find(v => v.gid === gid);
+    if (!deleting) return;
+    try {
+      const client = window.top?.AI00ExistingCapabilityClient || window.parent?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
+      if (!client) throw new Error('保存视图服务不可用');
+      await client.call('base.savedViews.delete', { viewGid: gid, expectedRevision: deleting.revision }, { confirm: () => true });
+    } catch (error) { this._notifyPersistenceError(error); throw error; }
     this._views = this._views.filter(v => v.gid !== gid);
     if (this._activeViewGid === gid) {
       this._activeViewGid  = null;
@@ -995,22 +951,22 @@ class ViewManager {
       this._updateName();
       this._emitChange();
     }
-    this._syncLS();
     this._rerenderTabBar();
-    try {
-      const fn = window.parent?._cloudFetch || window._cloudFetch;
-      if (fn && !gid.startsWith('local_'))
-        await fn(`/api/views/${gid}`, { method: 'DELETE' });
-    } catch (_) {}
     this._closePanel();
   }
 
   async _apiPatch(gid, body) {
-    try {
-      const fn = window.parent?._cloudFetch || window._cloudFetch;
-      if (fn && !gid.startsWith('local_'))
-        await fn(`/api/views/${gid}`, { method: 'PATCH', body: JSON.stringify(body) });
-    } catch (_) {}
+    const client = window.top?.AI00ExistingCapabilityClient || window.parent?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
+    const current = this._views.find(v => v.gid === gid);
+    if (!client || !current) throw new Error('保存视图服务不可用');
+    const saved = await client.call('base.savedViews.update', {
+      viewGid: gid, expectedRevision: current.revision,
+      name: body.name ?? current.name, module: current.module ?? this.moduleId,
+      listGid: current.list_gid ?? this._listGid, config: body.config ?? current.config,
+      shareScope: current.share_scope ?? 'private',
+    }, { confirm: () => this._vmConfirm('确认更新此视图？') });
+    Object.assign(current, saved);
+    return saved;
   }
 
   /** 新视图保存对话框（name + 共享给团队 checkbox） */
@@ -1087,12 +1043,21 @@ class ViewManager {
     if (el) { el.textContent = this._sorts.length; el.classList.toggle('hidden', !this._sorts.length); }
   }
 
-  _syncLS() {
-    try { localStorage.setItem(this._lsKey(), JSON.stringify(this._views)); } catch (_) {}
+  _governedConfig() {
+    if (this._filterMode === 'or') throw new Error('保存视图仅支持筛选条件全部满足（AND）');
+    if (this._groupBy) throw new Error('保存视图暂不支持分组');
+    return {
+      field_gids: [...this._cols].filter(c => c.visible).sort((a, b) => a.order - b.order).map(c => c.key),
+      filters: this._filters.map(item => ({ field_gid: item.field, operator: item.op, value: item.value })),
+      sort: this._sorts.map(item => ({ field_gid: item.field, direction: item.dir })),
+      page_size: 200,
+      presentation: 'table',
+    };
   }
 
-  _lsKey() {
-    return `vm_views_${this.moduleId}_${this._listGid || 'global'}`;
+  _notifyPersistenceError(error) {
+    const message = `保存视图操作失败：${error?.message || String(error)}`;
+    if (typeof window?.alert === 'function') window.alert(message);
   }
 
   // ─── 公开快捷操作（供列表头右键菜单调用）────────────────────────────────────
@@ -1463,3 +1428,4 @@ function _he(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+if (typeof module === 'object' && module.exports) module.exports = ViewManager;

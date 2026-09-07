@@ -125,9 +125,10 @@ async function _load() {
 
   // 云端清单（via cloudFetch）
   try {
-    const cf = window._cloudFetch || window.parent?._cloudFetch;
-    if (cf) {
-      const res = await cf(`/api/lists?item_type=${_itemType}`);
+    const _cloudFetch = window._cloudFetch || window.parent?._cloudFetch;
+    if (_cloudFetch) {
+      const res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+        .call('project.lists.search', { itemType: _itemType });
       _lists = (res?.data || []).map(l => ({ ...l, scope: 'cloud' }));
     }
   } catch (e) {

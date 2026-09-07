@@ -119,9 +119,9 @@
       btn.disabled = true;
       btn.textContent = '提交中...';
       try {
-        const cf = (window.parent && window.parent._cloudFetch) || window._cloudFetch;
-        if (!cf) throw new Error('_cloudFetch 未初始化');
-        await cf('/api/approval/orders/scope_upgrade', {
+        const _cloudFetch = (window.parent && window.parent._cloudFetch) || window._cloudFetch;
+        if (!_cloudFetch) throw new Error('_cloudFetch 未初始化');
+        await _cloudFetch('/api/approval/orders/scope_upgrade', {
           method: 'POST',
           body: JSON.stringify({
             item_type: itemType,
@@ -206,7 +206,7 @@
     `;
     document.body.appendChild(dlg);
 
-    const cf = (window.parent && window.parent._cloudFetch) || window._cloudFetch;
+    const _cloudFetch = (window.parent && window.parent._cloudFetch) || window._cloudFetch;
     const shareList = dlg.querySelector('#_lsd-share-list');
     const search   = dlg.querySelector('#_lsd-user-search');
     const permSel  = dlg.querySelector('#_lsd-perm-select');
@@ -216,9 +216,9 @@
     let _selectedUser = null;
 
     async function loadShares() {
-      if (!cf) return;
+      if (!_cloudFetch) return;
       try {
-        const data = await cf(`/api/shares/lists/${listGid}`);
+        const data = await _cloudFetch(`/api/shares/lists/${listGid}`, { method: 'GET' });
         shareList.innerHTML = !data.shares?.length
           ? '<p style="color:var(--text-muted);font-size:12px;margin:0">暂无分享</p>'
           : data.shares.map(s => `
@@ -229,7 +229,7 @@
               </div>`).join('');
         shareList.querySelectorAll('[data-share-gid]').forEach(btn => {
           btn.onclick = async () => {
-            await cf(`/api/shares/lists/${listGid}/${btn.dataset.shareGid}`, { method: 'DELETE' });
+            await _cloudFetch(`/api/shares/lists/${listGid}/${btn.dataset.shareGid}`, { method: 'DELETE' });
             loadShares();
           };
         });
@@ -242,9 +242,9 @@
       clearTimeout(_searchTimer);
       _searchTimer = setTimeout(async () => {
         const q = search.value.trim();
-        if (!q || !cf) { cands.style.display='none'; return; }
+        if (!q || !_cloudFetch) { cands.style.display='none'; return; }
         try {
-          const data = await cf(`/api/users/search?q=${encodeURIComponent(q)}&limit=8`);
+          const data = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('base.users.search', { query: q, limit: 8 });
           const users = data.users || data.data || [];
           if (!users.length) { cands.style.display='none'; return; }
           cands.style.display = 'block';
@@ -266,10 +266,10 @@
 
     addBtn.onclick = async () => {
       if (!_selectedUser) { _showToast('请选择用户', 'warning'); return; }
-      if (!cf) return;
+      if (!_cloudFetch) return;
       addBtn.disabled = true;
       try {
-        await cf(`/api/shares/lists/${listGid}`, {
+        await _cloudFetch(`/api/shares/lists/${listGid}`, {
           method: 'POST',
           body: JSON.stringify({ shared_to: _selectedUser.gid, permission: permSel.value }),
         });

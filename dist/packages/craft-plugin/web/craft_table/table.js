@@ -5,10 +5,12 @@ const CRAFT_COLS = [
   { key: 'clone_status',     label: '来源',        type: 'text',    width: 60,  editable: false },
   { key: 'workstation_name', label: '工位',        type: 'text',    width: 100 },
   { key: 'post_name',        label: '岗位',        type: 'text',    width: 100 },
-  { key: 'code',             label: '工序编号',    type: 'text',    width: 110 },
-  { key: 'name',             label: '工序名称',    type: 'text',    width: 200 },
-  { key: 'standard_time',    label: '标准工时(s)', type: 'number',  width: 110 },
-  { key: 'importance',       label: '重要度',      type: 'enum',    width: 90,  options: [{value:'high',label:'高'},{value:'medium',label:'中'},{value:'low',label:'低'}] },
+  // V1 /api/bop/operations 写入接口已明确 410，当前表格只允许读取。
+  // 待新版 BOP 条目编辑契约覆盖这些字段后，再恢复 editable。
+  { key: 'code',             label: '工序编号',    type: 'text',    width: 110, editable: false },
+  { key: 'name',             label: '工序名称',    type: 'text',    width: 200, editable: false },
+  { key: 'standard_time',    label: '标准工时(s)', type: 'number',  width: 110, editable: false },
+  { key: 'importance',       label: '重要度',      type: 'enum',    width: 90,  editable: false, options: [{value:'high',label:'高'},{value:'medium',label:'中'},{value:'low',label:'低'}] },
   { key: 'is_nudd',          label: 'NUDD',        type: 'boolean', width: 70  },
   { key: 'part_bindings',    label: '绑定零件',    type: 'array',   width: 180, editable: false },
   { key: 'tool_requirements',label: '工具要求',    type: 'array',   width: 150, editable: false },
@@ -66,63 +68,31 @@ let _grid = null; // GridEditor
 // ─── 云端 API 封装 ─────────────────────────────────────────────
 async function callBridge(namespace, method, params = {}) {
   try {
-    const fn = window.parent?._cloudFetch || window._cloudFetch;
-    if (!fn) {
+    const _cloudFetch = window.parent?._cloudFetch || window._cloudFetch;
+    if (!_cloudFetch) {
       console.warn('[table.js] _cloudFetch 未就绪，返回空数据');
       return namespace === 'craft_plan' && method === 'list_work_plans' ? [] : null;
     }
     if (namespace === 'craft_plan') {
-      if (method === 'list_work_plans') {
-        const res = await fn('/api/craft/work_plans');
-        return res?.data || [];
-      }
-      if (method === 'list_sections') {
-        const res = await fn(`/api/craft/work_plans/${params.work_plan_gid}/sections`);
-        return res?.data || [];
-      }
-      if (method === 'get_table_view') {
-        const secGid = params.section_gid;
-        if (secGid) {
-          const res = await fn(`/api/craft/sections/${secGid}/operations`);
-          return res?.data || [];
-        }
-        return [];
-      }
-      if (method === 'update_operation') {
-        const opGid = params.operation_gid;
-        const body  = { ...params };
-        delete body.operation_gid;
-        delete body.section_gid;
-        delete body.workstation_gid;
-        delete body.post_gid;
-        await fn(`/api/bop/operations/${opGid}`, {
-          method: 'PATCH', body: JSON.stringify(body),
-        });
-        return null;
-      }
+      console.warn(`[table.js] V1 craft_plan 已停用: ${method}`);
+      return method.startsWith('list_') || method === 'get_table_view' ? [] : null;
     }
     if (namespace === 'std_op') {
       if (method === 'list') {
-        const res = await fn('/api/std_op/operations?status=active');
+        const res = await _cloudFetch('/api/std_op/operations?status=active', { method: 'GET' });
         return res?.data || [];
       }
       if (method === 'clone_to_post') {
-        const res = await fn(`/api/std_op/operations/${params.std_op_gid}/clone-to-post`, {
-          method: 'POST', body: JSON.stringify({ post_gid: params.post_gid, seq_no: params.seq_no || 0 }),
-        });
-        return res?.data || null;
+        console.warn('[table.js] 标准工序克隆到岗位接口已停用');
+        return null;
       }
     }
     if (namespace === 'bop') {
       if (method === 'drift_check') {
-        const res = await fn(`/api/bop/operations/${params.op_gid}/drift-check`);
-        return res?.data || null;
+        return { deprecated: true, message: 'V1 operations drift-check 已废弃，请使用新版 BOP 条目差异能力' };
       }
       if (method === 'reset_fields') {
-        const res = await fn(`/api/bop/operations/${params.op_gid}/reset-fields`, {
-          method: 'POST', body: JSON.stringify({ fields: params.fields }),
-        });
-        return res || null;
+        return { deprecated: true, message: 'V1 operations reset-fields 已废弃，请使用新版 BOP 条目变更能力' };
       }
     }
     console.warn(`[table.js] 未映射的 bridge 调用: ${namespace}.${method}`);
@@ -211,8 +181,6 @@ function renderTable(rows) {
   const dataRows = showRows.filter(r => !r._isGroupHeader);
   const allCols  = geMergeCols(visCols, dataRows, CRAFT_SKIP_KEYS);
 
-  const EDITABLE_KEYS = ['code', 'name', 'standard_time', 'importance'];
-
   if (!_grid) {
     const container = document.getElementById('geContainer');
     _grid = new GridEditor({
@@ -220,6 +188,7 @@ function renderTable(rows) {
       columns: allCols,
       rows: dataRows,
       draggableRows: false,
+      readOnly: true,
       cellRenderer: {
         clone_status: (val, row) => cloneStatusHtml(row),
         importance: (val) => {
@@ -248,40 +217,6 @@ function renderTable(rows) {
           { label: '查看与标准差异', icon: svgIcon('compare'), action: () => openDriftDialog(row.gid) },
         ];
       },
-      onRowsChange: async (newRows) => {
-        let didSave = false;
-        for (const row of newRows) {
-          if (row.gid) {
-            const orig = state.tableRows.find(r => r.gid === row.gid);
-            if (!orig) continue;
-            const body = {};
-            EDITABLE_KEYS.forEach(k => {
-              if (String(row[k] ?? '') !== String(orig[k] ?? '')) body[k] = row[k];
-            });
-            if (!Object.keys(body).length) continue;
-            await callBridge('craft_plan', 'update_operation', {
-              operation_gid: row.gid,
-              section_gid: row.section_gid,
-              workstation_gid: row.workstation_gid,
-              post_gid: row.post_gid,
-              ...body,
-            });
-            didSave = true;
-          } else if (row.name && state.sectionGid) {
-            await callBridge('craft_plan', 'add_operation', {
-              section_gid: state.sectionGid,
-              workstation_gid: row.workstation_gid || _firstWsGid(),
-              post_gid: row.post_gid || _firstPostGid(row.workstation_gid || _firstWsGid()),
-              code: row.code || '',
-              name: row.name,
-              standard_time: parseFloat(row.standard_time) || 0,
-              importance: row.importance || 'normal',
-            });
-            didSave = true;
-          }
-        }
-        if (didSave) await loadTableView(state.workPlanGid, state.sectionGid);
-      },
       onColsChange: () => {},
     });
   } else {
@@ -294,46 +229,6 @@ function renderTable(rows) {
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c =>
     ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
-// ─── 行内编辑 ──────────────────────────────────────────────────
-function startEdit(cell) {
-  if (cell.contentEditable === 'true') return;
-  cell.contentEditable = 'true';
-  cell.focus();
-  const range = document.createRange();
-  range.selectNodeContents(cell);
-  window.getSelection().removeAllRanges();
-  window.getSelection().addRange(range);
-  cell.addEventListener('blur', () => commitEdit(cell), { once: true });
-  cell.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === 'Escape') { e.preventDefault(); cell.blur(); }
-  });
-}
-
-async function commitEdit(cell) {
-  cell.contentEditable = 'false';
-  const tr     = cell.closest('tr');
-  const field  = cell.dataset.field;
-  const newVal = cell.textContent.trim();
-  const opGid  = tr.dataset.opGid;
-  const secGid = tr.dataset.secGid;
-  const wsGid  = tr.dataset.wsGid;
-  const postGid = tr.dataset.postGid;
-  try {
-    const params = {
-      section_gid: secGid, workstation_gid: wsGid,
-      post_gid: postGid, operation_gid: opGid,
-    };
-    params[field] = field === 'standard_time' ? parseFloat(newVal) || 0 : newVal;
-    await callBridge('craft_plan', 'update_operation', params);
-    if (field === 'importance') {
-      cell.className = `editable ${newVal === 'critical' ? 'importance-critical' : 'importance-normal'}`;
-      cell.dataset.field = field;
-    }
-  } catch (e) {
-    console.error('[table] update_operation 失败', e);
-  }
 }
 
 // ─── 零件抽屉 ──────────────────────────────────────────────────
@@ -573,16 +468,7 @@ async function init() {
     columns:  CRAFT_COLS,
     getRows:  () => (vm ? vm.applyView(state.tableRows) : state.tableRows).filter(r => !r._isGroupHeader),
     onImport: async (rows, _fieldMap, _conflict, signal) => {
-      if (!state.sectionGid) { alert('请先选择工段再导入'); return; }
-      const fn = window.parent?._cloudFetch || window._cloudFetch;
-      if (!fn) return;
-      for (const r of rows) {
-        if (signal?.aborted) break;
-        await fn(`/api/craft/sections/${state.sectionGid}/operations`, {
-          method: 'POST', body: JSON.stringify(r), signal,
-        });
-      }
-      if (!signal?.aborted) await loadTable(state.sectionGid);
+      throw new Error('V1 工段工序导入已停用，不支持导入');
     },
   });
   const btnImport = document.getElementById('btnImport');
@@ -600,23 +486,10 @@ async function init() {
         id:       'section',
         label:    '工段（工艺方案）',
         loadList: async () => {
-          const fn = window.parent?._cloudFetch || window._cloudFetch;
-          if (!fn) return [];
-          const plansRes = await fn('/api/craft/work_plans');
-          const plans = plansRes?.data || [];
-          const items = [];
-          for (const p of plans) {
-            const secRes = await fn(`/api/craft/work_plans/${p.gid}/sections`);
-            const secs = secRes?.data || [];
-            secs.forEach(s => items.push({ id: s.gid, label: `${p.name} / ${s.name}` }));
-          }
-          return items;
+          return [];
         },
         loadRows: async (gid) => {
-          const fn = window.parent?._cloudFetch || window._cloudFetch;
-          if (!fn) return [];
-          const res = await fn(`/api/craft/sections/${gid}/operations`);
-          return res?.data || [];
+          return [];
         },
       },
       dmCurrentLoader('当前视图', () => (vm ? vm.applyView(state.tableRows) : state.tableRows).filter(r => !r._isGroupHeader)),
@@ -747,6 +620,12 @@ async function openDriftDialog(opGid) {
   const data = await callBridge('bop', 'drift_check', { op_gid: opGid });
   _driftData = data;
 
+  if (data?.deprecated) {
+    document.getElementById('driftContent').innerHTML =
+      `<p style="padding:12px;color:var(--app-text-secondary,#888)">${esc(data.message)}</p>`;
+    return;
+  }
+
   if (!data || !data.has_source) {
     document.getElementById('driftContent').innerHTML =
       '<p style="padding:12px;color:var(--app-text-secondary,#888)">此工序无标准来源</p>';
@@ -805,7 +684,11 @@ async function confirmResetDriftFields() {
   const fields = checked.map(cb => cb.dataset.field);
   if (!fields.length) return;
 
-  await callBridge('bop', 'reset_fields', { op_gid: _driftOpGid, fields });
+  const result = await callBridge('bop', 'reset_fields', { op_gid: _driftOpGid, fields });
+  if (result?.deprecated) {
+    alert(result.message);
+    return;
+  }
   document.getElementById('dialogDrift').classList.add('hidden');
   await loadTableView(state.workPlanGid, state.sectionGid);
 }

@@ -3,6 +3,10 @@
  */
 'use strict';
 
+function _cf(method, path, opts = {}) {
+  return ListShell._cf(path, { ...opts, method });
+}
+
 // ── 列定义 ────────────────────────────────────────────────────────────────────
 const KNOWLEDGE_COLS = [
   { key: 'display_id',  label: 'ID',      type: 'text',   width: 90,  editable: false },
@@ -84,7 +88,7 @@ const EXTRA_CTX = (row) => [
 const load = ListShell.buildLoadHandler({
   bridgeNs:         'knowledge',
   bridgeListMethod: 'list_entries',
-  cloudPath:        '/api/knowledge_entries',
+  cloudRequest:     (query) => _cf('GET', `/api/knowledge_entries?${query}`),
   getCurrentList:   () => _currentList,
   getAllLists:       () => _allLists,
   getShell:         () => _shell,
@@ -95,8 +99,8 @@ const load = ListShell.buildLoadHandler({
 const _onRowsChange = ListShell.buildRowsChangeHandler({
   editableKeys:       ['title', 'entry_type', 'status', 'tags'],
   primaryKey:         'title',
-  cloudUpdatePath:    (gid) => `/api/knowledge_entries/${gid}`,
-  cloudCreatePath:    '/api/knowledge_entries',
+  cloudUpdate:        (gid, body) => _cf('PATCH', `/api/knowledge_entries/${gid}`, { body: JSON.stringify(body) }),
+  cloudCreate:        (body) => _cf('POST', '/api/knowledge_entries', { body: JSON.stringify(body) }),
   bridgeNs:           'knowledge',
   bridgeUpdateMethod: 'update_entry',
   bridgeCreateMethod: 'create_entry',
@@ -136,12 +140,12 @@ async function init() {
     onListsChange: (lists) => { _allLists = lists; },
     onSelect:      (gid) => { _currentList = gid; load(); },
     initListGid:   null,
-    rdpSaveOpts:   { bridgeNs: 'knowledge', bridgeMethod: 'update_entry', cloudPath: '/api/knowledge_entries' },
+    rdpSaveOpts:   { bridgeNs: 'knowledge', bridgeMethod: 'update_entry', savePatch: (row, patch) => _cf('PATCH', `/api/knowledge_entries/${row.gid}`, { body: JSON.stringify(patch) }) },
     importExport: ListShell.makeImportExport('knowledge', _getViewRows, async (rows, _fm, _c, signal) => {
         for (const r of rows) {
           if (signal?.aborted) break;
           if (!r.title) continue;
-          await ListShell._cf('/api/knowledge_entries', {
+          await _cf('POST', '/api/knowledge_entries', {
             method: 'POST',
             body: JSON.stringify({ title: r.title, entry_type: r.entry_type || 'guide', list_gid: _currentList || null }),
             signal,

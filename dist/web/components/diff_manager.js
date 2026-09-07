@@ -576,6 +576,7 @@ class DiffManager {
   // ── 导出 Excel ────────────────────────────────────────────────────────────
 
   async _exportExcel(labelA, labelB) {
+    const _cf = this._cf.bind(this);
     const exportBtn = this._overlay.querySelector('#dm-export-btn');
     if (exportBtn) { exportBtn.disabled = true; exportBtn.textContent = '导出中…'; }
     try {
@@ -586,7 +587,7 @@ class DiffManager {
         label_b:   labelB,
         filename:  `diff_${this._moduleId}_${_dmDateStr()}.xlsx`,
       };
-      const resp = await this._cloudPost('/api/import-export/export/diff-report', body);
+      const resp = await _cf('POST', '/api/import-export/export/diff-report', body);
       if (!resp?.file_b64) throw new Error('后端未返回文件数据');
       _dmSaveBase64(resp.file_b64, resp.filename || body.filename);
     } catch (err) {
@@ -599,6 +600,7 @@ class DiffManager {
   // ── 导出飞书电子表格 ──────────────────────────────────────────────────────
 
   async _exportLarkSheet(labelA, labelB) {
+    const _cf = this._cf.bind(this);
     // 弹出简单输入对话框
     const token = prompt('请输入飞书电子表格 Token（URL 中 spreadsheets/ 后面的部分）：');
     if (!token) return;
@@ -619,7 +621,7 @@ class DiffManager {
         label_a:           labelA,
         label_b:           labelB,
       };
-      const resp = await this._cloudPost('/api/import-export/export/diff-lark-sheet', body);
+      const resp = await _cf('POST', '/api/import-export/export/diff-lark-sheet', body);
       alert(`写入成功，共 ${resp?.written_rows || 0} 行`);
     } catch (err) {
       alert('写入失败：' + (err.message || String(err)));
@@ -631,6 +633,7 @@ class DiffManager {
   // ── 解析 Excel 文件 ───────────────────────────────────────────────────────
 
   async _parseExcelFile(file) {
+    const _cf = this._cf.bind(this);
     // 读取 file 为 base64
     const b64 = await new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -644,7 +647,7 @@ class DiffManager {
       reader.readAsArrayBuffer(file);
     });
 
-    const data = await this._cloudPost('/api/import-export/import/parse-excel', {
+    const data = await _cf('POST', '/api/import-export/import/parse-excel', {
       file_b64:  b64,
       filename:  file.name,
     });
@@ -661,10 +664,10 @@ class DiffManager {
 
   // ── 工具：云端 API ────────────────────────────────────────────────────────
 
-  async _cloudPost(path, body) {
+  async _cf(method, path, body) {
     const fn = window.parent?._cloudFetch || window._cloudFetch;
     if (!fn) throw new Error('_cloudFetch 未就绪');
-    const resp = await fn(path, { method: 'POST', body: JSON.stringify(body) });
+    const resp = await fn(path, { method, body: JSON.stringify(body) });
     if (!resp?.success) throw new Error(resp?.message || 'API 调用失败');
     return resp.data;
   }

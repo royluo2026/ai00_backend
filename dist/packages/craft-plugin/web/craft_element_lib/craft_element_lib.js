@@ -3,6 +3,10 @@
  */
 'use strict';
 
+function _cf(method, path, opts = {}) {
+  return ListShell._cfSafe(path, { ...opts, method });
+}
+
 // ── 列定义（覆盖所有子类型的字段） ───────────────────────────────────────────
 const ELEM_COLS = [
   { key: 'name',              label: '名称',         type: 'text',   width: 200 },
@@ -30,11 +34,36 @@ const ELEM_COLS = [
 
 // ── 子标签配置 ────────────────────────────────────────────────────────────────
 const TAB_CONFIG = {
-  tool:      { label: '工具模板',   apiPath: '/api/craft_lib/tools',     obsoletePath: '/api/craft_lib/tools',     fields: [{ id:'name', label:'名称' }, { id:'category', label:'分类' }] },
-  equipment: { label: '设备模板',   apiPath: '/api/craft_lib/equipments', obsoletePath: '/api/craft_lib/equipments',fields: [{ id:'name', label:'名称' }, { id:'category', label:'分类' }] },
-  fixture:   { label: '工装模板',   apiPath: '/api/craft_lib/fixtures',   obsoletePath: '/api/craft_lib/fixtures',  fields: [{ id:'name', label:'名称' }] },
-  fastener:  { label: '标准紧固件', apiPath: '/api/craft_lib/fasteners',  obsoletePath: null,                       fields: [{ id:'part_no', label:'零件号' }, { id:'name', label:'名称' }] },
-  partname:  { label: '标准零件名', apiPath: '/api/craft_lib/part_names', obsoletePath: null,
+  tool:      { label: '工具模板', fields: [{ id:'name', label:'名称' }, { id:'category', label:'分类' }],
+    load: listGid => _cf('GET', '/api/craft_lib/tools' + (listGid ? `?list_gid=${listGid}` : '')),
+    create: (body, opts = {}) => _cf('POST', '/api/craft_lib/tools', { ...opts, body: JSON.stringify(body) }),
+    update: (gid, body) => _cf('PATCH', `/api/craft_lib/tools/${gid}`, { body: JSON.stringify(body) }),
+    save: (gid, body) => { const _cloudFetch = ListShell._cf; return _cloudFetch(`/api/craft_lib/tools/${gid}`, { method: 'PATCH', body: JSON.stringify(body) }); },
+    obsolete: gid => _cf('POST', `/api/craft_lib/tools/${gid}/obsolete`) },
+  equipment: { label: '设备模板', fields: [{ id:'name', label:'名称' }, { id:'category', label:'分类' }],
+    load: listGid => _cf('GET', '/api/craft_lib/equipments' + (listGid ? `?list_gid=${listGid}` : '')),
+    create: (body, opts = {}) => _cf('POST', '/api/craft_lib/equipments', { ...opts, body: JSON.stringify(body) }),
+    update: (gid, body) => _cf('PATCH', `/api/craft_lib/equipments/${gid}`, { body: JSON.stringify(body) }),
+    save: (gid, body) => { const _cloudFetch = ListShell._cf; return _cloudFetch(`/api/craft_lib/equipments/${gid}`, { method: 'PATCH', body: JSON.stringify(body) }); },
+    obsolete: gid => _cf('POST', `/api/craft_lib/equipments/${gid}/obsolete`) },
+  fixture:   { label: '工装模板', fields: [{ id:'name', label:'名称' }],
+    load: listGid => _cf('GET', '/api/craft_lib/fixtures' + (listGid ? `?list_gid=${listGid}` : '')),
+    create: (body, opts = {}) => _cf('POST', '/api/craft_lib/fixtures', { ...opts, body: JSON.stringify(body) }),
+    update: (gid, body) => _cf('PATCH', `/api/craft_lib/fixtures/${gid}`, { body: JSON.stringify(body) }),
+    save: (gid, body) => { const _cloudFetch = ListShell._cf; return _cloudFetch(`/api/craft_lib/fixtures/${gid}`, { method: 'PATCH', body: JSON.stringify(body) }); },
+    obsolete: gid => _cf('POST', `/api/craft_lib/fixtures/${gid}/obsolete`) },
+  fastener:  { label: '标准紧固件', fields: [{ id:'part_no', label:'零件号' }, { id:'name', label:'名称' }],
+    load: listGid => _cf('GET', '/api/craft_lib/fasteners' + (listGid ? `?list_gid=${listGid}` : '')),
+    create: (body, opts = {}) => _cf('POST', '/api/craft_lib/fasteners', { ...opts, body: JSON.stringify(body) }),
+    update: (gid, body) => _cf('PATCH', `/api/craft_lib/fasteners/${gid}`, { body: JSON.stringify(body) }),
+    save: (gid, body) => { const _cloudFetch = ListShell._cf; return _cloudFetch(`/api/craft_lib/fasteners/${gid}`, { method: 'PATCH', body: JSON.stringify(body) }); },
+    obsolete: null },
+  partname:  { label: '标准零件名',
+    load: listGid => _cf('GET', '/api/craft_lib/part_names' + (listGid ? `?list_gid=${listGid}` : '')),
+    create: (body, opts = {}) => _cf('POST', '/api/craft_lib/part_names', { ...opts, body: JSON.stringify(body) }),
+    update: (gid, body) => _cf('PATCH', `/api/craft_lib/part_names/${gid}`, { body: JSON.stringify(body) }),
+    save: (gid, body) => { const _cloudFetch = ListShell._cf; return _cloudFetch(`/api/craft_lib/part_names/${gid}`, { method: 'PATCH', body: JSON.stringify(body) }); },
+    obsolete: null,
                 fields: [
                   { id:'standard_name',          label:'标准名称'         },
                   { id:'part_category',           label:'零件类别'         },
@@ -58,9 +87,9 @@ let _shell       = null;
 async function obsoleteItem(gid) {
   if (!confirm('确认废弃？')) return;
   const cfg = TAB_CONFIG[_currentTab];
-  if (!cfg.obsoletePath) { alert('该类型不支持废弃操作'); return; }
+  if (!cfg.obsolete) { alert('该类型不支持废弃操作'); return; }
   try {
-    await ListShell._cfSafe(`${cfg.obsoletePath}/${gid}/obsolete`, { method: 'POST' });
+    await cfg.obsolete(gid);
     await loadItems();
   } catch (e) { alert('废弃失败: ' + e.message); }
 }
@@ -81,7 +110,7 @@ const CELL_RENDERERS = {
   _actions: (val, row) => {
     if (!row.gid) return '';
     const cfg = TAB_CONFIG[_currentTab];
-    if (cfg.obsoletePath && row.status !== 'obsolete') {
+    if (cfg.obsolete && row.status !== 'obsolete') {
       return `<button class="btn-danger-sm" onclick="obsoleteItem('${row.gid}')">废弃</button>`;
     }
     return '';
@@ -93,7 +122,8 @@ async function _loadSapIndicators(gids) {
   if (!gids.length) return;
   for (let i = 0; i < gids.length; i += 500) {
     const chunk = gids.slice(i, i + 500);
-    const res = await ListShell._cfSafe(`/api/self_ann/batch?gids=${chunk.join(',')}`);
+    const res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+      .call('base.annotations.batch', { gids: chunk });
     if (!res) return;
     Object.entries(res).forEach(([gid, info]) => {
       document.querySelectorAll(`.sap-row-pin[data-gid="${gid}"]`).forEach(el => {
@@ -108,8 +138,7 @@ async function _loadSapIndicators(gids) {
 async function loadItems() {
   const cfg = TAB_CONFIG[_currentTab];
   try {
-    const url = _currentList ? `${cfg.apiPath}?list_gid=${_currentList}` : cfg.apiPath;
-    const res = await ListShell._cfSafe(url);
+    const res = await cfg.load(_currentList);
     _items = res?.data || [];
   } catch (e) { _items = []; }
   _shell?.setRows(_items);
@@ -140,13 +169,13 @@ async function init() {
           if (!firstVal) continue;
           const body = {};
           cfg.fields.forEach(f => { if (r[f.id]) body[f.id] = r[f.id]; });
-          await ListShell._cfSafe(cfg.apiPath, { method: 'POST', body: JSON.stringify(body), signal }).catch(e => console.error('[import craft_element]', e));
+          await cfg.create(body, { signal }).catch(e => console.error('[import craft_element]', e));
         }
         if (!signal?.aborted) await loadItems();
       }),
     diffManager: ListShell.makeDiffManager('craft_element_lib', _getViewRows, 'name'),
     rdpSaveOpts: {
-      cloudPath: (row) => TAB_CONFIG[_currentTab].apiPath,
+      savePatch: (row, patch) => TAB_CONFIG[_currentTab].save(row.gid, patch),
     },
     onRowsChange: async (newRows) => {
       const cfg = TAB_CONFIG[_currentTab];
@@ -158,7 +187,7 @@ async function init() {
           if (!firstVal) continue;
           const body = {};
           cfg.fields.forEach(f => { if (row[f.id]) body[f.id] = row[f.id]; });
-          await ListShell._cfSafe(cfg.apiPath, { method: 'POST', body: JSON.stringify(body) });
+          await cfg.create(body);
           didSave = true;
         } else {
           // 已有记录：PATCH 变化字段
@@ -169,7 +198,7 @@ async function init() {
             if (String(row[f.id] ?? '') !== String(orig[f.id] ?? '')) body[f.id] = row[f.id];
           });
           if (!Object.keys(body).length) continue;
-          await ListShell._cfSafe(`${cfg.apiPath}/${row.gid}`, { method: 'PATCH', body: JSON.stringify(body) });
+          await cfg.update(row.gid, body);
           didSave = true;
         }
       }

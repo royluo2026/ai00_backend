@@ -1608,12 +1608,12 @@ class WorkflowCanvas {
 
   /** 保存画布到云端 DB。ownerGid 由调用方传入。*/
   async save(title, ownerGid = '', existingGid = null) {
-    const cf = this._cf();
-    if (!cf) { console.error('[WFC] _cloudFetch 未就绪'); return null; }
+    const _cloudFetch = this._cf();
+    if (!_cloudFetch) { console.error('[WFC] _cloudFetch 未就绪'); return null; }
     const data = this.toJSON();
     data.title = title || data.title;
     try {
-      const res = await cf('/api/canvases', {
+      const res = await _cloudFetch('/api/canvases', {
         method: 'POST',
         body: JSON.stringify({
           owner_gid: ownerGid,
@@ -1632,10 +1632,10 @@ class WorkflowCanvas {
 
   /** 从云端 DB 加载指定 gid 的画布。*/
   async load(gid) {
-    const cf = this._cf();
-    if (!cf) return null;
+    const _cloudFetch = this._cf();
+    if (!_cloudFetch) return null;
     try {
-      const res = await cf(`/api/canvases/${gid}`);
+      const res = await _cloudFetch(`/api/canvases/${gid}`, { method: 'GET' });
       if (res?.data) this.fromJSON(res.data);
       return res;
     } catch (e) {
@@ -1646,10 +1646,10 @@ class WorkflowCanvas {
 
   /** 列出当前用户的画布存档。*/
   async listSaves(ownerGid = '') {
-    const cf = this._cf();
-    if (!cf) return [];
+    const _cloudFetch = this._cf();
+    if (!_cloudFetch) return [];
     try {
-      const res = await cf('/api/canvases');
+      const res = await _cloudFetch('/api/canvases', { method: 'GET' });
       return res?.canvases || [];
     } catch (e) {
       console.error('[WFC] list_canvases failed', e);
@@ -1659,10 +1659,10 @@ class WorkflowCanvas {
 
   /** 删除指定 gid 的存档。*/
   async deleteSave(gid) {
-    const cf = this._cf();
-    if (!cf) return null;
+    const _cloudFetch = this._cf();
+    if (!_cloudFetch) return null;
     try {
-      return await cf(`/api/canvases/${gid}`, { method: 'DELETE' });
+      return await _cloudFetch(`/api/canvases/${gid}`, { method: 'DELETE' });
     } catch (e) {
       console.error('[WFC] delete_canvas failed', e);
       return null;
@@ -1671,10 +1671,10 @@ class WorkflowCanvas {
 
   /** 切换共享状态。*/
   async toggleShared(gid, isShared) {
-    const cf = this._cf();
-    if (!cf) return null;
+    const _cloudFetch = this._cf();
+    if (!_cloudFetch) return null;
     try {
-      return await cf(`/api/canvases/${gid}/shared`, {
+      return await _cloudFetch(`/api/canvases/${gid}/shared`, {
         method: 'PATCH',
         body: JSON.stringify({ is_shared: isShared }),
       });

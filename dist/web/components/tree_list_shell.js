@@ -153,8 +153,6 @@ class TreeListShell {
     this._bindEvents();
     this._renderExtraButtons();
     await this._initViewManager();
-    this._restoreState(); // 加载上次持久化的字段配置
-    this._initialized = true; // 标记初始化完成，此后 VM onChange 才允许回写 localStorage
     if (this._forcedItemType) {
       await this._loadLists();
     } else if (this._selectedType) {
@@ -250,9 +248,6 @@ class TreeListShell {
             </button>
             <button class="col-btn" id="${this._uid}_config" title="字段设置">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="4" x2="14" y2="4"/><line x1="10" y1="4" x2="3" y2="4"/><line x1="21" y1="12" x2="12" y2="12"/><line x1="8" y1="12" x2="3" y2="12"/><line x1="21" y1="20" x2="16" y2="20"/><line x1="12" y1="20" x2="3" y2="20"/><circle cx="12" cy="4" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="16" cy="20" r="2"/></svg>
-            </button>
-            <button class="col-btn" id="${this._uid}_views" title="视图管理">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>
             </button>
             <div class="col-separator"></div>
             <div class="tls-extra-btns" id="${this._uid}_extra"></div>
@@ -371,7 +366,6 @@ class TreeListShell {
         this.vm.setGroup(null);
       }
       this._collapseState.clear();
-      this._saveState();
       this._updateGroupBtn();
       this._renderTree();
     });
@@ -381,12 +375,6 @@ class TreeListShell {
     document.getElementById(`${this._uid}_config`).addEventListener('click', e => {
       e.stopPropagation();
       self._openConfigPanel(e.currentTarget);
-    });
-
-    // Views panel
-    document.getElementById(`${this._uid}_views`).addEventListener('click', e => {
-      e.stopPropagation();
-      self._openViewsPanel(e.currentTarget);
     });
 
     // Search
@@ -1040,7 +1028,6 @@ class TreeListShell {
       // 同步到 VM 的 groupBy（用于视图保存/恢复）和 TLS 的 groupField（用于实际渲染）
       self.vm.setGroup(key);
       self._fieldConfig.groupField = key;
-      self._saveState();   // 持久化 groupField
       self._closeFieldMenu();
     });
 
@@ -1156,7 +1143,6 @@ class TreeListShell {
         vmFilterMode: self.vm?._filterMode || 'and',
         vmGroupBy:    self.vm?._groupBy    || null,
       });
-      self._saveState();
       self._closePanel();
       self._renderTree();
     });
@@ -1175,160 +1161,8 @@ class TreeListShell {
       });
       self._userAdjustedCols = false; // 重置后恢复自适应
       if (self._searchInpEl) self._searchInpEl.value = '';
-      self._saveState();
       self._closePanel();
       self._renderTree();
-    });
-
-    this._registerOutsideClick(panel, anchor);
-  }
-
-  // ==========================================================================
-  //  Views Panel（字段预设 + 搜索词快照）
-  // ==========================================================================
-
-  _openViewsPanel(anchor) {
-    this._closePanel();
-
-    const viewsKey = this._lsk(`tls_views_${this._moduleId}`);
-    const defKey   = this._lsk(`tls_def_${this._moduleId}`);
-    const getViews = () => { try { return JSON.parse(localStorage.getItem(viewsKey) || '[]'); } catch { return []; } };
-    const saveViews = v => localStorage.setItem(viewsKey, JSON.stringify(v));
-    const getDef    = () => { try { return JSON.parse(localStorage.getItem(defKey) || 'null'); } catch { return null; } };
-    const saveDef   = v => localStorage.setItem(defKey, JSON.stringify(v));
-    const views = getViews();
-    const defView = getDef();
-
-    const panel = document.createElement('div');
-    panel.className = 'fp-panel vp-panel';
-    panel.style.cssText = 'position:fixed;z-index:9999;width:220px';
-
-    // 默认视图行（固定，不可删除/改名，可更新）
-    const defHtml = `
-      <div class="vp-item vp-item-default" data-default="1">
-        <span class="vp-name">默认视图${defView ? '' : '<span class="vp-unset">（未设置）</span>'}</span>
-        <button class="vp-update vp-update-def" title="更新为当前设置">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-        </button>
-      </div>`;
-
-    const listHtml = views.length
-      ? views.map((v, i) => `
-          <div class="vp-item" data-idx="${i}">
-            <span class="vp-name">${_tlsHe(v.name)}</span>
-            <button class="vp-update" data-idx="${i}" title="更新为当前设置">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            </button>
-            <button class="vp-del" data-idx="${i}" title="删除">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
-          </div>`).join('')
-      : '';
-
-    panel.innerHTML = `
-      <div class="fp-title">视图预设</div>
-      <div class="fp-section">
-        <div class="fp-label">将当前字段配置另存为</div>
-        <div class="vp-save-row">
-          <input class="fp-inp vp-name-inp" id="vp-new-name-${this._uid}" type="text" placeholder="预设名称…">
-          <button class="fp-btn-apply vp-save-btn">保存</button>
-        </div>
-      </div>
-      <div class="fp-divider"></div>
-      <div class="fp-label" style="padding:0 0 4px">已保存预设</div>
-      <div class="vp-list">${defHtml}${listHtml || '<div class="vp-empty">暂无其他视图</div>'}</div>`;
-
-    document.body.appendChild(panel);
-    this._activePanel = panel;
-    this._positionPanel(panel, anchor);
-
-    const self = this;
-    const nameInp = panel.querySelector(`#vp-new-name-${this._uid}`);
-    const doSave = () => {
-      const name = nameInp.value.trim();
-      if (!name) { nameInp.focus(); return; }
-      // 保存完整快照（TLS 字段配置 + VM 筛选/排序 + 搜索词）
-      const entry = { name, ...self._collectState() };
-      if (name === '默认视图') {
-        saveDef(entry);
-      } else {
-        const allViews = getViews();
-        const idx = allViews.findIndex(v => v.name === name);
-        if (idx >= 0) allViews[idx] = entry; else allViews.push(entry);
-        saveViews(allViews);
-      }
-      nameInp.value = '';
-      self._openViewsPanel(anchor);
-    };
-    panel.querySelector('.vp-save-btn').addEventListener('click', doSave);
-    nameInp.addEventListener('keydown', e => { if (e.key === 'Enter') doSave(); });
-
-    // 应用一个视图预设（支持旧格式 fieldConfig 子对象和新格式扁平对象）
-    const applyView = v => {
-      if (!v) return;
-      // 兼容旧格式（{name, fieldConfig:{...}, search}）和新格式（扁平）
-      const state = v.fieldConfig
-        ? {
-            parentField:  v.fieldConfig.parentField,
-            groupMode:    v.fieldConfig.groupMode,
-            groupField:   v.fieldConfig.groupField,
-            fields:       v.fieldConfig.fields,
-            search:       v.search || '',
-            vmFilters:    v.vmFilters    || [],
-            vmSorts:      v.vmSorts      || [],
-            vmFilterMode: v.vmFilterMode || 'and',
-            vmGroupBy:    v.vmGroupBy    || null,
-          }
-        : v;
-      self._applyState(state);
-      self._saveState();
-      self._closePanel();
-      self._renderTree();
-      self._onViewChange?.(v.name);
-    };
-
-    // 默认视图行
-    const defItem = panel.querySelector('.vp-item-default');
-    if (defItem) {
-      defItem.style.cursor = defView ? 'pointer' : 'default';
-      defItem.addEventListener('click', e => {
-        if (e.target.closest('.vp-update')) return;
-        if (defView) applyView(defView);
-      });
-      defItem.querySelector('.vp-update-def')?.addEventListener('click', e => {
-        e.stopPropagation();
-        saveDef({ name: '默认视图', ...self._collectState() });
-        self._openViewsPanel(anchor);
-      });
-    }
-
-    // 普通视图行
-    panel.querySelectorAll('.vp-item:not(.vp-item-default)').forEach(item => {
-      item.addEventListener('click', e => {
-        if (e.target.closest('.vp-del') || e.target.closest('.vp-update')) return;
-        applyView(views[parseInt(item.dataset.idx)]);
-      });
-    });
-
-    // 更新按钮（普通视图）
-    panel.querySelectorAll('.vp-item:not(.vp-item-default) .vp-update').forEach(btn => {
-      btn.addEventListener('click', e => {
-        e.stopPropagation();
-        const idx = parseInt(btn.dataset.idx);
-        const allViews = getViews();
-        allViews[idx] = { name: allViews[idx].name, ...self._collectState() };
-        saveViews(allViews);
-        self._openViewsPanel(anchor);
-      });
-    });
-
-    panel.querySelectorAll('.vp-del').forEach(btn => {
-      btn.addEventListener('click', e => {
-        e.stopPropagation();
-        views.splice(parseInt(btn.dataset.idx), 1);
-        saveViews(views);
-        self._openViewsPanel(anchor);
-      });
     });
 
     this._registerOutsideClick(panel, anchor);
@@ -1492,34 +1326,12 @@ class TreeListShell {
   }
 
   // ==========================================================================
-  //  Config Persistence（核心状态管理）
+  //  Runtime Config Application
   // ==========================================================================
 
-  _cfgKey()   { return this._moduleId ? this._lsk(`tls_cfg_${this._moduleId}`)   : null; }
-  _viewsKey() { return this._moduleId ? this._lsk(`tls_views_${this._moduleId}`) : null; }
-  _lsk(base) { try { const u = window.parent?._authUser || window.top?._authUser || window._authUser; const g = u?.gid || u?.user_gid || ''; return g ? `${g}:${base}` : base; } catch { return base; } }
-
   /**
-   * 抓取当前完整状态快照（TLS 字段设置 + VM 筛选/排序/分组）。
-   * 供 _saveState 和视图预设 doSave 使用。
-   */
-  _collectState() {
-    return {
-      parentField:  this._fieldConfig.parentField,
-      groupMode:    this._fieldConfig.groupMode,
-      groupField:   this._fieldConfig.groupField,
-      fields:       [...(this._fieldConfig.fields || [])],
-      search:       this._searchText,
-      vmFilters:    this.vm?._filters    ? [...this.vm._filters]    : [],
-      vmSorts:      this.vm?._sorts      ? [...this.vm._sorts]      : [],
-      vmFilterMode: this.vm?._filterMode || 'and',
-      vmGroupBy:    this.vm?._groupBy    || null,
-    };
-  }
-
-  /**
-   * 将快照应用到 TLS + VM，不触发 onChange 回写 localStorage。
-   * 调用方负责在需要时显式调用 _saveState() 和 _renderTree()。
+   * Apply the field-config panel's in-memory TLS + VM state without emitting
+   * intermediate renders for every ViewManager setter.
    */
   _applyState(state) {
     if (!state) return;
@@ -1549,7 +1361,7 @@ class TreeListShell {
       document.getElementById(`${this._uid}_searchbtn`)?.classList.toggle('col-btn-active', hasSearch);
     }
 
-    // 3. VM 同步——用 _restoringConfig 阻止 onChange 的 _saveState 和 _renderTree
+    // 3. VM 同步——用 _restoringConfig 阻止 onChange 的重复渲染
     this._restoringConfig = true;
     try {
       if (this.vm) {
@@ -1587,26 +1399,6 @@ class TreeListShell {
     this._vmStateVer = (this._vmStateVer || 0) + 1;
     this._updateGroupBtn();
   }
-
-  /** 持久化当前完整状态到 localStorage */
-  _saveState() {
-    const key = this._cfgKey();
-    if (!key) return;
-    try { localStorage.setItem(key, JSON.stringify(this._collectState())); } catch (_) {}
-  }
-
-  /** 从 localStorage 恢复状态（init 阶段调用） */
-  _restoreState() {
-    const key = this._cfgKey();
-    if (!key) return;
-    let saved;
-    try { saved = JSON.parse(localStorage.getItem(key) || 'null'); } catch { return; }
-    this._applyState(saved);
-  }
-
-  // 向后兼容别名（外部代码可能仍调用旧名）
-  _saveFieldConfig()    { this._saveState(); }
-  _restoreFieldConfig() { this._restoreState(); }
 
   _updatePageBar(totalVisible, totalPages, currentPage) {
     if (!this._pageSzEl) return;
@@ -1927,15 +1719,16 @@ class TreeListShell {
       columns: this._allColumns.map(c => ({ ...c, visible: _initVisibleKeys.has(c.key) })),
       toolbarEl: this._vmToolbarEl,
       onChange: () => {
-        // _restoringConfig 期间（_applyState 内部）完全跳过，避免多次渲染和误写 localStorage
+        // _restoringConfig 期间（_applyState 内部）完全跳过，避免多次渲染
         if (self._restoringConfig) return;
         self._vmStateVer = (self._vmStateVer || 0) + 1;
-        // 只有 init 完成后才持久化（防止 VM init 阶段 onChange 覆盖已保存的 TLS 状态）
-        if (self._initialized) self._saveState();
+        const activeView = self.vm?._views?.find(view => view.gid === self.vm?._activeViewGid);
+        if (activeView) self._onViewChange?.(activeView.name);
         self._renderTree();
       },
     });
     await this.vm.init();
+    this.vm.renderTabBar(this._vmToolbarEl);
   }
 
   // ==========================================================================

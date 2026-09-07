@@ -606,9 +606,9 @@ class RowDetailPanel {
     if (!itemType || !gid) { console.warn('[RowDetailPanel._loadEntriesAsync] missing itemType or gid'); return; }
     try {
       let result;
-      const cf = window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
-      if (cf) {
-        const resp = await cf(`/api/item-entries/${itemType}/${gid}`);
+      const _cloudFetch = window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
+      if (_cloudFetch) {
+        const resp = await _cloudFetch(`/api/item-entries/${itemType}/${gid}`, { method: 'GET' });
         result = resp?.entries || [];
       }
       // 防竞争：如果已切换到其他行，丢弃过期结果
@@ -648,9 +648,9 @@ class RowDetailPanel {
     const countEl = this._el.querySelector('#rdpChangeLogCount');
     if (!listEl) return;
     listEl.textContent = '加载中…';
-    const cf = window._cloudFetch || window.parent?._cloudFetch || window.top?._cloudFetch;
-    if (!cf) { listEl.textContent = '（无云端连接）'; return; }
-    cf(`/api/change-logs?item_type=${encodeURIComponent(this._itemType)}&item_gid=${encodeURIComponent(itemGid)}&limit=50`)
+    const _cloudFetch = window._cloudFetch || window.parent?._cloudFetch || window.top?._cloudFetch;
+    if (!_cloudFetch) { listEl.textContent = '（无云端连接）'; return; }
+    _cloudFetch(`/api/change-logs?item_type=${encodeURIComponent(this._itemType)}&item_gid=${encodeURIComponent(itemGid)}&limit=50`, { method: 'GET' })
       .then(rows => {
         if (!Array.isArray(rows) || rows.length === 0) {
           listEl.innerHTML = '<div style="padding:6px 0">暂无变更记录</div>';

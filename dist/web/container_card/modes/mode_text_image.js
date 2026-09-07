@@ -20,9 +20,14 @@ window.ContainerModes['text_image'] = (() => {
   }
 
   // ── 加载数据（复用 row_detail 逻辑）─────────────────────────────────────
-  async function _load(itemType, gid, source, cloudFetch) {
-    if (!cloudFetch) throw new Error('未连接云端');
-    const res = await cloudFetch(`/api/${itemType}s/${gid}`);
+  async function _load(itemType, gid, source, _cloudFetch) {
+    if (!_cloudFetch) throw new Error('未连接云端');
+    let res;
+    if (itemType === 'task') res = await _cloudFetch(`/api/tasks/${gid}`, { method: 'GET' });
+    else if (itemType === 'issue') res = await _cloudFetch(`/api/issues/${gid}`, { method: 'GET' });
+    else if (itemType === 'knowledge') res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('knowledge.get', { gid });
+    else if (itemType === 'rule') res = await _cloudFetch(`/api/rules/${gid}`, { method: 'GET' });
+    else throw new Error(`不支持的条目类型: ${itemType}`);
     return res?.data || res || null;
   }
 

@@ -363,6 +363,22 @@
   box-shadow: 0 0 0 1px rgba(137, 180, 250, 0.3);
 }
 
+.ll-process-card-left { transition: background-color 0.18s ease; }
+.ll-process-card-left.ll-process-change-operation { background: rgba(250, 179, 135, 0.22); }
+.ll-process-card-left.ll-process-change-parts { background: rgba(137, 180, 250, 0.20); }
+[data-lv-theme="light"] .ll-process-card-left.ll-process-change-operation { background: #ffeadb; }
+[data-lv-theme="light"] .ll-process-card-left.ll-process-change-parts { background: #e3f1ff; }
+.ll-process-critical-mark { color: var(--mauve, #cba6f7); font-size: 12px; font-weight: 800; margin-right: 4px; }
+.ll-process-seq-badge { cursor: pointer; user-select: none; color: #1e1e2e !important; }
+.ll-process-seq-badge.ll-seq-red, .ll-seq-color-option.ll-seq-red { background: #f38ba8 !important; }
+.ll-process-seq-badge.ll-seq-yellow, .ll-seq-color-option.ll-seq-yellow { background: #f9e2af !important; }
+.ll-process-seq-badge.ll-seq-green, .ll-seq-color-option.ll-seq-green { background: #a6e3a1 !important; }
+.ll-process-seq-badge.ll-seq-gray, .ll-seq-color-option.ll-seq-gray { background: #9399b2 !important; }
+.ll-process-seq-badge.ll-seq-blue, .ll-seq-color-option.ll-seq-blue { background: #89b4fa !important; }
+.ll-seq-color-picker { position: fixed; z-index: 12000; display: flex; gap: 7px; padding: 7px; border: 1px solid var(--surface2, #585b70); border-radius: 7px; background: var(--surface0, #313244); box-shadow: 0 8px 22px rgba(0,0,0,.4); }
+.ll-seq-color-option { width: 22px; height: 22px; padding: 0; border: 2px solid transparent; border-radius: 50%; cursor: pointer; }
+.ll-seq-color-option:hover, .ll-seq-color-option.active { border-color: var(--text, #cdd6f4); transform: scale(1.08); }
+
 /* 编辑模式下可拖动的环内卡片 */
 .ll-ring-card.ll-draggable {
   cursor: move;
@@ -1254,4 +1270,3 @@
   -webkit-line-clamp: unset !important;
   overflow: visible !important;
 }
-

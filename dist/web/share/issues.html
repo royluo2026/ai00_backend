@@ -175,7 +175,7 @@
       document.getElementById('emptyState').style.display = 'none';
       try {
         const qs = listGid ? `?list_gid=${encodeURIComponent(listGid)}` : '';
-        const res = await fetch(`${API}/api/issues${qs}`, {
+        const res = await fetch(API + '/api/issues' + qs, {
           headers: { 'X-AI00-Token': jwt }
         });
         if (res.status === 401) {

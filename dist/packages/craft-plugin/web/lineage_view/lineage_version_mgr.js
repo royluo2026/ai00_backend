@@ -66,18 +66,29 @@ const _TC_TYPE_MAP = {
   'Tool': 'tool_need', 'Fixture': 'fixture_need', 'Equipment': 'equipment_need',
   'Manufacturing Tool': 'tool_need', 'Manufacturing Fixture': 'fixture_need',
   'Manufacturing Equipment': 'equipment_need',
-  '总装工厂BOP': 'factory_bop', '整车BOP': 'factory_bop', '总装': 'factory_bop',
-  '总装线体工艺': 'line_process', '线体工艺': 'line_process', '线体': 'line_process',
-  '总装工位工艺': 'station_process', '工位工艺': 'station_process', '工位': 'station_process',
+  '总装工厂BOP': 'factory_bop', '总装产品BOP': 'factory_bop', '总装产品bop': 'factory_bop',
+  '总装BOP': 'factory_bop', '工厂BOP': 'factory_bop', '产品BOP': 'factory_bop',
+  'BOP': 'factory_bop', '整车BOP': 'factory_bop', '总装': 'factory_bop',
+  '总装线体工艺': 'line_process', '产线工艺': 'line_process', '线体工艺': 'line_process', '线体': 'line_process',
+  '总装工位工艺': 'station_process', '工位工艺': 'station_process',
   '总装岗位工艺': 'operator_process', '岗位工艺': 'operator_process',
+  '人': 'man', '工位': 'station_factory',
   '总装工序': 'process', '工艺过程': 'process', '工序': 'process',
+  '总装操作（Product）': 'operation', '总装操作(Product)': 'operation',
+  '总装操作（product）': 'operation', '总装操作(product)': 'operation',
   '总装操作': 'operation', '操作': 'operation',
+  '问题': 'issue', '标准任务': 'standard_task', '非标任务': 'non_standard_task',
+  '控制计划': 'contral_plan', '工艺卡': 'process_chart',
   '零件': 'part', '零组件': 'part', '零部件': 'part',
   '非标零件': 'non_standard_part', '非标件': 'non_standard_part',
   '标准零件': 'standard_part', '标准件': 'standard_part',
   '辅料': 'support_material',
+  '设备（现有）': 'equipment_factory', '设备（需求）': 'equipment_need',
+  '工具（现有）': 'tool_factory', '工具（需求）': 'tool_need',
+  '工装（现有）': 'fixture_factory', '工装（需求）': 'fixture_need',
   '工具': 'tool_need', '工装': 'fixture_need', '设备': 'equipment_need',
   '工具需求': 'tool_need', '工装需求': 'fixture_need', '设备需求': 'equipment_need',
+  '地面高度(现有）': 'floor_height_factory', '人机姿态': 'jack_pos',
 };
 
 // ── LineageVersionManager ──────────────────────────────────────────────────
@@ -125,14 +136,44 @@ class LineageVersionManager {
     this._$versionLbl = document.getElementById('lvVersionLabel');
   }
 
+  async _invokeCapability(id, payload = {}) {
+    const _cloudFetch = this._cf;
+    const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ version: 1, payload }),
+    });
+    const envelope = response?.data;
+    if (response?.success !== true || envelope?.ok !== true) {
+      // 保留独立测试/旧嵌入页传入 {data: value} 的轻量适配。
+      if (response && !Object.prototype.hasOwnProperty.call(response, 'success') && response.data !== undefined) {
+        return response.data;
+      }
+      const detail = envelope?.error || response?.error || {};
+      throw new Error(detail.message || `能力调用失败：${id}@1`);
+    }
+    const value = envelope.data;
+    return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+  }
+
   get allVersions() { return this._allVersions; }
 
   // ── 版本列表 ───────────────────────────────────────────────────────────
 
   async loadVersions() {
     try {
-      const res = await this._cf('/api/bop/versions?include_archived=true');
-      this._allVersions = res.data || [];
+      const res = await this._invokeCapability('craft.bop.version.list', {
+        include_archived: true, page_size: 100,
+      });
+      const versions = Array.isArray(res) ? res : (res?.items || res?.data || []);
+      this._allVersions = versions.map(ver => ({
+        ...ver,
+        gid: ver.gid ?? ver.version_gid,
+        version_family_gid: ver.version_family_gid ?? ver.family_gid,
+      }));
+      if (this._allVersions.some(ver => !ver.gid)) {
+        throw new Error('版本列表返回缺少 version_gid');
+      }
     } catch (e) {
       this._toast('加载版本列表失败: ' + e.message, 'error');
     }
@@ -365,10 +406,12 @@ class LineageVersionManager {
 
   async freeze(gid) {
     try {
-      const res = await this._cf(`/api/bop/versions/${gid}/freeze`, { method: 'POST' });
+      const res = await this._invokeCapability('craft.bop.version.freeze.change.apply', {
+        operation: 'freeze', version_gid: gid,
+      });
       await this.loadVersions();
       if (gid === this.currentVersionGid) {
-        this.currentVersionStatus = res.data?.status || 'baseline';
+        this.currentVersionStatus = res?.data?.status || res?.status || 'baseline';
         this._onStatusChange(this.currentVersionStatus);
       }
       this.renderMenu();
@@ -378,10 +421,12 @@ class LineageVersionManager {
 
   async unfreeze(gid) {
     try {
-      const res = await this._cf(`/api/bop/versions/${gid}/unfreeze`, { method: 'POST' });
+      const res = await this._invokeCapability('craft.bop.version.freeze.change.apply', {
+        operation: 'unfreeze', version_gid: gid,
+      });
       await this.loadVersions();
       if (gid === this.currentVersionGid) {
-        this.currentVersionStatus = res.data?.status || 'active';
+        this.currentVersionStatus = res?.data?.status || res?.status || 'active';
         this._onStatusChange(this.currentVersionStatus);
       }
       this.renderMenu();
@@ -391,10 +436,12 @@ class LineageVersionManager {
 
   async publish(gid) {
     try {
-      const res = await this._cf(`/api/bop/versions/${gid}/publish`, { method: 'POST' });
+      const res = await this._invokeCapability('craft.bop.version.lifecycle.change.apply', {
+        operation: 'publish', version_gid: gid,
+      });
       await this.loadVersions();
       if (gid === this.currentVersionGid) {
-        this.currentVersionStatus = res.data?.status || 'M';
+        this.currentVersionStatus = res?.data?.status || res?.status || 'M';
         this._onStatusChange(this.currentVersionStatus);
       }
       this.renderMenu();
@@ -405,7 +452,9 @@ class LineageVersionManager {
   async archiveFamily(familyGid) {
     if (!confirm('确认归档此版本族？归档后不可编辑，可恢复。')) return;
     try {
-      await this._cf(`/api/bop/version-families/${familyGid}/archive`, { method: 'POST' });
+      await this._invokeCapability('craft.bop.version.lifecycle.change.apply', {
+        operation: 'archive_family', family_gid: familyGid,
+      });
       await this.loadVersions();
       this.renderMenu();
       this._toast('版本族已归档', 'ok');
@@ -414,7 +463,9 @@ class LineageVersionManager {
 
   async unarchiveFamily(familyGid) {
     try {
-      await this._cf(`/api/bop/version-families/${familyGid}/archive`, { method: 'DELETE' });
+      await this._invokeCapability('craft.bop.version.lifecycle.change.apply', {
+        operation: 'unarchive_family', family_gid: familyGid,
+      });
       await this.loadVersions();
       this.renderMenu();
       this._toast('版本族已恢复', 'ok');
@@ -426,10 +477,8 @@ class LineageVersionManager {
     if (!confirm(`确认对版本「${ver.version_tag}」执行 ${modeLabel}？\n将清空全部条目及关联私有实体。`)) return;
     if (mode === 'hard' && !confirm('⚠️ 再次确认：硬删将永久清除所有数据，是否继续？')) return;
     try {
-      const res = await this._cf(`/api/bop/versions/${ver.gid}/purge-entries`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode }),
+      const res = await this._invokeCapability('craft.bop.entry.bulk.change.apply', {
+        operation: 'purge', version_gid: ver.gid, mode,
       });
       const c = res.counts || {};
       this._toast(`清空完成（条目 ${c.entries ?? 0} 条，链接 ${c.links ?? 0} 条）`, 'ok');
@@ -458,16 +507,8 @@ class LineageVersionManager {
     box.querySelector('#_ds-ok').addEventListener('click', async () => {
       const stage = box.querySelector('#_ds-sel').value || null;
       overlay.remove();
-      try {
-        await this._cf(`/api/bop/versions/${ver.gid}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ data_stage: stage }),
-        });
-        await this.loadVersions();
-        this.renderMenu();
-        this._toast('数据阶段已更新', 'ok');
-      } catch (e) { this._toast('保存失败: ' + e.message, 'error'); }
+      void stage;
+      this._toast('数据阶段编辑暂未开放，请通过新版 BOP 版本元数据能力处理', 'warn');
     });
   }
 
@@ -628,14 +669,14 @@ class LineageVersionManager {
   async openCreateModal(prefillFamilyGid = null) {
     if (this._projectsCache.length === 0) {
       try {
-        const res = await this._cf('/api/projects?limit=200');
-        this._projectsCache = (res.data || []).filter(p => !p.is_deleted && p.project_type !== 'gbop');
+        const res = await this._invokeCapability('project.project.read.atomic.projects_search', {});
+        this._projectsCache = (res?.data || res || []).filter(p => !p.is_deleted && p.project_type !== 'gbop');
       } catch (_) { this._projectsCache = []; }
     }
     if (this._factoriesCache.length === 0) {
       try {
-        const res = await this._cf('/api/bop/factories');
-        this._factoriesCache = res.data || [];
+        const res = await this._invokeCapability('factory.asset.search', { asset_type: 'factory' });
+        this._factoriesCache = res || [];
       } catch (_) { this._factoriesCache = []; }
     }
 
@@ -736,16 +777,13 @@ class LineageVersionManager {
     if (!tag)      { this._toast('版本号生成失败，请刷新重试', 'warn'); return; }
     if (!bopName)  { this._toast('族群名生成失败，请选择项目', 'warn'); return; }
     try {
-      const res = await this._cf('/api/bop/versions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ version_tag: tag, bop_name: bopName, version_family_gid: familyGid,
-                               status: 'active', project_gid: project, factory_gid: factory,
-                               pbom_version_gid: pbomGid || null }),
+      const res = await this._invokeCapability('craft.bop.version.create', {
+        source: 'empty', version_tag: tag, bop_name: bopName, version_family_gid: familyGid,
+        project_gid: project, factory_gid: factory, pbom_version_gid: pbomGid || null,
       });
       this._closeCreateModal();
       await this.loadVersions();
-      const newGid = res.data?.gid || res.gid;
+      const newGid = res.version_gid || res.gid;
       if (newGid) this.selectVersion(newGid, tag);
       this._toast('版本创建成功', 'ok');
     } catch (e) { this._toast('创建失败: ' + e.message, 'error'); }
@@ -762,8 +800,10 @@ class LineageVersionManager {
     }
     sel.innerHTML = '<option value="">— 加载中… —</option>';
     try {
-      const res = await this._cf(`/api/bop/pbom-versions?project_gid=${encodeURIComponent(projectGid)}`);
-      const versions = (res?.data || []).filter(v => !v.archived_at);
+      const res = await this._invokeCapability('craft.pbom.version.search', {
+        project_ref: projectGid, limit: 50,
+      });
+      const versions = (res?.items || []).filter(v => !v.archived_at);
       if (!versions.length) {
         sel.innerHTML = '<option value="">（无已就绪 PBOM 版本）</option>';
         if (hint) hint.style.display = '';
@@ -1030,8 +1070,8 @@ class LineageVersionManager {
       // 父级 VPPS 链接
       if (row._parent_vpps) {
         row.parent_vpps = row._parent_vpps;
-        delete row._parent_vpps;
       }
+      delete row._parent_vpps;
 
       parsed.push(row);
     }
@@ -1063,10 +1103,8 @@ class LineageVersionManager {
     btn.textContent = '导入中…';
     btn.disabled = true;
     try {
-      const resp = await this._cf(`/api/bop/versions/${this.currentVersionGid}/import-tc`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rows }),
+      const resp = await this._invokeCapability('craft.bop.entry.bulk.change.apply', {
+        operation: 'import_tc', version_gid: this.currentVersionGid, rows,
       });
       document.getElementById('lv-modal-import-tc').classList.add('hidden');
       await this.loadVersions();
@@ -1144,8 +1182,8 @@ class LineageVersionManager {
     // 确保工厂缓存已加载（save-as-template 需要工厂下拉）
     if (this._factoriesCache.length === 0) {
       try {
-        const res = await this._cf('/api/bop/factories');
-        this._factoriesCache = res.data || [];
+        const res = await this._invokeCapability('factory.asset.search', { asset_type: 'factory' });
+        this._factoriesCache = res || [];
       } catch (_) { this._factoriesCache = []; }
     }
 
@@ -1198,10 +1236,9 @@ class LineageVersionManager {
       if (!tmplName)   { this._toast('模板名称不能为空', 'warn'); return; }
       if (!factoryGid) { this._toast('请选择目标工厂', 'warn'); return; }
       try {
-        const res = await this._cf(`/api/bop/versions/${srcGid}/save-as-template`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ factory_gid: factoryGid, template_name: tmplName, copy_operator: copyOp }),
+        const res = await this._invokeCapability('craft.bop.template.change.apply', {
+          operation: 'save_as_template', source_version_gid: srcGid,
+          factory_gid: factoryGid, template_name: tmplName, copy_operator: copyOp,
         });
         document.getElementById('lv-modal-fork').classList.add('hidden');
         await this.loadVersions();
@@ -1236,10 +1273,10 @@ class LineageVersionManager {
     const srcVer = this._allVersions.find(v => v.gid === srcGid);
     const bopName = srcVer?.bop_name || null;
     try {
-      const res = await this._cf(`/api/bop/versions/${srcGid}/fork`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target_version_tag: tag, target_bop_name: bopName || '', target_version_family_gid: famGid, change_note: note }),
+      const res = await this._invokeCapability('craft.bop.fork.change.apply', {
+        operation: 'fork', source_version_gid: srcGid,
+        target_version_tag: tag, target_bop_name: bopName || '',
+        target_version_family_gid: famGid, change_note: note,
       });
       document.getElementById('lv-modal-fork').classList.add('hidden');
       await this.loadVersions();
@@ -1254,8 +1291,8 @@ class LineageVersionManager {
   async openSaveTmplModal() {
     if (this._factoriesCache.length === 0) {
       try {
-        const res = await this._cf('/api/bop/factories');
-        this._factoriesCache = res.data || [];
+        const res = await this._invokeCapability('factory.asset.search', { asset_type: 'factory' });
+        this._factoriesCache = res || [];
       } catch (_) { this._factoriesCache = []; }
     }
 
@@ -1328,10 +1365,9 @@ class LineageVersionManager {
     btn.textContent = '保存中…';
     btn.disabled = true;
     try {
-      const res = await this._cf(`/api/bop/versions/${srcGid}/save-as-template`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ factory_gid: facGid, template_name: tmplName, copy_operator: copyOp }),
+      const res = await this._invokeCapability('craft.bop.template.change.apply', {
+        operation: 'save_as_template', source_version_gid: srcGid,
+        factory_gid: facGid, template_name: tmplName, copy_operator: copyOp,
       });
       document.getElementById('lv-modal-save-tmpl').classList.add('hidden');
       await this.loadVersions();
@@ -1419,14 +1455,14 @@ class LineageVersionManager {
 
     if (this._projectsCache.length === 0) {
       try {
-        const res = await this._cf('/api/projects?limit=200');
-        this._projectsCache = (res.data || []).filter(p => !p.is_deleted && p.project_type !== 'gbop');
+        const res = await this._invokeCapability('project.project.read.atomic.projects_search', {});
+        this._projectsCache = (res?.data || res || []).filter(p => !p.is_deleted && p.project_type !== 'gbop');
       } catch (_) { this._projectsCache = []; }
     }
     if (this._factoriesCache.length === 0) {
       try {
-        const res = await this._cf('/api/bop/factories');
-        this._factoriesCache = res.data || [];
+        const res = await this._invokeCapability('factory.asset.search', { asset_type: 'factory' });
+        this._factoriesCache = res || [];
       } catch (_) { this._factoriesCache = []; }
     }
 
@@ -1540,16 +1576,11 @@ class LineageVersionManager {
     btn.textContent = '创建中…';
     btn.disabled = true;
     try {
-      const res = await this._cf(`/api/bop/versions/${this._selectedTmplGid}/fork`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          target_version_tag:        tag,
-          target_bop_name:           bopName,
-          target_version_family_gid: famGid,
-          change_note:               changeNote,
-          version_type:              'working',
-        }),
+      const res = await this._invokeCapability('craft.bop.fork.change.apply', {
+        operation: 'fork', source_version_gid: this._selectedTmplGid,
+        target_version_tag: tag, target_bop_name: bopName,
+        target_version_family_gid: famGid, change_note: changeNote,
+        version_type: 'working',
       });
       document.getElementById('lv-modal-from-tmpl').classList.add('hidden');
       await this.loadVersions();
@@ -1576,8 +1607,10 @@ class LineageVersionManager {
     const gbopSel = document.getElementById('lv-gbop-src');
     gbopSel.innerHTML = '<option value="">-- 加载中… --</option>';
     try {
-      const res = await this._cf('/api/gbop/versions?limit=100');
-      const gbopVers = res.data || [];
+      const res = await this._invokeCapability('craft.gbop.release.search', {
+        include_archived: false,
+      });
+      const gbopVers = res?.items || res?.data || [];
       gbopSel.innerHTML = '<option value="">-- 选择 GBOP 版本 --</option>';
       for (const v of gbopVers) {
         const opt = document.createElement('option');
@@ -1597,8 +1630,8 @@ class LineageVersionManager {
     if (!gbopGid) { this._toast('请选择 GBOP 来源版本', 'warn'); return; }
     try {
       console.log('[Import-GBOP] target:', this.currentVersionGid, 'src:', gbopGid);
-      const resp = await this._cf(`/api/bop/versions/${this.currentVersionGid}/copy-from-gbop/${gbopGid}`, {
-        method: 'POST',
+      const resp = await this._invokeCapability('craft.bop.entry.bulk.change.apply', {
+        operation: 'copy_from_gbop', version_gid: this.currentVersionGid, source_gid: gbopGid,
       });
       console.log('[Import-GBOP] response:', resp);
       document.getElementById('lv-modal-import-gbop').classList.add('hidden');

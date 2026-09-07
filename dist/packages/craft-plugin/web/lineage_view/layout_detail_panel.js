@@ -55,12 +55,51 @@ const TREE_VALID_PARENTS = {
 // ── 关系分组配置 ──────────────────────────────────────────────────────────────
 const REL_GROUPS = [
   { key: 'pbom',    name: 'PBOM 零件', ntType: 'part',              linkTypes: ['pbom_part'] },
-  { key: 'equip',   name: '设备',      ntType: 'equipment_factory', linkTypes: ['physical_equipment', 'project_equipment'] },
-  { key: 'tool',    name: '工具',      ntType: 'tool_factory',      linkTypes: ['physical_tool', 'project_tools'] },
-  { key: 'fixture', name: '工装',      ntType: 'fixture_factory',   linkTypes: ['physical_fixture', 'project_tooling'] },
+  { key: 'equip',   name: '设备',      ntType: 'equipment_factory', linkTypes: ['physical_equipment'] },
+  { key: 'tool',    name: '工具',      ntType: 'tool_factory',      linkTypes: ['physical_tool'] },
+  { key: 'fixture', name: '工装',      ntType: 'fixture_factory',   linkTypes: ['physical_fixture'] },
   { key: 'issue',   name: '问题',      ntType: 'issue',             linkTypes: ['issue'] },
   { key: 'task',    name: '任务',      ntType: 'standard_task',     linkTypes: ['task_std', 'task_custom'] },
 ];
+
+const CRAFT_RESOURCE_GROUPS = Object.freeze([
+  { key: 'need_socket', resourceType: 'socket', name: '需求套筒', ntType: 'socket_need', linkType: 'resource_socket', legacyLinkTypes: [] },
+  { key: 'need_tool', resourceType: 'tool', name: '需求工具', ntType: 'tool_need', linkType: 'resource_tool', legacyLinkTypes: ['project_tools', 'needsTool'] },
+  { key: 'need_fixture', resourceType: 'fixture', name: '需求工装', ntType: 'fixture_need', linkType: 'resource_fixture', legacyLinkTypes: ['project_tooling', 'needsFixture'] },
+  { key: 'need_equip', resourceType: 'equipment', name: '需求设备', ntType: 'equipment_need', linkType: 'resource_equipment', legacyLinkTypes: ['project_equipment', 'needsEquipment'] },
+]);
+const CRAFT_RESOURCE_TYPE_BY_LINK_TYPE = Object.freeze(Object.fromEntries(
+  CRAFT_RESOURCE_GROUPS.flatMap(group => [[group.linkType, group.resourceType], ...group.legacyLinkTypes.map(linkType => [linkType, group.resourceType])]),
+));
+const _craftResourceType = linkType => CRAFT_RESOURCE_TYPE_BY_LINK_TYPE[linkType] || null;
+const _craftResourceUrl = linkType => {
+  const resourceType = _craftResourceType(linkType);
+  return resourceType ? `/api/craft/resource-requirements?resource_type=${resourceType}` : null;
+};
+function _buildRuntimeRelationGroups(relationConfigs) {
+  const groups = [];
+  const resourceTypes = new Set();
+  for (const relation of relationConfigs || []) {
+    const resourceType = _craftResourceType(relation.link_type_binding);
+    if (resourceType) {
+      if (resourceTypes.has(resourceType)) continue;
+      resourceTypes.add(resourceType);
+      const config = CRAFT_RESOURCE_GROUPS.find(item => item.resourceType === resourceType);
+      groups.push({ ...config, linkTypes: [config.linkType, ...config.legacyLinkTypes], relation });
+    } else {
+      groups.push({
+        key: `link:${relation.link_type_binding}`,
+        name: relation.label_zh || relation.name || relation.link_type_binding,
+        ntType: relation.range_node_type || 'process',
+        linkTypes: [relation.link_type_binding], linkType: relation.link_type_binding, relation,
+      });
+    }
+  }
+  return groups;
+}
+const _candidatePrimary = candidate => candidate.code || candidate.part_no || candidate.title || candidate.name || candidate.gid;
+const _candidateSearchText = candidate => [candidate.code, candidate.title, candidate.part_no, candidate.name, candidate.vpps, candidate.component_id]
+  .filter(Boolean).join('\n').toLowerCase();
 
 // ── 子节点类型映射 ─────────────────────────────────────────────────────────────
 const CHILD_TYPE_MAP = {
@@ -183,6 +222,19 @@ function _he(s) {
   return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+const _RULE_ENTRY_FIELDS = new Set([
+  'gid', 'node_type', 'title', 'name', 'vpps', 'version_no', 'std_time', 'torque', 'qualification',
+  'seq_no', 'tools_calibrated', 'headcount', 'model_no', 'certification_date', 'calibration_interval',
+  'calibrated', 'vd_time', 'total_time', 'floor_height_need', 'op_req_height', 'spec', 'quantity',
+  'status', 'asset_no', 'role_type',
+]);
+
+function _closedRuleEntry(row) {
+  return Object.fromEntries(Object.entries(row || {}).filter(([key, value]) =>
+    _RULE_ENTRY_FIELDS.has(key) && (value === null || ['string', 'number', 'boolean'].includes(typeof value)),
+  ));
+}
+
 function _statusBadgeClass(status) {
   const m = { 'open': 'b-r', 'in_progress': 'b-b', 'resolved': 'b-g', 'done': 'b-g',
     'todo': 'b-0', 'cancelled': 'b-0', 'pending': 'b-y', 'confirmed': 'b-b',
@@ -204,7 +256,7 @@ class LayoutDetailPanel {
    * @param {Function}    opts.getLineageData - () => { rowByGid, childMap, statsMap, versionGid }
    * @param {Function}    opts.onNodeActivate - (gid) => void  节点树点击时通知主视图高亮定位
    */
-  constructor({ containerEl, cf, toast, patchEntry, reloadData, preserveLayoutView, getLineageData, onNodeActivate, getVersionInfo, onVersionChange }) {
+  constructor({ containerEl, cf, toast, patchEntry, reloadData, preserveLayoutView, getLineageData, onNodeActivate, onPropertyChange, getVersionInfo, onVersionChange, loadEntryDetail, loadVersionProjection }) {
     this._el = containerEl;
     this._cf = cf;
     this._toast = toast;
@@ -213,8 +265,67 @@ class LayoutDetailPanel {
     this._preserveLayoutView = preserveLayoutView || (() => {});
     this._getLineageData = getLineageData || (() => null);
     this._onNodeActivate  = onNodeActivate  || null;
+    this._onPropertyChange = onPropertyChange || null;
     this._getVersionInfo  = getVersionInfo  || null;
     this._onVersionChange = onVersionChange || null;
+    this._loadEntryDetail = loadEntryDetail || null;
+    this._loadVersionProjection = loadVersionProjection || null;
+    this._detailGeneration = 0;
+
+    this._invokeCapability = async (id, payload = {}) => {
+      const _cloudFetch = this._cf;
+      const requestBody = {
+        version: 1,
+        payload,
+        idempotency_key: `${id}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      };
+      const request = (suffix, body) => _cloudFetch(`/api/v1/capabilities/${id}:${suffix}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      let response = await request('invoke', requestBody);
+      if (response?.data?.error?.code === 'confirmation_required') {
+        const confirmation = await request('confirm', requestBody);
+        const token = confirmation?.data?.confirmation_token;
+        if (!token) throw new Error(`能力确认失败：${id}@1`);
+        response = await request('invoke', { ...requestBody, confirmation_token: token });
+      }
+      const envelope = response?.data;
+      if (response?.success !== true || envelope?.ok !== true) {
+        const detail = envelope?.error || response?.error || {};
+        throw new Error(detail.message || `能力调用失败：${id}@1`);
+      }
+      const value = envelope.data;
+      return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+    };
+    this._ontologySchemaCache = new Map();
+    this._ontologySchemaVersionKey = 'ai00:ontology-schema-version';
+    this._onOntologySchemaVersion = event => {
+      if (event.key === this._ontologySchemaVersionKey) this._ontologySchemaCache.clear();
+    };
+    window.addEventListener('storage', this._onOntologySchemaVersion);
+    this._loadOntologySchema = async (nodeType) => {
+      const key = String(nodeType || '').trim();
+      if (!key) return { properties: [], relations: [], rules: [] };
+      if (this._ontologySchemaCache.has(key)) return this._ontologySchemaCache.get(key);
+      const resolved = await this._invokeCapability('ontology.concept.resolve', { term: key });
+      const concept = resolved?.concept || null;
+      const stableGid = concept?.concept_ref?.concept_id || concept?.stable_gid;
+      if (!stableGid) return { properties: [], relations: [], rules: [] };
+      const detail = await this._invokeCapability('ontology.concept.get', {
+        stable_gid: stableGid, kind: 'concept', view: 'schema', release_gid: resolved?.release_gid,
+      });
+      const schema = detail?.concept || detail || {};
+      const normalized = {
+        ...schema,
+        properties: Array.isArray(schema.properties) ? schema.properties : [],
+        relations: Array.isArray(schema.relations) ? schema.relations : [],
+        rules: Array.isArray(schema.rules) ? schema.rules : [],
+      };
+      this._ontologySchemaCache.set(key, normalized);
+      return normalized;
+    };
 
     this._isOpen = false;
     this._userClosed = false;
@@ -224,6 +335,7 @@ class LayoutDetailPanel {
     this._treeDragPending = null; // mousedown 后待确认的拖拽 { gid, nodeType, parentGid, el, startX, startY }
     this._treeDragState   = null; // 拖拽激活后 { ...pending, ghost, currentTarget, currentAction }
     this._currentRelGroups = []; // 本体驱动关系分组，_renderRels 填充
+    this._craftResourceCache = null;
     this._treeExpanded = new Set();
     this._lastVersionGid = null; // 上次渲染时的版本 gid，用于检测版本切换
     this._relLinks = [];        // 当前节点的所有关系链接
@@ -354,6 +466,24 @@ class LayoutDetailPanel {
       return;
     }
     this._renderAll(gid, row);
+    void this._hydrateEntryDetail(gid, row);
+  }
+
+  async _hydrateEntryDetail(gid, row) {
+    if (!this._loadEntryDetail) return;
+    const generation = ++this._detailGeneration;
+    try {
+      const detail = await this._loadEntryDetail(gid, row);
+      if (generation !== this._detailGeneration || this._currentGid !== gid || detail?.cancelled) return;
+      Object.assign(row, detail?.entry || {});
+      row.__governed_links = Array.isArray(detail?.links) ? detail.links : [];
+      this._currentRow = row;
+      this._renderAll(gid, row);
+    } catch (error) {
+      if (generation === this._detailGeneration && this._currentGid === gid) {
+        this._toast?.(`详情加载失败：${error?.message || '未知错误'}`, 'error');
+      }
+    }
   }
 
   /** 判断一行是否匹配搜索词（检查 title/vpps/bom_row_id 和 entity_data 里的关键字段） */
@@ -779,10 +909,8 @@ class LayoutDetailPanel {
       sort_order:  maxSort + 1,
     };
     try {
-      await this._cf('/api/bop/entries', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+      await this._invokeCapability('craft.bop.entry.bulk.change.apply', {
+        operation: 'create', ...body,
       });
       this._toast?.('节点已创建', 'ok');
       await this._reloadData();
@@ -834,8 +962,10 @@ class LayoutDetailPanel {
 
   _openDetDrawer() {
     this._detDrawer?.classList.add('open');
-    document.getElementById('llDetDrawerSave').style.display = '';
-    document.getElementById('llDetDrawerUnlink').style.display = '';
+    const save = document.getElementById('llDetDrawerSave');
+    const unlink = document.getElementById('llDetDrawerUnlink');
+    if (save) save.style.display = '';
+    if (unlink) unlink.style.display = '';
   }
 
   _closeDetDrawer(force) {
@@ -999,10 +1129,8 @@ class LayoutDetailPanel {
     try {
       // Step 1: 换父
       if (oldParentGid !== newParentGid) {
-        await this._cf(`/api/bop/entries/${encodeURIComponent(dragGid)}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ parent_gid: newParentGid }),
+        await this._invokeCapability('craft.bop.entry.change.apply', {
+          operation: 'update', entry_gid: dragGid, updates: { parent_gid: newParentGid },
         });
       }
       // Step 2: 重排序（仅 before/after 时）
@@ -1015,13 +1143,9 @@ class LayoutDetailPanel {
         const patches = siblings
           .map((r, i) => ({ gid: r.gid, newSeq: i + 1, oldSeq: r.sort_order }))
           .filter(p => p.newSeq !== p.oldSeq || p.gid === dragGid);
-        await Promise.all(patches.map(p =>
-          this._cf(`/api/bop/entries/${encodeURIComponent(p.gid)}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sort_order: p.newSeq }),
-          })
-        ));
+        await Promise.all(patches.map(p => this._invokeCapability('craft.bop.entry.change.apply', {
+          operation: 'update', entry_gid: p.gid, updates: { sort_order: p.newSeq },
+        })));
       }
       await this._reloadData();
     } catch (err) {
@@ -1214,7 +1338,7 @@ class LayoutDetailPanel {
     }
   }
 
-  /** 获取子节点的某个属性值（优先实体表 entity_data，其次 entity-props API，最后兜底 meta） */
+  /** 获取子节点的某个属性值（优先实体表 entity_data，最后兜底 meta） */
   async _fetchChildPropValues(children, propName) {
     // 第一优先：entity_data（实体表列值，SQL JOIN 已带入）
     let values = children
@@ -1224,17 +1348,6 @@ class LayoutDetailPanel {
         return NaN;
       })
       .filter(v => !isNaN(v));
-    // 第二优先：entity-props API
-    if (!values.length) {
-      const results = await Promise.all(
-        children.map(c =>
-          this._cf(`/api/bop/entries/${encodeURIComponent(c.gid)}/entity-props`)
-            .then(r => r?.data?.[propName])
-            .catch(() => null)
-        )
-      );
-      values = results.filter(v => v != null).map(Number).filter(v => !isNaN(v));
-    }
     // 最后兜底：meta
     if (!values.length) {
       values = children
@@ -1300,7 +1413,7 @@ class LayoutDetailPanel {
     const canEditCurrentLine = !lineReadOnly || !currentLineGid || lineGrantSet.has(currentLineGid);
     try {
       const nodeType = row.node_type;
-      const schemaResp = await this._cf(`/api/ontology/schema/${encodeURIComponent(nodeType)}`);
+      const schemaResp = await this._loadOntologySchema(nodeType);
       const props = (schemaResp?.properties || [])
         .filter(p => p.prop_kind === 'data' && Boolean(p.show_in_detail) !== false)
         .sort((a, b) => (a.sort_order ?? 99) - (b.sort_order ?? 99));
@@ -1317,13 +1430,8 @@ class LayoutDetailPanel {
       const entityProps = props.filter(p => p.storage_hint === 'entity_table');
       const metaProps   = props.filter(p => p.storage_hint !== 'entity_table');
 
-      let entityVals = {};
-      if (entityProps.length) {
-        try {
-          const er = await this._cf(`/api/bop/entries/${encodeURIComponent(gid)}/entity-props`);
-          entityVals = er?.data || {};
-        } catch {}
-      }
+      // 实体属性 REST 已废弃；读取布局数据中已随结构查询返回的 entity_data。
+      const entityVals = (row?.entity_data && typeof row.entity_data === 'object') ? row.entity_data : {};
       const metaVals = (typeof row.meta === 'object' && row.meta) ? row.meta : {};
 
       // 保持本体 sort_order 顺序，标记来源
@@ -1392,7 +1500,10 @@ class LayoutDetailPanel {
 
       // 保存逻辑
       area.querySelectorAll('.ll-props-inp, .ll-props-sel').forEach(inp => {
+        let committedRaw = inp.value;
+        let saving = false;
         const save = async () => {
+          if (saving || inp.value === committedRaw) return;
           const propName = inp.dataset.prop;
           const src = inp.dataset.src;
           const dtype = inp.dataset.dtype || 'string';
@@ -1402,31 +1513,29 @@ class LayoutDetailPanel {
           else if (dtype === 'float')   { val = parseFloat(val);   if (isNaN(val)) return; }
           else if (dtype === 'boolean') { val = val === 'true' ? true : val === 'false' ? false : null; }
 
+          saving = true;
           try {
-            // 统一走 entity-props PATCH（后端自动路由到实体表列/ext/bop_entries.meta）
-            await this._cf(`/api/bop/entries/${encodeURIComponent(gid)}/entity-props`, {
-              method: 'PATCH', body: JSON.stringify({ [propName]: val }),
+            await this._invokeCapability('craft.bop.entry.change.apply', {
+              operation: 'update', entry_gid: gid, properties: [{ name: propName, value: val }],
             });
+            committedRaw = inp.value;
             if (src === 'entity') {
-              entityVals[propName] = val;
-              // 同步更新 row.entity_data，使布局卡片立即显示新值
-              if (row.entity_data && typeof row.entity_data === 'object') {
-                row.entity_data[propName] = val;
+              if (Object.prototype.hasOwnProperty.call(entityVals, propName)) entityVals[propName] = val;
+              else {
+                if (!entityVals.ext || typeof entityVals.ext !== 'object') entityVals.ext = {};
+                entityVals.ext[propName] = val;
               }
-            } else {
-              metaVals[propName] = val;
-            }
+            } else metaVals[propName] = val;
+            this._onPropertyChange?.(gid, propName, val);
           } catch (e) {
             this._toast?.('保存失败: ' + (e?.message || e), 'error');
+          } finally {
+            saving = false;
           }
-          // 保存后立即刷新属性面板 + 布局卡片（保持画面焦点不变）
-          this._renderProps(gid, data.rowByGid.get(gid) || row);
-          this._preserveLayoutView();
-          this._reloadData?.();
         };
-        inp.addEventListener('blur', save);
-        inp.addEventListener('change', save);
-        inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); save(); } });
+        if (inp.matches('select')) inp.addEventListener('change', save);
+        else inp.addEventListener('blur', save);
+        inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); inp.blur(); } });
       });
 
     } catch (e) {
@@ -1449,12 +1558,16 @@ class LayoutDetailPanel {
     const hasChildren = data ? (data.childMap.get(gid) || []).filter(r => !r.is_deleted).length > 0 : false;
 
     let links = [];
-    try {
-      const resp = await this._cf(
-        `/api/bop/entry-links?entry_gid=${encodeURIComponent(gid)}${hasChildren ? '&recursive=true' : ''}`
-      );
-      links = resp?.data || [];
-    } catch {}
+    if (Array.isArray(row?.__governed_links)) {
+      links = row.__governed_links;
+    } else if (!this._loadEntryDetail) {
+      try {
+        const resp = await this._invokeCapability('craft.bop.entry.legacy_read', {
+          operation: 'entry_links', entry_gid: gid, recursive: hasChildren,
+        });
+        links = resp?.data || resp || [];
+      } catch {}
+    }
     this._relLinks = links;
 
     // 子节点从 childMap 取
@@ -1513,7 +1626,7 @@ class LayoutDetailPanel {
     // ── 从本体 schema 加载自定义关系（有 link_type_binding 且 show_in_detail 非 false）──
     let ontoRelTypes = [];
     try {
-      const schemaResp = await this._cf(`/api/ontology/schema/${encodeURIComponent(row.node_type)}`);
+      const schemaResp = await this._loadOntologySchema(row.node_type);
       ontoRelTypes = (schemaResp?.relations || []).filter(r => r.link_type_binding && r.show_in_detail !== false);
     } catch (_) {}
 
@@ -1664,8 +1777,10 @@ class LayoutDetailPanel {
     let entityData = {};
     if (linkType && linkType !== 'child' && entityGid) {
       try {
-        const resp = await this._cf(`/api/bop/entity-detail?link_type=${encodeURIComponent(linkType)}&ref_gid=${encodeURIComponent(entityGid)}`);
-        entityData = resp?.data || {};
+        const resp = await this._invokeCapability('craft.bop.entry.legacy_read', {
+          operation: 'entity_detail', link_type: linkType, ref_gid: entityGid,
+        });
+        entityData = resp?.data || resp || {};
       } catch {}
     } else if (linkType === 'child' && entityGid) {
       // 子节点 → 从 lineage data 读
@@ -1752,9 +1867,8 @@ class LayoutDetailPanel {
       });
       try {
         if (linkType !== 'child') {
-          await this._cf('/api/bop/entity-detail', {
-            method: 'PATCH',
-            body: JSON.stringify({ link_type: linkType, ref_gid: entityGid, fields }),
+          await this._invokeCapability('craft.bop.entry.bulk.change.apply', {
+            operation: 'entity_detail.patch', link_type: linkType, ref_gid: entityGid, fields,
           });
         } else if (entityGid) {
           const newTitle = this._detDrawerBody.querySelector('#llDetTitleInp')?.value?.trim();
@@ -1780,7 +1894,9 @@ class LayoutDetailPanel {
       }
       if (!item.link?.gid) return;
       try {
-        await this._cf(`/api/bop/entry-links/${encodeURIComponent(item.link.gid)}`, { method: 'DELETE' });
+        await this._invokeCapability('craft.bop.entry_link.change.apply', {
+          operation: 'detach', link_gid: item.link.gid,
+        });
         this._renderDetailEmpty();
         await this._renderRels(this._currentGid);
       } catch (e) {
@@ -1789,18 +1905,26 @@ class LayoutDetailPanel {
     });
   }
 
+  _getCraftResourceRequirements() {
+    if (!this._craftResourceCache) {
+      this._craftResourceCache = this._cf('/api/craft/resource-requirements')
+        .then(response => response?.data || response?.items || response || [])
+        .catch(error => {
+          this._craftResourceCache = null;
+          throw error;
+        });
+    }
+    return this._craftResourceCache;
+  }
+
   async _openAddDetail(key, parentGid, nodeType, typeLabel) {
     this._detMode = 'add';
     this._addType = key;
 
-    const grp = REL_GROUPS.find(g => g.key === key);
+    const grp = this._currentRelGroups?.find(g => g.key === key) || REL_GROUPS.find(g => g.key === key);
     const dot = grp?.dot || '#89b4fa';
 
-    const isResourceGroup = key === 'equip' || key === 'tool' || key === 'fixture' || [
-      'physical_equipment', 'project_equipment', 'needsEquipment',
-      'physical_tool', 'project_tools', 'needsTool',
-      'physical_fixture', 'project_tooling', 'needsFixture',
-    ].includes(nodeType || '');
+    const isResourceGroup = !!grp?.resourceType;
     let selLinkType = nodeType || '';
 
     // 加载候选：按关系类型走对应数据源
@@ -1815,15 +1939,24 @@ class LayoutDetailPanel {
     let isPbomType = key === 'pbom' || ['pbom_part', 'usesPart', 'part', 'non_standard_part', 'standard_part', 'support_material'].includes(_nt);
 
     try {
-      if (isPbomType) {
+      if (isResourceGroup) {
+        candidates = (await this._getCraftResourceRequirements())
+          .filter(item => item.resource_type === grp.resourceType);
+        candSrcLabel = `${typeLabel}标准库`;
+        selLinkType = grp.linkType;
+      } else if (isPbomType) {
         // 加载 PBOM 版本列表
-        const verResp = await this._cf('/api/ebom/snapshots?limit=50');
+        const verResp = await this._invokeCapability('craft.bop.entry.legacy_read', {
+          operation: 'pbom_snapshots', limit: 50,
+        });
         pbomVersions = verResp?.data || (Array.isArray(verResp) ? verResp : []);
         selectedPbomGid = verInfo?.pbomVersionGid || pbomVersions[0]?.gid || null;
         candSrcLabel = 'PBOM';
         // 加载默认版本下的零件
         if (selectedPbomGid) {
-          const partResp = await this._cf(`/api/ebom/snapshots/${selectedPbomGid}/parts`);
+          const partResp = await this._invokeCapability('craft.bop.entry.legacy_read', {
+            operation: 'pbom_search', snapshot_gid: selectedPbomGid, limit: 500,
+          });
           const parts = partResp?.data || [];
           candidates = parts.map(r => ({
             gid: r.gid,
@@ -1837,31 +1970,47 @@ class LayoutDetailPanel {
             unit: r.unit || 'pcs',
           }));
         }
-      } else if (key === 'equip' || ['physical_equipment', 'project_equipment', 'needsEquipment'].includes(_nt)) {
-        const fgid = verInfo?.factoryGid;
-        const url = fgid ? `/api/bop/factory/equipments?factory_gid=${encodeURIComponent(fgid)}&limit=20` : `/api/bop/factory/equipments?limit=20`;
-        const resp = await this._cf(url); candidates = resp?.data || []; candSrcLabel = '设备库';
-      } else if (key === 'tool' || ['physical_tool', 'project_tools', 'needsTool'].includes(_nt)) {
-        const resp = await this._cf(`/api/bop/factory/tools?limit=20`);
-        candidates = resp?.data || []; candSrcLabel = '工具库';
-      } else if (key === 'fixture' || ['physical_fixture', 'project_tooling', 'needsFixture'].includes(_nt)) {
-        const resp = await this._cf(`/api/bop/factory/fixtures?limit=20`);
-        candidates = resp?.data || []; candSrcLabel = '工装库';
+      } else if (key === 'equip' || ['physical_equipment', 'project_equipment'].includes(_nt)) {
+        const resp = await this._invokeCapability('factory.asset.search', { asset_type: 'equipment', limit: 20 });
+        candidates = Array.isArray(resp) ? resp : (resp?.data || []); candSrcLabel = '设备库';
+      } else if (key === 'tool' || ['physical_tool', 'project_tools'].includes(_nt)) {
+        const resp = await this._invokeCapability('factory.asset.search', { asset_type: 'tool', limit: 20 });
+        candidates = Array.isArray(resp) ? resp : (resp?.data || []); candSrcLabel = '工具库';
+      } else if (key === 'fixture' || ['physical_fixture', 'project_tooling'].includes(_nt)) {
+        const resp = await this._invokeCapability('factory.asset.search', { asset_type: 'fixture', limit: 20 });
+        candidates = Array.isArray(resp) ? resp : (resp?.data || []); candSrcLabel = '工装库';
+      } else if (_nt === 'needsEquipment') {
+        const resp = await this._invokeCapability('craft.bop.entry.search', { node_types: ['equipment_need'], limit: 20 });
+        candidates = (Array.isArray(resp) ? resp : (resp?.data || [])).map(r => ({ gid: r.gid, title: r.title || r.gid })); candSrcLabel = 'BOP设备需求';
+      } else if (_nt === 'needsTool') {
+        const resp = await this._invokeCapability('craft.bop.entry.search', { node_types: ['tool_need'], limit: 20 });
+        candidates = (Array.isArray(resp) ? resp : (resp?.data || [])).map(r => ({ gid: r.gid, title: r.title || r.gid })); candSrcLabel = 'BOP工具需求';
+      } else if (_nt === 'needsFixture') {
+        const resp = await this._invokeCapability('craft.bop.entry.search', { node_types: ['fixture_need'], limit: 20 });
+        candidates = (Array.isArray(resp) ? resp : (resp?.data || [])).map(r => ({ gid: r.gid, title: r.title || r.gid })); candSrcLabel = 'BOP工装需求';
       } else if (key === 'issue' || _nt === 'issue') {
         const pgid = verInfo?.projectGid;
-        const resp = await this._cf(pgid ? `/api/issues?project_gid=${encodeURIComponent(pgid)}&page_size=20` : `/api/issues?page_size=20`);
-        candidates = (resp?.data || []).map(r => ({ gid: r.gid, title: r.title })); candSrcLabel = '问题清单';
+        const resp = await this._invokeCapability('project.issue.read.atomic.issues_search', {
+          ...(pgid ? { project_gid: pgid } : {}), page_size: 20,
+        });
+        candidates = (resp?.data || resp || []).map(r => ({ gid: r.gid, title: r.title })); candSrcLabel = '问题清单';
       } else if (key === 'task' || ['task_std', 'task_custom'].includes(_nt)) {
         const pgid = verInfo?.projectGid;
-        const resp = await this._cf(pgid ? `/api/tasks?project_gid=${encodeURIComponent(pgid)}&page_size=20` : `/api/tasks?page_size=20`);
-        candidates = (resp?.data || []).map(r => ({ gid: r.gid, title: r.title })); candSrcLabel = '任务清单';
+        const resp = await this._invokeCapability('project.task.read.atomic.tasks_search', {
+          ...(pgid ? { project_gid: pgid } : {}), page_size: 20,
+        });
+        candidates = (resp?.data || resp || []).map(r => ({ gid: r.gid, title: r.title })); candSrcLabel = '任务清单';
       } else if (['knowledge', 'rule_std', 'rule_custom'].includes(_nt)) {
-        const resp = await this._cf(`/api/knowledge_entries?limit=20`);
-        candidates = (resp?.data || []).map(r => ({ gid: r.gid, title: r.title })); candSrcLabel = '知识库';
+        const resp = await this._invokeCapability('knowledge.hub.read.atomic.items_list', { limit: 20 });
+        candidates = (resp?.items || resp?.data || resp || []).map(r => ({ gid: r.gid, title: r.title })); candSrcLabel = '知识库';
       } else {
         const searchType = _nt || 'process';
-        const resp = await this._cf(`/api/gbop/entries?node_type=${encodeURIComponent(searchType)}&limit=10`);
-        candidates = resp?.data || []; candSrcLabel = 'GBOP';
+        const resp = await this._invokeCapability('craft.gbop.catalog.read', {
+          operation: 'entries.list',
+          version_gid: this._versionGid,
+        });
+        candidates = (resp?.items || resp?.data || []).filter(item => item.node_type === searchType).slice(0, 10);
+        candSrcLabel = 'GBOP';
       }
     } catch (e) { console.warn('[DetailPanel] 加载候选失败:', e); }
 
@@ -1878,7 +2027,7 @@ class LayoutDetailPanel {
                data-component_id="${_he(c.component_id || '')}">
             <span class="lv-nt-dot lv-nt-${_he(grp?.ntType || 'part')}"></span>
             <div class="ll-det-sr-info">
-              <span class="ll-det-sr-name">${_he(c.part_no || c.title || c.name || c.gid)}</span>
+              <span class="ll-det-sr-name">${_he(_candidatePrimary(c))}</span>
               ${c.name ? `<span class="ll-det-sr-sub">${_he(c.name)}</span>` : ''}
             </div>
             ${c.vpps ? `<span class="ll-det-sr-tag">${_he(c.vpps)}</span>` : ''}
@@ -1953,7 +2102,9 @@ class LayoutDetailPanel {
         const candsEl = this._detDrawerBody.querySelector('#llAddCands');
         candsEl.innerHTML = '<div style="color:var(--surface2);font-size:11px;padding:8px 10px">加载中…</div>';
         try {
-          const partResp = await this._cf(`/api/ebom/snapshots/${newGid}/parts`);
+          const partResp = await this._invokeCapability('craft.bop.entry.legacy_read', {
+            operation: 'pbom_search', snapshot_gid: newGid, limit: 500,
+          });
           const parts = partResp?.data || [];
           candidates = parts.map(r => ({
             gid: r.gid,
@@ -1986,14 +2137,8 @@ class LayoutDetailPanel {
     searchInp?.addEventListener('input', () => {
       const q = searchInp.value.trim().toLowerCase();
       this._detDrawerBody.querySelectorAll('.ll-det-sr-item').forEach(item => {
-        const fields = [
-          item.dataset.title || '',
-          item.dataset.part_no || '',
-          item.dataset.name || '',
-          item.dataset.vpps || '',
-          item.dataset.component_id || '',
-        ];
-        item.style.display = (!q || fields.some(f => f.toLowerCase().includes(q))) ? '' : 'none';
+        const candidate = candidates.find(value => String(value.gid) === item.dataset.gid);
+        item.style.display = (!q || _candidateSearchText(candidate || item.dataset).includes(q)) ? '' : 'none';
       });
     });
     searchInp?.focus();
@@ -2024,15 +2169,9 @@ class LayoutDetailPanel {
           // 创建子节点
           const title = sel.dataset.title;
           const childCount = (data.childMap.get(parentGid) || []).length;
-          await this._cf('/api/bop/entries', {
-            method: 'POST',
-            body: JSON.stringify({
-              version_gid: versionGid,
-              parent_gid: parentGid,
-              node_type: nodeType,
-              title,
-              seq_no: (childCount + 1) * 10,
-            }),
+          await this._invokeCapability('craft.bop.entry.bulk.change.apply', {
+            operation: 'create', version_gid: versionGid, parent_gid: parentGid,
+            node_type: nodeType, title, sort_order: (childCount + 1) * 10,
           });
           await this._reloadData();
           const newData = this._getLineageData();
@@ -2043,14 +2182,9 @@ class LayoutDetailPanel {
           this._toast?.('已添加', 'ok', 1200);
         } else if (isPbomType) {
           // 创建 PBOM 零件关联
-          await this._cf('/api/bop/entry-links', {
-            method: 'POST',
-            body: JSON.stringify({
-              entry_gid: parentGid,
-              link_type: 'pbom_part',
-              entity_gid: entityGid,
-              is_primary: true,
-            }),
+          await this._invokeCapability('craft.bop.entry_link.change.apply', {
+            operation: 'attach', entry_gid: parentGid, link_type: 'pbom_part',
+            entity_gid: entityGid, is_primary: true,
           });
           await this._reloadData();
           this.refresh();
@@ -2058,17 +2192,12 @@ class LayoutDetailPanel {
         } else if (key === 'issue' || key === 'task') {
           this._toast?.('关联已有实体请从右侧关联面板选择', 'info');
           return;
-        } else if (key === 'equip' || key === 'tool' || key === 'fixture' || isResourceGroup) {
+        } else if (isResourceGroup || key === 'equip' || key === 'tool' || key === 'fixture') {
           // 创建实物/需求关联（nodeType 已在 type 选择器中确定）
           const linkType = selLinkType || nodeType || '';
-          await this._cf('/api/bop/entry-links', {
-            method: 'POST',
-            body: JSON.stringify({
-              entry_gid: parentGid,
-              link_type: linkType,
-              entity_gid: entityGid,
-              is_primary: false,
-            }),
+          await this._invokeCapability('craft.bop.entry_link.change.apply', {
+            operation: 'attach', entry_gid: parentGid, link_type: linkType,
+            entity_gid: entityGid, is_primary: false,
           });
           await this._reloadData();
           this.refresh();
@@ -2079,32 +2208,22 @@ class LayoutDetailPanel {
           const relName = key.slice(5);
           let linkType = relName;
           try {
-            const schema = await this._cf(`/api/ontology/schema/${encodeURIComponent(nodeType)}`);
+            const schema = await this._loadOntologySchema(nodeType);
             const rel = (schema?.relations || []).find(r => r.name === relName);
             if (rel?.link_type_binding) linkType = rel.link_type_binding;
           } catch {}
-          await this._cf('/api/bop/entry-links', {
-            method: 'POST',
-            body: JSON.stringify({
-              entry_gid: parentGid,
-              link_type: linkType,
-              entity_gid: entityGid,
-              is_primary: false,
-            }),
+          await this._invokeCapability('craft.bop.entry_link.change.apply', {
+            operation: 'attach', entry_gid: parentGid, link_type: linkType,
+            entity_gid: entityGid, is_primary: false,
           });
           await this._reloadData();
           this.refresh();
           this._toast?.('已关联', 'ok', 1200);
         } else {
           // 默认：创建 entry_link
-          await this._cf('/api/bop/entry-links', {
-            method: 'POST',
-            body: JSON.stringify({
-              entry_gid: parentGid,
-              link_type: typeLabel,
-              entity_gid: entityGid,
-              is_primary: false,
-            }),
+          await this._invokeCapability('craft.bop.entry_link.change.apply', {
+            operation: 'attach', entry_gid: parentGid, link_type: typeLabel,
+            entity_gid: entityGid, is_primary: false,
           });
           await this._reloadData();
           this.refresh();
@@ -2123,25 +2242,38 @@ class LayoutDetailPanel {
     this._rulesBody.innerHTML = '<div style="color:var(--surface2);font-size:11px;padding:4px">加载中…</div>';
     if (!row?.node_type) { this._rulesBody.innerHTML = ''; return; }
     try {
-      const schema = await this._cf(`/api/ontology/schema/${encodeURIComponent(row.node_type)}`);
+      const schema = await this._loadOntologySchema(row.node_type);
       const rules = schema?.rules || [];
       if (!rules.length) {
         this._rulesBody.innerHTML = '<div style="color:var(--surface2);font-size:11px;padding:4px">暂无规则</div>';
         return;
       }
-      // 运行规则检查
-      let violations = [];
-      try {
-        const chk = await this._cf(`/api/rule-engine/check-entry?entry_gid=${encodeURIComponent(gid)}`);
-        violations = chk?.data || [];
-      } catch {}
+      // 运行每条已绑定规则；不回退到 legacy check-entry 聚合接口。
+      const entry = _closedRuleEntry(row);
+      const client = window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
+      const violations = await Promise.all(rules.map(async rule => {
+        const ruleReference = rule.rule_reference;
+        const ruleGid = ruleReference?.rule_gid;
+        const ruleRevision = ruleReference?.rule_revision;
+        if (!client || !ruleGid || !Number.isInteger(ruleRevision)) {
+          return { rule_gid: rule.gid, result: 'fail', diagnostics: [{ code: 'rule_reference_unbound' }] };
+        }
+        try {
+          const outcome = await client.invoke('craft.rule.entry.evaluate', {
+            rule_gid: ruleGid, rule_revision: ruleRevision, entry: entry,
+          });
+          return { rule_gid: rule.gid, result: outcome?.passed ? 'pass' : 'fail', diagnostics: outcome?.diagnostics || [] };
+        } catch (error) {
+          return { rule_gid: rule.gid, result: 'fail', diagnostics: [{ code: error?.code === 'evaluation_timeout' ? 'evaluation_timeout' : 'evaluation_unavailable' }] };
+        }
+      }));
 
       const violMap = new Map(violations.map(v => [v.rule_gid, v]));
       let html = '';
       for (const rule of rules) {
         const viol = violMap.get(rule.gid);
-        const cls = viol ? (viol.result === 'fail' ? 'll-rule-fail' : 'll-rule-warn') : 'll-rule-pass';
-        const ico = viol ? (viol.result === 'fail' ? '✗' : '⚠') : '✓';
+        const cls = !viol || viol.result === 'pass' ? 'll-rule-pass' : (viol.result === 'fail' ? 'll-rule-fail' : 'll-rule-warn');
+        const ico = !viol || viol.result === 'pass' ? '✓' : (viol.result === 'fail' ? '✗' : '⚠');
         const lv  = rule.enforcement_level === 'mandatory' ? 'll-rule-lv-m' : 'll-rule-lv-a';
         const lvLabel = rule.enforcement_level === 'mandatory' ? '必须' : '建议';
         html += `
@@ -2151,7 +2283,7 @@ class LayoutDetailPanel {
               <span class="ll-rule-lv ${lv}">${lvLabel}</span>
               <span class="ll-rule-name">${_he(rule.name)}</span>
             </div>
-            ${viol ? `<div class="ll-rule-msg">${_he(viol.message || '')}</div>` : ''}
+            ${viol?.diagnostics?.[0] ? `<div class="ll-rule-msg">${_he(viol.diagnostics[0].code)}</div>` : ''}
           </div>`;
       }
       this._rulesBody.innerHTML = html;
@@ -2165,10 +2297,10 @@ class LayoutDetailPanel {
   async _renderKnowledge(gid) {
     this._knowBody.innerHTML = '';
     try {
-      const resp = await this._cf(
-        `/api/bop/entry-links?entry_gid=${encodeURIComponent(gid)}`
-      );
-      const knowLinks = (resp?.data || []).filter(l => l.link_type === 'knowledge' || l.link_type === 'rule_std' || l.link_type === 'rule_custom');
+      const resp = await this._invokeCapability('craft.bop.entry.legacy_read', {
+        operation: 'entry_links', entry_gid: gid,
+      });
+      const knowLinks = (resp?.data || resp || []).filter(l => l.link_type === 'knowledge' || l.link_type === 'rule_std' || l.link_type === 'rule_custom');
       if (!knowLinks.length) {
         this._knowBody.innerHTML = '<div style="color:var(--surface2);font-size:11px;padding:4px">暂无关联知识</div>';
       } else {
@@ -2642,7 +2774,7 @@ class LayoutDetailPanel {
     const canEditCurrentLine = !lineReadOnly || !currentLineGid || lineGrantSet.has(currentLineGid);
     try {
       const nodeType = row.node_type;
-      const schemaResp = await this._cf(`/api/ontology/schema/${encodeURIComponent(nodeType)}`);
+      const schemaResp = await this._loadOntologySchema(nodeType);
       const props = (schemaResp?.properties || [])
         .filter(p => p.prop_kind === 'data' && Boolean(p.show_in_detail) !== false)
         .sort((a, b) => (a.sort_order ?? 99) - (b.sort_order ?? 99));
@@ -2659,13 +2791,7 @@ class LayoutDetailPanel {
       const entityProps = props.filter(p => p.storage_hint === 'entity_table');
       const metaProps   = props.filter(p => p.storage_hint !== 'entity_table');
 
-      let entityVals = {};
-      if (entityProps.length) {
-        try {
-          const er = await this._cf(`/api/bop/entries/${encodeURIComponent(gid)}/entity-props`);
-          entityVals = er?.data || {};
-        } catch {}
-      }
+      const entityVals = (row?.entity_data && typeof row.entity_data === 'object') ? row.entity_data : {};
       const metaVals = (typeof row.meta === 'object' && row.meta) ? row.meta : {};
 
       // 保持本体 sort_order 顺序，标记来源
@@ -2734,7 +2860,10 @@ class LayoutDetailPanel {
 
       // 保存逻辑
       area.querySelectorAll('.ll-props-inp, .ll-props-sel').forEach(inp => {
+        let committedRaw = inp.value;
+        let saving = false;
         const save = async () => {
+          if (saving || inp.value === committedRaw) return;
           const propName = inp.dataset.prop;
           const src = inp.dataset.src;
           const dtype = inp.dataset.dtype || 'string';
@@ -2744,31 +2873,29 @@ class LayoutDetailPanel {
           else if (dtype === 'float')   { val = parseFloat(val);   if (isNaN(val)) return; }
           else if (dtype === 'boolean') { val = val === 'true' ? true : val === 'false' ? false : null; }
 
+          saving = true;
           try {
-            // 统一走 entity-props PATCH（后端自动路由到实体表列/ext/bop_entries.meta）
-            await this._cf(`/api/bop/entries/${encodeURIComponent(gid)}/entity-props`, {
-              method: 'PATCH', body: JSON.stringify({ [propName]: val }),
+            await this._invokeCapability('craft.bop.entry.change.apply', {
+              operation: 'update', entry_gid: gid, properties: [{ name: propName, value: val }],
             });
+            committedRaw = inp.value;
             if (src === 'entity') {
-              entityVals[propName] = val;
-              // 同步更新 row.entity_data，使布局卡片立即显示新值
-              if (row.entity_data && typeof row.entity_data === 'object') {
-                row.entity_data[propName] = val;
+              if (Object.prototype.hasOwnProperty.call(entityVals, propName)) entityVals[propName] = val;
+              else {
+                if (!entityVals.ext || typeof entityVals.ext !== 'object') entityVals.ext = {};
+                entityVals.ext[propName] = val;
               }
-            } else {
-              metaVals[propName] = val;
-            }
+            } else metaVals[propName] = val;
+            this._onPropertyChange?.(gid, propName, val);
           } catch (e) {
             this._toast?.('保存失败: ' + (e?.message || e), 'error');
+          } finally {
+            saving = false;
           }
-          // 保存后立即刷新属性面板 + 布局卡片（保持画面焦点不变）
-          this._renderProps(gid, data.rowByGid.get(gid) || row);
-          this._preserveLayoutView();
-          this._reloadData?.();
         };
-        inp.addEventListener('blur', save);
-        inp.addEventListener('change', save);
-        inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); save(); } });
+        if (inp.matches('select')) inp.addEventListener('change', save);
+        else inp.addEventListener('blur', save);
+        inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); inp.blur(); } });
       });
 
     } catch (e) {
@@ -2790,10 +2917,10 @@ class LayoutDetailPanel {
 
     let links = [];
     try {
-      const resp = await this._cf(
-        `/api/bop/entry-links?entry_gid=${encodeURIComponent(gid)}${hasChildren ? '&recursive=true' : ''}`
-      );
-      links = resp?.data || [];
+      const resp = await this._invokeCapability('craft.bop.entry.legacy_read', {
+        operation: 'entry_links', entry_gid: gid, recursive: hasChildren,
+      });
+      links = resp?.data || resp || [];
     } catch {}
     this._relLinks = links;
 
@@ -2853,7 +2980,7 @@ class LayoutDetailPanel {
     // ── 从本体 schema 加载自定义关系（有 link_type_binding 且 show_in_detail 非 false）──
     let ontoRelTypes = [];
     try {
-      const schemaResp = await this._cf(`/api/ontology/schema/${encodeURIComponent(row.node_type)}`);
+      const schemaResp = await this._loadOntologySchema(row.node_type);
       ontoRelTypes = (schemaResp?.relations || []).filter(r => r.link_type_binding && r.show_in_detail !== false);
     } catch (_) {}
 
@@ -3004,8 +3131,10 @@ class LayoutDetailPanel {
     let entityData = {};
     if (linkType && linkType !== 'child' && entityGid) {
       try {
-        const resp = await this._cf(`/api/bop/entity-detail?link_type=${encodeURIComponent(linkType)}&ref_gid=${encodeURIComponent(entityGid)}`);
-        entityData = resp?.data || {};
+        const resp = await this._invokeCapability('craft.bop.entry.legacy_read', {
+          operation: 'entity_detail', link_type: linkType, ref_gid: entityGid,
+        });
+        entityData = resp?.data || resp || {};
       } catch {}
     } else if (linkType === 'child' && entityGid) {
       // 子节点 → 从 lineage data 读
@@ -3092,9 +3221,8 @@ class LayoutDetailPanel {
       });
       try {
         if (linkType !== 'child') {
-          await this._cf('/api/bop/entity-detail', {
-            method: 'PATCH',
-            body: JSON.stringify({ link_type: linkType, ref_gid: entityGid, fields }),
+          await this._invokeCapability('craft.bop.entry.bulk.change.apply', {
+            operation: 'entity_detail.patch', link_type: linkType, ref_gid: entityGid, fields,
           });
         } else if (entityGid) {
           const newTitle = this._detDrawerBody.querySelector('#llDetTitleInp')?.value?.trim();
@@ -3120,7 +3248,9 @@ class LayoutDetailPanel {
       }
       if (!item.link?.gid) return;
       try {
-        await this._cf(`/api/bop/entry-links/${encodeURIComponent(item.link.gid)}`, { method: 'DELETE' });
+        await this._invokeCapability('craft.bop.entry_link.change.apply', {
+          operation: 'detach', link_gid: item.link.gid,
+        });
         this._renderDetailEmpty();
         await this._renderRels(this._currentGid);
       } catch (e) {
@@ -3133,14 +3263,10 @@ class LayoutDetailPanel {
     this._detMode = 'add';
     this._addType = key;
 
-    const grp = REL_GROUPS.find(g => g.key === key);
+    const grp = this._currentRelGroups?.find(g => g.key === key) || REL_GROUPS.find(g => g.key === key);
     const dot = grp?.dot || '#89b4fa';
 
-    const isResourceGroup = key === 'equip' || key === 'tool' || key === 'fixture' || [
-      'physical_equipment', 'project_equipment', 'needsEquipment',
-      'physical_tool', 'project_tools', 'needsTool',
-      'physical_fixture', 'project_tooling', 'needsFixture',
-    ].includes(nodeType || '');
+    const isResourceGroup = !!grp?.resourceType;
     let selLinkType = nodeType || '';
 
     // 加载候选：按关系类型走对应数据源
@@ -3155,15 +3281,24 @@ class LayoutDetailPanel {
     let isPbomType = key === 'pbom' || ['pbom_part', 'usesPart', 'part', 'non_standard_part', 'standard_part', 'support_material'].includes(_nt);
 
     try {
-      if (isPbomType) {
+      if (isResourceGroup) {
+        candidates = (await this._getCraftResourceRequirements())
+          .filter(item => item.resource_type === grp.resourceType);
+        candSrcLabel = `${typeLabel}标准库`;
+        selLinkType = grp.linkType;
+      } else if (isPbomType) {
         // 加载 PBOM 版本列表
-        const verResp = await this._cf('/api/ebom/snapshots?limit=50');
+        const verResp = await this._invokeCapability('craft.bop.entry.legacy_read', {
+          operation: 'pbom_snapshots', limit: 50,
+        });
         pbomVersions = verResp?.data || (Array.isArray(verResp) ? verResp : []);
         selectedPbomGid = verInfo?.pbomVersionGid || pbomVersions[0]?.gid || null;
         candSrcLabel = 'PBOM';
         // 加载默认版本下的零件
         if (selectedPbomGid) {
-          const partResp = await this._cf(`/api/ebom/snapshots/${selectedPbomGid}/parts`);
+          const partResp = await this._invokeCapability('craft.bop.entry.legacy_read', {
+            operation: 'pbom_search', snapshot_gid: selectedPbomGid, limit: 500,
+          });
           const parts = partResp?.data || [];
           candidates = parts.map(r => ({
             gid: r.gid,
@@ -3177,31 +3312,48 @@ class LayoutDetailPanel {
             unit: r.unit || 'pcs',
           }));
         }
-      } else if (key === 'equip' || ['physical_equipment', 'project_equipment', 'needsEquipment'].includes(_nt)) {
+      } else if (key === 'equip' || ['physical_equipment', 'project_equipment'].includes(_nt)) {
         const fgid = verInfo?.factoryGid;
-        const url = fgid ? `/api/bop/factory/equipments?factory_gid=${encodeURIComponent(fgid)}&limit=20` : `/api/bop/factory/equipments?limit=20`;
-        const resp = await this._cf(url); candidates = resp?.data || []; candSrcLabel = '设备库';
-      } else if (key === 'tool' || ['physical_tool', 'project_tools', 'needsTool'].includes(_nt)) {
-        const resp = await this._cf(`/api/bop/factory/tools?limit=20`);
-        candidates = resp?.data || []; candSrcLabel = '工具库';
-      } else if (key === 'fixture' || ['physical_fixture', 'project_tooling', 'needsFixture'].includes(_nt)) {
-        const resp = await this._cf(`/api/bop/factory/fixtures?limit=20`);
-        candidates = resp?.data || []; candSrcLabel = '工装库';
+        const resp = await this._invokeCapability('factory.asset.search', { asset_type: 'equipment', limit: 20 });
+        candidates = Array.isArray(resp) ? resp : (resp?.data || []); candSrcLabel = '设备库';
+      } else if (key === 'tool' || ['physical_tool', 'project_tools'].includes(_nt)) {
+        const resp = await this._invokeCapability('factory.asset.search', { asset_type: 'tool', limit: 20 });
+        candidates = Array.isArray(resp) ? resp : (resp?.data || []); candSrcLabel = '工具库';
+      } else if (key === 'fixture' || ['physical_fixture', 'project_tooling'].includes(_nt)) {
+        const resp = await this._invokeCapability('factory.asset.search', { asset_type: 'fixture', limit: 20 });
+        candidates = Array.isArray(resp) ? resp : (resp?.data || []); candSrcLabel = '工装库';
+      } else if (_nt === 'needsEquipment') {
+        const resp = await this._invokeCapability('craft.bop.entry.search', { node_types: ['equipment_need'], limit: 20 });
+        candidates = (Array.isArray(resp) ? resp : (resp?.data || [])).map(r => ({ gid: r.gid, title: r.title || r.gid })); candSrcLabel = 'BOP设备需求';
+      } else if (_nt === 'needsTool') {
+        const resp = await this._invokeCapability('craft.bop.entry.search', { node_types: ['tool_need'], limit: 20 });
+        candidates = (Array.isArray(resp) ? resp : (resp?.data || [])).map(r => ({ gid: r.gid, title: r.title || r.gid })); candSrcLabel = 'BOP工具需求';
+      } else if (_nt === 'needsFixture') {
+        const resp = await this._invokeCapability('craft.bop.entry.search', { node_types: ['fixture_need'], limit: 20 });
+        candidates = (Array.isArray(resp) ? resp : (resp?.data || [])).map(r => ({ gid: r.gid, title: r.title || r.gid })); candSrcLabel = 'BOP工装需求';
       } else if (key === 'issue' || _nt === 'issue') {
         const pgid = verInfo?.projectGid;
-        const resp = await this._cf(pgid ? `/api/issues?project_gid=${encodeURIComponent(pgid)}&page_size=20` : `/api/issues?page_size=20`);
-        candidates = (resp?.data || []).map(r => ({ gid: r.gid, title: r.title })); candSrcLabel = '问题清单';
+        const resp = await this._invokeCapability('project.issue.read.atomic.issues_search', {
+          ...(pgid ? { project_gid: pgid } : {}), page_size: 20,
+        });
+        candidates = (resp?.data || resp || []).map(r => ({ gid: r.gid, title: r.title })); candSrcLabel = '问题清单';
       } else if (key === 'task' || ['task_std', 'task_custom'].includes(_nt)) {
         const pgid = verInfo?.projectGid;
-        const resp = await this._cf(pgid ? `/api/tasks?project_gid=${encodeURIComponent(pgid)}&page_size=20` : `/api/tasks?page_size=20`);
-        candidates = (resp?.data || []).map(r => ({ gid: r.gid, title: r.title })); candSrcLabel = '任务清单';
+        const resp = await this._invokeCapability('project.task.read.atomic.tasks_search', {
+          ...(pgid ? { project_gid: pgid } : {}), page_size: 20,
+        });
+        candidates = (resp?.data || resp || []).map(r => ({ gid: r.gid, title: r.title })); candSrcLabel = '任务清单';
       } else if (['knowledge', 'rule_std', 'rule_custom'].includes(_nt)) {
-        const resp = await this._cf(`/api/knowledge_entries?limit=20`);
-        candidates = (resp?.data || []).map(r => ({ gid: r.gid, title: r.title })); candSrcLabel = '知识库';
+        const resp = await this._invokeCapability('knowledge.hub.read.atomic.items_list', { limit: 20 });
+        candidates = (resp?.items || resp?.data || resp || []).map(r => ({ gid: r.gid, title: r.title })); candSrcLabel = '知识库';
       } else {
         const searchType = _nt || 'process';
-        const resp = await this._cf(`/api/gbop/entries?node_type=${encodeURIComponent(searchType)}&limit=10`);
-        candidates = resp?.data || []; candSrcLabel = 'GBOP';
+        const resp = await this._invokeCapability('craft.gbop.catalog.read', {
+          operation: 'entries.list',
+          version_gid: this._versionGid,
+        });
+        candidates = (resp?.items || resp?.data || []).filter(item => item.node_type === searchType).slice(0, 10);
+        candSrcLabel = 'GBOP';
       }
     } catch (e) { console.warn('[DetailPanel] 加载候选失败:', e); }
 
@@ -3218,7 +3370,7 @@ class LayoutDetailPanel {
                data-component_id="${_he(c.component_id || '')}">
             <span class="lv-nt-dot lv-nt-${_he(grp?.ntType || 'part')}"></span>
             <div class="ll-det-sr-info">
-              <span class="ll-det-sr-name">${_he(c.part_no || c.title || c.name || c.gid)}</span>
+              <span class="ll-det-sr-name">${_he(_candidatePrimary(c))}</span>
               ${c.name ? `<span class="ll-det-sr-sub">${_he(c.name)}</span>` : ''}
             </div>
             ${c.vpps ? `<span class="ll-det-sr-tag">${_he(c.vpps)}</span>` : ''}
@@ -3293,7 +3445,9 @@ class LayoutDetailPanel {
         const candsEl = this._detDrawerBody.querySelector('#llAddCands');
         candsEl.innerHTML = '<div style="color:var(--surface2);font-size:11px;padding:8px 10px">加载中…</div>';
         try {
-          const partResp = await this._cf(`/api/ebom/snapshots/${newGid}/parts`);
+          const partResp = await this._invokeCapability('craft.bop.entry.legacy_read', {
+            operation: 'pbom_search', snapshot_gid: newGid, limit: 500,
+          });
           const parts = partResp?.data || [];
           candidates = parts.map(r => ({
             gid: r.gid,
@@ -3326,14 +3480,8 @@ class LayoutDetailPanel {
     searchInp?.addEventListener('input', () => {
       const q = searchInp.value.trim().toLowerCase();
       this._detDrawerBody.querySelectorAll('.ll-det-sr-item').forEach(item => {
-        const fields = [
-          item.dataset.title || '',
-          item.dataset.part_no || '',
-          item.dataset.name || '',
-          item.dataset.vpps || '',
-          item.dataset.component_id || '',
-        ];
-        item.style.display = (!q || fields.some(f => f.toLowerCase().includes(q))) ? '' : 'none';
+        const candidate = candidates.find(value => String(value.gid) === item.dataset.gid);
+        item.style.display = (!q || _candidateSearchText(candidate || item.dataset).includes(q)) ? '' : 'none';
       });
     });
     searchInp?.focus();
@@ -3364,15 +3512,9 @@ class LayoutDetailPanel {
           // 创建子节点
           const title = sel.dataset.title;
           const childCount = (data.childMap.get(parentGid) || []).length;
-          await this._cf('/api/bop/entries', {
-            method: 'POST',
-            body: JSON.stringify({
-              version_gid: versionGid,
-              parent_gid: parentGid,
-              node_type: nodeType,
-              title,
-              seq_no: (childCount + 1) * 10,
-            }),
+          await this._invokeCapability('craft.bop.entry.bulk.change.apply', {
+            operation: 'create', version_gid: versionGid, parent_gid: parentGid,
+            node_type: nodeType, title, sort_order: (childCount + 1) * 10,
           });
           await this._reloadData();
           const newData = this._getLineageData();
@@ -3383,14 +3525,9 @@ class LayoutDetailPanel {
           this._toast?.('已添加', 'ok', 1200);
         } else if (isPbomType) {
           // 创建 PBOM 零件关联
-          await this._cf('/api/bop/entry-links', {
-            method: 'POST',
-            body: JSON.stringify({
-              entry_gid: parentGid,
-              link_type: 'pbom_part',
-              entity_gid: entityGid,
-              is_primary: true,
-            }),
+          await this._invokeCapability('craft.bop.entry_link.change.apply', {
+            operation: 'attach', entry_gid: parentGid, link_type: 'pbom_part',
+            entity_gid: entityGid, is_primary: true,
           });
           await this._reloadData();
           this.refresh();
@@ -3398,17 +3535,12 @@ class LayoutDetailPanel {
         } else if (key === 'issue' || key === 'task') {
           this._toast?.('关联已有实体请从右侧关联面板选择', 'info');
           return;
-        } else if (key === 'equip' || key === 'tool' || key === 'fixture' || isResourceGroup) {
+        } else if (isResourceGroup || key === 'equip' || key === 'tool' || key === 'fixture') {
           // 创建实物/需求关联（nodeType 已在 type 选择器中确定）
           const linkType = selLinkType || nodeType || '';
-          await this._cf('/api/bop/entry-links', {
-            method: 'POST',
-            body: JSON.stringify({
-              entry_gid: parentGid,
-              link_type: linkType,
-              entity_gid: entityGid,
-              is_primary: false,
-            }),
+          await this._invokeCapability('craft.bop.entry_link.change.apply', {
+            operation: 'attach', entry_gid: parentGid, link_type: linkType,
+            entity_gid: entityGid, is_primary: false,
           });
           await this._reloadData();
           this.refresh();
@@ -3419,32 +3551,22 @@ class LayoutDetailPanel {
           const relName = key.slice(5);
           let linkType = relName;
           try {
-            const schema = await this._cf(`/api/ontology/schema/${encodeURIComponent(nodeType)}`);
+            const schema = await this._loadOntologySchema(nodeType);
             const rel = (schema?.relations || []).find(r => r.name === relName);
             if (rel?.link_type_binding) linkType = rel.link_type_binding;
           } catch {}
-          await this._cf('/api/bop/entry-links', {
-            method: 'POST',
-            body: JSON.stringify({
-              entry_gid: parentGid,
-              link_type: linkType,
-              entity_gid: entityGid,
-              is_primary: false,
-            }),
+          await this._invokeCapability('craft.bop.entry_link.change.apply', {
+            operation: 'attach', entry_gid: parentGid, link_type: linkType,
+            entity_gid: entityGid, is_primary: false,
           });
           await this._reloadData();
           this.refresh();
           this._toast?.('已关联', 'ok', 1200);
         } else {
           // 默认：创建 entry_link
-          await this._cf('/api/bop/entry-links', {
-            method: 'POST',
-            body: JSON.stringify({
-              entry_gid: parentGid,
-              link_type: typeLabel,
-              entity_gid: entityGid,
-              is_primary: false,
-            }),
+          await this._invokeCapability('craft.bop.entry_link.change.apply', {
+            operation: 'attach', entry_gid: parentGid, link_type: typeLabel,
+            entity_gid: entityGid, is_primary: false,
           });
           await this._reloadData();
           this.refresh();
@@ -3463,25 +3585,38 @@ class LayoutDetailPanel {
     this._rulesBody.innerHTML = '<div style="color:var(--surface2);font-size:11px;padding:4px">加载中…</div>';
     if (!row?.node_type) { this._rulesBody.innerHTML = ''; return; }
     try {
-      const schema = await this._cf(`/api/ontology/schema/${encodeURIComponent(row.node_type)}`);
+      const schema = await this._loadOntologySchema(row.node_type);
       const rules = schema?.rules || [];
       if (!rules.length) {
         this._rulesBody.innerHTML = '<div style="color:var(--surface2);font-size:11px;padding:4px">暂无规则</div>';
         return;
       }
-      // 运行规则检查
-      let violations = [];
-      try {
-        const chk = await this._cf(`/api/rule-engine/check-entry?entry_gid=${encodeURIComponent(gid)}`);
-        violations = chk?.data || [];
-      } catch {}
+      // 运行每条已绑定规则；不回退到 legacy check-entry 聚合接口。
+      const entry = _closedRuleEntry(row);
+      const client = window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
+      const violations = await Promise.all(rules.map(async rule => {
+        const ruleReference = rule.rule_reference;
+        const ruleGid = ruleReference?.rule_gid;
+        const ruleRevision = ruleReference?.rule_revision;
+        if (!client || !ruleGid || !Number.isInteger(ruleRevision)) {
+          return { rule_gid: rule.gid, result: 'fail', diagnostics: [{ code: 'rule_reference_unbound' }] };
+        }
+        try {
+          const outcome = await client.invoke('craft.rule.entry.evaluate', {
+            rule_gid: ruleGid, rule_revision: ruleRevision, entry: entry,
+          });
+          return { rule_gid: rule.gid, result: outcome?.passed ? 'pass' : 'fail', diagnostics: outcome?.diagnostics || [] };
+        } catch (error) {
+          return { rule_gid: rule.gid, result: 'fail', diagnostics: [{ code: error?.code === 'evaluation_timeout' ? 'evaluation_timeout' : 'evaluation_unavailable' }] };
+        }
+      }));
 
       const violMap = new Map(violations.map(v => [v.rule_gid, v]));
       let html = '';
       for (const rule of rules) {
         const viol = violMap.get(rule.gid);
-        const cls = viol ? (viol.result === 'fail' ? 'll-rule-fail' : 'll-rule-warn') : 'll-rule-pass';
-        const ico = viol ? (viol.result === 'fail' ? '✗' : '⚠') : '✓';
+        const cls = !viol || viol.result === 'pass' ? 'll-rule-pass' : (viol.result === 'fail' ? 'll-rule-fail' : 'll-rule-warn');
+        const ico = !viol || viol.result === 'pass' ? '✓' : (viol.result === 'fail' ? '✗' : '⚠');
         const lv  = rule.enforcement_level === 'mandatory' ? 'll-rule-lv-m' : 'll-rule-lv-a';
         const lvLabel = rule.enforcement_level === 'mandatory' ? '必须' : '建议';
         html += `
@@ -3491,7 +3626,7 @@ class LayoutDetailPanel {
               <span class="ll-rule-lv ${lv}">${lvLabel}</span>
               <span class="ll-rule-name">${_he(rule.name)}</span>
             </div>
-            ${viol ? `<div class="ll-rule-msg">${_he(viol.message || '')}</div>` : ''}
+            ${viol?.diagnostics?.[0] ? `<div class="ll-rule-msg">${_he(viol.diagnostics[0].code)}</div>` : ''}
           </div>`;
       }
       this._rulesBody.innerHTML = html;
@@ -3505,10 +3640,10 @@ class LayoutDetailPanel {
   async _renderKnowledge(gid) {
     this._knowBody.innerHTML = '';
     try {
-      const resp = await this._cf(
-        `/api/bop/entry-links?entry_gid=${encodeURIComponent(gid)}`
-      );
-      const knowLinks = (resp?.data || []).filter(l => l.link_type === 'knowledge' || l.link_type === 'rule_std' || l.link_type === 'rule_custom');
+      const resp = await this._invokeCapability('craft.bop.entry.legacy_read', {
+        operation: 'entry_links', entry_gid: gid,
+      });
+      const knowLinks = (resp?.data || resp || []).filter(l => l.link_type === 'knowledge' || l.link_type === 'rule_std' || l.link_type === 'rule_custom');
       if (!knowLinks.length) {
         this._knowBody.innerHTML = '<div style="color:var(--surface2);font-size:11px;padding:4px">暂无关联知识</div>';
       } else {
@@ -3790,8 +3925,11 @@ class LayoutDetailPanel {
     for (const gid of versionGids) {
       if (this._extraVersionData.has(gid)) continue;
       try {
-        const resp = await this._cf(`/api/bop/versions/${encodeURIComponent(gid)}/entries`);
-        const rawRows = resp?.data || [];
+        if (!this._loadVersionProjection) continue;
+        // The parent owns the bounded Capability projection.  Never fall back to
+        // the legacy full-version entries endpoint from this secondary panel.
+        const projection = await this._loadVersionProjection(gid);
+        const rawRows = Array.isArray(projection) ? projection : (projection?.rows || []);
         const rowByGid = new Map(rawRows.map(r => [r.gid, r]));
         const childMap = new Map();
         rawRows.forEach(r => {
@@ -3901,6 +4039,10 @@ class LayoutDetailPanel {
       project_tools:      { label: '工具', ntType: 'tool_factory' },
       physical_fixture:   { label: '工装', ntType: 'fixture_factory' },
       project_tooling:    { label: '工装', ntType: 'fixture_factory' },
+      resource_socket:    { label: '需求套筒', ntType: 'tool_need' },
+      resource_tool:      { label: '需求工具', ntType: 'tool_need' },
+      resource_fixture:   { label: '需求工装', ntType: 'fixture_need' },
+      resource_equipment: { label: '需求设备', ntType: 'equipment_need' },
       pbom_part:          { label: '零件', ntType: 'non_standard_part' },
       issue:              { label: '问题', ntType: 'issue' },
       task_std:           { label: '任务', ntType: 'standard_task' },
@@ -3943,8 +4085,20 @@ class LayoutDetailPanel {
       // ── 2. 关联实体：从 entry-links recursive 拿 ─────────────────────────
       const catMap = LayoutDetailPanel._STATS_CATEGORY_MAP;
       try {
-        const resp = await this._cf(`/api/bop/entry-links?entry_gid=${encodeURIComponent(gid)}&recursive=true`);
-        for (const l of (resp?.data || [])) {
+        let governedLinks = [];
+        const collectGoverned = entryGid => {
+          const entry = data?.rowByGid?.get(entryGid);
+          if (Array.isArray(entry?.__governed_links)) governedLinks.push(...entry.__governed_links);
+          for (const child of (data?.childMap?.get(entryGid) || [])) collectGoverned(child.gid);
+        };
+        collectGoverned(gid);
+        if (!this._loadEntryDetail && !governedLinks.length) {
+          const resp = await this._invokeCapability('craft.bop.entry.legacy_read', {
+            operation: 'entry_links', entry_gid: gid, recursive: true,
+          });
+          governedLinks = resp?.data || resp || [];
+        }
+        for (const l of governedLinks) {
           const cat = catMap[l.link_type];
           if (!cat) continue;
           if (!groups[cat.label]) groups[cat.label] = { ntType: cat.ntType, items: [], isStruct: false };
@@ -4031,12 +4185,16 @@ class LayoutDetailPanel {
     const hasChildren = data ? (data.childMap.get(gid) || []).filter(r => !r.is_deleted).length > 0 : false;
 
     let links = [];
-    try {
-      const resp = await this._cf(
-        `/api/bop/entry-links?entry_gid=${encodeURIComponent(gid)}${hasChildren ? '&recursive=true' : ''}`
-      );
-      links = resp?.data || [];
-    } catch {}
+    if (Array.isArray(row?.__governed_links)) {
+      links = row.__governed_links;
+    } else if (!this._loadEntryDetail) {
+      try {
+        const resp = await this._invokeCapability('craft.bop.entry.legacy_read', {
+          operation: 'entry_links', entry_gid: gid, recursive: hasChildren,
+        });
+        links = resp?.data || resp || [];
+      } catch {}
+    }
     this._relLinks = links;
 
     const childRows = data ? (data.childMap.get(gid) || []).filter(r => !r.is_deleted) : [];
@@ -4044,7 +4202,7 @@ class LayoutDetailPanel {
     // 每次切换节点都重新加载本体 schema（不同 node_type 有不同关系定义）
     if (row?.node_type) {
       try {
-        const schemaResp = await this._cf(`/api/ontology/schema/${encodeURIComponent(row.node_type)}`);
+        const schemaResp = await this._loadOntologySchema(row.node_type);
         this._hiddenLinkTypes = new Set(
           (schemaResp?.relations || [])
             .filter(r => r.show_in_detail === false)
@@ -4062,14 +4220,12 @@ class LayoutDetailPanel {
       .filter(r => r.link_type_binding && r.show_in_detail !== false)
       .sort((a, b) => (a.sort_order ?? 99) - (b.sort_order ?? 99) || String(a.label_zh || a.name || '').localeCompare(String(b.label_zh || b.name || '')));
 
-    const groups = relationConfigs.map(r => ({
-      key: `link:${r.link_type_binding}`,
-      name: r.label_zh || r.name || r.link_type_binding,
-      ntType: r.range_node_type || 'process',
-      linkTypes: [r.link_type_binding],
-      linkType: r.link_type_binding,
-      relation: r,
-    }));
+    const groups = relationConfigs.length
+      ? _buildRuntimeRelationGroups(relationConfigs)
+      : [
+        ...REL_GROUPS.map(group => ({ ...group, linkType: group.linkTypes[0] })),
+        ...CRAFT_RESOURCE_GROUPS.map(group => ({ ...group, linkTypes: [group.linkType, ...group.legacyLinkTypes] })),
+      ];
     this._currentRelGroups = groups;
 
     let html = '';

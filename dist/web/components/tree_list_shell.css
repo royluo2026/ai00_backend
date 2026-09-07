@@ -637,6 +637,14 @@
 }
 
 /* ── ViewManager toolbar override ────────────────────────── */
+.tls-vm-toolbar:not(:empty) {
+  display: flex; align-items: center; gap: 0;
+  min-height: 36px; padding: 0 8px; flex-shrink: 0;
+  overflow-x: auto; scrollbar-width: none;
+  background: var(--surface, var(--bg2));
+  border-bottom: 1px solid var(--border);
+}
+.tls-vm-toolbar::-webkit-scrollbar { display: none; }
 .tls-vm-toolbar .vm-toolbar { padding: 6px 14px; background: var(--surface, var(--bg2)); border-bottom: 1px solid var(--border); }
 .tls-vm-toolbar .vm-panel { z-index: 100; }
 .tls-vm-toolbar .vm-btn, .tls-vm-toolbar .app-btn { background: transparent; color: var(--text); border-color: var(--border); }

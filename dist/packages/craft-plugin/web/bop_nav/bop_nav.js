@@ -12,10 +12,26 @@
  * 数据来源：GET /api/bop/pbom-versions/{gid}/gbop-match-preview
  */
 
-function _cf(path, opts) {
+function _cf(method, path, opts = {}) {
   const fn = window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
   if (!fn) throw new Error('cloudFetch not available');
-  return fn(path, opts);
+  return fn(path, { ...opts, method });
+}
+
+async function _invokeCapability(id, payload) {
+  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version: 1, payload }),
+  });
+  const result = response?.data;
+  if (response?.success !== true || result?.ok !== true) {
+    const detail = result?.error || response?.error || {};
+    const error = new Error(detail.message || `能力调用失败：${id}@1`);
+    error.code = detail.code || 'capability_invocation_failed';
+    throw error;
+  }
+  return result.data;
 }
 
 // localStorage 账号隔离
@@ -166,11 +182,14 @@ async function _load(pbomGid) {
   _activeAssemblyGid = null;
   try {
     const [data] = await Promise.all([
-      _cf(`/api/bop/pbom-versions/${pbomGid}/gbop-match-preview`),
+      _invokeCapability('craft.bop.gbop.legacy_read', {
+        operation: 'match_preview',
+        pbom_gid: pbomGid,
+      }),
       _checkAutoLinkState(pbomGid),
       _loadProcessHierarchySilent(pbomGid),
     ]);
-    _previewData = data.data || [];
+    _previewData = data?.data || [];
     _pendingChanges.clear();
     _buildRows();
     _buildIndexes();
@@ -639,8 +658,10 @@ function _scrollToActiveCard(activeGid) {
 // ── 静默加载工序层级（与 preview 并行） ─────────────────────────
 async function _loadProcessHierarchySilent(pbomGid) {
   try {
-    const res = await _cf(`/api/gbop/pbom-versions/${pbomGid}/process-hierarchy`);
-    _processHierarchy = res.data || [];
+    const res = await _invokeCapability('craft.gbop.process_hierarchy.read', {
+      pbom_version_gid: pbomGid,
+    });
+    _processHierarchy = res?.data || [];
     _activeProcessGid = null;
     _activeOpGid      = null;
   } catch (_) { /* silent — 工序视图切换时会再次加载 */ }
@@ -961,10 +982,10 @@ async function _submit() {
   try {
     $submit.disabled = true;
     $submit.textContent = '提交中…';
-    await _cf(`/api/bop/pbom-versions/${_currentGid}/gbop-match-confirm`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ matches }),
+    await _invokeCapability('craft.bop.gbop.change.apply', {
+      operation: 'match_confirm',
+      pbom_gid: _currentGid,
+      matches,
     });
     _pendingChanges.clear();
     _toast('提交成功', 'ok');
@@ -977,10 +998,12 @@ async function _submit() {
         const total     = data.filter(p => !p._isVirtualOp).length;
         const confirmed = data.filter(p => !p._isVirtualOp && ['confirmed','matched_1','matched'].includes(_effectiveSt(p.gid))).length;
         const skipped   = data.filter(p => !p._isVirtualOp && _effectiveSt(p.gid) === 'skipped').length;
-        await _cf(`/api/bop/versions/${_bopVersionGid}/vehicle-ops-stats`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ confirmed, skipped, total }),
+        await _invokeCapability('craft.bop.lifecycle.change.apply', {
+          operation: 'vehicle_ops_stats.update',
+          version_gid: _bopVersionGid,
+          confirmed,
+          skipped,
+          total,
         });
       } catch (_) {}  // fire-and-forget
     }
@@ -1036,8 +1059,11 @@ function _renderVerMenu() {
         _expanded.add(proj.gid);
         if (!_pbomByProject.has(proj.gid)) {
           try {
-            const d = await _cf(`/api/bop/pbom-versions?project_gid=${encodeURIComponent(proj.gid)}`);
-            _pbomByProject.set(proj.gid, d.data || []);
+            const d = await _invokeCapability('craft.pbom.version.search', {
+              project_ref: proj.gid,
+              limit: 200,
+            });
+            _pbomByProject.set(proj.gid, d?.items || []);
           } catch { _pbomByProject.set(proj.gid, []); }
         }
       } else {
@@ -1096,8 +1122,10 @@ function _applyTheme() {
 
   // 加载项目列表
   try {
-    const d = await _cf('/api/projects?limit=200');
-    _projects = (d.data || d || []).filter(p => !p.is_deleted && p.project_type !== 'gbop');
+    const d = await _invokeCapability('project.project.read.atomic.projects_search', {
+      limit: 200,
+    });
+    _projects = (d?.data || d || []).filter(p => !p.is_deleted && p.project_type !== 'gbop');
   } catch (e) { console.warn('[BopNav] 加载项目失败:', e); }
 
   // 初始化 MillerCentering
@@ -1201,7 +1229,10 @@ function _syncAutoLinkState(hasPending) {
 async function _checkAutoLinkState(pbomGid) {
   if (!pbomGid) return;
   try {
-    const res = await _cf(`/api/gbop/pbom-versions/${pbomGid}/vpps-auto-link-status`);
+    const res = await _invokeCapability('craft.gbop.navigation.read', {
+      operation: 'auto_link_status',
+      pbom_version_gid: pbomGid,
+    });
     const d = res.data || {};
     _syncAutoLinkState((d.pending_count || 0) > 0);
   } catch (_) { /* 静默失败，不影响主流程 */ }
@@ -1212,10 +1243,9 @@ async function _checkAutoLinkState(pbomGid) {
     btn.disabled = true;
     btn.textContent = '匹配中…';
     try {
-      const res = await _cf(`/api/gbop/pbom-versions/${_currentGid}/vpps-auto-link`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
+      const res = await _invokeCapability('craft.gbop.navigation.change.apply', {
+        operation: 'auto_link',
+        pbom_version_gid: _currentGid,
       });
       const d = res.data || {};
       _toast(`Auto-Link 完成：${d.parts_matched || 0} 零件已匹配，绑定 ${d.bound || 0} 条，请确认后提交`, 'ok', 5000);
@@ -1240,12 +1270,11 @@ async function _checkAutoLinkState(pbomGid) {
     btn.disabled = true;
     btn.textContent = '提交中…';
     try {
-      const res = await _cf(`/api/gbop/pbom-versions/${_currentGid}/vpps-auto-link-confirm`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
+      const res = await _invokeCapability('craft.gbop.navigation.change.apply', {
+        operation: 'confirm',
+        pbom_version_gid: _currentGid,
       });
-      const d = res || {};
+      const d = res.data || res || {};
       _toast(`已确认 ${d.confirmed || 0} 条 Auto-Link 绑定`, 'ok');
       _syncAutoLinkState(false);
       if (_viewMode === 'process') await _loadProcessHierarchy();
@@ -1332,8 +1361,10 @@ async function _loadProcessHierarchy() {
   if (!_currentGid) return;
   $columns.innerHTML = '<div class="lv-loading"><div class="lv-spinner"></div>加载工序层级…</div>';
   try {
-    const res = await _cf(`/api/gbop/pbom-versions/${_currentGid}/process-hierarchy`);
-    _processHierarchy = res.data || [];
+    const res = await _invokeCapability('craft.gbop.process_hierarchy.read', {
+      pbom_version_gid: _currentGid,
+    });
+    _processHierarchy = res?.data || [];
     _activeProcessGid = null;
     _activeOpGid      = null;
     _autoExpand();

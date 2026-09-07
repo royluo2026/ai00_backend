@@ -1,3 +1,7 @@
+function _cf(method, path, opts = {}) {
+  return ListShell._cf(path, { ...opts, method });
+}
+
 // ── 常量 ────────────────────────────────────────────────────────
 // 节点类型 AI_00 显示名：对照 docs/bop/db csv ui.xlsx "零组件类型AI_00" 列
 // 注意：CSV 导入映射用 _TC_TYPE_MAP（对照"零组件类型"列），本表仅用于 UI 显示
@@ -88,6 +92,21 @@ let _currentVersion = null;
 let _parsedTcRows = [];
 let _bopVersions  = [];               // 所有版本（含归档）
 let _bopFamilyCollapsed = new Set();  // 折叠的版本族 family_gid
+
+async function _bopInvokeCapability(id, payload = {}) {
+  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version: 1, payload }),
+  });
+  const envelope = response?.data;
+  if (response?.success !== true || envelope?.ok !== true) {
+    const detail = envelope?.error || response?.error || {};
+    throw new Error(detail.message || `能力调用失败：${id}@1`);
+  }
+  const value = envelope.data;
+  return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+}
 let _bopArcOpen   = false;            // 已归档区是否展开
 
 // ── Helpers ──────────────────────────────────────────────────────
@@ -114,12 +133,30 @@ function _flattenMeta(rows) {
   return rows;
 }
 
+async function _loadVersionEntries(versionGid) {
+  const rows = [];
+  const pageSize = 100;
+  let offset = 0;
+  let total = null;
+  do {
+    const page = await _bopInvokeCapability('craft.bop.entry.legacy_read', {
+      operation: 'version_entries', version_gid: versionGid,
+      limit: pageSize, offset,
+    });
+    const items = Array.isArray(page) ? page : (page?.items || page?.data || []);
+    rows.push(...items);
+    total = Number.isFinite(Number(page?.total)) ? Number(page.total) : rows.length;
+    offset += items.length;
+    if (!items.length) break;
+  } while (offset < total);
+  return rows;
+}
+
 // ── 加载条目 ─────────────────────────────────────────────────────
 async function load() {
   if (!_currentVersion) return;
   try {
-    const json = await ListShell._cf(`/api/bop/versions/${_currentVersion}/entries`);
-    _shell.setRows(_flattenMeta(json.data || []));
+    _shell.setRows(_flattenMeta(await _loadVersionEntries(_currentVersion)));
   } catch (e) { _toast('加载失败: ' + e.message, 'error'); }
 }
 
@@ -183,20 +220,18 @@ function _initShell() {
       if (action === 'edit' && changedRow?.gid) {
         const { gid, node_type, title, seq_no } = changedRow;
         try {
-          await ListShell._cf(`/api/bop/entries/${gid}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ node_type, title, seq_no }),
+          await _bopInvokeCapability('craft.bop.entry.change.apply', {
+            operation: 'update', entry_gid: gid,
+            updates: { node_type, title, sort_order: seq_no },
           });
           await load();
         } catch (e) { _toast('保存失败: ' + e.message, 'error'); }
       } else if (!changedRow?.gid && changedRow?.title) {
         if (!_currentVersion) { _toast('请先选择 BOP 版本', 'warn'); return; }
         try {
-          await ListShell._cf('/api/bop/entries', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ bop_version_gid: _currentVersion, node_type: 'operation', title: changedRow.title }),
+          await _bopInvokeCapability('craft.bop.entry.bulk.change.apply', {
+            operation: 'create', version_gid: _currentVersion,
+            node_type: 'operation', title: changedRow.title,
           });
           await load();
         } catch (e) { _toast('创建失败: ' + e.message, 'error'); }
@@ -228,8 +263,10 @@ async function _refreshSidebar() {
 // ── BOP 版本侧边栏（自定义分组渲染）────────────────────────────
 async function _loadBopVersions() {
   try {
-    const json = await ListShell._cf('/api/bop/versions?include_archived=true');
-    _bopVersions = json.data || [];
+    const json = await _bopInvokeCapability('craft.bop.version.list', {
+      include_archived: true, page_size: 100,
+    });
+    _bopVersions = json.items || [];
   } catch (e) {
     console.warn('[BOP] 加载版本列表失败:', e);
   }
@@ -400,7 +437,9 @@ function _showVerCtxMenu(x, y, ver, familyGid, familyName) {
 async function _freezeVersion(ver) {
   if (!confirm(`确认冻结版本「${ver.version_tag}」？冻结后不可编辑。`)) return;
   try {
-    await ListShell._cf(`/api/bop/versions/${ver.gid}/freeze`, { method: 'POST' });
+    await _bopInvokeCapability('craft.bop.version.freeze.change.apply', {
+      operation: 'freeze', version_gid: ver.gid,
+    });
     await _refreshSidebar();
     _toast(`版本「${ver.version_tag}」已冻结`, 'success');
   } catch (e) { _toast('冻结失败: ' + e.message, 'error'); }
@@ -409,7 +448,9 @@ async function _freezeVersion(ver) {
 async function _archiveFamily(familyGid) {
   if (!confirm('确认归档此 BOP 的所有版本？归档后不再显示在主列表中，可在已归档区恢复。')) return;
   try {
-    await ListShell._cf(`/api/bop/version-families/${familyGid}/archive`, { method: 'POST' });
+    await _bopInvokeCapability('craft.bop.version.lifecycle.change.apply', {
+      operation: 'archive_family', family_gid: familyGid,
+    });
     if (_bopVersions.find(v => (v.version_family_gid || v.gid) === familyGid && v.gid === _currentVersion)) {
       _currentVersion = null;
       _shell?.setRows([]);
@@ -422,7 +463,9 @@ async function _archiveFamily(familyGid) {
 
 async function _unarchiveFamily(familyGid) {
   try {
-    await ListShell._cf(`/api/bop/version-families/${familyGid}/archive`, { method: 'DELETE' });
+    await _bopInvokeCapability('craft.bop.version.lifecycle.change.apply', {
+      operation: 'unarchive_family', family_gid: familyGid,
+    });
     await _refreshSidebar();
     _toast('已恢复', 'success');
   } catch (e) { _toast('恢复失败: ' + e.message, 'error'); }
@@ -436,15 +479,15 @@ async function _openNewVersionModal(prefillFamilyGid = null, prefillProjectGid =
   // 加载项目列表（缓存）
   if (_projectsForModal.length === 0) {
     try {
-      const res = await ListShell._cf('/api/projects?limit=200');
-      _projectsForModal = (res.data || []).filter(p => !p.is_deleted && p.project_type !== 'gbop');
+      const res = await _bopInvokeCapability('project.project.read.atomic.projects_search', {});
+      _projectsForModal = (res?.data || res || []).filter(p => !p.is_deleted && p.project_type !== 'gbop');
     } catch (_) { _projectsForModal = []; }
   }
   // 加载工厂列表（缓存）
   if (_factoriesForModal.length === 0) {
     try {
-      const res = await ListShell._cf('/api/bop/factories');
-      _factoriesForModal = res.data || [];
+      const res = await _bopInvokeCapability('factory.asset.search', { asset_type: 'factory' });
+      _factoriesForModal = res || [];
     } catch (_) { _factoriesForModal = []; }
   }
 
@@ -551,8 +594,10 @@ async function _refreshPbomVersionList(projectGid) {
     return;
   }
   try {
-    const res = await ListShell._cf(`/api/bop/pbom-versions?project_gid=${encodeURIComponent(projectGid)}`);
-    const versions = res?.data || [];
+    const res = await _bopInvokeCapability('craft.pbom.version.search', {
+      project_ref: projectGid, limit: 50,
+    });
+    const versions = res?.items || [];
     if (!versions.length) {
       sel.innerHTML = '<option value="">（无已就绪 PBOM 版本）</option>';
       if (hint) hint.style.display = '';
@@ -583,14 +628,10 @@ async function _createVersion() {
   if (!tag)      { _toast('版本标签不能为空', 'warn'); return; }
   if (!bopName)  { _toast('BOP名称生成失败，请检查项目和版本标签', 'warn'); return; }
   try {
-    await ListShell._cf('/api/bop/versions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        version_tag: tag, bop_name: bopName, version_family_gid: familyGid,
-        status: 'active', takt_time: takt, project_gid: project, factory_gid: factory,
-        pbom_version_gid: pbomGid,
-      }),
+    await _bopInvokeCapability('craft.bop.version.create', {
+      source: 'empty', version_tag: tag, bop_name: bopName,
+      version_family_gid: familyGid, takt_time: takt, project_gid: project,
+      factory_gid: factory, pbom_version_gid: pbomGid,
     });
     // Reset modal
     closeModal('modal-new-version');
@@ -629,16 +670,10 @@ async function _saveEditVersion() {
   const takt     = parseFloat(document.getElementById('inp-editver-takt').value) || 60;
   const status   = document.getElementById('inp-editver-status').value;
   if (!tag) { _toast('版本标签不能为空', 'warn'); return; }
-  try {
-    await ListShell._cf(`/api/bop/versions/${gid}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ version_tag: tag, bop_name: bopName, maturity, takt_time: takt, status }),
-    });
-    closeModal('modal-edit-version');
-    await _refreshSidebar();
-    _toast('版本属性已保存', 'success');
-  } catch (e) { _toast('保存失败: ' + e.message, 'error'); }
+  // 当前稳定 Capability 只覆盖版本创建/生命周期，不覆盖这些元数据字段。
+  // 不再调用已退出治理面的 V1 PATCH，避免 UI 给出“已保存”的假成功。
+  void gid; void bopName; void maturity; void takt; void status;
+  _toast('版本属性编辑暂未开放，请通过新版 BOP 版本元数据能力处理', 'warn');
 }
 
 // ── 删除版本 ─────────────────────────────────────────────────────
@@ -652,10 +687,8 @@ async function _purgeVersionEntries(ver, mode) {
   if (!confirm(`确认对版本「${ver.version_tag}」执行 ${modeLabel}？\n将清空全部条目及关联实体记录。`)) return;
   if (mode === 'hard' && !confirm('⚠️ 再次确认：硬删将永久清除所有数据，是否继续？')) return;
   try {
-    const res = await ListShell._cf(`/api/bop/versions/${ver.gid}/purge-entries`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mode }),
+    const res = await _bopInvokeCapability('craft.bop.entry.bulk.change.apply', {
+      operation: 'purge', version_gid: ver.gid, mode,
     });
     const c = res.counts || {};
     const entityTotal = Object.values(c.entities || {}).reduce((a, b) => a + b, 0);
@@ -665,9 +698,16 @@ async function _purgeVersionEntries(ver, mode) {
 }
 
 async function _deleteVersion(ver) {
-  if (!confirm(`确认删除版本「${ver.name || ver.version_tag}」？此操作不可恢复。`)) return;
+  const confirmed = confirm(`确认删除版本「${ver.name || ver.version_tag}」？此操作不可恢复。`);
+  if (!confirmed) return;
   try {
-    await ListShell._cf(`/api/lists/${ver.gid}`, { method: 'DELETE' });
+    await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+      .call('project.lists.delete', {
+        gid: ver.gid, itemType: 'bop_version', expectedRevision: ver.revision,
+      }, {
+        confirm: () => confirmed,
+        idempotencyKey: `bop-version-archive:${ver.gid}:${ver.revision}`,
+      });
     if (_currentVersion === ver.gid) { _currentVersion = null; _shell.setRows([]); }
     await _refreshSidebar();
     _toast('版本已删除', 'success');
@@ -684,10 +724,8 @@ async function _createRoot() {
   const seq_no    = parseInt(document.getElementById('inp-root-seq').value) || 0;
   if (!title) { _toast('名称不能为空', 'warn'); return; }
   try {
-    await ListShell._cf('/api/bop/entries', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bop_version_gid: _currentVersion, node_type, title, seq_no }),
+    await _bopInvokeCapability('craft.bop.entry.bulk.change.apply', {
+      operation: 'create', version_gid: _currentVersion, node_type, title, sort_order: seq_no,
     });
     closeModal('modal-new-root');
     document.getElementById('inp-root-title').value = '';
@@ -717,11 +755,9 @@ async function _createChild() {
   const seq_no    = parseInt(document.getElementById('inp-child-seq').value) || 0;
   if (!title) { _toast('名称不能为空', 'warn'); return; }
   try {
-    await ListShell._cf('/api/bop/entries', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bop_version_gid: _currentVersion, parent_bop_gid: parentGid,
-                             node_type, title, vpps, vpps_desc, seq_no }),
+    await _bopInvokeCapability('craft.bop.entry.bulk.change.apply', {
+      operation: 'create', version_gid: _currentVersion, parent_gid: parentGid,
+      node_type, title, vpps, vpps_desc, sort_order: seq_no,
     });
     closeModal('modal-add-child');
     await load();
@@ -752,10 +788,9 @@ async function _saveEditEntry() {
   const seq_no     = parseInt(document.getElementById('inp-edit-seq').value) || 0;
   if (!title) { _toast('名称不能为空', 'warn'); return; }
   try {
-    await ListShell._cf(`/api/bop/entries/${gid}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ node_type, title, vpps, vpps_desc, seq_no }),
+    await _bopInvokeCapability('craft.bop.entry.change.apply', {
+      operation: 'update', entry_gid: gid,
+      updates: { node_type, title, vpps, vpps_desc, sort_order: seq_no },
     });
     closeModal('modal-edit-entry');
     await load();
@@ -769,7 +804,9 @@ async function _deleteEntry(gid) {
   const _frozenVerD = _bopVersions.find(v => v.gid === _currentVersion);
   if (_frozenVerD?.frozen_at) { _toast('版本已冻结，不允许删除', 'warn'); return; }
   try {
-    await ListShell._cf(`/api/bop/entries/${gid}`, { method: 'DELETE' });
+    await _bopInvokeCapability('craft.bop.entry.change.apply', {
+      operation: 'delete', entry_gid: gid,
+    });
     await load();
     _toast('已删除', 'success');
   } catch (e) { _toast('删除失败: ' + e.message, 'error'); }
@@ -994,9 +1031,8 @@ async function _importTc() {
   if (!_currentVersion) { _toast('请先在左侧列表选择一个 BOP 版本', 'warn'); return; }
   if (!_parsedTcRows.length) { _toast('请先选择 CSV 文件', 'warn'); return; }
   try {
-    const json = await ListShell._cf(`/api/bop/versions/${_currentVersion}/import-tc`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rows: _parsedTcRows }),
+    const json = await _bopInvokeCapability('craft.bop.entry.bulk.change.apply', {
+      operation: 'import_tc', version_gid: _currentVersion, rows: _parsedTcRows,
     });
     closeModal('modal-import-tc');
     await load();
@@ -1141,8 +1177,8 @@ async function _openForkModal() {
   document.getElementById('btn-fork-delete-preset').style.display = 'none';
 
   try {
-    const json = await ListShell._cf('/api/bop/versions');
-    const vers = json.data || [];
+    const json = await _bopInvokeCapability('craft.bop.version.list', { page_size: 100 });
+    const vers = json.items || [];
     vers.forEach(v => {
       const opt = document.createElement('option');
       opt.value = v.gid;
@@ -1165,8 +1201,8 @@ async function _openForkModal() {
 
   // 加载自定义预设
   try {
-    const json = await ListShell._cf('/api/bop/fork-presets');
-    _forkCustomPresets = json.data || [];
+    const json = await _bopInvokeCapability('craft.bop.fork_preset.read', { operation: 'list' });
+    _forkCustomPresets = json || [];
     _refreshForkPresetList();
   } catch (_) { _forkCustomPresets = []; }
 
@@ -1214,11 +1250,11 @@ async function _saveForkPreset() {
   if (!name) return;
   try {
     const body = { name, include_node_types: includeNodeTypes, field_rules: fieldRules, meta_key_rules: {} };
-    const json = await ListShell._cf('/api/bop/fork-presets', { method: 'POST', body: JSON.stringify(body) });
-    _forkCustomPresets.push(json.data);
+    const json = await _bopInvokeCapability('craft.bop.fork_preset.change.apply', { operation: 'create', ...body });
+    _forkCustomPresets.push(json);
     _refreshForkPresetList();
     // 选中新保存的预设
-    document.getElementById('inp-fork-preset').value = json.data.gid;
+    document.getElementById('inp-fork-preset').value = json.gid;
     _forkSelectedPresetGid = json.data.gid;
     document.getElementById('btn-fork-delete-preset').style.display = '';
     _toast('预设已保存', 'success');
@@ -1229,7 +1265,9 @@ async function _deleteForkPreset() {
   if (!_forkSelectedPresetGid) return;
   if (!confirm('确认删除此预设？')) return;
   try {
-    await ListShell._cf(`/api/bop/fork-presets/${_forkSelectedPresetGid}`, { method: 'DELETE' });
+    await _bopInvokeCapability('craft.bop.fork_preset.change.apply', {
+      operation: 'delete', gid: _forkSelectedPresetGid,
+    });
     _forkCustomPresets = _forkCustomPresets.filter(p => p.gid !== _forkSelectedPresetGid);
     _forkSelectedPresetGid = null;
     _refreshForkPresetList();
@@ -1256,8 +1294,8 @@ async function _executeFork() {
     meta_key_rules:           {},
   };
   try {
-    const json = await ListShell._cf(`/api/bop/versions/${srcGid}/fork`, {
-      method: 'POST', body: JSON.stringify(body)
+    const json = await _bopInvokeCapability('craft.bop.fork.change.apply', {
+      operation: 'fork', source_version_gid: srcGid, ...body,
     });
     closeModal('modal-fork-bop');
     await _refreshSidebar();
@@ -1270,8 +1308,9 @@ async function _executeFork() {
 async function _loadAlPreview() {
   if (!_currentVersion) { _toast('请先选择 BOP 版本', 'warn'); return; }
   try {
-    const json = await ListShell._cf(`/api/bop/versions/${_currentVersion}/auto-link-preview`);
-    const data = json.data || {};
+    const data = await _bopInvokeCapability('craft.bop.entry.legacy_read', {
+      operation: 'auto_link_preview', version_gid: _currentVersion,
+    });
     const items = data.items || [];
     _renderAlItems(items, { ok: data.pending, skip: data.skip, warn: data.warn, error: 0 });
     _toast(`预览完成：待处理 ${data.pending ?? 0}，跳过 ${data.skip ?? 0}，警告 ${data.warn ?? 0}`, 'info');
@@ -1327,8 +1366,9 @@ async function _openAutoLinkModal() {
 
   // 自动拉取预览
   try {
-    const json = await ListShell._cf(`/api/bop/versions/${_currentVersion}/auto-link-preview`);
-    const data = json.data || {};
+    const data = await _bopInvokeCapability('craft.bop.entry.legacy_read', {
+      operation: 'auto_link_preview', version_gid: _currentVersion,
+    });
     const items = data.items || [];
     _renderAlItems(items, { ok: data.pending, skip: data.skip, warn: data.warn, error: 0 });
   } catch (_) { /* 预览失败不阻塞 */ }
@@ -1338,9 +1378,8 @@ async function _runAlStep(step) {
   if (!_currentVersion) { _toast('请先选择 BOP 版本', 'warn'); return; }
   const label = step === 'A' ? 'Step A' : step === 'B' ? 'Step B' : '全部';
   try {
-    const json = await ListShell._cf(`/api/bop/versions/${_currentVersion}/auto-link`, {
-      method: 'POST',
-      body: JSON.stringify({ step }),
+    const json = await _bopInvokeCapability('craft.bop.entry.bulk.change.apply', {
+      operation: 'auto_link', version_gid: _currentVersion, step,
     });
     const data = json.data || {};
     const items = data.items || [];
@@ -1357,8 +1396,8 @@ async function _openImportGbopModal() {
   const sel = document.getElementById('inp-copy-gbop-version');
   sel.innerHTML = '<option value="">-- 选择 GBOP 版本 --</option>';
   try {
-    const json = await ListShell._cf('/api/bop/versions');
-    (json.data || []).forEach(v => {
+    const json = await _bopInvokeCapability('craft.bop.version.list', { page_size: 100 });
+    (json.items || []).forEach(v => {
       if (v.gid === _currentVersion) return;
       const opt = document.createElement('option');
       opt.value = v.gid;
@@ -1373,7 +1412,9 @@ async function _importGbop() {
   const srcGid = document.getElementById('inp-copy-gbop-version').value;
   if (!_currentVersion || !srcGid) { _toast('请选择 GBOP 版本', 'warn'); return; }
   try {
-    const json = await ListShell._cf(`/api/bop/versions/${_currentVersion}/copy-from-gbop/${srcGid}`, { method: 'POST' });
+    const json = await _bopInvokeCapability('craft.bop.entry.bulk.change.apply', {
+      operation: 'copy_from_gbop', version_gid: _currentVersion, source_gid: srcGid,
+    });
     closeModal('modal-import-gbop');
     await load();
     _toast(`GBOP 导入成功，共 ${json.count} 个节点`, 'success');

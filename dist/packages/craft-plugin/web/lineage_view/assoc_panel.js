@@ -11,6 +11,22 @@ function _assocLsk(base) {
   try { const u = window.parent?._authUser || window.top?._authUser || window._authUser; const g = u?.gid || u?.user_gid || ''; return g ? `${g}:${base}` : base; } catch { return base; }
 }
 
+async function _assocInvoke(_cloudFetch, id, payload) {
+  const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version: 1, payload }),
+  });
+  const result = response?.data;
+  if (response?.success !== true || result?.ok !== true) {
+    const detail = result?.error || response?.error || {};
+    const error = new Error(detail.message || `能力调用失败：${id}@1`);
+    error.code = detail.code || 'capability_invocation_failed';
+    throw error;
+  }
+  return result.data;
+}
+
 /* ── 状态常量 ────────────────────────────────────────── */
 const _TASK_STATUSES = [
   { value: 'open',        label: '待办' },
@@ -35,10 +51,10 @@ const ASSOC_ADAPTERS = {
     filter: {
       type: 'version',
       fetchOptions: async (cf) => {
-        const res = await cf('/api/ebom/snapshots');
-        return (res?.data || []).map(v => ({
-          gid: v.gid,
-          name: v.name || v.version_tag || v.gid,
+        const res = await _assocInvoke(cf, 'craft.pbom.version.search', { limit: 200 });
+        return (res?.items || []).map(v => ({
+          gid: v.gid || v.version_gid,
+          name: v.name || v.version_tag || v.gid || v.version_gid,
         }));
       },
       allLabel: '已关联零件',
@@ -49,13 +65,18 @@ const ASSOC_ADAPTERS = {
     fetchData: async (cf, versionGid, filterGid) => {
       if (filterGid) {
         // 选了具体 PBOM 版本 → 直接获取该版本的全部零件
-        const res = await cf(`/api/ebom/snapshots/${filterGid}/parts`);
-        return res?.data || [];
+        const res = await _assocInvoke(cf, 'craft.pbom.part.search', {
+          version_gid: filterGid,
+          limit: 500,
+        });
+        return res?.items || [];
       }
       // 默认：显示已关联到当前 BOP 版本的零件
       if (!versionGid) return [];
-      const res = await cf(`/api/bop/versions/${versionGid}/linked-parts`);
-      return res?.data || [];
+      const res = await _assocInvoke(cf, 'craft.bop.linked_parts.get', {
+        version_gid: versionGid,
+      });
+      return res?.items || [];
     },
     getLinkType: () => 'pbom_part',
     getRefGid:   item => item.gid,
@@ -82,8 +103,10 @@ const ASSOC_ADAPTERS = {
     ],
     fetchData: async (cf, _vgid, filterGid) => {
       const q = filterGid ? `?list_gid=${filterGid}&limit=500` : '?limit=500';
-      const res = await cf('/api/issues' + q);
-      return res.data || [];
+      const res = await _assocInvoke(cf, 'project.issue.read.atomic.issues_search', {
+        ...(filterGid ? { list_gid: filterGid } : {}), page_size: 500,
+      });
+      return res?.data || [];
     },
     getLinkType: () => 'issue',
     getRefGid:   item => item.gid,
@@ -113,8 +136,10 @@ const ASSOC_ADAPTERS = {
     ],
     fetchData: async (cf, _vgid, filterGid) => {
       const q = filterGid ? `?list_gid=${filterGid}&limit=500` : '?limit=500';
-      const res = await cf('/api/tasks' + q);
-      return res.data || [];
+      const res = await _assocInvoke(cf, 'project.task.read.atomic.tasks_search', {
+        ...(filterGid ? { list_gid: filterGid } : {}), page_size: 500,
+      });
+      return res?.data || [];
     },
     getLinkType: () => 'task_custom',
     getRefGid:   item => item.gid,
@@ -133,8 +158,11 @@ const ASSOC_ADAPTERS = {
     groupFields: null,
     filterFields: null,
     fetchData: async (cf) => {
-      const res = await cf('/api/factory/tools?limit=500');
-      return res.data || [];
+      const res = await _assocInvoke(cf, 'factory.asset.search', {
+        asset_type: 'tool',
+        limit: 500,
+      });
+      return res?.data || res?.items || [];
     },
     getLinkType: () => 'physical_tool',
     getRefGid:   item => item.gid,
@@ -150,8 +178,8 @@ const ASSOC_ADAPTERS = {
     filter: {
       type: 'version',
       fetchOptions: async (cf) => {
-        const res = await cf('/api/gbop/versions');
-        return (res.data || [])
+        const res = await _assocInvoke(cf, 'craft.gbop.release.search', { include_archived: false });
+        return (res?.items || [])
           .filter(v => !v.archived_at)
           .map(v => ({ gid: v.gid, name: v.name || v.gid }));
       },
@@ -162,16 +190,20 @@ const ASSOC_ADAPTERS = {
     filterFields: null,
     fetchData: async (cf, _vgid, filterGid) => {
       if (filterGid) {
-        const res = await cf(`/api/gbop/versions/${filterGid}/entries`);
-        return res.data || [];
+        const res = await _assocInvoke(cf, 'craft.gbop.catalog.read', {
+          operation: 'entries.list', version_gid: filterGid,
+        });
+        return res?.items || res?.data || [];
       }
-      const vRes = await cf('/api/gbop/versions');
-      const versions = (vRes.data || []).filter(v => !v.archived_at);
+      const vRes = await _assocInvoke(cf, 'craft.gbop.release.search', { include_archived: false });
+      const versions = (vRes?.items || []).filter(v => !v.archived_at);
       const all = [];
       for (const v of versions) {
         try {
-          const eRes = await cf(`/api/gbop/versions/${v.gid}/entries`);
-          const entries = eRes.data || [];
+          const eRes = await _assocInvoke(cf, 'craft.gbop.catalog.read', {
+            operation: 'entries.list', version_gid: v.gid,
+          });
+          const entries = eRes?.items || eRes?.data || [];
           entries.forEach(e => { e._gbop_version_name = v.name || v.gid; });
           all.push(...entries);
         } catch (_) { /* skip */ }
@@ -193,8 +225,8 @@ const ASSOC_ADAPTERS = {
     filter: {
       type: 'version',
       fetchOptions: async (cf) => {
-        const res = await cf('/api/gbop/versions');
-        return (res.data || []).filter(v => !v.archived_at).map(v => ({ gid: v.gid, name: v.name || v.gid }));
+        const res = await _assocInvoke(cf, 'craft.gbop.release.search', { include_archived: false });
+        return (res?.items || []).filter(v => !v.archived_at).map(v => ({ gid: v.gid, name: v.name || v.gid }));
       },
       allLabel: '全部版本',
     },
@@ -203,16 +235,20 @@ const ASSOC_ADAPTERS = {
     filterFields: null,
     fetchData: async (cf, _vgid, filterGid) => {
       if (filterGid) {
-        const res = await cf(`/api/gbop/versions/${filterGid}/entries`);
-        return res.data || [];
+        const res = await _assocInvoke(cf, 'craft.gbop.catalog.read', {
+          operation: 'entries.list', version_gid: filterGid,
+        });
+        return res?.items || res?.data || [];
       }
-      const vRes = await cf('/api/gbop/versions');
-      const versions = (vRes.data || []).filter(v => !v.archived_at);
+      const vRes = await _assocInvoke(cf, 'craft.gbop.release.search', { include_archived: false });
+      const versions = (vRes?.items || []).filter(v => !v.archived_at);
       const all = [];
       for (const v of versions) {
         try {
-          const eRes = await cf(`/api/gbop/versions/${v.gid}/entries`);
-          const entries = eRes.data || [];
+          const eRes = await _assocInvoke(cf, 'craft.gbop.catalog.read', {
+            operation: 'entries.list', version_gid: v.gid,
+          });
+          const entries = eRes?.items || eRes?.data || [];
           entries.forEach(e => { e._gbop_version_name = v.name || v.gid; });
           all.push(...entries);
         } catch (_) {}
@@ -229,8 +265,11 @@ const ASSOC_ADAPTERS = {
     getLinkSummary: async (cf, versionGid) => {
       if (!versionGid || versionGid === 'bn_nav') return {};
       try {
-        const res = await cf(`/api/gbop/pbom-versions/${versionGid}/gbop-nav-link-summary`);
-        return res.data || {};
+        const res = await _assocInvoke(cf, 'craft.gbop.navigation.read', {
+          operation: 'link_summary',
+          pbom_version_gid: versionGid,
+        });
+        return res?.data || {};
       } catch (_) { return {}; }
     },
   },
@@ -250,8 +289,11 @@ const ASSOC_ADAPTERS = {
     fetchData: async (cf, vgid, filterGid) => {
       const gid = filterGid || vgid;
       if (!gid || gid === 'bn_nav') return [];
-      const res = await cf(`/api/ebom/snapshots/${gid}/parts`);
-      return res?.data || [];
+      const res = await _assocInvoke(cf, 'craft.pbom.part.search', {
+        version_gid: gid,
+        limit: 500,
+      });
+      return res?.items || [];
     },
     getLinkType: () => 'pbom_part',
     getRefGid:   item => item.gid,
@@ -263,8 +305,11 @@ const ASSOC_ADAPTERS = {
     getLinkSummary: async (cf, versionGid) => {
       if (!versionGid || versionGid === 'bn_nav') return {};
       try {
-        const res = await cf(`/api/gbop/pbom-versions/${versionGid}/gbop-nav-link-summary`);
-        const gbopMap = res.data || {};
+        const res = await _assocInvoke(cf, 'craft.gbop.navigation.read', {
+          operation: 'link_summary',
+          pbom_version_gid: versionGid,
+        });
+        const gbopMap = res?.data || {};
         // 转置：以 pbom_entry_gid 为键（原 bop_entry_gid 字段存的是 pbom_entry_gid）
         const pbomMap = {};
         for (const v of Object.values(gbopMap)) {
@@ -289,7 +334,11 @@ const ASSOC_ADAPTERS = {
       if (!versionGid) return null;
       try {
         const override = panel?._bopPbomGid ? `?pbom_version_gid=${panel._bopPbomGid}` : '';
-        const res = await cf(`/api/gbop/bop-versions/${versionGid}/station-autolink-preview${override}`);
+        const res = await _assocInvoke(cf, 'craft.gbop.station_autolink.preview', {
+          operation: 'preview',
+          bop_gid: versionGid,
+          ...(panel?._bopPbomGid ? { pbom_version_gid: panel._bopPbomGid } : {}),
+        });
         if (res?.need_select) return { need_select: true, pbom_versions: res.pbom_versions || [] };
         return res?.pbom_version || null;
       } catch (_) { return null; }
@@ -297,7 +346,11 @@ const ASSOC_ADAPTERS = {
     fetchData: async (cf, versionGid, _filterGid, panel) => {
       if (!versionGid) return [];
       const override = panel?._bopPbomGid ? `?pbom_version_gid=${panel._bopPbomGid}` : '';
-      const res = await cf(`/api/gbop/bop-versions/${versionGid}/station-autolink-preview${override}`);
+      const res = await _assocInvoke(cf, 'craft.gbop.station_autolink.preview', {
+        operation: 'preview',
+        bop_gid: versionGid,
+        ...(panel?._bopPbomGid ? { pbom_version_gid: panel._bopPbomGid } : {}),
+      });
       if (res?.need_select) return [];
       // 存线体列表供筛选条渲染
       if (panel && Array.isArray(res?.lines)) panel._availableLines = res.lines;
@@ -315,7 +368,11 @@ const ASSOC_ADAPTERS = {
       if (!versionGid) return {};
       try {
         const override = panel?._bopPbomGid ? `?pbom_version_gid=${panel._bopPbomGid}` : '';
-        const res = await cf(`/api/gbop/bop-versions/${versionGid}/station-autolink-preview${override}`);
+        const res = await _assocInvoke(cf, 'craft.gbop.station_autolink.preview', {
+          operation: 'preview',
+          bop_gid: versionGid,
+          ...(panel?._bopPbomGid ? { pbom_version_gid: panel._bopPbomGid } : {}),
+        });
         const map = {};
         for (const item of res?.data || []) {
           if (item.linked) map[item.gid] = { is_valid: true };
@@ -331,10 +388,12 @@ const ASSOC_ADAPTERS = {
           if (panel?._selectedLineGids?.size > 0) {
             bodyObj.line_gids = [...panel._selectedLineGids];
           }
-          const res = await cf(
-            `/api/gbop/bop-versions/${versionGid}/station-autolink`,
-            { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(bodyObj) }
-          );
+          const res = await _assocInvoke(cf, 'craft.gbop.station_autolink.change.apply', {
+            operation: 'apply',
+            bop_gid: versionGid,
+            pbom_version_gid: bodyObj.pbom_version_gid || null,
+            line_gids: bodyObj.line_gids || null,
+          });
           // 若是通过面板选择的 PBOM（未写入 BOP），Auto-Link 成功后清除 override（已写入 bop_versions）
           if (panel && bodyObj.pbom_version_gid && res?.ok) panel._bopPbomGid = null;
           const lineInfo = bodyObj.line_gids ? `（${bodyObj.line_gids.length} 条线体）` : '';
@@ -346,10 +405,11 @@ const ASSOC_ADAPTERS = {
         danger: true,
         execute: async (cf, versionGid, toast) => {
           if (!confirm('确定撤销所有已关联的工序、操作和零件节点？此操作不可恢复。')) return;
-          const res = await cf(
-            `/api/gbop/bop-versions/${versionGid}/station-autolink-undo`,
-            { method: 'POST' }
-          );
+          const res = await _assocInvoke(cf, 'craft.gbop.station_autolink.change.apply', {
+            operation: 'undo',
+            bop_gid: versionGid,
+            mode: 'soft',
+          });
           toast(`已撤销：删除 ${res?.deleted || 0} 个节点`, 'ok');
         },
       },
@@ -359,10 +419,11 @@ const ASSOC_ADAPTERS = {
         superAdminOnly: true,
         execute: async (cf, versionGid, toast) => {
           if (!confirm('【超管】硬删除：将彻底删除所有工序/操作/零件节点及其链接，无法恢复！确定继续？')) return;
-          const res = await cf(
-            `/api/gbop/bop-versions/${versionGid}/station-autolink-undo?mode=hard`,
-            { method: 'POST' }
-          );
+          const res = await _assocInvoke(cf, 'craft.gbop.station_autolink.change.apply', {
+            operation: 'undo',
+            bop_gid: versionGid,
+            mode: 'hard',
+          });
           toast(`硬删除完成：永久删除 ${res?.deleted || 0} 个节点`, 'ok');
         },
       },
@@ -402,19 +463,19 @@ const ASSOC_ADAPTERS = {
           const lineGid = lineGids[0];
           if (!confirm('确定清除该线体所有工序的流程图片（process_flow_pic）？')) return;
 
-          const opsRes = await cf(
-            `/api/bop/versions/${versionGid}/line-operations?line_entry_gid=${lineGid}`
-          );
+          const opsRes = await _assocInvoke(cf, 'craft.bop.line_operation_catia.read', {
+            line_entry_gid: lineGid,
+          });
           const ops = opsRes?.data || [];
           if (!ops.length) { toast('未找到工序节点', 'warn'); return; }
 
           let cleared = 0;
           for (const op of ops) {
             try {
-              await cf(`/api/bop/entries/${op.bop_entry_gid}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ process_flow_pic: [] }),
+              await _assocInvoke(cf, 'craft.bop.entry.change.apply', {
+                operation: 'update',
+                entry_gid: op.bop_entry_gid,
+                updates: { process_flow_pic: [] },
               });
               cleared++;
             } catch (e) { console.error('[清除附图]', op.bop_entry_gid, e); }
@@ -427,7 +488,11 @@ const ASSOC_ADAPTERS = {
         skipPostRefresh: true,   // 演示不修改数据，结束后不触发 _reload
         execute: async (cf, versionGid, toast, panel) => {
           const override = panel?._bopPbomGid ? `?pbom_version_gid=${panel._bopPbomGid}` : '';
-          const res = await cf(`/api/gbop/bop-versions/${versionGid}/station-autolink-preview${override}`);
+          const res = await _assocInvoke(cf, 'craft.gbop.station_autolink.preview', {
+            operation: 'preview',
+            bop_gid: versionGid,
+            ...(panel?._bopPbomGid ? { pbom_version_gid: panel._bopPbomGid } : {}),
+          });
           const allItems = res?.data || [];
           const hasLinked = allItems.some(it => it.linked);
           if (!hasLinked) { toast('暂无已关联节点，请先运行 Auto-Link', 'warn'); return; }
@@ -767,7 +832,9 @@ class AssocPanel {
     if (!options) {
       try {
         if (filterCfg.type === 'list') {
-          const res = await this._cf(`/api/lists?item_type=${filterCfg.itemType}`);
+          const _cloudFetch = this._cf;
+          const res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+            .call('project.lists.search', { itemType: filterCfg.itemType });
           options = (res.data || []).map(l => ({ gid: l.gid, name: l.name || l.gid }));
         } else if (filterCfg.type === 'version') {
           options = await filterCfg.fetchOptions(this._cf);
@@ -1326,9 +1393,11 @@ class AssocPanel {
           if (adapter.getLinkSummary) {
             linkMap = await adapter.getLinkSummary(this._cf, this._versionGid, this);
           } else {
-            const summaryRes = await this._cf(
-              `/api/bop/versions/${this._versionGid}/link-summary?link_type=${adapter.getLinkType()}`
-            );
+            const summaryRes = await _assocInvoke(this._cf, 'craft.bop.entry.legacy_read', {
+              operation: 'link_summary',
+              version_gid: this._versionGid,
+              link_type: adapter.getLinkType(),
+            });
             linkMap = summaryRes.data || {};
           }
         } catch (_) { linkMap = {}; }
@@ -1417,9 +1486,9 @@ class AssocPanel {
     if (!this._versionGid || this._selectedLineGids.size !== 1) return;
     const lineGid = [...this._selectedLineGids][0];
     try {
-      const res = await this._cf(
-        `/api/bop/versions/${this._versionGid}/line-operations?line_entry_gid=${lineGid}`
-      );
+      const res = await _assocInvoke(this._cf, 'craft.bop.line_operation_catia.read', {
+        line_entry_gid: lineGid,
+      });
       const ops = res?.data || [];
       this._picMap.clear();
       for (const op of ops) {
@@ -1686,15 +1755,12 @@ class AssocPanel {
       const picked = await _openParentPicker({ title: '选择关联目标节点' });
       if (!picked) return;
       try {
-        await this._cf('/api/bop/entry-links', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            bop_entry_gid: picked.gid,
-            link_type:     info.linkType,
-            ref_gid:       info.refGid,
-            is_primary:    info.isPrimary ?? false,
-          }),
+        await _assocInvoke(this._cf, 'craft.bop.entry_link.change.apply', {
+          operation: 'attach',
+          entry_gid: picked.gid,
+          link_type: info.linkType,
+          entity_gid: info.refGid,
+          is_primary: info.isPrimary ?? false,
         });
         this._toast('已创建关联', 'ok');
         await this.refresh();

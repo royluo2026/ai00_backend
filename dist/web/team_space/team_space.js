@@ -23,10 +23,10 @@ function _applyTheme(theme) {
 })();
 
 // ── 云端 fetch ────────────────────────────────────────────────────────────────
-function _cf(path, opts) {
+function _cf(method, path, opts = {}) {
   const fetch = window._cloudFetch || window.parent?._cloudFetch;
   if (!fetch) return Promise.reject(new Error('no cloud fetch'));
-  return fetch(path, opts);
+  return fetch(path, { ...opts, method });
 }
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -41,7 +41,7 @@ let _myGid      = '';
 async function init() {
   // 获取当前用户信息
   try {
-    const me = await _cf('/users/me');
+    const me = await _cf('GET', '/users/me');
     const meData = me.data || me;
     _myGid    = meData.gid || '';
     _myGrants = meData.grants || [];
@@ -54,7 +54,7 @@ async function init() {
 // ── Load teams ────────────────────────────────────────────────────────────────
 async function _loadTeams() {
   try {
-    const data = await _cf('/teams');
+    const data = await _cf('GET', '/teams');
     _teams = Array.isArray(data) ? data : (data.data || data.teams || []);
   } catch (_) {
     _teams = [];
@@ -144,7 +144,7 @@ async function _selectTeam(team) {
 // ── Load members ──────────────────────────────────────────────────────────────
 async function _loadMembers(teamGid) {
   try {
-    const data = await _cf(`/teams/${encodeURIComponent(teamGid)}/members`);
+    const data = await _cf('GET', `/teams/${encodeURIComponent(teamGid)}/members`);
     _members = Array.isArray(data) ? data : (data.data || data.members || []);
   } catch (_) {
     _members = [];
@@ -207,7 +207,8 @@ function _renderMembers() {
 // ── Load team lists ────────────────────────────────────────────────────────────
 async function _loadTeamLists(teamGid) {
   try {
-    const data = await _cf(`/api/lists?owner_team_gid=${encodeURIComponent(teamGid)}&read_scope=team`);
+    const data = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
+      .call('project.lists.search', { ownerTeamGid: teamGid });
     _teamLists = Array.isArray(data) ? data : (data.lists || data.data || []);
   } catch (_) {
     _teamLists = [];
@@ -253,10 +254,8 @@ function _listColor(itemType) {
 async function _grantTeamAdmin(userGid) {
   if (!userGid || !_currentTeam) return;
   try {
-    await _cf('/api/grants', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ grantee_gid: userGid, grant_type: 'team_admin', scope_gid: _currentTeam.gid }),
+    await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('base.grants.create', {
+      granteeGid: userGid, grantType: 'team_admin', scopeGid: _currentTeam.gid,
     });
     await _loadMembers(_currentTeam.gid);
   } catch (e) {
@@ -268,7 +267,7 @@ async function _removeMember(userGid) {
   if (!userGid || !_currentTeam) return;
   if (!confirm('确认从团队移除该成员？')) return;
   try {
-    await _cf(`/teams/${encodeURIComponent(_currentTeam.gid)}/members/${encodeURIComponent(userGid)}`, { method: 'DELETE' });
+    await _cf('DELETE', `/teams/${encodeURIComponent(_currentTeam.gid)}/members/${encodeURIComponent(userGid)}`, { method: 'DELETE' });
     await _loadMembers(_currentTeam.gid);
   } catch (e) {
     alert('移除失败：' + (e.message || String(e)));
@@ -280,7 +279,7 @@ async function _deleteCurrentTeam() {
   if (!_currentTeam) return;
   if (!confirm(`确认软删除团队「${_currentTeam.name || _currentTeam.gid}」？\n\n团队将从列表隐藏，成员数据不受影响。`)) return;
   try {
-    await _cf(`/teams/${encodeURIComponent(_currentTeam.gid)}`, { method: 'DELETE' });
+    await _cf('DELETE', `/teams/${encodeURIComponent(_currentTeam.gid)}`, { method: 'DELETE' });
     _currentTeam = null;
     document.getElementById('tsTeamName').textContent = '选择团队';
     document.getElementById('tsAdminBadge').style.display = 'none';
@@ -308,7 +307,7 @@ document.getElementById('dlgMemberSearch')?.addEventListener('input', _debounce(
   const q = e.target.value.trim();
   if (q.length < 2) { document.getElementById('dlgMemberResults').innerHTML = ''; return; }
   try {
-    const data = await _cf(`/users/search?q=${encodeURIComponent(q)}&limit=8`);
+    const data = await _cf('GET', `/users/search?q=${encodeURIComponent(q)}&limit=8`);
     const users = Array.isArray(data) ? data : (data.data || data.users || []);
     const resultsEl = document.getElementById('dlgMemberResults');
     resultsEl.innerHTML = users.map(u => `
@@ -340,7 +339,7 @@ document.getElementById('dlgMemberConfirm')?.addEventListener('click', async () 
   const userGid = selected.dataset.gid;
   const role = document.getElementById('dlgMemberRole').value;
   try {
-    await _cf(`/teams/${encodeURIComponent(_currentTeam.gid)}/members`, {
+    await _cf('POST', `/teams/${encodeURIComponent(_currentTeam.gid)}/members`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_gid: userGid }),
     });
@@ -367,7 +366,7 @@ document.getElementById('dlgSubConfirm')?.addEventListener('click', async () => 
   const name = document.getElementById('dlgSubTeamName').value.trim();
   if (!name) { alert('请输入团队名称'); return; }
   try {
-    await _cf('/teams', {
+    await _cf('POST', '/teams', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, parent_team_gid: _currentTeam?.gid || null }),
     });
@@ -395,13 +394,12 @@ document.getElementById('dlgTransferConfirm')?.addEventListener('click', async (
   if (!targetGid || !_currentTeam) return;
   if (!confirm('确认转让？此操作将撤销您在该团队的 team_admin 权限。')) return;
   try {
-    await _cf('/api/grants', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ grantee_gid: targetGid, grant_type: 'team_admin', scope_gid: _currentTeam.gid }),
+    await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('base.grants.create', {
+      granteeGid: targetGid, grantType: 'team_admin', scopeGid: _currentTeam.gid,
     });
     const ownGrant = _myGrants.find(g => g.grant_type === 'team_admin' && g.scope_gid === _currentTeam.gid);
     if (ownGrant) {
-      await _cf(`/api/grants/${encodeURIComponent(ownGrant.gid)}`, { method: 'DELETE' }).catch(() => {});
+      await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('base.grants.revoke', { gid: ownGrant.gid }).catch(() => {});
     }
     document.getElementById('dlgTransfer').classList.remove('open');
     await _loadTeams();

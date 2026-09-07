@@ -4,11 +4,75 @@
  */
 'use strict';
 
-const _cf = (path, opts) => {
+const _cf = (method, path, opts = {}) => {
   const fn = window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
   if (!fn) throw new TypeError('_cloudFetch 未就绪');
-  return fn(path, opts);
+  return fn(path, { ...opts, method });
 };
+async function _invokeCapability(id, payload = {}) {
+  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version: 1, payload }),
+  });
+  const envelope = response?.data;
+  if (response?.success !== true || envelope?.ok !== true) {
+    const detail = envelope?.error || response?.error || {};
+    throw new Error(detail.message || `能力调用失败：${id}@1`);
+  }
+  const value = envelope.data;
+  return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+}
+function _connectorCapabilityClient() {
+  const client = window.top?.AI00ExistingCapabilityClient
+    || window.parent?.AI00ExistingCapabilityClient
+    || window.AI00ExistingCapabilityClient;
+  if (!client?.invoke) throw new TypeError('Capability 客户端未就绪');
+  return client;
+}
+function _connectorIdempotencyKey(capabilityId) {
+  const nonce = globalThis.crypto?.randomUUID?.()
+    || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  return `${capabilityId}:${nonce}`;
+}
+async function _invokeConnectorCapability(
+  capabilityId, payload, { write = false, confirmation = '', idempotencyKey = '' } = {}
+) {
+  if (!write) return _connectorCapabilityClient().invoke(capabilityId, payload);
+  if (!window.confirm(confirmation)) {
+    const error = new Error('操作已取消');
+    error.code = 'capability_confirmation_cancelled';
+    throw error;
+  }
+  idempotencyKey = idempotencyKey || _connectorIdempotencyKey(capabilityId);
+  return _connectorCapabilityClient().invoke(
+    capabilityId,
+    { ...payload, idempotency_key: idempotencyKey },
+    { write: true, idempotencyKey, confirmed: true },
+  );
+}
+function _operationMessage(operationRef, labels) {
+  const status = operationRef?.status;
+  if (status === 'accepted') return { kind: 'pending', text: `${labels.subject}已受理，正在等待执行` };
+  if (status === 'outcome_unknown') return { kind: 'pending', text: `${labels.subject}结果未知，正在协调确认` };
+  if (status === 'failed') return { kind: 'failed', text: `${labels.subject}执行失败` };
+  if (status === 'succeeded') return { kind: 'succeeded', text: '' };
+  return { kind: 'failed', text: `${labels.subject}返回了未知状态` };
+}
+async function _listOntologyObjects(kinds) {
+  const items = [];
+  let offset = 0;
+  let total = 0;
+  do {
+    const page = await _invokeCapability('ontology.object.list', { kinds, limit: 100, offset });
+    const rows = page?.items || [];
+    items.push(...rows);
+    total = Number(page?.total || items.length);
+    offset += rows.length;
+    if (!rows.length) break;
+  } while (offset < total);
+  return items.map(item => ({ ...item, gid: item.gid || item.stable_gid }));
+}
 const _esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const _gid = () => Math.random().toString(36).slice(2);
 
@@ -24,6 +88,15 @@ let _selectedDs   = null;
 let _selectedMap  = null;
 let _infoStats    = {};
 let _dirty        = false; // 字段映射有未保存改动
+const _importIdempotencyStorageKey = mappingGid => `ai00:integration:import-idempotency:${mappingGid}`;
+function _importIdempotencyKey(mappingGid) {
+  const storageKey = _importIdempotencyStorageKey(mappingGid);
+  const existing = window.localStorage.getItem(storageKey);
+  if (existing) return existing;
+  const created = _connectorIdempotencyKey('integration.mapping.import.start');
+  window.localStorage.setItem(storageKey, created);
+  return created;
+}
 
 // ── BOP 直接字段（不走 onto_properties，直接写 bop_entries 列）────────────────
 const BOP_DIRECT_FIELDS = [
@@ -64,7 +137,7 @@ async function _init() {
       </div>
     </div>`;
 
-  document.getElementById('addDsBtn').addEventListener('click', _showNewDsModal);
+  document.getElementById('addDsBtn').addEventListener('click', () => _showNewDsModal());
   document.getElementById('addMapBtn').addEventListener('click', _showNewMapModal);
   document.getElementById('edsSaveBtn').addEventListener('click', _saveFieldMaps);
   document.getElementById('edsPreviewBtn').addEventListener('click', () => _loadPreview(true));
@@ -81,18 +154,55 @@ async function _init() {
 // ── 本体数据 ──────────────────────────────────────────────────────────────────
 async function _loadOntoData() {
   try {
-    const [clsResp, propResp] = await Promise.all([
-      _cf('/api/ontology/classes'),
-      _cf('/api/ontology/graph'),
-    ]);
-    _ontoClasses = _flatClasses(clsResp.data || []);
+    const classes = _flatClasses(await _listOntologyObjects(['concept']));
+    let bindings = [];
+    if (classes.length) {
+      try {
+        bindings = await _listMappingTargets(classes.map(item => item.gid));
+      } catch { /* target projection remains fail-closed */ }
+    }
+    const byOntologyObject = new Map(
+      bindings.filter(binding => _validMappingTarget(binding, classes)).map(binding => [binding.ontology_object_gid, binding])
+    );
+    _ontoClasses = classes.map(item => ({
+      ...item,
+      integration_target_binding: byOntologyObject.get(item.gid) || null,
+    }));
     _ontoProps   = []; // 按需加载
   } catch { /* silent */ }
 }
 
+async function _listMappingTargets(ontologyObjectGids) {
+  const items = [];
+  const uniqueGids = [...new Set(ontologyObjectGids)];
+  for (let offset = 0; offset < uniqueGids.length; offset += 200) {
+    const projection = await _invokeConnectorCapability('integration.mapping_target.search', {
+      ontology_object_gids: uniqueGids.slice(offset, offset + 200),
+    });
+    items.push(...(projection?.items || []));
+  }
+  return items;
+}
+
+function _validMappingTarget(binding, classes) {
+  return binding
+    && classes.some(item => item.gid === binding.ontology_object_gid)
+    && typeof binding.binding_id === 'string' && binding.binding_id.length > 0
+    && typeof binding.target_domain === 'string' && binding.target_domain.length > 0
+    && typeof binding.target_capability_id === 'string'
+    && binding.target_capability_id.startsWith(`${binding.target_domain}.`)
+    && Number.isInteger(binding.target_major_version) && binding.target_major_version > 0
+    && typeof binding.minimum_catalog_release === 'string' && binding.minimum_catalog_release.length > 0;
+}
+
 function _flatClasses(nodes, res=[]) {
   for (const n of nodes) {
-    res.push({ gid: n.gid, name: n.name, label_zh: n.label_zh || n.name, node_type_binding: n.node_type_binding });
+    res.push({
+      gid: n.gid || n.stable_gid,
+      name: n.name,
+      label_zh: n.label_zh || n.name,
+      node_type_binding: n.node_type_binding,
+    });
     _flatClasses(n.children || [], res);
   }
   return res;
@@ -100,19 +210,33 @@ function _flatClasses(nodes, res=[]) {
 
 async function _loadPropsForClass(classGid) {
   try {
-    const resp = await _cf(`/api/ontology/schema/${encodeURIComponent(
-      _ontoClasses.find(c => c.gid === classGid)?.node_type_binding || classGid
-    )}`);
-    _ontoProps = resp.properties || [];
+    const classRow = _ontoClasses.find(c => c.gid === classGid);
+    const resolved = await _invokeCapability('ontology.concept.resolve', {
+      term: classRow?.node_type_binding || classGid,
+    });
+    const conceptRef = resolved?.concept?.concept_ref || {};
+    const stableGid = conceptRef.concept_id || resolved?.concept?.stable_gid;
+    if (!stableGid) throw new Error('ontology concept could not be resolved');
+    const schema = await _invokeCapability('ontology.concept.get', {
+      stable_gid: stableGid,
+      kind: 'concept',
+      view: 'schema',
+      release_gid: resolved?.release_gid,
+    });
+    const concept = schema?.concept || schema?.data?.concept || schema;
+    _ontoProps = concept?.properties || [];
   } catch { _ontoProps = []; }
 }
 
 // ── 连接列表 ──────────────────────────────────────────────────────────────────
 async function _loadDatasources() {
   try {
-    const resp = await _cf('/api/ext-datasources');
-    _datasources = resp.data || [];
-  } catch { _datasources = []; }
+    const result = await _invokeConnectorCapability('integration.connector.search', { limit: 200 });
+    _datasources = result.items || [];
+  } catch (error) {
+    _datasources = [];
+    _showToast(`连接加载失败：${error?.message || error}`, 'err');
+  }
   _renderDsList();
 }
 
@@ -127,13 +251,21 @@ function _renderDsList() {
     const dotCls = ds.status === 'ok' ? 'eds-dot-ok' : ds.status === 'error' ? 'eds-dot-err' : 'eds-dot-unk';
     const active = _selectedDs?.gid === ds.gid ? ' active' : '';
     return `<div class="eds-conn-item${active}" data-gid="${_esc(ds.gid)}">
-      <div class="eds-conn-name"><span class="eds-dot ${dotCls}"></span>${_esc(ds.name)}</div>
-      <div class="eds-conn-type">${_esc(ds.db_type)} · ${_esc(ds.host)}</div>
+      <div class="eds-conn-name"><span class="eds-dot ${dotCls}"></span>${_esc(ds.name)}
+        <button type="button" class="eds-btn-ghost eds-conn-edit" aria-label="编辑连接 ${_esc(ds.name)}"
+          style="margin-left:auto;padding:1px 6px;font-size:10px">编辑</button>
+      </div>
+      <div class="eds-conn-type">${_esc(ds.connector_type)} · ${_esc(ds.host)}</div>
     </div>`;
   }).join('');
-  el.querySelectorAll('.eds-conn-item').forEach(item =>
-    item.addEventListener('click', () => _selectDs(item.dataset.gid))
-  );
+  el.querySelectorAll('.eds-conn-item').forEach(item => {
+    item.addEventListener('click', () => _selectDs(item.dataset.gid));
+    item.querySelector('.eds-conn-edit').addEventListener('click', event => {
+      event.stopPropagation();
+      const connector = _datasources.find(value => value.gid === item.dataset.gid);
+      if (connector) _showNewDsModal(connector);
+    });
+  });
 }
 
 async function _selectDs(gid) {
@@ -149,9 +281,15 @@ async function _selectDs(gid) {
 async function _loadMappings() {
   if (!_selectedDs) { _mappings = []; _renderMapList(); return; }
   try {
-    const resp = await _cf(`/api/ext-mappings?datasource_gid=${_selectedDs.gid}`);
-    _mappings = resp.data || [];
-  } catch { _mappings = []; }
+    const result = await _invokeConnectorCapability(
+      'integration.mapping.search',
+      { datasource_gid: _selectedDs.gid, limit: 200 },
+    );
+    _mappings = result.items || [];
+  } catch (error) {
+    _mappings = [];
+    _showToast(`映射加载失败：${error?.message || error}`, 'err');
+  }
   _renderMapList();
 }
 
@@ -165,14 +303,13 @@ function _renderMapList() {
   }
   el.innerHTML = _mappings.map(m => {
     const active = _selectedMap?.gid === m.gid ? ' active' : '';
-    const mapped = (m.mapped_count || 0);
-    const total  = (m.total_count || 0);
-    const tagCls = !total ? 'eds-tag-none' : mapped >= total ? 'eds-tag-ok' : 'eds-tag-warn';
-    const tagTxt = !total ? '未配置' : `${mapped}/${total} 已映射`;
+    const activeMapping = m.status === 'active';
+    const tagCls = activeMapping ? 'eds-tag-ok' : 'eds-tag-warn';
+    const tagTxt = activeMapping ? '生效中' : m.status;
     return `<div class="eds-map-item${active}" data-gid="${_esc(m.gid)}">
-      <div class="eds-map-ext">${_esc(m.ext_table)}</div>
+      <div class="eds-map-ext">${_esc(m.source_object)}</div>
       <div class="eds-map-to">↓ 映射到</div>
-      <div class="eds-map-cls">${_esc(m.class_label || m.onto_class_gid)}</div>
+      <div class="eds-map-cls">${_esc(m.target_capability_id)}</div>
       <span class="eds-tag ${tagCls}">${tagTxt}</span>
     </div>`;
   }).join('');
@@ -186,12 +323,9 @@ async function _selectMap(gid) {
   _renderMapList();
   if (!_selectedMap) { _renderRightEmpty(); return; }
   _updatePath();
-  // 并行加载：本体属性、外部列、字段映射
-  await Promise.all([
-    _loadPropsForClass(_selectedMap.onto_class_gid),
-    _loadExtColumns(),
-    _loadFieldMaps(),
-  ]);
+  _ontoProps = [];
+  await _loadExtColumns();
+  await _loadFieldMaps();
   await _loadInfoStats();
   _renderRight();
   _loadPreview(false);
@@ -206,9 +340,9 @@ function _updatePath() {
   p.innerHTML = `
     <span>${_esc(_selectedDs.name)}</span>
     <span class="sep">/</span>
-    <span>${_esc(_selectedMap.ext_table)}</span>
+    <span>${_esc(_selectedMap.source_object)}</span>
     <span class="sep">→</span>
-    <span class="cur">${_esc(_selectedMap.class_label || '')}</span>`;
+    <span class="cur">${_esc(_selectedMap.target_capability_id)}</span>`;
 }
 
 // ── 右侧面板 ──────────────────────────────────────────────────────────────────
@@ -278,15 +412,15 @@ async function _loadInfoStats() {
     // 行数从预览接口统计
     _infoStats = {
       rows: '—',
-      key:  _selectedMap.unique_key_col || '—',
-      lastImport: _selectedMap.last_import_at ? _selectedMap.last_import_at.slice(0,10) : '—',
-      importCount: _selectedMap.last_import_count ?? '—',
+      key:  '—',
+      lastImport: '—',
+      importCount: '—',
     };
   } catch { _infoStats = {}; }
 }
 
 function _updateInfoStrip() {
-  const mapped = _fieldMaps.filter(f => (f.onto_property_gid || f.bop_field) && !f.is_ignored).length;
+  const mapped = _fieldMaps.filter(f => (f.target_field || f.onto_property_gid || f.bop_field) && !f.is_ignored).length;
   const total  = _extColumns.length;
   const progEl = document.getElementById('iProgress');
   if (progEl) {
@@ -303,23 +437,54 @@ function _updateInfoStrip() {
 async function _loadExtColumns() {
   if (!_selectedMap) { _extColumns = []; return; }
   try {
-    const resp = await _cf(`/api/ext-mappings/${_selectedMap.gid}/columns`);
-    _extColumns = resp.data || [];
-  } catch { _extColumns = []; }
+    const result = await _invokeConnectorCapability(
+      'integration.mapping.source_columns.discover',
+      { mapping_gid: _selectedMap.gid, limit: 200 },
+    );
+    const operation = _operationMessage(result.operation_ref, { subject: '字段发现' });
+    if (operation.kind !== 'succeeded') {
+      _extColumns = [];
+      _showToast(operation.text, operation.kind === 'failed' ? 'err' : 'warn');
+      return;
+    }
+    _extColumns = result.columns || [];
+  } catch (error) {
+    _extColumns = [];
+    _showToast(`字段发现失败：${error?.message || error}`, 'err');
+  }
 }
 
 async function _loadFieldMaps() {
   if (!_selectedMap) { _fieldMaps = []; return; }
   try {
-    const resp = await _cf(`/api/ext-field-mappings?mapping_gid=${_selectedMap.gid}`);
-    _fieldMaps = resp.data || [];
-  } catch { _fieldMaps = []; }
+    const result = await _invokeConnectorCapability(
+      'integration.field_mapping.search',
+      { mapping_gid: _selectedMap.gid, limit: 200 },
+    );
+    _fieldMaps = (result.items || []).map(item => {
+      const target = item.target_field || '';
+      return {
+        ...item,
+        mapping_gid: _selectedMap.gid,
+        ext_column: item.source_field,
+        target_type: target.startsWith('bop:') ? 'bop_field' : 'property',
+        bop_field: target.startsWith('bop:') ? target.slice(4) : null,
+        onto_property_gid: target.startsWith('prop:') ? target.slice(5) : null,
+        transform_expr: item.transform_expression || null,
+        is_ignored: false,
+      };
+    });
+  } catch (error) {
+    _fieldMaps = [];
+    _showToast(`字段映射加载失败：${error?.message || error}`, 'err');
+  }
   // 确保每个外部列都有一行（新列补空行）
   for (const col of _extColumns) {
-    if (!_fieldMaps.find(f => f.ext_column === col.column_name)) {
+    if (!_fieldMaps.find(f => f.ext_column === col.name)) {
       _fieldMaps.push({
         gid: null, mapping_gid: _selectedMap.gid,
-        ext_column: col.column_name, target_type: 'property',
+        ext_column: col.name, target_type: 'property',
+        target_field: null,
         onto_property_gid: null, bop_field: null,
         transform_expr: null, is_ignored: false,
         sort_order: _fieldMaps.length,
@@ -331,7 +496,7 @@ async function _loadFieldMaps() {
 function _renderFmBody() {
   const tbody = document.getElementById('edsFmBody');
   if (!tbody) return;
-  const colMap = Object.fromEntries(_extColumns.map(c => [c.column_name, c.data_type]));
+  const colMap = Object.fromEntries(_extColumns.map(c => [c.name, c.data_type]));
 
   // 属性选项
   const propOpts = [
@@ -347,10 +512,15 @@ function _renderFmBody() {
   tbody.innerHTML = _fieldMaps.map((fm, idx) => {
     const col      = fm.ext_column;
     const dtype    = colMap[col] || '';
-    const isKey    = col === (_selectedMap?.unique_key_col || '');
-    const curVal   = fm.onto_property_gid ? `prop:${fm.onto_property_gid}` : fm.bop_field ? `bop:${fm.bop_field}` : '';
+    const isKey    = false;
+    const curVal   = fm.target_field || (fm.onto_property_gid ? `prop:${fm.onto_property_gid}` : fm.bop_field ? `bop:${fm.bop_field}` : '');
     const hasProp  = !!curVal;
     const statusCls = fm.is_ignored ? 'none' : hasProp ? 'ok' : 'warn';
+    const currentAvailable = curVal.startsWith('bop:')
+      ? BOP_DIRECT_FIELDS.some(field => `bop:${field.value}` === curVal)
+      : _ontoProps.some(property => `prop:${property.gid}` === curVal);
+    const currentOption = curVal && !currentAvailable
+      ? `<option value="${_esc(curVal)}">${_esc(curVal)}</option>` : '';
 
     return `<tr data-idx="${idx}">
       <td class="eds-fm-col">${_esc(col)}${isKey ? ' <span class="eds-fm-key">唯一键</span>' : ''}</td>
@@ -358,7 +528,7 @@ function _renderFmBody() {
       <td class="eds-fm-arrow">→</td>
       <td>
         <select class="eds-fm-sel" data-idx="${idx}" data-role="prop" ${fm.is_ignored ? 'disabled' : ''}>
-          ${propOpts}
+          ${propOpts}${currentOption}
         </select>
       </td>
       <td>
@@ -374,7 +544,7 @@ function _renderFmBody() {
   // 设置 select 当前值
   tbody.querySelectorAll('[data-role="prop"]').forEach(sel => {
     const fm = _fieldMaps[+sel.dataset.idx];
-    const val = fm?.onto_property_gid ? `prop:${fm.onto_property_gid}` : fm?.bop_field ? `bop:${fm.bop_field}` : '';
+    const val = fm?.target_field || (fm?.onto_property_gid ? `prop:${fm.onto_property_gid}` : fm?.bop_field ? `bop:${fm.bop_field}` : '');
     sel.value = val;
     sel.addEventListener('change', _onFmChange);
   });
@@ -390,9 +560,10 @@ function _onFmChange(e) {
   const role = e.target.dataset.role;
   if (role === 'prop') {
     const val = e.target.value;
+    fm.target_field = val || null;
     if (!val) { fm.onto_property_gid = null; fm.bop_field = null; fm.target_type = 'property'; }
     else if (val.startsWith('bop:')) { fm.bop_field = val.slice(4); fm.onto_property_gid = null; fm.target_type = 'bop_field'; }
-    else { fm.onto_property_gid = val.slice(5); fm.bop_field = null; fm.target_type = 'property'; }
+    else if (val.startsWith('prop:')) { fm.onto_property_gid = val.slice(5); fm.bop_field = null; fm.target_type = 'property'; }
   } else if (role === 'tx') {
     fm.transform_expr = e.target.value.trim() || null;
   }
@@ -409,19 +580,22 @@ function _onFmChange(e) {
 
 async function _saveFieldMaps() {
   if (!_selectedMap) return;
-  const items = _fieldMaps.map((fm, i) => ({
-    ext_column:        fm.ext_column,
-    target_type:       fm.target_type || 'property',
-    onto_property_gid: fm.onto_property_gid || null,
-    bop_field:         fm.bop_field || null,
-    transform_expr:    fm.transform_expr || null,
-    is_ignored:        fm.is_ignored || false,
-    sort_order:        i,
+  const items = _fieldMaps.filter(fm => !fm.is_ignored && (
+    fm.target_field || fm.onto_property_gid || fm.bop_field
+  )).map(fm => ({
+    source_field: fm.ext_column,
+    target_field: fm.target_field
+      || (fm.onto_property_gid ? `prop:${fm.onto_property_gid}` : `bop:${fm.bop_field}`),
+    ...(fm.transform_expr ? { transform_expression: fm.transform_expr } : {}),
   }));
+  if (!items.length) { _showToast('至少配置一个字段映射后再保存', 'warn'); return; }
   try {
-    await _cf(`/api/ext-field-mappings/batch?mapping_gid=${_selectedMap.gid}`, {
-      method: 'PUT', body: JSON.stringify(items),
-    });
+    const result = await _invokeConnectorCapability(
+      'integration.field_mapping.batch.update',
+      { mapping_gid: _selectedMap.gid, expected_revision: _selectedMap.revision, items },
+      { write: true, confirmation: `确认保存“${_selectedMap.name}”的字段映射？` },
+    );
+    _selectedMap.revision = result.revision;
     _dirty = false;
     _showToast('字段映射已保存', 'ok');
     await _loadMappings();
@@ -458,18 +632,26 @@ async function _loadPreview(forceRefresh = false) {
   if (!scroll) return;
   scroll.innerHTML = '<div class="eds-preview-empty">加载中…</div>';
   try {
-    const resp = await _cf(`/api/ext-mappings/${_selectedMap.gid}/preview?limit=5`);
-    _previewData = resp.raw_rows || [];
-    const mapped  = _fieldMaps.filter(f => (f.onto_property_gid || f.bop_field) && !f.is_ignored);
+    const result = await _invokeConnectorCapability(
+      'integration.mapping.preview',
+      { gid: _selectedMap.gid, limit: 5 },
+    );
+    const operation = _operationMessage(result.operation_ref, { subject: '数据预览' });
+    if (operation.kind !== 'succeeded') {
+      _previewData = [];
+      scroll.innerHTML = `<div class="eds-preview-empty${operation.kind === 'failed' ? ' err' : ''}">${_esc(operation.text)}</div>`;
+      return;
+    }
+    _previewData = (result.rows || []).slice(0, 5);
+    const mapped  = _fieldMaps.filter(f => (f.target_field || f.onto_property_gid || f.bop_field) && !f.is_ignored);
     const columns = mapped.slice(0, 6); // 最多显示6列
 
     if (!_previewData.length) { scroll.innerHTML = '<div class="eds-preview-empty">暂无数据</div>'; return; }
 
-    const colMap = Object.fromEntries(_extColumns.map(c => [c.column_name, c]));
     const getLabel = fm => {
       if (fm.bop_field) return BOP_DIRECT_FIELDS.find(f=>f.value===fm.bop_field)?.label || fm.bop_field;
       const p = _ontoProps.find(p => p.gid === fm.onto_property_gid);
-      return p ? `${p.label_zh || p.name}` : fm.ext_column;
+      return p ? `${p.label_zh || p.name}` : fm.target_field || fm.ext_column;
     };
 
     let html = '<table class="eds-preview-table"><thead><tr>';
@@ -478,17 +660,12 @@ async function _loadPreview(forceRefresh = false) {
     }
     html += '</tr></thead><tbody>';
 
-    for (const raw of _previewData) {
+    for (const row of _previewData) {
+      const cells = Object.fromEntries((row.values || []).map(cell => [cell.field, cell]));
       html += '<tr>';
       for (const fm of columns) {
-        const rawVal = raw[fm.ext_column];
-        const mapped2 = resp.data?.find(d => d[fm.ext_column]);
-        const tx = fm.transform_expr;
-        if (tx && rawVal !== undefined && rawVal !== null) {
-          html += `<td>${_esc(String(rawVal))} → <span class="tx-val">${_esc(String(mapped2?.[fm.ext_column]?.transformed ?? rawVal))}</span></td>`;
-        } else {
-          html += `<td>${_esc(String(rawVal ?? '—'))}</td>`;
-        }
+        const cell = cells[fm.ext_column];
+        html += `<td${cell?.redacted ? ' class="tx-val"' : ''}>${_esc(String(cell?.value ?? '—'))}</td>`;
       }
       html += '</tr>';
     }
@@ -510,14 +687,18 @@ async function _executeImport() {
   if (_dirty) { _showToast('请先保存字段映射', 'warn'); return; }
   const btn = document.getElementById('edsImportBtn');
   btn.disabled = true; btn.textContent = '导入中…';
+  const idempotencyKey = _importIdempotencyKey(_selectedMap.gid);
   try {
-    const resp = await _cf(`/api/ext-mappings/${_selectedMap.gid}/import`, { method: 'POST' });
-    const { imported=0, updated=0, skipped=0, errors=[] } = resp;
-    _showToast(`导入完成：新增 ${imported}，更新 ${updated}，跳过 ${skipped}${errors.length ? `，错误 ${errors.length}` : ''}`, 'ok');
-    await _loadMappings();
-    _renderMapList();
-    await _loadInfoStats();
-    _updateInfoStrip();
+    const result = await _invokeConnectorCapability(
+      'integration.mapping.import.start',
+      { mapping_gid: _selectedMap.gid },
+      { write: true, confirmation: `确认开始导入“${_selectedMap.name}”？`, idempotencyKey },
+    );
+    const operation = _operationMessage(result.operation_ref, { subject: '导入' });
+    if (operation.kind === 'succeeded' || operation.kind === 'failed') {
+      window.localStorage.removeItem(_importIdempotencyStorageKey(_selectedMap.gid));
+    }
+    _showToast(operation.text || `导入任务 ${result.run_id} 已完成`, operation.kind === 'failed' ? 'err' : operation.kind === 'succeeded' ? 'ok' : 'warn');
   } catch (e) {
     _showToast('导入失败：' + e, 'err');
   } finally {
@@ -537,9 +718,9 @@ function _showNewDsModal(ds = null) {
         <input class="eds-input" id="dsName" value="${_esc(ds?.name||'')}" placeholder="如：MES_DB"></div>
       <div class="eds-field"><label>数据库类型</label>
         <select class="eds-input eds-select" id="dsType">
-          <option value="postgresql" ${ds?.db_type==='postgresql'?'selected':''}>PostgreSQL</option>
-          <option value="mysql" ${ds?.db_type==='mysql'?'selected':''}>MySQL</option>
-          <option value="sqlserver" ${ds?.db_type==='sqlserver'?'selected':''}>SQL Server</option>
+          <option value="postgresql" ${ds?.connector_type==='postgresql'?'selected':''}>PostgreSQL</option>
+          <option value="mysql" ${ds?.connector_type==='mysql'?'selected':''}>MySQL</option>
+          <option value="sqlserver" ${ds?.connector_type==='sqlserver'?'selected':''}>SQL Server</option>
         </select></div>
       <div class="eds-row2">
         <div class="eds-field"><label>主机</label>
@@ -548,12 +729,13 @@ function _showNewDsModal(ds = null) {
           <input class="eds-input" id="dsPort" type="number" value="${ds?.port||5432}"></div>
       </div>
       <div class="eds-field"><label>数据库名</label>
-        <input class="eds-input" id="dsDb" value="${_esc(ds?.database||'')}" placeholder="mes_production"></div>
+        <input class="eds-input" id="dsDb" value="${_esc(ds?.database_name||'')}" placeholder="mes_production"></div>
       <div class="eds-row2">
         <div class="eds-field"><label>用户名</label>
           <input class="eds-input" id="dsUser" value="${_esc(ds?.username||'')}"></div>
-        <div class="eds-field"><label>密码${isEdit?' (留空不修改)':''}</label>
-          <input class="eds-input" id="dsPwd" type="password" placeholder="${isEdit?'留空不修改':''}"></div>
+        <div class="eds-field"><label>一次性凭据注册句柄${isEdit?' (留空不轮换)':''}</label>
+          <input class="eds-input" id="dsCredentialEnrollmentHandle" autocomplete="off" spellcheck="false"
+            placeholder="${isEdit?'粘贴预先创建的句柄以轮换':'粘贴预先创建的句柄'}"></div>
       </div>
       <div id="dsTestResult"></div>
       <div class="eds-modal-actions">
@@ -567,27 +749,56 @@ function _showNewDsModal(ds = null) {
   overlay.querySelector('#dsCancelBtn').addEventListener('click', () => overlay.remove());
   overlay.querySelector('#dsTestBtn').addEventListener('click', async () => {
     if (!isEdit) { _showToast('请先创建连接后再测试', 'warn'); return; }
-    const r = await _cf(`/api/ext-datasources/${ds.gid}/test`, { method: 'POST' });
     const resEl = document.getElementById('dsTestResult');
-    if (resEl) resEl.innerHTML = `<div class="eds-test-result ${r.status==='ok'?'ok':'err'}">${r.status==='ok'?`✓ 连接正常 (${r.latency_ms}ms)`:`✕ ${_esc(r.error||'未知错误')}`}</div>`;
-    await _loadDatasources();
+    try {
+      const result = await _invokeConnectorCapability(
+        'integration.connector.connection.test',
+        { gid: ds.gid },
+        { write: true, confirmation: `确认测试连接“${ds.name}”？` },
+      );
+      const operation = _operationMessage(result.operation_ref, { subject: '连接测试' });
+      if (operation.kind === 'pending') {
+        if (resEl) resEl.innerHTML = `<div class="eds-test-result">${_esc(operation.text)}</div>`;
+        return;
+      }
+      if (operation.kind === 'failed' || result.reachable !== true) {
+        if (resEl) resEl.innerHTML = `<div class="eds-test-result err">✕ ${_esc(result.message || operation.text)}</div>`;
+        return;
+      }
+      const latency = Number.isInteger(result.latency_ms) ? ` (${result.latency_ms}ms)` : '';
+      if (resEl) resEl.innerHTML = `<div class="eds-test-result ok">✓ 连接正常${latency}</div>`;
+    } catch (error) {
+      if (resEl) resEl.innerHTML = `<div class="eds-test-result err">✕ ${_esc(error?.message || error)}</div>`;
+    }
   });
   overlay.querySelector('#dsSaveBtn2').addEventListener('click', async () => {
+    const enrollmentHandle = document.getElementById('dsCredentialEnrollmentHandle').value.trim();
     const payload = {
       name: document.getElementById('dsName').value.trim(),
-      db_type: document.getElementById('dsType').value,
+      connector_type: document.getElementById('dsType').value,
       host: document.getElementById('dsHost').value.trim(),
       port: +document.getElementById('dsPort').value,
-      database: document.getElementById('dsDb').value.trim(),
+      database_name: document.getElementById('dsDb').value.trim(),
       username: document.getElementById('dsUser').value.trim(),
-      password: document.getElementById('dsPwd').value,
+      ...(enrollmentHandle ? { credential_enrollment_handle: enrollmentHandle } : {}),
     };
-    if (!payload.name || !payload.host || !payload.database) { _showToast('请填写必填字段', 'warn'); return; }
+    if (!payload.name || !payload.host || !payload.database_name || (!isEdit && !enrollmentHandle)) {
+      _showToast('请填写必填字段和预先创建的一次性凭据注册句柄', 'warn');
+      return;
+    }
     try {
       if (isEdit) {
-        await _cf(`/api/ext-datasources/${ds.gid}`, { method: 'PATCH', body: JSON.stringify(payload) });
+        await _invokeConnectorCapability(
+          'integration.connector.update',
+          { gid: ds.gid, expected_revision: ds.revision, ...payload },
+          { write: true, confirmation: `确认更新连接“${ds.name}”？` },
+        );
       } else {
-        await _cf('/api/ext-datasources', { method: 'POST', body: JSON.stringify(payload) });
+        await _invokeConnectorCapability(
+          'integration.connector.create',
+          payload,
+          { write: true, confirmation: `确认创建连接“${payload.name}”？` },
+        );
       }
       overlay.remove();
       await _loadDatasources();
@@ -602,11 +813,19 @@ async function _showNewMapModal() {
   // 拉取外部表列表
   let tables = [];
   try {
-    const resp = await _cf(`/api/ext-datasources/${_selectedDs.gid}/tables`);
-    tables = resp.data || [];
+    const result = await _invokeConnectorCapability(
+      'integration.connector.schema.discover',
+      { gid: _selectedDs.gid, limit: 200 },
+    );
+    const operation = _operationMessage(result.operation_ref, { subject: '结构发现' });
+    if (operation.kind !== 'succeeded') {
+      _showToast(operation.text, operation.kind === 'failed' ? 'err' : 'warn');
+      return;
+    }
+    tables = result.objects || [];
   } catch (e) { _showToast('获取表列表失败：' + e, 'err'); return; }
 
-  const tableOpts = tables.map(t => `<option value="${_esc(t.full_name)}">${_esc(t.full_name)}</option>`).join('');
+  const tableOpts = tables.map(t => `<option value="${_esc(t.name)}">${_esc(t.name)} (${_esc(t.kind)})</option>`).join('');
   const classOpts = _ontoClasses.map(c =>
     `<option value="${_esc(c.gid)}">${_esc(c.label_zh)} (${_esc(c.name)})</option>`
   ).join('');
@@ -622,8 +841,6 @@ async function _showNewMapModal() {
         <select class="eds-input eds-select" id="mapClass"><option value="">— 选择本体类 —</option>${classOpts}</select></div>
       <div class="eds-field"><label>唯一键列（用于去重，通常是 ID 列）</label>
         <input class="eds-input" id="mapKey" placeholder="如：op_id、station_code"></div>
-      <div class="eds-field"><label>过滤条件（可选 SQL WHERE 子句）</label>
-        <input class="eds-input" id="mapFilter" placeholder="如：status = 'active'"></div>
       <div class="eds-modal-actions">
         <button class="eds-btn-ghost" id="mapCancelBtn">取消</button>
         <button class="eds-btn" id="mapSaveBtn">创建映射</button>
@@ -636,16 +853,24 @@ async function _showNewMapModal() {
     const extTable = document.getElementById('mapTable').value;
     const classGid = document.getElementById('mapClass').value;
     const key      = document.getElementById('mapKey').value.trim();
-    const filter   = document.getElementById('mapFilter').value.trim();
     if (!extTable || !classGid) { _showToast('请选择外部表和本体类', 'warn'); return; }
+    const selectedClass = _ontoClasses.find(item => item.gid === classGid);
+    if (!selectedClass?.integration_target_binding) {
+      _showToast('所选本体类尚未绑定可执行的稳定目标能力', 'warn');
+      return;
+    }
     try {
-      await _cf('/api/ext-mappings', { method: 'POST', body: JSON.stringify({
-        datasource_gid: _selectedDs.gid,
-        ext_table: extTable,
-        onto_class_gid: classGid,
-        unique_key_col: key || null,
-        filter_sql: filter || null,
-      })});
+      await _invokeConnectorCapability(
+        'integration.mapping.create',
+        {
+          datasource_gid: _selectedDs.gid,
+          name: `${extTable} → ${selectedClass?.label_zh || selectedClass?.name || classGid}`,
+          source_object: extTable,
+          target_binding_id: selectedClass.integration_target_binding.binding_id,
+          field_mappings: key ? [{ source_field: key, target_field: 'code' }] : [],
+        },
+        { write: true, confirmation: `确认创建“${extTable}”映射？` },
+      );
       overlay.remove();
       await _loadMappings();
       _renderMapList();

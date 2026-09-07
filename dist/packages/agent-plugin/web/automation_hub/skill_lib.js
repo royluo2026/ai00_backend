@@ -49,12 +49,29 @@
   // ── 云端 API ───────────────────────────────────────────────────────────────
   function _cf() { return window.parent?._cloudFetch || window._cloudFetch; }
 
+  async function _invokeCapability(id, payload = {}) {
+    const _cloudFetch = _cf();
+    if (!_cloudFetch) throw new Error('云端服务未连接');
+    const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ version: 1, payload }),
+    });
+    const envelope = response?.data;
+    if (response?.success !== true || envelope?.ok !== true) {
+      const detail = envelope?.error || response?.error || {};
+      throw new Error(detail.message || `能力调用失败：${id}@1`);
+    }
+    const value = envelope.data;
+    return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+  }
+
   // ── 加载数据 ──────────────────────────────────────────────────────────────
   async function loadSkills() {
     try {
-      const cf = _cf();
-      if (!cf) { _skills = []; renderGrid(); return; }
-      const list = await cf(`/api/skills?scope_filter=all`);
+      const _cloudFetch = _cf();
+      if (!_cloudFetch) { _skills = []; renderGrid(); return; }
+      const list = await _cloudFetch(`/api/skills?scope_filter=all`, { method: 'GET' });
       _skills = Array.isArray(list) ? list : [];
     } catch (e) {
       _skills = [];
@@ -117,7 +134,10 @@
         const skill = _skills.find(s => s.gid === gid);
         if (!skill) return;
         const newStatus = skill.status === 'active' ? 'archived' : 'active';
-        _cf()?.(`/api/skills/${gid}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ status: newStatus }) }).then(() => loadSkills());
+        const _cloudFetch = _cf();
+        if (_cloudFetch) {
+          _cloudFetch(`/api/skills/${gid}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ status: newStatus }) }).then(() => loadSkills());
+        }
       });
     });
   }
@@ -249,8 +269,7 @@
       // flow 类型：加载流程列表
       setTimeout(async () => {
         try {
-          const cf = _cf();
-          const data = cf ? await cf('/api/flows') : null;
+          const data = await _invokeCapability('agent.flow.read', { operation: 'list' });
           const flows = data?.flows || (Array.isArray(data) ? data : []);
           const sel = document.getElementById('slNFlowGid');
           if (!sel) return;
@@ -355,9 +374,9 @@
     }
 
     try {
-      const cf = _cf();
-      if (!cf) { alert('需要飞书登录才能保存'); return; }
-      const result = await cf('/api/skills', {
+      const _cloudFetch = _cf();
+      if (!_cloudFetch) { alert('需要飞书登录才能保存'); return; }
+      const result = await _cloudFetch('/api/skills', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -501,9 +520,9 @@
     fields.content = JSON.stringify(content);
 
     try {
-      const cf = _cf();
-      if (!cf) { alert('需要飞书登录才能保存'); return; }
-      const result = await cf(`/api/skills/${s.gid}`, {
+      const _cloudFetch = _cf();
+      if (!_cloudFetch) { alert('需要飞书登录才能保存'); return; }
+      const result = await _cloudFetch(`/api/skills/${s.gid}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(fields),
@@ -518,8 +537,8 @@
     if (!_editSkill) return;
     if (!confirm(`确认删除 Skill「${_editSkill.title}」？此操作不可恢复。`)) return;
     try {
-      const cf = _cf();
-      if (cf) await cf(`/api/skills/${_editSkill.gid}`, { method: 'DELETE' });
+      const _cloudFetch = _cf();
+      if (_cloudFetch) await _cloudFetch(`/api/skills/${_editSkill.gid}`, { method: 'DELETE' });
       closeEditModal();
       await loadSkills();
     } catch (e) { alert('删除失败: ' + e.message); }
@@ -529,8 +548,8 @@
     if (!_editSkill) return;
     const newStatus = _editSkill.status === 'active' ? 'archived' : 'active';
     try {
-      const cf = _cf();
-      if (cf) await cf(`/api/skills/${_editSkill.gid}`, {
+      const _cloudFetch = _cf();
+      if (_cloudFetch) await _cloudFetch(`/api/skills/${_editSkill.gid}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),

@@ -15,11 +15,108 @@ const _collapsed = new Set(); // 已折叠的 gid
 let _schemaDiff  = null;   // schema-diff 缓存 {prop_gid → sync_status}
 
 // ── 工具 ──────────────────────────────────────────────────────────────────────
-const _cf = (path, opts) => {
+const _cf = (method, path, opts = {}) => {
   const fn = window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
   if (!fn) throw new TypeError('_cloudFetch 未就绪');
-  return fn(path, opts);
+  return fn(path, { ...opts, method });
 };
+const _ONTOLOGY_SCHEMA_VERSION_KEY = 'ai00:ontology-schema-version';
+const _ONTOLOGY_IDENTIFIER_RE = /^[A-Za-z_][A-Za-z0-9_]*$/;
+const _ONTOLOGY_IDENTIFIER_HINT = '只能使用英文字母、数字和下划线，且不能以数字开头，例如 critical_process';
+const _isValidOntologyIdentifier = value => _ONTOLOGY_IDENTIFIER_RE.test(String(value ?? ''));
+
+async function _invokeCapability(id, payload = {}) {
+  const requestBody = {
+    version: 1,
+    payload,
+    idempotency_key: `${id}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+  };
+  const request = (suffix, body) => _cf('POST', `/api/v1/capabilities/${id}:${suffix}`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  let response = await request('invoke', requestBody);
+  if (response?.data?.error?.code === 'confirmation_required') {
+    if (!window.confirm('确认提交这次本体结构变更？')) throw new Error('已取消变更');
+    const confirmation = await request('confirm', requestBody);
+    const token = confirmation?.data?.confirmation_token;
+    if (!token) throw new Error(`能力确认失败：${id}@1`);
+    response = await request('invoke', { ...requestBody, confirmation_token: token });
+  }
+  const envelope = response?.data;
+  if (response?.success !== true || envelope?.ok !== true) {
+    const detail = envelope?.error || response?.error || {};
+    throw new Error(detail.message || `能力调用失败：${id}@1`);
+  }
+  const value = envelope.data;
+  return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+}
+
+let _activeReleaseGid = null;
+async function _submitOntologyChange(change) {
+  if (!_activeReleaseGid) {
+    const release = await _invokeCapability('ontology.release.get');
+    _activeReleaseGid = release?.release_gid || release?.gid || null;
+  }
+  if (!_activeReleaseGid) throw new Error('未找到当前 Ontology release');
+  const [kind, action] = String(change.change_type || '').split('.', 2);
+  const value = { ...(change.after || {}) };
+  let operation = `${kind}.${action === 'create' ? 'add' : action === 'update' ? 'change' : 'deprecate'}`;
+  let stableGid = change.stable_gid || value.stable_gid || value.gid;
+  if (!stableGid && value.name) {
+    const ownerGid = value.class_gid || value.domain_class_gid;
+    stableGid = `${kind}.${ownerGid ? `${ownerGid}.` : ''}${value.name}`;
+  }
+  if (!stableGid && value.axiom_type) {
+    stableGid = `${kind}.${value.class_gid}.${value.axiom_type}.${value.target_gid}`;
+  }
+  if (operation === 'concept.change' && Object.prototype.hasOwnProperty.call(value, 'parent_gid')) {
+    operation = 'parent.change';
+    value.parent_stable_gid = value.parent_gid || null;
+    delete value.parent_gid;
+  }
+  if (!stableGid) throw new Error('Ontology 变更缺少 stable_gid');
+  const result = await _invokeCapability('ontology.schema.change.apply', {
+    base_release_gid: _activeReleaseGid,
+    changes: [{ operation, stable_gid: stableGid, value, source_evidence: [] }],
+  });
+  localStorage.setItem(_ONTOLOGY_SCHEMA_VERSION_KEY, `${Date.now()}:${stableGid}`);
+  return result;
+}
+
+async function _listOntologyObjects(kinds) {
+  const items = [];
+  let offset = 0;
+  let total = 0;
+  do {
+    const page = await _invokeCapability('ontology.object.list', { kinds, limit: 100, offset });
+    const rows = page?.items || [];
+    items.push(...rows);
+    total = Number(page?.total || items.length);
+    offset += rows.length;
+    if (!rows.length) break;
+  } while (offset < total);
+  return items.map(item => ({ ...item, gid: item.gid || item.stable_gid }));
+}
+
+async function _getOntologyConcept(stableGid) {
+  const value = await _invokeCapability('ontology.concept.get', {
+    stable_gid: stableGid, kind: 'concept', view: 'schema',
+  });
+  const concept = value?.concept || value || {};
+  const normalize = (item) => ({
+    ...item,
+    gid: item.gid || item.stable_gid,
+    parent_gid: item.parent_gid || item.parent_stable_gid,
+    class_gid: item.class_gid || item.class_stable_gid,
+    range_class_gid: item.range_class_gid || item.range_stable_gid,
+  });
+  const result = normalize(concept);
+  for (const key of ['properties', 'relations', 'constraints', 'axioms', 'rules']) {
+    if (Array.isArray(result[key])) result[key] = result[key].map(normalize);
+  }
+  return result;
+}
 
 const _he = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
@@ -226,8 +323,7 @@ async function _init() {
 
 async function _loadAndRender() {
   try {
-    const resp = await _cf('/api/ontology/classes');
-    _allClasses = _flattenTree(resp.data || []);
+    _allClasses = await _listOntologyObjects(['concept']);
   } catch (e) {
     _allClasses = [];
     if (String(e).includes('onto_classes') || (e && e.status === 404)) {
@@ -241,8 +337,8 @@ async function _loadAndRender() {
 async function _refreshGraph() {
   if (!_graph) return;
   try {
-    const resp = await _cf('/api/ontology/graph');
-    _graph.setData(resp.classes || [], resp.relations || []);
+    const items = await _listOntologyObjects(['concept', 'relation']);
+    _graph.setData(items.filter(item => item.kind === 'concept'), items.filter(item => item.kind === 'relation'));
     if (_selectedGid) _graph.setSelected(_selectedGid);
   } catch { /* graph unavailable, silent */ }
 }
@@ -347,9 +443,9 @@ function _bindInlineToggles(pane) {
       const api   = cb.dataset.api; // 'properties' | 'relations'
       const val   = cb.checked;
       try {
-        await _cf(`/api/ontology/${api}/${gid}`, {
-          method: 'PATCH',
-          body: JSON.stringify({ [field]: val }),
+        await _submitOntologyChange({
+          change_type: api === 'properties' ? 'property.update' : 'relation.update',
+          stable_gid: gid, after: { [field]: val },
         });
         _fullData = null;
       } catch (e) {
@@ -363,7 +459,7 @@ function _bindInlineToggles(pane) {
 }
 
 // ── 表格行拖拽排序（属性/关系共用）────────────────────────────────────────────
-function _bindTableRowDrag(tbody, patchUrl, onDone) {
+function _bindTableRowDrag(tbody, patchFn, onDone) {
   let dragGid = null;
 
   const rows = () => Array.from(tbody.querySelectorAll('tr[data-gid]'));
@@ -413,11 +509,7 @@ function _bindTableRowDrag(tbody, patchUrl, onDone) {
     newOrder.splice(toIdx, 0, dragGid);
 
     await Promise.all(newOrder.map((gid, i) =>
-      _cf(patchUrl(gid), {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sort_order: (i + 1) * 10 }),
-      }).catch(() => null)
+      patchFn(gid, { sort_order: (i + 1) * 10 }).catch(() => null)
     ));
     if (onDone) onDone();
   });
@@ -491,10 +583,9 @@ function _bindTreeDrag(container) {
       const cls = _allClasses.find(c => c.gid === gid);
       if (cls && cls.sort_order !== newSort) {
         cls.sort_order = newSort;
-        patches.push(_cf(`/api/ontology/classes/${gid}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sort_order: newSort }),
+        patches.push(_submitOntologyChange({
+          change_type: 'concept.update', stable_gid: gid,
+          after: { sort_order: newSort },
         }).catch(() => null));
       }
     });
@@ -579,8 +670,7 @@ async function _loadTabCounts() {
   if (!_selectedGid) return;
   try {
     if (!_fullData) {
-      const resp = await _cf(`/api/ontology/classes/${_selectedGid}/full`);
-      _fullData = resp.data;
+      _fullData = await _getOntologyConcept(_selectedGid);
     }
     const counts = {
       data_props:  (_fullData.properties  || []).filter(p => p.prop_kind === 'data' && p.class_gid === _selectedGid).length,
@@ -611,18 +701,11 @@ async function _renderActiveTab() {
   if (!_selectedGid) return;
   if (!_fullData) {
     try {
-      const resp = await _cf(`/api/ontology/classes/${_selectedGid}/full`);
-      _fullData = resp.data;
+      _fullData = await _getOntologyConcept(_selectedGid);
     } catch { _showToast('加载详情失败', 'error'); return; }
   }
-  // 懒加载 schema-diff（第一次打开属性 tab 时缓存）
-  if (_activeTab === 'data_props' && !_schemaDiff) {
-    try {
-      const dr = await _cf('/api/ontology/schema-diff');
-      _schemaDiff = {};
-      (dr.data || []).forEach(r => { _schemaDiff[r.gid] = r.sync_status; });
-    } catch { _schemaDiff = {}; }
-  }
+  // schema-diff REST 已废弃；稳定能力暂不提供跨表同步状态。
+  if (_activeTab === 'data_props' && !_schemaDiff) _schemaDiff = {};
   const pane = document.getElementById(`ontoTab-${_activeTab}`);
   if (!pane) return;
   ({ annotation: _renderAnnotation, data_props: _renderDataProps,
@@ -707,7 +790,7 @@ async function _saveAnnotation() {
     is_abstract:       document.getElementById('annAbstract').checked,
   };
   try {
-    await _cf(`/api/ontology/classes/${_selectedGid}`, { method: 'PATCH', body: JSON.stringify(payload) });
+    await _submitOntologyChange({ change_type: 'concept.update', stable_gid: _selectedGid, after: payload });
     const idx = _allClasses.findIndex(c => c.gid === _selectedGid);
     if (idx >= 0) Object.assign(_allClasses[idx], payload);
     _fullData = { ..._fullData, ...payload };
@@ -785,15 +868,8 @@ function _renderDataProps(pane) {
           </div>`).join('')}
       </div>` : ''}`;
   document.getElementById('addPropBtn').addEventListener('click', _showAddPropModal);
-  document.getElementById('syncFromTableBtn')?.addEventListener('click', async () => {
-    if (!await _confirm(`从「${cls.entity_table}」同步未导入的列？\n（已存在属性和基础设施列会自动跳过）`)) return;
-    try {
-      const r = await _cf(`/api/ontology/classes/${_selectedGid}/sync-from-table`, { method: 'POST' });
-      _fullData = null; _schemaDiff = null; await _renderActiveTab(); _loadTabCounts();
-      const relMsg = r.added_relations?.length ? `，新增 ${r.added_relations.length} 个关系` : '';
-      _showToast(`同步完成：新增 ${r.total_added} 个属性${relMsg}，跳过 ${r.skipped_exists.length} 个已存在，跳过 ${r.skipped_infra.length} 个基础设施列`, 'success');
-    } catch (e) { _showToast('同步失败：' + e, 'error'); }
-  });
+  document.getElementById('syncFromTableBtn')?.addEventListener('click', () =>
+    _showToast('从实体表同步已废弃，请通过 Ontology 版本提案管理结构变更', 'warn'));
   pane.querySelectorAll('.edit-prop-btn').forEach(btn => {
     const propGid = btn.dataset.gid;
     const prop = own.find(p => p.gid === propGid);
@@ -806,7 +882,7 @@ function _renderDataProps(pane) {
   const propTbody = pane.querySelector('.onto-table tbody');
   if (propTbody) {
     _bindTableRowDrag(propTbody,
-      gid => `/api/ontology/properties/${gid}`,
+      (gid, after) => _submitOntologyChange({ change_type: 'property.update', stable_gid: gid, after }),
       () => { _fullData = null; _renderActiveTab(); }
     );
   }
@@ -839,6 +915,7 @@ function _showAddPropModal() {
       <div class="onto-form-row"><label>最大值</label><input class="onto-input" id="nPropMax" type="number" placeholder="可选"></div>
       <div class="onto-form-row"><label>描述</label><input class="onto-input" id="nPropDesc" placeholder="可选"></div>
       <div class="onto-form-row"><label>DB列名</label><input class="onto-input" id="nPropMappedCol" placeholder="留空则与属性名相同"></div>
+      <div id="nPropIdentifierError" style="min-height:16px;margin:-5px 0 7px;color:var(--onto-red,#f38ba8);font-size:10px"></div>
       <div class="onto-form-row"><label>存储方式</label>
         <select class="onto-input" id="nPropStorageHint">
           <option value="">自动（根据实体表）</option>
@@ -900,6 +977,26 @@ function _showAddPropModal() {
       </div>
     </div>`;
   document.body.appendChild(overlay);
+  const propNameInput = overlay.querySelector('#nPropName');
+  const mappedColumnInput = overlay.querySelector('#nPropMappedCol');
+  const savePropButton = overlay.querySelector('#savePropBtn');
+  const identifierError = overlay.querySelector('#nPropIdentifierError');
+  const refreshIdentifierValidation = () => {
+    const name = propNameInput.value.trim();
+    const mappedColumn = mappedColumnInput.value.trim();
+    let message = '';
+    let invalidInput = null;
+    if (!name) { message = '属性名不能为空'; invalidInput = propNameInput; }
+    else if (!_isValidOntologyIdentifier(name)) { message = '属性名' + _ONTOLOGY_IDENTIFIER_HINT; invalidInput = propNameInput; }
+    else if (mappedColumn && !_isValidOntologyIdentifier(mappedColumn)) { message = 'DB列名' + _ONTOLOGY_IDENTIFIER_HINT; invalidInput = mappedColumnInput; }
+    identifierError.textContent = message;
+    propNameInput.style.borderColor = invalidInput === propNameInput ? 'var(--onto-red,#f38ba8)' : '';
+    mappedColumnInput.style.borderColor = invalidInput === mappedColumnInput ? 'var(--onto-red,#f38ba8)' : '';
+    savePropButton.disabled = Boolean(message);
+  };
+  propNameInput.addEventListener('input', refreshIdentifierValidation);
+  mappedColumnInput.addEventListener('input', refreshIdentifierValidation);
+  refreshIdentifierValidation();
   overlay.querySelector('#nPropType').addEventListener('change', e => {
     overlay.querySelector('#nEnumValuesRow').style.display = e.target.value === 'enum' ? 'block' : 'none';
   });
@@ -915,6 +1012,9 @@ function _showAddPropModal() {
   overlay.querySelector('#savePropBtn').addEventListener('click', async () => {
     const name = overlay.querySelector('#nPropName').value.trim();
     if (!name) { _showToast('属性名不能为空', 'warn'); return; }
+    if (!_isValidOntologyIdentifier(name)) { _showToast('属性名' + _ONTOLOGY_IDENTIFIER_HINT, 'warn'); return; }
+    const mappedColumn = overlay.querySelector('#nPropMappedCol').value.trim();
+    if (mappedColumn && !_isValidOntologyIdentifier(mappedColumn)) { _showToast('DB列名' + _ONTOLOGY_IDENTIFIER_HINT, 'warn'); return; }
     const minV = overlay.querySelector('#nPropMin').value;
     const maxV = overlay.querySelector('#nPropMax').value;
     const storageHint = overlay.querySelector('#nPropStorageHint').value || null;
@@ -935,19 +1035,19 @@ function _showAddPropModal() {
     const enumValsRaw = overlay.querySelector('#nPropEnumValues')?.value.trim() || '';
     const enumVals = enumValsRaw ? enumValsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
     try {
-      await _cf('/api/ontology/properties', { method: 'POST', body: JSON.stringify({
+      await _submitOntologyChange({ change_type: 'property.create', after: {
         class_gid: _selectedGid, name, label_zh: overlay.querySelector('#nPropLabel').value.trim(),
         prop_kind: 'data', data_type: overlay.querySelector('#nPropType').value,
         enum_values: enumVals,
         required: overlay.querySelector('#nPropReq').checked,
         min_val: minV ? parseFloat(minV) : null, max_val: maxV ? parseFloat(maxV) : null,
         description: overlay.querySelector('#nPropDesc').value.trim(),
-        mapped_column: overlay.querySelector('#nPropMappedCol').value.trim() || null,
+        mapped_column: mappedColumn || null,
         storage_hint: storageHint || null,
         field_config: fieldConfig,
         show_in_detail: overlay.querySelector('#nPropShowDetail').checked,
         detail_order:   parseInt(overlay.querySelector('#nPropDetailOrder').value) || 99,
-      })});
+      }});
       overlay.remove(); _fullData = null; await _renderActiveTab(); _showToast('属性已添加', 'success');
     } catch (e) { _showToast('添加失败：' + e, 'error'); }
   });
@@ -1072,13 +1172,14 @@ function _showEditPropModal(prop) {
   // 升级为实列按钮（仅 ext 状态可见）
   overlay.querySelector('#promoteColBtn')?.addEventListener('click', async () => {
     if (!await _confirm(`确认将「${prop.name}」从 ext JSONB 升级为独立 DB 列？此操作会执行 ALTER TABLE。`)) return;
-    try {
-      await _cf(`/api/ontology/properties/${prop.gid}/promote`, { method: 'POST' });
-      overlay.remove(); _fullData = null; _schemaDiff = null; await _renderActiveTab();
-      _showToast('已升级为实列', 'success');
-    } catch (e) { _showToast('升级失败：' + e, 'error'); }
+    _showToast('升级实体列需要独立迁移能力，当前仅允许通过受控迁移执行', 'warn');
   });
   overlay.querySelector('#saveEditPropBtn').addEventListener('click', async () => {
+    const mappedColumn = overlay.querySelector('#ePropMappedCol').value.trim();
+    if (mappedColumn && !_isValidOntologyIdentifier(mappedColumn)) {
+      _showToast('DB列名' + _ONTOLOGY_IDENTIFIER_HINT, 'warn');
+      return;
+    }
     const minV = overlay.querySelector('#ePropMin').value;
     const maxV = overlay.querySelector('#ePropMax').value;
     const eStorageHint = overlay.querySelector('#ePropStorageHint').value;
@@ -1099,7 +1200,7 @@ function _showEditPropModal(prop) {
     const enumValsRaw = overlay.querySelector('#ePropEnumValues')?.value.trim() || '';
     const enumVals = enumValsRaw ? enumValsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
     try {
-      await _cf(`/api/ontology/properties/${prop.gid}`, { method: 'PATCH', body: JSON.stringify({
+      await _submitOntologyChange({ change_type: 'property.update', stable_gid: prop.gid, after: {
         label_zh:      overlay.querySelector('#ePropLabel').value.trim(),
         data_type:     overlay.querySelector('#ePropType').value,
         enum_values:   enumVals,
@@ -1107,12 +1208,12 @@ function _showEditPropModal(prop) {
         min_val:       minV ? parseFloat(minV) : null,
         max_val:       maxV ? parseFloat(maxV) : null,
         description:   overlay.querySelector('#ePropDesc').value.trim(),
-        mapped_column: overlay.querySelector('#ePropMappedCol').value.trim() || null,
+        mapped_column: mappedColumn || null,
         storage_hint:  eStorageHint,
         field_config:  eFieldConfig,
         show_in_detail: overlay.querySelector('#ePropShowDetail').checked,
         detail_order:   parseInt(overlay.querySelector('#ePropDetailOrder').value) || 99,
-      })});
+      }});
       overlay.remove(); _fullData = null; await _renderActiveTab(); _showToast('属性已更新', 'success');
     } catch (e) { _showToast('保存失败：' + e, 'error'); }
   });
@@ -1121,7 +1222,7 @@ function _showEditPropModal(prop) {
 async function _deleteProperty(propGid) {
   if (!await _confirm('确认删除此属性？')) return;
   try {
-    await _cf(`/api/ontology/properties/${propGid}`, { method: 'DELETE' });
+    await _submitOntologyChange({ change_type: 'property.archive', stable_gid: propGid });
     _fullData = null; await _renderActiveTab(); _showToast('已删除', 'success');
   } catch (e) { _showToast('删除失败：' + e, 'error'); }
 }
@@ -1161,7 +1262,7 @@ function _renderObjProps(pane) {
   pane.querySelectorAll('.del-rel-btn').forEach(btn => btn.addEventListener('click', async () => {
     if (!await _confirm('确认删除此关系？')) return;
     try {
-      await _cf(`/api/ontology/relations/${btn.dataset.gid}`, { method: 'DELETE' });
+      await _submitOntologyChange({ change_type: 'relation.archive', stable_gid: btn.dataset.gid });
       _fullData = null; await _renderActiveTab(); _showToast('已删除', 'success');
     } catch (e) { _showToast('删除失败：' + e, 'error'); }
   }));
@@ -1170,7 +1271,7 @@ function _renderObjProps(pane) {
   const relTbody = pane.querySelector('.onto-table tbody');
   if (relTbody) {
     _bindTableRowDrag(relTbody,
-      gid => `/api/ontology/relations/${gid}`,
+      (gid, after) => _submitOntologyChange({ change_type: 'relation.update', stable_gid: gid, after }),
       () => { _fullData = null; _renderActiveTab(); }
     );
   }
@@ -1256,18 +1357,17 @@ function _showAddRelModal(editRel = null) {
     const name = overlay.querySelector('#nRelName').value.trim();
     if (!name) { _showToast('请选择关系类型', 'warn'); return; }
     try {
-      // 编辑模式：先删除原有再新建
-      if (editRel) {
-        await _cf(`/api/ontology/relations/${editRel.gid}`, { method: 'DELETE' });
-      }
-      await _cf('/api/ontology/relations', { method: 'POST', body: JSON.stringify({
+      const change = {
         name, label_zh: overlay.querySelector('#nRelLabel').value.trim(),
         domain_class_gid: _selectedGid,
         range_class_gid: overlay.querySelector('#nRelRange').value || null,
         is_functional: overlay.querySelector('#nRelFunc').checked,
         show_in_detail: overlay.querySelector('#nRelShowDetail').checked,
         link_type_binding: name,  // name 即 link_type，用于详情面板匹配
-      })});
+      };
+      await _submitOntologyChange(editRel
+        ? { change_type: 'relation.update', stable_gid: editRel.gid, after: change }
+        : { change_type: 'relation.create', after: change });
       overlay.remove(); _fullData = null; await _renderActiveTab();
       _showToast(editRel ? '已更新' : '已添加', 'success');
       _refreshGraph();
@@ -1283,30 +1383,7 @@ async function _renderIndividuals(pane) {
     pane.innerHTML = '<p class="onto-empty-hint">该类未绑定实体表或 node_type，无法查询实例</p>';
     return;
   }
-  pane.innerHTML = '<p class="onto-empty-hint">加载中…</p>';
-  try {
-    const resp = await _cf(`/api/ontology/classes/${_selectedGid}/individuals?limit=20`);
-    const rows   = resp.data || [];
-    const source = resp.source;
-    const hint   = source === 'entity_table'
-      ? `来自 <code>${_he(resp.entity_table)}</code>`
-      : `来自 bop_entries（node_type = <code>${_he(resp.node_type_binding)}</code>）`;
-
-    if (!rows.length) {
-      pane.innerHTML = `<p class="onto-empty-hint">暂无实例数据（${hint.replace(/<[^>]+>/g,'')}）</p>`;
-      return;
-    }
-
-    const cols = Object.keys(rows[0]);
-    pane.innerHTML = `
-      <div class="onto-individuals-hint">最近 ${rows.length} 条 · ${hint}</div>
-      <table class="onto-table">
-        <thead><tr>${cols.map(c => `<th>${_he(c)}</th>`).join('')}</tr></thead>
-        <tbody>${rows.map(r => `
-          <tr>${cols.map(c => `<td>${_he(r[c] ?? '-')}</td>`).join('')}</tr>`).join('')}
-        </tbody>
-      </table>`;
-  } catch (e) { pane.innerHTML = '<p class="onto-empty-hint">加载实例失败</p>'; }
+  pane.innerHTML = '<p class="onto-empty-hint">实例查询已暂时关闭：旧跨域 individuals 接口已废弃。</p>';
 }
 
 // ── Tab 5：规则 ───────────────────────────────────────────────────────────────
@@ -1387,13 +1464,13 @@ function _showEditRuleModal(rule) {
     if (!name) { _showToast('规则名不能为空', 'warn'); return; }
     try {
       if (isNew) {
-        await _cf('/api/rules', { method: 'POST', body: JSON.stringify({
+        await _cf('POST', '/api/rules', { method: 'POST', body: JSON.stringify({
           name, enforcement_level: level, status, expression,
           context_class_gid: _selectedGid,
         })});
         _showToast('规则已创建', 'success');
       } else {
-        await _cf(`/api/rules/${rule.gid}`, { method: 'PATCH', body: JSON.stringify({
+        await _cf('PATCH', `/api/rules/${rule.gid}`, { method: 'PATCH', body: JSON.stringify({
           name, enforcement_level: level, status, expression,
         })});
         _showToast('规则已更新', 'success');
@@ -1409,7 +1486,7 @@ async function _runRuleCheck(ruleGid, ruleName) {
   let context;
   try { context = JSON.parse(ctx); } catch { _showToast('JSON 格式错误', 'error'); return; }
   try {
-    const resp = await _cf('/api/rule-engine/check', { method: 'POST', body: JSON.stringify({ rule_gid: ruleGid, context }) });
+    const resp = await _cf('POST', '/api/rule-engine/check', { method: 'POST', body: JSON.stringify({ rule_gid: ruleGid, context }) });
     const r = resp.result;
     _showToast(`结果：${r.toUpperCase()}${resp.message ? ' — ' + resp.message : ''}`,
       r === 'pass' ? 'success' : r === 'fail' ? 'error' : 'warn');
@@ -1423,9 +1500,9 @@ async function _createChildClass(parent) {
   const name = await _prompt('标识符（英文/下划线）：', labelZh.toLowerCase().replace(/\s+/g,'_').replace(/[^\w]/g,''));
   if (!name) return;
   try {
-    await _cf('/api/ontology/classes', { method: 'POST', body: JSON.stringify({
+    await _submitOntologyChange({ change_type: 'concept.create', after: {
       name, label_zh: labelZh, parent_gid: parent?.gid || null, sort_order: 0,
-    })});
+    }});
     await _loadAndRender();
     _showToast('类已创建', 'success');
   } catch (e) { _showToast('创建失败：' + e, 'error'); }
@@ -1438,8 +1515,8 @@ async function _reparentClass(cls) {
   if (choice === null) return;
   const target = _allClasses.find(c => c.label_zh === choice.trim() || c.name === choice.trim());
   try {
-    await _cf(`/api/ontology/classes/${cls.gid}`, { method: 'PATCH',
-      body: JSON.stringify({ parent_gid: target?.gid || null }) });
+    await _submitOntologyChange({ change_type: 'concept.update', stable_gid: cls.gid,
+      after: { parent_gid: target?.gid || null } });
     await _loadAndRender();
     _showToast('父类已变更', 'success');
   } catch (e) { _showToast('变更失败：' + e, 'error'); }
@@ -1448,7 +1525,7 @@ async function _reparentClass(cls) {
 async function _deleteClass(cls) {
   if (!await _confirm(`确认删除「${cls.label_zh||cls.name}」？\n（需先删除所有子类和关联规则）`)) return;
   try {
-    await _cf(`/api/ontology/classes/${cls.gid}`, { method: 'DELETE' });
+    await _submitOntologyChange({ change_type: 'concept.archive', stable_gid: cls.gid });
     if (_selectedGid === cls.gid) {
       _selectedGid = null; _fullData = null;
       document.getElementById('ontoDetailEmpty').style.display = '';
@@ -1462,11 +1539,7 @@ async function _deleteClass(cls) {
 // ── Seed ──────────────────────────────────────────────────────────────────────
 async function _runSeed() {
   if (!await _confirm('将从 BOP node_types 预填初始类（幂等）。确认？')) return;
-  try {
-    const resp = await _cf('/api/ontology/seed', { method: 'POST' });
-    await _loadAndRender();
-    _showToast(resp.message || 'Seed 完成', 'success');
-  } catch (e) { _showToast('Seed 失败：' + e, 'error'); }
+  _showToast('Seed 已废弃，请创建并审批 Ontology 变更提案', 'warn');
 }
 
 document.addEventListener('DOMContentLoaded', _init);
@@ -1479,11 +1552,7 @@ async function _renderCardinalityAxioms(pane, classGid) {
     sec.style.marginTop = '16px';
     pane.appendChild(sec);
   }
-  let axioms = [];
-  try {
-    const res = await _cf(`/api/ontology/classes/${classGid}/axioms`);
-    axioms = res.data || [];
-  } catch (_) {}
+  const axioms = _fullData?.constraints || _fullData?.axioms || [];
 
   const childCls = _allClasses.filter(c => c.parent_gid === classGid && c.node_type_binding);
   sec.innerHTML = `
@@ -1510,7 +1579,7 @@ async function _renderCardinalityAxioms(pane, classGid) {
     btn.addEventListener('click', async () => {
       if (!await _confirm('确认删除此基数约束？')) return;
       try {
-        await _cf(`/api/ontology/axioms/${btn.dataset.gid}`, { method: 'DELETE' });
+        await _submitOntologyChange({ change_type: 'constraint.archive', stable_gid: btn.dataset.gid });
         _fullData = null; await _renderActiveTab(); _showToast('已删除', 'success');
       } catch(e) { _showToast('删除失败：' + e, 'error'); }
     }));
@@ -1553,10 +1622,10 @@ function _showAddAxiomModal(classGid, childClasses) {
     const expression = overlay.querySelector('#axExpr').value.trim();
     if (!targetGid || !expression) { _showToast('请填写完整', 'warn'); return; }
     try {
-      await _cf('/api/ontology/axioms', { method: 'POST', body: JSON.stringify({
+      await _submitOntologyChange({ change_type: 'constraint.create', after: {
         class_gid: classGid, axiom_type: axiomType,
         target_gid: targetGid, expression,
-      })});
+      }});
       overlay.remove(); _fullData = null; await _renderActiveTab(); _showToast('约束已添加', 'success');
     } catch(e) { _showToast('添加失败：' + e, 'error'); }
   });
@@ -1567,10 +1636,7 @@ let _dbTablesCache = null;
 
 async function _getDbTables() {
   if (_dbTablesCache) return _dbTablesCache;
-  try {
-    const r = await _cf('/api/ontology/db-tables');
-    _dbTablesCache = r.data || [];
-  } catch { _dbTablesCache = []; }
+  _dbTablesCache = [];
   return _dbTablesCache;
 }
 
@@ -1606,11 +1672,10 @@ async function _showBindTableModal() {
   overlay.querySelector('#bindTableCancel').addEventListener('click', () => overlay.remove());
 
   // 并行加载：类列表 + DB 表列表
-  const [classResp, tables] = await Promise.all([
-    _cf('/api/ontology/unbound-classes').catch(() => ({ data: [] })),
+  const [classes, tables] = await Promise.all([
+    Promise.resolve(_allClasses.filter(c => !c.entity_table && c.node_type_binding)),
     _getDbTables(),
   ]);
-  const classes = classResp.data || [];
   const tableOpts = tables.map(t => `<option value="${_he(t)}">${_he(t)}</option>`).join('');
 
   const body = overlay.querySelector('#bindTableBody');
@@ -1663,11 +1728,8 @@ async function _showBindTableModal() {
       const newVal = sel.value;
       if (newVal !== orig) {
         patches.push(
-          _cf(`/api/ontology/classes/${gid}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ entity_table: newVal || null }),
-          }).catch(() => null)
+          _submitOntologyChange({ change_type: 'concept.update', stable_gid: gid,
+            after: { entity_table: newVal || null } }).catch(() => null)
         );
         // 同步更新 _allClasses 本地缓存
         const cls = _allClasses.find(c => c.gid === gid);
@@ -1688,8 +1750,7 @@ async function _loadNodeTypeSuggestionsInto(selectId, currentVal) {
   const sel = document.getElementById(selectId);
   if (!sel) return;
   try {
-    const r = await _cf('/api/ontology/node-type-suggestions');
-    const vals = r.data || [];
+    const vals = _allClasses.map(c => c.node_type_binding).filter(Boolean);
     const isCustom = currentVal && !vals.includes(currentVal);
     if (isCustom) vals.push(currentVal);
     sel.innerHTML =

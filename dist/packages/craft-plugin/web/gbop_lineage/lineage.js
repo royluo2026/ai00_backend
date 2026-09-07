@@ -37,13 +37,29 @@ const _OP_STATS_PRIORITY = ['part'];
 // ── 状态 ─────────────────────────────────────────────────────────────
 const _params   = Object.fromEntries(new URLSearchParams(location.search));
 // 向上遍历 frame 链找到 _cloudFetch（可能嵌套多层 iframe：main→knowledgeHub→lineage）
-function _cf(path, opts) {
+function _cf(method, path, opts = {}) {
   let w = window;
   for (let i = 0; i < 5; i++) {
-    if (w._cloudFetch) return w._cloudFetch(path, opts);
+    if (w._cloudFetch) return w._cloudFetch(path, { ...opts, method });
     if (w.parent && w.parent !== w) w = w.parent; else break;
   }
   throw new Error('cloudFetch not available');
+}
+
+async function _invokeCapability(id, payload) {
+  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version: 1, payload }),
+  });
+  const result = response?.data;
+  if (response?.success !== true || result?.ok !== true) {
+    const detail = result?.error || response?.error || {};
+    const error = new Error(detail.message || `能力调用失败：${id}@1`);
+    error.code = detail.code || 'capability_invocation_failed';
+    throw error;
+  }
+  return result.data;
 }
 // localStorage 账号隔离
 const _USER_GID = (() => {
@@ -228,8 +244,11 @@ async function _load() {
   try {
     _loadedVersionGids = new Set([_versionGid]);
     _versionTagMap.set(_versionGid, _versionTag);
-    const json = await _cf(`/api/gbop/versions/${_versionGid}/entries`);
-    _rows = _flattenMeta(json.data || []);
+    const json = await _invokeCapability('craft.gbop.catalog.read', {
+      operation: 'entries.list',
+      version_gid: _versionGid,
+    });
+    _rows = _flattenMeta(json?.items || json?.data || []);
     _buildIndexes(_rows);
     _buildStats();
     _initCollapsed();   // 初始化 _selectedRoots（默认只选第一个树深度=0 根节点）
@@ -249,8 +268,10 @@ async function _load() {
 async function _loadVersionSelect() {
   if (!$versionSel) return;
   try {
-    const json = await _cf('/api/gbop/versions');
-    const versions = json.data || [];
+    const json = await _invokeCapability('craft.gbop.release.search', {
+      include_archived: false,
+    });
+    const versions = json?.items || [];
     $versionSel.innerHTML = '<option value="">选择版本…</option>';
     for (const v of versions) {
       const opt = document.createElement('option');
@@ -381,8 +402,10 @@ async function _toggleRootPicker(anchorBtn) {
   picker._closeHandler = closeOutside;
 
   try {
-    const json = await _cf('/api/gbop/versions');
-    const available = (json.data || []).filter(v => !_loadedVersionGids.has(v.gid));
+    const json = await _invokeCapability('craft.gbop.release.search', {
+      include_archived: false,
+    });
+    const available = (json?.items || []).filter(v => !_loadedVersionGids.has(v.gid));
 
     picker.innerHTML = '';
     if (available.length === 0) {
@@ -416,8 +439,11 @@ function _closeRootPicker() {
 /** 加载指定版本的条目并合并到当前视图 */
 async function _addVersionRoots(versionGid, versionTag) {
   try {
-    const json = await _cf(`/api/gbop/versions/${versionGid}/entries`);
-    const newRows = _flattenMeta(json.data || []);
+    const json = await _invokeCapability('craft.gbop.catalog.read', {
+      operation: 'entries.list',
+      version_gid: versionGid,
+    });
+    const newRows = _flattenMeta(json?.items || json?.data || []);
     if (newRows.length === 0) { _toast('该版本暂无条目', 'warn'); return; }
 
     // 合并去重（按 gid）
@@ -1039,8 +1065,10 @@ function _ensureDnt() {
     },
     onCompareRequest: async () => {
       try {
-        const res = await _cf(`/api/gbop/versions/${_versionGid}/linked-parts`);
-        _dnt.setCompareData(res.data || [], {
+        const res = await _invokeCapability('craft.bop.linked_parts.get', {
+          version_gid: _versionGid,
+        });
+        _dnt.setCompareData(res?.legacy_items || res?.items || [], {
           primaryLabel:   'PBOM',
           secondaryLabel: 'BOP已挂载',
         });
@@ -1288,10 +1316,10 @@ function _clearDropClasses() {
 }
 
 async function _patchEntry(gid, body) {
-  await _cf(`/api/gbop/entries/${gid}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+  await _invokeCapability('craft.gbop.entity.change.apply', {
+    operation: 'entry.update',
+    gid,
+    updates: body,
   });
 }
 
@@ -1399,11 +1427,12 @@ async function _uploadBopPic(file) {
       const mime    = dataUrl.slice(5, dataUrl.indexOf(';'));
       const b64     = dataUrl.slice(comma + 1);
       try {
-        const res = await _cf('/api/gbop/pics/upload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ filename: file.name, mime, data_b64: b64 }),
+        const response = await _invokeCapability('craft.bop.picture.upload', {
+          filename: file.name,
+          mime,
+          data_b64: b64,
         });
+        const res = response?.data || response;
         if (!res?.url) throw new Error('上传失败：无返回 URL');
         // 转为绝对 URL，确保 img.src 在 iframe 中可访问
         if (res.url.startsWith('http')) { resolve(res.url); return; }
@@ -1650,10 +1679,9 @@ async function _createNodeFromDialog(action, refGid) {
         description:      description || '',
       };
       if (bom_row_id) body.vpps = bom_row_id;
-      await _cf('/api/gbop/processes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+      await _invokeCapability('craft.gbop.entity.change.apply', {
+        operation: 'process.create',
+        ...body,
       });
     } else if (nodeType === 'operation') {
       const body = {
@@ -1675,10 +1703,9 @@ async function _createNodeFromDialog(action, refGid) {
           if (procLink) body.process_gid = procLink.ref_gid;
         }
       }
-      await _cf('/api/gbop/operations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+      await _invokeCapability('craft.gbop.entity.change.apply', {
+        operation: 'operation.create',
+        ...body,
       });
     } else {
       // 其他节点类型走通用 entry API
@@ -1690,10 +1717,9 @@ async function _createNodeFromDialog(action, refGid) {
         seq_no:          seqNo,
       };
       if (bom_row_id) body.vpps = bom_row_id;
-      const resp = await _cf('/api/gbop/entries', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+      const resp = await _invokeCapability('craft.gbop.entity.change.apply', {
+        operation: 'entry.create',
+        ...body,
       });
       const newGid = resp?.data?.gid;
       // 上传图片（如有）
@@ -1701,10 +1727,10 @@ async function _createNodeFromDialog(action, refGid) {
         const picPatch = {};
         if (process_flow_pic?.length)  picPatch.process_flow_pic  = process_flow_pic;
         if (process_chart_pic?.length) picPatch.process_chart_pic = process_chart_pic;
-        await _cf(`/api/gbop/entries/${newGid}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(picPatch),
+        await _invokeCapability('craft.gbop.entity.change.apply', {
+          operation: 'entry.update',
+          gid: newGid,
+          updates: picPatch,
         });
       }
     }
@@ -1726,7 +1752,10 @@ async function _deleteEntry(gid) {
   const ok = await _confirmDialog(`确认删除「${row.title || '(无名称)'}」？此操作不可恢复。`);
   if (!ok) return;
   try {
-    await _cf(`/api/gbop/entries/${gid}`, { method: 'DELETE' });
+    await _invokeCapability('craft.gbop.entity.change.apply', {
+      operation: 'entry.delete',
+      gid,
+    });
     if (_activeGid === gid) _activeGid = null;
     await _reload();
     _toast('已删除', 'ok');
@@ -1997,10 +2026,10 @@ function _openOverlayPanel(gid) {
       _renderPicArea(picsContainer, currentUrls, 3, async urls => {
         currentUrls = urls;
         try {
-          await _cf(`/api/gbop/entries/${gid}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ [picField]: urls }),
+          await _invokeCapability('craft.gbop.entity.change.apply', {
+            operation: 'entry.update',
+            gid,
+            updates: { [picField]: urls },
           });
           const r = _rowByGid.get(gid);
           if (r) r[picField] = urls;
@@ -2037,10 +2066,10 @@ function _openOverlayPanel(gid) {
       if (vppsEl)  payload.vpps  = vppsEl.value.trim();
       if (typeEl)  payload.node_type = typeEl.value;
       try {
-        await _cf(`/api/gbop/entries/${gid}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
+        await _invokeCapability('craft.gbop.entity.change.apply', {
+          operation: 'entry.update',
+          gid,
+          updates: payload,
         });
         _toast('保存成功', 'ok', 1500);
         await _reload();
@@ -2058,18 +2087,15 @@ function _openOverlayPanel(gid) {
     const entitySection = document.getElementById('lvOpEntitySection');
     const loadingEl = document.getElementById('lvOpEntityLoading');
     const isProc = primaryLink.link_type === 'gbop_process';
-    const entityUrl = isProc
-      ? `/api/gbop/processes/${primaryLink.ref_gid}`
-      : `/api/gbop/operations/${primaryLink.ref_gid}`;
-
     // 尝试从版本列表加载（因为没有单个获取端点，从列表中查找）
-    const listUrl = isProc
-      ? `/api/gbop/versions/${_versionGid}/processes`
-      : `/api/gbop/versions/${_versionGid}/operations`;
+    const catalogOperation = isProc ? 'processes.list' : 'operations.list';
 
-    _cf(listUrl).then(resp => {
+    _invokeCapability('craft.gbop.catalog.read', {
+      operation: catalogOperation,
+      version_gid: _versionGid,
+    }).then(resp => {
       if (_opGid !== gid) return; // 面板已切换
-      const entities = resp?.data || [];
+      const entities = resp?.items || resp?.data || [];
       const entity = entities.find(e => e.gid === primaryLink.ref_gid);
       if (!entity) {
         if (loadingEl) loadingEl.textContent = '关联实体未找到';
@@ -2101,7 +2127,6 @@ function _openOverlayPanel(gid) {
 
       // 编辑按钮
       const entityGid = entity.gid;
-      const patchUrl = isProc ? `/api/gbop/processes/${entityGid}` : `/api/gbop/operations/${entityGid}`;
       html += `<button class="lv-op-save-btn" id="lvOpEntityEditBtn" style="margin-top:6px">编辑实体详情</button>`;
 
       if (entitySection) {
@@ -2114,7 +2139,7 @@ function _openOverlayPanel(gid) {
         // 编辑按钮 → 弹出编辑 overlay
         const editBtn = document.getElementById('lvOpEntityEditBtn');
         if (editBtn) {
-          editBtn.addEventListener('click', () => _openEntityEditDialog(entity, isProc, patchUrl));
+          editBtn.addEventListener('click', () => _openEntityEditDialog(entity, isProc));
         }
       }
     }).catch(err => {
@@ -2132,7 +2157,7 @@ function _closeOverlayPanel() {
 /**
  * 弹出编辑实体详情的 overlay 对话框（process / operation）
  */
-async function _openEntityEditDialog(entity, isProcess, patchUrl) {
+async function _openEntityEditDialog(entity, isProcess) {
   const fieldDefs = [
     { id: 'op_code',           label: isProcess ? '工序编码' : '操作编码', type: 'text' },
     { id: 'op_name',           label: isProcess ? '工序全称' : '操作全称', type: 'text' },
@@ -2181,10 +2206,10 @@ async function _openEntityEditDialog(entity, isProcess, patchUrl) {
         }
       }
       try {
-        await _cf(patchUrl, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
+        await _invokeCapability('craft.gbop.entity.change.apply', {
+          operation: isProcess ? 'process.update' : 'operation.update',
+          gid: entity.gid,
+          updates: payload,
         });
         _toast('实体已保存', 'ok', 1500);
         // 刷新 overlay panel
@@ -2328,8 +2353,6 @@ function _lsKey() { return _lsk(`lv:view:${_versionGid}`); }
 function _isCloud() {
   return (window.parent?._authMode || window._authMode || 'local') === 'feishu';
 }
-function _layoutConfigUrl() { return `/api/gbop/versions/${_versionGid}/layout-config`; }
-
 async function _saveView() {
   const view = {
     typeFilter:    _typeFilter,
@@ -2348,10 +2371,9 @@ async function _saveView() {
     return;
   }
   try {
-    await _cf(_layoutConfigUrl(), {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ config: { lineage_view: view } }),
+    await _invokeCapability('craft.bop.version.layout.change.apply', {
+      version_gid: _versionGid,
+      config: { lineage_view: view },
     });
     _toast('视图已同步到云端', 'ok', 2000);
   } catch {
@@ -2367,8 +2389,10 @@ async function _saveView() {
 async function _loadCloudConfig() {
   if (!_isCloud() || !_versionGid) return;
   try {
-    const res = await _cf(_layoutConfigUrl());
-    const cloudCfg = res?.config;
+    const res = await _invokeCapability('craft.bop.version.legacy_read', {
+      operation: 'layout_config', version_gid: _versionGid,
+    });
+    const cloudCfg = res?.config || res?.data?.config;
     if (!cloudCfg) return;
 
     // 将云端视图设置同步写回 localStorage（下次打开可立即生效）
@@ -2438,8 +2462,11 @@ async function _reload() {
   try {
     let allRows = [];
     for (const vGid of _loadedVersionGids) {
-      const json = await _cf(`/api/gbop/versions/${vGid}/entries`);
-      allRows = allRows.concat(_flattenMeta(json.data || []));
+      const json = await _invokeCapability('craft.gbop.catalog.read', {
+        operation: 'entries.list',
+        version_gid: vGid,
+      });
+      allRows = allRows.concat(_flattenMeta(json?.items || json?.data || []));
     }
     _rows = allRows;
     _buildIndexes(_rows);

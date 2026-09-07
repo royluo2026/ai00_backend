@@ -289,6 +289,21 @@ function _hasGrant(grantType, scopeGid = null) {
 
 window._hasGrant = _hasGrant;
 
+// 状态栏显示服务器返回的身份；按钮可见性不能用来推断当前角色。
+function _renderAuthStatus(state = null) {
+  const element = document.getElementById('current-user');
+  if (!element) return;
+  const mode = state?.mode || window._authMode || 'none';
+  const user = state?.user || window._authUser || null;
+  if (window.AuthStateManager?.renderUserStatus) {
+    window.AuthStateManager.renderUserStatus(element, user, mode);
+    return;
+  }
+  element.textContent = user ? (user.name || user.gid || '已登录') : '未登录';
+  element.title = user ? '已通过后端鉴权' : '未登录，尚未完成后端鉴权';
+}
+window._renderAuthStatus = _renderAuthStatus;
+
 function _meetsVisibility(level) {
   const user = window._authUser;
   const role = user?.org_role || user?.system_role || user?.role || 'member';
@@ -336,12 +351,13 @@ const LogPanel = (() => {
   }
 
   async function refresh() {
+    const _cloudFetch = window._cloudFetch?.bind(window);
     try {
       const lines = [];
 
       // 1. 后端服务日志（/admin/debug-logs）
       if (window._cloudFetch) {
-        const res = await window._cloudFetch('/admin/debug-logs?limit=200').catch(() => null);
+        const res = await _cloudFetch('/admin/debug-logs?limit=200', { method: 'GET' }).catch(() => null);
         if (res?.data) lines.push(...res.data.map(l => '[Backend] ' + l));
       }
 
@@ -491,6 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 立即从 localStorage 读取认证状态，避免状态栏短暂显示"未登录"
   // AuthStateManager.init() 是异步的但基于 localStorage，几乎瞬间完成
   AuthStateManager.init().then(() => {
+    _renderAuthStatus();
     _applyStatusbarFlags();
     NavManager.render();
   }).catch(() => {});
@@ -502,6 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
   _bindNavSidebar();
   _bindShortcuts();
   _bindStatusbar();
+  _renderAuthStatus();
   _applyStatusbarFlags();   // 用初始默认值先遮住无权限按钮
   // Phase 2：从 PluginRegistry 动态加载 Tab/Nav（补充 manifest 中声明的、硬编码中未包含的条目）
   Promise.all([
@@ -514,6 +532,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window._authMode  = state?.mode  || 'none';
     window._authUser  = state?.user  || null;
     window._authToken = state?.token || '';
+    _renderAuthStatus(state);
     _addCrumb('auth', `登录状态: ${window._authMode}`);
     if (state?.mode === 'feishu') {
       NotifManager.startPolling();
@@ -530,6 +549,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // （工作台有 localStorage 前缀依赖，必须完整重载；其他 Tab 也可能有缓存数据）
     WorkspaceEngine.reloadAllTabs();
   });
+  // auth_state.js 异步补全 /users/me 后更新角色和权限显示。
+  window.addEventListener('ai00-auth-user-updated', () => _renderAuthStatus());
   // 跨窗口主题同步（设置窗口改主题后广播到主窗口）
   window.electronAPI?.onThemeChanged?.((theme) => ThemeManager.applyTheme(theme));
 
@@ -617,6 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── 深链接处理 ─────────────────────────────────────────────────────────────────
 async function _handleDeepLink(url) {
+  const _cloudFetch = window._cloudFetch?.bind(window);
   if (!url) return;
   try {
     const u = new URL(url);
@@ -632,7 +654,7 @@ async function _handleDeepLink(url) {
     if (!match) return;
     const token = match[1];
     if (window._authMode !== 'feishu') return;
-    const data = await window._cloudFetch(`/api/share-links/${token}`);
+    const data = await _cloudFetch(`/api/share-links/${token}`, { method: 'GET' });
     if (data.current_permission && data.current_permission !== 'none') {
       // 有权限直接打开
       if (data.target_type === 'list') {
@@ -669,11 +691,12 @@ function _showPermissionRequestDialog(token, displayName) {
   document.body.appendChild(dlg);
   dlg.querySelector('#_prd-cancel').onclick = () => dlg.remove();
   dlg.querySelector('#_prd-submit').onclick = async () => {
+    const _cloudFetch = window._cloudFetch?.bind(window);
     const btn = dlg.querySelector('#_prd-submit');
     const message = dlg.querySelector('#_prd-message').value.trim();
     btn.disabled = true; btn.textContent = '提交中...';
     try {
-      await window._cloudFetch('/api/permission-requests', {
+      await _cloudFetch('/api/permission-requests', {
         method: 'POST',
         body: JSON.stringify({ target_type: 'list', target_gid: token, message }),
       });
@@ -738,9 +761,10 @@ function _applyStatusbarFlags() {
 }
 
 async function _loadFeatureFlags() {
+  const _cloudFetch = window._cloudFetch?.bind(window);
   try {
     if (window._cloudFetch) {
-      const res = await window._cloudFetch('/admin/config/feature_flags');
+      const res = await _cloudFetch('/admin/config/feature_flags', { method: 'GET' });
       if (res?.data?.value) {
         const parsed = JSON.parse(res.data.value);
         Object.assign(window._featureFlags, parsed);
@@ -823,10 +847,11 @@ window._addCrumb = _addCrumb;
 let _healthCheckTimer = null;
 
 async function _runHealthCheck() {
+  const _cloudFetch = window._cloudFetch?.bind(window);
   const dot = document.getElementById('health-dot');
   if (!dot || !window._cloudFetch) return;
   try {
-    const r = await window._cloudFetch('/health');
+    const r = await _cloudFetch('/health', { method: 'GET' });
     const ok = r?.status === 'ok';
     dot.style.background = ok ? '#a6e3a1' : '#f9e2af';
     dot.title = ok
@@ -1164,6 +1189,7 @@ const TaskTimeline = {
   },
 
   async _loadAll() {
+    const _cloudFetch = window._cloudFetch?.bind(window);
     if (window._authMode !== 'feishu') {
       this._tasks = []; this._overdueTasks = []; this._calEvents = []; return;
     }
@@ -1180,8 +1206,8 @@ const TaskTimeline = {
 
     // 并行拉取任务 + 飞书日历
     const [taskRes, calRes] = await Promise.allSettled([
-      _taskEnabled ? window._cloudFetch(`/api/tasks?scheduled_date_from=${from30}&page_size=300`) : Promise.resolve({ data: [] }),
-      _feishuEnabled ? window._cloudFetch('/feishu/calendar/today') : Promise.resolve({ data: [] }),
+      _taskEnabled ? _cloudFetch(`/api/tasks?scheduled_date_from=${from30}&page_size=300`, { method: 'GET' }) : Promise.resolve({ data: [] }),
+      _feishuEnabled ? _cloudFetch('/feishu/calendar/today', { method: 'GET' }) : Promise.resolve({ data: [] }),
     ]);
 
     const all = taskRes.status === 'fulfilled' ? (taskRes.value?.data || []) : [];
@@ -1453,8 +1479,9 @@ const TaskTimeline = {
   },
 
   async _save(gid, fields) {
+    const _cloudFetch = window._cloudFetch?.bind(window);
     try {
-      await window._cloudFetch(`/api/tasks/${gid}`, {
+      await _cloudFetch(`/api/tasks/${gid}`, {
         method: 'PUT', body: JSON.stringify({ gid, ...fields }),
       });
       await this.refresh();
@@ -1462,9 +1489,10 @@ const TaskTimeline = {
   },
 
   async _openEntries(task) {
+    const _cloudFetch = window._cloudFetch?.bind(window);
     let entries = [];
     try {
-      const r = await window._cloudFetch(`/api/tasks/${task.gid}/entries`);
+      const r = await window.AI00ExistingCapabilityClient.call('project.itemEntries.get', { itemGid: task.gid });
       entries = r?.data || [];
     } catch (_) {}
 
@@ -1497,8 +1525,10 @@ const TaskTimeline = {
         onChange: () => {},
         onSave: async (updated) => {
           try {
-            await window._cloudFetch(`/api/tasks/${task.gid}/entries`,
-              { method: 'PUT', body: JSON.stringify(updated) });
+            await window.AI00ExistingCapabilityClient.call('project.itemEntries.replace', {
+              itemGid: task.gid,
+              entries: updated,
+            });
           } catch (_) {}
         },
       });

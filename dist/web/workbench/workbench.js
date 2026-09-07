@@ -187,12 +187,8 @@
     rule:        'category',
   };
   const WB_P1_API_MAP = {
-    task:        (listGid) => `/api/tasks?list_gid=${listGid}&limit=200`,
-    issue:       (listGid) => `/api/issues?list_gid=${listGid}&limit=200`,
-    bop_version: (listGid) => `/api/bop/versions/${listGid}/entries?limit=200`,
-    pbom:        (listGid) => `/api/ebom/snapshots/${listGid}/parts`,
-    knowledge:   (listGid) => `/api/knowledge?list_gid=${listGid}&limit=200`,
-    rule:        (listGid) => `/api/rules?list_gid=${listGid}&limit=200`,
+    task:  (_cloudFetch, listGid) => _cloudFetch(`/api/tasks?list_gid=${listGid}&limit=200`, { method: 'GET' }),
+    issue: (_cloudFetch, listGid) => _cloudFetch(`/api/issues?list_gid=${listGid}&limit=200`, { method: 'GET' }),
   };
 
   function _loadTreeOpen() {
@@ -236,8 +232,8 @@
     if (!treeEl) return;
     treeEl.innerHTML = '<div class="wb-loading">加载中…</div>';
 
-    const fn = _cf();
-    if (!fn) { treeEl.innerHTML = '<div class="wb-empty">请先登录</div>'; return; }
+    const _cloudFetch = _cloudFetchFn();
+    if (!_cloudFetch) { treeEl.innerHTML = '<div class="wb-empty">请先登录</div>'; return; }
 
     _fetchAllLists().then(allLists => {
       _panel1ListsCache = allLists;
@@ -864,8 +860,8 @@
     bodyEl.style.display = 'none';
     tlsEl.style.display  = '';
 
-    const fn = _cf();
-    if (!fn) { tlsEl.innerHTML = '<div class="wb-empty">请先登录</div>'; return; }
+    const _cloudFetch = _cloudFetchFn();
+    if (!_cloudFetch) { tlsEl.innerHTML = '<div class="wb-empty">请先登录</div>'; return; }
 
     const itemType = tab.itemType || 'task';
     const listGid  = tab.listGid;
@@ -919,7 +915,7 @@
       if (tlsEl.dataset.renderedDocGid === listGid) return;
       tlsEl.innerHTML = '<div class="wb-loading" style="padding:12px">加载中…</div>';
       try {
-        const item = await fn(`/api/knowledge_hub/items/${listGid}`);
+        const item = await _cloudFetch(`/api/knowledge_hub/items/${listGid}`, { method: 'GET' });
         _renderKnowledgeDocPanel(tlsEl, item);
         tlsEl.dataset.renderedDocGid = listGid;
       } catch (e) {
@@ -950,14 +946,11 @@
     }
 
     const cols  = WB_P1_COLS_MAP[itemType] || WB_P1_COLS_TASK;
-    const apiFn = WB_P1_API_MAP[itemType];
-    const url   = apiFn ? apiFn(listGid) : `/api/tasks?list_gid=${listGid}&limit=200`;
 
     let tlsData = [];
     try {
       tlsEl.innerHTML = '<div class="wb-loading" style="padding:12px">加载中…</div>';
-      const res = await fn(url);
-      tlsData = Array.isArray(res) ? res : (res.items || res.data || []);
+      tlsData = await _loadWorkbenchRows(itemType, listGid, _cloudFetch);
       tlsData.forEach(row => { if (!row.item_type) row.item_type = itemType; });
     } catch (e) {
       console.error('面板3清单加载失败', e);
@@ -1006,10 +999,10 @@
   async function _createList(sectionKey) {
     const title = await _promptText('新建文件', '');
     if (!title) return;
-    const fn = _cf(); if (!fn) return;
+    const _cloudFetch = _cloudFetchFn(); if (!_cloudFetch) return;
     const shareScope = sectionKey === 'public' ? 'org' : 'private';
     try {
-      await fn('/api/lists', {
+      await _cloudFetch('/api/lists', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, name: title, item_type: 'task', share_scope: shareScope }),
@@ -1182,7 +1175,54 @@
   }
 
   // ── 工具 ────────────────────────────────────────────────────────────────
-  function _cf() { return window._cloudFetch || window.parent?._cloudFetch || null; }
+  function _cloudFetchFn() { return window._cloudFetch || window.parent?._cloudFetch || null; }
+
+  function _existingCapabilityClient() {
+    return window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
+  }
+
+  async function _invokeWorkbenchCapability(id, payload = {}) {
+    const _cloudFetch = _cloudFetchFn();
+    if (!_cloudFetch) throw new Error('云端服务未连接');
+    const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ version: 1, payload }),
+    });
+    const envelope = response?.data;
+    if (response?.success !== true || envelope?.ok !== true) {
+      const detail = envelope?.error || response?.error || {};
+      throw new Error(detail.message || `能力调用失败：${id}@1`);
+    }
+    const value = envelope.data;
+    return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+  }
+
+  async function _loadWorkbenchRows(itemType, listGid, _cloudFetch) {
+    if (itemType === 'bop_version') {
+      const value = await _invokeWorkbenchCapability('craft.bop.alt_hierarchy.read', { version_gid: listGid });
+      return value?.entries || [];
+    }
+    if (itemType === 'pbom') {
+      const value = await _invokeWorkbenchCapability('craft.pbom.part.search', { version_gid: listGid, limit: 500 });
+      return value?.items || [];
+    }
+    if (itemType === 'knowledge') {
+      const value = await _invokeWorkbenchCapability('knowledge.search', {
+        query: '', list_gid: listGid, limit: 500, include_content: false,
+      });
+      return value?.items || value?.data || [];
+    }
+    if (itemType === 'rule') {
+      const value = await _invokeWorkbenchCapability('craft.rule.library.read', {
+        operation: 'list', list_gid: listGid, limit: 500,
+      });
+      return value?.data || value?.items || [];
+    }
+    const loadRows = WB_P1_API_MAP[itemType] || WB_P1_API_MAP.task;
+    const res = await loadRows(_cloudFetch, listGid);
+    return Array.isArray(res) ? res : (res.items || res.data || []);
+  }
 
   function _applyTheme() {
     const t = localStorage.getItem('system.theme') || 'dark';
@@ -1963,21 +2003,21 @@
         return;
       }
       subEl.innerHTML = '<span class="wb-p1-sp-loading">加载中…</span>';
-      const fn = _cf(); if (!fn) return;
+      const _cloudFetch = _cloudFetchFn(); if (!_cloudFetch) return;
       try {
         const [bopRes, pbomRes] = await Promise.allSettled([
-          fn('/api/bop/versions'),
-          fn('/api/ebom/snapshots'),
+          _invokeWorkbenchCapability('craft.bop.version.list', { include_archived: false, page_size: 100 }),
+          _invokeWorkbenchCapability('craft.pbom.version.search', { limit: 500 }),
         ]);
         const bopVers = (bopRes.status === 'fulfilled'
-          ? (bopRes.value?.versions || bopRes.value?.data || bopRes.value || [])
+          ? (bopRes.value?.versions || bopRes.value?.items || bopRes.value?.data || bopRes.value || [])
           : []).map(r => ({
             gid: 'bv:' + r.gid,
             name: (r.bop_name || r.version_name || r.gid) + (r.version_tag ? ` (${r.version_tag})` : ''),
             _group: 'BOP版本',
           }));
         const pbomVers = (pbomRes.status === 'fulfilled'
-          ? (pbomRes.value?.data || pbomRes.value || [])
+          ? (pbomRes.value?.items || pbomRes.value?.data || pbomRes.value || [])
           : []).map(r => ({
             gid: 'pv:' + r.gid,
             name: r.name || r.version_tag || r.gid,
@@ -1997,10 +2037,10 @@
       return;
     }
     subEl.innerHTML = '<span class="wb-p1-sp-loading">加载中…</span>';
-    const fn = _cf();
-    if (!fn) return;
+    const _cloudFetch = _cloudFetchFn();
+    if (!_cloudFetch) return;
     try {
-      const res = await fn(`/api/lists?item_type=${domain}`);
+      const res = await _existingCapabilityClient().call('project.lists.search', { itemType: domain });
       const lists = Array.isArray(res) ? res : (res.data || res.lists || []);
       _p1DomainListsCache[domain] = lists;
       _renderP1ListCheckboxes(domain, lists, subEl);
@@ -2428,19 +2468,19 @@
       });
     });
 
-    const fn = _cf();
+    const _cloudFetch = _cloudFetchFn();
     const needProjects = fileType.startsWith('list_') || fileType === 'bop_version';
     const needFolders  = fileType.startsWith('doc_');
     const needVersions = fileType === 'bop_version';
 
     const [projRes, folderRes, verRes] = await Promise.allSettled([
-      (needProjects && fn) ? fn('/api/projects') : Promise.resolve(null),
-      (needFolders  && fn) ? fn('/api/knowledge_hub/folders') : Promise.resolve(null),
-      (needVersions && fn) ? fn('/api/bop/versions') : Promise.resolve(null),
+      (needProjects && _cloudFetch) ? _invokeWorkbenchCapability('project.project.read.atomic.projects_search', {}) : Promise.resolve(null),
+      (needFolders  && _cloudFetch) ? _cloudFetch('/api/knowledge_hub/folders', { method: 'GET' }) : Promise.resolve(null),
+      (needVersions && _cloudFetch) ? _invokeWorkbenchCapability('craft.bop.version.list', { include_archived: false, page_size: 100 }) : Promise.resolve(null),
     ]);
 
     if (needProjects && projRes.status === 'fulfilled' && projRes.value) {
-      const arr = Array.isArray(projRes.value) ? projRes.value : (projRes.value.data || projRes.value.projects || []);
+      const arr = Array.isArray(projRes.value) ? projRes.value : (projRes.value?.data || projRes.value?.projects || []);
       const opts = '<option value="">— 不关联项目 —</option>' +
         arr.map(p => `<option value="${p.gid}">${_wbEscHtml(p.name)}</option>`).join('');
       document.querySelectorAll('#wbCreateModalBody .mf-proj-select').forEach(sel => { sel.innerHTML = opts; });
@@ -2452,7 +2492,7 @@
     }
 
     if (needVersions && verRes.status === 'fulfilled' && verRes.value) {
-      const arr = Array.isArray(verRes.value) ? verRes.value : (verRes.value.data || verRes.value.versions || []);
+      const arr = Array.isArray(verRes.value) ? verRes.value : (verRes.value.items || verRes.value.data || verRes.value.versions || []);
       const opts = '<option value="">— 选择源版本 —</option>' +
         arr.map(v => `<option value="${v.gid}">${_wbEscHtml((v.bop_name||'') + ' ' + (v.version_tag||''))}</option>`).join('');
       ['wbFormForkSrc','wbFormSmartSrc'].forEach(id => {
@@ -2631,8 +2671,8 @@
   }
 
   async function _doWbCreate(fileType) {
-    const fn = _cf();
-    if (!fn) throw new Error('未登录');
+    const _cloudFetch = _cloudFetchFn();
+    if (!_cloudFetch) throw new Error('未登录');
 
     if (fileType.startsWith('list_')) {
       const name       = document.getElementById('wbFormName')?.value?.trim();
@@ -2645,7 +2685,7 @@
       const uid = _currentUser?.gid || '';
       const body = { name, color, item_type: itemType, visibility, storage_scope: 'cloud', owner_type: 'user', owner_gid: uid };
       if (projectGid) body.project_gid = projectGid;
-      const res = await fn('/api/lists', { method: 'POST', body: JSON.stringify(body) });
+      const res = await _cloudFetch('/api/lists', { method: 'POST', body: JSON.stringify(body) });
       const gid = res?.data?.gid || res?.gid;
       return { gid, name, item_type: itemType };
     }
@@ -2658,10 +2698,10 @@
         const projectGid = document.getElementById('wbFormBopProject')?.value || null;
         const taktTime   = parseFloat(document.getElementById('wbFormTaktTime')?.value) || 60;
         if (!versionTag) { _showWbToast('请填写版本标签'); return null; }
-        const body = { version_tag: versionTag, bop_name: bopName, takt_time: taktTime };
+        const body = { source: 'empty', version_tag: versionTag, bop_name: bopName, takt_time: taktTime };
         if (projectGid) body.project_gid = projectGid;
-        const res = await fn('/api/bop/versions', { method: 'POST', body: JSON.stringify(body) });
-        const gid = res?.data?.gid || res?.gid;
+        const res = await _invokeWorkbenchCapability('craft.bop.version.create', body);
+        const gid = res?.version_gid || res?.gid || res?.data?.gid;
         return { gid, name: bopName || versionTag, item_type: 'bop_version' };
       }
       if (mode === 'fork') {
@@ -2669,8 +2709,10 @@
         const tag    = document.getElementById('wbFormForkTag')?.value?.trim();
         const note   = document.getElementById('wbFormForkNote')?.value?.trim() || null;
         if (!srcGid || !tag) { _showWbToast('请选择源版本并填写新版本标签'); return null; }
-        const res = await fn(`/api/bop/versions/${srcGid}/fork`, { method: 'POST', body: JSON.stringify({ target_version_tag: tag, change_note: note }) });
-        const gid = res?.data?.gid || res?.gid;
+        const res = await _invokeWorkbenchCapability('craft.bop.fork.change.apply', {
+          operation: 'fork', source_version_gid: srcGid, target_version_tag: tag, change_note: note,
+        });
+        const gid = res?.data?.gid || res?.gid || res?.version_gid;
         return { gid, name: tag, item_type: 'bop_version' };
       }
       if (mode === 'smart') {
@@ -2678,8 +2720,10 @@
         const m      = document.getElementById('wbFormSmartMode')?.value;
         const tag    = document.getElementById('wbFormSmartTag')?.value?.trim();
         if (!srcGid || !tag) { _showWbToast('请选择源版本并填写标签'); return null; }
-        const res = await fn(`/api/bop/versions/${srcGid}/smart-fork`, { method: 'POST', body: JSON.stringify({ mode: m, target_version_tag: tag }) });
-        const gid = res?.data?.gid || res?.gid;
+        const res = await _invokeWorkbenchCapability('craft.bop.fork.change.apply', {
+          operation: 'smart_fork', source_version_gid: srcGid, mode: m, target_version_tag: tag,
+        });
+        const gid = res?.data?.gid || res?.gid || res?.version_gid;
         return { gid, name: tag, item_type: 'bop_version' };
       }
     }
@@ -2689,7 +2733,7 @@
       if (mode === 'import') return null;
       const name = document.getElementById('wbFormPbomName')?.value?.trim();
       if (!name) { _showWbToast('请填写版本名称'); return null; }
-      const res = await fn('/api/ebom/snapshots', { method: 'POST', body: JSON.stringify({ name, version_tag: name, source_type: 'manual' }) });
+      const res = await _cloudFetch('/api/ebom/snapshots', { method: 'POST', body: JSON.stringify({ name, version_tag: name, source_type: 'manual' }) });
       const gid = res?.data?.gid || res?.gid;
       return { gid, name, item_type: 'pbom' };
     }
@@ -2719,7 +2763,7 @@
         if (!title) { _showWbToast('请输入标题'); return null; }
       }
       body.title = title || '未命名';
-      const res = await fn('/api/knowledge_hub/items', { method: 'POST', body: JSON.stringify(body) });
+      const res = await _cloudFetch('/api/knowledge_hub/items', { method: 'POST', body: JSON.stringify(body) });
       const gid = res?.gid || res?.data?.gid;
       return { gid, name: body.title, item_type: fileType };
     }
@@ -2752,18 +2796,17 @@
     if (todayEl) todayEl.style.display = 'none';
     tlsEl.style.display = '';
 
-    const fn = _cf();
-    if (!fn) { tlsEl.innerHTML = '<div class="wb-empty">请先登录</div>'; return; }
+    const _cloudFetch = _cloudFetchFn();
+    if (!_cloudFetch) { tlsEl.innerHTML = '<div class="wb-empty">请先登录</div>'; return; }
 
     const m = _getActiveTabMode();
 
     // 全部类型 → TreeListShell
     const cols    = WB_P1_COLS_MAP[m.itemType]   || WB_P1_COLS_TASK;
-    const apiFn   = WB_P1_API_MAP[m.itemType];
-    const url     = apiFn ? apiFn(m.listGid) : `/api/tasks?list_gid=${m.listGid}&limit=200`;
+    const loadRows = WB_P1_API_MAP[m.itemType] || WB_P1_API_MAP.task;
 
     try {
-      const res = await fn(url);
+      const res = await loadRows(_cloudFetch, m.listGid);
       _p1TlsData = Array.isArray(res) ? res : (res.items || res.data || []);
       // 补充 item_type，供详情条判断类型（各 API 原始响应不含此字段）
       _p1TlsData.forEach(row => { if (!row.item_type) row.item_type = m.itemType; });
@@ -2920,24 +2963,24 @@
   let _khPersonalDocs    = [];   // 个人知识库文档
 
   async function _fetchAllLists() {
-    const fn = _cf();
-    if (!fn) return [];
+    const _cloudFetch = _cloudFetchFn();
+    if (!_cloudFetch) return [];
     try {
       const [listsRes, bopRes, knowledgeRes, foldersRes, projectsRes,
              personalFoldersRes, personalDocsRes] = await Promise.allSettled([
-        fn('/api/lists'),
-        fn('/api/bop/versions'),
-        fn('/api/knowledge_hub/items?scope_type=public'),
-        fn('/api/knowledge_hub/folders?scope_type=public'),
-        fn('/api/projects'),
-        fn('/api/knowledge_hub/folders?scope_type=personal'),
-        fn('/api/knowledge_hub/items?scope_type=personal'),
+        _existingCapabilityClient().call('project.lists.search'),
+        _invokeWorkbenchCapability('craft.bop.version.list', { include_archived: false, page_size: 100 }),
+        _cloudFetch('/api/knowledge_hub/items?scope_type=public', { method: 'GET' }),
+        _cloudFetch('/api/knowledge_hub/folders?scope_type=public', { method: 'GET' }),
+        _invokeWorkbenchCapability('project.project.read.atomic.projects_search', {}),
+        _cloudFetch('/api/knowledge_hub/folders?scope_type=personal', { method: 'GET' }),
+        _cloudFetch('/api/knowledge_hub/items?scope_type=personal', { method: 'GET' }),
       ]);
       const lists = listsRes.status === 'fulfilled'
         ? (listsRes.value?.lists || listsRes.value?.data || listsRes.value || [])
         : [];
       const bops = bopRes.status === 'fulfilled'
-        ? (bopRes.value?.versions || bopRes.value?.data || bopRes.value || []).map(r => ({
+        ? (bopRes.value?.versions || bopRes.value?.items || bopRes.value?.data || bopRes.value || []).map(r => ({
             ...r,
             name:      r.bop_name || r.name || r.version_name || r.gid,
             item_type: 'bop_version',
@@ -2967,7 +3010,7 @@
         : [];
       // 存储项目列表供项目文件区渲染使用
       _allProjects = projectsRes.status === 'fulfilled'
-        ? (projectsRes.value?.data || projectsRes.value?.projects || projectsRes.value || [])
+        ? (Array.isArray(projectsRes.value) ? projectsRes.value : (projectsRes.value?.data || projectsRes.value?.projects || []))
         : [];
       return [...lists, ...bops, ...docs, ..._khPersonalDocs];
     } catch { return []; }
@@ -3171,12 +3214,11 @@
       const msgEl = body.querySelector('#wb-detail-msg');
 
       const _doSave = async (field, value) => {
-        const fn = _cf(); if (!fn) return;
+        const _cloudFetch = _cloudFetchFn(); if (!_cloudFetch) return;
         if (msgEl) msgEl.textContent = '保存中…';
         try {
           const payload = { [field]: value || null };
-          const endpoint = type === 'issue' ? `/api/issues/${item.gid}` : `/api/tasks/${item.gid}`;
-          await fn(endpoint, { method:'PATCH', body: JSON.stringify(payload),
+          await _cloudFetch(type === 'issue' ? `/api/issues/${item.gid}` : `/api/tasks/${item.gid}`, { method:'PATCH', body: JSON.stringify(payload),
             headers: { 'Content-Type': 'application/json' } });
           Object.assign(item, payload);
           // 同步更新 _panelData[1] 中的原始条目，并刷新面板1分组
@@ -3260,7 +3302,7 @@
   function _showListItemCtxMenu(e, item) {
     document.getElementById('_wbListItemCtx')?.remove();
     const uid = window.top?._authUser?.gid || window.parent?._authUser?.gid || window._authUser?.gid || '';
-    const fn  = window._cloudFetch || window.parent?._cloudFetch;
+    const _cloudFetch  = window._cloudFetch || window.parent?._cloudFetch;
 
     // ── 类型分类 ──
     const isList    = ['task','issue','knowledge','rule'].includes(item.item_type);
@@ -3332,37 +3374,37 @@
 
         try {
           if (isList) {
-            await fn(`/api/lists/${item.gid}`, { method: 'PATCH', body: JSON.stringify({ name: newName }) });
+            await _existingCapabilityClient().call('project.lists.patch', { gid: item.gid, patch: { name: newName } });
             item.name = newName;
           } else if (isKhDoc) {
-            await fn(`/api/knowledge_hub/items/${item.gid}`, { method: 'PATCH', body: JSON.stringify({ title: newName }) });
+            await _cloudFetch(`/api/knowledge_hub/items/${item.gid}`, { method: 'PATCH', body: JSON.stringify({ title: newName }) });
             item.title = newName; item.name = newName;
           } else if (isBopVer) {
-            await fn(`/api/bop/versions/${item.gid}`, { method: 'PATCH', body: JSON.stringify({ bop_name: newName }) });
-            item.bop_name = newName; item.name = newName;
+            alert('BOP 版本元数据编辑暂未开放，请通过新版 BOP 版本元数据能力处理');
+            return;
           } else if (isPbom) {
-            await fn(`/api/ebom/snapshots/${item.gid}`, { method: 'PATCH', body: JSON.stringify({ name: newName }) });
+            await _cloudFetch(`/api/ebom/snapshots/${item.gid}`, { method: 'PATCH', body: JSON.stringify({ name: newName }) });
             item.name = newName;
           }
           _renderP2TreeSections(_treeSections);
         } catch (err) { alert('改名失败：' + (err.message || err)); }
 
       } else if (action.dataset.action === 'visibility') {
-        _showListVisibilityDialog(item, fn);
+        _showListVisibilityDialog(item, _cloudFetch);
 
       } else if (action.dataset.action === 'project') {
-        _showListProjectDialog(item, fn);
+        _showListProjectDialog(item, _cloudFetch);
       }
     });
   }
 
   // 可见范围设置对话框（仅清单类型）
-  async function _showListVisibilityDialog(list, fn) {
+  async function _showListVisibilityDialog(list, _cloudFetch) {
     if (window.VisibilitySelector) {
       await VisibilitySelector.showDialog(list, async (val) => {
-        await fn?.(`/api/lists/${list.gid}`, {
-          method: 'PATCH',
-          body: JSON.stringify({ visibility: val.visibility, shared_team_gid: val.shared_team_gid || null, project_gid: val.shared_project_gid || list.project_gid || null }),
+        await _existingCapabilityClient().call('project.lists.patch', {
+          gid: list.gid,
+          patch: { visibility: val.visibility, shared_team_gid: val.shared_team_gid || null, project_gid: val.shared_project_gid || list.project_gid || null },
         }).catch(err => alert('设置失败：' + err.message));
         list.visibility = val.visibility;
         list.shared_team_gid = val.shared_team_gid;
@@ -3396,8 +3438,8 @@
     dlg.querySelector('#_wbVisSave').onclick = async () => {
       const vis = dlg.querySelector('input[name="wb_vis"]:checked')?.value;
       if (!vis) { dlg.remove(); return; }
-      await fn?.(`/api/lists/${list.gid}`, {
-        method: 'PATCH', body: JSON.stringify({ visibility: vis }),
+      await _existingCapabilityClient().call('project.lists.patch', {
+        gid: list.gid, patch: { visibility: vis },
       }).catch(err => alert('设置失败：' + err.message));
       list.visibility = vis;
       dlg.remove();
@@ -3406,10 +3448,10 @@
   }
 
   // 绑定项目对话框（仅清单类型）
-  async function _showListProjectDialog(list, fn) {
+  async function _showListProjectDialog(list, _cloudFetch) {
     document.getElementById('_wbListProjCtx')?.remove();
     const projects = _allProjects?.length ? _allProjects
-      : await fn?.('/api/projects').then(r => r?.data || r?.projects || []).catch(() => []) || [];
+      : await _invokeWorkbenchCapability('project.project.read.atomic.projects_search', {}).then(value => value?.data || value || []).catch(() => []);
 
     const dlg = document.createElement('div');
     dlg.id = '_wbListProjCtx';
@@ -3430,8 +3472,8 @@
     dlg.querySelector('#_wbProjCancel').onclick = () => dlg.remove();
     dlg.querySelector('#_wbProjSave').onclick = async () => {
       const projGid = dlg.querySelector('#_wbProjSel').value || null;
-      await fn?.(`/api/lists/${list.gid}`, {
-        method: 'PATCH', body: JSON.stringify({ project_gid: projGid }),
+      await _existingCapabilityClient().call('project.lists.patch', {
+        gid: list.gid, patch: { project_gid: projGid },
       }).catch(err => alert('绑定失败：' + err.message));
       list.project_gid = projGid;
       dlg.remove();
@@ -3642,18 +3684,16 @@
         });
       };
       const _saveFsh = async (field, arr) => {
-        const fn = _cf(); if (!fn) return;
-        const ep = type === 'issue' ? `/api/issues/${item.gid}` : `/api/tasks/${item.gid}`;
-        await fn(ep, { method: 'PATCH', body: JSON.stringify({ [field]: arr }),
+        const _cloudFetch = _cloudFetchFn(); if (!_cloudFetch) return;
+        await _cloudFetch(type === 'issue' ? `/api/issues/${item.gid}` : `/api/tasks/${item.gid}`, { method: 'PATCH', body: JSON.stringify({ [field]: arr }),
           headers: { 'Content-Type': 'application/json' } }).catch(e => console.error('[fsh-save]', e));
         Object.assign(item, { [field]: arr });
       };
 
       // 懒加载完整数据（panel1 未返回 feishu_groups/feishu_docs）
-      const fn = _cf();
-      if (fn && item.gid) {
-        const ep = type === 'issue' ? `/api/issues/${item.gid}` : `/api/tasks/${item.gid}`;
-        fn(ep).then(res => {
+      const _cloudFetch = _cloudFetchFn();
+      if (_cloudFetch && item.gid) {
+        _cloudFetch(type === 'issue' ? `/api/issues/${item.gid}` : `/api/tasks/${item.gid}`, { method: 'GET' }).then(res => {
           if (!pop.isConnected) return;
           if (res?.data) {
             _grps = Array.isArray(res.data.feishu_groups) ? [...res.data.feishu_groups] : _grps;
@@ -3720,7 +3760,7 @@
       let _saveTimer = 0;
       const msgEl = pop.querySelector('#_wbRCtxMsg');
       const _doSave = async (field, value) => {
-        const fn = _cf(); if (!fn) return;
+        const _cloudFetch = _cloudFetchFn(); if (!_cloudFetch) return;
         // 类型转换：INTEGER 列需要数字类型，否则 psycopg2 参数化查询类型不匹配
         let typedValue = value || null;
         if (field === 'time_estimate' && value) typedValue = parseInt(value, 10) || null;
@@ -3728,8 +3768,7 @@
         if (msgEl) msgEl.textContent = '保存中…';
         try {
           const payload = { [field]: typedValue };
-          const endpoint = type === 'issue' ? `/api/issues/${item.gid}` : `/api/tasks/${item.gid}`;
-          const res = await fn(endpoint, { method:'PATCH', body: JSON.stringify(payload),
+          const res = await _cloudFetch(type === 'issue' ? `/api/issues/${item.gid}` : `/api/tasks/${item.gid}`, { method:'PATCH', body: JSON.stringify(payload),
             headers: { 'Content-Type': 'application/json' } });
           console.log('[p1-ctx-save] OK', field, res);
           Object.assign(item, payload);
@@ -4398,10 +4437,9 @@
 
   /** PATCH 一个条目字段到 DB，并同步更新 panel1 缓存 */
   async function _dvPatchItem(gid, itemType, fields) {
-    const cf = _cf();
-    if (!cf) throw new Error('cloudFetch 不可用，请检查登录状态');
-    const endpoint = itemType === 'task' ? `/api/tasks/${gid}` : `/api/issues/${gid}`;
-    await cf(endpoint, {
+    const _cloudFetch = _cloudFetchFn();
+    if (!_cloudFetch) throw new Error('cloudFetch 不可用，请检查登录状态');
+    await _cloudFetch(itemType === 'task' ? `/api/tasks/${gid}` : `/api/issues/${gid}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(fields),
@@ -4574,10 +4612,10 @@
     const tlBody = document.getElementById('wbCalTlBody');
     if (tlBody) {
       // 触发实际拉取（同 日期点击 逻辑）
-      const fn = window._cloudFetch || window.parent?._cloudFetch;
-      if (!fn) return;
+      const _cloudFetch = window._cloudFetch || window.parent?._cloudFetch;
+      if (!_cloudFetch) return;
       const date = _calSelectedDay;
-      fn(`/feishu/calendar/today${date ? `?date=${date}` : ''}`)
+      _cloudFetch(`/feishu/calendar/today${date ? `?date=${date}` : ''}`)
         .then(res => {
           _calFeishuItems = (res?.success && res.data?.length) ? res.data : [];
           if (document.getElementById('wbCalTlBody')) {
@@ -4904,8 +4942,8 @@
 
   // ── 右侧通知栏按需加载 ───────────────────────────────────────────────────
   async function _loadRightPanel(panel) {
-    const fn = _cf();
-    if (!fn) return;
+    const _cloudFetch = _cloudFetchFn();
+    if (!_cloudFetch) return;
     // panel 5: follows（已在 home 数据里）
     // panel 6/7: 占位，后续补充 API
     if (panel === 4 && _panelData[4]) {
@@ -4921,7 +4959,7 @@
 
   // 面板1 独立加载（使用 /api/workbench/panel1，支持多来源）
   async function _loadPanel1() {
-    const fn = _cf(); if (!fn) return;
+    const _cloudFetch = _cloudFetchFn(); if (!_cloudFetch) return;
     const body = document.getElementById('wb-p1-today');
     if (body) body.innerHTML = '<div class="wb-loading">加载中…</div>';
     try {
@@ -4945,7 +4983,7 @@
         if (bvGids.length) params.set('bop_version_gids', bvGids.join(','));
         if (pvGids.length) params.set('pbom_version_gids', pvGids.join(','));
       }
-      const data = await fn(`/api/workbench/panel1?${params}`);
+      const data = await _cloudFetch(`/api/workbench/panel1?${params}`, { method: 'GET' });
       _panelData[1] = data.items || [];
       _renderPanelToday(_panelData[1]);
       if (_vis.cal) _renderCalendar();  // 同步刷新时间线
@@ -4958,8 +4996,8 @@
 
   async function _loadHome() {
     _panel1ListsCache = null;  // 刷新时清除清单缓存
-    const fn = _cf();
-    if (!fn) {
+    const _cloudFetch = _cloudFetchFn();
+    if (!_cloudFetch) {
       const ids = ['wb-body-1','wb-body-2','wb-body-3','wb-body-4','wb-body-5','wb-body-6'];
       ids.forEach(id => {
         const b = document.getElementById(id);
@@ -4970,7 +5008,7 @@
     // 面板1 与主数据并行加载
     _loadPanel1();
     try {
-      const data = await fn('/api/workbench/home');
+      const data = await _cloudFetch('/api/workbench/home', { method: 'GET' });
       // _panelData[1] 由 _loadPanel1 管理，不再使用 today_items
       _panelData[3] = data.my_contexts     || [];
       _panelData[4] = data.recent_follows  || [];
@@ -5026,25 +5064,25 @@
   }
 
   async function _submitNewItemByDomain(domain, listGid, fields) {
-    const fn = _cf();
-    if (!fn) throw new Error('未连接到服务器');
+    const _cloudFetch = _cloudFetchFn();
+    if (!_cloudFetch) throw new Error('未连接到服务器');
     const uid = _currentUser?.gid || '';
     const body = { ...fields, list_gid: listGid || null };
     switch (domain) {
       case 'task':
         body.owner_gid = uid; body.owner_user_gid = uid;
         body.status = 'pending';
-        return fn('/api/tasks', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+        return _cloudFetch('/api/tasks', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
       case 'issue':
         body.owner_gid = uid; body.owner_user_gid = uid;
         body.status = 'open';
-        return fn('/api/issues', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+        return _cloudFetch('/api/issues', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
       case 'knowledge':
         body.maintainer_gid = uid; body.status = 'draft';
-        return fn('/api/knowledge_entries', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+        return _cloudFetch('/api/knowledge_entries', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
       case 'rule':
         body.status = 'draft';
-        return fn('/api/rules', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+        return _cloudFetch('/api/rules', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
       default:
         throw new Error('不支持的域：' + domain);
     }
@@ -5195,10 +5233,10 @@
   async function _createNew() {
     const title = await _promptText('新建任务', '');
     if (!title) return;
-    const fn = _cf();
-    if (!fn) return;
+    const _cloudFetch = _cloudFetchFn();
+    if (!_cloudFetch) return;
     try {
-      await fn('/api/tasks', {
+      await _cloudFetch('/api/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -5539,9 +5577,9 @@
   function _loadSkillList() {
     const body = document.getElementById('wbFcSkillBody');
     if (!body || body.dataset.loaded) return;
-    const fn = _cf();
-    if (!fn) return;
-    fn('/api/skills?limit=50').then(data => {
+    const _cloudFetch = _cloudFetchFn();
+    if (!_cloudFetch) return;
+    _cloudFetch('/api/skills?limit=50', { method: 'GET' }).then(data => {
       const skills = Array.isArray(data) ? data : (data?.skills || []);
       if (!skills.length) { body.innerHTML = '<div class="wb-fc-empty">暂无 Skill</div>'; return; }
       body.innerHTML = skills.map(s =>

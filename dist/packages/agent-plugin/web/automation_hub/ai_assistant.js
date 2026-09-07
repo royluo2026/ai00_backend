@@ -963,29 +963,12 @@
   function _sbStartBalPolling() {
     clearInterval(_sbBalTimer);
     clearInterval(_sbBalTickTimer);
-    _sbFetchBalance();
-    _sbBalTimer     = setInterval(_sbFetchBalance,  5 * 60 * 1000);
-    _sbBalTickTimer = setInterval(_sbTickBalTime,   60 * 1000);
-    // 点击余额强制刷新
-    if ($sbBal && !$sbBal._clickBound) {
-      $sbBal._clickBound = true;
-      $sbBal.addEventListener('click', () => {
-        $sbBal.style.opacity = '.5';
-        _sbFetchBalance().finally(() => { $sbBal.style.opacity = ''; });
-      });
-    }
+    _sbBalTimer = _sbBalTickTimer = null;
     _sbRenderUsage();
   }
 
   async function _sbFetchBalance() {
-    try {
-      const res = await _cf('GET', '/api/ai/balance').catch(() => null);
-      if (res && res.supported) {
-        _sbLastBalVal  = parseFloat(res.balance);
-        _sbLastBalTime = Date.now();
-        _sbRenderBal();
-      }
-    } catch (_) {}
+    return null;
   }
 
   function _sbTickBalTime() {
