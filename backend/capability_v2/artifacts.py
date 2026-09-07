@@ -3,10 +3,11 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import threading
 import uuid
 from datetime import UTC, datetime, timedelta
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
 from typing import BinaryIO, Callable, Literal, Protocol
 
 from .contracts import ArtifactRef, ConsumerIdentity, FrozenModel
@@ -117,6 +118,47 @@ class OisObjectStorage:
         if data is None:
             raise ArtifactIntegrityError("artifact object is missing")
         return hashlib.sha256(data).hexdigest(), len(data)
+
+
+class FilesystemObjectStorage:
+    """Explicit local/test ArtifactPort; never selected without a configured root."""
+
+    def __init__(self, root: str | Path) -> None:
+        self.root = Path(root).resolve()
+        self.root.mkdir(parents=True, exist_ok=True)
+
+    def path_for(self, object_key: str) -> Path:
+        key = PurePosixPath(str(object_key or "").strip().lstrip("/"))
+        if not key.parts or ".." in key.parts:
+            raise ArtifactAuthorizationError("invalid artifact object key")
+        path = self.root.joinpath(*key.parts).resolve()
+        if path != self.root and self.root not in path.parents:
+            raise ArtifactAuthorizationError("artifact object escaped configured root")
+        return path
+
+    def put_stream(self, object_key: str, stream: BinaryIO) -> None:
+        path = self.path_for(object_key)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            with path.open("xb") as output:
+                while chunk := stream.read(1024 * 1024):
+                    output.write(chunk)
+        except Exception:
+            if path.exists():
+                path.unlink()
+            raise
+
+    def stat(self, object_key: str) -> tuple[str, int]:
+        path = self.path_for(object_key)
+        if not path.is_file():
+            raise ArtifactIntegrityError("artifact object is missing")
+        with path.open("rb") as stream:
+            return hashlib.sha256(stream.read()).hexdigest(), path.stat().st_size
+
+
+def configured_object_storage() -> ObjectStorage:
+    local_root = os.environ.get("AI00_ARTIFACT_LOCAL_ROOT", "").strip()
+    return FilesystemObjectStorage(local_root) if local_root else OisObjectStorage()
 
 
 class InMemoryArtifactStore:

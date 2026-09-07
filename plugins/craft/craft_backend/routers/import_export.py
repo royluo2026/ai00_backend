@@ -70,6 +70,7 @@ class ExportExcelBody(BaseModel):
 class ParseExcelBody(BaseModel):
     file_b64: str
     filename: str = "upload.xlsx"
+    module: str = ""
 
 
 class LarkSheetsReadBody(BaseModel):
@@ -400,6 +401,8 @@ async def parse_excel(
     gateway=Depends(get_default_gateway),
 ):
     parsed = _legacy_parse_excel(body, user)
+    if body.module != "bop":
+        return parsed
     parsed_data = parsed.get("data", {})
     document = {
         "version_tag": body.filename.rsplit(".", 1)[0] or "import",
@@ -428,7 +431,7 @@ async def parse_excel(
             status_code=400 if error and error.code == "invalid_input" else 422,
             detail=error.model_dump(mode="json") if error else None,
         )
-    parsed_data["import_preview"] = result.data["data"]
+    parsed_data["import_preview"] = result.data
     return parsed
 
 

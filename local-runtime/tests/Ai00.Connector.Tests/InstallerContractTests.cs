@@ -30,6 +30,13 @@ public sealed class InstallerContractTests
         var planPipe = File.ReadAllText(SourceFile("src", "Ai00.Connector.SessionHost", "PlanPipeHost.cs"));
         Assert.DoesNotContain("PipeOptions.CurrentUserOnly", planPipe, StringComparison.Ordinal);
         Assert.Contains("LocalServiceSid", planPipe, StringComparison.Ordinal);
+        Assert.DoesNotContain("WindowsIdentity.GetCurrent().User", planPipe, StringComparison.Ordinal);
+
+        var sessionOptions = File.ReadAllText(SourceFile("src", "Ai00.Connector.SessionHost", "SessionHostOptions.cs"));
+        Assert.DoesNotContain("operation.keys", sessionOptions, StringComparison.Ordinal);
+
+        var serviceProgram = File.ReadAllText(SourceFile("src", "Ai00.Connector.Service", "Program.cs"));
+        Assert.DoesNotContain("RuntimeWorker", serviceProgram, StringComparison.Ordinal);
     }
 
     private static string SourceFile(params string[] parts)

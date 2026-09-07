@@ -75,6 +75,23 @@ class SimulationConnectorRepository:
             )
             return cursor.fetchone() is not None
 
+    def binding_for_user(self, user_gid: str, team_gid: str | None = None) -> dict | None:
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            if team_gid is None:
+                cursor.execute(
+                    "SELECT connector_id,installation_id,team_gid,status,pending_pairing_id "
+                    "FROM workmanship_sim_connector_bindings WHERE owner_user_gid=%s LIMIT 1",
+                    (user_gid,),
+                )
+            else:
+                cursor.execute(
+                    "SELECT connector_id,installation_id,team_gid,status,pending_pairing_id "
+                    "FROM workmanship_sim_connector_bindings "
+                    "WHERE owner_user_gid=%s AND team_gid=%s LIMIT 1",
+                    (user_gid, team_gid),
+                )
+            return cursor.fetchone()
+
     def get_health(self, connector_id: str) -> ConnectorHealth | None:
         from ..capabilities.connector_contracts import ConnectorHealth
 
@@ -153,17 +170,17 @@ class SimulationConnectorRepository:
             with conn.cursor() as cursor:
                 cursor.execute(
                     "UPDATE workmanship_sim_connector_plans SET status='outcome_unknown',updated_at=NOW(6) "
-                    "WHERE connector_id=%s AND status='leased' AND lease_until<=NOW(6)",
+                    "WHERE connector_id=%s AND status='leased' AND lease_until<=UTC_TIMESTAMP(6)",
                     (connector_id,),
                 )
                 cursor.execute(
                     "UPDATE workmanship_sim_connector_plans SET status='expired',updated_at=NOW(6) "
-                    "WHERE connector_id=%s AND status='queued' AND expires_at<=NOW(6)",
+                    "WHERE connector_id=%s AND status='queued' AND expires_at<=UTC_TIMESTAMP(6)",
                     (connector_id,),
                 )
                 cursor.execute(
                     "SELECT plan_id,plan_json FROM workmanship_sim_connector_plans "
-                    "WHERE connector_id=%s AND status='queued' AND expires_at>NOW(6) "
+                    "WHERE connector_id=%s AND status='queued' AND expires_at>UTC_TIMESTAMP(6) "
                     "ORDER BY created_at LIMIT 1 FOR UPDATE",
                     (connector_id,),
                 )
@@ -172,7 +189,7 @@ class SimulationConnectorRepository:
                     return None
                 cursor.execute(
                     "UPDATE workmanship_sim_connector_plans SET status='leased',lease_id=%s,"
-                    "lease_until=DATE_ADD(NOW(6),INTERVAL %s SECOND),attempts=attempts+1,updated_at=NOW(6) "
+                    "lease_until=DATE_ADD(UTC_TIMESTAMP(6),INTERVAL %s SECOND),attempts=attempts+1,updated_at=NOW(6) "
                     "WHERE plan_id=%s AND status='queued'",
                     (lease_id, lease_seconds, row["plan_id"]),
                 )
@@ -188,7 +205,7 @@ class SimulationConnectorRepository:
             cursor.execute(
                 "SELECT plan_json FROM workmanship_sim_connector_plans "
                 "WHERE plan_id=%s AND connector_id=%s AND lease_id=%s AND ("
-                "(status='leased' AND lease_until>NOW(6) AND expires_at>NOW(6)) OR "
+                "(status='leased' AND lease_until>UTC_TIMESTAMP(6) AND expires_at>UTC_TIMESTAMP(6)) OR "
                 "(status IN ('completed','failed','cancelled','outcome_unknown') AND outcome_hash IS NOT NULL)"
                 ") LIMIT 1",
                 (plan_id, connector_id, lease_id),
@@ -200,6 +217,21 @@ class SimulationConnectorRepository:
         if isinstance(value, str):
             value = json.loads(value)
         return ConnectorExecutionPlanV1.model_validate(value)
+
+    def get_plan_result(self, plan_id: str, user_gid: str, team_gid: str) -> dict | None:
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT plan_id,status,outcome_json FROM workmanship_sim_connector_plans "
+                "WHERE plan_id=%s AND user_gid=%s AND tenant_gid=%s LIMIT 1",
+                (plan_id, user_gid, team_gid),
+            )
+            row = cursor.fetchone()
+        if not row:
+            return None
+        outcome = row.get("outcome_json")
+        if isinstance(outcome, str):
+            outcome = json.loads(outcome)
+        return {"operation_id": row["plan_id"], "status": row["status"], "outcome": outcome}
 
     def complete_plan(
         self, connector_id: str, plan_id: str, lease_id: str,
@@ -225,7 +257,7 @@ class SimulationConnectorRepository:
                 cursor.execute(
                     "UPDATE workmanship_sim_connector_plans SET status=%s,outcome_json=%s,"
                     "outcome_hash=%s,updated_at=NOW(6) WHERE plan_id=%s AND connector_id=%s "
-                    "AND status='leased' AND lease_id=%s AND lease_until>NOW(6)",
+                    "AND status='leased' AND lease_id=%s AND lease_until>UTC_TIMESTAMP(6)",
                     (outcome.status, encoded, digest, plan_id, connector_id, lease_id),
                 )
                 if cursor.rowcount != 1:
@@ -256,7 +288,7 @@ class SimulationConnectorRepository:
                     cursor.execute(
                         "UPDATE workmanship_sim_connector_plans SET status=%s,outcome_json=%s,"
                         "outcome_hash=%s,updated_at=NOW(6) WHERE plan_id=%s AND connector_id=%s "
-                        "AND status='leased' AND lease_id=%s AND lease_until>NOW(6)",
+                        "AND status='leased' AND lease_id=%s AND lease_until>UTC_TIMESTAMP(6)",
                         (outcome.status, encoded, digest, plan_id, connector_id, lease_id),
                     )
                     if cursor.rowcount != 1:

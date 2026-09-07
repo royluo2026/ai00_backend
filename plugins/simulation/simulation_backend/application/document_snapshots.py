@@ -78,7 +78,7 @@ class DocumentSnapshotWorkflow:
             return None
         plan = ConnectorExecutionPlanV1.model_validate(row.get("plan"))
         return {
-            "capability_id": "simulation.connector.plan.queue", "major_version": 1,
+            "capability_id": "simulation.connector.plan.queue", "major_version": 2,
             "payload": {"plan": plan.model_dump(mode="json")},
             "idempotency_key": plan.plan_id,
         }
@@ -94,6 +94,7 @@ class DocumentSnapshotWorkflow:
         plan = ConnectorExecutionPlanV1.model_validate(action["payload"]["plan"])
         await self.connector_port.queue_plan(
             plan, context, approval_reference=approval_reference,
+            major_version=action["major_version"],
         )
         self.repository.mark_dispatched(request_id)
         return self.get(request_id, context)

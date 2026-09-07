@@ -38,6 +38,28 @@ public sealed class SessionOwnershipTests
         Assert.Equal(SessionHostState.Conflict, (await conflict.EnsureBoundSessionAsync(binding, default)).State);
     }
 
+    [Fact]
+    public void TrayStartsSessionHostOnlyWhenCurrentSessionHasNone()
+    {
+        var starts = 0;
+
+        Assert.True(SessionHostProcess.EnsureStarted(() => false, () => starts++));
+        Assert.False(SessionHostProcess.EnsureStarted(() => true, () => starts++));
+        Assert.Equal(1, starts);
+    }
+
+    [Fact]
+    public void BrokerAcceptsOnlyCompleteIdentityForItsInteractiveSid()
+    {
+        const string sid = "S-1-5-21-test";
+        Assert.True(SessionHostBroker.IsAllowed(
+            new SessionHostStartRequest("device-1", "user-1", sid), sid));
+        Assert.False(SessionHostBroker.IsAllowed(
+            new SessionHostStartRequest("device-1", "user-1", "S-1-5-21-other"), sid));
+        Assert.False(SessionHostBroker.IsAllowed(
+            new SessionHostStartRequest("", "user-1", sid), sid));
+    }
+
     private sealed class StubSessions(IReadOnlyList<int> ids) : IWindowsSessionLocator
     {
         public IReadOnlyList<int> ForSid(string windowsSid) => ids;

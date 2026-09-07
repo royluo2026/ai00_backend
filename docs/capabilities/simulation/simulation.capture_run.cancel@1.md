@@ -8,7 +8,7 @@ Cancel unstarted capture steps and reconcile active work.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_052a820799b9df56f233d3475547c8fa`
+- Catalog Release：`rel_6b7ac7cd21ed113da5a033e433f09a37`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -86,7 +86,7 @@ Cancel unstarted capture steps and reconcile active work.
 ```json
 {
   "capability_id": "simulation.capture_run.cancel",
-  "catalog_release": "rel_052a820799b9df56f233d3475547c8fa",
+  "catalog_release": "rel_6b7ac7cd21ed113da5a033e433f09a37",
   "major_version": 1,
   "payload": {
     "capture_run_id": "example"
@@ -196,11 +196,23 @@ Cancel unstarted capture steps and reconcile active work.
 - `plan_outcome_invalid`：The Connector outcome does not match the immutable execution plan.（retryable=false）
 - `capability_migration_required`：This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.（retryable=false）
 - `pairing_not_found`：The Connector pairing request does not exist.（retryable=false）
+- `pairing_bootstrap_not_found`：The Connector bootstrap ticket does not exist or is not visible to this user.（retryable=false）
+- `pairing_bootstrap_expired`：The two-minute Connector bootstrap ticket expired.（retryable=false）
+- `pairing_bootstrap_reused`：The Connector bootstrap ticket was already claimed or cancelled.（retryable=false）
+- `pairing_bootstrap_active`：An active Connector bootstrap ticket cannot be cancelled.（retryable=false）
+- `pairing_bootstrap_version_conflict`：The Connector bootstrap ticket changed after it was displayed.（retryable=false）
+- `pairing_bootstrap_conflict`：The Connector bootstrap ticket could not be created uniquely.（retryable=false）
+- `pairing_bootstrap_owner_mismatch`：The Connector bootstrap ticket belongs to a different user or team scope.（retryable=false）
 - `pairing_expired`：The five-minute Connector pairing request expired.（retryable=false）
 - `pairing_proof_invalid`：The Connector did not prove the original verifier and installation identity.（retryable=false）
+- `pairing_activation_proof_invalid`：The Connector activation proof is invalid.（retryable=false）
 - `pairing_not_approved`：The signed-in AI00 user has not approved this pairing.（retryable=false）
 - `pairing_version_conflict`：The pairing changed after it was displayed.（retryable=false）
 - `connector_binding_conflict`：The AI00 user already has a different Connector binding.（retryable=false）
+- `connector_binding_not_found`：The signed-in user has no bound Simulation Connector.（retryable=false）
+- `connector_command_not_found`：The requested Connector command is unavailable or outside the caller scope.（retryable=false）
+- `capability_provenance_required`：The Connector command requires exact Capability version and business-definition provenance.（retryable=false）
+- `vismockup_document_not_owned`：AI00 may close only a VisMockup document that it opened in this Connector session.（retryable=false）
 - `feishu_login_required`：Pairing approval requires an AI00 Web session established through Feishu login.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。

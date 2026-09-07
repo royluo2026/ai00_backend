@@ -8,7 +8,7 @@ Apply bounded Craft standard operation lifecycle and content changes.
 - 不适用：The change belongs to a GBOP release or BOP execution operation.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_052a820799b9df56f233d3475547c8fa`
+- Catalog Release：`rel_6b7ac7cd21ed113da5a033e433f09a37`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -96,7 +96,16 @@ Apply bounded Craft standard operation lifecycle and content changes.
     "record": {
       "additionalProperties": false,
       "properties": {
+        "ai00_level": {
+          "type": "integer"
+        },
+        "bom_row": {
+          "type": "string"
+        },
         "code": {
+          "type": "string"
+        },
+        "component_type": {
           "type": "string"
         },
         "description": {
@@ -108,7 +117,13 @@ Apply bounded Craft standard operation lifecycle and content changes.
         "level": {
           "type": "string"
         },
+        "match_tag": {
+          "type": "string"
+        },
         "name": {
+          "type": "string"
+        },
+        "operation_vpps": {
           "type": "string"
         },
         "parameters": {
@@ -116,7 +131,16 @@ Apply bounded Craft standard operation lifecycle and content changes.
           "properties": {},
           "type": "object"
         },
+        "parent_bom_row": {
+          "type": "string"
+        },
         "parent_vpps": {
+          "type": "string"
+        },
+        "part_feed": {
+          "type": "boolean"
+        },
+        "process_vpps": {
           "type": "string"
         },
         "required_tools": {
@@ -151,6 +175,9 @@ Apply bounded Craft standard operation lifecycle and content changes.
         },
         "vpps_desc": {
           "type": "string"
+        },
+        "vpps_part": {
+          "type": "string"
         }
       },
       "type": "object"
@@ -159,7 +186,16 @@ Apply bounded Craft standard operation lifecycle and content changes.
       "items": {
         "additionalProperties": false,
         "properties": {
+          "ai00_level": {
+            "type": "integer"
+          },
+          "bom_row": {
+            "type": "string"
+          },
           "code": {
+            "type": "string"
+          },
+          "component_type": {
             "type": "string"
           },
           "description": {
@@ -171,7 +207,13 @@ Apply bounded Craft standard operation lifecycle and content changes.
           "level": {
             "type": "string"
           },
+          "match_tag": {
+            "type": "string"
+          },
           "name": {
+            "type": "string"
+          },
+          "operation_vpps": {
             "type": "string"
           },
           "parameters": {
@@ -179,7 +221,16 @@ Apply bounded Craft standard operation lifecycle and content changes.
             "properties": {},
             "type": "object"
           },
+          "parent_bom_row": {
+            "type": "string"
+          },
           "parent_vpps": {
+            "type": "string"
+          },
+          "part_feed": {
+            "type": "boolean"
+          },
+          "process_vpps": {
             "type": "string"
           },
           "required_tools": {
@@ -214,6 +265,9 @@ Apply bounded Craft standard operation lifecycle and content changes.
           },
           "vpps_desc": {
             "type": "string"
+          },
+          "vpps_part": {
+            "type": "string"
           }
         },
         "type": "object"
@@ -234,7 +288,7 @@ Apply bounded Craft standard operation lifecycle and content changes.
 ```json
 {
   "capability_id": "craft.standard_operation.change.apply",
-  "catalog_release": "rel_052a820799b9df56f233d3475547c8fa",
+  "catalog_release": "rel_6b7ac7cd21ed113da5a033e433f09a37",
   "major_version": 1,
   "payload": {
     "operation": "create"

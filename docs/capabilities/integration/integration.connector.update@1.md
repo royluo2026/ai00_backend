@@ -8,7 +8,7 @@ Execute the governed integration.connector.update Integration outcome.
 - 不适用：The caller can use an owning domain Capability directly without external integration.
 - 生命周期：`stable`
 - 所属领域：`integration`
-- Catalog Release：`rel_052a820799b9df56f233d3475547c8fa`
+- Catalog Release：`rel_6b7ac7cd21ed113da5a033e433f09a37`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -137,7 +137,7 @@ Execute the governed integration.connector.update Integration outcome.
 ```json
 {
   "capability_id": "integration.connector.update",
-  "catalog_release": "rel_052a820799b9df56f233d3475547c8fa",
+  "catalog_release": "rel_6b7ac7cd21ed113da5a033e433f09a37",
   "major_version": 1,
   "payload": {
     "expected_revision": 1,

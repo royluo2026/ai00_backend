@@ -23,12 +23,21 @@ class CreateOpBody(BaseModel):
     importance: Optional[str] = None
     description: str = ""
     level: str = ""
+    ai00_level: Optional[int] = None
     vpps_attr: str = ""
     vpps: Optional[str] = None
     vpps_desc: str = ""
     torque_importance: str = ""
     vehicle_model: str = ""
     parent_vpps: str = ""
+    component_type: str = ""
+    bom_row: str = ""
+    parent_bom_row: str = ""
+    process_vpps: str = ""
+    operation_vpps: str = ""
+    vpps_part: str = ""
+    match_tag: str = ""
+    part_feed: bool = False
     steps: list = []
     required_tools: list = []
     parameters: dict = {}
@@ -40,12 +49,21 @@ class UpdateOpBody(BaseModel):
     importance: Optional[str] = None
     description: Optional[str] = None
     level: Optional[str] = None
+    ai00_level: Optional[int] = None
     vpps_attr: Optional[str] = None
     vpps: Optional[str] = None
     vpps_desc: Optional[str] = None
     torque_importance: Optional[str] = None
     vehicle_model: Optional[str] = None
     parent_vpps: Optional[str] = None
+    component_type: Optional[str] = None
+    bom_row: Optional[str] = None
+    parent_bom_row: Optional[str] = None
+    process_vpps: Optional[str] = None
+    operation_vpps: Optional[str] = None
+    vpps_part: Optional[str] = None
+    match_tag: Optional[str] = None
+    part_feed: Optional[bool] = None
     steps: Optional[list] = None
     required_tools: Optional[list] = None
     parameters: Optional[dict] = None
@@ -72,7 +90,7 @@ async def _invoke_standard_operation(request, current_user, principal, gateway, 
     if not result.ok:
         code = result.error.code if result.error else "provider_error"
         raise HTTPException(status_code={"resource_not_found": 404, "permission_denied": 403, "invalid_input": 400}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
-    return result.data["data"]
+    return result.data
 
 
 @router.get("/operations")
@@ -82,7 +100,7 @@ async def list_operations(status: Optional[str] = Query(None), request: Request 
 
 @router.post("/operations", status_code=201)
 async def create_operation(body: CreateOpBody, request: Request, current_user: dict = Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
-    return await _invoke_standard_operation(request, current_user, principal, gateway, "craft.standard_operation.change.apply", "create", record=body.model_dump())
+    return await _invoke_standard_operation(request, current_user, principal, gateway, "craft.standard_operation.change.apply", "create", record=body.model_dump(exclude_none=True))
 
 
 @router.get("/operations/{gid}")

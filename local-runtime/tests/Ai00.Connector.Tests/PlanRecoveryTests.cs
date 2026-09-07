@@ -19,10 +19,34 @@ public sealed class PlanRecoveryTests : IDisposable
         var gateway = new RecordingPlanGateway();
         var worker = new PlanWorker(journal, gateway, new NoopPlanExecutor());
 
-        await worker.StartOnceAsync(default);
+        Assert.True(await worker.StartOnceAsync(default));
 
         Assert.Equal("plan-001", gateway.FirstReconciliation!.PlanId);
         Assert.Equal(0, gateway.LeaseCallsBeforeReconciliation);
+    }
+
+    [Fact]
+    public async Task EmptyLeaseReportsNoWorkSoTheLoopCanWaitForAWakeSignal()
+    {
+        var worker = new PlanWorker(
+            new PlanJournal(Path.Combine(_directory, "empty-journal.json")),
+            new RecordingPlanGateway(), new NoopPlanExecutor());
+
+        Assert.False(await worker.StartOnceAsync(default));
+    }
+
+    [Theory]
+    [InlineData("http://127.0.0.1:8080/", "ws://127.0.0.1:8080/api/v1/simulation/connectors/plans/wake")]
+    [InlineData("https://ai00.example.com/base/", "wss://ai00.example.com/base/api/v1/simulation/connectors/plans/wake")]
+    public void WakeEndpointUsesTheAuthenticatedGatewayOrigin(string gateway, string expected)
+    {
+        Assert.Equal(expected, ConnectorPlanWakeClient.BuildEndpoint(new Uri(gateway)).AbsoluteUri);
+    }
+
+    [Fact]
+    public void LeasePollingIsOnlyAThirtySecondRecoveryFallback()
+    {
+        Assert.Equal(30, new RuntimeOptions().PollSeconds);
     }
 
     [Fact]

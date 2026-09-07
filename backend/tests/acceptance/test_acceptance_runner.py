@@ -123,6 +123,11 @@ def test_release_bindings_cover_manifest_and_every_domain_migration():
         ("agent", "0004_confirmation_tokens.sql"),
         ("agent", "0005_capability_outbox.sql"),
         ("agent", "0006_capability_outbox_delivery.sql"),
+        ("agent", "0007_agent_orchestration_mvp.sql"),
+        ("agent", "0008_agent_orchestration_runtime_metrics.sql"),
+        ("agent", "0009_agent_orchestration_scope.sql"),
+        ("agent", "0010_agent_orchestration_scope_backfill.sql"),
+        ("agent", "0011_agent_orchestration_evidence_trust.sql"),
         ("base", "0001_base_platform.sql"),
         ("base", "0002_domain_inbox.sql"),
         ("craft", "0001_pbom.sql"),
@@ -132,8 +137,11 @@ def test_release_bindings_cover_manifest_and_every_domain_migration():
         ("craft", "0005_pbom_updated_at.sql"),
         ("craft", "0006_socket_resource_requirements.sql"),
         ("craft", "0007_process_screenshots.sql"),
+        ("craft", "0008_standard_operation_ai00_level.sql"),
+        ("craft", "0009_standard_operation_gbop_match_fields.sql"),
         ("digital_model", "0001_digital_model.sql"),
         ("factory", "0001_factory.sql"),
+        ("factory", "0002_legacy_structure_backfill.sql"),
         ("integration", "0001_integration.sql"),
         ("integration", "0002_integration_structural_operations.sql"),
         ("integration", "0003_integration_mapping_target_bindings.sql"),
@@ -156,6 +164,7 @@ def test_release_bindings_cover_manifest_and_every_domain_migration():
         ("simulation", "0004_capture_dispatch_plans.sql"),
         ("simulation", "0005_connector_control_plane.sql"),
         ("simulation", "0006_capture_dispatch_compatibility.sql"),
+        ("simulation", "0007_connector_pairing_activation.sql"),
     }
     assert all(row["sha256"].startswith("sha256:") for row in migration_bindings)
     assert all(row["artifact_version"] for row in migration_bindings)

@@ -45,6 +45,23 @@ def test_factory_repository_decodes_json_columns_for_provider_consumers():
     assert row["meta"] == {"source": "e2e"}
 
 
+def test_factory_migration_backfills_legacy_structure_hierarchy():
+    migration = ROOT / "backend/db/migrations/domains/factory/0002_legacy_structure_backfill.sql"
+
+    assert migration.exists()
+    sql = migration.read_text(encoding="utf-8")
+    for source in (
+        "workmanship_factory_factories",
+        "workmanship_factory_factory_sections",
+        "workmanship_factory_factory_lines",
+        "workmanship_factory_factory_stations",
+    ):
+        assert f"FROM `{source}`" in sql
+    assert sql.count("AI00: RESUMABLE BACKFILL") == 4
+    assert "tenant_gid" in sql and "ON DUPLICATE KEY UPDATE" in sql
+    assert "owner_gid" not in sql
+
+
 def test_factory_compatibility_uses_user_tenant_when_team_is_missing():
     from plugins.factory.factory_backend.api.compatibility import (
         build_web_compatibility_envelope,

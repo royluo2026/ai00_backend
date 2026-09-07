@@ -54,6 +54,25 @@ public sealed class ExecutionPlanVectorTests
         Assert.Equal("duplicate_step_id", PlanValidator.Validate(duplicate, TestManifest(), Context(duplicate)).ErrorCode);
     }
 
+    [Fact]
+    public void SecurityAndAdapterValidationCanRunAcrossTheServiceBoundary()
+    {
+        var plan = LoadPlan();
+
+        Assert.True(PlanValidator.ValidateSecurity(plan, Context(plan)).IsValid);
+        Assert.True(PlanValidator.ValidateAdapter(plan, TestManifest()).IsValid);
+        Assert.Equal(
+            "plan_signature_invalid",
+            PlanValidator.ValidateSecurity(
+                plan,
+                Context(plan) with { Signature = "hmac-sha256:" + new string('0', 64) }).ErrorCode);
+        Assert.Equal(
+            "adapter_operation_not_allowed",
+            PlanValidator.ValidateAdapter(
+                plan with { Steps = [plan.Steps[0] with { OperationId = "vismockup.raw.com@1" }] },
+                TestManifest()).ErrorCode);
+    }
+
     private static AdapterManifest TestManifest() => new(
         "ai00.vismockup", 1, "siemens.vismockup", "14.2.0",
         [new AdapterOperationContract("vismockup.application.probe@1", "sha256:" + new string('1', 64))]);

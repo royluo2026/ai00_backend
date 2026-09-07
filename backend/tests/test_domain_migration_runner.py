@@ -170,7 +170,7 @@ class RecordingConnection:
         self.rollbacks += 1
 
 
-def test_simulation_historical_0004_checksum_upgrades_forward_to_0006(simulation_manifest):
+def test_simulation_historical_0004_checksum_upgrades_through_current_chain(simulation_manifest):
     migrations = discover_domain_migrations(ROOT, simulation_manifest)
     old = next(item for item in migrations if item.migration_id == "0004")
     assert old.checksum == "be3e9cefefa42b1fc196ffdf275d4740d30d8acffff0e80dc0408008e03ada04"
@@ -184,7 +184,7 @@ def test_simulation_historical_0004_checksum_upgrades_forward_to_0006(simulation
 
     applied = apply_domain_migrations(connection, simulation_manifest, migrations)
 
-    assert applied == ("0005", "0006")
+    assert applied == ("0005", "0006", "0007")
 
 
 def test_apply_uses_domain_lock_ledger_and_artifact_version(craft_manifest):
@@ -269,7 +269,7 @@ def test_apply_rejects_changed_checksum_for_applied_migration(craft_manifest):
 
 def test_check_mode_validates_empty_domain_without_connecting(capsys):
     assert main(["--domain", "craft", "--check"], root=ROOT, environ={}) == 0
-    assert capsys.readouterr().out.strip() == "domain=craft migrations=7 mode=check"
+    assert capsys.readouterr().out.strip() == "domain=craft migrations=9 mode=check"
 
 
 def test_apply_requires_only_the_selected_domains_ddl_credential(monkeypatch, capsys):
@@ -309,4 +309,4 @@ def test_apply_requires_only_the_selected_domains_ddl_credential(monkeypatch, ca
     assert result == 0
     assert captured[0].username == "craft_ddl"
     assert connection.closed is True
-    assert "domain=craft migrations=7 applied=0" in capsys.readouterr().out
+    assert "domain=craft migrations=9 applied=0" in capsys.readouterr().out

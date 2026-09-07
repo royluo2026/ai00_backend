@@ -19,7 +19,6 @@ builder.Services.AddWindowsService(options => options.ServiceName = "AI00 Connec
 builder.Services.Configure<RuntimeOptions>(builder.Configuration.GetSection("Connector"));
 builder.Services.AddSingleton<IDeviceCredentialStore>(_ => new DeviceCredentialStore(
     Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "AI00", "Connector", "device.credential")));
-builder.Services.AddHttpClient<DeviceGatewayClient>();
 builder.Services.AddHttpClient<ConnectorGatewayClient>();
 builder.Services.AddHttpClient<IArtifactTransport, HttpArtifactTransport>();
 builder.Services.AddSingleton<TemporaryFileStore>(service => new TemporaryFileStore(
@@ -31,7 +30,6 @@ builder.Services.AddSingleton<IConnectorHealthSource, FileConnectorHealthSource>
 builder.Services.AddSingleton<ConnectorHeartbeatReporter>();
 builder.Services.AddSingleton<IConnectorPlanGateway>(service =>
     service.GetRequiredService<ConnectorGatewayClient>());
-builder.Services.AddSingleton<SessionHostClient>();
 builder.Services.AddSingleton<PlanSessionHostClient>();
 builder.Services.AddSingleton<PlanJournal>(_ => new PlanJournal(
     Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
@@ -43,8 +41,13 @@ builder.Services.AddSingleton<IConnectorPlanExecutor>(service =>
         service.GetRequiredService<PlanSessionHostClient>(),
         service.GetRequiredService<ISystemPowerGuard>()));
 builder.Services.AddSingleton<PlanWorker>();
-builder.Services.AddHostedService<RuntimeWorker>();
+builder.Services.AddSingleton<ConnectorPlanWakeClient>();
+builder.Services.AddSingleton<IConnectorPlanWakeSignal>(service =>
+    service.GetRequiredService<ConnectorPlanWakeClient>());
+builder.Services.AddHostedService(service =>
+    service.GetRequiredService<ConnectorPlanWakeClient>());
 builder.Services.AddHostedService<PairingPipeHost>();
+builder.Services.AddHostedService<SessionHostPresenceWorker>();
 builder.Services.AddHostedService<ConnectorPlanBackgroundWorker>();
 builder.Services.AddHostedService<ConnectorHeartbeatWorker>();
 await builder.Build().RunAsync();

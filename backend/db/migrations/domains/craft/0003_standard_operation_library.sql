@@ -1,4 +1,4 @@
--- Craft-owned standard-operation library. This is distinct from GBOP tree entries.
+-- Craft-owned GBOP standard-operation library; versioned GBOP tree tables provide its structured view.
 CREATE TABLE IF NOT EXISTS `workmanship_craft_standard_operations` (
   `gid` CHAR(36) PRIMARY KEY,
   `display_id` VARCHAR(64) NOT NULL DEFAULT '',

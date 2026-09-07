@@ -25,7 +25,25 @@ public sealed class FakeVisMockupCom : IVisMockupCom
         new("14.2.0", new FakeDocument(documentId, "tc://bom/1", FakeNode.FlatTree(nodeCount)));
 }
 
-public sealed record FakeApplication(string ProductVersion, IVisMockupDocument? ActiveDocument) : IVisMockupApplication;
+public sealed class FakeApplication(string productVersion, IVisMockupDocument? activeDocument) : IVisMockupApplication
+{
+    public string ProductVersion { get; } = productVersion;
+    public IVisMockupDocument? ActiveDocument { get; set; } = activeDocument;
+    public FakeDocument? LastOpenedDocument { get; private set; }
+    public IVisMockupDocument OpenDocument(string path)
+    {
+        LastOpenedDocument = new FakeDocument(Path.GetFullPath(path), Path.GetFullPath(path), FakeNode.FlatTree(1));
+        ActiveDocument = LastOpenedDocument;
+        return LastOpenedDocument;
+    }
+    public void CloseAllDocuments()
+    {
+        ActiveDocument?.Close();
+        if (LastOpenedDocument is not null && !ReferenceEquals(LastOpenedDocument, ActiveDocument))
+            LastOpenedDocument.Close();
+        ActiveDocument = null;
+    }
+}
 public sealed class FakeDocument(string documentId, string sourceIdentity, IVisMockupNode rootNode) : IVisMockupDocument
 {
     private readonly HashSet<string> _visible = [];
@@ -33,6 +51,8 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
     public string SourceIdentity { get; } = sourceIdentity;
     public IVisMockupNode RootNode { get; } = rootNode;
     public int CaptureImageCalls { get; private set; }
+    public bool Closed { get; private set; }
+    public List<bool> VisibilityChanges { get; } = [];
     public CaptureProfile Profile { get; private set; } = new("png", 1, 1, "current");
     public IReadOnlyCollection<string> AllNodeKeys => Traverse().Select(item => item.NodeKey).ToArray();
     public IReadOnlyCollection<string> VisibleNodeKeys => _visible.ToArray();
@@ -52,6 +72,8 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         File.WriteAllBytes(path, header);
     }
+    public void SetAllNodesVisible(bool visible) => VisibilityChanges.Add(visible);
+    public void Close() => Closed = true;
     private IEnumerable<IVisMockupNode> Traverse()
     {
         var queue = new Queue<IVisMockupNode>();

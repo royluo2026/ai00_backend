@@ -1,4 +1,5 @@
 using System.IO.Pipes;
+using System.Security.Principal;
 using System.Text;
 
 namespace Ai00.Connector.Tray;
@@ -28,7 +29,8 @@ public static class PairingPipeClient
     {
         if (!IsAllowed(uri)) throw new InvalidOperationException("connector_pairing_uri_invalid");
         await using var pipe = new NamedPipeClientStream(
-            ".", PipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
+            ".", PipeName, PipeDirection.InOut, PipeOptions.Asynchronous,
+            TokenImpersonationLevel.Impersonation);
         await pipe.ConnectAsync(5_000, cancellationToken);
         await using var writer = new StreamWriter(pipe, new UTF8Encoding(false), leaveOpen: true) {
             AutoFlush = true,

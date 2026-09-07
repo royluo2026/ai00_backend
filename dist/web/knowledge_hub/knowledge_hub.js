@@ -932,7 +932,7 @@ async function _openItem(item) {
     _centerBody.style.cssText = '';
     const iframe = document.createElement('iframe');
     iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;';
-    iframe.src = path ? `../${path}` : 'about:blank';
+    iframe.src = resolveKnowledgeSitePageUrl(path);
     _centerBody.appendChild(iframe);
     _loadThread(item);
     return;
@@ -1599,14 +1599,17 @@ async function _createSitePage() {
   if (!picked || !picked.length) return;
 
   // 批量添加
+  let added = 0;
   for (const page of picked) {
-    await _doCreateItem({
+    const item = await _doCreateItem({
       item_type: 'site_page',
       title: page.title,
-      site_ref: { path: page.path, label: page.title },
+      site_ref: { path: page.path },
     });
+    if (item) added++;
   }
-  _showToast(`已添加 ${picked.length} 个页面`);
+  const failed = picked.length - added;
+  if (added) _showToast(`已添加 ${added} 个页面${failed ? `，失败 ${failed} 个，请重试` : ''}`);
 }
 
 // ── 页面选择器弹窗（多选） ───────────────────────────────────────────────────
@@ -1699,8 +1702,8 @@ async function _doCreateItem(fields) {
         cleanFields.tags || [], '');
       item = res?.data;
     } else if (_isCloud()) {
-      const _cloudFetch = _cf();
-      if (!_cloudFetch) return;
+      const cf = _cf();
+      if (!cf) throw new Error('知识库服务不可用，请重新登录后重试');
       const body = {
         ...extra,
         scope_type: visOverride?.scope_type || scope,
@@ -1708,14 +1711,18 @@ async function _doCreateItem(fields) {
         ...cleanFields,
       };
       if (visOverride?.shared_project_gid) body.shared_project_gid = visOverride.shared_project_gid;
-      item = await _cloudFetch('/api/knowledge_hub/items', { method: 'POST', body: JSON.stringify(body) });
+      item = await cf('/api/knowledge_hub/items', { method: 'POST', body: JSON.stringify(body) });
     }
-    if (item) {
-      _items.unshift(item);
-      _renderLeft2();
-      _openItem(item);
-    }
-  } catch (_) {}
+    if (!item?.gid) throw new Error('未收到已保存的条目，请刷新列表后重试');
+    _items.unshift(item);
+    _renderLeft2();
+    _openItem(item);
+    return item;
+  } catch (error) {
+    console.error('[KnowledgeHub] 创建条目失败', error);
+    _showToast(`创建失败：${error?.message || error}`);
+    return null;
+  }
 }
 
 // ── 下拉菜单 ──────────────────────────────────────────────────────────────────

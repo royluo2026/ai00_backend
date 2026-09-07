@@ -14,6 +14,10 @@ public sealed class ConnectorGatewayClient(
 {
     private readonly RuntimeOptions _options = options.Value;
 
+    private Uri Gateway(DeviceCredential credential) => ConnectorGatewayEndpoint.Resolve(
+        credential,
+        new Uri(_options.GatewayUrl.TrimEnd('/') + "/"));
+
     public async Task HeartbeatAsync(object health, CancellationToken cancellationToken)
     {
         using var request = Request(HttpMethod.Post, "/api/v1/simulation/connectors/heartbeat", health);
@@ -50,9 +54,12 @@ public sealed class ConnectorGatewayClient(
         LeasedConnectorPlan lease, CancellationToken cancellationToken)
     {
         var materialized = new List<MaterializedArtifact>();
-        foreach (var step in lease.Plan.Steps.Where(item => item.OperationId == "vismockup.model.attach@1"))
+        foreach (var step in lease.Plan.Steps.Where(item =>
+                     item.OperationId is "vismockup.model.attach@1" or "vismockup.model.open@1"))
         {
-            var artifact = step.Payload.GetProperty("binding").GetProperty("model_ref").GetProperty("artifact_ref");
+            var artifact = step.OperationId == "vismockup.model.open@1"
+                ? step.Payload.GetProperty("artifact_ref")
+                : step.Payload.GetProperty("binding").GetProperty("model_ref").GetProperty("artifact_ref");
             var reference = new ConnectorArtifactRef(
                 artifact.GetProperty("artifact_id").GetString() ?? throw new ConnectorException("artifact_ref_invalid"),
                 artifact.GetProperty("media_type").GetString() ?? "",
@@ -65,8 +72,9 @@ public sealed class ConnectorGatewayClient(
             response.EnsureSuccessStatusCode();
             var envelope = await response.Content.ReadFromJsonAsync<ApiEnvelope<ArtifactGrant>>(cancellationToken: cancellationToken)
                 ?? throw new ConnectorException("artifact_download_unavailable");
+            var credential = credentialStore.Load();
             var download = Uri.TryCreate(envelope.Data.DownloadUrl, UriKind.Absolute, out var absolute)
-                ? absolute : new Uri(new Uri(_options.GatewayUrl.TrimEnd('/') + "/"), envelope.Data.DownloadUrl.TrimStart('/'));
+                ? absolute : new Uri(Gateway(credential), envelope.Data.DownloadUrl.TrimStart('/'));
             materialized.Add(await artifactTransfer.DownloadAsync(reference, download, cancellationToken));
         }
         return materialized;
@@ -138,7 +146,7 @@ public sealed class ConnectorGatewayClient(
     private HttpRequestMessage Request(HttpMethod method, string path, object? body = null)
     {
         var credential = credentialStore.Load();
-        var request = new HttpRequestMessage(method, new Uri(new Uri(_options.GatewayUrl.TrimEnd('/') + "/"), path.TrimStart('/')));
+        var request = new HttpRequestMessage(method, new Uri(Gateway(credential), path.TrimStart('/')));
         request.Headers.Add("X-AI00-Connector-ID", credential.DeviceId);
         request.Headers.Add("X-AI00-Connector-Token", credential.DeviceToken);
         if (body is not null) request.Content = JsonContent.Create(body);

@@ -18,6 +18,7 @@ from backend.capability_v2.artifacts import (
     ArtifactRecord,
     ArtifactIntegrityError,
     ArtifactService,
+    FilesystemObjectStorage,
     InMemoryArtifactStore,
     InMemoryObjectStorage,
     SqlArtifactStore,
@@ -58,6 +59,18 @@ def test_artifact_hash_mismatch_is_rejected_and_session_is_not_finalized():
         service.finalize(session.upload_id, identity(), reported_sha256="0" * 64)
 
     assert service.get_upload(session.upload_id, identity()).status == "pending"
+
+
+def test_filesystem_artifact_storage_is_explicit_integrity_checked_and_scoped(tmp_path):
+    storage = FilesystemObjectStorage(tmp_path)
+    storage.put_stream("capability-artifacts/tenant/upload-1", io.BytesIO(b"abc"))
+
+    assert storage.stat("capability-artifacts/tenant/upload-1") == (
+        "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
+        3,
+    )
+    with pytest.raises(ArtifactAuthorizationError):
+        storage.path_for("../outside")
 
 
 def test_artifact_finalize_returns_immutable_ref_and_is_idempotent():

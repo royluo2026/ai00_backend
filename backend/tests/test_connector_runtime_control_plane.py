@@ -19,9 +19,13 @@ from plugins.simulation.simulation_backend.capabilities.connector_runtime import
     ConnectorControlPlane,
     ConnectorError,
     ConnectorHealth,
+    _direct_vismockup_plan,
     require_compatible,
     register_connector_runtime_capabilities,
     sign_connector_plan_lease,
+)
+from plugins.simulation.simulation_backend.application.connector_wakeup import (
+    ConnectorWakeBroker,
 )
 
 
@@ -58,6 +62,80 @@ def healthy(session_id="session-1"):
 
 def plan():
     return ConnectorExecutionPlanV1.model_validate(VECTOR["plan"])
+
+
+def test_direct_plan_uses_cross_language_timestamp_precision():
+    value = _direct_vismockup_plan(
+        action="launch", connector_id="device-001", payload={},
+        context=CapabilityContext(
+            user_gid="user-001", team_gid="tenant-001",
+            capability_version_gid="cv2_1234567890abcdef12345678",
+            business_definition_hash="sha256:" + "2" * 64,
+        ),
+        now=NOW.replace(microsecond=123456),
+    )
+
+    assert value.issued_at.microsecond == 0
+    assert value.expires_at.microsecond == 0
+
+
+def test_wake_broker_notifies_only_the_target_connector():
+    async def exercise():
+        broker = ConnectorWakeBroker()
+        async with broker.subscribe("device-001") as subscription:
+            broker.notify("device-002")
+            assert await subscription.wait(0.01) is False
+            broker.notify("device-001")
+            assert await subscription.wait(0.1) is True
+
+    asyncio.run(exercise())
+
+
+def test_queue_plan_wakes_the_target_connector_after_persistence():
+    class WakeRecorder:
+        def __init__(self): self.connector_ids = []
+        def notify(self, connector_id): self.connector_ids.append(connector_id)
+
+    repository = MemoryRepository()
+    wake = WakeRecorder()
+    context = CapabilityContext(
+        user_gid="user-001", team_gid="tenant-001",
+        capability_version_gid="cv2_1234567890abcdef12345678",
+        business_definition_hash="sha256:" + "2" * 64,
+    )
+    value = _direct_vismockup_plan(
+        action="attach", connector_id="device-001", payload={}, context=context, now=NOW,
+    )
+    health_data = healthy().model_dump(mode="json")
+    health_data["adapters"][0]["operations"] = [{
+        "operation_id": value.steps[0].operation_id,
+        "contract_hash": value.steps[0].contract_hash,
+    }]
+    health = ConnectorHealth.model_validate(health_data)
+    repository.save_health("device-001", health)
+
+    operation = ConnectorControlPlane(
+        repository, clock=lambda: NOW, wake_notifier=wake,
+    ).queue_plan(value, context)
+
+    assert operation.operation_id == value.plan_id
+    assert wake.connector_ids == ["device-001"]
+
+
+def test_attach_plan_never_launches_vismockup():
+    value = _direct_vismockup_plan(
+        action="attach", connector_id="device-001", payload={},
+        context=CapabilityContext(
+            user_gid="user-001", team_gid="tenant-001",
+            capability_version_gid="cv2_1234567890abcdef12345678",
+            business_definition_hash="sha256:" + "2" * 64,
+        ),
+        now=NOW,
+    )
+
+    assert value.steps[0].operation_id == "vismockup.application.probe@1"
+    assert value.steps[0].payload == {"allow_launch": False}
+    assert value.compute_hash() == value.plan_hash
 
 
 class MemoryRepository:
@@ -232,6 +310,20 @@ def test_stale_session_can_be_replaced_for_the_same_bound_user():
     assert repository.health["device-001"].session_id == "session-2"
 
 
+def test_missing_session_heartbeat_can_transition_to_ready_immediately():
+    repository = MemoryRepository()
+    repository.save_health("device-001", healthy("missing").model_copy(update={
+        "user_session_present": False,
+        "session_host_ready": False,
+        "adapters": (),
+    }))
+    control_plane = ConnectorControlPlane(repository, clock=lambda: NOW)
+
+    control_plane.record_heartbeat("device-001", "user-001", healthy("session-1"))
+
+    assert repository.health["device-001"].session_host_ready is True
+
+
 def test_queue_checks_protocol_adapter_operation_and_contract_hash():
     health = healthy()
     require_compatible(plan(), health)
@@ -317,6 +409,14 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
     assert set(by_id) == {
         ("simulation.connector.health.get", 1),
         ("simulation.connector.plan.queue", 1),
+        ("simulation.connector.plan.queue", 2),
+        ("simulation.vismockup.application.attach.request", 1),
+        ("simulation.vismockup.application.launch.request", 1),
+        ("simulation.vismockup.model.open.request", 1),
+        ("simulation.vismockup.model.close.request", 1),
+        ("simulation.vismockup.visibility.change.request", 1),
+        ("simulation.vismockup.tree.read.request", 1),
+        ("simulation.vismockup.command.get", 1),
         ("simulation.vismockup.status.get", 1),
         ("simulation.vismockup.application.launch", 1),
         ("simulation.vismockup.model.open", 1),
@@ -332,10 +432,37 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
         assert substantive_business_definition_errors(descriptor) == ()
     assert by_id[("simulation.connector.plan.queue", 1)][1].consistency_policy == "external"
     assert by_id[("simulation.connector.plan.queue", 1)][1].lifecycle_status == "experimental"
+    assert by_id[("simulation.connector.plan.queue", 1)][0].permissions == ("agent.run",)
+    assert by_id[("simulation.connector.plan.queue", 2)][0].permissions == ("simulation.use",)
+    snapshot_payload_schema = (
+        by_id[("simulation.connector.plan.queue", 2)][0]
+        .input_schema["properties"]["plan"]["properties"]["steps"]["items"]
+        ["properties"]["payload"]
+    )
+    assert set(snapshot_payload_schema["properties"]) == {"max_nodes", "max_depth"}
+    for capability_id in (
+        "simulation.vismockup.application.attach.request",
+        "simulation.vismockup.application.launch.request",
+        "simulation.vismockup.model.open.request",
+        "simulation.vismockup.model.close.request",
+        "simulation.vismockup.visibility.change.request",
+        "simulation.vismockup.tree.read.request",
+        "simulation.vismockup.command.get",
+    ):
+        spec, descriptor = by_id[(capability_id, 1)]
+        assert spec.permissions == ("simulation.use",)
+        assert descriptor.execution_mode.value == "cloud_sync"
+        assert descriptor.operation_policy == ("optional" if spec.risk.value == "write" else "none")
+    assert by_id[("simulation.vismockup.application.attach.request", 1)][0].confirmation == "none"
+    assert by_id[("simulation.vismockup.visibility.change.request", 1)][0].confirmation == "none"
+    assert by_id[("simulation.vismockup.tree.read.request", 1)][0].confirmation == "none"
     for capability_id, (_spec, descriptor) in by_id.items():
-        if capability_id[0].startswith("simulation.vismockup."):
+        if capability_id[0].startswith("simulation.vismockup.") and not capability_id[0].endswith(".request") and capability_id[0] != "simulation.vismockup.command.get":
             assert descriptor.exposure.local_runtime
             assert not descriptor.exposure.web
+        elif capability_id[0].startswith("simulation.vismockup."):
+            assert descriptor.exposure.web
+            assert not descriptor.exposure.local_runtime
 
 
 def test_connector_heartbeat_route_passes_authenticated_connector_identity(monkeypatch):

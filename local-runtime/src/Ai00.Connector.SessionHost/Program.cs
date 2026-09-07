@@ -8,55 +8,43 @@ using System.Text.Json;
 var options = SessionHostOptions.FromEnvironment();
 var windowsSid = WindowsIdentity.GetCurrent().User?.Value
     ?? throw new InvalidOperationException("Current Windows SID is unavailable");
-var credentialPath = Path.Combine(
-    Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-    "AI00", "Connector", "device.credential");
-var credential = ConnectorIdentityStore.Load(credentialPath);
-if (!string.Equals(credential.WindowsSid, windowsSid, StringComparison.Ordinal))
-    throw new InvalidOperationException("connector_windows_session_mismatch");
-var connectorId = credential.DeviceId;
+var connectorId = Environment.GetEnvironmentVariable("AI00_CONNECTOR_DEVICE_ID")
+    ?? throw new InvalidOperationException("connector_device_identity_missing");
+var userId = Environment.GetEnvironmentVariable("AI00_CONNECTOR_USER_ID")
+    ?? throw new InvalidOperationException("connector_user_identity_missing");
 using var instance = SingleInstanceGuard.Acquire(connectorId, windowsSid);
+var presencePath = SessionHostPresencePath.For(windowsSid);
 using var sta = new StaDispatcher();
 var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy(options.AllowedRoots.Append(options.ArtifactCacheRoot)), options.VisMockupExe);
-var ledgerPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AI00", "command-ledger.jsonl");
-var host = new CommandPipeHost(
-    new CommandDispatcher(adapter, new CommandLedger(ledgerPath), options.ArtifactCacheRoot),
-    options.OperationSigningKeys,
-    ConnectorPipeName.For(connectorId, windowsSid));
 var planHost = new PlanPipeHost(
-    new ValidatedPlanDispatcher([adapter], options.OperationSigningKeys),
+    new ValidatedPlanDispatcher([adapter]),
     ConnectorPipeName.PlanFor(connectorId, windowsSid));
 using var presenceCancellation = new CancellationTokenSource();
-var presence = PublishPresenceAsync(adapter, windowsSid, presenceCancellation.Token);
+var presence = PublishPresenceAsync(adapter, windowsSid, presencePath, presenceCancellation.Token);
 try
 {
-    await Task.WhenAll(
-        host.RunAsync(CancellationToken.None),
-        planHost.RunAsync(CancellationToken.None));
+    await planHost.RunAsync(CancellationToken.None);
 }
 finally
 {
     presenceCancellation.Cancel();
     try { await presence; } catch (OperationCanceledException) { }
-    if (File.Exists(SessionHostPresencePath.Value)) File.Delete(SessionHostPresencePath.Value);
+    if (File.Exists(presencePath)) File.Delete(presencePath);
 }
 
 static async Task PublishPresenceAsync(
-    VisMockupAdapter adapter, string windowsSid, CancellationToken cancellationToken)
+    VisMockupAdapter adapter, string windowsSid, string presencePath,
+    CancellationToken cancellationToken)
 {
-    Directory.CreateDirectory(Path.GetDirectoryName(SessionHostPresencePath.Value)!);
+    Directory.CreateDirectory(Path.GetDirectoryName(presencePath)!);
     using var timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
     do
     {
-        var health = await adapter.ProbeAsync(cancellationToken);
-        var advertised = string.IsNullOrWhiteSpace(health.ProductVersion)
-            ? adapter.Manifest
-            : adapter.Manifest with { ProductVersion = health.ProductVersion };
         var value = new SessionHostPresence(
             windowsSid, Process.GetCurrentProcess().SessionId, Environment.ProcessId,
-            advertised, DateTimeOffset.UtcNow);
-        var temporary = SessionHostPresencePath.Value + ".tmp-" + Guid.NewGuid().ToString("N");
+            adapter.Manifest, DateTimeOffset.UtcNow);
+        var temporary = presencePath + ".tmp-" + Guid.NewGuid().ToString("N");
         await File.WriteAllTextAsync(temporary, JsonSerializer.Serialize(value), cancellationToken);
-        File.Move(temporary, SessionHostPresencePath.Value, true);
+        File.Move(temporary, presencePath, true);
     } while (await timer.WaitForNextTickAsync(cancellationToken));
 }

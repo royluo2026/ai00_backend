@@ -16,6 +16,8 @@ public sealed class SessionHostClient(IDeviceCredentialStore credentialStore)
             return new(operation.OperationId, "failed", ErrorCode: "operation_expired");
 
         var credential = credentialStore.Load();
+        await SessionHostBrokerClient.EnsureStartedAsync(new(
+            credential.DeviceId, credential.UserId, credential.WindowsSid), cancellationToken);
         await using var pipe = new NamedPipeClientStream(".", ConnectorPipeName.For(credential.DeviceId, credential.WindowsSid), PipeDirection.InOut, PipeOptions.Asynchronous);
         await pipe.ConnectAsync(5_000, cancellationToken);
         await JsonSerializer.SerializeAsync(pipe, request, cancellationToken: cancellationToken);

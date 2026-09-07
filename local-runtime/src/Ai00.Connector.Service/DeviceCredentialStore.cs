@@ -7,7 +7,19 @@ public sealed record DeviceCredential(
     string DeviceId,
     string UserId,
     string WindowsSid,
-    string DeviceToken);
+    string DeviceToken,
+    string GatewayUrl = "");
+
+public static class ConnectorGatewayEndpoint
+{
+    public static Uri Resolve(DeviceCredential credential, Uri fallback)
+    {
+        if (Uri.TryCreate(credential.GatewayUrl, UriKind.Absolute, out var paired) &&
+            (paired.Scheme == Uri.UriSchemeHttps || paired.IsLoopback))
+            return new Uri(paired.ToString().TrimEnd('/') + "/");
+        return fallback;
+    }
+}
 
 public interface IDeviceCredentialStore
 {

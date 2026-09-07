@@ -5,9 +5,9 @@ import base64
 import io
 from typing import Any
 
-from fastapi import UploadFile
+from fastapi import HTTPException, UploadFile
 
-from backend.capability_v2.provider_contracts import CapabilityContext, CapabilitySpec
+from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilitySpec
 
 
 def _required(payload: dict[str, Any], name: str) -> str:
@@ -28,7 +28,21 @@ async def apply_gbop_import_tc_change(payload: dict[str, Any], context: Capabili
         raise ValueError("content_b64 is invalid") from exc
     from ..routers import gbop as legacy
     upload = UploadFile(file=io.BytesIO(content), filename=str(payload.get("filename") or "import.xlsx"))
-    return {"data": await legacy._legacy_import_tc_excel(version_gid, upload, {"gid": context.user_gid, "name": context.user_gid, "org_role": "member"})}
+    try:
+        result = await legacy._legacy_import_tc_excel(
+            version_gid,
+            upload,
+            {
+                "gid": context.user_gid,
+                "name": context.user_gid,
+                "team_id": context.team_gid,
+                "org_role": "member",
+            },
+        )
+    except HTTPException as exc:
+        code = "invalid_input" if exc.status_code == 400 else "provider_failed"
+        raise CapabilityBusinessError(code, str(exc.detail)) from exc
+    return {"data": result}
 
 
 def register_gbop_import_tc_change_capability(registry: Any) -> None:

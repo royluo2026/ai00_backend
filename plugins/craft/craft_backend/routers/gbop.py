@@ -1122,6 +1122,14 @@ def _legacy_import_entries(version_gid: str, body: ImportEntriesBody, current_us
 
 # ── TC Excel Import ───────────────────────────────────────────────
 
+def _required_excel_columns(sheet_name: str, headers: List[str], required: tuple[str, ...]) -> Dict[str, int]:
+    """Resolve required Teamcenter columns or fail before writing partial GBOP data."""
+    indexes = {name: headers.index(name) for name in required if name in headers}
+    missing = [name for name in required if name not in indexes]
+    if missing:
+        raise HTTPException(400, f"Sheet {sheet_name} 缺少必需列：{'、'.join(missing)}")
+    return indexes
+
 @router.post("/versions/{version_gid}/import-tc-excel", status_code=201)
 async def import_tc_excel(
     version_gid: str,
@@ -1157,8 +1165,9 @@ async def _legacy_import_tc_excel(
     except Exception as exc:
         raise HTTPException(400, f"无法解析 Excel 文件：{exc}")
 
-    if '1' not in wb.sheetnames:
-        raise HTTPException(400, "Excel 缺少工作表 '1'")
+    missing_sheets = [name for name in ('1', '2') if name not in wb.sheetnames]
+    if missing_sheets:
+        raise HTTPException(400, f"Excel 缺少工作表：{'、'.join(missing_sheets)}")
 
     ws1 = wb['1']
     rows1 = list(ws1.iter_rows(values_only=True))
@@ -1168,22 +1177,17 @@ async def _legacy_import_tc_excel(
     # ── 列索引 ──
     h1 = [str(c).strip() if c is not None else '' for c in rows1[0]]
 
-    def _ci(headers, *names):
-        for n in names:
-            try:
-                return headers.index(n)
-            except ValueError:
-                pass
-        return -1
-
-    c1_type   = _ci(h1, '零组件类型')
-    c1_name   = _ci(h1, '零组件名称')
-    c1_bom    = _ci(h1, 'BOM 行')
-    c1_vpps   = _ci(h1, 'VPPS')
-    c1_parent = _ci(h1, '父级')
+    sheet1_columns = _required_excel_columns(
+        '1', h1, ('零组件类型', '零组件名称', 'BOM 行', 'VPPS', '父级')
+    )
+    c1_type   = sheet1_columns['零组件类型']
+    c1_name   = sheet1_columns['零组件名称']
+    c1_bom    = sheet1_columns['BOM 行']
+    c1_vpps   = sheet1_columns['VPPS']
+    c1_parent = sheet1_columns['父级']
 
     def _val(row, idx):
-        return str(row[idx]).strip() if idx >= 0 and row[idx] is not None else ''
+        return str(row[idx]).strip() if 0 <= idx < len(row) and row[idx] is not None else ''
 
     # ── 分拣 Sheet 1 行 ──
     proc_rows = []
@@ -1258,138 +1262,141 @@ async def _legacy_import_tc_excel(
             # entry_gid → [{vpps, node_type, title}] 用于回写 child_vpps
             entry_child_map: Dict[str, list] = {}
 
-            if '2' in wb.sheetnames:
-                ws2   = wb['2']
-                rows2 = list(ws2.iter_rows(values_only=True))
-                if len(rows2) >= 2:
-                    h2      = [str(c).strip() if c is not None else '' for c in rows2[0]]
-                    c2_vpps = _ci(h2, 'VPPS')
-                    c2_proc = _ci(h2, '工序VPPS')
-                    c2_op   = _ci(h2, '操作VPPS')
-                    c2_tag  = _ci(h2, '标记')
+            ws2   = wb['2']
+            rows2 = list(ws2.iter_rows(values_only=True))
+            if len(rows2) < 2:
+                raise HTTPException(400, "Sheet 2 数据为空，无法建立 GBOP 自动匹配关系")
+            h2 = [str(c).strip() if c is not None else '' for c in rows2[0]]
+            sheet2_columns = _required_excel_columns(
+                '2', h2, ('VPPS', '工序VPPS', '操作VPPS', '标记')
+            )
+            c2_vpps = sheet2_columns['VPPS']
+            c2_proc = sheet2_columns['工序VPPS']
+            c2_op   = sheet2_columns['操作VPPS']
+            c2_tag  = sheet2_columns['标记']
 
-                    # seq 计数器（按父节点分别累加）
-                    proc_seq: Dict[str, int] = {}
-                    op_seq:   Dict[str, int] = {}
+            # seq 计数器（按父节点分别累加）
+            proc_seq: Dict[str, int] = {}
+            op_seq:   Dict[str, int] = {}
 
-                    def _lookup_proc_entity(vpps_val):
-                        g = proc_vpps_to_gid.get(vpps_val)
-                        if g:
-                            return g
-                        cur.execute(
-                            "SELECT gid FROM workmanship_tpl_gbop_processes "
-                            "WHERE version_gid=%s AND vpps=%s LIMIT 1",
-                            (version_gid, vpps_val),
-                        )
-                        r = cur.fetchone()
-                        return r['gid'] if r else None
+            def _lookup_proc_entity(vpps_val):
+                g = proc_vpps_to_gid.get(vpps_val)
+                if g:
+                    return g
+                cur.execute(
+                    "SELECT gid FROM workmanship_tpl_gbop_processes "
+                    "WHERE version_gid=%s AND vpps=%s LIMIT 1",
+                    (version_gid, vpps_val),
+                )
+                r = cur.fetchone()
+                return r['gid'] if r else None
 
-                    def _lookup_op_entity(vpps_val):
-                        g = op_vpps_to_gid.get(vpps_val)
-                        if g:
-                            return g
-                        cur.execute(
-                            "SELECT gid FROM workmanship_tpl_gbop_operations "
-                            "WHERE version_gid=%s AND vpps=%s LIMIT 1",
-                            (version_gid, vpps_val),
-                        )
-                        r = cur.fetchone()
-                        return r['gid'] if r else None
+            def _lookup_op_entity(vpps_val):
+                g = op_vpps_to_gid.get(vpps_val)
+                if g:
+                    return g
+                cur.execute(
+                    "SELECT gid FROM workmanship_tpl_gbop_operations "
+                    "WHERE version_gid=%s AND vpps=%s LIMIT 1",
+                    (version_gid, vpps_val),
+                )
+                r = cur.fetchone()
+                return r['gid'] if r else None
 
-                    for row in rows2[1:]:
-                        part_vpps    = _val(row, c2_vpps)
-                        proc_vpps    = _val(row, c2_proc)
-                        op_vpps      = _val(row, c2_op)
-                        is_part_feed = _val(row, c2_tag).lower() == 'part_feed'
-                        if not proc_vpps and not op_vpps:
-                            continue
+            for row in rows2[1:]:
+                part_vpps    = _val(row, c2_vpps)
+                proc_vpps    = _val(row, c2_proc)
+                op_vpps      = _val(row, c2_op)
+                is_part_feed = _val(row, c2_tag).lower() == 'part_feed'
+                if not proc_vpps and not op_vpps:
+                    continue
 
-                        # ── 找 part gbop_entry（找不到则以顶层挂载）──
-                        part_entry_gid = None
-                        part_level     = -1   # process=0, operation=1
-                        if part_vpps:
+                # ── 找 part gbop_entry（找不到则以顶层挂载）──
+                part_entry_gid = None
+                part_level     = -1   # process=0, operation=1
+                if part_vpps:
+                    cur.execute(
+                        "SELECT gid, level FROM workmanship_tpl_gbop_entries "
+                        "WHERE version_gid=%s AND vpps=%s AND node_type='part' LIMIT 1",
+                        (version_gid, part_vpps),
+                    )
+                    part_r = cur.fetchone()
+                    if part_r:
+                        part_entry_gid = part_r['gid']
+                        part_level     = part_r['level']
+
+                # ── 创建/复用 process entry（每个 part×proc 组合唯一）──
+                proc_entry_gid = None
+                if proc_vpps:
+                    proc_key = (part_entry_gid, proc_vpps)
+                    if proc_key in proc_entry_map:
+                        proc_entry_gid = proc_entry_map[proc_key]
+                    else:
+                        p_entity_gid = _lookup_proc_entity(proc_vpps)
+                        if p_entity_gid:
+                            seq = proc_seq.get(part_entry_gid, 0)
+                            proc_seq[part_entry_gid] = seq + 1
+                            proc_entry_gid = str(next_gid())
+                            proc_name = proc_vpps_to_name.get(proc_vpps, proc_vpps)
                             cur.execute(
-                                "SELECT gid, level FROM workmanship_tpl_gbop_entries "
-                                "WHERE version_gid=%s AND vpps=%s AND node_type='part' LIMIT 1",
-                                (version_gid, part_vpps),
+                                "INSERT INTO workmanship_tpl_gbop_entries "
+                                "(gid, version_gid, parent_gid, level, node_type, seq_no, "
+                                " vpps, vpps_desc, meta, team_id, created_by, vpps_part, part_feed) "
+                                "VALUES (%s,%s,%s,%s,'process',%s,%s,%s,'{}',%s,%s,%s,FALSE)",
+                                (proc_entry_gid, version_gid, part_entry_gid,
+                                 part_level + 1, seq,
+                                 proc_vpps, proc_name,
+                                 current_user.get('team_id'), current_user['gid'],
+                                 part_vpps),
                             )
-                            part_r = cur.fetchone()
-                            if part_r:
-                                part_entry_gid = part_r['gid']
-                                part_level     = part_r['level']
+                            cur.execute(
+                                "INSERT INTO workmanship_tpl_gbop_entry_links "
+                                "(gid, entry_gid, link_type, ref_gid, is_primary, created_by) "
+                                "VALUES (%s,%s,'gbop_process',%s,TRUE,%s)",
+                                (str(next_gid()), proc_entry_gid, p_entity_gid, current_user['gid']),
+                            )
+                            proc_entry_map[proc_key] = proc_entry_gid
+                            entries_created += 1
+                            links_created   += 1
+                            cv = entry_child_map.setdefault(part_entry_gid, [])
+                            if not any(c['vpps'] == proc_vpps for c in cv):
+                                cv.append({'vpps': proc_vpps, 'node_type': 'process', 'title': proc_name})
 
-                        # ── 创建/复用 process entry（每个 part×proc 组合唯一）──
-                        proc_entry_gid = None
-                        if proc_vpps:
-                            proc_key = (part_entry_gid, proc_vpps)
-                            if proc_key in proc_entry_map:
-                                proc_entry_gid = proc_entry_map[proc_key]
-                            else:
-                                p_entity_gid = _lookup_proc_entity(proc_vpps)
-                                if p_entity_gid:
-                                    seq = proc_seq.get(part_entry_gid, 0)
-                                    proc_seq[part_entry_gid] = seq + 1
-                                    proc_entry_gid = str(next_gid())
-                                    proc_name = proc_vpps_to_name.get(proc_vpps, proc_vpps)
-                                    cur.execute(
-                                        "INSERT INTO workmanship_tpl_gbop_entries "
-                                        "(gid, version_gid, parent_gid, level, node_type, seq_no, "
-                                        " vpps, vpps_desc, meta, team_id, created_by, vpps_part, part_feed) "
-                                        "VALUES (%s,%s,%s,%s,'process',%s,%s,%s,'{}',%s,%s,%s,FALSE)",
-                                        (proc_entry_gid, version_gid, part_entry_gid,
-                                         part_level + 1, seq,
-                                         proc_vpps, proc_name,
-                                         current_user.get('team_id'), current_user['gid'],
-                                         part_vpps),
-                                    )
-                                    cur.execute(
-                                        "INSERT INTO workmanship_tpl_gbop_entry_links "
-                                        "(gid, entry_gid, link_type, ref_gid, is_primary, created_by) "
-                                        "VALUES (%s,%s,'gbop_process',%s,TRUE,%s)",
-                                        (str(next_gid()), proc_entry_gid, p_entity_gid, current_user['gid']),
-                                    )
-                                    proc_entry_map[proc_key] = proc_entry_gid
-                                    entries_created += 1
-                                    links_created   += 1
-                                    cv = entry_child_map.setdefault(part_entry_gid, [])
-                                    if not any(c['vpps'] == proc_vpps for c in cv):
-                                        cv.append({'vpps': proc_vpps, 'node_type': 'process', 'title': proc_name})
-
-                        # ── 创建/复用 operation entry（每个 proc_entry×op 组合唯一）──
-                        if op_vpps and proc_entry_gid:
-                            op_key = (proc_entry_gid, op_vpps)
-                            if op_key not in op_entry_map:
-                                o_entity_gid = _lookup_op_entity(op_vpps)
-                                if o_entity_gid:
-                                    seq = op_seq.get(proc_entry_gid, 0)
-                                    op_seq[proc_entry_gid] = seq + 1
-                                    op_entry_gid = str(next_gid())
-                                    op_name = op_vpps_to_name.get(op_vpps, op_vpps)
-                                    cur.execute(
-                                        "INSERT INTO workmanship_tpl_gbop_entries "
-                                        "(gid, version_gid, parent_gid, level, node_type, seq_no, "
-                                        " vpps, vpps_desc, meta, team_id, created_by, vpps_part, part_feed) "
-                                        "VALUES (%s,%s,%s,%s,'operation',%s,%s,%s,'{}',%s,%s,%s,%s)",
-                                        (op_entry_gid, version_gid, proc_entry_gid,
-                                         part_level + 2, seq,
-                                         op_vpps, op_name,
-                                         current_user.get('team_id'), current_user['gid'],
-                                         part_vpps, is_part_feed),
-                                    )
-                                    cur.execute(
-                                        "INSERT INTO workmanship_tpl_gbop_entry_links "
-                                        "(gid, entry_gid, link_type, ref_gid, is_primary, created_by) "
-                                        "VALUES (%s,%s,'gbop_operation',%s,TRUE,%s)",
-                                        (str(next_gid()), op_entry_gid, o_entity_gid, current_user['gid']),
-                                    )
-                                    op_entry_map[op_key] = op_entry_gid
-                                    entries_created += 1
-                                    links_created   += 1
-                                    if is_part_feed:
-                                        cur.execute(
-                                            "UPDATE workmanship_tpl_gbop_operations SET part_feed=TRUE WHERE gid=%s",
-                                            (o_entity_gid,),
-                                        )
+                # ── 创建/复用 operation entry（每个 proc_entry×op 组合唯一）──
+                if op_vpps and proc_entry_gid:
+                    op_key = (proc_entry_gid, op_vpps)
+                    if op_key not in op_entry_map:
+                        o_entity_gid = _lookup_op_entity(op_vpps)
+                        if o_entity_gid:
+                            seq = op_seq.get(proc_entry_gid, 0)
+                            op_seq[proc_entry_gid] = seq + 1
+                            op_entry_gid = str(next_gid())
+                            op_name = op_vpps_to_name.get(op_vpps, op_vpps)
+                            cur.execute(
+                                "INSERT INTO workmanship_tpl_gbop_entries "
+                                "(gid, version_gid, parent_gid, level, node_type, seq_no, "
+                                " vpps, vpps_desc, meta, team_id, created_by, vpps_part, part_feed) "
+                                "VALUES (%s,%s,%s,%s,'operation',%s,%s,%s,'{}',%s,%s,%s,%s)",
+                                (op_entry_gid, version_gid, proc_entry_gid,
+                                 part_level + 2, seq,
+                                 op_vpps, op_name,
+                                 current_user.get('team_id'), current_user['gid'],
+                                 part_vpps, is_part_feed),
+                            )
+                            cur.execute(
+                                "INSERT INTO workmanship_tpl_gbop_entry_links "
+                                "(gid, entry_gid, link_type, ref_gid, is_primary, created_by) "
+                                "VALUES (%s,%s,'gbop_operation',%s,TRUE,%s)",
+                                (str(next_gid()), op_entry_gid, o_entity_gid, current_user['gid']),
+                            )
+                            op_entry_map[op_key] = op_entry_gid
+                            entries_created += 1
+                            links_created   += 1
+                            if is_part_feed:
+                                cur.execute(
+                                    "UPDATE workmanship_tpl_gbop_operations SET part_feed=TRUE WHERE gid=%s",
+                                    (o_entity_gid,),
+                                )
 
             # ── 回写 child_vpps 到零件 entry ──
             for e_gid, child_list in entry_child_map.items():

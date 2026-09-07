@@ -118,4 +118,10 @@ public static class ConnectorPipeName
 
     public static string PlanFor(string deviceId, string windowsSid) =>
         For(deviceId, windowsSid) + "-plan";
+
+    public static string SessionBrokerFor(string windowsSid)
+    {
+        var digest = SHA256.HashData(Encoding.UTF8.GetBytes(windowsSid));
+        return "ai00-connector-session-broker-v1-" + Convert.ToHexString(digest).ToLowerInvariant()[..24];
+    }
 }

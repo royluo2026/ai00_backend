@@ -236,7 +236,8 @@ public static class ConnectorPairing
         var credentialPath = Path.Combine(root, "device.credential");
         var credentialStore = new DeviceCredentialStore(credentialPath);
         credentialStore.Save(new(
-            credential.ConnectorId, credential.UserId, windowsSid, credential.ConnectorToken));
+            credential.ConnectorId, credential.UserId, windowsSid, credential.ConnectorToken,
+            gatewayUri.GetLeftPart(UriPartial.Authority)));
         ProtectedSecretStore.Save(
             Path.Combine(root, "operation.keys"),
             new Dictionary<string, string> { [credential.PlanSigningKeyId] = credential.PlanSigningSecret });
@@ -244,6 +245,7 @@ public static class ConnectorPairing
         var storedKeys = ProtectedSecretStore.Load(Path.Combine(root, "operation.keys"));
         if (stored.DeviceId != credential.ConnectorId || stored.UserId != credential.UserId ||
             stored.WindowsSid != windowsSid || stored.DeviceToken != credential.ConnectorToken ||
+            stored.GatewayUrl != gatewayUri.GetLeftPart(UriPartial.Authority) ||
             storedKeys.GetValueOrDefault(credential.PlanSigningKeyId) != credential.PlanSigningSecret)
             throw new InvalidOperationException("connector_credential_readback_failed");
         using var activate = await http.PostAsJsonAsync(

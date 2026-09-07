@@ -12,8 +12,10 @@ from ..data.connection import get_conn
 READ_OPERATIONS = ("list", "get")
 CHANGE_OPERATIONS = ("create", "update", "delete", "publish", "deprecate")
 _FIELDS = (
-    "code", "name", "standard_time", "importance", "description", "level", "vpps_attr",
+    "code", "name", "standard_time", "importance", "description", "level", "ai00_level", "vpps_attr",
     "vpps", "vpps_desc", "torque_importance", "vehicle_model", "parent_vpps",
+    "component_type", "bom_row", "parent_bom_row", "process_vpps", "operation_vpps",
+    "vpps_part", "match_tag", "part_feed",
     "steps", "required_tools", "parameters",
 )
 
@@ -45,12 +47,12 @@ def read_standard_operation(payload: dict[str, Any], context: CapabilityContext)
                 if status:
                     where += " AND status = %s"
                     params.append(status)
-                cur.execute(f"SELECT gid, display_id, code, name, status, standard_time, importance, description, level, vpps_attr, vpps, vpps_desc, torque_importance, vehicle_model, parent_vpps, share_scope, version, created_by, created_at, updated_at FROM workmanship_tpl_gbop_entries {where} ORDER BY code LIMIT 500", tuple(params))
+                cur.execute(f"SELECT gid, display_id, code, name, status, standard_time, importance, description, component_type, bom_row, parent_bom_row, level, ai00_level, vpps_attr, vpps, vpps_desc, torque_importance, vehicle_model, parent_vpps, process_vpps, operation_vpps, vpps_part, match_tag, part_feed, share_scope, version, created_by, created_at, updated_at FROM workmanship_craft_standard_operations {where} ORDER BY code LIMIT 500", tuple(params))
                 return CapabilityOutput(data={"items": [_row(row) for row in cur.fetchall()]})
             gid = str(payload.get("gid") or "")
             if not gid:
                 raise ValueError("gid is required")
-            cur.execute("SELECT gid, display_id, code, name, status, standard_time, importance, description, steps, required_tools, parameters, created_by, version, created_at, updated_at FROM workmanship_tpl_gbop_entries WHERE gid = %s", (gid,))
+            cur.execute("SELECT gid, display_id, code, name, status, standard_time, importance, description, component_type, bom_row, parent_bom_row, level, ai00_level, vpps_attr, vpps, vpps_desc, torque_importance, vehicle_model, parent_vpps, process_vpps, operation_vpps, vpps_part, match_tag, part_feed, steps, required_tools, parameters, created_by, version, created_at, updated_at FROM workmanship_craft_standard_operations WHERE gid = %s", (gid,))
             row = cur.fetchone()
     if not row:
         raise ValueError("standard operation not found")
@@ -80,7 +82,7 @@ def change_standard_operation(payload: dict[str, Any], context: CapabilityContex
                 values["created_by"] = context.user_gid
                 values["team_id"] = context.team_gid
                 columns = list(values)
-                cur.execute(f"INSERT INTO workmanship_tpl_gbop_entries ({', '.join(columns)}) VALUES ({', '.join(['%s'] * len(columns))})", tuple(_json_value(k, values[k]) for k in columns))
+                cur.execute(f"INSERT INTO workmanship_craft_standard_operations ({', '.join(columns)}) VALUES ({', '.join(['%s'] * len(columns))})", tuple(_json_value(k, values[k]) for k in columns))
                 conn.commit()
                 return CapabilityOutput(data={"success": True, "gid": new_gid})
             if not gid:
@@ -88,13 +90,13 @@ def change_standard_operation(payload: dict[str, Any], context: CapabilityContex
             if operation in {"publish", "deprecate"}:
                 target = "active" if operation == "publish" else "deprecated"
                 source = "draft" if operation == "publish" else "active"
-                cur.execute("UPDATE workmanship_tpl_gbop_entries SET status=%s, updated_at=NOW() WHERE gid=%s AND status=%s", (target, gid, source))
+                cur.execute("UPDATE workmanship_craft_standard_operations SET status=%s, updated_at=NOW() WHERE gid=%s AND status=%s", (target, gid, source))
                 if cur.rowcount == 0:
                     raise ValueError("standard operation not found or lifecycle state is invalid")
                 conn.commit()
                 return CapabilityOutput(data={"success": True, "gid": gid})
             if operation == "delete":
-                cur.execute("DELETE FROM workmanship_tpl_gbop_entries WHERE gid=%s AND (created_by=%s OR team_id=%s)", (gid, context.user_gid, context.team_gid))
+                cur.execute("DELETE FROM workmanship_craft_standard_operations WHERE gid=%s AND (created_by=%s OR team_id=%s)", (gid, context.user_gid, context.team_gid))
                 if cur.rowcount == 0:
                     raise ValueError("standard operation not found or not owned")
                 conn.commit()
@@ -113,7 +115,7 @@ def change_standard_operation(payload: dict[str, Any], context: CapabilityContex
                     assignments.append(f"{key} = %s")
                     params.append(_json_value(key, value))
             params.extend([gid, context.user_gid, context.team_gid])
-            cur.execute(f"UPDATE workmanship_tpl_gbop_entries SET {', '.join(assignments)} WHERE gid=%s AND (created_by=%s OR team_id=%s)", tuple(params))
+            cur.execute(f"UPDATE workmanship_craft_standard_operations SET {', '.join(assignments)} WHERE gid=%s AND (created_by=%s OR team_id=%s)", tuple(params))
             if cur.rowcount == 0:
                 raise ValueError("standard operation not found or not owned")
         conn.commit()

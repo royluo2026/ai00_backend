@@ -37,24 +37,25 @@ public sealed class PlanWorker(
     IConnectorPlanGateway gateway,
     IConnectorPlanExecutor executor)
 {
-    public async Task StartOnceAsync(CancellationToken cancellationToken)
+    public async Task<bool> StartOnceAsync(CancellationToken cancellationToken)
     {
         var pending = journal.FirstUnreconciled();
         if (pending is not null)
         {
             await gateway.ReconcileAsync(pending, cancellationToken);
             journal.MarkReconciled(pending.PlanId);
-            return;
+            return true;
         }
 
         var leased = await gateway.LeaseAsync(cancellationToken);
-        if (leased is null) return;
+        if (leased is null) return false;
         var retained = await AcceptAsync(leased, cancellationToken);
         if (retained is not null)
         {
             await gateway.ReconcileAsync(new(leased.Plan.PlanId, PlanState.Completed, retained), cancellationToken);
             journal.MarkReconciled(leased.Plan.PlanId);
         }
+        return true;
     }
 
     public Task<SignedConnectorPlanOutcome?> AcceptAsync(
@@ -80,6 +81,7 @@ public sealed class PlanWorker(
 
 public sealed class ConnectorPlanBackgroundWorker(
     PlanWorker worker,
+    IConnectorPlanWakeSignal wakeSignal,
     Microsoft.Extensions.Options.IOptions<RuntimeOptions> options,
     ILogger<ConnectorPlanBackgroundWorker> logger) : BackgroundService
 {
@@ -91,11 +93,12 @@ public sealed class ConnectorPlanBackgroundWorker(
         {
             try
             {
-                await worker.StartOnceAsync(stoppingToken);
+                if (await worker.StartOnceAsync(stoppingToken)) continue;
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { break; }
             catch (Exception ex) { logger.LogWarning(ex, "Simulation Connector Plan loop failed"); }
-            await Task.Delay(TimeSpan.FromSeconds(Math.Clamp(_options.PollSeconds, 1, 60)), stoppingToken);
+            await wakeSignal.WaitAsync(
+                TimeSpan.FromSeconds(Math.Clamp(_options.PollSeconds, 1, 60)), stoppingToken);
         }
     }
 }

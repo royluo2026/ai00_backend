@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 from backend.capabilities.registry_next import CapabilityRegistry
 from plugins.device.device_backend.capabilities import (
     register_capabilities as register_device_capabilities,
@@ -105,6 +108,36 @@ def test_bootstrap_is_web_only_and_activation_is_local_runtime_only() -> None:
             "mcp": False, "local_runtime": False, "worker": False,
         }
     assert registrations["simulation.connector.pairing.activate"].descriptor.exposure.model_dump() == {
+        "web": False, "api": False, "plugin": False, "agent": False,
+        "mcp": False, "local_runtime": True, "worker": False,
+    }
+
+
+def test_checked_in_catalog_exposes_the_complete_connector_onboarding_contract() -> None:
+    release_path = Path(__file__).resolve().parents[2] / "docs/governance/capability-catalog-release.json"
+    release = json.loads(release_path.read_text(encoding="utf-8"))
+    descriptors = {
+        item["id"]: item
+        for item in release["descriptors"]
+        if item["id"].startswith("simulation.connector.pairing.")
+        or item["id"] == "simulation.connector.binding.get"
+    }
+
+    assert set(descriptors) == {
+        "simulation.connector.pairing.request",
+        "simulation.connector.pairing.bootstrap.create",
+        "simulation.connector.pairing.bootstrap.get",
+        "simulation.connector.pairing.summary.get",
+        "simulation.connector.pairing.approve",
+        "simulation.connector.pairing.complete",
+        "simulation.connector.pairing.activate",
+        "simulation.connector.pairing.cancel",
+        "simulation.connector.binding.get",
+    }
+    assert "activation_challenge" in descriptors[
+        "simulation.connector.pairing.complete"
+    ]["output_schema"]["required"]
+    assert descriptors["simulation.connector.pairing.activate"]["exposure"] == {
         "web": False, "api": False, "plugin": False, "agent": False,
         "mcp": False, "local_runtime": True, "worker": False,
     }

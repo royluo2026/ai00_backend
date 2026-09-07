@@ -102,8 +102,14 @@ def example_for_schema(schema: Mapping[str, Any]) -> Any:
                 )
                 break
         branch_properties = selected_branch.get("properties") or {}
+        available = {**properties, **branch_properties}
+        minimum = int(schema.get("minProperties", 0))
+        required.extend(
+            name for name in available
+            if name not in required and len(required) < minimum
+        )
         return {
-            name: example_for_schema(branch_properties.get(name) or properties.get(name) or {})
+            name: example_for_schema(available.get(name) or {})
             for name in required
         }
     if expected == "array":

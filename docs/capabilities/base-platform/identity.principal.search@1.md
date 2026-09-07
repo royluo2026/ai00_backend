@@ -8,7 +8,7 @@ Search bounded principal summaries.
 - 不适用：A domain-specific stable ref is already known.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_052a820799b9df56f233d3475547c8fa`
+- Catalog Release：`rel_6b7ac7cd21ed113da5a033e433f09a37`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -89,7 +89,7 @@ Search bounded principal summaries.
 ```json
 {
   "capability_id": "identity.principal.search",
-  "catalog_release": "rel_052a820799b9df56f233d3475547c8fa",
+  "catalog_release": "rel_6b7ac7cd21ed113da5a033e433f09a37",
   "major_version": 1,
   "payload": {
     "query": "example"

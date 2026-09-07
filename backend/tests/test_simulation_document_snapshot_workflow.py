@@ -24,6 +24,9 @@ from plugins.simulation.simulation_backend.capabilities import (
 from plugins.simulation.simulation_backend.capabilities import default_capture_provider
 from plugins.simulation.simulation_backend.capabilities import legacy_repository
 from plugins.simulation.simulation_backend.capabilities import default_snapshot_workflow
+from plugins.simulation.simulation_backend.capabilities.document_snapshots import (
+    DocumentSnapshotProvider,
+)
 
 
 NOW = datetime(2026, 9, 3, tzinfo=UTC)
@@ -52,8 +55,8 @@ class Repository:
 
 class Connector:
     def __init__(self): self.plans = []
-    async def queue_plan(self, plan, context, *, approval_reference):
-        self.plans.append((plan, approval_reference))
+    async def queue_plan(self, plan, context, *, approval_reference, major_version=1):
+        self.plans.append((plan, approval_reference, major_version))
 
 
 def context(user="user-1", team="team-1"):
@@ -77,10 +80,10 @@ def test_snapshot_request_is_idempotent_and_completes_only_from_connector_outcom
     assert connector.plans == []
     action = workflow.next_action("snapshot-1", context())
     assert action["capability_id"] == "simulation.connector.plan.queue"
-    assert action["major_version"] == 1
+    assert action["major_version"] == 2
     asyncio.run(workflow.dispatch("snapshot-1", "approval-snapshot", context()))
     assert len(connector.plans) == 1
-    assert connector.plans[0][1] == "approval-snapshot"
+    assert connector.plans[0][1:] == ("approval-snapshot", 2)
 
     plan = connector.plans[0][0]
     result = ConnectorStepResultV1(
@@ -96,6 +99,34 @@ def test_snapshot_request_is_idempotent_and_completes_only_from_connector_outcom
     completed = workflow.get("snapshot-1", context())
     assert completed["snapshot"] == SNAPSHOT
     assert completed["status"] == "completed"
+
+
+def test_snapshot_action_and_dispatch_return_governance_evidence():
+    repository, connector = Repository(), Connector()
+    workflow = DocumentSnapshotWorkflow(
+        repository=repository, connector_port=connector,
+        id_factory=lambda _prefix: "snapshot-1", clock=lambda: NOW,
+    )
+    provider = DocumentSnapshotProvider(workflow)
+    ctx = context()
+    asyncio.run(workflow.request("device-1", "web-request-1", ctx))
+
+    action_output = provider.action({"snapshot_request_id": "snapshot-1"}, ctx)
+    assert action_output.evidence
+    assert action_output.evidence[0].kind == "simulation.document_snapshot_action"
+
+    dispatch_context = CapabilityContext(
+        user_gid=ctx.user_gid,
+        team_gid=ctx.team_gid,
+        capability_version_gid=ctx.capability_version_gid,
+        business_definition_hash=ctx.business_definition_hash,
+        confirmation_token="approval-snapshot",
+    )
+    dispatch_output = asyncio.run(provider.dispatch(
+        {"snapshot_request_id": "snapshot-1"}, dispatch_context,
+    ))
+    assert dispatch_output.evidence
+    assert dispatch_output.evidence[0].kind == "simulation.document_snapshot_dispatch"
 
 
 def test_snapshot_visibility_is_owner_or_team_scoped():

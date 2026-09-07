@@ -23,9 +23,26 @@ _TWO_PHASE_ENTRYPOINTS = {
     "simulation.capture_run.start",
 }
 
+_VISMOCKUP_WEB_WORKFLOWS = {
+    "simulation.vismockup.application.attach.request",
+    "simulation.vismockup.application.launch.request",
+    "simulation.vismockup.model.open.request",
+    "simulation.vismockup.model.close.request",
+    "simulation.vismockup.visibility.change.request",
+    "simulation.vismockup.tree.read.request",
+    "simulation.vismockup.command.get",
+}
+
 _RESOURCES = {
     "simulation.connector.health.get": (("simulation-connector", "connector_id"),),
     "simulation.connector.plan.queue": (("simulation-connector", "plan.device_id"),),
+    "simulation.vismockup.application.attach.request": (),
+    "simulation.vismockup.application.launch.request": (),
+    "simulation.vismockup.model.open.request": (("artifact", "artifact_ref.artifact_id"),),
+    "simulation.vismockup.model.close.request": (),
+    "simulation.vismockup.visibility.change.request": (),
+    "simulation.vismockup.tree.read.request": (),
+    "simulation.vismockup.command.get": (("simulation-connector-command", "operation_id"),),
     "simulation.vismockup.status.get": (("simulation-connector", "connector_id"),),
     "simulation.vismockup.application.launch": (("simulation-connector", "connector_id"),),
     "simulation.vismockup.model.open": (
@@ -138,6 +155,10 @@ _ERROR_PAIRS = (
     ("pairing_not_approved", "The signed-in AI00 user has not approved this pairing."),
     ("pairing_version_conflict", "The pairing changed after it was displayed."),
     ("connector_binding_conflict", "The AI00 user already has a different Connector binding."),
+    ("connector_binding_not_found", "The signed-in user has no bound Simulation Connector."),
+    ("connector_command_not_found", "The requested Connector command is unavailable or outside the caller scope."),
+    ("capability_provenance_required", "The Connector command requires exact Capability version and business-definition provenance."),
+    ("vismockup_document_not_owned", "AI00 may close only a VisMockup document that it opened in this Connector session."),
     ("feishu_login_required", "Pairing approval requires an AI00 Web session established through Feishu login."),
 )
 _LEGACY_ERROR_CODES = frozenset(code for code, _ in _ERROR_PAIRS[:9])
@@ -352,7 +373,9 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             else LifecycleStatus.STABLE
         ),
         "exposure": (
-            ExposurePolicy(local_runtime=True)
+            ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True)
+            if governed.id in _VISMOCKUP_WEB_WORKFLOWS
+            else ExposurePolicy(local_runtime=True)
             if governed.id.startswith("simulation.vismockup.")
             or governed.id in {
                 "simulation.connector.pairing.request",
@@ -377,7 +400,9 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         "data_classification": "confidential", "delegation_policy": "scoped",
         "agent_output_schema": descriptor.output_schema,
         "execution_mode": (
-            ExecutionMode.LOCAL
+            ExecutionMode.CLOUD_SYNC
+            if governed.id in _VISMOCKUP_WEB_WORKFLOWS
+            else ExecutionMode.LOCAL
             if governed.id.startswith("simulation.vismockup.")
             or governed.id in {
                 "simulation.connector.pairing.request",
@@ -389,12 +414,14 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             else descriptor.execution_mode
         ),
         "artifact_policy": (
-            "input" if governed.id == "simulation.vismockup.model.open"
+            "input" if governed.id in {"simulation.vismockup.model.open", "simulation.vismockup.model.open.request"}
             else "output" if governed.id in {"simulation.result.get", "simulation.vismockup.capture.create"}
             else "none"
         ),
         "operation_policy": (
-            "required" if governed.id.startswith("simulation.vismockup.") or governed.id == "simulation.run.start"
+            "optional" if governed.id in _VISMOCKUP_WEB_WORKFLOWS and is_write
+            else "none" if governed.id in _VISMOCKUP_WEB_WORKFLOWS
+            else "required" if governed.id.startswith("simulation.vismockup.") or governed.id == "simulation.run.start"
             else "optional" if is_write else "none"
         ),
         "concurrency_policy": "none", "idempotency_policy": "required" if is_write else "none",
@@ -442,6 +469,8 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             "business_effect": (
                 "Validate and persist one exact Connector control-plane operation for the caller-bound Simulation runtime."
                 if governed.id.startswith("simulation.connector.")
+                else "Queue or read one user-scoped signed VisMockup command through the bound Simulation Connector."
+                if governed.id in _VISMOCKUP_WEB_WORKFLOWS
                 else "Expose one exact VisMockup adapter atom exclusively to a signed Simulation Connector execution plan."
             ),
             "business_acceptance_criteria": (

@@ -52,9 +52,11 @@ class DocumentSnapshotProvider:
         ),))
 
     def action(self, payload, context):
+        snapshot_request_id = payload["snapshot_request_id"]
         action = self._call(
-            self.workflow.next_action, payload["snapshot_request_id"], context,
+            self.workflow.next_action, snapshot_request_id, context,
         )
+        digest = None
         if action is not None:
             action = {
                 "capability_id": action["capability_id"],
@@ -63,7 +65,12 @@ class DocumentSnapshotProvider:
                 "payload_hash": canonical_hash(action["payload"]),
                 "idempotency_key": action["idempotency_key"],
             }
-        return CapabilityOutput(data={"action": action})
+            digest = action["payload_hash"]
+        return CapabilityOutput(data={"action": action}, evidence=(EvidenceRef(
+            kind="simulation.document_snapshot_action",
+            reference=f"simulation://document-snapshot/{snapshot_request_id}/action",
+            digest=digest,
+        ),))
 
     async def dispatch(self, payload, context):
         try:
@@ -72,7 +79,14 @@ class DocumentSnapshotProvider:
             )
         except SimulationWorkflowError as exc:
             raise CapabilityBusinessError(str(exc), str(exc)) from exc
-        return CapabilityOutput(data=self._project(row))
+        return CapabilityOutput(data=self._project(row), evidence=(EvidenceRef(
+            kind="simulation.document_snapshot_dispatch",
+            reference=f"simulation://document-snapshot/{row['snapshot_request_id']}/dispatch",
+            digest=canonical_hash({
+                "plan_id": row.get("plan_id"),
+                "status": row.get("status"),
+            }),
+        ),))
 
     @staticmethod
     def _project(row):

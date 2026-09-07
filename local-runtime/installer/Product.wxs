@@ -25,7 +25,9 @@
       <Directory Id="Ai00ProgramData" Name="AI00">
         <Directory Id="Ai00ConnectorProgramData" Name="Connector">
           <Component Id="Ai00ConnectorProgramDataAcl" Guid="*">
-            <CreateFolder />
+            <CreateFolder>
+              <Permission User="LOCAL SERVICE" GenericAll="yes" />
+            </CreateFolder>
             <RegistryValue Root="HKLM" Key="Software\AI00\Connector" Name="BoundUserStartupTask" Value="AI00 Connector Tray" Type="string" KeyPath="yes" />
           </Component>
         </Directory>
@@ -53,6 +55,7 @@
         <Exclude Files="$(var.SessionHostPublishDir)\Ai00.Connector.SessionHost.exe" />
         <Exclude Files="$(var.SessionHostPublishDir)\Ai00.Connector.Contracts.dll" />
         <Exclude Files="$(var.SessionHostPublishDir)\Ai00.Connector.Contracts.pdb" />
+        <Exclude Files="$(var.SessionHostPublishDir)\System.Security.Cryptography.ProtectedData.dll" />
       </Files>
     </ComponentGroup>
     <ComponentGroup Id="Ai00ConnectorTrayPayload" Directory="INSTALLFOLDER">

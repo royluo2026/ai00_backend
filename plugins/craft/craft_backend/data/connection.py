@@ -47,6 +47,10 @@ def get_craft_conn():
     conn = wrap_connection(_get_pool().connection())
     try:
         yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
     finally:
         conn.close()
 

@@ -35,22 +35,29 @@ public sealed class PairingPipeHost(
     {
         var security = new PipeSecurity();
         security.AddAccessRule(new PipeAccessRule(
-            new SecurityIdentifier(WellKnownSidType.NetworkSid, null),
-            PipeAccessRights.FullControl, AccessControlType.Deny));
-        security.AddAccessRule(new PipeAccessRule(
-            new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null),
-            PipeAccessRights.ReadWrite | PipeAccessRights.CreateNewInstance,
+            new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null),
+            PipeAccessRights.FullControl,
             AccessControlType.Allow));
         security.AddAccessRule(new PipeAccessRule(
             new SecurityIdentifier(WellKnownSidType.LocalServiceSid, null),
+            PipeAccessRights.FullControl, AccessControlType.Allow));
+        security.AddAccessRule(new PipeAccessRule(
+            new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null),
             PipeAccessRights.FullControl, AccessControlType.Allow));
         await using var pipe = NamedPipeServerStreamAcl.Create(
             PipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte,
             PipeOptions.Asynchronous, MaximumMessageBytes, MaximumMessageBytes, security);
         await pipe.WaitForConnectionAsync(cancellationToken);
         var callerSid = "";
-        pipe.RunAsClient(() => callerSid = WindowsIdentity.GetCurrent().User?.Value ?? "");
-        if (string.IsNullOrWhiteSpace(callerSid))
+        var callerIsInteractive = false;
+        pipe.RunAsClient(() =>
+        {
+            using var identity = WindowsIdentity.GetCurrent();
+            callerSid = identity.User?.Value ?? "";
+            callerIsInteractive = new WindowsPrincipal(identity).IsInRole(
+                new SecurityIdentifier(WellKnownSidType.InteractiveSid, null));
+        });
+        if (string.IsNullOrWhiteSpace(callerSid) || !callerIsInteractive)
             throw new InvalidOperationException("connector_pairing_caller_unavailable");
         try
         {

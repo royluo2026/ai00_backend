@@ -1,4 +1,5 @@
 using System.IO.Pipes;
+using System.Text;
 using System.Text.Json;
 using System.Security.AccessControl;
 using System.Security.Principal;
@@ -7,8 +8,7 @@ using Ai00.Connector.Contracts;
 namespace Ai00.Connector.SessionHost;
 
 public sealed class ValidatedPlanDispatcher(
-    IEnumerable<IConnectorAdapter> adapters,
-    IReadOnlyDictionary<string, string> signingKeys)
+    IEnumerable<IConnectorAdapter> adapters)
 {
     private readonly IReadOnlyDictionary<string, IConnectorAdapter> _adapters = adapters
         .ToDictionary(item => item.Manifest.AdapterId, StringComparer.Ordinal);
@@ -20,11 +20,7 @@ public sealed class ValidatedPlanDispatcher(
     {
         if (!_adapters.TryGetValue(request.Plan.AdapterId, out var adapter))
             return Rejected(request.Plan, "adapter_unavailable");
-        var validation = PlanValidator.Validate(
-            request.Plan,
-            adapter.Manifest,
-            new(request.DeviceId, request.UserId, DateTimeOffset.UtcNow,
-                request.KeyId, request.Signature, signingKeys));
+        var validation = PlanValidator.ValidateAdapter(request.Plan, adapter.Manifest);
         if (!validation.IsValid)
             return Rejected(request.Plan, validation.ErrorCode);
         return await _dispatcher.ExecuteAsync(
@@ -49,21 +45,26 @@ public sealed class PlanPipeHost(
         {
             var security = new System.IO.Pipes.PipeSecurity();
             security.AddAccessRule(new PipeAccessRule(
-                WindowsIdentity.GetCurrent().User!, PipeAccessRights.ReadWrite, AccessControlType.Allow));
-            security.AddAccessRule(new PipeAccessRule(
                 new SecurityIdentifier(WellKnownSidType.LocalServiceSid, null),
                 PipeAccessRights.ReadWrite, AccessControlType.Allow));
             await using var pipe = NamedPipeServerStreamAcl.Create(
                 pipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte,
                 PipeOptions.Asynchronous, 64 * 1024, 64 * 1024, security);
             await pipe.WaitForConnectionAsync(cancellationToken);
-            var request = await JsonSerializer.DeserializeAsync<ConnectorPlanExecutionRequest>(
-                pipe, cancellationToken: cancellationToken);
+            using var reader = new StreamReader(pipe, Encoding.UTF8, false, 64 * 1024, leaveOpen: true);
+            using var writer = new StreamWriter(pipe, new UTF8Encoding(false), 64 * 1024, leaveOpen: true)
+            {
+                AutoFlush = true,
+            };
+            var requestJson = await reader.ReadLineAsync(cancellationToken);
+            var request = string.IsNullOrWhiteSpace(requestJson)
+                ? null
+                : JsonSerializer.Deserialize<ConnectorPlanExecutionRequest>(requestJson);
             var outcome = request is null
                 ? throw new ConnectorException("connector_plan_request_invalid")
                 : await dispatcher.ExecuteAsync(request, cancellationToken);
-            await JsonSerializer.SerializeAsync(pipe, outcome, cancellationToken: cancellationToken);
-            await pipe.FlushAsync(cancellationToken);
+            await writer.WriteLineAsync(JsonSerializer.Serialize(outcome).AsMemory(), cancellationToken);
         }
     }
+
 }

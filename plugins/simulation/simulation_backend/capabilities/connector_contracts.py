@@ -62,20 +62,39 @@ CONNECTOR_STEP = obj({
     "payload_hash": HASH,
     "timeout_seconds": {"type": "integer", "minimum": 1, "maximum": 900},
 }, ("step_id", "operation_id", "contract_hash", "depends_on", "payload", "payload_hash", "timeout_seconds"))
-CONNECTOR_PLAN = obj({
-    "protocol": {"type": "string", "const": "ai00.connector.execution-plan.v1"},
-    "plan_id": STRING, "tenant_id": STRING, "user_id": STRING, "device_id": STRING,
-    "capability_version_gid": STRING, "business_definition_hash": HASH,
-    "adapter_id": STRING, "adapter_major": {"type": "integer", "const": 1},
-    "target_product": CONNECTOR_TARGET_PRODUCT,
-    "steps": {"type": "array", "items": CONNECTOR_STEP, "minItems": 1, "maxItems": 10000},
-    "issued_at": {"type": "string", "format": "date-time"},
-    "expires_at": {"type": "string", "format": "date-time"}, "plan_hash": HASH,
-}, (
-    "protocol", "plan_id", "tenant_id", "user_id", "device_id",
-    "capability_version_gid", "business_definition_hash", "adapter_id", "adapter_major",
-    "target_product", "steps", "issued_at", "expires_at", "plan_hash",
-))
+DOCUMENT_SNAPSHOT_STEP = obj({
+    "step_id": STRING,
+    "operation_id": {"type": "string", "const": "vismockup.document.snapshot@1"},
+    "contract_hash": HASH,
+    "depends_on": {"type": "array", "items": STRING, "maxItems": 0},
+    "payload": obj({
+        "max_nodes": {"type": "integer", "minimum": 1, "maximum": 10000},
+        "max_depth": {"type": "integer", "minimum": 1, "maximum": 100},
+    }, ("max_nodes", "max_depth")),
+    "payload_hash": HASH,
+    "timeout_seconds": {"type": "integer", "minimum": 1, "maximum": 900},
+}, ("step_id", "operation_id", "contract_hash", "depends_on", "payload", "payload_hash", "timeout_seconds"))
+
+
+def connector_plan(step_schema: dict, *, max_steps: int) -> dict:
+    return obj({
+        "protocol": {"type": "string", "const": "ai00.connector.execution-plan.v1"},
+        "plan_id": STRING, "tenant_id": STRING, "user_id": STRING, "device_id": STRING,
+        "capability_version_gid": STRING, "business_definition_hash": HASH,
+        "adapter_id": STRING, "adapter_major": {"type": "integer", "const": 1},
+        "target_product": CONNECTOR_TARGET_PRODUCT,
+        "steps": {"type": "array", "items": step_schema, "minItems": 1, "maxItems": max_steps},
+        "issued_at": {"type": "string", "format": "date-time"},
+        "expires_at": {"type": "string", "format": "date-time"}, "plan_hash": HASH,
+    }, (
+        "protocol", "plan_id", "tenant_id", "user_id", "device_id",
+        "capability_version_gid", "business_definition_hash", "adapter_id", "adapter_major",
+        "target_product", "steps", "issued_at", "expires_at", "plan_hash",
+    ))
+
+
+CONNECTOR_PLAN = connector_plan(CONNECTOR_STEP, max_steps=10000)
+DOCUMENT_SNAPSHOT_CONNECTOR_PLAN = connector_plan(DOCUMENT_SNAPSHOT_STEP, max_steps=1)
 
 
 class AdapterOperation(FrozenModel):
@@ -121,6 +140,16 @@ class ConnectorHealth(FrozenModel):
 INPUT_SCHEMAS = {
     "simulation.connector.health.get": obj(CONNECTOR, ("connector_id",)),
     "simulation.connector.plan.queue": obj({"plan": CONNECTOR_PLAN}, ("plan",)),
+    ("simulation.connector.plan.queue", 2): obj(
+        {"plan": DOCUMENT_SNAPSHOT_CONNECTOR_PLAN}, ("plan",),
+    ),
+    "simulation.vismockup.application.attach.request": obj({}, ()),
+    "simulation.vismockup.application.launch.request": obj({}, ()),
+    "simulation.vismockup.model.open.request": obj({"artifact_ref": ARTIFACT_REF}, ("artifact_ref",)),
+    "simulation.vismockup.model.close.request": obj({}, ()),
+    "simulation.vismockup.visibility.change.request": obj({"action": {"type": "string", "enum": ["all_on", "all_off"]}}, ("action",)),
+    "simulation.vismockup.tree.read.request": obj({"max_depth": {"type": "integer", "minimum": 1, "maximum": 8}}, ("max_depth",)),
+    "simulation.vismockup.command.get": obj({"operation_id": STRING}, ("operation_id",)),
     "simulation.vismockup.status.get": obj(CONNECTOR, ("connector_id",)),
     "simulation.vismockup.application.launch": obj(CONNECTOR, ("connector_id",)),
     "simulation.vismockup.model.open": obj({**CONNECTOR, "artifact_ref": ARTIFACT_REF}, ("connector_id", "artifact_ref")),
@@ -185,6 +214,19 @@ PAIRING_SUMMARY = obj({
 OUTPUT_SCHEMAS = {
     "simulation.connector.health.get": CONNECTOR_HEALTH,
     "simulation.connector.plan.queue": OPERATION_REF,
+    "simulation.vismockup.application.attach.request": OPERATION_REF,
+    "simulation.vismockup.application.launch.request": OPERATION_REF,
+    "simulation.vismockup.model.open.request": OPERATION_REF,
+    "simulation.vismockup.model.close.request": OPERATION_REF,
+    "simulation.vismockup.visibility.change.request": OPERATION_REF,
+    "simulation.vismockup.tree.read.request": OPERATION_REF,
+    "simulation.vismockup.command.get": obj({
+        "operation_id": STRING,
+        "status": {"type": "string", "enum": [
+            "queued", "leased", "completed", "failed", "cancelled", "outcome_unknown", "expired",
+        ]},
+        "outcome": {"type": ["object", "null"], "additionalProperties": True},
+    }, ("operation_id", "status", "outcome")),
     "simulation.vismockup.status.get": STATUS_RESULT,
     "simulation.vismockup.application.launch": LAUNCH_RESULT,
     "simulation.vismockup.model.open": OPEN_RESULT,

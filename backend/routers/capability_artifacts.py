@@ -11,8 +11,8 @@ from backend.capability_v2.artifacts import (
     ArtifactError,
     ArtifactIntegrityError,
     ArtifactService,
-    OisObjectStorage,
     SqlArtifactStore,
+    configured_object_storage,
 )
 from backend.capability_v2.contracts import (
     ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType, TenantIdentity,
@@ -49,7 +49,7 @@ def _identity(user: dict, principal) -> ConsumerIdentity:
 
 
 def _service() -> ArtifactService:
-    return ArtifactService(SqlArtifactStore(get_conn), OisObjectStorage())
+    return ArtifactService(SqlArtifactStore(get_conn), configured_object_storage())
 
 
 def _granted_resources(user: dict, identity: ConsumerIdentity) -> tuple[str, ...]:

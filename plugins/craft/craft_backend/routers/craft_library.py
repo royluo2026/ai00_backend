@@ -51,7 +51,7 @@ async def _invoke_library(request, current_user, principal, gateway, operation, 
     if not result.ok:
         code = result.error.code if result.error else "provider_error"
         raise HTTPException(status_code={"resource_not_found": 404, "permission_denied": 403, "invalid_input": 400}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
-    return result.data["data"].get("items", [])
+    return (result.data or {}).get("items", [])
 
 
 async def _invoke_change(request, current_user, principal, gateway, operation, *, gid=None, record=None, items=None, meta=None, alias=None):
@@ -75,7 +75,7 @@ async def _invoke_change(request, current_user, principal, gateway, operation, *
     if not result.ok:
         code = result.error.code if result.error else "provider_error"
         raise HTTPException(status_code={"resource_not_found": 404, "permission_denied": 403, "invalid_input": 400}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
-    return result.data["data"]
+    return result.data or {}
 
 
 class TemplateBody(BaseModel):

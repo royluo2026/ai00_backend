@@ -1,4 +1,5 @@
 using Ai00.Connector.Tray;
+using System.Security.Principal;
 
 ApplicationConfiguration.Initialize();
 if (args.Length == 1 && Uri.TryCreate(args[0], UriKind.Absolute, out var pairingUri))
@@ -14,6 +15,10 @@ if (args.Length == 1 && Uri.TryCreate(args[0], UriKind.Absolute, out var pairing
     return;
 }
 using var icon = new NotifyIcon { Text = "AI00 Connector", Visible = true, Icon = SystemIcons.Application };
+var windowsSid = WindowsIdentity.GetCurrent().User?.Value
+    ?? throw new InvalidOperationException("Current Windows SID is unavailable");
+using var brokerCancellation = new CancellationTokenSource();
+var broker = new SessionHostBroker(windowsSid).RunAsync(brokerCancellation.Token);
 using var menu = new ContextMenuStrip();
 using var status = new StatusView();
 menu.Items.Add("配对", null, (_, _) => MessageBox.Show("请从 AI00 数模仿真页面点击“连接本机”。", "AI00 Connector"));
@@ -23,3 +28,5 @@ menu.Items.Add("解绑", null, (_, _) => MessageBox.Show("解绑需要在 AI00 �
 menu.Items.Add("退出", null, (_, _) => Application.Exit());
 icon.ContextMenuStrip = menu;
 Application.Run();
+brokerCancellation.Cancel();
+try { await broker; } catch (OperationCanceledException) { }

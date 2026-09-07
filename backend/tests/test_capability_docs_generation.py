@@ -94,6 +94,23 @@ def test_minimal_example_preserves_typed_object_when_one_of_selects_required_pro
     validate_payload(schema, example)
 
 
+def test_minimal_example_fills_object_min_properties():
+    schema = {
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"},
+            "enabled": {"type": "boolean"},
+        },
+        "minProperties": 1,
+        "additionalProperties": False,
+    }
+
+    example = example_for_schema(schema)
+
+    assert example == {"name": "example"}
+    validate_payload(schema, example)
+
+
 def test_deprecated_empty_operation_enum_is_compatibility_unconstrained():
     validate_payload({"type": "string", "enum": []}, "legacy-operation")
 

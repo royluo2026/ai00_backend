@@ -6,7 +6,7 @@ import hashlib
 import tempfile
 import uuid
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel, ConfigDict, Field
 
 from backend.platform_sdk.auth import get_authenticated_principal, get_current_user
@@ -15,6 +15,7 @@ from plugins.simulation.simulation_backend.capabilities.connector_runtime import
     lease_connector_plan, record_connector_heartbeat,
 )
 from plugins.simulation.simulation_backend.data.connector_repository import SimulationConnectorRepository
+from plugins.simulation.simulation_backend.application.connector_wakeup import connector_wake_broker
 from plugins.simulation.simulation_backend.domain.connector_pairing import PairingRequest
 from backend.capability_v2.contracts import ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType, InvocationEnvelope, TenantIdentity
 from backend.capability_v2.gateway import get_default_gateway
@@ -230,6 +231,24 @@ def connector_plan_lease(body: ConnectorLeaseBody, connector: dict = Depends(_co
     return {"success": True, "data": value}
 
 
+@router.websocket("/plans/wake")
+async def connector_plan_wake(
+    websocket: WebSocket, connector: dict = Depends(_connector_auth),
+):
+    """Wake-only channel; plans still require the authenticated lease endpoint."""
+    await websocket.accept()
+    try:
+        async with connector_wake_broker.subscribe(connector["gid"]) as subscription:
+            await websocket.send_json({"type": "ready"})
+            while True:
+                signaled = await subscription.wait(25)
+                await websocket.send_json({
+                    "type": "plan_available" if signaled else "keepalive",
+                })
+    except WebSocketDisconnect:
+        return
+
+
 @router.post("/plans/{plan_id}/complete")
 async def connector_plan_complete(
     plan_id: str, body: ConnectorCompleteBody,
@@ -280,11 +299,47 @@ def connector_plan_artifact(
         record = SqlArtifactStore(get_conn).get_artifact(artifact_id)
         if record.artifact_ref.model_dump(mode="json") != expected:
             raise ValueError("artifact_ref_mismatch")
-        from backend.core.ois_storage import generate_access_url
-        url = generate_access_url(record.object_key, expire_in_seconds=120)
+        from backend.capability_v2.artifacts import FilesystemObjectStorage, configured_object_storage
+        storage = configured_object_storage()
+        if isinstance(storage, FilesystemObjectStorage):
+            url = (
+                f"/api/v1/simulation/connectors/plans/{plan_id}/artifacts/{artifact_id}/content"
+                f"?lease_id={lease_id}&connector_id={connector['gid']}"
+            )
+        else:
+            from backend.core.ois_storage import generate_access_url
+            url = generate_access_url(record.object_key, expire_in_seconds=120)
         if not url:
             raise RuntimeError("artifact_download_unavailable")
         return {"success": True, "data": {"artifact_ref": expected, "download_url": url}}
+    except PermissionError as exc:
+        raise HTTPException(status_code=403, detail={"code": str(exc)}) from exc
+    except (LookupError, ValueError) as exc:
+        raise HTTPException(status_code=409, detail={"code": str(exc)}) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail={"code": "artifact_download_unavailable"}) from exc
+
+
+@router.get("/plans/{plan_id}/artifacts/{artifact_id}/content")
+def connector_plan_artifact_content(
+    plan_id: str, artifact_id: str, lease_id: str = Query(min_length=1),
+    connector_id: str = Query(min_length=1),
+):
+    """Serve a lease-scoped local artifact like a short-lived presigned URL."""
+    try:
+        plan = get_leased_connector_plan(connector_id, plan_id, lease_id)
+        expected = _plan_artifact(plan, artifact_id)
+        if expected is None:
+            raise PermissionError("artifact_not_bound_to_plan")
+        from backend.capability_v2.artifacts import FilesystemObjectStorage, SqlArtifactStore, configured_object_storage
+        record = SqlArtifactStore(get_conn).get_artifact(artifact_id)
+        if record.artifact_ref.model_dump(mode="json") != expected:
+            raise ValueError("artifact_ref_mismatch")
+        storage = configured_object_storage()
+        if not isinstance(storage, FilesystemObjectStorage):
+            raise RuntimeError("local_artifact_transport_disabled")
+        from fastapi.responses import FileResponse
+        return FileResponse(storage.path_for(record.object_key), media_type=record.artifact_ref.media_type)
     except PermissionError as exc:
         raise HTTPException(status_code=403, detail={"code": str(exc)}) from exc
     except (LookupError, ValueError) as exc:
@@ -315,8 +370,8 @@ async def connector_step_result_artifact(
             tenant=TenantIdentity(tenant_id=plan.tenant_id, membership="connector"),
             consumer=ConsumerDescriptor(type=ConsumerType.LOCAL_RUNTIME, consumer_id=connector["gid"]),
         )
-        from backend.capability_v2.artifacts import ArtifactIntegrityError, ArtifactService, OisObjectStorage, SqlArtifactStore
-        service = ArtifactService(SqlArtifactStore(get_conn), OisObjectStorage())
+        from backend.capability_v2.artifacts import ArtifactIntegrityError, ArtifactService, SqlArtifactStore, configured_object_storage
+        service = ArtifactService(SqlArtifactStore(get_conn), configured_object_storage())
         session = service.create_upload(
             identity, media_type=media_type, expected_sha256=content_sha256,
             expected_byte_size=content_length, resource_refs=tuple(refs),

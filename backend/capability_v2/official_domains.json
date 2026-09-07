@@ -90,7 +90,7 @@
         "plugin_id": "official.craft",
         "module": "craft_backend.capabilities",
         "version": "1.2.0",
-        "artifact_hash": "sha256:b701f7f4fd4cdc0fd3e5e9110dd07c8b7889583b8af8f5ba05202fc37f4c853f"
+        "artifact_hash": "sha256:3a19eea5a551b8030f3391dbb666432b44ffba57e23d16dfdf295be2b7816aa9"
       },
       "artifact_path": "plugins/craft/craft_backend",
       "allowed_owners": [
@@ -224,7 +224,7 @@
         "plugin_id": "official.knowledge",
         "module": "knowledge_backend.capabilities",
         "version": "2.0.0",
-        "artifact_hash": "sha256:2d002bab50e442539b044ac09e61adb13529c9d0176eb3c1e77af2742ad96396"
+        "artifact_hash": "sha256:c45f8400d92a33509b4a03f7d58c243a1ee07fdd47ec802aafcfd4738975016a"
       },
       "artifact_path": "plugins/knowledge/knowledge_backend",
       "allowed_owners": [
@@ -304,7 +304,7 @@
         "plugin_id": "official.simulation",
         "module": "simulation_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:6e07ea783c75b056b3f1e93122ff1c002874fb4eee4ccd0604efc131f105d9cd"
+        "artifact_hash": "sha256:d261c9e3c9988832f13ae70222570b45f2a8bc0fe78f2135a6bcf4a92cba1ee9"
       },
       "artifact_path": "plugins/simulation/simulation_backend",
       "allowed_owners": [

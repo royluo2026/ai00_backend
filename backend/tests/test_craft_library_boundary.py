@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import ast
+import asyncio
 from pathlib import Path
+from types import SimpleNamespace
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -38,3 +40,23 @@ def test_library_read_capability_is_bounded_and_closed():
         pass
     else:
         raise AssertionError("unknown Craft library operation must be rejected")
+
+
+def test_library_compatibility_helpers_use_direct_capability_payload(monkeypatch):
+    from plugins.craft.craft_backend.routers import craft_library
+
+    async def invoke_read(*_args, **_kwargs):
+        return SimpleNamespace(ok=True, data={"items": [{"gid": "part-1"}], "total": 1}, error=None)
+
+    monkeypatch.setattr(craft_library, "invoke_compatibility", invoke_read)
+    monkeypatch.setattr(craft_library, "build_web_compatibility_envelope", lambda *_args, **_kwargs: object())
+    request = SimpleNamespace(headers={})
+    rows = asyncio.run(craft_library._invoke_library(request, {}, object(), object(), "part_names.list"))
+    assert rows == [{"gid": "part-1"}]
+
+    async def invoke_change(*_args, **_kwargs):
+        return SimpleNamespace(ok=True, data={"gid": "part-1", "changed": True}, error=None)
+
+    monkeypatch.setattr(craft_library, "invoke_compatibility", invoke_change)
+    changed = asyncio.run(craft_library._invoke_change(request, {}, object(), object(), "part_names.create"))
+    assert changed == {"gid": "part-1", "changed": True}

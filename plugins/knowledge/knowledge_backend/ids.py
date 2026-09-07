@@ -11,6 +11,8 @@ _PREFIXES = {
     "proposal": "knp",
     "outbox": "kno",
     "entry": "kne",
+    "folder": "knf",
+    "item": "kni",
 }
 
 

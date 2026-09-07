@@ -8,5 +8,5 @@ public sealed class RuntimeOptions
     public string PipeSecret { get; set; } = "";
     public string ArtifactCacheRoot { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "AI00", "artifacts");
     public string CaptureRoot { get; set; } = Path.Combine(Path.GetTempPath(), "AI00", "captures");
-    public int PollSeconds { get; set; } = 2;
+    public int PollSeconds { get; set; } = 30;
 }

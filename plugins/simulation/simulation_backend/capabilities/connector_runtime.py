@@ -5,6 +5,7 @@ from datetime import UTC, datetime, timedelta
 import hashlib
 import hmac
 import os
+import secrets
 
 from backend.capability_v2.contracts import OperationRef, OperationStatus
 from backend.capability_v2.provider_contracts import (
@@ -18,9 +19,12 @@ from backend.capability_v2.provider_contracts import (
 from backend.contracts.connector_execution_plan_v1 import (
     ConnectorExecutionPlanV1,
     ConnectorPlanOutcomeV1,
+    ConnectorStepV1,
+    ConnectorTargetProductV1,
     canonical_hash,
 )
 from backend.domain_ports.local_integration import canonical_json_bytes
+from plugins.simulation.simulation_backend.application.connector_wakeup import connector_wake_broker
 from backend.domain_ports.simulation_runtime import (
     ConnectorOutcomePortProxy,
     GovernedSimulationRuntimeClient,
@@ -35,6 +39,17 @@ from .connector_contracts import AdapterAdvertisement, AdapterOperation, Connect
 
 class ConnectorError(RuntimeError):
     pass
+
+
+DIRECT_VISMOCKUP_OPERATIONS = {
+    "attach": ("vismockup.application.probe@1", "sha256:197cfad8bc3453030fdc288ea78c3abc21699274dd48d4482444af4f62380a37"),
+    "launch": ("vismockup.application.probe@1", "sha256:197cfad8bc3453030fdc288ea78c3abc21699274dd48d4482444af4f62380a37"),
+    "open": ("vismockup.model.open@1", "sha256:aabd43bb066794c250f7eeed41def7c147a4da7263e813f192efa59a0cb40e34"),
+    "close": ("vismockup.model.close@1", "sha256:a1a27969ab8638c9868b384ccb546aed1ece56219ded7c7ec3bb3d6b19861771"),
+    "visibility": ("vismockup.visibility.change@1", "sha256:6ecb8dd2239a2ca881bfc8d40463778f2b80f15f66f1be50a3ceb91a90bff201"),
+    "tree": ("vismockup.tree.read@1", "sha256:25ac87b341ef76d657c627b45bc0c4de129f55b92e01401dd6f2cd8649dd2f16"),
+}
+DIRECT_VISMOCKUP_OPERATION_IDS = frozenset(value[0] for value in DIRECT_VISMOCKUP_OPERATIONS.values())
 
 
 def connector_plan_signing_material(connector_id: str) -> tuple[str, str]:
@@ -103,10 +118,14 @@ def require_compatible(plan: ConnectorExecutionPlanV1, health: ConnectorHealth) 
 
 
 class ConnectorControlPlane:
-    def __init__(self, repository, *, outcome_port=None, clock=lambda: datetime.now(UTC)):
+    def __init__(
+        self, repository, *, outcome_port=None, clock=lambda: datetime.now(UTC),
+        wake_notifier=None,
+    ):
         self.repository = repository
         self.outcome_port = outcome_port
         self.clock = clock
+        self.wake_notifier = wake_notifier
 
     def record_heartbeat(
         self, connector_id: str, expected_user_id: str, health: ConnectorHealth,
@@ -117,6 +136,8 @@ class ConnectorControlPlane:
         if (
             current is not None
             and current.reported_at > self.clock() - timedelta(minutes=2)
+            and current.user_session_present
+            and health.user_session_present
             and current.session_id != health.session_id
         ):
             raise ConnectorError("interactive_session_conflict")
@@ -143,6 +164,8 @@ class ConnectorControlPlane:
             self.repository.insert_plan(plan)
         except ConnectorRepositoryError as exc:
             raise ConnectorError(str(exc)) from exc
+        if self.wake_notifier is not None:
+            self.wake_notifier.notify(plan.device_id)
         return OperationRef(operation_id=plan.plan_id, status=OperationStatus.ACCEPTED)
 
     def lease_plan(self, connector_id: str, lease_seconds: int = 60):
@@ -187,6 +210,14 @@ class ConnectorControlPlane:
                 raise ConnectorError("plan_outcome_invalid")
             if any(step.status != "completed" for step in outcome.steps[:-1]):
                 raise ConnectorError("plan_outcome_invalid")
+        if plan.plan_id.startswith("vismockup-command-") and {
+            step.operation_id for step in plan.steps
+        } <= DIRECT_VISMOCKUP_OPERATION_IDS:
+            try:
+                self.repository.complete_plan(connector_id, plan_id, lease_id, outcome)
+            except ConnectorRepositoryError as exc:
+                raise ConnectorError(str(exc)) from exc
+            return
         target = (
             self.outcome_port.target(plan)
             if self.outcome_port is not None and hasattr(self.outcome_port, "target")
@@ -202,7 +233,43 @@ class ConnectorControlPlane:
 
 connector_control_plane = ConnectorControlPlane(
     SimulationConnectorRepository(), outcome_port=ConnectorOutcomePortProxy(),
+    wake_notifier=connector_wake_broker,
 )
+
+
+def _direct_vismockup_plan(
+    *, action: str, connector_id: str, payload: dict, context: CapabilityContext,
+    now: datetime,
+) -> ConnectorExecutionPlanV1:
+    # execution-plan.v1 canonicalizes timestamps to whole UTC seconds in the
+    # Windows runtime.  Match that wire contract before computing the hash.
+    now = now.astimezone(UTC).replace(microsecond=0)
+    capability_version_gid = str(getattr(context, "capability_version_gid", "") or "")
+    definition_hash = str(getattr(context, "business_definition_hash", "") or "")
+    if not context.team_gid or not capability_version_gid.startswith("cv2_") or not definition_hash.startswith("sha256:"):
+        raise ConnectorError("capability_provenance_required")
+    operation_id, contract_hash = DIRECT_VISMOCKUP_OPERATIONS[action]
+    step_payload = {"allow_launch": action == "launch"} if action in {"attach", "launch"} else payload
+    step = ConnectorStepV1(
+        step_id="step-00001", operation_id=operation_id, contract_hash=contract_hash,
+        depends_on=(), payload=step_payload, payload_hash=canonical_hash(step_payload),
+        timeout_seconds=120,
+    )
+    raw = {
+        "protocol": "ai00.connector.execution-plan.v1",
+        "plan_id": "vismockup-command-" + secrets.token_hex(16),
+        "tenant_id": context.team_gid, "user_id": context.user_gid,
+        "device_id": connector_id, "capability_version_gid": capability_version_gid,
+        "business_definition_hash": definition_hash,
+        "adapter_id": "ai00.vismockup", "adapter_major": 1,
+        "target_product": ConnectorTargetProductV1(
+            product_id="siemens.vismockup", minimum_version="14.0.0",
+            maximum_version_exclusive="15.0.0",
+        ),
+        "steps": (step,), "issued_at": now, "expires_at": now + timedelta(minutes=15),
+    }
+    draft = ConnectorExecutionPlanV1.model_construct(**raw, plan_hash="sha256:" + "0" * 64)
+    return ConnectorExecutionPlanV1(**raw, plan_hash=draft.compute_hash())
 
 
 def record_connector_heartbeat(
@@ -263,6 +330,40 @@ def register_connector_runtime_capabilities(
             digest=plan.plan_hash,
         ),))
 
+    def request_direct(action):
+        def handler(payload, context):
+            binding = control_plane.repository.binding_for_user(context.user_gid, context.team_gid)
+            if not binding or not binding.get("connector_id"):
+                raise ConnectorError("connector_binding_not_found")
+            plan_payload = (
+                {"artifact_ref": payload["artifact_ref"]} if action == "open"
+                else {"action": payload["action"]} if action == "visibility"
+                else {"max_depth": payload["max_depth"]} if action == "tree"
+                else {}
+            )
+            plan = _direct_vismockup_plan(
+                action=action, connector_id=binding["connector_id"], payload=plan_payload,
+                context=context, now=control_plane.clock(),
+            )
+            operation = control_plane.queue_plan(plan, context)
+            return CapabilityOutput(data=operation.model_dump(mode="json"), evidence=(EvidenceRef(
+                kind="simulation.vismockup.command",
+                reference=f"connector-plan:{plan.plan_id}", digest=plan.plan_hash,
+            ),))
+        return handler
+
+    def get_direct(payload, context):
+        value = control_plane.repository.get_plan_result(
+            payload["operation_id"], context.user_gid, context.team_gid,
+        )
+        if value is None:
+            raise ConnectorError("connector_command_not_found")
+        return CapabilityOutput(data=value, evidence=(EvidenceRef(
+            kind="simulation.vismockup.command",
+            reference=f"connector-plan:{payload['operation_id']}",
+            digest=canonical_hash(value),
+        ),))
+
     def local_atom_only(_payload, _context):
         raise CapabilityBusinessError(
             "provider_unavailable",
@@ -285,6 +386,39 @@ def register_connector_runtime_capabilities(
         risk=CapabilityRisk.WRITE, confirmation="user", permissions=("agent.run",),
         input_schema={}, output_schema={}, tags=("simulation", "connector", "plan"),
     ), queue_plan)
+    register(registry, CapabilitySpec(
+        id="simulation.connector.plan.queue", owner="simulation", version=2,
+        description="Queue one immutable compatible execution plan for the bound AI00 Connector as a Simulation user.",
+        use_when="A Simulation workflow has an exact version-pinned local plan.",
+        do_not_use_when="Connector compatibility or session preflight has not passed.",
+        risk=CapabilityRisk.WRITE, confirmation="user", permissions=("simulation.use",),
+        input_schema={}, output_schema={}, tags=("simulation", "connector", "plan"),
+    ), queue_plan)
+    for capability_id, action, description in (
+        ("simulation.vismockup.application.attach.request", "attach", "Queue a signed attach-only probe for an already-running VisMockup application."),
+        ("simulation.vismockup.application.launch.request", "launch", "Queue a signed request to launch or attach to VisMockup."),
+        ("simulation.vismockup.model.open.request", "open", "Queue a signed request to open one governed model artifact."),
+        ("simulation.vismockup.model.close.request", "close", "Queue a signed request to close all models in the connected VisMockup application."),
+        ("simulation.vismockup.visibility.change.request", "visibility", "Queue a signed request to show or hide all nodes in the active VisMockup document."),
+        ("simulation.vismockup.tree.read.request", "tree", "Queue a signed bounded read of the active VisMockup product tree."),
+    ):
+        register(registry, CapabilitySpec(
+            id=capability_id, owner="simulation", version=1, description=description,
+            use_when="The signed-in user requests one direct action on the bound workstation Connector.",
+            do_not_use_when="No current user-scoped Connector binding exists.",
+            risk=CapabilityRisk.WRITE,
+            confirmation="none" if action in {"attach", "visibility", "tree"} else "user",
+            permissions=("simulation.use",),
+            input_schema={}, output_schema={}, tags=("simulation", "connector", "vismockup", "workflow"),
+        ), request_direct(action))
+    register(registry, CapabilitySpec(
+        id="simulation.vismockup.command.get", owner="simulation", version=1,
+        description="Read one caller-scoped direct VisMockup command outcome.",
+        use_when="The caller needs authoritative progress for a queued direct VisMockup command.",
+        do_not_use_when="The command belongs to another user or tenant.",
+        risk=CapabilityRisk.READ, confirmation="none", permissions=("simulation.use",),
+        input_schema={}, output_schema={}, tags=("simulation", "connector", "vismockup", "workflow"),
+    ), get_direct)
     for capability_id, description, risk in _VISMOCKUP_ATOMS:
         register(registry, CapabilitySpec(
             id=capability_id, owner="simulation", version=1,

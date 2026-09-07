@@ -202,7 +202,14 @@ class CapabilityGatewayService:
             descriptor, provider = self._resolve_envelope(envelope)
         except GatewayPolicyError as exc:
             return self._rejected(envelope, exc.code, exc.message)
-        except CatalogResolutionError:
+        except CatalogResolutionError as error:
+            _log.warning(
+                "Capability catalog resolution failed for %s@%s in %s: %s",
+                envelope.capability_id,
+                envelope.major_version,
+                envelope.catalog_release,
+                error,
+            )
             return self._rejected(
                 envelope, "catalog_resolution_failed", "Capability catalog resolution failed."
             )

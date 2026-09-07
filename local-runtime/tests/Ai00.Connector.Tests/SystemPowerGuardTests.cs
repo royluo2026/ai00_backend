@@ -6,6 +6,12 @@ namespace Ai00.Connector.Tests;
 public sealed class SystemPowerGuardTests
 {
     [Fact]
+    public void SystemRequiredUsesTheWindowsPowerRequestContractValue()
+    {
+        Assert.Equal(1, (int)PowerRequestType.SystemRequired);
+    }
+
+    [Fact]
     public void PowerRequestIsReleasedWhenPlanThrows()
     {
         var native = new RecordingPowerNative();

@@ -32,13 +32,15 @@ public sealed class DocumentSnapshotReader
         while (queue.TryDequeue(out var current))
         {
             if (nodes.Count == maxNodes) throw new ConnectorException("bom_snapshot_limit_exceeded");
-            if (current.Depth > maxDepth || string.IsNullOrWhiteSpace(current.Node.NodeKey) || !seen.Add(current.Node.NodeKey))
+            var nodeKey = current.Node.NodeKey;
+            if (current.Depth > maxDepth || string.IsNullOrWhiteSpace(nodeKey) || !seen.Add(nodeKey))
                 throw new ConnectorException("bom_snapshot_invalid");
             nodes.Add(new(
-                current.Node.NodeKey, current.Parent, current.ChildOrder, current.Depth,
+                nodeKey, current.Parent, current.ChildOrder, current.Depth,
                 current.Node.PrintableName, current.Node.OccurrenceId, current.Node.ModelId));
-            for (var index = 0; index < current.Node.Children.Count; index++)
-                queue.Enqueue((current.Node.Children[index], current.Node.NodeKey, index, current.Depth + 1));
+            var children = current.Node.Children;
+            for (var index = 0; index < children.Count; index++)
+                queue.Enqueue((children[index], nodeKey, index, current.Depth + 1));
         }
         var projection = new Dictionary<string, object?>
         {

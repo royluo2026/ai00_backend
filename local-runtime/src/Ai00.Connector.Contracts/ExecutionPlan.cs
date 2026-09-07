@@ -128,6 +128,14 @@ public static class PlanValidator
         AdapterManifest manifest,
         PlanValidationContext context)
     {
+        var security = ValidateSecurity(plan, context);
+        return security.IsValid ? ValidateAdapter(plan, manifest) : security;
+    }
+
+    public static PlanValidationResult ValidateSecurity(
+        ConnectorExecutionPlan plan,
+        PlanValidationContext context)
+    {
         if (plan.Protocol != ConnectorExecutionPlan.ProtocolVersion)
             return PlanValidationResult.Fail("connector_version_incompatible");
         if (plan.ComputeHash() != plan.PlanHash)
@@ -140,6 +148,13 @@ public static class PlanValidator
             return PlanValidationResult.Fail("plan_expired");
         if (plan.DeviceId != context.DeviceId || plan.UserId != context.UserId)
             return PlanValidationResult.Fail("plan_identity_mismatch");
+        return PlanValidationResult.Success();
+    }
+
+    public static PlanValidationResult ValidateAdapter(
+        ConnectorExecutionPlan plan,
+        AdapterManifest manifest)
+    {
         if (plan.AdapterId != manifest.AdapterId || plan.AdapterMajor != manifest.AdapterMajor)
             return PlanValidationResult.Fail("adapter_unavailable");
         if (plan.TargetProduct.ProductId != manifest.ProductId ||

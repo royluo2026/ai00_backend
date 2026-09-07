@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Ai00.Connector.Contracts;
@@ -33,7 +32,8 @@ public sealed class ConnectorHeartbeatReporter(
 
 public sealed class FileConnectorHealthSource(
     IDeviceCredentialStore credentials,
-    IOptions<RuntimeOptions> options)
+    IOptions<RuntimeOptions> options,
+    ILogger<FileConnectorHealthSource> logger)
     : IConnectorHealthSource
 {
     private readonly RuntimeOptions _options = options.Value;
@@ -45,13 +45,16 @@ public sealed class FileConnectorHealthSource(
         try
         {
             presence = JsonSerializer.Deserialize<SessionHostPresence>(
-                File.ReadAllText(SessionHostPresencePath.Value));
+                File.ReadAllText(SessionHostPresencePath.For(credential.WindowsSid)));
             if (presence is null || presence.WindowsSid != credential.WindowsSid ||
-                presence.ReportedAt < DateTimeOffset.UtcNow.AddSeconds(-20) ||
-                Process.GetProcessById(presence.ProcessId).HasExited)
+                presence.ReportedAt < DateTimeOffset.UtcNow.AddSeconds(-20))
                 presence = null;
         }
-        catch { presence = null; }
+        catch (Exception error)
+        {
+            logger.LogWarning(error, "SessionHost presence could not be read");
+            presence = null;
+        }
         return new(
             _options.Version, [ConnectorExecutionPlan.ProtocolVersion], credential.UserId,
             presence?.SessionId.ToString() ?? "missing", presence is not null,

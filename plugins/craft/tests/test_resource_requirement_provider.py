@@ -72,6 +72,21 @@ def test_normalization_rejects_blank_values_and_unknown_types():
         resource_requirements.normalize_nonblank("   ", "name", 255)
 
 
+def test_transport_preserves_legacy_extension_attributes_inside_declared_field():
+    from plugins.craft.craft_backend.capabilities import resource_requirements
+
+    row = resource_requirements._transport({
+        "gid": "resource-1",
+        "attributes": '{"gun_model":"G-01","TC数模号":"CAD-01","大类别":"拧紧"}',
+    })
+
+    assert row["attributes"]["gun_model"] == "G-01"
+    assert "TC数模号" not in row["attributes"]
+    assert "大类别" not in row["attributes"]
+    assert '"TC数模号": "CAD-01"' in row["attributes"]["legacy_spec"]
+    assert '"大类别": "拧紧"' in row["attributes"]["legacy_spec"]
+
+
 def test_socket_need_is_an_independent_tc_resource_node():
     from plugins.craft.craft_backend.capabilities import resource_requirements
     from plugins.craft.craft_backend.routers._bop._constants import _AI00_LEVEL

@@ -22,6 +22,25 @@ public sealed class DeviceCredentialStoreTests : IDisposable
     }
 
     [Fact]
+    public void PairedGatewayUsesOnlyHttpsOrLoopbackEndpoints()
+    {
+        var fallback = new Uri("https://configured.example/");
+
+        Assert.Equal(
+            "http://127.0.0.1:5173/",
+            ConnectorGatewayEndpoint.Resolve(
+                new DeviceCredential("d", "u", "s", "t", "http://127.0.0.1:5173"), fallback).ToString());
+        Assert.Equal(
+            "https://ai00.example/",
+            ConnectorGatewayEndpoint.Resolve(
+                new DeviceCredential("d", "u", "s", "t", "https://ai00.example"), fallback).ToString());
+        Assert.Equal(
+            fallback,
+            ConnectorGatewayEndpoint.Resolve(
+                new DeviceCredential("d", "u", "s", "t", "http://evil.example"), fallback));
+    }
+
+    [Fact]
     public void OperationSigningKeyIsProtectedAtRestAndRoundTrips()
     {
         var path = Path.Combine(_directory, "operation.keys");

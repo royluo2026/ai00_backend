@@ -29,6 +29,9 @@ def _record(properties):
     return {"type": "object", "properties": properties, "additionalProperties": False}
 
 
+_SITE_REF = _record({"path": _STRING, "label": _STRING})
+
+
 _FOLDER = _record({
     "gid": _TEXT, "parent_gid": _TEXT, "scope_type": _TEXT, "team_gid": _TEXT,
     "name": _TEXT, "sort_order": _INT, "creator_gid": _TEXT,
@@ -122,7 +125,7 @@ _ITEM_UPDATES = {
     "properties": {
         "folder_gid": _STRING, "title": {"type": "string", "maxLength": 512}, "status": _STRING,
         "content_body": {"type": "object", "additionalProperties": True}, "content_md": {"type": "string", "maxLength": 200000},
-        "file_path": _STRING, "url": _STRING, "site_ref": {"type": "object", "additionalProperties": True},
+        "file_path": _STRING, "url": _STRING, "site_ref": _SITE_REF,
         "tags": _TAGS, "is_pinned": {"type": "boolean"}, "is_hidden": {"type": "boolean"},
         "scope_type": _STRING, "team_gid": _STRING,
     },
@@ -176,7 +179,7 @@ SCHEMAS = {
          "name": {"type": "string", "maxLength": 512}, "sort_order": {"type": "integer", "minimum": -1000000, "maximum": 1000000},
          "folder_gid": _STRING, "item_type": _STRING, "title": {"type": "string", "maxLength": 512},
          "status": _STRING, "content_body": {"type": "object", "additionalProperties": True}, "content_md": {"type": "string", "maxLength": 200000},
-         "file_path": _STRING, "url": _STRING, "site_ref": {"type": "object", "additionalProperties": True},
+         "file_path": _STRING, "url": _STRING, "site_ref": _SITE_REF,
          "tags": _TAGS, "updates": _ITEM_UPDATES},
     ),
 }

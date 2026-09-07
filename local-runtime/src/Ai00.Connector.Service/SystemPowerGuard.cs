@@ -4,7 +4,7 @@ using Ai00.Connector.Contracts;
 
 namespace Ai00.Connector.Service;
 
-public enum PowerRequestType { SystemRequired = 0 }
+public enum PowerRequestType { SystemRequired = 1 }
 
 public interface ISystemPowerGuard
 {

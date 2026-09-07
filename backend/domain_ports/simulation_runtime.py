@@ -110,9 +110,9 @@ class GovernedSimulationRuntimeClient:
             "simulation.connector.health.get", 1, {"connector_id": device_id},
         ), context)
 
-    async def queue_plan(self, plan, context, *, approval_reference):
+    async def queue_plan(self, plan, context, *, approval_reference, major_version=1):
         return await self._invoke(DomainInvocation(
-            "simulation.connector.plan.queue", 1,
+            "simulation.connector.plan.queue", major_version,
             {"plan": plan.model_dump(mode="json")}, idempotency_key=plan.plan_id,
             approval_reference=approval_reference,
         ), context)
@@ -212,9 +212,10 @@ class ConnectorPortProxy:
     async def get_health(self, device_id, context):
         return await simulation_runtime_ports.require("governed.domain_client").get_health(device_id, context)
 
-    async def queue_plan(self, plan, context, *, approval_reference):
+    async def queue_plan(self, plan, context, *, approval_reference, major_version=1):
         return await simulation_runtime_ports.require("governed.domain_client").queue_plan(
             plan, context, approval_reference=approval_reference,
+            major_version=major_version,
         )
 
 

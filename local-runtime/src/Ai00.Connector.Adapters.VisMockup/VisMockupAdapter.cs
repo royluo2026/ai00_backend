@@ -16,6 +16,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     private readonly ModelAttacher _attacher;
     private readonly InternalCapture _capture;
     private object? _application;
+    private string? _ownedDocumentId;
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, string executable)
         : this(sta, paths, new WindowsVisMockupCom(executable), executable,
@@ -42,6 +43,10 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         [
             new("vismockup.application.probe@1", "sha256:197cfad8bc3453030fdc288ea78c3abc21699274dd48d4482444af4f62380a37"),
             new("vismockup.document.snapshot@1", "sha256:aa7c11c2501026c470a9cc7bfcbbecc7339879c18bf2b6b86f68ed7fc2e1861b"),
+            new("vismockup.model.open@1", "sha256:aabd43bb066794c250f7eeed41def7c147a4da7263e813f192efa59a0cb40e34"),
+            new("vismockup.model.close@1", "sha256:a1a27969ab8638c9868b384ccb546aed1ece56219ded7c7ec3bb3d6b19861771"),
+            new("vismockup.visibility.change@1", "sha256:6ecb8dd2239a2ca881bfc8d40463778f2b80f15f66f1be50a3ceb91a90bff201"),
+            new("vismockup.tree.read@1", "sha256:25ac87b341ef76d657c627b45bc0c4de129f55b92e01401dd6f2cd8649dd2f16"),
             new("vismockup.model.attach@1", "sha256:444b6b8a963b5a7e04d6b607cfe53699a5c93196a5bf78c98843d12d073fe844"),
             new("vismockup.scene.apply@1", "sha256:fce8ff3a33d996a26c3121d015839e2d68bc3c631a8c8c1091201e95d0bcabd3"),
             new("vismockup.scene.verify@1", "sha256:e99bf5896c3f655afc7470fc140d261225d6f37a1d8224b7e9438a2e7b7a211a"),
@@ -62,7 +67,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
                 var documentReady = application.ActiveDocument is not null;
                 return new AdapterHealth(true, documentReady ? "ready" : "document_missing", true, documentReady, application.ProductVersion);
             }
-            catch (ConnectorException)
+            catch (Exception)
             {
                 return new AdapterHealth(false, "unavailable");
             }
@@ -105,6 +110,13 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             "vismockup.document.snapshot@1" => await SnapshotAsync(
                 operation.Payload.GetProperty("max_nodes").GetInt32(),
                 operation.Payload.GetProperty("max_depth").GetInt32()),
+            "vismockup.model.open@1" => await OpenManagedFileAsync(
+                operation.Payload.GetProperty("local_artifact_path").GetString() ?? ""),
+            "vismockup.model.close@1" => await CloseManagedFileAsync(),
+            "vismockup.visibility.change@1" => await ChangeAllVisibilityAsync(
+                operation.Payload.GetProperty("action").GetString() ?? ""),
+            "vismockup.tree.read@1" => await TreeAsync(
+                operation.Payload.GetProperty("max_depth").GetInt32()),
             "vismockup.model.attach@1" => await AttachModelAsync(
                 operation.Payload.GetProperty("document_id").GetString() ?? "",
                 operation.Payload.GetProperty("baseline_snapshot_hash").GetString() ?? "",
@@ -129,6 +141,36 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         };
         return new AdapterResult(true, result);
     }
+
+    public Task<object> OpenManagedFileAsync(string filePath) => _sta.InvokeAsync<object>(() =>
+    {
+        var safePath = _paths.ValidateModelPath(filePath);
+        var application = _connection.RequireActiveApplication(true);
+        var document = application.OpenDocument(safePath);
+        _ownedDocumentId = document.DocumentId;
+        return new { opened = true, document_id = document.DocumentId };
+    });
+
+    public Task<object> CloseManagedFileAsync() => _sta.InvokeAsync<object>(() =>
+    {
+        var application = _connection.RequireActiveApplication(false);
+        application.CloseAllDocuments();
+        var closed = _ownedDocumentId;
+        _ownedDocumentId = null;
+        return new { closed = true, document_id = closed };
+    });
+
+    public Task<object> ChangeAllVisibilityAsync(string action) => _sta.InvokeAsync<object>(() =>
+    {
+        var document = _connection.RequireActiveDocument();
+        document.SetAllNodesVisible(action switch
+        {
+            "all_on" => true,
+            "all_off" => false,
+            _ => throw new ConnectorException("visibility_action_unsupported"),
+        });
+        return new { action };
+    });
 
     private static SceneState ReadScene(System.Text.Json.JsonElement value)
     {
@@ -181,26 +223,26 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     });
     public Task<object> TreeAsync(int maxDepth) => _sta.InvokeAsync<object>(() =>
     {
-        dynamic app = Connect(); dynamic documents = app.Documents;
-        if ((int)documents.Count <= 0) throw new InvalidOperationException("No active VisMockup document");
-        dynamic root = documents.Item(1).ActiveView.RootNode;
+        if (maxDepth is < 1 or > 8) throw new ConnectorException("vismockup_tree_depth_invalid");
+        var document = _connection.RequireActiveDocument();
+        var root = document.RootNode;
         var nodes = new List<object>();
-        var queue = new Queue<(object Node, string? Parent, int Depth)>();
+        var queue = new Queue<(IVisMockupNode Node, string? Parent, int Depth)>();
         queue.Enqueue((root, null, 0));
         while (queue.Count > 0)
         {
-            var item = queue.Dequeue(); dynamic node = item.Node;
-            string name;
-            string catiaName = "";
-            try { name = Convert.ToString(node.PrintableName) ?? ""; } catch { name = Convert.ToString(node.Fullname) ?? ""; }
-            try { catiaName = Convert.ToString(node.MetaDataProperties.GetPropertyByName("catiaOccurrenceName")) ?? ""; } catch { }
-            var nodeKey = Convert.ToString(node.GetNodeKey()) ?? "";
-            var childCount = Convert.ToInt32(node.NumChildren);
-            nodes.Add(new { node_key = nodeKey, parent_node_key = item.Parent, name, catia_occurrence_name = catiaName, has_more = item.Depth >= maxDepth && childCount > 0 });
+            var item = queue.Dequeue();
+            var nodeKey = item.Node.NodeKey;
+            var children = item.Node.Children;
+            nodes.Add(new {
+                node_key = nodeKey, parent_node_key = item.Parent,
+                name = item.Node.PrintableName, catia_occurrence_name = item.Node.OccurrenceId,
+                has_more = item.Depth >= maxDepth && children.Count > 0,
+            });
             if (item.Depth < maxDepth)
             {
-                dynamic collection = node.Children;
-                for (var index = 0; index < childCount; index++) queue.Enqueue((collection.Node(index), nodeKey, item.Depth + 1));
+                for (var index = 0; index < children.Count; index++)
+                    queue.Enqueue((children[index], nodeKey, item.Depth + 1));
             }
         }
         return new { nodes, max_depth = maxDepth };

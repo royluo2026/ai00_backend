@@ -8,7 +8,7 @@ craft.pbom.draft.change.preview
 - 不适用：The subject is BOP or GBOP.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_052a820799b9df56f233d3475547c8fa`
+- Catalog Release：`rel_6b7ac7cd21ed113da5a033e433f09a37`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -90,7 +90,7 @@ craft.pbom.draft.change.preview
 ```json
 {
   "capability_id": "craft.pbom.draft.change.preview",
-  "catalog_release": "rel_052a820799b9df56f233d3475547c8fa",
+  "catalog_release": "rel_6b7ac7cd21ed113da5a033e433f09a37",
   "major_version": 1,
   "payload": {
     "changes": "example",

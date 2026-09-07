@@ -8,7 +8,7 @@ Read bounded Craft standard operation library records.
 - 不适用：The outcome is a GBOP release or BOP execution operation.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_052a820799b9df56f233d3475547c8fa`
+- Catalog Release：`rel_6b7ac7cd21ed113da5a033e433f09a37`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -98,7 +98,7 @@ Read bounded Craft standard operation library records.
 ```json
 {
   "capability_id": "craft.standard_operation.read",
-  "catalog_release": "rel_052a820799b9df56f233d3475547c8fa",
+  "catalog_release": "rel_6b7ac7cd21ed113da5a033e433f09a37",
   "major_version": 1,
   "payload": {
     "operation": "list"
@@ -114,7 +114,19 @@ Read bounded Craft standard operation library records.
 {
   "additionalProperties": false,
   "properties": {
+    "ai00_level": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "bom_row": {
+      "type": "string"
+    },
     "code": {
+      "type": "string"
+    },
+    "component_type": {
       "type": "string"
     },
     "created_at": {
@@ -140,7 +152,19 @@ Read bounded Craft standard operation library records.
       "items": {
         "additionalProperties": false,
         "properties": {
+          "ai00_level": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "bom_row": {
+            "type": "string"
+          },
           "code": {
+            "type": "string"
+          },
+          "component_type": {
             "type": "string"
           },
           "created_at": {
@@ -165,10 +189,25 @@ Read bounded Craft standard operation library records.
           "level": {
             "type": "string"
           },
+          "match_tag": {
+            "type": "string"
+          },
           "name": {
             "type": "string"
           },
+          "operation_vpps": {
+            "type": "string"
+          },
+          "parent_bom_row": {
+            "type": "string"
+          },
           "parent_vpps": {
+            "type": "string"
+          },
+          "part_feed": {
+            "type": "boolean"
+          },
+          "process_vpps": {
             "type": "string"
           },
           "share_scope": {
@@ -203,6 +242,9 @@ Read bounded Craft standard operation library records.
           },
           "vpps_desc": {
             "type": "string"
+          },
+          "vpps_part": {
+            "type": "string"
           }
         },
         "type": "object"
@@ -210,13 +252,34 @@ Read bounded Craft standard operation library records.
       "maxItems": 500,
       "type": "array"
     },
+    "level": {
+      "type": "string"
+    },
+    "match_tag": {
+      "type": "string"
+    },
     "name": {
+      "type": "string"
+    },
+    "operation_vpps": {
       "type": "string"
     },
     "parameters": {
       "additionalProperties": false,
       "properties": {},
       "type": "object"
+    },
+    "parent_bom_row": {
+      "type": "string"
+    },
+    "parent_vpps": {
+      "type": "string"
+    },
+    "part_feed": {
+      "type": "boolean"
+    },
+    "process_vpps": {
+      "type": "string"
     },
     "required_tools": {
       "items": {
@@ -238,11 +301,32 @@ Read bounded Craft standard operation library records.
       "maxItems": 200,
       "type": "array"
     },
+    "torque_importance": {
+      "type": "string"
+    },
     "updated_at": {
+      "type": "string"
+    },
+    "vehicle_model": {
       "type": "string"
     },
     "version": {
       "type": "integer"
+    },
+    "vpps": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "vpps_attr": {
+      "type": "string"
+    },
+    "vpps_desc": {
+      "type": "string"
+    },
+    "vpps_part": {
+      "type": "string"
     }
   },
   "type": "object"

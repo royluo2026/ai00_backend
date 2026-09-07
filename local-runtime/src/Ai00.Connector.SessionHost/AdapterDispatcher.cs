@@ -55,11 +55,18 @@ public sealed class AdapterDispatcher(IEnumerable<IConnectorAdapter> adapters)
                     results.Add(new(step.StepId, "outcome_unknown", null, null, "local_execution_outcome_unknown", startedAt, completedAt));
                     return new(plan.Protocol, plan.PlanId, "outcome_unknown", results, completedAt);
                 }
-                catch
+                catch (ConnectorException error)
                 {
                     var completedAt = WholeSecond(DateTimeOffset.UtcNow);
-                    results.Add(new(step.StepId, "outcome_unknown", null, null, "local_execution_outcome_unknown", startedAt, completedAt));
-                    return new(plan.Protocol, plan.PlanId, "outcome_unknown", results, completedAt);
+                    results.Add(new(step.StepId, "failed", null, null, error.Code, startedAt, completedAt));
+                    return new(plan.Protocol, plan.PlanId, "failed", results, completedAt);
+                }
+                catch (Exception error)
+                {
+                    var completedAt = WholeSecond(DateTimeOffset.UtcNow);
+                    var code = "local_execution_" + error.GetType().Name.ToLowerInvariant();
+                    results.Add(new(step.StepId, "failed", null, null, code, startedAt, completedAt));
+                    return new(plan.Protocol, plan.PlanId, "failed", results, completedAt);
                 }
             }
             return new(plan.Protocol, plan.PlanId, "completed", results, WholeSecond(DateTimeOffset.UtcNow));
@@ -76,6 +83,16 @@ public sealed class AdapterDispatcher(IEnumerable<IConnectorAdapter> adapters)
     private static JsonElement MaterializePayload(
         ConnectorStep step, IReadOnlyList<MaterializedArtifact> artifacts)
     {
+        if (step.OperationId == "vismockup.model.open@1")
+        {
+            var openRoot = JsonNode.Parse(step.Payload.GetRawText())?.AsObject()
+                ?? throw new ConnectorException("artifact_materialization_required");
+            var openArtifactId = openRoot["artifact_ref"]?["artifact_id"]?.GetValue<string>() ?? "";
+            var openMaterialized = artifacts.SingleOrDefault(item => item.ArtifactId == openArtifactId)
+                ?? throw new ConnectorException("artifact_materialization_required");
+            openRoot["local_artifact_path"] = openMaterialized.CachePath;
+            return JsonSerializer.SerializeToElement(openRoot);
+        }
         if (step.OperationId != "vismockup.model.attach@1") return step.Payload;
         var root = JsonNode.Parse(step.Payload.GetRawText())?.AsObject()
             ?? throw new ConnectorException("artifact_materialization_required");

@@ -19,6 +19,12 @@ from backend.platform_sdk.ids import next_gid
 from ..data.connection import get_conn
 
 RESOURCE_TYPES = ("socket", "tool", "fixture", "equipment")
+RESOURCE_ATTRIBUTE_KEYS = (
+    "gun_model", "matou_part_no", "importance", "gun_type", "wireless",
+    "output_square", "torque_min", "torque_recommended", "cad_model_no",
+    "socket_model", "fastener_type", "fastener_params", "extension_model",
+    "socket_cad_no", "extension_cad_no", "category", "legacy_spec",
+)
 RESOURCE_LINK_TYPES = {
     "socket": "resource_socket",
     "tool": "resource_tool",
@@ -164,8 +170,25 @@ def _transport(row: dict[str, Any]) -> dict[str, Any]:
         if hasattr(value, "isoformat"):
             result[key] = value.isoformat()
     attributes = result.get("attributes")
-    if isinstance(attributes, dict) and isinstance(attributes.get("legacy_spec"), (dict, list)):
-        attributes["legacy_spec"] = json.dumps(attributes["legacy_spec"], ensure_ascii=False, sort_keys=True)
+    if isinstance(attributes, dict):
+        unknown = {key: value for key, value in attributes.items() if key not in RESOURCE_ATTRIBUTE_KEYS}
+        attributes = {key: value for key, value in attributes.items() if key in RESOURCE_ATTRIBUTE_KEYS}
+        legacy = attributes.get("legacy_spec")
+        if unknown:
+            if isinstance(legacy, dict):
+                legacy_payload = dict(legacy)
+            elif isinstance(legacy, str):
+                parsed = _json(legacy, {})
+                legacy_payload = parsed if isinstance(parsed, dict) else {"value": legacy}
+            elif legacy is None:
+                legacy_payload = {}
+            else:
+                legacy_payload = {"value": legacy}
+            legacy_payload.update(unknown)
+            attributes["legacy_spec"] = json.dumps(legacy_payload, ensure_ascii=False, sort_keys=True)
+        elif isinstance(legacy, (dict, list)):
+            attributes["legacy_spec"] = json.dumps(legacy, ensure_ascii=False, sort_keys=True)
+        result["attributes"] = attributes
     return result
 
 
@@ -432,12 +455,7 @@ NULLABLE_STRING = {"type": ["string", "null"]}
 ATTRIBUTE_VALUE = {"type": ["string", "number", "boolean", "null"]}
 ATTRIBUTES = _object({
     key: ({"type": ["string", "null"]} if key == "legacy_spec" else ATTRIBUTE_VALUE)
-    for key in (
-        "gun_model", "matou_part_no", "importance", "gun_type", "wireless",
-        "output_square", "torque_min", "torque_recommended", "cad_model_no",
-        "socket_model", "fastener_type", "fastener_params", "extension_model",
-        "socket_cad_no", "extension_cad_no", "category", "legacy_spec",
-    )
+    for key in RESOURCE_ATTRIBUTE_KEYS
 })
 CURSOR = {"anyOf": [{"type": "string"}, {"type": "null"}]}
 ALIAS_ROW = _object({
