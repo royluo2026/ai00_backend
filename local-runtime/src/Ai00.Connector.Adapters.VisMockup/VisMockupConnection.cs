@@ -17,3 +17,10 @@ public sealed class VisMockupConnection(IVisMockupCom com)
         RequireActiveApplication(allowLaunch).ActiveDocument
         ?? throw new ConnectorException("active_document_unavailable");
 }
+public sealed class BreakawayVisMockupCom(string executable,string publisher):IVisMockupCom
+{
+    private readonly WindowsVisMockupCom inner=new(executable);
+    public bool TryGetActiveApplication(out IVisMockupApplication? application)=>inner.TryGetActiveApplication(out application);
+    public void Launch()=>new VisMockupBreakawayLauncher(executable,publisher).Launch();
+    public IVisMockupApplication WaitForActiveApplication(TimeSpan timeout)=>inner.WaitForActiveApplication(timeout);
+}

@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Ai00.Connector.AppHost\Ai00.Connector.AppHost.csproj" />
     <ProjectReference Include="..\..\src\Ai00.Connector.Contracts.V2\Ai00.Connector.Contracts.V2.csproj" />
     <None Include="..\..\..\backend\tests\fixtures\connector_execution_plan_v2.json" Link="connector_execution_plan_v2.json" CopyToOutputDirectory="PreserveNewest" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />

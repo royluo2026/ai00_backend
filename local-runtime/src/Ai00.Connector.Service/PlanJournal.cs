@@ -103,22 +103,9 @@ public sealed class PlanJournal
         string planId, PlanState planState, string? stepId, StepState? stepState,
         ConnectorExecutionPlan? plan, SignedConnectorPlanOutcome? outcome)
     {
-        _records.Add(new(_records.Count + 1L, planId, planState, stepId, stepState, plan, outcome, DateTimeOffset.UtcNow));
-        var directory = Path.GetDirectoryName(_path) ?? throw new InvalidOperationException("plan_journal_path_invalid");
-        Directory.CreateDirectory(directory);
-        var temporaryPath = _path + ".tmp-" + Guid.NewGuid().ToString("N");
-        try
-        {
-            using (var stream = new FileStream(temporaryPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, FileOptions.WriteThrough))
-            {
-                JsonSerializer.Serialize(stream, _records);
-                stream.Flush(true);
-            }
-            File.Move(temporaryPath, _path, true);
-        }
-        finally
-        {
-            if (File.Exists(temporaryPath)) File.Delete(temporaryPath);
-        }
+        var next = _records.Append(new JournalRecord(_records.Count + 1L, planId, planState, stepId, stepState, plan, outcome, DateTimeOffset.UtcNow)).ToList();
+        DurableJsonFile.Write(_path, next);
+        _records.Clear();
+        _records.AddRange(next);
     }
 }

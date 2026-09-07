@@ -274,7 +274,7 @@ public sealed class ProtocolV2VectorTests
             D = Decode(jwk["d"]!.GetValue<string>()) });
     }
     private static string Hash(byte[] bytes) => Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
-    private static void SignPlan(JsonObject plan, ECDsa key)
+    internal static void SignPlan(JsonObject plan, ECDsa key)
     {
         plan["plan_hash"] = Hash(ProtocolV2Signatures.PlanHashBytes(Json(plan)));
         var raw = key.SignData(ProtocolV2Signatures.SignatureBytes(Json(plan)), HashAlgorithmName.SHA256,
