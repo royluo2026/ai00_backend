@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import re
+import json
 from typing import Any
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field, ConfigDict, model_validator
 from backend.capability_v2.identity import CONSUMER_IDENTITY_FIELDS
 
@@ -15,6 +17,7 @@ from backend.capability_v2.identity import authenticated_user_identity
 from backend.capability_v2.contracts import ConsumerIdentity, IDENTITY_PATTERN, InvocationEnvelope
 from backend.capability_v2.gateway import get_default_gateway
 from backend.capability_v2.policies import GatewayPolicyError
+from backend.platform_sdk.request_credentials import authenticated_transport_scope
 
 
 class InvokeRequest(BaseModel):
@@ -64,6 +67,26 @@ def _business_error_http_exception(error: CapabilityBusinessError) -> HTTPExcept
         status_code=_BUSINESS_ERROR_STATUS.get(error.code, 422),
         detail=payload.model_dump(mode="json"),
     )
+
+
+async def _stream_response(result, gateway):
+    """Claim only the stream returned by this same authenticated invocation.
+
+    There is no public stream-id lookup route. Gateway keeps event, byte,
+    lifetime, cancellation and invocation leases until this response closes.
+    """
+    stream_id = result.data['data']['stream_id']
+    iterator, media_type = await gateway.claim_stream(stream_id)
+    async def events():
+        try:
+            yield 'data: ' + json.dumps({'type':'capability_result','result':result.model_dump(mode='json')},ensure_ascii=False) + '\n\n'
+            async for chunk in iterator:
+                yield chunk
+        finally:
+            close = getattr(iterator,'aclose',None)
+            if close:
+                await close()
+    return StreamingResponse(events(),media_type=media_type,headers={'Cache-Control':'no-store','X-Accel-Buffering':'no'})
 
 
 def _build_router(prefix: str) -> APIRouter:
@@ -156,7 +179,7 @@ def _build_router(prefix: str) -> APIRouter:
         trace_id = _correlation_id(request.headers.get("X-Trace-ID"), request_id)
         gateway = get_default_gateway()
         identity = _web_identity(current_user, principal)
-        result = await gateway.invoke(InvocationEnvelope(
+        envelope = InvocationEnvelope(
             capability_id=capability_id,
             major_version=body.version,
             catalog_release=gateway.catalog_release,
@@ -167,7 +190,14 @@ def _build_router(prefix: str) -> APIRouter:
             approval_reference=body.confirmation_token,
             request_id=request_id,
             trace_id=trace_id,
-        ))
+        )
+        authorization = request.headers.get('Authorization', '')
+        credential = authorization[7:] if authorization.lower().startswith('bearer ') else request.headers.get('X-AI00-Token', '')
+        with authenticated_transport_scope(credential):
+            result = await gateway.invoke(envelope)
+        data = result.data.get('data') if isinstance(result.data,dict) else None
+        if result.ok and isinstance(data,dict) and data.get('stream_id') and request.headers.get('Accept') == 'text/event-stream':
+            return await _stream_response(result,gateway)
         return {"success": result.ok, "data": result.model_dump(mode="json")}
 
     return api

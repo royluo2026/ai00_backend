@@ -166,3 +166,5 @@ def register_capabilities(registry: Any) -> None:
         handler = change_library_v2 if capability_id == "craft.library.change.apply" else original.handler
         native.register(original.spec.model_copy(update={"version": 2}), handler)
     versioned_resource_resolvers.register("craft.execution_plan", resolve_execution_plan_reference)
+    from .desktop_exchange import register_desktop_exchange
+    register_desktop_exchange(registry)

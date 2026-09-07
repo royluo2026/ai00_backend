@@ -60,6 +60,7 @@ class ArtifactStore(Protocol):
 
 
 class ObjectStorage(Protocol):
+    def read(self, object_key: str, maximum: int) -> bytes: ...
     def put_stream(self, object_key: str, stream: BinaryIO) -> None: ...
     def stat(self, object_key: str) -> tuple[str, int]: ...
 
@@ -84,6 +85,11 @@ class OisImmutableObjectStorage:
 
 
 class InMemoryObjectStorage:
+    def read(self, object_key: str, maximum: int) -> bytes:
+        data = self._objects[object_key]
+        if len(data)>maximum: raise ArtifactIntegrityError('artifact exceeds read limit')
+        return data
+
     def __init__(self) -> None:
         self._objects: dict[str, bytes] = {}
 
@@ -104,6 +110,12 @@ class InMemoryObjectStorage:
 class OisObjectStorage:
     """OIS adapter that preserves host-generated immutable object keys."""
 
+    def read(self, object_key: str, maximum: int) -> bytes:
+        from backend.core.ois_storage import get_immutable
+        data = get_immutable(object_key)
+        if data is None or len(data)>maximum: raise ArtifactIntegrityError('artifact exceeds read limit or is missing')
+        return data
+
     def put_stream(self, object_key: str, stream: BinaryIO) -> None:
         from backend.core.ois_storage import put_immutable_stream
 
@@ -122,6 +134,12 @@ class OisObjectStorage:
 
 class FilesystemObjectStorage:
     """Explicit local/test ArtifactPort; never selected without a configured root."""
+
+    def read(self, object_key: str, maximum: int) -> bytes:
+        with self.path_for(object_key).open('rb') as stream:
+            data=stream.read(maximum+1)
+        if len(data)>maximum: raise ArtifactIntegrityError('artifact exceeds read limit')
+        return data
 
     def __init__(self, root: str | Path) -> None:
         self.root = Path(root).resolve()
@@ -349,6 +367,15 @@ class SqlArtifactStore:
 
 
 class ArtifactService:
+    def read(self, ref: ArtifactRef, requested_by: ConsumerIdentity, *, maximum: int, granted_resources=()) -> bytes:
+        record=self.authorize_download(ref.artifact_id,requested_by,granted_resources=granted_resources)
+        if record.artifact_ref!=ref or ref.byte_size>maximum:
+            raise ArtifactIntegrityError('artifact reference or size limit mismatch')
+        data=self._storage.read(record.object_key,maximum)
+        if len(data)!=ref.byte_size or hashlib.sha256(data).hexdigest()!=ref.sha256:
+            raise ArtifactIntegrityError('artifact content integrity mismatch')
+        return data
+
     def __init__(self, store: ArtifactStore, storage: ObjectStorage, *,
                  clock: Callable[[], datetime] = lambda: datetime.now(UTC)) -> None:
         self._store = store

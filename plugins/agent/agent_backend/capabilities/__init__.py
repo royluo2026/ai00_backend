@@ -210,5 +210,7 @@ def register_capabilities(
         registry, transaction_factory=transaction_factory,
     )
     register_catalog_tool_confirmation_capability(registry)
+    from .desktop_actions import register_desktop_agent_capabilities
+    register_desktop_agent_capabilities(registry, provider, transaction_factory)
 
 __all__ = ["register_capabilities"]

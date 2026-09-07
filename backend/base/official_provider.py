@@ -13,6 +13,7 @@ from backend.base.collaboration import register_collaboration_capabilities
 from backend.base.runtime_database_config import register_runtime_database_capabilities
 from backend.base.web_atomic import register_atomic_web_capabilities
 from backend.base.file_store_public_config import register_file_store_public_config_capability
+from backend.base.desktop_actions import register_desktop_capabilities
 
 def register_capabilities(registry: Any) -> None:
     register_system_shared_capabilities(registry)
@@ -27,6 +28,7 @@ def register_capabilities(registry: Any) -> None:
     register_runtime_database_capabilities(registry)
     register_atomic_web_capabilities(registry)
     register_file_store_public_config_capability(registry)
+    register_desktop_capabilities(registry)
 
 
 __all__ = ["register_capabilities"]

@@ -152,7 +152,7 @@ def save_config(body: dict, _user: dict = Depends(_WRITE)):
 @router.post("/ois-config")
 def save_ois_config(body: dict, _user: dict = Depends(_WRITE)):
     """保存 OIS 配置（理想汽车内网对象存储，SDK: ois3-sdk-python）。"""
-    print(f"[ois-config] 收到 body keys={list(body.keys())} values={body}", flush=True)
+    _log.info("Saving OIS connection configuration")
     print(f"[ois-config] 当前用户 role={_user.get('org_role') or _user.get('system_role')}", flush=True)
 
     identify        = (body.get("identify")           or "").strip()

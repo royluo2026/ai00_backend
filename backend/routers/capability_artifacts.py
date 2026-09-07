@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import tempfile
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
 from backend.capability_v2.artifacts import (
@@ -146,3 +146,15 @@ def get_artifact(
     except ArtifactError as exc:
         _raise_artifact_error(exc)
     return {"artifact_ref": record.artifact_ref.model_dump(mode="json"), "download_url": url}
+
+
+@router.get('/{artifact_id}/content')
+def artifact_content(artifact_id: str,user: dict=Depends(get_current_user),principal=Depends(get_authenticated_principal)):
+    identity=_identity(user,principal)
+    try:
+        service=_service()
+        record=service.authorize_download(artifact_id,identity,granted_resources=_granted_resources(user,identity))
+        data=service.read(record.artifact_ref,identity,maximum=5*1024*1024,granted_resources=_granted_resources(user,identity))
+        return Response(content=data,media_type=record.artifact_ref.media_type,headers={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'})
+    except ArtifactError as exc:
+        _raise_artifact_error(exc)
