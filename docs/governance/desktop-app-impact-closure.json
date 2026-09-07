@@ -4,10 +4,10 @@
   "consumer_type": "web",
   "transport_classification": "authenticated interactive Gateway; single Windows x64 App product",
   "source_basis": "immutable Git commit tree; not a promoted release candidate",
-  "source_commit": "176c3d11abe82d54631c415177132556ae262dc8",
-  "source_tree": "e008d8777f8d55e21df8b5f9c3c2079019742bdb",
+  "source_commit": "4ca647f4101f15f3a2cae6fcfa0c5275926735df",
+  "source_tree": "d95ba3930471330b775153c791af9c5e6afab655",
   "source_hash_format": "exact Git blob bytes (no working directory normalization)",
-  "source_set_hash": "sha256:2478e3b7c36872f414348bd9dd430d48575b59b51e020a0bfcd795854803b2eb",
+  "source_set_hash": "sha256:087d9496c8cf776d494d54c75547c580ce4636f5decc6489b24f4fdbf00a0d4b",
   "published_catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
   "published_catalog_hash": "sha256:09e54550fcbaaab2df24bfa28d2c2478d9d47f455a27563405bce365efb2e2fd",
   "published_catalog_current": false,
@@ -11035,8 +11035,8 @@
     },
     {
       "path": "backend/capability_v2/official_domains.json",
-      "git_blob_oid": "dc5f780e6d0429aa117d4a8fb9196b4148704ed8",
-      "sha256": "sha256:92948629bd345a73296d979de1c68fabfe76c3a96ff37c4b6f559d965ebd29ab"
+      "git_blob_oid": "02f04d976f1c8b444cccec600aa1bb35a5858e57",
+      "sha256": "sha256:7bac5b75b15722e4cde873cdf38c66664bdccd8731e45ba14e0b7ecbab54ad21"
     },
     {
       "path": "backend/capability_v2/operations.py",
@@ -11650,8 +11650,8 @@
     },
     {
       "path": "backend/scripts/build_desktop_app_governance.py",
-      "git_blob_oid": "c05ba05f25e974fef1669f7999a9f1afd0f4b49c",
-      "sha256": "sha256:ae51a312b32c2c4238c0b11432162dac6d4717fc62c1ed372033373a8d378ea4"
+      "git_blob_oid": "93f5b641678bbb6079add2a673e941e66b242ee8",
+      "sha256": "sha256:e7bb1536476a22de172faa143c17eca5885a03a85cca22323ec2f8e8cc115e28"
     },
     {
       "path": "backend/scripts/build_user_function_registry.py",
@@ -11662,6 +11662,16 @@
       "path": "backend/scripts/check_web_capability_routes.py",
       "git_blob_oid": "5d7aa0d3022748b9aa28ae71fce079ca94d7918f",
       "sha256": "sha256:7828823ff65c9e8794554f083c9593a023ea32f5afb96c983abcebd67459e839"
+    },
+    {
+      "path": "backend/scripts/desktop_governance_bootstrap.py",
+      "git_blob_oid": "59acd02e95eaf1e382584a8cf25b0597c3f81b52",
+      "sha256": "sha256:3d069fbf964690e2bfb788353973c76486f80e5355248e22162d4e7c185634d0"
+    },
+    {
+      "path": "backend/scripts/desktop_governance_command.py",
+      "git_blob_oid": "fa80695e8e66f564e7fd47ca84ff0549a298d7c7",
+      "sha256": "sha256:e5e1e128f8dd1fb44c3e978c7d35734c41574b0f404cebe153f0fc62eb5f6bcb"
     },
     {
       "path": "backend/services/__init__.py",
@@ -11860,8 +11870,8 @@
     },
     {
       "path": "plugins/agent/agent_backend/api/compatibility.py",
-      "git_blob_oid": "edcac114ebe3ed74778fce0c9a14dd3a3a275b01",
-      "sha256": "sha256:029fa3b4147cd62dbcd00736301d883ab35e6731ea8ff4855dd1c6ccb42c88a1"
+      "git_blob_oid": "105c16cb9d81c6328dd10eb7ca5d58a31c65adb4",
+      "sha256": "sha256:af2ce951864e0d1d1323db5a470b96572ac1e09097bbd92d25cc91b41fed02c0"
     },
     {
       "path": "plugins/agent/agent_backend/application/__init__.py",
@@ -12030,23 +12040,23 @@
     },
     {
       "path": "plugins/agent/agent_backend/routers/ai_audit.py",
-      "git_blob_oid": "6b3b1be8b9b51ab84ec096d1cac19ff677c2c1dc",
-      "sha256": "sha256:6e2f22b78a0cd4d2db9b99fa1942fabe6ddf9bb98ea3f496fd65583c28b23a00"
+      "git_blob_oid": "7b2886ed6306bd09c7336eeebbd4ad69ce1684c7",
+      "sha256": "sha256:0edbfb327d097f97b0035dddb87fea119e6cf18bfa1e8f38d2a31a43980e45b6"
     },
     {
       "path": "plugins/agent/agent_backend/routers/ai_chat.py",
-      "git_blob_oid": "6ec2da5aaabda2cf8da059d370a4c8234c5fbfa4",
-      "sha256": "sha256:b96ce8269411d50b2f05f47a45b5e902973f5a57b2d19b205e031c66feb33dd8"
+      "git_blob_oid": "51182bb869b1adb807795622304ae7564a9d2f2e",
+      "sha256": "sha256:44f6c6694a45c50a78526f2963c563ea22e35d74dba83e327d30d855f0fecfc9"
     },
     {
       "path": "plugins/agent/agent_backend/routers/flows.py",
-      "git_blob_oid": "1f6d914f59da4263ea1e9a0b341078d08d21b921",
-      "sha256": "sha256:b7451e4b3a5537ec078bad85d9c1131b6ce4e20d608d07b8cde116e159b48ad8"
+      "git_blob_oid": "3c3f419701cba98f464b021d865c305c6dbc1b58",
+      "sha256": "sha256:882da7039a59025619b01f4b742dba1d5a8129054a8b2c5de80cc2ae2642b392"
     },
     {
       "path": "plugins/agent/agent_backend/routers/skills_v2.py",
-      "git_blob_oid": "f31473ded6c42e99e2a535b035a818ff6cfa2d36",
-      "sha256": "sha256:0a0abfd6f6966e8e22d84073ac3cf2ee609522925f0d04ccfcbf05bbc6e507df"
+      "git_blob_oid": "33dcf646f80037861eaea4fbf2b3528bb7d34f90",
+      "sha256": "sha256:c4584729afcf6985a5ac723943e1a626777b79ab2680960b5545089ae9742569"
     },
     {
       "path": "plugins/agent/agent_backend/runtime_mode.py",
@@ -17518,6 +17528,10 @@
     {
       "source": "plugins/agent/agent_backend/api/compatibility.py",
       "dependency": "backend/capability_v2/gateway.py"
+    },
+    {
+      "source": "plugins/agent/agent_backend/api/compatibility.py",
+      "dependency": "backend/capability_v2/identity.py"
     },
     {
       "source": "plugins/agent/agent_backend/api/compatibility.py",
