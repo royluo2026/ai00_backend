@@ -1,0 +1,2336 @@
+{
+  "fixture_kind": "Real registered owner handlers and services; deterministic SQL/external I/O ports, no live approval",
+  "rows": [
+    {
+      "id": "base.team.create",
+      "version": 1,
+      "payload": {
+        "name": "Fixture team"
+      },
+      "provider_data": {
+        "success": true,
+        "data": {
+          "gid": "created-team",
+          "name": "Fixture team"
+        }
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "parent_team_gid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4096
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "name": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "name"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": 1,
+      "commits": 1
+    },
+    {
+      "id": "base.team.update",
+      "version": 1,
+      "payload": {
+        "team_gid": "fixture-team",
+        "changes": {
+          "name": "Updated team"
+        }
+      },
+      "provider_data": {
+        "success": true
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "team_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "changes": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "is_active": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false,
+            "minProperties": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "team_gid",
+          "changes"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      },
+      "sql_statements": 1,
+      "commits": 1
+    },
+    {
+      "id": "base.team.archive",
+      "version": 1,
+      "payload": {
+        "team_gid": "fixture-team"
+      },
+      "provider_data": {
+        "success": true
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "team_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "team_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      },
+      "sql_statements": 1,
+      "commits": 1
+    },
+    {
+      "id": "base.team.member.list",
+      "version": 1,
+      "payload": {
+        "team_gid": "fixture-team"
+      },
+      "provider_data": {
+        "success": true,
+        "data": [
+          {
+            "gid": "member-one",
+            "name": "Fixture member",
+            "email": "",
+            "avatar_url": "",
+            "org_role": "member",
+            "created_at": "2026-09-08"
+          }
+        ]
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "team_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "team_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "email": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "avatar_url": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "org_role": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "created_at": {
+                  "type": "string",
+                  "maxLength": 4096
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "name",
+                "email",
+                "avatar_url",
+                "org_role",
+                "created_at"
+              ]
+            },
+            "maxItems": 500
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": 1,
+      "commits": 0
+    },
+    {
+      "id": "base.team.member.add",
+      "version": 1,
+      "payload": {
+        "team_gid": "fixture-team",
+        "member": {
+          "user_gid": "member-one"
+        }
+      },
+      "provider_data": {
+        "success": true
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "team_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "member": {
+            "type": "object",
+            "properties": {
+              "user_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "feishu_open_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "email": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "avatar_url": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "team_gid",
+          "member"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      },
+      "sql_statements": 1,
+      "commits": 1
+    },
+    {
+      "id": "base.team.member.remove",
+      "version": 1,
+      "payload": {
+        "team_gid": "fixture-team",
+        "user_gid": "member-one"
+      },
+      "provider_data": {
+        "success": true
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "team_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "user_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "team_gid",
+          "user_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      },
+      "sql_statements": 1,
+      "commits": 1
+    },
+    {
+      "id": "base.identity.current.get",
+      "version": 1,
+      "payload": {},
+      "provider_data": {
+        "success": true,
+        "data": {
+          "gid": "fixture-user",
+          "name": "Fixture user",
+          "email": null,
+          "avatar_url": null,
+          "system_role": "super_admin",
+          "org_role": "super_admin",
+          "external_subtype": null,
+          "team_id": "fixture-team",
+          "created_at": null,
+          "updated_at": null,
+          "is_active": true,
+          "permissions": [
+            "digital_model.use",
+            "craft.write",
+            "approval.submit",
+            "template.view",
+            "project.create",
+            "knowledge.read",
+            "project.manage_any",
+            "rule.manage",
+            "simulation.use",
+            "craft.view",
+            "system.tech_config",
+            "knowledge.view",
+            "knowledge.manage",
+            "system.user.manage",
+            "craft.write_direct",
+            "approval.approve",
+            "knowledge.write",
+            "project.view",
+            "system.plugin.manage",
+            "template.manage",
+            "factory.read",
+            "system.app_config",
+            "craft.write_draft",
+            "factory.write",
+            "rule.view",
+            "agent.read",
+            "feishu.view",
+            "craft.read",
+            "agent.interact"
+          ],
+          "visible_panels": [
+            "appearance",
+            "shortcuts",
+            "general",
+            "database",
+            "file-store",
+            "feishu",
+            "plugin-market",
+            "user-management"
+          ],
+          "grants": []
+        }
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "email": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "avatar_url": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "system_role": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "org_role": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "external_subtype": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "team_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "created_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "updated_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "is_active": {
+                "type": "boolean"
+              },
+              "permissions": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "maxItems": 500
+              },
+              "visible_panels": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "maxItems": 100
+              },
+              "grants": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 4096
+                    },
+                    "scope_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 4096
+                    },
+                    "granted_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 4096
+                    },
+                    "expires_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 4096
+                    },
+                    "note": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 4096
+                    },
+                    "grant_type": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 256
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "grant_type"
+                  ]
+                },
+                "maxItems": 500
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "name",
+              "system_role",
+              "org_role",
+              "permissions",
+              "grants",
+              "visible_panels",
+              "is_active"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": 0,
+      "commits": 0
+    },
+    {
+      "id": "base.runtime.feature_flags.get",
+      "version": 1,
+      "payload": {},
+      "provider_data": {
+        "success": true,
+        "data": {
+          "key": "feature_flags",
+          "value": "{\"ai_assistant\":true}",
+          "description": "Fixture",
+          "updated_at": "2026-09-08",
+          "source": "db"
+        }
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "value": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "description": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "updated_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "source": {
+                "type": "string",
+                "enum": [
+                  "env",
+                  "db"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "key",
+              "value"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": 1,
+      "commits": 0
+    },
+    {
+      "id": "base.runtime.feature_flags.replace",
+      "version": 1,
+      "payload": {
+        "flags": [
+          {
+            "id": "ai_assistant",
+            "enabled": true
+          },
+          {
+            "id": "workbench",
+            "visibility": "all",
+            "availability": "all"
+          }
+        ]
+      },
+      "provider_data": {
+        "success": true
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "flags": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "enabled": {
+                  "type": "boolean"
+                },
+                "visibility": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "availability": {
+                  "type": "string",
+                  "maxLength": 4096
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "id"
+              ]
+            },
+            "maxItems": 500
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "flags"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      },
+      "sql_statements": 1,
+      "commits": 0
+    },
+    {
+      "id": "base.runtime.annotation.search",
+      "version": 1,
+      "payload": {
+        "collection": "lists"
+      },
+      "provider_data": {
+        "success": true,
+        "data": [
+          {
+            "key": "lists.task.note",
+            "value": "Fixture note",
+            "description": "",
+            "updated_at": null,
+            "source": "db"
+          }
+        ]
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "collection": {
+            "enum": [
+              "capabilities",
+              "lists"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "value": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "updated_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "source": {
+                  "type": "string",
+                  "enum": [
+                    "env",
+                    "db"
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "key",
+                "value"
+              ]
+            },
+            "maxItems": 500
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": 1,
+      "commits": 0
+    },
+    {
+      "id": "base.runtime.capability_note.set",
+      "version": 1,
+      "payload": {
+        "id": "craft",
+        "value": "Fixture note"
+      },
+      "provider_data": {
+        "success": true
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[a-z_]+$"
+          },
+          "value": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "value"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      },
+      "sql_statements": 1,
+      "commits": 0
+    },
+    {
+      "id": "base.runtime.capability_status.set",
+      "version": 1,
+      "payload": {
+        "id": "craft",
+        "value": "active"
+      },
+      "provider_data": {
+        "success": true
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[a-z_]+$"
+          },
+          "value": {
+            "enum": [
+              "active",
+              "partial",
+              "planned"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "value"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      },
+      "sql_statements": 1,
+      "commits": 0
+    },
+    {
+      "id": "base.runtime.list_note.set",
+      "version": 1,
+      "payload": {
+        "id": "task",
+        "value": "Fixture list"
+      },
+      "provider_data": {
+        "success": true
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[a-z_]+$"
+          },
+          "value": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "value"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      },
+      "sql_statements": 1,
+      "commits": 0
+    },
+    {
+      "id": "base.runtime.feishu_app_id.get",
+      "version": 1,
+      "payload": {},
+      "provider_data": {
+        "success": true,
+        "data": {
+          "key": "feature_flags",
+          "value": "{\"ai_assistant\":true}",
+          "description": "Fixture",
+          "updated_at": "2026-09-08",
+          "source": "db"
+        }
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "value": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "description": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "updated_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "source": {
+                "type": "string",
+                "enum": [
+                  "env",
+                  "db"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "key",
+              "value"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": 1,
+      "commits": 0
+    },
+    {
+      "id": "base.runtime.feishu_app_id.set",
+      "version": 1,
+      "payload": {
+        "value": "fixture-app"
+      },
+      "provider_data": {
+        "success": true
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "value"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      },
+      "sql_statements": 1,
+      "commits": 0
+    },
+    {
+      "id": "base.runtime.feishu_app_secret.set",
+      "version": 1,
+      "payload": {
+        "value": "fixture-secret"
+      },
+      "provider_data": {
+        "success": true
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "value"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      },
+      "sql_statements": 1,
+      "commits": 0
+    },
+    {
+      "id": "base.runtime.log.search",
+      "version": 1,
+      "payload": {
+        "limit": 2
+      },
+      "provider_data": {
+        "success": true,
+        "data": [
+          "Fixture log"
+        ]
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "maxItems": 500
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": 0,
+      "commits": 0
+    },
+    {
+      "id": "base.file_store.minio_config.set",
+      "version": 1,
+      "payload": {
+        "endpoint": "https://storage.invalid",
+        "access_key": "fixture-access",
+        "secret_key": "fixture-secret",
+        "bucket": "ai00"
+      },
+      "provider_data": {
+        "success": true
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "access_key": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "secret_key": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "bucket": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "public_url": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "endpoint",
+          "access_key"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      },
+      "sql_statements": 2,
+      "commits": 0
+    },
+    {
+      "id": "base.file_store.ois_config.set",
+      "version": 1,
+      "payload": {
+        "identify": "fixture",
+        "ois3_url": "https://ois.invalid",
+        "idaas_client_secret": "fixture-secret"
+      },
+      "provider_data": {
+        "success": true
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "identify": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "env": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "ois3_url": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "region": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "licloud_appid": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "idaas_url": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "idaas_client_id": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "idaas_client_secret": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "idaas_service_id": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "public_base_url": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "identify",
+          "ois3_url"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      },
+      "sql_statements": 2,
+      "commits": 0
+    },
+    {
+      "id": "base.file_store.minio_connection.test",
+      "version": 1,
+      "payload": {},
+      "provider_data": {
+        "success": false,
+        "msg": "连接失败，请检查服务端配置"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "msg": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "msg"
+        ]
+      },
+      "sql_statements": 0,
+      "commits": 0
+    },
+    {
+      "id": "base.file_store.ois_connection.test",
+      "version": 1,
+      "payload": {},
+      "provider_data": {
+        "success": true,
+        "msg": "连接成功"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "msg": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "msg"
+        ]
+      },
+      "sql_statements": 0,
+      "commits": 0
+    },
+    {
+      "id": "base.feishu.calendar.day.get",
+      "version": 1,
+      "payload": {
+        "date": "2026-09-08"
+      },
+      "provider_data": {
+        "success": true,
+        "data": [
+          {
+            "event_id": "event-one",
+            "summary": "Fixture event",
+            "description": "",
+            "start": "",
+            "end": "",
+            "start_ts": "",
+            "end_ts": "",
+            "rsvp": "",
+            "meeting_url": "",
+            "organizer": "",
+            "is_organizer": false
+          }
+        ]
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "event_id": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "summary": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "start": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "end": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "start_ts": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "end_ts": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "rsvp": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "meeting_url": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "organizer": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "is_organizer": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "event_id",
+                "summary",
+                "description",
+                "start",
+                "end",
+                "start_ts",
+                "end_ts",
+                "rsvp",
+                "meeting_url",
+                "organizer",
+                "is_organizer"
+              ]
+            },
+            "maxItems": 500
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": 0,
+      "commits": 0
+    },
+    {
+      "id": "base.feishu.calendar.event.get",
+      "version": 1,
+      "payload": {
+        "event_id": "event-one"
+      },
+      "provider_data": {
+        "success": true,
+        "event": {
+          "event_id": "event-one",
+          "summary": "Fixture event",
+          "description": ""
+        }
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "event_id"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "event": {
+            "type": "object",
+            "properties": {
+              "event_id": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "summary": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "event_id",
+              "summary",
+              "description"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "event"
+        ]
+      },
+      "sql_statements": 0,
+      "commits": 0
+    },
+    {
+      "id": "base.feishu.calendar.event.update",
+      "version": 1,
+      "payload": {
+        "event_id": "event-one",
+        "changes": {
+          "summary": "Updated",
+          "description": "Fixture"
+        }
+      },
+      "provider_data": {
+        "success": true
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "changes": {
+            "type": "object",
+            "properties": {
+              "summary": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "additionalProperties": false,
+            "minProperties": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "event_id",
+          "changes"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      },
+      "sql_statements": 0,
+      "commits": 0
+    },
+    {
+      "id": "base.feishu.calendar.rsvp.set",
+      "version": 1,
+      "payload": {
+        "event_id": "event-one",
+        "rsvp_status": "accept"
+      },
+      "provider_data": {
+        "success": true
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "rsvp_status": {
+            "enum": [
+              "accept",
+              "tentative",
+              "decline"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "event_id",
+          "rsvp_status"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      },
+      "sql_statements": 1,
+      "commits": 0
+    },
+    {
+      "id": "base.feishu.user.search",
+      "version": 1,
+      "payload": {
+        "query": "Fixture",
+        "limit": 5
+      },
+      "provider_data": {
+        "success": true,
+        "data": [
+          {
+            "open_id": "open-one",
+            "name": "Fixture record",
+            "email": "",
+            "avatar_url": "",
+            "entity_id": "",
+            "db_gid": ""
+          }
+        ]
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "query"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "open_id": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "email": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "avatar_url": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "entity_id": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "db_gid": {
+                  "type": "string",
+                  "maxLength": 4096
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "open_id",
+                "name",
+                "email",
+                "avatar_url",
+                "entity_id",
+                "db_gid"
+              ]
+            },
+            "maxItems": 50
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": 0,
+      "commits": 0
+    },
+    {
+      "id": "base.feishu.chat.search",
+      "version": 1,
+      "payload": {
+        "query": "Fixture",
+        "limit": 5
+      },
+      "provider_data": {
+        "success": true,
+        "data": [
+          {
+            "chat_id": "chat-one",
+            "name": "Fixture record",
+            "avatar": "",
+            "description": "",
+            "entity_id": "",
+            "url": "https://feishu.invalid/item"
+          }
+        ]
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "query"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "chat_id": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "avatar": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "entity_id": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 4096
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "chat_id",
+                "name",
+                "avatar",
+                "description",
+                "entity_id",
+                "url"
+              ]
+            },
+            "maxItems": 50
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": 0,
+      "commits": 0
+    },
+    {
+      "id": "base.feishu.document.search",
+      "version": 1,
+      "payload": {
+        "query": "Fixture",
+        "limit": 5
+      },
+      "provider_data": {
+        "success": true,
+        "data": [
+          {
+            "name": "Fixture record",
+            "url": "https://feishu.invalid/item",
+            "type": "",
+            "owner_name": "",
+            "entity_id": ""
+          }
+        ]
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "query"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "type": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "owner_name": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "entity_id": {
+                  "type": "string",
+                  "maxLength": 4096
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "url",
+                "type",
+                "owner_name",
+                "entity_id"
+              ]
+            },
+            "maxItems": 50
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": 0,
+      "commits": 0
+    },
+    {
+      "id": "base.feishu.event.search",
+      "version": 1,
+      "payload": {
+        "query": "Fixture",
+        "limit": 5
+      },
+      "provider_data": {
+        "success": true,
+        "data": [
+          {
+            "name": "Fixture record",
+            "url": "https://feishu.invalid/item",
+            "entity_id": "",
+            "start_time": "",
+            "end_time": "",
+            "description": "",
+            "event_id": "event-one",
+            "summary": "Fixture event"
+          }
+        ]
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "query"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "entity_id": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "start_time": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "end_time": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "event_id": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "summary": {
+                  "type": "string",
+                  "maxLength": 4096
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "url",
+                "entity_id",
+                "start_time",
+                "end_time",
+                "description",
+                "event_id",
+                "summary"
+              ]
+            },
+            "maxItems": 50
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": 0,
+      "commits": 0
+    },
+    {
+      "id": "base.feishu.meeting.search",
+      "version": 1,
+      "payload": {
+        "query": "Fixture",
+        "limit": 5
+      },
+      "provider_data": {
+        "success": true,
+        "data": [
+          {
+            "name": "Fixture record",
+            "url": "https://feishu.invalid/item",
+            "entity_id": "",
+            "start_time": "",
+            "end_time": "",
+            "description": "",
+            "meeting_id": ""
+          }
+        ]
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "query"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "entity_id": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "start_time": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "end_time": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "meeting_id": {
+                  "type": "string",
+                  "maxLength": 4096
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "url",
+                "entity_id",
+                "start_time",
+                "end_time",
+                "description",
+                "meeting_id"
+              ]
+            },
+            "maxItems": 50
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": 0,
+      "commits": 0
+    },
+    {
+      "id": "base.feishu.organization_user.search",
+      "version": 1,
+      "payload": {
+        "query": "Fixture"
+      },
+      "provider_data": {
+        "success": true,
+        "data": [
+          {
+            "open_id": "open-one",
+            "name": "Fixture record",
+            "email": "",
+            "avatar_url": "",
+            "entity_id": "",
+            "db_gid": "member-one"
+          }
+        ]
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "query"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "open_id": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "email": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "avatar_url": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "entity_id": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "db_gid": {
+                  "type": "string",
+                  "maxLength": 4096
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "open_id",
+                "name",
+                "email",
+                "avatar_url",
+                "entity_id",
+                "db_gid"
+              ]
+            },
+            "maxItems": 15
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": 1,
+      "commits": 0
+    },
+    {
+      "id": "base.feishu.list_share.send",
+      "version": 1,
+      "payload": {
+        "chat_id": "chat-one",
+        "list_name": "Fixture list",
+        "share_url": "https://app.invalid/share/list-one"
+      },
+      "provider_data": {
+        "success": true
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "chat_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "list_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "share_url": {
+            "type": "string",
+            "maxLength": 4096,
+            "pattern": "^https://[^\\s]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "chat_id",
+          "list_name",
+          "share_url"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      },
+      "sql_statements": 0,
+      "commits": 0
+    }
+  ]
+}

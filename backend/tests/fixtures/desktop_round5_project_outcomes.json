@@ -1,0 +1,1437 @@
+{
+  "fixture_kind": "Real Project handlers/application/repositories; deterministic SQL driver; complete create/start/approve/withdraw/replay/notification",
+  "rows": [
+    {
+      "id": "project.approval.order.create",
+      "version": 1,
+      "payload": {
+        "title": "Fixture approval",
+        "reviewer_gid": "reviewer",
+        "content": {
+          "description": "Fixture request"
+        }
+      },
+      "provider_data": {
+        "success": true,
+        "data": {
+          "gid": "7e807d78-cb8f-4724-a213-5b42c8f2fbac"
+        }
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "order_type": {
+            "enum": [
+              "general"
+            ]
+          },
+          "project_gid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4096
+          },
+          "reviewer_gid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4096
+          },
+          "source_ref": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4096
+          },
+          "content": {
+            "type": "object",
+            "properties": {
+              "item_type": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "item_gid": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "item_title": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "current_scope": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "target_scope": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "reason": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "body": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "title"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": [
+        "INSERT INTO workmanship_proj_desktop_operations (actor_gid,team_gid,capability_id,idempotency_key,payload_hash) VALUES (%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE actor_gid=VALUES(actor_gid)",
+        "SELECT payload_hash,result_text FROM workmanship_proj_desktop_operations WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s FOR UPDATE",
+        "INSERT INTO workmanship_proj_approval_orders (gid,title,order_type,project_gid,team_gid,applicant_gid,reviewer_gid,source_ref,content) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+        "UPDATE workmanship_proj_desktop_operations SET result_text=%s,completed_at=CURRENT_TIMESTAMP(6) WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s"
+      ]
+    },
+    {
+      "id": "project.approval.order.search",
+      "version": 1,
+      "payload": {},
+      "provider_data": {
+        "success": true,
+        "data": [
+          {
+            "gid": "7e807d78-cb8f-4724-a213-5b42c8f2fbac",
+            "project_gid": null,
+            "team_gid": "fixture-team",
+            "order_type": "general",
+            "title": "Fixture approval",
+            "applicant_gid": "applicant",
+            "reviewer_gid": "reviewer",
+            "source_ref": null,
+            "status": "pending",
+            "revision": 1,
+            "content": {
+              "description": "Fixture request"
+            },
+            "opinions": []
+          }
+        ]
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "enum": [
+              "pending",
+              "in_review",
+              "approved",
+              "rejected",
+              "withdrawn"
+            ]
+          },
+          "project_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "project_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "team_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "order_type": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "title": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "applicant_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "reviewer_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "source_ref": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "share_scope": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "created_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "updated_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "status": {
+                  "enum": [
+                    "pending",
+                    "in_review",
+                    "approved",
+                    "rejected",
+                    "withdrawn"
+                  ]
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "content": {
+                  "type": "object",
+                  "properties": {
+                    "item_type": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "item_gid": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "item_title": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "current_scope": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "target_scope": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "reason": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "description": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "body": {
+                      "type": "string",
+                      "maxLength": 4096
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "opinions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "actor_gid": {
+                        "type": "string",
+                        "maxLength": 4096
+                      },
+                      "approver_gid": {
+                        "type": "string",
+                        "maxLength": 4096
+                      },
+                      "action": {
+                        "type": "string",
+                        "maxLength": 4096
+                      },
+                      "decision": {
+                        "type": "string",
+                        "maxLength": 4096
+                      },
+                      "comment": {
+                        "type": "string",
+                        "maxLength": 4096
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "maxLength": 4096
+                      },
+                      "timestamp": {
+                        "type": "string",
+                        "maxLength": 4096
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "maxItems": 200
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "status",
+                "revision",
+                "title",
+                "applicant_gid"
+              ]
+            },
+            "maxItems": 500
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": [
+        "SELECT o.* FROM workmanship_proj_approval_orders o LEFT JOIN workmanship_proj_projects p ON p.gid=o.project_gid WHERE COALESCE(o.team_gid,p.team_id)=%s ORDER BY o.updated_at DESC LIMIT 500"
+      ]
+    },
+    {
+      "id": "project.approval.order.get",
+      "version": 1,
+      "payload": {
+        "order_gid": "7e807d78-cb8f-4724-a213-5b42c8f2fbac"
+      },
+      "provider_data": {
+        "success": true,
+        "data": {
+          "gid": "7e807d78-cb8f-4724-a213-5b42c8f2fbac",
+          "project_gid": null,
+          "team_gid": "fixture-team",
+          "order_type": "general",
+          "title": "Fixture approval",
+          "applicant_gid": "applicant",
+          "reviewer_gid": "reviewer",
+          "source_ref": null,
+          "status": "pending",
+          "revision": 1,
+          "content": {
+            "description": "Fixture request"
+          },
+          "opinions": []
+        }
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "order_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "order_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "project_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "team_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "order_type": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "title": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "applicant_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "reviewer_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "source_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "share_scope": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "created_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "updated_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "status": {
+                "enum": [
+                  "pending",
+                  "in_review",
+                  "approved",
+                  "rejected",
+                  "withdrawn"
+                ]
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "content": {
+                "type": "object",
+                "properties": {
+                  "item_type": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "item_gid": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "item_title": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "current_scope": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "target_scope": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "body": {
+                    "type": "string",
+                    "maxLength": 4096
+                  }
+                },
+                "additionalProperties": false
+              },
+              "opinions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "actor_gid": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "approver_gid": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "action": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "decision": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "comment": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "maxLength": 4096
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "maxItems": 200
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "status",
+              "revision",
+              "title",
+              "applicant_gid"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": [
+        "SELECT o.* FROM workmanship_proj_approval_orders o LEFT JOIN workmanship_proj_projects p ON p.gid=o.project_gid WHERE o.gid=%s AND COALESCE(o.team_gid,p.team_id)=%s FOR UPDATE"
+      ]
+    },
+    {
+      "id": "project.approval.order.start",
+      "version": 1,
+      "payload": {
+        "order_gid": "7e807d78-cb8f-4724-a213-5b42c8f2fbac",
+        "expected_revision": 1
+      },
+      "provider_data": {
+        "success": true,
+        "order_gid": "7e807d78-cb8f-4724-a213-5b42c8f2fbac",
+        "status": "in_review",
+        "revision": 2
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "order_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "comment": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "order_gid",
+          "expected_revision"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "order_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "in_review",
+              "approved",
+              "rejected",
+              "withdrawn"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "order_gid",
+          "status",
+          "revision"
+        ]
+      },
+      "sql_statements": [
+        "INSERT INTO workmanship_proj_desktop_operations (actor_gid,team_gid,capability_id,idempotency_key,payload_hash) VALUES (%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE actor_gid=VALUES(actor_gid)",
+        "SELECT payload_hash,result_text FROM workmanship_proj_desktop_operations WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s FOR UPDATE",
+        "SELECT o.* FROM workmanship_proj_approval_orders o LEFT JOIN workmanship_proj_projects p ON p.gid=o.project_gid WHERE o.gid=%s AND COALESCE(o.team_gid,p.team_id)=%s FOR UPDATE",
+        "UPDATE workmanship_proj_approval_orders SET status=%s,revision=revision+1,opinions=JSON_MERGE_PRESERVE(COALESCE(opinions,JSON_ARRAY()),%s),updated_at=NOW() WHERE gid=%s AND revision=%s",
+        "INSERT INTO workmanship_proj_approval_audit_events (gid,order_gid,actor_gid,team_gid,operation,idempotency_key,status,revision) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+        "UPDATE workmanship_proj_desktop_operations SET result_text=%s,completed_at=CURRENT_TIMESTAMP(6) WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s"
+      ]
+    },
+    {
+      "id": "project.approval.order.approve",
+      "version": 1,
+      "payload": {
+        "order_gid": "7e807d78-cb8f-4724-a213-5b42c8f2fbac",
+        "expected_revision": 2,
+        "comment": "Approved"
+      },
+      "provider_data": {
+        "success": true,
+        "order_gid": "7e807d78-cb8f-4724-a213-5b42c8f2fbac",
+        "status": "approved",
+        "revision": 3
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "order_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "comment": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "order_gid",
+          "expected_revision"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "order_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "in_review",
+              "approved",
+              "rejected",
+              "withdrawn"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "order_gid",
+          "status",
+          "revision"
+        ]
+      },
+      "sql_statements": [
+        "INSERT INTO workmanship_proj_desktop_operations (actor_gid,team_gid,capability_id,idempotency_key,payload_hash) VALUES (%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE actor_gid=VALUES(actor_gid)",
+        "SELECT payload_hash,result_text FROM workmanship_proj_desktop_operations WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s FOR UPDATE",
+        "SELECT o.* FROM workmanship_proj_approval_orders o LEFT JOIN workmanship_proj_projects p ON p.gid=o.project_gid WHERE o.gid=%s AND COALESCE(o.team_gid,p.team_id)=%s FOR UPDATE",
+        "UPDATE workmanship_proj_approval_orders SET status=%s,revision=revision+1,opinions=JSON_MERGE_PRESERVE(COALESCE(opinions,JSON_ARRAY()),%s),updated_at=NOW() WHERE gid=%s AND revision=%s",
+        "INSERT INTO workmanship_proj_approval_audit_events (gid,order_gid,actor_gid,team_gid,operation,idempotency_key,status,revision) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+        "INSERT INTO workmanship_work_notifications (gid,user_gid,type,item_type,item_gid,title,body) VALUES (%s,%s,%s,%s,%s,%s,%s)",
+        "UPDATE workmanship_proj_desktop_operations SET result_text=%s,completed_at=CURRENT_TIMESTAMP(6) WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s"
+      ]
+    },
+    {
+      "id": "project.approval.order.create",
+      "version": 1,
+      "payload": {
+        "title": "Withdraw fixture",
+        "reviewer_gid": "reviewer"
+      },
+      "provider_data": {
+        "success": true,
+        "data": {
+          "gid": "625f8a3a-a0d3-46c4-8513-ccec141031ad"
+        }
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "order_type": {
+            "enum": [
+              "general"
+            ]
+          },
+          "project_gid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4096
+          },
+          "reviewer_gid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4096
+          },
+          "source_ref": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4096
+          },
+          "content": {
+            "type": "object",
+            "properties": {
+              "item_type": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "item_gid": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "item_title": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "current_scope": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "target_scope": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "reason": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "body": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "title"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": [
+        "INSERT INTO workmanship_proj_desktop_operations (actor_gid,team_gid,capability_id,idempotency_key,payload_hash) VALUES (%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE actor_gid=VALUES(actor_gid)",
+        "SELECT payload_hash,result_text FROM workmanship_proj_desktop_operations WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s FOR UPDATE",
+        "INSERT INTO workmanship_proj_approval_orders (gid,title,order_type,project_gid,team_gid,applicant_gid,reviewer_gid,source_ref,content) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+        "UPDATE workmanship_proj_desktop_operations SET result_text=%s,completed_at=CURRENT_TIMESTAMP(6) WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s"
+      ]
+    },
+    {
+      "id": "project.approval.order.withdraw",
+      "version": 1,
+      "payload": {
+        "order_gid": "625f8a3a-a0d3-46c4-8513-ccec141031ad",
+        "expected_revision": 1
+      },
+      "provider_data": {
+        "success": true,
+        "order_gid": "625f8a3a-a0d3-46c4-8513-ccec141031ad",
+        "status": "withdrawn",
+        "revision": 2
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "order_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "comment": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "order_gid",
+          "expected_revision"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "order_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "in_review",
+              "approved",
+              "rejected",
+              "withdrawn"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "order_gid",
+          "status",
+          "revision"
+        ]
+      },
+      "sql_statements": [
+        "INSERT INTO workmanship_proj_desktop_operations (actor_gid,team_gid,capability_id,idempotency_key,payload_hash) VALUES (%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE actor_gid=VALUES(actor_gid)",
+        "SELECT payload_hash,result_text FROM workmanship_proj_desktop_operations WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s FOR UPDATE",
+        "SELECT o.* FROM workmanship_proj_approval_orders o LEFT JOIN workmanship_proj_projects p ON p.gid=o.project_gid WHERE o.gid=%s AND COALESCE(o.team_gid,p.team_id)=%s FOR UPDATE",
+        "UPDATE workmanship_proj_approval_orders SET status=%s,revision=revision+1,opinions=JSON_MERGE_PRESERVE(COALESCE(opinions,JSON_ARRAY()),%s),updated_at=NOW() WHERE gid=%s AND revision=%s",
+        "INSERT INTO workmanship_proj_approval_audit_events (gid,order_gid,actor_gid,team_gid,operation,idempotency_key,status,revision) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+        "UPDATE workmanship_proj_desktop_operations SET result_text=%s,completed_at=CURRENT_TIMESTAMP(6) WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s"
+      ]
+    },
+    {
+      "id": "project.approval.scope_upgrade.create",
+      "version": 1,
+      "payload": {
+        "item_type": "project",
+        "item_gid": "project-one",
+        "item_title": "Fixture project",
+        "current_scope": "local",
+        "target_scope": "team",
+        "reason": "Fixture"
+      },
+      "provider_data": {
+        "success": true,
+        "data": {
+          "gid": "b12f1573-b670-44c4-b0fd-856e2b1feb4c",
+          "reviewer_gid": "reviewer"
+        }
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "item_type": {
+            "enum": [
+              "project",
+              "approval"
+            ]
+          },
+          "item_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "item_title": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "current_scope": {
+            "enum": [
+              "local",
+              "project",
+              "team"
+            ]
+          },
+          "target_scope": {
+            "enum": [
+              "project",
+              "team",
+              "global"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "item_type",
+          "item_gid",
+          "item_title",
+          "current_scope",
+          "target_scope"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "reviewer_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "reviewer_gid"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": [
+        "INSERT INTO workmanship_proj_desktop_operations (actor_gid,team_gid,capability_id,idempotency_key,payload_hash) VALUES (%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE actor_gid=VALUES(actor_gid)",
+        "SELECT payload_hash,result_text FROM workmanship_proj_desktop_operations WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s FOR UPDATE",
+        "SELECT share_scope FROM workmanship_proj_projects WHERE gid=%s AND owner_gid=%s AND team_id=%s FOR UPDATE",
+        "INSERT INTO workmanship_proj_approval_orders (gid,title,order_type,project_gid,team_gid,applicant_gid,reviewer_gid,content) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+        "UPDATE workmanship_proj_desktop_operations SET result_text=%s,completed_at=CURRENT_TIMESTAMP(6) WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s"
+      ]
+    },
+    {
+      "id": "project.follow.create",
+      "version": 1,
+      "payload": {
+        "item_type": "project",
+        "item_gid": "project-one",
+        "item_title": "Fixture project"
+      },
+      "provider_data": {
+        "success": true,
+        "data": {
+          "gid": "32af9f1c-e428-4ac0-80e3-d6515bd27663"
+        }
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "item_type": {
+            "enum": [
+              "project",
+              "approval",
+              "task",
+              "issue",
+              "knowledge_item",
+              "rule",
+              "bop",
+              "gbop"
+            ]
+          },
+          "item_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "item_title": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "notify_on": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "any_change",
+                "status_change",
+                "comment_added",
+                "resolved",
+                "assigned_to_me",
+                "mentioned"
+              ]
+            },
+            "maxItems": 6
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "item_type",
+          "item_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "sql_statements": [
+        "INSERT INTO workmanship_proj_desktop_operations (actor_gid,team_gid,capability_id,idempotency_key,payload_hash) VALUES (%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE actor_gid=VALUES(actor_gid)",
+        "SELECT payload_hash,result_text FROM workmanship_proj_desktop_operations WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s FOR UPDATE",
+        "SELECT gid FROM workmanship_work_follows WHERE user_gid=%s AND item_type=%s AND item_gid=%s FOR UPDATE",
+        "INSERT INTO workmanship_work_follows (gid,user_gid,item_type,item_gid,item_title,notify_on) VALUES (%s,%s,%s,%s,%s,%s)",
+        "SELECT owner_gid AS owner_gid FROM workmanship_proj_projects WHERE gid=%s",
+        "INSERT INTO workmanship_work_notifications (gid,user_gid,type,item_type,item_gid,title,body) VALUES (%s,%s,%s,%s,%s,%s,%s)",
+        "UPDATE workmanship_proj_desktop_operations SET result_text=%s,completed_at=CURRENT_TIMESTAMP(6) WHERE actor_gid=%s AND team_gid=%s AND capability_id=%s AND idempotency_key=%s"
+      ]
+    },
+    {
+      "id": "project.share.list",
+      "version": 1,
+      "payload": {
+        "list_gid": "list-one"
+      },
+      "provider_data": {
+        "shares": [
+          {
+            "gid": "share-one",
+            "list_gid": "list-one",
+            "shared_to": "reviewer",
+            "permission": "read",
+            "shared_by": "applicant",
+            "created_at": "2026-09-08",
+            "shared_to_name": "Reviewer",
+            "shared_to_avatar": ""
+          }
+        ]
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "list_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "list_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "shares": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "list_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "shared_to": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "permission": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "shared_by": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "created_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "updated_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "shared_to_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "shared_to_avatar": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                }
+              },
+              "additionalProperties": false
+            },
+            "maxItems": 500
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "shares"
+        ]
+      },
+      "sql_statements": [
+        "SELECT owner_gid,creator_gid FROM workmanship_work_lists WHERE gid=%s AND deleted_at IS NULL",
+        "SELECT * FROM workmanship_work_list_shares WHERE list_gid=%s ORDER BY created_at"
+      ]
+    },
+    {
+      "id": "project.change_log.search",
+      "version": 1,
+      "payload": {
+        "list_gid": "list-one",
+        "limit": 100,
+        "offset": 0
+      },
+      "provider_data": {
+        "logs": []
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "item_type": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4096
+          },
+          "item_gid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4096
+          },
+          "list_gid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "logs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "item_type": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "item_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "list_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "changed_by": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "field_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "old_value": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "new_value": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "created_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                },
+                "changed_by_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 4096
+                }
+              },
+              "additionalProperties": false
+            },
+            "maxItems": 500
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "logs"
+        ]
+      },
+      "sql_statements": [
+        "SELECT owner_gid FROM workmanship_work_lists WHERE gid = %s",
+        "SELECT gid,item_type,item_gid,list_gid,changed_by,changed_at,field_name,old_value,new_value FROM workmanship_work_item_change_logs WHERE list_gid = %s ORDER BY changed_at DESC LIMIT %s OFFSET %s"
+      ]
+    }
+  ]
+}

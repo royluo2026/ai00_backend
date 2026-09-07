@@ -1,0 +1,1962 @@
+{
+  "fixture_kind": "Real Artifact store, CSV/XLSX handlers and Feishu owner services; deterministic HTTP ports",
+  "rows": [
+    {
+      "id": "base.artifact.import",
+      "version": 1,
+      "payload": {
+        "artifact_ref": {
+          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "media_type": "text/csv",
+          "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+          "byte_size": 21,
+          "version": 1
+        },
+        "name": "fixture.csv"
+      },
+      "provider_data": {
+        "artifact_ref": {
+          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "media_type": "text/csv",
+          "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+          "byte_size": 21,
+          "version": 1
+        },
+        "name": "fixture.csv"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "runtime_requests": []
+    },
+    {
+      "id": "base.artifact.get",
+      "version": 1,
+      "payload": {
+        "artifact_ref": {
+          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "media_type": "text/csv",
+          "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+          "byte_size": 21,
+          "version": 1
+        },
+        "name": "fixture.csv"
+      },
+      "provider_data": {
+        "artifact_ref": {
+          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "media_type": "text/csv",
+          "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+          "byte_size": 21,
+          "version": 1
+        },
+        "name": "fixture.csv"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "runtime_requests": []
+    },
+    {
+      "id": "base.artifact.bytes.get",
+      "version": 1,
+      "payload": {
+        "artifact_ref": {
+          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "media_type": "text/csv",
+          "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+          "byte_size": 21,
+          "version": 1
+        }
+      },
+      "provider_data": {
+        "artifact_ref": {
+          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "media_type": "text/csv",
+          "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+          "byte_size": 21,
+          "version": 1
+        },
+        "data_base64": "TmFtZSxWYWx1ZQpGaXh0dXJlLDEK"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "data_base64": {
+            "type": "string",
+            "maxLength": 6990510
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "data_base64"
+        ]
+      },
+      "runtime_requests": []
+    },
+    {
+      "id": "base.artifact.batch.import",
+      "version": 1,
+      "payload": {
+        "artifacts": [
+          {
+            "artifact_ref": {
+              "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+              "media_type": "text/csv",
+              "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+              "byte_size": 21,
+              "version": 1
+            },
+            "name": "fixture.csv"
+          }
+        ]
+      },
+      "provider_data": {
+        "artifacts": [
+          {
+            "artifact_ref": {
+              "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+              "media_type": "text/csv",
+              "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+              "byte_size": 21,
+              "version": 1
+            },
+            "name": "fixture.csv"
+          }
+        ]
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "artifact_ref": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_id": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                      "title": "Artifact Id",
+                      "type": "string"
+                    },
+                    "media_type": {
+                      "maxLength": 255,
+                      "minLength": 1,
+                      "title": "Media Type",
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "title": "Sha256",
+                      "type": "string"
+                    },
+                    "byte_size": {
+                      "minimum": 0,
+                      "title": "Byte Size",
+                      "type": "integer"
+                    },
+                    "version": {
+                      "default": 1,
+                      "minimum": 1,
+                      "title": "Version",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "artifact_id",
+                    "media_type",
+                    "sha256",
+                    "byte_size"
+                  ],
+                  "title": "ArtifactRef",
+                  "type": "object"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "artifact_ref",
+                "name"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 20
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifacts"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "artifact_ref": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_id": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                      "title": "Artifact Id",
+                      "type": "string"
+                    },
+                    "media_type": {
+                      "maxLength": 255,
+                      "minLength": 1,
+                      "title": "Media Type",
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "title": "Sha256",
+                      "type": "string"
+                    },
+                    "byte_size": {
+                      "minimum": 0,
+                      "title": "Byte Size",
+                      "type": "integer"
+                    },
+                    "version": {
+                      "default": 1,
+                      "minimum": 1,
+                      "title": "Version",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "artifact_id",
+                    "media_type",
+                    "sha256",
+                    "byte_size"
+                  ],
+                  "title": "ArtifactRef",
+                  "type": "object"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "artifact_ref",
+                "name"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 20
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifacts"
+        ]
+      },
+      "runtime_requests": []
+    },
+    {
+      "id": "base.artifact.text.get",
+      "version": 1,
+      "payload": {
+        "artifact_ref": {
+          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "media_type": "text/csv",
+          "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+          "byte_size": 21,
+          "version": 1
+        }
+      },
+      "provider_data": {
+        "artifact_ref": {
+          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "media_type": "text/csv",
+          "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+          "byte_size": 21,
+          "version": 1
+        },
+        "content": "Name,Value\nFixture,1\n"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 1048576
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "content"
+        ]
+      },
+      "runtime_requests": []
+    },
+    {
+      "id": "base.artifact.text.create",
+      "version": 1,
+      "payload": {
+        "name": "fixture.md",
+        "content": "# Fixture",
+        "media_type": "text/markdown"
+      },
+      "provider_data": {
+        "artifact_ref": {
+          "artifact_id": "artifact_1a1b33ae14be56418d44fe85298cf133",
+          "media_type": "text/markdown",
+          "sha256": "3ecc582c62a6db5dbff58d7a5466c745d10a5a6f6c5ecccda93df0f3b4beb104",
+          "byte_size": 9,
+          "version": 1
+        },
+        "name": "fixture.md"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "maxLength": 1048576
+          },
+          "media_type": {
+            "enum": [
+              "text/markdown",
+              "text/plain",
+              "text/csv",
+              "application/json"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "content",
+          "media_type",
+          "name"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "runtime_requests": []
+    },
+    {
+      "id": "base.artifact.revise",
+      "version": 1,
+      "payload": {
+        "artifact_ref": {
+          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "media_type": "text/csv",
+          "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+          "byte_size": 21,
+          "version": 1
+        },
+        "name": "fixture.csv",
+        "previous_artifact_ref": {
+          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "media_type": "text/csv",
+          "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+          "byte_size": 21,
+          "version": 1
+        }
+      },
+      "provider_data": {
+        "artifact_ref": {
+          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "media_type": "text/csv",
+          "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+          "byte_size": 21,
+          "version": 1
+        },
+        "name": "fixture.csv"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "previous_artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "previous_artifact_ref",
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "runtime_requests": []
+    },
+    {
+      "id": "craft.data_exchange.excel.parse",
+      "version": 1,
+      "payload": {
+        "artifact_ref": {
+          "artifact_id": "artifact_e0520af90bfa5dab972951bb29306e3d",
+          "media_type": "text/csv",
+          "sha256": "634af9b5cd561c1cd6e179cc0df3e4576d148fe66a448e60c3a9678128282982",
+          "byte_size": 21,
+          "version": 1
+        },
+        "name": "fixture.csv"
+      },
+      "provider_data": {
+        "success": true,
+        "data": {
+          "headers": [
+            "Name",
+            "Value"
+          ],
+          "rows": [
+            [
+              "Fixture",
+              "1"
+            ]
+          ],
+          "warnings": []
+        }
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "module": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "headers": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "maxItems": 200,
+                "minItems": 0
+              },
+              "rows": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "maxItems": 200,
+                  "minItems": 0
+                },
+                "maxItems": 5000,
+                "minItems": 0
+              },
+              "warnings": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "maxItems": 20,
+                "minItems": 0
+              },
+              "import_preview": {
+                "type": "object",
+                "properties": {
+                  "import_preview_gid": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^[A-Za-z0-9_.-]+$"
+                  },
+                  "content_hash": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "entry_count": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "expires_at": {
+                    "type": "string",
+                    "maxLength": 4096
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "headers",
+              "rows",
+              "warnings"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "runtime_requests": []
+    },
+    {
+      "id": "craft.data_exchange.excel.export",
+      "version": 1,
+      "payload": {
+        "columns": [
+          {
+            "key": "name",
+            "label": "Name",
+            "width": 15
+          }
+        ],
+        "rows": [
+          [
+            "Fixture"
+          ]
+        ],
+        "filename": "fixture.xlsx"
+      },
+      "provider_data": {
+        "artifact_ref": {
+          "artifact_id": "artifact_08ca4ebb48c857fcb1b2559b5b7a3436",
+          "media_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "sha256": "63afaccae350d3811658e4da907b7f60fc819fba2d4d96de372449d1d2865976",
+          "byte_size": 5036,
+          "version": 1
+        },
+        "name": "fixture.xlsx"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "columns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "label": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "width": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "include": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "key"
+              ]
+            },
+            "maxItems": 200,
+            "minItems": 1
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "maxItems": 200,
+              "minItems": 0
+            },
+            "maxItems": 5000,
+            "minItems": 0
+          },
+          "styles": {
+            "type": "object",
+            "properties": {
+              "headerBg": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "headerFg": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "altRowBg": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "borderStyle": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "fontSize": {
+                "type": "integer",
+                "minimum": 6,
+                "maximum": 48
+              }
+            },
+            "additionalProperties": false
+          },
+          "filename": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "columns",
+          "rows"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "runtime_requests": []
+    },
+    {
+      "id": "craft.data_exchange.diff_report.export",
+      "version": 1,
+      "payload": {
+        "columns": [
+          {
+            "key": "name",
+            "label": "Name",
+            "width": 15
+          }
+        ],
+        "diff_rows": [
+          {
+            "status": "modified",
+            "values_a": [
+              "Old"
+            ],
+            "values_b": [
+              "New"
+            ],
+            "changed_fields": [
+              "name"
+            ]
+          }
+        ],
+        "filename": "diff.xlsx"
+      },
+      "provider_data": {
+        "artifact_ref": {
+          "artifact_id": "artifact_9bbc7787fcc25a3b8b7901e442206d7b",
+          "media_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "sha256": "4e009560994c4e696b0fe823abfd9a1f3b61169a45b0f4b7725ea357db43f8f7",
+          "byte_size": 5308,
+          "version": 1
+        },
+        "name": "diff.xlsx"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "columns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "label": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "width": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "include": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "key"
+              ]
+            },
+            "maxItems": 200,
+            "minItems": 1
+          },
+          "diff_rows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "enum": [
+                    "added",
+                    "removed",
+                    "modified",
+                    "same"
+                  ]
+                },
+                "values_a": {
+                  "type": "array",
+                  "items": {
+                    "type": [
+                      "string",
+                      "number",
+                      "boolean",
+                      "null"
+                    ],
+                    "maxLength": 4096
+                  },
+                  "maxItems": 200,
+                  "minItems": 0
+                },
+                "values_b": {
+                  "type": "array",
+                  "items": {
+                    "type": [
+                      "string",
+                      "number",
+                      "boolean",
+                      "null"
+                    ],
+                    "maxLength": 4096
+                  },
+                  "maxItems": 200,
+                  "minItems": 0
+                },
+                "changed_fields": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "maxItems": 200,
+                  "minItems": 0
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "values_a",
+                "values_b",
+                "changed_fields"
+              ]
+            },
+            "maxItems": 5000,
+            "minItems": 0
+          },
+          "label_a": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "label_b": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "filename": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "columns",
+          "diff_rows"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "runtime_requests": []
+    },
+    {
+      "id": "craft.data_exchange.feishu_diff.write",
+      "version": 1,
+      "payload": {
+        "columns": [
+          {
+            "key": "name",
+            "label": "Name",
+            "width": 15
+          }
+        ],
+        "diff_rows": [
+          {
+            "status": "modified",
+            "values_a": [
+              "Old"
+            ],
+            "values_b": [
+              "New"
+            ],
+            "changed_fields": [
+              "name"
+            ]
+          }
+        ],
+        "spreadsheet_token": "sheet-one",
+        "sheet_id": "Sheet1"
+      },
+      "provider_data": {
+        "written_rows": 1,
+        "spreadsheet_token": "sheet-one",
+        "sheet_id": "Sheet1"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "columns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "label": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "width": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "include": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "key"
+              ]
+            },
+            "maxItems": 200,
+            "minItems": 1
+          },
+          "diff_rows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "enum": [
+                    "added",
+                    "removed",
+                    "modified",
+                    "same"
+                  ]
+                },
+                "values_a": {
+                  "type": "array",
+                  "items": {
+                    "type": [
+                      "string",
+                      "number",
+                      "boolean",
+                      "null"
+                    ],
+                    "maxLength": 4096
+                  },
+                  "maxItems": 200,
+                  "minItems": 0
+                },
+                "values_b": {
+                  "type": "array",
+                  "items": {
+                    "type": [
+                      "string",
+                      "number",
+                      "boolean",
+                      "null"
+                    ],
+                    "maxLength": 4096
+                  },
+                  "maxItems": 200,
+                  "minItems": 0
+                },
+                "changed_fields": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "maxItems": 200,
+                  "minItems": 0
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "values_a",
+                "values_b",
+                "changed_fields"
+              ]
+            },
+            "maxItems": 5000,
+            "minItems": 0
+          },
+          "label_a": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "label_b": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "spreadsheet_token": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "sheet_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "columns",
+          "diff_rows",
+          "spreadsheet_token",
+          "sheet_id"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "written_rows": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5000
+          },
+          "spreadsheet_token": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "sheet_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "written_rows",
+          "spreadsheet_token",
+          "sheet_id"
+        ]
+      },
+      "runtime_requests": [
+        [
+          "PUT",
+          "/open-apis/sheets/v2/spreadsheets/sheet-one/values"
+        ]
+      ]
+    },
+    {
+      "id": "craft.data_exchange.feishu_sheet.write",
+      "version": 1,
+      "payload": {
+        "spreadsheet_token": "sheet-one",
+        "sheet_id": "Sheet1",
+        "headers": [
+          "Name"
+        ],
+        "rows": [
+          [
+            "Fixture"
+          ]
+        ]
+      },
+      "provider_data": {
+        "success": true,
+        "written_rows": 1
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "spreadsheet_token": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "sheet_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "headers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "maxItems": 200,
+            "minItems": 1
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ],
+                "maxLength": 4096
+              },
+              "maxItems": 200,
+              "minItems": 0
+            },
+            "maxItems": 5000,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "spreadsheet_token",
+          "sheet_id",
+          "headers",
+          "rows"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "written_rows": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5000
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "written_rows"
+        ]
+      },
+      "runtime_requests": [
+        [
+          "PUT",
+          "/open-apis/sheets/v2/spreadsheets/sheet-one/values"
+        ],
+        [
+          "PUT",
+          "/open-apis/sheets/v2/spreadsheets/sheet-one/values"
+        ]
+      ]
+    },
+    {
+      "id": "craft.data_exchange.feishu_sheet.read",
+      "version": 1,
+      "payload": {
+        "spreadsheet_token": "sheet-one",
+        "sheet_range": "Sheet1!A1:Z1000"
+      },
+      "provider_data": {
+        "headers": [
+          "Name"
+        ],
+        "rows": [
+          [
+            "Fixture"
+          ]
+        ],
+        "warnings": []
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "spreadsheet_token": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "sheet_range": {
+            "type": "string",
+            "maxLength": 4096,
+            "pattern": "^[A-Za-z0-9_ -]+![A-Z]+[0-9]+:[A-Z]+[0-9]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "spreadsheet_token",
+          "sheet_range"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "headers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "maxItems": 200,
+            "minItems": 0
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "maxItems": 200,
+              "minItems": 0
+            },
+            "maxItems": 5000,
+            "minItems": 0
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "maxItems": 20,
+            "minItems": 0
+          },
+          "import_preview": {
+            "type": "object",
+            "properties": {
+              "import_preview_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9_.-]+$"
+              },
+              "content_hash": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "entry_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "expires_at": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "headers",
+          "rows",
+          "warnings"
+        ]
+      },
+      "runtime_requests": [
+        [
+          "PUT",
+          "/open-apis/sheets/v2/spreadsheets/sheet-one/values"
+        ],
+        [
+          "PUT",
+          "/open-apis/sheets/v2/spreadsheets/sheet-one/values"
+        ],
+        [
+          "GET",
+          "/open-apis/sheets/v2/spreadsheets/sheet-one/values/Sheet1!A1:Z1000"
+        ]
+      ]
+    }
+  ]
+}

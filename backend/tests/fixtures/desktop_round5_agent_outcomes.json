@@ -1,0 +1,2330 @@
+{
+  "fixture_kind": "Real owner handlers/application/repositories; deterministic SQL/HTTP ports",
+  "rows": [
+    {
+      "id": "agent.skill.create",
+      "version": 1,
+      "payload": {
+        "name": "fixture_skill",
+        "title": "Fixture Skill",
+        "skill_type": "prompt",
+        "visibility": "private",
+        "content": {
+          "template": "Hello"
+        }
+      },
+      "provider_data": {
+        "gid": "c6f82f93-2ac1-4541-bc9e-9f8ab7cca38b",
+        "success": true
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{1,49}$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "skill_type": {
+            "enum": [
+              "prompt",
+              "tool",
+              "flow"
+            ]
+          },
+          "visibility": {
+            "enum": [
+              "private",
+              "team",
+              "global"
+            ]
+          },
+          "content": {
+            "type": "object",
+            "properties": {
+              "template": {
+                "type": "string",
+                "maxLength": 65536
+              },
+              "variables": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 256
+                    },
+                    "label": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "required": {
+                      "type": "boolean"
+                    },
+                    "default": {
+                      "type": "string",
+                      "maxLength": 4096
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "name",
+                    "label",
+                    "required",
+                    "default"
+                  ]
+                },
+                "maxItems": 64
+              },
+              "system_hint": {
+                "type": "string",
+                "maxLength": 65536
+              },
+              "script": {
+                "type": "string",
+                "maxLength": 65536
+              },
+              "input_schema": {
+                "$ref": "#/$defs/parameter_schema"
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "need_confirm": {
+                "type": "boolean"
+              },
+              "flow_gid": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "canvas": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "lanes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 256
+                        },
+                        "label": {
+                          "type": "string",
+                          "maxLength": 4096
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "label"
+                      ]
+                    },
+                    "maxItems": 128
+                  },
+                  "steps": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 128
+                  },
+                  "step_labels": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "maxItems": 128
+                  },
+                  "nodes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 256
+                        },
+                        "type": {
+                          "enum": [
+                            "agent",
+                            "human",
+                            "tool_read",
+                            "tool_write",
+                            "skill_call",
+                            "fork",
+                            "join",
+                            "condition",
+                            "list",
+                            "data_db",
+                            "data_mem",
+                            "data_file",
+                            "human_approval",
+                            "human_task",
+                            "result_list"
+                          ]
+                        },
+                        "label": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "lane_id": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "laneIdx": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 127
+                        },
+                        "step": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 127
+                        },
+                        "params": {
+                          "type": "object",
+                          "properties": {
+                            "agent_name": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "note": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "assignee": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "task_desc": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "tool_name": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "params_hint": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "confirm_required": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "skill_gid": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "skill_name": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "branches": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "strategy": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "condition_expr": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "true_branch": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "false_branch": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "domain": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "list_gid": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "item_query": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "table": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "db": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "access": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "var_name": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "scope": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "path": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "format": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "approver": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "_items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "gid": {
+                                    "type": "string",
+                                    "maxLength": 4096
+                                  },
+                                  "title": {
+                                    "type": "string",
+                                    "maxLength": 4096
+                                  },
+                                  "name": {
+                                    "type": "string",
+                                    "maxLength": 4096
+                                  },
+                                  "item_type": {
+                                    "type": "string",
+                                    "maxLength": 4096
+                                  },
+                                  "status": {
+                                    "type": "string",
+                                    "maxLength": 4096
+                                  },
+                                  "url": {
+                                    "type": "string",
+                                    "maxLength": 4096
+                                  },
+                                  "description": {
+                                    "type": "string",
+                                    "maxLength": 4096
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              "maxItems": 128
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        "x": {
+                          "type": "number"
+                        },
+                        "y": {
+                          "type": "number"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "type",
+                        "label",
+                        "params"
+                      ]
+                    },
+                    "maxItems": 128
+                  },
+                  "connections": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "from": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "to": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "type": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "fromPort": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "toPort": {
+                          "type": "string",
+                          "maxLength": 4096
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "from",
+                        "to",
+                        "type"
+                      ]
+                    },
+                    "maxItems": 256
+                  },
+                  "questions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "nodeId": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "text": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "answer": {
+                          "type": "string",
+                          "maxLength": 4096
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "text",
+                        "answer"
+                      ]
+                    },
+                    "maxItems": 128
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "icon": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "maxItems": 64
+          },
+          "sort_order": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "title",
+          "skill_type",
+          "content"
+        ],
+        "$defs": {
+          "parameter_schema": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "enum": [
+                  "object",
+                  "array",
+                  "string",
+                  "number",
+                  "integer",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "title": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "properties": {
+                "type": "object",
+                "maxProperties": 64,
+                "patternProperties": {
+                  "^[A-Za-z][A-Za-z0-9_.-]{0,127}$": {
+                    "$ref": "#/$defs/parameter_schema"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "required": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "maxItems": 64
+              },
+              "items": {
+                "$ref": "#/$defs/parameter_schema"
+              },
+              "enum": {
+                "type": "array",
+                "items": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "maxItems": 64
+              },
+              "default": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "minimum": {
+                "type": "number"
+              },
+              "maximum": {
+                "type": "number"
+              },
+              "minLength": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "maxLength": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 65536
+              },
+              "minItems": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "maxItems": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 128
+              },
+              "additionalProperties": {
+                "const": false
+              },
+              "format": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      },
+      "sql_statements": [
+        "INSERT INTO workmanship_app_skills (gid,name,title,description,skill_type,scope,status,owner_gid,team_gid,is_system,content,icon,tags,sort_order,is_pinned) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+      ],
+      "runtime_requests": [],
+      "outbox_count": 1
+    },
+    {
+      "id": "agent.skill.update",
+      "version": 1,
+      "payload": {
+        "skill_gid": "skill-one",
+        "changes": {
+          "title": "Updated Skill",
+          "content": {
+            "template": "Updated"
+          }
+        }
+      },
+      "provider_data": {
+        "success": true
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "skill_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "changes": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "visibility": {
+                "enum": [
+                  "private",
+                  "team",
+                  "global"
+                ]
+              },
+              "content": {
+                "type": "object",
+                "properties": {
+                  "template": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "variables": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 256
+                        },
+                        "label": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "required": {
+                          "type": "boolean"
+                        },
+                        "default": {
+                          "type": "string",
+                          "maxLength": 4096
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "name",
+                        "label",
+                        "required",
+                        "default"
+                      ]
+                    },
+                    "maxItems": 64
+                  },
+                  "system_hint": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "script": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "input_schema": {
+                    "$ref": "#/$defs/parameter_schema"
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "need_confirm": {
+                    "type": "boolean"
+                  },
+                  "flow_gid": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "canvas": {
+                    "type": "object",
+                    "properties": {
+                      "title": {
+                        "type": "string",
+                        "maxLength": 4096
+                      },
+                      "lanes": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 256
+                            },
+                            "label": {
+                              "type": "string",
+                              "maxLength": 4096
+                            }
+                          },
+                          "additionalProperties": false,
+                          "required": [
+                            "id",
+                            "label"
+                          ]
+                        },
+                        "maxItems": 128
+                      },
+                      "steps": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 128
+                      },
+                      "step_labels": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "maxLength": 4096
+                        },
+                        "maxItems": 128
+                      },
+                      "nodes": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 256
+                            },
+                            "type": {
+                              "enum": [
+                                "agent",
+                                "human",
+                                "tool_read",
+                                "tool_write",
+                                "skill_call",
+                                "fork",
+                                "join",
+                                "condition",
+                                "list",
+                                "data_db",
+                                "data_mem",
+                                "data_file",
+                                "human_approval",
+                                "human_task",
+                                "result_list"
+                              ]
+                            },
+                            "label": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "lane_id": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "laneIdx": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 127
+                            },
+                            "step": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 127
+                            },
+                            "params": {
+                              "type": "object",
+                              "properties": {
+                                "agent_name": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "note": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "assignee": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "task_desc": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "tool_name": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "params_hint": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "confirm_required": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "skill_gid": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "skill_name": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "branches": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "strategy": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "condition_expr": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "true_branch": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "false_branch": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "domain": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "list_gid": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "item_query": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "table": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "db": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "access": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "var_name": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "scope": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "path": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "format": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "approver": {
+                                  "type": "string",
+                                  "maxLength": 4096
+                                },
+                                "_items": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "gid": {
+                                        "type": "string",
+                                        "maxLength": 4096
+                                      },
+                                      "title": {
+                                        "type": "string",
+                                        "maxLength": 4096
+                                      },
+                                      "name": {
+                                        "type": "string",
+                                        "maxLength": 4096
+                                      },
+                                      "item_type": {
+                                        "type": "string",
+                                        "maxLength": 4096
+                                      },
+                                      "status": {
+                                        "type": "string",
+                                        "maxLength": 4096
+                                      },
+                                      "url": {
+                                        "type": "string",
+                                        "maxLength": 4096
+                                      },
+                                      "description": {
+                                        "type": "string",
+                                        "maxLength": 4096
+                                      }
+                                    },
+                                    "additionalProperties": false
+                                  },
+                                  "maxItems": 128
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            "x": {
+                              "type": "number"
+                            },
+                            "y": {
+                              "type": "number"
+                            }
+                          },
+                          "additionalProperties": false,
+                          "required": [
+                            "id",
+                            "type",
+                            "label",
+                            "params"
+                          ]
+                        },
+                        "maxItems": 128
+                      },
+                      "connections": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "from": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "to": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "type": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "fromPort": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "toPort": {
+                              "type": "string",
+                              "maxLength": 4096
+                            }
+                          },
+                          "additionalProperties": false,
+                          "required": [
+                            "id",
+                            "from",
+                            "to",
+                            "type"
+                          ]
+                        },
+                        "maxItems": 256
+                      },
+                      "questions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "nodeId": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "text": {
+                              "type": "string",
+                              "maxLength": 4096
+                            },
+                            "answer": {
+                              "type": "string",
+                              "maxLength": 4096
+                            }
+                          },
+                          "additionalProperties": false,
+                          "required": [
+                            "id",
+                            "text",
+                            "answer"
+                          ]
+                        },
+                        "maxItems": 128
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              },
+              "icon": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "maxItems": 64
+              },
+              "sort_order": {
+                "type": "integer"
+              },
+              "status": {
+                "enum": [
+                  "draft",
+                  "active",
+                  "disabled"
+                ]
+              },
+              "is_pinned": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false,
+            "minProperties": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "skill_gid",
+          "changes"
+        ],
+        "$defs": {
+          "parameter_schema": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "enum": [
+                  "object",
+                  "array",
+                  "string",
+                  "number",
+                  "integer",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "title": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "properties": {
+                "type": "object",
+                "maxProperties": 64,
+                "patternProperties": {
+                  "^[A-Za-z][A-Za-z0-9_.-]{0,127}$": {
+                    "$ref": "#/$defs/parameter_schema"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "required": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "maxItems": 64
+              },
+              "items": {
+                "$ref": "#/$defs/parameter_schema"
+              },
+              "enum": {
+                "type": "array",
+                "items": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "maxItems": 64
+              },
+              "default": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "minimum": {
+                "type": "number"
+              },
+              "maximum": {
+                "type": "number"
+              },
+              "minLength": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "maxLength": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 65536
+              },
+              "minItems": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "maxItems": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 128
+              },
+              "additionalProperties": {
+                "const": false
+              },
+              "format": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      },
+      "sql_statements": [
+        "SELECT * FROM workmanship_app_skills WHERE gid=%s AND team_gid=%s AND deleted_at IS NULL",
+        "UPDATE workmanship_app_skills SET title=%s,content=%s,revision=revision+1,updated_at=NOW() WHERE gid=%s AND team_gid=%s"
+      ],
+      "runtime_requests": [],
+      "outbox_count": 1
+    },
+    {
+      "id": "agent.session.list",
+      "version": 1,
+      "payload": {},
+      "provider_data": {
+        "sessions": [
+          {
+            "gid": "session-one",
+            "title": "Fixture",
+            "created_at": "2026-09-08T00:00:00",
+            "updated_at": "2026-09-08T00:00:00"
+          }
+        ]
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "sessions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "title": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "created_at": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "updated_at": {
+                  "type": "string",
+                  "maxLength": 4096
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "title",
+                "created_at",
+                "updated_at"
+              ]
+            },
+            "maxItems": 50
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "sessions"
+        ]
+      },
+      "sql_statements": [
+        "SELECT gid, title, created_at, updated_at FROM workmanship_app_ai_sessions\n                    WHERE user_gid=%s ORDER BY updated_at DESC LIMIT 50"
+      ],
+      "runtime_requests": [],
+      "outbox_count": 0
+    },
+    {
+      "id": "agent.audit.search",
+      "version": 1,
+      "payload": {
+        "limit": 5,
+        "offset": 0
+      },
+      "provider_data": {
+        "logs": [
+          {
+            "id": 1,
+            "gid": "audit-one",
+            "session_gid": "session-one",
+            "user_gid": "fixture-user",
+            "tool_name": "Fixture",
+            "is_write": false,
+            "is_confirmed": false,
+            "inputs_json": "{}",
+            "result_json": "{}",
+            "resource_gid": "",
+            "resource_type": "",
+            "status": "ok",
+            "created_at": "2026-09-08T00:00:00"
+          }
+        ],
+        "total": 1,
+        "limit": 5,
+        "offset": 0
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "session_gid": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "user_gid": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "tool_name": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "is_write": {
+            "enum": [
+              "",
+              "true",
+              "false"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "logs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "maxLength": 65536
+                },
+                "session_gid": {
+                  "type": "string",
+                  "maxLength": 65536
+                },
+                "user_gid": {
+                  "type": "string",
+                  "maxLength": 65536
+                },
+                "tool_name": {
+                  "type": "string",
+                  "maxLength": 65536
+                },
+                "inputs_json": {
+                  "type": "string",
+                  "maxLength": 65536
+                },
+                "result_json": {
+                  "type": "string",
+                  "maxLength": 65536
+                },
+                "resource_gid": {
+                  "type": "string",
+                  "maxLength": 65536
+                },
+                "resource_type": {
+                  "type": "string",
+                  "maxLength": 65536
+                },
+                "status": {
+                  "type": "string",
+                  "maxLength": 65536
+                },
+                "created_at": {
+                  "type": "string",
+                  "maxLength": 65536
+                },
+                "id": {
+                  "type": "integer"
+                },
+                "is_write": {
+                  "type": "boolean"
+                },
+                "is_confirmed": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
+            "maxItems": 500
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "logs",
+          "total",
+          "limit",
+          "offset"
+        ]
+      },
+      "sql_statements": [
+        "SELECT COUNT(*) AS total FROM workmanship_app_ai_audit_logs WHERE 1=1",
+        "SELECT id, gid, session_gid, user_gid, tool_name, is_write, is_confirmed,\n                    inputs_json, result_json, resource_gid, resource_type, status, created_at\n                    FROM workmanship_app_ai_audit_logs WHERE 1=1 ORDER BY created_at DESC LIMIT %s OFFSET %s"
+      ],
+      "runtime_requests": [],
+      "outbox_count": 0
+    },
+    {
+      "id": "agent.tool_catalog.list",
+      "version": 1,
+      "payload": {},
+      "provider_data": {
+        "read": [
+          {
+            "name": "global_search",
+            "description": "全局跨域搜索（等同于 Ctrl+O 全局搜索），一次调用同时搜索：BOP工艺节点、任务、问题、知识库文档、工艺规则、飞书联系人/群/文档/日程。当用户询问'有没有关于X的内容''搜一下X''找找X相关'时优先使用此工具。",
+            "category": "read",
+            "need_confirm": false,
+            "params": [
+              "q",
+              "categories",
+              "limit"
+            ]
+          },
+          {
+            "name": "search",
+            "description": "跨模块统一关键词搜索（任务/问题/知识库/规则/BOP）。",
+            "category": "read",
+            "need_confirm": false,
+            "params": [
+              "keyword",
+              "modules",
+              "limit"
+            ]
+          },
+          {
+            "name": "list_tasks",
+            "description": "列出任务，支持按状态/优先级/关键词/清单过滤。",
+            "category": "read",
+            "need_confirm": false,
+            "params": [
+              "keyword",
+              "list_gid",
+              "status",
+              "priority",
+              "limit"
+            ]
+          },
+          {
+            "name": "get_task",
+            "description": "获取单条任务详情。",
+            "category": "read",
+            "need_confirm": false,
+            "params": [
+              "gid"
+            ]
+          },
+          {
+            "name": "get_issue",
+            "description": "获取单条问题详情。",
+            "category": "read",
+            "need_confirm": false,
+            "params": [
+              "gid"
+            ]
+          },
+          {
+            "name": "list_task_lists",
+            "description": "列出所有任务清单。",
+            "category": "read",
+            "need_confirm": false,
+            "params": []
+          },
+          {
+            "name": "list_issue_lists",
+            "description": "列出所有问题清单。",
+            "category": "read",
+            "need_confirm": false,
+            "params": []
+          },
+          {
+            "name": "list_issues",
+            "description": "列出问题，支持按状态/关键词/清单过滤。",
+            "category": "read",
+            "need_confirm": false,
+            "params": [
+              "keyword",
+              "list_gid",
+              "status",
+              "severity",
+              "limit"
+            ]
+          },
+          {
+            "name": "list_projects",
+            "description": "列出所有项目。",
+            "category": "read",
+            "need_confirm": false,
+            "params": []
+          },
+          {
+            "name": "search_knowledge",
+            "description": "在知识库中全文搜索条目（标题/标签/描述）。",
+            "category": "read",
+            "need_confirm": false,
+            "params": [
+              "keyword",
+              "limit"
+            ]
+          },
+          {
+            "name": "get_knowledge_entry",
+            "description": "获取单条知识库条目的详细内容。",
+            "category": "read",
+            "need_confirm": false,
+            "params": [
+              "gid"
+            ]
+          },
+          {
+            "name": "get_knowledge_document",
+            "description": "读取有权访问的团队Markdown文档；可固定到指定revision，并返回可验证来源。",
+            "category": "read",
+            "need_confirm": false,
+            "params": [
+              "document_gid",
+              "revision_gid"
+            ]
+          },
+          {
+            "name": "list_rules",
+            "description": "列出工艺规则，支持按状态/类型过滤。",
+            "category": "read",
+            "need_confirm": false,
+            "params": [
+              "status",
+              "rule_type",
+              "limit"
+            ]
+          },
+          {
+            "name": "list_approval_orders",
+            "description": "列出审批单，支持按状态过滤。",
+            "category": "read",
+            "need_confirm": false,
+            "params": [
+              "status",
+              "limit"
+            ]
+          }
+        ],
+        "write_confirm": [
+          {
+            "name": "create_task",
+            "description": "创建新任务。需用户确认。",
+            "category": "write_confirm",
+            "need_confirm": true,
+            "params": [
+              "title",
+              "priority",
+              "description",
+              "due_date",
+              "list_gid"
+            ]
+          },
+          {
+            "name": "update_task",
+            "description": "更新任务字段（状态/标题/优先级/描述/截止日期等）。需用户确认。",
+            "category": "write_confirm",
+            "need_confirm": true,
+            "params": [
+              "gid",
+              "status",
+              "title",
+              "priority",
+              "description",
+              "due_date"
+            ]
+          },
+          {
+            "name": "create_issue",
+            "description": "创建新问题记录。需用户确认。",
+            "category": "write_confirm",
+            "need_confirm": true,
+            "params": [
+              "title",
+              "severity",
+              "description",
+              "list_gid"
+            ]
+          },
+          {
+            "name": "update_issue",
+            "description": "更新问题字段。需用户确认。",
+            "category": "write_confirm",
+            "need_confirm": true,
+            "params": [
+              "gid",
+              "status",
+              "title",
+              "severity",
+              "description"
+            ]
+          },
+          {
+            "name": "create_approval_order",
+            "description": "创建新审批单。需用户确认。",
+            "category": "write_confirm",
+            "need_confirm": true,
+            "params": [
+              "title",
+              "description",
+              "approver_gid"
+            ]
+          }
+        ],
+        "write_no_confirm": [
+          {
+            "name": "add_task_progress_log",
+            "description": "为任务追加进度备注（不修改任务状态）。",
+            "category": "write_no_confirm",
+            "need_confirm": false,
+            "params": [
+              "gid",
+              "content"
+            ]
+          },
+          {
+            "name": "run_skill_canvas",
+            "description": "执行一个 Skill 画布（按阶段执行所有节点）。",
+            "category": "write_no_confirm",
+            "need_confirm": false,
+            "params": [
+              "skill_gid",
+              "user_inputs",
+              "pause_token",
+              "resume_inputs"
+            ]
+          }
+        ],
+        "system": [
+          {
+            "name": "calculate",
+            "description": "执行安全的数学表达式计算。",
+            "category": "system",
+            "need_confirm": false,
+            "params": [
+              "expression"
+            ]
+          },
+          {
+            "name": "save_preference",
+            "description": "保存用户长期偏好记忆（如回复语言、风格）。",
+            "category": "system",
+            "need_confirm": false,
+            "params": [
+              "key",
+              "value"
+            ]
+          },
+          {
+            "name": "list_preferences",
+            "description": "查看当前用户已保存的所有长期偏好记忆。",
+            "category": "system",
+            "need_confirm": false,
+            "params": []
+          },
+          {
+            "name": "ask_for_clarification",
+            "description": "当需要更多信息才能完成任务时，向用户提问。",
+            "category": "system",
+            "need_confirm": false,
+            "params": [
+              "question"
+            ]
+          },
+          {
+            "name": "generate_canvas",
+            "description": "生成工作流画布（流程泳道图），前端自动渲染。用户说「在画布里规划」「生成画布」「转为工作流」时调用。纵轴=lanes[]（泳道/角色），横轴=step_labels[]（自定义列标题），节点用lane_id+step(1-based)定位到单元格。⚠️ 重要约束：同一 step 列的不同泳道节点表示【并行执行】，顺序流程中每个步骤必须占用不同的 step 编号，禁止把先后顺序的步骤放在同一 step 列。例如：A→B→C 三步顺序流程，A用step=1，B用step=2，C用step=3，不能共用同一个step。",
+            "category": "system",
+            "need_confirm": false,
+            "params": [
+              "title",
+              "step_labels",
+              "lanes",
+              "nodes",
+              "connections"
+            ]
+          },
+          {
+            "name": "open_in_container",
+            "description": "在 WFC 窗口底部容器中打开指定页面。",
+            "category": "system",
+            "need_confirm": false,
+            "params": [
+              "page_id",
+              "title",
+              "url"
+            ]
+          },
+          {
+            "name": "create_discussion_topic",
+            "description": "在画布话题讨论区创建结构化多层级话题卡（适合有父子层级的决策树）。",
+            "category": "system",
+            "need_confirm": false,
+            "params": [
+              "title",
+              "questions"
+            ]
+          },
+          {
+            "name": "save_memory",
+            "description": "保存结构化 AI 记忆条目（比 save_preference 更丰富，支持分类标签）。适合保存项目上下文、工程规律、领域知识等跨会话信息。",
+            "category": "system",
+            "need_confirm": false,
+            "params": [
+              "key",
+              "content",
+              "tag",
+              "overwrite"
+            ]
+          },
+          {
+            "name": "recall_memory",
+            "description": "检索历史 AI 记忆，支持关键词搜索和标签过滤。",
+            "category": "system",
+            "need_confirm": false,
+            "params": [
+              "query",
+              "tag_filter",
+              "limit"
+            ]
+          },
+          {
+            "name": "list_memories",
+            "description": "列出当前用户的所有 AI 记忆条目（按标签分组）。",
+            "category": "system",
+            "need_confirm": false,
+            "params": [
+              "limit"
+            ]
+          },
+          {
+            "name": "get_canvas_state",
+            "description": "读取当前会话关联的工作流画布状态（节点列表、连接关系等）。仅当用户在画布页面发起对话时有效。",
+            "category": "system",
+            "need_confirm": false,
+            "params": [
+              "canvas_id"
+            ]
+          },
+          {
+            "name": "get_selected_elements",
+            "description": "获取用户在画布/视图中当前选中的元素列表（gid、类型、标签等）。仅当用户在相关页面发起对话且有选中元素时有效。",
+            "category": "system",
+            "need_confirm": false,
+            "params": []
+          },
+          {
+            "name": "flag_for_review",
+            "description": "标记当前问题需要人工复核。当 AI 对结果不确定、发现潜在风险或无法给出可靠答案时使用。",
+            "category": "system",
+            "need_confirm": false,
+            "params": [
+              "reason",
+              "context",
+              "severity"
+            ]
+          },
+          {
+            "name": "find_similar_cases",
+            "description": "在任务/问题/知识库中语义搜索相似历史案例。比 search_knowledge 更聚焦于「相似情境」匹配，返回相似度评分。",
+            "category": "system",
+            "need_confirm": false,
+            "params": [
+              "query",
+              "item_types",
+              "limit"
+            ]
+          },
+          {
+            "name": "aggregate_history",
+            "description": "对任务或问题进行聚合统计分析（按状态/优先级/严重度/时间分组统计数量）。",
+            "category": "system",
+            "need_confirm": false,
+            "params": [
+              "item_type",
+              "group_by",
+              "filter_status",
+              "date_range"
+            ]
+          },
+          {
+            "name": "check_rules",
+            "description": "针对具体工艺场景，检索适用的工艺规则并判断强制/建议/参考级别。返回含置信度和规则强度的规则列表。",
+            "category": "system",
+            "need_confirm": false,
+            "params": [
+              "scenario",
+              "part_no",
+              "operation_type",
+              "limit"
+            ]
+          },
+          {
+            "name": "recommend_practice",
+            "description": "根据工艺场景推荐相关的最佳实践和经验教训。搜索 lesson_learned / guide 类型的知识条目。",
+            "category": "system",
+            "need_confirm": false,
+            "params": [
+              "scenario",
+              "context",
+              "limit"
+            ]
+          }
+        ],
+        "total": 38
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "read": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 65536
+                },
+                "category": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "need_confirm": {
+                  "type": "boolean"
+                },
+                "params": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  },
+                  "maxItems": 64
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "description",
+                "category",
+                "need_confirm",
+                "params"
+              ]
+            },
+            "maxItems": 500
+          },
+          "write_confirm": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 65536
+                },
+                "category": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "need_confirm": {
+                  "type": "boolean"
+                },
+                "params": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  },
+                  "maxItems": 64
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "description",
+                "category",
+                "need_confirm",
+                "params"
+              ]
+            },
+            "maxItems": 500
+          },
+          "write_no_confirm": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 65536
+                },
+                "category": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "need_confirm": {
+                  "type": "boolean"
+                },
+                "params": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  },
+                  "maxItems": 64
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "description",
+                "category",
+                "need_confirm",
+                "params"
+              ]
+            },
+            "maxItems": 500
+          },
+          "system": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 65536
+                },
+                "category": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "need_confirm": {
+                  "type": "boolean"
+                },
+                "params": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  },
+                  "maxItems": 64
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "description",
+                "category",
+                "need_confirm",
+                "params"
+              ]
+            },
+            "maxItems": 500
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "read",
+          "write_confirm",
+          "write_no_confirm",
+          "system",
+          "total"
+        ]
+      },
+      "sql_statements": [],
+      "runtime_requests": [],
+      "outbox_count": 0
+    },
+    {
+      "id": "agent.flow.capability_manifest.get",
+      "version": 1,
+      "payload": {},
+      "provider_data": {
+        "manifest": [],
+        "message": "Flow 节点必须从 Capability Catalog 选择；旧进程内 node_registry 已停用"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "manifest": {
+            "type": "array",
+            "maxItems": 0
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "manifest",
+          "message"
+        ]
+      },
+      "sql_statements": [],
+      "runtime_requests": [],
+      "outbox_count": 0
+    },
+    {
+      "id": "agent.interaction.cancel",
+      "version": 2,
+      "payload": {
+        "session_gid": "session-one"
+      },
+      "provider_data": {
+        "ok": true,
+        "session_gid": "session-one"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "session_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "session_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": true
+          },
+          "session_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "ok",
+          "session_gid"
+        ]
+      },
+      "sql_statements": [
+        "SELECT gid FROM workmanship_app_ai_sessions WHERE gid=%s AND user_gid=%s",
+        "SELECT role, content, tool_calls FROM workmanship_app_ai_turns WHERE session_gid=%s ORDER BY sort_order ASC LIMIT %s"
+      ],
+      "runtime_requests": [],
+      "outbox_count": 1
+    },
+    {
+      "id": "agent.runtime.config.set",
+      "version": 1,
+      "payload": {
+        "model": "pi",
+        "api_base": "https://runtime.invalid",
+        "api_key": "private-fixture-key"
+      },
+      "provider_data": {
+        "source": "local_secret",
+        "model": "pi",
+        "api_base": "https://runtime.invalid",
+        "has_key": true,
+        "key_preview": "",
+        "is_admin": true
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "api_base": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "api_key": {
+            "type": "string",
+            "maxLength": 8192
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "model"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "model": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "api_base": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "has_key": {
+            "type": "boolean"
+          },
+          "key_preview": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "is_admin": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "sql_statements": [],
+      "runtime_requests": [],
+      "outbox_count": 1
+    },
+    {
+      "id": "agent.runtime.connection.test",
+      "version": 1,
+      "payload": {},
+      "provider_data": {
+        "success": true,
+        "reply": "Pi Agent Runtime 可用",
+        "model": "pi",
+        "error": ""
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "reply": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "model": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "error": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "reply",
+          "model",
+          "error"
+        ]
+      },
+      "sql_statements": [],
+      "runtime_requests": [
+        {
+          "method": "GET",
+          "path": "/health"
+        }
+      ],
+      "outbox_count": 1
+    },
+    {
+      "id": "agent.interaction.chat.change.apply",
+      "version": 3,
+      "payload": {
+        "operation": "chat_sync",
+        "body": {
+          "message": "Hello",
+          "context": {
+            "text": "Fixture"
+          }
+        }
+      },
+      "provider_data": {
+        "data": {
+          "response_json": "{\"answer\":\"Fixture answer\",\"session_id\":\"session-one\",\"run_id\":\"run-one\",\"tool_calls\":[],\"model\":\"pi\"}"
+        }
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "enum": [
+              "chat_stream",
+              "chat_sync"
+            ]
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string",
+                "maxLength": 65536
+              },
+              "session_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 256
+              },
+              "context": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "current_page": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "project_name": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "canvas_context": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "bottom_context": {
+                    "type": "string",
+                    "maxLength": 65536
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "message"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "body"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "stream_id": {
+                "type": "string",
+                "pattern": "^capability-stream-[0-9a-f]{32}$"
+              },
+              "media_type": {
+                "type": "string",
+                "maxLength": 4096
+              },
+              "response_json": {
+                "type": "string",
+                "maxLength": 1048576
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "sql_statements": [],
+      "runtime_requests": [
+        {
+          "method": "POST",
+          "path": "/v1/sessions"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/runs"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/runs/run-one/messages"
+        }
+      ],
+      "outbox_count": 0
+    }
+  ]
+}
