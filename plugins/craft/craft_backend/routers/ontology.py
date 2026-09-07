@@ -61,7 +61,7 @@ async def _invoke(
         gateway,
         InvocationEnvelope(
             capability_id=capability_id,
-            major_version=1,
+            major_version=2 if capability_id in {"ontology.concept.get", "ontology.concept.resolve"} else 1,
             catalog_release=gateway.catalog_release,
             payload=payload,
             identity=_identity(user, principal),

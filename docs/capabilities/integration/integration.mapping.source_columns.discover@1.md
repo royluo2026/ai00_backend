@@ -8,7 +8,7 @@ Execute the governed integration.mapping.source_columns.discover Integration out
 - 不适用：The caller can use an owning domain Capability directly without external integration.
 - 生命周期：`stable`
 - 所属领域：`integration`
-- Catalog Release：`rel_6b7ac7cd21ed113da5a033e433f09a37`
+- Catalog Release：`rel_09e54550fcbaaab2df24bfa28d2c2478`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -92,7 +92,7 @@ Execute the governed integration.mapping.source_columns.discover Integration out
 ```json
 {
   "capability_id": "integration.mapping.source_columns.discover",
-  "catalog_release": "rel_6b7ac7cd21ed113da5a033e433f09a37",
+  "catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
   "major_version": 1,
   "payload": {
     "mapping_gid": "example"

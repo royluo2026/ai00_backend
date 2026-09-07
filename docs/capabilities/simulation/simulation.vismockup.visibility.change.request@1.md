@@ -8,7 +8,7 @@ Queue a signed request to show or hide all nodes in the active VisMockup documen
 - 不适用：No current user-scoped Connector binding exists.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
-- Catalog Release：`rel_6b7ac7cd21ed113da5a033e433f09a37`
+- Catalog Release：`rel_09e54550fcbaaab2df24bfa28d2c2478`
 - Schema 精度：`typed`
 - 暂未开放原因：`experimental_lifecycle`
 
@@ -90,7 +90,7 @@ Queue a signed request to show or hide all nodes in the active VisMockup documen
 ```json
 {
   "capability_id": "simulation.vismockup.visibility.change.request",
-  "catalog_release": "rel_6b7ac7cd21ed113da5a033e433f09a37",
+  "catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
   "major_version": 1,
   "payload": {
     "action": "all_on"

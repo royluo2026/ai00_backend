@@ -8,7 +8,7 @@ Read the signed-in user's safe bootstrap ticket state.
 - 不适用：Secret bootstrap material is required.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
-- Catalog Release：`rel_6b7ac7cd21ed113da5a033e433f09a37`
+- Catalog Release：`rel_09e54550fcbaaab2df24bfa28d2c2478`
 - Schema 精度：`typed`
 - 暂未开放原因：`experimental_lifecycle`
 
@@ -87,7 +87,7 @@ Read the signed-in user's safe bootstrap ticket state.
 ```json
 {
   "capability_id": "simulation.connector.pairing.bootstrap.get",
-  "catalog_release": "rel_6b7ac7cd21ed113da5a033e433f09a37",
+  "catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
   "major_version": 1,
   "payload": {
     "bootstrap_id": "example"

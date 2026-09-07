@@ -8,7 +8,7 @@ Read safe display fields for one Connector pairing code.
 - 不适用：The Connector is requesting credential material.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
-- Catalog Release：`rel_6b7ac7cd21ed113da5a033e433f09a37`
+- Catalog Release：`rel_09e54550fcbaaab2df24bfa28d2c2478`
 - Schema 精度：`typed`
 - 暂未开放原因：`experimental_lifecycle`
 
@@ -100,7 +100,7 @@ Read safe display fields for one Connector pairing code.
 ```json
 {
   "capability_id": "simulation.connector.pairing.summary.get",
-  "catalog_release": "rel_6b7ac7cd21ed113da5a033e433f09a37",
+  "catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
   "major_version": 1,
   "payload": {
     "user_code": "example"

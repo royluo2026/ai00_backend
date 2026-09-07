@@ -1,6 +1,7 @@
 """Governed ontology concept reads and non-persistent mapping assessment."""
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import Any
 
 from plugins.ontology.ontology_backend.concepts import concept_summary, project_concept, resolve_term
@@ -209,7 +210,13 @@ def resolve_concept(payload: dict[str, Any], _context: CapabilityContext) -> Cap
     return CapabilityOutput(data=data, evidence=(_release_evidence(release),))
 
 
-def get_concept(payload: dict[str, Any], _context: CapabilityContext) -> CapabilityOutput:
+def resolve_concept_v2(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+    result = resolve_concept(payload, context)
+    result.data["candidates"] = result.data["candidates"][:20]
+    return result
+
+
+def get_concept(payload: dict[str, Any], _context: CapabilityContext, *, include_inherited: bool = True) -> CapabilityOutput:
     stable_gid = str(payload.get("stable_gid") or "").strip()
     kind = str(payload.get("kind") or "concept").strip()
     view = str(payload.get("view") or "summary").strip()
@@ -222,7 +229,7 @@ def get_concept(payload: dict[str, Any], _context: CapabilityContext) -> Capabil
     if not item:
         raise LookupError("ontology object not found in the resolved release")
     objects = None
-    if view == "schema" and kind == "concept":
+    if include_inherited and view == "schema" and kind == "concept":
         objects = repository.list_objects(release["release_gid"], kinds={"concept", "property", "relation", "constraint"})
     return CapabilityOutput(
         data={
@@ -232,6 +239,10 @@ def get_concept(payload: dict[str, Any], _context: CapabilityContext) -> Capabil
         },
         evidence=(_release_evidence(release),),
     )
+
+
+def get_concept_v1(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+    return get_concept(payload, context, include_inherited=False)
 
 
 def list_objects(payload: dict[str, Any], _context: CapabilityContext) -> CapabilityOutput:
@@ -297,17 +308,33 @@ def register_ontology_concept_capabilities(registry: Any) -> None:
         "subject_concepts": ("ontology.release", "ontology.object"),
         "tags": ("ontology", "read"),
     }
-    registry.register(CapabilitySpec(
+
+    def register_read(spec: CapabilitySpec, handler: Any) -> None:
+        # Restore the pre-4ac7758ee v1 contract; typed projections belong to v2.
+        legacy_schema = deepcopy(spec.output_schema)
+        properties = legacy_schema["properties"]
+        if spec.id == "ontology.concept.get":
+            properties["concept"] = {}
+        elif spec.id == "ontology.concept.resolve":
+            properties.update({"matched_by": {}, "concept": {}, "candidates": {"type": "array", "items": {}}})
+        else:
+            properties["items"] = {"type": "array", "items": {"type": "object"}}
+        registry.register(spec.model_copy(update={"output_schema": legacy_schema}),
+                          get_concept_v1 if spec.id == "ontology.concept.get" else handler)
+        registry.register(spec.model_copy(update={"version": 2}),
+                          resolve_concept_v2 if spec.id == "ontology.concept.resolve" else handler)
+
+    register_read(CapabilitySpec(
         **common, id="ontology.concept.resolve", description="Resolve a term without guessing across an immutable release.",
         use_when="A caller has a human term or external identity.", do_not_use_when="The stable object identity is already known.",
         effects=("read:ontology.object",), output_schema=RESOLUTION_RESULT_SCHEMA,
         input_schema={"type": "object", "required": ["term"], "properties": {"term": {"type": "string"}, "release_gid": {"type": "string"}}}), resolve_concept)
-    registry.register(CapabilitySpec(
+    register_read(CapabilitySpec(
         **common, id="ontology.concept.get", description="Read a summary or schema view pinned to an immutable release.",
         use_when="A stable ontology identity is known.", do_not_use_when="The caller only has an ambiguous term.",
         effects=("read:ontology.object",), output_schema=CONCEPT_RESULT_SCHEMA,
         input_schema={"type": "object", "required": ["stable_gid"], "properties": {"stable_gid": {"type": "string"}, "kind": object_ref["properties"]["kind"], "release_gid": {"type": "string"}, "view": {"type": "string", "enum": ["summary", "schema"]}}}), get_concept)
-    registry.register(CapabilitySpec(
+    register_read(CapabilitySpec(
         **common, id="ontology.object.list", description="Read a bounded page of immutable ontology objects.",
         use_when="A consumer needs a list or graph projection of ontology objects.",
         do_not_use_when="A stable object identity is already known or an unbounded export is requested.",

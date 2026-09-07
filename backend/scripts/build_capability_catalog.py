@@ -25,6 +25,8 @@ from backend.capability_v2.catalog import (
 )
 from backend.capability_v2.catalog_lineage import CatalogLineage
 from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
+from backend.capability_v2.business_definition import business_definition_hash
+from backend.capability_v2.release_gate import load_legacy_baseline
 
 
 DEFAULT_OUTPUT = REPOSITORY_ROOT / "docs" / "governance" / "capability-catalog-release.json"
@@ -46,6 +48,20 @@ def _load_release(path: Path) -> CatalogRelease:
 def _verified_consumer_refs(capability_id: str, major_version: int = 1) -> tuple[dict[str, str], ...]:
     """Return only consumers proven by migrated source files in this release."""
     consumers: list[dict[str, str]] = []
+    if major_version == 2 and capability_id in {
+        "ontology.concept.get", "ontology.concept.resolve", "ontology.object.list",
+    }:
+        paths = ["web/ext_datasource/ext_ds.js"]
+        if capability_id != "ontology.concept.resolve":
+            paths.append("web/ontology/ontology.js")
+        if capability_id == "ontology.object.list":
+            paths.append("web/rule_mgmt/rule_mgmt.js")
+        else:
+            paths.append("packages/craft-plugin/web/lineage_view/layout_detail_panel.js")
+            paths.append("plugins/craft/craft_backend/routers/ontology.py")
+        consumers.extend({
+            "consumer_id": path, "consumer_type": "web", "version_constraint": "==2",
+        } for path in paths)
     if capability_id.startswith("craft.ebom.") or capability_id.startswith("craft.pbom."):
         consumers.append({
             "consumer_id": "craft-plugin/ebom.js",
@@ -151,6 +167,17 @@ def _providers() -> tuple[ProviderArtifact, ...]:
     return tuple(ProviderArtifact.model_validate(item["artifact"]) for item in document["domains"])
 
 
+def legacy_collection_paths(descriptors, baseline: dict[str, str]) -> set[tuple[str, int, str]]:
+    """Retain restored v1 collections only for an exact immutable definition."""
+    return {
+        (item.id, item.major_version, path)
+        for item in descriptors
+        if item.major_version == 1
+        and baseline.get(f"{item.id}@1") == business_definition_hash(item)
+        for path in unbounded_collection_paths(item.output_schema)
+    }
+
+
 def current_release() -> CatalogRelease:
     registry = build_capability_registry(REPOSITORY_ROOT, PROVIDERS_PATH)
     registrations = {
@@ -170,13 +197,20 @@ def current_release() -> CatalogRelease:
         for key in sorted(registrations)
     ]
     grandfathered: set[tuple[str, int, str]] = set()
+    candidate_hashes = {(item.id, item.major_version): business_definition_hash(item) for item in descriptors}
     if DEFAULT_OUTPUT.is_file():
         previous_document = json.loads(DEFAULT_OUTPUT.read_text(encoding="utf-8"))
         for item in previous_document.get("descriptors", []):
             if item.get("lifecycle_status") != "stable":
                 continue
+            if candidate_hashes.get((item["id"], int(item["major_version"]))) != business_definition_hash(item):
+                continue
             for path in unbounded_collection_paths(item.get("output_schema") or {}):
                 grandfathered.add((item["id"], int(item["major_version"]), path))
+    baseline_path = REPOSITORY_ROOT / "docs/governance/capability-business-governance-legacy-baseline.json"
+    if baseline_path.is_file():
+        baseline = load_legacy_baseline(baseline_path, catalog_path=DEFAULT_OUTPUT)
+        grandfathered.update(legacy_collection_paths(descriptors, baseline.capabilities))
     return build_release(
         descriptors,
         _providers(),

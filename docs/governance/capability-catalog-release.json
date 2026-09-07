@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_6b7ac7cd21ed113da5a033e433f09a37",
-  "catalog_hash": "sha256:6b7ac7cd21ed113da5a033e433f09a376552d1fe41cfd302c48fb4e3645f5a0b",
+  "release_id": "rel_09e54550fcbaaab2df24bfa28d2c2478",
+  "catalog_hash": "sha256:09e54550fcbaaab2df24bfa28d2c2478d9d47f455a27563405bce365efb2e2fd",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -190450,6 +190450,422 @@
         "properties": {
           "concept": {
             "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "view": {
+            "type": "string",
+            "enum": [
+              "summary",
+              "schema"
+            ]
+          },
+          "release_gid": {
+            "type": "string"
+          },
+          "release_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "concept",
+          "view",
+          "release_gid",
+          "release_sha256",
+          "ontology_version_ref"
+        ],
+        "properties": {
+          "concept": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "view": {
+            "type": "string",
+            "enum": [
+              "summary",
+              "schema"
+            ]
+          },
+          "release_gid": {
+            "type": "string"
+          },
+          "release_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:44fde9f0556c1ddabb5643640eb92fea203222f656b47c2e6ac64fd94e93b4aa",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "Ontology release or object was not found.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "Activation requires an approved release.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "Ontology active release changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "Ontology provider is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_d82cf7fffde587178becfc4c",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "Ontology release or object was not found.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "Activation requires an approved release.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "Ontology active release changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "Ontology provider is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "ontology.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/ontology.concept.get:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[ontology.concept.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[ontology.concept.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[ontology.concept.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[ontology.concept.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[ontology.concept.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[ontology.concept.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[ontology.concept.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:5cfc784d580ec3982b2dc64ff2abcf781d778faac2bf9ad9b14a1778cadd6022"
+    },
+    {
+      "id": "ontology.concept.get",
+      "major_version": 2,
+      "owner_domain": "ontology",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "ontology.concept.get",
+      "description": "Read a summary or schema view pinned to an immutable release.",
+      "use_when": "A stable ontology identity is known.",
+      "do_not_use_when": "The caller only has an ambiguous term.",
+      "business_effect": "Consumers obtain the effective schema of one immutable ontology concept, including ancestor-owned properties and relations, or its typed summary.",
+      "business_acceptance_criteria": [
+        "Schema members are gathered only from the resolved release and ordered from ancestors to the requested concept.",
+        "The requested stable identity and kind select one object; a missing object fails instead of resolving another identity.",
+        "The closed result and its concept reference identify the same immutable release and content hash."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "ontology.concept.get.release_projection",
+          "version": 1,
+          "statement": "Schema members are gathered only from the resolved release and ordered from ancestors to the requested concept.",
+          "applies_when": "ontology.concept.get@2 returns a result",
+          "enforcement_ref": "plugins/ontology/ontology_backend/capabilities/ontology_concepts_next.py:get_concept",
+          "error_code": "resource_not_found",
+          "test_refs": [
+            "backend/tests/test_ontology_read_versions.py::test_v2_schema_inherits_members_from_the_same_immutable_release"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "read",
+      "side_effects": "Reads ontology domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "ontology.v2:authenticated",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "stable_gid"
+        ],
+        "properties": {
+          "stable_gid": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "concept",
+              "property",
+              "relation",
+              "mapping",
+              "constraint"
+            ]
+          },
+          "release_gid": {
+            "type": "string"
+          },
+          "view": {
+            "type": "string",
+            "enum": [
+              "summary",
+              "schema"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "concept",
+          "view",
+          "release_gid",
+          "release_sha256",
+          "ontology_version_ref"
+        ],
+        "properties": {
+          "concept": {
+            "type": "object",
             "properties": {
               "kind": {
                 "type": [
@@ -193271,7 +193687,444 @@
         }
       ],
       "domain_errors_complete": true,
-      "capability_version_gid": "cv2_d82cf7fffde587178becfc4c",
+      "capability_version_gid": "cv2_98ff6935af70a9593cd64c48",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "Ontology release or object was not found.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "Activation requires an approved release.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "Ontology active release changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "Ontology provider is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [
+        {
+          "consumer_id": "web/ext_datasource/ext_ds.js",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        },
+        {
+          "consumer_id": "web/ontology/ontology.js",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        },
+        {
+          "consumer_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        },
+        {
+          "consumer_id": "plugins/craft/craft_backend/routers/ontology.py",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        }
+      ],
+      "no_consumer_reason": null,
+      "provider_ref": "ontology.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/ontology.concept.get:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[ontology.concept.get@2]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[ontology.concept.get@2]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[ontology.concept.get@2]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[ontology.concept.get@2]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[ontology.concept.get@2]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[ontology.concept.get@2]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[ontology.concept.get@2]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:9254137939ddaa29e363680f9ed190c931536ef0836d520fc636a40bc2c7ef3b"
+    },
+    {
+      "id": "ontology.concept.resolve",
+      "major_version": 1,
+      "owner_domain": "ontology",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "ontology.concept.resolve",
+      "description": "Resolve a term without guessing across an immutable release.",
+      "use_when": "A caller has a human term or external identity.",
+      "do_not_use_when": "The stable object identity is already known.",
+      "business_effect": "Resolve a term without guessing across an immutable release.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "read",
+      "side_effects": "Reads ontology domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "ontology.v2:authenticated",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "term"
+        ],
+        "properties": {
+          "term": {
+            "type": "string"
+          },
+          "release_gid": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "status",
+          "matched_by",
+          "concept",
+          "candidates",
+          "release_gid",
+          "release_sha256",
+          "ontology_version_ref"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "resolved",
+              "ambiguous",
+              "candidates",
+              "unresolved"
+            ]
+          },
+          "matched_by": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "concept": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "release_gid": {
+            "type": "string"
+          },
+          "release_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "status",
+          "matched_by",
+          "concept",
+          "candidates",
+          "release_gid",
+          "release_sha256",
+          "ontology_version_ref"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "resolved",
+              "ambiguous",
+              "candidates",
+              "unresolved"
+            ]
+          },
+          "matched_by": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "concept": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "release_gid": {
+            "type": "string"
+          },
+          "release_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:41712052fa26952463d3945803445e788bbdd13942c1eb47d7ec77f23964ff22",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "Ontology release or object was not found.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "Activation requires an approved release.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "Ontology active release changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "Ontology provider is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_9b89bdaaa6003fca29045f32",
       "error_schema": [
         {
           "error_code": "resource_not_found",
@@ -193306,57 +194159,57 @@
       "no_consumer_reason": "No verified consumer is registered for this provider capability.",
       "provider_ref": "ontology.provider",
       "api_refs": [
-        "gateway:/api/v1/capabilities/ontology.concept.get:invoke"
+        "gateway:/api/v1/capabilities/ontology.concept.resolve:invoke"
       ],
       "test_refs": [
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[ontology.concept.get@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[ontology.concept.resolve@1]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[ontology.concept.get@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[ontology.concept.resolve@1]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[ontology.concept.get@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[ontology.concept.resolve@1]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[ontology.concept.get@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[ontology.concept.resolve@1]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[ontology.concept.get@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[ontology.concept.resolve@1]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[ontology.concept.get@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[ontology.concept.resolve@1]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[ontology.concept.get@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[ontology.concept.resolve@1]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:0ba3bf6812b1af5ac90735a1d899331ce75bb262755b74569f4c6e1bad41226d"
+      "business_definition_hash": "sha256:a432321bfbbf05e0af862c9009858887842d07e4492194d2bab50c83a1053cc2"
     },
     {
       "id": "ontology.concept.resolve",
-      "major_version": 1,
+      "major_version": 2,
       "owner_domain": "ontology",
       "lifecycle_status": "stable",
       "catalog_release": null,
@@ -193364,9 +194217,26 @@
       "description": "Resolve a term without guessing across an immutable release.",
       "use_when": "A caller has a human term or external identity.",
       "do_not_use_when": "The stable object identity is already known.",
-      "business_effect": "Resolve a term without guessing across an immutable release.",
-      "business_acceptance_criteria": [],
-      "business_invariants": [],
+      "business_effect": "Consumers receive a typed ontology identity resolution that preserves ambiguity and offers at most twenty candidates from one immutable release.",
+      "business_acceptance_criteria": [
+        "Unique exact matches resolve deterministically; multiple matches remain ambiguous and never select an arbitrary concept.",
+        "The result includes no more than twenty typed candidate summaries while retaining the ambiguous or candidate status.",
+        "Resolved concepts and candidates retain the selected release and content hash."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "ontology.concept.resolve.release_projection",
+          "version": 1,
+          "statement": "Unique exact matches resolve deterministically; multiple matches remain ambiguous and never select an arbitrary concept.",
+          "applies_when": "ontology.concept.resolve@2 returns a result",
+          "enforcement_ref": "plugins/ontology/ontology_backend/capabilities/ontology_concepts_next.py:resolve_concept_v2",
+          "error_code": "resource_not_found",
+          "test_refs": [
+            "backend/tests/test_ontology_read_versions.py::test_v2_resolution_keeps_ambiguity_and_bounds_candidates"
+          ],
+          "machine_constraints": null
+        }
+      ],
       "no_business_invariant_reason": null,
       "side_effect_level": "read",
       "side_effects": "Reads ontology domain state; emits no mutation event or external call.",
@@ -194297,7 +195167,7 @@
         }
       ],
       "domain_errors_complete": true,
-      "capability_version_gid": "cv2_9b89bdaaa6003fca29045f32",
+      "capability_version_gid": "cv2_96dda853e8e68af59655b028",
       "error_schema": [
         {
           "error_code": "resource_not_found",
@@ -194328,8 +195198,24 @@
         "mode": "provider",
         "boundary": "owning_domain"
       },
-      "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "consumer_refs": [
+        {
+          "consumer_id": "web/ext_datasource/ext_ds.js",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        },
+        {
+          "consumer_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        },
+        {
+          "consumer_id": "plugins/craft/craft_backend/routers/ontology.py",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        }
+      ],
+      "no_consumer_reason": null,
       "provider_ref": "ontology.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/ontology.concept.resolve:invoke"
@@ -194337,48 +195223,48 @@
       "test_refs": [
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[ontology.concept.resolve@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[ontology.concept.resolve@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[ontology.concept.resolve@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[ontology.concept.resolve@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[ontology.concept.resolve@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[ontology.concept.resolve@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[ontology.concept.resolve@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[ontology.concept.resolve@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[ontology.concept.resolve@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[ontology.concept.resolve@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[ontology.concept.resolve@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[ontology.concept.resolve@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[ontology.concept.resolve@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[ontology.concept.resolve@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:4c1e9dcd5f1636da6e23f59f944efd0606cd5cbe771bb7813ab020e0f1656ec9"
+      "business_definition_hash": "sha256:e697cdca67c794335c691133438ea947d2c6fb5e254b521791dad70f5bf4a401"
     },
     {
       "id": "ontology.mapping.assess",
@@ -194892,6 +195778,448 @@
       "business_effect": "Read a bounded page of immutable ontology objects.",
       "business_acceptance_criteria": [],
       "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "read",
+      "side_effects": "Reads ontology domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "ontology.v2:authenticated",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "release_gid": {
+            "type": "string"
+          },
+          "kinds": {
+            "type": "array",
+            "maxItems": 5,
+            "items": {
+              "type": "string",
+              "enum": [
+                "concept",
+                "property",
+                "relation",
+                "mapping",
+                "constraint"
+              ]
+            }
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 100
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "offset",
+          "limit",
+          "release_gid",
+          "release_sha256",
+          "ontology_version_ref"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "release_gid": {
+            "type": "string"
+          },
+          "release_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "offset",
+          "limit",
+          "release_gid",
+          "release_sha256",
+          "ontology_version_ref"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "release_gid": {
+            "type": "string"
+          },
+          "release_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:f13ed600d7bf25dd21f6ec172324619f62b27075fe19610e744cbdf94954d87b",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "medium",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 2097152,
+        "collection_policy": "paged",
+        "max_page_size": 100,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "Ontology release or object was not found.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "Activation requires an approved release.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "Ontology active release changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "Ontology provider is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_843a7d9437fdc3a4f84aa56c",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "Ontology release or object was not found.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "Activation requires an approved release.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "Ontology active release changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "Ontology provider is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "ontology.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/ontology.object.list:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[ontology.object.list@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[ontology.object.list@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[ontology.object.list@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[ontology.object.list@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[ontology.object.list@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[ontology.object.list@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[ontology.object.list@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:1b65d66533682ec2fac3c7ecc81e80f51e9df4d61de04ffc0ebb850751bd58b2"
+    },
+    {
+      "id": "ontology.object.list",
+      "major_version": 2,
+      "owner_domain": "ontology",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "ontology.object.list",
+      "description": "Read a bounded page of immutable ontology objects.",
+      "use_when": "A consumer needs a list or graph projection of ontology objects.",
+      "do_not_use_when": "A stable object identity is already known or an unbounded export is requested.",
+      "business_effect": "Consumers browse a typed page of immutable ontology objects with their exact release references, total count and deterministic page position.",
+      "business_acceptance_criteria": [
+        "Only requested supported object kinds from one resolved release are returned.",
+        "Pages contain at most the requested limit, which cannot exceed one hundred, and retain total and offset.",
+        "Every returned object's concept reference matches the release and content hash of the page."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "ontology.object.list.release_projection",
+          "version": 1,
+          "statement": "Only requested supported object kinds from one resolved release are returned.",
+          "applies_when": "ontology.object.list@2 returns a result",
+          "enforcement_ref": "plugins/ontology/ontology_backend/capabilities/ontology_concepts_next.py:list_objects",
+          "error_code": "resource_not_found",
+          "test_refs": [
+            "backend/tests/test_ontology_read_versions.py::test_v2_list_is_paged_and_release_pinned"
+          ],
+          "machine_constraints": null
+        }
+      ],
       "no_business_invariant_reason": null,
       "side_effect_level": "read",
       "side_effects": "Reads ontology domain state; emits no mutation event or external call.",
@@ -196037,7 +197365,7 @@
         }
       ],
       "domain_errors_complete": true,
-      "capability_version_gid": "cv2_843a7d9437fdc3a4f84aa56c",
+      "capability_version_gid": "cv2_e2937537da8815b209f3fc83",
       "error_schema": [
         {
           "error_code": "resource_not_found",
@@ -196068,8 +197396,24 @@
         "mode": "provider",
         "boundary": "owning_domain"
       },
-      "consumer_refs": [],
-      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "consumer_refs": [
+        {
+          "consumer_id": "web/ext_datasource/ext_ds.js",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        },
+        {
+          "consumer_id": "web/ontology/ontology.js",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        },
+        {
+          "consumer_id": "web/rule_mgmt/rule_mgmt.js",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        }
+      ],
+      "no_consumer_reason": null,
       "provider_ref": "ontology.provider",
       "api_refs": [
         "gateway:/api/v1/capabilities/ontology.object.list:invoke"
@@ -196077,48 +197421,48 @@
       "test_refs": [
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[ontology.object.list@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[ontology.object.list@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[ontology.object.list@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[ontology.object.list@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[ontology.object.list@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[ontology.object.list@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[ontology.object.list@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[ontology.object.list@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[ontology.object.list@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[ontology.object.list@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[ontology.object.list@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[ontology.object.list@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         },
         {
           "test_type": "contract",
-          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[ontology.object.list@1]",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[ontology.object.list@2]",
           "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:facc4cffc5cba9f12ebc88b3877fd2512ac166a8d5da809dfb9ce0f98fde4fb8"
+      "business_definition_hash": "sha256:1a279a66fd24c2661b0b257ddc5689dd56f7496d965bb92383c5f86d1727c540"
     },
     {
       "id": "ontology.release.activate",
@@ -325353,7 +326697,7 @@
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:3a19eea5a551b8030f3391dbb666432b44ffba57e23d16dfdf295be2b7816aa9"
+      "artifact_hash": "sha256:bb76c355c008ee1a147c639cc10a9149d027aa726785f2e160e0052bc56eec16"
     },
     {
       "plugin_id": "official.device",
@@ -325389,7 +326733,7 @@
       "plugin_id": "official.ontology",
       "module": "ontology_backend.capabilities",
       "version": "2.0.0",
-      "artifact_hash": "sha256:4edff76a02cb2aabc13a581556bcab0b0c22de4099b2d0c01431084960fd331f"
+      "artifact_hash": "sha256:4dc45382728e8e947987a75c3af28b50ca6ee2e3f9636e2ffb270242a3589026"
     },
     {
       "plugin_id": "official.project-management",
@@ -325404,5 +326748,5 @@
       "artifact_hash": "sha256:d261c9e3c9988832f13ae70222570b45f2a8bc0fe78f2135a6bcf4a92cba1ee9"
     }
   ],
-  "created_at": "2026-09-07T06:05:39.333573Z"
+  "created_at": "2026-09-07T09:32:56.605560Z"
 }

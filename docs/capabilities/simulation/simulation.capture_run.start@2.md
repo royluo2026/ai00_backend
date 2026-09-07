@@ -8,7 +8,7 @@ Prepare reverse-order internal VisMockup captures for separately confirmed dispa
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
-- Catalog Release：`rel_6b7ac7cd21ed113da5a033e433f09a37`
+- Catalog Release：`rel_09e54550fcbaaab2df24bfa28d2c2478`
 - Schema 精度：`typed`
 - 暂未开放原因：`experimental_lifecycle`
 
@@ -96,7 +96,7 @@ Prepare reverse-order internal VisMockup captures for separately confirmed dispa
 ```json
 {
   "capability_id": "simulation.capture_run.start",
-  "catalog_release": "rel_6b7ac7cd21ed113da5a033e433f09a37",
+  "catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
   "major_version": 2,
   "payload": {
     "device_id": "example",

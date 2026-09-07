@@ -8,7 +8,7 @@ Apply bounded Craft rule-library CRUD changes.
 - 不适用：The request evaluates a rule or changes a published rule release.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_6b7ac7cd21ed113da5a033e433f09a37`
+- Catalog Release：`rel_09e54550fcbaaab2df24bfa28d2c2478`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -101,7 +101,7 @@ Apply bounded Craft rule-library CRUD changes.
 ```json
 {
   "capability_id": "craft.rule.library.change.apply",
-  "catalog_release": "rel_6b7ac7cd21ed113da5a033e433f09a37",
+  "catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
   "major_version": 1,
   "payload": {
     "operation": "create"

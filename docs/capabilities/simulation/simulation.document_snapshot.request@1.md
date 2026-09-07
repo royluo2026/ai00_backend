@@ -8,7 +8,7 @@ Request and queue an immutable snapshot of the bound user's active VisMockup BOM
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`deprecated`
 - 所属领域：`simulation`
-- Catalog Release：`rel_6b7ac7cd21ed113da5a033e433f09a37`
+- Catalog Release：`rel_09e54550fcbaaab2df24bfa28d2c2478`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -90,7 +90,7 @@ Request and queue an immutable snapshot of the bound user's active VisMockup BOM
 ```json
 {
   "capability_id": "simulation.document_snapshot.request",
-  "catalog_release": "rel_6b7ac7cd21ed113da5a033e433f09a37",
+  "catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
   "major_version": 1,
   "payload": {
     "device_id": "example",

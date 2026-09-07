@@ -8,7 +8,7 @@ Transition one PBOM snapshot status.
 - 不适用：The request changes metadata or VPPS statistics.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_6b7ac7cd21ed113da5a033e433f09a37`
+- Catalog Release：`rel_09e54550fcbaaab2df24bfa28d2c2478`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -92,7 +92,7 @@ Transition one PBOM snapshot status.
 ```json
 {
   "capability_id": "craft.ebom.snapshot.status.update",
-  "catalog_release": "rel_6b7ac7cd21ed113da5a033e433f09a37",
+  "catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
   "major_version": 1,
   "payload": {
     "snapshot_gid": "example",
