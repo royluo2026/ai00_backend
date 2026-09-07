@@ -30,10 +30,8 @@ from backend.db.connection import get_conn
 from backend.config import get_settings
 from backend.routers.deps import require_role, get_current_user_claims_only
 from backend.base.runtime_database_config import resolve_password as _resolve_cloud_db_password
-from backend.capability_v2.contracts import (
-    ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType,
-    InvocationEnvelope, TenantIdentity,
-)
+from backend.capability_v2.identity import authenticated_user_identity
+from backend.capability_v2.contracts import InvocationEnvelope
 from backend.capability_v2.gateway import get_default_gateway
 from backend.capability_v2.web_compatibility import invoke_trusted_web_compatibility
 from backend.platform_sdk.auth import get_authenticated_principal
@@ -137,15 +135,8 @@ async def _invoke_runtime_database_capability(
         major_version=1,
         catalog_release=gateway.catalog_release,
         payload=payload,
-        identity=ConsumerIdentity(
-            actor=ActorIdentity(**principal.model_dump()),
-            tenant=TenantIdentity(
-                tenant_id=str(current_user.get("team_id") or f"user:{current_user['gid']}"),
-                membership="member",
-                active_roles=tuple(filter(None, (current_user.get("org_role"), current_user.get("system_role")))),
-            ),
-            consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web.base.runtime-database.compatibility"),
-        ),
+        identity=authenticated_user_identity(current_user, principal,
+            legacy_consumer_id="ai00.web.base.runtime-database.compatibility"),
         idempotency_key=(request.headers.get("X-Idempotency-Key") or request_id) if write else None,
         approval_reference=request.headers.get("X-Capability-Approval") if write else None,
         request_id=request_id,

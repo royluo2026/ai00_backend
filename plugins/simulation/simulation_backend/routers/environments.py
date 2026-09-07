@@ -7,7 +7,8 @@ import uuid
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, ConfigDict, Field
 
-from backend.capability_v2.contracts import ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType, IDENTITY_PATTERN, InvocationEnvelope, TenantIdentity
+from backend.capability_v2.identity import authenticated_user_identity
+from backend.capability_v2.contracts import ConsumerIdentity, IDENTITY_PATTERN, InvocationEnvelope
 from backend.capability_v2.gateway import get_default_gateway
 from backend.capability_v2.web_compatibility import invoke_trusted_web_compatibility
 from backend.domain_ports.digital_model import ModelSnapshotRef
@@ -29,14 +30,7 @@ class CreateEnvironmentBody(BaseModel):
 
 
 def _identity(user: dict, principal) -> ConsumerIdentity:
-    return ConsumerIdentity(
-        actor=ActorIdentity(**principal.model_dump()),
-        tenant=TenantIdentity(
-            tenant_id=str(user.get("team_id") or "default"), membership="member",
-            active_roles=tuple(filter(None, (user.get("org_role"), user.get("system_role")))),
-        ),
-        consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web"),
-    )
+    return authenticated_user_identity(user, principal, legacy_tenant_fallback="default")
 
 
 def _correlation(value: str | None, fallback: str) -> str:

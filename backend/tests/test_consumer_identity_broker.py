@@ -80,7 +80,9 @@ def test_fastapi_principal_dependency_has_no_client_source_or_permission_inputs(
 
     assert principal.user_id == "user_1"
     assert principal.authenticated_at == NOW
-    assert set(inspect.signature(deps.get_authenticated_principal).parameters) == {"x_ai00_token"}
+    parameters = inspect.signature(deps.get_authenticated_principal).parameters
+    assert set(parameters) == {"x_ai00_token", "_identity_guard"}
+    assert parameters["_identity_guard"].default.dependency is deps.reject_consumer_identity_overrides
 
 
 def test_inactive_tenant_membership_fails_closed():

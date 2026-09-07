@@ -84,7 +84,7 @@ def test_verified_claim_becomes_trusted_identity(client, monkeypatch):
                 capability_id=envelope.capability_id, major_version=1, data={}, correlation={"request_id": envelope.request_id})
     monkeypatch.setattr(capabilities, "get_default_gateway", Gateway)
     response = client.post("/api/v1/capabilities/simulation.connector.binding.get:invoke",
-        json={"version": 1, "payload": {}}, headers={"X-AI00-Token": signed_claim(), "X-Consumer-ID": "forged"})
+        json={"version": 1, "payload": {}}, headers={"X-AI00-Token": signed_claim()})
     assert response.status_code == 200
     identity = captured[0].identity
     assert identity.consumer.consumer_id == DESKTOP
@@ -154,11 +154,30 @@ def test_desktop_impact_closure_is_generated_and_truthful():
     assert document["artifacts"]
 
 
-def test_impact_source_hashes_survive_git_line_ending_conversion():
-    document = json.loads((ROOT / "docs/governance/desktop-app-impact-closure.json").read_text(encoding="utf-8"))
-    for artifact in document["artifacts"]:
-        content = (ROOT / artifact["path"]).read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+def assert_fixed_git_artifacts(document):
+    tree = {}
+    for row in subprocess.check_output(["git", "ls-tree", "-r", "-z", document["source_commit"]], cwd=ROOT).split(b"\0"):
+        if row:
+            info, path = row.split(b"\t", 1)
+            tree[path.decode()] = info.decode().split()[2]
+    rows = document["artifacts"]
+    objects = subprocess.check_output(["git", "cat-file", "--batch"], cwd=ROOT,
+        input="".join(row["git_blob_oid"] + "\n" for row in rows).encode())
+    offset = 0
+    for artifact in rows:
+        end = objects.index(b"\n", offset)
+        oid, kind, size = objects[offset:end].decode().split()
+        size = int(size)
+        content = objects[end + 1:end + 1 + size]
+        offset = end + size + 2
+        assert kind == "blob"
+        assert oid == tree[artifact["path"]] == artifact["git_blob_oid"]
         assert artifact["sha256"] == "sha256:" + hashlib.sha256(content).hexdigest(), artifact["path"]
+
+
+def test_impact_source_hashes_match_pinned_git_blobs():
+    document = json.loads((ROOT / "docs/governance/desktop-app-impact-closure.json").read_text(encoding="utf-8"))
+    assert_fixed_git_artifacts(document)
 
 
 def test_impact_closure_contains_repository_sources_not_local_build_outputs():

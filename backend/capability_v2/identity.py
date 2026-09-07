@@ -66,6 +66,28 @@ def authenticated_user_consumer(principal: AuthenticatedPrincipal, tenant_id: st
         installation_id=claim.installation_id, consumer_version=claim.consumer_version)
 
 
+def authenticated_user_identity(user: dict, principal: AuthenticatedPrincipal, *,
+                                legacy_consumer_id: str = "ai00.web",
+                                legacy_tenant_fallback: str | None = None) -> ConsumerIdentity:
+    """Shared interactive identity; delegated consumers use their verified grants.
+
+    Legacy adapter IDs and tenant fallbacks are server constants. A desktop
+    claim always binds to the authenticated user's tenant, including solo users.
+    """
+    tenant_id = str(user.get("team_id") or (
+        f"user:{user['gid']}" if principal.desktop_consumer is not None
+        else legacy_tenant_fallback or f"user:{user['gid']}"))
+    consumer = authenticated_user_consumer(principal, tenant_id)
+    if principal.desktop_consumer is None:
+        consumer = consumer.model_copy(update={"consumer_id": legacy_consumer_id})
+    return ConsumerIdentity(
+        actor=ActorIdentity(**principal.model_dump()),
+        tenant=TenantIdentity(tenant_id=tenant_id, membership="member",
+            active_roles=tuple(filter(None, (user.get("org_role"), user.get("system_role"))))),
+        consumer=consumer,
+    )
+
+
 class TenantMembership(FrozenModel):
     tenant_id: str = Field(pattern=IDENTITY_PATTERN)
     membership: str = Field(min_length=1, max_length=64)

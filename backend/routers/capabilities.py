@@ -6,20 +6,13 @@ from typing import Any
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, Field, ConfigDict, model_validator
-from backend.capability_v2.identity import authenticated_user_consumer, CONSUMER_IDENTITY_FIELDS
+from backend.capability_v2.identity import CONSUMER_IDENTITY_FIELDS
 
 from backend.capabilities.init_next import CapabilityBusinessError, CapabilityError, capability_registry
 from backend.routers.deps import build_profile, get_current_user
 from backend.routers.deps import get_authenticated_principal
-from backend.capability_v2.contracts import (
-    ActorIdentity,
-    ConsumerDescriptor,
-    ConsumerIdentity,
-    ConsumerType,
-    IDENTITY_PATTERN,
-    InvocationEnvelope,
-    TenantIdentity,
-)
+from backend.capability_v2.identity import authenticated_user_identity
+from backend.capability_v2.contracts import ConsumerIdentity, IDENTITY_PATTERN, InvocationEnvelope
 from backend.capability_v2.gateway import get_default_gateway
 from backend.capability_v2.policies import GatewayPolicyError
 
@@ -47,17 +40,7 @@ def _correlation_id(candidate: str | None, fallback: str) -> str:
 
 
 def _web_identity(current_user: dict, principal) -> ConsumerIdentity:
-    return ConsumerIdentity(
-        actor=ActorIdentity(**principal.model_dump()),
-        tenant=TenantIdentity(
-            tenant_id=str(current_user.get("team_id") or f"user:{current_user['gid']}"),
-            membership="member",
-            active_roles=tuple(filter(None, (
-                current_user.get("org_role"), current_user.get("system_role"),
-            ))),
-        ),
-        consumer=authenticated_user_consumer(principal, str(current_user.get("team_id") or f"user:{current_user['gid']}")),
-    )
+    return authenticated_user_identity(current_user, principal)
 
 
 _BUSINESS_ERROR_STATUS = {

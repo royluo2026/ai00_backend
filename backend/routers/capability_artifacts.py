@@ -14,9 +14,8 @@ from backend.capability_v2.artifacts import (
     SqlArtifactStore,
     configured_object_storage,
 )
-from backend.capability_v2.contracts import (
-    ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType, TenantIdentity,
-)
+from backend.capability_v2.identity import authenticated_user_identity
+from backend.capability_v2.contracts import ConsumerIdentity
 from backend.db.connection import get_conn
 from backend.routers.deps import (
     build_capability_authorization_grants, get_authenticated_principal, get_current_user,
@@ -38,14 +37,7 @@ class FinalizeUploadRequest(BaseModel):
 
 
 def _identity(user: dict, principal) -> ConsumerIdentity:
-    return ConsumerIdentity(
-        actor=ActorIdentity(**principal.model_dump()),
-        tenant=TenantIdentity(
-            tenant_id=str(user.get("team_id") or "default"), membership="member",
-            active_roles=tuple(filter(None, (user.get("org_role"), user.get("system_role")))),
-        ),
-        consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web"),
-    )
+    return authenticated_user_identity(user, principal, legacy_tenant_fallback="default")
 
 
 def _service() -> ArtifactService:

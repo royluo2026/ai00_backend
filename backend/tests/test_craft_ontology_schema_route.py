@@ -50,7 +50,8 @@ def test_compatibility_gateway_pins_only_changed_reads_to_v2(monkeypatch, capabi
 
     monkeypatch.setattr(ontology, "get_default_gateway", lambda: SimpleNamespace(catalog_release="release-test"))
     monkeypatch.setattr(ontology, "invoke_trusted_web_compatibility", invoke)
-    principal = SimpleNamespace(model_dump=lambda: {
+    from backend.capability_v2.identity import AuthenticatedPrincipal
+    principal = AuthenticatedPrincipal.model_validate({
         "user_id": "user-1", "authentication_method": "test",
         "authenticated_at": "2026-09-07T00:00:00Z",
     })

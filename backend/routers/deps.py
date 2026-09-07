@@ -9,7 +9,7 @@ from datetime import UTC, datetime
 from typing import Optional
 import jwt as pyjwt
 
-from fastapi import Header, HTTPException, status
+from fastapi import Depends, Header, HTTPException, Request, status
 
 from backend.services import jwt_service, user_service
 from backend.capability_v2.identity import AuthenticatedPrincipal
@@ -141,8 +141,35 @@ def get_current_user(x_ai00_token: str = Header(alias="X-AI00-Token")) -> dict:
     return user
 
 
+async def reject_consumer_identity_overrides(request: Request) -> None:
+    """Reject identity envelopes before adapters discard unknown JSON fields.
+
+    Artifact content streams are business bytes, not authentication envelopes.
+    Grant-bound fields such as installation_id/run_id remain validated by their
+    own closed contracts and trusted mount/delegation resolvers.
+    """
+    from backend.capability_v2.identity import CONSUMER_IDENTITY_FIELDS
+    names = CONSUMER_IDENTITY_FIELDS | {"installation_id", "consumer_version", "app_version"}
+    headers = {f"x-{prefix}{name.replace('_', '-')}" for prefix in ("", "ai00-") for name in names}
+    override = bool(headers.intersection(request.headers))
+    media_type = request.headers.get("content-type", "").split(";", 1)[0].strip().lower()
+    if ((not media_type or media_type == "application/json" or media_type.endswith("+json"))
+            and getattr(request.scope.get("route"), "body_field", None) is not None):
+        try:
+            body = await request.json()
+        except (ValueError, UnicodeDecodeError):
+            body = None
+        if isinstance(body, dict):
+            override |= bool(CONSUMER_IDENTITY_FIELDS.intersection(body))
+            if isinstance(body.get("payload"), dict):
+                override |= bool(CONSUMER_IDENTITY_FIELDS.intersection(body["payload"]))
+    if override:
+        raise HTTPException(status_code=400, detail={"code": "consumer_identity_override_forbidden"})
+
+
 def get_authenticated_principal(
     x_ai00_token: str = Header(alias="X-AI00-Token"),
+    _identity_guard=Depends(reject_consumer_identity_overrides),
 ) -> AuthenticatedPrincipal:
     """Build a trusted Web principal without accepting client source or permission headers."""
     try:

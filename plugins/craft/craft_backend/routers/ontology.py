@@ -12,14 +12,8 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, ConfigDict
 
-from backend.capability_v2.contracts import (
-    ActorIdentity,
-    ConsumerDescriptor,
-    ConsumerIdentity,
-    ConsumerType,
-    InvocationEnvelope,
-    TenantIdentity,
-)
+from backend.capability_v2.identity import authenticated_user_identity
+from backend.capability_v2.contracts import ConsumerIdentity, InvocationEnvelope
 from backend.capability_v2.gateway import get_default_gateway
 from backend.capability_v2.web_compatibility import invoke_trusted_web_compatibility
 from backend.platform_sdk.auth import get_authenticated_principal, get_current_user
@@ -36,15 +30,7 @@ ClassBody = PropBody = RelBody = AxiomBody = _LooseBody
 
 
 def _identity(user: dict, principal: Any) -> ConsumerIdentity:
-    return ConsumerIdentity(
-        actor=ActorIdentity(**principal.model_dump()),
-        tenant=TenantIdentity(
-            tenant_id=str(user.get("team_id") or "default"),
-            membership="member",
-            active_roles=tuple(filter(None, (user.get("org_role"), user.get("system_role")))),
-        ),
-        consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web.ontology-compat"),
-    )
+    return authenticated_user_identity(user, principal, legacy_consumer_id='ai00.web.ontology-compat', legacy_tenant_fallback='default')
 
 
 async def _invoke(

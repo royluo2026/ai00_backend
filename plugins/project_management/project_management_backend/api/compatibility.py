@@ -3,14 +3,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from backend.capability_v2.contracts import (
-    ActorIdentity,
-    ConsumerDescriptor,
-    ConsumerIdentity,
-    ConsumerType,
-    InvocationEnvelope,
-    TenantIdentity,
-)
+from backend.capability_v2.identity import authenticated_user_identity
+from backend.capability_v2.contracts import InvocationEnvelope
 from backend.capability_v2.web_compatibility import invoke_trusted_web_compatibility
 from ..application.service import SUPPORTED_OPERATIONS
 
@@ -45,26 +39,7 @@ def build_web_compatibility_envelope(
         major_version=1,
         catalog_release=gateway.catalog_release,
         payload=payload,
-        identity=ConsumerIdentity(
-            actor=ActorIdentity(**principal.model_dump()),
-            tenant=TenantIdentity(
-                tenant_id=str(current_user.get("team_id") or "default"),
-                membership="member",
-                active_roles=tuple(
-                    filter(
-                        None,
-                        (
-                            current_user.get("org_role"),
-                            current_user.get("system_role"),
-                        ),
-                    )
-                ),
-            ),
-            consumer=ConsumerDescriptor(
-                type=ConsumerType.WEB,
-                consumer_id="ai00.web.compatibility",
-            ),
-        ),
+        identity=authenticated_user_identity(current_user, principal, legacy_consumer_id='ai00.web.compatibility', legacy_tenant_fallback='default'),
         idempotency_key=idempotency_key,
         approval_reference=approval_reference,
         request_id=request_id,
