@@ -41,6 +41,24 @@ def test_v2_library_does_not_accept_fields_from_another_collection(registry):
     assert list(validator.iter_errors({'operation':'tools.create','record':{'name':'Tool','category':'wrong collection'}}))
     assert list(validator.iter_errors({'operation':'tools.update','record':{'name':'Tool'}}))
 
+def test_v2_pbom_batch_acceptance_matches_schema_and_real_handler(registry, monkeypatch):
+    from types import SimpleNamespace
+    from backend.tests.support.desktop_handler_fixtures import Connection
+    from plugins.craft.craft_backend.capabilities import library_change
+    entry = registry.get('craft.library.change.apply', 2)
+    criteria = ' '.join(entry.descriptor.business_acceptance_criteria)
+    assert 'part_names.batch_add_from_pbom' in criteria
+    assert '500' in criteria and '10000' not in criteria
+    payload = {'operation': 'part_names.batch_add_from_pbom', 'items': [{'vpps': ''}] * 500}
+    validator = Draft202012Validator(entry.descriptor.input_schema)
+    validator.validate(payload)
+    assert not validator.is_valid({**payload, 'items': payload['items'] + [{'vpps': ''}]})
+    connection = Connection()
+    monkeypatch.setattr(library_change, 'get_conn', lambda: connection)
+    outcome = entry.handler(payload, SimpleNamespace(user_gid='fixture-user', team_gid='fixture-team'))
+    assert outcome.data == {'operation': payload['operation'], 'success': True, 'added': 0, 'skipped': 500}
+    assert connection.commits == 1
+
 @pytest.mark.parametrize('kind,model_name',[('task','TaskBody'),('issue','IssueBody')])
 def test_v2_create_fields_exactly_match_authoritative_request_model(registry,kind,model_name):
     from plugins.craft.craft_backend.routers import promotion

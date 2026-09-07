@@ -523,6 +523,13 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             "business_invariants": _LIBRARY_CHANGE_BUSINESS_RULES,
             "no_business_invariant_reason": None,
         })
+        if spec.version == 2:
+            updates["business_acceptance_criteria"] = (
+                "part_names.batch_add_from_pbom accepts at most 500 records; larger batches are rejected by the input schema before execution.",
+                "Blank or existing VPPS identifiers are skipped without overwriting manufacturing-resource master data.",
+                "The added and skipped counts reconcile every accepted input record in the complete batch.",
+                "The batch commits once after all accepted records are processed; a database failure does not report successful completion.",
+            )
     elif spec.id == _STANDARD_OPERATION_CHANGE_ID:
         updates.update({
             "business_effect": (

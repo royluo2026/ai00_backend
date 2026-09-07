@@ -36,10 +36,10 @@
       "do_not_use_when": "The change belongs to BOP, PBOM, GBOP or another domain capability.",
       "business_effect": "Create or change manufacturing-resource library records, including one governed VPPS part-name batch import.",
       "business_acceptance_criteria": [
-        "A VPPS part-name import accepts at most 10000 records and requires a non-empty VPPS identifier for creation.",
-        "Existing, duplicate and blank VPPS identifiers are skipped and counted without overwriting governed master data.",
-        "Created and skipped counts reconcile the complete input batch.",
-        "A database failure rolls back the complete batch rather than leaving a partial import."
+        "part_names.batch_add_from_pbom accepts at most 500 records; larger batches are rejected by the input schema before execution.",
+        "Blank or existing VPPS identifiers are skipped without overwriting manufacturing-resource master data.",
+        "The added and skipped counts reconcile every accepted input record in the complete batch.",
+        "The batch commits once after all accepted records are processed; a database failure does not report successful completion."
       ],
       "business_invariants": [
         {
@@ -5321,5 +5321,11 @@
       ],
       "reason": "Untyped dict/list item models have no authoritative named fields; nonempty records remain rejected."
     }
-  ]
+  ],
+  "business_definition_hashes": {
+    "craft.library.change.apply@2": "sha256:5f7123f5b8b2b18193cf0da52a8f251537192aae8a2adca014c1869ae0e1ca90",
+    "craft.rule.library.change.apply@2": "sha256:ccf09f72378d57319779a0aee11fdcf58b3657534fbb9384437c676da1ce3d1d",
+    "project.task.change.apply.atomic.tasks_create@2": "sha256:3b4de346107a53b4cc502614788b273643e646c6c4963434fb395d7a66a42d5c",
+    "project.issue.change.apply.atomic.issues_create@2": "sha256:3790ca58eec6225237aad3bff9d85e9a158ec27aab63ed2aaff7227e5bb99ca1"
+  }
 }
