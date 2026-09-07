@@ -1,0 +1,901 @@
+{
+  "fixture_kind": "Real registered handlers and actual owner services, deterministic repository/SQL ports; no live database or runtime approval",
+  "rows": [
+    {
+      "id": "craft.vpps_audit.change.apply",
+      "version": 1,
+      "payload": {
+        "operation": "rule4_bulk_ignore",
+        "pbom_version_gid": "version-one",
+        "rows": [
+          {
+            "pbom_row_gid": "row-one",
+            "original_vpps_desc": "Fixture"
+          }
+        ],
+        "actor_gid": "fixture-user",
+        "actor_name": "Fixture user"
+      },
+      "provider_data": {
+        "success": true,
+        "created": 1,
+        "operations": [
+          {
+            "gid": "operation-one",
+            "pbom_version_gid": "version-one",
+            "pbom_row_gid": "row-one",
+            "operation_type": "rule4_bulk_ignore",
+            "rule_no": 4,
+            "field_name": "vpps_desc",
+            "original_value": "Fixture",
+            "new_value": null,
+            "actor_gid": "fixture-user",
+            "actor_name": "Fixture user",
+            "created_at": "2026-09-08T00:00:00+00:00",
+            "notes": null,
+            "is_active": true,
+            "reverted_at": null,
+            "reverted_by_gid": null,
+            "reverted_by_name": null
+          }
+        ]
+      },
+      "method": "POST",
+      "route": "/api/vpps-operations/rule4-bulk-ignore",
+      "body": {
+        "pbom_version_gid": "version-one",
+        "rows": [
+          {
+            "pbom_row_gid": "row-one",
+            "original_vpps_desc": "Fixture"
+          }
+        ],
+        "actor_gid": "fixture-user",
+        "actor_name": "Fixture user"
+      },
+      "path": {},
+      "query": "",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "enum": [
+              "rule4_bulk_ignore",
+              "revert"
+            ]
+          },
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "pbom_version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rows": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "properties": {
+                "pbom_row_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "original_vpps_desc": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "notes": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "pbom_row_gid"
+              ]
+            }
+          },
+          "actor_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "actor_name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "operation"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "created": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "operations": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pbom_version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pbom_row_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "operation_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "rule_no": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "field_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "original_value": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "new_value": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "actor_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "actor_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "created_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "notes": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "is_active": {
+                  "type": "boolean"
+                },
+                "reverted_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "reverted_by_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "reverted_by_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "operation": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1
+              },
+              "pbom_version_gid": {
+                "type": "string",
+                "minLength": 1
+              },
+              "pbom_row_gid": {
+                "type": "string",
+                "minLength": 1
+              },
+              "operation_type": {
+                "type": "string",
+                "minLength": 1
+              },
+              "rule_no": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "field_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "original_value": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "new_value": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "actor_gid": {
+                "type": "string",
+                "minLength": 1
+              },
+              "actor_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "created_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "notes": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "is_active": {
+                "type": "boolean"
+              },
+              "reverted_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "reverted_by_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "reverted_by_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "craft.vpps_audit.change.apply",
+      "version": 1,
+      "payload": {
+        "operation": "revert",
+        "gid": "operation-one",
+        "actor_gid": "fixture-user",
+        "actor_name": "Fixture user"
+      },
+      "provider_data": {
+        "success": true,
+        "operation": {
+          "gid": "operation-one",
+          "pbom_version_gid": "version-one",
+          "pbom_row_gid": "row-one",
+          "operation_type": "rule4_bulk_ignore",
+          "rule_no": 4,
+          "field_name": "vpps_desc",
+          "original_value": "Fixture",
+          "new_value": null,
+          "actor_gid": "fixture-user",
+          "actor_name": "Fixture user",
+          "created_at": "2026-09-08T00:00:00+00:00",
+          "notes": null,
+          "is_active": false,
+          "reverted_at": "2026-09-08T00:00:00+00:00",
+          "reverted_by_gid": "fixture-user",
+          "reverted_by_name": "Fixture user"
+        }
+      },
+      "method": "POST",
+      "route": "/api/vpps-operations/{gid}/revert",
+      "body": {
+        "reverted_by_gid": "fixture-user",
+        "reverted_by_name": "Fixture user"
+      },
+      "path": {
+        "gid": "operation-one"
+      },
+      "query": "",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "enum": [
+              "rule4_bulk_ignore",
+              "revert"
+            ]
+          },
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "pbom_version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rows": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "properties": {
+                "pbom_row_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "original_vpps_desc": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "notes": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "pbom_row_gid"
+              ]
+            }
+          },
+          "actor_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "actor_name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "operation"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "created": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "operations": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pbom_version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pbom_row_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "operation_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "rule_no": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "field_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "original_value": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "new_value": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "actor_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "actor_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "created_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "notes": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "is_active": {
+                  "type": "boolean"
+                },
+                "reverted_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "reverted_by_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "reverted_by_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "operation": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1
+              },
+              "pbom_version_gid": {
+                "type": "string",
+                "minLength": 1
+              },
+              "pbom_row_gid": {
+                "type": "string",
+                "minLength": 1
+              },
+              "operation_type": {
+                "type": "string",
+                "minLength": 1
+              },
+              "rule_no": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "field_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "original_value": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "new_value": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "actor_gid": {
+                "type": "string",
+                "minLength": 1
+              },
+              "actor_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "created_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "notes": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "is_active": {
+                "type": "boolean"
+              },
+              "reverted_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "reverted_by_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "reverted_by_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "base.team.directory.list",
+      "version": 1,
+      "payload": {},
+      "provider_data": {
+        "success": true,
+        "data": [
+          {
+            "gid": "team-one",
+            "name": "Fixture team",
+            "is_active": true,
+            "parent_team_gid": null,
+            "created_at": "2026-09-08"
+          }
+        ]
+      },
+      "method": "GET",
+      "route": "/teams",
+      "body": {},
+      "path": {},
+      "query": "",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "is_active": {
+                  "type": "boolean"
+                },
+                "parent_team_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "created_at": {
+                  "type": "string",
+                  "maxLength": 64
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "name",
+                "is_active",
+                "parent_team_gid",
+                "created_at"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      }
+    },
+    {
+      "id": "base.identity.admin_user.list",
+      "version": 1,
+      "payload": {},
+      "provider_data": {
+        "success": true,
+        "data": [
+          {
+            "gid": "user-one",
+            "name": "Fixture user",
+            "email": "user@example.invalid",
+            "avatar_url": "",
+            "system_role": "member",
+            "org_role": "member",
+            "external_subtype": null,
+            "team_id": null,
+            "is_active": true,
+            "created_at": ""
+          }
+        ]
+      },
+      "method": "GET",
+      "route": "/users/",
+      "body": {},
+      "path": {},
+      "query": "",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "email": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "avatar_url": {
+                  "type": "string",
+                  "maxLength": 2048
+                },
+                "system_role": {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                "org_role": {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                "external_subtype": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "team_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "is_active": {
+                  "type": "boolean"
+                },
+                "created_at": {
+                  "type": "string",
+                  "maxLength": 64
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "name",
+                "email",
+                "avatar_url",
+                "system_role",
+                "org_role",
+                "external_subtype",
+                "team_id",
+                "is_active",
+                "created_at"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      }
+    },
+    {
+      "id": "base.identity.user.search",
+      "version": 1,
+      "payload": {
+        "query": "Fixture",
+        "limit": 10
+      },
+      "provider_data": {
+        "success": true,
+        "data": [
+          {
+            "gid": "user-one",
+            "name": "Fixture user",
+            "email": "user@example.invalid",
+            "avatar_url": ""
+          }
+        ]
+      },
+      "method": "GET",
+      "route": "/users/search",
+      "body": {},
+      "path": {},
+      "query": "q=Fixture&limit=10",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "query",
+          "limit"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "email": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "avatar_url": {
+                  "type": "string",
+                  "maxLength": 2048
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "name",
+                "email",
+                "avatar_url"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "data"
+        ]
+      }
+    }
+  ]
+}
