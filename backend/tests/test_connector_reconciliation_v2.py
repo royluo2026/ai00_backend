@@ -58,12 +58,12 @@ def test_signing_key_revocation_and_validity_are_enforced(changes):
         service.sign(VECTOR['plan'])
 
 
-def running(database, *, probe=True):
+def running(database, *, probe=True, plan_id=None):
     service, key = setup_service(database)
     session = register(service, key, database[1])
     cloud, _ = signer()
     raw = deepcopy(VECTOR['plan'])
-    raw.update(plan_id='v2-'+database[1], device_id=database[1], runtime_instance_id='winner',
+    raw.update(plan_id=plan_id or 'v2-'+database[1], device_id=database[1], runtime_instance_id='winner',
                issued_at='2026-09-07T12:00:00Z', expires_at='2026-09-07T12:10:00Z')
     if probe:
         raw['steps'][0].update(side_effect_classification='write', post_condition_probe_id='vismockup.application.postcondition@1')
@@ -86,6 +86,105 @@ def outcome(plan, leased, key, status='succeeded', sequence=1, result=None, **ch
     raw.update(changes)
     raw['signature'] = signature(key, outcome_signature_bytes(raw))
     return ConnectorPlanOutcomeV2.model_validate(raw)
+
+
+def probe_evidence(context, key, classification='failed_without_effect', sequence=2, *, probes=None):
+    from plugins.simulation.simulation_backend.application.connector_protocol_v2 import ConnectorReconciliationEvidenceV2
+    raw = {k: context[k] for k in ('plan_id','plan_hash','lease_id','tenant_id','device_id',
+        'runtime_generation','runtime_instance_id','recovery_instance_id','recovery_session_id','nonce','scope')}
+    raw.update(protocol='ai00.connector.reconciliation-evidence.v2', journal_sequence=sequence,
+        reported_at='2026-09-07T12:06:00Z', device_key_id='device-key-001', signature_algorithm='ecdsa-p256-sha256',
+        probes=probes if probes is not None else [dict(**p, classification=classification, observed_result=None) for p in context['required_probes']])
+    raw['signature'] = signature(key, outcome_signature_bytes(raw))
+    return ConnectorReconciliationEvidenceV2.model_validate(raw)
+
+
+@pytest.mark.parametrize('crash,read_prefix,classification,coverage,expected', [
+    (False, False, 'failed_without_effect', 'all', 'failed_without_effect'),
+    (False, True, 'failed_without_effect', 'all', 'failed_without_effect'),
+    (True, False, 'failed_without_effect', 'all', 'failed_without_effect'),
+    (True, True, 'failed_without_effect', 'all', 'failed_without_effect'),
+    (True, False, 'succeeded', 'all', 'succeeded'),
+    (False, False, 'succeeded', 'all', 'manual_review_required'),
+    (True, True, 'failed_without_effect', 'missing', 'manual_review_required'),
+    (True, True, 'failed_without_effect', 'mixed', 'manual_review_required'),
+    (True, False, 'inconclusive', 'all', 'manual_review_required'),
+])
+def test_dedicated_evidence_reconciles_multiple_writes_without_execution_prefix(database, crash, read_prefix, classification, coverage, expected):
+    service, key = setup_service(database)
+    session = register(service, key, database[1])
+    cloud, _ = signer()
+    raw = deepcopy(VECTOR['plan'])
+    raw.update(device_id=database[1], runtime_instance_id='winner', issued_at='2026-09-07T12:00:00Z', expires_at='2026-09-07T12:10:00Z')
+    first = raw['steps'][0]
+    raw['steps'] = ([deepcopy(first)] if read_prefix else []) + [dict(deepcopy(first),
+        step_id=f'write-{i}', side_effect_classification='write', post_condition_probe_id=f'write.{i}.probe@1') for i in range(2)]
+    if read_prefix and not crash:
+        raw['steps'][0]['post_condition_probe_id'] = 'read.check@1'
+    plan = cloud.sign(raw)
+    service.repository.insert_v2_plan(plan, session.session_token, NOW)
+    pins = dict(device_id=database[1], generation=7, runtime_instance_id='winner', runtime_type='electron')
+    leased = service.lease(session.session_token, **pins)
+    original = None
+    if not crash:
+        raw_outcome = outcome(plan, leased, key, 'outcome_unknown').model_dump(mode='json')
+        raw_outcome['steps'][0]['step_id'] = 'write-0'
+        if read_prefix:
+            terminal = deepcopy(raw_outcome['steps'][0])
+            raw_outcome['steps'] = []
+            for step in plan.steps:
+                result = dict(terminal, step_id=step.step_id)
+                if step is not plan.steps[-1]:
+                    result.update(status='succeeded', error_code=None, result={},
+                        result_hash='sha256:'+hashlib.sha256(b'{}').hexdigest())
+                raw_outcome['steps'].append(result)
+        raw_outcome['signature'] = signature(key, outcome_signature_bytes(raw_outcome))
+        original = ConnectorPlanOutcomeV2.model_validate(raw_outcome)
+        service.outcome(session.session_token, original, **pins)
+    service.clock = lambda: NOW+timedelta(minutes=6)
+    recovered = register(service, key, database[1], instance='replacement', plan_id=plan.plan_id)
+    pins['runtime_instance_id'] = 'replacement'
+    context = service.probe(recovered['session_token'], plan_id=plan.plan_id, **pins)
+    assert context['recovery_instance_id'] == 'replacement'
+    assert context['lease_id'] == leased['lease_id']
+    assert 'steps' not in context and 'plan' not in context
+    assert [p['step_id'] for p in context['required_probes']] == (['write-0', 'write-1'] if crash or read_prefix else ['write-0'])
+    probes = [dict(**p, classification=classification, observed_result=None) for p in context['required_probes']]
+    if coverage == 'missing':
+        probes = probes[:-1]
+    elif coverage == 'mixed':
+        probes[-1]['classification'] = 'succeeded'
+    evidence = probe_evidence(context, key, probes=probes)
+    service.outcome(recovered['session_token'], evidence, reconcile=True, **pins)
+    saved = json.loads(read(database, 'runtime_plans')['outcome_json'])
+    assert saved['overall_status'] == expected
+    assert 'signature' not in saved
+    assert saved['evidence'] == evidence.model_dump(mode='json')
+    assert saved['original_outcome'] == (original.model_dump(mode='json') if original else None)
+
+
+def test_reconciliation_evidence_is_closed_and_context_signature_bound(database):
+    from pydantic import ValidationError
+    from plugins.simulation.simulation_backend.application.connector_protocol_v2 import ConnectorReconciliationEvidenceV2
+    service, key, session, plan, leased, pins = running(database)
+    service.outcome(session.session_token, outcome(plan, leased, key, 'outcome_unknown'), **pins)
+    context = service.probe(session.session_token, plan_id=plan.plan_id, **pins)
+    evidence = probe_evidence(context, key)
+    raw = evidence.model_dump(mode='json')
+    for field in raw:
+        with pytest.raises(ValidationError):
+            ConnectorReconciliationEvidenceV2.model_validate({k:v for k,v in raw.items() if k != field})
+    with pytest.raises(ValidationError):
+        ConnectorReconciliationEvidenceV2.model_validate({**raw, 'steps':[]})
+    for field, value in [('nonce','0'*64), ('recovery_session_id','0'*64), ('recovery_instance_id','other')]:
+        changed = {**raw, field:value}
+        changed['signature'] = signature(key, outcome_signature_bytes(changed))
+        with pytest.raises(RuntimeError, match='reconciliation_evidence_invalid'):
+            service.outcome(session.session_token, ConnectorReconciliationEvidenceV2.model_validate(changed), reconcile=True, **pins)
+    wrong = probe_evidence(context, ec.generate_private_key(ec.SECP256R1()))
+    with pytest.raises(RuntimeError, match='outcome_signature_invalid'):
+        service.outcome(session.session_token, wrong, reconcile=True, **pins)
+    assert read(database)['last_journal_sequence'] == 1
 
 
 def test_outcome_verifies_device_key_and_persists_projection_atomically(database):
@@ -121,7 +220,7 @@ def test_recovery_context_binds_original_lease_and_never_returns_mutation(databa
     assert context['lease_id'] == leased['lease_id']
     assert context['scope'] == 'read_only_post_condition_probe'
     assert 'steps' not in context and 'plan' not in context
-    assert context['probes'][0]['probe_id'] == 'vismockup.application.postcondition@1'
+    assert context['required_probes'][0]['probe_id'] == 'vismockup.application.postcondition@1'
     assert context['nonce']
     forged = outcome(plan, leased, key, sequence=2)
     with pytest.raises(RuntimeError, match='reconciliation_evidence_invalid'):
@@ -137,8 +236,7 @@ def test_signed_probe_controls_reconciliation_and_replacement(database, classifi
     pins['runtime_instance_id'] = 'recovery'
     context = service.probe(recovered['session_token'], plan_id=plan.plan_id, **pins)
     status = 'manual_review_required' if classification=='inconclusive' else classification
-    result = dict(probe_id=context['probes'][0]['probe_id'], nonce=context['nonce'], classification=classification)
-    evidence = outcome(plan, leased, key, status, sequence=2, result=result)
+    evidence = probe_evidence(context, key, classification)
     service.outcome(recovered['session_token'], evidence, reconcile=True, **pins)
     assert read(database, 'runtime_plans')['status'] == status
     assert read(database)['last_journal_sequence'] == 2
@@ -217,8 +315,8 @@ def test_no_declared_probe_keeps_recovery_in_manual_review(database):
     recovered = register(service, key, database[1], instance='recovery', plan_id=plan.plan_id)
     pins['runtime_instance_id'] = 'recovery'
     context = service.probe(recovered['session_token'], plan_id=plan.plan_id, **pins)
-    assert context['probes'] == []
-    evidence = outcome(plan, leased, key, 'manual_review_required', result={'nonce':context['nonce']})
+    assert context['required_probes'] == []
+    evidence = probe_evidence(context, key, 'inconclusive', sequence=1)
     service.outcome(recovered['session_token'], evidence, reconcile=True, **pins)
     assert read(database, 'runtime_plans')['status'] == 'manual_review_required'
 
@@ -228,8 +326,7 @@ def test_current_session_can_probe_unknown_effect_with_server_lease_context(data
     service.outcome(session.session_token, outcome(plan, leased, key, 'outcome_unknown'), **pins)
     context = service.probe(session.session_token, plan_id=plan.plan_id, **pins)
     assert context['lease_id'] == leased['lease_id']
-    evidence = outcome(plan, leased, key, 'failed_without_effect', sequence=2,
-        result=dict(nonce=context['nonce'], probe_id=context['probes'][0]['probe_id'], classification='failed_without_effect'))
+    evidence = probe_evidence(context, key)
     service.outcome(session.session_token, evidence, reconcile=True, **pins)
     assert read(database, 'runtime_plans')['status'] == 'failed_without_effect'
 
@@ -259,15 +356,22 @@ def test_queue_v2_pins_owner_before_signing(database):
     assert persisted['key_id'] == 'cloud-key'
 
 
-def test_verified_v2_materialization_projects_exact_persisted_plan(database):
+@pytest.mark.parametrize('plan_id_length', [184, 256])
+@pytest.mark.parametrize('reconciled', [False, True])
+def test_verified_v2_materialization_projects_exact_persisted_plan(database, plan_id_length, reconciled):
     import asyncio
     from types import SimpleNamespace
     from plugins.simulation.simulation_backend.application.capture_worker import CaptureWorkflow
     from plugins.simulation.simulation_backend.capabilities.connector_outcomes import ConnectorOutcomeProvider
     from backend.capability_v2.provider_contracts import CapabilityContext, CapabilityBusinessError
-    service, key, session, plan, leased, pins = running(database)
-    good = outcome(plan, leased, key)
+    service, key, session, plan, leased, pins = running(database, plan_id='p'*plan_id_length)
+    good = outcome(plan, leased, key, 'outcome_unknown' if reconciled else 'succeeded')
     service.outcome(session.session_token, good, **pins)
+    if reconciled:
+        context = service.probe(session.session_token, plan_id=plan.plan_id, **pins)
+        service.outcome(session.session_token, probe_evidence(context, key, 'succeeded'), reconcile=True, **pins)
+        from plugins.simulation.simulation_backend.application.connector_protocol_v2 import parse_v2_outcome
+        good = parse_v2_outcome(json.loads(read(database, 'runtime_plans')['outcome_json']))
     changes = []
     repo = SimpleNamespace(get_materialization_run=lambda *a: {'plan': plan.model_dump(mode='json')},
                            update_materialization_run=lambda *a, **kw: changes.append(kw))
@@ -301,26 +405,76 @@ def test_verified_v2_materialization_projects_exact_persisted_plan(database):
             policy_version='test-policy', tenant_id='tenant-001'), resource_authorizer=lambda *_: True)
     gateway = CapabilityGatewayService(CatalogResolver(store, registry), policy,
         reliability=ReliabilityCoordinator(InMemoryOutcomeStore(), InMemoryRateLimiter(limit=100))).bind_release(release.release_id)
+    invoked = []
+    invoke = gateway.invoke
+    async def record(envelope):
+        invoked.append(envelope)
+        return await invoke(envelope)
+    gateway.invoke = record
     asyncio.run(GovernedSimulationRuntimeClient(gateway).apply_connector_outcome(plan, good))
     assert changes == [{'status': 'completed'}]
     assert claimed.plan_id == plan.plan_id
+    assert len(invoked[0].trace_id) == 79
+    assert len(invoked[0].idempotency_key) == 85
+    assert len(invoked[0].request_id) <= 128
+    assert invoked[0].trace_id.endswith(hashlib.sha256(plan.plan_id.encode()).hexdigest())
+    outcome_hash = 'sha256:' + hashlib.sha256(json.dumps(good.model_dump(mode='json'), ensure_ascii=False, sort_keys=True, separators=(',',':')).encode()).hexdigest()
+    assert invoked[0].idempotency_key.endswith(hashlib.sha256((plan.plan_id+'\0'+outcome_hash).encode()).hexdigest())
 
 
-def test_reconciled_snapshot_projects_observed_result():
+def test_http_reconciliation_accepts_only_dedicated_evidence(database, monkeypatch):
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+    from backend.routers import simulation_connector
+    service, key, session, plan, leased, pins = running(database)
+    original = outcome(plan, leased, key, 'outcome_unknown')
+    service.outcome(session.session_token, original, **pins)
+    context = service.probe(session.session_token, plan_id=plan.plan_id, **pins)
+    evidence = probe_evidence(context, key)
+    app = FastAPI()
+    app.include_router(simulation_connector.router)
+    monkeypatch.setattr(simulation_connector, 'runtime_session_service', service)
+    app.dependency_overrides[simulation_connector._reconciliation_auth] = lambda: dict(token=session.session_token, **pins)
+    app.dependency_overrides[simulation_connector._runtime_auth] = lambda: dict(token=session.session_token, **pins)
+    path = '/api/v1/simulation/connectors/v2/plans/' + plan.plan_id
+    with TestClient(app) as client:
+        assert client.post(path+'/reconcile', json=original.model_dump(mode='json')).status_code == 422
+        assert client.post(path+'/outcome', json=evidence.model_dump(mode='json')).status_code == 422
+        result = client.post(path+'/reconcile', json=evidence.model_dump(mode='json'))
+        assert result.status_code == 200, result.text
+    assert read(database, 'runtime_plans')['status'] == 'failed_without_effect'
+
+
+@pytest.mark.parametrize('valid_snapshot', [True, False])
+def test_reconciled_snapshot_projects_observed_result(valid_snapshot):
     from types import SimpleNamespace
     from backend.tests.test_simulation_document_snapshot_workflow import SNAPSHOT, context
     from plugins.simulation.simulation_backend.application.document_snapshots import DocumentSnapshotWorkflow
     cloud, _ = signer()
     raw = deepcopy(VECTOR['plan'])
     raw.update(issued_at='2026-09-07T12:00:00Z', expires_at='2026-09-07T12:10:00Z')
-    raw['steps'][0].update(operation_id='vismockup.document.snapshot@1')
+    raw['steps'][0].update(operation_id='vismockup.document.snapshot@1', post_condition_probe_id='snapshot.probe@1')
     plan = cloud.sign(raw)
     recorded = []
     repo = SimpleNamespace(get_request=lambda *a: {'plan':plan.model_dump(mode='json')},
         complete_request=lambda *a, **kw: recorded.append(kw))
     workflow = object.__new__(DocumentSnapshotWorkflow)
     workflow.repository = repo
-    result = dict(nonce='context-nonce', probe_id='snapshot.probe@1', classification='succeeded', observed_result=SNAPSHOT)
-    value = outcome(plan, {'lease_id':'lease-1'}, ec.generate_private_key(ec.SECP256R1()), result=result)
+    from plugins.simulation.simulation_backend.application.connector_protocol_v2 import probe_context, ReconciliationService
+    from backend.tests.test_connector_runtime_sessions_v2 import keys
+    key, jwk, _, _ = keys()
+    row = dict(plan_json=plan.model_dump(mode='json'), plan_id=plan.plan_id, plan_hash=plan.plan_hash,
+        lease_id='lease-1', device_id=plan.device_id, tenant_gid=plan.tenant_id,
+        runtime_generation=plan.runtime_generation, runtime_instance_id=plan.runtime_instance_id)
+    recovery = dict(token_hash='a'*64, recovery_instance_id='replacement')
+    context_value = probe_context(row, recovery)
+    evidence = probe_evidence(context_value, key, 'succeeded', probes=[dict(**context_value['required_probes'][0],
+        classification='succeeded', observed_result=SNAPSHOT if valid_snapshot else {})])
+    value = ReconciliationService().verify(row, recovery, evidence, jwk)
     workflow.apply_connector_outcome(plan, value, context())
-    assert recorded[0]['snapshot'] == SNAPSHOT
+    if valid_snapshot:
+        assert value.overall_status == 'succeeded'
+        assert recorded[0]['snapshot'] == SNAPSHOT
+    else:
+        assert value.overall_status == 'manual_review_required'
+        assert recorded[0]['status'] == 'outcome_unknown'

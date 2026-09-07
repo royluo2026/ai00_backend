@@ -59,3 +59,48 @@ Result: **177 passed, 73 skipped**, 13.20 seconds. Skips are the native MySQL se
 Self-review traced the cloud session snapshot through signing and insertion, current-key verification through the transaction, replay handling before journal advancement, outbox reset on reconciliation, original-lease recovery binding, and exact-plan domain projection. Confirmed that failed outcome/audit transactions leave no journal or outbox residue and that successful reconciliation still blocks equivalent replacement. Updated an existing registration-set test for the Task 4 takeover Capability and upgraded old storage-only test outcomes to genuine device signatures/evidence rather than weakening production checks.
 
 Deployment/follow-on integration must configure the cloud secret-provider callable and a `PlanSigner` on the v2 issuing control plane, apply migration 0010, and launch the v2 projection worker. The default control plane fails closed without a signer; no environment-secret or HMAC fallback is introduced. Existing v1 producer Capability wrappers remain v1; new v2 producers use the explicit `queue_v2` interface. Connector-side declared-probe dispatch and public-key trust-chain delivery remain later tasks. Native MySQL/OceanBase behavior remains unverified. Equivalent-input lookup currently scans one device's retained plans under its writer lock; an indexed normalized-input projection is the upgrade path if per-device history becomes large.
+
+## Fix round 1 — review corrections
+
+This section supersedes the original recovery evidence format above. Reconciliation no longer accepts or fabricates a device-signed normal execution Outcome. The normal v1 and v2 execution contracts and v2 execution-prefix validation are preserved.
+
+### Dedicated signed evidence and server reconciliation result
+
+`ConnectorReconciliationEvidenceV2` is a closed, strict record exposed by the `/v2/plans/{plan_id}/reconcile` HTTP body schema. Every field is required:
+
+```text
+protocol = ai00.connector.reconciliation-evidence.v2
+scope = read_only_post_condition_probe
+plan_id, plan_hash, lease_id, tenant_id, device_id
+runtime_generation, runtime_instance_id          # original execution identity
+recovery_instance_id, recovery_session_id, nonce
+probes = [{step_id, probe_id, classification, observed_result}]
+journal_sequence, reported_at, device_key_id
+signature_algorithm, signature
+```
+
+The protocol marker separates its signature domain from normal Outcomes. The existing low-S P1363/P-256 signature primitives validate the evidence against the registered current device key. The server checks all context bindings under the existing device lock. Duplicate, reordered, and undeclared probes are rejected; missing, mixed, or inconclusive required proof yields `manual_review_required`.
+
+Probe responses return the safe identities/scope above and an explicit ordered `required_probes` set instead of executable steps or the original plan. `recovery_session_id` and `nonce` are derived from the authenticated server-held session binding. A replacement runtime can construct the entire evidence record from this response and its read-only probe results without its predecessor's local journal. With an original signed Outcome, the server derives the invoked prefix itself and does not demand normal results for later uninvoked steps. With no original Outcome, all declared side-effect probes are required. Read probes do not veto proofs that all invoked writes had no effect; pure read plans retain their declared probe path.
+
+Only complete absence proof for all required side effects produces `failed_without_effect`. Complete success proof produces `succeeded` only when later uninvoked work does not remain and relevant snapshot/capture result validation succeeds. Otherwise the result remains manual review. This supports multiple writes and read-before-write crashes without forcing probe observations through normal execution-prefix rules.
+
+The persisted projection record is `ConnectorReconciledOutcomeV2`, discriminated by `record_type=server_reconciliation_v2`. It contains the untouched original signed Outcome (or null for a crash), the complete signed reconciliation evidence, and explicit server-derived projection facts. It has no top-level device signature. Original outcome audit rows remain untouched. Projection payload parsing and the governed provider recognize this separate record, and a manual-review snapshot cannot be projected as successful merely because one probe succeeded.
+
+### Bounded Gateway identifiers
+
+For v2 only, trace IDs use `connector-plan-` plus SHA-256(plan_id), and idempotency keys use `connector-projection-` plus SHA-256(plan_id + NUL + outcome_hash). Their lengths are 79 and 85 characters respectively. The existing request ID is also bounded. The v1 identifier format is unchanged. Real Gateway tests cover both normal and reconciled projections with 184- and 256-character plan IDs and assert the lengths and hash bindings.
+
+### RED/GREEN and final evidence
+
+- RED: the original recovery context lacked `recovery_instance_id` for the multi-write/crash test, and a valid 184-character plan ID failed Gateway validation with `idempotency_key` longer than 255 characters.
+- GREEN: dedicated evidence tests now cover a stored signed prefix containing a successful read/write before an unknown write, crash-before-outcome with two writes, read-before-write crash, later uninvoked writes, complete absence/success, missing/mixed/inconclusive proof, closed-field validation, wrong context/signature, and preservation of both signed records.
+- RED/GREEN: invalid snapshot proof originally reached the success projection branch; it now stays in manual review. A declared read probe originally polluted required write-absence evidence; required side-effect selection now avoids that conflict.
+- HTTP tests reject a normal Outcome at the reconciliation endpoint and reconciliation evidence at the normal Outcome endpoint, while accepting and verifying dedicated evidence through the real service and SQL transaction.
+- Final broader command: the same 14-file selection recorded in section 5. Result: **192 passed, 87 skipped**, 16.36 seconds. All skips require native MySQL configuration; SQLite/Gateway evidence does not replace native MySQL verification. `git diff --check` passes.
+
+### Self-review and remaining concern
+
+Reviewed the normal/evidence protocol split, exact original-lease and recovery-session bindings, required-probe ordering and coverage, original signed record preservation, server-result parsing, domain validation before success classification, and bounded Gateway values. No approval or release state was synthesized.
+
+The reviewer's claim-owner observation remains: the governed v2 provider checks that the exact stored plan/outcome has an active outbox claim, but it does not bind the invoking Gateway consumer to that claim's `lease_owner`. The current provider payload and trusted Gateway context do not carry a worker claim identity. Adding a caller-supplied owner would not establish that proof; a real correction needs a trusted claim propagated through the worker/Gateway interface. Per the requested scope, this was documented rather than broadening interfaces. Native MySQL and production secret/worker deployment remain unverified as before.

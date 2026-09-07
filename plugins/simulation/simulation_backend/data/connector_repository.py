@@ -27,6 +27,7 @@ from .connection import get_simulation_conn
 
 if TYPE_CHECKING:
     from ..capabilities.connector_contracts import ConnectorHealth
+    from ..application.connector_protocol_v2 import ConnectorReconciliationEvidenceV2, ConnectorReconciledOutcomeV2
 
 
 class ConnectorRepositoryError(RuntimeError):
@@ -482,14 +483,17 @@ class SimulationConnectorRepository:
         self._write_v2_outcome(device_id, runtime_generation, runtime_instance_id, session_token, outcome, now, reconciled=False)
 
     def mark_reconciled(self, device_id, runtime_generation, runtime_instance_id, session_token,
-                        outcome: ConnectorPlanOutcomeV2, now: datetime) -> None:
+                        outcome: ConnectorReconciliationEvidenceV2, now: datetime) -> None:
         self._write_v2_outcome(device_id, runtime_generation, runtime_instance_id, session_token, outcome, now, reconciled=True)
 
     def _write_v2_outcome(self, device_id, generation, instance, token, outcome, now, *, reconciled):
         """Verify under the device lock, then atomically persist outcome and intent."""
-        outcome = ConnectorPlanOutcomeV2.model_validate(outcome)
-        encoded = canonicalize_v2(outcome).decode("utf-8")
-        digest = hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+        from ..application.connector_protocol_v2 import ConnectorReconciliationEvidenceV2
+        try:
+            model = ConnectorReconciliationEvidenceV2 if reconciled else ConnectorPlanOutcomeV2
+            outcome = model.model_validate(outcome)
+        except ValueError as exc:
+            raise ConnectorRepositoryError('reconciliation_evidence_invalid' if reconciled else 'plan_outcome_invalid') from exc
         now = _utc(now)
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             recovery = None
@@ -515,21 +519,21 @@ class SimulationConnectorRepository:
                 raise ConnectorRepositoryError('device_key_invalid')
             try:
                 jwk = json.loads(row['device_signing_jwk']) if isinstance(row['device_signing_jwk'], str) else row['device_signing_jwk']
-                OutcomeVerifier.verify(outcome, jwk)
                 plan = ConnectorExecutionPlanV2.model_validate(json.loads(current['plan_json']) if isinstance(current['plan_json'], str) else current['plan_json'])
-                OutcomeVerifier.verify_steps(plan, outcome)
+                if reconciled:
+                    outcome = ReconciliationService().verify(current, recovery or {'token_hash': row['session_token_hash']}, outcome, jwk)
+                else:
+                    OutcomeVerifier.verify(outcome, jwk)
+                    OutcomeVerifier.verify_steps(plan, outcome)
             except ValueError as exc:
                 raise ConnectorRepositoryError(str(exc)) from exc
+            encoded = canonicalize_v2(outcome).decode('utf-8')
+            digest = hashlib.sha256(encoded.encode('utf-8')).hexdigest()
             if current["outcome_hash"] == digest and (not reconciled or current["reconciled_at"] is not None):
                 return
             if outcome.journal_sequence <= row['last_journal_sequence']:
                 raise ConnectorRepositoryError('journal_sequence_invalid')
             if reconciled:
-                try:
-                    # Live sessions also receive a context bound to their token.
-                    ReconciliationService().verify(current, recovery or {'token_hash': row['session_token_hash']}, outcome)
-                except ValueError as exc:
-                    raise ConnectorRepositoryError(str(exc)) from exc
                 if outcome.overall_status not in {"succeeded", "failed_without_effect", "manual_review_required"}:
                     raise ConnectorRepositoryError("reconciliation_result_invalid")
                 uncertain = current["status"] in {"outcome_unknown", "manual_review_required"}
@@ -889,7 +893,7 @@ class SimulationConnectorRepository:
 
     def read_projection_payload(
         self, lease: ProjectionLease,
-    ) -> tuple[ConnectorExecutionPlanV1 | ConnectorExecutionPlanV2, ConnectorPlanOutcomeV1 | ConnectorPlanOutcomeV2]:
+    ) -> tuple[ConnectorExecutionPlanV1 | ConnectorExecutionPlanV2, ConnectorPlanOutcomeV1 | ConnectorPlanOutcomeV2 | ConnectorReconciledOutcomeV2]:
         plan_table = 'workmanship_sim_connector_runtime_plans' if self.projection_v2 else 'workmanship_sim_connector_plans'
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
@@ -916,8 +920,12 @@ class SimulationConnectorRepository:
             outcome_value = json.loads(outcome_value)
         return (
             (ConnectorExecutionPlanV2 if self.projection_v2 else ConnectorExecutionPlanV1).model_validate(plan_value),
-            (ConnectorPlanOutcomeV2 if self.projection_v2 else ConnectorPlanOutcomeV1).model_validate(outcome_value),
+            self._parse_projection_outcome(outcome_value),
         )
+
+    def _parse_projection_outcome(self, value):
+        from ..application.connector_protocol_v2 import parse_v2_outcome
+        return parse_v2_outcome(value) if self.projection_v2 else ConnectorPlanOutcomeV1.model_validate(value)
 
     def finish_projection(self, plan_id: str, owner: str) -> None:
         with get_simulation_conn() as conn:

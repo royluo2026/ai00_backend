@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import Literal
 from backend.contracts.connector_execution_plan_v2 import ConnectorPlanOutcomeV2, IDENTITY_PATTERN
+from plugins.simulation.simulation_backend.application.connector_protocol_v2 import ConnectorReconciliationEvidenceV2
 from plugins.simulation.simulation_backend.application.connector_runtime_sessions import runtime_session_service
 from plugins.simulation.simulation_backend.capabilities.connector_pairing import app_pairing_service
 from plugins.simulation.simulation_backend.domain.connector_pairing import PairingError
@@ -538,7 +539,7 @@ def runtime_probe(plan_id: str, pins: dict = Depends(_reconciliation_auth)):
 
 
 @router.post('/v2/plans/{plan_id}/reconcile')
-def runtime_reconcile(plan_id: str, body: ConnectorPlanOutcomeV2, pins: dict = Depends(_reconciliation_auth)):
+def runtime_reconcile(plan_id: str, body: ConnectorReconciliationEvidenceV2, pins: dict = Depends(_reconciliation_auth)):
     if plan_id != body.plan_id:
         raise HTTPException(status_code=409, detail={'code': 'plan_identity_mismatch'})
     return _transport(lambda: runtime_session_service.outcome(outcome=body, reconcile=True, **pins))

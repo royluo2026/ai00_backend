@@ -1,7 +1,7 @@
 """Asynchronous acquisition of the bound user's active VisMockup BOM."""
 from __future__ import annotations
 
-from .connector_protocol_v2 import parse_plan, projection_status, projection_result
+from .connector_protocol_v2 import parse_plan, projection_status
 
 import secrets
 from datetime import UTC, datetime
@@ -119,7 +119,9 @@ class DocumentSnapshotWorkflow:
             raise SimulationWorkflowError("plan_outcome_invalid")
         if outcome.plan_id != plan.plan_id:
             raise SimulationWorkflowError("plan_outcome_invalid")
-        if projection_status(outcome) == "outcome_unknown" and not outcome.steps:
+        if projection_status(outcome) == 'outcome_unknown' and (
+            not outcome.steps or outcome.protocol == 'ai00.connector.execution-plan.v2'
+        ):
             self.repository.complete_request(
                 plan.plan_id, status="outcome_unknown",
                 failure_code="local_execution_outcome_unknown",
@@ -132,7 +134,7 @@ class DocumentSnapshotWorkflow:
             raise SimulationWorkflowError("plan_outcome_invalid")
         if projection_status(result) == "completed":
             self.repository.complete_request(
-                plan.plan_id, snapshot=_validate_snapshot(projection_result(result)), status="completed",
+                plan.plan_id, snapshot=_validate_snapshot(result.result), status="completed",
             )
         else:
             self.repository.complete_request(

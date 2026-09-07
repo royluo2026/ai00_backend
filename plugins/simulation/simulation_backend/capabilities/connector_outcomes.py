@@ -11,14 +11,13 @@ from backend.capability_v2.provider_contracts import (
     EvidenceRef,
 )
 from backend.contracts.connector_execution_plan_v1 import (
-    ConnectorExecutionPlanV1,
     ConnectorPlanOutcomeV1,
 )
 
 from ..application.capture_worker import CaptureWorkflow, SimulationWorkflowError
 from ..application.document_snapshots import DocumentSnapshotWorkflow
-from ..application.connector_protocol_v2 import parse_plan
-from backend.contracts.connector_execution_plan_v2 import ConnectorExecutionPlanV2, ConnectorPlanOutcomeV2
+from ..application.connector_protocol_v2 import parse_plan, parse_v2_outcome
+from backend.contracts.connector_execution_plan_v2 import ConnectorExecutionPlanV2
 from ..data.connector_repository import SimulationConnectorRepository
 
 
@@ -35,8 +34,8 @@ class ConnectorOutcomeProvider:
     def _contracts(payload):
         try:
             plan = parse_plan(json.loads(payload["plan_json"]))
-            model = ConnectorPlanOutcomeV2 if isinstance(plan, ConnectorExecutionPlanV2) else ConnectorPlanOutcomeV1
-            outcome = model.model_validate(json.loads(payload["outcome_json"]))
+            raw = json.loads(payload['outcome_json'])
+            outcome = parse_v2_outcome(raw) if isinstance(plan, ConnectorExecutionPlanV2) else ConnectorPlanOutcomeV1.model_validate(raw)
         except Exception as exc:
             raise CapabilityBusinessError("plan_outcome_invalid", "plan_outcome_invalid") from exc
         if outcome.plan_id != plan.plan_id or outcome.protocol != plan.protocol:

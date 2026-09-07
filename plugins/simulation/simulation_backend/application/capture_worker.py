@@ -1,7 +1,7 @@
 """Server-authoritative state machine for materialization and reverse capture."""
 from __future__ import annotations
 
-from .connector_protocol_v2 import parse_plan, projection_status, projection_result
+from .connector_protocol_v2 import parse_plan, projection_status
 
 import secrets
 from datetime import UTC, datetime
@@ -328,7 +328,7 @@ class CaptureWorkflow:
             if existing["status"] == "completed" and existing.get("artifact_attached"):
                 continue
             if projection_status(result) == "completed":
-                value = projection_result(result)
+                value = result.result
                 artifact = value.get("artifact") if isinstance(value, Mapping) else None
                 if not isinstance(artifact, Mapping):
                     raise SimulationWorkflowError("artifact_upload_unconfirmed")

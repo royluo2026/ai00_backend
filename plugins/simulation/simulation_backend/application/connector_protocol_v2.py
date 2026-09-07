@@ -5,15 +5,94 @@ import base64
 from datetime import UTC, datetime
 import hashlib
 import json
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field
+from cryptography.exceptions import InvalidSignature
 
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
-from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature
+from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature, encode_dss_signature
 
 from backend.contracts.connector_execution_plan_v2 import (
-    ConnectorExecutionPlanV2, ConnectorPlanOutcomeV2, ConnectorStepResultV2, P256_ORDER,
+    ConnectorExecutionPlanV2, ConnectorPlanOutcomeV2, P256_ORDER,
     canonicalize_v2, compute_plan_hash, plan_signature_bytes,
+    IDENTITY_PATTERN, Signature, Timestamp, JsonValue, _public_key, _decode_signature, outcome_signature_bytes,
 )
+
+
+class _ClosedEvidence(BaseModel):
+    model_config = ConfigDict(extra='forbid', strict=True, frozen=True, revalidate_instances='always')
+
+
+class ConnectorProbeEvidenceV2(_ClosedEvidence):
+    step_id: str = Field(pattern=IDENTITY_PATTERN)
+    probe_id: str = Field(pattern=IDENTITY_PATTERN)
+    classification: Literal['succeeded', 'failed_without_effect', 'inconclusive']
+    observed_result: JsonValue
+
+
+class ConnectorReconciliationEvidenceV2(_ClosedEvidence):
+    protocol: Literal['ai00.connector.reconciliation-evidence.v2']
+    scope: Literal['read_only_post_condition_probe']
+    plan_id: str = Field(pattern=IDENTITY_PATTERN)
+    plan_hash: str = Field(pattern=r'^[0-9a-f]{64}$')
+    lease_id: str = Field(pattern=IDENTITY_PATTERN)
+    tenant_id: str = Field(pattern=IDENTITY_PATTERN)
+    device_id: str = Field(pattern=IDENTITY_PATTERN)
+    runtime_generation: int = Field(ge=1)
+    runtime_instance_id: str = Field(pattern=IDENTITY_PATTERN)
+    recovery_instance_id: str = Field(pattern=IDENTITY_PATTERN)
+    recovery_session_id: str = Field(pattern=r'^[0-9a-f]{64}$')
+    nonce: str = Field(pattern=r'^[0-9a-f]{64}$')
+    probes: list[ConnectorProbeEvidenceV2] = Field(max_length=10_000)
+    journal_sequence: int = Field(ge=1)
+    reported_at: Timestamp
+    device_key_id: str = Field(pattern=IDENTITY_PATTERN)
+    signature_algorithm: Literal['ecdsa-p256-sha256']
+    signature: Signature
+
+    def verify_signature(self, jwk):
+        try:
+            r, s = _decode_signature(self.signature)
+            _public_key(jwk).verify(encode_dss_signature(r, s), outcome_signature_bytes(self), ec.ECDSA(hashes.SHA256()))
+            return True
+        except (InvalidSignature, ValueError, TypeError):
+            return False
+
+
+class ReconciledStep(_ClosedEvidence):
+    step_id: str
+    status: Literal['succeeded', 'failed_without_effect', 'outcome_unknown', 'manual_review_required']
+    result: JsonValue
+    error_code: str | None
+
+
+class ConnectorReconciledOutcomeV2(_ClosedEvidence):
+    """Server projection facts retaining both authentic source records.
+
+    This is deliberately not a device-signed normal execution Outcome.
+    """
+    protocol: Literal['ai00.connector.execution-plan.v2']
+    record_type: Literal['server_reconciliation_v2']
+    plan_id: str
+    plan_hash: str
+    lease_id: str
+    tenant_id: str
+    device_id: str
+    runtime_generation: int
+    runtime_instance_id: str
+    overall_status: Literal['succeeded', 'failed_without_effect', 'manual_review_required']
+    journal_sequence: int
+    reported_at: Timestamp
+    steps: list[ReconciledStep]
+    original_outcome: ConnectorPlanOutcomeV2 | None
+    evidence: ConnectorReconciliationEvidenceV2
+
+
+def parse_v2_outcome(value):
+    model = ConnectorReconciledOutcomeV2 if value.get('record_type') == 'server_reconciliation_v2' else ConnectorPlanOutcomeV2
+    return model.model_validate(value)
 
 
 def parse_plan(value):
@@ -27,13 +106,6 @@ def projection_status(value):
     status = getattr(value, 'overall_status', None) or value.status
     return {'succeeded': 'completed', 'failed_without_effect': 'failed',
             'manual_review_required': 'outcome_unknown'}.get(status, status)
-
-
-def projection_result(step):
-    value = step.result
-    if isinstance(step, ConnectorStepResultV2) and isinstance(value, dict) and 'nonce' in value:
-        return value.get('observed_result')
-    return value
 
 
 class PlanSigner:
@@ -99,16 +171,32 @@ class OutcomeVerifier:
             raise ValueError('plan_outcome_invalid')
 
 
+def original_outcome(plan_row):
+    raw = plan_row.get('outcome_json')
+    if not raw:
+        return None
+    raw = json.loads(raw) if isinstance(raw, str) else raw
+    value = parse_v2_outcome(raw)
+    return value.original_outcome if isinstance(value, ConnectorReconciledOutcomeV2) else value
+
+
 def probe_context(plan_row, recovery):
     plan = json.loads(plan_row['plan_json']) if isinstance(plan_row['plan_json'], str) else plan_row['plan_json']
+    original = original_outcome(plan_row)
+    # A verified execution prefix proves later steps were never invoked. With
+    # no original Outcome, every declared probe is required, including all writes.
+    invoked = plan['steps'][:len(original.steps)] if original else plan['steps']
+    has_effects = any(s['side_effect_classification'] != 'read' for s in plan['steps'])
+    required = [dict(step_id=s['step_id'], probe_id=s['post_condition_probe_id'])
+                for s in invoked if s['post_condition_probe_id']
+                and (s['side_effect_classification'] != 'read' or not has_effects)]
     context = dict(scope='read_only_post_condition_probe', plan_id=plan_row['plan_id'],
-                   plan_hash=plan_row['plan_hash'], lease_id=plan_row['lease_id'],
-                   runtime_instance_id=plan_row['runtime_instance_id'], runtime_generation=plan_row['runtime_generation'],
-                   device_id=plan_row['device_id'], tenant_id=plan_row['tenant_gid'],
-                   probes=[dict(step_id=s['step_id'], probe_id=s['post_condition_probe_id'])
-                           for s in plan['steps'] if s['post_condition_probe_id']])
-    # A server-held recovery token hash binds the nonce to this recovery session
-    # and the original lease. The response contains no executable mutation.
+        plan_hash=plan_row['plan_hash'], lease_id=plan_row['lease_id'],
+        runtime_instance_id=plan_row['runtime_instance_id'], runtime_generation=plan_row['runtime_generation'],
+        device_id=plan_row['device_id'], tenant_id=plan_row['tenant_gid'],
+        recovery_instance_id=recovery.get('recovery_instance_id', plan_row['runtime_instance_id']),
+        recovery_session_id=hashlib.sha256(('reconciliation-session:' + recovery['token_hash']).encode()).hexdigest(),
+        required_probes=required)
     context['nonce'] = hashlib.sha256(canonicalize_v2(context) + recovery['token_hash'].encode()).hexdigest()
     return context
 
@@ -126,21 +214,48 @@ class ReconciliationService:
             return 'failed_without_effect'
         return 'manual_review_required'
 
-    def verify(self, plan_row, recovery, outcome):
+    def verify(self, plan_row, recovery, evidence, jwk):
+        evidence = ConnectorReconciliationEvidenceV2.model_validate(evidence)
+        if not evidence.verify_signature(jwk):
+            raise ValueError('outcome_signature_invalid')
         context = probe_context(plan_row, recovery)
-        declared = {p['step_id']: p['probe_id'] for p in context['probes']}
-        classifications = []
-        for step in outcome.steps:
-            result = step.result
-            if not isinstance(result, dict) or result.get('nonce') != context['nonce']:
-                raise ValueError('reconciliation_evidence_invalid')
-            if step.step_id in declared:
-                if result.get('probe_id') != declared[step.step_id]:
-                    raise ValueError('reconciliation_evidence_invalid')
-                classifications.append(result.get('classification'))
-        if set(declared) - {s.step_id for s in outcome.steps}:
-            classifications.append('inconclusive')
-        status = self.reconcile(outcome.plan_id, dict(plan_id=outcome.plan_id, classifications=classifications))
-        if outcome.overall_status != status:
+        if any(getattr(evidence, key) != value for key, value in context.items() if key != 'required_probes'):
             raise ValueError('reconciliation_evidence_invalid')
-        return status
+        required = [(p['step_id'], p['probe_id']) for p in context['required_probes']]
+        actual = [(p.step_id, p.probe_id) for p in evidence.probes]
+        # Ordered subsets are inconclusive; duplicate, unknown, or reordered
+        # probes are malformed evidence and never advance the journal.
+        if len(set(actual)) != len(actual) or any(p not in required for p in actual):
+            raise ValueError('reconciliation_evidence_invalid')
+        if actual != [p for p in required if p in actual]:
+            raise ValueError('reconciliation_evidence_invalid')
+        classifications = [p.classification for p in evidence.probes]
+        if actual != required:
+            classifications.append('inconclusive')
+        status = self.reconcile(evidence.plan_id, dict(plan_id=evidence.plan_id, classifications=classifications))
+        plan = parse_plan(json.loads(plan_row['plan_json']) if isinstance(plan_row['plan_json'], str) else plan_row['plan_json'])
+        original = original_outcome(plan_row)
+        if status == 'succeeded' and original and len(original.steps) != len(plan.steps):
+            status = 'manual_review_required'
+        projected = {s.step_id: ReconciledStep(step_id=s.step_id, status=s.status, result=s.result, error_code=s.error_code)
+                     for s in original.steps} if original else {}
+        for probe in evidence.probes:
+            step_status = {'inconclusive':'manual_review_required'}.get(probe.classification, probe.classification)
+            projected[probe.step_id] = ReconciledStep(step_id=probe.step_id, status=step_status,
+                result=probe.observed_result, error_code=None if step_status=='succeeded' else 'reconciliation_required')
+        steps = [projected[s.step_id] for s in plan.steps if s.step_id in projected]
+        if status == 'succeeded':
+            try:
+                from backend.capability_v2.contracts import ArtifactRef
+                from .document_snapshots import _validate_snapshot
+                for step in plan.steps:
+                    if step.operation_id == 'vismockup.document.snapshot@1':
+                        _validate_snapshot(projected[step.step_id].result)
+                    if step.operation_id == 'vismockup.view.capture@1':
+                        ArtifactRef.model_validate(projected[step.step_id].result['artifact'])
+            except (ValueError, RuntimeError, KeyError, TypeError):
+                status = 'manual_review_required'
+        return ConnectorReconciledOutcomeV2(protocol=plan.protocol, record_type='server_reconciliation_v2',
+            **{k:getattr(evidence,k) for k in ('plan_id','plan_hash','lease_id','tenant_id','device_id',
+                'runtime_generation','runtime_instance_id','journal_sequence','reported_at')},
+            overall_status=status, steps=steps, original_outcome=original, evidence=evidence)

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 import json
+import hashlib
 from threading import RLock
 from typing import Any
 
@@ -172,11 +173,13 @@ class GovernedSimulationRuntimeClient:
         )
         correlation = CorrelationRef(
             request_id=f"connector-outcome-{digest}",
-            trace_id=f"connector-plan-{plan.plan_id}",
+            trace_id=(f"connector-plan-{hashlib.sha256(plan.plan_id.encode()).hexdigest()}"
+                if plan.protocol == 'ai00.connector.execution-plan.v2' else f"connector-plan-{plan.plan_id}"),
         )
         result = await self.client.invoke(DomainInvocation(
             capability_id, 1, payload,
-            idempotency_key=f"{plan.plan_id}:{outcome_hash}",
+            idempotency_key=('connector-projection-' + hashlib.sha256((plan.plan_id + '\0' + outcome_hash).encode()).hexdigest()
+                if plan.protocol == 'ai00.connector.execution-plan.v2' else f"{plan.plan_id}:{outcome_hash}"),
         ), identity, correlation)
         if result.status is not CapabilityStatus.COMPLETED or result.error is not None:
             error = result.error

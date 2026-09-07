@@ -220,17 +220,17 @@ def sign_outcome(source):
 
 
 def reconciled_outcome(database, plan, leased):
-    from backend.contracts.connector_execution_plan_v2 import canonicalize_v2
-    from plugins.simulation.simulation_backend.application.connector_protocol_v2 import probe_context
+    from plugins.simulation.simulation_backend.application.connector_protocol_v2 import probe_context, ConnectorReconciliationEvidenceV2
     row = read(database)
     recovered = read(database, 'runtime_recovery_sessions') or {'token_hash': row['session_token_hash']}
     context = probe_context(read(database, 'runtime_plans'), recovered)
-    value = outcome_for(plan, leased).model_dump(mode='json')
-    result = dict(probe_id='vismockup.application.postcondition@1', nonce=context['nonce'], classification='succeeded')
-    value['steps'][0].update(result=result, result_hash='sha256:'+hashlib.sha256(canonicalize_v2(result)).hexdigest())
-    value['journal_sequence'] = row['last_journal_sequence']+1
+    value = {k:v for k,v in context.items() if k != 'required_probes'}
+    value.update(protocol='ai00.connector.reconciliation-evidence.v2',
+        probes=[dict(**p, classification='succeeded', observed_result=None) for p in context['required_probes']],
+        journal_sequence=row['last_journal_sequence']+1, reported_at='2026-09-07T12:00:00Z',
+        device_key_id='device-key-001', signature_algorithm='ecdsa-p256-sha256')
     value['signature'] = sign_outcome(value)
-    return ConnectorPlanOutcomeV2.model_validate(value)
+    return ConnectorReconciliationEvidenceV2.model_validate(value)
 
 
 def complete(database, registered, outcome, *, reconciled=False, now=NOW):
@@ -332,8 +332,11 @@ def test_completion_idempotency_conflict_and_reconciliation(database):
     complete(database, registered, unknown)
     complete(database, registered, unknown)
     success = reconciled_outcome(database, current, leased)
+    normal = outcome_for(current, leased).model_dump(mode='json')
+    normal['journal_sequence'] = 2
+    normal['signature'] = sign_outcome(normal)
     with pytest.raises(ConnectorRepositoryError, match="connector_outcome_conflict"):
-        complete(database, registered, success)
+        complete(database, registered, ConnectorPlanOutcomeV2.model_validate(normal))
     complete(database, registered, success, reconciled=True)
     row = read(database, "runtime_plans")
     assert row["status"] == "succeeded"
@@ -362,6 +365,7 @@ def test_wrong_token_and_expired_session_cannot_complete_or_reconcile(database):
     leased = lease(database, registered)
     outcome = outcome_for(current, leased)
     for reconcile in (False, True):
+        outcome = reconciled_outcome(database, current, leased) if reconcile else outcome
         with pytest.raises(ConnectorRepositoryError, match="runtime_session_invalid"):
             complete(database, replace(registered, session_token="wrong"), outcome, reconciled=reconcile)
         with pytest.raises(ConnectorRepositoryError, match="runtime_session_invalid"):
@@ -467,7 +471,7 @@ def test_recovery_registration_race_and_scope(database):
             method(database[1], 7, f"recovery-{winner}", f"token-{winner}", *args)
     with pytest.raises(ConnectorRepositoryError, match="plan_lease_invalid"):
         repo.mark_reconciled(database[1], 7, f"recovery-{winner}", f"token-{winner}",
-            outcome_for(plan, leased).model_copy(update={"plan_id": "other-plan"}), now)
+            reconciled_outcome(database, plan, leased).model_copy(update={"plan_id": "other-plan"}), now)
     repo.mark_reconciled(database[1], 7, f"recovery-{winner}", f"token-{winner}", reconciled_outcome(database, plan, leased), now)
     row = read(database)
     assert row["current_runtime_instance_id"] == registered.runtime_instance_id
@@ -489,7 +493,7 @@ def test_recovery_rejects_expiry_wrong_generation_and_resolved_plan(database):
             NOW + timedelta(seconds=120), now=NOW + timedelta(seconds=61))
     recovery(database, plan)
     with pytest.raises(ConnectorRepositoryError, match="runtime_session_invalid"):
-        repo.mark_reconciled(database[1], 7, "recovery-1", "recovery-secret", outcome_for(plan, leased), NOW + timedelta(seconds=122))
+        repo.mark_reconciled(database[1], 7, "recovery-1", "recovery-secret", reconciled_outcome(database, plan, leased), NOW + timedelta(seconds=122))
     recovery(database, plan, instance="recovery-2", token="new-token", now=NOW + timedelta(seconds=122))
     repo.mark_reconciled(database[1], 7, "recovery-2", "new-token", reconciled_outcome(database, plan, leased), NOW + timedelta(seconds=123))
     with pytest.raises(ConnectorRepositoryError, match="plan_reconciliation_invalid"):
