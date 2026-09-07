@@ -29,7 +29,7 @@ PLAN_HASH_PATTERN = r"^[0-9a-f]{64}$"
 BASE64URL_PATTERN = r"^[A-Za-z0-9_-]+$"
 TIMESTAMP_PATTERN = re.compile(
     r"^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])"
-    r"T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\.[0-9]{1,9})?Z$"
+    r"T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\.[0-9]{1,7})?Z$"
 )
 
 
@@ -40,7 +40,12 @@ def _validate_json(value: Any) -> Any:
         return value
     if isinstance(value, int):
         if not -SAFE_INTEGER_MAX <= value <= SAFE_INTEGER_MAX:
-            raise ValueError("json_safe_integer_required")
+            try:
+                binary64 = float(value)
+            except OverflowError as error:
+                raise ValueError("json_binary64_integer_required") from error
+            if not math.isfinite(binary64) or int(binary64) != value:
+                raise ValueError("json_binary64_integer_required")
         return value
     if isinstance(value, float):
         if not math.isfinite(value):
@@ -71,7 +76,7 @@ def _canonical_text(value: Any) -> str:
     if value is False:
         return "false"
     if isinstance(value, int):
-        return str(value)
+        return str(value) if -SAFE_INTEGER_MAX <= value <= SAFE_INTEGER_MAX else _canonical_float(float(value))
     if isinstance(value, float):
         return _canonical_float(value)
     if isinstance(value, str):
@@ -174,14 +179,23 @@ def _validate_timestamp(value: str) -> str:
     if not TIMESTAMP_PATTERN.fullmatch(value):
         raise ValueError("canonical_utc_timestamp_required")
     try:
-        datetime.fromisoformat(value[:-1] + "+00:00")
+        _timestamp_ticks(value)
     except ValueError as error:
         raise ValueError("canonical_utc_timestamp_required") from error
     return value
 
 
-def _timestamp(value: str) -> datetime:
-    return datetime.fromisoformat(value[:-1] + "+00:00")
+def _timestamp_ticks(value: str) -> int:
+    whole = datetime.strptime(value[:19], "%Y-%m-%dT%H:%M:%S")
+    fraction = value[20:-1] if len(value) > 20 else ""
+    fraction_ticks = int(fraction.ljust(7, "0")) if fraction else 0
+    whole_seconds = (
+        whole.toordinal() * 86_400
+        + whole.hour * 3_600
+        + whole.minute * 60
+        + whole.second
+    )
+    return whole_seconds * 10_000_000 + fraction_ticks
 
 
 Signature = Annotated[str, Field(pattern=BASE64URL_PATTERN), AfterValidator(_validate_signature)]
@@ -189,7 +203,9 @@ Timestamp = Annotated[str, AfterValidator(_validate_timestamp)]
 
 
 class _ClosedModel(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+    model_config = ConfigDict(
+        extra="forbid", strict=True, frozen=True, revalidate_instances="always",
+    )
 
 
 class ConnectorTargetProductV2(_ClosedModel):
@@ -263,7 +279,7 @@ class ConnectorExecutionPlanV2(_ClosedModel):
 
     @model_validator(mode="after")
     def verify_plan(self) -> "ConnectorExecutionPlanV2":
-        if _timestamp(self.expires_at) <= _timestamp(self.issued_at):
+        if _timestamp_ticks(self.expires_at) <= _timestamp_ticks(self.issued_at):
             raise ValueError("plan_expiry_must_follow_issue_time")
         seen: set[str] = set()
         for step in self.steps:
@@ -291,7 +307,7 @@ class ConnectorStepResultV2(_ClosedModel):
 
     @model_validator(mode="after")
     def verify_result(self) -> "ConnectorStepResultV2":
-        if _timestamp(self.completed_at) < _timestamp(self.started_at):
+        if _timestamp_ticks(self.completed_at) < _timestamp_ticks(self.started_at):
             raise ValueError("step_completion_precedes_start")
         if self.status == "succeeded":
             expected_hash = "sha256:" + hashlib.sha256(canonicalize_v2(self.result)).hexdigest()
@@ -356,8 +372,8 @@ def _public_key(jwk: Mapping[str, Any]) -> ec.EllipticCurvePublicKey:
 
 def _verify(value: Mapping[str, Any] | BaseModel, jwk: Mapping[str, Any], *, outcome: bool) -> bool:
     try:
-        raw = value.model_dump(mode="json") if isinstance(value, BaseModel) else value
-        model = ConnectorPlanOutcomeV2.model_validate(raw) if outcome else ConnectorExecutionPlanV2.model_validate(raw)
+        model_type = ConnectorPlanOutcomeV2 if outcome else ConnectorExecutionPlanV2
+        model = model_type.model_validate(value)
         r, s = _decode_signature(model.signature)
         data = outcome_signature_bytes(model) if outcome else plan_signature_bytes(model)
         _public_key(jwk).verify(encode_dss_signature(r, s), data, ec.ECDSA(hashes.SHA256()))

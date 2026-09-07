@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from datetime import datetime, timezone
+import hashlib
 import json
 from pathlib import Path
 
@@ -95,6 +96,26 @@ def test_canonicalization_uses_rfc8785_number_serialization():
     }) == b'{"numbers":[333333333.3333333,1e+30,4.5,0.002,1e-27,0]}'
 
 
+def test_canonical_number_and_complete_plan_round_trip_through_json(vector):
+    number_wire = canonicalize_v2({"number": 1e20})
+    assert number_wire == b'{"number":100000000000000000000}'
+    assert canonicalize_v2(json.loads(number_wire)) == number_wire
+    with pytest.raises(ValueError, match="json_binary64_integer_required"):
+        canonicalize_v2({"number": 9_007_199_254_740_993})
+
+    raw = deepcopy(vector["plan"])
+    payload = {"number": 1e20}
+    raw["steps"][0]["payload"] = payload
+    raw["steps"][0]["payload_hash"] = "sha256:" + hashlib.sha256(canonicalize_v2(payload)).hexdigest()
+    raw["plan_hash"] = compute_plan_hash(raw)
+    plan = ConnectorExecutionPlanV2.model_validate(raw)
+    plan_wire = canonicalize_v2(plan)
+    parsed = json.loads(plan_wire)
+
+    assert canonicalize_v2(parsed) == plan_wire
+    assert ConnectorExecutionPlanV2.model_validate(parsed).model_dump(mode="json") == parsed
+
+
 @pytest.mark.parametrize("case", ["mutation", "der", "high_s", "padding", "downgrade", "unknown_field"])
 def test_checked_in_rejection_vectors_fail_closed(vector, case):
     rejected = vector["rejection_cases"][case]
@@ -116,6 +137,51 @@ def test_plan_verifier_rejects_wrong_curve_and_private_jwk_members(vector):
 
     with pytest.raises(ValidationError):
         ConnectorExecutionPlanV2.model_validate({**vector["plan"], "signature": "a"})
+
+
+def test_verifiers_reject_coerced_model_instances_before_serialization(vector):
+    plan = ConnectorExecutionPlanV2.model_validate(vector["plan"])
+    coerced_plan = plan.model_copy(update={
+        "issued_at": datetime(2026, 9, 7, 1, 2, 3, tzinfo=timezone.utc),
+    })
+    with pytest.raises(ValidationError):
+        ConnectorExecutionPlanV2.model_validate(coerced_plan)
+    assert verify_plan_signature(coerced_plan, vector["plan_public_jwk"]) is False
+
+    outcome = ConnectorPlanOutcomeV2.model_validate(vector["outcome"])
+    coerced_outcome = outcome.model_copy(update={
+        "reported_at": datetime(2026, 9, 7, 1, 2, 6, tzinfo=timezone.utc),
+    })
+    with pytest.raises(ValidationError):
+        ConnectorPlanOutcomeV2.model_validate(coerced_outcome)
+    assert verify_outcome_signature(coerced_outcome, vector["device_public_jwk"]) is False
+
+
+def test_timestamps_use_exact_100ns_ordering_and_reject_higher_precision(vector):
+    ordered = deepcopy(vector["plan"])
+    ordered["issued_at"] = "2026-09-07T01:02:03.0000001Z"
+    ordered["expires_at"] = "2026-09-07T01:02:03.0000002Z"
+    ordered["plan_hash"] = compute_plan_hash(ordered)
+    assert ConnectorExecutionPlanV2.model_validate(ordered).expires_at.endswith("2Z")
+
+    equal = deepcopy(ordered)
+    equal["issued_at"] = "2026-09-07T01:02:03.1Z"
+    equal["expires_at"] = "2026-09-07T01:02:03.1000000Z"
+    equal["plan_hash"] = compute_plan_hash(equal)
+    with pytest.raises(ValidationError, match="plan_expiry_must_follow_issue_time"):
+        ConnectorExecutionPlanV2.model_validate(equal)
+
+    too_precise = deepcopy(ordered)
+    too_precise["issued_at"] = "2026-09-07T01:02:03.00000001Z"
+    too_precise["plan_hash"] = compute_plan_hash(too_precise)
+    with pytest.raises(ValidationError, match="canonical_utc_timestamp_required"):
+        ConnectorExecutionPlanV2.model_validate(too_precise)
+
+    reversed_step = deepcopy(vector["outcome"])
+    reversed_step["steps"][0]["started_at"] = "2026-09-07T01:02:04.0000002Z"
+    reversed_step["steps"][0]["completed_at"] = "2026-09-07T01:02:04.0000001Z"
+    with pytest.raises(ValidationError, match="step_completion_precedes_start"):
+        ConnectorPlanOutcomeV2.model_validate(reversed_step)
 
 
 def test_outcome_requires_at_least_one_ordered_step_result(vector):
