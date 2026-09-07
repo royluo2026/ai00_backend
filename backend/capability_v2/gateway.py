@@ -150,6 +150,9 @@ class CapabilityGatewayService:
         return self._metrics.recent()
 
     async def request_approval(self, envelope: InvocationEnvelope) -> IssuedApproval:
+        from .identity import CONSUMER_IDENTITY_FIELDS
+        if CONSUMER_IDENTITY_FIELDS.intersection(envelope.payload):
+            raise GatewayPolicyError("consumer_identity_override_forbidden", "Consumer identity comes from authenticated context.")
         try:
             descriptor, provider = self._resolve_envelope(envelope)
         except GatewayPolicyError:
@@ -198,6 +201,9 @@ class CapabilityGatewayService:
             ) from exc
 
     async def invoke(self, envelope: InvocationEnvelope) -> CapabilityResultV2:
+        from .identity import CONSUMER_IDENTITY_FIELDS
+        if CONSUMER_IDENTITY_FIELDS.intersection(envelope.payload):
+            return self._rejected(envelope, "consumer_identity_override_forbidden", "Consumer identity comes from authenticated context.")
         try:
             descriptor, provider = self._resolve_envelope(envelope)
         except GatewayPolicyError as exc:

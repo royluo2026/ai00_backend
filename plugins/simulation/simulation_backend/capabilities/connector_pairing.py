@@ -1,4 +1,4 @@
-"""Simulation Capability provider for browser-assisted Connector pairing."""
+"""Simulation Capability provider for authenticated interactive Connector pairing."""
 from __future__ import annotations
 
 from backend.capability_v2.provider_contracts import (
@@ -14,6 +14,15 @@ from ..data.connector_repository import SqlPairingRepository
 from ..data.connector_app_pairing_repository import SqlAppPairingRepository
 from ..domain.connector_pairing import PairingError, PairingRequest, PairingService
 from .connector_runtime import connector_plan_signing_material
+
+
+# Exact App consumer contract; v1 device bootstrap remains a legacy transport.
+DESKTOP_CAPABILITY_BINDINGS = (
+    ("simulation.connector.pairing.approve", 2),
+    ("simulation.connector.pairing.summary.get", 2),
+    ("simulation.connector.pairing.cancel", 2),
+    ("simulation.connector.binding.get", 1),
+)
 
 
 def _plan_credentials(connector_id: str) -> dict:

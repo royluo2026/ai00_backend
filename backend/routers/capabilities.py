@@ -5,7 +5,8 @@ import re
 from typing import Any
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict, model_validator
+from backend.capability_v2.identity import authenticated_user_consumer, CONSUMER_IDENTITY_FIELDS
 
 from backend.capabilities.init_next import CapabilityBusinessError, CapabilityError, capability_registry
 from backend.routers.deps import build_profile, get_current_user
@@ -24,11 +25,20 @@ from backend.capability_v2.policies import GatewayPolicyError
 
 
 class InvokeRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     payload: dict[str, Any] = Field(default_factory=dict)
     version: int | None = Field(default=None, ge=1)
     confirmation_token: str | None = None
     idempotency_key: str | None = Field(default=None, min_length=1, max_length=255)
     expected_resource_version: str | None = Field(default=None, max_length=255)
+
+    @model_validator(mode="before")
+    @classmethod
+    def reject_consumer_override(cls, value):
+        if isinstance(value, dict) and (CONSUMER_IDENTITY_FIELDS.intersection(value) or
+                isinstance(value.get("payload"), dict) and CONSUMER_IDENTITY_FIELDS.intersection(value["payload"])):
+            raise HTTPException(status_code=400, detail={"code": "consumer_identity_override_forbidden"})
+        return value
 
 
 def _correlation_id(candidate: str | None, fallback: str) -> str:
@@ -46,7 +56,7 @@ def _web_identity(current_user: dict, principal) -> ConsumerIdentity:
                 current_user.get("org_role"), current_user.get("system_role"),
             ))),
         ),
-        consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web"),
+        consumer=authenticated_user_consumer(principal, str(current_user.get("team_id") or f"user:{current_user['gid']}")),
     )
 
 

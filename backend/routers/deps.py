@@ -157,10 +157,20 @@ def get_authenticated_principal(
     if not user or not user.get("is_active"):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found or inactive")
     authenticated_at = _authentication_time(payload)
+    from backend.capability_v2.identity import DesktopConsumerClaim
+    from pydantic import ValidationError
+    try:
+        desktop_consumer = (DesktopConsumerClaim.model_validate(payload['desktop_consumer'])
+                            if 'desktop_consumer' in payload else None)
+        if desktop_consumer is not None and desktop_consumer.tenant_id != str(user.get('team_id') or f"user:{user['gid']}"):
+            raise ValueError('desktop tenant mismatch')
+    except (ValidationError, ValueError) as exc:
+        raise HTTPException(status_code=401, detail={"code": "desktop_consumer_claim_invalid"}) from exc
     return AuthenticatedPrincipal(
         user_id=str(user["gid"]),
         authentication_method="jwt",
         authenticated_at=authenticated_at,
+        desktop_consumer=desktop_consumer,
     )
 
 

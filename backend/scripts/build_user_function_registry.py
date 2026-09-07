@@ -448,12 +448,32 @@ def scan_agent_runtime_routes(root: Path) -> dict[str, dict]:
     return found
 
 
+def scan_desktop_consumers(root: Path) -> dict[str, dict]:
+    """Record exact declared App contracts separately from frozen legacy rows."""
+    from backend.capability_v2.identity import DESKTOP_CONSUMER_ID
+    from plugins.simulation.simulation_backend.capabilities import connector_pairing, connector_runtime
+    found: dict[str, dict] = {}
+    for module in (connector_pairing, connector_runtime):
+        source = "plugins/simulation/simulation_backend/capabilities/" + module.__name__.rsplit(".", 1)[-1] + ".py"
+        if not (root / source).is_file():
+            continue
+        for capability_id, version in module.DESKTOP_CAPABILITY_BINDINGS:
+            _add(found, f"desktop_capability:{capability_id}@{version}",
+                 consumer=DESKTOP_CONSUMER_ID, source_path=source, domain="Simulation", stability="experimental")
+    route_source = "backend/routers/simulation_connector.py"
+    if (root / route_source).is_file():
+        for binding in connector_runtime.DESKTOP_TRANSPORT_BINDINGS:
+            _add(found, f"rest:{binding['method']}:{binding['route']}",
+                 consumer=binding["consumer_id"], source_path=route_source, domain="Simulation")
+    return found
+
+
 def discover_user_functions(root: Path = REPOSITORY_ROOT) -> list[dict]:
     """Return sorted records discovered from every supported public-function surface."""
     found: dict[str, dict] = {}
     for scanner in (scan_fastapi_routes, scan_web_calls, scan_capability_registrations,
                     scan_agent_tools, scan_mcp_tools, scan_local_runtime_commands,
-                    scan_agent_runtime_routes):
+                    scan_agent_runtime_routes, scan_desktop_consumers):
         for function_id, row in scanner(root).items():
             for consumer in row["current_consumers"]:
                 _add(found, function_id, consumer=consumer, source_path=next(iter(row["source_paths"])),
@@ -465,6 +485,10 @@ def discover_user_functions(root: Path = REPOSITORY_ROOT) -> list[dict]:
 
 def _defaults(discovered: dict) -> dict:
     function_id = discovered["function_id"]
+    if function_id.startswith("desktop_capability:"):
+        capability_id, version = function_id.removeprefix("desktop_capability:").rsplit("@", 1)
+        base = _defaults({**discovered, "function_id": "capability:" + capability_id})
+        return {**base, "function_id": function_id, "target_major_version": int(version)}
     target_capability = TARGET_CAPABILITIES.get(function_id)
     if function_id.startswith("capability:"):
         target_capability = function_id.removeprefix("capability:")
@@ -842,6 +866,10 @@ def validate_registry_document(document: object, schema: dict) -> list[str]:
             errors.append("record has invalid domain")
         if record.get("stability") not in {"stable", "experimental", "deprecated"}:
             errors.append("record has invalid stability")
+        if "target_major_version" in record and (
+            type(record["target_major_version"]) is not int or record["target_major_version"] < 1
+        ):
+            errors.append("record has invalid target_major_version")
         if not isinstance(record.get("current_consumers"), list) or not isinstance(record.get("source_paths"), list):
             errors.append("record evidence fields must be arrays")
         if record.get("target_capability") is None:

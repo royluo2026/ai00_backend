@@ -56,7 +56,37 @@ def verify(token: str) -> dict:
     返回 payload dict。
     """
     s = get_settings()
-    return jwt.decode(token, s.jwt_secret, algorithms=[ALGORITHM])
+    try:
+        payload = jwt.decode(token, s.jwt_secret, algorithms=[ALGORITHM])
+        if "desktop_consumer" in payload:
+            # Older browser sessions retain their compatibility contract; new
+            # desktop sessions always require signed actor and time bounds.
+            payload = jwt.decode(token, s.jwt_secret, algorithms=[ALGORITHM], options={"require": ["sub", "iat", "exp"]})
+        return payload
+    except (TypeError, ValueError) as exc:
+        raise jwt.InvalidTokenError("Invalid authentication claims") from exc
+
+
+def sign_desktop_session(principal, *, tenant_id: str, installation_id: str, consumer_version: str) -> str:
+    """Server-only completion of a verified desktop OAuth PKCE authentication.
+
+    The OAuth adapter owns verification of state, redirect and PKCE before
+    creating this principal. There is deliberately no browser-token exchange
+    endpoint or caller-selected consumer identity.
+    """
+    from backend.capability_v2.identity import DesktopConsumerClaim, DESKTOP_CONSUMER_ID, IdentityError
+    if not principal.user_id or principal.authentication_method != "oauth2_pkce":
+        raise IdentityError("desktop_pkce_authentication_required")
+    claim = DesktopConsumerClaim(consumer_id=DESKTOP_CONSUMER_ID, tenant_id=tenant_id,
+        installation_id=installation_id, consumer_version=consumer_version)
+    now = datetime.now(timezone.utc)
+    if principal.authenticated_at > now:
+        raise IdentityError("desktop_authentication_time_invalid")
+    settings = get_settings()
+    return jwt.encode(dict(sub=principal.user_id, team_id=tenant_id,
+        auth_time=principal.authenticated_at.timestamp(), iat=now,
+        exp=now + timedelta(hours=settings.jwt_expire_hours),
+        desktop_consumer=claim.model_dump()), settings.jwt_secret, algorithm=ALGORITHM)
 
 
 def decode_unverified(token: str) -> dict:

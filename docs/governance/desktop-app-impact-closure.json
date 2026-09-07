@@ -1,0 +1,4731 @@
+{
+  "schema_version": 1,
+  "consumer_id": "ai00.desktop.windows-x64",
+  "consumer_type": "web",
+  "transport_classification": "authenticated interactive Gateway; single Windows x64 App product",
+  "source_basis": "content-addressed source set; not a promoted release candidate",
+  "source_hash_format": "UTF-8 source bytes with LF line endings, matching native Provider hashing",
+  "source_set_hash": "sha256:5748222c119b9f78f6b738decb33d9655d5f1be88702122ed07c9e087e302782",
+  "published_catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
+  "published_catalog_hash": "sha256:09e54550fcbaaab2df24bfa28d2c2478d9d47f455a27563405bce365efb2e2fd",
+  "published_catalog_current": false,
+  "catalog_generation_errors": [
+    "unbounded stable collection: knowledge.document.acl.list@1 output_schema.items",
+    "unbounded stable collection: knowledge.get@1 output_schema.attachments",
+    "unbounded stable collection: knowledge.get@1 output_schema.related_operation_gids",
+    "unbounded stable collection: knowledge.get@1 output_schema.related_part_nos",
+    "unbounded stable collection: knowledge.get@1 output_schema.tags",
+    "unbounded stable collection: knowledge.migration.status@1 output_schema.items",
+    "unbounded stable collection: knowledge.migration.status@1 output_schema.runs",
+    "unbounded stable collection: knowledge.proposal.get@1 output_schema.tags",
+    "unbounded stable collection: knowledge.proposal.list@1 output_schema.items[].tags",
+    "unbounded stable collection: knowledge.proposal.review@1 output_schema.tags",
+    "unbounded stable collection: knowledge.propose@1 output_schema.tags",
+    "unbounded stable collection: knowledge.search@1 output_schema.items[].attachments",
+    "unbounded stable collection: knowledge.search@1 output_schema.items[].related_operation_gids",
+    "unbounded stable collection: knowledge.search@1 output_schema.items[].related_part_nos",
+    "unbounded stable collection: knowledge.search@1 output_schema.items[].tags",
+    "unbounded stable collection: knowledge.space.search@1 output_schema.items"
+  ],
+  "roots": [
+    "simulation.connector.binding.get@1",
+    "simulation.connector.health.get@1",
+    "simulation.connector.pairing.approve@2",
+    "simulation.connector.pairing.cancel@2",
+    "simulation.connector.pairing.summary.get@2",
+    "simulation.connector.plan.queue@2",
+    "simulation.connector.runtime.takeover@1",
+    "simulation.environment.preflight@1",
+    "simulation.vismockup.application.attach.request@1",
+    "simulation.vismockup.application.launch.request@1",
+    "simulation.vismockup.command.get@1",
+    "simulation.vismockup.model.close.request@1",
+    "simulation.vismockup.model.open.request@1",
+    "simulation.vismockup.tree.read.request@1",
+    "simulation.vismockup.visibility.change.request@1"
+  ],
+  "capabilities": [
+    {
+      "id": "agent.canvas.execution.resume",
+      "major_version": 1,
+      "capability_version_gid": "cv2_144847665bd4d9d31e769ef5",
+      "business_definition_hash": "sha256:4817cb4ec3b40d39f840aa19b0af22a1a1e28215ac800495784458f93f60f16c",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "agent.v2:agent.write",
+      "execution_mode": "cloud_async",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:78306f4edb0efa9b2d94c7ecda4985136656251d8140c77515c22cc5965bc575"
+    },
+    {
+      "id": "agent.canvas.execution.start",
+      "major_version": 1,
+      "capability_version_gid": "cv2_ca14eeaba4789cbd2e1b9ca3",
+      "business_definition_hash": "sha256:61e200bdf080f911e0aa31945e9b7a405ae11756cb3c1cda62ac6dcec78f9e11",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "agent.v2:agent.write",
+      "execution_mode": "cloud_async",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:1cf53e6d4af26c9d95a1ff0196774660649700a2cdd2adbea480a1ffbb9e7714"
+    },
+    {
+      "id": "agent.canvas.options.resolve",
+      "major_version": 1,
+      "capability_version_gid": "cv2_30471d2a719b5d1ed503285f",
+      "business_definition_hash": "sha256:cb685ab159b9074b99cc5c24aca75c61defb46dd9502ba624b6223fa914c5fb4",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "agent.v2:agent.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:3d2a320def6f1c70354b83314a520082c68aa1e80d772bcfef18f0d9e6326ca0"
+    },
+    {
+      "id": "agent.catalog_tool.confirm.apply",
+      "major_version": 1,
+      "capability_version_gid": "cv2_f11ad30fd2b3570c6feeb96c",
+      "business_definition_hash": "sha256:e7dc458697a58e352a8c9d6cf9c7eac775af2b67f34e0371a8cd84665e3ea948",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "dist/packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        },
+        {
+          "consumer_id": "dist/packages/agent-plugin/web/automation_hub/ai_assistant.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "agent.v2:agent.interact",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:c7768238646a80f177f4d6f522156cbcacd264109b904fd2a887e498404aa03a"
+    },
+    {
+      "id": "agent.flow.change.apply",
+      "major_version": 1,
+      "capability_version_gid": "cv2_f1f27112e425df9fb6eb77c6",
+      "business_definition_hash": "sha256:53c5dc490bb29a1e9e118bf7f82f0e9f970fbff3b59465c16849a1ca790b8443",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "agent-plugin/flow_canvas/flow_editor.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        },
+        {
+          "consumer_id": "web/canvas/types/flow_type.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "agent.v2:agent.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:b435ed05a346da2b576867e135dfcfd268dda64f85424cd274478343d3110ff0"
+    },
+    {
+      "id": "agent.flow.read",
+      "major_version": 1,
+      "capability_version_gid": "cv2_f3448e3c2c160ce1f5ae7028",
+      "business_definition_hash": "sha256:160cafb635e54ef4210b42a3704a1431014dc5dcb499bbb0e512661ec0fbd9f6",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "agent-plugin/flow_canvas/flow_editor.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        },
+        {
+          "consumer_id": "web/canvas/types/flow_type.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "agent.v2:agent.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:8cf2245bd8de5197fb05138043b97a74cbc614a998617f92adf8686a59ecfaa4"
+    },
+    {
+      "id": "agent.interaction.chat.change.apply",
+      "major_version": 1,
+      "capability_version_gid": "cv2_8335e9c791643fbf4536a58e",
+      "business_definition_hash": "sha256:cd4e5f972aeffa4be59487b94163c985098a720c7c09e23825f617d704e13805",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "agent.v2:agent.interact",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:6ba2d8ebc7deac2d3416d1aa3f11aa74bee427e7afaa4db2e1c63347e6a519f4"
+    },
+    {
+      "id": "agent.interaction.chat.change.apply",
+      "major_version": 2,
+      "capability_version_gid": "cv2_a09683f34b2ca0145f27d5f9",
+      "business_definition_hash": "sha256:4fd51f5a68c7ce37804b93b7fc85fa2a667ea31d4f8c72c0f2fea7228e47eb74",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "dist/web/workbench/workbench.js",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        },
+        {
+          "consumer_id": "dist/packages/agent-plugin/web/wfc_window/wfc_window.js",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        },
+        {
+          "consumer_id": "dist/packages/agent-plugin/web/automation_hub/ai_assistant.js",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "agent.v2:agent.interact",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:aaaa86150afe7d191bd798feacd752e6fdd9f6e53b1bad868aea69b2a1b91618"
+    },
+    {
+      "id": "agent.orchestration.graph.read",
+      "major_version": 1,
+      "capability_version_gid": "cv2_22abad02f4f600570338a59d",
+      "business_definition_hash": "sha256:42b60bb302fe278f2ea8c2e03a401340bea009bab475c455e9722ca543c2e04f",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "packages/agent-plugin/web/orchestration_center/index.html",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "agent.v2:agent.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:ee53974e26342918e5abee9f08a04226a5852fadac2fe64bfae6dbbedd68eb6d"
+    },
+    {
+      "id": "agent.orchestration.metric.read",
+      "major_version": 1,
+      "capability_version_gid": "cv2_8411baf32e6338cf4126a977",
+      "business_definition_hash": "sha256:a110d46b4ff23900219647b680bf46bb7f5e058eb4b4f11f65843e9125d45afb",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "packages/agent-plugin/web/orchestration_center/index.html",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "agent.v2:agent.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:388e10d095f43732c8dfea279cf7dc18e6952d8fd26bb52e54b65b286c51a920"
+    },
+    {
+      "id": "agent.orchestration.panorama.read",
+      "major_version": 1,
+      "capability_version_gid": "cv2_0a86d22be2508b177ded231f",
+      "business_definition_hash": "sha256:5dde05ad1cc7e52869e26708ef178e6a2ccc51ed1fef17347b11b868b18a7868",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "packages/agent-plugin/web/orchestration_center/index.html",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "agent.v2:agent.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:aeb2c2348c9285e97a4f881c4cb0bcf1901747892b4c5316c81780746e1eff44"
+    },
+    {
+      "id": "agent.runtime.config.read",
+      "major_version": 1,
+      "capability_version_gid": "cv2_a842e75061603bfe5d402d58",
+      "business_definition_hash": "sha256:32318eb009d5d670107e28de0759da95930d98cef9cc3f7962647e03f39bf054",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "dist/packages/agent-plugin/web/automation_hub/ai_settings.html",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        },
+        {
+          "consumer_id": "dist/packages/agent-plugin/web/automation_hub/ai_assistant.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "agent.v2:agent.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:716278f61f3400870b58f06fa642fc39f355c01b304e1e3c40ba8407c3c1e3c1"
+    },
+    {
+      "id": "agent.workflow.node.test.execute",
+      "major_version": 1,
+      "capability_version_gid": "cv2_a21a297112412b6deab23132",
+      "business_definition_hash": "sha256:cb6110fc0bbde77c671c913aad7ca8a54d9235a4be4b5f36a89fcae68cd37f62",
+      "owner_domain": "agent",
+      "provider_ref": "agent.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "agent.v2:agent.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:7c2a29142e859bf55a350447d4e1b46f34df35be03e49de9c712c40985bbbf24"
+    },
+    {
+      "id": "base.authorization.grant.create",
+      "major_version": 1,
+      "capability_version_gid": "cv2_1bc41a75803b41f153dc323f",
+      "business_definition_hash": "sha256:f9081015567833f1be48ecfcd2917b7ac7777a6cb3ee5eecbbacfcc73d4570a4",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "base.v2:system.user.manage",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:ea1c91d973f085c0a0ff04c8330e358afb2e2628814a3a07a9e2e00c0a7a56a0"
+    },
+    {
+      "id": "base.authorization.grant.list",
+      "major_version": 1,
+      "capability_version_gid": "cv2_84058a3b606290be1aa1c173",
+      "business_definition_hash": "sha256:194ee3153f83ada1b97550e9aa20a9ee4d3d0983d4413d3c42e4207a79d8000e",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "base.v2:system.user.manage",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:a81a10e93817b7269b6e68cf69cc4f9c04d3ecd90b322a5a517905ac0e7bca2e"
+    },
+    {
+      "id": "base.authorization.grant.revoke",
+      "major_version": 1,
+      "capability_version_gid": "cv2_1c3b7784e36c2ccd7cf0e706",
+      "business_definition_hash": "sha256:2bb534c22962aa63de1222a363f14551713f814abeaac3ce4a9732aab2713f2c",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "base.v2:system.user.manage",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:e2f0f9a8de11669237bb4f95e54e029b4ab4e5dfb2d1867baa52446285324226"
+    },
+    {
+      "id": "base.identity.admin_user.list",
+      "major_version": 1,
+      "capability_version_gid": "cv2_33d16718ea62c2249dfc7e6a",
+      "business_definition_hash": "sha256:d197114674ef4d16bc288356891c496b5fb4fe9333f477745fdce604f458f33a",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "base.v2:system.user.manage",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:2ad5c11b90b419c9bbb6b12386e0e6330c131252f106e09911c563daa3b51285"
+    },
+    {
+      "id": "base.identity.directory.feishu.sync",
+      "major_version": 1,
+      "capability_version_gid": "cv2_1cbcee1e99f6c4255ad6ef5a",
+      "business_definition_hash": "sha256:0264060b750c878068321d292b252433fe44958a615a5769128f5469340e3b47",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "admin",
+      "authorization_policy": "base.v2:system.tech_config",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:80df311e805d537d12a0856d47c08147e96e143e729e0fbf92c12a556573f74c"
+    },
+    {
+      "id": "base.identity.role.assign.atomic",
+      "major_version": 1,
+      "capability_version_gid": "cv2_393abbf07baad5665eca796d",
+      "business_definition_hash": "sha256:59fb66b3e4695847daa3cb77a3b1fd27352df4b8b15f20fdb03f07209c8dc48f",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "base.v2:system.user.manage",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:3f086cd8802853ecbede2ff15a91714d0514bf69831abd40f3656037db1361f5"
+    },
+    {
+      "id": "base.identity.session.profile.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_4499ba05a02a58d4613d224f",
+      "business_definition_hash": "sha256:cdfdfa4f6995948667e8a68d55134e01c06b9cb18605967d012c04d352450a71",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:be565bdc42646678206a970bb699ae23637cae93e5d3b86ff8bd21674945b64a"
+    },
+    {
+      "id": "base.identity.user.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_77a333a08066d19055b09bfb",
+      "business_definition_hash": "sha256:6af8fc1a6796c2bc57f8ff6861339dd5a2d15495431df0432dc3afc8e9fcfede",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:f1538354afa184aafd9ef054282a72e050cbc8f8a4e4949dfb9babddfb4cb9d7"
+    },
+    {
+      "id": "base.notification.preference.atomic.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_d0a59207708bd33fed760b6e",
+      "business_definition_hash": "sha256:de7b8adda684dda7e28befb51cf8df9df15fe992a6b56056b2ce989fb6261fe2",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:a4d8d5da577a093ec6b335fe9524be53588ca3bd3319338753891d7a38f7b306"
+    },
+    {
+      "id": "base.notification.preference.atomic.update",
+      "major_version": 1,
+      "capability_version_gid": "cv2_80fc65f0ba29abfd23bb955e",
+      "business_definition_hash": "sha256:c59dd96d51e900bade34d23cfa9445ac2352a0687b5d2535794e78a3c46f0187",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:db301275635898bf1993f23f33713c789ce3e6faa4abc02a1984ad44025cc7bb"
+    },
+    {
+      "id": "base.organization.team.directory.list",
+      "major_version": 1,
+      "capability_version_gid": "cv2_66c19494170ac350fa97ef6a",
+      "business_definition_hash": "sha256:01543a1e7676563b9c1980d20472a55ad1d782b33441cccf3f7b94aff8e8bd4b",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:1226a15a088576e3f09249fea2210cbb3865fc3b561041f2d69da188409a4619"
+    },
+    {
+      "id": "base.plugin.installation.request.create",
+      "major_version": 1,
+      "capability_version_gid": "cv2_96a411616dc66c13a40a58e1",
+      "business_definition_hash": "sha256:80ff4ec8f3b80c0957218c15409deae41cf6e8b7e916d48caadd74fdb763c74e",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "base.v2:system.plugin.manage",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:37b238d0a1cdf08dda1cfb283cd6db3ceeccd5877bc1bab8a92397a82556d409"
+    },
+    {
+      "id": "base.plugin.installation.transition.uninstall",
+      "major_version": 1,
+      "capability_version_gid": "cv2_ff4456f5df6151d5f1a7fc54",
+      "business_definition_hash": "sha256:267309c882263a762ab7e7dae92dfe54e3a0edd7ca3c3f3aaca46ef7d44f4d2b",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "base.v2:system.plugin.manage",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:cbd34ac15cada8e29b60df5e04d86c4f586e56b48b5dfa68df734bcf1bea1de9"
+    },
+    {
+      "id": "base.plugin.installed.list",
+      "major_version": 1,
+      "capability_version_gid": "cv2_9c0e08c05c343a4a81d299f1",
+      "business_definition_hash": "sha256:8423958e0548973db01da8f2caf6b51dfab40791997bebe457a097925a86f884",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:4a84317a8514078e2897061070836a4873d59b4e4648880edd4982fed6510352"
+    },
+    {
+      "id": "base.saved_view.copy",
+      "major_version": 1,
+      "capability_version_gid": "cv2_78a34f79d69453add8bf8b6a",
+      "business_definition_hash": "sha256:728da787e8060abdb89e242e393c15a168bd61461ffe1b1889b8a578b3924616",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:2f5756efd342f97c4ce7b5bcf48ef3249cd016167603a0119941ea111ddb5690"
+    },
+    {
+      "id": "base.saved_view.create",
+      "major_version": 1,
+      "capability_version_gid": "cv2_c11e958a8729c753c2b6ee41",
+      "business_definition_hash": "sha256:b23bf13221ac755d3659a2c92c192b45013c529bef58a66e7ce553ef0f01343c",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:fd81082d9b5df19d051e8351e4ddd9752357e83a1062fbc35caaefc17a254799"
+    },
+    {
+      "id": "base.saved_view.delete",
+      "major_version": 1,
+      "capability_version_gid": "cv2_ab46575ba75993dacd95597d",
+      "business_definition_hash": "sha256:429a28132d498c15a4b88edfa1bf0f955cc7c3db5a6220daf4353ff061ea88b7",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:2869a8b9578e16cd53b26d3a4164ec3f9b26d57d94c644860f6cfc2a171ec14a"
+    },
+    {
+      "id": "base.saved_view.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_621e3b8abdf04e9c260ef19b",
+      "business_definition_hash": "sha256:44d4511e21a71f1bd6b0df8d8dd3679e7f90e5295971b28967994c51e3b2050c",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:a6ab025621ff16f0c99f746fc941fe2dce20820d2a264aa879780d1ca95f192b"
+    },
+    {
+      "id": "base.saved_view.update",
+      "major_version": 1,
+      "capability_version_gid": "cv2_5d76ef62893804d33ac52f3a",
+      "business_definition_hash": "sha256:2e6024898fd72e8ca6c47ea2776fa71dbd74a91885346401e9eaef7755256b71",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:8378964c1c34766b0b1f0e9e1d540c4692def6cebf85f24994e54c8122d029eb"
+    },
+    {
+      "id": "base.self_annotation.batch.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_416a2d1e4acac748e77a7684",
+      "business_definition_hash": "sha256:4f23c364408057f787a68977fefb7463227dece5d1d603e35e8b6080584bbe4a",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:caff84eb00431160bf8312475c25e859d144086aa74deda2fb79be65ed4c48e6"
+    },
+    {
+      "id": "base.self_annotation.change.apply",
+      "major_version": 1,
+      "capability_version_gid": "cv2_9920c9dc42073de0c160e166",
+      "business_definition_hash": "sha256:3b992d787f8517349aed0c98ad8e12a7771e95b4502d0720b6bdcb278464a3ac",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:8f71707e699c900ad417b63a8d17d4eb0104c2f128f6b8cbce35f8c75a3fd8fc"
+    },
+    {
+      "id": "base.self_annotation.record.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_b2d992b5e2e2bc9af9f4336f",
+      "business_definition_hash": "sha256:f4d68712126aa56e89111463a761434403cbbb7e5ab88056580d60e945f95353",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:73fea0e25cfb1fb1227f9b34e940723899489214a43624af0e4948cbc49e579e"
+    },
+    {
+      "id": "base.self_annotation.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_f71659779f980fb068f25e40",
+      "business_definition_hash": "sha256:f8e44358e4cd0ab4b00576d940558bd9b3a2b338e57ee594b49ed729d0bf6f3e",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:12e63e14c129362fbdade6a34321897d7a52cf2280bbec66a21d29619dfe18e2"
+    },
+    {
+      "id": "base.team.directory.list",
+      "major_version": 1,
+      "capability_version_gid": "cv2_a9d86933aa63177b679179a7",
+      "business_definition_hash": "sha256:12edb888cef6782d74ea0a18078cc95c9d2a9d18dff69f0eb5ed2f934bf57d62",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:6085cb1d4cc8f810278a1e968e5f138683ff9d21ad267850acc559d0efba88e8"
+    },
+    {
+      "id": "craft.bop.entry.detail.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_c6a5c9701af0e15c94c86bf1",
+      "business_definition_hash": "sha256:c60f90e312ffa43adcd19f4071ee447eddaa21a36c1af16bc9ed0fe90ba6f7a6",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "craft.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:e9033716f7392ba8d6343e6cd74286412ce5406c027686ff2ce384c035e9d76c"
+    },
+    {
+      "id": "craft.bop.execution_structure.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_d34f3eb635875cf318979383",
+      "business_definition_hash": "sha256:5f074db3d8c18ba285b971314af67a0cf7b43b37a0144bb4c6a438c6453600c3",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "craft.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:ece948b9bca7fc581762f19191caae59352b4e6746ba8ff1a38c4a55a0c4eef9"
+    },
+    {
+      "id": "craft.bop.execution_structure.preview",
+      "major_version": 1,
+      "capability_version_gid": "cv2_99ce1c4904614825e21a2cf2",
+      "business_definition_hash": "sha256:1883e062cc269d9aa765a2ac167010931903371ba67a467e340e720afc05c353",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "craft.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:e4bcd3fc3e00aef2bcf57d01b1aa11bbbcd007546ffc896a099394e639ad5e4e"
+    },
+    {
+      "id": "craft.bop.linked_parts.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_e86c36523e17ac62058d7666",
+      "business_definition_hash": "sha256:116ceace562601362302120d8066ba816a89c81acd944adc83735a390ec5ba13",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "craft.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:f56c7550780610fe1e2772180829f71f1428cfb92969c9efabbda1833d83e03e"
+    },
+    {
+      "id": "craft.bop.structure.outline.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_1754d7c7a327850672afa6eb",
+      "business_definition_hash": "sha256:cf2bf0add5b0e8adfdc7428c6e5f4b6515d5e129371a2933138b01935e4d469c",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "craft.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:2d5732189bf03c438c3130d884220472793f94056358fbd7b075204dd3a191d2"
+    },
+    {
+      "id": "craft.bop.version.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_c09f087887148498a86aa173",
+      "business_definition_hash": "sha256:7ad991772f59ada0c25e6c1c839882bcbe2f5ff732353ec395800bdc7d96b7c7",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "craft.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:f2fa2bcce5a54709b9f0aa6599888034d682f5dd7179708f2a7c38ed3a30fc4e"
+    },
+    {
+      "id": "craft.bop.version.list",
+      "major_version": 1,
+      "capability_version_gid": "cv2_7d1c23665ba1eaaae9b788ff",
+      "business_definition_hash": "sha256:804f00198e7c546beee0669e58327b3a5c43e9a3bfedcb6df91b82c79787b4ad",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "web/my_files/my_files.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "craft.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:f183c09ada3bb1621fd031e0907b312269e6c7ba8b43db0aa1d92d70d741df0f"
+    },
+    {
+      "id": "craft.bop.work_package.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_cd1e5ec2fa4e5670236ad531",
+      "business_definition_hash": "sha256:4a8f4382362533d9f39e5860575ac50cb0f405e3cf83811045ae025eac71ec9b",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "craft.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:2c3928a7a3a6fd8c4d71aff7db4d0db99d957c702bdd02c41ea164706dd34a13"
+    },
+    {
+      "id": "craft.bop.work_package.get",
+      "major_version": 2,
+      "capability_version_gid": "cv2_a17ad26ec74e07f2f7944a2a",
+      "business_definition_hash": "sha256:2096d3bb3e305ba23351d25563e784cab9bc925a7198fa25c1a612be2faecd01",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "craft.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:4a8125ffc586610ad2f97377341df3e08646f44c381c30d446449cac0cb25ab5"
+    },
+    {
+      "id": "craft.pbom.draft.change.apply",
+      "major_version": 1,
+      "capability_version_gid": "cv2_d40a7063a53ce02aa90fdbd0",
+      "business_definition_hash": "sha256:9f62e5ce9d3215a1ccba2567f4ba203e25166b03afe08e6d0aa8ed0b356d4882",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "craft-plugin/ebom.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "craft.v2:craft.pbom.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:b93cdce4feb7af50f03dc92f9006e74c7ca0f7e814f5cad1440020a09d52d7fc"
+    },
+    {
+      "id": "craft.pbom.draft.change.preview",
+      "major_version": 1,
+      "capability_version_gid": "cv2_05c80dd77f4a960a6b22a3cf",
+      "business_definition_hash": "sha256:d121d776c6e37b2ea5ee70ee6c9ff66c91742044f7333ee385f2c3c9d6d07169",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "craft-plugin/ebom.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "craft.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:ac51274eff86e974f5985dc853d2b35803c87ac8ddfbb239ae873183c05fc131"
+    },
+    {
+      "id": "craft.pbom.import.preview",
+      "major_version": 1,
+      "capability_version_gid": "cv2_5ef08e0b0b009e4d1a84aedc",
+      "business_definition_hash": "sha256:49041eeb99ff661d9ed0d6f4453d84cda5ce51b8d665a2858333143d5db037ba",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "craft-plugin/ebom.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "craft.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:1cc11198bc45a1ff4b3afd1db6ce2e0674e0c91dd3bf5950f4bcfd4b34d1e84f"
+    },
+    {
+      "id": "craft.pbom.part.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_4c18c056c1d2e1a448dcb705",
+      "business_definition_hash": "sha256:42e06d07228c1166aaed6a9573019511bac1d72ffce71e7663e78bd3b03d72f1",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "craft-plugin/ebom.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "craft.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:3411c8d89a347f93484e860f3d4dbc16b07753e65d38f00c9c92cad165c46d92"
+    },
+    {
+      "id": "craft.pbom.version.archive",
+      "major_version": 1,
+      "capability_version_gid": "cv2_d1ddd58bd23bc3567721116a",
+      "business_definition_hash": "sha256:5dcacab4c33417983aa54a92ec00379538afb0c03842c8ac3120094a12057770",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "craft-plugin/ebom.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "craft.v2:craft.pbom.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:ffb7b42a05f586f7a9326f12c1507a6fbe691185a7632f3f5dab8a5009abe784"
+    },
+    {
+      "id": "craft.pbom.version.compare",
+      "major_version": 1,
+      "capability_version_gid": "cv2_e412decf39898d6847fdac7b",
+      "business_definition_hash": "sha256:9e031908a0b03ea66f27bc40d990f7ec51c1f2daa1e850def0bdead97b487da1",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "craft-plugin/ebom.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "craft.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:f53259f873f8a40365175d3851666b047ae9dd24c75946cbeb13d27c7988079c"
+    },
+    {
+      "id": "craft.pbom.version.create",
+      "major_version": 1,
+      "capability_version_gid": "cv2_ac798f88fc0946a54b750eed",
+      "business_definition_hash": "sha256:b7e9b34445ba052da49747d9d7bde2839fc824ca21ec759ca3b35bf8d2acafab",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "craft-plugin/ebom.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "craft.v2:craft.pbom.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:7cb7856b8118007b55ddc2f8ac67e421d564f9bf2a9581bf52692ddaed04912d"
+    },
+    {
+      "id": "craft.pbom.version.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_0b82ac03d3e7fd247910f3fe",
+      "business_definition_hash": "sha256:542a3d6cb014b3f6b5fb8c0befde9491ee55c83223b0563592101e54a114240a",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "craft-plugin/ebom.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "craft.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:a525ee813eb1aff508965c159ce85c49469dc92018b89a471c7c43719b61b96a"
+    },
+    {
+      "id": "craft.pbom.version.publish",
+      "major_version": 1,
+      "capability_version_gid": "cv2_122e48bb1e2a60a885109e83",
+      "business_definition_hash": "sha256:bc44bba79e33a9676be544bd94cdef82b8aa1270f6ee606f23ef0877af453be6",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "craft-plugin/ebom.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "craft.v2:craft.pbom.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:7ae87ff5436573885304986dcf603d4e3164480d5027cf7e22dbb88ce4fd1347"
+    },
+    {
+      "id": "craft.pbom.version.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_c4ec4ba70d213ae6f98f3797",
+      "business_definition_hash": "sha256:bfff1a7500fc3bcebdce6019ccef15efe85f0d03e913061e741b78dfd0ec2896",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "craft-plugin/ebom.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "craft.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:c884c63ae35d57b27f0a9ca52ef5a3f847a03e1f1bac8f87490fb2ed15f8e42f"
+    },
+    {
+      "id": "craft.pbom.version.submit",
+      "major_version": 1,
+      "capability_version_gid": "cv2_09260038a60941d81b3c8295",
+      "business_definition_hash": "sha256:593ce423bf91599dc803199285b7dc85f0089efc01e26a298b81dffed5bf44b7",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "craft-plugin/ebom.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "craft.v2:craft.pbom.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:24f2d5acb29d45e91c688473bd4b5800e448307d4ac34fc99d79dc70433a137f"
+    },
+    {
+      "id": "craft.process_screenshot.attach",
+      "major_version": 1,
+      "capability_version_gid": "cv2_bc2c06f66e7341bb1fd4827a",
+      "business_definition_hash": "sha256:81d4e58bfbd81b2f552345d93d3b3a6923db795956b378ef69031a2952606cf0",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "craft.v2:craft.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:7957cbb0a5d3ed5efce1bf454a68a051095c3face66875dd12e9ee01c68737ee"
+    },
+    {
+      "id": "craft.resource_requirement.alias.create",
+      "major_version": 1,
+      "capability_version_gid": "cv2_44d9089adab4314eb6c569f3",
+      "business_definition_hash": "sha256:5d2b25269b33533979b4d4de9607d3bc6f68ca8505f664816a893934e12ee385",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "web/knowledge_hub/pages/gbop_vpps.html",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "craft.v2:craft.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:7e1ff7987227c8ed35eaf44a841dcbf149c5d5acaecca7b44ee3cafd76326097"
+    },
+    {
+      "id": "craft.resource_requirement.alias.delete",
+      "major_version": 1,
+      "capability_version_gid": "cv2_405669d44c7284c9c59668b4",
+      "business_definition_hash": "sha256:1750306a5db6ad81b71dca68d5676c0fcd258c2ac985abeb62786bd83a58bb91",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "web/knowledge_hub/pages/gbop_vpps.html",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "craft.v2:craft.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:ef0e734fde1e2a1dafb9e07a6e35f8a622742ce504d37fb7d96daff283c5b044"
+    },
+    {
+      "id": "craft.resource_requirement.create",
+      "major_version": 1,
+      "capability_version_gid": "cv2_56ffdef84db88ee1f6674107",
+      "business_definition_hash": "sha256:56757e8a3f7106c423b53ea668a4100432cd43c9c757117e7cab66ff643df77b",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "web/knowledge_hub/pages/gbop_vpps.html",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "craft.v2:craft.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:7039b87ca78c90e5dcc68fb109a5d3df8644d2ababef679cedd6b0402605dc88"
+    },
+    {
+      "id": "craft.resource_requirement.retire",
+      "major_version": 1,
+      "capability_version_gid": "cv2_dba6720ea73aba97ebe4e948",
+      "business_definition_hash": "sha256:c63e567e814b0a30969d501c94a68baa140bf0cd6525fc1503a2435af7d36f65",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "web/knowledge_hub/pages/gbop_vpps.html",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "craft.v2:craft.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:1c3891cdd636fdb387ff9c3ef61ff0afebaf3d0b76f0fa1a8da654cd5d2f3f87"
+    },
+    {
+      "id": "craft.resource_requirement.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_dee9aad44408610d347318d9",
+      "business_definition_hash": "sha256:c1cde10cab7b5643df883e4f7d1018cf02d8cfbb56238c9b31c3514bf2abd37c",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "web/knowledge_hub/pages/gbop_vpps.html",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        },
+        {
+          "consumer_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "craft.v2:craft.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:dcd98f4ae29dca33b1095f943dda30928d36d09244692cde12cccc77e3ce4732"
+    },
+    {
+      "id": "craft.resource_requirement.staging.ignore",
+      "major_version": 1,
+      "capability_version_gid": "cv2_704203975c7976ceacf9d6c8",
+      "business_definition_hash": "sha256:0c92bcdfeb43dd15e9dca949512d40c9f239e9ab221e52b37f43acf15394a280",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "packages/craft-plugin/web/lineage_view/staging_panel.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "craft.v2:craft.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:d526d7f6cc15c7f25407dd60c6a196d941f0a5fe426c08435d3d8533a8a9cfe0"
+    },
+    {
+      "id": "craft.resource_requirement.staging.resolve",
+      "major_version": 1,
+      "capability_version_gid": "cv2_c5934be58433885ae5cf8ab0",
+      "business_definition_hash": "sha256:2d1073aeaa87371dc8973b75e5e22f6ccb9e45f92fcf872f180baec163587b14",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "packages/craft-plugin/web/lineage_view/staging_panel.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "craft.v2:craft.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:c033661d223a6cee94518d5cc2d27bdbd1886214e086bb2756385e395d74fdf2"
+    },
+    {
+      "id": "craft.resource_requirement.staging.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_0b3a69275dc267b0762f294d",
+      "business_definition_hash": "sha256:1a366e7bae9fd9fb8ba8dce8ff05946bb80707a61894cadbd35e0d144175a870",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "packages/craft-plugin/web/lineage_view/staging_panel.js",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "craft.v2:craft.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:98193b34a7b8679fe5b43e52b9c2383712be294cd152d4df80cf6ca021d0c2f3"
+    },
+    {
+      "id": "craft.resource_requirement.update",
+      "major_version": 1,
+      "capability_version_gid": "cv2_3178f757b441748d9e9aa332",
+      "business_definition_hash": "sha256:364bade6b6bdee0d7f874c6be95d26450ce532bc3c6c8ae1999a5d23e712fc78",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "web/knowledge_hub/pages/gbop_vpps.html",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "craft.v2:craft.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:0cbd80a4e5bd03c1c393f834268a28154a975423ac0b52464fc84e31a81141ad"
+    },
+    {
+      "id": "factory.structure.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_c9bba5e6d03c0f76527a8de8",
+      "business_definition_hash": "sha256:f2f9d66f6ca732fa11eb3281611946a4967f0db9a581c9f510b3922388a1bb90",
+      "owner_domain": "factory",
+      "provider_ref": "factory.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "knowledge-hub/factory_info.html",
+          "consumer_type": "web",
+          "version_constraint": ">=1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "factory.v2:factory.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:b13eb04c19660ea1b1bc7a8dc04eced7a7d8d34b619d15e2c3da4a66e8bf11fc"
+    },
+    {
+      "id": "identity.principal.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_383e4eeb953db554256032d5",
+      "business_definition_hash": "sha256:e6057cec71f9115355c23c56c22a1f1eaa4ce434a16cabe6112ed5839b4e9846",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:a1ac1a63a774a9c1c452ad3d8ea752d752d9f1078db626ad94b4227ec137704c"
+    },
+    {
+      "id": "knowledge.context.retrieve",
+      "major_version": 1,
+      "capability_version_gid": "cv2_75933756306c33f25b6478bc",
+      "business_definition_hash": "sha256:6ee0331b1b194920e5f6d215c44a9a313d169e6fce6d5a32ba0bcadeefbdad5e",
+      "owner_domain": "knowledge",
+      "provider_ref": "knowledge.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "knowledge.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:542de07bbcd01ff420cb0bb67c3ffcd9971ba1e711e63f053f302b155d469e4c"
+    },
+    {
+      "id": "knowledge.reference_data.change.apply",
+      "major_version": 1,
+      "capability_version_gid": "cv2_00cd1ed6dbedfce11c716779",
+      "business_definition_hash": "sha256:37fa5d1b46707a59a1ab74c11229da16506ae70fe40bdab1a8db2307d7772c79",
+      "owner_domain": "knowledge",
+      "provider_ref": "knowledge.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "knowledge.v2:knowledge.reference_data.publish",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:cee467add50016d3952544a43ac6a81b92bbbe252bf96f7be81b8fe42236c9da"
+    },
+    {
+      "id": "knowledge.reference_data.read",
+      "major_version": 1,
+      "capability_version_gid": "cv2_627ebee349e7d9bf48f2ba18",
+      "business_definition_hash": "sha256:46c4682c9a274d961d40468f4cfc0493e2ebd168adf5ec25d012fcfdbbd5b990",
+      "owner_domain": "knowledge",
+      "provider_ref": "knowledge.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "knowledge.v2:knowledge.reference_data.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:31221cd7f59f90924b460ca991adc52a35a7bd24f1e68f11707c8fe22a291541"
+    },
+    {
+      "id": "knowledge.reference_dataset.publish",
+      "major_version": 1,
+      "capability_version_gid": "cv2_a2ac487fdc355f9d5de3b482",
+      "business_definition_hash": "sha256:ab0ee7876a87c6ed44124f3880c90114a7c135cc89f647ba07c596fdbebf98bd",
+      "owner_domain": "knowledge",
+      "provider_ref": "knowledge.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": true,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "knowledge.v2:knowledge.reference_data.publish",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:22fea14721985eba1337b029d81b6dcb7601c4deb45dbbd0249e874d5817da8f"
+    },
+    {
+      "id": "knowledge.resource_model_mapping.resolve",
+      "major_version": 1,
+      "capability_version_gid": "cv2_b7e23c2391d35a0db8865578",
+      "business_definition_hash": "sha256:d22171a41fc51b358ada06a9c9b274d84d263919336298436aa16097454f6e55",
+      "owner_domain": "knowledge",
+      "provider_ref": "knowledge.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": true,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "knowledge.v2:knowledge.reference_data.read",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:9e133db62cbc6223f23ced7d9858a180dfaf582bebcb92fdec72759d7d033796"
+    },
+    {
+      "id": "local.command.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_a31e3123231e5359bc67a09f",
+      "business_definition_hash": "sha256:559bfb017a06fb3c8b74e11606a6926ddf2801c670a24d054e2c6ef27d68d8ee",
+      "owner_domain": "device",
+      "provider_ref": "device.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "local-runtime.v2:agent.run",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:a74c5fbf6af5b02c4fdb96198c26c55c362b53f663fa932cf4bd563aa99364ee"
+    },
+    {
+      "id": "ontology.concept.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_d82cf7fffde587178becfc4c",
+      "business_definition_hash": "sha256:5cfc784d580ec3982b2dc64ff2abcf781d778faac2bf9ad9b14a1778cadd6022",
+      "owner_domain": "ontology",
+      "provider_ref": "ontology.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "ontology.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:18b504d38a7f4c07abf50a02ced022d8ccea62eb2b88fe4335bfc458bfc1add6"
+    },
+    {
+      "id": "ontology.concept.get",
+      "major_version": 2,
+      "capability_version_gid": "cv2_98ff6935af70a9593cd64c48",
+      "business_definition_hash": "sha256:9254137939ddaa29e363680f9ed190c931536ef0836d520fc636a40bc2c7ef3b",
+      "owner_domain": "ontology",
+      "provider_ref": "ontology.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "web/ext_datasource/ext_ds.js",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        },
+        {
+          "consumer_id": "web/ontology/ontology.js",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        },
+        {
+          "consumer_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        },
+        {
+          "consumer_id": "plugins/craft/craft_backend/routers/ontology.py",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "ontology.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:f6b1a441a8294169e54bc6994bbe1545bd1048b9bdc322472025f3f585da1b33"
+    },
+    {
+      "id": "ontology.concept.resolve",
+      "major_version": 1,
+      "capability_version_gid": "cv2_9b89bdaaa6003fca29045f32",
+      "business_definition_hash": "sha256:a432321bfbbf05e0af862c9009858887842d07e4492194d2bab50c83a1053cc2",
+      "owner_domain": "ontology",
+      "provider_ref": "ontology.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "ontology.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:dc8a9b256f85c380b02dc776e80d4dd2bd22e86e19e6071b859c3e0e38f66d20"
+    },
+    {
+      "id": "ontology.concept.resolve",
+      "major_version": 2,
+      "capability_version_gid": "cv2_96dda853e8e68af59655b028",
+      "business_definition_hash": "sha256:e697cdca67c794335c691133438ea947d2c6fb5e254b521791dad70f5bf4a401",
+      "owner_domain": "ontology",
+      "provider_ref": "ontology.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "web/ext_datasource/ext_ds.js",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        },
+        {
+          "consumer_id": "packages/craft-plugin/web/lineage_view/layout_detail_panel.js",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        },
+        {
+          "consumer_id": "plugins/craft/craft_backend/routers/ontology.py",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "ontology.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:aa0ba18e4f5ee085a58a4c9ddd5e0c224f1bd1db58ed6eb8d82caf22b7aea645"
+    },
+    {
+      "id": "ontology.mapping.assess",
+      "major_version": 1,
+      "capability_version_gid": "cv2_82aa637b16ea14d635941a15",
+      "business_definition_hash": "sha256:18e1852b7726855f276e60917c7eaf394ea865a2caa1d69da0c29631c4799780",
+      "owner_domain": "ontology",
+      "provider_ref": "ontology.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "ontology.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:5c9447066ea01a97c2b0e9de31e3a47ea9c9d7873004bf62a7043aaf7358a6eb"
+    },
+    {
+      "id": "ontology.object.list",
+      "major_version": 1,
+      "capability_version_gid": "cv2_843a7d9437fdc3a4f84aa56c",
+      "business_definition_hash": "sha256:1b65d66533682ec2fac3c7ecc81e80f51e9df4d61de04ffc0ebb850751bd58b2",
+      "owner_domain": "ontology",
+      "provider_ref": "ontology.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "ontology.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:03dae1d648d9018b30a270baaa162c45e5646de4ac02ee1e446848c0f368cc2a"
+    },
+    {
+      "id": "ontology.object.list",
+      "major_version": 2,
+      "capability_version_gid": "cv2_e2937537da8815b209f3fc83",
+      "business_definition_hash": "sha256:1a279a66fd24c2661b0b257ddc5689dd56f7496d965bb92383c5f86d1727c540",
+      "owner_domain": "ontology",
+      "provider_ref": "ontology.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "web/ext_datasource/ext_ds.js",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        },
+        {
+          "consumer_id": "web/ontology/ontology.js",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        },
+        {
+          "consumer_id": "web/rule_mgmt/rule_mgmt.js",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "ontology.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:39c2fc9255cccdc6d40845df8bc76b52eba54a537c8f51f83d4f97433a1f4b16"
+    },
+    {
+      "id": "semantic.context.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_60fbb13e8dc344d4557f06a4",
+      "business_definition_hash": "sha256:f8650669a0300d4d683eb416241089fb1ea8f3094a19b93d6cd75321b02ef226",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:14e927204a7a0d02e89d0dbec7e2eac66945c4fee9ee4468616fa27234848646"
+    },
+    {
+      "id": "simulation.capture_run.action.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_1f4419369780beb6466c9955",
+      "business_definition_hash": "sha256:c481e7f0ed865567e9544853843a354138d44585f2b651e30038a8852ae05196",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:9bcb9e198dca246b0811b6d088255c20b2ecd4a7702880448091c330a06db869"
+    },
+    {
+      "id": "simulation.capture_run.cancel",
+      "major_version": 1,
+      "capability_version_gid": "cv2_bb4740f311f537f404b91dec",
+      "business_definition_hash": "sha256:36fee07247bcdada3ed46725ec0d011f470de90a347a332d6c1b2b888b5b5bbc",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:41800612ee16e0b464f4c397772d28e4fcd37bc57dfd4485e417ea95f3d7c794"
+    },
+    {
+      "id": "simulation.capture_run.dispatch",
+      "major_version": 1,
+      "capability_version_gid": "cv2_7354b5e8af99fa749db575eb",
+      "business_definition_hash": "sha256:13bf43cc445924376d6fc9ca681c39b4fec64d71f6503653fda1608678c8d222",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:f9186982851e63133d94d6121f78ead3492e7f01fee4aa389d225b8536a2354b"
+    },
+    {
+      "id": "simulation.capture_run.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_7d3056d86251cc9c0432213a",
+      "business_definition_hash": "sha256:cdfa130e0e3b50099b9437d6091987b3984d918f11261eee30ecabb589d12250",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:156a1834fe3e9d1cdb036172b76aa7a6fdfbd8d2b677f1acc81a40420a3b1b56"
+    },
+    {
+      "id": "simulation.capture_run.start",
+      "major_version": 1,
+      "capability_version_gid": "cv2_f5a31692b1774e7457466cfb",
+      "business_definition_hash": "sha256:d67456c0d656fc2064b92aad8526a6f6c1f14aa3a2e4a3cf19e154d4d20c6f19",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "deprecated",
+      "descriptor_hash": "sha256:55ae67ff4b9bca309ce12bb1b1f4553de633513c7cb055d2a766930794c1a17d"
+    },
+    {
+      "id": "simulation.capture_run.start",
+      "major_version": 2,
+      "capability_version_gid": "cv2_7691c436a7b73bbdba95083c",
+      "business_definition_hash": "sha256:58d7a681d2aea0353e9a3a4715690e92cc2ee30b386934b03354b8931fa8f98c",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:398f69a39d1b94411db9e189a3c9e22273a2c7a1261458ad14a194a6b0ec63fc"
+    },
+    {
+      "id": "simulation.capture_step.retry",
+      "major_version": 1,
+      "capability_version_gid": "cv2_eb7584295b607c3e27562295",
+      "business_definition_hash": "sha256:d2c90702765fd3ad7bf819e0877043c9ae37a105f106144bf2cccd7e5ae74c1d",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:ab5cd0274ecea3791c37e176dd39eddf231f1610e8c385693693c900ada379f7"
+    },
+    {
+      "id": "simulation.connector.binding.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_4b6207c380d8f153ac08b75c",
+      "business_definition_hash": "sha256:f10a78d4624c01af8884fb1f510d525d4d5bc4ab229def90612ce4b6d56ef857",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:b1d51ad1e9ea705cb463ea40f7c27843cf03b9ee2398df05ab192f6a66ed2dac"
+    },
+    {
+      "id": "simulation.connector.health.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_93bb71bd0caeb5c1c79b23e3",
+      "business_definition_hash": "sha256:067805ba77cdb56a8d7a80c001dd197615488e72fda25303486d3df3e3db409e",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:agent.run",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:36625fc7171ced28fed70a259772b9b1aca64e684fe73442ce1b6ca7064d6895"
+    },
+    {
+      "id": "simulation.connector.pairing.activate",
+      "major_version": 1,
+      "capability_version_gid": "cv2_c1d26d5824a87f9d49e429fc",
+      "business_definition_hash": "sha256:5dead2f95acf37685ca5b553511117a15ee4c6317cf06d1ef6f2002c74b0d45d",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": true
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "local",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:cce6b9d9039cc8ead69d34138967a66d7785cbca3585c160f2e03984c00c61b5"
+    },
+    {
+      "id": "simulation.connector.pairing.approve",
+      "major_version": 1,
+      "capability_version_gid": "cv2_35813bd06557794f9d8bcaf3",
+      "business_definition_hash": "sha256:8f625c2a40a3e177c3384e1205e679432706ea9d6819d78d3b8b4d4eb10cb860",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:ee90b3a19c8f08e61ce042e79c8d35fda647ff29e9c81d57a411a4cd4a2a757d"
+    },
+    {
+      "id": "simulation.connector.pairing.approve",
+      "major_version": 2,
+      "capability_version_gid": "cv2_3294e3ea3b536ee59b480914",
+      "business_definition_hash": "sha256:6699de6bb8354d622dd7472e3587eb778226d2daafc23a0e2ce1f48c6d49522a",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:47937560c7e38d6f18a8154ae09685a1c8e1f72d99df79e80cd7cfca10e8d6ad"
+    },
+    {
+      "id": "simulation.connector.pairing.bootstrap.create",
+      "major_version": 1,
+      "capability_version_gid": "cv2_20da81f362587e142cc53a92",
+      "business_definition_hash": "sha256:a39a16f4617a82b6ca355bdb5413a00b17debeb67c3b4e9b511ec3bb13c15fc3",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:834e450d9b92bb318c06792bc97f38d64e177f3765b32d6e0e1a85720b1e54ea"
+    },
+    {
+      "id": "simulation.connector.pairing.bootstrap.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_c7c948e1d64c08488f0d4038",
+      "business_definition_hash": "sha256:691c68e91f6515b138f28c38b1423b78f696af0d41ee90082b824d48a86f7eee",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:44299f6e68bbae72230e0007d3027edef6337cf699d8191ccbd643c2b8703b5e"
+    },
+    {
+      "id": "simulation.connector.pairing.cancel",
+      "major_version": 1,
+      "capability_version_gid": "cv2_8df2b37235f6df7ed7ba11d1",
+      "business_definition_hash": "sha256:57e187b079e6a04cf01e97c57cfc1c3bea8ee8213ae9370904bf60df84965d41",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:3bd036374804b4a06d80a64bb289576122509ad39fe044e42a1f019c70ec9eb9"
+    },
+    {
+      "id": "simulation.connector.pairing.cancel",
+      "major_version": 2,
+      "capability_version_gid": "cv2_23c5d25a397e0e68b9eec4d5",
+      "business_definition_hash": "sha256:ffaccaa480b4e7c28ee55d8e5e46a0eb92619b912b2b20b278522f32e9ebda7a",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:bb6c212679359135db260f2c5e07be0d4105ac789bfeae5d599c196732d1c74b"
+    },
+    {
+      "id": "simulation.connector.pairing.complete",
+      "major_version": 1,
+      "capability_version_gid": "cv2_3314cf5f8e7d2e80844cc5df",
+      "business_definition_hash": "sha256:b27b744273ab58013721565e2b2f9fc790d742514c9386e34437ab5f77d8de2a",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": true
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "local",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:c2bf4f789da5e4d8abc018b879d8327eabf16049da78a8346116f15c2942fd3a"
+    },
+    {
+      "id": "simulation.connector.pairing.request",
+      "major_version": 1,
+      "capability_version_gid": "cv2_5abd422a763525c92b75c8ef",
+      "business_definition_hash": "sha256:b6d4d53afbcfc6e49376707d26bd883aa82686cad5c9efe06c756eca72509d5c",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": true
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "local",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:86008857e4719cfa337894f6549d5968a28e69bed32bf7b635edb1937fb77247"
+    },
+    {
+      "id": "simulation.connector.pairing.summary.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_16dac0331d83f5abed60f2cf",
+      "business_definition_hash": "sha256:f55e1ea7ef359aa699372ed9351cde09765048628fb60f2759fec0b7b77f25a0",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:6a44ab6b661c075c60572f4f6fe29c01fcab3470252c8e0c79052a81fa0cee94"
+    },
+    {
+      "id": "simulation.connector.pairing.summary.get",
+      "major_version": 2,
+      "capability_version_gid": "cv2_4ce616ad37fac62e7997ab1a",
+      "business_definition_hash": "sha256:49b00a542cdf51ba9cb2723613652e2785daa34269e0d280342f20a4ed4380ba",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:5036f47108c9063a1a49275d67828c404687844083e6fad92a749f69e06d228f"
+    },
+    {
+      "id": "simulation.connector.plan.queue",
+      "major_version": 1,
+      "capability_version_gid": "cv2_9b0d9ecbb385196c6035981e",
+      "business_definition_hash": "sha256:16107a65dabe50224c8e4692f5802d2eab7177635c132d0b732bdce2b218e9bf",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:agent.run",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:893a04092be6cee5c97c69f2fd4cd8ce05fbcf27318f96423c2e8e2dfdee4415"
+    },
+    {
+      "id": "simulation.connector.plan.queue",
+      "major_version": 2,
+      "capability_version_gid": "cv2_35089210adaa0a636822b6ab",
+      "business_definition_hash": "sha256:4c63f4bc525db7d334f6267dbbb172a0e64fdfb59775651e06b78eb93623f1c1",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==2"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:84547d562c9b1ee4e93035afbe3f4c570805af419f086681d917146de062cd95"
+    },
+    {
+      "id": "simulation.connector.runtime.takeover",
+      "major_version": 1,
+      "capability_version_gid": "cv2_656d2058feacb6c2752d732e",
+      "business_definition_hash": "sha256:cad2310814186d0a31a63830b8792f6792cce211b8c9406587b6ab2d357776d2",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:509a1608e63b1d9068abe87eb4b25261e9bec982dbaf36eff37b3f9b52e2da81"
+    },
+    {
+      "id": "simulation.connector_capture_outcome.apply",
+      "major_version": 1,
+      "capability_version_gid": "cv2_40d56338fdb6c954c94b1ef1",
+      "business_definition_hash": "sha256:e215904ce954e4ea77e516b92512fdf0c82619af4734db88682bf19d40d8f8ae",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": true
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:79baa8fc2f41ea0683656976dbc8dca086ac18846748c11358d89e761c382ee7"
+    },
+    {
+      "id": "simulation.connector_document_snapshot_outcome.apply",
+      "major_version": 1,
+      "capability_version_gid": "cv2_27169b3f85f73e9fa675fd79",
+      "business_definition_hash": "sha256:89c47f280c2c405acf86cc86ccb816566f1eeb89bf0b6d741b24887ab0fb2cce",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": true
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:190e626d72b1277f286683f13b8cde043b9ca79254a855e98162f7fb59ae1d5d"
+    },
+    {
+      "id": "simulation.connector_materialization_outcome.apply",
+      "major_version": 1,
+      "capability_version_gid": "cv2_bd1117281a022fbb1591e4d4",
+      "business_definition_hash": "sha256:564c0b80ff6b408135dd9ad6b36116ca2d0929085940d935d7153cacf843af4d",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": true
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:3b73b8e6226ac15cd54e76ed7b968839f8a7194d7a38178f2b7aa62ea9e6fbb6"
+    },
+    {
+      "id": "simulation.document_snapshot.action.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_cca29a54ba63a23d7676bb2f",
+      "business_definition_hash": "sha256:f4b713d503a9ac38ea5b295022e28be0e466f7cdd56cfb55541e18e0ca94226c",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:7905e776ed9e968b7f5bdb8a84a27050e0c51706cb8e895695eadc3c83d1f54b"
+    },
+    {
+      "id": "simulation.document_snapshot.dispatch",
+      "major_version": 1,
+      "capability_version_gid": "cv2_ad746ef2dae359702daf9440",
+      "business_definition_hash": "sha256:089940c575177ac30c0022b5e4262c50db91918c833ed71d65bdbb2622e4cb13",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:bba3e3dba0c5ad69c021cc8e57b72b02bc475b8d6a0744d2026268865ebde67e"
+    },
+    {
+      "id": "simulation.document_snapshot.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_e5dbbaa3266d6a396d73aeaf",
+      "business_definition_hash": "sha256:5c3f5ddaff7a04030b6ecfd950587e8ec5626ecb8dfdeda072d56ffb2ab7c82e",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:56b2d8cdf716431649192ecbc551d6c1ca54a0b5ed84705bc93b9a26fadc715a"
+    },
+    {
+      "id": "simulation.document_snapshot.request",
+      "major_version": 1,
+      "capability_version_gid": "cv2_fed7bec1b267b79371bd918d",
+      "business_definition_hash": "sha256:ed3424d7fba01ed8c2a2b572e42e2917b7d2bd3f1efe30c1b519b125fd12efae",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "deprecated",
+      "descriptor_hash": "sha256:7f69c7c191bc6249e7fc40ac7672a400d1606991451ad9c6806824f58bfeb523"
+    },
+    {
+      "id": "simulation.document_snapshot.request",
+      "major_version": 2,
+      "capability_version_gid": "cv2_da2fcd57c296a397587ecfe7",
+      "business_definition_hash": "sha256:c8002910ae3424168bfb7fd2f3b5237f4edf978b19811b6812d4397d8ee46345",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:0e3973ea9a3d61ca3e2fb777216569004d2719e4ccfaf736ac854c4f2c43d1f3"
+    },
+    {
+      "id": "simulation.environment.archive",
+      "major_version": 1,
+      "capability_version_gid": "cv2_b46d0fdeb18bbf1af609084c",
+      "business_definition_hash": "sha256:c912956cc03f7014ee4694b3c2c50fb49a1e633e5e67bd3f61d264b7ff385680",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:b88b8919d1425a032b9f1d7fc021fa6fef51d503cb61cec3696a2a31e52c3efa"
+    },
+    {
+      "id": "simulation.environment.compose",
+      "major_version": 1,
+      "capability_version_gid": "cv2_8e9ccdc8eb914e8d5ddb1631",
+      "business_definition_hash": "sha256:d3dad70de632bad78251cc80270e7a1aa21e42f39eb20194be2475d1752438af",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:32fcb1d38b047595b6c8babb9f80c3144ea07a3a07a3442cf03dc25b2e7fa8ac"
+    },
+    {
+      "id": "simulation.environment.compose",
+      "major_version": 2,
+      "capability_version_gid": "cv2_28fd4d4a17acab6c343321f3",
+      "business_definition_hash": "sha256:9cea370a8b199201231bbcf48bdcaede1fc7bd89fc6dabc196272fb016444496",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:4ecd0658ec20ca432180d2897a4ce4858a2c1cce2440c4a077a765d124644df8"
+    },
+    {
+      "id": "simulation.environment.create",
+      "major_version": 1,
+      "capability_version_gid": "cv2_c260d738d4d46cb73df67793",
+      "business_definition_hash": "sha256:9a77186a91cd732dd8ac4887cb75b9a6b4255c1e0c31a9f242fcba6f8ce6c214",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:7591065d25ccdb42c7db52949136ae1a82538e7a1fee031cbeb42b6b3be96fbb"
+    },
+    {
+      "id": "simulation.environment.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_1aa5afe776a659500f29877a",
+      "business_definition_hash": "sha256:ecc0a90b84cf625851814b141446bc4e8466eb47c40d2b5992788e6fb0b7289b",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:5542bc64752d9367d39ebde2821c23b82ca0e88670defaf52b1e00dd3f0417a0"
+    },
+    {
+      "id": "simulation.environment.manifest.archive",
+      "major_version": 1,
+      "capability_version_gid": "cv2_fd1589d16af812e71cf1cf13",
+      "business_definition_hash": "sha256:8cc498fc735191b6db302f2c7666a004f2385a3f5aa6329311f05354143e47cd",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:4739b46a917aa7ba1aef0096f104d00ae40d3a6c9669d35a5e8d645d2d048326"
+    },
+    {
+      "id": "simulation.environment.manifest.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_377e6a469161282ac77aa243",
+      "business_definition_hash": "sha256:54d6c2a513f0ba273cf7b6d5bb150922e3a4151b5f38bcbf9d5e6e02b182e3ac",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:bfe25f7103ac39ce0efdb09a3e0d8c34dbe4edc69bc42c868318a36ab04377b5"
+    },
+    {
+      "id": "simulation.environment.manifest.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_5151de369a155d93d132d047",
+      "business_definition_hash": "sha256:2f19de083b74e9927a86218a475d457c9f9bae974ab3e59bf117a59a2db63b3b",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:4bfbb1b6b33d39472a251decf18e6ca1f71bab8371c8ff4070aa9a7c5eb97ef0"
+    },
+    {
+      "id": "simulation.environment.materialize",
+      "major_version": 1,
+      "capability_version_gid": "cv2_182249e94a64354fc67c9ae2",
+      "business_definition_hash": "sha256:13c8704e0d5099dedc5f36565202eb5432e47a4283a8626d57973d9c72cc8d68",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "deprecated",
+      "descriptor_hash": "sha256:d12780125dc67bd8a4df03427790e1935303c8a7a6c942172214dcb8ff76d9ff"
+    },
+    {
+      "id": "simulation.environment.materialize",
+      "major_version": 2,
+      "capability_version_gid": "cv2_bfd161d0af053081b391bb2b",
+      "business_definition_hash": "sha256:01a6c9dbbd5cff5a7d152688e5fc34125712f590d33712d6ddbe4c6daeccb187",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:7fea8d60b1a85472874aa162f74507e561a2ef13fbe9841f9053009177441123"
+    },
+    {
+      "id": "simulation.environment.preflight",
+      "major_version": 1,
+      "capability_version_gid": "cv2_e353f21c24f14cffd82fd9eb",
+      "business_definition_hash": "sha256:7a1ac95bc65ac8f6476e0c390a7f4c834018c2e5b6675e0021817cb19207e4c1",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:5b04a75ec0c954e4028d3105525f351614e21a9e24333af88acefed1b7485f80"
+    },
+    {
+      "id": "simulation.environment.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_7227bbc550aabf136e33a39d",
+      "business_definition_hash": "sha256:909fafb4dd4fa30d02c72fa5697fc36096e38ab12d8bce061d247cc70dc310ae",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:ae9a388bfccdc8718dd46edc71e58210af280aec6d5e6d633e7173173246a1d8"
+    },
+    {
+      "id": "simulation.materialization_run.action.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_42da87e34644271c2ce7a015",
+      "business_definition_hash": "sha256:d05dbc04759e9afc1771482653a985abc2a123975475f753e1b628df37a0a580",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:18f6587ee162b721ae762f2c6d9e7e8e3fdad35ddec7ca141309bb0db22e84a1"
+    },
+    {
+      "id": "simulation.materialization_run.dispatch",
+      "major_version": 1,
+      "capability_version_gid": "cv2_40a0b9070e7d5a206fd9ba99",
+      "business_definition_hash": "sha256:cc2b429d45039613845c5427998e0ff33754c6b2e0f88051caa0e1a591ee8f2a",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:78591338bcabe11b7a66ab3bb51acabdd1c58d84b241f8b10782a3fa3797b359"
+    },
+    {
+      "id": "simulation.parameter_set.create",
+      "major_version": 1,
+      "capability_version_gid": "cv2_e832fa065586c8e06198ddeb",
+      "business_definition_hash": "sha256:8e087c776f7adc42123c98978b61b53ea2df91f8d1c2f76916da2099661885a4",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:98f87bbc3249d8a04ffc6e147fd3a7692e543355245e13d5609198b44a615aa1"
+    },
+    {
+      "id": "simulation.parameter_set.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_d67fddccb406dbe8f607e8fe",
+      "business_definition_hash": "sha256:66e27593c817c3aa3ad1467c8a03c996c34407c16c1366abcaf5518188109c75",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:8d95eacc29d30b7777355040fb12e2391970ea805c90ea2b7bf49f8ac60d099c"
+    },
+    {
+      "id": "simulation.parameter_set.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_ba8c91a97f55ce794a645f7c",
+      "business_definition_hash": "sha256:f5e03b4850cd553f57eec63d27c9c7869a4e3208408fe92a6405e43c92013af7",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:43aa13f6493daeabf331e0163de67b0d06f9cd39697b1d0f82099f78c856d3d3"
+    },
+    {
+      "id": "simulation.result.compare",
+      "major_version": 1,
+      "capability_version_gid": "cv2_399b706d48beb08b300ce62f",
+      "business_definition_hash": "sha256:2c94421439081b1e864f8fc141910e9ec16737f331549cb8b91af1859e3eeb08",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:84b9a689a7f47ef1efbe4a86c285a74e4277f0693e385c382f7f41f5fb33f2fc"
+    },
+    {
+      "id": "simulation.result.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_ee143c3e10ab09d8c78f9cfb",
+      "business_definition_hash": "sha256:a09488df2a8e3c17f5434e578499909e81c70b6d48ab7101067f4090215b985e",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:a8c244c15ade886cbe4f9b69f9da5d76934bb535de081f7ca64d7a5bd52b2c3b"
+    },
+    {
+      "id": "simulation.run.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_da38a9fd4e481a86c792f0eb",
+      "business_definition_hash": "sha256:c60db7787dd419dd45e3d54bbde1a432b546396e373785e26f6a375eccdf8364",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:84670b47edc8e2487f9d3f7525d1a209a7c8867622d06e836710d7653a6162dc"
+    },
+    {
+      "id": "simulation.run.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_8d94827a0cdd25822d939a36",
+      "business_definition_hash": "sha256:bd565f04ddb575c6cd9c6859113e99c61e1a537c1ec7bfb50e15cd8e22378f9f",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:cc3b9655a797d455acba9d598824264a5be2dd4ebc888c657adcb69218b27416"
+    },
+    {
+      "id": "simulation.run.start",
+      "major_version": 1,
+      "capability_version_gid": "cv2_4ab89866252d0ad98484ba4f",
+      "business_definition_hash": "sha256:523d26cad40e94988ea7b46d1e9f24dfd4141abe9ece7d71fbaa6f049f57b5c3",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_async",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:30500da283c15b4496c4ca9eac17955ae7a076c0caa0ca5063213e62fc64ced4"
+    },
+    {
+      "id": "simulation.solver_profile.create",
+      "major_version": 1,
+      "capability_version_gid": "cv2_fffc47454288dbfc2783f038",
+      "business_definition_hash": "sha256:d240adde54b3103c1104ab21d95294cd9c67aa9b8f0106a570b587809352c4ae",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:5f762af944ac386115f789afec23aa7008bd22f2f07fca99cc0ea21f48b27179"
+    },
+    {
+      "id": "simulation.solver_profile.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_af0095aa47d994165a92175e",
+      "business_definition_hash": "sha256:98f484f7167e815efd6f8c5fe83c3588756db5851fa846cbf67c78b6cc20361e",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:f421fb1abef1af7ffa058625fefc05b05ddfa128228f4f2e5acc4f14bae6c8fa"
+    },
+    {
+      "id": "simulation.solver_profile.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_09e6e129fd5c3efa07a908bc",
+      "business_definition_hash": "sha256:2bed22059f070da8771bd63ba6c8284b3815f474b4d676ddf065ad9f08f1a754",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:fa78861c62e024844252ea4b128a027771708528da90a94a60339b24ef29ff36"
+    },
+    {
+      "id": "simulation.vismockup.application.attach.request",
+      "major_version": 1,
+      "capability_version_gid": "cv2_3489523c3bbbeae990c209ab",
+      "business_definition_hash": "sha256:7888bc9fd8236232c9b0d7aa489f7ee719210ff7807ea541aac4df3d84cabfae",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:790bf9df84558c601e6dca5aa2e0439a79da153b1cc357bbfa2e0713d41829df"
+    },
+    {
+      "id": "simulation.vismockup.application.launch",
+      "major_version": 1,
+      "capability_version_gid": "cv2_d96202e7ce6d397786231f9f",
+      "business_definition_hash": "sha256:47fe1825c69cf02af7c8bbd80bf7fb39055c8b7aab2b300150b57ac9364a841e",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": true
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:agent.run",
+      "execution_mode": "local",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:0d749c6da0d8400cfe361caaeeca5f0b1037baa8aa36b159d15700a841bc5d2b"
+    },
+    {
+      "id": "simulation.vismockup.application.launch.request",
+      "major_version": 1,
+      "capability_version_gid": "cv2_8f8579479f0584f78507dffb",
+      "business_definition_hash": "sha256:be59c4e1cc45069ff699e6a6c1f33491a6ad704a7e6cbfd5242bdca45bfbc122",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:1958ccf64bbaf15da7781b4829f17030bf5fbbf35f30f5d122ab7ce66b64d075"
+    },
+    {
+      "id": "simulation.vismockup.capture.create",
+      "major_version": 1,
+      "capability_version_gid": "cv2_53136c3a250c4b190685b9a8",
+      "business_definition_hash": "sha256:a0ea040479922c15609a54c05b9f7d9b425794fa78b5d2595161caec8f2bee45",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": true
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:agent.run",
+      "execution_mode": "local",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:37d3caa471f7e4598ab91dee3dcfe246e0e861ff07e9d1be2c10b6d8155946f5"
+    },
+    {
+      "id": "simulation.vismockup.command.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_0deda7033f1182ab99397046",
+      "business_definition_hash": "sha256:00bde7a834dcd8d5d6f1c7b2318134c1701959d68d80b707364638301fc0d3cd",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:dd4a132bcf2b067de41e289f56e4039e2d1562aa09d9df5eafc0f5e873c75c20"
+    },
+    {
+      "id": "simulation.vismockup.model.close.request",
+      "major_version": 1,
+      "capability_version_gid": "cv2_14cd0edb2087e1b7e0aef57a",
+      "business_definition_hash": "sha256:e68b01e2a37f2cd8e385bebf60abc159f714ab1ff4650f0191488def51f17b67",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:2bf79aa26f7b81c13f450e745806ef04cbde12bfd58ecf76a343f3a87abfb96b"
+    },
+    {
+      "id": "simulation.vismockup.model.open",
+      "major_version": 1,
+      "capability_version_gid": "cv2_b2cf32850aaa4c5b4fd89243",
+      "business_definition_hash": "sha256:5dc3a3943ee6761a96017cc90b7665e656a96af1cb7fd59a03f3e08b9b7a1811",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": true
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:agent.run",
+      "execution_mode": "local",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:ebfc34d76f339ed51492adb2de4f2255a2a2a75d2418499067635c5f6c211adf"
+    },
+    {
+      "id": "simulation.vismockup.model.open.request",
+      "major_version": 1,
+      "capability_version_gid": "cv2_7d67a0e58d4d1fc4b6f14923",
+      "business_definition_hash": "sha256:bf040f4f2e2616182e96e1c33f403b6495a72af90aa8c06301fea5851ca2e549",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:262aa697590dd9eced305fcc02d02ec24add28486271d850c0a769821d071e37"
+    },
+    {
+      "id": "simulation.vismockup.selection.highlight",
+      "major_version": 1,
+      "capability_version_gid": "cv2_0bec76d335480fadf1a4a3b8",
+      "business_definition_hash": "sha256:3cf2a64b61fd25567a896ed76343ce0cc44bf030348a92df9558615a438af3bf",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": true
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:agent.run",
+      "execution_mode": "local",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:7520130f930acf413244f3f21a1e092fde61c6a65785ea14adbed659ca03280e"
+    },
+    {
+      "id": "simulation.vismockup.status.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_267202dc882e8dc35c676718",
+      "business_definition_hash": "sha256:9f65ec9e13ccf7c610e3d9d3ae6e4fb95a2339a3fc463343719b1e81f07208e1",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": true
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:agent.run",
+      "execution_mode": "local",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:6af3a7ad8b0196e52c348a9376a3ad1cb6dbe0d87e5b20384651ea219d272700"
+    },
+    {
+      "id": "simulation.vismockup.tree.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_5461d821d2c5acd04426e841",
+      "business_definition_hash": "sha256:c072a0e0036a073980b0ee0a6f4834aaac60fd0702b4e87ab8ea186c1aafcb59",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": true
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:agent.run",
+      "execution_mode": "local",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:a6b8a9bf870ecd3a983d2064a8022fb3485a0c9950ccc9eda066f9e08aff9ffb"
+    },
+    {
+      "id": "simulation.vismockup.tree.read.request",
+      "major_version": 1,
+      "capability_version_gid": "cv2_03ee83213b28b3c20a24b5cb",
+      "business_definition_hash": "sha256:e086259b5e746227b9d39b59c5be8ac105da68459d393ac4fdc86cc01a4cc535",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:e5e716ea7aa9c2bdc05535fddce870cbf7596a08f2ebcc0b887ac21ff2c3e8da"
+    },
+    {
+      "id": "simulation.vismockup.visibility.change.apply",
+      "major_version": 1,
+      "capability_version_gid": "cv2_73a4b58a3bc25f77c25aca5f",
+      "business_definition_hash": "sha256:51e305c027a29fae9d6e42bc3d98d26ebd52d8a28c048d645c1b57a857c504b7",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": true
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:agent.run",
+      "execution_mode": "local",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:987185805ecf2554b55eb27f12e704ce4c1b148bfd93ba33cd592ee468056f2f"
+    },
+    {
+      "id": "simulation.vismockup.visibility.change.request",
+      "major_version": 1,
+      "capability_version_gid": "cv2_ed1e1f1d44246a165a00a320",
+      "business_definition_hash": "sha256:3696611c6f30db4a525e3fc34e3933759a9057eb8d2851d91071f25bde6ef4f9",
+      "owner_domain": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "experimental",
+      "descriptor_hash": "sha256:521397eb40fb5d4b0e46dfc776bee5bf81291766d5a385b137870cadeae450de"
+    },
+    {
+      "id": "system.activity.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_e4da37b5877832d0247da2b4",
+      "business_definition_hash": "sha256:ac4705f665ef1f8932ae72ed3acc9f22da3f84378bfc5e2d3992ea730db11796",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:d22d69268056cc7261b9894f5b05633852b9b990533c1e68a0c81fadeae6e3e2"
+    },
+    {
+      "id": "system.change_impact.preview",
+      "major_version": 1,
+      "capability_version_gid": "cv2_546421592435b16bc70ca6f8",
+      "business_definition_hash": "sha256:49fc2d9e236515c519b8b58e88e093dc394225acde65fe179b9973a9e74e2c9b",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:252f4c494750e5441541745d44fddfbe25fa7dceb2607d421f730c9a66fb16b1"
+    },
+    {
+      "id": "system.job.cancel",
+      "major_version": 1,
+      "capability_version_gid": "cv2_5d2299b3523c56340f77e940",
+      "business_definition_hash": "sha256:7ea37506150fde65cab00b03d364a4c2bd262eee570076520382fd47e254598e",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:59ca08ad7edb6009b6e8c79c19dead1de162853140d81a2802ad2882ceb549eb"
+    },
+    {
+      "id": "system.job.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_0a57eef3a4cc62df457fd6e3",
+      "business_definition_hash": "sha256:97d8a3da195682523641fdb1b2bffe86d5a8a77747f765469a7d264def877fe5",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:3c2915f76d933df907f9978aee6c09496bcdba98b52116c54f133bffde8280e7"
+    },
+    {
+      "id": "system.lineage.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_29e3c7660f31f633183a7f46",
+      "business_definition_hash": "sha256:f403346955f4da6791a568a57499d86be13af3761fff42c8bd2a4e03e44bac41",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:30abffb8d2b50849bf728b5042ceb25fd332c9c667b46f8b4195178b47620618"
+    },
+    {
+      "id": "system.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_d875a7aadaff0533e39a8197",
+      "business_definition_hash": "sha256:4b6a4eae3f8d9dfa23984135d67086a8c7d372744f2b7f88b023bd6a44250c1d",
+      "owner_domain": "base",
+      "provider_ref": "base.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "base.v2:authenticated",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:46f86cd0d8793381588b1d32959078c060e733bcd47d72c965293260c6862ec1"
+    },
+    {
+      "id": "vismockup.capture",
+      "major_version": 1,
+      "capability_version_gid": "cv2_5d37be1d945ce7e6a3daab85",
+      "business_definition_hash": "sha256:ce3a5af5ccfdc509cc1bb06e51ba06e0c46cea9b3c957b12387a29abcb802c06",
+      "owner_domain": "device",
+      "provider_ref": "device.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "local-runtime.v2:agent.run",
+      "execution_mode": "local",
+      "lifecycle_status": "deprecated",
+      "descriptor_hash": "sha256:1165e73718500c4bcdf3aa90bf9e04c6994c42e42eec6fcf913c94f436a34353"
+    },
+    {
+      "id": "vismockup.highlight",
+      "major_version": 1,
+      "capability_version_gid": "cv2_3cc89bf87b93811532802d89",
+      "business_definition_hash": "sha256:f020e65458aea8f42b7a2729b84ce727e934abe0ef8959375ebf9c844f07708c",
+      "owner_domain": "device",
+      "provider_ref": "device.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "local-runtime.v2:agent.run",
+      "execution_mode": "local",
+      "lifecycle_status": "deprecated",
+      "descriptor_hash": "sha256:e4d8a7faf6fb3c43dfbe26a56702e54b479e32f4316b25e5cac71c7ce6e93dc4"
+    },
+    {
+      "id": "vismockup.launch",
+      "major_version": 1,
+      "capability_version_gid": "cv2_ce455ecddc0d1d763e1d3498",
+      "business_definition_hash": "sha256:79698196acdd858300bb9aa24d0b0531db72e57af824cbfc10a0e261c5015987",
+      "owner_domain": "device",
+      "provider_ref": "device.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "local-runtime.v2:agent.run",
+      "execution_mode": "local",
+      "lifecycle_status": "deprecated",
+      "descriptor_hash": "sha256:6bc06ecd16624b54dcfee1c099acb50b09f059c017b4845817c928fe8f39d769"
+    },
+    {
+      "id": "vismockup.model.open",
+      "major_version": 1,
+      "capability_version_gid": "cv2_7d079fbaddacc3bb080af29c",
+      "business_definition_hash": "sha256:6f8061f029db665466a182bba22d9cf4c3d7752d4ec9bd1f84eb2bd10af18749",
+      "owner_domain": "device",
+      "provider_ref": "device.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "local-runtime.v2:agent.run",
+      "execution_mode": "local",
+      "lifecycle_status": "deprecated",
+      "descriptor_hash": "sha256:b0a2cfffdf43ff32a53ec0877a191eafff1df72f8981a841a22ad7d4310061c2"
+    },
+    {
+      "id": "vismockup.status",
+      "major_version": 1,
+      "capability_version_gid": "cv2_8e20a2465266e3a7938e3504",
+      "business_definition_hash": "sha256:661e687a7ba0cccbdbde366cc948e6fe890a73b8b2248c43eb0383d4ecaa606c",
+      "owner_domain": "device",
+      "provider_ref": "device.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "local-runtime.v2:agent.run",
+      "execution_mode": "local",
+      "lifecycle_status": "deprecated",
+      "descriptor_hash": "sha256:866c0abf5ff23d233a036cd78d9c0e8516c9fdc6cd4ee345fb94f4569fe80494"
+    },
+    {
+      "id": "vismockup.tree",
+      "major_version": 1,
+      "capability_version_gid": "cv2_1f3ff086a4f3e68ce065a459",
+      "business_definition_hash": "sha256:8dd8999d8558765b7f4158fc9ebf31e5a297e6821b64961c6110da099747f208",
+      "owner_domain": "device",
+      "provider_ref": "device.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "none",
+      "authorization_policy": "local-runtime.v2:agent.run",
+      "execution_mode": "local",
+      "lifecycle_status": "deprecated",
+      "descriptor_hash": "sha256:9d492ce8f4931ad83f285540ee8543e72783dfa902910d8081fa7d2d85066eba"
+    },
+    {
+      "id": "vismockup.visibility",
+      "major_version": 1,
+      "capability_version_gid": "cv2_461b1f20bf07697b35db6487",
+      "business_definition_hash": "sha256:d23e1c5e81a2060e0a36fd71180ed0fc77fe4ad1f97f23c344e85debc7c6db1c",
+      "owner_domain": "device",
+      "provider_ref": "device.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "local-runtime.v2:agent.run",
+      "execution_mode": "local",
+      "lifecycle_status": "deprecated",
+      "descriptor_hash": "sha256:5a1d7d2a0b22f59fd7090666e5c20a1583f5c9b45e9aa94664858e665c0434b5"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "backend/base/web_atomic.py",
+      "sha256": "sha256:0a3f1ba4d3ada8460ecbd68f81e029474d1ce8f07bf6ecbddccb2cde751067ad"
+    },
+    {
+      "path": "backend/capabilities/system_shared_next.py",
+      "sha256": "sha256:d8a4f2f06808f58a5a8a3c63f0a128459a1ee841a1718ab8823d61c30e231e9c"
+    },
+    {
+      "path": "backend/capability_v2/authorization.py",
+      "sha256": "sha256:95b6e5bc2e9e5aadec7d44265ceb4381b287b93cf24f5b7b1bcfee114da2d717"
+    },
+    {
+      "path": "backend/capability_v2/desktop_release_approval.py",
+      "sha256": "sha256:bdfda8d60bf29039f4584c2c0441d65c579bf572b2accd52ffc70f75d96be327"
+    },
+    {
+      "path": "backend/capability_v2/gateway.py",
+      "sha256": "sha256:234e600ba9efb2bd64de06f9fafc908a04b53134e1d1446f31d6ff48dc214fbe"
+    },
+    {
+      "path": "backend/capability_v2/identity.py",
+      "sha256": "sha256:cc561c4b131a265e079511d54aec00d3d75ff023c9598fff85ef299ae3f71508"
+    },
+    {
+      "path": "backend/capability_v2/official_domains.json",
+      "sha256": "sha256:be6f682e2fa258e7e5b6b8b5d7977000ffd49aa7af81f173dac3f06115cd1863"
+    },
+    {
+      "path": "backend/capability_v2/policies.py",
+      "sha256": "sha256:835f80d7b3bae5f3fd38fa10fa8984d119fbaf7c4962223ee5584b6cfae1f373"
+    },
+    {
+      "path": "backend/capability_v2/web_compatibility.py",
+      "sha256": "sha256:128c9f4f400e371f21a41e08731cf80f2b629fb948ff623dca903a0b94fda919"
+    },
+    {
+      "path": "backend/contracts/connector_execution_plan_v1.py",
+      "sha256": "sha256:12bdcfc6928892ed14f082cf4c0ddbf1b04b4471a6f59618d133270ae2852a74"
+    },
+    {
+      "path": "backend/contracts/connector_execution_plan_v2.py",
+      "sha256": "sha256:e5f780673b2a9902d69a7fbe950c8276a32b981152df34c347cf8157d812e314"
+    },
+    {
+      "path": "backend/db/migrations/domains/simulation/0001_simulation.sql",
+      "sha256": "sha256:ca094946dd333f904ca84cfad5c8ba7be8399cb48c88c6eda6201e49fcdc85ab"
+    },
+    {
+      "path": "backend/db/migrations/domains/simulation/0002_connector_environments.sql",
+      "sha256": "sha256:e1897a00f30b9c1345c9316d8a07b791f36e34667713e6abde1d2a1e45702037"
+    },
+    {
+      "path": "backend/db/migrations/domains/simulation/0003_document_snapshots.sql",
+      "sha256": "sha256:e090c84352b1fc5ea3a3b5cc207421dbcf57dc9b00b897954df7b271d7715100"
+    },
+    {
+      "path": "backend/db/migrations/domains/simulation/0004_capture_dispatch_plans.sql",
+      "sha256": "sha256:be3e9cefefa42b1fc196ffdf275d4740d30d8acffff0e80dc0408008e03ada04"
+    },
+    {
+      "path": "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql",
+      "sha256": "sha256:a558015450dfc8402a8f2cbe660b1b346d305f7375d9f7e8731b6819b8f469b4"
+    },
+    {
+      "path": "backend/db/migrations/domains/simulation/0006_capture_dispatch_compatibility.sql",
+      "sha256": "sha256:2003ab71c09c1889b2216e74a301f5fd05f303a74576e0a9f83f00ad26706481"
+    },
+    {
+      "path": "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql",
+      "sha256": "sha256:685eb816f5881db015ec133fc1e552a8d7ca05efc99da0deacc8696abad6fc95"
+    },
+    {
+      "path": "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql",
+      "sha256": "sha256:1586c30204eb0b06efb7db1d335135a3d7bec19f0d3617e6fac779ce554653da"
+    },
+    {
+      "path": "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql",
+      "sha256": "sha256:b593b53756b8d9ec8f5dd249f586195ed9a774d42c78e62eaea5ac8f5ac8feb6"
+    },
+    {
+      "path": "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql",
+      "sha256": "sha256:76328efb98c5511b7a0f0ac602725c80832d03d195ab441e2f03dfd85a9bef16"
+    },
+    {
+      "path": "backend/domain_ports/simulation_runtime.py",
+      "sha256": "sha256:f51d3b9455dfa52c42170148a947acb0221f158359d2c3c3ac6d68afe0104e81"
+    },
+    {
+      "path": "backend/routers/capabilities.py",
+      "sha256": "sha256:d020b5c88e69fc37948127ab43f1d2eca5cd077f00ec230a9245d756a17055ab"
+    },
+    {
+      "path": "backend/routers/deps.py",
+      "sha256": "sha256:a63c35a0743ec5694f6dc3dfdf0cd76ff2099230640e7ca47eb715e8fe3151ae"
+    },
+    {
+      "path": "backend/routers/simulation_connector.py",
+      "sha256": "sha256:39c6485e0547ccbf028ffa494a11831e486035797bc736d91553e5a0d3ef5004"
+    },
+    {
+      "path": "backend/scripts/build_capability_catalog.py",
+      "sha256": "sha256:59f23e83fd2568b09e6761fe964b190fbee02e87e61cb5bc154fc1ab08d4c420"
+    },
+    {
+      "path": "backend/scripts/build_desktop_app_governance.py",
+      "sha256": "sha256:a5ab99a9818e950584a065276a9d08ecbe571034a93ad8be0d0a7db7309345e7"
+    },
+    {
+      "path": "backend/scripts/build_user_function_registry.py",
+      "sha256": "sha256:fd71354d0baba63f7524d2cac0b8d54d13e5340e1348c625075cfdf5bdb576bc"
+    },
+    {
+      "path": "backend/services/jwt_service.py",
+      "sha256": "sha256:5fc11b8abdb3b5c8677eb33536c2c21028fafb6e6ee247d3c328621b89f56564"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/AllowedPathPolicy.cs",
+      "sha256": "sha256:9d2b6924b9f6b30f2197bd10218cf41f8d4b0b7c834b8c0392e1a20b33168a74"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/DocumentSnapshotReader.cs",
+      "sha256": "sha256:7b1105d90a2133c9c2273cca5aab377fc932b56b36d99b21b0eff9f39d2ed3ab"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/InternalCapture.cs",
+      "sha256": "sha256:942cb2788045d1c311330ac4e6ced10ade61213bb83ed41f90a2178a973e464c"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/IVisMockupCom.cs",
+      "sha256": "sha256:9257a7e161ea50bc1fa97eccee15a9c53b858613af97180c58cf274428b8351f"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/ModelAttacher.cs",
+      "sha256": "sha256:45db4e47d3d9d842acb78281f37ad19a15a90fbce82e2544117c1f10f3d65b3e"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/obj/Debug/net8.0-windows/.NETCoreApp,Version=v8.0.AssemblyAttributes.cs",
+      "sha256": "sha256:ae41ca1e67556e4b0622d82a2122a04f17722c0c19d3b2f1fbcab8a2aaf16d2e"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/obj/Debug/net8.0-windows/Ai00.Connector.Adapters.VisMockup.AssemblyInfo.cs",
+      "sha256": "sha256:c21939bd7e8fad708c89d856f771cb1ca7a771bcc6f32e218590e0b81f54dda8"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/obj/Debug/net8.0-windows/Ai00.Connector.Adapters.VisMockup.GlobalUsings.g.cs",
+      "sha256": "sha256:addb143f8c43b95f1bb73a0cba7c793281935c4ab8ccabbdf6b04d3e0f809e0e"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/obj/Release/net8.0-windows/.NETCoreApp,Version=v8.0.AssemblyAttributes.cs",
+      "sha256": "sha256:ae41ca1e67556e4b0622d82a2122a04f17722c0c19d3b2f1fbcab8a2aaf16d2e"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/obj/Release/net8.0-windows/Ai00.Connector.Adapters.VisMockup.AssemblyInfo.cs",
+      "sha256": "sha256:986bcb6a936123917f97b7256f48726e7a6250c79dc6ddf8a2d260b32d231847"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/obj/Release/net8.0-windows/Ai00.Connector.Adapters.VisMockup.GlobalUsings.g.cs",
+      "sha256": "sha256:addb143f8c43b95f1bb73a0cba7c793281935c4ab8ccabbdf6b04d3e0f809e0e"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/SceneController.cs",
+      "sha256": "sha256:d1659eb747cc626a70d23da8fa1c8edc84a8f8ca0a95c6dace1c590865594d1b"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/StaDispatcher.cs",
+      "sha256": "sha256:9aeba71eaeffdc34fba2184c5ad10db68ad3cf272841eca1eb8c7cc9b580035b"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/VisMockupAdapter.cs",
+      "sha256": "sha256:1fe762895f18b8565cd173be7232f904a5c1783ea45f4a517da9f585093ed7c9"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/VisMockupConnection.cs",
+      "sha256": "sha256:fdc516167ea1c9c5fc4ed58d1be2c7709aa0e86099229a439a99354738dcf97d"
+    },
+    {
+      "path": "plugins/agent/agent_backend/capabilities/__init__.py",
+      "sha256": "sha256:67dea4fa65f520f0fcd187b6fdc5685774c9b47ca27dd3c1b78ec9eabecd061e"
+    },
+    {
+      "path": "plugins/agent/agent_backend/capabilities/catalog_tool_confirmation.py",
+      "sha256": "sha256:8f2484d1287083efb606bf115fec2bbfab16c3c080c126418902d81c2c0140e8"
+    },
+    {
+      "path": "plugins/agent/agent_backend/capabilities/interaction_chat_change.py",
+      "sha256": "sha256:4bc5abb426a445a256b75ce6afea309956e0e697581a273bb653d76c280d039a"
+    },
+    {
+      "path": "plugins/craft/craft_backend/capabilities/bop_navigation.py",
+      "sha256": "sha256:7d853dd19005abd29abc0a3ab10a7d2d87bdc56599309d7b2e61824455263ffd"
+    },
+    {
+      "path": "plugins/craft/craft_backend/capabilities/bop_structure.py",
+      "sha256": "sha256:65e39212acc1b323523b46e0b245bbc1c671b962cd61d7598e03d35e093e0f97"
+    },
+    {
+      "path": "plugins/craft/craft_backend/capabilities/bop_versions.py",
+      "sha256": "sha256:21a50d8dcc434b3ca5091622aa2572baa0aa790184e9edd9f09173e1761da5b7"
+    },
+    {
+      "path": "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
+      "sha256": "sha256:be5a220b15a74159049e505b935ba78787e54324f0d49b86b57a01835ca512e8"
+    },
+    {
+      "path": "plugins/craft/craft_backend/capabilities/process_screenshot.py",
+      "sha256": "sha256:2f3e905f7b12864d178ea60979266c899481c929380c8a4c4be78491de4ae80c"
+    },
+    {
+      "path": "plugins/craft/craft_backend/capabilities/resource_requirements.py",
+      "sha256": "sha256:fe5bf56b5e2606bb1b167ec22fa5eec59fc22eb5ae7c9db9f68b1fb96d781cf4"
+    },
+    {
+      "path": "plugins/device/device_backend/capabilities/runtime.py",
+      "sha256": "sha256:e08a4895f3d5b1a64fa6c81a80bee7ab0d834815b78b743b93ceb58144959355"
+    },
+    {
+      "path": "plugins/factory/factory_backend/capabilities/__init__.py",
+      "sha256": "sha256:92edd17261194b164005828e04b4da7f1e31e83d1433dbad01d142f0fe9ee09e"
+    },
+    {
+      "path": "plugins/knowledge/knowledge_backend/capabilities/knowledge_context_next.py",
+      "sha256": "sha256:09ccba115ebad87eecad2def7b154cc677e40f7ee84648d8587494554bf96f4d"
+    },
+    {
+      "path": "plugins/knowledge/knowledge_backend/capabilities/reference_data.py",
+      "sha256": "sha256:433bfa4f50c457cf756b71db9dc182e0ab92da1b9f099d78656e1433770adee7"
+    },
+    {
+      "path": "plugins/knowledge/knowledge_backend/capabilities/resource_model_mapping.py",
+      "sha256": "sha256:648af9e66b3cb1899f18112f9dff1b12c97093b51e9f1a3e9c16e9a15b171981"
+    },
+    {
+      "path": "plugins/ontology/ontology_backend/capabilities/ontology_concepts_next.py",
+      "sha256": "sha256:605f8b3cf28e173b2137fb2e3f8c02597c67df4bc25ec47829404897420d275f"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/__init__.py",
+      "sha256": "sha256:9ceface72671e0e9d1c3b5d0ef6dffe3688dc87e7242a5f973d20c7ae0e73db2"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/application/__init__.py",
+      "sha256": "sha256:e87768db2788a17ce8780bfb74a60c53b6c933b6ac1fa1a24a137737cfba1d69"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/application/capture_worker.py",
+      "sha256": "sha256:dd965ed57f7259165637766caf61c72da4d2da667ee380e93566e2e39619de40"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/application/connector_plans.py",
+      "sha256": "sha256:a14edc75a500fc9457faf38a045102d7a6b20003539e74ef906ae942b9582344"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/application/connector_projection_worker.py",
+      "sha256": "sha256:a43c5b14f64677542fc31fd7d860698937d3b83844e01bee402319fab947cd1b"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/application/connector_protocol_v2.py",
+      "sha256": "sha256:4d94591f799b62e6d2e1b988e2943d8fc34b3df3849bb82de7c45ca7842dbaca"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/application/connector_runtime_sessions.py",
+      "sha256": "sha256:22a3b7935dc8c54e0af13a230a6a386419933293fd7bbfcac00d1ce8967667a0"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/application/connector_wakeup.py",
+      "sha256": "sha256:0c59e9bcec97428ae278f078383774320db7dcefc30f42f44193caf28f836594"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/application/document_snapshots.py",
+      "sha256": "sha256:1767b083fb41110eadd12955cf5338eb4c04199a635eae87e1b2b06bc1a79c5f"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/application/runs.py",
+      "sha256": "sha256:45e565a1943294c10db71caacc586063eee4b3aa0abbb456d81b0b3cb9682e9c"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/application/runtime_ports.py",
+      "sha256": "sha256:54ab3c9c2563185437776954e6b94a4c54623d929f61040c58e628a46c986dd5"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/capabilities/__init__.py",
+      "sha256": "sha256:590f782eff4f8cb084dfbba364329b2035967fa8d71d2d0ba41b9ec81aee148f"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/capabilities/capture_runs.py",
+      "sha256": "sha256:9c80b160b303dbf2b51b9849bb157057925eef4a58324e72bb3f0291850f5eda"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/capabilities/connector_contracts.py",
+      "sha256": "sha256:01bb98dfb90aa90e7d1a7080dfa90801c5b7e2e6b2c5a7c9e28214b62e190416"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/capabilities/connector_outcomes.py",
+      "sha256": "sha256:c72c70f8e2d74fc57c4edf73591c458a6f13cfc962e4ec861792b861793647fe"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/capabilities/connector_pairing.py",
+      "sha256": "sha256:9ebc84821587bfab0b6b78853361bcb44e173ee6c933dd59118d56d177510849"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/capabilities/connector_runtime.py",
+      "sha256": "sha256:b25e96552df5a87a29349ef6d1594d5b552f040cec2cf7e858525cff14e2b662"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/capabilities/contracts.py",
+      "sha256": "sha256:9730accd92f9f76f9e95ff498cb3284cb6a40f2259901ca2cb115002a3ea97eb"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/capabilities/document_snapshots.py",
+      "sha256": "sha256:ae1a3d30db33cf9225f64f74c524610c42abc2fae294eee4b876b11b7a2bd9f8"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/capabilities/environment_composition.py",
+      "sha256": "sha256:2916818701aaa6c6caa902998cbfa44a9aebde469838a162d79ffeb77c85ee9c"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/capabilities/models.py",
+      "sha256": "sha256:4b9a1090d4fa3f5db5b2a20831cf9edd123520d22ba7a8921aaf77a3b44919d6"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/capabilities/provider.py",
+      "sha256": "sha256:8fac997ebedfc165868f7e858e05f3e720600c6c4fefb97f5632f6ba2138e70a"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/data/__init__.py",
+      "sha256": "sha256:3e600264efd16f4ce4119194faca0c334dbd2a2a2bcee2b3033b18b89c7c8692"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/data/connection.py",
+      "sha256": "sha256:96b7ed5658ef4ad039388a4904f2ed52884d73fda1ff6754519ba1cae63729f6"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/data/connector_app_pairing_repository.py",
+      "sha256": "sha256:675485641394c009ecb56734b0a6097ceb5524fbabf57a740ecd37e81eb4e51e"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/data/connector_repository.py",
+      "sha256": "sha256:b3a6638afc5567a9570b0f9b91a78010b193fd6f8faf28242144ff3216c1204b"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/data/document_snapshot_repository.py",
+      "sha256": "sha256:1dda39d6122be444a6ef8b641589ef5b237fab46a2a4213a2b24a5e365791f63"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/data/environment_repository.py",
+      "sha256": "sha256:20f6ca05ee0617bb733d28cff569d9f123ab9ad54da2879feb909400a61518a9"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/domain/__init__.py",
+      "sha256": "sha256:fc3e9c255b72f6641fdb8ffa6682435d007ff67a51ba0d71ba72c4691d546de3"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/domain/connector_pairing.py",
+      "sha256": "sha256:37e3fb52d3f74172864f674c47a53486ceff04be1270d29573a2d07d6f86645e"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/domain/environment_manifest.py",
+      "sha256": "sha256:3ec0781df0fba36dac27ebc85453642e93356e49f1d3ae952ba886119bf35fcc"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/domain/runs.py",
+      "sha256": "sha256:7de60d819aed31e8d1b5d2a3ac374aba756d01d10a5e9e7df1c768d40502726a"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/routers/__init__.py",
+      "sha256": "sha256:3c7e2aa0e96881fc30ea6f766204b850ebb3644969e0357f85582f0550a1387b"
+    },
+    {
+      "path": "plugins/simulation/simulation_backend/routers/environments.py",
+      "sha256": "sha256:cee94aaf16711b434c19808e36a1fb4e2f8081f1be08bf0465a874516e010567"
+    }
+  ],
+  "transport_bindings": [
+    {
+      "method": "POST",
+      "route": "/api/v1/simulation/connectors/v2/pairings",
+      "handler": "app_pairing_request",
+      "owner": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_id": "ai00.connector",
+      "authentication": "possession_pairing_bootstrap"
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/simulation/connectors/v2/pairings/{pairing_id}/activate",
+      "handler": "app_pairing_activate",
+      "owner": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_id": "ai00.connector",
+      "authentication": "two_key_possession"
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/simulation/connectors/v2/runtime/challenge",
+      "handler": "runtime_challenge",
+      "owner": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_id": "ai00.connector",
+      "authentication": "device_credential"
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/simulation/connectors/v2/runtime/register",
+      "handler": "runtime_register",
+      "owner": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_id": "ai00.connector",
+      "authentication": "device_credential_and_signature"
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/simulation/connectors/v2/runtime/reconciliation/register",
+      "handler": "runtime_reconciliation_register",
+      "owner": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_id": "ai00.connector",
+      "authentication": "device_credential_and_signature"
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/simulation/connectors/v2/heartbeat",
+      "handler": "runtime_heartbeat",
+      "owner": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_id": "ai00.connector",
+      "authentication": "runtime_session"
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/simulation/connectors/v2/runtime/renew",
+      "handler": "runtime_renew",
+      "owner": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_id": "ai00.connector",
+      "authentication": "runtime_session"
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/simulation/connectors/v2/plans/lease",
+      "handler": "runtime_lease",
+      "owner": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_id": "ai00.connector",
+      "authentication": "runtime_session"
+    },
+    {
+      "method": "WEBSOCKET",
+      "route": "/api/v1/simulation/connectors/v2/plans/wake",
+      "handler": "runtime_wake",
+      "owner": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_id": "ai00.connector",
+      "authentication": "runtime_session"
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/simulation/connectors/v2/plans/{plan_id}/outcome",
+      "handler": "runtime_outcome",
+      "owner": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_id": "ai00.connector",
+      "authentication": "runtime_session_and_signed_outcome"
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/simulation/connectors/v2/plans/{plan_id}/probe",
+      "handler": "runtime_probe",
+      "owner": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_id": "ai00.connector",
+      "authentication": "plan_scoped_reconciliation_session"
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/simulation/connectors/v2/plans/{plan_id}/reconcile",
+      "handler": "runtime_reconcile",
+      "owner": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_id": "ai00.connector",
+      "authentication": "plan_scoped_session_and_signed_evidence"
+    }
+  ],
+  "dependency_analysis": "conservative fixed point over actual registered Capability literals and provider source files",
+  "unverified_artifacts": [
+    "Electron main/preload/Renderer consumer migration and IPC",
+    "AppHost Windows x64 executable and installer",
+    "signed release manifest and Authenticode",
+    "dynamic Capability dependency dispatch",
+    "native MySQL execution",
+    "production runtime evidence"
+  ],
+  "blockers": [
+    "full_catalog_not_current",
+    "full_release_gate_not_verified",
+    "capability_human_approval_missing",
+    "runtime_evidence_missing",
+    "technical_release_approval_missing",
+    "app_artifacts_not_yet_verified"
+  ],
+  "machine_passed": false,
+  "human_approved": false,
+  "runtime_verified": false,
+  "technical_release_approved": false,
+  "advisory": true
+}

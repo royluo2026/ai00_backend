@@ -46,8 +46,17 @@ def _load_release(path: Path) -> CatalogRelease:
 
 
 def _verified_consumer_refs(capability_id: str, major_version: int = 1) -> tuple[dict[str, str], ...]:
-    """Return only consumers proven by migrated source files in this release."""
+    """Return server-declared App bindings and source-proven legacy consumers.
+
+    A registration is not runtime evidence; App call-site migration and release
+    validation remain explicitly unverified in the desktop impact closure.
+    """
     consumers: list[dict[str, str]] = []
+    from backend.capability_v2.identity import DESKTOP_CONSUMER_ID
+    from plugins.simulation.simulation_backend.capabilities.connector_pairing import DESKTOP_CAPABILITY_BINDINGS as pairing
+    from plugins.simulation.simulation_backend.capabilities.connector_runtime import DESKTOP_CAPABILITY_BINDINGS as runtime
+    if (capability_id, major_version) in (*pairing, *runtime):
+        consumers.append({"consumer_id": DESKTOP_CONSUMER_ID, "consumer_type": "web", "version_constraint": f"=={major_version}"})
     if major_version == 2 and capability_id in {
         "ontology.concept.get", "ontology.concept.resolve", "ontology.object.list",
     }:

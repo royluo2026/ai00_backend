@@ -28,6 +28,7 @@
         "stability": {"enum": ["stable", "experimental", "deprecated"]},
         "current_consumers": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "target_capability": {"type": ["string", "null"]},
+        "target_major_version": {"type": "integer", "minimum": 1},
         "exposure": {"type": "string"},
         "automation_level": {"type": "string"},
         "resource_types": {"type": "array", "items": {"type": "string"}},

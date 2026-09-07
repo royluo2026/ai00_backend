@@ -4,7 +4,7 @@ from __future__ import annotations
 import hashlib
 import secrets
 from datetime import UTC, datetime
-from typing import Callable, Protocol
+from typing import Callable, Protocol, Literal
 
 from pydantic import Field, model_validator
 
@@ -25,11 +25,25 @@ class IdentityError(PermissionError):
     pass
 
 
+DESKTOP_CONSUMER_ID = "ai00.desktop.windows-x64"
+CONSUMER_IDENTITY_FIELDS = frozenset({"consumer_id", "consumer_type", "consumer", "identity", "desktop_consumer"})
+
+
+class DesktopConsumerClaim(FrozenModel):
+    """Nested claim carried only inside the cloud-signed authentication JWT."""
+    consumer_id: Literal["ai00.desktop.windows-x64"]
+    tenant_id: str = Field(pattern=IDENTITY_PATTERN)
+    installation_id: str = Field(pattern=IDENTITY_PATTERN)
+    consumer_version: str = Field(pattern=r"^[0-9]+\.[0-9]+\.[0-9]+$")
+
+
 class AuthenticatedPrincipal(FrozenModel):
     user_id: str | None = Field(default=None, pattern=IDENTITY_PATTERN)
     service_id: str | None = Field(default=None, pattern=IDENTITY_PATTERN)
     authentication_method: str = Field(min_length=1, max_length=64)
     authenticated_at: datetime
+    # ActorIdentity projections must not copy consumer claims into actor fields.
+    desktop_consumer: DesktopConsumerClaim | None = Field(default=None, exclude=True)
 
     @model_validator(mode="after")
     def principal_contract(self) -> "AuthenticatedPrincipal":
@@ -38,6 +52,18 @@ class AuthenticatedPrincipal(FrozenModel):
         if self.authenticated_at.tzinfo is None or self.authenticated_at.utcoffset() is None:
             raise ValueError("authenticated_at must be timezone-aware")
         return self
+
+
+def authenticated_user_consumer(principal: AuthenticatedPrincipal, tenant_id: str) -> ConsumerDescriptor:
+    if principal.desktop_consumer is None:
+        return ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web")
+    claim = principal.desktop_consumer
+    if not principal.user_id or claim.tenant_id != tenant_id:
+        raise IdentityError("desktop_consumer_claim_invalid")
+    # WEB is the existing authenticated interactive transport policy, not a
+    # separate browser product identity. The App has its own signed consumer ID.
+    return ConsumerDescriptor(type=ConsumerType.WEB, consumer_id=DESKTOP_CONSUMER_ID,
+        installation_id=claim.installation_id, consumer_version=claim.consumer_version)
 
 
 class TenantMembership(FrozenModel):
@@ -130,7 +156,7 @@ class IdentityBroker:
         )
 
     def for_web(self, principal: AuthenticatedPrincipal, *, tenant_id: str) -> ConsumerIdentity:
-        return self._identity(principal, tenant_id, ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web"))
+        return self._identity(principal, tenant_id, authenticated_user_consumer(principal, tenant_id))
 
     def for_plugin_mount(self, token: str) -> ConsumerIdentity:
         grant = self._mounts.consume_active(token)

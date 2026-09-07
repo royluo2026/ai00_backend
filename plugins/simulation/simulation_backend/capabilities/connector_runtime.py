@@ -41,6 +41,42 @@ class ConnectorError(RuntimeError):
     pass
 
 
+# Consumer declarations do not add authorization or change existing versions.
+DESKTOP_CAPABILITY_BINDINGS = (
+    ("simulation.connector.runtime.takeover", 1),
+    ("simulation.connector.health.get", 1),
+    ("simulation.connector.plan.queue", 2),
+    ("simulation.environment.preflight", 1),
+    ("simulation.vismockup.application.attach.request", 1),
+    ("simulation.vismockup.application.launch.request", 1),
+    ("simulation.vismockup.model.open.request", 1),
+    ("simulation.vismockup.model.close.request", 1),
+    ("simulation.vismockup.visibility.change.request", 1),
+    ("simulation.vismockup.tree.read.request", 1),
+    ("simulation.vismockup.command.get", 1),
+)
+
+# Device-authenticated protocol adapters are Simulation-owned transports, not
+# independent business Capabilities and not Renderer-callable providers.
+DESKTOP_TRANSPORT_BINDINGS = tuple(dict(method=method,
+    route="/api/v1/simulation/connectors/v2/" + route, handler=handler,
+    owner="simulation", provider_ref="simulation.provider", consumer_id="ai00.connector",
+    authentication=authentication) for method, route, handler, authentication in (
+    ("POST", "pairings", "app_pairing_request", "possession_pairing_bootstrap"),
+    ("POST", "pairings/{pairing_id}/activate", "app_pairing_activate", "two_key_possession"),
+    ("POST", "runtime/challenge", "runtime_challenge", "device_credential"),
+    ("POST", "runtime/register", "runtime_register", "device_credential_and_signature"),
+    ("POST", "runtime/reconciliation/register", "runtime_reconciliation_register", "device_credential_and_signature"),
+    ("POST", "heartbeat", "runtime_heartbeat", "runtime_session"),
+    ("POST", "runtime/renew", "runtime_renew", "runtime_session"),
+    ("POST", "plans/lease", "runtime_lease", "runtime_session"),
+    ("WEBSOCKET", "plans/wake", "runtime_wake", "runtime_session"),
+    ("POST", "plans/{plan_id}/outcome", "runtime_outcome", "runtime_session_and_signed_outcome"),
+    ("GET", "plans/{plan_id}/probe", "runtime_probe", "plan_scoped_reconciliation_session"),
+    ("POST", "plans/{plan_id}/reconcile", "runtime_reconcile", "plan_scoped_session_and_signed_evidence"),
+))
+
+
 DIRECT_VISMOCKUP_OPERATIONS = {
     "attach": ("vismockup.application.probe@1", "sha256:197cfad8bc3453030fdc288ea78c3abc21699274dd48d4482444af4f62380a37"),
     "launch": ("vismockup.application.probe@1", "sha256:197cfad8bc3453030fdc288ea78c3abc21699274dd48d4482444af4f62380a37"),

@@ -16,6 +16,10 @@ def build_trusted_web_envelope(
     approval_reference: str | None = None, major_version: int = 1,
 ) -> InvocationEnvelope:
     """Build a server-owned Web invocation with an explicit consumer identity."""
+    from .identity import authenticated_user_consumer
+    consumer = (authenticated_user_consumer(principal, str(current_user.get("team_id") or f"user:{current_user['gid']}"))
+                if getattr(principal, "desktop_consumer", None) is not None
+                else ConsumerDescriptor(type=ConsumerType.WEB, consumer_id=consumer_id))
     return InvocationEnvelope(
         capability_id=capability_id,
         major_version=major_version,
@@ -28,7 +32,7 @@ def build_trusted_web_envelope(
                 membership="member",
                 active_roles=tuple(filter(None, (current_user.get("org_role"), current_user.get("system_role")))),
             ),
-            consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id=consumer_id),
+            consumer=consumer,
         ),
         idempotency_key=idempotency_key,
         approval_reference=approval_reference,
