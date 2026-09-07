@@ -1,11 +1,11 @@
 {
-  "acceptance_report_id": "sha256:e1fca15d22cad6b65c06d4868aca9a5a960d7661e2b1cb6cfb221610dbd84c59",
+  "acceptance_report_id": "sha256:ac2b39b7f54bc4df3c0675e7ecb12dd400c98f0bc7f6ab11973927ae5e64516e",
   "acceptance_report_path": "docs/acceptance/agent-runtime-capability-closure.json",
-  "acceptance_report_sha256": "sha256:34ec7283af428e6fefd3297badd3b494660df1416a129b8cabe5500d718ca425",
+  "acceptance_report_sha256": "sha256:d249a16e47a405b1d72d0bfc8592795163727348e29f14f35e7e9886c4c1a2ec",
   "adapter_factory": "backend.tests.support.integration_catalog_factory:build",
-  "backend_source_revision": "d56c743dee03112b2a3211a4ccb659ebed9cfda5",
-  "catalog_hash": "sha256:b79f7e734da4b72dbf4af4adbf91bb3715b3ffe41e3c6252f0b2165152c211e5",
-  "catalog_release": "rel_b79f7e734da4b72dbf4af4adbf91bb37",
+  "backend_source_revision": "605339ad0ec6f66f50477e89e9fb1d54bd4e2d56",
+  "catalog_hash": "sha256:09e54550fcbaaab2df24bfa28d2c2478d9d47f455a27563405bce365efb2e2fd",
+  "catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
   "closure_arithmetic": {
     "baseline": {
       "groups": 14,
@@ -20,7 +20,10 @@
       "occurrences": 17
     }
   },
-  "code_commit": "3bfbd3f6498364a248b6253e0362c3a087c6a1f4",
+  "code_commit": "605339ad0ec6f66f50477e89e9fb1d54bd4e2d56",
+  "completion_blockers": [
+    "legacy_route_proof_anchor_invalid:48"
+  ],
   "controlled_agent_mysql_oceanbase_gate": {
     "mandatory_probe_result": "4 errors",
     "reason": "AI00_AGENT_TEST_DB_URL and a dedicated DDL+DML test database are unavailable on this host",
@@ -129,9 +132,15 @@
       "occurrences": 2
     }
   ],
-  "factory_sha256": "sha256:67009b68b2ca32693174cb017317904a76ae6a76ccb851d8a7a651f547b41882",
-  "frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
-  "frontend_tree": "3c3156841af0d4bf2833dba8184b071265993965",
+  "factory_sha256": "sha256:5dc93a327c9c27f1e2e36520bdb073dafbaf66ccd494f8e0a43b61afe76027b5",
+  "frontend_revision": "df4e5514cfd90282784de0fc6a90bc8add346174",
+  "frontend_tree": "840e0b251ce37eb9fb542c8df8eaa51c72557b65",
+  "governance_status": {
+    "human_approved": false,
+    "machine_passed": true,
+    "runtime_verified": false,
+    "status": "blocked"
+  },
   "normalization_excluded_paths": [
     "generated_at",
     "environment_id",
@@ -140,11 +149,17 @@
     "test_run.command",
     "test_run.summary"
   ],
+  "normalization_helper": "backend.scripts.build_project_list_approval_acceptance_evidence:normalize_acceptance_report",
   "normalized_report_path": "docs/acceptance/agent-runtime-capability-closure.normalized.json",
-  "normalized_report_sha256": "sha256:1f2a9992ae121c4b3390b34b875240975e93fa2950b27c9126eb84f4ce43f56e",
-  "normalized_semantic_sha256": "sha256:1f2a9992ae121c4b3390b34b875240975e93fa2950b27c9126eb84f4ce43f56e",
-  "provider_manifest_sha256": "sha256:ba5483b5bfb0713e95556ae7360abdd95a33df86035e3cc871b8e4891b285ff2",
-  "retained_advisory": "coverage_invariant:stable_functions:922!=920",
+  "normalized_report_sha256": "sha256:bfad1227a0a2a2f19332a9840bf250c9132023409fdc0ace1b71955726d77f41",
+  "normalized_semantic_sha256": "sha256:bfad1227a0a2a2f19332a9840bf250c9132023409fdc0ace1b71955726d77f41",
+  "provider_manifest_sha256": "sha256:3cefda36cd1e6b3f0a86136f41d5f03aa7480daf86ff38af8a94cb941835dc6a",
+  "replay_command": "python backend/scripts/run_capability_v2_acceptance.py --mode offline --strict --report docs/acceptance/agent-runtime-capability-closure.json",
+  "replay_environment": {
+    "AI00_INTEGRATION_ADAPTER_FACTORY": "backend.tests.support.integration_catalog_factory:build",
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONPATH": "<backend-root>/plugins/integration"
+  },
   "schema_version": "1.0.0",
   "structural_content_sha256": "sha256:3e4daf840b1ab4e98786f602e8a9271ec38deb9a6c32db5639ac97a69fdc1cc8",
   "structural_counts": {
@@ -158,5 +173,10 @@
     "unresolved_occurrences": 0
   },
   "structural_manifest_path": "docs/governance/craft-agent-project-structural-web-remediation.json",
-  "structural_manifest_sha256": "sha256:09c31126cfc0ae0619892548db1b5fd81bdb7fb37a08f93716adf3c4f274d3dc"
+  "structural_manifest_sha256": "sha256:09c31126cfc0ae0619892548db1b5fd81bdb7fb37a08f93716adf3c4f274d3dc",
+  "structural_source": {
+    "backend_source_revision": "d56c743dee03112b2a3211a4ccb659ebed9cfda5",
+    "frontend_revision": "08359de59e756ce73c61df9818c7e7bcaeb86975",
+    "frontend_tree": "3c3156841af0d4bf2833dba8184b071265993965"
+  }
 }

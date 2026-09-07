@@ -1,0 +1,5 @@
+# Evidence identities hash bytes; keep these generated reports stable on Windows.
+agent-runtime-capability-closure.json text eol=lf
+agent-runtime-capability-closure.normalized.json text eol=lf
+agent-runtime-capability-closure-evidence.json text eol=lf
+electron-app-stage-0-snapshot.json text eol=lf
