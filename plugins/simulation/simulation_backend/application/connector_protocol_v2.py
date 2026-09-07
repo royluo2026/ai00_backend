@@ -180,23 +180,32 @@ def original_outcome(plan_row):
     return value.original_outcome if isinstance(value, ConnectorReconciledOutcomeV2) else value
 
 
-def probe_context(plan_row, recovery):
+def probe_context(plan_row, recovery, *, last_journal_sequence):
     plan = json.loads(plan_row['plan_json']) if isinstance(plan_row['plan_json'], str) else plan_row['plan_json']
     original = original_outcome(plan_row)
     # A verified execution prefix proves later steps were never invoked. With
-    # no original Outcome, every declared probe is required, including all writes.
+    # no original Outcome, every side effect needs a probe; read execution is unproven.
     invoked = plan['steps'][:len(original.steps)] if original else plan['steps']
     has_effects = any(s['side_effect_classification'] != 'read' for s in plan['steps'])
     required = [dict(step_id=s['step_id'], probe_id=s['post_condition_probe_id'])
                 for s in invoked if s['post_condition_probe_id']
                 and (s['side_effect_classification'] != 'read' or not has_effects)]
+    probed = {p['step_id'] for p in required}
+    completed = {s.step_id for s in original.steps if s.status == 'succeeded'} if original else set()
+    coverage = dict(
+        unprobeable_side_effect_step_ids=[s['step_id'] for s in invoked
+            if s['side_effect_classification'] != 'read' and not s['post_condition_probe_id']],
+        success_unproven_step_ids=[s['step_id'] for s in invoked
+            if (s['step_id'] not in probed and s['step_id'] not in completed)
+            or (not original and s['side_effect_classification'] == 'read')],
+        uninvoked_step_ids=[s['step_id'] for s in plan['steps'][len(invoked):]])
     context = dict(scope='read_only_post_condition_probe', plan_id=plan_row['plan_id'],
         plan_hash=plan_row['plan_hash'], lease_id=plan_row['lease_id'],
         runtime_instance_id=plan_row['runtime_instance_id'], runtime_generation=plan_row['runtime_generation'],
         device_id=plan_row['device_id'], tenant_id=plan_row['tenant_gid'],
         recovery_instance_id=recovery.get('recovery_instance_id', plan_row['runtime_instance_id']),
         recovery_session_id=hashlib.sha256(('reconciliation-session:' + recovery['token_hash']).encode()).hexdigest(),
-        required_probes=required)
+        required_probes=required, coverage=coverage, next_journal_sequence=last_journal_sequence + 1)
     context['nonce'] = hashlib.sha256(canonicalize_v2(context) + recovery['token_hash'].encode()).hexdigest()
     return context
 
@@ -207,19 +216,27 @@ class ReconciliationService:
             return 'manual_review_required'
         if probe_result.get('plan_id') != plan_id:
             raise ValueError('reconciliation_evidence_invalid')
+        coverage = probe_result.get('coverage')
+        if coverage is None:
+            return 'manual_review_required'
         classifications = probe_result.get('classifications', [])
-        if classifications and all(s == 'succeeded' for s in classifications):
+        if (classifications and all(s == 'succeeded' for s in classifications)
+                and not coverage['success_unproven_step_ids'] and not coverage['uninvoked_step_ids']):
             return 'succeeded'
-        if classifications and all(s == 'failed_without_effect' for s in classifications):
+        if (classifications and all(s == 'failed_without_effect' for s in classifications)
+                and not coverage['unprobeable_side_effect_step_ids']):
             return 'failed_without_effect'
         return 'manual_review_required'
 
-    def verify(self, plan_row, recovery, evidence, jwk):
+    def verify(self, plan_row, recovery, evidence, jwk, *, last_journal_sequence):
         evidence = ConnectorReconciliationEvidenceV2.model_validate(evidence)
         if not evidence.verify_signature(jwk):
             raise ValueError('outcome_signature_invalid')
-        context = probe_context(plan_row, recovery)
-        if any(getattr(evidence, key) != value for key, value in context.items() if key != 'required_probes'):
+        context = probe_context(plan_row, recovery, last_journal_sequence=last_journal_sequence)
+        if evidence.journal_sequence != context['next_journal_sequence']:
+            raise ValueError('journal_sequence_invalid')
+        if any(getattr(evidence, key) != value for key, value in context.items()
+                if key not in {'required_probes', 'coverage', 'next_journal_sequence'}):
             raise ValueError('reconciliation_evidence_invalid')
         required = [(p['step_id'], p['probe_id']) for p in context['required_probes']]
         actual = [(p.step_id, p.probe_id) for p in evidence.probes]
@@ -232,11 +249,10 @@ class ReconciliationService:
         classifications = [p.classification for p in evidence.probes]
         if actual != required:
             classifications.append('inconclusive')
-        status = self.reconcile(evidence.plan_id, dict(plan_id=evidence.plan_id, classifications=classifications))
+        status = self.reconcile(evidence.plan_id, dict(plan_id=evidence.plan_id,
+            classifications=classifications, coverage=context['coverage']))
         plan = parse_plan(json.loads(plan_row['plan_json']) if isinstance(plan_row['plan_json'], str) else plan_row['plan_json'])
         original = original_outcome(plan_row)
-        if status == 'succeeded' and original and len(original.steps) != len(plan.steps):
-            status = 'manual_review_required'
         projected = {s.step_id: ReconciledStep(step_id=s.step_id, status=s.status, result=s.result, error_code=s.error_code)
                      for s in original.steps} if original else {}
         for probe in evidence.probes:

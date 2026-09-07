@@ -145,7 +145,7 @@ class SimulationConnectorRepository:
                     or plan['session_token_hash'] != row['session_token_hash']):
                 raise ConnectorRepositoryError('plan_reconciliation_invalid')
             from ..application.connector_protocol_v2 import probe_context
-            return probe_context(plan, recovery)
+            return probe_context(plan, recovery, last_journal_sequence=row['last_journal_sequence'])
 
     # Device rows serialize all v2 writers. Never acquire a plan lock before
     # its device lock, including queueing, recovery, and takeover.
@@ -521,7 +521,8 @@ class SimulationConnectorRepository:
                 jwk = json.loads(row['device_signing_jwk']) if isinstance(row['device_signing_jwk'], str) else row['device_signing_jwk']
                 plan = ConnectorExecutionPlanV2.model_validate(json.loads(current['plan_json']) if isinstance(current['plan_json'], str) else current['plan_json'])
                 if reconciled:
-                    outcome = ReconciliationService().verify(current, recovery or {'token_hash': row['session_token_hash']}, outcome, jwk)
+                    outcome = ReconciliationService().verify(current, recovery or {'token_hash': row['session_token_hash']},
+                        outcome, jwk, last_journal_sequence=row['last_journal_sequence'])
                 else:
                     OutcomeVerifier.verify(outcome, jwk)
                     OutcomeVerifier.verify_steps(plan, outcome)

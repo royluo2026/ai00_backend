@@ -219,15 +219,14 @@ def sign_outcome(source):
     return base64.urlsafe_b64encode(r.to_bytes(32, 'big')+min(s, P256_ORDER-s).to_bytes(32, 'big')).rstrip(b'=').decode()
 
 
-def reconciled_outcome(database, plan, leased):
-    from plugins.simulation.simulation_backend.application.connector_protocol_v2 import probe_context, ConnectorReconciliationEvidenceV2
-    row = read(database)
-    recovered = read(database, 'runtime_recovery_sessions') or {'token_hash': row['session_token_hash']}
-    context = probe_context(read(database, 'runtime_plans'), recovered)
-    value = {k:v for k,v in context.items() if k != 'required_probes'}
+def reconciled_outcome(database, plan, *, instance, token, now=NOW):
+    from plugins.simulation.simulation_backend.application.connector_protocol_v2 import ConnectorReconciliationEvidenceV2
+    context = SimulationConnectorRepository().reconciliation_plan(
+        database[1], 7, instance, token, plan.plan_id, now, 'electron')
+    value = {k:v for k,v in context.items() if k not in {'required_probes', 'coverage', 'next_journal_sequence'}}
     value.update(protocol='ai00.connector.reconciliation-evidence.v2',
         probes=[dict(**p, classification='succeeded', observed_result=None) for p in context['required_probes']],
-        journal_sequence=row['last_journal_sequence']+1, reported_at='2026-09-07T12:00:00Z',
+        journal_sequence=context['next_journal_sequence'], reported_at='2026-09-07T12:00:00Z',
         device_key_id='device-key-001', signature_algorithm='ecdsa-p256-sha256')
     value['signature'] = sign_outcome(value)
     return ConnectorReconciliationEvidenceV2.model_validate(value)
@@ -331,7 +330,7 @@ def test_completion_idempotency_conflict_and_reconciliation(database):
     unknown = outcome_for(current, leased, "outcome_unknown")
     complete(database, registered, unknown)
     complete(database, registered, unknown)
-    success = reconciled_outcome(database, current, leased)
+    success = reconciled_outcome(database, current, instance=registered.runtime_instance_id, token=registered.session_token)
     normal = outcome_for(current, leased).model_dump(mode='json')
     normal['journal_sequence'] = 2
     normal['signature'] = sign_outcome(normal)
@@ -341,7 +340,8 @@ def test_completion_idempotency_conflict_and_reconciliation(database):
     row = read(database, "runtime_plans")
     assert row["status"] == "succeeded"
     assert row["reconciliation_state"] == "succeeded"
-    complete(database, registered, success, reconciled=True)
+    with pytest.raises(ConnectorRepositoryError, match='journal_sequence_invalid'):
+        complete(database, registered, success, reconciled=True)
 
 
 @pytest.mark.parametrize("field,value", [
@@ -365,12 +365,14 @@ def test_wrong_token_and_expired_session_cannot_complete_or_reconcile(database):
     leased = lease(database, registered)
     outcome = outcome_for(current, leased)
     for reconcile in (False, True):
-        outcome = reconciled_outcome(database, current, leased) if reconcile else outcome
+        if reconcile:
+            complete(database, registered, outcome_for(current, leased, 'outcome_unknown'))
+            outcome = reconciled_outcome(database, current, instance=registered.runtime_instance_id, token=registered.session_token)
         with pytest.raises(ConnectorRepositoryError, match="runtime_session_invalid"):
             complete(database, replace(registered, session_token="wrong"), outcome, reconciled=reconcile)
         with pytest.raises(ConnectorRepositoryError, match="runtime_session_invalid"):
             complete(database, registered, outcome, reconciled=reconcile, now=NOW + timedelta(seconds=61))
-    assert read(database, "runtime_plans")["status"] == "leased"
+    assert read(database, "runtime_plans")["status"] == "outcome_unknown"
 
 
 def test_migration_preserves_v1_defaults_and_rejects_v1_in_v2_tables(database):
@@ -471,8 +473,10 @@ def test_recovery_registration_race_and_scope(database):
             method(database[1], 7, f"recovery-{winner}", f"token-{winner}", *args)
     with pytest.raises(ConnectorRepositoryError, match="plan_lease_invalid"):
         repo.mark_reconciled(database[1], 7, f"recovery-{winner}", f"token-{winner}",
-            reconciled_outcome(database, plan, leased).model_copy(update={"plan_id": "other-plan"}), now)
-    repo.mark_reconciled(database[1], 7, f"recovery-{winner}", f"token-{winner}", reconciled_outcome(database, plan, leased), now)
+            reconciled_outcome(database, plan, instance=f'recovery-{winner}', token=f'token-{winner}', now=now)
+                .model_copy(update={"plan_id": "other-plan"}), now)
+    repo.mark_reconciled(database[1], 7, f"recovery-{winner}", f"token-{winner}",
+        reconciled_outcome(database, plan, instance=f'recovery-{winner}', token=f'token-{winner}', now=now), now)
     row = read(database)
     assert row["current_runtime_instance_id"] == registered.runtime_instance_id
     assert row["session_token_hash"] == hashlib.sha256(registered.session_token.encode()).hexdigest()
@@ -492,17 +496,21 @@ def test_recovery_rejects_expiry_wrong_generation_and_resolved_plan(database):
         repo.register_reconciliation_session(database[1], 8, "recovery", plan.plan_id, "a" * 64,
             NOW + timedelta(seconds=120), now=NOW + timedelta(seconds=61))
     recovery(database, plan)
+    evidence = reconciled_outcome(database, plan, instance='recovery-1', token='recovery-secret', now=NOW + timedelta(seconds=61))
     with pytest.raises(ConnectorRepositoryError, match="runtime_session_invalid"):
-        repo.mark_reconciled(database[1], 7, "recovery-1", "recovery-secret", reconciled_outcome(database, plan, leased), NOW + timedelta(seconds=122))
+        repo.mark_reconciled(database[1], 7, "recovery-1", "recovery-secret", evidence, NOW + timedelta(seconds=122))
     recovery(database, plan, instance="recovery-2", token="new-token", now=NOW + timedelta(seconds=122))
-    repo.mark_reconciled(database[1], 7, "recovery-2", "new-token", reconciled_outcome(database, plan, leased), NOW + timedelta(seconds=123))
+    repo.mark_reconciled(database[1], 7, "recovery-2", "new-token",
+        reconciled_outcome(database, plan, instance='recovery-2', token='new-token', now=NOW + timedelta(seconds=123)),
+        NOW + timedelta(seconds=123))
     with pytest.raises(ConnectorRepositoryError, match="plan_reconciliation_invalid"):
         recovery(database, plan, now=NOW + timedelta(seconds=200))
 
 
 def test_reconciliation_preserves_original_signed_outcome_in_audit(database):
     registered, plan, leased = uncertain(database)
-    complete(database, registered, reconciled_outcome(database, plan, leased), reconciled=True)
+    complete(database, registered, reconciled_outcome(database, plan,
+        instance=registered.runtime_instance_id, token=registered.session_token), reconciled=True)
     transaction, device = database
     with transaction() as conn, conn.cursor() as cur:
         cur.execute("SELECT outcome_json FROM workmanship_sim_connector_runtime_audit WHERE device_id=%s AND event_type='plan_outcome'", (device,))
@@ -546,8 +554,12 @@ def test_crash_before_report_can_recover_after_lease_and_session_expire(database
                     "WHERE device_id=%s AND plan_id=%s AND event_type='lease_expired'", (device, plan.plan_id))
         assert cur.fetchone() == {"runtime_instance_id": registered.runtime_instance_id,
             "session_token_hash": hashlib.sha256(registered.session_token.encode()).hexdigest()}
-    SimulationConnectorRepository().mark_reconciled(device, 7, "recovery-1", "recovery-secret", reconciled_outcome(database, plan, leased), now)
-    assert session(database, now=now, instance="new-normal").runtime_instance_id == "new-normal"
+    SimulationConnectorRepository().mark_reconciled(device, 7, "recovery-1", "recovery-secret",
+        reconciled_outcome(database, plan, instance='recovery-1', token='recovery-secret', now=now), now)
+    # A crash gives no signed execution evidence for this read step.
+    assert read(database, 'runtime_plans')['status'] == 'manual_review_required'
+    with pytest.raises(ConnectorRepositoryError, match='runtime_plans_unresolved'):
+        session(database, now=now, instance='new-normal')
 
 
 @pytest.mark.parametrize("failure_at", ["expiry_audit", "session_audit"])

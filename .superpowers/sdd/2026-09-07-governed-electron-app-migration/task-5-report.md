@@ -104,3 +104,46 @@ For v2 only, trace IDs use `connector-plan-` plus SHA-256(plan_id), and idempote
 Reviewed the normal/evidence protocol split, exact original-lease and recovery-session bindings, required-probe ordering and coverage, original signed record preservation, server-result parsing, domain validation before success classification, and bounded Gateway values. No approval or release state was synthesized.
 
 The reviewer's claim-owner observation remains: the governed v2 provider checks that the exact stored plan/outcome has an active outbox claim, but it does not bind the invoking Gateway consumer to that claim's `lease_owner`. The current provider payload and trusted Gateway context do not carry a worker claim identity. Adding a caller-supplied owner would not establish that proof; a real correction needs a trusted claim propagated through the worker/Gateway interface. Per the requested scope, this was documented rather than broadening interfaces. Native MySQL and production secret/worker deployment remain unverified as before.
+
+## Fix round 2 — complete coverage and exact recovery journal cursor
+
+### Change classification and implementation boundary
+
+Implementation fix on top of `b4a557c7d`, limited to the reconciliation policy, its repository call sites, and the two reconciliation/SQL test files. The normal execution Outcome contracts, normal Outcome monotonic sequence and duplicate semantics, v1 paths, bounded Gateway identifiers, and claim-owner interfaces are unchanged.
+
+### Authoritative context and coverage correction
+
+Re-read the Task 5 brief and prior report, the closed v2 step/outcome contracts, the original-outcome execution-prefix validation, recovery session and device locking paths, projection parsing and domain validation, and the existing SQL/Gateway tests. The root cause was that selecting declared probes erased information about steps that those probes did not cover.
+
+The safe probe response now includes `coverage` with three ordered lists of step identifiers: `unprobeable_side_effect_step_ids`, `success_unproven_step_ids`, and `uninvoked_step_ids`. These are server-derived requirements, contain no executable payloads, and participate in the nonce binding together with the ordered `required_probes`.
+
+- Absence classification requires complete absence evidence for every required side-effect probe and no potentially invoked side effect without a declared probe. A signed execution prefix continues to exclude later uninvoked effects from absence requirements.
+- Success requires complete success evidence for the required probes, stored signed success for every unprobed invoked step, no later uninvoked steps, and the existing domain validation for snapshot/capture results. With no original Outcome, any read step blocks success; only a plan consisting entirely of probed side effects can succeed from probe evidence alone.
+- Missing, mixed, inconclusive, or insufficient coverage remains `manual_review_required`. A successful write probe cannot clear an uncertain read that was excluded from the probe set.
+
+The v2 step contract already rejects write/destructive steps without `post_condition_probe_id`. It was preserved. The explicit unprobeable-write-plus-probed-write test therefore exercises safe context derivation and classification for a raw incomplete record; it does not claim issuance of a valid plan with that forbidden shape. Repository parsing continues to reject malformed persisted plans. Integration cases cover valid mixed plans, completed read prefixes, later uninvoked work, all-probed effect plans, and missing/inconclusive evidence.
+
+### Server journal cursor and recovery evidence construction
+
+`next_journal_sequence` is now exactly `last_journal_sequence + 1`, read from the locked device row when returning probe context. The complete context, including this cursor, is nonce-bound. Locked reconciliation verification requires the signed evidence sequence to equal the current next cursor before persistence; stale, duplicate, concurrent-loser, and skipped-ahead evidence fail with `journal_sequence_invalid`. Changing only the signed sequence while retaining an old nonce fails with `reconciliation_evidence_invalid`. A client must fetch fresh context and sign fresh evidence.
+
+Both reconciliation test helpers now construct evidence from the returned probe context and the device signing key. Removed the SQL helper's direct reads of device, recovery-session, and plan rows, and removed the other helper's default/hardcoded reconciliation sequence. Tests use database reads only to assert persisted results, not to build recovery evidence. Normal execution tests still choose their own journal sequences, including a predecessor sequence of 37, to prove the recovery client receives 38 from the server; crash recovery receives 1 without a predecessor Outcome.
+
+### RED/GREEN verification evidence
+
+- Coverage RED command: `python -m pytest backend/tests/test_connector_reconciliation_v2.py -q -k 'complete_effect_and_execution_coverage or unprobeable_write' --tb=short`. Result: **5 failed, 4 passed, 7 skipped**. Three valid plans incorrectly resolved to success and two raw-context cases lacked coverage metadata. An earlier fixture draft attempting to sign an unprobed write was rejected by the existing contract; those cases were corrected to test the raw coverage boundary without weakening the contract.
+- Journal RED command: `python -m pytest backend/tests/test_connector_reconciliation_v2.py -q -k 'exact_journal_cursor or race_requires_fresh' --tb=short`. Result: **3 failed, 3 skipped**, all because the response lacked `next_journal_sequence`.
+- Focused GREEN command: `python -m pytest backend/tests/test_connector_reconciliation_v2.py -q --tb=short`. Result: **47 passed, 37 skipped**, 9.02 seconds.
+- Final broader command:
+
+```powershell
+python -m pytest backend/tests/test_connector_execution_plan_v1.py backend/tests/test_connector_execution_plan_v2.py backend/tests/test_connector_runtime_control_plane.py backend/tests/test_simulation_connector_outcome_capabilities.py backend/tests/test_connector_reconciliation_v2.py backend/tests/test_simulation_connector_runtime_v2_sql.py backend/tests/test_connector_runtime_sessions_v2.py backend/tests/test_simulation_connector_projection_worker.py backend/tests/test_simulation_capture_workflow.py backend/tests/test_simulation_document_snapshot_workflow.py backend/tests/test_simulation_connector_http_api.py backend/tests/test_simulation_connector_data_migration.py backend/tests/test_simulation_connector_capability_ownership.py backend/tests/integration/test_simulation_connector_projection_mysql.py -q --tb=short
+```
+
+Result: **204 passed, 97 skipped**, 19.08 seconds. The final run includes the stale-nonce-with-new-cursor assertion and the public-response SQL helper changes. All skips require native MySQL configuration. SQLite uses real transactions and serialized writers; its two-thread race is not native MySQL row-lock evidence. `git diff --check` passes with only configured LF/CRLF notices.
+
+### Self-review and governance status
+
+Traced both live and replacement recovery sessions from context generation to locked verification, checked that all coverage and cursor facts are server-derived and nonce-bound, and confirmed no reconciliation can advance state from a returned probe subset while omitted work remains unproven. Reviewed exact-prefix handling, crash handling, absence versus success requirements, original signed evidence preservation, domain validation, atomic journal/outbox persistence, and stale-context rejection. The existing 184/256-character real Gateway cases and normal Outcome duplicate test remain green.
+
+Inspected `verified_v2_projection` and the provider guard for regressions: the previously documented trusted claim-owner propagation limitation remains, and no interfaces were broadened. `machine_passed` applies to the recorded local checks; `human_approved` is not asserted; `runtime_verified` remains limited to local SQLite/Gateway evidence. Native MySQL, Electron/VisMockup execution, and production rollout remain unverified. No push, merge, publication, or subagent dispatch occurred.
