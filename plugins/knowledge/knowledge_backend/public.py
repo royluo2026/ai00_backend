@@ -20,5 +20,13 @@ def list_knowledge_workbench_items(user_gid: str, list_gids: list[str] | None = 
             return [dict(row) for row in cur.fetchall()]
 
 
-__all__ = ["list_knowledge_workbench_items"]
+def require_readable_item(gid, context):
+    """Prove the Knowledge item is readable before another owner reads its comments."""
+    from .application.outcomes import knowledge_outcomes
+    from backend.capability_v2.provider_contracts import CapabilityBusinessError
+    result=knowledge_outcomes.invoke('knowledge.hub.read',{'operation':'items.get','arguments':{'gid':gid}},context)
+    if not result:raise CapabilityBusinessError('resource_not_found','The Knowledge item is unavailable.')
+
+
+__all__ = ["list_knowledge_workbench_items", "require_readable_item"]
 

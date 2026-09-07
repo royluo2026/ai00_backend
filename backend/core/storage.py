@@ -289,12 +289,12 @@ def put_immutable(object_key: str, data: bytes, media_type: str) -> dict | None:
         return None
 
 
-def get_immutable(object_key: str, expected_sha256: str = "") -> bytes | None:
+def get_immutable(object_key: str, expected_sha256: str = "", *, maximum: int | None = None) -> bytes | None:
     """Read exact immutable bytes, preferring OIS then MinIO."""
     normalized = _normalized_immutable_key(object_key)
     try:
         from backend.core import ois_storage
-        data = ois_storage.get_immutable(normalized, expected_sha256)
+        data = ois_storage.get_immutable(normalized, expected_sha256, maximum=maximum)
         if data is not None:
             return data
     except Exception as exc:
@@ -307,9 +307,10 @@ def get_immutable(object_key: str, expected_sha256: str = "") -> bytes | None:
     try:
         response = _s3.get_object(Bucket=_bucket, Key=normalized)
         body = response.get("Body")
-        data = body.read() if hasattr(body, "read") else body
+        data = (body.read() if maximum is None else body.read(maximum + 1)) if hasattr(body, "read") else body
         if not isinstance(data, bytes):
             raise RuntimeError("MinIO returned no byte payload")
+        if maximum is not None and len(data)>maximum:raise ValueError('object_size_limit')
         if expected_sha256 and hashlib.sha256(data).hexdigest() != expected_sha256:
             raise RuntimeError("immutable object digest mismatch")
         return data

@@ -79,7 +79,10 @@ def read_lark_data(payload: dict[str, Any], _context: CapabilityContext) -> dict
             url = f"https://open.feishu.cn/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/records"
             records: list[dict[str, Any]] = []
             page_token = None
+            seen_pages = set()
             while True:
+                if page_token in seen_pages or len(seen_pages)>=100:raise CapabilityBusinessError('response_limit_exceeded','Feishu pagination exceeded its bound.')
+                seen_pages.add(page_token)
                 params: dict[str, Any] = {"page_size": page_size}
                 if page_token:
                     params["page_token"] = page_token

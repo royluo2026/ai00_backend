@@ -347,7 +347,8 @@ DEFINITIONS = [
 
 def register_desktop_capabilities(registry):
     from .desktop_artifacts import DEFINITIONS as ARTIFACT_DEFINITIONS
-    for capability_id, service, input_schema, output_schema, write, permission, effect in (*DEFINITIONS,*ARTIFACT_DEFINITIONS):
+    from .desktop_templates import DEFINITIONS as TEMPLATE_DEFINITIONS
+    for capability_id, service, input_schema, output_schema, write, permission, effect in (*DEFINITIONS,*ARTIFACT_DEFINITIONS,*TEMPLATE_DEFINITIONS):
         request_validator = Draft202012Validator(input_schema)
         output_validator = Draft202012Validator(output_schema)
 

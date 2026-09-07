@@ -107,6 +107,12 @@ def changes(payload,context):
     rows=project_outcome_port.invoke('project.change_log.read',{'operation':'change_logs.search','arguments':payload},context)
     return {'logs':[{key:str(row[key]) if row[key] is not None else None for key in LOG['properties'] if key in row} for row in rows]}
 
+ENTRY=obj({**{key:TEXT for key in ('gid','section','author','author_name','author_gid','ai_status')},'id':{'type':['integer','string']},'parent_id':{'type':['integer','string','null']},'content':{**TEXT,'maxLength':65536},'resolved':BOOL,'read_by_human':BOOL,'sort_order':{'type':'number'},'created_at':{'type':['number','string']}},('id','gid','content'))
+def knowledge_comments(payload,context):
+    from backend.platform_sdk.knowledge import require_readable_item
+    require_readable_item(payload['item_gid'],context)
+    return project_outcome_port.invoke('project.list.read',{'operation':'item_entries.get','arguments':{'item_type':'knowledge_item','item_gid':payload['item_gid']}},context)
+
 DEFINITIONS=[
  ('project.approval.order.search',obj({'status':STATE,'project_gid':ID}),success(array(ORDER)),False,search),
  ('project.approval.order.get',obj({'order_gid':ID},('order_gid',)),success(ORDER),False,get),
@@ -116,6 +122,7 @@ DEFINITIONS=[
  ('project.follow.create',FOLLOW,success(obj({'gid':ID},('gid',))),True,follow),
  ('project.share.list',obj({'list_gid':ID},('list_gid',)),obj({'shares':array(SHARE)},('shares',)),False,shares),
  ('project.change_log.search',CHANGE,obj({'logs':array(LOG)},('logs',)),False,changes),
+ ('project.knowledge_comment.list',obj({'item_gid':ID},('item_gid',)),obj({'entries':array(ENTRY)},('entries',)),False,knowledge_comments),
 ]
 
 def register_desktop_capabilities(registry):

@@ -88,6 +88,8 @@ def _authorize_bop_version(resource_id, identity) -> bool:
 def register_capabilities(registry: Any) -> None:
     """Register Craft-owned handlers; never mount routers or start workers."""
     resource_authorizers.register("craft-bop-version", _authorize_bop_version)
+    from .desktop_vpps import register_desktop_vpps
+    register_desktop_vpps(registry)
     native = NativeContractRegistry(registry)
     register_bop_version_capabilities(native)
     register_bop_structure_capabilities(native)

@@ -261,7 +261,7 @@ def put_immutable_stream(object_key: str, stream) -> str | None:
         _log.error("OIS immutable stream upload failed: %s | object_key=%s", exc, normalized)
         return None
 
-def get_immutable(object_key: str, expected_sha256: str = "") -> bytes | None:
+def get_immutable(object_key: str, expected_sha256: str = "", *, maximum: int | None = None) -> bytes | None:
     """Read an immutable OIS object and optionally verify its SHA-256 digest."""
     import hashlib
 
@@ -284,12 +284,13 @@ def get_immutable(object_key: str, expected_sha256: str = "") -> bytes | None:
         if isinstance(value, bytes):
             data = value
         elif hasattr(value, "read"):
-            data = value.read()
+            data = value.read() if maximum is None else value.read(maximum + 1)
         else:
             body = getattr(value, "body", None) or getattr(value, "content", None)
-            data = body.read() if hasattr(body, "read") else body
+            data = (body.read() if maximum is None else body.read(maximum + 1)) if hasattr(body, "read") else body
         if not isinstance(data, bytes):
             raise RuntimeError("OIS get_object returned no byte payload")
+        if maximum is not None and len(data)>maximum:raise ValueError('object_size_limit')
         if expected_sha256 and hashlib.sha256(data).hexdigest() != expected_sha256:
             raise RuntimeError("OIS immutable object digest mismatch")
         return data

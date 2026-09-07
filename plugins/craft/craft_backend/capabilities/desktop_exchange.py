@@ -14,6 +14,7 @@ from backend.platform_sdk.artifacts import read_artifact, create_artifact
 from backend.platform_sdk.feishu import user_credential
 from .data_exchange import _export_excel, _export_diff_report, _export_diff_lark_sheet
 from .lark_exchange import read_lark_data, write_lark_data
+from .desktop_pictures import resolve_picture
 
 TEXT={'type':'string','maxLength':4096}
 ID={'type':'string','minLength':1,'maxLength':128,'pattern':'^[A-Za-z0-9_.-]+$'}
@@ -88,7 +89,16 @@ def write_sheet(payload,context):
 def read_sheet(payload,context):
     return read_lark_data({'operation':'sheets.read',**payload,'user_access_token':user_credential(context)},context)['data']
 
+def read_bitable(payload,context):
+    return read_lark_data({'operation':'bitable.read',**payload,'user_access_token':user_credential(context)},context)['data']
+
+def write_bitable(payload,context):
+    return write_lark_data({'operation':'bitable.write','app_token':payload['app_token'],'table_id':payload['table_id'],'records':[dict(zip(payload['headers'],row)) for row in payload['rows']],'user_access_token':user_credential(context)},context)['data']
+
 DEFINITIONS=[
+ ('craft.bop.picture.resolve',obj({'version_gid':ID,'reference_hash':{'type':'string','pattern':'^[a-f0-9]{64}$'}},('version_gid','reference_hash')),ARTIFACT,False,resolve_picture),
+ ('craft.data_exchange.feishu_bitable.read',obj({'app_token':ID,'table_id':ID,'page_size':{'type':'integer','minimum':1,'maximum':500}},('app_token','table_id')),PARSED,False,read_bitable),
+ ('craft.data_exchange.feishu_bitable.write',obj({'app_token':ID,'table_id':ID,'headers':array(TEXT,200,1),'rows':ROWS},('app_token','table_id','headers','rows')),obj({'success':{'const':True},'written_rows':{'type':'integer','minimum':0,'maximum':5000}},('success','written_rows')),True,write_bitable),
  ('craft.data_exchange.excel.parse',obj({'artifact_ref':ArtifactRef.model_json_schema(),'name':ARTIFACT['properties']['name'],'module':TEXT},('artifact_ref','name')),obj({'success':{'const':True},'data':PARSED},('success','data')),False,parse),
  ('craft.data_exchange.excel.export',obj({'columns':COLUMNS,'rows':ROWS,'styles':STYLE,'filename':TEXT},('columns','rows')),ARTIFACT,True,export_excel),
  ('craft.data_exchange.diff_report.export',DIFF,ARTIFACT,True,export_diff),
