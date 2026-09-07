@@ -7,7 +7,7 @@
         "plugin_id": "official.agent",
         "module": "agent_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:91ed45bf94e373576388be18cb4a53ac351f061279cf16a7aa95f37bb1888f89"
+        "artifact_hash": "sha256:b5e57c8bc97d0e979164f57acbe0ee984c238118b0d44cf8b45246100342f35a"
       },
       "artifact_path": "plugins/agent/agent_backend",
       "allowed_owners": [
@@ -36,7 +36,7 @@
         "plugin_id": "official.base",
         "module": "backend.base.official_provider",
         "version": "1.0.0",
-        "artifact_hash": "sha256:bfa72712a7cc8aec7768f08b3206c5f68004f62ad14c6035ea06f67f82db3a3c"
+        "artifact_hash": "sha256:f410fb70a08a11f65de4b0c76378c8a201d6bf446a0a268f27e4161346581d89"
       },
       "artifact_path": "backend/base",
       "allowed_owners": [
@@ -90,7 +90,7 @@
         "plugin_id": "official.craft",
         "module": "craft_backend.capabilities",
         "version": "1.2.0",
-        "artifact_hash": "sha256:9374469604120cd5498ab50803e185d130b7f9f087e6d45c1006abd7cc422952"
+        "artifact_hash": "sha256:b021f37b9675fc94ff0f8261376a9722aff95f5b432eadf85d9e90b5855aaa3a"
       },
       "artifact_path": "plugins/craft/craft_backend",
       "allowed_owners": [
@@ -224,7 +224,7 @@
         "plugin_id": "official.knowledge",
         "module": "knowledge_backend.capabilities",
         "version": "2.0.0",
-        "artifact_hash": "sha256:c45f8400d92a33509b4a03f7d58c243a1ee07fdd47ec802aafcfd4738975016a"
+        "artifact_hash": "sha256:23093b87509833a8110c389df85c0d6e3a2f776c69e0d6f04222bee7e96f76be"
       },
       "artifact_path": "plugins/knowledge/knowledge_backend",
       "allowed_owners": [
@@ -278,7 +278,7 @@
         "plugin_id": "official.project-management",
         "module": "project_management_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:921e452331ea722370f68b42aeceeb61f6a8939bd98ef4e2151faf68a37e230e"
+        "artifact_hash": "sha256:6aa6ffd650bdf923d3a635d70061cfa5f87d73f86117134fb1717a0fdfa5927d"
       },
       "artifact_path": "plugins/project_management/project_management_backend",
       "allowed_owners": [
