@@ -112,7 +112,24 @@ def _get_user_grants(user_gid: str) -> list:
         return []
 
 
-def get_current_user(x_ai00_token: str = Header(alias="X-AI00-Token")) -> dict:
+def _request_token(request: Request, x_ai00_token: str | None = Header(default=None, alias="X-AI00-Token"),
+                   authorization: str | None = Header(default=None)) -> str:
+    if any(len(request.headers.getlist(key)) > 1 for key in ("authorization", "x-ai00-token")):
+        raise HTTPException(401, detail={"code": "invalid_authentication"})
+    bearer = None
+    if authorization is not None:
+        if not authorization.startswith("Bearer ") or not authorization[7:] or any(char.isspace() for char in authorization[7:]):
+            raise HTTPException(401, detail={"code": "invalid_authentication"})
+        bearer = authorization[7:]
+    if bearer and x_ai00_token and bearer != x_ai00_token:
+        raise HTTPException(401, detail={"code": "invalid_authentication"})
+    token = bearer or x_ai00_token
+    if not token:
+        raise HTTPException(401, detail={"code": "authentication_required"})
+    return token
+
+
+def get_current_user(x_ai00_token: str = Depends(_request_token)) -> dict:
     """
     验证客户端携带的 JWT，返回用户 dict。
     无效/过期 → 401。
@@ -168,7 +185,7 @@ async def reject_consumer_identity_overrides(request: Request) -> None:
 
 
 def get_authenticated_principal(
-    x_ai00_token: str = Header(alias="X-AI00-Token"),
+    x_ai00_token: str = Depends(_request_token),
     _identity_guard=Depends(reject_consumer_identity_overrides),
 ) -> AuthenticatedPrincipal:
     """Build a trusted Web principal without accepting client source or permission headers."""

@@ -85,7 +85,7 @@ def sign_desktop_session(principal, *, tenant_id: str, installation_id: str, con
     settings = get_settings()
     return jwt.encode(dict(sub=principal.user_id, team_id=tenant_id,
         auth_time=principal.authenticated_at.timestamp(), iat=now,
-        exp=now + timedelta(hours=settings.jwt_expire_hours),
+        exp=now + timedelta(minutes=15),
         desktop_consumer=claim.model_dump()), settings.jwt_secret, algorithm=ALGORITHM)
 
 

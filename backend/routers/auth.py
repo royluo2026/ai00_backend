@@ -15,8 +15,8 @@ import threading
 import logging
 from datetime import datetime, timezone, timedelta
 
-from fastapi import APIRouter, HTTPException, Depends
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
 
 from backend.services.feishu_service import feishu_service
 from backend.services import jwt_service, user_service
@@ -24,6 +24,7 @@ from backend.db.connection import get_conn
 from backend.routers.deps import get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+from backend.routers import desktop_auth
 _log = logging.getLogger(__name__)
 
 
@@ -51,12 +52,23 @@ def get_login_url():
 # ── 2. 飞书 OAuth 回调 ─────────────────────────────────────────────────────────
 
 @router.get("/feishu/callback")
-def feishu_callback(code: str = "", state: str = "", error: str = ""):
+def feishu_callback(request: Request, code: str = "", state: str = "", error: str = ""):
     """
     飞书 OAuth 回调（需在飞书开放平台配置此 URL）。
     成功：换 token → 查/建用户 → 签发 JWT → 写入 auth_pending → 返回提示页面。
     失败：写入错误信息 → 返回提示页面。
     """
+    if any(value.startswith("dt_") for value in request.query_params.getlist("state")):
+        fields = request.query_params
+        if (set(fields) != {"state", "code"} or any(len(fields.getlist(key)) != 1 for key in fields)
+                or not state.startswith("dt_") or len(state) != 46 or not code or len(code) > 2048):
+            raise HTTPException(400, detail={"code": "invalid_callback"})
+        try:
+            location = desktop_auth.service.complete(state, code)
+        except Exception:
+            raise HTTPException(400, detail={"code": "invalid_callback"}) from None
+        return RedirectResponse(location, status_code=302, headers={"Cache-Control": "no-store", "Referrer-Policy": "no-referrer"})
+
     if error or not code:
         _write_pending_error(state, error or "no_code")
         return HTMLResponse("<h3>登录失败，请关闭此页面重试</h3>")
