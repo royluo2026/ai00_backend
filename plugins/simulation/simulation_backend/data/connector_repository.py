@@ -122,12 +122,34 @@ class SimulationConnectorRepository:
         )
 
     @classmethod
+    def _retire_queued_plans(cls, cursor, row, now):
+        """Never-issued plans cannot follow a replacement session or execute."""
+        if row["session_token_hash"] is None:
+            return
+        identity = (row["device_id"], PROTOCOL_V2, row["runtime_generation"],
+                    row["current_runtime_instance_id"], row["session_token_hash"])
+        scope = ("device_id=%s AND protocol=%s AND runtime_generation=%s AND runtime_instance_id=%s "
+                 "AND session_token_hash=%s AND status='queued' AND attempts=0 AND lease_id IS NULL")
+        cursor.execute("SELECT plan_id FROM workmanship_sim_connector_runtime_plans WHERE " + scope + " FOR UPDATE", identity)
+        plans = cursor.fetchall()
+        for plan in plans:
+            cursor.execute(
+                "UPDATE workmanship_sim_connector_runtime_plans SET status='failed_without_effect',updated_at=%s "
+                "WHERE plan_id=%s AND " + scope, (now, plan["plan_id"], *identity),
+            )
+            if cursor.rowcount != 1:
+                raise ConnectorRepositoryError("plan_session_mismatch")
+            cls._runtime_audit(cursor, row, "plan_failed_without_effect", now, plan_id=plan["plan_id"],
+                reason="runtime_session_replaced_before_lease")
+
+    @classmethod
     def _install_runtime_session(cls, cursor, row, generation, instance, now, expires_at, *, event, actor_id=None, reason=None):
         now, expires_at = _utc(now), _utc(expires_at)
         if not re.fullmatch(IDENTITY_PATTERN, instance):
             raise ConnectorRepositoryError("runtime_instance_invalid")
         if not 0 < (expires_at - now).total_seconds() <= 300:
             raise ConnectorRepositoryError("runtime_session_expiry_invalid")
+        cls._retire_queued_plans(cursor, row, now)
         token = secrets.token_urlsafe(32)
         digest = hashlib.sha256(token.encode("utf-8")).hexdigest()
         cursor.execute(
@@ -199,6 +221,17 @@ class SimulationConnectorRepository:
                 raise ConnectorRepositoryError("runtime_generation_invalid")
             if not row["session_expires_at"] or _utc(row["session_expires_at"]) > now:
                 raise ConnectorRepositoryError("runtime_session_active")
+            # A crashed executor may never have reported or polled again.
+            # Expiry establishes uncertainty, never absence of side effects.
+            cursor.execute(
+                "UPDATE workmanship_sim_connector_runtime_plans SET status='outcome_unknown',"
+                "reconciliation_state='pending',updated_at=%s WHERE plan_id=%s AND device_id=%s "
+                "AND protocol=%s AND runtime_generation=%s AND runtime_instance_id=%s AND session_token_hash=%s "
+                "AND status IN ('leased','executing') AND lease_until<=%s",
+                (now, plan_id, device_id, PROTOCOL_V2, generation, row["current_runtime_instance_id"], row["session_token_hash"], now),
+            )
+            if cursor.rowcount:
+                self._runtime_audit(cursor, row, "lease_expired", now, plan_id=plan_id)
             cursor.execute(
                 "SELECT plan_id FROM workmanship_sim_connector_runtime_plans WHERE plan_id=%s AND device_id=%s "
                 "AND protocol=%s AND runtime_generation=%s AND runtime_instance_id=%s AND session_token_hash=%s "
@@ -255,16 +288,27 @@ class SimulationConnectorRepository:
         now = _utc(now)
         plan = ConnectorExecutionPlanV2.model_validate(plan)
         with get_simulation_conn() as conn, conn.cursor() as cursor:
-            row = self._authenticated_runtime(cursor, plan.device_id, plan.runtime_generation,
-                plan.runtime_instance_id, session_token, now)
-            if row["tenant_gid"] != plan.tenant_id or _utc(plan.expires_at) <= _utc(now):
+            row = self._locked_runtime(cursor, plan.device_id)
+            row = self._authenticated_runtime(cursor, plan.device_id, row["runtime_generation"],
+                row["current_runtime_instance_id"], session_token, now)
+            if (plan.runtime_generation, plan.runtime_instance_id) != (row["runtime_generation"], row["current_runtime_instance_id"]):
+                raise ConnectorRepositoryError("plan_session_mismatch")
+            if row["tenant_gid"] != plan.tenant_id:
                 raise ConnectorRepositoryError("plan_lease_invalid")
             cursor.execute(
-                "SELECT plan_id,plan_hash FROM workmanship_sim_connector_runtime_plans "
+                "SELECT plan_id,plan_hash,device_id,runtime_generation,runtime_instance_id,session_token_hash "
+                "FROM workmanship_sim_connector_runtime_plans "
                 "WHERE plan_id=%s OR (device_id=%s AND idempotency_key=%s) FOR UPDATE",
                 (plan.plan_id, plan.device_id, plan.idempotency_key),
             )
             current = cursor.fetchone()
+            if current:
+                if (current["device_id"], current["runtime_generation"], current["runtime_instance_id"], current["session_token_hash"]) != (
+                    row["device_id"], row["runtime_generation"], row["current_runtime_instance_id"], row["session_token_hash"],
+                ):
+                    raise ConnectorRepositoryError("plan_session_mismatch")
+            if _utc(plan.expires_at) <= now:
+                raise ConnectorRepositoryError("plan_lease_invalid")
             if current:
                 if current["plan_id"] != plan.plan_id or current["plan_hash"] != plan.plan_hash:
                     raise ConnectorRepositoryError("idempotency_conflict")

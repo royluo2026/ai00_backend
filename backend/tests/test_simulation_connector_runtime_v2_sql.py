@@ -48,6 +48,9 @@ class SQLiteCursor:
         row = self.cursor.fetchone()
         return dict(row) if row else None
 
+    def fetchall(self):
+        return [dict(row) for row in self.cursor.fetchall()]
+
     def __enter__(self):
         return self
 
@@ -166,14 +169,17 @@ def session(database, *, now=NOW, instance="runtime-instance-001"):
     return SimulationConnectorRepository().register_runtime_session(database[1], 7, instance, now, now + timedelta(seconds=60))
 
 
-def queue(database, registered):
+def queue(database, registered, *, now=NOW, idempotency_key=None, expires_at="2026-09-07T12:10:00Z"):
     source = json.loads((ROOT / "backend/tests/fixtures/connector_execution_plan_v2.json").read_text())["plan"]
     source.update(device_id=database[1], plan_id="plan-" + uuid.uuid4().hex,
+                  runtime_generation=registered.runtime_generation,
                   runtime_instance_id=registered.runtime_instance_id,
-                  issued_at="2026-09-07T12:00:00Z", expires_at="2026-09-07T12:10:00Z")
+                  issued_at="2026-09-07T12:00:00Z", expires_at=expires_at)
+    if idempotency_key is not None:
+        source["idempotency_key"] = idempotency_key
     source["plan_hash"] = compute_plan_hash(source)
     plan = ConnectorExecutionPlanV2.model_validate(source)
-    SimulationConnectorRepository().insert_v2_plan(plan, registered.session_token, NOW)
+    SimulationConnectorRepository().insert_v2_plan(plan, registered.session_token, now)
     return plan
 
 
@@ -477,3 +483,128 @@ def test_pairing_nonce_is_unique_and_protocol_is_required(database):
     with pytest.raises((sqlite3.IntegrityError, pymysql.IntegrityError)):
         with transaction() as conn, conn.cursor() as cur:
             cur.execute(statement, (device + '-invalid', None, device, 'b' * 64, NOW))
+
+
+@pytest.mark.parametrize("status", ["leased", "executing"])
+def test_crash_before_report_can_recover_after_lease_and_session_expire(database, status):
+    registered = session(database)
+    plan = queue(database, registered)
+    leased = lease(database, registered)
+    transaction, device = database
+    with transaction() as conn, conn.cursor() as cur:
+        cur.execute("UPDATE workmanship_sim_connector_runtime_plans SET status=%s WHERE plan_id=%s", (status, plan.plan_id))
+    now = NOW + timedelta(seconds=61)
+    recovery(database, plan, now=now)
+    row = read(database, "runtime_plans")
+    assert row["status"] == "outcome_unknown"
+    assert row["reconciliation_state"] == "pending"
+    assert row["runtime_instance_id"] == registered.runtime_instance_id
+    with transaction() as conn, conn.cursor() as cur:
+        cur.execute("SELECT runtime_instance_id,session_token_hash FROM workmanship_sim_connector_runtime_audit "
+                    "WHERE device_id=%s AND plan_id=%s AND event_type='lease_expired'", (device, plan.plan_id))
+        assert cur.fetchone() == {"runtime_instance_id": registered.runtime_instance_id,
+            "session_token_hash": hashlib.sha256(registered.session_token.encode()).hexdigest()}
+    SimulationConnectorRepository().mark_reconciled(device, 7, "recovery-1", "recovery-secret", outcome_for(plan, leased), now)
+    assert session(database, now=now, instance="new-normal").runtime_instance_id == "new-normal"
+
+
+@pytest.mark.parametrize("failure_at", ["expiry_audit", "session_audit"])
+def test_crash_recovery_expiry_and_audit_failure_roll_back_together(database, monkeypatch, failure_at):
+    from types import SimpleNamespace
+    registered = session(database)
+    plan = queue(database, registered)
+    lease(database, registered)
+    audit_id = read(database, "runtime_audit")["audit_id"]
+    ids = iter([audit_id] if failure_at == "expiry_audit" else [uuid.uuid4().hex, audit_id])
+    monkeypatch.setattr(connector_repository.uuid, "uuid4", lambda: SimpleNamespace(hex=next(ids)))
+    import pymysql
+    with pytest.raises((sqlite3.IntegrityError, pymysql.IntegrityError)):
+        recovery(database, plan)
+    assert read(database, "runtime_plans")["status"] == "leased"
+    assert read(database, "runtime_recovery_sessions") is None
+
+
+@pytest.mark.parametrize("replacement", ["expiry", "takeover"])
+def test_replacement_terminates_queued_plan_without_rebinding_and_audits(database, replacement):
+    old = session(database)
+    plan = queue(database, old)
+    now = NOW + timedelta(seconds=61) if replacement == "expiry" else NOW
+    new = session(database, now=now, instance="new-normal") if replacement == "expiry" else takeover(database, old, 8)
+    row = read(database, "runtime_plans")
+    assert row["status"] == "failed_without_effect"
+    assert row["attempts"] == 0 and row["lease_id"] is None
+    assert row["runtime_instance_id"] == old.runtime_instance_id
+    assert row["session_token_hash"] == hashlib.sha256(old.session_token.encode()).hexdigest()
+    value = json.loads(row["plan_json"]) if isinstance(row["plan_json"], str) else row["plan_json"]
+    assert value == plan.model_dump(mode="json")
+    transaction, device = database
+    with transaction() as conn, conn.cursor() as cur:
+        cur.execute("SELECT runtime_instance_id,reason FROM workmanship_sim_connector_runtime_audit "
+            "WHERE device_id=%s AND plan_id=%s AND event_type='plan_failed_without_effect'", (device, plan.plan_id))
+        assert cur.fetchone() == {"runtime_instance_id": old.runtime_instance_id, "reason": "runtime_session_replaced_before_lease"}
+    with pytest.raises(ConnectorRepositoryError, match="plan_session_mismatch"):
+        SimulationConnectorRepository().insert_v2_plan(plan, new.session_token, now)
+    with pytest.raises(ConnectorRepositoryError, match="plan_session_mismatch"):
+        queue(database, new, now=now)  # The obsolete idempotency key also stays bound.
+    equivalent = queue(database, new, now=now, idempotency_key="new-request")
+    leased = lease(database, new, now)
+    assert leased["plan"]["plan_id"] == equivalent.plan_id
+
+
+@pytest.mark.parametrize("plan_expiry", ["2026-09-07T12:10:00Z", "2026-09-07T12:00:30Z"])
+def test_reusing_instance_after_expiry_does_not_acknowledge_old_session_plan(database, plan_expiry):
+    old = session(database)
+    plan = queue(database, old, expires_at=plan_expiry)
+    repo = SimulationConnectorRepository()
+    repo.insert_v2_plan(plan, old.session_token, NOW)  # Real same-session retry.
+    now = NOW + timedelta(seconds=61)
+    new = session(database, now=now, instance=old.runtime_instance_id)
+    with pytest.raises(ConnectorRepositoryError, match="plan_session_mismatch"):
+        repo.insert_v2_plan(plan, new.session_token, now)
+
+
+@pytest.mark.parametrize("replacement", ["expiry", "takeover"])
+def test_replacement_rolls_back_queue_terminalization_if_final_audit_fails(database, monkeypatch, replacement):
+    from types import SimpleNamespace
+    import pymysql
+    old = session(database)
+    queue(database, old)
+    audit_id = read(database, "runtime_audit")["audit_id"]
+    ids = iter([uuid.uuid4().hex, audit_id])
+    monkeypatch.setattr(connector_repository.uuid, "uuid4", lambda: SimpleNamespace(hex=next(ids)))
+    with pytest.raises((sqlite3.IntegrityError, pymysql.IntegrityError)):
+        if replacement == "expiry":
+            session(database, now=NOW + timedelta(seconds=61), instance="new-normal")
+        else:
+            takeover(database, old, 8)
+    assert read(database, "runtime_plans")["status"] == "queued"
+    assert read(database)["session_token_hash"] == hashlib.sha256(old.session_token.encode()).hexdigest()
+
+
+def test_replacement_terminalizes_every_obsolete_queued_plan(database):
+    old = session(database)
+    first = queue(database, old)
+    second = queue(database, old, idempotency_key="second-request")
+    session(database, now=NOW + timedelta(seconds=61), instance="replacement")
+    transaction, device = database
+    with transaction() as conn, conn.cursor() as cur:
+        cur.execute("SELECT plan_id,status FROM workmanship_sim_connector_runtime_plans WHERE device_id=%s", (device,))
+        assert {row["plan_id"]: row["status"] for row in cur.fetchall()} == {
+            first.plan_id: "failed_without_effect", second.plan_id: "failed_without_effect"}
+
+
+@pytest.mark.parametrize("field,value", [
+    ("runtime_instance_id", "other-instance"), ("runtime_generation", 8),
+    ("session_token_hash", "a" * 64), ("lease_until", NOW + timedelta(seconds=200)),
+])
+def test_recovery_expiry_does_not_change_a_nonmatching_or_unexpired_lease(database, field, value):
+    registered = session(database)
+    plan = queue(database, registered)
+    lease(database, registered)
+    transaction, _ = database
+    with transaction() as conn, conn.cursor() as cur:
+        cur.execute(f"UPDATE workmanship_sim_connector_runtime_plans SET {field}=%s WHERE plan_id=%s", (value, plan.plan_id))
+    with pytest.raises(ConnectorRepositoryError, match="plan_reconciliation_invalid"):
+        recovery(database, plan)
+    assert read(database, "runtime_plans")["status"] == "leased"
+    assert read(database, "runtime_recovery_sessions") is None
