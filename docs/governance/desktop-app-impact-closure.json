@@ -4,10 +4,10 @@
   "consumer_type": "web",
   "transport_classification": "authenticated interactive Gateway; single Windows x64 App product",
   "source_basis": "immutable Git commit tree; not a promoted release candidate",
-  "source_commit": "66513ab71c03f48493f31855bf9b30f70a657ffb",
-  "source_tree": "8a352eeae5642885b05d9d96ab4dedfe6442bc65",
+  "source_commit": "378a58c4f315797fb7d61fcca69c762a2a5279c7",
+  "source_tree": "57bbec026af398f75a40b0cae0ba2b8a0d8eea2a",
   "source_hash_format": "exact Git blob bytes (no working directory normalization)",
-  "source_set_hash": "sha256:89f73ab0b82a507f90135db3b4ceec282cb62e289cdd8655cbb4580fe997f653",
+  "source_set_hash": "sha256:518ee2467d500f3203fa92d26883098210cc93e9fd54bb5eccebcd11f30cd88e",
   "published_catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
   "published_catalog_hash": "sha256:09e54550fcbaaab2df24bfa28d2c2478d9d47f455a27563405bce365efb2e2fd",
   "published_catalog_current": false,
@@ -4485,7 +4485,7 @@
       "id": "craft.library.change.apply",
       "major_version": 2,
       "capability_version_gid": "cv2_737aaef0732896f765d0bf3f",
-      "business_definition_hash": "sha256:1366c9e903587679dc69492f955e4e77b71037b38b7aeb32d17cfc1e63e44ab5",
+      "business_definition_hash": "sha256:f736f7a682dd8455871e53faafe3c2627f6e1ea0100662dcadf6b3c4db2d40e0",
       "owner_domain": "craft",
       "provider_ref": "craft.provider",
       "consumer_refs": [],
@@ -4502,7 +4502,7 @@
       "authorization_policy": "craft.v2:craft.library.write",
       "execution_mode": "cloud_sync",
       "lifecycle_status": "stable",
-      "descriptor_hash": "sha256:4d259e5dfc7f7a917e18ed9bd95d0004c069c47edfd9455546430ece97fd2824"
+      "descriptor_hash": "sha256:2cc3e804eb609c5e081fcf4c54cfecdd83135db7ba91b3af4f71917b5b090877"
     },
     {
       "id": "craft.library.read",
@@ -11081,8 +11081,8 @@
     },
     {
       "path": "backend/capability_v2/official_domains.json",
-      "git_blob_oid": "89391bb479e5604a30dee841ad98d100a084d24a",
-      "sha256": "sha256:7be6bf845268c052c4a86dabd24f43d4039e211c6c9730a11a347f58ac1dd929"
+      "git_blob_oid": "8310ef285ed0f02c2690fb7cc92bed2eaf5cb72e",
+      "sha256": "sha256:957bdd7e02192122a25cd2df4fdb726a5ebc25638c2b54d178c0f82a66ceb63c"
     },
     {
       "path": "backend/capability_v2/operations.py",
@@ -12481,8 +12481,8 @@
     },
     {
       "path": "plugins/craft/craft_backend/capabilities/provider.py",
-      "git_blob_oid": "234309af372a86d278efec1f0fa0d10acc0f8d47",
-      "sha256": "sha256:eee6b19cdddee34fd83185afc5bfab111f1a46fba73310ca2e4c032340b96b29"
+      "git_blob_oid": "2f9aee2e95594ca13cf6d33da0f2dfc9702794d2",
+      "sha256": "sha256:ebe35684f49ebfd58ac4fd095cf6d362c20f38c46d0908164b42e845a1c189b0"
     },
     {
       "path": "plugins/craft/craft_backend/capabilities/resource_requirements.py",

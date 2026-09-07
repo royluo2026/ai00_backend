@@ -1,0 +1,23 @@
+{
+  "source_revision": "378a58c4f315797fb7d61fcca69c762a2a5279c7",
+  "acceptance_fix": "b88be50e8",
+  "classification": "v2 acceptance metadata correction; v1 descriptors unchanged",
+  "focused_command": "python -m pytest backend/tests/test_desktop_contract_v2.py backend/tests/test_desktop_handler_matrix.py backend/tests/test_desktop_round4.py backend/tests/test_native_capability_registration.py -q",
+  "focused_passed": 66,
+  "impact_blob_tests_passed": 2,
+  "immutable_bootstrap_check": "passed",
+  "official_provider_freeze_check": "passed",
+  "v1_descriptors_unchanged": 4,
+  "new_route_handler_fixtures": 5,
+  "business_definition_hashes": {
+    "craft.library.change.apply@2": "sha256:5f7123f5b8b2b18193cf0da52a8f251537192aae8a2adca014c1869ae0e1ca90",
+    "craft.rule.library.change.apply@2": "sha256:ccf09f72378d57319779a0aee11fdcf58b3657534fbb9384437c676da1ce3d1d",
+    "project.task.change.apply.atomic.tasks_create@2": "sha256:3b4de346107a53b4cc502614788b273643e646c6c4963434fb395d7a66a42d5c",
+    "project.issue.change.apply.atomic.issues_create@2": "sha256:3790ca58eec6225237aad3bff9d85e9a158ec27aab63ed2aaff7227e5bb99ca1"
+  },
+  "published_catalog_changed": false,
+  "catalog_blockers": 16,
+  "machine_passed": false,
+  "human_approved": false,
+  "runtime_verified": false
+}
