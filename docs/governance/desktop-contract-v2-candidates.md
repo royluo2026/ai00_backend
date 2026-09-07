@@ -8,7 +8,7 @@ The schemas add named legacy request-model fields only. Untyped nested JSON rema
 
 ## craft.library.change.apply@2
 
-Provider: `craft`. User confirmation and existing handler retained.
+Provider: `craft`. User confirmation retained; library v2 adds a closed operation-discriminated adapter over the existing business handler.
 
 ```json
 {
@@ -18,10 +18,6 @@ Provider: `craft`. User confirmation and existing handler retained.
       "properties": {
         "operation": {
           "const": "tools.create"
-        },
-        "gid": {
-          "type": "string",
-          "maxLength": 128
         },
         "record": {
           "type": "object",
@@ -82,86 +78,6 @@ Provider: `craft`. User confirmation and existing handler retained.
             }
           },
           "additionalProperties": false
-        },
-        "items": {
-          "type": "array",
-          "maxItems": 10000,
-          "items": {
-            "type": "object",
-            "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "alias": {
-                "description": "Provider-validated transport value."
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "meta": {
-          "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
-        },
-        "alias": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
-          ]
         }
       },
       "additionalProperties": false,
@@ -178,6 +94,7 @@ Provider: `craft`. User confirmation and existing handler retained.
         },
         "gid": {
           "type": "string",
+          "minLength": 1,
           "maxLength": 128
         },
         "record": {
@@ -239,93 +156,13 @@ Provider: `craft`. User confirmation and existing handler retained.
             }
           },
           "additionalProperties": false
-        },
-        "items": {
-          "type": "array",
-          "maxItems": 10000,
-          "items": {
-            "type": "object",
-            "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "alias": {
-                "description": "Provider-validated transport value."
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "meta": {
-          "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
-        },
-        "alias": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
-          ]
         }
       },
       "additionalProperties": false,
       "required": [
         "operation",
-        "record",
-        "gid"
+        "gid",
+        "record"
       ]
     },
     {
@@ -333,10 +170,6 @@ Provider: `craft`. User confirmation and existing handler retained.
       "properties": {
         "operation": {
           "const": "equipments.create"
-        },
-        "gid": {
-          "type": "string",
-          "maxLength": 128
         },
         "record": {
           "type": "object",
@@ -350,92 +183,13 @@ Provider: `craft`. User confirmation and existing handler retained.
             "spec": {
               "type": "object",
               "properties": {},
-              "additionalProperties": false
+              "additionalProperties": false,
+              "maxProperties": 0
             }
           },
           "additionalProperties": false,
           "required": [
             "name"
-          ]
-        },
-        "items": {
-          "type": "array",
-          "maxItems": 10000,
-          "items": {
-            "type": "object",
-            "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "alias": {
-                "description": "Provider-validated transport value."
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "meta": {
-          "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
-        },
-        "alias": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
           ]
         }
       },
@@ -453,6 +207,7 @@ Provider: `craft`. User confirmation and existing handler retained.
         },
         "gid": {
           "type": "string",
+          "minLength": 1,
           "maxLength": 128
         },
         "record": {
@@ -476,97 +231,18 @@ Provider: `craft`. User confirmation and existing handler retained.
                 "null"
               ],
               "properties": {},
-              "additionalProperties": false
+              "additionalProperties": false,
+              "maxProperties": 0
             }
           },
           "additionalProperties": false
-        },
-        "items": {
-          "type": "array",
-          "maxItems": 10000,
-          "items": {
-            "type": "object",
-            "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "alias": {
-                "description": "Provider-validated transport value."
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "meta": {
-          "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
-        },
-        "alias": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
-          ]
         }
       },
       "additionalProperties": false,
       "required": [
         "operation",
-        "record",
-        "gid"
+        "gid",
+        "record"
       ]
     },
     {
@@ -574,10 +250,6 @@ Provider: `craft`. User confirmation and existing handler retained.
       "properties": {
         "operation": {
           "const": "fixtures.create"
-        },
-        "gid": {
-          "type": "string",
-          "maxLength": 128
         },
         "record": {
           "type": "object",
@@ -591,92 +263,13 @@ Provider: `craft`. User confirmation and existing handler retained.
             "spec": {
               "type": "object",
               "properties": {},
-              "additionalProperties": false
+              "additionalProperties": false,
+              "maxProperties": 0
             }
           },
           "additionalProperties": false,
           "required": [
             "name"
-          ]
-        },
-        "items": {
-          "type": "array",
-          "maxItems": 10000,
-          "items": {
-            "type": "object",
-            "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "alias": {
-                "description": "Provider-validated transport value."
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "meta": {
-          "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
-        },
-        "alias": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
           ]
         }
       },
@@ -694,6 +287,7 @@ Provider: `craft`. User confirmation and existing handler retained.
         },
         "gid": {
           "type": "string",
+          "minLength": 1,
           "maxLength": 128
         },
         "record": {
@@ -717,97 +311,18 @@ Provider: `craft`. User confirmation and existing handler retained.
                 "null"
               ],
               "properties": {},
-              "additionalProperties": false
+              "additionalProperties": false,
+              "maxProperties": 0
             }
           },
           "additionalProperties": false
-        },
-        "items": {
-          "type": "array",
-          "maxItems": 10000,
-          "items": {
-            "type": "object",
-            "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "alias": {
-                "description": "Provider-validated transport value."
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "meta": {
-          "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
-        },
-        "alias": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
-          ]
         }
       },
       "additionalProperties": false,
       "required": [
         "operation",
-        "record",
-        "gid"
+        "gid",
+        "record"
       ]
     },
     {
@@ -815,10 +330,6 @@ Provider: `craft`. User confirmation and existing handler retained.
       "properties": {
         "operation": {
           "const": "fasteners.create"
-        },
-        "gid": {
-          "type": "string",
-          "maxLength": 128
         },
         "record": {
           "type": "object",
@@ -861,86 +372,6 @@ Provider: `craft`. User confirmation and existing handler retained.
             }
           },
           "additionalProperties": false
-        },
-        "items": {
-          "type": "array",
-          "maxItems": 10000,
-          "items": {
-            "type": "object",
-            "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "alias": {
-                "description": "Provider-validated transport value."
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "meta": {
-          "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
-        },
-        "alias": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
-          ]
         }
       },
       "additionalProperties": false,
@@ -957,6 +388,7 @@ Provider: `craft`. User confirmation and existing handler retained.
         },
         "gid": {
           "type": "string",
+          "minLength": 1,
           "maxLength": 128
         },
         "record": {
@@ -1036,93 +468,13 @@ Provider: `craft`. User confirmation and existing handler retained.
             }
           },
           "additionalProperties": false
-        },
-        "items": {
-          "type": "array",
-          "maxItems": 10000,
-          "items": {
-            "type": "object",
-            "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "alias": {
-                "description": "Provider-validated transport value."
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "meta": {
-          "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
-        },
-        "alias": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
-          ]
         }
       },
       "additionalProperties": false,
       "required": [
         "operation",
-        "record",
-        "gid"
+        "gid",
+        "record"
       ]
     },
     {
@@ -1130,10 +482,6 @@ Provider: `craft`. User confirmation and existing handler retained.
       "properties": {
         "operation": {
           "const": "part_names.create"
-        },
-        "gid": {
-          "type": "string",
-          "maxLength": 128
         },
         "record": {
           "type": "object",
@@ -1173,7 +521,20 @@ Provider: `craft`. User confirmation and existing handler retained.
             },
             "meta": {
               "type": "object",
-              "properties": {},
+              "properties": {
+                "added_by": {
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "project": {
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "added_at": {
+                  "type": "string",
+                  "maxLength": 2000
+                }
+              },
               "additionalProperties": false
             },
             "flex_type": {
@@ -1197,94 +558,13 @@ Provider: `craft`. User confirmation and existing handler retained.
             "alias": {
               "type": "array",
               "items": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "type": "string",
+                "maxLength": 2000
               },
               "maxItems": 200
             }
           },
           "additionalProperties": false
-        },
-        "items": {
-          "type": "array",
-          "maxItems": 10000,
-          "items": {
-            "type": "object",
-            "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "alias": {
-                "description": "Provider-validated transport value."
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "meta": {
-          "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
-        },
-        "alias": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
-          ]
         }
       },
       "additionalProperties": false,
@@ -1301,6 +581,7 @@ Provider: `craft`. User confirmation and existing handler retained.
         },
         "gid": {
           "type": "string",
+          "minLength": 1,
           "maxLength": 128
         },
         "record": {
@@ -1341,7 +622,20 @@ Provider: `craft`. User confirmation and existing handler retained.
             },
             "meta": {
               "type": "object",
-              "properties": {},
+              "properties": {
+                "added_by": {
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "project": {
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "added_at": {
+                  "type": "string",
+                  "maxLength": 2000
+                }
+              },
               "additionalProperties": false
             },
             "flex_type": {
@@ -1365,101 +659,20 @@ Provider: `craft`. User confirmation and existing handler retained.
             "alias": {
               "type": "array",
               "items": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "type": "string",
+                "maxLength": 2000
               },
               "maxItems": 200
             }
           },
           "additionalProperties": false
-        },
-        "items": {
-          "type": "array",
-          "maxItems": 10000,
-          "items": {
-            "type": "object",
-            "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "alias": {
-                "description": "Provider-validated transport value."
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "meta": {
-          "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
-        },
-        "alias": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
-          ]
         }
       },
       "additionalProperties": false,
       "required": [
         "operation",
-        "record",
-        "gid"
+        "gid",
+        "record"
       ]
     },
     {
@@ -1470,97 +683,14 @@ Provider: `craft`. User confirmation and existing handler retained.
         },
         "gid": {
           "type": "string",
+          "minLength": 1,
           "maxLength": 128
-        },
-        "record": {
-          "type": "object",
-          "properties": {},
-          "additionalProperties": false
-        },
-        "items": {
-          "type": "array",
-          "maxItems": 10000,
-          "items": {
-            "type": "object",
-            "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "alias": {
-                "description": "Provider-validated transport value."
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "meta": {
-          "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
-        },
-        "alias": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
-          ]
         }
       },
       "additionalProperties": false,
       "required": [
-        "operation"
+        "operation",
+        "gid"
       ]
     },
     {
@@ -1571,97 +701,14 @@ Provider: `craft`. User confirmation and existing handler retained.
         },
         "gid": {
           "type": "string",
+          "minLength": 1,
           "maxLength": 128
-        },
-        "record": {
-          "type": "object",
-          "properties": {},
-          "additionalProperties": false
-        },
-        "items": {
-          "type": "array",
-          "maxItems": 10000,
-          "items": {
-            "type": "object",
-            "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "alias": {
-                "description": "Provider-validated transport value."
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "meta": {
-          "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
-        },
-        "alias": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
-          ]
         }
       },
       "additionalProperties": false,
       "required": [
-        "operation"
+        "operation",
+        "gid"
       ]
     },
     {
@@ -1672,97 +719,14 @@ Provider: `craft`. User confirmation and existing handler retained.
         },
         "gid": {
           "type": "string",
+          "minLength": 1,
           "maxLength": 128
-        },
-        "record": {
-          "type": "object",
-          "properties": {},
-          "additionalProperties": false
-        },
-        "items": {
-          "type": "array",
-          "maxItems": 10000,
-          "items": {
-            "type": "object",
-            "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "alias": {
-                "description": "Provider-validated transport value."
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "meta": {
-          "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
-        },
-        "alias": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
-          ]
         }
       },
       "additionalProperties": false,
       "required": [
-        "operation"
+        "operation",
+        "gid"
       ]
     },
     {
@@ -1773,97 +737,14 @@ Provider: `craft`. User confirmation and existing handler retained.
         },
         "gid": {
           "type": "string",
+          "minLength": 1,
           "maxLength": 128
-        },
-        "record": {
-          "type": "object",
-          "properties": {},
-          "additionalProperties": false
-        },
-        "items": {
-          "type": "array",
-          "maxItems": 10000,
-          "items": {
-            "type": "object",
-            "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "alias": {
-                "description": "Provider-validated transport value."
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "meta": {
-          "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
-        },
-        "alias": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
-          ]
         }
       },
       "additionalProperties": false,
       "required": [
-        "operation"
+        "operation",
+        "gid"
       ]
     },
     {
@@ -1874,97 +755,14 @@ Provider: `craft`. User confirmation and existing handler retained.
         },
         "gid": {
           "type": "string",
+          "minLength": 1,
           "maxLength": 128
-        },
-        "record": {
-          "type": "object",
-          "properties": {},
-          "additionalProperties": false
-        },
-        "items": {
-          "type": "array",
-          "maxItems": 10000,
-          "items": {
-            "type": "object",
-            "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "alias": {
-                "description": "Provider-validated transport value."
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "meta": {
-          "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
-        },
-        "alias": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
-          ]
         }
       },
       "additionalProperties": false,
       "required": [
-        "operation"
+        "operation",
+        "gid"
       ]
     },
     {
@@ -1975,198 +773,14 @@ Provider: `craft`. User confirmation and existing handler retained.
         },
         "gid": {
           "type": "string",
+          "minLength": 1,
           "maxLength": 128
-        },
-        "record": {
-          "type": "object",
-          "properties": {},
-          "additionalProperties": false
-        },
-        "items": {
-          "type": "array",
-          "maxItems": 10000,
-          "items": {
-            "type": "object",
-            "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "alias": {
-                "description": "Provider-validated transport value."
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "meta": {
-          "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
-        },
-        "alias": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
-          ]
         }
       },
       "additionalProperties": false,
       "required": [
-        "operation"
-      ]
-    },
-    {
-      "type": "object",
-      "properties": {
-        "operation": {
-          "const": "part_names.bulk_import"
-        },
-        "gid": {
-          "type": "string",
-          "maxLength": 128
-        },
-        "record": {
-          "type": "object",
-          "properties": {},
-          "additionalProperties": false
-        },
-        "items": {
-          "type": "array",
-          "maxItems": 10000,
-          "items": {
-            "type": "object",
-            "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "alias": {
-                "description": "Provider-validated transport value."
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "meta": {
-          "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
-        },
-        "alias": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
-          ]
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "operation"
+        "operation",
+        "gid"
       ]
     },
     {
@@ -2175,99 +789,54 @@ Provider: `craft`. User confirmation and existing handler retained.
         "operation": {
           "const": "part_names.batch_add_from_pbom"
         },
-        "gid": {
-          "type": "string",
-          "maxLength": 128
-        },
-        "record": {
-          "type": "object",
-          "properties": {},
-          "additionalProperties": false
-        },
         "items": {
           "type": "array",
-          "maxItems": 10000,
+          "maxItems": 500,
           "items": {
             "type": "object",
             "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
+              "vpps": {
+                "type": "string",
+                "maxLength": 2000
               },
               "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
+                "type": "string",
+                "maxLength": 2000
               },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "alias": {
-                "description": "Provider-validated transport value."
+              "vpps_description": {
+                "type": "string",
+                "maxLength": 2000
               }
             },
-            "additionalProperties": false
+            "additionalProperties": false,
+            "required": [
+              "vpps"
+            ]
           }
         },
         "meta": {
           "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
-        },
-        "alias": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
-          ]
+          "properties": {
+            "added_by": {
+              "type": "string",
+              "maxLength": 2000
+            },
+            "project": {
+              "type": "string",
+              "maxLength": 2000
+            },
+            "added_at": {
+              "type": "string",
+              "maxLength": 2000
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false,
       "required": [
-        "operation"
+        "operation",
+        "items"
       ]
     },
     {
@@ -2276,99 +845,56 @@ Provider: `craft`. User confirmation and existing handler retained.
         "operation": {
           "const": "part_names.batch_accept_alias"
         },
-        "gid": {
-          "type": "string",
-          "maxLength": 128
-        },
-        "record": {
-          "type": "object",
-          "properties": {},
-          "additionalProperties": false
-        },
         "items": {
           "type": "array",
-          "maxItems": 10000,
+          "maxItems": 500,
           "items": {
             "type": "object",
             "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
+              "vpps_part_gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
               },
               "alias": {
-                "description": "Provider-validated transport value."
+                "type": "string",
+                "maxLength": 2000
+              },
+              "pbom_part_gid": {
+                "type": "string",
+                "maxLength": 2000
               }
             },
-            "additionalProperties": false
+            "additionalProperties": false,
+            "required": [
+              "vpps_part_gid",
+              "alias"
+            ]
           }
         },
         "meta": {
           "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
-        },
-        "alias": {
-          "type": "string",
-          "maxLength": 500
-        },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
-          ]
+          "properties": {
+            "added_by": {
+              "type": "string",
+              "maxLength": 2000
+            },
+            "project": {
+              "type": "string",
+              "maxLength": 2000
+            },
+            "added_at": {
+              "type": "string",
+              "maxLength": 2000
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false,
       "required": [
-        "operation"
+        "operation",
+        "items"
       ]
     },
     {
@@ -2379,97 +905,32 @@ Provider: `craft`. User confirmation and existing handler retained.
         },
         "gid": {
           "type": "string",
+          "minLength": 1,
           "maxLength": 128
-        },
-        "record": {
-          "type": "object",
-          "properties": {},
-          "additionalProperties": false
-        },
-        "items": {
-          "type": "array",
-          "maxItems": 10000,
-          "items": {
-            "type": "object",
-            "properties": {
-              "vpps_description": {
-                "description": "Provider-validated transport value."
-              },
-              "part_category": {
-                "description": "Provider-validated transport value."
-              },
-              "description": {
-                "description": "Provider-validated transport value."
-              },
-              "level": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps_desc_cn": {
-                "description": "Provider-validated transport value."
-              },
-              "vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "importance": {
-                "description": "Provider-validated transport value."
-              },
-              "vehicle_model": {
-                "description": "Provider-validated transport value."
-              },
-              "parent_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "status": {
-                "description": "Provider-validated transport value."
-              },
-              "meta": {
-                "description": "Provider-validated transport value."
-              },
-              "flex_type": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_main_vpps_desc": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_direction": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_static_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "ref_install_clearance": {
-                "description": "Provider-validated transport value."
-              },
-              "alias": {
-                "description": "Provider-validated transport value."
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "meta": {
-          "type": "object",
-          "maxProperties": 20,
-          "additionalProperties": false,
-          "properties": {}
         },
         "alias": {
           "type": "string",
-          "maxLength": 500
+          "maxLength": 2000
         },
-        "conflict": {
-          "type": "string",
-          "enum": [
-            "skip"
-          ]
+        "record": {
+          "type": "object",
+          "properties": {
+            "pbom_part_gid": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 128
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false,
       "required": [
-        "operation"
+        "operation",
+        "gid",
+        "alias"
       ]
     }
   ]
@@ -2478,7 +939,7 @@ Provider: `craft`. User confirmation and existing handler retained.
 
 ## craft.rule.library.change.apply@2
 
-Provider: `craft`. User confirmation and existing handler retained.
+Provider: `craft`. User confirmation retained; library v2 adds a closed operation-discriminated adapter over the existing business handler.
 
 ```json
 {
@@ -2673,7 +1134,7 @@ Provider: `craft`. User confirmation and existing handler retained.
 
 ## project.task.change.apply.atomic.tasks_create@2
 
-Provider: `project_management`. User confirmation and existing handler retained.
+Provider: `project_management`. User confirmation retained; library v2 adds a closed operation-discriminated adapter over the existing business handler.
 
 ```json
 {
@@ -2904,7 +1365,7 @@ Provider: `project_management`. User confirmation and existing handler retained.
 
 ## project.issue.change.apply.atomic.issues_create@2
 
-Provider: `project_management`. User confirmation and existing handler retained.
+Provider: `project_management`. User confirmation retained; library v2 adds a closed operation-discriminated adapter over the existing business handler.
 
 ```json
 {

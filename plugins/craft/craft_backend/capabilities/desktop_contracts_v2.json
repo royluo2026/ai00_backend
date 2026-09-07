@@ -7,10 +7,6 @@
           "operation": {
             "const": "tools.create"
           },
-          "gid": {
-            "type": "string",
-            "maxLength": 128
-          },
           "record": {
             "type": "object",
             "properties": {
@@ -70,86 +66,6 @@
               }
             },
             "additionalProperties": false
-          },
-          "items": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {
-              "type": "object",
-              "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "alias": {
-                  "description": "Provider-validated transport value."
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "meta": {
-            "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
-          },
-          "alias": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
-            ]
           }
         },
         "additionalProperties": false,
@@ -166,6 +82,7 @@
           },
           "gid": {
             "type": "string",
+            "minLength": 1,
             "maxLength": 128
           },
           "record": {
@@ -227,93 +144,13 @@
               }
             },
             "additionalProperties": false
-          },
-          "items": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {
-              "type": "object",
-              "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "alias": {
-                  "description": "Provider-validated transport value."
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "meta": {
-            "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
-          },
-          "alias": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
-            ]
           }
         },
         "additionalProperties": false,
         "required": [
           "operation",
-          "record",
-          "gid"
+          "gid",
+          "record"
         ]
       },
       {
@@ -321,10 +158,6 @@
         "properties": {
           "operation": {
             "const": "equipments.create"
-          },
-          "gid": {
-            "type": "string",
-            "maxLength": 128
           },
           "record": {
             "type": "object",
@@ -338,92 +171,13 @@
               "spec": {
                 "type": "object",
                 "properties": {},
-                "additionalProperties": false
+                "additionalProperties": false,
+                "maxProperties": 0
               }
             },
             "additionalProperties": false,
             "required": [
               "name"
-            ]
-          },
-          "items": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {
-              "type": "object",
-              "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "alias": {
-                  "description": "Provider-validated transport value."
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "meta": {
-            "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
-          },
-          "alias": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
             ]
           }
         },
@@ -441,6 +195,7 @@
           },
           "gid": {
             "type": "string",
+            "minLength": 1,
             "maxLength": 128
           },
           "record": {
@@ -464,97 +219,18 @@
                   "null"
                 ],
                 "properties": {},
-                "additionalProperties": false
+                "additionalProperties": false,
+                "maxProperties": 0
               }
             },
             "additionalProperties": false
-          },
-          "items": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {
-              "type": "object",
-              "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "alias": {
-                  "description": "Provider-validated transport value."
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "meta": {
-            "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
-          },
-          "alias": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
-            ]
           }
         },
         "additionalProperties": false,
         "required": [
           "operation",
-          "record",
-          "gid"
+          "gid",
+          "record"
         ]
       },
       {
@@ -562,10 +238,6 @@
         "properties": {
           "operation": {
             "const": "fixtures.create"
-          },
-          "gid": {
-            "type": "string",
-            "maxLength": 128
           },
           "record": {
             "type": "object",
@@ -579,92 +251,13 @@
               "spec": {
                 "type": "object",
                 "properties": {},
-                "additionalProperties": false
+                "additionalProperties": false,
+                "maxProperties": 0
               }
             },
             "additionalProperties": false,
             "required": [
               "name"
-            ]
-          },
-          "items": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {
-              "type": "object",
-              "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "alias": {
-                  "description": "Provider-validated transport value."
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "meta": {
-            "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
-          },
-          "alias": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
             ]
           }
         },
@@ -682,6 +275,7 @@
           },
           "gid": {
             "type": "string",
+            "minLength": 1,
             "maxLength": 128
           },
           "record": {
@@ -705,97 +299,18 @@
                   "null"
                 ],
                 "properties": {},
-                "additionalProperties": false
+                "additionalProperties": false,
+                "maxProperties": 0
               }
             },
             "additionalProperties": false
-          },
-          "items": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {
-              "type": "object",
-              "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "alias": {
-                  "description": "Provider-validated transport value."
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "meta": {
-            "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
-          },
-          "alias": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
-            ]
           }
         },
         "additionalProperties": false,
         "required": [
           "operation",
-          "record",
-          "gid"
+          "gid",
+          "record"
         ]
       },
       {
@@ -803,10 +318,6 @@
         "properties": {
           "operation": {
             "const": "fasteners.create"
-          },
-          "gid": {
-            "type": "string",
-            "maxLength": 128
           },
           "record": {
             "type": "object",
@@ -849,86 +360,6 @@
               }
             },
             "additionalProperties": false
-          },
-          "items": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {
-              "type": "object",
-              "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "alias": {
-                  "description": "Provider-validated transport value."
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "meta": {
-            "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
-          },
-          "alias": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
-            ]
           }
         },
         "additionalProperties": false,
@@ -945,6 +376,7 @@
           },
           "gid": {
             "type": "string",
+            "minLength": 1,
             "maxLength": 128
           },
           "record": {
@@ -1024,93 +456,13 @@
               }
             },
             "additionalProperties": false
-          },
-          "items": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {
-              "type": "object",
-              "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "alias": {
-                  "description": "Provider-validated transport value."
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "meta": {
-            "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
-          },
-          "alias": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
-            ]
           }
         },
         "additionalProperties": false,
         "required": [
           "operation",
-          "record",
-          "gid"
+          "gid",
+          "record"
         ]
       },
       {
@@ -1118,10 +470,6 @@
         "properties": {
           "operation": {
             "const": "part_names.create"
-          },
-          "gid": {
-            "type": "string",
-            "maxLength": 128
           },
           "record": {
             "type": "object",
@@ -1161,7 +509,20 @@
               },
               "meta": {
                 "type": "object",
-                "properties": {},
+                "properties": {
+                  "added_by": {
+                    "type": "string",
+                    "maxLength": 2000
+                  },
+                  "project": {
+                    "type": "string",
+                    "maxLength": 2000
+                  },
+                  "added_at": {
+                    "type": "string",
+                    "maxLength": 2000
+                  }
+                },
                 "additionalProperties": false
               },
               "flex_type": {
@@ -1185,94 +546,13 @@
               "alias": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "type": "string",
+                  "maxLength": 2000
                 },
                 "maxItems": 200
               }
             },
             "additionalProperties": false
-          },
-          "items": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {
-              "type": "object",
-              "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "alias": {
-                  "description": "Provider-validated transport value."
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "meta": {
-            "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
-          },
-          "alias": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
-            ]
           }
         },
         "additionalProperties": false,
@@ -1289,6 +569,7 @@
           },
           "gid": {
             "type": "string",
+            "minLength": 1,
             "maxLength": 128
           },
           "record": {
@@ -1329,7 +610,20 @@
               },
               "meta": {
                 "type": "object",
-                "properties": {},
+                "properties": {
+                  "added_by": {
+                    "type": "string",
+                    "maxLength": 2000
+                  },
+                  "project": {
+                    "type": "string",
+                    "maxLength": 2000
+                  },
+                  "added_at": {
+                    "type": "string",
+                    "maxLength": 2000
+                  }
+                },
                 "additionalProperties": false
               },
               "flex_type": {
@@ -1353,101 +647,20 @@
               "alias": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "type": "string",
+                  "maxLength": 2000
                 },
                 "maxItems": 200
               }
             },
             "additionalProperties": false
-          },
-          "items": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {
-              "type": "object",
-              "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "alias": {
-                  "description": "Provider-validated transport value."
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "meta": {
-            "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
-          },
-          "alias": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
-            ]
           }
         },
         "additionalProperties": false,
         "required": [
           "operation",
-          "record",
-          "gid"
+          "gid",
+          "record"
         ]
       },
       {
@@ -1458,97 +671,14 @@
           },
           "gid": {
             "type": "string",
+            "minLength": 1,
             "maxLength": 128
-          },
-          "record": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
-          },
-          "items": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {
-              "type": "object",
-              "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "alias": {
-                  "description": "Provider-validated transport value."
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "meta": {
-            "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
-          },
-          "alias": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
-            ]
           }
         },
         "additionalProperties": false,
         "required": [
-          "operation"
+          "operation",
+          "gid"
         ]
       },
       {
@@ -1559,97 +689,14 @@
           },
           "gid": {
             "type": "string",
+            "minLength": 1,
             "maxLength": 128
-          },
-          "record": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
-          },
-          "items": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {
-              "type": "object",
-              "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "alias": {
-                  "description": "Provider-validated transport value."
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "meta": {
-            "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
-          },
-          "alias": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
-            ]
           }
         },
         "additionalProperties": false,
         "required": [
-          "operation"
+          "operation",
+          "gid"
         ]
       },
       {
@@ -1660,97 +707,14 @@
           },
           "gid": {
             "type": "string",
+            "minLength": 1,
             "maxLength": 128
-          },
-          "record": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
-          },
-          "items": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {
-              "type": "object",
-              "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "alias": {
-                  "description": "Provider-validated transport value."
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "meta": {
-            "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
-          },
-          "alias": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
-            ]
           }
         },
         "additionalProperties": false,
         "required": [
-          "operation"
+          "operation",
+          "gid"
         ]
       },
       {
@@ -1761,97 +725,14 @@
           },
           "gid": {
             "type": "string",
+            "minLength": 1,
             "maxLength": 128
-          },
-          "record": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
-          },
-          "items": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {
-              "type": "object",
-              "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "alias": {
-                  "description": "Provider-validated transport value."
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "meta": {
-            "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
-          },
-          "alias": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
-            ]
           }
         },
         "additionalProperties": false,
         "required": [
-          "operation"
+          "operation",
+          "gid"
         ]
       },
       {
@@ -1862,97 +743,14 @@
           },
           "gid": {
             "type": "string",
+            "minLength": 1,
             "maxLength": 128
-          },
-          "record": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
-          },
-          "items": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {
-              "type": "object",
-              "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "alias": {
-                  "description": "Provider-validated transport value."
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "meta": {
-            "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
-          },
-          "alias": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
-            ]
           }
         },
         "additionalProperties": false,
         "required": [
-          "operation"
+          "operation",
+          "gid"
         ]
       },
       {
@@ -1963,198 +761,14 @@
           },
           "gid": {
             "type": "string",
+            "minLength": 1,
             "maxLength": 128
-          },
-          "record": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
-          },
-          "items": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {
-              "type": "object",
-              "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "alias": {
-                  "description": "Provider-validated transport value."
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "meta": {
-            "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
-          },
-          "alias": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
-            ]
           }
         },
         "additionalProperties": false,
         "required": [
-          "operation"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "operation": {
-            "const": "part_names.bulk_import"
-          },
-          "gid": {
-            "type": "string",
-            "maxLength": 128
-          },
-          "record": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
-          },
-          "items": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {
-              "type": "object",
-              "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "alias": {
-                  "description": "Provider-validated transport value."
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "meta": {
-            "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
-          },
-          "alias": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
-            ]
-          }
-        },
-        "additionalProperties": false,
-        "required": [
-          "operation"
+          "operation",
+          "gid"
         ]
       },
       {
@@ -2163,99 +777,54 @@
           "operation": {
             "const": "part_names.batch_add_from_pbom"
           },
-          "gid": {
-            "type": "string",
-            "maxLength": 128
-          },
-          "record": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
-          },
           "items": {
             "type": "array",
-            "maxItems": 10000,
+            "maxItems": 500,
             "items": {
               "type": "object",
               "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
+                "vpps": {
+                  "type": "string",
+                  "maxLength": 2000
                 },
                 "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
+                  "type": "string",
+                  "maxLength": 2000
                 },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "alias": {
-                  "description": "Provider-validated transport value."
+                "vpps_description": {
+                  "type": "string",
+                  "maxLength": 2000
                 }
               },
-              "additionalProperties": false
+              "additionalProperties": false,
+              "required": [
+                "vpps"
+              ]
             }
           },
           "meta": {
             "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
-          },
-          "alias": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
-            ]
+            "properties": {
+              "added_by": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "project": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "added_at": {
+                "type": "string",
+                "maxLength": 2000
+              }
+            },
+            "additionalProperties": false
           }
         },
         "additionalProperties": false,
         "required": [
-          "operation"
+          "operation",
+          "items"
         ]
       },
       {
@@ -2264,99 +833,56 @@
           "operation": {
             "const": "part_names.batch_accept_alias"
           },
-          "gid": {
-            "type": "string",
-            "maxLength": 128
-          },
-          "record": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
-          },
           "items": {
             "type": "array",
-            "maxItems": 10000,
+            "maxItems": 500,
             "items": {
               "type": "object",
               "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
+                "vpps_part_gid": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
                 },
                 "alias": {
-                  "description": "Provider-validated transport value."
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "pbom_part_gid": {
+                  "type": "string",
+                  "maxLength": 2000
                 }
               },
-              "additionalProperties": false
+              "additionalProperties": false,
+              "required": [
+                "vpps_part_gid",
+                "alias"
+              ]
             }
           },
           "meta": {
             "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
-          },
-          "alias": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
-            ]
+            "properties": {
+              "added_by": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "project": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "added_at": {
+                "type": "string",
+                "maxLength": 2000
+              }
+            },
+            "additionalProperties": false
           }
         },
         "additionalProperties": false,
         "required": [
-          "operation"
+          "operation",
+          "items"
         ]
       },
       {
@@ -2367,97 +893,32 @@
           },
           "gid": {
             "type": "string",
+            "minLength": 1,
             "maxLength": 128
-          },
-          "record": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
-          },
-          "items": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {
-              "type": "object",
-              "properties": {
-                "vpps_description": {
-                  "description": "Provider-validated transport value."
-                },
-                "part_category": {
-                  "description": "Provider-validated transport value."
-                },
-                "description": {
-                  "description": "Provider-validated transport value."
-                },
-                "level": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps_desc_cn": {
-                  "description": "Provider-validated transport value."
-                },
-                "vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "importance": {
-                  "description": "Provider-validated transport value."
-                },
-                "vehicle_model": {
-                  "description": "Provider-validated transport value."
-                },
-                "parent_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "status": {
-                  "description": "Provider-validated transport value."
-                },
-                "meta": {
-                  "description": "Provider-validated transport value."
-                },
-                "flex_type": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_main_vpps_desc": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_direction": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_static_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "ref_install_clearance": {
-                  "description": "Provider-validated transport value."
-                },
-                "alias": {
-                  "description": "Provider-validated transport value."
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "meta": {
-            "type": "object",
-            "maxProperties": 20,
-            "additionalProperties": false,
-            "properties": {}
           },
           "alias": {
             "type": "string",
-            "maxLength": 500
+            "maxLength": 2000
           },
-          "conflict": {
-            "type": "string",
-            "enum": [
-              "skip"
-            ]
+          "record": {
+            "type": "object",
+            "properties": {
+              "pbom_part_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 128
+              }
+            },
+            "additionalProperties": false
           }
         },
         "additionalProperties": false,
         "required": [
-          "operation"
+          "operation",
+          "gid",
+          "alias"
         ]
       }
     ]

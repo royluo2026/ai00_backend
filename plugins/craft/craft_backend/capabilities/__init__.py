@@ -162,5 +162,7 @@ def register_capabilities(registry: Any) -> None:
     register_reviewed_capabilities(registry)
     for capability_id in ("craft.library.change.apply", "craft.rule.library.change.apply"):
         original = registry.get(capability_id, 1)
-        native.register(original.spec.model_copy(update={"version": 2}), original.handler)
+        from .desktop_library_v2 import change_library_v2
+        handler = change_library_v2 if capability_id == "craft.library.change.apply" else original.handler
+        native.register(original.spec.model_copy(update={"version": 2}), handler)
     versioned_resource_resolvers.register("craft.execution_plan", resolve_execution_plan_reference)

@@ -1068,6 +1068,9 @@ for _id, _schema in _json.loads((_Path(__file__).with_name("desktop_contracts_v2
     OUTPUT_SCHEMAS[(_id, 2)]["properties"]["data"] = _object({"gid": STRING}, required=("gid",))
 
 
+from .desktop_library_v2 import OUTPUT_SCHEMA as _LIBRARY_V2_OUTPUT
+OUTPUT_SCHEMAS[("craft.library.change.apply", 2)] = _LIBRARY_V2_OUTPUT
+
 def input_schema_for(capability_id: str, major_version: int) -> dict[str, Any]:
     return INPUT_SCHEMAS.get((capability_id, major_version)) or INPUT_SCHEMAS[capability_id]
 
