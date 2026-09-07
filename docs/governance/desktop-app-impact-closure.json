@@ -4,10 +4,10 @@
   "consumer_type": "web",
   "transport_classification": "authenticated interactive Gateway; single Windows x64 App product",
   "source_basis": "immutable Git commit tree; not a promoted release candidate",
-  "source_commit": "4ca647f4101f15f3a2cae6fcfa0c5275926735df",
-  "source_tree": "d95ba3930471330b775153c791af9c5e6afab655",
+  "source_commit": "abbb9827368c22403549d2f0dc4f80ea3d4c242a",
+  "source_tree": "2958fcb29bfda48314dfde9c2d687677d65d58f6",
   "source_hash_format": "exact Git blob bytes (no working directory normalization)",
-  "source_set_hash": "sha256:087d9496c8cf776d494d54c75547c580ce4636f5decc6489b24f4fdbf00a0d4b",
+  "source_set_hash": "sha256:8cd8e8052d306c5d8702d70b0f8275d1b8f930edf64a0ea1c71493e78a964cf9",
   "published_catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
   "published_catalog_hash": "sha256:09e54550fcbaaab2df24bfa28d2c2478d9d47f455a27563405bce365efb2e2fd",
   "published_catalog_current": false,
@@ -4482,6 +4482,29 @@
       "descriptor_hash": "sha256:70587b5eb2ff568f2dca36e901d3ead0511126c056a802cb02b7c5e54f8920d3"
     },
     {
+      "id": "craft.library.change.apply",
+      "major_version": 2,
+      "capability_version_gid": "cv2_737aaef0732896f765d0bf3f",
+      "business_definition_hash": "sha256:00562ce56109500253eaedc48a72ad3ed767f7a7f9846e3452b8d8349c041cbd",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "craft.v2:craft.library.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:f73bfbbdc1184eb52eaa217d575b6fc704d99b25533715f7437c51a31aec8a5c"
+    },
+    {
       "id": "craft.library.read",
       "major_version": 1,
       "capability_version_gid": "cv2_6785106bc7dc5b0b7e6b2ef6",
@@ -5410,6 +5433,29 @@
       "execution_mode": "cloud_sync",
       "lifecycle_status": "stable",
       "descriptor_hash": "sha256:fdd8dba9de65aee52ffc85d7e697e17846b619aa6b36a9c80fa567f933642b7a"
+    },
+    {
+      "id": "craft.rule.library.change.apply",
+      "major_version": 2,
+      "capability_version_gid": "cv2_611bd634e98485d168931c14",
+      "business_definition_hash": "sha256:85a635520bd6f7e9e9ba0d28ed2e4b3a2b086513c31390e6997249fd1edbf902",
+      "owner_domain": "craft",
+      "provider_ref": "craft.provider",
+      "consumer_refs": [],
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "confirmation_policy": "user",
+      "authorization_policy": "craft.v2:craft.rule.write",
+      "execution_mode": "cloud_sync",
+      "lifecycle_status": "stable",
+      "descriptor_hash": "sha256:55f278043058f49146ac4840f15516e186b133498c3cab14a5eb8efef13e5384"
     },
     {
       "id": "craft.rule.library.read",
@@ -11035,8 +11081,8 @@
     },
     {
       "path": "backend/capability_v2/official_domains.json",
-      "git_blob_oid": "02f04d976f1c8b444cccec600aa1bb35a5858e57",
-      "sha256": "sha256:7bac5b75b15722e4cde873cdf38c66664bdccd8731e45ba14e0b7ecbab54ad21"
+      "git_blob_oid": "3ab63cd75cd2ff4cc48530d8d8f80b92da3ae4b1",
+      "sha256": "sha256:8f0e49e69a5ab0532f7e5c98107f09e270d3ca95926ce07bd9f435d25ca8e0bf"
     },
     {
       "path": "backend/capability_v2/operations.py",
@@ -11175,8 +11221,8 @@
     },
     {
       "path": "backend/contracts/connector_execution_plan_v2.py",
-      "git_blob_oid": "8d51947138cd60d710eb4847c9037a563819dced",
-      "sha256": "sha256:e5f780673b2a9902d69a7fbe950c8276a32b981152df34c347cf8157d812e314"
+      "git_blob_oid": "34e406d1aa04e4fb8f50ada4f6b8e29e7a07342e",
+      "sha256": "sha256:a0eae091a338978ae17453e1b359ef762a84eba60d249d748537419dec83969c"
     },
     {
       "path": "backend/contracts/craft_execution_plan_v1.py",
@@ -11595,8 +11641,8 @@
     },
     {
       "path": "backend/routers/deps.py",
-      "git_blob_oid": "a876b35f11867160f373580009265c9a1aad41c0",
-      "sha256": "sha256:04f83d68e4b34d5e272126331e137e59b8087d2a3b1dc4cde2002dc057ef6e4b"
+      "git_blob_oid": "ebbc537a74f1f426075c064dc57804aaaece01c8",
+      "sha256": "sha256:2288982f155de8bc0d5091114a610c58fae581013ed10676c5dcbff2d39cb0d6"
     },
     {
       "path": "backend/routers/file_store.py",
@@ -11625,8 +11671,8 @@
     },
     {
       "path": "backend/routers/simulation_connector.py",
-      "git_blob_oid": "aaaca01fdb669c047f04601277e2b07b21b79c76",
-      "sha256": "sha256:39c6485e0547ccbf028ffa494a11831e486035797bc736d91553e5a0d3ef5004"
+      "git_blob_oid": "0f95ccc0c0523a3c31279c59a8f9be9c1260d271",
+      "sha256": "sha256:1490494a97a36455f4f1ba228880c85bcb7c9969fb034d2f74bd0a3caae3bdf0"
     },
     {
       "path": "backend/routers/workbench_home.py",
@@ -11685,8 +11731,8 @@
     },
     {
       "path": "backend/services/jwt_service.py",
-      "git_blob_oid": "dd5b77981cdffe6273ae5f652dd6d6e442dffc47",
-      "sha256": "sha256:5fc11b8abdb3b5c8677eb33536c2c21028fafb6e6ee247d3c328621b89f56564"
+      "git_blob_oid": "c1cbed6d0e960bba9b76974c703ce5d7741987a3",
+      "sha256": "sha256:0ddcaa1a959802e1341f43c61132e318bcc83104a205adf7492b81ac1883cfce"
     },
     {
       "path": "backend/services/org_sync_service.py",
@@ -11754,6 +11800,11 @@
       "sha256": "sha256:45db4e47d3d9d842acb78281f37ad19a15a90fbce82e2544117c1f10f3d65b3e"
     },
     {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/PostConditionProbes.cs",
+      "git_blob_oid": "4eb0e917ef0fd09d1d171b735ea2427d022dfeab",
+      "sha256": "sha256:bc0c1a50db50155528e8384638cde6b083b47c4680a9d6539d2dfbbaa48a4f20"
+    },
+    {
       "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/SceneController.cs",
       "git_blob_oid": "2239130cc765fe83e78987ab515063d2a539cd00",
       "sha256": "sha256:d1659eb747cc626a70d23da8fa1c8edc84a8f8ca0a95c6dace1c590865594d1b"
@@ -11769,9 +11820,14 @@
       "sha256": "sha256:1fe762895f18b8565cd173be7232f904a5c1783ea45f4a517da9f585093ed7c9"
     },
     {
+      "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/VisMockupBreakawayLauncher.cs",
+      "git_blob_oid": "0bb078575834800a33c158b31d2ede1b7172400c",
+      "sha256": "sha256:34eb57d793dcc9794b68b5cb66b443fa58ab4ef80d7ac079e199670db65dcbd4"
+    },
+    {
       "path": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/VisMockupConnection.cs",
-      "git_blob_oid": "fd25c28c639c80f997590e608df60d1ad1d906d1",
-      "sha256": "sha256:fdc516167ea1c9c5fc4ed58d1be2c7709aa0e86099229a439a99354738dcf97d"
+      "git_blob_oid": "a9d0f0cc379dfeb01bef984dea57a63182c4f58d",
+      "sha256": "sha256:9ea8ed03dffd6b795a3b24813260983e55ee9860974d4d3e9ef5b9269e7ffeb1"
     },
     {
       "path": "local-runtime/src/Ai00.Connector.Contracts/AdapterManifest.cs",
@@ -11802,6 +11858,11 @@
       "path": "local-runtime/src/Ai00.Connector.Contracts/Contracts.cs",
       "git_blob_oid": "927f4c561e769445d45a7e3555529a00bff59973",
       "sha256": "sha256:4fc401f5b1fa52614f350d4bc9578f70d192f282678cb80958b344312b248d43"
+    },
+    {
+      "path": "local-runtime/src/Ai00.Connector.Contracts/DurableJsonFile.cs",
+      "git_blob_oid": "f7be7d816e26147e989925c124bb220f6693bd89",
+      "sha256": "sha256:5ff4027439c5daeb50aa59ad0a9d2888ffa7a90662eb2c03a7dc251c3266b32b"
     },
     {
       "path": "local-runtime/src/Ai00.Connector.Contracts/ExecutionPlan.cs",
@@ -12090,8 +12151,8 @@
     },
     {
       "path": "plugins/craft/craft_backend/capabilities/__init__.py",
-      "git_blob_oid": "ee7436de7b7c588e8e3cd5bdd47602ef9e40c87a",
-      "sha256": "sha256:ddf45cd1a44b42c5f3fbeaf9ae0de31a720645b738e12a4711a4972665442789"
+      "git_blob_oid": "6b719398db8b0856c8b9d7a9a2ea76f2ce411432",
+      "sha256": "sha256:ca5e051d8cc4413b0b6b6385b0071812b1966d7538ef0d2cb5e7f6c8746fb319"
     },
     {
       "path": "plugins/craft/craft_backend/capabilities/bop_alt_hierarchy.py",
@@ -12290,8 +12351,8 @@
     },
     {
       "path": "plugins/craft/craft_backend/capabilities/contracts.py",
-      "git_blob_oid": "7c3a38ff475cdb0a1552f68dbc9b46d8b69fdd3c",
-      "sha256": "sha256:917f494e76c3ec2104b14299e0f1bdcfdee5f2c75f6754a93f665b0989d1ac73"
+      "git_blob_oid": "613e374bac5cf25f2b54416477c39d4ba1d9d003",
+      "sha256": "sha256:4e4ec992696a819fd20ea1f2e36c32389f2c017bdc23021957ee291a0c055064"
     },
     {
       "path": "plugins/craft/craft_backend/capabilities/data_exchange.py",
@@ -13155,8 +13216,8 @@
     },
     {
       "path": "plugins/project_management/project_management_backend/capabilities/__init__.py",
-      "git_blob_oid": "aa353ccd2111d8976fc52ffedf7447c6c5b6a04c",
-      "sha256": "sha256:a2a076064100b92a1906e5313e4f7d15cb354d2b07677223aab6d48f61675145"
+      "git_blob_oid": "ee5c7b6b64004073353b8355053d6f183648c557",
+      "sha256": "sha256:a46020e0b5b3252f17584e5a88d62d79b6f42a5d821a1dff64d899fd1fd7e86d"
     },
     {
       "path": "plugins/project_management/project_management_backend/capabilities/projects.py",
@@ -13170,8 +13231,8 @@
     },
     {
       "path": "plugins/project_management/project_management_backend/capabilities/reviewed.py",
-      "git_blob_oid": "6a362fa1cd5620ed58578bc788ecbdcc6f5248ff",
-      "sha256": "sha256:1961939cb68b9a1560730c7de75e25656ae49f3f9def8b8796fb03bdc167b034"
+      "git_blob_oid": "8e1414b44e207a768546d3ae627236349f4bc241",
+      "sha256": "sha256:f1b535a5d1ff630ba17da8cfd20fd35a05a3569e2ba7ef1da49696acf14fda2f"
     },
     {
       "path": "plugins/project_management/project_management_backend/data/__init__.py",
@@ -13230,8 +13291,8 @@
     },
     {
       "path": "plugins/simulation/simulation_backend/application/connector_runtime_sessions.py",
-      "git_blob_oid": "de566eaf838a470fb72126178bc8cc10b424cf37",
-      "sha256": "sha256:22a3b7935dc8c54e0af13a230a6a386419933293fd7bbfcac00d1ce8967667a0"
+      "git_blob_oid": "a4a34c3b3d5d0b55558558f364f92840d8ff223c",
+      "sha256": "sha256:141b0a9b74c983ac741ecbf4b5ed4c7d276250073cd20e1c22725913b1ef0016"
     },
     {
       "path": "plugins/simulation/simulation_backend/application/connector_wakeup.py",
@@ -13280,8 +13341,8 @@
     },
     {
       "path": "plugins/simulation/simulation_backend/capabilities/connector_runtime.py",
-      "git_blob_oid": "e9ed186a53283a525fb91e01b59f0d56e296b69c",
-      "sha256": "sha256:b25e96552df5a87a29349ef6d1594d5b552f040cec2cf7e858525cff14e2b662"
+      "git_blob_oid": "f254d79d92e7201551e56c380806f1e6a507bfd2",
+      "sha256": "sha256:0aeb015680e7c9010bede5aa0eb5d1be46fe5308b9ed5adc25f348eee9f4ebff"
     },
     {
       "path": "plugins/simulation/simulation_backend/capabilities/contracts.py",
@@ -13325,8 +13386,8 @@
     },
     {
       "path": "plugins/simulation/simulation_backend/data/connector_repository.py",
-      "git_blob_oid": "d8bdffb621bcaf355bdfe7a680b1ec09b7ab3fd0",
-      "sha256": "sha256:b3a6638afc5567a9570b0f9b91a78010b193fd6f8faf28242144ff3216c1204b"
+      "git_blob_oid": "9491178b6e510484731950f7d789e1dde90900a5",
+      "sha256": "sha256:faf88abd154286376b04bc5fded6f9a7bfe058072e787c4b7243fecb227e930e"
     },
     {
       "path": "plugins/simulation/simulation_backend/data/document_snapshot_repository.py",
@@ -13459,6 +13520,15 @@
       "provider_ref": "simulation.provider",
       "consumer_id": "ai00.connector",
       "authentication": "runtime_session_and_signed_outcome"
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/simulation/connectors/v2/plans/{plan_id}/acknowledge",
+      "handler": "runtime_outcome_acknowledge",
+      "owner": "simulation",
+      "provider_ref": "simulation.provider",
+      "consumer_id": "ai00.connector",
+      "authentication": "plan_scoped_session_and_exact_stored_outcome"
     },
     {
       "method": "GET",
@@ -17335,6 +17405,10 @@
     },
     {
       "source": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/Ai00.Connector.Adapters.VisMockup.csproj",
+      "dependency": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/PostConditionProbes.cs"
+    },
+    {
+      "source": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/Ai00.Connector.Adapters.VisMockup.csproj",
       "dependency": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/SceneController.cs"
     },
     {
@@ -17344,6 +17418,10 @@
     {
       "source": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/Ai00.Connector.Adapters.VisMockup.csproj",
       "dependency": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/VisMockupAdapter.cs"
+    },
+    {
+      "source": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/Ai00.Connector.Adapters.VisMockup.csproj",
+      "dependency": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/VisMockupBreakawayLauncher.cs"
     },
     {
       "source": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/Ai00.Connector.Adapters.VisMockup.csproj",
@@ -17376,6 +17454,10 @@
     {
       "source": "local-runtime/src/Ai00.Connector.Contracts/Ai00.Connector.Contracts.csproj",
       "dependency": "local-runtime/src/Ai00.Connector.Contracts/Contracts.cs"
+    },
+    {
+      "source": "local-runtime/src/Ai00.Connector.Contracts/Ai00.Connector.Contracts.csproj",
+      "dependency": "local-runtime/src/Ai00.Connector.Contracts/DurableJsonFile.cs"
     },
     {
       "source": "local-runtime/src/Ai00.Connector.Contracts/Ai00.Connector.Contracts.csproj",
