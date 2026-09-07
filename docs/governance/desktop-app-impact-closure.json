@@ -4,10 +4,10 @@
   "consumer_type": "web",
   "transport_classification": "authenticated interactive Gateway; single Windows x64 App product",
   "source_basis": "immutable Git commit tree; not a promoted release candidate",
-  "source_commit": "abbb9827368c22403549d2f0dc4f80ea3d4c242a",
-  "source_tree": "2958fcb29bfda48314dfde9c2d687677d65d58f6",
+  "source_commit": "66513ab71c03f48493f31855bf9b30f70a657ffb",
+  "source_tree": "8a352eeae5642885b05d9d96ab4dedfe6442bc65",
   "source_hash_format": "exact Git blob bytes (no working directory normalization)",
-  "source_set_hash": "sha256:8cd8e8052d306c5d8702d70b0f8275d1b8f930edf64a0ea1c71493e78a964cf9",
+  "source_set_hash": "sha256:89f73ab0b82a507f90135db3b4ceec282cb62e289cdd8655cbb4580fe997f653",
   "published_catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
   "published_catalog_hash": "sha256:09e54550fcbaaab2df24bfa28d2c2478d9d47f455a27563405bce365efb2e2fd",
   "published_catalog_current": false,
@@ -4485,7 +4485,7 @@
       "id": "craft.library.change.apply",
       "major_version": 2,
       "capability_version_gid": "cv2_737aaef0732896f765d0bf3f",
-      "business_definition_hash": "sha256:00562ce56109500253eaedc48a72ad3ed767f7a7f9846e3452b8d8349c041cbd",
+      "business_definition_hash": "sha256:1366c9e903587679dc69492f955e4e77b71037b38b7aeb32d17cfc1e63e44ab5",
       "owner_domain": "craft",
       "provider_ref": "craft.provider",
       "consumer_refs": [],
@@ -4502,7 +4502,7 @@
       "authorization_policy": "craft.v2:craft.library.write",
       "execution_mode": "cloud_sync",
       "lifecycle_status": "stable",
-      "descriptor_hash": "sha256:f73bfbbdc1184eb52eaa217d575b6fc704d99b25533715f7437c51a31aec8a5c"
+      "descriptor_hash": "sha256:4d259e5dfc7f7a917e18ed9bd95d0004c069c47edfd9455546430ece97fd2824"
     },
     {
       "id": "craft.library.read",
@@ -11081,8 +11081,8 @@
     },
     {
       "path": "backend/capability_v2/official_domains.json",
-      "git_blob_oid": "3ab63cd75cd2ff4cc48530d8d8f80b92da3ae4b1",
-      "sha256": "sha256:8f0e49e69a5ab0532f7e5c98107f09e270d3ca95926ce07bd9f435d25ca8e0bf"
+      "git_blob_oid": "89391bb479e5604a30dee841ad98d100a084d24a",
+      "sha256": "sha256:7be6bf845268c052c4a86dabd24f43d4039e211c6c9730a11a347f58ac1dd929"
     },
     {
       "path": "backend/capability_v2/operations.py",
@@ -12151,8 +12151,8 @@
     },
     {
       "path": "plugins/craft/craft_backend/capabilities/__init__.py",
-      "git_blob_oid": "6b719398db8b0856c8b9d7a9a2ea76f2ce411432",
-      "sha256": "sha256:ca5e051d8cc4413b0b6b6385b0071812b1966d7538ef0d2cb5e7f6c8746fb319"
+      "git_blob_oid": "dd81f638c33e52fe73a0813a3cad0c409d8dc206",
+      "sha256": "sha256:899a694c270c13694245605f43d2747c26c479b958227730ffc05fb321d50120"
     },
     {
       "path": "plugins/craft/craft_backend/capabilities/bop_alt_hierarchy.py",
@@ -12351,13 +12351,18 @@
     },
     {
       "path": "plugins/craft/craft_backend/capabilities/contracts.py",
-      "git_blob_oid": "613e374bac5cf25f2b54416477c39d4ba1d9d003",
-      "sha256": "sha256:4e4ec992696a819fd20ea1f2e36c32389f2c017bdc23021957ee291a0c055064"
+      "git_blob_oid": "ac136fadc494c6a22a511076f56a671c590221b9",
+      "sha256": "sha256:86cc027f3c664b80796e60038e49a435f46ca9cef6df3b943484914eb2f24826"
     },
     {
       "path": "plugins/craft/craft_backend/capabilities/data_exchange.py",
       "git_blob_oid": "7e229de8a862eedd0330501d7c39ad28f5689695",
       "sha256": "sha256:f6baa3e844cab484c472ee14e8bbbaa86baf84547a9cfab1758a49f323f2d2ea"
+    },
+    {
+      "path": "plugins/craft/craft_backend/capabilities/desktop_library_v2.py",
+      "git_blob_oid": "52b48dc1c6e37fae1d6e5e1c64690dba2ef2d4c0",
+      "sha256": "sha256:071a3ba74d802c89e1557006916f0334fcff59d49fc19585d01a8171ac1a97ba"
     },
     {
       "path": "plugins/craft/craft_backend/capabilities/ebom_change.py",
@@ -18677,6 +18682,10 @@
     },
     {
       "source": "plugins/craft/craft_backend/capabilities/__init__.py",
+      "dependency": "plugins/craft/craft_backend/capabilities/desktop_library_v2.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/__init__.py",
       "dependency": "plugins/craft/craft_backend/capabilities/ebom_change.py"
     },
     {
@@ -20017,6 +20026,10 @@
     },
     {
       "source": "plugins/craft/craft_backend/capabilities/contracts.py",
+      "dependency": "plugins/craft/craft_backend/capabilities/desktop_library_v2.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/contracts.py",
       "dependency": "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
     },
     {
@@ -20042,6 +20055,30 @@
     {
       "source": "plugins/craft/craft_backend/capabilities/data_exchange.py",
       "dependency": "backend/capability_v2/provider_contracts.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_library_v2.py",
+      "dependency": "backend/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_library_v2.py",
+      "dependency": "backend/capability_v2/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_library_v2.py",
+      "dependency": "backend/capability_v2/provider_contracts.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_library_v2.py",
+      "dependency": "plugins/craft/craft_backend/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_library_v2.py",
+      "dependency": "plugins/craft/craft_backend/capabilities/__init__.py"
+    },
+    {
+      "source": "plugins/craft/craft_backend/capabilities/desktop_library_v2.py",
+      "dependency": "plugins/craft/craft_backend/capabilities/library_change.py"
     },
     {
       "source": "plugins/craft/craft_backend/capabilities/ebom_change.py",
