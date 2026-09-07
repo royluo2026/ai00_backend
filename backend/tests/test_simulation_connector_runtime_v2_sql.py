@@ -104,7 +104,7 @@ def database(request, tmp_path, monkeypatch):
         finally:
             conn.close()
 
-    ddl = MIGRATION.read_text(encoding="utf-8")
+    ddl = MIGRATION.read_text(encoding="utf-8") + "\n" + (MIGRATION.parent / "0009_connector_app_auth.sql").read_text(encoding="utf-8")
     with transaction() as conn:
         if dialect == "mysql":
             from backend.db.versioned_migrations import prepare_resumable_statement
@@ -153,7 +153,7 @@ def database(request, tmp_path, monkeypatch):
     yield transaction, device
     if dialect == "mysql":
         with transaction() as conn, conn.cursor() as cur:
-            for table in ("app_pairings", "runtime_recovery_sessions", "runtime_audit", "runtime_plans", "runtime_devices"):
+            for table in ("app_pairings", "runtime_challenges", "runtime_recovery_sessions", "runtime_audit", "runtime_plans", "runtime_devices"):
                 cur.execute(f"DELETE FROM workmanship_sim_connector_{table} WHERE device_id=%s", (device,))
             cur.execute("DELETE FROM workmanship_sim_connector_plans WHERE connector_id=%s", (device,))
 

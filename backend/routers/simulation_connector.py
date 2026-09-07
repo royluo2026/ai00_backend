@@ -1,6 +1,13 @@
 """HTTP bootstrap adapter for Simulation-owned AI00 Connector pairing."""
 from __future__ import annotations
 
+from typing import Literal
+from backend.contracts.connector_execution_plan_v2 import ConnectorPlanOutcomeV2, IDENTITY_PATTERN
+from plugins.simulation.simulation_backend.application.connector_runtime_sessions import runtime_session_service
+from plugins.simulation.simulation_backend.capabilities.connector_pairing import app_pairing_service
+from plugins.simulation.simulation_backend.domain.connector_pairing import PairingError
+from plugins.simulation.simulation_backend.data.connector_repository import ConnectorRepositoryError
+
 from datetime import datetime, timezone
 import hashlib
 import tempfile
@@ -393,6 +400,148 @@ async def connector_step_result_artifact(
         raise HTTPException(status_code=409, detail={"code": str(exc)}) from exc
     except Exception as exc:
         raise HTTPException(status_code=503, detail={"code": "artifact_upload_failed"}) from exc
+
+# V2 device/control-plane transport. User intent (approval and takeover) stays
+# behind the Capability gateway; no user-authenticated token issuance route.
+
+
+class AppPairingRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    device_signing_jwk: dict
+    bootstrap_encryption_jwk: dict
+    nonce: str = Field(min_length=16, max_length=512)
+
+
+class AppPairingActivate(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    signing_challenge: str = Field(min_length=1, max_length=1024)
+    signature: str = Field(pattern=r'^[A-Za-z0-9_-]{86}$')
+    decrypted_challenge: str = Field(min_length=16, max_length=512)
+
+
+class RuntimeChallengeBody(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    device_id: str = Field(pattern=IDENTITY_PATTERN)
+    generation: int = Field(ge=1)
+    runtime_instance_id: str = Field(pattern=IDENTITY_PATTERN)
+    runtime_type: Literal['electron']
+    plan_id: str | None = Field(default=None, pattern=IDENTITY_PATTERN)
+
+
+class RuntimeRegisterBody(RuntimeChallengeBody):
+    challenge: str = Field(min_length=1, max_length=1024)
+    signature: str = Field(pattern=r'^[A-Za-z0-9_-]{86}$')
+
+
+def _transport(call):
+    try:
+        return {'success': True, 'data': call()}
+    except (PairingError, ConnectorRepositoryError) as exc:
+        code = str(exc)
+        status = 401 if code in {'runtime_session_invalid', 'device_credential_invalid', 'runtime_proof_invalid', 'runtime_type_invalid'} else 409
+        raise HTTPException(status_code=status, detail={'code': code}) from exc
+
+
+def _runtime_pins(
+    device_id: str = Header(alias='X-AI00-Device-ID', pattern=IDENTITY_PATTERN),
+    generation: int = Header(alias='X-AI00-Runtime-Generation', ge=1),
+    runtime_instance_id: str = Header(alias='X-AI00-Runtime-Instance-ID', pattern=IDENTITY_PATTERN),
+    runtime_type: Literal['electron'] = Header(alias='X-AI00-Runtime-Type'),
+    session_token: str = Header(alias='X-AI00-Runtime-Session', min_length=1, max_length=512),
+):
+    return dict(device_id=device_id, generation=generation, runtime_instance_id=runtime_instance_id,
+                runtime_type=runtime_type, token=session_token)
+
+
+def _runtime_auth(pins: dict = Depends(_runtime_pins)):
+    _transport(lambda: runtime_session_service.authenticate(**pins))
+    return pins
+
+
+def _reconciliation_auth(plan_id: str, pins: dict = Depends(_runtime_pins)):
+    _transport(lambda: runtime_session_service.authenticate_reconciliation(plan_id=plan_id, **pins))
+    return pins
+
+
+@router.post('/v2/pairings')
+def app_pairing_request(body: AppPairingRequest):
+    return _transport(lambda: app_pairing_service.request_v2(body.device_signing_jwk, body.bootstrap_encryption_jwk, body.nonce))
+
+
+@router.post('/v2/pairings/{pairing_id}/activate')
+def app_pairing_activate(pairing_id: str, body: AppPairingActivate):
+    return _transport(lambda: app_pairing_service.activate_v2(pairing_id, body.signing_challenge, body.signature, body.decrypted_challenge))
+
+
+@router.post('/v2/runtime/challenge')
+def runtime_challenge(body: RuntimeChallengeBody, device_credential: str = Header(alias='X-AI00-Device-Credential', min_length=1, max_length=512)):
+    return _transport(lambda: runtime_session_service.challenge(device_credential=device_credential, **body.model_dump()))
+
+
+@router.post('/v2/runtime/register')
+def runtime_register(body: RuntimeRegisterBody, device_credential: str = Header(alias='X-AI00-Device-Credential', min_length=1, max_length=512)):
+    if body.plan_id is not None:
+        raise HTTPException(status_code=400, detail={'code': 'runtime_scope_invalid'})
+    from dataclasses import asdict
+    return _transport(lambda: asdict(runtime_session_service.register(device_credential=device_credential, **body.model_dump(exclude={'plan_id'}))))
+
+
+@router.post('/v2/runtime/reconciliation/register')
+def runtime_reconciliation_register(body: RuntimeRegisterBody, device_credential: str = Header(alias='X-AI00-Device-Credential', min_length=1, max_length=512)):
+    if not body.plan_id:
+        raise HTTPException(status_code=400, detail={'code': 'plan_reconciliation_invalid'})
+    return _transport(lambda: runtime_session_service.register_reconciliation(device_credential=device_credential, **body.model_dump()))
+
+
+@router.post('/v2/heartbeat')
+def runtime_heartbeat(pins: dict = Depends(_runtime_auth)):
+    return _transport(lambda: runtime_session_service.heartbeat(**pins))
+
+
+@router.post('/v2/runtime/renew')
+def runtime_renew(pins: dict = Depends(_runtime_auth)):
+    return _transport(lambda: runtime_session_service.renew(**pins))
+
+
+@router.post('/v2/plans/lease')
+def runtime_lease(body: ConnectorLeaseBody, pins: dict = Depends(_runtime_auth)):
+    return _transport(lambda: runtime_session_service.lease(**pins, lease_seconds=body.lease_seconds))
+
+
+@router.websocket('/v2/plans/wake')
+async def runtime_wake(websocket: WebSocket, pins: dict = Depends(_runtime_pins)):
+    try:
+        runtime_session_service.authenticate(**pins)
+        await websocket.accept()
+        async with connector_wake_broker.subscribe(pins['device_id']) as subscription:
+            await websocket.send_json({'type': 'ready'})
+            while True:
+                signaled = await subscription.wait(25)
+                runtime_session_service.authenticate(**pins)
+                await websocket.send_json({'type': 'plan_available' if signaled else 'keepalive'})
+    except ConnectorRepositoryError:
+        await websocket.close(code=4401)
+    except WebSocketDisconnect:
+        return
+
+
+@router.post('/v2/plans/{plan_id}/outcome')
+def runtime_outcome(plan_id: str, body: ConnectorPlanOutcomeV2, pins: dict = Depends(_runtime_auth)):
+    if plan_id != body.plan_id:
+        raise HTTPException(status_code=409, detail={'code': 'plan_identity_mismatch'})
+    return _transport(lambda: runtime_session_service.outcome(outcome=body, **pins))
+
+
+@router.get('/v2/plans/{plan_id}/probe')
+def runtime_probe(plan_id: str, pins: dict = Depends(_reconciliation_auth)):
+    return _transport(lambda: runtime_session_service.probe(plan_id=plan_id, **pins))
+
+
+@router.post('/v2/plans/{plan_id}/reconcile')
+def runtime_reconcile(plan_id: str, body: ConnectorPlanOutcomeV2, pins: dict = Depends(_reconciliation_auth)):
+    if plan_id != body.plan_id:
+        raise HTTPException(status_code=409, detail={'code': 'plan_identity_mismatch'})
+    return _transport(lambda: runtime_session_service.outcome(outcome=body, reconcile=True, **pins))
 
 
 __all__ = ["router"]

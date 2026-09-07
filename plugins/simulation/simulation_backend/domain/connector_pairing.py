@@ -10,16 +10,51 @@ import secrets
 from typing import Callable
 
 from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding, rsa
+from cryptography.hazmat.primitives.asymmetric import padding, rsa, ec
+from cryptography.hazmat.primitives.asymmetric.utils import encode_dss_signature
+from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from pydantic import Field, field_validator
 
 from backend.capability_v2.contracts import FrozenModel
 from backend.contracts.connector_execution_plan_v1 import canonical_hash
+from backend.contracts.connector_execution_plan_v2 import PROTOCOL_V2, _public_key, _decode_signature
 
 
 def _hash(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def verify_possession(jwk: dict, challenge: str, signature: str) -> bool:
+    try:
+        r, s = _decode_signature(signature)
+        _public_key(jwk).verify(encode_dss_signature(r, s), challenge.encode(), ec.ECDSA(hashes.SHA256()))
+        return True
+    except (InvalidSignature, TypeError, ValueError):
+        return False
+
+
+def bootstrap_public_key(jwk: dict):
+    if set(jwk) != {'kty', 'alg', 'n', 'e'} or jwk['kty'] != 'RSA' or jwk['alg'] != 'RSA-OAEP-256':
+        raise ValueError('bootstrap_key_invalid')
+    def integer(value):
+        decoded = base64.urlsafe_b64decode(value + '=' * (-len(value) % 4))
+        if not decoded or decoded[0] == 0 or base64.urlsafe_b64encode(decoded).rstrip(b'=').decode() != value:
+            raise ValueError('bootstrap_key_invalid')
+        return int.from_bytes(decoded, 'big')
+    key = rsa.RSAPublicNumbers(integer(jwk['e']), integer(jwk['n'])).public_key()
+    if not 2048 <= key.key_size <= 4096:
+        raise ValueError('bootstrap_key_invalid')
+    return key
+
+
+def encrypt_bootstrap(jwk: dict, plaintext: bytes) -> dict:
+    key = AESGCM.generate_key(bit_length=256)
+    nonce = secrets.token_bytes(12)
+    encrypted = AESGCM(key).encrypt(nonce, plaintext, None)
+    wrapped = bootstrap_public_key(jwk).encrypt(key, padding.OAEP(mgf=padding.MGF1(hashes.SHA256()), algorithm=hashes.SHA256(), label=None))
+    encode = lambda value: base64.urlsafe_b64encode(value).rstrip(b'=').decode()
+    return {'algorithm': 'RSA-OAEP-256+A256GCM', 'encrypted_key': encode(wrapped), 'nonce': encode(nonce), 'ciphertext': encode(encrypted)}
 
 
 class PairingError(RuntimeError):
@@ -320,6 +355,90 @@ class PairingService:
         if kind == "code":
             return secrets.token_hex(4).upper()
         return f"{kind}-" + secrets.token_hex(16)
+
+    def _v2_attempt(self, pairing_id, actor, call):
+        try:
+            return call()
+        except PairingError as exc:
+            self.repository.audit_pairing(pairing_id, 'pairing_rejected', self.clock(), actor=actor, reason=str(exc))
+            raise
+
+    def request_v2(self, device_signing_jwk, bootstrap_encryption_jwk, nonce):
+        def create():
+            try:
+                _public_key(device_signing_jwk)
+                encryption_key = bootstrap_public_key(bootstrap_encryption_jwk)
+            except (ValueError, TypeError, KeyError) as exc:
+                raise PairingError('pairing_key_invalid') from exc
+            if not isinstance(nonce, str) or not 16 <= len(nonce) <= 512:
+                raise PairingError('pairing_nonce_invalid')
+            now = self.clock()
+            pairing_id = self.id_factory('pairing')
+            signing_challenge = 'ai00.app-pairing.v2:' + pairing_id + ':' + secrets.token_urlsafe(32)
+            encryption_challenge = secrets.token_urlsafe(32)
+            encrypted = encryption_key.encrypt(encryption_challenge.encode(), padding.OAEP(
+                mgf=padding.MGF1(hashes.SHA256()), algorithm=hashes.SHA256(), label=None))
+            key_id = 'device-key-' + _hash(json.dumps(device_signing_jwk, sort_keys=True, separators=(',', ':')))
+            record = dict(pairing_id=pairing_id, protocol=PROTOCOL_V2, device_signing_jwk=device_signing_jwk,
+                bootstrap_encryption_jwk=bootstrap_encryption_jwk, bootstrap_nonce_hash=_hash(nonce), device_key_id=key_id,
+                signing_challenge_hash=_hash(signing_challenge), activation_challenge_hash=_hash(encryption_challenge),
+                status='created', resource_version=1, runtime_type='electron', expires_at=now + timedelta(minutes=5),
+                challenge_expires_at=now + timedelta(minutes=5))
+            self.repository.create_pairing(record, now)
+            return dict(pairing_id=pairing_id, status='created', resource_version=1, expires_at=record['expires_at'],
+                        signing_challenge=signing_challenge, encrypted_challenge=base64.urlsafe_b64encode(encrypted).rstrip(b'=').decode())
+        return self._v2_attempt(None, None, create)
+
+    @staticmethod
+    def _v2_summary(row):
+        return {k: row[k] for k in ('pairing_id', 'status', 'resource_version', 'expires_at', 'device_key_id')}
+
+    def bind_v2(self, pairing_id, user_id, tenant_id, *, expected_version):
+        if not user_id or not tenant_id:
+            raise PairingError('pairing_owner_mismatch')
+        return self._v2_attempt(pairing_id, user_id, lambda: self._v2_summary(
+            self.repository.bind_pairing(pairing_id, user_id, tenant_id, expected_version, self.clock())))
+
+    def summary_v2(self, pairing_id, user_id, tenant_id):
+        def summary():
+            row = self.repository.get_pairing(pairing_id)
+            if not row or (row['owner_user_gid'], row['tenant_gid']) != (user_id, tenant_id):
+                raise PairingError('pairing_owner_mismatch')
+            return self._v2_summary(row)
+        return self._v2_attempt(pairing_id, user_id, summary)
+
+    def cancel_v2(self, pairing_id, user_id, tenant_id, *, expected_version):
+        return self._v2_attempt(pairing_id, user_id, lambda: self._v2_summary(self.repository.close_pairing(
+            pairing_id, 'cancelled', self.clock(), user_id=user_id, tenant_id=tenant_id, expected_version=expected_version)))
+
+    def activate_v2(self, pairing_id, signing_challenge, signature, decrypted_challenge):
+        def activate():
+            row = self.repository.get_pairing(pairing_id)
+            if not row:
+                raise PairingError('pairing_not_found')
+            if row['status'] in ('activated', 'cancelled'):
+                raise PairingError('pairing_consumed')
+            now = self.clock()
+            if row['expires_at'] <= now or row['challenge_expires_at'] <= now:
+                if row['status'] != 'expired':
+                    self.repository.close_pairing(pairing_id, 'expired', now)
+                raise PairingError('pairing_expired')
+            if row['status'] != 'user_bound':
+                raise PairingError('pairing_not_approved')
+            if (not secrets.compare_digest(row['signing_challenge_hash'] or '', _hash(signing_challenge))
+                    or not secrets.compare_digest(row['activation_challenge_hash'] or '', _hash(decrypted_challenge))
+                    or not verify_possession(row['device_signing_jwk'], signing_challenge, signature)):
+                raise PairingError('pairing_proof_invalid')
+            device_id = 'app-device-' + secrets.token_hex(16)
+            credential = secrets.token_urlsafe(32)
+            envelope = encrypt_bootstrap(row['bootstrap_encryption_jwk'], json.dumps(dict(
+                device_id=device_id, device_credential=credential, credential_generation=1, runtime_generation=1,
+                owner_user_gid=row['owner_user_gid'], tenant_gid=row['tenant_gid'], device_key_id=row['device_key_id'],
+                protocol=PROTOCOL_V2, runtime_type=row['runtime_type']), sort_keys=True, separators=(',', ':')).encode())
+            self.repository.activate_pairing(row, device_id, _hash(credential), now)
+            return dict(device_id=device_id, device_key_id=row['device_key_id'], status='activated',
+                bootstrap_key_retained=False, encrypted_credential_envelope=envelope)
+        return self._v2_attempt(pairing_id, None, activate)
 
     def request(self, request: PairingRequest) -> PairingCreated:
         now = self.clock()

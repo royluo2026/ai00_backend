@@ -272,3 +272,26 @@ __all__ = [
     "AdapterAdvertisement", "AdapterOperation", "ConnectorHealth",
     "INPUT_SCHEMAS", "OUTPUT_SCHEMAS",
 ]
+
+# App v2 user actions remain governed; device transport is not a business Capability.
+INPUT_SCHEMAS['simulation.connector.runtime.takeover'] = obj({
+    'device_id': {'type': 'string', 'minLength': 1, 'maxLength': 256},
+    'expected_generation': {'type': 'integer', 'minimum': 1},
+    'runtime_instance_id': {'type': 'string', 'minLength': 1, 'maxLength': 256},
+    'reason': {'type': 'string', 'minLength': 1, 'maxLength': 1024},
+}, ('device_id', 'expected_generation', 'runtime_instance_id', 'reason'))
+OUTPUT_SCHEMAS['simulation.connector.runtime.takeover'] = obj({
+    'device_id': STRING, 'runtime_generation': {'type': 'integer', 'minimum': 1},
+    'runtime_instance_id': STRING, 'audit_ref': STRING,
+}, ('device_id', 'runtime_generation', 'runtime_instance_id', 'audit_ref'))
+for _action in ('approve', 'summary.get', 'cancel'):
+    _id = 'simulation.connector.pairing.' + _action
+    _properties = {'pairing_id': {'type': 'string', 'minLength': 1, 'maxLength': 256}}
+    if _action != 'summary.get':
+        _properties['expected_version'] = {'type': 'integer', 'minimum': 1}
+    INPUT_SCHEMAS[(_id, 2)] = obj(_properties, tuple(_properties))
+    OUTPUT_SCHEMAS[(_id, 2)] = obj({
+        'pairing_id': STRING, 'status': {'type': 'string', 'enum': ['created', 'user_bound', 'activated', 'cancelled', 'expired']},
+        'resource_version': {'type': 'integer', 'minimum': 1},
+        'expires_at': {'type': 'string', 'format': 'date-time'}, 'device_key_id': STRING,
+    }, ('pairing_id', 'status', 'resource_version', 'expires_at', 'device_key_id'))

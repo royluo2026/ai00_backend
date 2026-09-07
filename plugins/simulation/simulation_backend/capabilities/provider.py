@@ -99,6 +99,15 @@ _RESOURCES = {
     "simulation.result.compare": (("simulation-run", "left_result_ref.run_id"), ("simulation-run", "right_result_ref.run_id")),
 }
 _ERROR_PAIRS = (
+    ('runtime_owner_mismatch', 'The authenticated user and tenant do not own this runtime device.'),
+    ('runtime_session_invalid', 'The session no longer matches the active device, generation, instance, hash, or expiry.'),
+    ('runtime_generation_invalid', 'The expected runtime generation has changed.'),
+    ('runtime_instance_invalid', 'The runtime instance identity is malformed.'),
+    ('runtime_session_conflict', 'A concurrent runtime change fenced this operation.'),
+    ('runtime_plans_unresolved', 'Leased, executing, unknown, or manual-review work blocks replacement.'),
+    ('runtime_takeover_audit_required', 'Takeover requires the authenticated actor and a nonempty bounded reason.'),
+    ('pairing_owner_mismatch', 'The App pairing belongs to another user or tenant.'),
+    ('pairing_consumed', 'The App pairing has already been activated or cancelled.'),
     ("source_resolver_unavailable", "A required owning-domain resolver is unavailable."),
     ("source_version_mismatch", "A referenced source no longer matches its immutable hash or version."),
     ("parameter_set_not_found", "The immutable parameter set is unavailable or not visible."),
@@ -390,6 +399,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                 "simulation.connector.pairing.approve",
                 "simulation.connector.pairing.cancel",
                 "simulation.connector.binding.get",
+                "simulation.connector.runtime.takeover",
             }
             else ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True)
         ),

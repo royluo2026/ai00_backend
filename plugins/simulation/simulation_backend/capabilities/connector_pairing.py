@@ -11,6 +11,7 @@ from backend.capability_v2.provider_contracts import (
 from backend.contracts.connector_execution_plan_v1 import canonical_hash
 
 from ..data.connector_repository import SqlPairingRepository
+from ..data.connector_app_pairing_repository import SqlAppPairingRepository
 from ..domain.connector_pairing import PairingError, PairingRequest, PairingService
 from .connector_runtime import connector_plan_signing_material
 
@@ -23,6 +24,9 @@ def _plan_credentials(connector_id: str) -> dict:
 default_service = PairingService(
     SqlPairingRepository(), extra_credential_factory=_plan_credentials,
 )
+
+
+app_pairing_service = PairingService(SqlAppPairingRepository())
 
 
 def _translate(call):
@@ -164,7 +168,31 @@ def specs(provider: ConnectorPairingProvider | None = None):
         "input_schema": {}, "output_schema": {},
         "tags": ("simulation", "connector", "pairing"),
     }
-    return (
+    def app_action(action):
+        def handler(payload, context):
+            selected._require_web_user(context)
+            method = getattr(app_pairing_service, action + '_v2')
+            kwargs = {} if action == 'summary' else {'expected_version': payload['expected_version']}
+            data = _translate(lambda: method(payload['pairing_id'], context.user_gid, selected._team_scope(context), **kwargs))
+            # Normalize timestamps for the closed Capability wire schema.
+            data = {key: value.isoformat() if hasattr(value, 'isoformat') else value for key, value in data.items()}
+            return CapabilityOutput(data=data, evidence=(EvidenceRef(kind='simulation.connector.app_pairing',
+                reference='connector-pairing:' + payload['pairing_id'], digest=canonical_hash(data)),))
+        return handler
+
+    app_specs = tuple((CapabilitySpec(
+        id='simulation.connector.pairing.' + suffix, owner='simulation', version=2,
+        description=description, use_when='The signed-in user manages App possession pairing.',
+        do_not_use_when='The caller is a device transport or belongs to another tenant.',
+        risk=CapabilityRisk.READ if action == 'summary' else CapabilityRisk.WRITE,
+        confirmation='user' if action == 'bind' else 'none', permissions=('simulation.use',),
+        input_schema={}, output_schema={}, tags=('simulation', 'connector', 'pairing'),
+    ), app_action(action)) for suffix, action, description in (
+        ('approve', 'bind', 'Bind one App pairing to the authenticated user and tenant.'),
+        ('summary.get', 'summary', 'Read an owned App pairing state.'),
+        ('cancel', 'cancel', 'Cancel an owned unfinished App pairing.'),
+    ))
+    return app_specs + (
         (CapabilitySpec(
             id="simulation.connector.pairing.bootstrap.create",
             description="Create a short-lived one-time Connector bootstrap ticket for the signed-in user.",

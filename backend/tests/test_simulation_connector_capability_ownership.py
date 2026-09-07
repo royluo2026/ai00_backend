@@ -195,3 +195,9 @@ def test_old_device_connector_ids_are_deprecated_and_fail_closed() -> None:
         descriptor = registrations[key].descriptor
         assert descriptor.lifecycle_status.value == "deprecated"
         assert not any(descriptor.exposure.model_dump().values())
+
+def test_app_auth_migration_has_exact_simulation_table_ownership():
+    from backend.governance import load_registry
+    owner = load_registry().table_owner('workmanship_sim_connector_runtime_challenges')
+    assert owner is not None
+    assert owner.owner == 'simulation'

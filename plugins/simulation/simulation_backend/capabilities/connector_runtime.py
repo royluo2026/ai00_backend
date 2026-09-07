@@ -312,6 +312,28 @@ def register_connector_runtime_capabilities(
 ) -> None:
     from .provider import register
 
+    def takeover(payload, context):
+        from ..application.connector_runtime_sessions import RuntimeSessionService
+        if context.source != 'web' or not context.user_gid or not context.team_gid:
+            raise CapabilityBusinessError('runtime_owner_mismatch', 'Takeover requires an authenticated user and tenant.')
+        try:
+            data = RuntimeSessionService(control_plane.repository, clock=control_plane.clock).takeover(
+                payload['device_id'], payload['expected_generation'], payload['runtime_instance_id'],
+                actor_id=context.user_gid, tenant_id=context.team_gid, reason=payload['reason'])
+        except ConnectorRepositoryError as exc:
+            raise CapabilityBusinessError(str(exc), str(exc)) from exc
+        return CapabilityOutput(data=data, evidence=(EvidenceRef(kind='simulation.connector.runtime.takeover',
+            reference=data['audit_ref'], digest=canonical_hash(data)),))
+
+    register(registry, CapabilitySpec(
+        id='simulation.connector.runtime.takeover', owner='simulation', version=1,
+        description='Reserve a new App runtime generation for a user-confirmed replacement instance.',
+        use_when='The device owner confirms replacement of a stale App instance.',
+        do_not_use_when='Work is unresolved or device identity does not match the authenticated owner.',
+        risk=CapabilityRisk.WRITE, confirmation='user', permissions=('simulation.use',),
+        input_schema={}, output_schema={}, tags=('simulation', 'connector', 'runtime'),
+    ), takeover)
+
     def get_health(payload, context):
         health = control_plane.get_health(payload["connector_id"], context)
         data = health.model_dump(mode="json")

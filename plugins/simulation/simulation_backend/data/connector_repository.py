@@ -66,6 +66,71 @@ class ProjectionLease:
 
 
 class SimulationConnectorRepository:
+    def runtime_device(self, device_id):
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            return self._locked_runtime(cursor, device_id)
+
+    def authenticate_runtime(self, device_id, generation, instance, token, now, runtime_type):
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            row = self._authenticated_runtime(cursor, device_id, generation, instance, token, now)
+            if runtime_type != 'electron' or row['runtime_type'] != runtime_type:
+                raise ConnectorRepositoryError('runtime_type_invalid')
+            return row
+
+    def authenticate_reconciliation(self, device_id, generation, instance, token, plan_id, now, runtime_type):
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            row = self._locked_runtime(cursor, device_id)
+            if runtime_type != 'electron' or row['runtime_type'] != runtime_type:
+                raise ConnectorRepositoryError('runtime_type_invalid')
+            return self._authenticated_recovery(cursor, row, generation, instance, token, plan_id, _utc(now))
+
+    def create_runtime_challenge(self, row, challenge_hash, generation, instance, plan_id, expires_at):
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute('INSERT INTO workmanship_sim_connector_runtime_challenges '
+                '(challenge_hash,protocol,device_id,runtime_generation,runtime_instance_id,runtime_type,device_key_id,plan_id,expires_at) '
+                'VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)', (challenge_hash, PROTOCOL_V2, row['device_id'], generation,
+                instance, row['runtime_type'], row['device_key_id'], plan_id, expires_at))
+
+    def consume_runtime_challenge(self, row, challenge_hash, generation, instance, plan_id, now):
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute('UPDATE workmanship_sim_connector_runtime_challenges SET consumed_at=%s WHERE challenge_hash=%s '
+                'AND protocol=%s AND device_id=%s AND runtime_generation=%s AND runtime_instance_id=%s AND runtime_type=%s '
+                'AND device_key_id=%s AND plan_id <=> %s AND expires_at>%s AND consumed_at IS NULL',
+                (now, challenge_hash, PROTOCOL_V2, row['device_id'], generation, instance, row['runtime_type'], row['device_key_id'], plan_id, now))
+            if cursor.rowcount != 1:
+                raise ConnectorRepositoryError('runtime_proof_invalid')
+
+    def heartbeat_runtime(self, device_id, generation, instance, token, now):
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            self._authenticated_runtime(cursor, device_id, generation, instance, token, now)
+            cursor.execute('UPDATE workmanship_sim_connector_runtime_devices SET heartbeat_at=%s WHERE device_id=%s', (now, device_id))
+
+    def renew_runtime(self, device_id, generation, instance, token, now, expires_at):
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            row = self._authenticated_runtime(cursor, device_id, generation, instance, token, now)
+            if not 0 < (_utc(expires_at) - _utc(now)).total_seconds() <= 300:
+                raise ConnectorRepositoryError('runtime_session_expiry_invalid')
+            cursor.execute('UPDATE workmanship_sim_connector_runtime_devices SET session_expires_at=%s,updated_at=%s '
+                'WHERE device_id=%s AND runtime_generation=%s AND current_runtime_instance_id=%s AND session_token_hash=%s',
+                (expires_at, now, device_id, generation, instance, row['session_token_hash']))
+            if cursor.rowcount != 1:
+                raise ConnectorRepositoryError('runtime_session_conflict')
+            self._runtime_audit(cursor, row, 'session_renewed', now)
+            return {'expires_at': expires_at}
+
+    def reconciliation_plan(self, device_id, generation, instance, token, plan_id, now, runtime_type):
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            row = self._locked_runtime(cursor, device_id)
+            if runtime_type != 'electron' or row['runtime_type'] != runtime_type:
+                raise ConnectorRepositoryError('runtime_type_invalid')
+            self._authenticated_recovery(cursor, row, generation, instance, token, plan_id, _utc(now))
+            cursor.execute('SELECT plan_json FROM workmanship_sim_connector_runtime_plans WHERE device_id=%s AND plan_id=%s AND protocol=%s',
+                           (device_id, plan_id, PROTOCOL_V2))
+            plan = cursor.fetchone()
+            if not plan:
+                raise ConnectorRepositoryError('plan_reconciliation_invalid')
+            return json.loads(plan['plan_json']) if isinstance(plan['plan_json'], str) else plan['plan_json']
+
     # Device rows serialize all v2 writers. Never acquire a plan lock before
     # its device lock, including queueing, recovery, and takeover.
     @staticmethod
@@ -176,11 +241,17 @@ class SimulationConnectorRepository:
                 raise ConnectorRepositoryError("runtime_session_active")
             if self._has_unresolved_plans(cursor, device_id):
                 raise ConnectorRepositoryError("runtime_plans_unresolved")
-            return self._install_runtime_session(cursor, row, runtime_generation, runtime_instance_id,
+            if row.get('takeover_instance_id') and row['takeover_instance_id'] != runtime_instance_id:
+                raise ConnectorRepositoryError('runtime_instance_reserved')
+            installed = self._install_runtime_session(cursor, row, runtime_generation, runtime_instance_id,
                 now, expires_at, event="session_registered")
+            if row.get('takeover_instance_id'):
+                cursor.execute('UPDATE workmanship_sim_connector_runtime_devices SET takeover_instance_id=NULL WHERE device_id=%s AND takeover_instance_id=%s',
+                               (device_id, runtime_instance_id))
+            return installed
 
     def force_takeover(self, device_id, expected_generation, new_generation, runtime_instance_id, now, expires_at,
-                       *, expected_runtime_instance_id, expected_session_token_hash, actor_id, reason) -> RuntimeSession:
+                       *, expected_runtime_instance_id, expected_session_token_hash, actor_id, reason, require_registration=False) -> RuntimeSession:
         """Called only behind the user-authenticated takeover Capability.
 
         The expected identity/hash is the provider's previously read snapshot,
@@ -197,8 +268,17 @@ class SimulationConnectorRepository:
                 raise ConnectorRepositoryError("runtime_session_conflict")
             if self._has_unresolved_plans(cursor, device_id):
                 raise ConnectorRepositoryError("runtime_plans_unresolved")
-            return self._install_runtime_session(cursor, row, new_generation, runtime_instance_id,
+            installed = self._install_runtime_session(cursor, row, new_generation, runtime_instance_id,
                 now, expires_at, event="force_takeover", actor_id=actor_id, reason=reason)
+            self._runtime_audit(cursor, row, 'takeover_prior_session', now, actor_id=actor_id, reason=reason,
+                                recovery_instance_id=runtime_instance_id)
+            if require_registration:
+                cursor.execute('UPDATE workmanship_sim_connector_runtime_devices SET session_expires_at=%s,takeover_instance_id=%s '
+                    'WHERE device_id=%s AND runtime_generation=%s AND current_runtime_instance_id=%s AND session_token_hash=%s',
+                    (now, runtime_instance_id, device_id, new_generation, runtime_instance_id, hashlib.sha256(installed.session_token.encode()).hexdigest()))
+                if cursor.rowcount != 1:
+                    raise ConnectorRepositoryError('runtime_session_conflict')
+            return installed
 
     def register_reconciliation_session(self, device_id, generation, recovery_instance_id, plan_id,
                                         token_hash, expires_at, *, now=None) -> dict:
