@@ -17,7 +17,7 @@ public static class ProtocolV2Signatures
     {
         ProtocolV2Schema.Require(value.ValueKind == JsonValueKind.Object, "object_required");
         var projected = value.EnumerateObject().Where(p => !excluded.Contains(p.Name)).ToDictionary(p => p.Name, p => p.Value);
-        return CanonicalJsonV2.Serialize(JsonSerializer.SerializeToElement(projected));
+        return CanonicalJsonV2.Serialize(JsonSerializer.SerializeToElement(projected, CanonicalJsonV2.SerializerOptions));
     }
     internal static string Encode(byte[] bytes) => Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
     internal static byte[] Decode(string value, int length)
@@ -68,7 +68,7 @@ public static class ProtocolV2Signatures
     internal static JsonElement PublicJwk(ECDsa key)
     {
         var parameters = key.ExportParameters(false);
-        return JsonSerializer.SerializeToElement(new { kty = "EC", crv = "P-256", x = Encode(parameters.Q.X!), y = Encode(parameters.Q.Y!) });
+        return JsonSerializer.SerializeToElement(new { kty = "EC", crv = "P-256", x = Encode(parameters.Q.X!), y = Encode(parameters.Q.Y!) }, CanonicalJsonV2.SerializerOptions);
     }
 }
 
@@ -81,12 +81,12 @@ public static class OutcomeV2Signer
     {
         var original = CanonicalJsonV2.Parse(unsignedJson);
         ProtocolV2Schema.Require(original.ValueKind == JsonValueKind.Object && !original.TryGetProperty("signature", out _), "unsigned_outcome_required");
-        var value = JsonNode.Parse(original.GetRawText())!.AsObject();
+        var value = JsonNode.Parse(original.GetRawText(), documentOptions: CanonicalJsonV2.DocumentOptions)!.AsObject();
         var placeholder = new byte[64]; placeholder[31] = placeholder[63] = 1;
         value["signature"] = ProtocolV2Signatures.Encode(placeholder);
-        var validated = CanonicalJsonV2.Parse(value.ToJsonString());
+        var validated = CanonicalJsonV2.Parse(value.ToJsonString(CanonicalJsonV2.SerializerOptions));
         ProtocolV2Schema.Outcome(validated);
         value["signature"] = sign(ProtocolV2Signatures.Project(validated, "signature"));
-        return Encoding.UTF8.GetString(CanonicalJsonV2.Serialize(value.ToJsonString()));
+        return Encoding.UTF8.GetString(CanonicalJsonV2.Serialize(value.ToJsonString(CanonicalJsonV2.SerializerOptions)));
     }
 }

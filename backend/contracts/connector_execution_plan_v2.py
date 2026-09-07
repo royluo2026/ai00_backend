@@ -20,6 +20,8 @@ PROTOCOL_V2 = "ai00.connector.execution-plan.v2"
 SIGNATURE_ALGORITHM = "ecdsa-p256-sha256"
 P256_ORDER = 0xFFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551
 SAFE_INTEGER_MAX = (1 << 53) - 1
+# Every object/array counts, including the root as 1; scalars add no depth.
+MAX_JSON_DEPTH = 64
 
 IDENTITY_PATTERN = r"^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$"
 CAPABILITY_PATTERN = r"^[a-z][a-z0-9_.-]{2,127}$"
@@ -31,6 +33,21 @@ TIMESTAMP_PATTERN = re.compile(
     r"^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])"
     r"T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\.[0-9]{1,7})?Z$"
 )
+
+
+def _validate_json_depth(value: Any, depth: int = 0) -> None:
+    if isinstance(value, BaseModel):
+        children = (getattr(value, field) for field in type(value).model_fields)
+    elif isinstance(value, Mapping):
+        children = value.values()
+    elif isinstance(value, list):
+        children = value
+    else:
+        return
+    if depth >= MAX_JSON_DEPTH:
+        raise ValueError("json_max_depth_exceeded")
+    for item in children:
+        _validate_json_depth(item, depth + 1)
 
 
 def _validate_json(value: Any) -> Any:
@@ -122,6 +139,7 @@ def _canonical_float(value: float) -> str:
 
 def canonicalize_v2(value: Any) -> bytes:
     """Return RFC 8785 UTF-8 bytes for values accepted by the protocol schema."""
+    _validate_json_depth(value)
     if isinstance(value, BaseModel):
         value = value.model_dump(mode="json")
     _validate_json(value)
@@ -129,6 +147,7 @@ def canonicalize_v2(value: Any) -> bytes:
 
 
 def _wire_mapping(value: Mapping[str, Any] | BaseModel) -> Mapping[str, Any]:
+    _validate_json_depth(value)
     return value.model_dump(mode="json") if isinstance(value, BaseModel) else value
 
 
@@ -206,6 +225,12 @@ class _ClosedModel(BaseModel):
     model_config = ConfigDict(
         extra="forbid", strict=True, frozen=True, revalidate_instances="always",
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def verify_json_depth(cls, value: Any) -> Any:
+        _validate_json_depth(value)
+        return value
 
 
 class ConnectorTargetProductV2(_ClosedModel):
@@ -396,7 +421,7 @@ def verify_outcome_signature(
 
 __all__ = [
     "ConnectorExecutionPlanV2", "ConnectorPlanOutcomeV2", "ConnectorStepResultV2",
-    "ConnectorStepV2", "ConnectorTargetProductV2", "PROTOCOL_V2", "SIGNATURE_ALGORITHM",
+    "ConnectorStepV2", "ConnectorTargetProductV2", "PROTOCOL_V2", "SIGNATURE_ALGORITHM", "MAX_JSON_DEPTH",
     "canonicalize_v2", "compute_plan_hash", "outcome_signature_bytes",
     "plan_signature_bytes", "verify_outcome_signature", "verify_plan_signature",
 ]

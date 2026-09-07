@@ -216,3 +216,47 @@ def test_mutating_any_signed_top_level_plan_binding_is_rejected(vector):
             mutated[field] = None
         with pytest.raises(ValidationError):
             ConnectorExecutionPlanV2.model_validate(mutated)
+
+
+def _nested_containers(depth, *, object_root):
+    value = 0
+    for _ in range(depth):
+        value = {"nested": value} if object_root else [value]
+    return value
+
+
+@pytest.mark.parametrize("object_root", [False, True])
+def test_json_depth_counts_root_array_and_object_as_one(object_root):
+    accepted = _nested_containers(64, object_root=object_root)
+    assert canonicalize_v2(accepted) == json.dumps(accepted, separators=(",", ":")).encode()
+    with pytest.raises(ValueError, match="json_max_depth_exceeded"):
+        canonicalize_v2(_nested_containers(65, object_root=object_root))
+
+
+@pytest.mark.parametrize("record_name,field", [("plan", "payload"), ("outcome", "result")])
+@pytest.mark.parametrize("object_root", [False, True])
+def test_plan_and_outcome_depth_includes_record_steps_array_and_step(vector, record_name, field, object_root):
+    model = ConnectorExecutionPlanV2 if record_name == "plan" else ConnectorPlanOutcomeV2
+    for total_depth in (64, 65):
+        raw = deepcopy(vector[record_name])
+        # Record object + steps array + step object = three enclosing containers.
+        raw["steps"][0][field] = _nested_containers(total_depth - 3, object_root=object_root)
+        raw["steps"][0][field + "_hash"] = "sha256:" + hashlib.sha256(
+            canonicalize_v2(raw["steps"][0][field])
+        ).hexdigest()
+        if record_name == "plan":
+            # Independent ASCII-only projection also constructs an invalid-depth input
+            # without depending on the production canonicalizer accepting it.
+            projected = {key: value for key, value in raw.items() if key not in {"plan_hash", "signature"}}
+            raw["plan_hash"] = hashlib.sha256(json.dumps(projected, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        if total_depth == 64:
+            parsed = model.model_validate(raw)
+            assert json.loads(canonicalize_v2(parsed)) == raw
+            assert model.model_validate_json(json.dumps(raw)).model_dump(mode="json") == raw
+        else:
+            with pytest.raises(ValidationError, match="json_max_depth_exceeded"):
+                model.model_validate(raw)
+            with pytest.raises(ValidationError, match="json_max_depth_exceeded"):
+                model.model_validate_json(json.dumps(raw))
+            with pytest.raises(ValueError, match="json_max_depth_exceeded"):
+                canonicalize_v2(raw)

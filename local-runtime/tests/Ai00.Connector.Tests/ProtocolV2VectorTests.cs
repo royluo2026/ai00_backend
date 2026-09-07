@@ -205,6 +205,64 @@ public sealed class ProtocolV2VectorTests
         Assert.Throws<ProtocolV2Exception>(() => OutcomeV2Signer.Sign(Json(outcome), key));
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void JcsDepthCountsRootArrayAndObjectAsOne(bool objectRoot)
+    {
+        var accepted = NestedContainers(64, objectRoot);
+        Assert.Equal(accepted, Encoding.UTF8.GetString(CanonicalJsonV2.Serialize(accepted)));
+        var rejected = NestedContainers(65, objectRoot);
+        Assert.Throws<ProtocolV2Exception>(() => CanonicalJsonV2.Serialize(rejected));
+        using var document = JsonDocument.Parse(rejected, new JsonDocumentOptions { MaxDepth = 128 });
+        Assert.Throws<ProtocolV2Exception>(() => CanonicalJsonV2.Serialize(document.RootElement));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void PlanAndOutcomeDepthIncludesRecordStepsArrayAndStep(bool objectRoot)
+    {
+        var v = Vector;
+        var plan = v["plan"]!.DeepClone().AsObject();
+        var payload = NestedContainers(61, objectRoot);
+        plan["steps"]![0]!["payload"] = JsonNode.Parse(payload);
+        plan["steps"]![0]!["payload_hash"] = "sha256:" + Hash(Encoding.UTF8.GetBytes(payload));
+        using var planKey = TestKey("plan");
+        SignPlan(plan, planKey);
+        var planJson = Json(plan);
+        ExecutionPlanV2.ParseAndVerify(planJson, Json(v["plan_public_jwk"]));
+        Assert.Equal(64, ContainerDepth(JsonDocument.Parse(planJson).RootElement));
+        var tooDeepPlan = planJson.Replace(payload, NestedContainers(62, objectRoot), StringComparison.Ordinal);
+        Assert.Throws<ProtocolV2Exception>(() => ExecutionPlanV2.ParseAndVerify(tooDeepPlan, Json(v["plan_public_jwk"])));
+        Assert.Throws<ProtocolV2Exception>(() => ProtocolV2Signatures.PlanHashBytes(tooDeepPlan));
+        Assert.Throws<ProtocolV2Exception>(() => ProtocolV2Signatures.SignatureBytes(tooDeepPlan));
+
+        var outcome = v["outcome"]!.DeepClone().AsObject();
+        outcome.Remove("signature");
+        outcome["steps"]![0]!["result"] = JsonNode.Parse(payload);
+        outcome["steps"]![0]!["result_hash"] = "sha256:" + Hash(Encoding.UTF8.GetBytes(payload));
+        using var outcomeKey = TestKey("device");
+        var signed = OutcomeV2Signer.Sign(Json(outcome), outcomeKey);
+        OutcomeV2.ParseAndVerify(signed, Json(v["device_public_jwk"]));
+        Assert.Equal(64, ContainerDepth(JsonDocument.Parse(signed).RootElement));
+        var tooDeepOutcome = Json(outcome).Replace(payload, NestedContainers(62, objectRoot), StringComparison.Ordinal);
+        Assert.Throws<ProtocolV2Exception>(() => OutcomeV2Signer.Sign(tooDeepOutcome, outcomeKey));
+        Assert.Throws<ProtocolV2Exception>(() => OutcomeV2.ParseAndVerify(
+            signed.Replace(payload, NestedContainers(62, objectRoot), StringComparison.Ordinal), Json(v["device_public_jwk"])));
+    }
+
+    private static string NestedContainers(int depth, bool objectRoot) =>
+        string.Concat(Enumerable.Repeat(objectRoot ? "{\"nested\":" : "[", depth)) + "0" +
+        string.Concat(Enumerable.Repeat(objectRoot ? "}" : "]", depth));
+
+    private static int ContainerDepth(JsonElement value) => value.ValueKind switch
+    {
+        JsonValueKind.Object => 1 + value.EnumerateObject().Select(p => ContainerDepth(p.Value)).DefaultIfEmpty(0).Max(),
+        JsonValueKind.Array => 1 + value.EnumerateArray().Select(ContainerDepth).DefaultIfEmpty(0).Max(),
+        _ => 0,
+    };
+
     internal static readonly BigInteger Order = BigInteger.Parse("0FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551", System.Globalization.NumberStyles.HexNumber);
     internal static byte[] Decode(string value) => Convert.FromBase64String(value.Replace('-', '+').Replace('_', '/') + new string('=', (4 - value.Length % 4) % 4));
     internal static string Encode(byte[] value) => Convert.ToBase64String(value).TrimEnd('=').Replace('+', '-').Replace('/', '_');

@@ -8,6 +8,11 @@ namespace Ai00.Connector.Contracts.V2;
 
 public static class CanonicalJsonV2
 {
+    // Protocol MAX_JSON_DEPTH: root object/array counts as 1; scalars add no depth.
+    public const int MaxJsonDepth = 64;
+    internal static JsonDocumentOptions DocumentOptions => new() { MaxDepth = MaxJsonDepth };
+    internal static readonly JsonSerializerOptions SerializerOptions = new() { MaxDepth = MaxJsonDepth };
+
     public static byte[] Serialize(string json) => Serialize(Parse(json));
 
     public static byte[] Serialize(JsonElement value)
@@ -24,7 +29,7 @@ public static class CanonicalJsonV2
         try
         {
             ValidateUnicode(json);
-            using var document = JsonDocument.Parse(json);
+            using var document = JsonDocument.Parse(json, DocumentOptions);
             var value = document.RootElement.Clone();
             // Validate arbitrary payloads too, before any schema projection loses information.
             Serialize(value);
@@ -37,8 +42,10 @@ public static class CanonicalJsonV2
     public static string Hash(JsonElement value) => "sha256:" + HexHash(Serialize(value));
     internal static string HexHash(byte[] value) => Convert.ToHexString(SHA256.HashData(value)).ToLowerInvariant();
 
-    private static void Write(StringBuilder text, JsonElement value)
+    private static void Write(StringBuilder text, JsonElement value, int depth = 0)
     {
+        if (value.ValueKind is JsonValueKind.Object or JsonValueKind.Array && ++depth > MaxJsonDepth)
+            throw new ProtocolV2Exception("json_max_depth_exceeded");
         switch (value.ValueKind)
         {
             case JsonValueKind.Object:
@@ -50,7 +57,7 @@ public static class CanonicalJsonV2
                     if (seen.Count > 1) text.Append(',');
                     WriteString(text, property.Name);
                     text.Append(':');
-                    Write(text, property.Value);
+                    Write(text, property.Value, depth);
                 }
                 text.Append('}');
                 break;
@@ -61,7 +68,7 @@ public static class CanonicalJsonV2
                 {
                     if (!first) text.Append(',');
                     first = false;
-                    Write(text, item);
+                    Write(text, item, depth);
                 }
                 text.Append(']');
                 break;
