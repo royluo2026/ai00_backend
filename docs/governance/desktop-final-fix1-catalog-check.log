@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "E:\Projects\ai00_v3\.worktrees\orchestration-merge-backend-20260905\backend\scripts\build_capability_catalog.py", line 302, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "E:\Projects\ai00_v3\.worktrees\orchestration-merge-backend-20260905\backend\scripts\build_capability_catalog.py", line 256, in main
+    release = current_release()
+              ^^^^^^^^^^^^^^^^^
+  File "E:\Projects\ai00_v3\.worktrees\orchestration-merge-backend-20260905\backend\scripts\build_capability_catalog.py", line 215, in current_release
+    return build_release(
+           ^^^^^^^^^^^^^^
+  File "E:\Projects\ai00_v3\.worktrees\orchestration-merge-backend-20260905\backend\capability_v2\catalog.py", line 276, in build_release
+    _validate_collection_boundaries(
+  File "E:\Projects\ai00_v3\.worktrees\orchestration-merge-backend-20260905\backend\capability_v2\catalog.py", line 253, in _validate_collection_boundaries
+    raise ValueError("; ".join(sorted(errors)))
+ValueError: unbounded stable collection: knowledge.document.acl.list@1 output_schema.items; unbounded stable collection: knowledge.get@1 output_schema.attachments; unbounded stable collection: knowledge.get@1 output_schema.related_operation_gids; unbounded stable collection: knowledge.get@1 output_schema.related_part_nos; unbounded stable collection: knowledge.get@1 output_schema.tags; unbounded stable collection: knowledge.migration.status@1 output_schema.items; unbounded stable collection: knowledge.migration.status@1 output_schema.runs; unbounded stable collection: knowledge.proposal.get@1 output_schema.tags; unbounded stable collection: knowledge.proposal.list@1 output_schema.items[].tags; unbounded stable collection: knowledge.proposal.review@1 output_schema.tags; unbounded stable collection: knowledge.propose@1 output_schema.tags; unbounded stable collection: knowledge.search@1 output_schema.items[].attachments; unbounded stable collection: knowledge.search@1 output_schema.items[].related_operation_gids; unbounded stable collection: knowledge.search@1 output_schema.items[].related_part_nos; unbounded stable collection: knowledge.search@1 output_schema.items[].tags; unbounded stable collection: knowledge.space.search@1 output_schema.items

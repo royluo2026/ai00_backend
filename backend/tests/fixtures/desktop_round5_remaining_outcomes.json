@@ -352,7 +352,7 @@
           "gid": "template-created"
         },
         "operation_ref": {
-          "operation_id": "op_c7787643f194486bbb5116ec35dad5e2",
+          "operation_id": "op_e6276831aba94118ad3506219f52ee10",
           "status": "completed",
           "version": 1
         },
@@ -524,7 +524,7 @@
           "gid": "template-created"
         },
         "operation_ref": {
-          "operation_id": "op_0dc9de58130643628a44df964ec8db76",
+          "operation_id": "op_cc5a2c841e8c40f39c0b202446eb59fc",
           "status": "completed",
           "version": 1
         },
@@ -1168,7 +1168,7 @@
       },
       "provider_data": {
         "artifact_ref": {
-          "artifact_id": "artifact_891121a2f99d581e9139c9c83c034e50",
+          "artifact_id": "artifact_30dc6edce09452189997a0716d269af4",
           "media_type": "image/png",
           "sha256": "bd54b02fae14b6b9ed73887ded339b8ef846fbcba0d4e5f9d95470ac23ade242",
           "byte_size": 15,
@@ -1259,7 +1259,7 @@
         "major_version": 1,
         "data": {
           "artifact_ref": {
-            "artifact_id": "artifact_891121a2f99d581e9139c9c83c034e50",
+            "artifact_id": "artifact_30dc6edce09452189997a0716d269af4",
             "media_type": "image/png",
             "sha256": "bd54b02fae14b6b9ed73887ded339b8ef846fbcba0d4e5f9d95470ac23ade242",
             "byte_size": 15,

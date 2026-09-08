@@ -4,10 +4,10 @@
   "consumer_type": "web",
   "transport_classification": "authenticated interactive Gateway; single Windows x64 App product",
   "source_basis": "immutable Git commit tree; not a promoted release candidate",
-  "source_commit": "4353070c39266c53ba0e8336674f05aa61c21979",
-  "source_tree": "21bc488e8cfd6b3ec87d137e6f8611b511b2aa16",
+  "source_commit": "5eb7637c063371eefe52f2852082f8c765a8447b",
+  "source_tree": "8dc1d86f1f7fee9a07dcc759ad4508fe85500e2a",
   "source_hash_format": "exact Git blob bytes (no working directory normalization)",
-  "source_set_hash": "sha256:1629bead2f1a2a918a337782ff682d408e9f41bd337dbb08876ce6a1c8603c1d",
+  "source_set_hash": "sha256:bbb8c91c65f89fdc6e4bfa7a19a3ea881351b437a8c796f9d02d05e75ed7f93d",
   "published_catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
   "published_catalog_hash": "sha256:09e54550fcbaaab2df24bfa28d2c2478d9d47f455a27563405bce365efb2e2fd",
   "published_catalog_current": false,
@@ -13211,8 +13211,8 @@
     },
     {
       "path": "backend/platform_sdk/historical_artifacts.py",
-      "git_blob_oid": "334af77013e92c7ff004b219d4a4f0cc549740cd",
-      "sha256": "sha256:ad7a16e39ac585ca8d62b4bf8f3448617d04e5510514a8ee340da7e2877252b7"
+      "git_blob_oid": "70e01542611ec550aa12a1df23b5519c839102b4",
+      "sha256": "sha256:3e4e50778afae7abce43e98e90b72228d6b611c474bfab8377896ec3a4ce5ffb"
     },
     {
       "path": "backend/platform_sdk/identity.py",

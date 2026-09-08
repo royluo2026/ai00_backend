@@ -85,7 +85,7 @@
           }
         },
         "operation_ref": {
-          "operation_id": "op_e055bc46b2f04f02944bc185373739a4",
+          "operation_id": "op_79381bcc5390484b93b5ca774b2562dc",
           "status": "completed",
           "version": 1
         },
@@ -190,7 +190,7 @@
           "success": true
         },
         "operation_ref": {
-          "operation_id": "op_96aeb6bd3ada4aa6a61a07a996f684aa",
+          "operation_id": "op_777bb8331a0846068b513ba21b77cc0e",
           "status": "completed",
           "version": 1
         },
@@ -276,7 +276,7 @@
           "success": true
         },
         "operation_ref": {
-          "operation_id": "op_92b2c24d626d46df9a4486b15cd761ad",
+          "operation_id": "op_74f2fd0288354219b305524d17707458",
           "status": "completed",
           "version": 1
         },
@@ -532,7 +532,7 @@
           "success": true
         },
         "operation_ref": {
-          "operation_id": "op_5da49ec28d724b27b0bcb20864a36db3",
+          "operation_id": "op_1976cf1c17794070b82583ff16744cd7",
           "status": "completed",
           "version": 1
         },
@@ -625,7 +625,7 @@
           "success": true
         },
         "operation_ref": {
-          "operation_id": "op_c8595218a3204e40a47d4bf3615112d0",
+          "operation_id": "op_d166861c0ff54c35b631f8c6c9ec87e4",
           "status": "completed",
           "version": 1
         },
@@ -683,35 +683,35 @@
           "updated_at": null,
           "is_active": true,
           "permissions": [
-            "knowledge.manage",
-            "digital_model.use",
-            "feishu.view",
-            "system.app_config",
-            "knowledge.write",
-            "factory.write",
-            "knowledge.read",
-            "rule.view",
-            "agent.read",
-            "factory.read",
-            "knowledge.view",
             "craft.write_direct",
-            "craft.write",
-            "system.tech_config",
-            "craft.read",
-            "project.manage_any",
-            "template.view",
-            "project.view",
-            "simulation.use",
-            "approval.approve",
-            "approval.submit",
-            "system.plugin.manage",
-            "craft.write_draft",
-            "project.create",
-            "agent.interact",
-            "system.user.manage",
-            "template.manage",
+            "agent.read",
+            "rule.view",
+            "knowledge.manage",
             "craft.view",
-            "rule.manage"
+            "factory.write",
+            "feishu.view",
+            "knowledge.write",
+            "digital_model.use",
+            "project.manage_any",
+            "system.tech_config",
+            "project.view",
+            "approval.approve",
+            "craft.write",
+            "agent.interact",
+            "craft.write_draft",
+            "knowledge.view",
+            "system.user.manage",
+            "knowledge.read",
+            "project.create",
+            "approval.submit",
+            "craft.read",
+            "simulation.use",
+            "rule.manage",
+            "system.app_config",
+            "template.view",
+            "template.manage",
+            "system.plugin.manage",
+            "factory.read"
           ],
           "visible_panels": [
             "appearance",
@@ -927,35 +927,35 @@
             "updated_at": null,
             "is_active": true,
             "permissions": [
-              "knowledge.manage",
-              "digital_model.use",
-              "feishu.view",
-              "system.app_config",
-              "knowledge.write",
-              "factory.write",
-              "knowledge.read",
-              "rule.view",
-              "agent.read",
-              "factory.read",
-              "knowledge.view",
               "craft.write_direct",
-              "craft.write",
-              "system.tech_config",
-              "craft.read",
-              "project.manage_any",
-              "template.view",
-              "project.view",
-              "simulation.use",
-              "approval.approve",
-              "approval.submit",
-              "system.plugin.manage",
-              "craft.write_draft",
-              "project.create",
-              "agent.interact",
-              "system.user.manage",
-              "template.manage",
+              "agent.read",
+              "rule.view",
+              "knowledge.manage",
               "craft.view",
-              "rule.manage"
+              "factory.write",
+              "feishu.view",
+              "knowledge.write",
+              "digital_model.use",
+              "project.manage_any",
+              "system.tech_config",
+              "project.view",
+              "approval.approve",
+              "craft.write",
+              "agent.interact",
+              "craft.write_draft",
+              "knowledge.view",
+              "system.user.manage",
+              "knowledge.read",
+              "project.create",
+              "approval.submit",
+              "craft.read",
+              "simulation.use",
+              "rule.manage",
+              "system.app_config",
+              "template.view",
+              "template.manage",
+              "system.plugin.manage",
+              "factory.read"
             ],
             "visible_panels": [
               "appearance",
@@ -1176,7 +1176,7 @@
           "success": true
         },
         "operation_ref": {
-          "operation_id": "op_dcdf8143ea4d4de9be5ce2f39bc55b72",
+          "operation_id": "op_654dcbfe916b4cacb7a5e69535b2f766",
           "status": "completed",
           "version": 1
         },
@@ -1395,7 +1395,7 @@
           "success": true
         },
         "operation_ref": {
-          "operation_id": "op_69b663a29db14738919803f93ef90f96",
+          "operation_id": "op_33c298969ea74d76b092185bd87eee61",
           "status": "completed",
           "version": 1
         },
@@ -1491,7 +1491,7 @@
           "success": true
         },
         "operation_ref": {
-          "operation_id": "op_48c2ca72b2004a80bf98c2f2c7ac05c5",
+          "operation_id": "op_182189ce7a12454a88316d3e5f02a4a4",
           "status": "completed",
           "version": 1
         },
@@ -1584,7 +1584,7 @@
           "success": true
         },
         "operation_ref": {
-          "operation_id": "op_3c73822130ce4f8c92256408b0df7b8c",
+          "operation_id": "op_b4d95cd8f81c43b7a423bdc98f38ce27",
           "status": "completed",
           "version": 1
         },
@@ -1779,7 +1779,7 @@
           "success": true
         },
         "operation_ref": {
-          "operation_id": "op_ba65736c9ebc49bd8aba6de7a30e22c5",
+          "operation_id": "op_6b7d10662b8a451c9accacf48f55e846",
           "status": "completed",
           "version": 1
         },
@@ -1865,7 +1865,7 @@
           "success": true
         },
         "operation_ref": {
-          "operation_id": "op_2905f56240ac43cd972b792f9d9760ee",
+          "operation_id": "op_d8a8e06dc7ab4754bb07535744cce12a",
           "status": "completed",
           "version": 1
         },
@@ -2044,7 +2044,7 @@
           "success": true
         },
         "operation_ref": {
-          "operation_id": "op_64459ce0ac8d4cf49f71a7557d5c2bcc",
+          "operation_id": "op_da580301804e4597a8f3929e2f26fdb5",
           "status": "completed",
           "version": 1
         },
@@ -2168,7 +2168,7 @@
           "success": true
         },
         "operation_ref": {
-          "operation_id": "op_8836657163d84147bbfd4b7bd5ea4105",
+          "operation_id": "op_5f5e64d602ad46da895e746e47bfce4a",
           "status": "completed",
           "version": 1
         },
@@ -2308,7 +2308,7 @@
           "msg": "连接成功"
         },
         "operation_ref": {
-          "operation_id": "op_019d9f1af0fc4f43b82b29fa89799b60",
+          "operation_id": "op_7ca400ecc053456e96b7e8330fc965de",
           "status": "completed",
           "version": 1
         },
@@ -2665,7 +2665,7 @@
           "success": true
         },
         "operation_ref": {
-          "operation_id": "op_64fe23a517794596adcdc4a88d4a6086",
+          "operation_id": "op_96cf2f13772b46e9a2c2f70b78092c83",
           "status": "completed",
           "version": 1
         },
@@ -2760,7 +2760,7 @@
           "success": true
         },
         "operation_ref": {
-          "operation_id": "op_c94eebf4337e43a281e88b5c195e0739",
+          "operation_id": "op_36494cf4324c49b8ba7424fd45e8ca75",
           "status": "completed",
           "version": 1
         },
@@ -3648,7 +3648,7 @@
           "success": true
         },
         "operation_ref": {
-          "operation_id": "op_5ec2f750f4f74fc4b3f5aa24f4b04b0e",
+          "operation_id": "op_d8f516b171da48a48f65e54ff1ee4c89",
           "status": "completed",
           "version": 1
         },

@@ -1,0 +1,9 @@
+[file_store] save_config called, keys=['endpoint', 'access_key', 'secret_key', 'bucket'], user_role=super_admin
+[file_store] _save_db_config OK
+[ois-config] 当前用户 role=super_admin
+[ois-config] 解析后: identify='fixture' ois3_url='https://ois.invalid' env=''
+[ois-config] 写入 DB key=ois_config ...
+[ois-config] 写入 DB 成功
+[DOC_SEARCH] q='Fixture' user_gid=fixture- has_token=True
+[DOC_SEARCH] realtime=1
+78 unpublished candidates; 89 actual owner -> Gateway outcomes

@@ -11,7 +11,7 @@
       },
       "provider_data": {
         "artifact_ref": {
-          "artifact_id": "artifact_60988e5867aa55448f92bb724d872837",
+          "artifact_id": "artifact_be73e93a00285424a26a67225b3d0d5b",
           "media_type": "text/markdown",
           "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
           "byte_size": 22,
@@ -109,7 +109,7 @@
         "major_version": 1,
         "data": {
           "artifact_ref": {
-            "artifact_id": "artifact_60988e5867aa55448f92bb724d872837",
+            "artifact_id": "artifact_be73e93a00285424a26a67225b3d0d5b",
             "media_type": "text/markdown",
             "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
             "byte_size": 22,
@@ -143,7 +143,7 @@
       },
       "provider_data": {
         "artifact_ref": {
-          "artifact_id": "artifact_98dfd2a9377453df9e98152a3fb6bb75",
+          "artifact_id": "artifact_21f20f0fcc425402a43ac9989ca8d448",
           "media_type": "text/markdown",
           "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
           "byte_size": 22,
@@ -241,7 +241,7 @@
         "major_version": 1,
         "data": {
           "artifact_ref": {
-            "artifact_id": "artifact_98dfd2a9377453df9e98152a3fb6bb75",
+            "artifact_id": "artifact_21f20f0fcc425402a43ac9989ca8d448",
             "media_type": "text/markdown",
             "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
             "byte_size": 22,
@@ -275,7 +275,7 @@
       },
       "provider_data": {
         "artifact_ref": {
-          "artifact_id": "artifact_f69dbe0a9dc856378d14afda1b6b6919",
+          "artifact_id": "artifact_2d5192e9c0b250b9bc14847ef49d359c",
           "media_type": "text/markdown",
           "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
           "byte_size": 22,
@@ -373,7 +373,7 @@
         "major_version": 1,
         "data": {
           "artifact_ref": {
-            "artifact_id": "artifact_f69dbe0a9dc856378d14afda1b6b6919",
+            "artifact_id": "artifact_2d5192e9c0b250b9bc14847ef49d359c",
             "media_type": "text/markdown",
             "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
             "byte_size": 22,
@@ -407,7 +407,7 @@
       },
       "provider_data": {
         "artifact_ref": {
-          "artifact_id": "artifact_72915275559a529d8c35fae474417aa1",
+          "artifact_id": "artifact_205a90b326c156a08fb26b1befdc7da2",
           "media_type": "text/markdown",
           "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
           "byte_size": 22,
@@ -505,7 +505,7 @@
         "major_version": 1,
         "data": {
           "artifact_ref": {
-            "artifact_id": "artifact_72915275559a529d8c35fae474417aa1",
+            "artifact_id": "artifact_205a90b326c156a08fb26b1befdc7da2",
             "media_type": "text/markdown",
             "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
             "byte_size": 22,
@@ -538,7 +538,7 @@
       },
       "provider_data": {
         "artifact_ref": {
-          "artifact_id": "artifact_6ca1b8cc2ab25d9ba9b126791d9c7a37",
+          "artifact_id": "artifact_184f5052825e5b3c9db10a273d102a78",
           "media_type": "image/png",
           "sha256": "bd54b02fae14b6b9ed73887ded339b8ef846fbcba0d4e5f9d95470ac23ade242",
           "byte_size": 15,
@@ -629,7 +629,7 @@
         "major_version": 1,
         "data": {
           "artifact_ref": {
-            "artifact_id": "artifact_6ca1b8cc2ab25d9ba9b126791d9c7a37",
+            "artifact_id": "artifact_184f5052825e5b3c9db10a273d102a78",
             "media_type": "image/png",
             "sha256": "bd54b02fae14b6b9ed73887ded339b8ef846fbcba0d4e5f9d95470ac23ade242",
             "byte_size": 15,
@@ -663,7 +663,7 @@
       },
       "provider_data": {
         "artifact_ref": {
-          "artifact_id": "artifact_2083beef9bae58a9bc183275e582fb00",
+          "artifact_id": "artifact_0cb217a03c775b6bb162ca767d92ee61",
           "media_type": "text/markdown",
           "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
           "byte_size": 22,
@@ -760,7 +760,7 @@
         "major_version": 1,
         "data": {
           "artifact_ref": {
-            "artifact_id": "artifact_2083beef9bae58a9bc183275e582fb00",
+            "artifact_id": "artifact_0cb217a03c775b6bb162ca767d92ee61",
             "media_type": "text/markdown",
             "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
             "byte_size": 22,
