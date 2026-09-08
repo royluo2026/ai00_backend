@@ -35,6 +35,12 @@ def main():
     capabilities.extend(registry.get(row[0],1).descriptor.model_dump(mode='json') for row in [*ARTIFACT_DEFINITIONS,*EXCHANGE_DEFINITIONS,*TEMPLATE_DEFINITIONS])
     register_desktop_vpps(registry)
     capabilities.append(registry.get(VPPS_ID,1).descriptor.model_dump(mode='json'))
+    from plugins.knowledge.knowledge_backend.capabilities.desktop_attachments import register_attachments
+    register_attachments(registry)
+    from plugins.craft.craft_backend.capabilities.desktop_attachments import register_attachments as register_craft_attachments
+    register_craft_attachments(registry)
+    for capability_id,version in [('project.task.change.apply.atomic.tasks_update',2),('project.issue.change.apply.atomic.issues_update',2),('project.attachment.resolve',1),('knowledge.attachment.resolve',1),('craft.attachment.resolve',1)]:
+        capabilities.append(registry.get(capability_id,version).descriptor.model_dump(mode='json'))
     value = {'status': 'unpublished_candidate', 'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'published_catalog_changed': False, 'machine_passed': False, 'human_approved': False, 'runtime_verified': False,
         'capabilities': capabilities, 'business_definition_hashes': {f"{d['id']}@{d['major_version']}": business_definition_hash(d) for d in capabilities},

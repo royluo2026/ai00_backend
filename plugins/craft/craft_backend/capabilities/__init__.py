@@ -166,7 +166,12 @@ def register_capabilities(registry: Any) -> None:
         original = registry.get(capability_id, 1)
         from .desktop_library_v2 import change_library_v2
         handler = change_library_v2 if capability_id == "craft.library.change.apply" else original.handler
-        native.register(original.spec.model_copy(update={"version": 2}), handler)
+        changes = {"version": 2}
+        if capability_id == "craft.rule.library.change.apply":
+            changes["permissions"] = ("rule.manage",)
+        native.register(original.spec.model_copy(update=changes), handler)
     versioned_resource_resolvers.register("craft.execution_plan", resolve_execution_plan_reference)
     from .desktop_exchange import register_desktop_exchange
     register_desktop_exchange(registry)
+    from .desktop_attachments import register_attachments
+    register_attachments(registry)

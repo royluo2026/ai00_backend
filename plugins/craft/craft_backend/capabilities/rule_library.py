@@ -140,12 +140,21 @@ def change_rule_library(payload: dict[str, Any], context: CapabilityContext) -> 
                 return CapabilityOutput(data={"success": True, "data": {"gid": new_gid}})
             if not gid:
                 raise ValueError("gid is required")
+            cur.execute("SELECT creator_gid,owner_user_gid,applicable_scope FROM workmanship_know_craft_rules WHERE gid=%s FOR UPDATE", (gid,))
+            owner = cur.fetchone()
+            scope = (owner or {}).get("applicable_scope") or {}
+            if isinstance(scope, str):
+                scope = json.loads(scope)
+            if (not owner or not context.team_gid or scope.get("team_gid") != context.team_gid
+                    or (not is_admin and context.user_gid not in {owner.get("creator_gid"), owner.get("owner_user_gid")})):
+                raise ValueError("rule not found or not permitted")
+            predicate = "gid=%s AND JSON_UNQUOTE(JSON_EXTRACT(applicable_scope, '$.team_gid'))=%s"
+            ownership = [gid, context.team_gid]
+            if not is_admin:
+                predicate += " AND (creator_gid=%s OR owner_user_gid=%s)"
+                ownership.extend([context.user_gid, context.user_gid])
             if operation == "delete":
-                sql = "DELETE FROM workmanship_know_craft_rules WHERE gid=%s"
-                params: list[Any] = [gid]
-                if not is_admin:
-                    sql += " AND creator_gid=%s"; params.append(context.user_gid)
-                cur.execute(sql, tuple(params))
+                cur.execute("DELETE FROM workmanship_know_craft_rules WHERE " + predicate, tuple(ownership))
                 if cur.rowcount == 0:
                     raise ValueError("rule not found or not permitted")
                 conn.commit()
@@ -154,8 +163,8 @@ def change_rule_library(payload: dict[str, Any], context: CapabilityContext) -> 
             if not updates:
                 raise ValueError("no update fields supplied")
             params = [json.dumps(value, ensure_ascii=False) if key == "rule_definition" and not isinstance(value, str) else value for key, value in updates.items()]
-            params.append(gid)
-            cur.execute(f"UPDATE workmanship_know_craft_rules SET {','.join(f'{key}=%s' for key in updates)},updated_at=NOW() WHERE gid=%s", tuple(params))
+            params.extend(ownership)
+            cur.execute(f"UPDATE workmanship_know_craft_rules SET {','.join(f'{key}=%s' for key in updates)},updated_at=NOW() WHERE {predicate}", tuple(params))
             if cur.rowcount == 0:
                 raise ValueError("rule not found")
         conn.commit()

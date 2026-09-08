@@ -20,3 +20,5 @@ def register_capabilities(registry: Any) -> None:
     register_reviewed_capabilities(registry)
     register_desktop_v2_capabilities(registry)
     register_desktop_capabilities(registry)
+    from .desktop_attachments import register_attachments
+    register_attachments(registry)

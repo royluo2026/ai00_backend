@@ -645,7 +645,7 @@ class ProjectManagementApplication:
         valid = {"any_change", "status_change", "comment_added", "resolved", "assigned_to_me", "mentioned"}
         if operation == "follows.list":
             rows = self._repository.list_follows(user_gid, str(arguments.get("item_type") or "") or None)
-            return {"success": True, "data": [{**row, "notify_on": _notify_conditions(row.get("notify_on"), valid), "created_at": str(row["created_at"])} for row in rows]}
+            return {"success": True, "data": [{**{key:value for key,value in row.items() if key != "user_gid"}, "notify_on": _notify_conditions(row.get("notify_on"), valid), "created_at": str(row["created_at"])} for row in rows]}
         if operation == "follows.check":
             row = self._repository.get_follow(user_gid, _required_text(arguments, "item_type"), _required_text(arguments, "item_gid"))
             return {"success": True, "data": ({"followed": True, "gid": row["gid"], "notify_on": _notify_conditions(row.get("notify_on"), valid)} if row else {"followed": False})}

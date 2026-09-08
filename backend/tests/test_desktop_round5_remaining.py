@@ -63,10 +63,14 @@ def execute_remaining_matrix(invoke=None):
         before=pc.execute.call_count;kc.fetchone.return_value=None
         with pytest.raises(Exception):registry.get('project.knowledge_comment.list',1).handler({'item_gid':'foreign'},ctx)
         assert pc.execute.call_count==before
-        picture,pic=sql();pic.fetchone.return_value={'gid':'version-one'}
+        picture,pic=sql();pic.fetchone.return_value={'gid':'version-one','owner_gid':ctx.user_gid,'shared_team_gid':ctx.team_gid}
         record={'storage':'ois','object_key':'owned/picture.png','url':''}
         pic.fetchall.return_value=[{'process_flow_pic':[record],'process_chart_pic':[]}]
         stack.enter_context(patch('plugins.craft.craft_backend.capabilities.desktop_pictures.get_craft_conn',return_value=picture))
+        from backend.tests.test_desktop_historical_attachments import LocalDatabase
+        index=LocalDatabase()
+        stack.enter_context(patch('backend.platform_sdk.historical_artifacts.get_conn',return_value=index))
+        stack.enter_context(patch('backend.platform_sdk.historical_artifacts.get_user_summaries',return_value={ctx.user_gid:{'team_id':ctx.team_gid}}))
         service=ArtifactService(InMemoryArtifactStore(),InMemoryObjectStorage())
         stack.enter_context(patch.object(artifacts,'artifact_service',return_value=service))
         image=b'\x89PNG\r\n\x1a\nfixture'

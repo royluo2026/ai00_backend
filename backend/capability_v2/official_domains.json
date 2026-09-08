@@ -90,7 +90,7 @@
         "plugin_id": "official.craft",
         "module": "craft_backend.capabilities",
         "version": "1.2.0",
-        "artifact_hash": "sha256:b021f37b9675fc94ff0f8261376a9722aff95f5b432eadf85d9e90b5855aaa3a"
+        "artifact_hash": "sha256:80bc6231ef1875b371ee3b95d3cf915f5891594a15bc41c769b7efb90cdb8f6a"
       },
       "artifact_path": "plugins/craft/craft_backend",
       "allowed_owners": [
@@ -224,7 +224,7 @@
         "plugin_id": "official.knowledge",
         "module": "knowledge_backend.capabilities",
         "version": "2.0.0",
-        "artifact_hash": "sha256:23093b87509833a8110c389df85c0d6e3a2f776c69e0d6f04222bee7e96f76be"
+        "artifact_hash": "sha256:41d049e9700e79f997f7464250f1936a39fb0caefbfac7cc7af0195025bda2d0"
       },
       "artifact_path": "plugins/knowledge/knowledge_backend",
       "allowed_owners": [
@@ -278,7 +278,7 @@
         "plugin_id": "official.project-management",
         "module": "project_management_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:b4768062c2db3ba881ef22248c6f1db0a278ba8efb89bcccc32b7070c77e7fed"
+        "artifact_hash": "sha256:e6f1f1a1d298d988b2a5f9e734846a3f2c4317b8d989608fa11889904a69eeb8"
       },
       "artifact_path": "plugins/project_management/project_management_backend",
       "allowed_owners": [

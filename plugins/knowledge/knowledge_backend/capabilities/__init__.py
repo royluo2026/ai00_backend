@@ -28,6 +28,8 @@ def register_capabilities(registry) -> None:
     register_reviewed_capabilities(registry)
     register_reference_data_capabilities(registry)
     register_resource_model_mapping_capability(registry)
+    from .desktop_attachments import register_attachments
+    register_attachments(registry)
 
 
 __all__ = ["register_capabilities"]

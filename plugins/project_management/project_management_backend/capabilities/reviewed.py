@@ -439,3 +439,7 @@ def register_desktop_v2_capabilities(registry: Any) -> None:
             "output_schema": _object({"data": _application_result(_WORK_ITEM)}, required=("data",)),
         })
         register_capability(registry, spec, original.handler)
+    # The immutable update v1 describes an empty data object. v2 describes the
+    # real application's success acknowledgement and a closed update command.
+    from .desktop_updates import register_updates
+    register_updates(registry)
