@@ -74,6 +74,8 @@ def execute_remaining_matrix(invoke=None):
         service=ArtifactService(InMemoryArtifactStore(),InMemoryObjectStorage())
         stack.enter_context(patch.object(artifacts,'artifact_service',return_value=service))
         image=b'\x89PNG\r\n\x1a\nfixture'
+        from backend.tests.test_desktop_historical_attachments import trust_fixture_upload
+        trust_fixture_upload(index,'ois','owned/picture.png',image,'image/png',[{'owner_domain':'craft','parent_type':'bop_version','parent_gid':'version-one'}],owner=ctx.user_gid,tenant=ctx.team_gid)
         read=stack.enter_context(patch('backend.core.ois_storage.get_immutable',return_value=image))
         result=call('craft.bop.picture.resolve',{'version_gid':'version-one','reference_hash':reference_hash(record)})
         assert artifacts.read_artifact(result['artifact_ref'],ctx)==image

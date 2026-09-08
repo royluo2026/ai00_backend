@@ -468,6 +468,11 @@
       "runtime_domain": "base"
     },
     {
+      "table": "workmanship_base_historical_uploads",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
       "table": "workmanship_base_legacy_artifact_bindings",
       "owner": "base",
       "runtime_domain": "base"

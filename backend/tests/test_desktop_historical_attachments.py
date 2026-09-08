@@ -15,8 +15,12 @@ class LocalDatabase:
     def __init__(self):
         self.db=sqlite3.connect(':memory:',check_same_thread=False);self.db.row_factory=sqlite3.Row;self.cursor_value=None
         self.db.executescript('''
-        CREATE TABLE workmanship_auth_users(gid TEXT PRIMARY KEY,name TEXT,avatar_url TEXT,team_id TEXT,is_active INTEGER);
-        INSERT INTO workmanship_auth_users VALUES('owner','Owner','','tenant',1);
+        CREATE TABLE workmanship_auth_users(gid TEXT PRIMARY KEY,name TEXT,avatar_url TEXT,team_id TEXT,is_active INTEGER,system_role TEXT DEFAULT 'member');
+        INSERT INTO workmanship_auth_users VALUES('owner','Owner','','tenant',1,'member');
+        INSERT INTO workmanship_auth_users VALUES('admin','Admin','','tenant',1,'super_admin');
+        CREATE TABLE workmanship_base_historical_uploads(object_hash TEXT PRIMARY KEY,storage_backend TEXT,object_key TEXT,tenant_gid TEXT,owner_gid TEXT,uploader_gid TEXT,sha256 TEXT,byte_size INTEGER,media_type TEXT,display_name TEXT,uploaded_at TEXT,parents_json TEXT,provenance_json TEXT);
+        CREATE TRIGGER historical_no_update BEFORE UPDATE ON workmanship_base_historical_uploads BEGIN SELECT RAISE(ABORT,'append-only'); END;
+        CREATE TRIGGER historical_no_delete BEFORE DELETE ON workmanship_base_historical_uploads BEGIN SELECT RAISE(ABORT,'append-only'); END;
         CREATE TABLE workmanship_base_legacy_artifact_bindings(binding_hash TEXT PRIMARY KEY,owner_domain TEXT,parent_type TEXT,parent_gid TEXT,tenant_gid TEXT,owner_gid TEXT,reader_gid TEXT,reference_hash TEXT,object_key TEXT,artifact_json TEXT);
         CREATE TABLE workmanship_proj_tasks(gid TEXT PRIMARY KEY,owner_user_gid TEXT,project_gid TEXT,share_scope TEXT,attachments TEXT,deleted_at TEXT,is_deleted INTEGER);
         CREATE TABLE workmanship_proj_issues AS SELECT * FROM workmanship_proj_tasks;
@@ -35,8 +39,31 @@ class LocalDatabase:
         sql=sql.replace('%s','?').replace(' FOR UPDATE','').replace(' ON DUPLICATE KEY UPDATE binding_hash=VALUES(binding_hash)',' ON CONFLICT(binding_hash) DO NOTHING')
         self.cursor_value=self.db.execute(sql,params);return self.cursor_value.rowcount
     def fetchone(self):
-        row=self.cursor_value.fetchone();return dict(row) if row else None
+        row=self.cursor_value.fetchone();row=dict(row) if row else None
+        if row and 'parents_json' in row:row['parents_json']=json.dumps(json.loads(row['parents_json']),sort_keys=True) # MySQL JSON normalizes stored formatting.
+        return row
     def fetchall(self):return [dict(row) for row in self.cursor_value.fetchall()]
+
+
+def trust_fixture_upload(db,backend,key,content,mime,parents,*,owner='owner',tenant='tenant'):
+    """Run the production signed importer, with only deployment key/identity SQL port fixtures."""
+    import base64,os
+    from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+    from backend.scripts.import_historical_upload_provenance import canonical,import_manifest
+    db.db.execute('INSERT OR IGNORE INTO workmanship_auth_users VALUES(?,?,?,?,?,?)',(owner,'Fixture','',''+tenant,1,'member'))
+    keypair=Ed25519PrivateKey.from_private_bytes(bytes(range(1,33)))
+    public=keypair.public_key().public_bytes(serialization.Encoding.PEM,serialization.PublicFormat.SubjectPublicKeyInfo).decode()
+    manifest={'schema_version':1,'signer_gid':'admin','signed_at':'2026-09-08T00:00:00+00:00','objects':[{
+        'storage_backend':backend,'object_key':key,'tenant_gid':tenant,'owner_gid':owner,'uploader_gid':owner,
+        'sha256':hashlib.sha256(content).hexdigest(),'byte_size':len(content),'media_type':mime,'display_name':key.rsplit('/',1)[-1],
+        'uploaded_at':'2026-09-01T00:00:00+00:00','parents':parents,'source_kind':'upload_transaction','source_ref':'fixture-original-upload-transaction'}]}
+    document={'manifest':manifest,'signature':base64.b64encode(keypair.sign(canonical(manifest))).decode()}
+    with patch.dict(os.environ,{'AI00_ATTACHMENT_BACKFILL_PUBLIC_KEY_PEM':public}),patch('backend.scripts.import_historical_upload_provenance.get_conn',return_value=db),patch('backend.platform_sdk.identity.get_conn',return_value=db):
+        assert import_manifest(document,apply=False)=={'objects':1,'inserted':0,'existing':0,'applied':False}
+        assert import_manifest(document,apply=True)=={'objects':1,'inserted':1,'existing':0,'applied':True}
+        assert import_manifest(document,apply=True)=={'objects':1,'inserted':0,'existing':1,'applied':True}
+    return document,public
 
 
 def execute_historical_matrix(invoke=None):
@@ -69,6 +96,10 @@ def execute_historical_matrix(invoke=None):
         stack.enter_context(patch('backend.core.ois_storage._get_ois_config',return_value={}))
         stack.enter_context(patch('backend.core.storage.get_immutable',return_value=content))
         cases=[('project','task','tasks-one',record),('project','issue','issues-one',record),('knowledge','entry','entry-one',record),('knowledge','item','item-one',{'url':'https://fixture-store.invalid/owned/document.md'}),('craft','bop_version','bop-one',photo),('craft','rule','rule-one',record)]
+        grant=lambda domain,kind,gid:{'owner_domain':domain,'parent_type':kind,'parent_gid':gid}
+        trust_fixture_upload(db,'ois','owned/document.md',content,'text/markdown',[grant('project_management','task','tasks-one'),grant('project_management','issue','issues-one'),grant('knowledge','entry','entry-one'),grant('craft','rule','rule-one')])
+        trust_fixture_upload(db,'minio','owned/document.md',content,'text/markdown',[grant('knowledge','item','item-one')])
+        trust_fixture_upload(db,'ois','owned/photo.png',picture,'image/png',[grant('craft','bop_version','bop-one')])
         for owner,kind,gid,stored in cases:
             name='craft.bop.picture.resolve' if kind=='bop_version' else owner+'.attachment.resolve'
             payload={'version_gid':gid,'reference_hash':reference_hash(stored)} if kind=='bop_version' else {'parent_type':kind,'parent_gid':gid,'reference_hash':reference_hash(stored)}
@@ -109,3 +140,50 @@ def test_historical_parent_rejects_cross_tenant_and_dangling_owner():
 def test_owner_sql_migration_is_idempotent_and_gateway_bound():
     from backend.tests.support.desktop_gateway_matrix import DesktopGatewayMatrix
     assert len(execute_historical_matrix(DesktopGatewayMatrix()))==6
+
+
+@pytest.mark.parametrize('backend',('minio','local'))
+@pytest.mark.parametrize('proof',('missing','foreign_tenant','foreign_owner','wrong_parent'))
+def test_owned_knowledge_item_cannot_launder_an_unregistered_foreign_object(backend,proof):
+    from backend.capability_v2.provider_contracts import CapabilityBusinessError
+    from backend.platform_sdk.historical_artifacts import reference_hash
+    from plugins.knowledge.knowledge_backend.capabilities.desktop_attachments import resolve_attachment
+    db=LocalDatabase();context=SimpleNamespace(user_gid='owner',team_gid='tenant',active_roles=('super_admin',))
+    url='https://fixture-store.invalid/foreign/private.md' if backend=='minio' else '/static/uploads/foreign/private.md'
+    if proof!='missing':
+        trust_fixture_upload(db,backend,'foreign/private.md',b'private foreign tenant content','text/markdown',[{'owner_domain':'knowledge','parent_type':'item','parent_gid':'other-item' if proof=='wrong_parent' else 'forged-item'}],owner='other' if proof in ('foreign_tenant','foreign_owner') else 'owner',tenant='foreign-tenant' if proof=='foreign_tenant' else 'tenant')
+    db.db.execute('INSERT INTO workmanship_know_items VALUES(?,?,?,?,?)',('forged-item','owner','tenant','personal',url))
+    service=ArtifactService(InMemoryArtifactStore(),InMemoryObjectStorage())
+    with ExitStack() as stack:
+        for target in ('backend.platform_sdk.historical_artifacts.get_conn','backend.platform_sdk.identity.get_conn','plugins.knowledge.knowledge_backend.capabilities.desktop_attachments.get_knowledge_conn'):
+            stack.enter_context(patch(target,return_value=db))
+        stack.enter_context(patch.object(artifacts,'artifact_service',return_value=service))
+        stack.enter_context(patch('backend.core.storage._get_minio_config',return_value={'public_url':'https://fixture-store.invalid'}))
+        stack.enter_context(patch('backend.core.ois_storage._get_ois_config',return_value={}))
+        read=stack.enter_context(patch('backend.core.storage.get_immutable',return_value=b'private foreign tenant content'))
+        with pytest.raises(CapabilityBusinessError) as rejected:
+            resolve_attachment({'parent_type':'item','parent_gid':'forged-item','reference_hash':reference_hash({'url':url})},context)
+        assert rejected.value.code=='object_ownership_unverified'
+        read.assert_not_called()
+        assert db.db.execute('SELECT COUNT(*) FROM workmanship_base_legacy_artifact_bindings').fetchone()[0]==0
+
+
+def test_signed_backfill_rejects_forgery_conflicts_and_mutable_provenance():
+    import copy,base64,os
+    from cryptography.exceptions import InvalidSignature
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+    from backend.scripts.import_historical_upload_provenance import canonical,import_manifest
+    db=LocalDatabase()
+    document,public=trust_fixture_upload(db,'ois','owned/fixture.md',b'fixture','text/markdown',[{'owner_domain':'knowledge','parent_type':'item','parent_gid':'item-one'}])
+    forged=copy.deepcopy(document);forged['manifest']['objects'][0]['owner_gid']='other'
+    with patch.dict(os.environ,{'AI00_ATTACHMENT_BACKFILL_PUBLIC_KEY_PEM':public}),patch('backend.scripts.import_historical_upload_provenance.get_conn',return_value=db),patch('backend.platform_sdk.identity.get_conn',return_value=db):
+        with pytest.raises(InvalidSignature):import_manifest(forged,apply=True)
+        forged=copy.deepcopy(document);forged['manifest']['objects'][0]['sha256']='0'*64
+        forged['signature']=base64.b64encode(Ed25519PrivateKey.from_private_bytes(bytes(range(1,33))).sign(canonical(forged['manifest']))).decode()
+        with pytest.raises(ValueError,match='conflicting_upload_provenance'):import_manifest(forged,apply=True)
+        forged['manifest']['signer_gid']='owner'
+        forged['signature']=base64.b64encode(Ed25519PrivateKey.from_private_bytes(bytes(range(1,33))).sign(canonical(forged['manifest']))).decode()
+        with pytest.raises(ValueError,match='active_administrator_required'):import_manifest(forged,apply=True)
+    with pytest.raises(sqlite3.IntegrityError,match='append-only'):db.db.execute("UPDATE workmanship_base_historical_uploads SET owner_gid='other'")
+    with pytest.raises(sqlite3.IntegrityError,match='append-only'):db.db.execute('DELETE FROM workmanship_base_historical_uploads')
+    assert db.db.execute('SELECT COUNT(*) FROM workmanship_base_historical_uploads').fetchone()[0]==1

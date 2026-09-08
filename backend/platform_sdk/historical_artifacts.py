@@ -44,28 +44,55 @@ def authorize_parent(owner_gid,tenant_gid,visibility,project_gid,context):
 
 
 def _key(value):
-    if not value or len(value)>2048 or unquote(value)!=value or '\\' in value or ':' in value or value.startswith('/') or any(part in ('','..','.') for part in value.split('/')):
+    if not value or len(value)>2048 or unquote(value)!=value or '\\' in value or any(char in value for char in ':?#') or value.startswith('/') or any(part in ('','..','.') for part in value.split('/')):
         raise ValueError('invalid_stored_object_key')
     return value
 
 
-def read_stored_attachment(record,*,static_root=UPLOADS):
+def object_location(record):
+    """Normalize an untrusted locator for registry lookup, never as ownership proof."""
     url=str(record.get('url') or '');key=str(record.get('object_key') or '')
-    if record.get('storage')=='ois' and key:
-        data=ois_storage.get_immutable(_key(key),maximum=MAXIMUM)
-    elif url.startswith('/static/uploads/'):
-        name=_key(url.removeprefix('/static/uploads/'))
-        root=Path(static_root).resolve();candidate=root/name
+    if record.get('storage') in ('ois','minio','local') and key:
+        return record['storage'],_key(key)
+    if url.startswith('/static/uploads/'):
+        return 'local',_key(url.removeprefix('/static/uploads/'))
+    configured=((storage._get_minio_config().get('public_url'),'minio'),(ois_storage._get_ois_config().get('public_base_url'),'ois'))
+    for base,backend in configured:
+        if base and url.startswith(base.rstrip('/')+'/'):
+            return backend,_key(url[len(base.rstrip('/')+'/'):])
+    raise ValueError('unsupported_stored_attachment_location')
+
+
+def object_hash(backend,key):
+    return hashlib.sha256(json.dumps([backend,_key(key)],separators=(',',':')).encode()).hexdigest()
+
+
+def trusted_object(record,owner_domain,parent_type,parent_gid,owner_gid,context):
+    backend,key=object_location(record)
+    with get_conn() as conn,conn.cursor() as cursor:
+        cursor.execute('SELECT * FROM workmanship_base_historical_uploads WHERE object_hash=%s',(object_hash(backend,key),))
+        row=cursor.fetchone()
+    parent={'owner_domain':owner_domain,'parent_type':parent_type,'parent_gid':parent_gid}
+    if (not row or row['tenant_gid']!=context.team_gid or row['owner_gid']!=owner_gid
+        or row['storage_backend']!=backend or row['object_key']!=key
+        or parent not in json.loads(row['parents_json']) or not row['provenance_json']):
+        raise CapabilityBusinessError('object_ownership_unverified','Independent upload ownership evidence is required for this parent.')
+    _verify(record,row['sha256'],row['byte_size'],row['media_type'])
+    return {'storage':backend,'object_key':key,'name':row['display_name'],'mime':row['media_type'],'sha256':row['sha256'],'byte_size':row['byte_size']}
+
+
+def read_stored_attachment(record,*,static_root=UPLOADS):
+    backend,key=object_location(record)
+    url=str(record.get('url') or '')
+    if backend=='ois':data=ois_storage.get_immutable(key,maximum=MAXIMUM)
+    elif backend=='minio':data=storage.get_immutable(key,maximum=MAXIMUM)
+    else:
+        root=Path(static_root).resolve();candidate=root/key
         if candidate.is_symlink():raise ValueError('invalid_stored_attachment_path')
         target=candidate.resolve()
         if not target.is_relative_to(root) or any(parent.is_symlink() for parent in candidate.parents if parent!=root and parent.is_relative_to(root)):
             raise ValueError('invalid_stored_attachment_path')
         with target.open('rb') as stream:data=stream.read(MAXIMUM+1)
-    else:
-        configured=((storage._get_minio_config().get('public_url'),storage),(ois_storage._get_ois_config().get('public_base_url'),ois_storage))
-        match=next(((base.rstrip('/')+'/',port) for base,port in configured if base and url.startswith(base.rstrip('/')+'/')),None)
-        if match is None:raise ValueError('unsupported_stored_attachment_location')
-        prefix,port=match;data=port.get_immutable(_key(url[len(prefix):]),maximum=MAXIMUM)
     if not isinstance(data,bytes) or len(data)>MAXIMUM:raise ValueError('stored_attachment_unavailable')
     extension=Path(str(record.get('name') or urlsplit(url).path or key)).suffix.lower()
     known={'.md':'text/markdown','.txt':'text/plain','.csv':'text/csv','.json':'application/json','.pdf':'application/pdf','.xlsx':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','.xls':'application/vnd.ms-excel'}
@@ -98,6 +125,7 @@ def _verify(record,digest,size,mime):
 
 def resolve_stored(owner_domain,parent_type,parent_gid,owner_gid,record,context,*,static_root=UPLOADS):
     """Caller has just re-read/authorized the parent and proven record membership."""
+    trusted=trusted_object(record,owner_domain,parent_type,parent_gid,owner_gid,context)
     binding=hashlib.sha256(json.dumps([owner_domain,parent_type,parent_gid,context.team_gid,owner_gid,context.user_gid,reference_hash(record)],separators=(',',':')).encode()).hexdigest()
     name=str(record.get('name') or Path(urlsplit(str(record.get('url') or '')).path or str(record.get('object_key') or '')).name)
     if not name or len(name)>255 or '/' in name or '\\' in name:raise ValueError('invalid_attachment_name')
@@ -106,10 +134,10 @@ def resolve_stored(owner_domain,parent_type,parent_gid,owner_gid,record,context,
         row=cursor.fetchone()
         if row:
             ref=json.loads(row['artifact_json'])
-            _verify(record,ref['sha256'],ref['byte_size'],ref['media_type'])
+            _verify(trusted,ref['sha256'],ref['byte_size'],ref['media_type'])
             read_artifact(ref,context)
         else:
-            data,mime=read_stored_attachment(record,static_root=static_root)
+            data,mime=read_stored_attachment(trusted,static_root=static_root)
             ref=create_artifact(data,mime,context)
             cursor.execute('INSERT INTO workmanship_base_legacy_artifact_bindings (binding_hash,owner_domain,parent_type,parent_gid,tenant_gid,owner_gid,reader_gid,reference_hash,object_key,artifact_json) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE binding_hash=VALUES(binding_hash)',(binding,owner_domain,parent_type,parent_gid,context.team_gid,owner_gid,context.user_gid,reference_hash(record),str(record.get('object_key') or record.get('url') or ''),json.dumps(ref)))
             conn.commit()
