@@ -2,10 +2,10 @@
   "schema_version": 1,
   "artifact_kind": "unsigned_local_content_only",
   "status": "blocked",
-  "frontend_commit": "2ea7ed1f9eb4d9f6b3a98847d563bcaa69e80fe2",
+  "frontend_commit": "7e4bb5343ca56bcd06cda1e95ca90a77da4b09b1",
   "backend_commit": "0d004c3976161931c989bc4e05523535a8c22ced",
   "source_tree": "982b65164503b599c9c98a980f95be32d8923aca",
-  "frontend_source_tree": "6827db9116f9984e294e33cb81e4f3647ccb759a",
+  "frontend_source_tree": "353a52fce09fc38c4441ec7a9510aae0da078e7d",
   "catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
   "platform": "win32",
   "arch": "x64",
@@ -16,7 +16,7 @@
   "artifacts": {
     "installer": {
       "path": "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\dist\\app-local-content\\AI00-UNSIGNED-CONTENT-ONLY-1.0.3-win-x64.exe",
-      "sha256": "6af8e60a504246124c48ae5a777df6981cc458d6ac62f85397758e982236ac43",
+      "sha256": "41030c6940be9d55a698690bb48d300f3760e758f02bfe06965b56eabf937045",
       "authenticode_verified": false
     },
     "app": {
@@ -67,7 +67,7 @@
   "evidence": {
     "frontend_npm_test": "passed with AI00_BACKEND_ROOT; web 154/154",
     "frontend_ast_scan": "272 files; literal 0; dynamic 0; eight documented auth exceptions; parse errors 0",
-    "installer_contents": "79 external files; 1107 ASAR entries; connector exact allowlist passed",
+    "installer_contents": "79 external files; 1108 ASAR entries; connector exact allowlist and mandatory afterPack inspection passed",
     "dotnet_release": "153 passed; 0 failed/skipped after source fix",
     "backend_release_evidence_tests": "2 passed after 2 RED assertions",
     "backend_full_pytest": "interrupted at 57% after observed failures/errors; no complete summary or traceback; not passed; log retained",
@@ -75,6 +75,7 @@
     "native_electron_addon": "prior Task10 build reused; final local command returned no stdout and is not credited as a verified native smoke",
     "ui_comparison": "fresh capture not run; existing baseline/current comparison rejected fixture digest mismatch; existing Task11 report retains its original 8/8 evidence",
     "packaged_shell_smoke": "win-unpacked App started with one visible main window; second instance exited; closing the main window left zero App and ConnectorHost processes; no post-fix EPIPE logged",
-    "backend_local_smoke": "health passed; readiness blocked only by DatabaseNotMigratedError in the configured test database"
+    "backend_local_smoke": "health passed; readiness blocked only by DatabaseNotMigratedError in the configured test database",
+    "release_gate_review_fixes": "legacy Gitea publisher fails closed; signed App version downgrade denied; every builder run invokes final unpacked/ASAR inspection"
   }
 }
