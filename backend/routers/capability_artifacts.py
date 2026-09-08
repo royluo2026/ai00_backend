@@ -5,6 +5,7 @@ import tempfile
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
+from backend.platform_sdk.historical_artifacts import redeem_picture_grant, read_stored_attachment
 
 from backend.capability_v2.artifacts import (
     ArtifactAuthorizationError,
@@ -16,6 +17,7 @@ from backend.capability_v2.artifacts import (
 )
 from backend.capability_v2.identity import authenticated_user_identity
 from backend.capability_v2.contracts import ConsumerIdentity
+from backend.capability_v2.provider_contracts import CapabilityBusinessError
 from backend.db.connection import get_conn
 from backend.routers.deps import (
     build_capability_authorization_grants, get_authenticated_principal, get_current_user,
@@ -34,6 +36,10 @@ class CreateUploadRequest(BaseModel):
 
 class FinalizeUploadRequest(BaseModel):
     sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class PictureContentRequest(BaseModel):
+    access_grant: str = Field(min_length=32,max_length=4096)
 
 
 def _identity(user: dict, principal) -> ConsumerIdentity:
@@ -158,3 +164,16 @@ def artifact_content(artifact_id: str,user: dict=Depends(get_current_user),princ
         return Response(content=data,media_type=record.artifact_ref.media_type,headers={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'})
     except ArtifactError as exc:
         _raise_artifact_error(exc)
+
+
+@router.post('/historical-picture/content')
+def historical_picture_content(body:PictureContentRequest,user:dict=Depends(get_current_user),principal=Depends(get_authenticated_principal)):
+    identity=_identity(user,principal)
+    try:
+        record=redeem_picture_grant(body.access_grant,identity.actor.user_id,identity.tenant.tenant_id)
+        data,mime=read_stored_attachment(record)
+        return Response(content=data,media_type=mime,headers={'Content-Length':str(len(data)),'Cache-Control':'private, max-age=600','X-Content-Type-Options':'nosniff'})
+    except CapabilityBusinessError as exc:
+        raise HTTPException(status_code=403,detail={'code':exc.code}) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=404,detail={'code':'picture_unavailable'}) from exc

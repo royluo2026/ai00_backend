@@ -138,6 +138,45 @@ def generate_access_url(object_key: str, expire_in_seconds: int = 1800) -> str |
         return None
 
 
+def generate_access_urls(object_keys: list[str], expire_in_seconds: int = 600) -> dict[str, str]:
+    """Generate bounded signed URLs from one cached OIS credential."""
+    normalized = list(dict.fromkeys(str(key or "").strip().lstrip("/") for key in object_keys))
+    if not normalized or any(not key or ".." in key.split("/") or "//" in key for key in normalized):
+        return {}
+    cfg = _get_ois_config()
+    client, err = _make_client()
+    if not client:
+        _log.error("OIS client unavailable: %s", err)
+        return {}
+    try:
+        import client.ois_s3_client as sdk
+
+        response = client._get_virtual_bucket_route(
+            "generate_pre_signed_url", cfg.get("identify", ""), normalized[0],
+            expire_in_seconds, use_cache=True,
+        )
+        if not response.is_succeed():
+            return {}
+        credential = response.data.credential_addressing()
+        urls = {}
+        for key in normalized:
+            if credential.storage_type == "BOS":
+                value = sdk.bos_util.generate_pre_signed_url(credential, key, expire_in_seconds).decode("UTF-8")
+            elif credential.storage_type == "OSS":
+                value = sdk.oss_util.generate_pre_signed_url(credential, key, expire_in_seconds)
+            else:
+                value = credential.get_s3_client().generate_presigned_url(
+                    "get_object", Params={"Bucket": credential.real_bucket_name, "Key": key},
+                    ExpiresIn=expire_in_seconds,
+                )
+            if isinstance(value, str) and value.startswith("https://"):
+                urls[key] = value
+        return urls
+    except Exception as exc:
+        _log.error("OIS batch signed URL generation failed: %s", exc)
+        return {}
+
+
 
 def upload(data: bytes, ext: str, mime: str, prefix: str = "uploads") -> str | None:
     """上传文件到 OIS，成功返回访问 URL，失败或未配置返回 None。"""

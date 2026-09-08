@@ -73,6 +73,31 @@ class VersionedMigrationFileTests(unittest.TestCase):
         ))
         self.assertFalse(is_resumable_ddl("UPDATE workmanship_app_x SET tenant_gid='x'"))
 
+    def test_marked_create_trigger_is_skipped_after_first_application(self):
+        statement = (
+            "-- AI00: RESUMABLE CREATE TRIGGER\n"
+            "CREATE TRIGGER immutable_row BEFORE UPDATE ON workmanship_app_x "
+            "FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='append-only'"
+        )
+        self.assertTrue(is_resumable_ddl(statement))
+        self.assertFalse(is_resumable_ddl(statement.replace("-- AI00: RESUMABLE CREATE TRIGGER\n", "")))
+
+        class Cursor:
+            def __init__(self, exists): self.exists = exists
+            def __enter__(self): return self
+            def __exit__(self, *_args): return False
+            def execute(self, sql, params=()):
+                assert "information_schema.TRIGGERS" in sql
+                assert params == ("immutable_row",)
+            def fetchone(self): return (self.exists,)
+
+        class Connection:
+            def __init__(self, exists): self.exists = exists
+            def cursor(self): return Cursor(self.exists)
+
+        self.assertIsNone(prepare_resumable_statement(Connection(1), statement))
+        self.assertEqual(prepare_resumable_statement(Connection(0), statement), statement)
+
     def test_completed_not_null_and_primary_key_steps_are_skipped(self):
         class MetadataCursor:
             def __init__(self):

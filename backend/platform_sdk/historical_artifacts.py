@@ -2,6 +2,7 @@
 import hashlib
 import io
 import json
+import time
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 from zipfile import ZipFile
@@ -10,6 +11,8 @@ from backend.capability_v2.descriptor_adapter import descriptor_from_provider_sp
 from backend.capability_v2.contracts import ExposurePolicy
 from backend.db.connection import get_conn
 from backend.core import storage, ois_storage
+from backend.config import get_settings
+import jwt
 from .artifacts import create_artifact, read_artifact
 from .identity import get_user_summaries
 from .business_images import image_type
@@ -31,11 +34,14 @@ def records(value):
 
 
 def authorize_parent(owner_gid,tenant_gid,visibility,project_gid,context):
-    owner=get_user_summaries([owner_gid]).get(str(owner_gid))
-    tenant=tenant_gid or (owner or {}).get('team_id')
-    if not owner or not tenant or tenant!=context.team_gid or owner.get('team_id')!=tenant:
+    owner_gid=str(owner_gid or '')
+    owner=get_user_summaries([owner_gid]).get(owner_gid)
+    tenant=str(tenant_gid or (owner or {}).get('team_id') or '')
+    reader_tenant=str(context.team_gid or '')
+    owner_tenant=str((owner or {}).get('team_id') or '')
+    if not owner or not tenant or tenant!=reader_tenant or owner_tenant!=tenant:
         raise CapabilityBusinessError('resource_not_found','The attachment parent is unavailable in this tenant.')
-    if context.user_gid==owner_gid:return
+    if str(context.user_gid or '')==owner_gid:return
     if visibility in ('team','global'):return
     if visibility=='project' and project_gid:
         from .project_access import list_user_project_memberships
@@ -49,17 +55,21 @@ def _key(value):
     return value
 
 
-def object_location(record):
+def object_location(record,configured=None):
     """Normalize an untrusted locator for registry lookup, never as ownership proof."""
     url=str(record.get('url') or '');key=str(record.get('object_key') or '')
     if record.get('storage') in ('ois','minio','local') and key:
         return record['storage'],_key(key)
     if url.startswith('/static/uploads/'):
         return 'local',_key(url.removeprefix('/static/uploads/'))
-    configured=((storage._get_minio_config().get('public_url'),'minio'),(ois_storage._get_ois_config().get('public_base_url'),'ois'))
+    configured=configured or ((storage._get_minio_config().get('public_url'),'minio'),(ois_storage._get_ois_config().get('public_base_url'),'ois'))
+    parsed=urlsplit(url)
     for base,backend in configured:
-        if base and url.startswith(base.rstrip('/')+'/'):
-            return backend,_key(url[len(base.rstrip('/')+'/'):])
+        if not base:continue
+        parsed_base=urlsplit(base.rstrip('/'))
+        prefix=parsed_base.path.rstrip('/')+'/'
+        if (parsed.scheme,parsed.netloc)==(parsed_base.scheme,parsed_base.netloc) and parsed.path.startswith(prefix):
+            return backend,_key(unquote(parsed.path[len(prefix):]))
     raise ValueError('unsupported_stored_attachment_location')
 
 
@@ -79,6 +89,53 @@ def trusted_object(record,owner_domain,parent_type,parent_gid,owner_gid,context)
         raise CapabilityBusinessError('object_ownership_unverified','Independent upload ownership evidence is required for this parent.')
     _verify(record,row['sha256'],row['byte_size'],row['media_type'])
     return {'storage':backend,'object_key':key,'name':row['display_name'],'mime':row['media_type'],'sha256':row['sha256'],'byte_size':row['byte_size']}
+
+
+def trusted_objects(values,owner_domain,parent_type,parent_gid,owner_gid,context):
+    """Resolve a bounded parent attachment set with one registry query per chunk."""
+    located=[];configured=((storage._get_minio_config().get('public_url'),'minio'),(ois_storage._get_ois_config().get('public_base_url'),'ois'))
+    for record in values:
+        backend,key=object_location(record,configured)
+        located.append((record,backend,key,object_hash(backend,key)))
+    rows={};unique=list(dict.fromkeys(item[3] for item in located))
+    with get_conn() as conn,conn.cursor() as cursor:
+        for offset in range(0,len(unique),50):
+            chunk=unique[offset:offset+50]
+            cursor.execute('SELECT * FROM workmanship_base_historical_uploads WHERE object_hash IN ('+','.join(['%s']*len(chunk))+')',tuple(chunk))
+            rows.update((row['object_hash'],row) for row in cursor.fetchall())
+    parent={'owner_domain':owner_domain,'parent_type':parent_type,'parent_gid':parent_gid}
+    trusted={};unavailable=[]
+    for record,backend,key,digest in located:
+        ref=reference_hash(record);row=rows.get(digest)
+        if (not row or row['tenant_gid']!=context.team_gid or row['owner_gid']!=owner_gid
+            or row['storage_backend']!=backend or row['object_key']!=key
+            or parent not in json.loads(row['parents_json']) or not row['provenance_json']):
+            unavailable.append(ref);continue
+        _verify(record,row['sha256'],row['byte_size'],row['media_type'])
+        trusted[ref]={'storage':backend,'object_key':key,'name':row['display_name'],'mime':row['media_type'],'sha256':row['sha256'],'byte_size':row['byte_size']}
+    return trusted,list(dict.fromkeys(unavailable))
+
+
+def issue_picture_grant(record,parent_gid,context,ttl_seconds=600):
+    now=int(time.time())
+    return jwt.encode({'typ':'historical_picture','sub':str(context.user_gid),'tenant':str(context.team_gid),'parent_gid':str(parent_gid),
+        'storage':record['storage'],'object_key':record['object_key'],'sha256':record['sha256'],'byte_size':record['byte_size'],
+        'media_type':record['mime'],'iat':now,'exp':now+ttl_seconds},get_settings().jwt_secret,algorithm='HS256')
+
+
+def redeem_picture_grant(grant,user_gid,tenant_gid):
+    try:
+        value=jwt.decode(grant,get_settings().jwt_secret,algorithms=['HS256'],options={'require':['typ','sub','tenant','parent_gid','storage','object_key','sha256','byte_size','media_type','iat','exp']})
+    except jwt.PyJWTError as exc:
+        raise CapabilityBusinessError('invalid_picture_grant','The picture access grant is invalid or expired.') from exc
+    if value.get('typ')!='historical_picture' or value.get('sub')!=str(user_gid) or value.get('tenant')!=str(tenant_gid):
+        raise CapabilityBusinessError('permission_denied','The picture access grant belongs to another reader.')
+    record={'storage':value.get('storage'),'object_key':value.get('object_key'),'sha256':value.get('sha256'),'byte_size':value.get('byte_size'),'mime':value.get('media_type')}
+    if (record['storage'] not in ('ois','minio','local') or not isinstance(record['byte_size'],int) or record['byte_size']<1 or record['byte_size']>MAXIMUM
+        or not isinstance(record['sha256'],str) or len(record['sha256'])!=64 or not isinstance(record['mime'],str) or not record['mime'].startswith('image/')):
+        raise CapabilityBusinessError('invalid_picture_grant','The picture access grant is malformed.')
+    _key(str(record['object_key'] or ''))
+    return record
 
 
 def read_stored_attachment(record,*,static_root=UPLOADS):

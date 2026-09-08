@@ -86,7 +86,7 @@ def runtime_test(_payload, context):
     from ..routers.ai_chat import test_connection
     result = test_connection({}, _user={'gid':context.user_gid})
     return {'success':bool(result.get('success')),'reply':str(result.get('reply',''))[:80],
-            'model':str(result.get('model',''))[:200], 'error':'' if result.get('success') else 'Runtime connection unavailable'}
+            'model':str(result.get('model',''))[:200], 'error':'' if result.get('success') else str(result.get('error') or 'Runtime connection unavailable')[:500]}
 
 
 def skill_fields(payload):
@@ -106,7 +106,7 @@ DEFINITIONS = (
     ('agent.flow.capability_manifest.get',1,obj({}),obj({'manifest':{'type':'array','maxItems':0},'message':SHORT},('manifest','message')),False,'agent.read','Reports the retired legacy node palette and the requirement to select governed Catalog capabilities.','agent.flow.read',lambda p:{'operation':'manifest'}),
     ('agent.interaction.cancel',2,obj({'session_gid':ID},('session_gid',)),obj({'ok':{'const':True},'session_gid':ID},('ok','session_gid')),True,'agent.interact','Cancels the current interaction only in a session owned by the authenticated user.','agent.interaction.cancel',lambda p:p),
     ('agent.runtime.config.set',1,obj({'model':{**ID,'maxLength':200},'api_base':{**SHORT,'maxLength':500},'api_key':{'type':'string','maxLength':8192}},('model',)),CONFIG,True,'system.tech_config','Replaces explicitly enabled deployment runtime settings without returning the secret.',None,None),
-    ('agent.runtime.connection.test',1,obj({}),obj({'success':BOOL,'reply':{'type':'string','maxLength':80},'model':{'type':'string','maxLength':200},'error':SHORT},('success','reply','model','error')),True,'agent.interact','Runs a bounded fixed model connectivity probe and returns a normalized diagnostic.',None,None),
+    ('agent.runtime.connection.test',1,obj({}),obj({'success':BOOL,'reply':{'type':'string','maxLength':80},'model':{'type':'string','maxLength':200},'error':SHORT},('success','reply','model','error')),False,'agent.interact','Runs a bounded fixed model connectivity probe and returns a normalized diagnostic.',None,None),
 )
 
 

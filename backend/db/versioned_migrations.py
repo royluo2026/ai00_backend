@@ -251,6 +251,7 @@ def is_resumable_ddl(statement: str) -> bool:
     normalized = " ".join(strip_sql_comments(statement).split()).upper()
     marked_backfill = "AI00: RESUMABLE BACKFILL" in statement.upper()
     marked_foreign_key_drop = "AI00: RESUMABLE DROP FOREIGN KEY" in statement.upper()
+    marked_create_trigger = "AI00: RESUMABLE CREATE TRIGGER" in statement.upper()
     return bool(
         re.match(r"^CREATE TABLE IF NOT EXISTS\b", normalized)
         or re.match(r"^CREATE (?:UNIQUE )?INDEX IF NOT EXISTS\b", normalized)
@@ -275,11 +276,30 @@ def is_resumable_ddl(statement: str) -> bool:
         )
         or (marked_backfill and re.match(r"^UPDATE\b", normalized))
         or (marked_backfill and re.match(r"^INSERT\b.*\bON DUPLICATE KEY UPDATE\b", normalized))
+        or (
+            marked_create_trigger
+            and re.match(r"^CREATE TRIGGER\s+`?[A-Z0-9_]+`?\s+BEFORE\s+(?:UPDATE|DELETE)\b", normalized)
+        )
     )
 
 
 def prepare_resumable_statement(conn, statement: str) -> str | None:
     """Translate declarative IF NOT EXISTS DDL for OceanBase 4.3.5."""
+    create_trigger = re.search(
+        r"\bCREATE\s+TRIGGER\s+`?([A-Za-z0-9_]+)`?\s+BEFORE\s+(?:UPDATE|DELETE)\b",
+        strip_sql_comments(statement),
+        re.I,
+    )
+    if "AI00: RESUMABLE CREATE TRIGGER" in statement.upper() and create_trigger:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT COUNT(*) FROM information_schema.TRIGGERS "
+                "WHERE TRIGGER_SCHEMA=DATABASE() AND TRIGGER_NAME=%s",
+                (create_trigger.group(1),),
+            )
+            exists = int(_scalar(cur.fetchone())) > 0
+        return None if exists else statement
+
     if re.search(r"\bworkmanship_base_self_annotations\s+a\b", statement, re.I):
         # The legacy annotation table can retain utf8mb4_general_ci while the
         # governed state/idempotency/audit tables use utf8mb4_unicode_ci.

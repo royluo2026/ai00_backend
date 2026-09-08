@@ -14,7 +14,7 @@
         }
       },
       "provider_data": {
-        "gid": "e5263efc-0b78-42bc-bd87-b24bba85409a",
+        "gid": "9d7a0340-0ab9-4378-afb8-e44ff946754f",
         "success": true
       },
       "input_schema": {
@@ -590,11 +590,11 @@
         "capability_id": "agent.skill.create",
         "major_version": 1,
         "data": {
-          "gid": "e5263efc-0b78-42bc-bd87-b24bba85409a",
+          "gid": "9d7a0340-0ab9-4378-afb8-e44ff946754f",
           "success": true
         },
         "operation_ref": {
-          "operation_id": "op_a4404b43a0424eb0a930fc7c03513256",
+          "operation_id": "op_fb39f392393b43d68ca7ec978957c7dc",
           "status": "completed",
           "version": 1
         },
@@ -603,8 +603,8 @@
         "evidence": [
           {
             "kind": "agent.change",
-            "reference": "agent://agent.skill.create/e5263efc-0b78-42bc-bd87-b24bba85409a",
-            "digest": "sha256:8b56bbfc1f10d9404b9b6faeeed83fb8e0429d79b765a18f80eadc50258ae062",
+            "reference": "agent://agent.skill.create/9d7a0340-0ab9-4378-afb8-e44ff946754f",
+            "digest": "sha256:bbeb6e88473a37a949437bd7df06a083eec01deee5c816880c444a6eaf805f4a",
             "summary": "Provider-owned Agent write result."
           }
         ],
@@ -1241,7 +1241,7 @@
           "success": true
         },
         "operation_ref": {
-          "operation_id": "op_5ef0859999174891b92c7214559ba626",
+          "operation_id": "op_c69d9c588bcf4d3aa47d8f535041cb87",
           "status": "completed",
           "version": 1
         },
@@ -2730,7 +2730,7 @@
           "session_gid": "session-one"
         },
         "operation_ref": {
-          "operation_id": "op_b73dfbc4f3874362a37ebe389ae1ec63",
+          "operation_id": "op_3014e2e4f65b4778b0f0ca9866fcdd4e",
           "status": "completed",
           "version": 1
         },
@@ -2840,7 +2840,7 @@
           "is_admin": true
         },
         "operation_ref": {
-          "operation_id": "op_e2c4b95800354c50b913a0a830b58cec",
+          "operation_id": "op_17e5eb9eac1c4234a8c0ce51e18e8675",
           "status": "completed",
           "version": 1
         },
@@ -2949,7 +2949,7 @@
           "error": ""
         },
         "operation_ref": {
-          "operation_id": "op_01a5a4629fea44988f4a493e314aa48f",
+          "operation_id": "op_22f52597d59445748428a686238ff203",
           "status": "completed",
           "version": 1
         },
@@ -3109,7 +3109,7 @@
           }
         },
         "operation_ref": {
-          "operation_id": "op_827091d54c8541608c22b8be92e8f828",
+          "operation_id": "op_4831876128f1447bbfb1bb6a977df4cf",
           "status": "completed",
           "version": 1
         },

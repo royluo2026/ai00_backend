@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "registry_version": 1,
-  "table_count": 305,
+  "table_count": 307,
   "tables": [
     {
       "table": "workmanship_agent_canvas_audit_events",
@@ -1442,6 +1442,12 @@
       "owner": "project_management",
       "runtime_domain": "project_management",
       "legacy_name": true
+    },
+    {
+      "table": "workmanship_proj_desktop_operations",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": false
     },
     {
       "table": "workmanship_proj_issues",

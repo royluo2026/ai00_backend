@@ -1,6 +1,6 @@
 {
   "registry_version": 1,
-  "table_count": 292,
+  "table_count": 307,
   "tables": [
     {
       "table": "workmanship_agent_canvas_audit_events",
@@ -19,6 +19,11 @@
     },
     {
       "table": "workmanship_agent_canvas_runtime_results",
+      "owner": "agent",
+      "runtime_domain": "agent"
+    },
+    {
+      "table": "workmanship_agent_capability_outbox",
       "owner": "agent",
       "runtime_domain": "agent"
     },
@@ -459,6 +464,21 @@
     },
     {
       "table": "workmanship_base_consumer_delegations",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_desktop_families",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_desktop_refresh_tokens",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_desktop_transactions",
       "owner": "base",
       "runtime_domain": "base"
     },
@@ -1183,6 +1203,11 @@
       "runtime_domain": "project_management"
     },
     {
+      "table": "workmanship_proj_desktop_operations",
+      "owner": "project_management",
+      "runtime_domain": "project_management"
+    },
+    {
       "table": "workmanship_proj_issues",
       "owner": "project_management",
       "runtime_domain": "project_management"
@@ -1258,12 +1283,52 @@
       "runtime_domain": "simulation"
     },
     {
+      "table": "workmanship_sim_connector_bindings",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
+      "table": "workmanship_sim_connector_enrollments",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
       "table": "workmanship_sim_connector_environments",
       "owner": "simulation",
       "runtime_domain": "simulation"
     },
     {
+      "table": "workmanship_sim_connector_health",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
+      "table": "workmanship_sim_connector_heartbeat_audit",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
+      "table": "workmanship_sim_connector_legacy_commands",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
       "table": "workmanship_sim_connector_pairing_bootstraps",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
+      "table": "workmanship_sim_connector_pairings",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
+      "table": "workmanship_sim_connector_plans",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
+      "table": "workmanship_sim_connector_projection_outbox",
       "owner": "simulation",
       "runtime_domain": "simulation"
     },
@@ -1284,6 +1349,11 @@
     },
     {
       "table": "workmanship_sim_connector_runtime_plans",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
+      "table": "workmanship_sim_connector_runtime_projection_outbox",
       "owner": "simulation",
       "runtime_domain": "simulation"
     },

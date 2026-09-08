@@ -17,13 +17,23 @@ from backend.capability_v2.provider_contracts import CapabilityBusinessError, Ca
 from .ontology_concepts_next import ONTOLOGY_VERSION_REF_SCHEMA
 
 JSON_VALUE_SCHEMA = {"anyOf": [{"type": "string"}, {"type": "number"}, {"type": "boolean"}, {"type": "null"}]}
+JSON_CONTAINER_VALUE_SCHEMA = {"anyOf": [
+    *JSON_VALUE_SCHEMA["anyOf"],
+    {"type": "array", "items": JSON_VALUE_SCHEMA},
+    {"type": "object", "properties": {}, "patternProperties": {r"^.*$": JSON_VALUE_SCHEMA}, "additionalProperties": False},
+]}
+CHANGE_VALUE_SCHEMA = {
+    "type": "object", "properties": {},
+    "patternProperties": {r"^.*$": JSON_CONTAINER_VALUE_SCHEMA},
+    "additionalProperties": False,
+}
 CHANGE_SCHEMA = {
     "type": "object",
     "required": ["operation", "stable_gid", "value", "source_evidence"],
     "properties": {
         "operation": {"type": "string"}, "stable_gid": {"type": "string"},
-        "value": JSON_VALUE_SCHEMA,
-        "source_evidence": {"type": "array", "items": JSON_VALUE_SCHEMA},
+        "value": CHANGE_VALUE_SCHEMA,
+        "source_evidence": {"type": "array", "items": CHANGE_VALUE_SCHEMA},
     },
     "additionalProperties": False,
 }
@@ -56,6 +66,23 @@ PROPOSAL_SEARCH_SCHEMA = {
         "items": {"type": "array", "items": {}},
         "total": {"type": "integer", "minimum": 0},
     },
+}
+
+PROPOSAL_SEARCH_V2_SCHEMA = {
+    "type": "object", "required": ["items", "total"],
+    "properties": {
+        "items": {"type": "array", "maxItems": 100, "items": {
+            "type": "object",
+            "required": ["proposal_gid", "base_release_gid", "status", "author_gid", "base_ontology_version_ref"],
+            "properties": {
+                "proposal_gid": {"type": "string"}, "base_release_gid": {"type": "string"},
+                "status": {"type": "string"}, "author_gid": {"type": "string"},
+                "channel": {"type": "string"}, "updated_at": {"type": "string"},
+                "base_ontology_version_ref": ONTOLOGY_VERSION_REF_SCHEMA,
+            }, "additionalProperties": False,
+        }},
+        "total": {"type": "integer", "minimum": 0},
+    }, "additionalProperties": False,
 }
 
 REVIEW_SCHEMA = {
@@ -196,3 +223,31 @@ def register_ontology_proposal_capabilities(registry: Any) -> None:
         effects=("create:ontology.proposal_review",), risk="write", confirmation="user", idempotent=False,
         permissions=("ontology.review",), output_schema=REVIEW_SCHEMA,
         input_schema={"type": "object", "properties": {"proposal_gid": {"type": "string"}, "proposal_revision_gid": {"type": "string"}, "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$", "example": "0" * 64}, "decision": {"type": "string", "enum": ["approve", "reject", "request_changes"]}, "comment": {"type": "string", "maxLength": 4000}}, "required": ["proposal_gid", "proposal_revision_gid", "content_sha256", "decision"]}), submit_review)
+    registry.register(CapabilitySpec(
+        **common, id="ontology.change.proposal.create", version=2,
+        description="Create an immutable typed proposal against the exact active release.",
+        use_when="A governed ontology change is being proposed with structured values.",
+        do_not_use_when="Direct mutation of an active release is expected.",
+        effects=("create:ontology.proposal", "create:ontology.proposal_revision"), risk="write",
+        confirmation="user", idempotent=False, output_schema=PROPOSAL_SCHEMA,
+        input_schema={"type": "object", "properties": {
+            "base_release_gid": {"type": "string"},
+            "changes": {"type": "array", "minItems": 1, "items": CHANGE_SCHEMA},
+        }, "required": ["base_release_gid", "changes"], "additionalProperties": False}), create_proposal)
+    registry.register(CapabilitySpec(
+        **common, id="ontology.change.proposal.get", version=2,
+        description="Read a structured immutable proposal revision.",
+        use_when="A proposal GID is known and its typed changes are required.",
+        do_not_use_when="Searching proposals.", effects=("read:ontology.proposal",),
+        output_schema=PROPOSAL_SCHEMA,
+        input_schema={"type": "object", "properties": {"proposal_gid": {"type": "string"}},
+                      "required": ["proposal_gid"], "additionalProperties": False}), get_proposal)
+    registry.register(CapabilitySpec(
+        **common, id="ontology.change.proposal.search", version=2,
+        description="Search structured proposal metadata by governed status.",
+        use_when="A review queue or proposal list is required.",
+        do_not_use_when="A proposal GID is known.", effects=("read:ontology.proposal",),
+        output_schema=PROPOSAL_SEARCH_V2_SCHEMA,
+        input_schema={"type": "object", "properties": {
+            "status": {"type": "string"}, "limit": {"type": "integer", "minimum": 1, "maximum": 100},
+        }, "additionalProperties": False}), search_proposals)

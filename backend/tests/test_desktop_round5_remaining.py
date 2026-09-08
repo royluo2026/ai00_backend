@@ -89,8 +89,46 @@ def test_remaining_owner_handlers_visibility_hash_and_closed_outcomes():
     assert len(execute_remaining_matrix())==6
 
 
+def test_picture_parent_scan_supports_xab_scale():
+    from plugins.craft.craft_backend.capabilities.desktop_pictures import parent_attachments
+    picture, cursor = sql()
+    cursor.fetchone.return_value = {
+        'gid': 'xab-version', 'owner_gid': 'fixture-user', 'created_by': 'fixture-user',
+        'shared_team_gid': 'fixture-team', 'visibility': 'team', 'project_gid': 'project-one',
+    }
+    cursor.fetchall.return_value = [
+        {'process_flow_pic': [{'storage': 'ois', 'object_key': f'bop_pics/{index}.png', 'url': ''}], 'process_chart_pic': []}
+        for index in range(866)
+    ]
+    ctx = SimpleNamespace(user_gid='fixture-user', team_gid='fixture-team')
+    with patch('plugins.craft.craft_backend.capabilities.desktop_pictures.get_craft_conn', return_value=picture), patch('plugins.craft.craft_backend.capabilities.desktop_pictures.authorize_parent'):
+        owner, attachments = parent_attachments('bop_version', 'xab-version', ctx)
+    assert owner == 'fixture-user'
+    assert len(attachments) == 866
+    assert cursor.execute.call_args_list[1].args[1] == ('xab-version', 5001)
+
+
 def test_historical_image_reader_refuses_unconfigured_urls_and_path_escape(tmp_path):
     from backend.platform_sdk.business_images import read_stored_image
     with patch('backend.core.storage._get_minio_config',return_value={}),patch('backend.core.ois_storage._get_ois_config',return_value={}):
         for url in ('https://attacker.invalid/private','/static/uploads/bop_pics/../secret.png'):
             with pytest.raises(ValueError):read_stored_image({'url':url},static_root=tmp_path)
+
+
+def test_historical_image_reader_uses_ois_for_signed_bucket_url(monkeypatch, tmp_path):
+    from backend.platform_sdk.business_images import read_stored_image
+
+    image = b'\x89PNG\r\n\x1a\nfixture'
+    monkeypatch.setattr('backend.core.storage._get_minio_config', lambda: {})
+    monkeypatch.setattr(
+        'backend.core.ois_storage._get_ois_config',
+        lambda: {'public_base_url': 'https://bj.bcebos.com/crawler-platform-public'},
+    )
+    read = monkeypatch.setattr(
+        'backend.core.ois_storage.get_immutable',
+        lambda key, **kwargs: image if key == 'bop_pics/example.png' else None,
+    )
+
+    assert read_stored_image({
+        'url': 'https://bj.bcebos.com/crawler-platform-public/bop_pics/example.png?authorization=expired',
+    }, static_root=tmp_path) == (image, 'image/png')

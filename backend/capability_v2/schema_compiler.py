@@ -212,6 +212,7 @@ def compile_expected_schema(root: Path) -> ExpectedSchema:
             create = re.match(r"^CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?([^\s(]+)\s*\((.*)\)\s*(?:ENGINE\b.*)?$", statement, re.I | re.S)
             alter = re.match(r"^ALTER\s+TABLE\s+([^\s]+)\s+(.+)$", statement, re.I | re.S)
             create_index = re.match(r"^CREATE\s+(UNIQUE\s+)?INDEX\s+(?:IF\s+NOT\s+EXISTS\s+)?([^\s]+)\s+ON\s+([^\s(]+)\s*\((.+)\)$", statement, re.I | re.S)
+            create_trigger = re.match(r"^CREATE\s+TRIGGER\s+[^\s]+\s+BEFORE\s+(?:UPDATE|DELETE)\s+ON\s+([^\s]+)\b", statement, re.I | re.S)
             if create:
                 name = _identifier(create.group(2), source)
                 row = ownership.get(name)
@@ -262,6 +263,10 @@ def compile_expected_schema(root: Path) -> ExpectedSchema:
                 if name not in tables: raise SchemaCompileError(f"index_before_create:{name}:{source}:1")
                 table = tables[name]; table.sources.add(source)
                 _merge_index(table, IndexSpec(create_index.group(2).replace("`", ""), _index_columns(create_index.group(4)), bool(create_index.group(1)), False, (source,)), source)
+            elif create_trigger:
+                name = _identifier(create_trigger.group(1), source)
+                if name not in tables: raise SchemaCompileError(f"trigger_before_create:{name}:{source}:1")
+                tables[name].sources.add(source)
             else:
                 raise SchemaCompileError(f"unsupported_ddl:{source}:1:{statement[:40]}")
     for table in tables.values():

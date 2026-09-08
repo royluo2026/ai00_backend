@@ -14,7 +14,7 @@ from backend.platform_sdk.artifacts import read_artifact, create_artifact
 from backend.platform_sdk.feishu import user_credential
 from .data_exchange import _export_excel, _export_diff_report, _export_diff_lark_sheet
 from .lark_exchange import read_lark_data, write_lark_data
-from .desktop_pictures import resolve_picture
+from .desktop_pictures import resolve_picture,list_picture_access
 
 TEXT={'type':'string','maxLength':4096}
 ID={'type':'string','minLength':1,'maxLength':128,'pattern':'^[A-Za-z0-9_.-]+$'}
@@ -27,6 +27,8 @@ STYLE=obj({**{key:TEXT for key in ('headerBg','headerFg','altRowBg','borderStyle
 DIFF_ROW=obj({'status':{'enum':['added','removed','modified','same']},'values_a':array(SCALAR,200),'values_b':array(SCALAR,200),'changed_fields':array(TEXT,200)},('status','values_a','values_b','changed_fields'))
 DIFF=obj({'columns':COLUMNS,'diff_rows':array(DIFF_ROW,5000),'label_a':TEXT,'label_b':TEXT,'filename':TEXT},('columns','diff_rows'))
 ARTIFACT=obj({'artifact_ref':ArtifactRef.model_json_schema(),'name':{'type':'string','minLength':1,'maxLength':255}},('artifact_ref','name'))
+PICTURE_ACCESS=obj({'reference_hash':{'type':'string','pattern':'^[a-f0-9]{64}$'},'access_grant':{'type':'string','minLength':32,'maxLength':4096},'download_url':{'type':'string','pattern':'^https://[^\\s]{1,4088}$','maxLength':4096},'media_type':{'type':'string','pattern':'^image/[a-z0-9.+-]{1,64}$'},'sha256':{'type':'string','pattern':'^[a-f0-9]{64}$'},'byte_size':{'type':'integer','minimum':1,'maximum':5*1024*1024}},('reference_hash','access_grant','media_type','sha256','byte_size'))
+PICTURE_ACCESS_LIST=obj({'version_gid':ID,'items':array(PICTURE_ACCESS,5000),'unavailable':array({'type':'string','pattern':'^[a-f0-9]{64}$'},5000)},('version_gid','items','unavailable'))
 PARSED=obj({'headers':array(TEXT,200),'rows':array(array(TEXT,200),5000),'warnings':array(TEXT,20),'import_preview':obj({'import_preview_gid':ID,'content_hash':TEXT,'entry_count':{'type':'integer','minimum':0},'expires_at':TEXT})},('headers','rows','warnings'))
 
 def fail(message): raise CapabilityBusinessError('invalid_input',message)
@@ -97,6 +99,7 @@ def write_bitable(payload,context):
     return {'success':value['success'],'written_rows':value['written_records']}
 
 DEFINITIONS=[
+ ('craft.bop.picture.access.list',obj({'version_gid':ID},('version_gid',)),PICTURE_ACCESS_LIST,False,list_picture_access),
  ('craft.bop.picture.resolve',obj({'version_gid':ID,'reference_hash':{'type':'string','pattern':'^[a-f0-9]{64}$'}},('version_gid','reference_hash')),ARTIFACT,False,resolve_picture),
  ('craft.data_exchange.feishu_bitable.read',obj({'app_token':ID,'table_id':ID,'page_size':{'type':'integer','minimum':1,'maximum':500}},('app_token','table_id')),PARSED,False,read_bitable),
  ('craft.data_exchange.feishu_bitable.write',obj({'app_token':ID,'table_id':ID,'headers':array(TEXT,200,1),'rows':ROWS},('app_token','table_id','headers','rows')),obj({'success':{'const':True},'written_rows':{'type':'integer','minimum':0,'maximum':5000}},('success','written_rows')),True,write_bitable),
@@ -115,7 +118,12 @@ def register_desktop_exchange(registry):
             result=_service(payload,context)
             if not Draft202012Validator(_output).is_valid(result): raise CapabilityBusinessError('provider_error','The spreadsheet outcome exceeds its closed model.')
             return result
-        effect=('Write ' if write else 'Read ')+capability_id.removeprefix('craft.data_exchange.').replace('.',' ')+' using owned immutable artifacts or the authenticated Feishu delegation.'
+        picture_access=capability_id=='craft.bop.picture.access.list'
+        effect=('Authorize the authenticated reader to view the bounded historical picture set attached to one visible BOP version.' if picture_access else
+            ('Write ' if write else 'Read ')+capability_id.removeprefix('craft.data_exchange.').replace('.',' ')+' using owned immutable artifacts or the authenticated Feishu delegation.')
         spec=CapabilitySpec(id=capability_id,version=1,owner='craft',description=effect,use_when=effect,do_not_use_when='Another export, import, resource or remote method is requested.',risk='write' if write else 'read',confirmation='user' if write else 'none',idempotent=True,permissions=('craft.write',) if write else ('craft.read',),input_schema=input_schema,output_schema=output_schema,tags=('craft','desktop','artifact'))
-        descriptor=descriptor_from_provider_spec(spec).model_copy(update={'business_effect':effect,'business_acceptance_criteria':(effect,'At most 5000 rows and 200 columns are accepted; raw credentials and filesystem paths are never input.','File output is an immutable ArtifactRef with verified hash and size.'),'business_invariants':(BusinessInvariantContract(rule_id=capability_id+'.owner_bound',version=1,statement='File and Feishu access are derived from authenticated context.',applies_when='The data exchange action executes.',enforcement_ref='backend/platform_sdk/artifacts.py; backend/platform_sdk/feishu.py',error_code='permission_denied',test_refs=('backend/tests/test_desktop_round5_exchange.py',)),),'no_business_invariant_reason':None,'exposure':ExposurePolicy(web=True,api=True,plugin=False,agent=False,mcp=False),'consistency_policy':'external' if write else 'strong','transaction_policy':{'mode':'provider','boundary':'owning_domain'},'delegation_policy':'none','idempotency_policy':'required' if write else 'none','evidence_policy':'optional'})
+        acceptance=((effect,'The parent, tenant, owner and registered upload provenance are re-read once for the requested BOP version.','The result contains at most 5000 short-lived image grants and identifies unavailable historical records.') if picture_access else
+            (effect,'At most 5000 rows and 200 columns are accepted; raw credentials and filesystem paths are never input.','File output is an immutable ArtifactRef with verified hash and size.'))
+        invariant=(BusinessInvariantContract(rule_id=capability_id+'.owner_bound',version=1,statement=('Every picture grant is bound to the authenticated reader, tenant, BOP version and immutable registered object.' if picture_access else 'File and Feishu access are derived from authenticated context.'),applies_when=('A BOP picture access set is issued.' if picture_access else 'The data exchange action executes.'),enforcement_ref=('plugins/craft/craft_backend/capabilities/desktop_pictures.py; backend/platform_sdk/historical_artifacts.py' if picture_access else 'backend/platform_sdk/artifacts.py; backend/platform_sdk/feishu.py'),error_code='permission_denied',test_refs=(('backend/tests/test_desktop_historical_attachments.py' if picture_access else 'backend/tests/test_desktop_round5_exchange.py'),)),)
+        descriptor=descriptor_from_provider_spec(spec).model_copy(update={'business_effect':effect,'business_acceptance_criteria':acceptance,'business_invariants':invariant,'no_business_invariant_reason':None,'exposure':ExposurePolicy(web=True,api=True,plugin=False,agent=False,mcp=False),'consistency_policy':'external' if write else 'strong','transaction_policy':{'mode':'provider','boundary':'owning_domain'},'delegation_policy':'none','idempotency_policy':'required' if write else 'none','evidence_policy':'optional'})
         registry.register(spec,handler,descriptor=descriptor)

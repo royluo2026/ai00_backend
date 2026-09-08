@@ -24,9 +24,13 @@ def read_stored_image(record, *, static_root):
     else:
         # Only the two configured owner stores can resolve historical public URLs.
         minio=storage._get_minio_config();ois=ois_storage._get_ois_config()
-        bases=[str(minio.get('public_url') or '').rstrip('/'),str(ois.get('public_base_url') or '').rstrip('/')]
-        prefix=next((base+'/' for base in bases if base and url.startswith(base+'/')),None)
-        if prefix is None:raise ValueError('unsupported_stored_image_location')
-        data=storage.get_immutable(unquote(url[len(prefix):]),maximum=MAXIMUM)
+        parsed=urlsplit(url);match=None
+        for base,backend in ((minio.get('public_url'),'minio'),(ois.get('public_base_url'),'ois')):
+            parsed_base=urlsplit(str(base or '').rstrip('/'));prefix=parsed_base.path.rstrip('/')+'/'
+            if base and (parsed.scheme,parsed.netloc)==(parsed_base.scheme,parsed_base.netloc) and parsed.path.startswith(prefix):
+                match=(backend,unquote(parsed.path[len(prefix):]));break
+        if match is None:raise ValueError('unsupported_stored_image_location')
+        backend,key=match
+        data=(ois_storage.get_immutable if backend=='ois' else storage.get_immutable)(key,maximum=MAXIMUM)
     if not isinstance(data,bytes) or len(data)>MAXIMUM:raise ValueError('stored_image_unavailable')
     return data,image_type(data)

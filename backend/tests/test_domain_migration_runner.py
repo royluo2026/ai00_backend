@@ -175,6 +175,7 @@ def test_simulation_historical_0004_checksum_upgrades_through_current_chain(simu
     old = next(item for item in migrations if item.migration_id == "0004")
     assert old.checksum == "be3e9cefefa42b1fc196ffdf275d4740d30d8acffff0e80dc0408008e03ada04"
     assert "ADD COLUMN IF NOT EXISTS" in old.sql
+    assert ",\n  ADD COLUMN IF NOT EXISTS" not in old.sql
     ledger = tuple(
         {"migration_id": item.migration_id, "checksum": item.checksum,
          "artifact_version": item.artifact_version}
@@ -184,7 +185,7 @@ def test_simulation_historical_0004_checksum_upgrades_through_current_chain(simu
 
     applied = apply_domain_migrations(connection, simulation_manifest, migrations)
 
-    assert applied == ("0005", "0006", "0007")
+    assert applied == ("0005", "0006", "0007", "0008", "0009", "0010")
 
 
 def test_apply_uses_domain_lock_ledger_and_artifact_version(craft_manifest):

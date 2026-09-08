@@ -27,6 +27,23 @@ _QUALIFIED_IDENTIFIER_RE = re.compile(
 )
 
 
+def _split_multi_add_column_alters(sql: str) -> str:
+    """Emit one ADD COLUMN per ALTER for OceanBase compatibility."""
+    expanded: list[str] = []
+    for statement in split_sql(sql):
+        match = re.match(
+            r"(?is)^(?P<head>\s*ALTER\s+TABLE\s+`?[A-Z0-9_]+`?\s+)"
+            r"(?P<body>ADD\s+COLUMN\s+.+)$",
+            statement,
+        )
+        if not match:
+            expanded.append(statement)
+            continue
+        clauses = re.split(r",\s*(?=ADD\s+COLUMN\b)", match.group("body"), flags=re.I)
+        expanded.extend(match.group("head") + clause for clause in clauses)
+    return ";\n".join(expanded) + (";" if expanded else "")
+
+
 @dataclass(frozen=True)
 class DomainMigration:
     migration_id: str
@@ -115,6 +132,7 @@ def discover_domain_migrations(
         ):
             sql = re.sub(r"\bADD\s+COLUMN\s+(?!IF\s+NOT\s+EXISTS)",
                          "ADD COLUMN IF NOT EXISTS ", sql, flags=re.I)
+        sql = _split_multi_add_column_alters(sql)
         _validate_domain_sql(path, sql)
         migrations.append(DomainMigration(
             migration_id=migration_id,
