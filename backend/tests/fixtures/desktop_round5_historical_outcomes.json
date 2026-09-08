@@ -1,0 +1,788 @@
+{
+  "fixture_kind": "Real registered owner handler + Gateway + LegacyServerGatewayPolicy + actual approval/schema/reliability; deterministic identity and SQL/external I/O ports",
+  "rows": [
+    {
+      "id": "project.attachment.resolve",
+      "version": 1,
+      "payload": {
+        "parent_type": "task",
+        "parent_gid": "tasks-one",
+        "reference_hash": "7260ba96e7a559272aa2fdeca7fba181a49e70279d712b903978fa399378afa9"
+      },
+      "provider_data": {
+        "artifact_ref": {
+          "artifact_id": "artifact_60988e5867aa55448f92bb724d872837",
+          "media_type": "text/markdown",
+          "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
+          "byte_size": 22,
+          "version": 1
+        },
+        "name": "document.md"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "parent_type": {
+            "enum": [
+              "task",
+              "issue"
+            ]
+          },
+          "parent_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "reference_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "parent_type",
+          "parent_gid",
+          "reference_hash"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "request_id": "matrix-83",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.attachment.resolve",
+        "major_version": 1,
+        "data": {
+          "artifact_ref": {
+            "artifact_id": "artifact_60988e5867aa55448f92bb724d872837",
+            "media_type": "text/markdown",
+            "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
+            "byte_size": 22,
+            "version": 1
+          },
+          "name": "document.md"
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-83",
+          "trace_id": "matrix-83"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.desktop_attachments",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "project.attachment.resolve",
+      "version": 1,
+      "payload": {
+        "parent_type": "issue",
+        "parent_gid": "issues-one",
+        "reference_hash": "7260ba96e7a559272aa2fdeca7fba181a49e70279d712b903978fa399378afa9"
+      },
+      "provider_data": {
+        "artifact_ref": {
+          "artifact_id": "artifact_98dfd2a9377453df9e98152a3fb6bb75",
+          "media_type": "text/markdown",
+          "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
+          "byte_size": 22,
+          "version": 1
+        },
+        "name": "document.md"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "parent_type": {
+            "enum": [
+              "task",
+              "issue"
+            ]
+          },
+          "parent_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "reference_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "parent_type",
+          "parent_gid",
+          "reference_hash"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "request_id": "matrix-84",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.attachment.resolve",
+        "major_version": 1,
+        "data": {
+          "artifact_ref": {
+            "artifact_id": "artifact_98dfd2a9377453df9e98152a3fb6bb75",
+            "media_type": "text/markdown",
+            "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
+            "byte_size": 22,
+            "version": 1
+          },
+          "name": "document.md"
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-84",
+          "trace_id": "matrix-84"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.desktop_attachments",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "knowledge.attachment.resolve",
+      "version": 1,
+      "payload": {
+        "parent_type": "entry",
+        "parent_gid": "entry-one",
+        "reference_hash": "7260ba96e7a559272aa2fdeca7fba181a49e70279d712b903978fa399378afa9"
+      },
+      "provider_data": {
+        "artifact_ref": {
+          "artifact_id": "artifact_f69dbe0a9dc856378d14afda1b6b6919",
+          "media_type": "text/markdown",
+          "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
+          "byte_size": 22,
+          "version": 1
+        },
+        "name": "document.md"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "parent_type": {
+            "enum": [
+              "entry",
+              "item"
+            ]
+          },
+          "parent_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "reference_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "parent_type",
+          "parent_gid",
+          "reference_hash"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "request_id": "matrix-85",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "knowledge.attachment.resolve",
+        "major_version": 1,
+        "data": {
+          "artifact_ref": {
+            "artifact_id": "artifact_f69dbe0a9dc856378d14afda1b6b6919",
+            "media_type": "text/markdown",
+            "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
+            "byte_size": 22,
+            "version": 1
+          },
+          "name": "document.md"
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-85",
+          "trace_id": "matrix-85"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.knowledge.knowledge_backend.capabilities.desktop_attachments",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "knowledge.attachment.resolve",
+      "version": 1,
+      "payload": {
+        "parent_type": "item",
+        "parent_gid": "item-one",
+        "reference_hash": "8804147933702c4039af5648ee029eaa85cf1c057ff12dbeb9c7263a3ce03ad1"
+      },
+      "provider_data": {
+        "artifact_ref": {
+          "artifact_id": "artifact_72915275559a529d8c35fae474417aa1",
+          "media_type": "text/markdown",
+          "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
+          "byte_size": 22,
+          "version": 1
+        },
+        "name": "document.md"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "parent_type": {
+            "enum": [
+              "entry",
+              "item"
+            ]
+          },
+          "parent_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "reference_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "parent_type",
+          "parent_gid",
+          "reference_hash"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "request_id": "matrix-86",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "knowledge.attachment.resolve",
+        "major_version": 1,
+        "data": {
+          "artifact_ref": {
+            "artifact_id": "artifact_72915275559a529d8c35fae474417aa1",
+            "media_type": "text/markdown",
+            "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
+            "byte_size": 22,
+            "version": 1
+          },
+          "name": "document.md"
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-86",
+          "trace_id": "matrix-86"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.knowledge.knowledge_backend.capabilities.desktop_attachments",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "craft.bop.picture.resolve",
+      "version": 1,
+      "payload": {
+        "version_gid": "bop-one",
+        "reference_hash": "86b4d70435492503095ac1cc6696c65cf25dd8786a3643d4bbf332f1bad75b1d"
+      },
+      "provider_data": {
+        "artifact_ref": {
+          "artifact_id": "artifact_6ca1b8cc2ab25d9ba9b126791d9c7a37",
+          "media_type": "image/png",
+          "sha256": "bd54b02fae14b6b9ed73887ded339b8ef846fbcba0d4e5f9d95470ac23ade242",
+          "byte_size": 15,
+          "version": 1
+        },
+        "name": "photo.png"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "version_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "reference_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "version_gid",
+          "reference_hash"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "request_id": "matrix-87",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "craft.bop.picture.resolve",
+        "major_version": 1,
+        "data": {
+          "artifact_ref": {
+            "artifact_id": "artifact_6ca1b8cc2ab25d9ba9b126791d9c7a37",
+            "media_type": "image/png",
+            "sha256": "bd54b02fae14b6b9ed73887ded339b8ef846fbcba0d4e5f9d95470ac23ade242",
+            "byte_size": 15,
+            "version": 1
+          },
+          "name": "photo.png"
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-87",
+          "trace_id": "matrix-87"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.craft.craft_backend.capabilities.desktop_exchange",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "craft.attachment.resolve",
+      "version": 1,
+      "payload": {
+        "parent_type": "rule",
+        "parent_gid": "rule-one",
+        "reference_hash": "7260ba96e7a559272aa2fdeca7fba181a49e70279d712b903978fa399378afa9"
+      },
+      "provider_data": {
+        "artifact_ref": {
+          "artifact_id": "artifact_2083beef9bae58a9bc183275e582fb00",
+          "media_type": "text/markdown",
+          "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
+          "byte_size": 22,
+          "version": 1
+        },
+        "name": "document.md"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "parent_type": {
+            "enum": [
+              "rule"
+            ]
+          },
+          "parent_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "reference_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "parent_type",
+          "parent_gid",
+          "reference_hash"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "request_id": "matrix-88",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "craft.attachment.resolve",
+        "major_version": 1,
+        "data": {
+          "artifact_ref": {
+            "artifact_id": "artifact_2083beef9bae58a9bc183275e582fb00",
+            "media_type": "text/markdown",
+            "sha256": "eda0f45bed794ab16c4f5cc369db81b62163e402be327a86bcc70d9967a6fd7e",
+            "byte_size": 22,
+            "version": 1
+          },
+          "name": "document.md"
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-88",
+          "trace_id": "matrix-88"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.craft.craft_backend.capabilities.desktop_attachments",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    }
+  ]
+}

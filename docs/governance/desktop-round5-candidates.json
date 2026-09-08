@@ -1,6 +1,6 @@
 {
   "status": "unpublished_candidate",
-  "source_revision": "37bd5fbea1e13aab2529472a999a9bd804a88daf",
+  "source_revision": "4353070c39266c53ba0e8336674f05aa61c21979",
   "published_catalog_changed": false,
   "machine_passed": false,
   "human_approved": false,
@@ -18740,6 +18740,1651 @@
       "provider_ref": "craft.provider",
       "api_refs": [],
       "test_refs": []
+    },
+    {
+      "id": "project.task.change.apply.atomic.tasks_update",
+      "major_version": 2,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.task.change.apply.atomic.tasks_update",
+      "description": "Execute Project Management operation tasks.update.",
+      "use_when": "A governed consumer needs exactly this Project Management operation.",
+      "do_not_use_when": "The request selects another operation or domain.",
+      "business_effect": "Authorized project participants can apply the requested tasks update change within their active tenant and receive its governed outcome.",
+      "business_acceptance_criteria": [
+        "The Provider evaluates the request only within the authenticated active tenant.",
+        "The returned data conforms to the Capability's closed output contract.",
+        "The requested change is committed once, or the Provider returns a governed error without reporting success."
+      ],
+      "business_invariants": [],
+      "no_business_invariant_reason": "This Capability introduces no additional business invariant beyond the Project Management Provider's tenant authorization, closed schema, and transaction policies.",
+      "side_effect_level": "write",
+      "side_effects": "Writes domain state through the owning Provider.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "project_management.v2:project.manage_any",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "arguments": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "updates": {
+                "type": "object",
+                "properties": {
+                  "share_scope": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "due_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "canvas_x": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "attachments": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "maxLength": 255
+                        },
+                        "mime": {
+                          "type": "string",
+                          "maxLength": 128
+                        },
+                        "url": {
+                          "type": "string",
+                          "pattern": "^artifact:",
+                          "maxLength": 4096
+                        },
+                        "artifact_ref": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "artifact_id": {
+                              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                              "title": "Artifact Id",
+                              "type": "string"
+                            },
+                            "media_type": {
+                              "maxLength": 255,
+                              "minLength": 1,
+                              "title": "Media Type",
+                              "type": "string"
+                            },
+                            "sha256": {
+                              "pattern": "^[0-9a-f]{64}$",
+                              "title": "Sha256",
+                              "type": "string"
+                            },
+                            "byte_size": {
+                              "minimum": 0,
+                              "title": "Byte Size",
+                              "type": "integer"
+                            },
+                            "version": {
+                              "default": 1,
+                              "minimum": 1,
+                              "title": "Version",
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "artifact_id",
+                            "media_type",
+                            "sha256",
+                            "byte_size"
+                          ],
+                          "title": "ArtifactRef",
+                          "type": "object"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "name",
+                        "artifact_ref"
+                      ]
+                    }
+                  },
+                  "actual_start": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "canvas_icon": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_chat_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "is_deleted": {
+                    "type": "boolean"
+                  },
+                  "status": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "scheduled_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "canvas_y": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "time_estimate": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "completion": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "plan_start": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "priority": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "actual_end": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "meeting_doc_link": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "meeting_level": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "title": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "assignee_team_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "parent_task_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "node_type": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "scheduled_start_time": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_open_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "project_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_docs": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "title": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "url": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "type": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "feishu_group_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_groups": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "chat_id": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "avatar": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "plan_end": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "review_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  }
+                },
+                "additionalProperties": false,
+                "minProperties": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "updates"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "success": {
+                "const": true
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "success"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "success": {
+                "const": true
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "success"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "schema_hash": "sha256:a32d318ec853351e54b72dceda07d65f6b7dffe81379ee2dbdc07055f25ff638",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_00d3697711d5c323f629ff10",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested project resource is unavailable.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller cannot access the project resource.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The project change requires Base approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The project resource changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "The Project Management provider is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "project_management.provider",
+      "api_refs": [],
+      "test_refs": []
+    },
+    {
+      "id": "project.issue.change.apply.atomic.issues_update",
+      "major_version": 2,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.issue.change.apply.atomic.issues_update",
+      "description": "Execute Project Management operation issues.update.",
+      "use_when": "A governed consumer needs exactly this Project Management operation.",
+      "do_not_use_when": "The request selects another operation or domain.",
+      "business_effect": "Authorized project participants can apply the requested issues update change within their active tenant and receive its governed outcome.",
+      "business_acceptance_criteria": [
+        "The Provider evaluates the request only within the authenticated active tenant.",
+        "The returned data conforms to the Capability's closed output contract.",
+        "The requested change is committed once, or the Provider returns a governed error without reporting success."
+      ],
+      "business_invariants": [],
+      "no_business_invariant_reason": "This Capability introduces no additional business invariant beyond the Project Management Provider's tenant authorization, closed schema, and transaction policies.",
+      "side_effect_level": "write",
+      "side_effects": "Writes domain state through the owning Provider.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "project_management.v2:project.manage_any",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "arguments": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "updates": {
+                "type": "object",
+                "properties": {
+                  "share_scope": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "title": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "assignee_team_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "related_knowledge_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "attachments": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "maxLength": 255
+                        },
+                        "mime": {
+                          "type": "string",
+                          "maxLength": 128
+                        },
+                        "url": {
+                          "type": "string",
+                          "pattern": "^artifact:",
+                          "maxLength": 4096
+                        },
+                        "artifact_ref": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "artifact_id": {
+                              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                              "title": "Artifact Id",
+                              "type": "string"
+                            },
+                            "media_type": {
+                              "maxLength": 255,
+                              "minLength": 1,
+                              "title": "Media Type",
+                              "type": "string"
+                            },
+                            "sha256": {
+                              "pattern": "^[0-9a-f]{64}$",
+                              "title": "Sha256",
+                              "type": "string"
+                            },
+                            "byte_size": {
+                              "minimum": 0,
+                              "title": "Byte Size",
+                              "type": "integer"
+                            },
+                            "version": {
+                              "default": 1,
+                              "minimum": 1,
+                              "title": "Version",
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "artifact_id",
+                            "media_type",
+                            "sha256",
+                            "byte_size"
+                          ],
+                          "title": "ArtifactRef",
+                          "type": "object"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "name",
+                        "artifact_ref"
+                      ]
+                    }
+                  },
+                  "bop_entry_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_chat_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "interim_action": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "approval_order_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "status": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "scheduled_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_open_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "severity": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "project_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_docs": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "title": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "url": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "type": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "permanent_action": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "related_task_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "escape_root_cause": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "occurrence_root_cause": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_groups": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "chat_id": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "avatar": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "additionalProperties": false,
+                "minProperties": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "updates"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "success": {
+                "const": true
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "success"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "success": {
+                "const": true
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "success"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "schema_hash": "sha256:fa34f0d25dc5c3f6dd6f59b2866b2267b034f098394d2e62248ab38b20164d08",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_800a5c5873adf86434dcc0d8",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested project resource is unavailable.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "permission_denied",
+          "message_template": "The caller cannot access the project resource.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "approval_required",
+          "message_template": "The project change requires Base approval.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The project resource changed concurrently.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "provider_unavailable",
+          "message_template": "The Project Management provider is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "project_management.provider",
+      "api_refs": [],
+      "test_refs": []
+    },
+    {
+      "id": "project.attachment.resolve",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "project.attachment.resolve",
+      "description": "Resolve one historical attachment proven to belong to an authorized project_management business parent into an immutable ArtifactRef.",
+      "use_when": "Resolve one historical attachment proven to belong to an authorized project_management business parent into an immutable ArtifactRef.",
+      "do_not_use_when": "Only an object key, filesystem path or unowned attachment is supplied.",
+      "business_effect": "Resolve one historical attachment proven to belong to an authorized project_management business parent into an immutable ArtifactRef.",
+      "business_acceptance_criteria": [
+        "Parent, tenant and owner are re-read before resolving the stored attachment.",
+        "Repeated migration returns the same immutable reference and validates hash, size and MIME."
+      ],
+      "business_invariants": [],
+      "no_business_invariant_reason": "This is an owner-authorized immutable attachment projection; domain ownership and Base content integrity enforce access.",
+      "side_effect_level": "read",
+      "side_effects": "Reads domain state without mutation.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "adapter_default",
+      "automation_level": "A2",
+      "authorization_policy": "legacy:project.view",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "parent_type": {
+            "enum": [
+              "task",
+              "issue"
+            ]
+          },
+          "parent_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "reference_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "parent_type",
+          "parent_gid",
+          "reference_hash"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "schema_hash": "sha256:7adc07bbc10b168b176d773d184588cff2ecbb10a292b160d53313e5d326c0e4",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_708b599f2ea186cf57a1129b",
+      "error_schema": [],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "project_management.provider",
+      "api_refs": [],
+      "test_refs": []
+    },
+    {
+      "id": "knowledge.attachment.resolve",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.attachment.resolve",
+      "description": "Resolve one historical attachment proven to belong to an authorized knowledge business parent into an immutable ArtifactRef.",
+      "use_when": "Resolve one historical attachment proven to belong to an authorized knowledge business parent into an immutable ArtifactRef.",
+      "do_not_use_when": "Only an object key, filesystem path or unowned attachment is supplied.",
+      "business_effect": "Resolve one historical attachment proven to belong to an authorized knowledge business parent into an immutable ArtifactRef.",
+      "business_acceptance_criteria": [
+        "Parent, tenant and owner are re-read before resolving the stored attachment.",
+        "Repeated migration returns the same immutable reference and validates hash, size and MIME."
+      ],
+      "business_invariants": [],
+      "no_business_invariant_reason": "This is an owner-authorized immutable attachment projection; domain ownership and Base content integrity enforce access.",
+      "side_effect_level": "read",
+      "side_effects": "Reads domain state without mutation.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "adapter_default",
+      "automation_level": "A2",
+      "authorization_policy": "legacy:knowledge.view",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "parent_type": {
+            "enum": [
+              "entry",
+              "item"
+            ]
+          },
+          "parent_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "reference_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "parent_type",
+          "parent_gid",
+          "reference_hash"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "schema_hash": "sha256:5a91262ddc08c0a7fee9c2848bc855f4fcc86a60e043a05cdf3ac81b158b3b61",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_d6799d76e34c17619dd01a4e",
+      "error_schema": [],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "knowledge.provider",
+      "api_refs": [],
+      "test_refs": []
+    },
+    {
+      "id": "craft.attachment.resolve",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.attachment.resolve",
+      "description": "Resolve one historical attachment proven to belong to an authorized craft business parent into an immutable ArtifactRef.",
+      "use_when": "Resolve one historical attachment proven to belong to an authorized craft business parent into an immutable ArtifactRef.",
+      "do_not_use_when": "Only an object key, filesystem path or unowned attachment is supplied.",
+      "business_effect": "Resolve one historical attachment proven to belong to an authorized craft business parent into an immutable ArtifactRef.",
+      "business_acceptance_criteria": [
+        "Parent, tenant and owner are re-read before resolving the stored attachment.",
+        "Repeated migration returns the same immutable reference and validates hash, size and MIME."
+      ],
+      "business_invariants": [],
+      "no_business_invariant_reason": "This is an owner-authorized immutable attachment projection; domain ownership and Base content integrity enforce access.",
+      "side_effect_level": "read",
+      "side_effects": "Reads domain state without mutation.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "adapter_default",
+      "automation_level": "A2",
+      "authorization_policy": "legacy:craft.read",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "parent_type": {
+            "enum": [
+              "rule"
+            ]
+          },
+          "parent_gid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "reference_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "parent_type",
+          "parent_gid",
+          "reference_hash"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "maxLength": 255,
+                "minLength": 1,
+                "title": "Media Type",
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Sha256",
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "title": "Byte Size",
+                "type": "integer"
+              },
+              "version": {
+                "default": 1,
+                "minimum": 1,
+                "title": "Version",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size"
+            ],
+            "title": "ArtifactRef",
+            "type": "object"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[^/\\\\\\x00-\\x1f]+$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_ref",
+          "name"
+        ]
+      },
+      "schema_hash": "sha256:9e22068a7ad33898f12154675e2f8d6821ce8430363a2bb9d8bbce5ec89572e5",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_ed52f6a186388d29ddf60fb2",
+      "error_schema": [],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": null,
+      "provider_ref": "craft.provider",
+      "api_refs": [],
+      "test_refs": []
     }
   ],
   "business_definition_hashes": {
@@ -18815,7 +20460,12 @@
     "base.export_template.list@1": "sha256:f3812cd1d1dd5dc83ef3808c249c5a57d292adbd8874304dd77e5c0db5b2fd78",
     "base.export_template.create@1": "sha256:5cbef09d5405eb714181988fba4a84d591cd474c9c68c6c898e8377ea7940cee",
     "base.export_template.update@1": "sha256:9dc379570811c5b364cd04dabc53d7e265049a3cbff2ad2fe07d7865cb89cb61",
-    "craft.pbom.vpps_validation.get@1": "sha256:f778a6085e5ea70a56cb54b19e2d6a14fc083c7eb53aeecb82d71ee4db7bf1a3"
+    "craft.pbom.vpps_validation.get@1": "sha256:f778a6085e5ea70a56cb54b19e2d6a14fc083c7eb53aeecb82d71ee4db7bf1a3",
+    "project.task.change.apply.atomic.tasks_update@2": "sha256:91c388cb4ce0d44d3be6f9a4a1e58d01e8dfa6be1fb7a74cd8a28360a98fa868",
+    "project.issue.change.apply.atomic.issues_update@2": "sha256:822caf02c8cb7377b220108f1951a6bf7f5f31c77cc237cf454ec14f4828bbae",
+    "project.attachment.resolve@1": "sha256:063aac009cf762ef756a0b389da64256cd47f3b2aa376062682dfa143d6713a0",
+    "knowledge.attachment.resolve@1": "sha256:2d4e0c703cfe06e50dab48d7c4f1b307e5acaa8bac82f8529c5f8b21ff4dff9d",
+    "craft.attachment.resolve@1": "sha256:2c88106396ecb82ee998a2da35ceea09412e215287706d25a76319067987c65c"
   },
   "verification": "backend/tests/test_desktop_round5_base.py; deterministic SQL/external ports, not live runtime approval"
 }

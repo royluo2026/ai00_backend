@@ -1,0 +1,3226 @@
+{
+  "fixture_kind": "Real registered owner handler + Gateway + LegacyServerGatewayPolicy + actual approval/schema/reliability; deterministic identity and SQL/external I/O ports",
+  "rows": [
+    {
+      "id": "base.identity.directory.feishu.sync",
+      "version": 1,
+      "payload": {},
+      "provider_data": {
+        "ok": true,
+        "created": 0,
+        "updated": 1,
+        "dept_synced": 1,
+        "departments": 1,
+        "manual_teams_preserved": true
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "department_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 512
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "created": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "updated": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "dept_synced": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "departments": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "manual_teams_preserved": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "ok",
+          "created",
+          "updated",
+          "dept_synced",
+          "departments",
+          "manual_teams_preserved"
+        ]
+      },
+      "sql_statements": [
+        [
+          "SELECT gid, feishu_dept_id FROM workmanship_auth_teams WHERE feishu_dept_id IS NOT NULL",
+          []
+        ],
+        [
+          "SELECT gid FROM workmanship_auth_teams WHERE feishu_dept_id = %s",
+          [
+            "department-one"
+          ]
+        ],
+        [
+          "UPDATE workmanship_auth_teams SET name=%s, parent_team_gid=%s WHERE feishu_dept_id=%s",
+          [
+            "Fixture department",
+            null,
+            "department-one"
+          ]
+        ],
+        [
+          "SELECT COUNT(*) AS total FROM workmanship_auth_users WHERE feishu_open_id=%s",
+          [
+            "feishu-user"
+          ]
+        ],
+        [
+          "SELECT * FROM workmanship_auth_users WHERE feishu_open_id = %s",
+          [
+            "feishu-user"
+          ]
+        ],
+        [
+          "UPDATE workmanship_auth_users SET name=%s, avatar_url=%s, feishu_access_token=%s, feishu_refresh_token=%s, feishu_token_expires_at=%s, org_role=%s, updated_at=NOW() WHERE feishu_open_id=%s",
+          [
+            "Fixture user",
+            "",
+            "",
+            "",
+            null,
+            "member",
+            "feishu-user"
+          ]
+        ],
+        [
+          "SELECT * FROM workmanship_auth_users WHERE feishu_open_id=%s",
+          [
+            "feishu-user"
+          ]
+        ],
+        [
+          "UPDATE workmanship_auth_users SET team_id=%s, updated_at=NOW() WHERE gid=%s",
+          [
+            "team-one",
+            "fixture-user"
+          ]
+        ]
+      ],
+      "request_id": "matrix-74",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "base.identity.directory.feishu.sync",
+        "major_version": 1,
+        "data": {
+          "ok": true,
+          "created": 0,
+          "updated": 1,
+          "dept_synced": 1,
+          "departments": 1,
+          "manual_teams_preserved": true
+        },
+        "operation_ref": {
+          "operation_id": "op_3d59b1826eef49b0a7c07d3be7bd06bd",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-74",
+          "trace_id": "matrix-74"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "base.identity.directory.feishu.sync",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-74",
+          "trace_id": "matrix-74"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "backend.base.web_atomic",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "craft.rule.library.change.apply",
+      "version": 2,
+      "payload": {
+        "operation": "update",
+        "gid": "rule-one",
+        "record": {
+          "name": "Updated rule"
+        }
+      },
+      "provider_data": {
+        "success": true
+      },
+      "input_schema": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "operation": {
+                "const": "create"
+              },
+              "gid": {
+                "type": "string",
+                "minLength": 1
+              },
+              "record": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "rule_type": {
+                    "type": "string"
+                  },
+                  "enforcement_level": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "share_scope": {
+                    "type": "string"
+                  },
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "context_class_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "rule_definition": {
+                    "type": "object",
+                    "properties": {},
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "name"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation",
+              "record"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "operation": {
+                "const": "update"
+              },
+              "gid": {
+                "type": "string",
+                "minLength": 1
+              },
+              "record": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "rule_type": {
+                    "type": "string"
+                  },
+                  "enforcement_level": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "share_scope": {
+                    "type": "string"
+                  },
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "context_class_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "rule_definition": {
+                    "type": "object",
+                    "properties": {},
+                    "additionalProperties": false
+                  },
+                  "expression": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation",
+              "gid",
+              "record"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "operation": {
+                "const": "delete"
+              },
+              "gid": {
+                "type": "string",
+                "minLength": 1
+              },
+              "record": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "rule_type": {
+                    "type": "string"
+                  },
+                  "enforcement_level": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "share_scope": {
+                    "type": "string"
+                  },
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "context_class_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "rule_definition": {
+                    "type": "object",
+                    "properties": {},
+                    "additionalProperties": false
+                  },
+                  "expression": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation",
+              "gid"
+            ]
+          }
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "success"
+        ]
+      },
+      "sql_statements": [
+        [
+          "SELECT creator_gid,owner_user_gid,applicable_scope FROM workmanship_know_craft_rules WHERE gid=%s FOR UPDATE",
+          [
+            "rule-one"
+          ]
+        ],
+        [
+          "UPDATE workmanship_know_craft_rules SET name=%s,updated_at=NOW() WHERE gid=%s AND JSON_UNQUOTE(JSON_EXTRACT(applicable_scope, '$.team_gid'))=%s",
+          [
+            "Updated rule",
+            "rule-one",
+            "fixture-team"
+          ]
+        ]
+      ],
+      "request_id": "matrix-75",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "craft.rule.library.change.apply",
+        "major_version": 2,
+        "data": {
+          "success": true
+        },
+        "operation_ref": {
+          "operation_id": "op_89c61a315d5b4e76b5a474a1e80ddbaa",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-75",
+          "trace_id": "matrix-75"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "craft.rule.library.change.apply",
+        "major_version": 2,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-75",
+          "trace_id": "matrix-75"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.craft.craft_backend.capabilities.rule_library",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "knowledge.entry.change.apply.atomic.entries_update",
+      "version": 1,
+      "payload": {
+        "gid": "entry-one",
+        "updates": {
+          "title": "Updated knowledge"
+        }
+      },
+      "provider_data": {
+        "data": {
+          "changed": true
+        }
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "entry_type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "share_scope": {
+            "type": "string"
+          },
+          "list_gid": {
+            "type": "string"
+          },
+          "source_gid": {
+            "type": "string"
+          },
+          "source_label": {
+            "type": "string"
+          },
+          "maintainer_gid": {
+            "type": "string"
+          },
+          "contributors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {}
+            },
+            "maxItems": 500
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {}
+            },
+            "maxItems": 500
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100
+          },
+          "content_ref": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_md": {
+            "type": "string"
+          },
+          "related_part_nos": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 500
+          },
+          "related_operation_gids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 500
+          },
+          "context_class_gid": {
+            "type": "string"
+          },
+          "updates": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "entry_type": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "share_scope": {
+                "type": "string"
+              },
+              "list_gid": {
+                "type": "string"
+              },
+              "source_gid": {
+                "type": "string"
+              },
+              "source_label": {
+                "type": "string"
+              },
+              "maintainer_gid": {
+                "type": "string"
+              },
+              "contributors": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "maxItems": 500
+              },
+              "attachments": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "maxItems": 500
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 100
+              },
+              "content_ref": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {}
+              },
+              "content_md": {
+                "type": "string"
+              },
+              "related_part_nos": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 500
+              },
+              "related_operation_gids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 500
+              },
+              "context_class_gid": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "changed": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "sql_statements": [
+        [
+          "SELECT creator_gid,share_scope FROM workmanship_know_entries WHERE gid=%s",
+          [
+            "entry-one"
+          ]
+        ],
+        [
+          "UPDATE workmanship_know_entries SET title=%s,updated_at=NOW() WHERE gid=%s AND creator_gid=%s",
+          [
+            "Updated knowledge",
+            "entry-one",
+            "fixture-user"
+          ]
+        ]
+      ],
+      "request_id": "matrix-76",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "knowledge.entry.change.apply.atomic.entries_update",
+        "major_version": 1,
+        "data": {
+          "data": {
+            "changed": true
+          }
+        },
+        "operation_ref": {
+          "operation_id": "op_4889d36413cf4d30bc10426f3fa6aef3",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-76",
+          "trace_id": "matrix-76"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "knowledge.entry.change.apply.atomic.entries_update",
+        "major_version": 1,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-76",
+          "trace_id": "matrix-76"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.knowledge.knowledge_backend.capabilities.reviewed",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "project.task.change.apply.atomic.tasks_update",
+      "version": 2,
+      "payload": {
+        "arguments": {
+          "gid": "task-one",
+          "updates": {
+            "title": "Updated task"
+          }
+        }
+      },
+      "provider_data": {
+        "data": {
+          "success": true
+        }
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "arguments": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "updates": {
+                "type": "object",
+                "properties": {
+                  "share_scope": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "due_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "canvas_x": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "attachments": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "maxLength": 255
+                        },
+                        "mime": {
+                          "type": "string",
+                          "maxLength": 128
+                        },
+                        "url": {
+                          "type": "string",
+                          "pattern": "^artifact:",
+                          "maxLength": 4096
+                        },
+                        "artifact_ref": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "artifact_id": {
+                              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                              "title": "Artifact Id",
+                              "type": "string"
+                            },
+                            "media_type": {
+                              "maxLength": 255,
+                              "minLength": 1,
+                              "title": "Media Type",
+                              "type": "string"
+                            },
+                            "sha256": {
+                              "pattern": "^[0-9a-f]{64}$",
+                              "title": "Sha256",
+                              "type": "string"
+                            },
+                            "byte_size": {
+                              "minimum": 0,
+                              "title": "Byte Size",
+                              "type": "integer"
+                            },
+                            "version": {
+                              "default": 1,
+                              "minimum": 1,
+                              "title": "Version",
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "artifact_id",
+                            "media_type",
+                            "sha256",
+                            "byte_size"
+                          ],
+                          "title": "ArtifactRef",
+                          "type": "object"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "name",
+                        "artifact_ref"
+                      ]
+                    }
+                  },
+                  "actual_start": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "canvas_icon": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_chat_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "is_deleted": {
+                    "type": "boolean"
+                  },
+                  "status": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "scheduled_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "canvas_y": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "time_estimate": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "completion": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "plan_start": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "priority": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "actual_end": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "meeting_doc_link": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "meeting_level": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "title": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "assignee_team_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "parent_task_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "node_type": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "scheduled_start_time": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_open_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "project_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_docs": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "title": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "url": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "type": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "feishu_group_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_groups": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "chat_id": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "avatar": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "plan_end": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "review_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  }
+                },
+                "additionalProperties": false,
+                "minProperties": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "updates"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "success": {
+                "const": true
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "success"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "sql_statements": [
+        [
+          "SELECT * FROM workmanship_proj_tasks WHERE gid=%s",
+          [
+            "task-one"
+          ]
+        ],
+        [
+          "SELECT * FROM workmanship_proj_tasks WHERE gid=%s",
+          [
+            "task-one"
+          ]
+        ],
+        [
+          "UPDATE workmanship_proj_tasks SET title=%s,updated_at=NOW() WHERE gid=%s",
+          [
+            "Updated task",
+            "task-one"
+          ]
+        ],
+        [
+          "INSERT INTO workmanship_work_item_change_logs (gid,item_type,item_gid,list_gid,changed_by,field_name,old_value,new_value) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+          [
+            "da40a34f-95c3-4b25-bea7-5fcc04f608e8",
+            "task",
+            "task-one",
+            null,
+            "fixture-user",
+            "title",
+            "\"Before\"",
+            "\"Updated task\""
+          ]
+        ],
+        [
+          "SELECT user_gid,notify_on FROM workmanship_work_follows WHERE item_type=%s AND item_gid=%s AND user_gid<>%s",
+          [
+            "task",
+            "task-one",
+            "fixture-user"
+          ]
+        ],
+        [
+          "INSERT INTO workmanship_work_notifications (gid,user_gid,type,item_type,item_gid,title,body) VALUES (%s,%s,%s,%s,%s,%s,%s)",
+          [
+            "3b84b871-8775-4b50-a7a3-04aba281067a",
+            "follower-one",
+            "item_status",
+            "task",
+            "task-one",
+            "Updated task",
+            "any_change"
+          ]
+        ]
+      ],
+      "request_id": "matrix-77",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.task.change.apply.atomic.tasks_update",
+        "major_version": 2,
+        "data": {
+          "data": {
+            "success": true
+          }
+        },
+        "operation_ref": {
+          "operation_id": "op_ae2c628d830c4eda9b7f55a7dd775412",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-77",
+          "trace_id": "matrix-77"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "project.task.change.apply.atomic.tasks_update",
+        "major_version": 2,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-77",
+          "trace_id": "matrix-77"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.desktop_updates",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "project.issue.change.apply.atomic.issues_update",
+      "version": 2,
+      "payload": {
+        "arguments": {
+          "gid": "issue-one",
+          "updates": {
+            "title": "Updated issue"
+          }
+        }
+      },
+      "provider_data": {
+        "data": {
+          "success": true
+        }
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "arguments": {
+            "type": "object",
+            "properties": {
+              "gid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "updates": {
+                "type": "object",
+                "properties": {
+                  "share_scope": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "title": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "assignee_team_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "related_knowledge_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "attachments": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "maxLength": 255
+                        },
+                        "mime": {
+                          "type": "string",
+                          "maxLength": 128
+                        },
+                        "url": {
+                          "type": "string",
+                          "pattern": "^artifact:",
+                          "maxLength": 4096
+                        },
+                        "artifact_ref": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "artifact_id": {
+                              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$",
+                              "title": "Artifact Id",
+                              "type": "string"
+                            },
+                            "media_type": {
+                              "maxLength": 255,
+                              "minLength": 1,
+                              "title": "Media Type",
+                              "type": "string"
+                            },
+                            "sha256": {
+                              "pattern": "^[0-9a-f]{64}$",
+                              "title": "Sha256",
+                              "type": "string"
+                            },
+                            "byte_size": {
+                              "minimum": 0,
+                              "title": "Byte Size",
+                              "type": "integer"
+                            },
+                            "version": {
+                              "default": 1,
+                              "minimum": 1,
+                              "title": "Version",
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "artifact_id",
+                            "media_type",
+                            "sha256",
+                            "byte_size"
+                          ],
+                          "title": "ArtifactRef",
+                          "type": "object"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "name",
+                        "artifact_ref"
+                      ]
+                    }
+                  },
+                  "bop_entry_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_chat_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "interim_action": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "approval_order_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "status": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "scheduled_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_open_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "severity": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "project_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_docs": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "title": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "url": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "type": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "permanent_action": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "related_task_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "escape_root_cause": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "occurrence_root_cause": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_groups": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "chat_id": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "avatar": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "additionalProperties": false,
+                "minProperties": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "gid",
+              "updates"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "success": {
+                "const": true
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "success"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "sql_statements": [
+        [
+          "SELECT * FROM workmanship_proj_issues WHERE gid=%s",
+          [
+            "issue-one"
+          ]
+        ],
+        [
+          "SELECT * FROM workmanship_proj_issues WHERE gid=%s",
+          [
+            "issue-one"
+          ]
+        ],
+        [
+          "UPDATE workmanship_proj_issues SET title=%s,updated_at=NOW() WHERE gid=%s",
+          [
+            "Updated issue",
+            "issue-one"
+          ]
+        ],
+        [
+          "INSERT INTO workmanship_work_item_change_logs (gid,item_type,item_gid,list_gid,changed_by,field_name,old_value,new_value) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+          [
+            "fdf32528-67c4-4e4e-aca7-789cd6130a04",
+            "issue",
+            "issue-one",
+            null,
+            "fixture-user",
+            "title",
+            "\"Before\"",
+            "\"Updated issue\""
+          ]
+        ],
+        [
+          "SELECT user_gid,notify_on FROM workmanship_work_follows WHERE item_type=%s AND item_gid=%s AND user_gid<>%s",
+          [
+            "issue",
+            "issue-one",
+            "fixture-user"
+          ]
+        ],
+        [
+          "INSERT INTO workmanship_work_notifications (gid,user_gid,type,item_type,item_gid,title,body) VALUES (%s,%s,%s,%s,%s,%s,%s)",
+          [
+            "69e8bbae-66b2-4a3c-ae0c-50d6f678cc6e",
+            "follower-one",
+            "item_status",
+            "issue",
+            "issue-one",
+            "Updated issue",
+            "any_change"
+          ]
+        ]
+      ],
+      "request_id": "matrix-78",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.issue.change.apply.atomic.issues_update",
+        "major_version": 2,
+        "data": {
+          "data": {
+            "success": true
+          }
+        },
+        "operation_ref": {
+          "operation_id": "op_6a8a5ee3c5484b79a8004197e3e97515",
+          "status": "completed",
+          "version": 1
+        },
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-78",
+          "trace_id": "matrix-78"
+        }
+      },
+      "gateway_pending": {
+        "ok": false,
+        "status": "rejected",
+        "capability_id": "project.issue.change.apply.atomic.issues_update",
+        "major_version": 2,
+        "data": null,
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": {
+          "code": "confirmation_required",
+          "message": "Confirmation is required.",
+          "retryable": false,
+          "details": {}
+        },
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-78",
+          "trace_id": "matrix-78"
+        }
+      },
+      "confirmation_exercised": true,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.desktop_updates",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "project.project.read.atomic.projects_search",
+      "version": 1,
+      "payload": {
+        "arguments": {
+          "include_deleted": false,
+          "include_archived": false
+        }
+      },
+      "provider_data": {
+        "data": {
+          "success": true,
+          "data": [
+            {
+              "gid": "project-one",
+              "name": "Fixture project",
+              "project_code": "",
+              "model_year": null,
+              "suffix": "",
+              "description": "",
+              "status": "active",
+              "vehicle_model_gid": null,
+              "factory_gid": null,
+              "team_id": null,
+              "owner_gid": null,
+              "owner_name": "",
+              "share_scope": "team",
+              "jph": null,
+              "is_deleted": false,
+              "is_archived": false,
+              "deleted_at": null,
+              "archived_at": null,
+              "created_at": "2026-09-08",
+              "updated_at": "2026-09-08"
+            }
+          ]
+        }
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "arguments": {
+            "type": "object",
+            "properties": {
+              "include_deleted": {
+                "type": "boolean"
+              },
+              "include_archived": {
+                "type": "boolean"
+              },
+              "scope": {
+                "type": "object",
+                "properties": {
+                  "user_gid": {
+                    "type": "string"
+                  },
+                  "team_gids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 200
+                  },
+                  "team_member_gids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 200
+                  },
+                  "project_gids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 200
+                  },
+                  "is_admin": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "user_gid"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "success": {
+                "type": "boolean"
+              },
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "gid": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "project_code": {
+                      "type": "string"
+                    },
+                    "model_year": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "suffix": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "vehicle_model_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "factory_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "team_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "owner_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "owner_name": {
+                      "type": "string"
+                    },
+                    "share_scope": {
+                      "type": "string"
+                    },
+                    "jph": {
+                      "type": [
+                        "integer",
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "is_deleted": {
+                      "type": "boolean"
+                    },
+                    "is_archived": {
+                      "type": "boolean"
+                    },
+                    "deleted_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "archived_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "created_at": {
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "maxItems": 500
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "success",
+              "data"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "sql_statements": [
+        [
+          "SELECT parent_team_gid FROM workmanship_auth_teams WHERE gid=%s",
+          [
+            "fixture-team"
+          ]
+        ],
+        [
+          "SELECT gid FROM workmanship_auth_users WHERE is_active=1 AND team_id IN (%s)",
+          [
+            "fixture-team"
+          ]
+        ],
+        [
+          "SELECT project_gid FROM workmanship_auth_project_members WHERE user_gid=%s",
+          [
+            "fixture-user"
+          ]
+        ],
+        [
+          "SELECT p.* FROM workmanship_proj_projects p WHERE p.is_deleted=FALSE AND p.is_archived=FALSE ORDER BY p.updated_at DESC",
+          []
+        ]
+      ],
+      "request_id": "matrix-79",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.project.read.atomic.projects_search",
+        "major_version": 1,
+        "data": {
+          "data": {
+            "success": true,
+            "data": [
+              {
+                "gid": "project-one",
+                "name": "Fixture project",
+                "project_code": "",
+                "model_year": null,
+                "suffix": "",
+                "description": "",
+                "status": "active",
+                "vehicle_model_gid": null,
+                "factory_gid": null,
+                "team_id": null,
+                "owner_gid": null,
+                "owner_name": "",
+                "share_scope": "team",
+                "jph": null,
+                "is_deleted": false,
+                "is_archived": false,
+                "deleted_at": null,
+                "archived_at": null,
+                "created_at": "2026-09-08",
+                "updated_at": "2026-09-08"
+              }
+            ]
+          }
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-79",
+          "trace_id": "matrix-79"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.reviewed",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "project.follow.read.atomic.follows_list",
+      "version": 1,
+      "payload": {
+        "arguments": {}
+      },
+      "provider_data": {
+        "data": {
+          "success": true,
+          "data": [
+            {
+              "gid": "follow-one",
+              "item_type": "project",
+              "item_gid": "project-one",
+              "item_title": "Fixture project",
+              "notify_on": [
+                "any_change"
+              ],
+              "created_at": "2026-09-08"
+            }
+          ]
+        }
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "arguments": {
+            "type": "object",
+            "properties": {
+              "item_type": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "success": {
+                "type": "boolean"
+              },
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "gid": {
+                      "type": "string"
+                    },
+                    "item_type": {
+                      "type": "string"
+                    },
+                    "item_gid": {
+                      "type": "string"
+                    },
+                    "item_title": {
+                      "type": "string"
+                    },
+                    "notify_on": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "maxItems": 200
+                    },
+                    "created_at": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "maxItems": 500
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "success",
+              "data"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "sql_statements": [
+        [
+          "SELECT gid,user_gid,item_type,item_gid,item_title,notify_on,created_at FROM workmanship_work_follows WHERE user_gid=%s ORDER BY created_at DESC",
+          [
+            "fixture-user"
+          ]
+        ]
+      ],
+      "request_id": "matrix-80",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.follow.read.atomic.follows_list",
+        "major_version": 1,
+        "data": {
+          "data": {
+            "success": true,
+            "data": [
+              {
+                "gid": "follow-one",
+                "item_type": "project",
+                "item_gid": "project-one",
+                "item_title": "Fixture project",
+                "notify_on": [
+                  "any_change"
+                ],
+                "created_at": "2026-09-08"
+              }
+            ]
+          }
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-80",
+          "trace_id": "matrix-80"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.reviewed",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "project.task.read.atomic.tasks_search",
+      "version": 1,
+      "payload": {
+        "arguments": {
+          "page_size": 200
+        }
+      },
+      "provider_data": {
+        "data": {
+          "success": true,
+          "data": [
+            {
+              "gid": "task-one",
+              "title": "Updated task",
+              "owner_user_gid": "fixture-user",
+              "status": "open",
+              "source_ref": {},
+              "progress_logs": [],
+              "tracking_refs": [],
+              "attachments": [],
+              "feishu_groups": [],
+              "feishu_docs": [],
+              "created_at": "",
+              "updated_at": "",
+              "owner_name": "",
+              "is_deleted": false,
+              "completion": 0,
+              "node_type": "normal",
+              "canvas_icon": "star"
+            }
+          ]
+        }
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "arguments": {
+            "type": "object",
+            "properties": {
+              "project_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "list_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "scheduled_date_from": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "q": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "page_size": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 500
+              },
+              "scope": {
+                "type": "object",
+                "properties": {
+                  "user_gid": {
+                    "type": "string"
+                  },
+                  "team_gids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 200
+                  },
+                  "team_member_gids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 200
+                  },
+                  "project_gids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 200
+                  },
+                  "is_admin": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "user_gid"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "success": {
+                "type": "boolean"
+              },
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "display_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "title": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "description": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "owner_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "owner_user_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "assignee_team_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "project_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "status": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "share_scope": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "list_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "priority": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "review_date": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "meeting_level": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "meeting_doc_link": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "due_date": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "plan_start": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "plan_end": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "actual_start": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "actual_end": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "scheduled_date": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "scheduled_start_time": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "parent_task_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "node_type": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "canvas_icon": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "canvas_row_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "canvas_col_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "feishu_assignee_open_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "feishu_assignee_name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "feishu_group_chat_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "feishu_group_name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "severity": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "occurrence_root_cause": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "escape_root_cause": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "interim_action": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "permanent_action": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "related_task_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "related_knowledge_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "approval_order_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "bop_entry_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "owner_name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "created_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "updated_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "deleted_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "source_ref": {
+                      "type": "object",
+                      "properties": {},
+                      "additionalProperties": false
+                    },
+                    "attachments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": false
+                      },
+                      "maxItems": 200
+                    },
+                    "progress_logs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": false
+                      },
+                      "maxItems": 200
+                    },
+                    "tracking_refs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": false
+                      },
+                      "maxItems": 200
+                    },
+                    "feishu_groups": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": false
+                      },
+                      "maxItems": 200
+                    },
+                    "feishu_docs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": false
+                      },
+                      "maxItems": 200
+                    },
+                    "is_deleted": {
+                      "type": "boolean"
+                    },
+                    "completion": {
+                      "type": [
+                        "integer",
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "time_estimate": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "canvas_x": {
+                      "type": [
+                        "integer",
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "canvas_y": {
+                      "type": [
+                        "integer",
+                        "number",
+                        "null"
+                      ]
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "maxItems": 500
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "success",
+              "data"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "sql_statements": [
+        [
+          "SELECT parent_team_gid FROM workmanship_auth_teams WHERE gid=%s",
+          [
+            "fixture-team"
+          ]
+        ],
+        [
+          "SELECT gid FROM workmanship_auth_users WHERE is_active=1 AND team_id IN (%s)",
+          [
+            "fixture-team"
+          ]
+        ],
+        [
+          "SELECT project_gid FROM workmanship_auth_project_members WHERE user_gid=%s",
+          [
+            "fixture-user"
+          ]
+        ],
+        [
+          "SELECT t.* FROM workmanship_proj_tasks t WHERE (t.owner_user_gid=%s OR t.share_scope='global' OR (t.share_scope='team' AND t.owner_user_gid IN (%s)) OR (t.share_scope='project' AND t.project_gid IN (%s))) AND t.deleted_at IS NULL ORDER BY t.created_at DESC LIMIT 200",
+          [
+            "fixture-user",
+            "fixture-user",
+            "project-one"
+          ]
+        ]
+      ],
+      "request_id": "matrix-81",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.task.read.atomic.tasks_search",
+        "major_version": 1,
+        "data": {
+          "data": {
+            "success": true,
+            "data": [
+              {
+                "gid": "task-one",
+                "title": "Updated task",
+                "owner_user_gid": "fixture-user",
+                "status": "open",
+                "source_ref": {},
+                "progress_logs": [],
+                "tracking_refs": [],
+                "attachments": [],
+                "feishu_groups": [],
+                "feishu_docs": [],
+                "created_at": "",
+                "updated_at": "",
+                "owner_name": "",
+                "is_deleted": false,
+                "completion": 0,
+                "node_type": "normal",
+                "canvas_icon": "star"
+              }
+            ]
+          }
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-81",
+          "trace_id": "matrix-81"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.reviewed",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    },
+    {
+      "id": "project.issue.read.atomic.issues_search",
+      "version": 1,
+      "payload": {
+        "arguments": {
+          "page_size": 200
+        }
+      },
+      "provider_data": {
+        "data": {
+          "success": true,
+          "data": [
+            {
+              "gid": "issue-one",
+              "title": "Updated issue",
+              "owner_user_gid": "fixture-user",
+              "status": "open",
+              "source_ref": {},
+              "progress_logs": [],
+              "tracking_refs": [],
+              "attachments": [],
+              "feishu_groups": [],
+              "feishu_docs": [],
+              "created_at": "",
+              "updated_at": ""
+            }
+          ]
+        }
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "arguments": {
+            "type": "object",
+            "properties": {
+              "project_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "list_gid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "q": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "page_size": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 500
+              },
+              "scope": {
+                "type": "object",
+                "properties": {
+                  "user_gid": {
+                    "type": "string"
+                  },
+                  "team_gids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 200
+                  },
+                  "team_member_gids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 200
+                  },
+                  "project_gids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 200
+                  },
+                  "is_admin": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "user_gid"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "success": {
+                "type": "boolean"
+              },
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "display_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "title": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "description": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "owner_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "owner_user_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "assignee_team_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "project_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "status": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "share_scope": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "list_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "priority": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "review_date": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "meeting_level": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "meeting_doc_link": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "due_date": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "plan_start": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "plan_end": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "actual_start": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "actual_end": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "scheduled_date": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "scheduled_start_time": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "parent_task_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "node_type": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "canvas_icon": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "canvas_row_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "canvas_col_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "feishu_assignee_open_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "feishu_assignee_name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "feishu_group_chat_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "feishu_group_name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "severity": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "occurrence_root_cause": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "escape_root_cause": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "interim_action": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "permanent_action": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "related_task_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "related_knowledge_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "approval_order_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "bop_entry_gid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "owner_name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "created_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "updated_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "deleted_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "source_ref": {
+                      "type": "object",
+                      "properties": {},
+                      "additionalProperties": false
+                    },
+                    "attachments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": false
+                      },
+                      "maxItems": 200
+                    },
+                    "progress_logs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": false
+                      },
+                      "maxItems": 200
+                    },
+                    "tracking_refs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": false
+                      },
+                      "maxItems": 200
+                    },
+                    "feishu_groups": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": false
+                      },
+                      "maxItems": 200
+                    },
+                    "feishu_docs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": false
+                      },
+                      "maxItems": 200
+                    },
+                    "is_deleted": {
+                      "type": "boolean"
+                    },
+                    "completion": {
+                      "type": [
+                        "integer",
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "time_estimate": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "canvas_x": {
+                      "type": [
+                        "integer",
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "canvas_y": {
+                      "type": [
+                        "integer",
+                        "number",
+                        "null"
+                      ]
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "maxItems": 500
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "success",
+              "data"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "sql_statements": [
+        [
+          "SELECT parent_team_gid FROM workmanship_auth_teams WHERE gid=%s",
+          [
+            "fixture-team"
+          ]
+        ],
+        [
+          "SELECT gid FROM workmanship_auth_users WHERE is_active=1 AND team_id IN (%s)",
+          [
+            "fixture-team"
+          ]
+        ],
+        [
+          "SELECT project_gid FROM workmanship_auth_project_members WHERE user_gid=%s",
+          [
+            "fixture-user"
+          ]
+        ],
+        [
+          "SELECT i.* FROM workmanship_proj_issues i WHERE (i.owner_user_gid=%s OR i.share_scope='global' OR (i.share_scope='team' AND i.owner_user_gid IN (%s)) OR (i.share_scope='project' AND i.project_gid IN (%s))) ORDER BY i.created_at DESC LIMIT 200",
+          [
+            "fixture-user",
+            "fixture-user",
+            "project-one"
+          ]
+        ]
+      ],
+      "request_id": "matrix-82",
+      "gateway_result": {
+        "ok": true,
+        "status": "completed",
+        "capability_id": "project.issue.read.atomic.issues_search",
+        "major_version": 1,
+        "data": {
+          "data": {
+            "success": true,
+            "data": [
+              {
+                "gid": "issue-one",
+                "title": "Updated issue",
+                "owner_user_gid": "fixture-user",
+                "status": "open",
+                "source_ref": {},
+                "progress_logs": [],
+                "tracking_refs": [],
+                "attachments": [],
+                "feishu_groups": [],
+                "feishu_docs": [],
+                "created_at": "",
+                "updated_at": ""
+              }
+            ]
+          }
+        },
+        "operation_ref": null,
+        "artifact_refs": [],
+        "error": null,
+        "evidence": [],
+        "warnings": [],
+        "correlation": {
+          "request_id": "matrix-82",
+          "trace_id": "matrix-82"
+        }
+      },
+      "gateway_pending": null,
+      "confirmation_exercised": false,
+      "policy": "LegacyServerGatewayPolicy",
+      "handler": "plugins.project_management.project_management_backend.capabilities.reviewed",
+      "fixture_scope": "real Gateway + registered owner handler; deterministic identity/SQL/external I/O ports"
+    }
+  ]
+}

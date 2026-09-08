@@ -1,0 +1,9 @@
+.........................................                                [100%]
+============================== warnings summary ===============================
+backend/tests/test_desktop_round5_base.py::test_every_real_base_handler_emits_a_closed_outcome
+backend/tests/test_desktop_round5_gateway.py::test_every_round5_owner_handler_through_gateway_policy_confirmation_and_schema
+  E:\Projects\ai00_v3\.worktrees\orchestration-merge-backend-20260905\backend\routers\feishu_proxy.py:122: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    fields = {k: v for k, v in body.dict().items() if v is not None}
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+41 passed, 2 warnings in 8.34s
