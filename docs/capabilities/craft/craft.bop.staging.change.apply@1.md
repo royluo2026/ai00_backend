@@ -8,7 +8,7 @@ Create, update, or delete active-version BOP staging entries.
 - 不适用：The request demotes/promotes an entry or mutates BOP entry history.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_09e54550fcbaaab2df24bfa28d2c2478`
+- Catalog Release：`rel_74f4926ccfa6bc3588ec1c956dc25a5e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -137,7 +137,7 @@ Create, update, or delete active-version BOP staging entries.
 ```json
 {
   "capability_id": "craft.bop.staging.change.apply",
-  "catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
+  "catalog_release": "rel_74f4926ccfa6bc3588ec1c956dc25a5e",
   "major_version": 1,
   "payload": {
     "operation": "create"

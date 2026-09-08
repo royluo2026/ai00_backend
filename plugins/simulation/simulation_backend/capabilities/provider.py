@@ -170,7 +170,8 @@ _ERROR_PAIRS = (
     ("vismockup_document_not_owned", "AI00 may close only a VisMockup document that it opened in this Connector session."),
     ("feishu_login_required", "Pairing approval requires an AI00 Web session established through Feishu login."),
 )
-_LEGACY_ERROR_CODES = frozenset(code for code, _ in _ERROR_PAIRS[:9])
+_RUNTIME_ERROR_CODES = frozenset(code for code, _ in _ERROR_PAIRS[:9])
+_LEGACY_ERROR_CODES = frozenset(code for code, _ in _ERROR_PAIRS[9:18])
 _RETRYABLE_ERROR_CODES = frozenset({
     "source_resolver_unavailable", "simulation_result_not_ready",
     "execution_plan_unavailable", "active_document_unavailable",
@@ -345,13 +346,16 @@ _CONNECTOR_BUSINESS_INVARIANTS = {
 }
 
 
-def _errors(*, connector_environment: bool) -> tuple[DomainErrorContract, ...]:
+def _errors(*, connector_environment: bool, include_runtime_errors: bool) -> tuple[DomainErrorContract, ...]:
     return tuple(
         DomainErrorContract(
             code=code, meaning=meaning, retryable=code in _RETRYABLE_ERROR_CODES,
         )
         for code, meaning in _ERROR_PAIRS
-        if connector_environment or code in _LEGACY_ERROR_CODES
+        if (
+            code in _LEGACY_ERROR_CODES
+            or connector_environment and (include_runtime_errors or code not in _RUNTIME_ERROR_CODES)
+        )
     )
 
 
@@ -439,6 +443,9 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         "domain_errors": _errors(connector_environment=(
             "connector_environment" in governed.tags
             or governed.id.startswith("simulation.connector")
+            or governed.id.startswith("simulation.vismockup.")
+        ), include_runtime_errors=(
+            governed.id.startswith("simulation.connector")
             or governed.id.startswith("simulation.vismockup.")
         )),
         "domain_errors_complete": True,

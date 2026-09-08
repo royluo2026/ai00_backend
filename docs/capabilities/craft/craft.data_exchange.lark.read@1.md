@@ -8,7 +8,7 @@ Read bounded Lark Sheets or Bitable tabular data.
 - 不适用：The request writes Lark data or exports a Craft-owned dataset.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_09e54550fcbaaab2df24bfa28d2c2478`
+- Catalog Release：`rel_74f4926ccfa6bc3588ec1c956dc25a5e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -114,7 +114,7 @@ Read bounded Lark Sheets or Bitable tabular data.
 ```json
 {
   "capability_id": "craft.data_exchange.lark.read",
-  "catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
+  "catalog_release": "rel_74f4926ccfa6bc3588ec1c956dc25a5e",
   "major_version": 1,
   "payload": {
     "operation": "sheets.read",

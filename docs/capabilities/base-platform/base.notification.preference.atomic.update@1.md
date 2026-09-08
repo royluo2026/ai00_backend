@@ -8,7 +8,7 @@ Execute exact Base outcome base.notification.preference.atomic.update.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_09e54550fcbaaab2df24bfa28d2c2478`
+- Catalog Release：`rel_74f4926ccfa6bc3588ec1c956dc25a5e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -101,7 +101,7 @@ Execute exact Base outcome base.notification.preference.atomic.update.
 ```json
 {
   "capability_id": "base.notification.preference.atomic.update",
-  "catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
+  "catalog_release": "rel_74f4926ccfa6bc3588ec1c956dc25a5e",
   "major_version": 1,
   "payload": {
     "preferences": {}

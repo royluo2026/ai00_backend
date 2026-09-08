@@ -8,7 +8,7 @@ Read one bounded page of direct or descendant BOP entry relations.
 - 不适用：A consumer needs to attach or detach a relation.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_09e54550fcbaaab2df24bfa28d2c2478`
+- Catalog Release：`rel_74f4926ccfa6bc3588ec1c956dc25a5e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -109,7 +109,7 @@ Read one bounded page of direct or descendant BOP entry relations.
 ```json
 {
   "capability_id": "craft.bop.entry.relation.list",
-  "catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
+  "catalog_release": "rel_74f4926ccfa6bc3588ec1c956dc25a5e",
   "major_version": 1,
   "payload": {
     "entry_gid": "example",

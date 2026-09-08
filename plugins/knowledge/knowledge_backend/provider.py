@@ -33,6 +33,23 @@ _RESOURCE_FIELDS = {
     "knowledge.personalization.change.apply.atomic.recent_record": ("knowledge-item", "gid"),
 }
 
+# These v1 capabilities were published before Knowledge added explicit business
+# definition text.  Their schemas contain intentionally unbounded legacy arrays,
+# so the catalog builder can grandfather them only when the complete published
+# business definition remains byte-for-byte compatible with the immutable v1
+# baseline.  New major versions receive the richer definition below.
+_LEGACY_V1_BUSINESS_DEFINITION_IDS = frozenset({
+    "knowledge.get",
+    "knowledge.space.search",
+    "knowledge.document.acl.list",
+    "knowledge.migration.status",
+    "knowledge.proposal.get",
+    "knowledge.proposal.list",
+    "knowledge.proposal.review",
+    "knowledge.propose",
+    "knowledge.search",
+})
+
 _DOMAIN_ERRORS = (
     DomainErrorContract(
         code="resource_not_found",
@@ -176,8 +193,12 @@ def descriptor_for(spec):
         "deprecation_message": (
             f"Use {spec.replaced_by}." if deprecated and spec.replaced_by else None
         ),
-        **_business_definition(spec, is_write=is_write),
     }
+    if not (
+        descriptor.major_version == 1
+        and spec.id in _LEGACY_V1_BUSINESS_DEFINITION_IDS
+    ):
+        updates.update(_business_definition(spec, is_write=is_write))
     if spec.id == "knowledge.resource_model_mapping.resolve":
         updates.update({
             "business_effect": "Resolve each typed process resource code to one exact governed tool, equipment or fixture model version, returning all missing or ambiguous mappings.",

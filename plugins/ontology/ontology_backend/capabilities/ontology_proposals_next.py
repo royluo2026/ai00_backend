@@ -22,6 +22,16 @@ JSON_CONTAINER_VALUE_SCHEMA = {"anyOf": [
     {"type": "array", "items": JSON_VALUE_SCHEMA},
     {"type": "object", "properties": {}, "patternProperties": {r"^.*$": JSON_VALUE_SCHEMA}, "additionalProperties": False},
 ]}
+LEGACY_CHANGE_SCHEMA = {
+    "type": "object",
+    "required": ["operation", "stable_gid", "value", "source_evidence"],
+    "properties": {
+        "operation": {"type": "string"}, "stable_gid": {"type": "string"},
+        "value": JSON_VALUE_SCHEMA,
+        "source_evidence": {"type": "array", "items": JSON_VALUE_SCHEMA},
+    },
+    "additionalProperties": False,
+}
 CHANGE_VALUE_SCHEMA = {
     "type": "object", "properties": {},
     "patternProperties": {r"^.*$": JSON_CONTAINER_VALUE_SCHEMA},
@@ -33,7 +43,7 @@ CHANGE_SCHEMA = {
     "properties": {
         "operation": {"type": "string"}, "stable_gid": {"type": "string"},
         "value": CHANGE_VALUE_SCHEMA,
-        "source_evidence": {"type": "array", "items": CHANGE_VALUE_SCHEMA},
+        "source_evidence": {"type": "array", "maxItems": 100, "items": CHANGE_VALUE_SCHEMA},
     },
     "additionalProperties": False,
 }
@@ -50,12 +60,19 @@ PROPOSAL_SCHEMA = {
         "revision_no": {"type": "integer", "minimum": 1},
         "base_release_gid": {"type": "string"},
         "content_sha256": {"type": "string", "pattern": r"^[0-9a-f]{64}$"},
-        "changes": {"type": "array", "items": CHANGE_SCHEMA},
+        "changes": {"type": "array", "maxItems": 1000, "items": CHANGE_SCHEMA},
         "status": {"type": "string"},
         "author_gid": {"type": "string"},
         "channel": {"type": "string"},
         "created_at": {"type": "string"},
         "base_ontology_version_ref": ONTOLOGY_VERSION_REF_SCHEMA,
+    },
+}
+LEGACY_PROPOSAL_SCHEMA = {
+    **PROPOSAL_SCHEMA,
+    "properties": {
+        **PROPOSAL_SCHEMA["properties"],
+        "changes": {"type": "array", "items": LEGACY_CHANGE_SCHEMA},
     },
 }
 
@@ -220,12 +237,12 @@ def register_ontology_proposal_capabilities(registry: Any) -> None:
         **common, id="ontology.change.proposal.create", description="Create an immutable typed proposal against the exact active release.",
         use_when="A governed ontology change is being proposed.", do_not_use_when="Direct mutation of an active release is expected.",
         effects=("create:ontology.proposal", "create:ontology.proposal_revision"), risk="write", confirmation="user", idempotent=False,
-        output_schema=PROPOSAL_SCHEMA,
-        input_schema={"type": "object", "properties": {"base_release_gid": {"type": "string"}, "changes": {"type": "array", "minItems": 1, "items": CHANGE_SCHEMA}}, "required": ["base_release_gid", "changes"]}), create_proposal)
+        output_schema=LEGACY_PROPOSAL_SCHEMA,
+        input_schema={"type": "object", "properties": {"base_release_gid": {"type": "string"}, "changes": {"type": "array", "minItems": 1, "items": LEGACY_CHANGE_SCHEMA}}, "required": ["base_release_gid", "changes"]}), create_proposal)
     registry.register(CapabilitySpec(
         **common, id="ontology.change.proposal.get", description="Read the current immutable proposal revision.",
         use_when="A proposal GID is known.", do_not_use_when="Searching proposals.", effects=("read:ontology.proposal",),
-        output_schema=PROPOSAL_SCHEMA,
+        output_schema=LEGACY_PROPOSAL_SCHEMA,
         input_schema={"type": "object", "properties": {"proposal_gid": {"type": "string"}}, "required": ["proposal_gid"]}), get_proposal)
     registry.register(CapabilitySpec(
         **common, id="ontology.change.proposal.search", description="Search proposal metadata by governed status.",
@@ -246,7 +263,7 @@ def register_ontology_proposal_capabilities(registry: Any) -> None:
         confirmation="user", idempotent=False, output_schema=PROPOSAL_SCHEMA,
         input_schema={"type": "object", "properties": {
             "base_release_gid": {"type": "string"},
-            "changes": {"type": "array", "minItems": 1, "items": CHANGE_SCHEMA},
+            "changes": {"type": "array", "minItems": 1, "maxItems": 1000, "items": CHANGE_SCHEMA},
         }, "required": ["base_release_gid", "changes"], "additionalProperties": False}), create_proposal)
     registry.register(CapabilitySpec(
         **common, id="ontology.change.proposal.get", version=2,

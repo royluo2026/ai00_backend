@@ -26,7 +26,7 @@ def register_reviewed_capabilities(registry):
             risk=CapabilityRisk.WRITE, confirmation="user", permissions=("ontology.propose",), plugin_callable=True,
             input_schema={"type": "object", "required": ["base_release_gid", "changes"], "properties": {
                 "base_release_gid": {"type": "string"},
-                "changes": {"type": "array", "minItems": 1, "items": CHANGE_SCHEMA},
+                "changes": {"type": "array", "minItems": 1, "maxItems": 1000, "items": CHANGE_SCHEMA},
             }, "additionalProperties": False},
             output_schema=PROPOSAL_SCHEMA, tags=("ontology", "proposal"),
         ), create_proposal)

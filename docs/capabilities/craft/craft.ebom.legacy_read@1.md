@@ -8,7 +8,7 @@ Read bounded legacy PBOM snapshot comparison projections.
 - 不适用：The consumer needs mutation, VPPS validation, or the native PBOM compare contract.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_09e54550fcbaaab2df24bfa28d2c2478`
+- Catalog Release：`rel_74f4926ccfa6bc3588ec1c956dc25a5e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -99,7 +99,7 @@ Read bounded legacy PBOM snapshot comparison projections.
 ```json
 {
   "capability_id": "craft.ebom.legacy_read",
-  "catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
+  "catalog_release": "rel_74f4926ccfa6bc3588ec1c956dc25a5e",
   "major_version": 1,
   "payload": {
     "base_gid": "example",

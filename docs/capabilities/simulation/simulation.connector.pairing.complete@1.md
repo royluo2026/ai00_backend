@@ -8,7 +8,7 @@ Exchange the Connector proof for one encrypted credential envelope.
 - 不适用：Only the public user code is available.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
-- Catalog Release：`rel_09e54550fcbaaab2df24bfa28d2c2478`
+- Catalog Release：`rel_74f4926ccfa6bc3588ec1c956dc25a5e`
 - Schema 精度：`typed`
 - 暂未开放原因：`experimental_lifecycle`
 
@@ -97,7 +97,7 @@ Exchange the Connector proof for one encrypted credential envelope.
 ```json
 {
   "capability_id": "simulation.connector.pairing.complete",
-  "catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
+  "catalog_release": "rel_74f4926ccfa6bc3588ec1c956dc25a5e",
   "major_version": 1,
   "payload": {
     "installation_id": "example",
@@ -174,6 +174,15 @@ Exchange the Connector proof for one encrypted credential envelope.
 
 领域错误：
 
+- `runtime_owner_mismatch`：The authenticated user and tenant do not own this runtime device.（retryable=false）
+- `runtime_session_invalid`：The session no longer matches the active device, generation, instance, hash, or expiry.（retryable=false）
+- `runtime_generation_invalid`：The expected runtime generation has changed.（retryable=false）
+- `runtime_instance_invalid`：The runtime instance identity is malformed.（retryable=false）
+- `runtime_session_conflict`：A concurrent runtime change fenced this operation.（retryable=false）
+- `runtime_plans_unresolved`：Leased, executing, unknown, or manual-review work blocks replacement.（retryable=false）
+- `runtime_takeover_audit_required`：Takeover requires the authenticated actor and a nonempty bounded reason.（retryable=false）
+- `pairing_owner_mismatch`：The App pairing belongs to another user or tenant.（retryable=false）
+- `pairing_consumed`：The App pairing has already been activated or cancelled.（retryable=false）
 - `source_resolver_unavailable`：A required owning-domain resolver is unavailable.（retryable=true）
 - `source_version_mismatch`：A referenced source no longer matches its immutable hash or version.（retryable=false）
 - `parameter_set_not_found`：The immutable parameter set is unavailable or not visible.（retryable=false）

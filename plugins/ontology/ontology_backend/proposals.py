@@ -32,6 +32,8 @@ def _validate_property_identifiers(operation: str, value: Mapping[str, Any]) -> 
 def normalize_changes(changes: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
     if isinstance(changes, bytes | str) or not isinstance(changes, Sequence) or not changes:
         raise ValueError("changes must be a non-empty array")
+    if len(changes) > 1000:
+        raise ValueError("changes must contain at most 1000 items")
     result = []
     identities = set()
     for raw in changes:
@@ -49,11 +51,14 @@ def normalize_changes(changes: Sequence[Mapping[str, Any]]) -> list[dict[str, An
         if identity in identities:
             raise ValueError(f"duplicate change operation: {operation}/{stable_gid}")
         identities.add(identity)
+        source_evidence = list(raw.get("source_evidence") or [])
+        if len(source_evidence) > 100:
+            raise ValueError("source_evidence must contain at most 100 items")
         result.append({
             "operation": operation,
             "stable_gid": stable_gid,
             "value": dict(value),
-            "source_evidence": list(raw.get("source_evidence") or []),
+            "source_evidence": source_evidence,
         })
     result.sort(key=lambda item: (item["operation"], item["stable_gid"]))
     return result

@@ -8,7 +8,7 @@ Execute the reviewed project.craft_scope.read project outcome.
 - 不适用：The operation belongs to another domain.
 - 生命周期：`deprecated`
 - 所属领域：`project_management`
-- Catalog Release：`rel_09e54550fcbaaab2df24bfa28d2c2478`
+- Catalog Release：`rel_74f4926ccfa6bc3588ec1c956dc25a5e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -93,7 +93,7 @@ Execute the reviewed project.craft_scope.read project outcome.
 ```json
 {
   "capability_id": "project.craft_scope.read",
-  "catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
+  "catalog_release": "rel_74f4926ccfa6bc3588ec1c956dc25a5e",
   "major_version": 1,
   "payload": {
     "arguments": {},
