@@ -64,6 +64,19 @@ REVIEW_SCHEMA = {
 }
 
 
+def _serialize_record(record: dict[str, Any]) -> dict[str, Any]:
+    result = dict(record)
+    for field in ("created_at", "updated_at"):
+        value = result.get(field)
+        if value is None:
+            result.pop(field, None)
+        elif not isinstance(value, str):
+            result[field] = value.isoformat() if hasattr(value, "isoformat") else str(value)
+    if result.get("channel") is None:
+        result.pop("channel", None)
+    return result
+
+
 def _proposal_evidence(data: dict[str, Any]) -> EvidenceRef:
     digest = str(data["content_sha256"])
     return EvidenceRef(
@@ -111,6 +124,7 @@ def get_proposal(payload: dict[str, Any], _context: CapabilityContext) -> Capabi
     if not data:
         raise LookupError("ontology proposal not found")
     base = OntologyReleaseRepository().resolve_release(str(data["base_release_gid"]))
+    data = _serialize_record(data)
     data["base_ontology_version_ref"] = _base_version_ref(base)
     return CapabilityOutput(data=data, evidence=(_proposal_evidence(data),))
 
@@ -118,7 +132,7 @@ def get_proposal(payload: dict[str, Any], _context: CapabilityContext) -> Capabi
 def search_proposals(payload: dict[str, Any], _context: CapabilityContext) -> dict[str, Any]:
     status = str(payload.get("status") or "").strip() or None
     limit = int(payload.get("limit") or 50)
-    items = OntologyProposalRepository().search(status=status, limit=limit)
+    items = [_serialize_record(item) for item in OntologyProposalRepository().search(status=status, limit=limit)]
     releases = OntologyReleaseRepository()
     cache: dict[str, dict[str, Any]] = {}
     for item in items:
