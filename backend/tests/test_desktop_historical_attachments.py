@@ -175,6 +175,25 @@ def test_bop_picture_access_is_batched_and_grant_is_identity_bound(monkeypatch):
     with pytest.raises(Exception):redeem_picture_grant(result['items'][0]['access_grant'],'other','tenant')
 
 
+def test_bop_picture_access_keeps_valid_history_when_one_locator_is_invalid(monkeypatch):
+    from backend.platform_sdk.historical_artifacts import reference_hash
+    from plugins.craft.craft_backend.capabilities.desktop_pictures import list_picture_access
+    db=LocalDatabase();context=SimpleNamespace(user_gid='owner',team_gid='tenant',active_roles=('super_admin',))
+    picture=b'\x89PNG\r\n\x1a\nfixture';photo={'storage':'ois','object_key':'owned/photo.png','name':'photo.png','mime':'image/png'}
+    invalid={'url':'https://untrusted.invalid/broken.png'}
+    db.db.execute('INSERT INTO workmanship_bop_bop_versions VALUES(?,?,?,?,?,?)',('bop-one','owner','owner','tenant','team',None))
+    db.db.execute('INSERT INTO workmanship_bop_bop_entries VALUES(?,?,?,?)',('bop-one',json.dumps([invalid,photo]),'[]',0))
+    trust_fixture_upload(db,'ois','owned/photo.png',picture,'image/png',[{'owner_domain':'craft','parent_type':'bop_version','parent_gid':'bop-one'}])
+    monkeypatch.setattr('plugins.craft.craft_backend.capabilities.desktop_pictures.get_craft_conn',lambda:db)
+    monkeypatch.setattr('backend.platform_sdk.historical_artifacts.get_conn',lambda:db)
+    monkeypatch.setattr('backend.platform_sdk.historical_artifacts.get_user_summaries',lambda gids:{'owner':{'team_id':'tenant'}})
+    monkeypatch.setattr('backend.platform_sdk.historical_artifacts.get_settings',lambda:SimpleNamespace(jwt_secret='picture-test-secret-32-bytes-long'))
+    monkeypatch.setattr('backend.core.ois_storage.generate_access_urls',lambda keys,expire_in_seconds=600:{})
+    result=list_picture_access({'version_gid':'bop-one'},context)
+    assert [item['reference_hash'] for item in result['items']]==[reference_hash(photo)]
+    assert result['unavailable']==[reference_hash(invalid)]
+
+
 def test_owner_sql_migration_is_idempotent_and_gateway_bound():
     from backend.tests.support.desktop_gateway_matrix import DesktopGatewayMatrix
     assert len(execute_historical_matrix(DesktopGatewayMatrix()))==6

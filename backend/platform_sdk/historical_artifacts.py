@@ -93,9 +93,11 @@ def trusted_object(record,owner_domain,parent_type,parent_gid,owner_gid,context)
 
 def trusted_objects(values,owner_domain,parent_type,parent_gid,owner_gid,context):
     """Resolve a bounded parent attachment set with one registry query per chunk."""
-    located=[];configured=((storage._get_minio_config().get('public_url'),'minio'),(ois_storage._get_ois_config().get('public_base_url'),'ois'))
+    located=[];unavailable=[];configured=((storage._get_minio_config().get('public_url'),'minio'),(ois_storage._get_ois_config().get('public_base_url'),'ois'))
     for record in values:
-        backend,key=object_location(record,configured)
+        try:backend,key=object_location(record,configured)
+        except ValueError:
+            unavailable.append(reference_hash(record));continue
         located.append((record,backend,key,object_hash(backend,key)))
     rows={};unique=list(dict.fromkeys(item[3] for item in located))
     with get_conn() as conn,conn.cursor() as cursor:
@@ -104,7 +106,7 @@ def trusted_objects(values,owner_domain,parent_type,parent_gid,owner_gid,context
             cursor.execute('SELECT * FROM workmanship_base_historical_uploads WHERE object_hash IN ('+','.join(['%s']*len(chunk))+')',tuple(chunk))
             rows.update((row['object_hash'],row) for row in cursor.fetchall())
     parent={'owner_domain':owner_domain,'parent_type':parent_type,'parent_gid':parent_gid}
-    trusted={};unavailable=[]
+    trusted={}
     for record,backend,key,digest in located:
         ref=reference_hash(record);row=rows.get(digest)
         if (not row or row['tenant_gid']!=context.team_gid or row['owner_gid']!=owner_gid
