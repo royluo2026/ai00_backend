@@ -65,6 +65,7 @@ public sealed class AdapterManifestLoader(
         .Select(path => Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar)
         .ToArray();
 
+    [System.Diagnostics.CodeAnalysis.RequiresAssemblyFiles("Legacy adapter loading requires a separately signed assembly; AppHost uses its compiled adapter.")]
     public AdapterManifest LoadBuiltIn(Assembly assembly, string resourceName)
     {
         using var stream = assembly.GetManifestResourceStream(resourceName)

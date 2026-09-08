@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "artifact_kind": "unexecuted_pilot_template",
+  "platform": "win32",
+  "arch": "x64",
+  "frontend_commit": null,
+  "backend_commit": null,
+  "catalog_release": null,
+  "artifacts": {
+    "installer": null,
+    "app": null,
+    "host": null,
+    "addon": null,
+    "adapter": null
+  },
+  "device_id": null,
+  "generation": null,
+  "session_id": null,
+  "machine_passed": false,
+  "human_approved": false,
+  "technical_release_approved": false,
+  "runtime_verified": false,
+  "scenarios": [
+    {
+      "id": "install",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "upgrade",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "failed_update",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "rollback",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "repair",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "uninstall",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "single_instance",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "host_exit_with_app",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "vismockup_survival",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "pairing",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "wake",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "normal_plan",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "duplicate_plan",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "network_loss",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "app_crash",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "host_crash",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "com_timeout",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "reconciliation",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "vismockup_absent",
+      "status": "not_run",
+      "evidence": null
+    }
+  ],
+  "authoritative_signature": null
+}

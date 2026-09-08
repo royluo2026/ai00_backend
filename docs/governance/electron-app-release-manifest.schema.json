@@ -1,0 +1,230 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AI00 signed Windows x64 release manifest; example is synthetic schema data, never approval",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "platform",
+    "arch",
+    "host_version",
+    "electron_version",
+    "protocol",
+    "anti_downgrade",
+    "frontend_commit",
+    "backend_commit",
+    "source_tree",
+    "security_version",
+    "minimum_security_version",
+    "local_state_schema",
+    "rotation_overlap_seconds",
+    "channel",
+    "key_id",
+    "catalog_release",
+    "version",
+    "origin",
+    "trusted_keys",
+    "revoked_keys",
+    "migrations",
+    "compatible_schemas",
+    "machine_passed",
+    "human_approved",
+    "runtime_verified",
+    "technical_release_approved",
+    "artifacts"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "platform": {
+      "const": "win32"
+    },
+    "arch": {
+      "const": "x64"
+    },
+    "host_version": {
+      "const": "1.0.0"
+    },
+    "electron_version": {
+      "const": "41.8.0"
+    },
+    "protocol": {
+      "const": "ai00.connector.execution-plan.v2"
+    },
+    "anti_downgrade": {
+      "const": true
+    },
+    "frontend_commit": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "backend_commit": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "source_tree": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "security_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "minimum_security_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "local_state_schema": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "rotation_overlap_seconds": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "channel": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "key_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "catalog_release": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "origin": {
+      "type": "string",
+      "pattern": "^https://[^/@?#]+$"
+    },
+    "trusted_keys": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "revoked_keys": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "migrations": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "compatible_schemas": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "machine_passed": {
+      "const": true
+    },
+    "human_approved": {
+      "const": true
+    },
+    "runtime_verified": {
+      "const": true
+    },
+    "technical_release_approved": {
+      "const": true
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "installer",
+        "app",
+        "host",
+        "addon",
+        "adapter"
+      ],
+      "properties": {
+        "installer": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "app": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "host": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "addon": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "adapter": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema_version": 1,
+      "platform": "win32",
+      "arch": "x64",
+      "host_version": "1.0.0",
+      "electron_version": "41.8.0",
+      "protocol": "ai00.connector.execution-plan.v2",
+      "anti_downgrade": true,
+      "frontend_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "backend_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "source_tree": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "security_version": 2,
+      "minimum_security_version": 2,
+      "local_state_schema": 2,
+      "rotation_overlap_seconds": 86400,
+      "channel": "stable",
+      "key_id": "publisher-test-only",
+      "catalog_release": "rel_test_only",
+      "version": "1.0.3",
+      "origin": "https://release.example.invalid",
+      "trusted_keys": [
+        "publisher-test-only"
+      ],
+      "revoked_keys": [],
+      "migrations": [],
+      "compatible_schemas": [
+        2
+      ],
+      "artifacts": {
+        "installer": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "app": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "host": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "addon": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "adapter": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "machine_passed": true,
+      "human_approved": true,
+      "runtime_verified": true,
+      "technical_release_approved": true
+    }
+  ]
+}
