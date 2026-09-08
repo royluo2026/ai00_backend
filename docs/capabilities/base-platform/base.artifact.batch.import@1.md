@@ -8,7 +8,7 @@ Adopts up to 20 finalized artifacts selected and uploaded by Main under the auth
 - 不适用：The requested effect belongs to another named action.
 - 生命周期：`experimental`
 - 所属领域：`base`
-- Catalog Release：`rel_74f4926ccfa6bc3588ec1c956dc25a5e`
+- Catalog Release：`rel_f4161c5a8d19fe4bc4d4c291fc962b7d`
 - Schema 精度：`typed`
 - 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -144,7 +144,7 @@ Adopts up to 20 finalized artifacts selected and uploaded by Main under the auth
 ```json
 {
   "capability_id": "base.artifact.batch.import",
-  "catalog_release": "rel_74f4926ccfa6bc3588ec1c956dc25a5e",
+  "catalog_release": "rel_f4161c5a8d19fe4bc4d4c291fc962b7d",
   "major_version": 1,
   "payload": {
     "artifacts": [

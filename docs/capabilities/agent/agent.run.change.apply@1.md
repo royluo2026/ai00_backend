@@ -8,7 +8,7 @@ Execute the governed agent.run.change.apply Agent outcome.
 - 不适用：The outcome belongs to another business domain; invoke that domain Capability instead.
 - 生命周期：`stable`
 - 所属领域：`agent`
-- Catalog Release：`rel_74f4926ccfa6bc3588ec1c956dc25a5e`
+- Catalog Release：`rel_f4161c5a8d19fe4bc4d4c291fc962b7d`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -207,7 +207,7 @@ Execute the governed agent.run.change.apply Agent outcome.
 ```json
 {
   "capability_id": "agent.run.change.apply",
-  "catalog_release": "rel_74f4926ccfa6bc3588ec1c956dc25a5e",
+  "catalog_release": "rel_f4161c5a8d19fe4bc4d4c291fc962b7d",
   "major_version": 1,
   "payload": {}
 }

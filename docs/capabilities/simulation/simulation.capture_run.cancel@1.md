@@ -8,7 +8,7 @@ Cancel unstarted capture steps and reconcile active work.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_74f4926ccfa6bc3588ec1c956dc25a5e`
+- Catalog Release：`rel_f4161c5a8d19fe4bc4d4c291fc962b7d`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -86,7 +86,7 @@ Cancel unstarted capture steps and reconcile active work.
 ```json
 {
   "capability_id": "simulation.capture_run.cancel",
-  "catalog_release": "rel_74f4926ccfa6bc3588ec1c956dc25a5e",
+  "catalog_release": "rel_f4161c5a8d19fe4bc4d4c291fc962b7d",
   "major_version": 1,
   "payload": {
     "capture_run_id": "example"

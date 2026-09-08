@@ -8,7 +8,7 @@ Resolve one historical attachment proven to belong to an authorized knowledge bu
 - 不适用：Only an object key, filesystem path or unowned attachment is supplied.
 - 生命周期：`experimental`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_74f4926ccfa6bc3588ec1c956dc25a5e`
+- Catalog Release：`rel_f4161c5a8d19fe4bc4d4c291fc962b7d`
 - Schema 精度：`typed`
 - 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -100,7 +100,7 @@ Resolve one historical attachment proven to belong to an authorized knowledge bu
 ```json
 {
   "capability_id": "knowledge.attachment.resolve",
-  "catalog_release": "rel_74f4926ccfa6bc3588ec1c956dc25a5e",
+  "catalog_release": "rel_f4161c5a8d19fe4bc4d4c291fc962b7d",
   "major_version": 1,
   "payload": {
     "parent_gid": "example",

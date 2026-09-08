@@ -8,7 +8,7 @@ Execute Knowledge operation items.create.
 - 不适用：The request selects another operation or domain.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_74f4926ccfa6bc3588ec1c956dc25a5e`
+- Catalog Release：`rel_f4161c5a8d19fe4bc4d4c291fc962b7d`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -210,7 +210,7 @@ Execute Knowledge operation items.create.
 ```json
 {
   "capability_id": "knowledge.hub.change.apply.atomic.items_create",
-  "catalog_release": "rel_74f4926ccfa6bc3588ec1c956dc25a5e",
+  "catalog_release": "rel_f4161c5a8d19fe4bc4d4c291fc962b7d",
   "major_version": 1,
   "payload": {}
 }

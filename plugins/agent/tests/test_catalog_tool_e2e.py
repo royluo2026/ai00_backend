@@ -180,3 +180,31 @@ def test_chj_connection_test_does_not_require_litellm(monkeypatch):
     assert ai_chat.test_connection({}, {"gid": "user-1"}) == {
         "success": True, "reply": "ok", "model": "kivy-glm-5",
     }
+
+
+def test_chj_http_failure_reports_sanitized_upstream_reason(monkeypatch):
+    import httpx
+
+    response = httpx.Response(
+        500,
+        json={
+            "code": 5000000,
+            "message": "系统异常",
+            "data": "模型[GLM-5] Connect timed out for secret-key",
+        },
+        request=httpx.Request("POST", "http://api-hub.inner.chj.cloud"),
+    )
+    monkeypatch.setattr(httpx, "post", lambda *_args, **_kwargs: response)
+
+    with pytest.raises(RuntimeError) as exc_info:
+        ai_chat._chj_completion(
+            messages=[{"role": "user", "content": "reply: ok"}],
+            model_id="kivy-glm-5",
+            api_key="secret-key",
+            max_tokens=16,
+        )
+
+    message = str(exc_info.value)
+    assert "CHJ gateway HTTP 500" in message
+    assert "Connect timed out" in message
+    assert "secret-key" not in message

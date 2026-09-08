@@ -8,7 +8,7 @@ Continues one authenticated user conversation with bounded sync output or a Gate
 - 不适用：Directly executing a proposed tool.
 - 生命周期：`stable`
 - 所属领域：`agent`
-- Catalog Release：`rel_74f4926ccfa6bc3588ec1c956dc25a5e`
+- Catalog Release：`rel_f4161c5a8d19fe4bc4d4c291fc962b7d`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -136,7 +136,7 @@ Continues one authenticated user conversation with bounded sync output or a Gate
 ```json
 {
   "capability_id": "agent.interaction.chat.change.apply",
-  "catalog_release": "rel_74f4926ccfa6bc3588ec1c956dc25a5e",
+  "catalog_release": "rel_f4161c5a8d19fe4bc4d4c291fc962b7d",
   "major_version": 3,
   "payload": {
     "body": {

@@ -8,7 +8,7 @@ Launch or connect to VisMockup.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`deprecated`
 - 所属领域：`device`
-- Catalog Release：`rel_74f4926ccfa6bc3588ec1c956dc25a5e`
+- Catalog Release：`rel_f4161c5a8d19fe4bc4d4c291fc962b7d`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -87,7 +87,7 @@ Launch or connect to VisMockup.
 ```json
 {
   "capability_id": "vismockup.launch",
-  "catalog_release": "rel_74f4926ccfa6bc3588ec1c956dc25a5e",
+  "catalog_release": "rel_f4161c5a8d19fe4bc4d4c291fc962b7d",
   "major_version": 1,
   "payload": {
     "device_id": "example"

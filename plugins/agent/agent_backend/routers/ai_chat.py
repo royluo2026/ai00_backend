@@ -201,7 +201,18 @@ def _chj_completion(messages, model_id, api_key, tools=None, max_tokens=4096):
         resp = httpx.post(url, headers=headers, json=body, timeout=120)
         resp.raise_for_status()
     except httpx.HTTPStatusError as exc:
-        raise RuntimeError(f"CHJ gateway HTTP {exc.response.status_code}") from None
+        try:
+            payload = exc.response.json()
+            detail = " | ".join(
+                str(payload.get(key) or "").strip()
+                for key in ("message", "data")
+                if str(payload.get(key) or "").strip()
+            )
+        except Exception:
+            detail = exc.response.text.strip()
+        detail = detail.replace(api_key, "[redacted]")[:300]
+        suffix = f": {detail}" if detail else ""
+        raise RuntimeError(f"CHJ gateway HTTP {exc.response.status_code}{suffix}") from None
     except Exception as exc:
         raise RuntimeError(f"CHJ gateway error: {_sanitize_error(exc)}") from None
     # 容错解码：UTF-8 → GBK → Latin-1

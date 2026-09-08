@@ -124,7 +124,7 @@ def register_desktop_agent_capabilities(registry, provider, transaction_factory)
         def handler(payload, context, _id=capability_id, _version=version, _write=write, _legacy=legacy, _adapt=adapt, _input=request_validator, _output=result_validator):
             if not _input.is_valid(payload):
                 raise CapabilityBusinessError('invalid_input','The request does not match this Agent action.')
-            transaction = transaction_factory() if _write else None
+            transaction = transaction_factory() if _write and _id != 'agent.runtime.config.set' else None
             try:
                 result = (provider.invoke(_legacy,_adapt(payload),context) if _legacy else runtime_config_set(payload,context) if _id=='agent.runtime.config.set' else runtime_test(payload,context))
                 if _id == 'agent.session.list':
@@ -134,8 +134,9 @@ def register_desktop_agent_capabilities(registry, provider, transaction_factory)
                 if not _write:
                     return result
                 output = write_output(_id,result,context)
-                transaction.record_outbox(_id,_version,context,output)
-                transaction.commit()
+                if transaction is not None:
+                    transaction.record_outbox(_id,_version,context,output)
+                    transaction.commit()
                 return output
             except BaseException:
                 if transaction is not None:
@@ -147,7 +148,13 @@ def register_desktop_agent_capabilities(registry, provider, transaction_factory)
         spec=CapabilitySpec(id=capability_id,version=version,owner='agent',description=effect,use_when=effect,do_not_use_when='Another business effect is requested.',
             risk='write' if write else 'read',confirmation='none' if capability_id in ('agent.interaction.cancel','agent.runtime.connection.test') else 'user' if write else 'none',
             idempotent=True,permissions=(permission,),input_schema=input_schema,output_schema=output_schema,tags=('agent','desktop','closed'))
-        registry.register(spec,handler,descriptor=_descriptor(spec,effect))
+        descriptor = _descriptor(spec,effect)
+        if capability_id == 'agent.runtime.config.set':
+            descriptor = descriptor.model_copy(update={
+                'consistency_policy':'external', 'evidence_policy':'optional',
+                'transaction_policy':{'mode':'provider','boundary':'owning_domain'},
+            })
+        registry.register(spec,handler,descriptor=descriptor)
     effect='Continues one authenticated user conversation with bounded sync output or a Gateway-owned stream and governed downstream tool confirmation.'
     spec=CapabilitySpec(id='agent.interaction.chat.change.apply',version=3,owner='agent',description=effect,use_when=effect,do_not_use_when='Directly executing a proposed tool.',risk='write',confirmation='none',idempotent=False,permissions=('agent.interact',),input_schema=CHAT,output_schema=CHAT_RESULT,tags=('agent','desktop','stream'))
     descriptor=_descriptor(spec,effect).model_copy(update={'resource_selectors':(ResourceSelector(resource_type='agent-session',payload_path='body.session_id',required=False),)})

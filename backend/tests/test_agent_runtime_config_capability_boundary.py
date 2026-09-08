@@ -74,6 +74,38 @@ def test_registered_runtime_config_handler_matches_its_output_contract(monkeypat
     validate_payload(dict(provider.descriptor.output_schema), value, label="output")
 
 
+def test_runtime_config_set_uses_external_secret_boundary_without_agent_outbox(monkeypatch):
+    from plugins.agent.agent_backend.capabilities.desktop_actions import (
+        register_desktop_agent_capabilities,
+    )
+
+    store = SimpleNamespace(load=lambda: {"api_key": "existing-key"}, save=lambda _value: None)
+    monkeypatch.setenv("ALLOW_LOCAL_RUNTIME_SECRET_ADMIN", "1")
+    monkeypatch.setattr(
+        "plugins.agent.agent_backend.infrastructure.runtime_secret_store.runtime_secret_store",
+        lambda: store,
+    )
+
+    registry = CapabilityRegistry()
+    register_desktop_agent_capabilities(
+        registry,
+        provider=SimpleNamespace(invoke=lambda *_args: None),
+        transaction_factory=lambda: (_ for _ in ()).throw(
+            AssertionError("runtime secret writes must not open an Agent DB transaction")
+        ),
+    )
+    provider = registry.get("agent.runtime.config.set", 1)
+
+    result = provider.handler(
+        {"model": "kivy-deepseek-v4-flash", "api_base": "http://api-hub.inner.chj.cloud/llm-gateway/v1", "api_key": ""},
+        SimpleNamespace(user_gid="u1", active_roles=("super_admin",), request_id="req-config"),
+    )
+
+    assert result.data["model"] == "kivy-deepseek-v4-flash"
+    assert provider.descriptor.consistency_policy == "external"
+    assert provider.descriptor.evidence_policy == "optional"
+
+
 def test_registered_write_handler_commits_agent_outbox_and_evidence_contract(monkeypatch):
     monkeypatch.setattr(
         "plugins.agent.agent_backend.capabilities.AgentCapabilityRepository.apply",

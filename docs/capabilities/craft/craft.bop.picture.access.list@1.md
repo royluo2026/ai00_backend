@@ -8,7 +8,7 @@ Authorize the authenticated reader to view the bounded historical picture set at
 - 不适用：Another export, import, resource or remote method is requested.
 - 生命周期：`experimental`
 - 所属领域：`craft`
-- Catalog Release：`rel_74f4926ccfa6bc3588ec1c956dc25a5e`
+- Catalog Release：`rel_f4161c5a8d19fe4bc4d4c291fc962b7d`
 - Schema 精度：`typed`
 - 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -89,7 +89,7 @@ Authorize the authenticated reader to view the bounded historical picture set at
 ```json
 {
   "capability_id": "craft.bop.picture.access.list",
-  "catalog_release": "rel_74f4926ccfa6bc3588ec1c956dc25a5e",
+  "catalog_release": "rel_f4161c5a8d19fe4bc4d4c291fc962b7d",
   "major_version": 1,
   "payload": {
     "version_gid": "example"

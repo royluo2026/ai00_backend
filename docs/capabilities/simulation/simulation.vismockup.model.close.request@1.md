@@ -8,7 +8,7 @@ Queue a signed request to close all models in the connected VisMockup applicatio
 - 不适用：No current user-scoped Connector binding exists.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
-- Catalog Release：`rel_74f4926ccfa6bc3588ec1c956dc25a5e`
+- Catalog Release：`rel_f4161c5a8d19fe4bc4d4c291fc962b7d`
 - Schema 精度：`typed`
 - 暂未开放原因：`experimental_lifecycle`
 
@@ -79,7 +79,7 @@ Queue a signed request to close all models in the connected VisMockup applicatio
 ```json
 {
   "capability_id": "simulation.vismockup.model.close.request",
-  "catalog_release": "rel_74f4926ccfa6bc3588ec1c956dc25a5e",
+  "catalog_release": "rel_f4161c5a8d19fe4bc4d4c291fc962b7d",
   "major_version": 1,
   "payload": {}
 }

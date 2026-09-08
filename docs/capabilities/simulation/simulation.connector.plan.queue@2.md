@@ -8,7 +8,7 @@ Queue one immutable compatible execution plan for the bound AI00 Connector as a 
 - 不适用：Connector compatibility or session preflight has not passed.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
-- Catalog Release：`rel_74f4926ccfa6bc3588ec1c956dc25a5e`
+- Catalog Release：`rel_f4161c5a8d19fe4bc4d4c291fc962b7d`
 - Schema 精度：`typed`
 - 暂未开放原因：`experimental_lifecycle`
 
@@ -245,7 +245,7 @@ Queue one immutable compatible execution plan for the bound AI00 Connector as a 
 ```json
 {
   "capability_id": "simulation.connector.plan.queue",
-  "catalog_release": "rel_74f4926ccfa6bc3588ec1c956dc25a5e",
+  "catalog_release": "rel_f4161c5a8d19fe4bc4d4c291fc962b7d",
   "major_version": 2,
   "payload": {
     "plan": {
