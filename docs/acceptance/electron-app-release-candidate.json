@@ -2,10 +2,10 @@
   "schema_version": 1,
   "artifact_kind": "unsigned_local_content_only",
   "status": "blocked",
-  "frontend_commit": "27501b128d25ea3b732ca26f599caa607c23629d",
+  "frontend_commit": "2ea7ed1f9eb4d9f6b3a98847d563bcaa69e80fe2",
   "backend_commit": "0d004c3976161931c989bc4e05523535a8c22ced",
   "source_tree": "982b65164503b599c9c98a980f95be32d8923aca",
-  "frontend_source_tree": "fd1482eff3b9bdc7457221fa5e22ff3fa474cd5e",
+  "frontend_source_tree": "6827db9116f9984e294e33cb81e4f3647ccb759a",
   "catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
   "platform": "win32",
   "arch": "x64",
@@ -16,12 +16,12 @@
   "artifacts": {
     "installer": {
       "path": "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\dist\\app-local-content\\AI00-UNSIGNED-CONTENT-ONLY-1.0.3-win-x64.exe",
-      "sha256": "5bab8a24ff9d193147a9b13fefd96f0da7ba69115d9d9205f02a3dd9895f4d25",
+      "sha256": "6af8e60a504246124c48ae5a777df6981cc458d6ac62f85397758e982236ac43",
       "authenticode_verified": false
     },
     "app": {
       "path": "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\dist\\app-local-content\\win-unpacked\\AI00.exe",
-      "sha256": "523aaa1fa0aca637901b500a6cd2e9d0d5c6ccdb3058f33775302d8cdd2533d4",
+      "sha256": "9caccac3595f820799dc02e27143998587c9332273c89da0ef48290db39c726e",
       "authenticode_verified": false
     },
     "host": {
@@ -73,6 +73,8 @@
     "backend_full_pytest": "interrupted at 57% after observed failures/errors; no complete summary or traceback; not passed; log retained",
     "ui_structure": "passed; no Renderer files changed; fresh screenshot pilot not run",
     "native_electron_addon": "prior Task10 build reused; final local command returned no stdout and is not credited as a verified native smoke",
-    "ui_comparison": "fresh capture not run; existing baseline/current comparison rejected fixture digest mismatch; existing Task11 report retains its original 8/8 evidence"
+    "ui_comparison": "fresh capture not run; existing baseline/current comparison rejected fixture digest mismatch; existing Task11 report retains its original 8/8 evidence",
+    "packaged_shell_smoke": "win-unpacked App started with one visible main window; second instance exited; closing the main window left zero App and ConnectorHost processes; no post-fix EPIPE logged",
+    "backend_local_smoke": "health passed; readiness blocked only by DatabaseNotMigratedError in the configured test database"
   }
 }

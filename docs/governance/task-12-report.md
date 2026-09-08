@@ -4,7 +4,7 @@ Status: **local content artifact produced; Task 12 release/pilot acceptance rema
 
 ## Changes and immutable identities
 
-Frontend source commits: `3612c7a00d0528cd0aae41cebf3129446ef52a56` (`build: package governed Windows x64 App`) and `27501b128d25ea3b732ca26f599caa607c23629d` (legacy update/publication retirement, installed Electron reuse and scanner compatibility). Backend source: `0d004c3976161931c989bc4e05523535a8c22ced` (`governance: define Electron App release evidence`). A following evidence-only commit binds these exact commits, source trees, generated closure and actual file hashes in `docs/acceptance/electron-app-release-candidate.json`.
+Frontend source commits: `3612c7a00d0528cd0aae41cebf3129446ef52a56` (`build: package governed Windows x64 App`), `27501b128d25ea3b732ca26f599caa607c23629d` (legacy update/publication retirement, installed Electron reuse and scanner compatibility), and `2ea7ed1f9eb4d9f6b3a98847d563bcaa69e80fe2` (production main-process EPIPE protection). Backend source: `0d004c3976161931c989bc4e05523535a8c22ced` (`governance: define Electron App release evidence`). A following evidence-only commit binds these exact commits, source trees, generated closure and actual file hashes in `docs/acceptance/electron-app-release-candidate.json`.
 
 The supported builder configuration is NSIS Windows x64 only, with one Start Menu shortcut and no desktop shortcut, Service, independent Tray or SessionHost. Connector resources allow only `AI00.ConnectorHost.exe`. The existing Electron 41.8.0 native addon is unpacked outside ASAR. Production Vite assets and official manifests/handlers are included. Source, tests, PDBs, Python, credentials, journals and prior installers are excluded from the artifact. Uninstall configuration removes Connector security state and the App installation/updater identity while retaining App document files and user document directories; actual uninstall remains unexecuted.
 
@@ -20,7 +20,7 @@ The pilot harness can emit a bounded template covering install, upgrade, failed 
 
 Local-only installer: frontend `dist/app-local-content/AI00-UNSIGNED-CONTENT-ONLY-1.0.3-win-x64.exe`.
 
-Installer SHA256: `5bab8a24ff9d193147a9b13fefd96f0da7ba69115d9d9205f02a3dd9895f4d25`. Actual `Get-AuthenticodeSignature` result: `NotSigned`. The empty Host signature and explicit inert local manifest cannot pass Host startup trust. No installer was executed.
+Installer SHA256: `6af8e60a504246124c48ae5a777df6981cc458d6ac62f85397758e982236ac43`. Actual `Get-AuthenticodeSignature` result: `NotSigned`. The empty Host signature and explicit inert local manifest cannot pass Host startup trust. No installer was executed.
 
 - TDD: installer configuration/allowlist, signed update policy/staged-pointer failure, EPIPE behavior, release schema and pilot template all failed before implementation and passed after it. Additional RED checks caught the legacy updater/workflow and absent installed-Electron reuse.
 - Actual unpacked artifact inspection passed: 79 external files and 1,107 ASAR entries; exact Connector file allowlist, required native unpack and forbidden contents verified.
@@ -29,7 +29,8 @@ Installer SHA256: `5bab8a24ff9d193147a9b13fefd96f0da7ba69115d9d9205f02a3dd9895f4
 - Runtime scanner: 272 files, 0 literal and 0 dynamic business transport violations, eight documented auth exceptions and zero parse errors.
 - Final `.NET Release`: 153 passed, 0 failed, 0 skipped. Backend release-evidence tests: 2 passed.
 - Backend full `pytest backend/tests plugins/simulation/tests -q` was interrupted at 57% after observed failures/errors, to avoid blocking the requested local handoff. No complete failure summary or traceback was emitted, so those failures are untriaged, not attributed to a cause or credited as passed.
-- A native Electron command returned without stdout and is not credited as verified. The existing Task10 compiled addon was reused; root should run the final native smoke.
+- Root local smoke started the final backend and development App shell, then rebuilt and started `win-unpacked/AI00.exe`. The packaged App showed one main window, rejected a second instance, and exited with zero App/Host processes. No post-fix EPIPE was logged. Backend `/health` passed; `/ready` remained blocked only by `DatabaseNotMigratedError` in the configured test database. This is local shell evidence, not a signed product pilot.
+- The existing Task10 compiled addon was reused. The packaged shell loaded successfully, but unsigned trust correctly prevented ConnectorHost startup; native Host control is not credited as a signed pilot.
 - Fresh screenshots were not captured. UI structure passed; attempting to reuse the existing baseline/current screenshots rejected a fixture digest mismatch. The Task11 report retains its own earlier eight-view result, which is not relabeled as Task12 evidence.
 - Immutable Git-blob bootstrap generation and check passed for backend source `0d004c3976161931c989bc4e05523535a8c22ced`. Direct mutable generator invocation was rejected as designed. The full Catalog/release gate was not rerun; existing Knowledge, route/audit/Registry and native MySQL release blockers remain.
 
