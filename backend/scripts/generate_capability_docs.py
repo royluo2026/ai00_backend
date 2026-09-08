@@ -28,6 +28,34 @@ def _actual_files(root: Path) -> dict[str, str]:
     }
 
 
+def _write_changed_files(root: Path, expected: dict[str, str]) -> tuple[int, int]:
+    """Update generated docs without rewriting files whose content is unchanged."""
+    root.mkdir(parents=True, exist_ok=True)
+    manifest_path = root / ".generated-manifest.json"
+    previous_files: set[str] = set()
+    if manifest_path.is_file():
+        previous = json.loads(manifest_path.read_text(encoding="utf-8"))
+        previous_files = {str(value) for value in previous.get("files", ())}
+
+    resolved_root = root.resolve()
+    removed = 0
+    for relative in sorted(previous_files - set(expected)):
+        path = (root / relative).resolve()
+        if path != resolved_root and resolved_root in path.parents and path.is_file():
+            path.unlink()
+            removed += 1
+
+    written = 0
+    for relative, content in expected.items():
+        path = root / relative
+        if path.is_file() and path.read_text(encoding="utf-8") == content:
+            continue
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content, encoding="utf-8", newline="\n")
+        written += 1
+    return written, removed
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group(required=True)
@@ -53,22 +81,11 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         print(f"Capability docs check passed: {release.release_id}, {len(release.descriptors)} pages")
         return 0
-    args.output.mkdir(parents=True, exist_ok=True)
-    # Remove only paths declared by the previous generated manifest. Never
-    # delete an untracked/manual file merely because it shares this directory.
-    manifest_path = args.output / ".generated-manifest.json"
-    if manifest_path.is_file():
-        previous = json.loads(manifest_path.read_text(encoding="utf-8"))
-        root = args.output.resolve()
-        for relative in previous.get("files", ()):
-            path = (args.output / str(relative)).resolve()
-            if path != root and root in path.parents and path.is_file():
-                path.unlink()
-    for relative, content in expected.items():
-        path = args.output / relative
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(content, encoding="utf-8", newline="\n")
-    print(f"Capability docs written: {release.release_id}, {len(release.descriptors)} pages")
+    written, removed = _write_changed_files(args.output, expected)
+    print(
+        f"Capability docs synchronized: {release.release_id}, "
+        f"{len(release.descriptors)} pages, written={written}, removed={removed}"
+    )
     return 0
 
 

@@ -8,7 +8,7 @@ Read the exact next downstream action awaiting user confirmation.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
-- Catalog Release：`rel_f4161c5a8d19fe4bc4d4c291fc962b7d`
+- Catalog Release：`<catalog_release>`（调用时使用 Host 当前固定的目录版本）
 - Schema 精度：`typed`
 - 暂未开放原因：`experimental_lifecycle`
 
@@ -86,7 +86,7 @@ Read the exact next downstream action awaiting user confirmation.
 ```json
 {
   "capability_id": "simulation.capture_run.action.get",
-  "catalog_release": "rel_f4161c5a8d19fe4bc4d4c291fc962b7d",
+  "catalog_release": "<catalog_release>",
   "major_version": 1,
   "payload": {
     "capture_run_id": "example"

@@ -8,7 +8,7 @@ Create, update, delete GBOP entries, process cards, operation cards, and entry l
 - 不适用：The request changes version lifecycle, imports external data, or only reads GBOP projections.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_f4161c5a8d19fe4bc4d4c291fc962b7d`
+- Catalog Release：`<catalog_release>`（调用时使用 Host 当前固定的目录版本）
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -159,7 +159,7 @@ Create, update, delete GBOP entries, process cards, operation cards, and entry l
 ```json
 {
   "capability_id": "craft.gbop.entity.change.apply",
-  "catalog_release": "rel_f4161c5a8d19fe4bc4d4c291fc962b7d",
+  "catalog_release": "<catalog_release>",
   "major_version": 1,
   "payload": {
     "operation": "entry.create"

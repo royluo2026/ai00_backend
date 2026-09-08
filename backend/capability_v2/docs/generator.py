@@ -365,6 +365,12 @@ def _error_guide() -> str:
 
 
 def _capability_page(item: dict[str, Any]) -> str:
+    # A capability page describes the stable per-capability contract. Binding it
+    # to the aggregate Catalog Release makes every page churn when any sibling
+    # capability or provider artifact changes. Keep the runtime requirement
+    # explicit without embedding the current release value in the page.
+    catalog_release = "<catalog_release>"
+    invoke = {**item["invoke"], "catalog_release": catalog_release}
     exposure = "\n".join(
         f"| {name} | {'可用' if allowed else '不可用'} |"
         for name, allowed in item["exposure"].items()
@@ -400,7 +406,7 @@ def _capability_page(item: dict[str, Any]) -> str:
 - 不适用：{item['do_not_use_when']}
 - 生命周期：`{item['lifecycle_status']}`
 - 所属领域：`{item['owner_domain']}`
-- Catalog Release：`{item['catalog_release']}`
+- Catalog Release：`{catalog_release}`（调用时使用 Host 当前固定的目录版本）
 - Schema 精度：`{item['schema_precision']}`
 - 暂未开放原因：{', '.join(f'`{value}`' for value in item['exposure_blockers']) or '无'}
 
@@ -459,7 +465,7 @@ def _capability_page(item: dict[str, Any]) -> str:
 最小结构示例：
 
 ```json
-{json.dumps(item['invoke'], ensure_ascii=False, sort_keys=True, indent=2)}
+{json.dumps(invoke, ensure_ascii=False, sort_keys=True, indent=2)}
 ```
 
 ## 输出 Schema

@@ -8,7 +8,7 @@ Change VisMockup view visibility.
 - 不适用：The caller is outside the trusted local Connector runtime.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
-- Catalog Release：`rel_f4161c5a8d19fe4bc4d4c291fc962b7d`
+- Catalog Release：`<catalog_release>`（调用时使用 Host 当前固定的目录版本）
 - Schema 精度：`typed`
 - 暂未开放原因：`experimental_lifecycle`
 
@@ -96,7 +96,7 @@ Change VisMockup view visibility.
 ```json
 {
   "capability_id": "simulation.vismockup.visibility.change.apply",
-  "catalog_release": "rel_f4161c5a8d19fe4bc4d4c291fc962b7d",
+  "catalog_release": "<catalog_release>",
   "major_version": 1,
   "payload": {
     "action": "all_on",

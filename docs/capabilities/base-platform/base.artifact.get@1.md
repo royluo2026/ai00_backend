@@ -8,7 +8,7 @@ Authorizes one immutable artifact for Main preview or native download.
 - 不适用：The requested effect belongs to another named action.
 - 生命周期：`experimental`
 - 所属领域：`base`
-- Catalog Release：`rel_f4161c5a8d19fe4bc4d4c291fc962b7d`
+- Catalog Release：`<catalog_release>`（调用时使用 Host 当前固定的目录版本）
 - Schema 精度：`typed`
 - 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -130,7 +130,7 @@ Authorizes one immutable artifact for Main preview or native download.
 ```json
 {
   "capability_id": "base.artifact.get",
-  "catalog_release": "rel_f4161c5a8d19fe4bc4d4c291fc962b7d",
+  "catalog_release": "<catalog_release>",
   "major_version": 1,
   "payload": {
     "artifact_ref": {

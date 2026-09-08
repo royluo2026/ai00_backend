@@ -8,7 +8,7 @@ Resolve one historical attachment proven to belong to an authorized craft busine
 - 不适用：Only an object key, filesystem path or unowned attachment is supplied.
 - 生命周期：`experimental`
 - 所属领域：`craft`
-- Catalog Release：`rel_f4161c5a8d19fe4bc4d4c291fc962b7d`
+- Catalog Release：`<catalog_release>`（调用时使用 Host 当前固定的目录版本）
 - Schema 精度：`typed`
 - 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -99,7 +99,7 @@ Resolve one historical attachment proven to belong to an authorized craft busine
 ```json
 {
   "capability_id": "craft.attachment.resolve",
-  "catalog_release": "rel_f4161c5a8d19fe4bc4d4c291fc962b7d",
+  "catalog_release": "<catalog_release>",
   "major_version": 1,
   "payload": {
     "parent_gid": "example",

@@ -1,17 +1,21 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import pytest
 
 from backend.capabilities.models_next import CapabilitySpec
 from backend.capabilities.validation_next import validate_payload
-from backend.capability_v2.catalog import CatalogRelease, load_catalog_release
+from backend.capability_v2.catalog import (
+    CatalogRelease, ProviderArtifact, build_release, load_catalog_release,
+)
 from backend.capability_v2.docs.generator import (
     DOMAIN_DOC_PATHS, build_documentation, example_for_schema, generated_files,
 )
 from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec as adapt_v1_spec
+from backend.scripts.generate_capability_docs import _write_changed_files
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -161,6 +165,56 @@ def test_capability_page_documents_every_execution_budget_field():
         "overload_policy",
     ):
         assert label in page
+
+
+def test_capability_page_is_stable_when_only_catalog_release_changes():
+    catalog = _catalog()
+    descriptor = catalog.descriptors[0]
+    page_path = (
+        f"{DOMAIN_DOC_PATHS[descriptor.owner_domain]}/"
+        f"{descriptor.id}@{descriptor.major_version}.md"
+    )
+    changed_provider = ProviderArtifact(
+        plugin_id="official.release-test",
+        module="release_test.provider",
+        version="1.0.0",
+        artifact_hash="sha256:" + "f" * 64,
+    )
+    next_release = build_release(catalog.descriptors, (changed_provider,))
+
+    current_page = generated_files(catalog)[page_path]
+    next_page = generated_files(next_release)[page_path]
+
+    assert next_release.release_id != catalog.release_id
+    assert next_page == current_page
+    assert catalog.release_id not in current_page
+    assert '"catalog_release": "<catalog_release>"' in current_page
+
+    changed_descriptor = descriptor.model_copy(
+        update={"description": descriptor.description + " Updated."},
+    )
+    changed_descriptors = (
+        changed_descriptor,
+        *catalog.descriptors[1:],
+    )
+    descriptor_release = build_release(changed_descriptors, catalog.provider_artifacts)
+    assert generated_files(descriptor_release)[page_path] != current_page
+
+
+def test_incremental_writer_only_rewrites_changed_generated_files(tmp_path):
+    expected = {"a.md": "same\n", "b.md": "before\n"}
+    assert _write_changed_files(tmp_path, expected) == (2, 0)
+    unchanged = tmp_path / "a.md"
+    fixed_time = 1_700_000_000_000_000_000
+    os.utime(unchanged, ns=(fixed_time, fixed_time))
+
+    written, removed = _write_changed_files(
+        tmp_path, {"a.md": "same\n", "b.md": "after\n"},
+    )
+
+    assert (written, removed) == (1, 0)
+    assert unchanged.stat().st_mtime_ns == fixed_time
+    assert (tmp_path / "b.md").read_text(encoding="utf-8") == "after\n"
 
 
 def test_checked_in_manual_has_no_generation_drift():

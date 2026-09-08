@@ -8,7 +8,7 @@ Read feishu_sheet read using owned immutable artifacts or the authenticated Feis
 - 不适用：Another export, import, resource or remote method is requested.
 - 生命周期：`experimental`
 - 所属领域：`craft`
-- Catalog Release：`rel_f4161c5a8d19fe4bc4d4c291fc962b7d`
+- Catalog Release：`<catalog_release>`（调用时使用 Host 当前固定的目录版本）
 - Schema 精度：`typed`
 - 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -95,7 +95,7 @@ Read feishu_sheet read using owned immutable artifacts or the authenticated Feis
 ```json
 {
   "capability_id": "craft.data_exchange.feishu_sheet.read",
-  "catalog_release": "rel_f4161c5a8d19fe4bc4d4c291fc962b7d",
+  "catalog_release": "<catalog_release>",
   "major_version": 1,
   "payload": {
     "sheet_range": "example",
