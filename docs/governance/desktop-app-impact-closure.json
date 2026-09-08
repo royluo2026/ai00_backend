@@ -4,10 +4,10 @@
   "consumer_type": "web",
   "transport_classification": "authenticated interactive Gateway; single Windows x64 App product",
   "source_basis": "immutable Git commit tree; not a promoted release candidate",
-  "source_commit": "5eb7637c063371eefe52f2852082f8c765a8447b",
-  "source_tree": "8dc1d86f1f7fee9a07dcc759ad4508fe85500e2a",
+  "source_commit": "0d004c3976161931c989bc4e05523535a8c22ced",
+  "source_tree": "982b65164503b599c9c98a980f95be32d8923aca",
   "source_hash_format": "exact Git blob bytes (no working directory normalization)",
-  "source_set_hash": "sha256:bbb8c91c65f89fdc6e4bfa7a19a3ea881351b437a8c796f9d02d05e75ed7f93d",
+  "source_set_hash": "sha256:8fe313bcf71ae35d3548cfa94d01a3cf01b9d0ed804315be236842b2305a5dcc",
   "published_catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
   "published_catalog_hash": "sha256:09e54550fcbaaab2df24bfa28d2c2478d9d47f455a27563405bce365efb2e2fd",
   "published_catalog_current": false,
@@ -13571,8 +13571,8 @@
     },
     {
       "path": "local-runtime/src/Ai00.Connector.Contracts/AdapterManifest.cs",
-      "git_blob_oid": "118c464aba9f44902223786e1269e3887cc5c984",
-      "sha256": "sha256:36bff9da586fb07a7c1fb40d09501c2093d923e9b526ae7f44e4df3e1e19c459"
+      "git_blob_oid": "df9ddc653cfff09ee9951a38e30b4c5d748436ea",
+      "sha256": "sha256:909cce98f470759e7317bd3f1d262e154fb99e165335ae5b67bc7f75d0a7b2e1"
     },
     {
       "path": "local-runtime/src/Ai00.Connector.Contracts/Ai00.Connector.Contracts.csproj",

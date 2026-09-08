@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "artifact_kind": "unsigned_local_content_only",
+  "status": "blocked",
+  "frontend_commit": "27501b128d25ea3b732ca26f599caa607c23629d",
+  "backend_commit": "0d004c3976161931c989bc4e05523535a8c22ced",
+  "source_tree": "982b65164503b599c9c98a980f95be32d8923aca",
+  "frontend_source_tree": "fd1482eff3b9bdc7457221fa5e22ff3fa474cd5e",
+  "catalog_release": "rel_09e54550fcbaaab2df24bfa28d2c2478",
+  "platform": "win32",
+  "arch": "x64",
+  "app_version": "1.0.3",
+  "host_version": "1.0.0",
+  "electron_version": "41.8.0",
+  "protocol": "ai00.connector.execution-plan.v2",
+  "artifacts": {
+    "installer": {
+      "path": "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\dist\\app-local-content\\AI00-UNSIGNED-CONTENT-ONLY-1.0.3-win-x64.exe",
+      "sha256": "5bab8a24ff9d193147a9b13fefd96f0da7ba69115d9d9205f02a3dd9895f4d25",
+      "authenticode_verified": false
+    },
+    "app": {
+      "path": "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\dist\\app-local-content\\win-unpacked\\AI00.exe",
+      "sha256": "523aaa1fa0aca637901b500a6cd2e9d0d5c6ccdb3058f33775302d8cdd2533d4",
+      "authenticode_verified": false
+    },
+    "host": {
+      "path": "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\dist\\app-local-content\\win-unpacked\\resources\\connector\\AI00.ConnectorHost.exe",
+      "sha256": "2189d15102543488664c871ce3fc79360e6d1a86e6628af30e8f09c4167d97e2",
+      "authenticode_verified": false
+    },
+    "addon": {
+      "path": "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\dist\\app-local-content\\win-unpacked\\resources\\app.asar.unpacked\\packages\\core\\electron\\native\\job_object\\build\\Release\\job_object.node",
+      "sha256": "45123f140555e87e499a798927b7212a6809dc851bb556d5dc3d799c9902843e",
+      "authenticode_verified": false
+    },
+    "adapter": {
+      "path": "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\local-runtime\\src\\Ai00.Connector.Adapters.VisMockup\\bin\\Release\\net8.0-windows\\Ai00.Connector.Adapters.VisMockup.dll",
+      "sha256": "ef68ba418c553ee49f97fbb05859fa2158ace66898fb8b1239ed5b210d57a1a1",
+      "authenticode_verified": false
+    }
+  },
+  "adapter_binding": "SHA256 of compiled adapter assembly embedded in the single-file Host",
+  "host_manifest_signature_verified": false,
+  "release_manifest_signature_verified": false,
+  "impact_closure_sha256": "70ad5d4028b7c18e9bf54f0dec12d1c022a72b5de3609bd48153f3b2d6494001",
+  "impact_source_commit": "0d004c3976161931c989bc4e05523535a8c22ced",
+  "machine_passed": false,
+  "human_approved": false,
+  "technical_release_approved": false,
+  "runtime_verified": false,
+  "release_ready": false,
+  "pilot_ready": false,
+  "local_content_check_passed": true,
+  "installer_runtime_executed": false,
+  "update_test_kind": "signature/policy and atomic-pointer filesystem simulation only; actual NSIS install/update/rollback not integrated",
+  "blockers": [
+    "windows_publisher_certificate_missing",
+    "signed_release_manifest_missing",
+    "signed_install_update_pilot_not_integrated",
+    "authoritative_technical_and_human_approval_missing",
+    "runtime_pilot_not_run",
+    "full_catalog_knowledge_paths_unbounded",
+    "full_release_gate_not_passed",
+    "native_mysql_and_real_feishu_vismockup_evidence_unverified"
+  ],
+  "evidence": {
+    "frontend_npm_test": "passed with AI00_BACKEND_ROOT; web 154/154",
+    "frontend_ast_scan": "272 files; literal 0; dynamic 0; eight documented auth exceptions; parse errors 0",
+    "installer_contents": "79 external files; 1107 ASAR entries; connector exact allowlist passed",
+    "dotnet_release": "153 passed; 0 failed/skipped after source fix",
+    "backend_release_evidence_tests": "2 passed after 2 RED assertions",
+    "backend_full_pytest": "interrupted at 57% after observed failures/errors; no complete summary or traceback; not passed; log retained",
+    "ui_structure": "passed; no Renderer files changed; fresh screenshot pilot not run",
+    "native_electron_addon": "prior Task10 build reused; final local command returned no stdout and is not credited as a verified native smoke",
+    "ui_comparison": "fresh capture not run; existing baseline/current comparison rejected fixture digest mismatch; existing Task11 report retains its original 8/8 evidence"
+  }
+}
