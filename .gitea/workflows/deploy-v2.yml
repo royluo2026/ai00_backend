@@ -38,6 +38,21 @@ jobs:
         shell: cmd
         run: E:\projects\ai00-v2\venv\Scripts\python.exe -m pip install -r workmanship-backend\backend\requirements.txt
 
+      - name: freeze-domains
+        shell: cmd
+        working-directory: workmanship-backend
+        run: E:\projects\ai00-v2\venv\Scripts\python.exe backend/scripts/freeze_official_domains.py --check
+
+      - name: catalog-check
+        shell: cmd
+        working-directory: workmanship-backend
+        run: E:\projects\ai00-v2\venv\Scripts\python.exe backend/scripts/build_capability_catalog.py --check
+
+      - name: docs-check
+        shell: cmd
+        working-directory: workmanship-backend
+        run: E:\projects\ai00-v2\venv\Scripts\python.exe backend/scripts/generate_capability_docs.py --check
+
       - name: Deploy
         shell: cmd
         run: |

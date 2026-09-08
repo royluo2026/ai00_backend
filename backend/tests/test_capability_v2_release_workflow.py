@@ -10,6 +10,7 @@ from backend.capability_v2.domain_manifest import load_domain_manifests
 ROOT = Path(__file__).resolve().parents[2]
 GITHUB_WORKFLOW = ROOT / ".github/workflows/capability-v2-release.yml"
 GITEA_WORKFLOW = ROOT / ".gitea/workflows/capability-v2-release.yml"
+GITEA_DEPLOY_WORKFLOW = ROOT / ".gitea/workflows/deploy-v2.yml"
 DOMAIN_MANIFESTS = ROOT / "backend/capability_v2/official_domains.json"
 REQUIRED_GATES = (
     "freeze-domains", "catalog-check", "docs-check", "registry-strict",
@@ -54,6 +55,18 @@ def test_both_workflows_have_identical_ordered_mandatory_gates():
     gitea = _mandatory_steps(GITEA_WORKFLOW)
     assert [name for name, _run, _cwd in github] == list(REQUIRED_GATES)
     assert gitea == github
+
+
+def test_gitea_test_deploy_rejects_provider_catalog_drift_before_deploy():
+    steps = _load(GITEA_DEPLOY_WORKFLOW)["jobs"]["deploy"]["steps"]
+    names = [str(step.get("name", "")) for step in steps]
+    deploy_index = names.index("Deploy")
+    for gate in ("freeze-domains", "catalog-check", "docs-check"):
+        gate_index = names.index(gate)
+        assert gate_index < deploy_index
+        command = str(steps[gate_index].get("run", ""))
+        assert "workmanship-backend" in str(steps[gate_index].get("working-directory", ""))
+        assert "--check" in command
 
 
 def test_workflows_bootstrap_one_admin_secret_and_import_generated_domain_urls():
