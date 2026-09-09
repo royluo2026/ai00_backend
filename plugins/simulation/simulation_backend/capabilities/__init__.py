@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Any
 
 from backend.domain_ports.resource_authorization import resource_authorizers
+from backend.domain_ports.versioned_resources import versioned_resource_resolvers
 from .models import specs
 from .environment_composition import EnvironmentCompositionProvider, specs as composition_specs
 from .capture_runs import CaptureRunProvider, specs as capture_specs
@@ -21,6 +22,10 @@ from .connector_pairing import specs as connector_pairing_specs
 from .provider import register
 from .workspaces import candidate_specs as workspace_specs
 from ..data.workspace_repository import WorkspaceRepository
+
+
+def _resolve_workspace_export(reference, context):
+    return WorkspaceRepository().resolve_export_ref(str(reference.get("export_ref") or ""),tenant_gid=str(context.team_gid or ""),owner_gid=str(context.user_gid or ""))
 
 
 def _authorize_document_snapshot(resource_id, identity) -> bool:
@@ -97,6 +102,7 @@ def register_capabilities(
     registry: Any, *, composition_provider: EnvironmentCompositionProvider | None = None,
     capture_provider: CaptureRunProvider | None = None,
 ) -> None:
+    versioned_resource_resolvers.register("simulation.workspace_export", _resolve_workspace_export)
     resource_authorizers.register("simulation-document-snapshot", _authorize_document_snapshot)
     resource_authorizers.register("simulation-environment", _authorize_environment)
     resource_authorizers.register("simulation-capture-run", _authorize_capture_run)

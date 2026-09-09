@@ -80,6 +80,7 @@ from .process_screenshot import register_process_screenshot_capability
 from .bop_repositories import candidate_specs as bop_repository_candidate_specs
 from .bop_repository_fork import candidate_specs as bop_repository_fork_candidate_specs
 from .bop_vpps_groups import candidate_specs as bop_vpps_group_candidate_specs
+from .bop_collaboration import candidate_specs as bop_collaboration_candidate_specs
 
 
 def _authorize_bop_version(resource_id, identity) -> bool:
@@ -88,9 +89,32 @@ def _authorize_bop_version(resource_id, identity) -> bool:
     return bool(resource_id and identity.actor.user_id)
 
 
+def _authorize_repository_resource(table, resource_id, identity, *, owner_only=False) -> bool:
+    if not resource_id or not identity.actor.user_id:
+        return False
+    from ..data.connection import get_craft_conn
+    column={"workmanship_craft_bop_repositories":"gid","workmanship_craft_bop_spaces":"gid","workmanship_craft_bop_change_proposals":"gid"}[table]
+    with get_craft_conn() as conn,conn.cursor() as cur:
+        if table=="workmanship_craft_bop_spaces" and owner_only:
+            cur.execute(f"SELECT 1 FROM {table} WHERE {column}=%s AND tenant_gid=%s AND owner_user_gid=%s AND deleted_at IS NULL",(resource_id,identity.tenant.tenant_id,identity.actor.user_id))
+        elif table=="workmanship_craft_bop_change_proposals":
+            cur.execute("SELECT 1 FROM workmanship_craft_bop_change_proposals p JOIN workmanship_craft_bop_repositories r ON r.gid=p.repository_gid WHERE p.gid=%s AND r.tenant_gid=%s AND r.deleted_at IS NULL",(resource_id,identity.tenant.tenant_id))
+        else:
+            cur.execute(f"SELECT 1 FROM {table} WHERE {column}=%s AND tenant_gid=%s AND deleted_at IS NULL",(resource_id,identity.tenant.tenant_id))
+        return cur.fetchone() is not None
+
+
+def _authorize_repository(resource_id,identity):return _authorize_repository_resource("workmanship_craft_bop_repositories",resource_id,identity)
+def _authorize_space(resource_id,identity):return _authorize_repository_resource("workmanship_craft_bop_spaces",resource_id,identity,owner_only=True)
+def _authorize_proposal(resource_id,identity):return _authorize_repository_resource("workmanship_craft_bop_change_proposals",resource_id,identity)
+
+
 def register_capabilities(registry: Any) -> None:
     """Register Craft-owned handlers; never mount routers or start workers."""
     resource_authorizers.register("craft-bop-version", _authorize_bop_version)
+    resource_authorizers.register("craft-bop-repository", _authorize_repository)
+    resource_authorizers.register("craft-bop-space", _authorize_space)
+    resource_authorizers.register("craft-bop-proposal", _authorize_proposal)
     from .desktop_vpps import register_desktop_vpps
     register_desktop_vpps(registry)
     native = NativeContractRegistry(registry)
@@ -99,6 +123,8 @@ def register_capabilities(registry: Any) -> None:
     for spec, handler in bop_repository_fork_candidate_specs():
         native.register(spec, handler)
     for spec, handler in bop_vpps_group_candidate_specs():
+        native.register(spec, handler)
+    for spec, handler in bop_collaboration_candidate_specs():
         native.register(spec, handler)
     register_bop_version_capabilities(native)
     register_bop_structure_capabilities(native)

@@ -355,7 +355,7 @@ git commit -m "feat(craft): version ordered vpps groups"
 - Produces repository Diff, personal sync Preview/Apply, private import Preview/Apply and proposal create/submit/review/apply/cancel/withdraw/supersede.
 - Consumes Simulation opaque export verification through a Gateway port, never a Simulation table.
 
-- [ ] **Step 1: Write failing trust and state-machine tests**
+- [x] **Step 1: Write failing trust and state-machine tests**
 
 ```python
 def test_partially_applied_is_not_terminal_and_accepted_cannot_withdraw(service):
@@ -366,23 +366,23 @@ def test_partially_applied_is_not_terminal_and_accepted_cannot_withdraw(service)
         service.withdraw(proposal["proposal_gid"])
 ```
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `python -m pytest plugins/craft/tests/test_bop_collaboration.py -q`
 
 Expected: FAIL.
 
-- [ ] **Step 3: Implement server-resolved three-way inputs**
+- [x] **Step 3: Implement server-resolved three-way inputs**
 
 Resolve Base/Ours/Theirs from the personal space record, build explicit dependency components, apply one component per Craft transaction and preserve outcomes. Verify every private export claim against caller, tenant, target, consumer, hash and expiry before Preview and again before Apply.
 
-- [ ] **Step 4: Run GREEN**
+- [x] **Step 4: Run GREEN**
 
 Run: `python -m pytest plugins/craft/tests/test_bop_collaboration.py -q`
 
 Expected: PASS for legal state pairs, terminal predicate, component atomicity, stale team head and export replay rejection.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add plugins/craft/craft_backend/data/bop_collaboration.py plugins/craft/craft_backend/capabilities/bop_collaboration.py plugins/craft/tests/test_bop_collaboration.py

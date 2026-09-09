@@ -58,6 +58,22 @@ class WorkspaceRepository:
                  token_digest,idempotency_key,expires_at),
             )
 
+    def resolve_export_ref(self, reference: str, *, tenant_gid: str, owner_gid: str) -> dict[str, Any]:
+        import time
+        from ..security.export_refs import ExportRefError, export_ref_digest, verify_export_ref
+        try:
+            claims=verify_export_ref(reference,now_epoch=int(time.time()))
+        except ExportRefError as exc:
+            raise WorkspaceRepositoryError(str(exc)) from exc
+        if str(claims.get("tenant_gid"))!=str(tenant_gid) or str(claims.get("actor_gid"))!=str(owner_gid):raise WorkspaceRepositoryError("private_export_invalid")
+        with get_simulation_conn() as conn,conn.cursor() as cursor:
+            cursor.execute("SELECT e.content_hash,e.consumer_capability_id,e.consumer_major_version,e.target_personal_space_gid,e.target_repository_gid,v.manifest_artifact_ref_json FROM workmanship_sim_workspace_export_refs e JOIN workmanship_sim_workspace_versions v ON v.gid=e.workspace_version_gid WHERE e.token_digest=%s AND e.tenant_gid=%s AND e.owner_gid=%s AND e.revoked_at IS NULL AND e.expires_at>NOW(6)",(export_ref_digest(reference),tenant_gid,owner_gid));row=cursor.fetchone()
+        if not row:raise WorkspaceRepositoryError("private_export_invalid")
+        if claims.get("content_hash")!=row["content_hash"] or claims.get("consumer")!=f'{row["consumer_capability_id"]}@{row["consumer_major_version"]}':raise WorkspaceRepositoryError("private_export_invalid")
+        value=row["manifest_artifact_ref_json"]
+        claims["manifest_artifact_ref"]=json.loads(value) if isinstance(value,str) else dict(value)
+        return claims
+
     def create(self, *, name: str, tenant_gid: str, owner_gid: str) -> dict[str, Any]:
         workspace_gid, version_gid = str(next_gid()), str(next_gid())
         with get_simulation_conn() as conn, conn.cursor() as cursor:
