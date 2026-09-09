@@ -180,6 +180,20 @@ def test_service_adapters_cannot_be_selected_by_a_user_principal():
     assert broker.for_mcp_client(_service(), tenant_id="tenant_1", client_id="client_1").consumer.type is ConsumerType.MCP
 
 
+def test_domain_provider_preserves_actor_and_tenant_but_fixes_scope():
+    broker, _, _ = _broker()
+    parent = broker.for_web(_user(), tenant_id="tenant_1")
+    derived = broker.for_domain_provider(
+        parent, runtime_id="craft-bop-authorizer",
+        capability_id="base.bop_edit.authorization.check",
+    )
+    assert derived.actor == parent.actor
+    assert derived.tenant == parent.tenant
+    assert derived.consumer.type is ConsumerType.LOCAL_RUNTIME
+    assert derived.consumer.consumer_id == "craft-bop-authorizer"
+    assert derived.delegation.capability_scopes == ("base.bop_edit.authorization.check",)
+
+
 def test_sql_delegation_insert_receives_hash_never_raw_bearer_token():
     statements = []
 

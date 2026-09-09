@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "registry_version": 1,
-  "table_count": 356,
+  "table_count": 365,
   "tables": [
     {
       "table": "workmanship_agent_canvas_audit_events",
@@ -707,6 +707,48 @@
     },
     {
       "table": "workmanship_base_saved_view_audit_events",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_line_projection_operations",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_line_responsibility_source_targets",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_line_responsibility_sources",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_line_responsibility_targets",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_project_manager_assignments",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_project_manager_heads",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_project_manager_operations",
       "owner": "base",
       "runtime_domain": "base",
       "legacy_name": false
@@ -1634,6 +1676,18 @@
       "owner": "project_management",
       "runtime_domain": "project_management",
       "legacy_name": true
+    },
+    {
+      "table": "workmanship_proj_org_management_operations",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_proj_org_management_outbox",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": false
     },
     {
       "table": "workmanship_proj_task_dependencies",

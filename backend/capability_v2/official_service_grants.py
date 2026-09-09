@@ -70,7 +70,7 @@ class OfficialServiceIdentityRegistry:
         if identity.consumer.consumer_id != service_id:
             raise IdentityError("official_service_consumer_denied")
         return AuthorizationGrants(
-            permissions=("base.read", "project.view"),
+            permissions=("base.read", "project.view", "system.user.manage"),
             capability_scopes=self._CAPABILITIES[service_id],
             resource_scopes=("*",), data_scopes=("confidential",),
             policy_version="official-service-v1",

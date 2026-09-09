@@ -49,6 +49,93 @@ def _pending(_payload: dict[str, Any], _context: object) -> dict[str, Any]:
     )
 
 
+def _tenant(context: object) -> str:
+    return str(getattr(context, "team_gid", None) or f"user:{getattr(context, 'user_gid', '')}")
+
+
+def _active_principal(payload: dict[str, Any], _context: object) -> dict[str, Any]:
+    from backend.base.active_principal import get_active_principal
+    value = get_active_principal(payload["user_gid"])
+    if value is None:
+        raise CapabilityBusinessError("resource_not_found", "人员不存在或已停用")
+    return {"data": value}
+
+
+def _manager_read(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.project_responsibility import ProjectManagerService
+    return {"data": ProjectManagerService().read(_tenant(context), payload["project_gid"])}
+
+
+async def _manager_replace(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from datetime import UTC, datetime
+    from backend.capability_v2.contracts import CorrelationRef
+    from backend.capability_v2.delegation import InMemoryDelegationStore
+    from backend.capability_v2.domain_client import DomainInvocation
+    from backend.capability_v2.identity import AuthenticatedPrincipal, IdentityBroker, InMemoryMountStore
+    from backend.capability_v2.official_service_grants import official_service_identities
+    from backend.base.project_responsibility import ProjectManagerError, ProjectManagerService
+    service_id = "base-project-validator"
+    tenant_gid = _tenant(context)
+    try:
+        with official_service_identities.trusted_tenant(
+            service_id=service_id, tenant_id=tenant_gid, source_kind="authenticated_request",
+            source_ref=str(getattr(context, "request_id", "manager-replace")),
+        ):
+            identity = IdentityBroker(
+                official_service_identities, InMemoryDelegationStore(), InMemoryMountStore()
+            ).for_local_runtime(
+                AuthenticatedPrincipal(service_id=service_id, authentication_method="internal",
+                                       authenticated_at=datetime.now(UTC)),
+                tenant_id=tenant_gid, runtime_id=service_id,
+            )
+            validation = await context.domain_client.invoke(
+                DomainInvocation(capability_id="project.project.validation.get", major_version=1,
+                                 payload={"project_gid": payload["project_gid"]}),
+                identity,
+                CorrelationRef(request_id=str(getattr(context, "request_id", "manager-replace")),
+                               trace_id=str(getattr(context, "request_id", "manager-replace"))),
+            )
+        if not validation.ok:
+            code = validation.error.code if validation.error else "provider_unavailable"
+            raise CapabilityBusinessError(code, validation.error.message if validation.error else "项目校验失败")
+        value = ProjectManagerService().replace(
+            tenant_gid=tenant_gid, actor_gid=str(getattr(context, "user_gid", "")),
+            project_gid=payload["project_gid"], user_gids=payload["user_gids"],
+            expected_revision=payload["expected_revision"],
+            idempotency_key=payload["idempotency_key"],
+        )
+    except ProjectManagerError as exc:
+        raise CapabilityBusinessError(exc.code, str(exc)) from exc
+    return {"data": value}
+
+
+def _bop_authorization(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.bop_edit_authorization import check_bop_edit
+    return {"data": check_bop_edit(
+        tenant_gid=_tenant(context), user_gid=str(getattr(context, "user_gid", "")),
+        active_roles=tuple(getattr(context, "active_roles", ()) or ()),
+        project_gid=payload["project_gid"], line_gid=payload.get("line_gid"),
+    )}
+
+
+def _projection_apply(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.line_responsibility_projection import apply_projection
+    from backend.base.project_responsibility import ProjectManagerError
+    try:
+        return {"data": apply_projection(payload, tenant_gid=_tenant(context),
+                                          actor_gid=str(getattr(context, "user_gid", "")))}
+    except ProjectManagerError as exc:
+        raise CapabilityBusinessError(exc.code, str(exc)) from exc
+
+
+def _projection_get(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.line_responsibility_projection import get_projection
+    value = get_projection(payload["operation_gid"], tenant_gid=_tenant(context))
+    if value is None:
+        raise CapabilityBusinessError("resource_not_found", "投影操作不存在")
+    return {"data": value}
+
+
 def _descriptor(
     spec: CapabilitySpec,
     *,
@@ -132,19 +219,19 @@ def register_org_management_capabilities(registry: Any) -> None:
         capability_id="base.identity.active_principal.get",
         description="Return one minimal active-principal projection by Base user GID.",
         input_schema=_object({"user_gid": ID}, ("user_gid",)),
-        output_schema=_object({"data": principal}, ("data",)),
+        output_schema=_object({"data": principal}, ("data",)), handler=_active_principal,
     )
     manager = _object({"gid": ID, "name": {"type": "string", "maxLength": 256}, "avatar_url": {"type": "string", "maxLength": 2048}}, ("gid", "name", "avatar_url"))
     manager_data = _object({"project_gid": ID, "revision": {"type": "integer", "minimum": 0}, "managed": {"type": "boolean"}, "managers": {"type": "array", "items": manager, "maxItems": 50}}, ("project_gid", "revision", "managed", "managers"))
-    _register(registry, capability_id="base.project_manager.read", description="Read the authoritative bounded project-manager set.", input_schema=_object({"project_gid": ID}, ("project_gid",)), output_schema=_object({"data": manager_data}, ("data",)))
-    _register(registry, capability_id="base.project_manager.replace", description="Replace the authoritative project-manager set after super-admin confirmation.", input_schema=_object({"project_gid": ID, "user_gids": {"type": "array", "items": ID, "maxItems": 50, "uniqueItems": True}, "expected_revision": {"type": "integer", "minimum": 0}, "idempotency_key": ID}, ("project_gid", "user_gids", "expected_revision", "idempotency_key")), output_schema=_object({"data": manager_data}, ("data",)), write=True)
+    _register(registry, capability_id="base.project_manager.read", description="Read the authoritative bounded project-manager set.", input_schema=_object({"project_gid": ID}, ("project_gid",)), output_schema=_object({"data": manager_data}, ("data",)), handler=_manager_read)
+    _register(registry, capability_id="base.project_manager.replace", description="Replace the authoritative project-manager set after super-admin confirmation.", input_schema=_object({"project_gid": ID, "user_gids": {"type": "array", "items": ID, "maxItems": 50, "uniqueItems": True}, "expected_revision": {"type": "integer", "minimum": 0}, "idempotency_key": ID}, ("project_gid", "user_gids", "expected_revision", "idempotency_key")), output_schema=_object({"data": manager_data}, ("data",)), write=True, handler=_manager_replace)
     projection_input = _object({"operation_gid": ID, "source_gid": ID, "source_revision": {"type": "integer", "minimum": 1}, "project_gid": ID, "bop_line_gid": NULL_ID, "user_gids": {"type": "array", "items": ID, "maxItems": 50, "uniqueItems": True}, "idempotency_key": ID}, ("operation_gid", "source_gid", "source_revision", "project_gid", "bop_line_gid", "user_gids", "idempotency_key"))
     projection_data = _object({"operation_gid": ID, "source_revision": {"type": "integer", "minimum": 1}, "status": {"type": "string", "enum": ["completed"]}}, ("operation_gid", "source_revision", "status"))
     worker = ExposurePolicy(worker=True)
-    _register(registry, capability_id="base.project_responsibility.projection.apply", description="Apply one idempotent source-scoped BOP line responsibility projection.", input_schema=projection_input, output_schema=_object({"data": projection_data}, ("data",)), write=True, exposure=worker)
-    _register(registry, capability_id="base.project_responsibility.projection.get", description="Read one source-scoped BOP line projection status.", input_schema=_object({"operation_gid": ID}, ("operation_gid",)), output_schema=_object({"data": projection_data}, ("data",)), exposure=worker)
+    _register(registry, capability_id="base.project_responsibility.projection.apply", description="Apply one idempotent source-scoped BOP line responsibility projection.", input_schema=projection_input, output_schema=_object({"data": projection_data}, ("data",)), write=True, exposure=worker, handler=_projection_apply)
+    _register(registry, capability_id="base.project_responsibility.projection.get", description="Read one source-scoped BOP line projection status.", input_schema=_object({"operation_gid": ID}, ("operation_gid",)), output_schema=_object({"data": projection_data}, ("data",)), exposure=worker, handler=_projection_get)
     auth_data = _object({"allowed": {"type": "boolean"}, "scope": {"type": "string", "enum": ["global", "project", "line", "none"]}, "reason": {"type": "string", "maxLength": 256}}, ("allowed", "scope", "reason"))
-    _register(registry, capability_id="base.bop_edit.authorization.check", description="Check one trusted actor's project or line-scoped BOP edit authority.", input_schema=_object({"project_gid": ID, "line_gid": NULL_ID}, ("project_gid", "line_gid")), output_schema=_object({"data": auth_data}, ("data",)), exposure=ExposurePolicy(local_runtime=True))
+    _register(registry, capability_id="base.bop_edit.authorization.check", description="Check one trusted actor's project or line-scoped BOP edit authority.", input_schema=_object({"project_gid": ID, "line_gid": NULL_ID}, ("project_gid", "line_gid")), output_schema=_object({"data": auth_data}, ("data",)), exposure=ExposurePolicy(local_runtime=True), handler=_bop_authorization)
 
 
 __all__ = ["register_org_management_capabilities"]

@@ -1,7 +1,7 @@
 """Project Management contracts for the manual responsibility tree."""
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Callable
 
 from backend.capability_v2.contracts import (
     AutomationLevel, BusinessInvariantContract, CapabilityDescriptorV2,
@@ -27,7 +27,8 @@ def _pending(_payload: dict[str, Any], _context: object) -> dict[str, Any]:
     raise CapabilityBusinessError("provider_unavailable", "Project org-management provider is not bound.", retryable=True)
 
 
-def _register(registry: Any, spec: CapabilitySpec, exposure: ExposurePolicy) -> None:
+def _register(registry: Any, spec: CapabilitySpec, exposure: ExposurePolicy,
+              handler: Callable[[dict[str, Any], object], dict[str, Any]] = _pending) -> None:
     descriptor = descriptor_from_provider_spec(spec)
     write = spec.risk == CapabilityRisk.WRITE
     descriptor = CapabilityDescriptorV2.model_validate({
@@ -65,10 +66,11 @@ def _register(registry: Any, spec: CapabilitySpec, exposure: ExposurePolicy) -> 
         ),),
         "no_business_invariant_reason": None,
     })
-    registry.register(spec, _pending, descriptor=descriptor)
+    registry.register(spec, handler, descriptor=descriptor)
 
 
 def register_org_management_capabilities(registry: Any) -> None:
+    from ..application.org_management import change, read, validate_project
     common = dict(owner="project_management", version=1, idempotent=True, plugin_callable=False, tags=("project_management", "org_management"))
     _register(registry, CapabilitySpec(
         id="project.project.validation.get", description="Return a minimal project identity projection for the fixed Base validator.",
@@ -77,8 +79,16 @@ def register_org_management_capabilities(registry: Any) -> None:
         input_schema=_object({"project_gid": ID}, ("project_gid",)),
         output_schema=_object({"data": _object({"gid": ID, "team_id": ID, "is_deleted": {"type": "boolean"}}, ("gid", "team_id", "is_deleted"))}, ("data",)),
         **common,
-    ), ExposurePolicy(local_runtime=True))
-    tree_item = _object({"gid": ID, "name": {"type": "string", "maxLength": 512}, "revision": {"type": "integer", "minimum": 0}}, ("gid", "name", "revision"))
+    ), ExposurePolicy(local_runtime=True), validate_project)
+    person_gid_array = {"type": "array", "items": ID, "maxItems": 50, "uniqueItems": True}
+    line = _object({"gid": ID, "name": {"type": "string", "minLength": 1, "maxLength": 512},
+                    "leader_user_gids": person_gid_array,
+                    "bop_line_gid": {"type": ["string", "null"], "maxLength": 256}},
+                   ("gid", "name", "leader_user_gids", "bop_line_gid"))
+    tree_item = _object({"gid": ID, "name": {"type": "string", "maxLength": 512},
+                         "revision": {"type": "integer", "minimum": 0},
+                         "lines": {"type": "array", "items": line, "maxItems": 5000}},
+                        ("gid", "name", "revision", "lines"))
     _register(registry, CapabilitySpec(
         id="project.org_management.read", description="Read bounded project responsibility tree, matrix, or operation status.",
         use_when="The super-admin management center reads manual project responsibilities.", do_not_use_when="The caller needs ordinary project members.",
@@ -86,15 +96,22 @@ def register_org_management_capabilities(registry: Any) -> None:
         input_schema=_object({"operation": {"type": "string", "enum": ["responsibility_tree.search", "responsibility_matrix.get", "operation.get"]}, "arguments": _object({"project_gid": {"type": ["string", "null"], "maxLength": 256}, "cursor": {"type": ["string", "null"], "maxLength": 512}, "page_size": {"type": "integer", "minimum": 1, "maximum": 100}, "operation_gid": {"type": ["string", "null"], "maxLength": 256}})}, ("operation", "arguments")),
         output_schema=_object({"data": _object({"items": {"type": "array", "items": tree_item, "maxItems": 100}, "next_cursor": {"type": ["string", "null"], "maxLength": 512}} , ("items", "next_cursor"))}, ("data",)),
         **common,
-    ), ExposurePolicy(web=True, api=True))
+    ), ExposurePolicy(web=True, api=True), read)
+    change_arguments = _object({
+        "project_gid": ID, "line_gid": ID,
+        "name": {"type": "string", "minLength": 1, "maxLength": 512},
+        "leader_user_gids": person_gid_array,
+        "bop_line_gid": {"type": ["string", "null"], "maxLength": 256},
+        "operation_gid": ID,
+    }, ("project_gid",))
     _register(registry, CapabilitySpec(
         id="project.org_management.change.apply", description="Apply one revisioned manual-line change and durably project its BOP responsibility grants.",
         use_when="A super administrator changes one manual project line.", do_not_use_when="The caller changes ordinary project membership.",
         risk=CapabilityRisk.WRITE, confirmation="user", permissions=("system.user.manage",),
-        input_schema=_object({"operation": {"type": "string", "enum": ["managed_line.create", "managed_line.update", "managed_line.delete", "projection.retry"]}, "arguments": _object({}), "expected_revision": {"type": "integer", "minimum": 0}, "idempotency_key": ID}, ("operation", "arguments", "expected_revision", "idempotency_key")),
+        input_schema=_object({"operation": {"type": "string", "enum": ["managed_line.create", "managed_line.update", "managed_line.delete", "projection.retry"]}, "arguments": change_arguments, "expected_revision": {"type": "integer", "minimum": 0}, "idempotency_key": ID}, ("operation", "arguments", "expected_revision", "idempotency_key")),
         output_schema=_object({"data": _object({"operation_gid": ID, "revision": {"type": "integer", "minimum": 1}, "status": {"type": "string", "enum": ["pending_projection", "completed", "failed_retryable", "failed_terminal"]}}, ("operation_gid", "revision", "status"))}, ("data",)),
         **common,
-    ), ExposurePolicy(web=True, api=True))
+    ), ExposurePolicy(web=True, api=True), change)
 
 
 __all__ = ["register_org_management_capabilities"]
