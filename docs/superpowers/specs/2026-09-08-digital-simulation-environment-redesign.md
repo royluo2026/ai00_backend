@@ -5,6 +5,8 @@
 **适用客户端：** AI00 Windows x64 App
 **相关既有设计：** `docs/superpowers/specs/2026-09-03-simulation-ai00-connector-governance-design.md`
 
+**协作与版本细化：** `docs/superpowers/specs/2026-09-09-simulation-environment-collaboration-versioning-design.md`。该细化设计取代本文关于“仅私人工作区”、复杂选择性合并和后续才支持共享/Fork 的旧假设。
+
 ## 1. 设计结论
 
 数模仿真页面应成为一个可持久化、可版本化的“仿真环境编排器”。它不保存或修改 Teamcenter 数模链接本身，也不替代 VisMockup 加载和显示数模。它保存用户如何引用、分类、排列、绑定和使用这些不可变链接，并通过 App 内置的 VisMockup Adapter 驱动 VisMockup 完成选择、高亮、显隐、着色和截图。
@@ -24,7 +26,7 @@ AI00 仿真环境中的引用、排列、绑定、版本和姿态
 VisMockup COM 选择 / 高亮 / 显隐 / 着色 / 截图
                |
                v
-选择性发布到正式 BOP 草稿
+项目主环境的在线 BOP 与版本基线
 ```
 
 这一区分是系统长期扩展的基础：来源链接不可变，AI00 拥有的编排关系和版本可以变化，VisMockup 是实际数模加载与图形执行引擎。
@@ -55,7 +57,7 @@ Renderer、preload、Electron IPC、Electron main、AppHost、named pipe 和 Web
 
 页面采用四列结构：
 
-1. **仿真环境记录列**：个人环境列表、搜索、最近打开、草稿/冻结版本、同步状态。
+1. **仿真环境记录列**：项目主环境、私人环境和共享池，按活动/基线/冻结/归档分组，并提供搜索、Fork、版本和同步状态。
 2. **当前仿真环境树**：引用既有 BOP，也允许在末端增加临时线体、工位、工序和操作。
 3. **VM 结构树**：展示当前 VisMockup 文档的结构化快照，并与 VisMockup 双向选择和高亮。
 4. **右侧工作区**：一期保留，用于详情、差异、冲突、截图预览和未来高级仿真工具。
@@ -64,29 +66,26 @@ Renderer、preload、Electron IPC、Electron main、AppHost、named pipe 和 Web
 
 ### 2.2 BOP 引用与仿真覆盖层
 
-- 既有 BOP 在仿真环境中是带版本的只读引用。
-- 用户的添加、移动、删除、排序和绑定写入仿真覆盖层，不直接修改源 BOP。
+- 节点评审的项目主环境直接跟随在线活动 BOP。项目管理者可修改全部区域，工程师可修改获授权线体；BOP 写入始终由 Craft Capability 执行。
+- 零散评审的私人/共享环境保存 BOP 引用和仿真覆盖层，不直接修改来源 BOP。
 - 临时层级节点拥有 Simulation GID，不预占 Craft/BOP GID。
 - 同一个 VM 实例可以在多个工序或操作中以关系投影出现，底层实例只有一份。
 - 工具、设备、工装、套筒等需求关系可显示为虚拟关系组或关系行，不伪装成 BOP 结构节点。
 
-### 2.3 选择性发布
+### 2.3 主环境在线协作
 
-- 用户在发布预览中选择需要进入正式 BOP 的临时节点和关系。
-- 被选子节点依赖的父节点自动加入变更集。
-- 未选择内容继续留在仿真环境。
-- 发布基于当前最新 BOP 草稿重放变更；其他区域变化自动合并，同一节点或关系的冲突逐项解决。
-- 发布生成新的 BOP 草稿或调用现有草稿变更流程，不覆盖正式版本。
-- Craft 域生成正式 BOP GID；Simulation 保存 `environment_node_gid -> bop_entry_gid` 发布映射。
+- 一个主项目最多有一个活动主环境，不提供 pull、push、merge、rebase 或日常工程师分支。
+- 项目管理者直接修改主环境；工程师直接修改获授权线体；跨线体调整由项目管理者处理。
+- 不同线体独立保存和冲突检测。首次修改、删除和跨线体移动前复用 Craft 线体 checkpoint。
+- 主环境的 BOP 与 Simulation 扩展绑定为同一项目版本；建立基线或冻结时固定两域的精确版本引用和 hash。
 
-### 2.4 每人独立、可持续维护的环境
+### 2.4 私人环境、共享池、Fork 与手动版本
 
-- 一期每个仿真环境仅创建者本人可读写，租户隔离和 owner resource selector 必须同时成立。
-- 分享、克隆、转移所有权和团队协作是后续独立 Capability，不在一期预埋模糊的 team 写权限。
-- 普通编辑自动保存到可变 draft head。
-- “保存版本”冻结一个不可变环境版本。
-- 截图和发布开始前自动冻结精确版本，保证输入可复现。
-- 历史版本只读；新的编辑从选定版本派生新的 draft head。
+- 私人环境仅 owner 可读写；共享池环境同租户可读、可用、可 Fork，但仍只有 owner 可修改。
+- Fork 从已保存版本或活动环境的自动 fork-base 派生，不改变来源状态，也不回写来源。
+- 私人和共享环境只保留当前状态、Fork 起点和用户主动保存的不可变版本，不保存每次自动保存的完整 BOP/VM 历史。
+- 同一环境任意两个手动保存版本必须支持完整结构化 Diff，包括 BOP、绑定、VM 版本、BOM 行、`catiaOccurrenceName`、坐标和姿态。
+- 冻结后不可修改；归档退出日常列表并可按权限恢复。
 
 ## 3. VisMockup 文档、窗口与同步
 
@@ -327,14 +326,13 @@ Craft 的执行结构投影对外规范化为 `parameters.is_load_part`，Simula
 
 单步失败、上传失败、取消、App/ConnectorHost/VisMockup 崩溃时停止后续步骤，并 best-effort 恢复运行前场景。恢复本身也要记录 outcome；不能证明截图或恢复结果时进入 `outcome_unknown` / `manual_review_required`。再次操作前先对账，不得通过重复截图猜测结果。成功、失败、取消和恢复都不能永久污染工程师原有场景。
 
-## 9. 正式 BOP 发布边界
+## 9. 项目主环境与正式 BOP 边界
 
-### 9.1 写入 BOP 的内容
+### 9.1 同一项目版本
 
-- 用户选中的临时线体、工位、工序和操作节点；
-- 零件的 load/operate 关系及必要的不可变模型引用；
-- 工具、设备、工装、套筒对应的正式资源需求关系；
-- 仿真环境版本和 VM 快照的追溯引用。
+节点评审主环境直接绑定项目在线活动 BOP。项目管理者和获授权工程师的结构、零件 load/operate 及资源需求修改由 Craft Capability 写入当前活动 BOP；Simulation 同步保存 VM 实例、姿态、截图和 VisMockup 映射。普通协作不经过私人环境合并或发布流程。
+
+建立基线或冻结时，项目版本同时固定精确 BOP version/revision/content hash 和 Simulation environment version/manifest hash。两域数据由共同版本锚点关联，对用户表现为同一个正式项目版本，但各自保持领域所有权。
 
 ### 9.2 不写入 BOP 主结构的内容
 
@@ -348,18 +346,17 @@ Craft 的执行结构投影对外规范化为 `parameters.is_load_part`，Simula
 
 ### 9.3 并发与冲突
 
-环境记录 `source_bop_version_gid` 和来源内容摘要。发布时：
-
-- 来源相关内容未变：直接预览并应用到新草稿；
-- 只有不相关区域变化：基于最新版自动重放；
-- 同一节点或关系双方均变化：返回结构化冲突，用户逐项解决；
-- 不得覆盖正式版本或盲目重试冲突写入。
-
-优先复用现有 `craft.bop.draft.change.preview@1` 和 `craft.bop.draft.change.apply@1`。若它们不能表达批量父依赖、load/operate 关系或跨版本冲突，则由 Craft owner 决定兼容扩展还是新增主版本，Simulation 不复制 Craft 规则。
+- 不同线体的修改使用独立授权和局部刷新，不互相阻塞。
+- 同一线体修改继续使用 Craft revision/CAS、typed preview/apply 和操作历史。
+- 首次修改、删除和跨线体移动前建立线体 checkpoint；跨线体移动仅项目管理者可执行，并同时保护来源与目标线体。
+- revision 冲突时只重新读取受影响线体，保留用户视点和未提交意图，禁止覆盖或盲目重试。
+- 私人和共享池环境不回写项目主环境，不提供 merge、pull 或 push。
 
 ## 10. 建议的数据模型
 
 以下名称为实施设计候选，最终迁移前需核对现有表：
+
+协作、共享、Fork 和手动版本的实际扩展表及字段以 2026-09-09 细化设计为准；下表保留原始核心对象边界。
 
 | 表 | Owner | 作用 |
 |---|---|---|
@@ -457,28 +454,27 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 
 | 原子业务效果 | advisory Capability 候选 | Owner / Provider / 消费者 | 权限、确认与并发 | 事务、稳定错误和审计 |
 |---|---|---|---|---|
-| 创建本人私有工作区 | `simulation.environment.workspace.create@1` | Simulation / Simulation Provider / Desktop cad_sim | owner selector；confirmation 待风险评审；幂等 | 单库事务；来源不可见/已存在/invalid；create 审计 |
-| 查询本人工作区列表 | `simulation.environment.workspace.search@1` | 同上 | owner only；`confirmation=none`；cursor/page_size | 只读；稳定分页和查询摘要审计 |
-| 读取一个工作区及 draft head | `simulation.environment.workspace.get@1` | 同上 | owner only；`confirmation=none`；有界 projection | 只读；not found/resource denied |
-| 修改名称或非语义元数据 | `simulation.environment.workspace.metadata.update@1` | 同上 | owner only；CAS + 幂等；confirmation 待评审 | 单库 CAS；metadata revision 审计 |
+| 创建项目主环境或私人/共享工作区 | `simulation.environment.workspace.create@1` | Simulation / Simulation Provider / Desktop cad_sim | 项目/owner selector；confirmation 待风险评审；幂等 | 单库事务；来源不可见/已存在/invalid；create 审计 |
+| 查询当前用户可见的工作区列表 | `simulation.environment.workspace.search@1` | 同上 | 私人 owner、同租户共享、项目可见；`confirmation=none`；cursor/page_size | 只读；稳定分页和查询摘要审计 |
+| 读取一个可见工作区及 draft head | `simulation.environment.workspace.get@1` | 同上 | 服务端可见范围 selector；`confirmation=none`；有界 projection | 只读；not found/resource denied |
+| 修改名称或非语义元数据 | `simulation.environment.workspace.metadata.update@1` | 同上 | owner；项目主环境允许项目管理者；CAS + 幂等 | 单库 CAS；metadata revision 审计 |
 | 归档工作区 | `simulation.environment.workspace.archive@1` | 同上 | owner only；CAS + 幂等；confirmation 待评审 | 软归档；不复用旧 `simulation.environment.archive@1` |
-| 创建一个临时结构节点 | `simulation.environment.structure_node.create@1` | 同上 | owner only；CAS + 幂等；confirmation 待评审 | parent/type/limit 校验；create 审计 |
-| 移动一个临时结构节点 | `simulation.environment.structure_node.move@1` | 同上 | owner only；CAS + 幂等；confirmation 待评审 | parent/cycle 校验；from/to 审计 |
-| 软删除一个临时结构节点 | `simulation.environment.structure_node.remove@1` | 同上 | owner only；CAS + 幂等；confirmation 待评审 | 依赖校验；remove 审计 |
-| 调整同父节点下一个节点的顺序 | `simulation.environment.structure_node.reorder@1` | 同上 | owner only；CAS + 幂等；confirmation 待评审 | 稳定 order key；before/after 审计 |
-| 创建一条 load/operate/resource_use 绑定 | `simulation.environment.binding.create@1` | 同上 | owner only；CAS + 幂等；confirmation 待评审 | load 唯一性和引用校验；create 审计 |
-| 修改一条绑定的角色或目标 | `simulation.environment.binding.update@1` | 同上 | owner only；binding CAS + 幂等；confirmation 待评审 | 追加 revision；before/after 审计 |
-| 解除一条绑定 | `simulation.environment.binding.remove@1` | 同上 | owner only；binding CAS + 幂等；confirmation 待评审 | 软删除 revision；remove 审计 |
-| 冻结 draft 为不可变版本 | `simulation.environment.version.freeze@1` | Simulation / Simulation Provider / Desktop、capture、publish | owner only；CAS + 幂等；confirmation 待评审 | Base Platform Artifact Capability + Simulation DB saga；version/hash 审计 |
-| 读取一个冻结版本 | `simulation.environment.version.get@1` | Simulation / Simulation Provider / Desktop | owner only；`confirmation=none`；有界 projection | 只读；not found/resource denied |
-| 查询冻结版本历史 | `simulation.environment.version.search@1` | 同上 | owner only；`confirmation=none`；cursor/page_size | 只读；稳定排序 |
-| 启动两个版本的大型比较 | `simulation.environment.version_compare.start@1` | Simulation / Simulation Provider / Desktop | owner only；confirmation 待评审；幂等；max_nodes | 创建只读计算任务；input/algorithm hash 审计 |
-| 读取比较进度和分页结果 | `simulation.environment.version_compare.get@1` | 同上 | owner only；`confirmation=none`；cursor/page_size | 只读；algorithm unavailable/limit exceeded |
+| 创建一个临时结构节点 | `simulation.environment.structure_node.create@1` | 同上 | 私人/共享 owner；主环境获授权线体；CAS + 幂等 | parent/type/limit 校验；create 审计 |
+| 移动一个临时结构节点 | `simulation.environment.structure_node.move@1` | 同上 | 私人/共享 owner；主环境线体权限；跨线体仅项目管理者 | parent/cycle 校验；from/to 审计 |
+| 软删除一个临时结构节点 | `simulation.environment.structure_node.remove@1` | 同上 | 私人/共享 owner；主环境获授权线体；CAS + 幂等 | 依赖校验；remove 审计 |
+| 调整同父节点下一个节点的顺序 | `simulation.environment.structure_node.reorder@1` | 同上 | 私人/共享 owner；主环境获授权线体；CAS + 幂等 | 稳定 order key；before/after 审计 |
+| 创建一条 load/operate/resource_use 绑定 | `simulation.environment.binding.create@1` | 同上 | 私人/共享 owner；主环境获授权线体；CAS + 幂等 | load 唯一性和引用校验；create 审计 |
+| 修改一条绑定的角色或目标 | `simulation.environment.binding.update@1` | 同上 | 私人/共享 owner；主环境获授权线体；binding CAS + 幂等 | 追加 revision；before/after 审计 |
+| 解除一条绑定 | `simulation.environment.binding.remove@1` | 同上 | 私人/共享 owner；主环境获授权线体；CAS + 幂等 | 软删除 revision；remove 审计 |
+| 保存一个不可变手动版本 | `simulation.environment.workspace.version.save@1` | Simulation / Simulation Provider / Desktop、capture | owner/项目管理者；CAS + 幂等 | Base Artifact + Simulation DB saga；完整 BOP/VM 锚点 |
+| Fork 一个可见环境状态 | `simulation.environment.workspace.fork@1` | Simulation / Simulation Provider / Desktop | 来源可读；新环境 owner；幂等 | 活动来源先建 fork-base；复制投影并保留 lineage |
+| 冻结 draft 为不可变版本 | `simulation.environment.version.freeze@1` | Simulation / Simulation Provider / Desktop、capture | owner/项目管理者；CAS + 幂等；confirmation 待评审 | Base Platform Artifact Capability + Simulation DB saga；version/hash 审计 |
+| 读取一个不可变版本 | `simulation.environment.version.get@1` | Simulation / Simulation Provider / Desktop | 按来源环境可见范围；`confirmation=none`；有界 projection | 只读；not found/resource denied |
+| 查询手动版本历史 | `simulation.environment.version.search@1` | 同上 | 按来源环境可见范围；`confirmation=none`；cursor/page_size | 只读；稳定排序 |
+| 启动两个版本的大型比较 | `simulation.environment.version_compare.start@1` | Simulation / Simulation Provider / Desktop | 左右版本均可读；confirmation 待评审；幂等；max_nodes | 创建只读计算任务；input/algorithm hash 审计 |
+| 读取比较进度和分页结果 | `simulation.environment.version_compare.get@1` | 同上 | 比较任务可读；`confirmation=none`；cursor/page_size | 只读；algorithm unavailable/limit exceeded |
 | 接受一次已解析 VM 快照差异 | `simulation.document_snapshot.change.accept@1` | Simulation / Simulation Provider / Desktop | owner only；expected head + 幂等；confirmation 待评审 | 单库 CAS；accepted/rejected diff 审计 |
 | 接受数模升版后的绑定迁移 | `simulation.environment.binding_migration.accept@1` | Simulation / Simulation Provider / Desktop | owner only；expected draft + 幂等；confirmation 待评审 | 单库 CAS；predecessor/target 审计 |
-| 生成选择性发布计划和 Craft 预览 | `simulation.environment.publish_plan.create@1` | Simulation 编排 Provider调用 Craft preview / Desktop | owner only；frozen/source/selection hash + 幂等；confirmation 待评审 | 保存预览，不写 BOP；plan/preview 审计 |
-| 读取待执行发布动作 | `simulation.environment.publish_plan.action.get@1` | Simulation / Simulation Provider / Desktop | owner only；`confirmation=none` | 返回精确 Craft apply action ref 和确认状态 |
-| 消费精确确认并执行一次发布计划 | `simulation.environment.publish_plan.dispatch@1` | Simulation 编排 Provider调用 Craft apply / Desktop | owner + Craft selector；confirmation receipt；端到端幂等 | Craft 写入后 Simulation 对账并写自有 map；outcome 审计 |
 | 按数模号批量精确反查知识资源 | `knowledge.resource_model_mapping.reverse_resolve@1` | Knowledge / Knowledge Provider / Simulation | `knowledge.read`；tenant 来自可信上下文；`confirmation=none`；有界批量 | 逐项 resolved/not_found/ambiguous；查询摘要审计 |
 
 每个候选在进入代码前必须使用治理变更记录模板补齐真实 `capability_version_gid`、business effect/invariants、闭合输入输出、Provider、Gateway exposure、消费者、表/迁移、测试和当前 Snapshot。上表不能作为注册或审批依据。
@@ -506,9 +502,6 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 | `simulation.environment.version_compare.get@1` | comparison GID、cursor/page_size | 状态、摘要、分页差异、result hash | 无 | unchanged/moved/upgraded/added/removed、分页/hash |
 | `simulation.document_snapshot.change.accept@1` | document、candidate、accepted/rejected diff IDs、expected head、幂等键 | 新 head/sequence、未解决摘要 | 单库 CAS | 全部 diff 类型、过期候选、并发、幂等、跨文档拒绝 |
 | `simulation.environment.binding_migration.accept@1` | workspace、candidate IDs、逐项 decision、expected draft、幂等键 | binding revisions、row version、剩余歧义 | 单库 CAS | inherit/replace/keep/unbind/rebind、过期、歧义、CAS |
-| `simulation.environment.publish_plan.create@1` | frozen version、选择、source BOP version/hash、幂等键 | plan GID、父依赖、Craft preview ref/hash、冲突、action ref | 保存预览；不写 BOP | 部分选择、父依赖、重放、冲突、过期、幂等 |
-| `simulation.environment.publish_plan.action.get@1` | publish plan GID | opaque action ref、payload hash、Craft capability/version、confirmation state | 无 | owner、过期、preview hash、闭合 Schema |
-| `simulation.environment.publish_plan.dispatch@1` | plan/action ref、confirmation receipt、幂等键 | publish status、Craft draft revision、mapping projection status、operation ref | Gateway 调 Craft apply；Simulation 通过 outbox/对账写自有 map | receipt、preview stale、Craft CAS、重复 outcome、outbox、unknown |
 | `knowledge.resource_model_mapping.reverse_resolve@1` | model numbers、允许的有效期/业务 selector、batch limit；无 tenant/actor payload | 输入逐项 resolved/not_found/ambiguous 与不可变 refs | 无 | 各资源类型、精确/非模糊、歧义、上限、敏感裁剪 |
 | `craft.bop.draft.change.apply` 复用/升版 | Craft preview ref、expected BOP version、opaque client/correlation ref、receipt、幂等键 | Craft draft revision、Craft 节点/关系 GID、原样 opaque client_ref、Craft audit ref | Craft 只写自有草稿；不写 Simulation map | consumer contract、关系、CAS、receipt、client_ref 原样、重复 outcome |
 
@@ -590,7 +583,7 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 
 ### 阶段 2：仿真环境工作区
 
-实现个人环境、BOP 引用、临时树、自动保存、冻结版本和四列页面骨架。
+实现项目主环境、私人环境、共享池、项目关联、临时树、自动保存、手动版本、Fork、冻结和四列页面骨架。
 
 ### 阶段 3：绑定与知识分类
 
@@ -600,13 +593,13 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 
 实现每工序一图、累计装配状态、越过 load 点隐藏、运行恢复、Artifact 上传及工序图片关联。
 
-### 阶段 5：选择性发布
+### 阶段 5：项目主环境协同
 
-实现变更集勾选、父依赖、Craft 预览/应用、冲突解决和 GID 映射。
+实现项目管理者全局编辑、工程师线体授权编辑、局部冲突恢复以及 BOP 与 Simulation 项目版本锚点。
 
 ### 阶段 6：升版与高级处理
 
-实现 Teamcenter 升版比较、绑定迁移、姿态对比、环境分支以及后续基于不可变链接的高级 VisMockup COM 操作。
+实现 Teamcenter 升版比较、绑定迁移、姿态对比、环境 Fork/版本 Diff 以及后续基于不可变链接的高级 VisMockup COM 操作。
 
 每个阶段必须能独立演示和回滚；阶段 0 结论会修正规格中的未验证字段和 Adapter 操作合同。
 
@@ -620,8 +613,8 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 6. 用户将资源拖入关系组，系统通过 Knowledge 精确反查；歧义项在面板中解决。
 7. 用户为零件建立 load 和后续 operate 关系，保存后重开环境仍保持。
 8. 倒序截图每工序生成一图，零件只在越过 load 点后隐藏。
-9. 用户选择部分临时节点和关系发布，系统生成 Craft 草稿并保存 GID 映射。
-10. BOP 同区域并发修改时发布被结构化冲突阻止，其他区域修改可自动重放。
+9. 项目管理者和工程师直接修改主环境的授权区域，BOP 与 Simulation 扩展保持同一项目版本锚点。
+10. 同一线体并发修改返回 revision 冲突并局部恢复；不同线体修改互不阻塞。
 11. VisMockup/App 重启后重新连接文档，恢复实例映射和未完成环境。
 12. 数模升版时旧版本保持可复现，新版本迁移必须经用户接受。
 13. 大树读取始终分页或 lazy-load；超出 max_depth/max_nodes 时返回稳定错误，不拖死 Renderer 或 Gateway。
@@ -630,8 +623,9 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 16. 截图成功后恢复 visibility、color、selection 和 camera；截图、上传、关联、取消或崩溃任一失败时停止后续步骤并执行可验证恢复。
 17. Outcome 不确定时进入 `outcome_unknown`/`manual_review_required`，对账前不能重试或生成第二张截图。
 18. Renderer、Electron IPC、named pipe、WebSocket 和 legacy bridge 扫描均不存在可绕过 Gateway/plan v2 的业务执行路径。
-19. 私有环境不能被同租户其他普通用户读取或修改；跨租户访问始终拒绝。
-20. 相同冻结环境版本在其绑定算法版本下重复生成截图计划，得到相同有序输入 hash。
+19. 私有环境不能被同租户其他普通用户读取；共享池环境可读、可用、可 Fork但仅 owner 可修改；跨租户访问始终拒绝。
+20. 私人环境任意两个手动保存版本可以比较 BOP、绑定、VM 版本、BOM 行、`catiaOccurrenceName`、坐标和姿态。
+21. 相同冻结环境版本在其绑定算法版本下重复生成截图计划，得到相同有序输入 hash。
 
 ## 15. 明确不做
 
@@ -645,3 +639,5 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 - 不把 BOP `data_stage` 用作 VM 快照版本轴。
 - 不让 renderer 或 AppHost 生成持久业务 GID。
 - 不在现有 Capability 上静默改变业务含义。
+- 不使用 Git 软件存储仿真业务数据，也不提供 pull、push、merge 或 rebase。
+- 不为私人和共享环境的每次自动保存生成完整 BOP/VM 历史。
