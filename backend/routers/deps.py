@@ -397,6 +397,10 @@ def build_profile(user: dict) -> dict:
         v2_perms.add("knowledge.read")
     if "knowledge.manage" in perms:
         v2_perms.add("knowledge.write")
+    if "system.user.manage" in perms:
+        v2_perms.add("base.read")
+    if org_role == "super_admin":
+        v2_perms.add("base.write")
     if org_role != "external":
         v2_perms.update({"agent.interact", "agent.read", "ontology.propose"})
     # Physical factory topology is an independent Capability V2 domain.  The
