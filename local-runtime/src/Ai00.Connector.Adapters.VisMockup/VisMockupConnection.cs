@@ -20,6 +20,7 @@ public sealed class VisMockupConnection(IVisMockupCom com)
 public sealed class BreakawayVisMockupCom(string executable,string publisher):IVisMockupCom
 {
     private readonly WindowsVisMockupCom inner=new(executable);
+    public VisMockupProcessState InspectProcess()=>inner.InspectProcess();
     public bool TryGetActiveApplication(out IVisMockupApplication? application)=>inner.TryGetActiveApplication(out application);
     public void Launch()=>new VisMockupBreakawayLauncher(executable,publisher).Launch();
     public IVisMockupApplication WaitForActiveApplication(TimeSpan timeout)=>inner.WaitForActiveApplication(timeout);

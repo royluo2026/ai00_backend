@@ -23,6 +23,12 @@ def craft_manifest():
     return manifests.require("craft")
 
 
+@pytest.fixture
+def simulation_manifest():
+    manifests = load_domain_manifests(ROOT / "backend/capability_v2/official_domains.json")
+    return manifests.require("simulation")
+
+
 def test_domain_database_requires_both_explicit_urls(craft_manifest):
     with pytest.raises(DomainDatabaseConfigurationError, match="AI00_CRAFT_DB_URL"):
         load_domain_database_config(craft_manifest, {"AI00_DB_URL": "mysql://global:x@db/ai00_craft"})
@@ -35,6 +41,31 @@ def test_domain_database_rejects_wrong_database_name(craft_manifest):
     }
     with pytest.raises(DomainDatabaseConfigurationError, match="database_name_mismatch"):
         load_domain_database_config(craft_manifest, env)
+
+
+def test_simulation_uses_shared_database_in_test_environment(simulation_manifest):
+    env = {
+        "AI00_SIMULATION_DB_URL": "mysql://runtime:runtime-secret@db/sht_mes_tool",
+        "AI00_SIMULATION_DDL_DB_URL": "mysql://ddl:ddl-secret@db/sht_mes_tool",
+        "TABLE_PREFIX": "test_",
+    }
+
+    config = load_domain_database_config(simulation_manifest, env)
+
+    assert config.database_name == "sht_mes_tool"
+    assert config.runtime_url.database == "sht_mes_tool"
+    assert config.ddl_url.database == "sht_mes_tool"
+
+
+def test_simulation_uses_same_shared_database_without_test_prefix(simulation_manifest):
+    env = {
+        "AI00_SIMULATION_DB_URL": "mysql://runtime:runtime-secret@db/sht_mes_tool",
+        "AI00_SIMULATION_DDL_DB_URL": "mysql://ddl:ddl-secret@db/sht_mes_tool",
+    }
+
+    config = load_domain_database_config(simulation_manifest, env)
+
+    assert config.database_name == "sht_mes_tool"
 
 
 def test_domain_database_rejects_same_runtime_and_ddl_user(craft_manifest):

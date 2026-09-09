@@ -37,6 +37,23 @@ public sealed class VisMockupSnapshotTests
     }
 
     [Fact]
+    public async Task ProbeReportsRunningProcessWhenItsAutomationObjectCannotBeAttached()
+    {
+        var fake = new FakeVisMockupCom { ProcessRunning = true };
+        using var sta = new StaDispatcher();
+        var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([Path.GetTempPath()]), fake);
+
+        var health = await adapter.ProbeAsync(default);
+        var json = JsonSerializer.SerializeToElement(health);
+
+        Assert.False(health.Ready);
+        Assert.True(health.ProcessReady);
+        Assert.Equal("automation_unavailable", health.Status);
+        Assert.True(json.GetProperty("process_ready").GetBoolean());
+        Assert.False(json.TryGetProperty("ProcessReady", out _));
+    }
+
+    [Fact]
     public async Task SnapshotRejectsTreeBeyondNodeLimit()
     {
         var fake = new FakeVisMockupCom { ExistingApplication = FakeVisMockupCom.WithDocument("BOM-1", 10_001) };

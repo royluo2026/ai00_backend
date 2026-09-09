@@ -622,7 +622,7 @@ Creates one owned Skill with a named prompt, tool, flow or canvas content model.
   "major_version": 1,
   "payload": {
     "content": {},
-    "name": "example",
+    "name": "ex",
     "skill_type": "prompt",
     "title": "example"
   }

@@ -6,6 +6,7 @@ namespace Ai00.Connector.Adapters.VisMockup;
 
 public interface IVisMockupCom
 {
+    VisMockupProcessState InspectProcess();
     bool TryGetActiveApplication(out IVisMockupApplication? application);
     void Launch();
     IVisMockupApplication WaitForActiveApplication(TimeSpan timeout);
@@ -31,6 +32,7 @@ public interface IVisMockupDocument
     void ApplyCaptureProfile(CaptureProfile profile);
     string AttachModel(string path);
     void CaptureImage(string path);
+    void ExportPlmxml(string path, int hierarchyIndex);
     void Close();
 }
 
@@ -42,6 +44,8 @@ public interface IVisMockupNode
     string ModelId { get; }
     IReadOnlyList<IVisMockupNode> Children { get; }
 }
+
+public sealed record VisMockupProcessState(bool Running, string ProductVersion);
 
 internal static class VisMockupDispatch
 {
@@ -168,6 +172,18 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
     private const string ProgId = "VFFrame.Application";
     private IVisMockupApplication? _application;
 
+    public VisMockupProcessState InspectProcess()
+    {
+        var path = Path.GetFullPath(executable);
+        var processName = Path.GetFileNameWithoutExtension(path);
+        var running = !string.IsNullOrWhiteSpace(processName) &&
+            System.Diagnostics.Process.GetProcesses().Any(process => MatchesProcessName(processName, process.ProcessName));
+        var version = File.Exists(path)
+            ? System.Diagnostics.FileVersionInfo.GetVersionInfo(path).ProductVersion ?? "unknown"
+            : "unknown";
+        return new(running, version);
+    }
+
     public bool TryGetActiveApplication(out IVisMockupApplication? application)
     {
         if (_application is not null)
@@ -176,9 +192,7 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
             return true;
         }
 
-        var processName = Path.GetFileNameWithoutExtension(executable);
-        if (string.IsNullOrWhiteSpace(processName) ||
-            !System.Diagnostics.Process.GetProcesses().Any(process => MatchesProcessName(processName, process.ProcessName)))
+        if (!InspectProcess().Running)
         {
             application = null;
             return false;
@@ -228,8 +242,7 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         var type = Type.GetTypeFromProgID(ProgId, throwOnError: true)!;
         var instance = Activator.CreateInstance(type)
             ?? throw new COMException("Unable to connect to VisMockup COM application");
-        var installedVersion = System.Diagnostics.FileVersionInfo
-            .GetVersionInfo(Path.GetFullPath(executable)).ProductVersion ?? "unknown";
+        var installedVersion = InspectProcess().ProductVersion;
         return new DynamicApplication(instance, installedVersion);
     }
 
@@ -296,6 +309,11 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
             return Convert.ToString(created.GetNodeKey()) ?? throw new InvalidOperationException("Attached node has no key");
         }
         public void CaptureImage(string path) => Value.ActiveView.CaptureImage(path);
+        public void ExportPlmxml(string path, int hierarchyIndex)
+        {
+            if (hierarchyIndex < 0) throw new ConnectorException("vismockup_hierarchy_index_invalid");
+            _ = VisMockupDispatch.InvokeMethod(value, 13, 0, path, "", hierarchyIndex);
+        }
         public void Close() => Value.CloseDocument();
         private List<object> Traverse()
         {

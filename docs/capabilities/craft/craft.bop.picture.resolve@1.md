@@ -97,7 +97,7 @@ Read craft bop picture resolve using owned immutable artifacts or the authentica
   "catalog_release": "<catalog_release>",
   "major_version": 1,
   "payload": {
-    "reference_hash": "example",
+    "reference_hash": "0000000000000000000000000000000000000000000000000000000000000000",
     "version_gid": "example"
   }
 }

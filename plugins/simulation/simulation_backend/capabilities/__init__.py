@@ -19,6 +19,8 @@ from .connector_runtime import (
 )
 from .connector_pairing import specs as connector_pairing_specs
 from .provider import register
+from .workspaces import candidate_specs as workspace_specs
+from ..data.workspace_repository import WorkspaceRepository
 
 
 def _authorize_document_snapshot(resource_id, identity) -> bool:
@@ -81,6 +83,16 @@ def _authorize_connector(resource_id, identity) -> bool:
     )
 
 
+_workspace_repository = WorkspaceRepository()
+
+
+def _authorize_workspace(resource_id, identity) -> bool:
+    scope = _identity_scope(identity)
+    return bool(scope["user_gid"]) and _workspace_repository.get(
+        resource_id, tenant_gid=scope["team_gid"], owner_gid=scope["user_gid"],
+    ) is not None
+
+
 def register_capabilities(
     registry: Any, *, composition_provider: EnvironmentCompositionProvider | None = None,
     capture_provider: CaptureRunProvider | None = None,
@@ -93,6 +105,7 @@ def register_capabilities(
     resource_authorizers.register("simulation-profile", _authorize_profile)
     resource_authorizers.register("simulation-run", _authorize_run)
     resource_authorizers.register("simulation-connector", _authorize_connector)
+    resource_authorizers.register("simulation-workspace", _authorize_workspace)
     selected_capture_provider = capture_provider or default_capture_provider
     for spec, handler in specs():
         register(registry, spec, handler)
@@ -109,6 +122,8 @@ def register_capabilities(
         register(registry, spec, handler)
     register_connector_runtime_capabilities(registry, connector_control_plane)
     for spec, handler in connector_pairing_specs():
+        register(registry, spec, handler)
+    for spec, handler in workspace_specs():
         register(registry, spec, handler)
 
 

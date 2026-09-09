@@ -105,7 +105,7 @@ Sends one explicitly confirmed list link to the selected Feishu chat.
   "payload": {
     "chat_id": "example",
     "list_name": "example",
-    "share_url": "example"
+    "share_url": "https://example.invalid"
   }
 }
 ```

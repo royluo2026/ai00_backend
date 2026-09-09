@@ -95,6 +95,10 @@ public sealed class OutcomeDelivery(RuntimeTransport transport,AppPlanJournal jo
             {
                 if(useRecovery)recovery=null;else original=null;
             }
+            catch(RuntimeTransportException e)when(e.Message=="plan_lease_invalid")
+            {
+                original=null; recovery=null;
+            }
             catch(RuntimeTransportException e)when(e.Transient||e.Message is "runtime_session_active" or "reconciliation_session_active"){}
             catch(HttpRequestException){}
             await Task.Delay(TimeSpan.FromSeconds(5),ct);
@@ -191,14 +195,20 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
         credentials.SaveSession(session);
         while(!ct.IsCancellationRequested)
         {
-            if(session.ExpiresAt-DateTimeOffset.UtcNow<TimeSpan.FromMinutes(2))
+            JsonElement leased;
+            try
             {
-                var renewed=await transport.SendAsync(HttpMethod.Post,"runtime/renew",null,ct,session);
-                session=session with{ExpiresAt=renewed.GetProperty("expires_at").GetDateTimeOffset()};
-                credentials.SaveSession(session);
+                if(session.ExpiresAt-DateTimeOffset.UtcNow<TimeSpan.FromMinutes(2))
+                {
+                    var renewed=await transport.SendAsync(HttpMethod.Post,"runtime/renew",null,ct,session);
+                    session=session with{ExpiresAt=renewed.GetProperty("expires_at").GetDateTimeOffset()};
+                    credentials.SaveSession(session);
+                }
+                await transport.SendAsync(HttpMethod.Post,"heartbeat",null,ct,session);
+                leased=await transport.SendAsync(HttpMethod.Post,"plans/lease",new{lease_seconds=120},ct,session);
             }
-            await transport.SendAsync(HttpMethod.Post,"heartbeat",null,ct,session);
-            var leased=await transport.SendAsync(HttpMethod.Post,"plans/lease",new{lease_seconds=120},ct,session);
+            catch(RuntimeTransportException e)when(e.Transient){await Task.Delay(TimeSpan.FromSeconds(5),ct);continue;}
+            catch(HttpRequestException){await Task.Delay(TimeSpan.FromSeconds(5),ct);continue;}
             if(leased.ValueKind==JsonValueKind.Null){await transport.WaitForWakeAsync(session,ct);continue;}
             var lease=new LeasedPlan(leased.GetProperty("lease_id").GetString()!,leased.GetProperty("lease_until").GetDateTimeOffset(),leased.GetProperty("plan").GetRawText());
             var outcome=await executor.ExecuteAsync(lease,session,ct);
@@ -256,7 +266,8 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
                     }
                     finally{CryptographicOperations.ZeroMemory(aesKey);CryptographicOperations.ZeroMemory(clear);}
                 }
-                catch(RuntimeTransportException e)when(e.Message=="pairing_not_approved"){await Task.Delay(TimeSpan.FromSeconds(5),ct);}
+                catch(RuntimeTransportException e)when(e.Message=="pairing_not_approved"||e.Transient){await Task.Delay(TimeSpan.FromSeconds(5),ct);}
+                catch(HttpRequestException){await Task.Delay(TimeSpan.FromSeconds(5),ct);}
             }
             await diagnostics.SendAsync(new{type="pairing_state",pairing_id=id,state="expired"},ct);
             throw new InvalidDataException("pairing_expired");
@@ -296,6 +307,7 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
         evidence["signature"]=key.Sign(CanonicalJsonV2.Serialize(evidence.ToJsonString()));
         journal.Append("reconciliation_evidence",outcome.PlanId,evidence.ToJsonString());
         await transport.SendAsync(HttpMethod.Post,"plans/"+Uri.EscapeDataString(outcome.PlanId)+"/reconcile",evidence,ct,session);
+        journal.Append("reconciled",outcome.PlanId,"{}");
         // Inconclusive observations deliberately remain blocked for cloud/manual resolution.
         journal.Append("manual_review_required",outcome.PlanId,"{}");
     }

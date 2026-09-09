@@ -28,6 +28,9 @@ public static class Program
             using var http=new HttpClient(new HttpClientHandler{AllowAutoRedirect=false,UseCookies=false}){Timeout=TimeSpan.FromSeconds(30)};
             var builder=Host.CreateApplicationBuilder(new HostApplicationBuilderSettings{Args=[],DisableDefaults=true});
             builder.Logging.ClearProviders();
+#if DEBUG
+            if(options.Development)builder.Logging.AddSimpleConsole(settings=>settings.SingleLine=true);
+#endif
             builder.Services.AddSingleton(options);builder.Services.AddSingleton(verified.Manifest);
             builder.Services.AddSingleton(new DiagnosticIdentity(options.ParentPid,Environment.ProcessId,Environment.ProcessPath!,verified.Manifest.Publisher,verified.Digest,options.LaunchNonce));
             builder.Services.AddSingleton<DiagnosticPipeHost>();
@@ -43,7 +46,14 @@ public static class Program
             try{await host.RunAsync();}finally{monitorCancellation.Cancel();await monitor;}
             return 0;
         }
-        catch{return 1;} // Never emit launch secrets, credentials, signed plans or COM payloads to parent/stderr.
+        catch(Exception error)
+        {
+            _ = error;
+#if DEBUG
+            Console.Error.WriteLine($"[ConnectorHost] {error.GetType().Name}: {error.Message}");
+#endif
+            return 1; // Release builds never emit launch secrets, credentials, signed plans or COM payloads.
+        }
     }
     private static async Task MonitorParentAsync(System.Diagnostics.Process parent,IHostApplicationLifetime lifetime,CancellationToken ct)
     {

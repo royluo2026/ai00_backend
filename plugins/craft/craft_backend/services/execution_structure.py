@@ -49,6 +49,12 @@ def _transport(value: Any) -> Any:
     return value.isoformat() if isinstance(value, (datetime, date)) else value
 
 
+def _boolean(value: Any) -> bool:
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "on"}
+    return bool(value)
+
+
 def _revision(version: Mapping[str, Any]) -> int:
     value = version.get("revision")
     if isinstance(value, bool) or not isinstance(value, int) or value < 1:
@@ -98,7 +104,7 @@ class ExecutionStructureRepository:
 
                 cursor.execute(
                     "SELECT gid, parent_gid, node_type, sort_order, title, vpps, "
-                    "vpps_desc, owner_gid, meta, created_at, updated_at "
+                    "vpps_desc, part_feed, owner_gid, meta, created_at, updated_at "
                     "FROM workmanship_bop_bop_entries "
                     "WHERE version_gid = %s AND is_deleted = 0",
                     (version_gid,),
@@ -326,7 +332,13 @@ def _normalize(aggregate: BopAggregate) -> dict[str, Any]:
                 "resources": sorted(resources, key=lambda item: (item["resource_type"], item["code"])),
                 "knowledge_refs": refs["knowledge_refs"],
                 "rule_refs": refs["rule_refs"],
-                "parameters": {"parent_node_id": parent_gid, "vpps": entry.get("vpps")},
+                "parameters": {
+                    "parent_node_id": parent_gid,
+                    "vpps": entry.get("vpps"),
+                    # Craft's persisted part_feed field is the authoritative
+                    # 'this process/operation loads the part' business fact.
+                    "is_load_part": _boolean(entry.get("part_feed")),
+                },
             }
         )
 

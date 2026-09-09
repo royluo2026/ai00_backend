@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import base64
 from datetime import UTC, datetime
+import os
 import hashlib
 import json
 from typing import Literal
@@ -12,6 +13,7 @@ from cryptography.exceptions import InvalidSignature
 
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature, encode_dss_signature
 
 from backend.contracts.connector_execution_plan_v2 import (
@@ -122,6 +124,25 @@ class PlanSigner:
     @classmethod
     def from_jwk(cls, _jwk):
         raise ValueError('cloud_secret_provider_required')
+
+    @classmethod
+    def configured_from_environment(cls, *, clock=lambda: datetime.now(UTC)):
+        """Compose the cloud signer from secret-injected PEM; return None when unconfigured."""
+        key_id = os.environ.get('AI00_CONNECTOR_PLAN_SIGNING_P256_KEY_ID', '').strip()
+        private_pem = os.environ.get('AI00_CONNECTOR_PLAN_SIGNING_P256_PRIVATE_KEY', '').replace('\\n', '\n').strip()
+        not_before_raw = os.environ.get('AI00_CONNECTOR_PLAN_SIGNING_P256_NOT_BEFORE', '').strip()
+        not_after_raw = os.environ.get('AI00_CONNECTOR_PLAN_SIGNING_P256_NOT_AFTER', '').strip()
+        if not any((key_id, private_pem, not_before_raw, not_after_raw)):
+            return None
+        if not all((key_id, private_pem, not_before_raw, not_after_raw)):
+            raise ValueError('connector_plan_signing_configuration_incomplete')
+        key = serialization.load_pem_private_key(private_pem.encode('utf-8'), password=None)
+        if not isinstance(key, ec.EllipticCurvePrivateKey) or not isinstance(key.curve, ec.SECP256R1):
+            raise ValueError('private_key_required')
+        parse = lambda value: datetime.fromisoformat(value.replace('Z', '+00:00')).astimezone(UTC)
+        record = dict(private_key=key, not_before=parse(not_before_raw),
+                      not_after=parse(not_after_raw), revoked=False)
+        return cls(lambda requested: record if requested == key_id else None, key_id=key_id, clock=clock)
 
     def sign(self, plan) -> ConnectorExecutionPlanV2:
         record = self._secret_provider(self.key_id)

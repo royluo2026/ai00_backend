@@ -54,6 +54,8 @@ public sealed class OutcomeUnknownRecoveryTests : IDisposable
         using var key = new DeviceSigningKeyStore(root).GetOrCreate();
         var plan=ProtocolV2VectorTests.Vector["plan"]!.DeepClone().AsObject();
         plan["steps"]![0]!["timeout_seconds"]=1;
+        plan["steps"]![0]!["side_effect_classification"]="write";
+        plan["steps"]![0]!["post_condition_probe_id"]="vismockup.application.probe@1";
         var second=plan["steps"]![0]!.DeepClone();second["step_id"]="step-00002";
         plan["steps"]!.AsArray().Add(second);
         using var cloud=ProtocolV2VectorTests.TestKey("plan");ProtocolV2VectorTests.SignPlan(plan,cloud);
@@ -61,6 +63,22 @@ public sealed class OutcomeUnknownRecoveryTests : IDisposable
         var worker=Worker(new AppPlanJournal(Path.Combine(root,"journal")),adapter,key);
         var outcome=await worker.ExecuteAsync(Lease() with{PlanJson=plan.ToJsonString()},Session(),CancellationToken.None);
         Assert.Equal("outcome_unknown",outcome.OverallStatus);Assert.Equal(1,adapter.Calls);Assert.Equal(1,outcome.Steps.GetArrayLength());
+    }
+    [Fact] public async Task ReadTimeoutIsFailedWithoutEffectAndDoesNotQuarantineRuntime()
+    {
+        using var key = new DeviceSigningKeyStore(root).GetOrCreate();
+        var plan=ProtocolV2VectorTests.Vector["plan"]!.DeepClone().AsObject();
+        plan["steps"]![0]!["timeout_seconds"]=1;
+        plan["steps"]![0]!["side_effect_classification"]="read";
+        plan["steps"]![0]!["post_condition_probe_id"]=null;
+        using var cloud=ProtocolV2VectorTests.TestKey("plan");ProtocolV2VectorTests.SignPlan(plan,cloud);
+        var adapter=new FakeAdapter(()=>new TaskCompletionSource<AdapterResult>().Task);
+        var worker=Worker(new AppPlanJournal(Path.Combine(root,"journal")),adapter,key);
+
+        var outcome=await worker.ExecuteAsync(Lease() with{PlanJson=plan.ToJsonString()},Session(),CancellationToken.None);
+
+        Assert.Equal("failed_without_effect",outcome.OverallStatus);
+        Assert.False(worker.ExecutionQuarantined);
     }
     [Fact] public async Task ArtifactOperationsFailBeforeInvocationWhenV2TransportIsUnavailable()
     {
@@ -91,10 +109,14 @@ public sealed class OutcomeUnknownRecoveryTests : IDisposable
     {
         using var key = new DeviceSigningKeyStore(root).GetOrCreate();
         var journal = new AppPlanJournal(Path.Combine(root,"journal"));
+        var plan=ProtocolV2VectorTests.Vector["plan"]!.DeepClone().AsObject();
+        plan["steps"]![0]!["side_effect_classification"]="write";
+        plan["steps"]![0]!["post_condition_probe_id"]="vismockup.application.probe@1";
+        using var cloud=ProtocolV2VectorTests.TestKey("plan");ProtocolV2VectorTests.SignPlan(plan,cloud);
         using var cancel = new CancellationTokenSource();
         var adapter = new FakeAdapter(() => { cancel.Cancel(); return new TaskCompletionSource<AdapterResult>().Task; });
         var worker = Worker(journal,adapter,key);
-        var outcome = await worker.ExecuteAsync(Lease(),Session(),cancel.Token);
+        var outcome = await worker.ExecuteAsync(Lease() with{PlanJson=plan.ToJsonString()},Session(),cancel.Token);
         Assert.Equal("outcome_unknown",outcome.OverallStatus);
         OutcomeV2.ParseAndVerify(outcome.ToJson(),key.PublicJwk.GetRawText());
         Assert.True(worker.ExecutionQuarantined);
@@ -113,6 +135,8 @@ public sealed class OutcomeUnknownRecoveryTests : IDisposable
         Assert.Equal("outcome_unknown",recovered[0].OverallStatus);
         Assert.Equal(0,adapter.Calls);
         Assert.Single(Worker(new AppPlanJournal(journal.Path),adapter,key).Recover());
+        journal.Append("reconciled","plan-002","{}");
+        Assert.Empty(Worker(new AppPlanJournal(journal.Path),adapter,key).Recover());
     }
     [Theory] [InlineData("device")] [InlineData("generation")] [InlineData("instance")] [InlineData("expiry")] [InlineData("key")] [InlineData("lease")]
     public async Task InvalidBindingsNeverReachAdapter(string field)

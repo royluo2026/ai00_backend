@@ -97,6 +97,13 @@ _RESOURCES = {
     "simulation.run.get": (("simulation-run", "run_id"),),
     "simulation.result.get": (("simulation-run", "run_id"),),
     "simulation.result.compare": (("simulation-run", "left_result_ref.run_id"), ("simulation-run", "right_result_ref.run_id")),
+    "simulation.environment.workspace.get": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.structure_node.create": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.structure_node.move": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.structure_node.remove": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.binding.create": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.binding.remove": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.version.freeze": (("simulation-workspace", "workspace_gid"),),
 }
 _ERROR_PAIRS = (
     ('runtime_owner_mismatch', 'The authenticated user and tenant do not own this runtime device.'),
@@ -360,8 +367,8 @@ def _errors(*, connector_environment: bool, include_runtime_errors: bool) -> tup
 
 
 def governed_spec(spec: Any) -> Any:
-    input_schema = INPUT_SCHEMAS.get((spec.id, spec.version), INPUT_SCHEMAS[spec.id])
-    output_schema = OUTPUT_SCHEMAS.get((spec.id, spec.version), OUTPUT_SCHEMAS[spec.id])
+    input_schema = INPUT_SCHEMAS.get((spec.id, spec.version), INPUT_SCHEMAS.get(spec.id, spec.input_schema))
+    output_schema = OUTPUT_SCHEMAS.get((spec.id, spec.version), OUTPUT_SCHEMAS.get(spec.id, spec.output_schema))
     return spec.model_copy(update={"plugin_callable": True, "input_schema": input_schema, "output_schema": output_schema})
 
 
@@ -383,6 +390,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             }
             or governed.id.startswith("simulation.connector")
             or governed.id.startswith("simulation.vismockup.")
+            or "experimental" in governed.tags
             else LifecycleStatus.STABLE
         ),
         "exposure": (

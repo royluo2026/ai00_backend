@@ -31,6 +31,27 @@ def signer():
     return PlanSigner(lambda key_id: record, key_id='cloud-key', clock=lambda: NOW), record
 
 
+def test_plan_signer_requires_complete_p256_secret_injection(monkeypatch):
+    from cryptography.hazmat.primitives import serialization
+    from plugins.simulation.simulation_backend.application.connector_protocol_v2 import PlanSigner
+    for name in ('AI00_CONNECTOR_PLAN_SIGNING_P256_KEY_ID',
+                 'AI00_CONNECTOR_PLAN_SIGNING_P256_PRIVATE_KEY',
+                 'AI00_CONNECTOR_PLAN_SIGNING_P256_NOT_BEFORE',
+                 'AI00_CONNECTOR_PLAN_SIGNING_P256_NOT_AFTER'):
+        monkeypatch.delenv(name, raising=False)
+    assert PlanSigner.configured_from_environment(clock=lambda: NOW) is None
+    monkeypatch.setenv('AI00_CONNECTOR_PLAN_SIGNING_P256_KEY_ID', 'cloud-key')
+    with pytest.raises(ValueError, match='configuration_incomplete'):
+        PlanSigner.configured_from_environment(clock=lambda: NOW)
+    key = ec.generate_private_key(ec.SECP256R1())
+    monkeypatch.setenv('AI00_CONNECTOR_PLAN_SIGNING_P256_PRIVATE_KEY', key.private_bytes(
+        serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8,
+        serialization.NoEncryption()).decode())
+    monkeypatch.setenv('AI00_CONNECTOR_PLAN_SIGNING_P256_NOT_BEFORE', '2026-09-01T00:00:00Z')
+    monkeypatch.setenv('AI00_CONNECTOR_PLAN_SIGNING_P256_NOT_AFTER', '2026-10-01T00:00:00Z')
+    assert PlanSigner.configured_from_environment(clock=lambda: NOW).key_id == 'cloud-key'
+
+
 def test_public_key_cannot_mint_cloud_plans_and_final_bindings_are_signed():
     from plugins.simulation.simulation_backend.application.connector_protocol_v2 import PlanSigner
     service, record = signer()

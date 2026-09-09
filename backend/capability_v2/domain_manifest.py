@@ -28,7 +28,7 @@ def _require_repository_relative_posix_path(value: str, *, field_name: str) -> N
 
 
 class DomainDatabaseManifest(FrozenModel):
-    database_name: str = Field(pattern=r"^ai00_[a-z][a-z0-9_]{1,62}$")
+    database_name: str = Field(pattern=r"^[a-z][a-z0-9_]{1,63}$")
     runtime_url_env: str = Field(pattern=r"^AI00_[A-Z0-9_]+_DB_URL$")
     ddl_url_env: str = Field(pattern=r"^AI00_[A-Z0-9_]+_DDL_DB_URL$")
     migration_path: str

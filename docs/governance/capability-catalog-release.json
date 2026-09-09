@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_f4161c5a8d19fe4bc4d4c291fc962b7d",
-  "catalog_hash": "sha256:f4161c5a8d19fe4bc4d4c291fc962b7d97b5f4986deb5d70c946297f355d9f10",
+  "release_id": "rel_a80127151841337846edb87755582909",
+  "catalog_hash": "sha256:a80127151841337846edb877555829095ab6256321468d05ed30c146ad02342f",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -249985,35 +249985,7 @@
               "updates": {
                 "type": "object",
                 "properties": {
-                  "related_knowledge_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "escape_root_cause": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "interim_action": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "related_task_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_assignee_name": {
+                  "permanent_action": {
                     "type": [
                       "string",
                       "null"
@@ -250027,13 +249999,6 @@
                     ],
                     "maxLength": 65536
                   },
-                  "title": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
                   "status": {
                     "type": [
                       "string",
@@ -250041,14 +250006,14 @@
                     ],
                     "maxLength": 65536
                   },
-                  "severity": {
+                  "description": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "occurrence_root_cause": {
+                  "feishu_group_name": {
                     "type": [
                       "string",
                       "null"
@@ -250062,7 +250027,14 @@
                     ],
                     "maxLength": 65536
                   },
-                  "scheduled_date": {
+                  "bop_entry_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "interim_action": {
                     "type": [
                       "string",
                       "null"
@@ -250076,29 +250048,35 @@
                     ],
                     "maxLength": 65536
                   },
-                  "feishu_groups": {
-                    "type": "array",
-                    "maxItems": 200,
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "chat_id": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "name": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "avatar": {
-                          "type": "string",
-                          "maxLength": 2048
-                        }
-                      },
-                      "additionalProperties": false
-                    }
+                  "escape_root_cause": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
                   },
-                  "feishu_group_chat_id": {
+                  "related_knowledge_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "scheduled_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "related_task_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "project_gid": {
                     "type": [
                       "string",
                       "null"
@@ -250134,48 +250112,6 @@
                       },
                       "additionalProperties": false
                     }
-                  },
-                  "feishu_group_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "project_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "description": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "list_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "permanent_action": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "bop_entry_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
                   },
                   "attachments": {
                     "type": "array",
@@ -250244,7 +250180,71 @@
                       ]
                     }
                   },
+                  "title": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "occurrence_root_cause": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
                   "approval_order_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_chat_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_groups": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "chat_id": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "avatar": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "severity": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "list_gid": {
                     "type": [
                       "string",
                       "null"
@@ -281412,41 +281412,6 @@
               "updates": {
                 "type": "object",
                 "properties": {
-                  "canvas_y": {
-                    "type": [
-                      "integer",
-                      "number",
-                      "null"
-                    ]
-                  },
-                  "meeting_level": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_assignee_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "node_type": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "title": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
                   "status": {
                     "type": [
                       "string",
@@ -281454,64 +281419,37 @@
                     ],
                     "maxLength": 65536
                   },
-                  "share_scope": {
+                  "description": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "actual_start": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_groups": {
-                    "type": "array",
-                    "maxItems": 200,
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "chat_id": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "name": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "avatar": {
-                          "type": "string",
-                          "maxLength": 2048
-                        }
-                      },
-                      "additionalProperties": false
-                    }
-                  },
-                  "assignee_team_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "canvas_x": {
+                  "time_estimate": {
                     "type": [
                       "integer",
-                      "number",
                       "null"
                     ]
                   },
-                  "due_date": {
+                  "review_date": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "plan_start": {
+                  "is_deleted": {
+                    "type": "boolean"
+                  },
+                  "scheduled_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "actual_end": {
                     "type": [
                       "string",
                       "null"
@@ -281548,21 +281486,78 @@
                       "additionalProperties": false
                     }
                   },
-                  "parent_task_gid": {
+                  "title": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "project_gid": {
+                  "feishu_assignee_name": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "description": {
+                  "meeting_doc_link": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_chat_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_groups": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "chat_id": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "avatar": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "completion": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "priority": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "meeting_level": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "node_type": {
                     "type": [
                       "string",
                       "null"
@@ -281576,20 +281571,70 @@
                     ],
                     "maxLength": 65536
                   },
-                  "time_estimate": {
-                    "type": [
-                      "integer",
-                      "null"
-                    ]
-                  },
-                  "list_gid": {
+                  "feishu_assignee_open_id": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "plan_end": {
+                  "canvas_y": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "feishu_group_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "share_scope": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "plan_start": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "parent_task_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "actual_start": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "assignee_team_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "canvas_x": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "project_gid": {
                     "type": [
                       "string",
                       "null"
@@ -281663,73 +281708,28 @@
                       ]
                     }
                   },
-                  "actual_end": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "review_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_assignee_open_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "is_deleted": {
-                    "type": "boolean"
-                  },
-                  "completion": {
-                    "type": [
-                      "integer",
-                      "number",
-                      "null"
-                    ]
-                  },
-                  "meeting_doc_link": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "scheduled_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "priority": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_chat_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
                   "canvas_icon": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "due_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "plan_end": {
                     "type": [
                       "string",
                       "null"
@@ -329169,6 +329169,639 @@
       "business_definition_hash": "sha256:c912956cc03f7014ee4694b3c2c50fb49a1e633e5e67bd3f61d264b7ff385680"
     },
     {
+      "id": "simulation.environment.binding.create",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.environment.binding.create",
+      "description": "Bind one VM occurrence to one simulation workspace node.",
+      "use_when": "Bind one VM occurrence to one simulation workspace node.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Bind one VM occurrence to one simulation workspace node.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-workspace",
+          "payload_path": "workspace_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "expected_row_version",
+          "idempotency_key",
+          "node_gid",
+          "occurrence_gid",
+          "role"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "expected_row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 191
+          },
+          "node_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "occurrence_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "load",
+              "operate"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "entity_gid",
+          "row_version",
+          "patch"
+        ],
+        "properties": {
+          "entity_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "patch": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "entity_gid",
+          "row_version",
+          "patch"
+        ],
+        "properties": {
+          "entity_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "patch": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:95c01dd2a26d227516b39eaea7a5a66a5fcbd68cbd3e84c879990f4047089b94",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_2febe6d4e347de1c0210461b",
+      "error_schema": [
+        {
+          "error_code": "source_resolver_unavailable",
+          "message_template": "A required owning-domain resolver is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "source_version_mismatch",
+          "message_template": "A referenced source no longer matches its immutable hash or version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "parameter_set_not_found",
+          "message_template": "The immutable parameter set is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_profile_not_found",
+          "message_template": "The immutable Simulation profile is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "solver_not_allowed",
+          "message_template": "The requested solver coordinate is not in the governed allowlist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_environment_not_found",
+          "message_template": "The Simulation environment is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_run_not_found",
+          "message_template": "The Simulation run is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_result_not_ready",
+          "message_template": "The Simulation run has no completed result artifacts.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different Simulation request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.environment.binding.create:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.environment.binding.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.environment.binding.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.environment.binding.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.environment.binding.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.environment.binding.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.environment.binding.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.environment.binding.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:7d69e9bc9f23e3fbd0a9e0c6c7cdee7c6b176fcd6db3328382cdcc0433fa3753"
+    },
+    {
+      "id": "simulation.environment.binding.remove",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.environment.binding.remove",
+      "description": "Remove one VM occurrence binding from a simulation workspace.",
+      "use_when": "Remove one VM occurrence binding from a simulation workspace.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Remove one VM occurrence binding from a simulation workspace.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-workspace",
+          "payload_path": "workspace_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "expected_row_version",
+          "idempotency_key",
+          "binding_gid"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "expected_row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 191
+          },
+          "binding_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "entity_gid",
+          "row_version",
+          "patch"
+        ],
+        "properties": {
+          "entity_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "patch": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "entity_gid",
+          "row_version",
+          "patch"
+        ],
+        "properties": {
+          "entity_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "patch": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:549e4f4c88298734a0f186a37945403649f935ef8382cd916d4c2383520234b5",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_22cd90d7d3a3c0b656a708de",
+      "error_schema": [
+        {
+          "error_code": "source_resolver_unavailable",
+          "message_template": "A required owning-domain resolver is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "source_version_mismatch",
+          "message_template": "A referenced source no longer matches its immutable hash or version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "parameter_set_not_found",
+          "message_template": "The immutable parameter set is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_profile_not_found",
+          "message_template": "The immutable Simulation profile is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "solver_not_allowed",
+          "message_template": "The requested solver coordinate is not in the governed allowlist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_environment_not_found",
+          "message_template": "The Simulation environment is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_run_not_found",
+          "message_template": "The Simulation run is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_result_not_ready",
+          "message_template": "The Simulation run has no completed result artifacts.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different Simulation request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.environment.binding.remove:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.environment.binding.remove@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.environment.binding.remove@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.environment.binding.remove@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.environment.binding.remove@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.environment.binding.remove@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.environment.binding.remove@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.environment.binding.remove@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:fef9a6e22798174317c1db16179183b66ef5ef8d59a6dd01d16b189bedb79752"
+    },
+    {
       "id": "simulation.environment.compose",
       "major_version": 1,
       "owner_domain": "simulation",
@@ -342618,6 +343251,2612 @@
         }
       ],
       "business_definition_hash": "sha256:909fafb4dd4fa30d02c72fa5697fc36096e38ab12d8bce061d247cc70dc310ae"
+    },
+    {
+      "id": "simulation.environment.structure_node.create",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.environment.structure_node.create",
+      "description": "Create one node in a private simulation workspace.",
+      "use_when": "Create one node in a private simulation workspace.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Create one node in a private simulation workspace.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-workspace",
+          "payload_path": "workspace_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "expected_row_version",
+          "idempotency_key",
+          "node_type",
+          "name"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "expected_row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 191
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "node_type": {
+            "type": "string",
+            "enum": [
+              "line",
+              "station",
+              "process",
+              "operation"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "entity_gid",
+          "row_version",
+          "patch"
+        ],
+        "properties": {
+          "entity_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "patch": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "entity_gid",
+          "row_version",
+          "patch"
+        ],
+        "properties": {
+          "entity_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "patch": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:47d086aa6b5b893fae3af879372f54a410132ad7399f2933cb90e230ae84fd6d",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_8a3aa0077e1640e16956818f",
+      "error_schema": [
+        {
+          "error_code": "source_resolver_unavailable",
+          "message_template": "A required owning-domain resolver is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "source_version_mismatch",
+          "message_template": "A referenced source no longer matches its immutable hash or version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "parameter_set_not_found",
+          "message_template": "The immutable parameter set is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_profile_not_found",
+          "message_template": "The immutable Simulation profile is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "solver_not_allowed",
+          "message_template": "The requested solver coordinate is not in the governed allowlist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_environment_not_found",
+          "message_template": "The Simulation environment is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_run_not_found",
+          "message_template": "The Simulation run is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_result_not_ready",
+          "message_template": "The Simulation run has no completed result artifacts.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different Simulation request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.environment.structure_node.create:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.environment.structure_node.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.environment.structure_node.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.environment.structure_node.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.environment.structure_node.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.environment.structure_node.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.environment.structure_node.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.environment.structure_node.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:0e024f47221a040f392062fe67fdac61e8e6bb7bad2388b5757045493f8cebda"
+    },
+    {
+      "id": "simulation.environment.structure_node.move",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.environment.structure_node.move",
+      "description": "Move one node in a private simulation workspace.",
+      "use_when": "Move one node in a private simulation workspace.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Move one node in a private simulation workspace.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-workspace",
+          "payload_path": "workspace_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "expected_row_version",
+          "idempotency_key",
+          "node_gid"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "expected_row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 191
+          },
+          "node_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[1-9][0-9]*$"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "entity_gid",
+          "row_version",
+          "patch"
+        ],
+        "properties": {
+          "entity_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "patch": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "entity_gid",
+          "row_version",
+          "patch"
+        ],
+        "properties": {
+          "entity_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "patch": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:2004b36a26998097b258ce132698357269eb9991d627db43e558e9134da77da0",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_35d901ce347fa4fae9c4d98a",
+      "error_schema": [
+        {
+          "error_code": "source_resolver_unavailable",
+          "message_template": "A required owning-domain resolver is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "source_version_mismatch",
+          "message_template": "A referenced source no longer matches its immutable hash or version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "parameter_set_not_found",
+          "message_template": "The immutable parameter set is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_profile_not_found",
+          "message_template": "The immutable Simulation profile is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "solver_not_allowed",
+          "message_template": "The requested solver coordinate is not in the governed allowlist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_environment_not_found",
+          "message_template": "The Simulation environment is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_run_not_found",
+          "message_template": "The Simulation run is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_result_not_ready",
+          "message_template": "The Simulation run has no completed result artifacts.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different Simulation request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.environment.structure_node.move:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.environment.structure_node.move@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.environment.structure_node.move@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.environment.structure_node.move@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.environment.structure_node.move@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.environment.structure_node.move@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.environment.structure_node.move@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.environment.structure_node.move@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:3ac1c8b6db1edda8661c6fb625739df4a75c0a04ba204230394e43bf6ebcf8d9"
+    },
+    {
+      "id": "simulation.environment.structure_node.remove",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.environment.structure_node.remove",
+      "description": "Soft-delete one simulation workspace subtree.",
+      "use_when": "Soft-delete one simulation workspace subtree.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Soft-delete one simulation workspace subtree.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-workspace",
+          "payload_path": "workspace_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "expected_row_version",
+          "idempotency_key",
+          "node_gid"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "expected_row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 191
+          },
+          "node_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "entity_gid",
+          "row_version",
+          "patch"
+        ],
+        "properties": {
+          "entity_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "patch": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "entity_gid",
+          "row_version",
+          "patch"
+        ],
+        "properties": {
+          "entity_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "patch": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:63b75de9811062500eb1d149673be25bf7bafb9660551c93f240683effd8cfa5",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_be87de504351dfd40cfdc691",
+      "error_schema": [
+        {
+          "error_code": "source_resolver_unavailable",
+          "message_template": "A required owning-domain resolver is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "source_version_mismatch",
+          "message_template": "A referenced source no longer matches its immutable hash or version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "parameter_set_not_found",
+          "message_template": "The immutable parameter set is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_profile_not_found",
+          "message_template": "The immutable Simulation profile is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "solver_not_allowed",
+          "message_template": "The requested solver coordinate is not in the governed allowlist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_environment_not_found",
+          "message_template": "The Simulation environment is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_run_not_found",
+          "message_template": "The Simulation run is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_result_not_ready",
+          "message_template": "The Simulation run has no completed result artifacts.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different Simulation request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.environment.structure_node.remove:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.environment.structure_node.remove@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.environment.structure_node.remove@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.environment.structure_node.remove@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.environment.structure_node.remove@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.environment.structure_node.remove@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.environment.structure_node.remove@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.environment.structure_node.remove@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:61d32fbd3a89bd12cecdc7db36241115321a6e63d238dd599c21279c15350317"
+    },
+    {
+      "id": "simulation.environment.version.freeze",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.environment.version.freeze",
+      "description": "Freeze one private simulation workspace version as an immutable Base Artifact.",
+      "use_when": "Freeze one private simulation workspace version as an immutable Base Artifact.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Freeze one private simulation workspace version as an immutable Base Artifact.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-workspace",
+          "payload_path": "workspace_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "expected_row_version",
+          "idempotency_key",
+          "algorithms"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "expected_row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 191
+          },
+          "algorithms": {
+            "type": "object",
+            "maxProperties": 16,
+            "additionalProperties": false,
+            "properties": {}
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "version_gid",
+          "status",
+          "content_hash",
+          "artifact_ref"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "version_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "status": {
+            "type": "string",
+            "const": "frozen"
+          },
+          "content_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "artifact_ref": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "version_gid",
+          "status",
+          "content_hash",
+          "artifact_ref"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "version_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "status": {
+            "type": "string",
+            "const": "frozen"
+          },
+          "content_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "artifact_ref": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:1901fa6a5ad06958ebec00dc6beeeef1bbbd0cd9c9296720080a19dd1548fcf7",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_64f802bdc9bb395a051a1343",
+      "error_schema": [
+        {
+          "error_code": "source_resolver_unavailable",
+          "message_template": "A required owning-domain resolver is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "source_version_mismatch",
+          "message_template": "A referenced source no longer matches its immutable hash or version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "parameter_set_not_found",
+          "message_template": "The immutable parameter set is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_profile_not_found",
+          "message_template": "The immutable Simulation profile is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "solver_not_allowed",
+          "message_template": "The requested solver coordinate is not in the governed allowlist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_environment_not_found",
+          "message_template": "The Simulation environment is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_run_not_found",
+          "message_template": "The Simulation run is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_result_not_ready",
+          "message_template": "The Simulation run has no completed result artifacts.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different Simulation request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.environment.version.freeze:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.environment.version.freeze@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.environment.version.freeze@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.environment.version.freeze@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.environment.version.freeze@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.environment.version.freeze@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.environment.version.freeze@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.environment.version.freeze@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:a30325b2b2b4d20d614bf44a4803c08700ce249a3dbbcb412dd5bf75c64cda92"
+    },
+    {
+      "id": "simulation.environment.workspace.create",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.environment.workspace.create",
+      "description": "Create a private versioned simulation workspace.",
+      "use_when": "Create a private versioned simulation workspace.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Create a private versioned simulation workspace.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "version_gid",
+          "name",
+          "status",
+          "row_version",
+          "nodes",
+          "bindings"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "version_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "node_type",
+                "name",
+                "position",
+                "row_version"
+              ],
+              "properties": {
+                "node_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "node_type": {
+                  "type": "string",
+                  "enum": [
+                    "line",
+                    "station",
+                    "process",
+                    "operation"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "row_version": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "binding_gid",
+                "node_gid",
+                "occurrence_gid",
+                "role",
+                "row_version"
+              ],
+              "properties": {
+                "binding_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "node_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "occurrence_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "role": {
+                  "type": "string",
+                  "enum": [
+                    "load",
+                    "operate"
+                  ]
+                },
+                "row_version": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "version_gid",
+          "name",
+          "status",
+          "row_version",
+          "nodes",
+          "bindings"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "version_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "node_type",
+                "name",
+                "position",
+                "row_version"
+              ],
+              "properties": {
+                "node_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "node_type": {
+                  "type": "string",
+                  "enum": [
+                    "line",
+                    "station",
+                    "process",
+                    "operation"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "row_version": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "binding_gid",
+                "node_gid",
+                "occurrence_gid",
+                "role",
+                "row_version"
+              ],
+              "properties": {
+                "binding_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "node_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "occurrence_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "role": {
+                  "type": "string",
+                  "enum": [
+                    "load",
+                    "operate"
+                  ]
+                },
+                "row_version": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:15ebf57c7fbb69ea44fd3dbd5d5c048238ab3fbb20428f12f0d38645cc5c0648",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_1acd4c8dceb681c95469e98f",
+      "error_schema": [
+        {
+          "error_code": "source_resolver_unavailable",
+          "message_template": "A required owning-domain resolver is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "source_version_mismatch",
+          "message_template": "A referenced source no longer matches its immutable hash or version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "parameter_set_not_found",
+          "message_template": "The immutable parameter set is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_profile_not_found",
+          "message_template": "The immutable Simulation profile is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "solver_not_allowed",
+          "message_template": "The requested solver coordinate is not in the governed allowlist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_environment_not_found",
+          "message_template": "The Simulation environment is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_run_not_found",
+          "message_template": "The Simulation run is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_result_not_ready",
+          "message_template": "The Simulation run has no completed result artifacts.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different Simulation request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.environment.workspace.create:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.environment.workspace.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.environment.workspace.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.environment.workspace.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.environment.workspace.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.environment.workspace.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.environment.workspace.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.environment.workspace.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:d5d6ca03e070ed1c1a0c5577f1246a81205978038c6e9dae1bb1f4cd915fe857"
+    },
+    {
+      "id": "simulation.environment.workspace.get",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.environment.workspace.get",
+      "description": "Read one current user's private simulation workspace.",
+      "use_when": "Read one current user's private simulation workspace.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Read one current user's private simulation workspace.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "read",
+      "side_effects": "Reads simulation domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-workspace",
+          "payload_path": "workspace_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "version_gid",
+          "name",
+          "status",
+          "row_version",
+          "nodes",
+          "bindings"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "version_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "node_type",
+                "name",
+                "position",
+                "row_version"
+              ],
+              "properties": {
+                "node_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "node_type": {
+                  "type": "string",
+                  "enum": [
+                    "line",
+                    "station",
+                    "process",
+                    "operation"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "row_version": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "binding_gid",
+                "node_gid",
+                "occurrence_gid",
+                "role",
+                "row_version"
+              ],
+              "properties": {
+                "binding_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "node_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "occurrence_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "role": {
+                  "type": "string",
+                  "enum": [
+                    "load",
+                    "operate"
+                  ]
+                },
+                "row_version": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "version_gid",
+          "name",
+          "status",
+          "row_version",
+          "nodes",
+          "bindings"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "version_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "node_type",
+                "name",
+                "position",
+                "row_version"
+              ],
+              "properties": {
+                "node_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "node_type": {
+                  "type": "string",
+                  "enum": [
+                    "line",
+                    "station",
+                    "process",
+                    "operation"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "row_version": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "binding_gid",
+                "node_gid",
+                "occurrence_gid",
+                "role",
+                "row_version"
+              ],
+              "properties": {
+                "binding_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "node_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "occurrence_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "role": {
+                  "type": "string",
+                  "enum": [
+                    "load",
+                    "operate"
+                  ]
+                },
+                "row_version": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:c6d0ab51cd1706879f2bd8b0b8d8d6d985247945ab70f2a9cfac6c7a5866253d",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_0ecba6fbe30bd055edc98f9b",
+      "error_schema": [
+        {
+          "error_code": "source_resolver_unavailable",
+          "message_template": "A required owning-domain resolver is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "source_version_mismatch",
+          "message_template": "A referenced source no longer matches its immutable hash or version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "parameter_set_not_found",
+          "message_template": "The immutable parameter set is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_profile_not_found",
+          "message_template": "The immutable Simulation profile is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "solver_not_allowed",
+          "message_template": "The requested solver coordinate is not in the governed allowlist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_environment_not_found",
+          "message_template": "The Simulation environment is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_run_not_found",
+          "message_template": "The Simulation run is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_result_not_ready",
+          "message_template": "The Simulation run has no completed result artifacts.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different Simulation request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.environment.workspace.get:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.environment.workspace.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.environment.workspace.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.environment.workspace.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.environment.workspace.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.environment.workspace.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.environment.workspace.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.environment.workspace.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:dcee79ee44996d6ae9f07057340ffc73059becde4f2620122e8b408d8498335d"
+    },
+    {
+      "id": "simulation.environment.workspace.search",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.environment.workspace.search",
+      "description": "Search the current user's private simulation workspaces.",
+      "use_when": "Search the current user's private simulation workspaces.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Search the current user's private simulation workspaces.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "read",
+      "side_effects": "Reads simulation domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "pattern": "^[0-9]+$"
+          },
+          "page_size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "required": [
+                "workspace_gid",
+                "version_gid",
+                "name",
+                "status",
+                "row_version"
+              ],
+              "properties": {
+                "workspace_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "version_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "row_version": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "updated_at": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9]+$"
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "required": [
+                "workspace_gid",
+                "version_gid",
+                "name",
+                "status",
+                "row_version"
+              ],
+              "properties": {
+                "workspace_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "version_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "row_version": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "updated_at": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9]+$"
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:9f8ece7a1f923b76ce3b56302acab42cfddb1881f99c05901baf3e6e349239ef",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_9fab9440a5ebcee46e43cde6",
+      "error_schema": [
+        {
+          "error_code": "source_resolver_unavailable",
+          "message_template": "A required owning-domain resolver is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "source_version_mismatch",
+          "message_template": "A referenced source no longer matches its immutable hash or version.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "parameter_set_not_found",
+          "message_template": "The immutable parameter set is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_profile_not_found",
+          "message_template": "The immutable Simulation profile is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "solver_not_allowed",
+          "message_template": "The requested solver coordinate is not in the governed allowlist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_environment_not_found",
+          "message_template": "The Simulation environment is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_run_not_found",
+          "message_template": "The Simulation run is unavailable or not visible.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "simulation_result_not_ready",
+          "message_template": "The Simulation run has no completed result artifacts.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to a different Simulation request.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.environment.workspace.search:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.environment.workspace.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.environment.workspace.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.environment.workspace.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.environment.workspace.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.environment.workspace.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.environment.workspace.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.environment.workspace.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:c8458752809d88252a0743f0f57378e832a546b282e62da547fc1aa440ed28d3"
     },
     {
       "id": "simulation.materialization_run.action.get",
@@ -367579,7 +370818,7 @@
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:c1a53622c9d8f3c52eaa4a9cad49b80cc7b2ed38c65a07cf757b3cbee84a5a14"
+      "artifact_hash": "sha256:32a5ff7917df038f9b1b3acce27076acb5eda7702b690e9dd6c3a2570f3d4faf"
     },
     {
       "plugin_id": "official.device",
@@ -367609,7 +370848,7 @@
       "plugin_id": "official.knowledge",
       "module": "knowledge_backend.capabilities",
       "version": "2.0.0",
-      "artifact_hash": "sha256:5c587bd2879e1b949e2367ec5ff786ce89f273b30ea69fe173a5a8d4627d9d03"
+      "artifact_hash": "sha256:67bc679346a18c0be930301ebe2b7e24640be13bad8a087ce50bbc756621b6bf"
     },
     {
       "plugin_id": "official.ontology",
@@ -367627,8 +370866,8 @@
       "plugin_id": "official.simulation",
       "module": "simulation_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:9df2adbb7c75ebde7600abdbea12f516fbbc9c36eea927ccb1cfefddacbed38d"
+      "artifact_hash": "sha256:cedb6123ee5f8fd62d0fa73f80dcd5f87d872dba7eef76bf931b14832bcebfab"
     }
   ],
-  "created_at": "2026-09-08T12:10:52.686245Z"
+  "created_at": "2026-09-09T01:47:37.815597Z"
 }

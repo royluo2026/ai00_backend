@@ -34,6 +34,31 @@ public sealed class AppHostLifecycleTests
         var result=await transport.SendAsync(HttpMethod.Post,"plans/lease",new{lease_seconds=120},CancellationToken.None,OutcomeUnknownRecoveryTests.Session());
         Assert.Equal(JsonValueKind.Null,result.ValueKind);
     }
+    [Fact] public async Task ExpiredLeaseOutcomeFallsBackToRecoveryAcknowledgement()
+    {
+        var root=Path.Combine(Path.GetTempPath(),"ai00-expired-lease-test-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
+        try
+        {
+            using var key=new Ai00.Connector.Contracts.V2.DeviceSigningKeyStore(root).GetOrCreate();
+            var journal=new AppPlanJournal(Path.Combine(root,"journal"));
+            var plan=ProtocolV2VectorTests.Vector["plan"]!.DeepClone().AsObject();
+            plan["steps"]![0]!["side_effect_classification"]="read";plan["steps"]![0]!["post_condition_probe_id"]=null;
+            using var cloud=ProtocolV2VectorTests.TestKey("plan");ProtocolV2VectorTests.SignPlan(plan,cloud);
+            var adapter=new OutcomeUnknownRecoveryTests.FakeAdapter(()=>Task.FromResult(new Ai00.Connector.Contracts.AdapterResult(false)));
+            var worker=new PlanExecutionWorker(journal,adapter,key,"device-key-001",new Dictionary<string,TrustedPlanKey>{{"cloud-plan-key-2026-09",new(ProtocolV2VectorTests.Vector["plan_public_jwk"]!.ToJsonString(),DateTimeOffset.Parse("2026-09-06T00:00:00Z"),DateTimeOffset.Parse("2026-09-08T00:00:00Z"),false)}},()=>DateTimeOffset.Parse("2026-09-07T01:03:00Z"));
+            var outcome=await worker.ExecuteAsync(OutcomeUnknownRecoveryTests.Lease() with{PlanJson=plan.ToJsonString()},OutcomeUnknownRecoveryTests.Session(),CancellationToken.None);
+            var calls=0;using var http=new HttpClient(new InspectRequest(_=>++calls==1
+                ? new HttpResponseMessage(System.Net.HttpStatusCode.Conflict){Content=new StringContent("{\"detail\":{\"code\":\"plan_lease_invalid\"}}")}
+                : new HttpResponseMessage(System.Net.HttpStatusCode.OK){Content=new StringContent("{\"success\":true,\"data\":{\"accepted\":true}}") }));
+            var recoveryRegistrations=0;
+
+            await new OutcomeDelivery(new RuntimeTransport(http,new Uri("https://gateway.example.com")),journal,()=>DateTimeOffset.Parse("2026-09-07T01:03:00Z")).DeliverAsync(
+                outcome,OutcomeUnknownRecoveryTests.Session(),_=>{recoveryRegistrations++;return Task.FromResult(OutcomeUnknownRecoveryTests.Session() with{InstanceId="recovery",Token="recovery"});},CancellationToken.None);
+
+            Assert.Equal(1,recoveryRegistrations);Assert.Equal(2,calls);
+        }
+        finally{Directory.Delete(root,true);}
+    }
     [Fact] public void CredentialCiphertextIsCurrentUserAndOriginBound()
     {
         var root=Path.Combine(Path.GetTempPath(),"ai00-credential-test-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);

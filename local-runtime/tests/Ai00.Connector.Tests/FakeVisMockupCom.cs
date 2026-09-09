@@ -4,6 +4,8 @@ namespace Ai00.Connector.Tests;
 
 public sealed class FakeVisMockupCom : IVisMockupCom
 {
+    public bool ProcessRunning { get; set; }
+    public VisMockupProcessState InspectProcess() => new(ProcessRunning || ExistingApplication is not null, "14.2.0");
     public IVisMockupApplication? ExistingApplication { get; set; }
     public int LaunchCalls { get; private set; }
     public HashSet<int> ThreadIds { get; } = [];
@@ -51,6 +53,7 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
     public string SourceIdentity { get; } = sourceIdentity;
     public IVisMockupNode RootNode { get; } = rootNode;
     public int CaptureImageCalls { get; private set; }
+    public int ExportPlmxmlCalls { get; private set; }
     public bool Closed { get; private set; }
     public List<bool> VisibilityChanges { get; } = [];
     public CaptureProfile Profile { get; private set; } = new("png", 1, 1, "current");
@@ -71,6 +74,12 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
         System.Buffers.Binary.BinaryPrimitives.WriteInt32BigEndian(header.AsSpan(20, 4), Profile.Height);
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         File.WriteAllBytes(path, header);
+    }
+    public void ExportPlmxml(string path, int hierarchyIndex)
+    {
+        ExportPlmxmlCalls++;
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        File.WriteAllText(path, $"<PLMXML hierarchy=\"{hierarchyIndex}\"/>");
     }
     public void SetAllNodesVisible(bool visible) => VisibilityChanges.Add(visible);
     public void Close() => Closed = true;

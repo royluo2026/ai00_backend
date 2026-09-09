@@ -418,7 +418,7 @@ class SimulationConnectorRepository:
                 if current["plan_id"] != plan.plan_id or current["plan_hash"] != plan.plan_hash:
                     raise ConnectorRepositoryError("idempotency_conflict")
                 return
-            cursor.execute("SELECT plan_json FROM workmanship_sim_connector_runtime_plans WHERE device_id=%s "
+            cursor.execute("SELECT status,plan_json FROM workmanship_sim_connector_runtime_plans WHERE device_id=%s "
                 "AND status IN ('queued','leased','executing','outcome_unknown','manual_review_required','succeeded') FOR UPDATE",
                 (plan.device_id,))
             # ponytail: scan one device's plans under its writer lock; add indexed
@@ -426,7 +426,8 @@ class SimulationConnectorRepository:
             for previous in cursor.fetchall():
                 prior = json.loads(previous['plan_json']) if isinstance(previous['plan_json'], str) else previous['plan_json']
                 fields = ('tenant_id', 'actor_id', 'capability_id', 'major_version', 'normalized_input_hash')
-                if all(prior[f] == getattr(plan, f) for f in fields):
+                write_plan = any(step.side_effect_classification != 'read' for step in plan.steps)
+                if all(prior[f] == getattr(plan, f) for f in fields) and (previous['status'] != 'succeeded' or write_plan):
                     raise ConnectorRepositoryError('reconciliation_required')
             cursor.execute(
                 "INSERT INTO workmanship_sim_connector_runtime_plans "
@@ -651,6 +652,25 @@ class SimulationConnectorRepository:
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             if team_gid is None:
                 cursor.execute(
+                    "SELECT device_id AS connector_id,NULL AS installation_id,tenant_gid AS team_gid,"
+                    "status,NULL AS pending_pairing_id FROM workmanship_sim_connector_runtime_devices "
+                    "WHERE owner_user_gid=%s AND protocol=%s AND runtime_type='electron' AND status='active' "
+                    "ORDER BY heartbeat_at DESC,updated_at DESC LIMIT 1",
+                    (user_gid, PROTOCOL_V2),
+                )
+            else:
+                cursor.execute(
+                    "SELECT device_id AS connector_id,NULL AS installation_id,tenant_gid AS team_gid,"
+                    "status,NULL AS pending_pairing_id FROM workmanship_sim_connector_runtime_devices "
+                    "WHERE owner_user_gid=%s AND tenant_gid=%s AND protocol=%s AND runtime_type='electron' AND status='active' "
+                    "ORDER BY heartbeat_at DESC,updated_at DESC LIMIT 1",
+                    (user_gid, team_gid, PROTOCOL_V2),
+                )
+            runtime = cursor.fetchone()
+            if runtime:
+                return runtime
+            if team_gid is None:
+                cursor.execute(
                     "SELECT connector_id,installation_id,team_gid,status,pending_pairing_id "
                     "FROM workmanship_sim_connector_bindings WHERE owner_user_gid=%s LIMIT 1",
                     (user_gid,),
@@ -804,12 +824,24 @@ class SimulationConnectorRepository:
                 (plan_id, user_gid, team_gid),
             )
             row = cursor.fetchone()
+            if not row:
+                cursor.execute(
+                    "SELECT plan_id,status,outcome_json FROM workmanship_sim_connector_runtime_plans "
+                    "WHERE plan_id=%s AND actor_gid=%s AND tenant_gid=%s AND protocol=%s LIMIT 1",
+                    (plan_id, user_gid, team_gid, PROTOCOL_V2),
+                )
+                row = cursor.fetchone()
         if not row:
             return None
         outcome = row.get("outcome_json")
         if isinstance(outcome, str):
             outcome = json.loads(outcome)
-        return {"operation_id": row["plan_id"], "status": row["status"], "outcome": outcome}
+        status = {
+            "succeeded": "completed",
+            "failed_without_effect": "failed",
+            "manual_review_required": "outcome_unknown",
+        }.get(row["status"], row["status"])
+        return {"operation_id": row["plan_id"], "status": status, "outcome": outcome}
 
     def complete_plan(
         self, connector_id: str, plan_id: str, lease_id: str,

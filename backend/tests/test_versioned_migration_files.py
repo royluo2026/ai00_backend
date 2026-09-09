@@ -47,6 +47,31 @@ class VersionedMigrationFileTests(unittest.TestCase):
         self.assertIn("payload JSON NOT NULL", normalized)
         self.assertNotIn("JSON_OBJECT", normalized)
 
+    def test_ascii_binary_identifiers_are_compatible_with_oceanbase_3(self):
+        sql = "device_id VARCHAR(256) CHARACTER SET ascii COLLATE ascii_bin PRIMARY KEY"
+        normalized = normalize_oceanbase_sql(sql)
+        self.assertIn("CHARACTER SET utf8mb4 COLLATE utf8mb4_bin", normalized)
+        self.assertNotIn("ascii_bin", normalized)
+
+    def test_oceanbase_3_add_column_drops_unsupported_inline_check(self):
+        class Cursor:
+            def __enter__(self): return self
+            def __exit__(self, *_args): return False
+            def execute(self, sql, _params=()):
+                self.row = (0,) if "information_schema.COLUMNS" in sql else ("5.7.25-OceanBase-v3.2.3.3",)
+            def fetchone(self): return self.row
+        class Connection:
+            def cursor(self): return Cursor()
+
+        statement = (
+            "ALTER TABLE workmanship_sim_connector_runtime_devices "
+            "ADD COLUMN IF NOT EXISTS runtime_type VARCHAR(32) NOT NULL DEFAULT 'electron' "
+            "CHECK (runtime_type = 'electron')"
+        )
+        prepared = prepare_resumable_statement(Connection(), statement)
+        self.assertIn("ADD COLUMN runtime_type", prepared)
+        self.assertNotIn("CHECK", prepared)
+
     def test_comment_stripping_preserves_comment_markers_inside_strings(self):
         sql = """CREATE TABLE x (
           color VARCHAR(16) DEFAULT ('#5b8dee'),

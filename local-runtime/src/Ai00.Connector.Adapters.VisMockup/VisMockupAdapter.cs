@@ -11,6 +11,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     private readonly AllowedPathPolicy _paths;
     private readonly string _executable;
     private readonly VisMockupConnection _connection;
+    private readonly IVisMockupCom _com;
     private readonly VisMockupSessionState _state = new();
     private readonly SceneController _scene;
     private readonly ModelAttacher _attacher;
@@ -33,6 +34,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         _sta = sta;
         _paths = paths;
         _executable = executable;
+        _com = com;
         _connection = new VisMockupConnection(com);
         _scene = new SceneController(_state);
         _attacher = new ModelAttacher(paths, _state);
@@ -69,7 +71,10 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             }
             catch (Exception)
             {
-                return new AdapterHealth(false, "unavailable");
+                var process = _com.InspectProcess();
+                return new AdapterHealth(
+                    false, process.Running ? "automation_unavailable" : "unavailable",
+                    process.Running, false, process.ProductVersion);
             }
         });
     }

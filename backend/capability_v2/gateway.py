@@ -17,6 +17,7 @@ from typing import Any, Mapping
 from backend.capabilities.models_next import CapabilityBusinessError, CapabilityContext, CapabilityOutput
 from .provider_contracts import CapabilityStreamOutput
 from backend.capabilities.validation_next import validate_payload
+from backend.contracts.connector_execution_plan_v2 import canonicalize_v2
 
 from .catalog import CatalogRelease, CatalogResolutionError, CatalogResolver, build_release, load_catalog_release
 from .catalog_store import InMemoryCatalogStore
@@ -1003,6 +1004,8 @@ class CapabilityGatewayService:
             active_roles=envelope.identity.tenant.active_roles,
             source=envelope.identity.consumer.type.value,
             request_id=envelope.request_id,
+            catalog_release=envelope.catalog_release,
+            normalized_input_hash="sha256:" + hashlib.sha256(canonicalize_v2(envelope.payload)).hexdigest(),
             confirmation_token=envelope.approval_reference,
             idempotency_key=envelope.idempotency_key,
             permissions=permissions,

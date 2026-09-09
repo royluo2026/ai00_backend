@@ -105,7 +105,7 @@ Resolve one historical attachment proven to belong to an authorized knowledge bu
   "payload": {
     "parent_gid": "example",
     "parent_type": "entry",
-    "reference_hash": "example"
+    "reference_hash": "0000000000000000000000000000000000000000000000000000000000000000"
   }
 }
 ```

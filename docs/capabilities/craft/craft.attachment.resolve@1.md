@@ -104,7 +104,7 @@ Resolve one historical attachment proven to belong to an authorized craft busine
   "payload": {
     "parent_gid": "example",
     "parent_type": "rule",
-    "reference_hash": "example"
+    "reference_hash": "0000000000000000000000000000000000000000000000000000000000000000"
   }
 }
 ```

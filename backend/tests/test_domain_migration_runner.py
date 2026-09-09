@@ -145,6 +145,8 @@ class RecordingCursor:
             self._one = (0,)
         elif "information_schema.COLUMNS" in normalized:
             self._one = (0,)
+        elif normalized == "SELECT VERSION()":
+            self._one = ("OceanBase_CE 4.3.5.1",)
 
     def fetchone(self):
         return self._one
@@ -185,7 +187,7 @@ def test_simulation_historical_0004_checksum_upgrades_through_current_chain(simu
 
     applied = apply_domain_migrations(connection, simulation_manifest, migrations)
 
-    assert applied == ("0005", "0006", "0007", "0008", "0009", "0010")
+    assert applied == ("0005", "0006", "0007", "0008", "0009", "0010", "0011")
 
 
 def test_apply_uses_domain_lock_ledger_and_artifact_version(craft_manifest):
@@ -311,3 +313,37 @@ def test_apply_requires_only_the_selected_domains_ddl_credential(monkeypatch, ca
     assert captured[0].username == "craft_ddl"
     assert connection.closed is True
     assert "domain=craft migrations=9 applied=0" in capsys.readouterr().out
+
+
+def test_apply_configures_selected_table_prefix(monkeypatch, capsys):
+    class Connection:
+        def close(self):
+            pass
+
+    prefixes = []
+    monkeypatch.setattr(runner_module, "configure_table_prefix", prefixes.append)
+    monkeypatch.setattr(runner_module, "connect_domain_database", lambda _url: Connection())
+    monkeypatch.setattr(
+        runner_module,
+        "verify_live_server",
+        lambda _connection: {"version": "OceanBase_CE 4.3.5.1"},
+    )
+    monkeypatch.setattr(
+        runner_module,
+        "apply_domain_migrations",
+        lambda _connection, _manifest, _migrations: (),
+    )
+
+    result = main(
+        ["--domain", "simulation", "--apply"],
+        root=ROOT,
+        environ={
+            "AI00_SIMULATION_DDL_DB_URL":
+                "mysql://simulation_ddl:secret@db/sht_mes_tool",
+            "TABLE_PREFIX": "test_",
+        },
+    )
+
+    assert result == 0
+    assert prefixes == ["test_"]
+    assert "domain=simulation migrations=11 applied=0" in capsys.readouterr().out

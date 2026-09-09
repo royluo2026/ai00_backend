@@ -24,7 +24,9 @@ from backend.contracts.connector_execution_plan_v1 import (
     canonical_hash,
 )
 from backend.domain_ports.local_integration import canonical_json_bytes
+from backend.contracts.connector_execution_plan_v2 import canonicalize_v2
 from plugins.simulation.simulation_backend.application.connector_wakeup import connector_wake_broker
+from plugins.simulation.simulation_backend.application.connector_protocol_v2 import PlanSigner
 from backend.domain_ports.simulation_runtime import (
     ConnectorOutcomePortProxy,
     GovernedSimulationRuntimeClient,
@@ -87,6 +89,14 @@ DIRECT_VISMOCKUP_OPERATIONS = {
     "tree": ("vismockup.tree.read@1", "sha256:25ac87b341ef76d657c627b45bc0c4de129f55b92e01401dd6f2cd8649dd2f16"),
 }
 DIRECT_VISMOCKUP_OPERATION_IDS = frozenset(value[0] for value in DIRECT_VISMOCKUP_OPERATIONS.values())
+DIRECT_VISMOCKUP_CAPABILITIES = {
+    "attach": "simulation.vismockup.application.attach.request",
+    "launch": "simulation.vismockup.application.launch.request",
+    "open": "simulation.vismockup.model.open.request",
+    "close": "simulation.vismockup.model.close.request",
+    "visibility": "simulation.vismockup.visibility.change.request",
+    "tree": "simulation.vismockup.tree.read.request",
+}
 
 
 def connector_plan_signing_material(connector_id: str) -> tuple[str, str]:
@@ -305,6 +315,7 @@ class ConnectorControlPlane:
 connector_control_plane = ConnectorControlPlane(
     SimulationConnectorRepository(), outcome_port=ConnectorOutcomePortProxy(),
     wake_notifier=connector_wake_broker,
+    plan_signer=PlanSigner.configured_from_environment(),
 )
 
 
@@ -341,6 +352,72 @@ def _direct_vismockup_plan(
     }
     draft = ConnectorExecutionPlanV1.model_construct(**raw, plan_hash="sha256:" + "0" * 64)
     return ConnectorExecutionPlanV1(**raw, plan_hash=draft.compute_hash())
+
+
+def _direct_vismockup_plan_v2(
+    *, action: str, connector_id: str, payload: dict, context: CapabilityContext,
+    now: datetime,
+) -> dict:
+    """Build the unsigned App-runtime plan; queue_v2 pins the live runtime then signs it."""
+    now = now.astimezone(UTC).replace(microsecond=0)
+    capability_version_gid = str(getattr(context, "capability_version_gid", "") or "")
+    definition_hash = str(getattr(context, "business_definition_hash", "") or "")
+    catalog_release = str(getattr(context, "catalog_release", "") or "")
+    request_id = str(getattr(context, "request_id", "") or "")
+    idempotency_key = str(getattr(context, "idempotency_key", "") or request_id)
+    normalized_input_hash = str(getattr(context, "normalized_input_hash", "") or "")
+    if (
+        not context.team_gid or not capability_version_gid.startswith("cv2_")
+        or not definition_hash.startswith("sha256:") or not catalog_release.startswith("rel_")
+        or not idempotency_key or not normalized_input_hash.startswith("sha256:")
+    ):
+        raise ConnectorError("capability_provenance_required")
+    operation_id, contract_hash = DIRECT_VISMOCKUP_OPERATIONS[action]
+    step_payload = {"allow_launch": action == "launch"} if action in {"attach", "launch"} else payload
+    classification = "read" if action in {"attach", "tree"} else "write"
+    probe_id = None if classification == "read" else (
+        "vismockup.application.probe@1" if action in {"launch", "close"}
+        else "vismockup.document.snapshot@1"
+    )
+    digest = lambda value: "sha256:" + hashlib.sha256(canonicalize_v2(value)).hexdigest()
+    return {
+        "protocol": "ai00.connector.execution-plan.v2",
+        "plan_id": "vismockup-command-" + secrets.token_hex(16),
+        "capability_id": DIRECT_VISMOCKUP_CAPABILITIES[action],
+        "major_version": 1,
+        "capability_version_gid": capability_version_gid,
+        "business_definition_hash": definition_hash,
+        "catalog_release": catalog_release,
+        "tenant_id": context.team_gid,
+        "actor_id": context.user_gid,
+        "device_id": connector_id,
+        # queue_v2 replaces both values from the authenticated runtime row before signing.
+        "runtime_generation": 1,
+        "runtime_instance_id": "runtime-pending",
+        "adapter_id": "ai00.vismockup",
+        "adapter_major": 1,
+        "target_product": {
+            "product_id": "siemens.vismockup",
+            "minimum_version": "14.0.0",
+            "maximum_version_exclusive": "15.0.0",
+        },
+        "normalized_input_hash": normalized_input_hash,
+        "confirmation_receipt_id": getattr(context, "confirmation_token", None),
+        "idempotency_key": idempotency_key,
+        "steps": [{
+            "step_id": "step-00001",
+            "operation_id": operation_id,
+            "contract_hash": contract_hash,
+            "depends_on": [],
+            "payload": step_payload,
+            "payload_hash": digest(step_payload),
+            "timeout_seconds": 120,
+            "side_effect_classification": classification,
+            "post_condition_probe_id": probe_id,
+        }],
+        "issued_at": now.isoformat().replace("+00:00", "Z"),
+        "expires_at": (now + timedelta(minutes=15)).isoformat().replace("+00:00", "Z"),
+    }
 
 
 def record_connector_heartbeat(
@@ -428,20 +505,34 @@ def register_connector_runtime_capabilities(
             binding = control_plane.repository.binding_for_user(context.user_gid, context.team_gid)
             if not binding or not binding.get("connector_id"):
                 raise ConnectorError("connector_binding_not_found")
+            connector_id = binding["connector_id"]
             plan_payload = (
                 {"artifact_ref": payload["artifact_ref"]} if action == "open"
                 else {"action": payload["action"]} if action == "visibility"
                 else {"max_depth": payload["max_depth"]} if action == "tree"
                 else {}
             )
-            plan = _direct_vismockup_plan(
-                action=action, connector_id=binding["connector_id"], payload=plan_payload,
-                context=context, now=control_plane.clock(),
-            )
-            operation = control_plane.queue_plan(plan, context)
+            try:
+                runtime = control_plane.repository.runtime_device(connector_id)
+            except ConnectorRepositoryError:
+                runtime = None
+            if runtime and runtime.get("runtime_type") == "electron":
+                plan = _direct_vismockup_plan_v2(
+                    action=action, connector_id=connector_id, payload=plan_payload,
+                    context=context, now=control_plane.clock(),
+                )
+                operation = control_plane.queue_v2(plan, context)
+                evidence_digest = canonical_hash(plan)
+            else:
+                plan = _direct_vismockup_plan(
+                    action=action, connector_id=connector_id, payload=plan_payload,
+                    context=context, now=control_plane.clock(),
+                )
+                operation = control_plane.queue_plan(plan, context)
+                evidence_digest = plan.plan_hash
             return CapabilityOutput(data=operation.model_dump(mode="json"), evidence=(EvidenceRef(
                 kind="simulation.vismockup.command",
-                reference=f"connector-plan:{plan.plan_id}", digest=plan.plan_hash,
+                reference=f"connector-plan:{operation.operation_id}", digest=evidence_digest,
             ),))
         return handler
 

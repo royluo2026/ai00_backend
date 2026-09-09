@@ -112,11 +112,19 @@ def canonicalize_migration_sql(sql: str) -> str:
 
 
 def normalize_oceanbase_sql(sql: str) -> str:
-    """Remove MySQL defaults that OceanBase 4.3.5 rejects, without changing checksums."""
-    return re.sub(
+    """Normalize MySQL syntax across supported OceanBase releases without changing checksums."""
+    sql = re.sub(
         r"\bJSON(?P<nullability>\s+(?:NOT\s+NULL|NULL))?\s+DEFAULT\s+"
         r"\(JSON_(?:OBJECT|ARRAY)\(\)\)",
         lambda match: "JSON" + (match.group("nullability") or ""),
+        sql,
+        flags=re.I,
+    )
+    # OceanBase 3.2 does not expose MySQL's ascii/ascii_bin character set,
+    # while utf8mb4_bin preserves the required case-sensitive identifier semantics.
+    return re.sub(
+        r"\bCHARACTER\s+SET\s+ascii\s+COLLATE\s+ascii_bin\b",
+        "CHARACTER SET utf8mb4 COLLATE utf8mb4_bin",
         sql,
         flags=re.I,
     )
@@ -351,7 +359,17 @@ def prepare_resumable_statement(conn, statement: str) -> str | None:
             exists = int(_scalar(cur.fetchone())) > 0
         if exists:
             return None
-        return re.sub(r"\bADD\s+COLUMN\s+IF\s+NOT\s+EXISTS\b", "ADD COLUMN", statement, count=1, flags=re.I)
+        statement = re.sub(r"\bADD\s+COLUMN\s+IF\s+NOT\s+EXISTS\b", "ADD COLUMN", statement, count=1, flags=re.I)
+        if re.search(r"\sCHECK\s*\(", statement, re.I):
+            with conn.cursor() as cur:
+                cur.execute("SELECT VERSION()")
+                server_version = str(_scalar(cur.fetchone()))
+            if "OceanBase" in server_version and "OceanBase-v3." in server_version:
+                # OceanBase 3.x returns error 4016 for inline CHECK constraints
+                # on ALTER ... ADD COLUMN. Runtime validation remains authoritative;
+                # newer OceanBase releases retain the database constraint.
+                statement = re.sub(r"\s+CHECK\s*\(.+\)\s*$", "", statement, flags=re.I | re.S)
+        return statement
 
     create_index = re.search(
         r"\bCREATE\s+(?:UNIQUE\s+)?INDEX\s+IF\s+NOT\s+EXISTS\s+"

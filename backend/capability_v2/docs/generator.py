@@ -124,10 +124,30 @@ def example_for_schema(schema: Mapping[str, Any]) -> Any:
     if expected == "null":
         return None
     if expected == "string":
-        if schema.get("pattern") == "^sha256:[0-9a-f]{64}$":
+        pattern = schema.get("pattern")
+        if pattern == "^sha256:[0-9a-f]{64}$":
             return "sha256:" + "0" * 64
-        if schema.get("pattern") == "^[0-9a-f]{64}$":
+        if pattern in {"^[0-9a-f]{64}$", "^[a-f0-9]{64}$"}:
             return "0" * 64
+        if pattern == "^[1-9][0-9]*$":
+            return "1"
+        if pattern == "^[0-9]+$":
+            return "0"
+        if pattern == r"^https://[^\s]+$":
+            return "https://example.invalid"
+        if pattern == r"^\d{4}-\d{2}-\d{2}$":
+            return "2000-01-01"
+        if pattern == r"^[A-Za-z0-9_ -]+![A-Z]+[0-9]+:[A-Z]+[0-9]+$":
+            return "Sheet1!A1:A1"
+        if pattern in {
+            "^[A-Za-z][A-Za-z0-9_.-]{0,127}$", "^[A-Za-z0-9_.-]+$",
+            "^[a-z0-9][a-z0-9._-]{0,254}$", "^[a-z_]+$",
+        }:
+            return "example"
+        if pattern == "^[a-z][a-z0-9_]{1,49}$":
+            return "ex"
+        if pattern == r"^[^/\\\x00-\x1f]+$":
+            return "example"
         minimum = max(1, int(schema.get("minLength", 0)))
         return "example" if minimum <= 7 else "x" * minimum
     # V1 descriptors may declare a required field without a type. Preserve its

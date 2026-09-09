@@ -25,11 +25,11 @@ public sealed record AdapterManifest(
 }
 
 public sealed record AdapterHealth(
-    bool Ready,
-    string Status,
-    bool ProcessReady = false,
-    bool DocumentReady = false,
-    string ProductVersion = "");
+    [property: JsonPropertyName("ready")] bool Ready,
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("process_ready")] bool ProcessReady = false,
+    [property: JsonPropertyName("document_ready")] bool DocumentReady = false,
+    [property: JsonPropertyName("product_version")] string ProductVersion = "");
 
 public sealed record AdapterOperation(
     string OperationId,

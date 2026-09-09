@@ -105,7 +105,7 @@ Resolve one historical attachment proven to belong to an authorized project_mana
   "payload": {
     "parent_gid": "example",
     "parent_type": "task",
-    "reference_hash": "example"
+    "reference_hash": "0000000000000000000000000000000000000000000000000000000000000000"
   }
 }
 ```

@@ -98,7 +98,7 @@ Read feishu_sheet read using owned immutable artifacts or the authenticated Feis
   "catalog_release": "<catalog_release>",
   "major_version": 1,
   "payload": {
-    "sheet_range": "example",
+    "sheet_range": "Sheet1!A1:A1",
     "spreadsheet_token": "example"
   }
 }

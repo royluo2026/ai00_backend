@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from backend.capability_v2.contracts import OperationStatus
+from backend.capability_v2.contracts import OperationRef, OperationStatus
 from backend.capability_v2.provider_contracts import CapabilityContext
 from backend.contracts.connector_execution_plan_v1 import (
     ConnectorExecutionPlanV1,
@@ -20,6 +20,7 @@ from plugins.simulation.simulation_backend.capabilities.connector_runtime import
     ConnectorError,
     ConnectorHealth,
     _direct_vismockup_plan,
+    _direct_vismockup_plan_v2,
     require_compatible,
     register_connector_runtime_capabilities,
     sign_connector_plan_lease,
@@ -136,6 +137,75 @@ def test_attach_plan_never_launches_vismockup():
     assert value.steps[0].operation_id == "vismockup.application.probe@1"
     assert value.steps[0].payload == {"allow_launch": False}
     assert value.compute_hash() == value.plan_hash
+
+
+def test_direct_app_plan_uses_v2_and_keeps_attach_read_only():
+    value = _direct_vismockup_plan_v2(
+        action="attach", connector_id="device-001", payload={},
+        context=CapabilityContext(
+            user_gid="user-001", team_gid="tenant-001", request_id="request-001",
+            catalog_release="rel_1234567890abcdef1234567890abcdef",
+            normalized_input_hash=canonical_hash({}),
+            capability_version_gid="cv2_1234567890abcdef12345678",
+            business_definition_hash="sha256:" + "2" * 64,
+        ),
+        now=NOW,
+    )
+
+    assert value["protocol"] == "ai00.connector.execution-plan.v2"
+    assert value["capability_id"] == "simulation.vismockup.application.attach.request"
+    assert value["catalog_release"] == "rel_1234567890abcdef1234567890abcdef"
+    assert value["idempotency_key"] == "request-001"
+    assert value["normalized_input_hash"] == canonical_hash({})
+    assert value["steps"] == [{
+        "step_id": "step-00001",
+        "operation_id": "vismockup.application.probe@1",
+        "contract_hash": "sha256:197cfad8bc3453030fdc288ea78c3abc21699274dd48d4482444af4f62380a37",
+        "depends_on": [],
+        "payload": {"allow_launch": False},
+        "payload_hash": canonical_hash({"allow_launch": False}),
+        "timeout_seconds": 120,
+        "side_effect_classification": "read",
+        "post_condition_probe_id": None,
+    }]
+
+
+def test_direct_app_request_queues_v2_instead_of_fenced_legacy_plan():
+    class Repository:
+        def binding_for_user(self, user_id, tenant_id):
+            return {"connector_id": "device-001"}
+
+        def runtime_device(self, device_id):
+            return {"runtime_type": "electron"}
+
+    class Control:
+        def __init__(self):
+            self.repository = Repository()
+            self.queued = None
+
+        def clock(self):
+            return NOW
+
+        def queue_v2(self, value, context):
+            self.queued = value
+            return OperationRef(operation_id=value["plan_id"], status=OperationStatus.ACCEPTED)
+
+    class Registry:
+        def __init__(self): self.handlers = {}
+        def register(self, spec, handler, *, descriptor): self.handlers[(spec.id, spec.version)] = handler
+
+    registry, control = Registry(), Control()
+    register_connector_runtime_capabilities(registry, control)
+    result = registry.handlers[("simulation.vismockup.application.attach.request", 1)](
+        {}, CapabilityContext(
+            user_gid="user-001", team_gid="tenant-001", request_id="request-001",
+            catalog_release="rel_1234567890abcdef1234567890abcdef",
+            normalized_input_hash=canonical_hash({}),
+        ),
+    )
+
+    assert control.queued["protocol"] == "ai00.connector.execution-plan.v2"
+    assert result.data["operation_id"] == control.queued["plan_id"]
 
 
 class MemoryRepository:

@@ -82,7 +82,13 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
                     if(!result.Ok)throw new ConnectorException("adapter_effect_unknown");
                     data=result.Data;
                 }
-                catch(Exception){status="outcome_unknown";error="invocation_outcome_unknown";ExecutionQuarantined=true;}
+                catch(Exception)
+                {
+                    var readOnly=step.SideEffectClassification=="read";
+                    status=readOnly?"failed_without_effect":"outcome_unknown";
+                    error=readOnly?"read_invocation_failed":"invocation_outcome_unknown";
+                    if(!readOnly)ExecutionQuarantined=true;
+                }
                 results.Add(StepResult(step.StepId,started,status,data,error));
                 journal.Append("step_terminal",plan.PlanId,results[^1].GetRawText());
                 if(status=="outcome_unknown")break;

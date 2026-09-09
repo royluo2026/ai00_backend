@@ -10,6 +10,7 @@ from backend.contracts.simulation_environment_source_v1 import (
     pin_environment_source,
     verify_environment_source,
 )
+from plugins.craft.craft_backend.services.execution_structure import BopAggregate, _normalize
 
 
 def sample_plan():
@@ -44,6 +45,23 @@ def sample_plan():
 
 
 class CraftSimulationContractTests(unittest.TestCase):
+    def test_craft_projects_part_feed_as_normalized_load_semantics(self):
+        aggregate = BopAggregate(
+            version={"gid": "700", "project_gid": "800", "revision": 3, "updated_at": "2026-09-09"},
+            entries=(
+                {"gid": "10", "parent_gid": None, "node_type": "process", "sort_order": 1,
+                 "title": "Load part", "vpps": "P10", "part_feed": 1, "meta": {}},
+                {"gid": "20", "parent_gid": None, "node_type": "operation", "sort_order": 2,
+                 "title": "Fasten part", "vpps": "O20", "part_feed": 0, "meta": {}},
+            ),
+            links=(),
+        )
+
+        normalized = _normalize(aggregate)
+
+        self.assertTrue(normalized["operations"][0]["parameters"]["is_load_part"])
+        self.assertFalse(normalized["operations"][1]["parameters"]["is_load_part"])
+
     def test_simulation_pins_version_revision_and_hash(self):
         sealed = seal_execution_plan(sample_plan())
         pinned = pin_environment_source(sealed, "ois://craft/execution-plans/bop-v7/r3.json")

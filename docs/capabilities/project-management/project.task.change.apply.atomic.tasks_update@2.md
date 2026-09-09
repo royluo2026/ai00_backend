@@ -435,7 +435,7 @@ Execute Project Management operation tasks.update.
     "arguments": {
       "gid": "example",
       "updates": {
-        "canvas_y": "example"
+        "status": "example"
       }
     }
   }
