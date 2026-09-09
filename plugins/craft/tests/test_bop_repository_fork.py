@@ -6,7 +6,16 @@ SOURCE={"source_version_gid":"100","target_project_gid":"200","fork_depth":"proc
 APPLY={"plan_hash":"","expected_target_slot":0,"idempotency_key":"a1","allowed_decisions":[]}
 
 
-def ctx(): return CapabilityContext(user_gid="30",team_gid="20",resource_refs=("project:200",))
+def ctx(): return CapabilityContext(user_gid="30",team_gid="20",resource_refs=("project:200",),active_roles=("super_admin",))
+
+
+def test_main_repository_fork_requires_trusted_super_admin_role():
+    from plugins.craft.craft_backend.data.bop_fork import MemoryBopForkStore
+    from plugins.craft.craft_backend.capabilities.bop_repository_fork import ForkProvider
+    member=CapabilityContext(user_gid="30",team_gid="20",resource_refs=("project:200",),active_roles=("member",))
+    with pytest.raises(CapabilityBusinessError) as error:
+        ForkProvider(MemoryBopForkStore()).repository_preview(SOURCE,member)
+    assert error.value.code=="repository_fork_super_admin_required"
 
 
 def test_preview_apply_all_depths_and_cross_project_identity():

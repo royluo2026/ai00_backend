@@ -78,6 +78,16 @@ def _hash(value: Any) -> str:
     return "sha256:" + hashlib.sha256(_json(value).encode()).hexdigest()
 
 
+def _bulk_insert(cur, statement: str, rows: list[tuple[Any, ...]], batch_size: int = 200) -> None:
+    """Issue real multi-row INSERTs; this driver expands executemany row by row."""
+    marker = " VALUES "
+    prefix, row_sql = statement.split(marker, 1)
+    for offset in range(0, len(rows), batch_size):
+        batch = rows[offset:offset + batch_size]
+        sql = prefix + marker + ",".join([row_sql] * len(batch))
+        cur.execute(sql, tuple(value for row in batch for value in row))
+
+
 class SqlBackfill:
     """Project the fenced legacy snapshot into one Craft team space per project."""
 
@@ -156,12 +166,15 @@ class SqlBackfill:
 
     def _pending_versions(self, limit):
         with self.connection_factory() as conn, conn.cursor() as cur:
-            cur.execute("SELECT v.* FROM workmanship_bop_bop_versions v LEFT JOIN workmanship_craft_bop_repository_id_map m ON m.legacy_kind='version' AND m.legacy_gid=CAST(v.gid AS UNSIGNED) LEFT JOIN workmanship_craft_bop_repository_quarantine q ON q.legacy_kind='version' AND q.legacy_gid=CAST(v.gid AS UNSIGNED) AND q.resolved_at IS NULL WHERE v.is_deleted=FALSE AND m.legacy_gid IS NULL AND q.legacy_gid IS NULL ORDER BY CAST(v.gid AS UNSIGNED) LIMIT %s", (limit,))
+            cur.execute("SELECT v.* FROM workmanship_bop_bop_versions v LEFT JOIN workmanship_craft_bop_repository_id_map m ON m.legacy_kind='version' AND m.legacy_gid=CAST(v.gid AS UNSIGNED) LEFT JOIN workmanship_craft_bop_repository_quarantine q ON q.legacy_kind='version' AND q.legacy_gid=CAST(v.gid AS UNSIGNED) AND q.resolved_at IS NULL WHERE v.is_deleted=FALSE AND q.legacy_gid IS NULL AND (m.legacy_gid IS NULL OR EXISTS (SELECT 1 FROM workmanship_bop_bop_entries e LEFT JOIN workmanship_craft_bop_repository_id_map em ON em.legacy_kind='entry' AND em.legacy_gid=CAST(e.gid AS UNSIGNED) LEFT JOIN workmanship_craft_bop_repository_quarantine eq ON eq.legacy_kind='entry' AND eq.legacy_gid=CAST(e.gid AS UNSIGNED) AND eq.resolved_at IS NULL WHERE e.version_gid=v.gid AND e.is_deleted=FALSE AND em.legacy_gid IS NULL AND eq.legacy_gid IS NULL)) ORDER BY CAST(v.gid AS UNSIGNED) LIMIT %s", (limit,))
             return list(cur.fetchall())
 
     def _migrate_version(self, version):
         legacy_gid, project_gid = str(version["gid"]), str(version["project_gid"])
         with self.connection_factory() as conn, conn.cursor() as cur:
+            cur.execute("SELECT revision_gid FROM workmanship_craft_bop_repository_id_map WHERE legacy_kind='version' AND legacy_gid=%s", (legacy_gid,))
+            if cur.fetchone():
+                return
             cur.execute("SELECT gid FROM workmanship_craft_bop_repositories WHERE tenant_gid=%s AND project_gid=%s AND deleted_at IS NULL", (self.tenant_gid, project_gid))
             row = cur.fetchone()
             repository_gid = str(row["gid"]) if row else str(next_gid())
@@ -170,39 +183,70 @@ class SqlBackfill:
                 space_gid, head_gid = str(next_gid()), str(next_gid())
                 cur.execute("INSERT INTO workmanship_craft_bop_spaces (gid,repository_gid,tenant_gid,space_kind,created_by) VALUES (%s,%s,%s,'team',%s)", (space_gid, repository_gid, self.tenant_gid, self.actor_gid))
                 cur.execute("INSERT INTO workmanship_craft_bop_space_heads (gid,space_gid,tenant_gid,content_hash,updated_by) VALUES (%s,%s,%s,%s,%s)", (head_gid, space_gid, self.tenant_gid, _hash([]), self.actor_gid))
-            cur.execute("INSERT INTO workmanship_craft_bop_repository_id_map (legacy_kind,legacy_gid,repository_gid,mapping_hash) VALUES ('version',%s,%s,%s)", (legacy_gid, repository_gid, _hash({"legacy_gid": legacy_gid, "project_gid": project_gid})))
+            cur.execute("SELECT gid FROM workmanship_craft_bop_spaces WHERE repository_gid=%s AND space_kind='team' AND deleted_at IS NULL", (repository_gid,))
+            space_gid = str(cur.fetchone()["gid"])
+            space_version_gid = str(next_gid())
+            manifest_hash = _hash({"legacy_version_gid": legacy_gid, "legacy_revision": version.get("revision", 1)})
+            source_refs = [{"kind": "legacy_bop_version", "gid": legacy_gid}]
+            cur.execute(
+                "INSERT INTO workmanship_craft_bop_space_versions "
+                "(gid,space_gid,tenant_gid,version_kind,source_refs_json,algorithm_versions_json,manifest_hash,created_by) "
+                "VALUES (%s,%s,%s,'frozen',%s,%s,%s,%s)",
+                (space_version_gid, space_gid, self.tenant_gid, _json(source_refs), _json({"legacy_backfill": 1}), manifest_hash, self.actor_gid),
+            )
+            cur.execute(
+                "INSERT INTO workmanship_craft_bop_repository_id_map "
+                "(legacy_kind,legacy_gid,repository_gid,logical_gid,revision_gid,mapping_hash) "
+                "VALUES ('version',%s,%s,%s,%s,%s)",
+                (legacy_gid, repository_gid, space_gid, space_version_gid, manifest_hash),
+            )
 
     def _migrate_entries(self, version):
         legacy_version_gid = str(version["gid"])
         with self.connection_factory() as conn, conn.cursor() as cur:
-            cur.execute("SELECT repository_gid FROM workmanship_craft_bop_repository_id_map WHERE legacy_kind='version' AND legacy_gid=%s", (legacy_version_gid,))
-            repository_gid = str(cur.fetchone()["repository_gid"])
+            cur.execute("SELECT repository_gid,revision_gid FROM workmanship_craft_bop_repository_id_map WHERE legacy_kind='version' AND legacy_gid=%s", (legacy_version_gid,))
+            version_map = cur.fetchone()
+            repository_gid = str(version_map["repository_gid"])
+            space_version_gid = str(version_map["revision_gid"])
             cur.execute("SELECT h.gid FROM workmanship_craft_bop_space_heads h JOIN workmanship_craft_bop_spaces s ON s.gid=h.space_gid WHERE s.repository_gid=%s AND s.space_kind='team' AND s.deleted_at IS NULL", (repository_gid,))
             head_gid = str(cur.fetchone()["gid"])
-            cur.execute("SELECT e.* FROM workmanship_bop_bop_entries e LEFT JOIN workmanship_craft_bop_repository_id_map m ON m.legacy_kind='entry' AND m.legacy_gid=CAST(e.gid AS UNSIGNED) WHERE e.version_gid=%s AND e.is_deleted=FALSE AND m.legacy_gid IS NULL ORDER BY COALESCE(e.level,0),e.sort_order,CAST(e.gid AS UNSIGNED)", (legacy_version_gid,))
+            cur.execute("SELECT e.* FROM workmanship_bop_bop_entries e LEFT JOIN workmanship_craft_bop_repository_id_map m ON m.legacy_kind='entry' AND m.legacy_gid=CAST(e.gid AS UNSIGNED) LEFT JOIN workmanship_craft_bop_repository_quarantine q ON q.legacy_kind='entry' AND q.legacy_gid=CAST(e.gid AS UNSIGNED) AND q.resolved_at IS NULL WHERE e.version_gid=%s AND e.is_deleted=FALSE AND m.legacy_gid IS NULL AND q.legacy_gid IS NULL ORDER BY COALESCE(e.level,0),e.sort_order,CAST(e.gid AS UNSIGNED)", (legacy_version_gid,))
             rows = list(cur.fetchall())
-        migrated = 0
-        for entry in rows:
-            parent_node_gid = None
-            if entry.get("parent_gid"):
-                with self.connection_factory() as conn, conn.cursor() as cur:
-                    cur.execute("SELECT logical_gid FROM workmanship_craft_bop_repository_id_map WHERE legacy_kind='entry' AND legacy_gid=%s", (str(entry["parent_gid"]),))
-                    parent = cur.fetchone()
-                if not parent:
-                    self._quarantine("entry", entry["gid"], "parent_not_migrated", {"parent_gid": entry["parent_gid"]})
-                    continue
-                parent_node_gid = str(parent["logical_gid"])
-            keys = ("title", "vpps", "vpps_desc", "vpps_part", "part_feed", "catia_occurrence_name", "parent_vpps_name", "process_flow_pic", "process_chart_pic", "child_vpps", "bom_row_owner", "meta")
-            properties = {key: entry.get(key) for key in keys}
-            content_hash = _hash({"parent": parent_node_gid, "type": entry["node_type"], "order": entry["sort_order"], "properties": properties})
-            node_gid, revision_gid = str(next_gid()), str(next_gid())
-            with self.connection_factory() as conn, conn.cursor() as cur:
-                cur.execute("INSERT INTO workmanship_craft_bop_nodes (gid,repository_gid,tenant_gid,lineage_gid,source_version_gid,created_by) VALUES (%s,%s,%s,%s,%s,%s)", (node_gid, repository_gid, self.tenant_gid, node_gid, legacy_version_gid, self.actor_gid))
-                cur.execute("INSERT INTO workmanship_craft_bop_node_revisions (gid,node_gid,tenant_gid,parent_node_gid,node_type,order_key,properties_json,content_hash,actor_gid,actor_type,evidence_refs_json) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,'system',%s)", (revision_gid, node_gid, self.tenant_gid, parent_node_gid, str(entry["node_type"])[:32], str(entry["sort_order"]), _json(properties), content_hash, self.actor_gid, _json({"legacy_version_gid": legacy_version_gid, "legacy_entry_gid": str(entry["gid"])})))
-                cur.execute("INSERT INTO workmanship_craft_bop_space_head_members (gid,space_head_gid,member_kind,logical_gid,node_revision_gid,is_tombstone) VALUES (%s,%s,'node',%s,%s,0)", (str(next_gid()), head_gid, node_gid, revision_gid))
-                cur.execute("INSERT INTO workmanship_craft_bop_repository_id_map (legacy_kind,legacy_gid,repository_gid,logical_gid,revision_gid,mapping_hash) VALUES ('entry',%s,%s,%s,%s,%s)", (str(entry["gid"]), repository_gid, node_gid, revision_gid, content_hash))
-            migrated += 1
-        return migrated
+            cur.execute("SELECT legacy_gid,logical_gid FROM workmanship_craft_bop_repository_id_map WHERE legacy_kind='entry' AND repository_gid=%s", (repository_gid,))
+            node_by_legacy = {str(row["legacy_gid"]): str(row["logical_gid"]) for row in cur.fetchall()}
+            nodes = []
+            revisions = []
+            head_members = []
+            version_members = []
+            mappings = []
+            for entry in rows:
+                parent_node_gid = None
+                if entry.get("parent_gid"):
+                    parent_node_gid = node_by_legacy.get(str(entry["parent_gid"]))
+                    if not parent_node_gid:
+                        cur.execute("INSERT IGNORE INTO workmanship_craft_bop_repository_quarantine (gid,legacy_kind,legacy_gid,reason_code,details_json) VALUES (%s,'entry',%s,'parent_not_migrated',%s)", (str(next_gid()), str(entry["gid"]), _json({"parent_gid": entry["parent_gid"]})))
+                        continue
+                keys = ("title", "vpps", "vpps_desc", "vpps_part", "part_feed", "catia_occurrence_name", "parent_vpps_name", "process_flow_pic", "process_chart_pic", "child_vpps", "bom_row_owner", "meta")
+                properties = {key: entry.get(key) for key in keys}
+                content_hash = _hash({"parent": parent_node_gid, "type": entry["node_type"], "order": entry["sort_order"], "properties": properties})
+                node_gid, revision_gid = str(next_gid()), str(next_gid())
+                node_by_legacy[str(entry["gid"])] = node_gid
+                nodes.append((node_gid, repository_gid, self.tenant_gid, node_gid, legacy_version_gid, self.actor_gid))
+                revisions.append((revision_gid, node_gid, self.tenant_gid, parent_node_gid, str(entry["node_type"])[:32], str(entry["sort_order"]), _json(properties), content_hash, self.actor_gid, _json({"legacy_version_gid": legacy_version_gid, "legacy_entry_gid": str(entry["gid"])})))
+                head_members.append((str(next_gid()), head_gid, node_gid, revision_gid))
+                version_members.append((str(next_gid()), space_version_gid, node_gid, revision_gid))
+                mappings.append((str(entry["gid"]), repository_gid, node_gid, revision_gid, content_hash))
+            if nodes:
+                statements = (
+                    ("INSERT INTO workmanship_craft_bop_nodes (gid,repository_gid,tenant_gid,lineage_gid,source_version_gid,created_by) VALUES (%s,%s,%s,%s,%s,%s)", nodes),
+                    ("INSERT INTO workmanship_craft_bop_node_revisions (gid,node_gid,tenant_gid,parent_node_gid,node_type,order_key,properties_json,content_hash,actor_gid,actor_type,evidence_refs_json) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,'system',%s)", revisions),
+                    ("INSERT INTO workmanship_craft_bop_space_head_members (gid,space_head_gid,member_kind,logical_gid,node_revision_gid,is_tombstone) VALUES (%s,%s,'node',%s,%s,0)", head_members),
+                    ("INSERT INTO workmanship_craft_bop_space_version_members (gid,space_version_gid,member_kind,logical_gid,node_revision_gid,is_tombstone) VALUES (%s,%s,'node',%s,%s,0)", version_members),
+                    ("INSERT INTO workmanship_craft_bop_repository_id_map (legacy_kind,legacy_gid,repository_gid,logical_gid,revision_gid,mapping_hash) VALUES ('entry',%s,%s,%s,%s,%s)", mappings),
+                )
+                for statement, values in statements:
+                    _bulk_insert(cur, statement, values)
+        return len(mappings)
 
     def _quarantine(self, kind, gid, reason, details):
         with self.connection_factory() as conn, conn.cursor() as cur:

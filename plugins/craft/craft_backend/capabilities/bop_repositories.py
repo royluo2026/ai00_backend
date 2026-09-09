@@ -20,10 +20,22 @@ def _scope(context: CapabilityContext) -> tuple[str, str]:
     return tenant_gid, actor_gid
 
 
+def _json_safe(data: Any, key: str = "") -> Any:
+    """Keep Snowflake identifiers exact across the JSON/JavaScript boundary."""
+    if isinstance(data, dict):
+        return {name: _json_safe(value, name) for name, value in data.items()}
+    if isinstance(data, (list, tuple)):
+        return [_json_safe(value, key) for value in data]
+    if data is not None and (key in {"gid", "created_by", "updated_by", "deleted_by"} or key.endswith("_gid")):
+        return str(data)
+    return json.loads(json.dumps(data, default=str))
+
+
 def _output(data: dict[str, Any], action: str) -> CapabilityOutput:
     digest = "sha256:" + hashlib.sha256(json.dumps(data, sort_keys=True, default=str).encode()).hexdigest()
     gid = data.get("repository_gid") or data.get("space_gid") or data.get("version_gid") or "search"
-    return CapabilityOutput(data=data, evidence=(EvidenceRef(
+    serializable = _json_safe(data)
+    return CapabilityOutput(data=serializable, evidence=(EvidenceRef(
         kind="craft.bop.repository", reference=f"craft://bop-repository/{gid}", digest=digest, summary=action,
     ),))
 
@@ -91,11 +103,39 @@ def candidate_specs(store: BopRepositoryStore | None = None) -> tuple[tuple[Capa
     key = {"type": "string", "minLength": 1, "maxLength": 191}
     page = {"cursor": {"type": "string", "pattern": "^[0-9]+$"}, "page_size": {"type": "integer", "minimum": 1, "maximum": 100}}
     def schema(properties, required=()): return {"type": "object", "properties": properties, "required": list(required), "additionalProperties": False}
-    output = schema({k: {} for k in ("items", "next_cursor", "repository_gid", "space_gid", "version_gid", "project_gid", "team_space_gid", "head_gid", "baseline_version_gid", "lifecycle_status", "space_kind", "owner_user_gid", "frozen_version_gid", "row_version", "manifest_hash", "version_kind", "deleted", "deletion_gid", "deleted_at", "operation", "tenant_gid", "actor_gid", "idempotency_key", "offset", "page_size")})
-    common = dict(owner="craft", permissions=("craft.bop.repository.use",), plugin_callable=True,
+    identifier = {"type": ["string", "null"]}
+    item = {"type": "object", "properties": {
+        **{name: identifier for name in (
+            "repository_gid", "project_gid", "baseline_version_gid", "space_gid", "owner_user_gid",
+            "fork_base_version_gid", "frozen_version_gid", "head_gid", "version_gid", "parent_version_gid",
+            "created_by",
+        )},
+        **{name: {"type": ["string", "null"]} for name in (
+            "lifecycle_status", "space_kind", "content_hash", "version_kind", "manifest_hash",
+            "created_at", "updated_at",
+        )},
+        "row_version": {"type": "integer", "minimum": 0},
+        "head_row_version": {"type": "integer", "minimum": 0},
+    }, "additionalProperties": False}
+    output = schema({
+        "items": {"type": "array", "maxItems": 100, "items": item},
+        "next_cursor": identifier,
+        **{name: identifier for name in (
+            "repository_gid", "space_gid", "version_gid", "project_gid", "team_space_gid", "head_gid",
+            "baseline_version_gid", "lifecycle_status", "space_kind", "owner_user_gid", "frozen_version_gid",
+            "manifest_hash", "version_kind", "deletion_gid", "deleted_at", "operation", "tenant_gid",
+            "actor_gid", "idempotency_key",
+        )},
+        "row_version": {"type": "integer", "minimum": 0},
+        "offset": {"type": "integer", "minimum": 0},
+        "page_size": {"type": "integer", "minimum": 1, "maximum": 100},
+        "deleted": {"type": "boolean"},
+    })
+    common = dict(owner="craft", plugin_callable=True,
                   confirmation="none", tags=("craft", "bop", "repository", "experimental"), output_schema=output)
     def spec(cid, handler, props, req=(), write=False):
-        return CapabilitySpec(id=cid, version=1, description=cid, risk="write" if write else "read", input_schema=schema(props, req), **common), handler
+        permissions = ("craft.write_direct",) if write else ("craft.view",)
+        return CapabilitySpec(id=cid, version=1, description=cid, risk="write" if write else "read", permissions=permissions, input_schema=schema(props, req), **common), handler
     repo = {"repository_gid": gid}; cas = {**repo, "expected_row_version": {"type":"integer","minimum":1}, "idempotency_key": key}
     space = {"space_gid": gid}; ver = {"version_gid": gid}
     return (

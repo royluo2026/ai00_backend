@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "registry_version": 1,
-  "table_count": 356,
+  "table_count": 358,
   "tables": [
     {
       "table": "workmanship_agent_canvas_audit_events",
@@ -1931,6 +1931,18 @@
     },
     {
       "table": "workmanship_sim_workspace_export_refs",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_workspace_fork_plan_options",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_workspace_fork_plans",
       "owner": "simulation",
       "runtime_domain": "simulation",
       "legacy_name": false

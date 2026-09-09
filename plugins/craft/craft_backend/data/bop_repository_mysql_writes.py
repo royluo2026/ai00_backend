@@ -63,6 +63,8 @@ def delete_personal_space(store, *, space_gid, tenant_gid, owner_gid, expected_r
         def effect():
             row=store._row(cur,"SELECT row_version FROM workmanship_craft_bop_spaces WHERE gid=%s AND tenant_gid=%s AND space_kind='managed_personal' AND owner_user_gid=%s AND deleted_at IS NULL FOR UPDATE",(space_gid,tenant_gid,owner_gid),"space_not_found")
             if row["row_version"]!=expected_row_version: raise BopRepositoryError("resource_version_conflict")
+            cur.execute("SELECT 1 FROM workmanship_craft_bop_change_proposals WHERE personal_space_gid=%s AND apply_status<>'applied' AND review_status NOT IN ('rejected','withdrawn','cancelled','superseded') LIMIT 1",(space_gid,))
+            if cur.fetchone(): raise BopRepositoryError("unresolved_proposal_exists")
             deletion_gid=str(next_gid()); cur.execute("UPDATE workmanship_craft_bop_spaces SET deleted_at=CURRENT_TIMESTAMP(6),deleted_by=%s,deletion_gid=%s,row_version=row_version+1 WHERE gid=%s",(owner_gid,deletion_gid,space_gid))
             return {"space_gid":str(space_gid),"deleted":True,"deletion_gid":deletion_gid,"row_version":expected_row_version+1}
         return store._write(cur,tenant_gid=tenant_gid,operation="personal.delete",resource_gid=space_gid,key=idempotency_key,payload=payload,effect=effect)

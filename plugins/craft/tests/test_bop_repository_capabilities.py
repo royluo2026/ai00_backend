@@ -62,6 +62,28 @@ def test_search_rejects_unbounded_page_size_before_store_call():
     assert store.calls == []
 
 
+def test_search_serializes_snowflake_gids_as_strings_for_javascript_clients():
+    from plugins.craft.craft_backend.capabilities.bop_repositories import RepositoryProvider
+
+    class SearchStore(StubStore):
+        def search_repositories(self, **kwargs):
+            return {
+                "items": [{
+                    "repository_gid": 223353250961690624,
+                    "project_gid": 203434543749795840,
+                    "baseline_version_gid": None,
+                    "created_by": 195807992300441600,
+                    "row_version": 1,
+                }],
+                "next_cursor": None,
+            }
+
+    data = RepositoryProvider(SearchStore()).search_repositories({}, context()).data
+    assert data["items"][0]["repository_gid"] == "223353250961690624"
+    assert data["items"][0]["project_gid"] == "203434543749795840"
+    assert data["items"][0]["created_by"] == "195807992300441600"
+
+
 def test_store_errors_are_stable_business_errors():
     from plugins.craft.craft_backend.capabilities.bop_repositories import RepositoryProvider
     from plugins.craft.craft_backend.data.bop_repository import BopRepositoryError

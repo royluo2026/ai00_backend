@@ -4,19 +4,24 @@ import hashlib,json
 from typing import Any
 from backend.capability_v2.provider_contracts import CapabilityBusinessError,CapabilityContext,CapabilityOutput,CapabilitySpec,EvidenceRef
 from ..data.bop_fork import BopForkError,MemoryBopForkStore, MysqlBopForkStore
+from .bop_repositories import _json_safe
 
 
 class ForkProvider:
     def __init__(self,store=None):self.store=store or MysqlBopForkStore()
+    @staticmethod
+    def _require_main_fork_admin(context):
+        if "super_admin" not in set(context.active_roles or ()):
+            raise CapabilityBusinessError("repository_fork_super_admin_required","repository_fork_super_admin_required")
     def _call(self,method,p,c):
         if not c.team_gid or not c.user_gid: raise CapabilityBusinessError("repository_identity_required","repository_identity_required")
         if "owner_verdict" in p: raise CapabilityBusinessError("fork_plan_changed","fork_plan_changed")
         try:data=getattr(self.store,method)(tenant_gid=str(c.team_gid),actor_gid=str(c.user_gid),**p)
         except BopForkError as exc: raise CapabilityBusinessError(str(exc),str(exc),retryable=str(exc)=="target_repository_exists") from exc
         digest="sha256:"+hashlib.sha256(json.dumps(data,sort_keys=True,default=str).encode()).hexdigest()
-        return CapabilityOutput(data=data,evidence=(EvidenceRef(kind="craft.bop.fork",reference=f"craft://bop-fork/{data.get('workflow_gid','status')}",digest=digest),))
-    def repository_preview(self,p,c):return self._call("preview_repository",p,c)
-    def repository_apply(self,p,c):return self._call("apply_repository",p,c)
+        return CapabilityOutput(data=_json_safe(data),evidence=(EvidenceRef(kind="craft.bop.fork",reference=f"craft://bop-fork/{data.get('workflow_gid','status')}",digest=digest),))
+    def repository_preview(self,p,c):self._require_main_fork_admin(c);return self._call("preview_repository",p,c)
+    def repository_apply(self,p,c):self._require_main_fork_admin(c);return self._call("apply_repository",p,c)
     def personal_preview(self,p,c):return self._call("preview_personal",p,c)
     def personal_apply(self,p,c):return self._call("apply_personal",p,c)
     def get_run(self,p,c):return self._call("get_run",p,c)
@@ -26,8 +31,14 @@ class ForkProvider:
 def candidate_specs(provider=None):
     p=provider or ForkProvider(); gid={"type":"string","pattern":"^[1-9][0-9]*$"}; key={"type":"string","minLength":1,"maxLength":191}
     def schema(props,req):return {"type":"object","properties":props,"required":list(req),"additionalProperties":False}
-    out={"type":"object","properties":{k:{} for k in ("preview_gid","workflow_gid","fork_run_gid","repository_gid","team_space_gid","personal_space_gid","fork_depth","status","input_hash","plan_hash","expires_at","owner_verdicts","allowed_decisions","personal_step","team","personal","tenant_gid","actor_gid","source_version_gid","target_project_gid","include_personal_migration","expected_target_slot")},"additionalProperties":False}
-    common=dict(owner="craft",permissions=("craft.bop.repository.fork",),plugin_callable=True,confirmation="none",tags=("craft","bop","fork","experimental"),output_schema=out)
+    out={"type":"object","properties":{
+        **{k:{"type":["string","null"]} for k in ("preview_gid","workflow_gid","fork_run_gid","repository_gid","team_space_gid","personal_space_gid","fork_depth","status","input_hash","plan_hash","expires_at","tenant_gid","actor_gid","source_version_gid","target_project_gid","target_repository_gid","content_hash")},
+        "owner_verdicts":{"type":"array","maxItems":100},"allowed_decisions":{"type":"array","maxItems":100},
+        "personal_step":{"type":"object","additionalProperties":True},"team":{"type":"object","additionalProperties":True},"personal":{"type":"object","additionalProperties":True},
+        "include_personal_migration":{"type":"boolean"},
+        **{k:{"type":"integer","minimum":0} for k in ("expected_target_slot","copied_node_count","blueprint_node_count")},
+    },"additionalProperties":False}
+    common=dict(owner="craft",permissions=("craft.write_direct",),plugin_callable=True,confirmation="none",tags=("craft","bop","fork","experimental"),output_schema=out)
     preview={"source_version_gid":gid,"target_project_gid":gid,"fork_depth":{"enum":["all","operation","process","role","station"]},"include_personal_migration":{"type":"boolean"},"expected_target_slot":{"type":"integer","minimum":0},"idempotency_key":key}
     apply={"preview_gid":gid,"plan_hash":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},"allowed_decisions":{"type":"array","maxItems":100},"expected_target_slot":{"type":"integer","minimum":0},"idempotency_key":key}
     def s(cid,h,props,req,write):return CapabilitySpec(id=cid,version=1,description=cid,risk="write" if write else "read",input_schema=schema(props,req),**common),h

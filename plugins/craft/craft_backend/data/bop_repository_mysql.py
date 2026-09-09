@@ -76,6 +76,12 @@ class MysqlBopRepositoryStore:
                 row=self._row(cur,"SELECT lifecycle_status,row_version FROM workmanship_craft_bop_repositories WHERE gid=%s AND tenant_gid=%s AND deleted_at IS NULL FOR UPDATE",(repository_gid,tenant_gid),"repository_not_found")
                 if row["row_version"] != expected_row_version: raise BopRepositoryError("resource_version_conflict")
                 if action == "delete":
+                    cur.execute("SELECT 1 FROM workmanship_craft_bop_spaces WHERE repository_gid=%s AND space_kind='managed_personal' AND deleted_at IS NULL LIMIT 1",(repository_gid,))
+                    if cur.fetchone(): raise BopRepositoryError("active_personal_space_exists")
+                    cur.execute("SELECT 1 FROM workmanship_craft_bop_change_proposals WHERE repository_gid=%s AND apply_status<>'applied' AND review_status NOT IN ('rejected','withdrawn','cancelled','superseded') LIMIT 1",(repository_gid,))
+                    if cur.fetchone(): raise BopRepositoryError("unresolved_proposal_exists")
+                    cur.execute("SELECT 1 FROM workmanship_craft_bop_fork_runs WHERE repository_gid=%s AND status IN ('previewing','pending','running','reconciling') LIMIT 1",(repository_gid,))
+                    if cur.fetchone(): raise BopRepositoryError("active_run_exists")
                     deletion_gid=str(next_gid()); cur.execute("UPDATE workmanship_craft_bop_repositories SET deleted_at=CURRENT_TIMESTAMP(6),deleted_by=%s,deletion_gid=%s,row_version=row_version+1 WHERE gid=%s",(actor_gid,deletion_gid,repository_gid)); return {"repository_gid":str(repository_gid),"deleted":True,"deletion_gid":deletion_gid,"row_version":expected_row_version+1}
                 status="archived" if action=="archive" else "active"
                 cur.execute("UPDATE workmanship_craft_bop_repositories SET lifecycle_status=%s,row_version=row_version+1,updated_at=CURRENT_TIMESTAMP(6) WHERE gid=%s",(status,repository_gid))

@@ -32,6 +32,11 @@ class StubRepository:
         return {"entity_gid": "103", "row_version": kwargs["expected_row_version"] + 1,
                 "patch": {"op": kwargs["operation"], **(kwargs["values"] if kwargs["operation"] == "update_workspace" else {})}}
 
+    def delete(self, **kwargs):
+        self.calls.append(("delete", kwargs))
+        return {"workspace_gid": kwargs["workspace_gid"], "deleted": True,
+                "deletion_gid": "901", "row_version": kwargs["expected_row_version"] + 1}
+
 
 def _context():
     return CapabilityContext(user_gid="30", team_gid="20", request_id="r1")
@@ -59,6 +64,10 @@ def test_workspace_candidates_are_experimental_and_user_actions_have_no_confirma
         "simulation.environment.workspace.search",
         "simulation.environment.workspace.get",
         "simulation.environment.workspace.update",
+        "simulation.environment.workspace.delete",
+        "simulation.environment.workspace.fork.preview",
+        "simulation.environment.workspace.fork.apply",
+        "simulation.environment.workspace_version.search",
         "simulation.environment.structure_node.create",
         "simulation.environment.structure_node.move",
         "simulation.environment.structure_node.remove",
@@ -132,3 +141,56 @@ def test_workspace_update_descriptor_is_owner_resource_scoped():
     from plugins.simulation.simulation_backend.capabilities.provider import descriptor_for
     descriptor = descriptor_for(spec)
     assert [(item.resource_type, item.payload_path) for item in descriptor.resource_selectors] == [("simulation-workspace", "workspace_gid")]
+
+
+def test_workspace_delete_is_owner_scoped_cas_and_has_no_confirmation_popup():
+    repo = StubRepository(); provider = WorkspaceProvider(repo)
+    output = provider.delete({"workspace_gid": "101", "expected_row_version": 3,
+                              "idempotency_key": "delete-1"}, _context())
+    assert output.data == {"workspace_gid": "101", "deleted": True,
+                           "deletion_gid": "901", "row_version": 4}
+    assert repo.calls[-1] == ("delete", {"workspace_gid": "101", "tenant_gid": "20",
+                                         "owner_gid": "30", "expected_row_version": 3,
+                                         "idempotency_key": "delete-1"})
+    spec = next(spec for spec, _handler in candidate_specs(provider)
+                if spec.id == "simulation.environment.workspace.delete")
+    assert spec.confirmation == "none"
+    assert spec.input_schema["additionalProperties"] is False
+
+
+def test_private_fork_uses_immutable_manifest_and_stays_private():
+    import hashlib, json
+    manifest={"schema":"ai00.simulation.environment-manifest.v1","workspace_gid":"101",
+              "version_gid":"102","nodes":[],"bindings":[],"algorithms":{}}
+    content=json.dumps(manifest,sort_keys=True,separators=(",", ":")).encode()
+    class ForkRepo(StubRepository):
+        def create_fork_preview(self, **kwargs):
+            self.calls.append(("fork_preview",kwargs));return {"preview_gid":"701","plan_hash":"sha256:"+"b"*64,"source_workspace_gid":"101","source_version_gid":"102","source_content_hash":"sha256:"+hashlib.sha256(content).hexdigest(),"target_name":kwargs["target_name"],"target_version_label":kwargs["target_version_label"],"fork_depth":kwargs["fork_depth"],"visibility":"private","expires_at":"2026-09-09T12:10:00+00:00"}
+        def get_fork_plan(self, **kwargs):
+            return {"gid":"701","plan_hash":kwargs["plan_hash"],"source_workspace_gid":"101","source_version_gid":"102","content_hash":"sha256:"+hashlib.sha256(content).hexdigest(),"fork_depth":"process","manifest_artifact_ref":{"artifact_id":"900"}}
+        def apply_fork(self, **kwargs):
+            assert kwargs["manifest"]==manifest
+            return {"workspace_gid":"801"}
+    class Port:
+        def read(self, reference, context):return content
+    class Freeze:
+        artifact_port=Port()
+    repo=ForkRepo();provider=WorkspaceProvider(repo,freeze_service=Freeze())
+    preview=provider.fork_preview({"source_workspace_gid":"101","source_version_gid":"102","target_name":"Fork 1","target_version_label":"V1","fork_depth":"process"},_context()).data
+    applied=provider.fork_apply({"preview_gid":"701","plan_hash":preview["plan_hash"],"idempotency_key":"fork-1"},_context()).data
+    assert preview["visibility"]=="private" and preview["fork_depth"]=="process" and applied["workspace_gid"]=="801"
+
+
+def test_private_fork_copy_depth_filters_nodes_and_resource_bindings():
+    from plugins.simulation.simulation_backend.data.workspace_repository import project_manifest_for_fork
+    manifest={"nodes":[
+        {"node_gid":"1","parent_gid":None,"node_type":"line"},
+        {"node_gid":"2","parent_gid":"1","node_type":"station"},
+        {"node_gid":"3","parent_gid":"2","node_type":"role"},
+        {"node_gid":"4","parent_gid":"3","node_type":"process"},
+        {"node_gid":"5","parent_gid":"4","node_type":"operation"},
+    ],"bindings":[{"binding_gid":"6","node_gid":"5","occurrence_gid":"7"}]}
+    projected=project_manifest_for_fork(manifest,"process")
+    assert [row["node_gid"] for row in projected["nodes"]]==["1","2","3","4"]
+    assert projected["bindings"]==[]
+    assert project_manifest_for_fork(manifest,"all")["bindings"]==manifest["bindings"]

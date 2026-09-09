@@ -30,6 +30,10 @@ class _ArtifactPort:
     def create(content, media_type, context):
         from backend.platform_sdk.artifacts import create_artifact
         return create_artifact(content, media_type, context)
+    @staticmethod
+    def read(reference, context):
+        from backend.platform_sdk.artifacts import read_artifact
+        return read_artifact(reference, context)
 
 
 def _scope(context: CapabilityContext) -> tuple[str, str]:
@@ -127,6 +131,50 @@ class WorkspaceProvider:
     def update(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
         values = self._metadata(payload)
         return self._mutate("update_workspace", {**payload, **values}, context)
+
+    def delete(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+        tenant_gid, owner_gid = _scope(context)
+        try:
+            data = self.repository.delete(
+                workspace_gid=str(payload.get("workspace_gid") or ""), tenant_gid=tenant_gid,
+                owner_gid=owner_gid, expected_row_version=payload.get("expected_row_version"),
+                idempotency_key=str(payload.get("idempotency_key") or ""),
+            )
+            return _output(data, workspace_gid=str(data["workspace_gid"]), action="workspace_deleted")
+        except WorkspaceRepositoryError as exc:
+            raise CapabilityBusinessError(str(exc), str(exc), retryable=str(exc) == "version_conflict") from exc
+
+    def fork_preview(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+        tenant_gid, actor_gid = _scope(context)
+        name=str(payload.get("target_name") or "").strip();label=str(payload.get("target_version_label") or "V1").strip()
+        fork_depth=str(payload.get("fork_depth") or "")
+        if not name or len(name)>255:raise CapabilityBusinessError("workspace_name_invalid","workspace_name_invalid")
+        if not label or len(label)>128:raise CapabilityBusinessError("workspace_version_label_invalid","workspace_version_label_invalid")
+        if fork_depth not in {"all","operation","process","role","station"}:raise CapabilityBusinessError("fork_depth_invalid","fork_depth_invalid")
+        try:
+            data=self.repository.create_fork_preview(workspace_gid=str(payload.get("source_workspace_gid") or ""),version_gid=str(payload.get("source_version_gid") or ""),target_name=name,target_version_label=label,fork_depth=fork_depth,tenant_gid=tenant_gid,actor_gid=actor_gid)
+            return _output(data,workspace_gid=str(payload.get("source_workspace_gid") or ""),action="workspace_fork_previewed")
+        except WorkspaceRepositoryError as exc:raise CapabilityBusinessError(str(exc),str(exc)) from exc
+
+    def version_search(self,payload:dict[str,Any],context:CapabilityContext)->CapabilityOutput:
+        tenant_gid,actor_gid=_scope(context)
+        try:
+            data=self.repository.search_saved_versions(workspace_gid=str(payload.get("workspace_gid") or ""),tenant_gid=tenant_gid,actor_gid=actor_gid)
+            return _output(data,workspace_gid=str(payload.get("workspace_gid") or ""),action="workspace_versions_searched")
+        except WorkspaceRepositoryError as exc:raise CapabilityBusinessError(str(exc),str(exc)) from exc
+
+    def fork_apply(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+        tenant_gid,actor_gid=_scope(context)
+        try:
+            plan=self.repository.get_fork_plan(preview_gid=str(payload.get("preview_gid") or ""),tenant_gid=tenant_gid,actor_gid=actor_gid,plan_hash=str(payload.get("plan_hash") or ""))
+            content=self.freeze_service.artifact_port.read(plan["manifest_artifact_ref"],context)
+            manifest=json.loads(content.decode("utf-8"))
+            if manifest.get("schema")!="ai00.simulation.environment-manifest.v1" or str(manifest.get("workspace_gid"))!=str(plan["source_workspace_gid"]) or str(manifest.get("version_gid"))!=str(plan["source_version_gid"]):raise WorkspaceRepositoryError("fork_manifest_invalid")
+            digest="sha256:"+hashlib.sha256(content).hexdigest()
+            if digest!=plan["content_hash"]:raise WorkspaceRepositoryError("fork_manifest_changed")
+            data=self.repository.apply_fork(plan=plan,manifest=manifest,tenant_gid=tenant_gid,actor_gid=actor_gid,idempotency_key=str(payload.get("idempotency_key") or ""))
+            return _output(data,workspace_gid=str(data["workspace_gid"]),action="workspace_forked")
+        except (WorkspaceRepositoryError,ValueError,KeyError,json.JSONDecodeError) as exc:raise CapabilityBusinessError(str(exc),str(exc)) from exc
 
     def _mutate(self, operation: str, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
         tenant_gid, owner_gid = _scope(context)
@@ -292,6 +340,30 @@ def candidate_specs(provider: WorkspaceProvider | None = None) -> tuple[tuple[Ca
                         "required": ["workspace_gid", "expected_row_version", "idempotency_key", *metadata.keys()],
                         "properties": {**cas, **metadata}, "additionalProperties": False},
                         output_schema=mutation_output, **common), selected.update),
+        (CapabilitySpec(id="simulation.environment.workspace.delete", version=1,
+                        description="Logically delete one owner-controlled simulation workspace.", risk="write",
+                        confirmation="none", input_schema={"type": "object",
+                        "required": ["workspace_gid", "expected_row_version", "idempotency_key"],
+                        "properties": cas, "additionalProperties": False},
+                        output_schema={"type": "object",
+                        "required": ["workspace_gid", "deleted", "deletion_gid", "row_version"],
+                        "properties": {"workspace_gid": gid, "deleted": {"const": True},
+                                       "deletion_gid": gid, "row_version": {"type": "integer", "minimum": 2}},
+                        "additionalProperties": False}, **common), selected.delete),
+        (CapabilitySpec(id="simulation.environment.workspace.fork.preview", version=1,
+                        description="Preview a private workspace Fork from an immutable readable version.",risk="write",confirmation="none",
+                        input_schema={"type":"object","required":["source_workspace_gid","source_version_gid","target_name","target_version_label","fork_depth"],
+                        "properties":{"source_workspace_gid":gid,"source_version_gid":gid,"target_name":metadata["name"],"target_version_label":metadata["version_label"],"fork_depth":{"type":"string","enum":["all","operation","process","role","station"]}},"additionalProperties":False},
+                        output_schema={"type":"object","required":["preview_gid","plan_hash","source_workspace_gid","source_version_gid","source_content_hash","target_name","target_version_label","fork_depth","visibility","expires_at"],
+                        "properties":{"preview_gid":gid,"plan_hash":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},"source_workspace_gid":gid,"source_version_gid":gid,"source_content_hash":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},"target_name":metadata["name"],"target_version_label":metadata["version_label"],"fork_depth":{"type":"string","enum":["all","operation","process","role","station"]},"visibility":{"const":"private"},"expires_at":{"type":"string"}},"additionalProperties":False},**common),selected.fork_preview),
+        (CapabilitySpec(id="simulation.environment.workspace.fork.apply", version=1,
+                        description="Apply a validated private workspace Fork without mutating its immutable source.",risk="write",confirmation="none",idempotent=True,
+                        input_schema={"type":"object","required":["preview_gid","plan_hash","idempotency_key"],"properties":{"preview_gid":gid,"plan_hash":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},"idempotency_key":{"type":"string","minLength":1,"maxLength":191}},"additionalProperties":False},
+                        output_schema={"type":"object","required":["workspace_gid","version_gid","owner_gid","is_owner",*metadata.keys(),"updated_at","row_version","nodes","bindings","fork_base"],"properties":{**workspace["properties"],"fork_base":{"type":"object","required":["workspace_gid","version_gid","content_hash","fork_depth"],"properties":{"workspace_gid":gid,"version_gid":gid,"content_hash":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},"fork_depth":{"type":"string","enum":["all","operation","process","role","station"]}},"additionalProperties":False}},"additionalProperties":False},**common),selected.fork_apply),
+        (CapabilitySpec(id="simulation.environment.workspace_version.search",version=1,
+                        description="Search readable immutable versions of one private Simulation workspace.",
+                        input_schema={"type":"object","required":["workspace_gid"],"properties":{"workspace_gid":gid},"additionalProperties":False},
+                        output_schema={"type":"object","required":["items"],"properties":{"items":{"type":"array","items":{"type":"object","required":["version_gid","workspace_gid","sequence","status","content_hash","created_at"],"properties":{"version_gid":gid,"workspace_gid":gid,"sequence":{"type":"integer","minimum":1},"status":{"type":"string","enum":["saved","frozen"]},"content_hash":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},"created_at":{"type":"string"}},"additionalProperties":False}}},"additionalProperties":False},**common),selected.version_search),
         (CapabilitySpec(id="simulation.environment.structure_node.create", version=1,
                         description="Create one node in a private simulation workspace.", risk="write",
                         confirmation="none", idempotent=True, input_schema={"type": "object",
