@@ -14,6 +14,7 @@ from .reference_resolver import CatalogReferenceResolver
 from .repository import OrchestrationRepository
 from .service import OrchestrationService
 from .runtime import OrchestrationRuntime
+from .bop_repository_assistant import BopRepositoryAssistant
 
 
 ORCHESTRATION_CAPABILITIES = frozenset({
@@ -149,4 +150,8 @@ def make_handler(
     raise KeyError(f"unknown orchestration capability: {capability_id}")
 
 
-__all__ = ["ORCHESTRATION_CAPABILITIES", "make_handler"]
+def make_bop_repository_assistant(*, invoke, catalog_contains, clock=None):
+    return BopRepositoryAssistant(invoke=invoke, catalog_contains=catalog_contains, clock=clock)
+
+
+__all__ = ["ORCHESTRATION_CAPABILITIES", "make_handler", "make_bop_repository_assistant"]

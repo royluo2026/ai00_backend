@@ -506,7 +506,7 @@ git commit -m "feat(simulation): version vm snapshots and reverse capture"
 - Consumes development-catalog Craft Repository/space/Fork/Diff/proposal candidates and existing Simulation private workspace candidates through `business_facade`.
 - Produces project/space selector, current environment tree, VM tree and reserved right pane with grouped state, Fork and Diff actions.
 
-- [ ] **Step 1: Write failing UI state tests**
+- [x] **Step 1: Write failing UI state tests**
 
 ```javascript
 test('groups team personal and unlimited private environments without losing selection', async () => {
@@ -517,23 +517,23 @@ test('groups team personal and unlimited private environments without losing sel
 });
 ```
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `node --test packages/sim-plugin/web/cad_sim/environment_store.test.js packages/sim-plugin/web/cad_sim/environment_workspace.test.js`
 
 Expected: FAIL.
 
-- [ ] **Step 3: Implement the four-column state and dialogs**
+- [x] **Step 3: Implement the four-column state and dialogs**
 
 Render project/space records in the first column, current BOP/Simulation tree in the second, VisMockup structure in the third and the reserved pane in the fourth. Selecting either tree invokes governed VisMockup highlight. Dragging a VM part/tool/equipment/fixture/socket to a BOP station/process/operation writes only a binding to the immutable source link. Persist selection/scroll/zoom before mutations and restore after targeted state patches. Never full-reload after add, delete, move, save, Fork or proposal action.
 
-- [ ] **Step 4: Run GREEN and layout smoke**
+- [x] **Step 4: Run GREEN and layout smoke**
 
 Run: `node --test packages/sim-plugin/web/cad_sim/*.test.js && node scripts/test_simulation_workspace_layout.js`
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit in frontend repository**
+- [x] **Step 5: Commit in frontend repository**
 
 ```bash
 git add packages/sim-plugin/web/cad_sim
@@ -551,7 +551,7 @@ git commit -m "feat(simulation): add bop repository collaboration workspace"
 - Produces Task Tool `task.bop_repository_assistant` with fixed `craft_repository` and `simulation_private_environment` profiles.
 - Consumes only exact candidate Capability ID/major from an explicitly pinned development Catalog and owner delegation.
 
-- [ ] **Step 1: Write failing routing tests**
+- [x] **Step 1: Write failing routing tests**
 
 ```python
 def test_team_profile_never_advances_current_or_accepts_proposal(tool):
@@ -559,23 +559,23 @@ def test_team_profile_never_advances_current_or_accepts_proposal(tool):
         tool.run({"profile": "craft_repository", "task_kind": "proposal_accept", **CONTEXT})
 ```
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `python -m pytest plugins/agent/tests/test_bop_repository_assistant.py -q`
 
 Expected: FAIL.
 
-- [ ] **Step 3: Implement fixed profile routing**
+- [x] **Step 3: Implement fixed profile routing**
 
 Validate delegation scope, Catalog release, expiry and allowed Capability IDs. Return bounded outcome references and summaries; do not return full PLMXML/BOP trees or embed business rules in the Tool.
 
-- [ ] **Step 4: Run GREEN**
+- [x] **Step 4: Run GREEN**
 
 Run: `python -m pytest plugins/agent/tests/test_bop_repository_assistant.py backend/tests/test_agent_tool_catalog_boundary.py -q`
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add plugins/agent/agent_backend/orchestration/bop_repository_assistant.py plugins/agent/agent_backend/orchestration/provider.py plugins/agent/tests/test_bop_repository_assistant.py
