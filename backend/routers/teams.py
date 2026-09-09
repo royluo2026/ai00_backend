@@ -54,7 +54,7 @@ def _validate_parent_team_gid(cur, team_gid: str, parent_team_gid: Optional[str]
         visited.add(current)
         cur.execute(
             "SELECT parent_team_gid FROM workmanship_auth_teams "
-            "WHERE gid = %s AND deleted_at IS NULL FOR UPDATE",
+            "WHERE gid = %s AND is_active = TRUE FOR UPDATE",
             (current,),
         )
         row = cur.fetchone()
@@ -115,11 +115,11 @@ def update_team(gid: str, body: UpdateTeamBody, _: dict = Depends(_SUPER_ONLY)):
 
 @router.delete("/{gid}")
 def delete_team(gid: str, _: dict = Depends(_SUPER_ONLY)):
-    """软删除团队（设置 deleted_at，不物理删除数据）"""
+    """停用团队，不物理删除数据。"""
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "UPDATE workmanship_auth_teams SET deleted_at = NOW() WHERE gid = %s AND deleted_at IS NULL",
+                "UPDATE workmanship_auth_teams SET is_active = FALSE WHERE gid = %s AND is_active = TRUE",
                 (gid,),
             )
             if cur.rowcount == 0:
@@ -162,7 +162,7 @@ def list_team_members(gid: str, current_user: dict = Depends(get_current_user)):
         with conn.cursor() as cur:
             cur.execute(
                 "SELECT gid, name, email, avatar_url, system_role, org_role, created_at "
-                "FROM workmanship_auth_users WHERE team_id = %s ORDER BY created_at",
+                "FROM workmanship_auth_users WHERE team_id = %s AND is_active = TRUE ORDER BY created_at",
                 (gid,),
             )
             rows = cur.fetchall()
@@ -215,7 +215,7 @@ def add_team_member(
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "UPDATE workmanship_auth_users SET team_id = %s WHERE gid = %s",
+                "UPDATE workmanship_auth_users SET team_id = %s, is_active = TRUE WHERE gid = %s",
                 (gid, target_gid),
             )
             if cur.rowcount == 0:

@@ -44,7 +44,7 @@ def list_organization_teams(*, actor: dict[str, Any]) -> dict[str, Any]:
         with conn.cursor() as cur:
             cur.execute(
                 "SELECT gid,name,is_active,feishu_dept_id,parent_team_gid,created_at "
-                "FROM workmanship_auth_teams ORDER BY name"
+                "FROM workmanship_auth_teams WHERE is_active=TRUE ORDER BY name LIMIT 1000"
             )
             rows = cur.fetchall()
     return {"teams": [_team(dict(row), include_feishu=True) for row in rows]}
@@ -55,7 +55,7 @@ def list_teams(*, actor: dict[str, Any]) -> dict[str, Any]:
         with conn.cursor() as cur:
             cur.execute(
                 "SELECT gid,name,is_active,parent_team_gid,created_at "
-                "FROM workmanship_auth_teams WHERE deleted_at IS NULL ORDER BY created_at"
+                "FROM workmanship_auth_teams WHERE is_active=TRUE ORDER BY created_at LIMIT 1000"
             )
             rows = cur.fetchall()
     return {"success": True, "data": [_team(dict(row), include_feishu=False) for row in rows]}
@@ -125,7 +125,7 @@ def list_admin_users(*, actor: dict[str, Any]) -> dict[str, Any]:
         with conn.cursor() as cur:
             cur.execute(
                 "SELECT gid,name,email,avatar_url,system_role,org_role,external_subtype,team_id,is_active,created_at "
-                "FROM workmanship_auth_users WHERE is_active=TRUE ORDER BY created_at"
+                "FROM workmanship_auth_users WHERE is_active=TRUE ORDER BY created_at LIMIT 1000"
             )
             rows = cur.fetchall()
     return {"success": True, "data": [_user_summary(dict(row)) for row in rows]}

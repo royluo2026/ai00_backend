@@ -377,7 +377,7 @@ Execute Project Management operation issues.update.
     "arguments": {
       "gid": "example",
       "updates": {
-        "description": "example"
+        "related_task_gid": "example"
       }
     }
   }
