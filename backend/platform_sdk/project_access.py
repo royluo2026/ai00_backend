@@ -15,6 +15,14 @@ def _unique(values: Iterable[str]) -> list[str]:
     return sorted({str(value) for value in values if value})
 
 
+def _membership(row: dict) -> dict:
+    value = dict(row)
+    created_at = value.get("created_at")
+    if created_at is not None and callable(getattr(created_at, "isoformat", None)):
+        value["created_at"] = created_at.isoformat()
+    return value
+
+
 def get_user_profiles(user_gids: Iterable[str]) -> dict[str, dict]:
     gids = _unique(user_gids)
     if not gids:
@@ -81,7 +89,7 @@ def list_project_access_entries(project_gid: str, line_gids: Iterable[str] = ())
                 "WHERE pm.project_gid=%s",
                 (project_gid,),
             )
-            result.extend(dict(row) for row in cur.fetchall())
+            result.extend(_membership(row) for row in cur.fetchall())
 
             gids = _unique(line_gids)
             if gids:
@@ -96,7 +104,7 @@ def list_project_access_entries(project_gid: str, line_gids: Iterable[str] = ())
                     "AND (pg.expires_at IS NULL OR pg.expires_at > NOW())",
                     gids,
                 )
-                result.extend(dict(row) for row in cur.fetchall())
+                result.extend(_membership(row) for row in cur.fetchall())
     return result
 
 
@@ -123,7 +131,7 @@ def list_all_project_memberships() -> list[dict]:
                 "JOIN workmanship_auth_users u ON pm.user_gid=u.gid "
                 "ORDER BY u.name, pm.project_gid"
             )
-            return [dict(row) for row in cur.fetchall()]
+            return [_membership(row) for row in cur.fetchall()]
 
 
 def add_project_member(
