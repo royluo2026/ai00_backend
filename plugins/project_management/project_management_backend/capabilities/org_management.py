@@ -75,9 +75,14 @@ def _register(registry: Any, spec: CapabilitySpec, exposure: ExposurePolicy, bus
             rule_id=spec.id + ".manual_authority", version=1,
             statement="Only explicitly stored manual responsibility data is authoritative.",
             applies_when="The capability is invoked.",
-            enforcement_ref="plugins/project_management/project_management_backend/capabilities/org_management.py",
+            enforcement_ref=(
+                "plugins/project_management/project_management_backend/capabilities/"
+                f"org_management.py:{handler.__name__}"
+            ),
             error_code="permission_denied",
-            test_refs=("backend/tests/test_org_management_capability_contracts.py",),
+            test_refs=(
+                f"backend/tests/acceptance/test_mandatory_cases.py::test_success_case[{spec.id}@1]",
+            ),
         ),),
         "no_business_invariant_reason": None,
     })

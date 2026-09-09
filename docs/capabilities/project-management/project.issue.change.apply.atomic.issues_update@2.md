@@ -377,7 +377,7 @@ Execute Project Management operation issues.update.
     "arguments": {
       "gid": "example",
       "updates": {
-        "feishu_groups": []
+        "list_gid": "example"
       }
     }
   }

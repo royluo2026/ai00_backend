@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_439ad9271d5f416bf5b0ff2b50ade400",
-  "catalog_hash": "sha256:439ad9271d5f416bf5b0ff2b50ade400611482fb1aa2e1744fcbc43b42fd1dfd",
+  "release_id": "rel_3afc1298e1aa2fbf55232ebb8671f16e",
+  "catalog_hash": "sha256:3afc1298e1aa2fbf55232ebb8671f16e5d37b1eed392481277d4c2a768c604b3",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -31486,10 +31486,10 @@
           "version": 1,
           "statement": "Responsibility state is isolated to the authenticated tenant.",
           "applies_when": "The capability is invoked.",
-          "enforcement_ref": "backend/base/org_management_capabilities.py",
+          "enforcement_ref": "backend/base/org_management_capabilities.py:_bop_authorization_provider",
           "error_code": "permission_denied",
           "test_refs": [
-            "backend/tests/test_org_management_capability_contracts.py"
+            "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[base.bop_edit.authorization.check@1]"
           ],
           "machine_constraints": null
         }
@@ -31764,7 +31764,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:2a96c6809068b640e62a1d5a4a13b83c0263ba91ada455f23821447ad17c5b39"
+      "business_definition_hash": "sha256:8b75879c764bb3798700a555cda2a983029ab2975096b1d72ed55e54b74c008e"
     },
     {
       "id": "base.export_template.change.apply",
@@ -36891,10 +36891,10 @@
           "version": 1,
           "statement": "Responsibility state is isolated to the authenticated tenant.",
           "applies_when": "The capability is invoked.",
-          "enforcement_ref": "backend/base/org_management_capabilities.py",
+          "enforcement_ref": "backend/base/org_management_capabilities.py:_active_principal_provider",
           "error_code": "permission_denied",
           "test_refs": [
-            "backend/tests/test_org_management_capability_contracts.py"
+            "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[base.identity.active_principal.get@1]"
           ],
           "machine_constraints": null
         }
@@ -37163,7 +37163,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:1d7cf8a6792f3246cbeceb883e19688567cbc086df0991db29962aaec609c799"
+      "business_definition_hash": "sha256:ebe040546b21a1d54e748e2c223c4d8194452171324c7bdfd98f3b423fdbb01d"
     },
     {
       "id": "base.identity.admin_user.list",
@@ -44505,10 +44505,10 @@
           "version": 1,
           "statement": "Responsibility state is isolated to the authenticated tenant.",
           "applies_when": "The capability is invoked.",
-          "enforcement_ref": "backend/base/org_management_capabilities.py",
+          "enforcement_ref": "backend/base/org_management_capabilities.py:_manager_read_provider",
           "error_code": "permission_denied",
           "test_refs": [
-            "backend/tests/test_org_management_capability_contracts.py"
+            "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[base.project_manager.read@1]"
           ],
           "machine_constraints": null
         }
@@ -44825,7 +44825,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:0e6b85ea5a78cc229a5eaaca8daa0de1fd77e62a1706001dd5070b4b7cb6add9"
+      "business_definition_hash": "sha256:07f42659d6750d21d6426e26eee216c57d62a9cfa750c0e8d4faa13d7c8f43a7"
     },
     {
       "id": "base.project_manager.replace",
@@ -44849,10 +44849,10 @@
           "version": 1,
           "statement": "Responsibility state is isolated to the authenticated tenant.",
           "applies_when": "The capability is invoked.",
-          "enforcement_ref": "backend/base/org_management_capabilities.py",
+          "enforcement_ref": "backend/base/org_management_capabilities.py:_manager_replace_provider",
           "error_code": "permission_denied",
           "test_refs": [
-            "backend/tests/test_org_management_capability_contracts.py"
+            "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[base.project_manager.replace@1]"
           ],
           "machine_constraints": null
         }
@@ -45191,7 +45191,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:dfba9e81e700524d8ce5a86f795d57fe6b1e8058636b7023d61cf60ab85f3c59"
+      "business_definition_hash": "sha256:18965d2204ac1b1a0740153f235dfa17eb60614289161e1a07a33d74b48688d6"
     },
     {
       "id": "base.project_responsibility.projection.apply",
@@ -45215,10 +45215,10 @@
           "version": 1,
           "statement": "Responsibility state is isolated to the authenticated tenant.",
           "applies_when": "The capability is invoked.",
-          "enforcement_ref": "backend/base/org_management_capabilities.py",
+          "enforcement_ref": "backend/base/org_management_capabilities.py:_projection_apply_provider",
           "error_code": "permission_denied",
           "test_refs": [
-            "backend/tests/test_org_management_capability_contracts.py"
+            "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[base.project_responsibility.projection.apply@1]"
           ],
           "machine_constraints": null
         }
@@ -45525,7 +45525,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:8296d2a6e18e392f65927f71c69016ae7d44cbc2b8a50797bad4e01d2c426850"
+      "business_definition_hash": "sha256:1761ec460e3c8b6e47b67a196f835f023b85b0b10d210c5c27e8b40c736ad9ed"
     },
     {
       "id": "base.project_responsibility.projection.get",
@@ -45549,10 +45549,10 @@
           "version": 1,
           "statement": "Responsibility state is isolated to the authenticated tenant.",
           "applies_when": "The capability is invoked.",
-          "enforcement_ref": "backend/base/org_management_capabilities.py",
+          "enforcement_ref": "backend/base/org_management_capabilities.py:_projection_get_provider",
           "error_code": "permission_denied",
           "test_refs": [
-            "backend/tests/test_org_management_capability_contracts.py"
+            "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[base.project_responsibility.projection.get@1]"
           ],
           "machine_constraints": null
         }
@@ -45817,7 +45817,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:3d1af5855cb163b9d01eac930f571485fd670d5bbf0c7f7e8d86b6a2db012fde"
+      "business_definition_hash": "sha256:fcaa3e24c156850e8f092cb939aaaaa719a3b20ec48dd08cdf39cce903e87201"
     },
     {
       "id": "base.runtime.annotation.search",
@@ -288000,6 +288000,76 @@
               "updates": {
                 "type": "object",
                 "properties": {
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "bop_entry_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "occurrence_root_cause": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "related_knowledge_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "scheduled_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "severity": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "assignee_team_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "share_scope": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "title": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
                   "feishu_groups": {
                     "type": "array",
                     "maxItems": 200,
@@ -288022,14 +288092,7 @@
                       "additionalProperties": false
                     }
                   },
-                  "title": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "permanent_action": {
+                  "description": {
                     "type": [
                       "string",
                       "null"
@@ -288043,121 +288106,7 @@
                     ],
                     "maxLength": 65536
                   },
-                  "related_task_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "related_knowledge_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_assignee_open_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "severity": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_docs": {
-                    "type": "array",
-                    "maxItems": 200,
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "token": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "name": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "title": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "url": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "type": {
-                          "type": "string",
-                          "maxLength": 2048
-                        }
-                      },
-                      "additionalProperties": false
-                    }
-                  },
-                  "feishu_group_chat_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "assignee_team_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "list_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "bop_entry_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "occurrence_root_cause": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
                   "escape_root_cause": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "scheduled_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "interim_action": {
                     "type": [
                       "string",
                       "null"
@@ -288171,14 +288120,21 @@
                     ],
                     "maxLength": 65536
                   },
-                  "approval_order_gid": {
+                  "feishu_group_chat_id": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "share_scope": {
+                  "feishu_assignee_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "related_task_gid": {
                     "type": [
                       "string",
                       "null"
@@ -288252,19 +288208,63 @@
                       ]
                     }
                   },
-                  "description": {
+                  "approval_order_gid": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "feishu_assignee_name": {
+                  "interim_action": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
+                  },
+                  "permanent_action": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_open_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_docs": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "title": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "url": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "type": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
                   }
                 },
                 "additionalProperties": false,
@@ -301328,10 +301328,10 @@
           "version": 1,
           "statement": "Only explicitly stored manual responsibility data is authoritative.",
           "applies_when": "The capability is invoked.",
-          "enforcement_ref": "plugins/project_management/project_management_backend/capabilities/org_management.py",
+          "enforcement_ref": "plugins/project_management/project_management_backend/capabilities/org_management.py:org_management_change_provider",
           "error_code": "permission_denied",
           "test_refs": [
-            "backend/tests/test_org_management_capability_contracts.py"
+            "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[project.org_management.change.apply@1]"
           ],
           "machine_constraints": null
         }
@@ -301688,7 +301688,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:57c82053d94d911338c202caf6b141f45c3f35eb58fc86a1f41fea6cf559a2ec"
+      "business_definition_hash": "sha256:692a27d8c5cf386e11a6ed261d5ddec46ad69ff330fef0381f6424603094333f"
     },
     {
       "id": "project.org_management.read",
@@ -301712,10 +301712,10 @@
           "version": 1,
           "statement": "Only explicitly stored manual responsibility data is authoritative.",
           "applies_when": "The capability is invoked.",
-          "enforcement_ref": "plugins/project_management/project_management_backend/capabilities/org_management.py",
+          "enforcement_ref": "plugins/project_management/project_management_backend/capabilities/org_management.py:org_management_read_provider",
           "error_code": "permission_denied",
           "test_refs": [
-            "backend/tests/test_org_management_capability_contracts.py"
+            "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[project.org_management.read@1]"
           ],
           "machine_constraints": null
         }
@@ -302167,7 +302167,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:285ef15ac69186385d9ba86940cf07cfdd5edff75dd417575ed4e0b2f3f396df"
+      "business_definition_hash": "sha256:7c66450ae52fc150bf3c815c995d6cf4a8ba2d86778f1b28381750191ccefc68"
     },
     {
       "id": "project.permission_request.change.apply",
@@ -310321,10 +310321,10 @@
           "version": 1,
           "statement": "Only explicitly stored manual responsibility data is authoritative.",
           "applies_when": "The capability is invoked.",
-          "enforcement_ref": "plugins/project_management/project_management_backend/capabilities/org_management.py",
+          "enforcement_ref": "plugins/project_management/project_management_backend/capabilities/org_management.py:project_validation_provider",
           "error_code": "permission_denied",
           "test_refs": [
-            "backend/tests/test_org_management_capability_contracts.py"
+            "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[project.project.validation.get@1]"
           ],
           "machine_constraints": null
         }
@@ -310609,7 +310609,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:2dfb3077d019d14d3a3ffc079dd030a5eea07c2c33366b7d81e737813737dde8"
+      "business_definition_hash": "sha256:801799db7be78e14e1133b98027e14331fd3ffa641ac05084f4c0fa7e6b543c6"
     },
     {
       "id": "project.share.list",
@@ -320602,29 +320602,14 @@
               "updates": {
                 "type": "object",
                 "properties": {
-                  "feishu_groups": {
-                    "type": "array",
-                    "maxItems": 200,
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "chat_id": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "name": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "avatar": {
-                          "type": "string",
-                          "maxLength": 2048
-                        }
-                      },
-                      "additionalProperties": false
-                    }
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
                   },
-                  "due_date": {
+                  "actual_end": {
                     "type": [
                       "string",
                       "null"
@@ -320638,14 +320623,10 @@
                       "null"
                     ]
                   },
-                  "priority": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
+                  "is_deleted": {
+                    "type": "boolean"
                   },
-                  "status": {
+                  "scheduled_date": {
                     "type": [
                       "string",
                       "null"
@@ -320653,6 +320634,83 @@
                     "maxLength": 65536
                   },
                   "actual_start": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "assignee_team_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "share_scope": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "meeting_doc_link": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "plan_end": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "plan_start": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "canvas_y": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "meeting_level": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_open_id": {
                     "type": [
                       "string",
                       "null"
@@ -320689,21 +320747,21 @@
                       "additionalProperties": false
                     }
                   },
-                  "completion": {
-                    "type": [
-                      "integer",
-                      "number",
-                      "null"
-                    ]
-                  },
-                  "meeting_level": {
+                  "status": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "feishu_group_chat_id": {
+                  "due_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "node_type": {
                     "type": [
                       "string",
                       "null"
@@ -320717,21 +320775,43 @@
                     ],
                     "maxLength": 65536
                   },
-                  "list_gid": {
+                  "scheduled_start_time": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "plan_end": {
+                  "title": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "scheduled_date": {
+                  "feishu_groups": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "chat_id": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "avatar": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "parent_task_gid": {
                     "type": [
                       "string",
                       "null"
@@ -320745,14 +320825,7 @@
                     ],
                     "maxLength": 65536
                   },
-                  "parent_task_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "share_scope": {
+                  "feishu_group_chat_id": {
                     "type": [
                       "string",
                       "null"
@@ -320826,34 +320899,6 @@
                       ]
                     }
                   },
-                  "description": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_assignee_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "scheduled_start_time": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "title": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
                   "canvas_icon": {
                     "type": [
                       "string",
@@ -320861,70 +320906,25 @@
                     ],
                     "maxLength": 65536
                   },
-                  "feishu_assignee_open_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "is_deleted": {
-                    "type": "boolean"
-                  },
-                  "plan_start": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "canvas_y": {
+                  "completion": {
                     "type": [
                       "integer",
                       "number",
                       "null"
                     ]
                   },
-                  "node_type": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "assignee_team_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "actual_end": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "meeting_doc_link": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
                   "time_estimate": {
                     "type": [
                       "integer",
                       "null"
                     ]
+                  },
+                  "priority": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
                   }
                 },
                 "additionalProperties": false,
@@ -414298,7 +414298,7 @@
       "plugin_id": "official.base",
       "module": "backend.base.official_provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:0aefa894ed499d467259492524bb057ca0bd4e10e46d43a208c836b7b3ce3a7b"
+      "artifact_hash": "sha256:52214952c13f9f19560f8e29f839a1f02924e4faaa8875589f921de1612824d6"
     },
     {
       "plugin_id": "official.craft",
@@ -414346,7 +414346,7 @@
       "plugin_id": "official.project-management",
       "module": "project_management_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:688faf37488d0cead884be52ad3e1937d49d10956a32dde034309b5ab4b6d5f6"
+      "artifact_hash": "sha256:7bcd4ee4f7487b7529c7a70fc2af1eeb9e893a674fd2eeff05ceabeb6221802f"
     },
     {
       "plugin_id": "official.simulation",
@@ -414355,5 +414355,5 @@
       "artifact_hash": "sha256:b082b0802f4d50dd287cb829fa382d2b3ac9d4a9bee44b153d27ff44ab728b76"
     }
   ],
-  "created_at": "2026-09-09T09:10:32.967657Z"
+  "created_at": "2026-09-09T09:19:17.645912Z"
 }
