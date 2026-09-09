@@ -314,7 +314,7 @@ def list_share_send(payload, actor):
 # id, real handler, input, output, write, permission, effect. No runtime selector.
 DEFINITIONS = [
     ('base.team.create', create_team, obj({'name': ID, 'is_active': BOOL, 'parent_team_gid': NULL_TEXT}, ('name',)), response(strings('gid', 'name')), True, 'system.user.manage', 'Creates one team under a parent the authenticated administrator controls.'),
-    ('base.team.update', update_team, obj({'team_gid': ID, 'changes': {**obj({'name': ID, 'is_active': BOOL}), 'minProperties': 1}}, ('team_gid', 'changes')), OK, True, 'system.user.manage', 'Changes the name or active state of one team under super administrator authorization.'),
+    ('base.team.update', update_team, obj({'team_gid': ID, 'changes': {**obj({'name': ID, 'is_active': BOOL, 'parent_team_gid': NULL_TEXT}), 'minProperties': 1}}, ('team_gid', 'changes')), OK, True, 'system.user.manage', 'Changes the name, parent, or active state of one team under super administrator authorization.'),
     ('base.team.archive', archive_team, obj({'team_gid': ID}, ('team_gid',)), OK, True, 'system.user.manage', 'Soft deletes one team while preserving its stored history.'),
     ('base.team.member.list', list_team_members, obj({'team_gid': ID}, ('team_gid',)), response(array(MEMBER)), False, '', 'Returns at most 500 members of a team the current user may view.'),
     ('base.team.member.add', add_team_member, obj({'team_gid': ID, 'member': obj({'user_gid': NULL_TEXT, 'feishu_open_id': NULL_TEXT, 'name': NULL_TEXT, 'email': NULL_TEXT, 'avatar_url': NULL_TEXT})}, ('team_gid', 'member')), OK, True, 'system.user.manage', 'Assigns one existing or identified Feishu user to a team the administrator controls.'),

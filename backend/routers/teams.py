@@ -39,6 +39,28 @@ class CreateTeamBody(BaseModel):
 class UpdateTeamBody(BaseModel):
     name: Optional[str] = None
     is_active: Optional[bool] = None
+    parent_team_gid: Optional[str] = None
+
+
+def _validate_parent_team_gid(cur, team_gid: str, parent_team_gid: Optional[str]) -> None:
+    """Reject missing parents and cycles while locking the inspected chain."""
+    current = parent_team_gid
+    visited = set()
+    while current:
+        if current == team_gid:
+            raise HTTPException(status_code=400, detail="上级组织不能是当前组织或其下级")
+        if current in visited:
+            raise HTTPException(status_code=400, detail="组织层级中存在循环")
+        visited.add(current)
+        cur.execute(
+            "SELECT parent_team_gid FROM workmanship_auth_teams "
+            "WHERE gid = %s AND deleted_at IS NULL FOR UPDATE",
+            (current,),
+        )
+        row = cur.fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="上级组织不存在")
+        current = row.get("parent_team_gid")
 
 
 @router.get("")
@@ -53,6 +75,7 @@ def create_team(body: CreateTeamBody, current_user: dict = Depends(_SUPER_ONLY))
     gid = str(next_gid())
     with get_conn() as conn:
         with conn.cursor() as cur:
+            _validate_parent_team_gid(cur, gid, body.parent_team_gid)
             cur.execute(
                 "INSERT INTO workmanship_auth_teams (gid, name, is_active, parent_team_gid, config) "
                 "VALUES (%s, %s, %s, %s, %s)",
@@ -69,12 +92,17 @@ def update_team(gid: str, body: UpdateTeamBody, _: dict = Depends(_SUPER_ONLY)):
         updates["name"] = body.name
     if body.is_active is not None:
         updates["is_active"] = body.is_active
+    fields_set = body.model_fields_set if hasattr(body, "model_fields_set") else body.__fields_set__
+    if "parent_team_gid" in fields_set:
+        updates["parent_team_gid"] = body.parent_team_gid
     if not updates:
         raise HTTPException(status_code=400, detail="没有需要更新的字段")
 
     set_clause = ", ".join(f"{k} = %s" for k in updates)
     with get_conn() as conn:
         with conn.cursor() as cur:
+            if "parent_team_gid" in updates:
+                _validate_parent_team_gid(cur, gid, body.parent_team_gid)
             cur.execute(
                 f"UPDATE workmanship_auth_teams SET {set_clause} WHERE gid = %s",
                 list(updates.values()) + [gid]
