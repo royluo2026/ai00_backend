@@ -143,7 +143,124 @@ Bind one VM occurrence to one simulation workspace node.
     },
     "patch": {
       "additionalProperties": false,
-      "properties": {},
+      "properties": {
+        "binding_gid": {
+          "pattern": "^[1-9][0-9]*$",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "node_gid": {
+          "pattern": "^[1-9][0-9]*$",
+          "type": "string"
+        },
+        "node_type": {
+          "enum": [
+            "line",
+            "station",
+            "process",
+            "operation"
+          ],
+          "type": "string"
+        },
+        "occurrence_gid": {
+          "pattern": "^[1-9][0-9]*$",
+          "type": "string"
+        },
+        "op": {
+          "enum": [
+            "update_workspace",
+            "create",
+            "move",
+            "remove",
+            "bind",
+            "unbind"
+          ],
+          "type": "string"
+        },
+        "parent_gid": {
+          "anyOf": [
+            {
+              "pattern": "^[1-9][0-9]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "position": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "primary_project_gid": {
+          "anyOf": [
+            {
+              "pattern": "^[1-9][0-9]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "project_gids": {
+          "items": {
+            "pattern": "^[1-9][0-9]*$",
+            "type": "string"
+          },
+          "maxItems": 50,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "removed_node_gids": {
+          "items": {
+            "pattern": "^[1-9][0-9]*$",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "review_type": {
+          "enum": [
+            "node_review",
+            "scattered_review",
+            "other"
+          ],
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "load",
+            "operate"
+          ],
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "active",
+            "baseline",
+            "frozen",
+            "archived"
+          ],
+          "type": "string"
+        },
+        "version_label": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "visibility": {
+          "enum": [
+            "private",
+            "shared"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "op"
+      ],
       "type": "object"
     },
     "row_version": {

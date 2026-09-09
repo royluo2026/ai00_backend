@@ -130,7 +130,14 @@ class OrgManagementRepository:
                     )
                     revision = expected_revision + 1
                     operation_gid = str(next_gid())
-                    needs_projection = bool(line and (line.get("bop_line_gid") or line.get("leader_user_gids")))
+                    projection_line = line
+                    if operation == "managed_line.delete" and line:
+                        # Deletion removes this source's effective grants while
+                        # keeping the stable source GID for ref-count cleanup.
+                        projection_line = {**line, "bop_line_gid": None, "leader_user_gids": []}
+                    needs_projection = bool(line and (
+                        operation == "managed_line.delete" or line.get("bop_line_gid") or line.get("leader_user_gids")
+                    ))
                     status = "pending_projection" if needs_projection else "completed"
                     result = {"operation_gid": operation_gid, "revision": revision, "status": status}
                     cursor.execute("UPDATE workmanship_proj_projects SET meta=%s,updated_at=NOW() WHERE gid=%s",
@@ -148,7 +155,7 @@ class OrgManagementRepository:
                             "(gid,operation_gid,tenant_gid,project_gid,payload_json,status) "
                             "VALUES (%s,%s,%s,%s,%s,'pending')",
                             (str(next_gid()), operation_gid, tenant_gid, project_gid,
-                             json.dumps({"line": line, "revision": revision, "operation": operation}, ensure_ascii=False)),
+                             json.dumps({"line": projection_line, "revision": revision, "operation": operation}, ensure_ascii=False)),
                         )
                 connection.commit()
                 return result

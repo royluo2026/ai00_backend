@@ -57,6 +57,29 @@ async def change(payload: dict[str, Any], context: object) -> dict[str, Any]:
         raise CapabilityBusinessError("permission_denied", "仅超管可维护项目责任")
     raw = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     repository = OrgManagementRepository()
+    from backend.capability_v2.contracts import CorrelationRef
+    from backend.capability_v2.domain_client import DomainInvocation
+    correlation = CorrelationRef(
+        request_id=str(getattr(context, "request_id", "org-management-change")),
+        trace_id=str(getattr(context, "request_id", "org-management-change")),
+    )
+    identity = context.effective_identity
+    for user_gid in sorted(set(payload["arguments"].get("leader_user_gids", []))):
+        checked = await context.domain_client.invoke(
+            DomainInvocation(capability_id="base.identity.active_principal.get", major_version=1,
+                             payload={"user_gid": user_gid}), identity, correlation,
+        )
+        if not checked.ok:
+            raise CapabilityBusinessError("resource_not_found", "线体负责人不存在或已停用")
+    if payload["arguments"].get("bop_line_gid"):
+        checked = await context.domain_client.invoke(
+            DomainInvocation(capability_id="craft.bop.active_line.validate", major_version=1,
+                             payload={"project_gid": str(payload["arguments"]["project_gid"]),
+                                      "bop_line_gid": str(payload["arguments"]["bop_line_gid"])}),
+            identity, correlation,
+        )
+        if not checked.ok:
+            raise CapabilityBusinessError("resource_not_found", "BOP 线体不存在、已失效或属于其他项目")
     result = repository.apply(
         tenant_gid=_tenant(context), actor_gid=str(getattr(context, "user_gid", "")),
         project_gid=str(payload["arguments"].get("project_gid") or ""),
@@ -71,7 +94,6 @@ async def change(payload: dict[str, Any], context: object) -> dict[str, Any]:
     from backend.capability_v2.domain_client import DomainInvocation
     from backend.capability_v2.identity import AuthenticatedPrincipal, IdentityBroker, InMemoryMountStore
     from backend.capability_v2.official_service_grants import official_service_identities
-    from backend.capability_v2.contracts import CorrelationRef
     service_id = "project-org-projection"
     tenant_gid = _tenant(context)
     try:
