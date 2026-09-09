@@ -143,14 +143,14 @@ vpps_group
    └─ ordered_member
       ├─ member_gid
       ├─ vpps_gid
-      ├─ parent_member_gid
+      ├─ parent_scope_gid (NOT NULL)
       ├─ node_level
       ├─ order_key
       ├─ source_bop_node_gid
       └─ source_node_lineage_gid
 ```
 
-同一版本内以 `(group_version_gid, parent_member_gid, order_key)` 唯一。顺序只在同一父成员下比较；canonical 序列化按根 sibling order，再递归按各层 sibling order 输出，并以 member GID 作为非法重复 order 检测后的稳定 tie-break evidence，不允许相同 order 静默共存。写入提交 expected group current version 做 CAS。
+同一版本内以 `(group_version_gid, parent_scope_gid, order_key)` 唯一。`parent_scope_gid` 不可为 null：根成员统一使用该 group version 的 `root_scope_gid`，子成员使用父 member GID，避免 MySQL/OceanBase 中 nullable unique 允许多个根顺序冲突。顺序只在同一父 scope 下比较；canonical 序列化按根 sibling order，再递归按各层 sibling order 输出，并以 member GID 作为检测非法重复 order 后的稳定诊断证据，不允许相同 order 静默共存。写入提交 expected group current version 做 CAS。
 
 `order_key` 使用可插入的稳定有序键，不使用全局连续序号。键空间不足时生成包含完全相同语义顺序的新 adjustment/rebalance 版本；canonical semantic hash 按成员相对顺序计算，单纯 rebalance 不产生业务顺序变化。组版本固定后不可修改。
 
@@ -173,7 +173,7 @@ vpps_group
 
 ### 6.3 自动生成与调整
 
-- Fork 核心完成后异步生成 `generated_initial`，状态为 pending/ready/failed；同一 `(reference_version_gid, matcher_policy_hash)` 只有一个稳定 operation/outcome，失败可幂等重试且不破坏 Repository、空间或 reference group。
+- Fork 核心完成后异步生成 `generated_initial`，状态为 pending/ready/failed；同一 `(target_group_gid, reference_version_gid, matcher_policy_hash)` 只有一个稳定 operation/outcome，避免同一参考版本派生到多个目标组时误复用结果。失败可幂等重试且不破坏 Repository、空间或 reference group。
 - 自动匹配只能建议成员对应关系并继承参考层级和顺序，不能静默重排。
 - 用户、Agent 和自动化调整均追加 `adjustment` 版本，不原地覆盖。
 - 团队空间的 generated_initial 和 Agent adjustment 都只是 candidate，项目管理者接受后才推进 current pointer。
@@ -201,7 +201,7 @@ vpps_group
 - 目标个人空间不存在时，从来源的精确不可变版本和个人 Diff 创建。
 - 目标个人空间已存在时返回 `managed_personal_space_exists`，UI 转入三方 Diff 和选择性导入，不覆盖。
 - 当来源和目标团队空间具有共同 base 时，只迁移个人 Diff；没有共同 base 时按 lineage、VPPS 和 source refs 做三方映射。
-- 用户可在一次向导中同时选择“Fork 目标团队空间”和“迁移自己的个人空间”；后端分配共享 workflow/correlation GID，但仍产生两个独立、可对账、幂等的业务 outcome。团队 Fork 成功而个人迁移失败时保留团队 Repository，客户端通过 workflow get 查询并重试第二步，不能依赖浏览器内存恢复。
+- 用户可在一次向导中同时选择“Fork 目标团队空间”和“迁移自己的个人空间”。`repository.fork.preview` 接受 `include_personal_migration` 和可选的来源个人空间，创建并返回共享 workflow/correlation GID；`repository.fork.apply` 在该 workflow 下创建团队 Fork 与个人迁移两个有序 child step。团队 Fork 成功而个人迁移失败时保留团队 Repository；个人步骤以原 workflow GID、固定来源和稳定 step idempotency key 重试，客户端只通过 workflow get 恢复状态，不能依赖浏览器内存重新拼装请求。
 
 ### 7.3 私人仿真环境 Fork
 
@@ -209,17 +209,15 @@ vpps_group
 - 私人环境 Fork 后仍为 private；第一阶段不把它转换为团队或公共空间。
 - 来源删除后，既有 Fork 继续通过自身 immutable fork-base 和 ArtifactRef 使用。
 
-### 7.4 Fork 准备—发布流程
+### 7.4 Fork Preview—Apply 流程
 
-1. 固定来源不可变版本并校验 read 与 fork/export 两种授权；拒绝跨租户来源。
-2. 逐项调用 Project、Knowledge、Digital Model、Artifact、Teamcenter/JT 等 source owner 的可复用/再分发判断，生成 `copy/reference/unresolved/redacted/reject` portability plan。
-3. 默认对正式结构、绑定和安全敏感引用采用 fail-closed；只有 owner 合同明确允许且用户在预览中接受时，才能生成 unresolved/redacted reference，绝不静默复制或裁剪。
-4. 校验目标项目、目标空间唯一约束和复制深度。
-5. 创建幂等 fork run 和 plan，固定 portability 结果和 evidence。
-6. 深度以内生成目标实例、GID、lineage 与 derivation。
-7. 深度以下生成 immutable、有序 reference VPPS group。
-8. 校验节点数、引用、hash 和权限后，将核心 Fork 置为 `ready`。
-9. 异步生成 `generated_initial` 版本；状态独立为 pending/ready/failed，可幂等重试。
+1. Preview 固定来源不可变版本、复制深度、目标项目/空槽 expected version、可选来源个人空间和 `include_personal_migration`，校验 read 与 fork/export 两种授权并拒绝跨租户来源。
+2. Preview 逐项调用 Project、Knowledge、Digital Model、Artifact、Teamcenter/JT 等 source owner 的可复用/再分发判断，生成 `copy/reference/unresolved/redacted/reject` portability plan；Renderer 只能选择 owner 已允许的处理项，不能提交或伪造 owner verdict。
+3. Preview 默认对正式结构、绑定和安全敏感引用 fail-closed；只有 owner 合同明确允许且用户在预览中接受时才能采用 unresolved/redacted reference。Preview 返回 `preview_gid`、`workflow_gid`、plan hash、固定输入 hash、过期时间和有界 evidence，不创建目标 Repository。
+4. Apply 只接受 `preview_gid`、plan hash、用户在允许集合内的显式 decisions、expected target slot、receipt/idempotency。Provider 重新读取 preview，复验过期时间、来源授权、owner portability verdict、目标唯一槽位和 plan hash；任何漂移都要求重新 Preview。
+5. Apply 在 workflow 下创建幂等 fork run。深度以内生成目标实例、GID、lineage 与 derivation；深度以下生成 immutable、有序 reference VPPS group。
+6. Apply 校验节点数、引用、hash 和权限后，将核心 Fork 置为 `ready`；若请求包含个人迁移，则随后执行独立 child step，并保留各自 outcome。
+7. 核心 Fork ready 后异步生成 `generated_initial`；状态独立为 pending/ready/failed，可幂等重试。
 
 Fork 失败不得发布部分 Repository。相同幂等键和 payload 返回原 outcome；不同 payload 返回幂等冲突。自动匹配失败不回滚已经 ready 的核心 Fork。
 
@@ -249,7 +247,9 @@ Theirs = 团队空间当前 head
 
 ### 8.3 私人环境导入
 
-私人环境到受管个人空间只允许选择原子变更单元导入。导入时以私人 fork-base、私人 head 和个人 head 做三方比较；冲突在个人空间解决。导入不创建团队提案，也不绕过 Craft Provider。
+私人环境到受管个人空间只允许从用户主动保存的不可变私人版本选择原子变更单元导入，不能读取不断漂移的 workspace head。Simulation 先通过 `workspace_version.export_for_import` 对 source workspace/version 授权，生成带 content hash、权限范围和有效期的 opaque export ref；原始私人 manifest、base/head 和 owner 判定不能由 Renderer 提交。
+
+Craft import Preview 只接受该 export ref、`personal_space_gid`、expected personal head 和 limits，通过 Gateway 向 Simulation 解析并复验 immutable source，再以其 fork-base、固定 source version 和个人 head 做三方比较。Apply 只接受 Preview ref、选择单元、expected personal head 和幂等键，并重新验证 Preview 未过期、source hash 未变且权限仍有效。冲突在个人空间解决；导入不创建团队提案，也不绕过 Craft Provider。
 
 ## 9. 变更提案
 
@@ -264,7 +264,23 @@ Theirs = 团队空间当前 head
 
 应用原子边界固定为“一个依赖连通分量”：同一分量在一个 Craft 单库事务/CAS 中全部成功或全部失败，不同分量可独立应用，因此允许 `partially_applied`。每个分量使用稳定 operation GID，记录全部 unit outcome 与 Craft audit ref，不得重复应用。团队 head 前进后原 preview/review 失效，必须重新生成 closure/conflict 预览并由项目管理者再次接受。
 
-Draft 可由 owner cancel；submitted 且尚未应用的提案可 withdraw；已有应用结果的提案不能 withdraw，只能完成剩余分量或由新提案 supersede，既有 outcome 永久保留。个人空间删除只被 submitted/reviewing/applying/reconciling 等未终结提案阻止；draft 可先 cancel，未应用 submitted 可先 withdraw。Agent 可解释和推荐，不能代表项目管理者接受团队提案。
+允许的状态组合与转换固定如下，其他组合由数据库约束或 Provider 拒绝：
+
+| 当前组合 | 允许转换 | 是否终态 |
+|---|---|---|
+| `draft/not_started` | submit → `submitted/not_started`；cancel → `cancelled/not_started` | 否；cancel 后是 |
+| `submitted/not_started` | review → `reviewing/not_started`；withdraw → `withdrawn/not_started` | 否；withdraw 后是 |
+| `reviewing/not_started` | review decision → `accepted/not_started`、`partially_accepted/not_started` 或 `rejected/not_started` | 否；rejected 后是 |
+| `accepted/not_started`、`partially_accepted/not_started` | apply → 对应 review status + `applying` | 否 |
+| accepted/partially_accepted + `applying` | component success → `partially_applied` 或 `applied`；失败 → `apply_failed`；不确定 → `reconciling` | 否；`applied` 见下述终态规则 |
+| accepted/partially_accepted + `partially_applied` | apply remaining、supersede remaining 或 reconcile | 否 |
+| accepted/partially_accepted + `apply_failed` | retry 或 reconcile | 否 |
+| accepted/partially_accepted + `reconciling` | 回到 `partially_applied`、`apply_failed` 或 `applied` | 否 |
+| 任意无 active apply/reconcile 的非终态 | supersede → 无应用结果时 `superseded/not_started`；已有部分结果时 `superseded/partially_applied` 并关闭 remaining set | 是，既有 outcome 保留 |
+
+终态谓词固定为：`cancelled/not_started`、`withdrawn/not_started`、`rejected/not_started`；或 `apply_status=applied` 且所有已接受分量均有成功 outcome；或 `review_status=superseded` 且没有 applying/reconciling 分量、remaining set 已明确关闭。`partially_applied` 本身永远不是终态；当部分接受的提案中所有 accepted 分量均已应用、其余分量已被拒绝时，状态收敛为 `partially_accepted/applied`。accepted/partially_accepted 后禁止 withdraw；停止剩余工作必须 supersede，并保留既有应用结果。
+
+Draft 可由 owner cancel；submitted 且尚未接受/应用的提案可 withdraw。个人空间删除只被所有不满足终态谓词的提案阻止；draft 可先 cancel，未评审 submitted 可先 withdraw。Agent 可解释和推荐，不能代表项目管理者接受团队提案。
 
 ## 10. Simulation Context、任务与问题
 
@@ -290,10 +306,17 @@ Repository tombstone 永远不级联 Project、VPPS、Artifact、Simulation Cont
 
 | 表 | 作用 |
 |---|---|
-| `workmanship_craft_bop_repositories` | project 唯一 Repository、lifecycle、head/baseline/frozen pointer、tombstone |
-| `workmanship_craft_bop_spaces` | team/managed_personal、owner、fork base、row version |
-| `workmanship_craft_bop_repository_versions` | immutable manifest、source refs、算法和 ArtifactRef |
-| `workmanship_craft_bop_fork_runs/plans` | 来源、目标、复制深度、幂等、状态和 evidence |
+| `workmanship_craft_bop_repositories` | project 唯一 Repository、lifecycle、baseline pointer、tombstone；baseline 只能指向同 Repository team space 的 immutable version |
+| `workmanship_craft_bop_spaces` | team/managed_personal、owner、fork base、mutable head row version；team 的 `frozen_version_gid` 固定在此，不放在 Repository |
+| `workmanship_craft_bop_space_versions` | `space_gid`、`version_kind`、immutable manifest、source refs、算法和 ArtifactRef |
+| `workmanship_craft_bop_nodes` | Repository 内稳定逻辑 node GID、lineage、direct source 和 created provenance，不承载可变内容 |
+| `workmanship_craft_bop_node_revisions` | immutable node revision GID、node GID、portable 属性、parent/order、content hash 和 actor/evidence |
+| `workmanship_craft_bop_bindings` | Repository 内稳定 logical binding GID、binding lineage 与 created provenance，不承载可变内容 |
+| `workmanship_craft_bop_binding_revisions` | immutable binding revision GID、稳定 binding GID、source/target node/resource ref、语义和 content hash |
+| `workmanship_craft_bop_space_heads` | 每个 space 当前 mutable head、CAS row version、node/binding/VPPS head refs |
+| `workmanship_craft_bop_space_head_members` | 当前 head 的 node/binding revision membership 与 `is_tombstone`；同一 node 在不同空间可指向不同 revision |
+| `workmanship_craft_bop_space_version_members` | immutable space version 的完整 node/binding/VPPS membership；创建后禁止更新/删除 |
+| `workmanship_craft_bop_fork_workflows/runs/plans` | workflow 与团队/个人 child step、来源、目标、复制深度、plan/input hash、expiry、幂等、状态、owner portability verdict 和 evidence |
 | `workmanship_craft_bop_fork_blueprint_nodes` | reference blueprint member 的物理投影；深度以下唯一蓝图事实和 materialized node ref |
 | `workmanship_craft_bop_vpps_groups/versions/members` | 有序组、版本链、space-scoped current/reference pointer 和成员树 |
 | `workmanship_craft_bop_change_proposals/units/conflicts` | 三方 Diff、closure graph、review/apply 状态和 component outcome |
@@ -302,6 +325,10 @@ Repository tombstone 永远不级联 Project、VPPS、Artifact、Simulation Cont
 | `workmanship_sim_environment_vpps_groups/versions/members` | 私人环境独立的有序 VPPS 组、版本和 space-scoped pointer |
 
 同域可使用受控 FK，跨域不建 FK/cascade，只保存 GID/ref/hash。OceanBase/MySQL 唯一性使用 guard/lock 表或可验证生成键，不依赖 partial unique index。
+
+旧 `workmanship_bop_bop_versions` 是以 version row 表达 BOP 快照/工作版本，`workmanship_bop_bop_entries` 的 entry GID 直接从属于 `version_gid` 并混合身份与内容，`workmanship_bop_bop_entry_links` 又直接从属于 entry；它们缺少 space、稳定 logical node、独立 revision、space head membership 和 space tombstone 语义。因此新模型采用 additive 表，不原地重释旧 GID：迁移为每个旧 entry 建立确定性 mapping，生成 logical node GID 与 immutable node revision；同一 lineage 可被确认映射时复用 logical node，否则 quarantine，禁止按名称猜测。旧 link 同样映射为稳定 binding GID + immutable binding revision。team/personal head 和每个 immutable space version 只通过 membership 表选择 revision；删除节点写 space-scoped tombstone membership，不删除 logical node 或其他空间的 revision。每个 `(space_head_gid, member_kind, logical_gid)` 只有一个有效 membership；所有 head membership 变更与 head row-version CAS 在同一 Craft 事务中提交，immutable version membership 创建后禁止更新和删除。
+
+`workmanship_craft_bop_space_versions` 的 `space_gid` 不可为空，`version_kind` 至少区分 `saved/frozen/fork_base/proposal_base`。团队 freeze 只能 CAS 更新对应 team space 的 `frozen_version_gid`；Repository baseline set 必须由 Provider 验证目标 version 属于同一 Repository 的 team space 且 immutable，不能指向 personal/private/跨 Repository version。
 
 ### 12.1 旧数据迁移与切换
 
@@ -313,7 +340,16 @@ Repository tombstone 永远不级联 Project、VPPS、Artifact、Simulation Cont
 | `0011` Simulation private workspaces/versions/nodes/bindings | 保持 Simulation owner 和原 GID，作为不限数量私人环境；补可选 Repository source ref，不迁入 Craft space |
 | `0011` publish plan/map/outbox | 冻结新写入；保留历史只读和 audit，不转成 change proposal |
 
-切换顺序固定为：阻止旧 publish plan/map/outbox 新写 → 创建 guard 与新表 → 回填 Repository/team/version 和 ID mapping → 对账项目数、BOP/节点/绑定计数及 manifest hash → quarantine 异常 → 切换只读消费者 → 切换写消费者 → 旧表只读兼容。切换期禁止双写；失败时在消费者切换前可回滚新表，在切换后只能前滚修复并保留 operation ledger。迁移测试覆盖空库、真实样本、重复运行、断点恢复、冲突项目、缺 project、计数/hash 不符、OceanBase DDL 和禁止双写。
+迁移采用受控维护写隔离，不做业务双写：
+
+1. 创建 guard、新表和只读 mapping 工具；记录旧 Craft BOP 与 Simulation 0011 的 high-water mark。
+2. 开启覆盖旧 Craft BOP 修改、旧 publish plan/map/outbox 和受影响 Simulation workspace/version 写入的 maintenance write fence；新写返回稳定 `migration_write_fenced`，不进入旧表或新表。
+3. 等待 fence 前已获 lease 的 in-flight operation 排空；按 operation ledger 对账到 high-water mark。无法确定 outcome 时停止切换并 reconcile，不能继续回填。
+4. 回填 Repository/team/space version、node/binding identity/revision/membership 与 ID mapping；0011 私人环境保持原 GID。对账项目数、BOP/节点/绑定计数、tombstone 和 manifest hash，异常进入 quarantine。
+5. 在 fence 持有期间切换读消费者，再原子切换写路由到新 Capability/表；执行一次 fence-window 增量检查，期望 delta 为零。
+6. 开放新写，旧表进入只读兼容。开放后禁止回退到旧写路径，只能前滚修复并保留 operation ledger；开放前可撤销新读路由并释放 fence。
+
+迁移测试覆盖空库、真实样本、重复运行、断点恢复、冲突项目、缺 project、计数/hash 不符、OceanBase DDL、fence 前并发写、fence 后拒绝写、in-flight drain、切换瞬间请求和零丢失写入。验收必须证明每个 fence 前成功 outcome 均进入新 membership/hash，每个 fence 后请求均明确失败或只落新表，不存在成功但未迁移的窗口。
 
 ## 13. Capability 边界
 
@@ -331,22 +367,27 @@ Repository tombstone 永远不级联 Project、VPPS、Artifact、Simulation Cont
 | `craft.bop.space_version.save@1` | space、expected head、source refs、idempotency → immutable version/manifest/hash | team 项目管理或 personal owner；Artifact+Craft saga；Desktop/Task Tool |
 | `craft.bop.space_version.freeze@1` | team space、expected head、source refs、idempotency → frozen version/frozen pointer | 项目管理者；Artifact+Craft saga；Desktop；冻结版本不可写 |
 | `craft.bop.repository_baseline.set@1` | repository、space version、expected repository row、idempotency → baseline pointer | 项目管理者；单库 CAS；Desktop；版本内容不变 |
-| `craft.bop.repository.fork@1` | source immutable version、target project、fork_depth、显式 portability decisions、expected empty slot、idempotency → repository/team space/fork run、copied/unresolved/redacted refs evidence | 同租户；来源 read + fork/export + 目标项目管理；逐 source owner 再分发校验；guard 锁内创建，跨 Artifact 用 saga；Desktop |
+| `craft.bop.repository.fork.preview@1` | source immutable version、target project、fork_depth、`include_personal_migration`、可选 source personal space、expected target slot、limits、idempotency → preview/workflow GID、owner portability outcomes、allowed decisions、plan/input hash、expiry/evidence | 同租户；来源 read + fork/export + 目标项目管理；逐 owner 再分发校验；只读持久化 plan；Desktop 不能提交 owner verdict |
+| `craft.bop.repository.fork.apply@1` | preview GID、plan hash、allowed decisions、expected target slot、receipt/idempotency → repository/team space/fork run、可选 personal child outcome、copied/unresolved/redacted evidence | 复验 preview 未过期、授权/verdict/target slot 未漂移；guard 锁创建，跨 Artifact 用 saga；Desktop |
 | `craft.bop.repository.archive@1` | repository、expected row、idempotency → archived_at/row version | 当前项目管理者；guard 锁拒绝 active run；Desktop；不改变不可变版本 |
 | `craft.bop.repository.restore@1` | repository、expected row、idempotency → archived_at=null/row version | 当前项目管理者；guard 锁与唯一性校验；Desktop |
 | `craft.bop.repository.delete@1` | repository、expected row、reason、idempotency → deletion GID/time/保留引用摘要 | 当前项目删除权限；tombstone、legal hold/run guard；不级联 Project/Knowledge/Simulation/Artifact/任务/问题 |
-| `craft.bop.managed_personal_space.fork@1` | source immutable version、target repository、可选 source personal space、expected target slots、workflow correlation、idempotency → personal space/fork-base | 仅当前 actor；Provider 解析 source personal Diff 与共同 base，拒绝跨 owner/repository 拼接；guard 锁；Desktop |
+| `craft.bop.managed_personal_space.fork.preview@1` | source immutable team version、target repository、可选本人 source personal space、workflow GID、expected personal slot、limits、idempotency → preview、personal Diff/portability plan、hash、expiry | 仅当前 actor；Provider 解析共同 base，拒绝跨 owner 拼接；跨 Repository 引用逐 owner 校验；Desktop |
+| `craft.bop.managed_personal_space.fork.apply@1` | preview、plan hash、allowed decisions、expected personal slot、workflow/step receipt、idempotency → personal space/fork-base/step outcome | 复验 preview、来源权限和目标空槽；guard 锁；可作为 Repository Fork workflow 的第二 child step 幂等重试；Desktop |
 | `craft.bop.managed_personal_space.delete@1` | personal space、expected row、idempotency → tombstone/保留提案摘要 | 当前 owner；有未收敛提案或 run 时拒绝；Desktop；团队不受影响 |
 | `craft.bop.managed_personal_space.sync.preview@1` | personal space、expected personal/team heads、limits → 服务端解析的 Base/Ours/Theirs Diff/conflicts/input hash | owner；拒绝跨 repository/owner version；只读任务；Desktop/Agent；记录算法版本 |
 | `craft.bop.managed_personal_space.sync.apply@1` | preview ref、selected units、expected heads、idempotency → new personal head/unit outcomes | owner；单库 CAS；Desktop；依赖闭包与 before/after audit |
-| `simulation.environment.workspace.fork@1` | source immutable refs、target metadata、idempotency → private workspace/fork-base | 来源读 + 新 workspace owner；Simulation saga；Desktop；数量不限 |
+| `simulation.environment.workspace.fork.preview@1` | source immutable version、target metadata、expected target state、limits、idempotency → preview、portability plan/hash/expiry | 来源读 + fork/export；逐 owner 校验外部 refs；只读持久化 plan；Desktop；数量不限 |
+| `simulation.environment.workspace.fork.apply@1` | preview、plan hash、allowed decisions、expected target state、receipt/idempotency → private workspace/fork-base | 复验 preview/授权/verdict；Simulation saga；Desktop；数量不限 |
+| `simulation.environment.workspace_version.get@1` | workspace/version selector、projection limits → immutable manifest metadata/content hash/source refs | workspace owner；只读、有界；Desktop/Agent |
+| `simulation.environment.workspace_version.export_for_import@1` | workspace/version selector、target purpose、expiry ceiling、idempotency → opaque export ref、content hash、scope、expiry | workspace owner；只允许已保存 immutable version；Simulation 签发并审计，不能导出 drifting head 或信任 Renderer manifest |
 | `simulation.environment.workspace.delete@1` | private workspace、expected row、idempotency → tombstone/保留引用摘要 | 当前 owner；guard 锁；Desktop；既有 Fork 和 Artifact refs 保持 |
 | `simulation.environment.vpps_group.get@1` | private workspace/group/version → ordered group/version | workspace owner；只读分页；Desktop/Agent Tool |
 | `simulation.environment.vpps_group.initial.generate@1` | private workspace/reference version/policy/idempotency → generated_initial/candidates/confidence | owner policy/delegation；Simulation+Artifact saga；Task Tool/scheduler |
 | `simulation.environment.vpps_group.adjustment.create@1` | private group/base/ordered ops/reason/evidence/expected current/idempotency → adjustment version | owner 或有效 Agent/system delegation；Simulation CAS；Desktop/Agent Tool |
 | `simulation.environment.vpps_group.current.set@1` | private group/version/expected current/idempotency → current pointer/row version | owner 或有效 Agent/system delegation；Simulation CAS；Desktop/Agent Tool |
-| `craft.bop.managed_personal_space.import.preview@1` | private manifest、private base/head、personal head、limits → typed Diff/conflicts | personal owner 且 source 可读；只读；Desktop/Agent |
-| `craft.bop.managed_personal_space.import.apply@1` | preview ref、selected units、expected personal head、idempotency → new head/unit outcomes | personal owner；Craft 单库 CAS，只消费 immutable Simulation refs；Desktop |
+| `craft.bop.managed_personal_space.import.preview@1` | Simulation opaque export ref、personal space、expected personal head、limits → typed Diff/conflicts、input hash、expiry | personal owner；经 Gateway 调用 Simulation 复验 source 授权/hash/immutable；Craft 不接受 Renderer manifest/base/head；Desktop/Agent |
+| `craft.bop.managed_personal_space.import.apply@1` | preview ref、selected units、expected personal head、idempotency → new head/unit outcomes | personal owner；复验 preview/source ref/权限/hash 未漂移；Craft 单库 CAS；Desktop |
 | `craft.bop.fork_run.get@1` | fork run selector → bounded status/plan/evidence/errors | 发起人或目标项目权限；只读；Desktop/scheduler |
 | `craft.bop.vpps_group.initial.generate@1` | fork run/reference group/target project/policy/idempotency → generated_initial version/candidates/confidence | Task Tool/scheduler delegation；Artifact + Craft saga；不推进 team current；记录模型、Tool、Catalog、hash |
 | `craft.bop.vpps_group.adjustment.create@1` | group/base version/ordered operations/reason/evidence/expected current/idempotency → immutable adjustment version | team 项目管理候选或 personal owner/Agent delegation；CAS；Desktop/Agent Tool |
@@ -385,7 +426,7 @@ Agent 使用 Task Tool 编排确定性 Capability。模型可以解释 Diff、�
 
 ## 15. 稳定失败与恢复
 
-至少定义：`target_repository_exists`、`managed_personal_space_exists`、`source_version_not_immutable`、`source_reference_denied`、`fork_export_denied`、`cross_tenant_fork_denied`、`source_not_portable`、`fork_depth_invalid`、`vpps_group_generation_failed`、`team_head_advanced`、`proposal_conflict`、`dependency_closure_not_accepted`、`proposal_not_withdrawable`、`repository_children_active`、`lineage_resolution_failed`、`resource_version_conflict`、`project_permission_denied`、`active_run_exists`、`reconciliation_required`。
+至少定义：`target_repository_exists`、`managed_personal_space_exists`、`source_version_not_immutable`、`source_reference_denied`、`fork_export_denied`、`cross_tenant_fork_denied`、`source_not_portable`、`fork_depth_invalid`、`fork_preview_expired`、`fork_plan_changed`、`private_export_invalid`、`private_export_expired`、`vpps_group_generation_failed`、`team_head_advanced`、`proposal_conflict`、`proposal_state_invalid`、`dependency_closure_not_accepted`、`proposal_not_withdrawable`、`repository_children_active`、`lineage_resolution_failed`、`resource_version_conflict`、`project_permission_denied`、`active_run_exists`、`migration_write_fenced`、`reconciliation_required`。
 
 核心 Fork 失败不能发布部分 Repository；generated_initial 失败允许独立重试。Craft 写入成功而投影或提案记录失败时，以 Craft outcome 为权威，进入 reconciliation，不盲目重放。所有重试使用稳定 operation GID 和幂等键。
 
@@ -421,6 +462,14 @@ Agent 使用 Task Tool 编排确定性 Capability。模型可以解释 Diff、�
 28. 0011 私人环境保留原 GID，旧 publish 表冻结；Craft BOP 回填按 project 对账，冲突或缺 project 进入 quarantine，切换期无双写。
 29. VPPS sibling 并发写使用 current CAS；rebalance 不改变 canonical semantic order hash。
 30. 团队+个人联合 Fork 通过 workflow correlation 查询部分成功，并可幂等重试个人步骤。
+31. 同一 logical node 在 team/personal head 可指向不同 immutable revision；空间删除只产生该空间 tombstone，其他空间和历史 version membership 不变。
+32. 旧 entry/link 回填生成可对账的 node/binding identity、revision 和 membership；歧义 lineage 被 quarantine，不按名称合并。
+33. Fork Preview 固定 plan hash、owner verdict 和 expiry；伪造 verdict、过期 plan、授权/目标槽位漂移均令 Apply 失败且不创建部分 Repository。
+34. 私人导入只接受 Simulation 为已保存 immutable version 签发的 export ref；Renderer manifest、漂移 head、过期或 hash 不符均被拒绝。
+35. proposal 状态只出现允许组合；`partially_applied` 非终态，所有 accepted 分量完成后收敛为 `applied`，accepted 后不能 withdraw。
+36. VPPS 根成员使用非空 root scope，同父 scope 顺序唯一；多个目标 group 从同一 reference 生成初版时不会误复用 operation。
+37. migration write fence 前成功的并发写全部进入新 hash/membership，fence 后请求明确拒绝或只写新表，切换窗口零丢失且无业务双写。
+38. Repository baseline 只能指向本 Repository team space 的 immutable version；freeze pointer 只属于 team space。
 
 ## 17. 明确不做
 

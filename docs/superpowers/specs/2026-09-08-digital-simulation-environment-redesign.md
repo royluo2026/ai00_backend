@@ -400,8 +400,8 @@ Repository、空间、Fork、VPPS 组和提案表以 2026-09-09 细化设计为�
 - 冻结采用跨资源 saga，不能把 Base Platform Artifact Capability 和 Simulation 数据库描述成一个事务：先通过受治理 Base Platform Artifact Capability 以 operation/idempotency 创建并 finalize 不可变 Artifact；再校验 ArtifactRef、hash、tenant 和访问范围；随后在 Simulation 单库事务中写入 version、membership、ArtifactRef/hash 和审计，提交后才令版本可见。OIS 只是 Artifact 字节存储的 Provider 实现，不是并列业务 owner。
 - Simulation 数据库失败时将已完成 Artifact 标记为 orphan，交由 Base Platform Artifact Capability 的受控保留/回收流程处理；数据库成功但 Artifact 暂时不可读时将版本标记为 unavailable 并对账，禁止用重新序列化的不同 bytes 替换原 Artifact。
 - archive/delete 与 capture/materialize/snapshot/comparison/reconciliation 的 run-lease 获取在同一 workspace guard/行锁上串行化；有活动 lease 返回 `active_run_exists`，archive/tombstone 落库后禁止新 lease。
-- Knowledge project 只允许一个有效 Craft Repository；Repository 只允许一个 team space，且每用户只允许一个 managed personal space。私人 Simulation workspace 不受数量限制。
-- 使用新增迁移建立 Craft Repository/space/Fork/VPPS/proposal 数据；不得修改已执行的 `0011_simulation_workspaces.sql`。0011 的 project-main/publish plan/map/outbox 停止新写入和新消费者，仅保留历史只读兼容。
+- Project Management 权威项目（由 Knowledge UI 展示/选择）只允许一个有效 Craft Repository；Repository 只允许一个 team space，且每用户只允许一个 managed personal space。私人 Simulation workspace 不受数量限制。
+- 使用新增迁移建立 Craft Repository/space/Fork/VPPS/proposal 数据；不得修改已执行的 `0011_simulation_workspaces.sql`。迁移按 2026-09-09 细化设计使用 maintenance write fence、in-flight drain、high-water 对账和零丢失验证，不做业务双写。0011 的 project-main/publish plan/map/outbox 停止新写入和新消费者，仅保留历史只读兼容。
 - archive 可恢复且不改变 active/frozen；delete 只写 tombstone，不删除不可变版本、Fork base、Diff、审计或其他领域数据。第一阶段不实现物理 purge。
 
 ### 10.3 大树读取与算法版本
@@ -462,10 +462,12 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 |---|---|---|
 | 创建私人仿真环境 | `simulation.environment.workspace.create@1` | 现有 experimental 若变更 source/权限必须重建 definition hash、迁移消费者或按 owner 判断升 major |
 | 查询/读取私人环境 | `simulation.environment.workspace.search@1`、`simulation.environment.workspace.get@1` | 逐项核对真实 Registry；默认只返回授权私人环境，不冒充 Craft Repository space |
-| Fork 私人仿真环境 | `simulation.environment.workspace.fork@1` | not_registered 设计候选；目标固定 private，数量不限 |
+| Fork 私人仿真环境 | `simulation.environment.workspace.fork.preview@1`、`simulation.environment.workspace.fork.apply@1` | not_registered 设计候选；目标固定 private，数量不限；Preview 固定 owner portability verdict/hash/expiry，Apply 复验后发布 |
 | 保存私人环境版本 | `simulation.environment.workspace.version.save@1` | not_registered 设计候选；固定实际 source refs、VM snapshot 和 canonical manifest |
+| 读取不可变私人版本 | `simulation.environment.workspace_version.get@1` | not_registered 设计候选；只读、有界，只返回已保存 immutable version |
+| 为 Craft 导入签发来源 | `simulation.environment.workspace_version.export_for_import@1` | not_registered 设计候选；Simulation 校验 owner 并签发带 hash/scope/expiry 的 opaque ref，不接受漂移 head |
 | 读取/生成/调整私人 VPPS 组 | `simulation.environment.vpps_group.get@1`、`simulation.environment.vpps_group.initial.generate@1`、`simulation.environment.vpps_group.adjustment.create@1`、`simulation.environment.vpps_group.current.set@1` | 均为逐项 not_registered 候选；Simulation owner；Agent/Task Tool 必须使用 private-environment 固定 profile 与 owner delegation |
-| 私人环境到受管个人空间导入 | 由 Craft owner 的 `craft.bop.managed_personal_space.import.preview@1` 与 `craft.bop.managed_personal_space.import.apply@1` 执行 | Simulation 只提供 immutable source manifest，不写 Craft 表 |
+| 私人环境到受管个人空间导入 | 由 Craft owner 的 `craft.bop.managed_personal_space.import.preview@1` 与 `craft.bop.managed_personal_space.import.apply@1` 执行 | Simulation 只通过上述 export Capability 提供 opaque immutable source ref；Craft 经 Gateway 复验，不信任 Renderer manifest，不写 Simulation 表 |
 | 接受 VM 快照差异 | `simulation.document_snapshot.change.accept@1` | 新合同需固定 document/snapshot、expected head、幂等和差异集合 |
 | 接受数模升版绑定迁移 | `simulation.environment.binding_migration.accept@1` | 新合同需固定 workspace/version/candidate、CAS 和逐项决定 |
 | 按数模号反查知识资源 | `knowledge.resource_model_mapping.reverse_resolve@1` | Knowledge owner 的 not_registered 候选；精确批量匹配，模糊搜索只用于人工候选 |
