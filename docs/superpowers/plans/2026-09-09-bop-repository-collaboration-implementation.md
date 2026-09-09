@@ -128,10 +128,10 @@ git commit -m "feat(craft): add bop repository persistence"
 - Create: `plugins/craft/tests/test_bop_repository_data.py`
 
 **Interfaces:**
-- Produces: `BopRepositoryStore.create_repository(...)`, `get_repository(...)`, `search_repositories(...)`, `save_space_version(...)`, `freeze_team_space(...)`, and `set_baseline(...)`.
+- Produces: the `BopRepositoryStore` persistence Protocol plus an executable `MemoryBopRepositoryStore` reference for `create_repository(...)`, `create_personal_space(...)`, `get_space(...)`, `save_space_version(...)`, `freeze_team_space(...)`, `set_baseline(...)`, and `delete_personal_space(...)`.
 - Returns: dictionaries with decimal string GIDs, `row_version`, immutable manifest hash and audit operation GID.
 
-- [ ] **Step 1: Write failing behavior tests**
+- [x] **Step 1: Write failing behavior tests**
 
 ```python
 def test_create_repository_is_idempotent_and_enforces_project_slot(store):
@@ -141,23 +141,23 @@ def test_create_repository_is_idempotent_and_enforces_project_slot(store):
         store.create_repository(project_gid="10", tenant_gid="20", actor_gid="30", idempotency_key="r-2")
 ```
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `python -m pytest plugins/craft/tests/test_bop_repository_data.py -q`
 
 Expected: FAIL because the store is absent.
 
-- [ ] **Step 3: Implement minimal transaction methods**
+- [x] **Step 3: Implement minimal transaction methods**
 
-Use `plugins.craft.craft_backend.data.connection.get_craft_conn`, `next_gid()`, row locks and payload hashes. Persist logical node identity separately from revision membership. Reject baseline versions whose resolved space is not the same Repository team space.
+Implement the Protocol and deterministic reference store with `next_gid()`, payload hashes, copy-on-read results and atomic method effects. Persisted adapters must preserve logical node identity separately from revision membership. Reject baseline versions whose resolved space is not the same Repository team space.
 
-- [ ] **Step 4: Run GREEN**
+- [x] **Step 4: Run GREEN**
 
 Run: `python -m pytest plugins/craft/tests/test_bop_repository_data.py -q`
 
 Expected: PASS, including idempotency conflict, CAS failure, cross-space baseline rejection and space tombstone isolation.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add plugins/craft/craft_backend/data/bop_repository.py plugins/craft/tests/test_bop_repository_data.py
@@ -168,6 +168,7 @@ git commit -m "feat(craft): persist repository and space identities"
 
 **Files:**
 - Create: `plugins/craft/craft_backend/capabilities/bop_repositories.py`
+- Create: `plugins/craft/craft_backend/data/bop_repository_mysql.py`
 - Modify: `plugins/craft/craft_backend/capabilities/__init__.py`
 - Modify: `plugins/craft/craft_backend/capabilities/provider.py`
 - Test: `plugins/craft/tests/test_bop_repository_capabilities.py`
@@ -194,7 +195,7 @@ Expected: FAIL because candidate specs are absent.
 
 - [ ] **Step 3: Implement providers and descriptors**
 
-Use one method per business effect, stable error mapping, resource selectors, bounded search and `confirmation=none` for explicit desktop writes. Register as experimental candidates; do not add them to a stable product release or claim approval.
+Implement `MysqlBopRepositoryStore` with `get_craft_conn`, row locks, operation-ledger idempotency and the Task 3 Protocol. Use one Provider method per business effect, stable error mapping, resource selectors, bounded search and `confirmation=none` for explicit desktop writes. Register as experimental candidates; do not add them to a stable product release or claim approval.
 
 - [ ] **Step 4: Run GREEN and registration boundaries**
 
