@@ -84,9 +84,11 @@ Project Management 新增持久操作/投递箱表，原子保存：配置 CAS�
 
 ### 5.1 多人项目经理
 
-- Base 新增项目责任分配表，`(project_gid, user_gid, role='project_manager')` 唯一，并为每项目保存 manager revision。它是多人项目经理的唯一新权威，不复用旧表的 `(project_gid,role)` 单经理唯一约束。
+- Base 新增项目责任分配表，`(tenant_gid, project_gid, user_gid, role='project_manager')` 唯一，并以 `(tenant_gid,project_gid)` 为 manager aggregate 保存 revision/managed 状态。它是多人项目经理的唯一新权威，不复用旧表的 `(project_gid,role)` 单经理唯一约束。
 - 未被人工接管的项目可读取一个旧 `workmanship_auth_project_members` manager 作为 `legacy` 回退。首次 `manager.replace` 原子写入完整期望人员集合并标记项目 `managed=true`；之后访问判断与读取忽略旧 manager 行，但不删除历史行。清空写入空集合且仍保持 managed，不能回退。
-- `manager.replace` 由 Base 超管专用 Capability 直接执行，不进入 Project meta/outbox Saga。每个有效项目经理获得本项目范围的 project-owner/edit projection；移除时只撤销新责任模型创建的精确行。
+- `manager.replace` 由 Base 超管专用 Capability 直接执行，不进入 Project meta/outbox Saga。提交前 Base 通过 `project.project.read.atomic.projects_get@1` 的受信 service identity 验证目标项目存在、未删除且 `team_id` 与 tenant 相同；missing/deleted/wrong-tenant 均不得落 manager、grant 或部分审计。
+- 经理的 `project_owner` grant 也使用 Base source/effective 台账：source 为 `(tenant,project,manager user)`，首次遇到同 target 的既有 grant 记录 `baseline_present=true` 并复用；否则保存新建 grant 的精确 GID。移除经理时只在引用归零、非 baseline 时删除精确 GID，既有授权不冲突也不误删。
+- 人工接管前，Base 权威 `can_edit_project_bop` 判定把旧 `workmanship_auth_project_members.role='project_manager'` 视为项目级编辑者，不要求预先存在 `project_owner` grant。首次 replace 后只认新 manager 集合；未被保留的 legacy manager 立即失去项目编辑，clear 后不回退。
 
 ### 5.2 多人线体负责人来源投影
 
@@ -112,6 +114,40 @@ Project 操作提交后通过 Gateway 调用 Base 投影 Capability。同步完�
 - `super_admin` 仍可编辑所有 BOP；Base 多人项目经理的项目级 edit/project-owner 投影可编辑本项目；`section_lead` 仅可编辑映射线体及其后代。其他组织成员为只读。
 - 所有调用 `_check_line_editable` 的 BOP 写 Capability/REST binding 必须统一经过该判定；复制类 `allow_copy` 例外保持现状但列入回归测试，不能借复制入口修改原 BOP。
 
+### 5.4 完整 BOP mutation inventory（test 基线冻结）
+
+下表由 test Catalog 全部 `craft.bop.*` write descriptor 与真实 SQL effect 交叉核对，共 25 项。除纯资产上传外，权限语义均改变并发布 v2；未列出的新 BOP write 在 inventory gate 中失败，不能默认继承 `craft.write`。
+
+| 授权范围 | Capability（新版本） | 规则 |
+|---|---|---|
+| 线体及后代 | `craft.bop.entry.change.apply@2` | 每个新增/更新/删除 entry 必须解析到授权线体 |
+| 线体及后代 | `craft.bop.entry_link.change.apply@2` | entry 与 link target 均不得越出授权线体 |
+| 线体及后代 | `craft.bop.lifecycle.checkpoint.change.apply@2` | 只能为有权线体创建 checkpoint |
+| 线体及后代 | `craft.bop.lifecycle.checkpoint.rollback.apply@2` | snapshot 中全部 entry/link 必须属于同一有权线体 |
+| 线体及后代 | `craft.bop.lifecycle.history.change.apply@2` | undo/redo batch 全部 effect 必须属于同一有权线体 |
+| 线体及后代 | `craft.bop.staging.lifecycle.change.apply@2` | promote/demote 的源与目标解析到有权线体 |
+| 项目级 | `craft.bop.draft.change.apply@2` | 版本级草稿应用，仅项目经理/超管 |
+| 项目级 | `craft.bop.entry.bulk.change.apply@2` | mixed bulk/import/purge/rollback 不拆分，整体仅项目经理/超管 |
+| 项目级 | `craft.bop.fork.change.apply@2` | 派生版本创建属于项目写；不得修改无权源项目 |
+| 项目级 | `craft.bop.gbop.change.apply@2` | BOP 版本级匹配/自动关联 |
+| 项目级 | `craft.bop.lifecycle.change.apply@2` | 生命周期元数据与 diff queue |
+| 项目级 | `craft.bop.lifecycle.state.change.apply@2` | 初始化/阶段推进 |
+| 项目级 | `craft.bop.lifecycle.stats.refresh.apply@2` | 持久化版本统计 |
+| 项目级 | `craft.bop.lifecycle.step.rollback.apply@2` | checklist step 及关联数据回退 |
+| 项目级 | `craft.bop.staging.change.apply@2` | active version staging CRUD |
+| 项目级 | `craft.bop.validation.run@2` | 持久化验证运行结果 |
+| 项目级 | `craft.bop.version.archive@2` | 归档版本 |
+| 项目级 | `craft.bop.version.create@2` | 在项目中创建版本；源与目标项目都验证 |
+| 项目级 | `craft.bop.version.freeze.change.apply@2` | freeze/unfreeze |
+| 项目级 | `craft.bop.version.layout.change.apply@2` | 共享布局写入 |
+| 项目级 | `craft.bop.version.lifecycle.change.apply@2` | publish/archive family/unarchive |
+| 项目级 | `craft.bop.version.snapshot.change.apply@2` | freeze snapshot/promote |
+| 仅超管 | `craft.bop.fork_preset.change.apply@2` | 共享 fork preset，不属于单项目/线体 |
+| 仅超管 | `craft.bop.template.change.apply@2` | 共享模板创建/刷新；读取源仍需可读 |
+| 资产上传（v1 不变） | `craft.bop.picture.upload@1` | 仅写未绑定图片资产，不改变 BOP；后续 attach/entry 写仍走上表授权 |
+
+每个 v2 的 Provider、Descriptor、Catalog、REST compatibility 和已知 consumer 均须迁移并跑 role matrix：super admin、同项目经理、异项目经理、同线体负责人、异线体负责人、普通 member、team admin。线体能力另测 batch/snapshot 内任一越界即整单拒绝；项目能力另测 wrong-tenant/deleted/inactive 项目。旧 v1 在 consumer 清零后统一 `capability_retired`。
+
 ## 6. Capability、Provider、Catalog 与兼容策略
 
 所有 ID/版本是本变更需要实现并由治理检查固定的契约：
@@ -134,7 +170,7 @@ Project 操作提交后通过 Gateway 调用 Base 投影 Capability。同步完�
 
 - `craft.bop.active_line.search@1`：输入 `project_gid,cursor,page_size<=100`，仅返回 `status='active'` 且未删除的 `line_process` 与路径；服务端固定 `max_depth=32,max_nodes=5000`，超限返回 `graph_limit_exceeded`。
 - `craft.bop.active_line.validate@1`：输入 `project_gid,bop_line_gid`，返回 active/归属/节点类型的封闭判定。
-- 受当前统一检查覆盖并需要 breaking major 的写能力为 `craft.bop.entry.change.apply@2`、`craft.bop.entry_link.change.apply@2`、`craft.bop.staging.lifecycle.change.apply@2`；对应 legacy entry/staging REST bindings 迁移到同一 v2 判定。后续扫描发现的其他 BOP 内容写入口必须先纳入清单和测试，不可默认放行；旧 major 在切换后返回 `capability_retired`。
+- BOP breaking-major 全集、授权范围与唯一 v1 例外固定在 §5.4；Capability 注册和 legacy REST binding 都必须消费同一 Base 权威判定，不得各自复制角色捷径。
 
 Project 通过受治理 domain capability client/Gateway 调用，禁止 Craft SQL 泄漏到 Project repository。
 
@@ -144,6 +180,7 @@ Project 通过受治理 domain capability client/Gateway 调用，禁止 Craft S
 - `base.project_manager.read@1` 与 `base.project_manager.replace@1`：按项目读取/原子替换零到多名经理；replace 仅超管、confirmation user、expected revision、required idempotency。
 - `base.identity.active_principal.get@1`：输入一个 user GID，只返回 `{gid,name,avatar_url,is_active}` 或 `resource_not_found`，供 Project 在配置提交前验证；不暴露邮箱/飞书标识。
 - `base.project_responsibility.projection.apply@1` 与 `.get@1`：承载线体来源台账与 grant 投影；apply `confirmation='none'`、无 Web/Agent exposure，只允许固定 Project worker service identity，get 只供 Project provider/worker。
+- Base manager replace 依赖现有 `project.project.read.atomic.projects_get@1`。Base 用 `IdentityBroker.for_local_runtime(service_principal, tenant_id, runtime_id='base-project-validator')` 生成固定 service identity 后通过 DomainCapabilityClient 调用；Project Provider 只允许该 consumer 读取最小 `{gid,team_id,is_deleted}` 验证投影，禁止信任浏览器传入的 tenant/project 状态。
 
 旧 `base.team.*@1` 写版本、`project.member.change.apply.atomic.members_line_assignment_replace@1`、旧 Craft BOP write major 和 `/line-assignment` 写适配器进入 deprecation/retirement 清单。已知消费者清单至少包含 `web/org_mgmt/org_mgmt.js`、`web/team_space/team_space.js`、`packages/craft-plugin/web/project/project.js`、`packages/core/manifest.json`、`packages/craft-plugin/manifest.json`、`packages/sim-plugin/manifest.json`、`scripts/build_desktop_round5_contracts.js`、生成的 `web/core/business_facade.js` 与 route/consumer evidence。团队空间对非超管移除组织写按钮并显示“请联系超管”，超管调用 v2。所有消费者迁移并通过 route gate 后才使旧 major 返回 `capability_retired`；REST 只可作为同一 Gateway Capability 的兼容绑定。
 
