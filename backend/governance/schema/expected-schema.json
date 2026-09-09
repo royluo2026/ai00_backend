@@ -1,7 +1,7 @@
 {
   "database_name": "ai00_test",
   "isolation_profile": "single_database_domain_tables",
-  "schema_sha256": "sha256:d37a1618a3c4604cdf42848bdd42a5c59764251bb975cb806c7ad4d9e6be4a27",
+  "schema_sha256": "sha256:62b2879d872234e608c2747d8c0002f1af58af9ca252d53f782169477054d88b",
   "schema_version": 1,
   "tables": [
     {
@@ -23473,6 +23473,549 @@
       "runtime_domain": "craft",
       "sources": [
         "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "legacy_kind",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "legacy_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "repository_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "logical_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "revision_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "source_operation_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "mapping_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "legacy_kind",
+            "legacy_gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "repository_gid",
+            "logical_gid"
+          ],
+          "name": "idx_craft_bop_map_repository",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_craft_bop_repository_id_map",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "sources": [
+        "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "migration_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": "'report_only'",
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "preliminary_high_water_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "preliminary_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "fence_activation_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "final_high_water_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "fenced_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "INT UNSIGNED",
+          "default": "0",
+          "extra": "",
+          "name": "active_lease_count",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": "1",
+          "extra": "",
+          "name": "row_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "migration_key"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_craft_bop_repository_migration_control",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "sources": [
+        "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "capability_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "expires_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "expires_at"
+          ],
+          "name": "idx_craft_bop_migration_lease_expiry",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_craft_bop_repository_migration_leases",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "sources": [
+        "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "legacy_kind",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "legacy_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "reason_code",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "details_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "resolved_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "legacy_kind",
+            "legacy_gid",
+            "reason_code"
+          ],
+          "name": "uq_craft_bop_quarantine_legacy",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_craft_bop_repository_quarantine",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "sources": [
+        "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "AUTO_INCREMENT",
+          "name": "journal_seq",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "lease_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(128)",
+          "default": null,
+          "extra": "",
+          "name": "capability_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "result_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "result_json",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ]
+        }
+      ],
+      "constraints": [],
+      "indexes": [
+        {
+          "columns": [
+            "journal_seq"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "lease_gid"
+          ],
+          "name": "uq_craft_bop_journal_lease",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_craft_bop_repository_write_journal",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "sources": [
+        "backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql"
       ]
     },
     {

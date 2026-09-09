@@ -1,6 +1,6 @@
 {
   "registry_version": 1,
-  "table_count": 350,
+  "table_count": 355,
   "tables": [
     {
       "table": "workmanship_agent_canvas_audit_events",
@@ -884,6 +884,31 @@
     },
     {
       "table": "workmanship_craft_bop_repositories",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_craft_bop_repository_id_map",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_craft_bop_repository_migration_control",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_craft_bop_repository_migration_leases",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_craft_bop_repository_quarantine",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_craft_bop_repository_write_journal",
       "owner": "craft",
       "runtime_domain": "craft"
     },

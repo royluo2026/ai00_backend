@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import Any
+import inspect
 
 from backend.capability_v2.contracts import (
     AutomationLevel,
@@ -657,7 +658,24 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
 
 def register_capability(registry: Any, spec: Any, handler: Any) -> None:
     governed = _governed_spec(spec)
-    registry.register(governed, handler, descriptor=descriptor_for(governed))
+    descriptor = descriptor_for(governed)
+    selected = handler
+    if (descriptor.side_effect_level is not SideEffectLevel.READ
+            and governed.id.startswith("craft.bop.") and "experimental" not in governed.tags):
+        def guarded(payload, context, _handler=handler, _id=governed.id):
+            from ..data.bop_migration_fence import legacy_write_lease
+            lease=legacy_write_lease(_id,context);box=lease.__enter__()
+            try: result=_handler(payload,context)
+            except BaseException as exc:lease.__exit__(type(exc),exc,exc.__traceback__);raise
+            if inspect.isawaitable(result):
+                async def complete():
+                    try:
+                        value=await result;box["result"]=value;lease.__exit__(None,None,None);return value
+                    except BaseException as exc:lease.__exit__(type(exc),exc,exc.__traceback__);raise
+                return complete()
+            box["result"]=result;lease.__exit__(None,None,None);return result
+        selected=guarded
+    registry.register(governed, selected, descriptor=descriptor)
 
 
 class NativeContractRegistry:

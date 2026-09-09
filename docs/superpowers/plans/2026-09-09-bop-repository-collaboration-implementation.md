@@ -392,14 +392,14 @@ git commit -m "feat(craft): add bop diff import and proposals"
 ### Task 9: Maintenance Fence and Legacy Backfill
 
 **Files:**
-- Create: `backend/db/migrations/domains/craft/0011_bop_repository_backfill_control.sql`
+- Create: `backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql`
 - Create: `scripts/migrate_bop_repositories.py`
 - Create: `backend/tests/test_bop_repository_backfill.py`
 
 **Interfaces:**
 - Produces preliminary snapshot, atomic fence activation token, lease drain, final high-water, delta replay, reconciliation report and cutover readiness result.
 
-- [ ] **Step 1: Write failing race tests**
+- [x] **Step 1: Write failing race tests**
 
 ```python
 def test_writes_between_preliminary_watermark_and_fence_are_replayed(harness):
@@ -411,26 +411,26 @@ def test_writes_between_preliminary_watermark_and_fence_are_replayed(harness):
     assert result.lost_write_count == 0
 ```
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `python -m pytest backend/tests/test_bop_repository_backfill.py -q`
 
 Expected: FAIL.
 
-- [ ] **Step 3: Implement resumable backfill and dry-run default**
+- [x] **Step 3: Implement resumable backfill and dry-run default**
 
 The script defaults to report-only. Mutation mode requires an explicit environment switch, installs the guard, atomically records fence activation, drains old leases, records final high-water, replays `(preliminary, final]`, and emits count/hash/quarantine evidence. It never enables the production cutover or approval itself.
 
-- [ ] **Step 4: Run GREEN**
+- [x] **Step 4: Run GREEN**
 
 Run: `python -m pytest backend/tests/test_bop_repository_backfill.py backend/tests/test_domain_migration_runner.py -q`
 
 Expected: PASS for both race injections, retries, interruption recovery and zero lost writes.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
-git add backend/db/migrations/domains/craft/0011_bop_repository_backfill_control.sql scripts/migrate_bop_repositories.py backend/tests/test_bop_repository_backfill.py
+git add backend/db/migrations/domains/craft/0012_bop_repository_backfill_control.sql scripts/migrate_bop_repositories.py backend/tests/test_bop_repository_backfill.py
 git commit -m "feat(craft): add fenced bop repository backfill"
 ```
 
