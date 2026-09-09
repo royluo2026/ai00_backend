@@ -29,14 +29,13 @@
 
 **Files:**
 - Create: `docs/governance/changes/2026-09-09-bop-repository-collaboration.md`
-- Modify: `backend/governance/domain_table_ownership.json`
 - Test: `backend/tests/test_bop_repository_governance_inventory.py`
 
 **Interfaces:**
 - Consumes: current Craft/Simulation Capability registries, provider registrations, migration inventory and Catalog release projections.
 - Produces: an advisory inventory with exact reuse decisions, candidate IDs, owner paths, affected consumers and independent governance states.
 
-- [ ] **Step 1: Write the failing inventory test**
+- [x] **Step 1: Write the failing inventory test**
 
 ```python
 def test_change_record_lists_every_candidate_without_claiming_approval():
@@ -47,30 +46,26 @@ def test_change_record_lists_every_candidate_without_claiming_approval():
     assert "runtime_verified: unverified" in text
 ```
 
-- [ ] **Step 2: Run the test and verify RED**
+- [x] **Step 2: Run the test and verify RED**
 
 Run: `python -m pytest backend/tests/test_bop_repository_governance_inventory.py -q`
 
 Expected: FAIL because the change record does not exist.
 
-- [ ] **Step 3: Inspect and record authoritative context**
+- [x] **Step 3: Inspect and record authoritative context**
 
 Run read-only searches over `plugins/craft/craft_backend/capabilities`, `plugins/simulation/simulation_backend/capabilities`, `backend/governance`, current migrations, API consumers and frontend invocations. Record each candidate using the governance proposal template, and classify legacy `craft.bop.fork.change.apply@1` as non-reusable for Repository semantics because it lacks target project uniqueness, Preview/Apply portability, workflow and immutable space versions.
 
-- [ ] **Step 4: Add Craft ownership declarations**
+- [x] **Step 4: Run the inventory test**
 
-Add every `workmanship_craft_bop_*` table from Task 2 to `domain_table_ownership.json` with domain `craft`; do not add Simulation tables to Craft.
-
-- [ ] **Step 5: Run the inventory and ownership tests**
-
-Run: `python -m pytest backend/tests/test_bop_repository_governance_inventory.py backend/tests/test_domain_table_ownership.py -q`
+Run: `python -m pytest backend/tests/test_bop_repository_governance_inventory.py -q`
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
-git add docs/governance/changes/2026-09-09-bop-repository-collaboration.md backend/governance/domain_table_ownership.json backend/tests/test_bop_repository_governance_inventory.py
+git add docs/governance/changes/2026-09-09-bop-repository-collaboration.md backend/tests/test_bop_repository_governance_inventory.py
 git commit -m "docs(governance): inventory bop repository capabilities"
 ```
 
@@ -80,6 +75,7 @@ git commit -m "docs(governance): inventory bop repository capabilities"
 - Create: `backend/db/migrations/domains/craft/0010_bop_repositories.sql`
 - Create: `backend/tests/test_bop_repository_migration.py`
 - Modify: `backend/governance/domain_table_inventory.json`
+- Modify: `backend/governance/domain_table_ownership.json`
 
 **Interfaces:**
 - Consumes: snowflake decimal GIDs and existing Craft migration runner.
@@ -612,4 +608,5 @@ Write commands, raw outcomes, revision hashes and unavailable identifiers. Keep 
 git add docs/governance/reports/2026-09-09-bop-repository-collaboration-readiness.md docs/superpowers/plans/2026-09-09-bop-repository-collaboration-implementation.md
 git commit -m "docs(governance): report bop collaboration readiness"
 ```
+
 
