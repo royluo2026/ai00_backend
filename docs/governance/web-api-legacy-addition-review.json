@@ -17,11 +17,11 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 1001,
-          "end_line": 1010,
-          "sha256": "4ac274a86cc2272aca28a1fc343433594b21b61f45ac4ea1ca4607de27fa7048"
+          "start_line": 1008,
+          "end_line": 1017,
+          "sha256": "99f0545db5c3547dc269c3eb47d3c73452c510ac326ad161b7c0c53fbb93bdac"
         },
-        "expected_target_invocation": "invoke_agent_capability(\n        \"agent.session.change.apply\", {\"operation\": \"delete\", \"session_gid\": gid}, _user\n    )"
+        "expected_target_invocation": "invoke_agent_capability(\n        \"agent.session.change.apply\", {\"operation\": \"delete\", \"session_gid\": gid}, _user, principal=principal,\n    )"
       }
     },
     {
@@ -36,9 +36,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 318,
+          "start_line": 319,
           "end_line": 321,
-          "sha256": "682b73e87b1566db4c9a0aa29d2d1066d265cc324b1d3d8d6915433acfb4fa20"
+          "sha256": "401c79ed7ff05b48c161053518ba06571b13e989e568cf7fd80d79b1596e4868"
         },
         "delegation_symbol": "_invoke_change",
         "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"equipments.update\", gid=gid, record=body.dict(exclude_unset=True))",
@@ -46,7 +46,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 57,
           "end_line": 78,
-          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+          "sha256": "2e3a650293837150ff6f75246dd7d4efc12b4804f128910b8e83ebef0971fa94"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -71,9 +71,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 306,
+          "start_line": 307,
           "end_line": 309,
-          "sha256": "b9619aa854db1da16b8915b3391c67fc57b58f6325ae7a62108713588666f928"
+          "sha256": "468113cc7518c7061031cea2edf6a38326a478db66d48a041cb0052e463f0c37"
         },
         "delegation_symbol": "_invoke_change",
         "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"equipments.create\", record=body.dict(exclude_unset=True))",
@@ -81,7 +81,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 57,
           "end_line": 78,
-          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+          "sha256": "2e3a650293837150ff6f75246dd7d4efc12b4804f128910b8e83ebef0971fa94"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -98,9 +98,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 301,
+          "start_line": 302,
           "end_line": 303,
-          "sha256": "7418c34abcea388df0af1ba6669e10b51ce7b80b2468b8e3ceed816d9089a31e"
+          "sha256": "0703bef1a1231e691c27c8df88cc428dd6feccfaa654320a80eec406cca5f6f1"
         },
         "delegation_symbol": "_invoke_library",
         "expected_delegation": "_invoke_library(request, current_user, principal, gateway, \"equipments.list\")",
@@ -108,7 +108,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 41,
           "end_line": 54,
-          "sha256": "ba940f7b7cd9f8921759d5770f8764629c1be2de2048752f102fb99609f45a66"
+          "sha256": "210fb78893d10e55a56f1fd19ebd93e30768d1f02bc4b1ac0ccd94cbeaf17db8"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.read\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -185,11 +185,11 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/skills_v2.py",
-          "start_line": 64,
+          "start_line": 65,
           "end_line": 75,
-          "sha256": "336a26e2841610988c818ad1020bdbe55b77428aa431e7e57bcf232a572bae8b"
+          "sha256": "09797f36567c5cfaa5c981986d9d38f2ffec48326fdf084ac5777ed71c574678"
         },
-        "expected_target_invocation": "invoke_agent_capability(\"agent.skill.change.apply\", payload, user)"
+        "expected_target_invocation": "invoke_agent_capability(\"agent.skill.change.apply\", payload, user, principal=principal)"
       }
     },
     {
@@ -297,9 +297,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 356,
+          "start_line": 357,
           "end_line": 358,
-          "sha256": "44892289c66e1509d2a701d5af0026cc2ab8edb2c9823ee9d21f63338010fecb"
+          "sha256": "872c0012ea33bf799cdc599d78e679bc54f1ddfce4793e30f03d5725b733b196"
         },
         "delegation_symbol": "_invoke_library",
         "expected_delegation": "_invoke_library(request, current_user, principal, gateway, \"fasteners.list\")",
@@ -307,7 +307,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 41,
           "end_line": 54,
-          "sha256": "ba940f7b7cd9f8921759d5770f8764629c1be2de2048752f102fb99609f45a66"
+          "sha256": "210fb78893d10e55a56f1fd19ebd93e30768d1f02bc4b1ac0ccd94cbeaf17db8"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.read\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -455,11 +455,11 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/skills_v2.py",
-          "start_line": 41,
+          "start_line": 42,
           "end_line": 61,
-          "sha256": "3877f3041e4a24f51ee8fa91efdccc788fdbb9714a0b1baf19044f3a3dce81e3"
+          "sha256": "45efed09a9e9596e56c293d1bf87f5f21f4899e0a9c55125d59f7c9e793d17a1"
         },
-        "expected_target_invocation": "invoke_agent_capability(\"agent.skill.change.apply\", payload, user)"
+        "expected_target_invocation": "invoke_agent_capability(\"agent.skill.change.apply\", payload, user, principal=principal)"
       }
     },
     {
@@ -504,9 +504,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/rule_engine.py",
-          "start_line": 42,
+          "start_line": 43,
           "end_line": 44,
-          "sha256": "e0502436fb510ad58480ac5e2084266ff3a124e5e2b9b2a36d7d96c7356880ab"
+          "sha256": "7ec3d92d0363cc940ab4a5a631b43e0ffcaf3b7a34e77be40cdda4215e9adc55"
         },
         "delegation_symbol": "_invoke_rule_engine",
         "expected_delegation": "_invoke_rule_engine(request, user, principal, gateway, \"check\", rule_gid=body.rule_gid, context=body.context)",
@@ -575,8 +575,8 @@
         "binding": {
           "source_path": "plugins/craft/craft_backend/routers/lists.py",
           "start_line": 57,
-          "end_line": 66,
-          "sha256": "d23e41b20ee8f9a46e10a086f79c38f433be73f3dfa1c393a22cfd3b3597392e"
+          "end_line": 71,
+          "sha256": "f7fef265701c240e46f0d650b14cf205e83de56de0f960cbbcd4ea841d8b8fc9"
         },
         "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.list.change.apply\" if write else \"project.list.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user,\n        principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
       },
@@ -613,9 +613,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 361,
+          "start_line": 362,
           "end_line": 380,
-          "sha256": "547d759515720f6f6621efc43ac221a36436033aa64676c5041dfdd84a7dda63"
+          "sha256": "1257abf60765f2fcf7a89a1fe19002c391c39189b6ff77d51169714e608ce256"
         },
         "delegation_symbol": "_invoke_change",
         "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"fasteners.create\", record=body.dict(exclude_unset=True))",
@@ -623,7 +623,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 57,
           "end_line": 78,
-          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+          "sha256": "2e3a650293837150ff6f75246dd7d4efc12b4804f128910b8e83ebef0971fa94"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -640,9 +640,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 383,
+          "start_line": 384,
           "end_line": 392,
-          "sha256": "862e104a1a0057d71d5115bf3e539a434150156e1461c8709aa12c80f71c8ff6"
+          "sha256": "63134faab6590b4935ed1dbf172b23f9f3e9b2d57c9994af728ea60db4e5aa3d"
         },
         "delegation_symbol": "_invoke_change",
         "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"fasteners.delete\", gid=gid)",
@@ -650,7 +650,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 57,
           "end_line": 78,
-          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+          "sha256": "2e3a650293837150ff6f75246dd7d4efc12b4804f128910b8e83ebef0971fa94"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -667,9 +667,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 395,
+          "start_line": 396,
           "end_line": 401,
-          "sha256": "f35a6d7f48ec646949899b8c969a76a8c4fbc0ab64059d37feb6e88fbcc9ce5e"
+          "sha256": "0a6c01838cb2a913169751acf4246645042350b56915d068c7ebcbbae3f5db51"
         },
         "delegation_symbol": "_invoke_change",
         "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"fasteners.update\", gid=gid, record=body.dict(exclude_unset=True))",
@@ -677,7 +677,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 57,
           "end_line": 78,
-          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+          "sha256": "2e3a650293837150ff6f75246dd7d4efc12b4804f128910b8e83ebef0971fa94"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -694,16 +694,16 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
-          "start_line": 571,
-          "end_line": 573,
-          "sha256": "f271df333fb24b7b8d3863e36656cfb5350cf3b6d4305906c36ce04a8594bf75"
+          "start_line": 575,
+          "end_line": 576,
+          "sha256": "3fab70e3fdafaf96340c6b229db6c2831d31fcd41c45f7acc414cda73ec02ebf"
         },
         "delegation_symbol": "_invoke_lark_write",
         "expected_delegation": "_invoke_lark_write(request, user, principal, gateway, {\"operation\": \"sheets.write\", \"user_access_token\": body.user_access_token, \"spreadsheet_token\": body.spreadsheet_token, \"sheet_id\": body.sheet_id, \"values\": [body.headers] + body.rows})",
         "binding": {
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
-          "start_line": 218,
-          "end_line": 231,
+          "start_line": 219,
+          "end_line": 232,
           "sha256": "3e57b04fa892540e35303e1950b70880e77cdab799adc808ec82755b48a30b26"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.data_exchange.lark.write\", payload=payload,\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n    )"
@@ -721,16 +721,16 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
-          "start_line": 539,
-          "end_line": 541,
-          "sha256": "a3bf071cdd595cdb8522292f1435f6899e52297e07c0f52d27ec84be9e9950fa"
+          "start_line": 543,
+          "end_line": 544,
+          "sha256": "245aebe1a6e235078cc00894cf1443da4fe0409043e38536b44d50f1587defc8"
         },
         "delegation_symbol": "_invoke_lark_read",
         "expected_delegation": "_invoke_lark_read(request, user, principal, gateway, {\"operation\": \"sheets.read\", **body.model_dump()})",
         "binding": {
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
-          "start_line": 204,
-          "end_line": 215,
+          "start_line": 205,
+          "end_line": 216,
           "sha256": "5b707450714f4a6c210955e1f94993a202f27c91256410f10ae7abc1e07324f5"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.data_exchange.lark.read\", payload=payload,\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
@@ -748,9 +748,9 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/std_op.py",
-          "start_line": 103,
-          "end_line": 105,
-          "sha256": "b6c90b1c041846a5a20b5d59980b4f6dc1094b8d9508a6e63bbfc085fb1b736f"
+          "start_line": 122,
+          "end_line": 123,
+          "sha256": "33dc93e81f0097285ca89abb43606c2782e9df19fb824bc58f736439f8ffc543"
         },
         "expected_target_invocation": "_invoke_standard_operation(request, current_user, principal, gateway, \"craft.standard_operation.change.apply\", \"publish\", gid=gid)"
       }
@@ -767,9 +767,9 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/std_op.py",
-          "start_line": 108,
-          "end_line": 110,
-          "sha256": "7ea56acce8d3f20a5e2968bf5388b7dd5ce139e8ad5f5a4d7cc1ccb44653aedc"
+          "start_line": 127,
+          "end_line": 128,
+          "sha256": "fed05b6c933dff5a44cb7ba3fe6ac52a2ab0422924c1d4ddfef42a7ccca3807b"
         },
         "expected_target_invocation": "_invoke_standard_operation(request, current_user, principal, gateway, \"craft.standard_operation.change.apply\", \"deprecate\", gid=gid)"
       }
@@ -786,11 +786,11 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/std_op.py",
-          "start_line": 83,
-          "end_line": 85,
-          "sha256": "292aed98775d63c137223c9bb91250d7d5cce1441b3d5e43221190a7fd97e376"
+          "start_line": 102,
+          "end_line": 103,
+          "sha256": "9a2628b6838411f1dde8f6647a917b673826eb4ac494554796f0f26679b252c3"
         },
-        "expected_target_invocation": "_invoke_standard_operation(request, current_user, principal, gateway, \"craft.standard_operation.change.apply\", \"create\", record=body.model_dump())"
+        "expected_target_invocation": "_invoke_standard_operation(request, current_user, principal, gateway, \"craft.standard_operation.change.apply\", \"create\", record=body.model_dump(exclude_none=True))"
       }
     },
     {
@@ -805,9 +805,9 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/std_op.py",
-          "start_line": 78,
-          "end_line": 80,
-          "sha256": "bbc63a943ccbfa956b1ae85933e3a161ba280abd64abed44f5677a4aa681e1a6"
+          "start_line": 97,
+          "end_line": 98,
+          "sha256": "e1ec31bd38f44cb9a55330404c8b24d092fef009107728906dd10838c32c20d4"
         },
         "expected_target_invocation": "_invoke_standard_operation(request, current_user, principal, gateway, \"craft.standard_operation.read\", \"list\", status=status)"
       }
@@ -862,9 +862,9 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/ebom.py",
-          "start_line": 341,
+          "start_line": 342,
           "end_line": 359,
-          "sha256": "3ac5b67ea2ab83a6347296c4235a9cd43ec586ff7955afa6aded6ef6f802214a"
+          "sha256": "25a0627a84ad38e2ce74d42657bdca4dae8fb225225f727f6802bf49ae4948f5"
         },
         "expected_target_invocation": "_invoke_pbom(request, current_user, principal, gateway, \"craft.pbom.part.search\", {\n        \"version_gid\": gid,\n        \"limit\": limit,\n    })"
       }
@@ -881,9 +881,9 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/ebom.py",
-          "start_line": 240,
+          "start_line": 241,
           "end_line": 252,
-          "sha256": "3c1c5071944173a297e6b942f7334cc1dd010234c9c6df251f9a91cf1c00a7d9"
+          "sha256": "9cb02982c3e172279c143b91d1e4b0e15b6317ddbab668c099ec8f7ba25bd7e9"
         },
         "expected_target_invocation": "_invoke_pbom(request, current_user, principal, gateway, \"craft.pbom.version.search\", {\n        \"project_ref\": project_gid,\n        \"limit\": 200,\n    })"
       }
@@ -900,9 +900,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 283,
+          "start_line": 284,
           "end_line": 290,
-          "sha256": "5f28fac1d50ff1a1e8f95d7f66236eb951afe995558aab9da428b6913e5b972a"
+          "sha256": "63a8ed4953a370395c9d578141fde29880857e0cc562e3d73c1204c711611e8c"
         },
         "delegation_symbol": "_invoke_change",
         "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"tools.update\", gid=gid, record=body.dict(exclude_unset=True))",
@@ -910,7 +910,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 57,
           "end_line": 78,
-          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+          "sha256": "2e3a650293837150ff6f75246dd7d4efc12b4804f128910b8e83ebef0971fa94"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -927,9 +927,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 271,
+          "start_line": 272,
           "end_line": 280,
-          "sha256": "536e9959613c19f9ef3d63f1ce1ebf7f8402ddbe585ee7510506ed5713f6782c"
+          "sha256": "7435e8052b95a244c204dcbd494511b4672f9e1e9c76bc9df8ffe666614b7f2f"
         },
         "delegation_symbol": "_invoke_change",
         "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"tools.delete\", gid=gid)",
@@ -937,7 +937,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 57,
           "end_line": 78,
-          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+          "sha256": "2e3a650293837150ff6f75246dd7d4efc12b4804f128910b8e83ebef0971fa94"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -954,9 +954,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 247,
+          "start_line": 248,
           "end_line": 268,
-          "sha256": "f60c1983293c4a948b6d656a055468c9573048cb1966cdcacef77041361ce06d"
+          "sha256": "29a4d19860216b9646aaa4d219b462edb989df6ec25a11d042f81eaaeaa10396"
         },
         "delegation_symbol": "_invoke_change",
         "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"tools.create\", record=body.dict(exclude_unset=True))",
@@ -964,7 +964,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 57,
           "end_line": 78,
-          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+          "sha256": "2e3a650293837150ff6f75246dd7d4efc12b4804f128910b8e83ebef0971fa94"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -981,9 +981,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 242,
+          "start_line": 243,
           "end_line": 244,
-          "sha256": "09bcb4ade4c247b15c9abc36d2534eb9f010b7dd392329761c00ceef4053781d"
+          "sha256": "c46d6a81f32ae17762419034c0e003b4d953aa9d69ff9049053021a28416cd36"
         },
         "delegation_symbol": "_invoke_library",
         "expected_delegation": "_invoke_library(request, current_user, principal, gateway, \"tools.list\")",
@@ -991,7 +991,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 41,
           "end_line": 54,
-          "sha256": "ba940f7b7cd9f8921759d5770f8764629c1be2de2048752f102fb99609f45a66"
+          "sha256": "210fb78893d10e55a56f1fd19ebd93e30768d1f02bc4b1ac0ccd94cbeaf17db8"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.read\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -1008,9 +1008,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 490,
+          "start_line": 491,
           "end_line": 520,
-          "sha256": "831f413f78e15835e3aaea20ae083d9d0d98d17bc78fad4cdc74951ad02c5873"
+          "sha256": "c585dea9580cb43318abe1cdf0eec8f7414ca148ea58f9e470abe4ace22cb528"
         },
         "delegation_symbol": "_invoke_change",
         "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"part_names.batch_add_from_pbom\", items=[item.dict() for item in body.entries], meta=body.meta)",
@@ -1018,7 +1018,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 57,
           "end_line": 78,
-          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+          "sha256": "2e3a650293837150ff6f75246dd7d4efc12b4804f128910b8e83ebef0971fa94"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -1035,9 +1035,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 534,
+          "start_line": 535,
           "end_line": 575,
-          "sha256": "440a2ed3ab7f317b89d2f984eff01699debe18b37afb66f6750b88fb967e298b"
+          "sha256": "c0866fae8aa83dfa499d97f81285301d72acc849604250cd7fda9dc918c93194"
         },
         "delegation_symbol": "_invoke_change",
         "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"part_names.batch_accept_alias\", items=[item.dict() for item in body.items], meta=body.meta)",
@@ -1045,7 +1045,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 57,
           "end_line": 78,
-          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+          "sha256": "2e3a650293837150ff6f75246dd7d4efc12b4804f128910b8e83ebef0971fa94"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -1062,9 +1062,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 580,
+          "start_line": 581,
           "end_line": 606,
-          "sha256": "049f9b5d3ead1c87fa77014389cca197907b5bdae61af6ab748d192eefa172f3"
+          "sha256": "ef574367811625c8e2b924e46e88136528460f94414e9ecafacc03217d4d3a19"
         },
         "delegation_symbol": "_invoke_change",
         "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"part_names.accept_alias\", gid=gid, alias=body.alias, record={\"pbom_part_gid\": body.pbom_part_gid})",
@@ -1072,7 +1072,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 57,
           "end_line": 78,
-          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+          "sha256": "2e3a650293837150ff6f75246dd7d4efc12b4804f128910b8e83ebef0971fa94"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -1089,9 +1089,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 457,
+          "start_line": 458,
           "end_line": 468,
-          "sha256": "9ee0440cad539508088c5d7520e34cc66d363fd876aac8ea5825fef311a3b5ec"
+          "sha256": "82dd50a8ed506a18e66c54c0056e8570c416a173f5bdcae9057c7847a85fdb42"
         },
         "delegation_symbol": "_invoke_change",
         "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"part_names.update\", gid=gid, record=body.dict(exclude_unset=True))",
@@ -1099,7 +1099,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 57,
           "end_line": 78,
-          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+          "sha256": "2e3a650293837150ff6f75246dd7d4efc12b4804f128910b8e83ebef0971fa94"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -1116,9 +1116,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 445,
+          "start_line": 446,
           "end_line": 454,
-          "sha256": "07c96b0420bc3da6f17492c99e3f4186d03804e5211f7857314c3ae0a287bf49"
+          "sha256": "6d6de15b0fb96a2be63834d691fc82275e683d2dbd84774cebf4130cd93505ec"
         },
         "delegation_symbol": "_invoke_change",
         "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"part_names.delete\", gid=gid)",
@@ -1126,7 +1126,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 57,
           "end_line": 78,
-          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+          "sha256": "2e3a650293837150ff6f75246dd7d4efc12b4804f128910b8e83ebef0971fa94"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -1143,9 +1143,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 417,
+          "start_line": 418,
           "end_line": 442,
-          "sha256": "9c37431c98e927a69e9188de0d7d092c1b802d7bccf7304a781df3902cc222dc"
+          "sha256": "2234fe8690662e8385f5e55d6c099fd12d12eeb8d2095abe7a9359c6f9a206a7"
         },
         "delegation_symbol": "_invoke_change",
         "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"part_names.create\", record=body.dict(exclude_unset=True))",
@@ -1153,7 +1153,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 57,
           "end_line": 78,
-          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+          "sha256": "2e3a650293837150ff6f75246dd7d4efc12b4804f128910b8e83ebef0971fa94"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -1170,9 +1170,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 406,
+          "start_line": 407,
           "end_line": 414,
-          "sha256": "183a180457595bed6ae37ac43d1c73433bd096d4cb9673a1ff9492224f1d7fcc"
+          "sha256": "d43c9132eb50a03dc1f97397b2613f9d482b2b46fb221bd71cab13121f5d90fc"
         },
         "delegation_symbol": "_invoke_library",
         "expected_delegation": "_invoke_library(request, current_user, principal, gateway, \"part_names.list\", q=q)",
@@ -1180,7 +1180,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 41,
           "end_line": 54,
-          "sha256": "ba940f7b7cd9f8921759d5770f8764629c1be2de2048752f102fb99609f45a66"
+          "sha256": "210fb78893d10e55a56f1fd19ebd93e30768d1f02bc4b1ac0ccd94cbeaf17db8"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.read\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -1197,9 +1197,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 343,
+          "start_line": 344,
           "end_line": 346,
-          "sha256": "807cbf4309e5ba435884c9ef750aa753cf75fd428706a6d467f0d9d9bc597d5a"
+          "sha256": "cc88d1255e18c4ce945641c73702fe7e3258a3946f56084de3daad0d82d88418"
         },
         "delegation_symbol": "_invoke_change",
         "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"fixtures.update\", gid=gid, record=body.dict(exclude_unset=True))",
@@ -1207,7 +1207,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 57,
           "end_line": 78,
-          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+          "sha256": "2e3a650293837150ff6f75246dd7d4efc12b4804f128910b8e83ebef0971fa94"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -1232,9 +1232,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 331,
+          "start_line": 332,
           "end_line": 334,
-          "sha256": "3290ccc2a61de0e07e9f0e87277a4c34069bbccd3b44e2b21d8f6471524733fc"
+          "sha256": "1e27de558a2faee30ef7d37816ad1d5716c747f68a91144f0de7d025ac40cc1b"
         },
         "delegation_symbol": "_invoke_change",
         "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"fixtures.create\", record=body.dict(exclude_unset=True))",
@@ -1242,7 +1242,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 57,
           "end_line": 78,
-          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+          "sha256": "2e3a650293837150ff6f75246dd7d4efc12b4804f128910b8e83ebef0971fa94"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -1259,9 +1259,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 326,
+          "start_line": 327,
           "end_line": 328,
-          "sha256": "461d6430850d58d4366f5a4755399008eb3b9d45558dd9a39428796a049019f4"
+          "sha256": "1eed47c19458caed6fdcd839b9d9ed48dd610205f2828d7c31a336b0c2de48b7"
         },
         "delegation_symbol": "_invoke_library",
         "expected_delegation": "_invoke_library(request, current_user, principal, gateway, \"fixtures.list\")",
@@ -1269,7 +1269,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 41,
           "end_line": 54,
-          "sha256": "ba940f7b7cd9f8921759d5770f8764629c1be2de2048752f102fb99609f45a66"
+          "sha256": "210fb78893d10e55a56f1fd19ebd93e30768d1f02bc4b1ac0ccd94cbeaf17db8"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.read\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -1316,16 +1316,16 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
-          "start_line": 608,
-          "end_line": 610,
-          "sha256": "5db8175d5c827b21d9c849ddee3a6c5d2dcaa4c345b6c2893f256f34c34b0542"
+          "start_line": 612,
+          "end_line": 613,
+          "sha256": "12bd38781e9f88c73332d671e0e177206fcca959c3a33c69f8ad37cf3f50186e"
         },
         "delegation_symbol": "_invoke_lark_read",
         "expected_delegation": "_invoke_lark_read(request, user, principal, gateway, {\"operation\": \"bitable.read\", **body.model_dump()})",
         "binding": {
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
-          "start_line": 204,
-          "end_line": 215,
+          "start_line": 205,
+          "end_line": 216,
           "sha256": "5b707450714f4a6c210955e1f94993a202f27c91256410f10ae7abc1e07324f5"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.data_exchange.lark.read\", payload=payload,\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
@@ -1343,11 +1343,11 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
-          "start_line": 394,
-          "end_line": 432,
-          "sha256": "890761ffd6258ea027b5369d449a3a68eb6281c6cb404d1517e5c3108aafc14a"
+          "start_line": 396,
+          "end_line": 435,
+          "sha256": "171186601b60d350ae8440cc55c5dd8b0623c322e27cde9e66d904dbb2743c5b"
         },
-        "expected_target_invocation": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"craft.bop.import.preview\",\n            payload={\"document\": document},\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        )"
+        "expected_target_invocation": "invoke_compatibility(\n        gateway,\n        build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"craft.bop.import.preview\",\n            payload={\"document\": document},\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        ),\n    )"
       }
     },
     {
@@ -1510,11 +1510,11 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/canvases.py",
-          "start_line": 120,
-          "end_line": 145,
-          "sha256": "c015b6e01716eb1637838a8235ae18bd00396612d31593163c094d3b31217d7f"
+          "start_line": 41,
+          "end_line": 68,
+          "sha256": "8d61847f56e51fcd07bf9fc4e903a4253a109e42fb5d15ad8fefde7d93220068"
         },
-        "expected_target_invocation": "_invoke_canvas(request, _user, principal, gateway, \"craft.canvas.read\", \"get\", gid=gid)"
+        "expected_target_invocation": "_invoke_canvas(request, _user, principal, gateway, \"craft.canvas.read\", \"list\")"
       }
     },
     {
@@ -1529,9 +1529,9 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/canvases.py",
-          "start_line": 40,
+          "start_line": 41,
           "end_line": 68,
-          "sha256": "c34b448dd0757ae5e57025455de57415b94865cc980417ae4b0601070c5df3b8"
+          "sha256": "8d61847f56e51fcd07bf9fc4e903a4253a109e42fb5d15ad8fefde7d93220068"
         },
         "expected_target_invocation": "_invoke_canvas(request, _user, principal, gateway, \"craft.canvas.read\", \"list\")"
       }
@@ -1668,11 +1668,11 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 991,
-          "end_line": 998,
-          "sha256": "31aedd61b13e1a10361b9a8a51487eae80be1b0970ca473f1e24b759e49a97b9"
+          "start_line": 997,
+          "end_line": 1004,
+          "sha256": "2f204ab868d0fe10929dc3afa6b9d86d57b848d9275b742f43b95775227d560f"
         },
-        "expected_target_invocation": "invoke_agent_capability(\"agent.session.read\", {\"operation\": \"list\"}, _user)"
+        "expected_target_invocation": "invoke_agent_capability(\"agent.session.read\", {\"operation\": \"list\"}, _user, principal=principal)"
       }
     },
     {
@@ -1769,11 +1769,11 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/skills_v2.py",
-          "start_line": 78,
+          "start_line": 79,
           "end_line": 83,
-          "sha256": "bc3b34e5ce5bce8a56a6d73a7695b4c6098d9d45fd67bf8a531b97d582c40fd2"
+          "sha256": "732c23dbad50acea1790beac1b0b3cc0cdcc869f7f2f797860e53397f1d7b851"
         },
-        "expected_target_invocation": "invoke_agent_capability(\n        \"agent.skill.change.apply\", {\"operation\": \"delete\", \"skill_gid\": gid}, user\n    )"
+        "expected_target_invocation": "invoke_agent_capability(\n        \"agent.skill.change.apply\", {\"operation\": \"delete\", \"skill_gid\": gid}, user, principal=principal,\n    )"
       }
     },
     {
@@ -1870,9 +1870,9 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/canvases.py",
-          "start_line": 148,
+          "start_line": 149,
           "end_line": 164,
-          "sha256": "f5a4ba654d99542314f8680fe76d7e85e82f6faa8b1e671c7bc0b81e757490ca"
+          "sha256": "f02155ff69870d5a73d17c4a8041aef3ba972afb66ab80cc3db42812072344aa"
         },
         "expected_target_invocation": "_invoke_canvas(request, _user, principal, gateway, \"craft.canvas.change.apply\", \"delete\", gid=gid)"
       }
@@ -1889,11 +1889,11 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 1013,
-          "end_line": 1023,
-          "sha256": "438571906130a444a2539400b4f1b98cbd80530d3905641cdc8fccd897a7c195"
+          "start_line": 1021,
+          "end_line": 1031,
+          "sha256": "0a71454bd8bb26ba60a00ba3f7c3c82f52390722d78508c6a6448f50f307fabf"
         },
-        "expected_target_invocation": "invoke_agent_capability(\n        \"agent.session.read\", {\"operation\": \"get\", \"session_gid\": gid}, _user\n    )"
+        "expected_target_invocation": "invoke_agent_capability(\n        \"agent.session.read\", {\"operation\": \"get\", \"session_gid\": gid}, _user, principal=principal,\n    )"
       }
     },
     {
@@ -1908,11 +1908,11 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/skills_v2.py",
-          "start_line": 34,
+          "start_line": 35,
           "end_line": 38,
-          "sha256": "4fbf60744b23798a5ab5094cb947fec313b20a642496108987921a07045d8bfa"
+          "sha256": "580e3e7c9db804716defe3197d44040f743d7752cedb720bdb1d50cfe4236978"
         },
-        "expected_target_invocation": "invoke_agent_capability(\n        \"agent.skill.read\", {\"operation\": \"list\", \"scope_filter\": scope_filter}, user\n    )"
+        "expected_target_invocation": "invoke_agent_capability(\n        \"agent.skill.read\", {\"operation\": \"list\", \"scope_filter\": scope_filter}, user, principal=principal,\n    )"
       }
     },
     {
@@ -1987,9 +1987,9 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/ebom.py",
-          "start_line": 255,
+          "start_line": 256,
           "end_line": 270,
-          "sha256": "4a9b98a4e049a78925d09fca9de3cf7bbd33299d19d1cd3e5581a2247d2cc23f"
+          "sha256": "03dbf76213734de27daa256944eb66287f578500d29b96db82c4b370e1ffe91d"
         },
         "expected_target_invocation": "_invoke_pbom(request, current_user, principal, gateway, \"craft.pbom.version.create\", {\n        \"project_ref\": body.project_gid or \"\",\n        \"project_gid\": body.project_gid,\n        \"version_tag\": body.version_tag,\n        \"name\": body.name,\n        \"source_type\": body.source_type,\n    }, write=True)"
       }
@@ -2006,9 +2006,9 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/canvases.py",
-          "start_line": 71,
+          "start_line": 72,
           "end_line": 117,
-          "sha256": "9047b9fe32b15a90df07e87dee352029532c2cc4cd511e81e01a924b8ad703bd"
+          "sha256": "8c0e6d06f6116c6048cb097a322fb775135bf9e9a445dab09fb20348de4cf311"
         },
         "expected_target_invocation": "_invoke_canvas(request, _user, principal, gateway, \"craft.canvas.change.apply\", \"save\", gid=body.get(\"gid\"), record=body)"
       }
@@ -2047,7 +2047,7 @@
           "end_line": 60,
           "sha256": "5b3835ef26dd5342c3b99640d3c4bf6674a930688b4b65fedf5151425b325f0e"
         },
-        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.approval.change.apply\" if write else \"project.approval.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+        "expected_facade_binding": "invoke_compatibility(gateway, build_web_compatibility_envelope(\n        gateway, capability_id=\"project.approval.change.apply\" if write else \"project.approval.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    ))"
       },
       "round_4_change": "re_retained"
     },
@@ -2085,7 +2085,7 @@
           "end_line": 60,
           "sha256": "5b3835ef26dd5342c3b99640d3c4bf6674a930688b4b65fedf5151425b325f0e"
         },
-        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.approval.change.apply\" if write else \"project.approval.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+        "expected_facade_binding": "invoke_compatibility(gateway, build_web_compatibility_envelope(\n        gateway, capability_id=\"project.approval.change.apply\" if write else \"project.approval.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    ))"
       },
       "round_4_change": "re_retained"
     },
@@ -2123,7 +2123,7 @@
           "end_line": 60,
           "sha256": "5b3835ef26dd5342c3b99640d3c4bf6674a930688b4b65fedf5151425b325f0e"
         },
-        "expected_facade_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"project.approval.change.apply\" if write else \"project.approval.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    )"
+        "expected_facade_binding": "invoke_compatibility(gateway, build_web_compatibility_envelope(\n        gateway, capability_id=\"project.approval.change.apply\" if write else \"project.approval.read\",\n        payload={\"operation\": operation, \"arguments\": arguments}, current_user=user, principal=principal,\n        request_id=request_id, trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") if write else None,\n        approval_reference=request.headers.get(\"X-Capability-Approval\") if write else None,\n    ))"
       },
       "round_4_change": "re_retained"
     },
@@ -2169,17 +2169,17 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 883,
-          "end_line": 889,
-          "sha256": "b0029f9a2df847fd0db5f68d9d1bca1a9b6965c03ee4ad50be7b9d8d3cc8328d"
+          "start_line": 888,
+          "end_line": 893,
+          "sha256": "e61b42d1e10af315a575b5d1bdb2d82424ad383d14dcc944297c58a5a092092f"
         },
         "delegation_symbol": "_invoke_confirmed_catalog_tool",
         "expected_delegation": "_invoke_confirmed_catalog_tool(request, _user, principal, gateway, {**body, \"stream\": False})",
         "binding": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 70,
-          "end_line": 92,
-          "sha256": "aee613ae821c70ffa7cdbaf0dea8ab2ebec311015e17b349faf43678403a32d6"
+          "start_line": 71,
+          "end_line": 97,
+          "sha256": "f98a3f799a2251991a21b573f75593d74327ee0798cf3e92cb404adef1ce0217"
         },
         "expected_target_binding": "build_trusted_web_envelope(\n        gateway, capability_id=\"agent.catalog_tool.confirm.apply\", major_version=1,\n        payload={\n            \"confirm_token\": str(body.get(\"confirm_token\") or \"\"),\n            \"tool_name\": str(body.get(\"tool_name\") or \"\"),\n            \"session_gid\": session_gid,\n            \"tool_use_id\": str(body.get(\"tool_use_id\") or \"\"),\n        }, current_user=user, principal=principal,\n        consumer_id=\"ai00.web.agent\", request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n    )"
       }
@@ -2196,17 +2196,17 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 622,
-          "end_line": 629,
-          "sha256": "b8537ad102440ea968bb481c6dca485cf1edafc4b493347a6003f91564bd9e33"
+          "start_line": 627,
+          "end_line": 633,
+          "sha256": "35de1dae1df3480a4dca7de6e707a749089f6471b55320ff58733addae584ce7"
         },
         "delegation_symbol": "_invoke_interaction_chat",
         "expected_delegation": "_invoke_interaction_chat(request, _user, principal, gateway, {\"operation\": \"chat_stream\", \"body\": body, \"ai00_token\": x_ai00_token})",
         "binding": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 52,
-          "end_line": 64,
-          "sha256": "c2a1eb98f40bf6ac7a66d8c6c3c4214ea3e4b249002676452be4be7e4504c851"
+          "start_line": 53,
+          "end_line": 68,
+          "sha256": "14c67d189ae5e6d96ea8f464b013879673706640d15a46ceb1b8aef53c8445b0"
         },
         "expected_target_binding": "build_trusted_web_envelope(\n        gateway, capability_id=\"agent.interaction.chat.change.apply\", payload=_normalize_interaction_payload(payload),\n        current_user=user, principal=principal, consumer_id=\"ai00.web.agent\", request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        major_version=2,\n    )"
       }
@@ -2223,17 +2223,17 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 732,
-          "end_line": 739,
-          "sha256": "25a447e0004f8ef2819d439c258ada28df866d9e8fac53ea77d981554ed78029"
+          "start_line": 737,
+          "end_line": 743,
+          "sha256": "3dddcd40a59bd5fbaedf43339f0e0979114225d2200003afcf5bcb39e4b8df5d"
         },
         "delegation_symbol": "_invoke_interaction_chat",
         "expected_delegation": "_invoke_interaction_chat(request, _user, principal, gateway, {\"operation\": \"chat_sync\", \"body\": body, \"ai00_token\": x_ai00_token})",
         "binding": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 52,
-          "end_line": 64,
-          "sha256": "c2a1eb98f40bf6ac7a66d8c6c3c4214ea3e4b249002676452be4be7e4504c851"
+          "start_line": 53,
+          "end_line": 68,
+          "sha256": "14c67d189ae5e6d96ea8f464b013879673706640d15a46ceb1b8aef53c8445b0"
         },
         "expected_target_binding": "build_trusted_web_envelope(\n        gateway, capability_id=\"agent.interaction.chat.change.apply\", payload=_normalize_interaction_payload(payload),\n        current_user=user, principal=principal, consumer_id=\"ai00.web.agent\", request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        major_version=2,\n    )"
       }
@@ -2250,11 +2250,11 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 974,
-          "end_line": 986,
-          "sha256": "83a440b8852e3abd037b02f5a33cdbbe2708807ed401b31ee26b13fd0a6163e5"
+          "start_line": 980,
+          "end_line": 991,
+          "sha256": "781daf76a60167730936b25df120dab59e87a2d5a2c31013f78f7955971b2d67"
         },
-        "expected_target_invocation": "invoke_agent_capability(\"agent.interaction.cancel\", {\"session_gid\": session_gid}, _user)"
+        "expected_target_invocation": "invoke_agent_capability(\"agent.interaction.cancel\", {\"session_gid\": session_gid}, _user, principal=principal)"
       }
     },
     {
@@ -2389,9 +2389,9 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/ebom.py",
-          "start_line": 303,
+          "start_line": 304,
           "end_line": 305,
-          "sha256": "a7ad4f958b94a10924ab6329a5f68d63e363d292c9311f986a56702612123798"
+          "sha256": "110d3d5da92cb41968a774d2ae079c3bf319e86a00acd08ccad49bfc7a2c5fc3"
         },
         "expected_target_invocation": "_invoke_ebom_atomic(request, current_user, principal, gateway, \"craft.ebom.snapshot.update\", {\"snapshot_gid\": gid, \"changes\": body.model_dump(exclude_none=True)})"
       }
@@ -2408,9 +2408,9 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/canvases.py",
-          "start_line": 167,
+          "start_line": 168,
           "end_line": 191,
-          "sha256": "3d9fc82f497999ef4bc21607127060f6124a370443d3868695af119670c629f3"
+          "sha256": "7a3d14c45aaf76f5a4b05b8fee34ae031ec3dfa127d66870a95d0c79e76a9d37"
         },
         "expected_target_invocation": "_invoke_canvas(request, _user, principal, gateway, \"craft.canvas.change.apply\", \"toggle_shared\", gid=gid, record=body)"
       }
@@ -2427,11 +2427,11 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/vpps_audit.py",
-          "start_line": 67,
-          "end_line": 68,
-          "sha256": "3c214acb9862c7010f3ce75f64a7432d23629f25c0c6a13638e52c12dd51ebbc"
+          "start_line": 62,
+          "end_line": 63,
+          "sha256": "578ddeaf55c5ce37aa2f50872296325b83b5ea621ef73ce343a91e356bf6a75c"
         },
-        "expected_target_invocation": "_invoke_vpps_audit(request, user, principal, gateway, \"craft.vpps_audit.read\", \"rule4_ignores\", pbom_version_gid=pbom_version_gid)"
+        "expected_target_invocation": "_invoke_vpps_audit(request, user, principal, gateway, \"craft.vpps_audit.read\", \"list\", pbom_version_gid=pbom_version_gid, operation_type=operation_type)"
       }
     },
     {
@@ -2561,16 +2561,16 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
-          "start_line": 653,
-          "end_line": 655,
-          "sha256": "9fa5c982adb04e5658807e7ffbb6b848358a30e549b7e2883f74faa5769cc36a"
+          "start_line": 657,
+          "end_line": 658,
+          "sha256": "ddc56facc881c222d1219cbdb84598e70831606eb7ab3bdc791f9e05d14aaa5b"
         },
         "delegation_symbol": "_invoke_lark_write",
         "expected_delegation": "_invoke_lark_write(request, user, principal, gateway, {\"operation\": \"bitable.write\", **body.model_dump()})",
         "binding": {
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
-          "start_line": 218,
-          "end_line": 231,
+          "start_line": 219,
+          "end_line": 232,
           "sha256": "3e57b04fa892540e35303e1950b70880e77cdab799adc808ec82755b48a30b26"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.data_exchange.lark.write\", payload=payload,\n        current_user=user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n    )"
@@ -3516,7 +3516,7 @@
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
           "start_line": 112,
           "end_line": 144,
-          "sha256": "84c02d2286475e315a4a89c3b83506095c059292f016036a4915bbfec8256a4b"
+          "sha256": "f1fa147e1fecabda21dfd644b288e08b6c8c3530e5dc95576ed8dcc26929827a"
         },
         "expected_target_invocation": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"base.export_template.read\",\n            payload={\"module\": module, \"limit\": 500},\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        )"
       },
@@ -3534,16 +3534,16 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
-          "start_line": 235,
-          "end_line": 255,
+          "start_line": 236,
+          "end_line": 256,
           "sha256": "e70f170e3ccb0e6a83beb29355094dea5e8e4771730e6841906ee9b82b9f86ec"
         },
         "delegation_symbol": "_invoke_template_change",
         "expected_delegation": "_invoke_template_change(\n        request,\n        user,\n        principal,\n        gateway,\n        {\n            \"operation\": \"create\",\n            \"name\": body.name,\n            \"module\": body.module,\n            \"config\": body.config,\n            \"is_shared\": body.is_shared,\n        },\n    )",
         "binding": {
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
-          "start_line": 147,
-          "end_line": 175,
+          "start_line": 148,
+          "end_line": 176,
           "sha256": "b05f070e81e7905ce2e8a036b00ce8ef5271d5f71c3c552a685700510ee4a917"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"base.export_template.change.apply\",\n            payload=payload,\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n            idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n            approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        )"
@@ -3562,16 +3562,16 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
-          "start_line": 264,
-          "end_line": 283,
+          "start_line": 265,
+          "end_line": 284,
           "sha256": "fe97432123e7899b0811d885c91d7efefd32415c74648fd4014a2cf556ee08fd"
         },
         "delegation_symbol": "_invoke_template_change",
         "expected_delegation": "_invoke_template_change(\n        request,\n        user,\n        principal,\n        gateway,\n        {\n            \"operation\": \"update\",\n            \"gid\": gid,\n            \"updates\": body.model_dump(exclude_none=True),\n        },\n    )",
         "binding": {
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
-          "start_line": 147,
-          "end_line": 175,
+          "start_line": 148,
+          "end_line": 176,
           "sha256": "b05f070e81e7905ce2e8a036b00ce8ef5271d5f71c3c552a685700510ee4a917"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"base.export_template.change.apply\",\n            payload=payload,\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n            idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n            approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        )"
@@ -3590,16 +3590,16 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
-          "start_line": 307,
-          "end_line": 318,
+          "start_line": 308,
+          "end_line": 319,
           "sha256": "9cf86a1f1b485bb674617a81c4ef4d4b2ca24e19cd4059f95bd332b78004ab1d"
         },
         "delegation_symbol": "_invoke_data_exchange",
         "expected_delegation": "_invoke_data_exchange(\n        request, user, principal, gateway,\n        {\"operation\": \"excel\", \"template_config\": body.template_config, \"rows\": body.rows, \"filename\": body.filename},\n    )",
         "binding": {
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
-          "start_line": 178,
-          "end_line": 201,
+          "start_line": 179,
+          "end_line": 202,
           "sha256": "2e4e043d3f192080284bdf6d31dd8db6fe29738d4dd75f4391e4dde06ec5f8b2"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"craft.data_exchange.export\",\n            payload=payload,\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n            idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n            approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        )"
@@ -3618,16 +3618,16 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
-          "start_line": 726,
-          "end_line": 740,
+          "start_line": 729,
+          "end_line": 743,
           "sha256": "a00ec601e390aaf327b753fbf21af1a39353510ce728775441d63a862d182c15"
         },
         "delegation_symbol": "_invoke_data_exchange",
         "expected_delegation": "_invoke_data_exchange(\n        request, user, principal, gateway,\n        {\n            \"operation\": \"diff_report\", \"columns\": body.columns, \"diff_rows\": body.diff_rows,\n            \"label_a\": body.label_a, \"label_b\": body.label_b, \"filename\": body.filename,\n        },\n    )",
         "binding": {
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
-          "start_line": 178,
-          "end_line": 201,
+          "start_line": 179,
+          "end_line": 202,
           "sha256": "2e4e043d3f192080284bdf6d31dd8db6fe29738d4dd75f4391e4dde06ec5f8b2"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"craft.data_exchange.export\",\n            payload=payload,\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n            idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n            approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        )"
@@ -3646,16 +3646,16 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
-          "start_line": 898,
-          "end_line": 914,
+          "start_line": 901,
+          "end_line": 917,
           "sha256": "305f25d874a10701a24355e22f2b6b527858fb98f7cc099c93c7f30ff6fd2c58"
         },
         "delegation_symbol": "_invoke_data_exchange",
         "expected_delegation": "_invoke_data_exchange(\n        request, user, principal, gateway,\n        {\n            \"operation\": \"diff_lark_sheet\", \"user_access_token\": body.user_access_token,\n            \"spreadsheet_token\": body.spreadsheet_token, \"sheet_id\": body.sheet_id,\n            \"columns\": body.columns, \"diff_rows\": body.diff_rows,\n            \"label_a\": body.label_a, \"label_b\": body.label_b,\n        },\n    )",
         "binding": {
           "source_path": "plugins/craft/craft_backend/routers/import_export.py",
-          "start_line": 178,
-          "end_line": 201,
+          "start_line": 179,
+          "end_line": 202,
           "sha256": "2e4e043d3f192080284bdf6d31dd8db6fe29738d4dd75f4391e4dde06ec5f8b2"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n            gateway,\n            capability_id=\"craft.data_exchange.export\",\n            payload=payload,\n            current_user=user,\n            principal=principal,\n            request_id=request_id,\n            trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n            idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n            approval_reference=request.headers.get(\"X-Capability-Approval\"),\n        )"
@@ -3674,17 +3674,17 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 810,
-          "end_line": 816,
-          "sha256": "0a79b7b601d9d95b79bca87b5cd77a0bd6c1023e8ca510f15a6837fe1ac6deca"
+          "start_line": 815,
+          "end_line": 820,
+          "sha256": "29de87dbba15a5881ec814bca0428a6620b62e8dc58fa898408132cddf37e22d"
         },
         "delegation_symbol": "_invoke_confirmed_catalog_tool",
         "expected_delegation": "_invoke_confirmed_catalog_tool(request, _user, principal, gateway, {**body, \"stream\": True})",
         "binding": {
           "source_path": "plugins/agent/agent_backend/routers/ai_chat.py",
-          "start_line": 70,
-          "end_line": 92,
-          "sha256": "aee613ae821c70ffa7cdbaf0dea8ab2ebec311015e17b349faf43678403a32d6"
+          "start_line": 71,
+          "end_line": 97,
+          "sha256": "f98a3f799a2251991a21b573f75593d74327ee0798cf3e92cb404adef1ce0217"
         },
         "expected_target_binding": "build_trusted_web_envelope(\n        gateway, capability_id=\"agent.catalog_tool.confirm.apply\", major_version=1,\n        payload={\n            \"confirm_token\": str(body.get(\"confirm_token\") or \"\"),\n            \"tool_name\": str(body.get(\"tool_name\") or \"\"),\n            \"session_gid\": session_gid,\n            \"tool_use_id\": str(body.get(\"tool_use_id\") or \"\"),\n        }, current_user=user, principal=principal,\n        consumer_id=\"ai00.web.agent\", request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n        idempotency_key=request.headers.get(\"X-Idempotency-Key\") or request_id,\n        approval_reference=request.headers.get(\"X-Capability-Approval\"),\n    )"
       },
@@ -3702,11 +3702,11 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/agent/agent_backend/routers/ai_audit.py",
-          "start_line": 27,
-          "end_line": 49,
-          "sha256": "d93fd51ca18e1e8f9d31046559f292226f35a099cfccd32f0c6cb826113ddfba"
+          "start_line": 28,
+          "end_line": 51,
+          "sha256": "6718d26879d19d303d9a6361db697bfa948ff530a498687392b349c3793303f4"
         },
-        "expected_target_invocation": "invoke_agent_capability(\n        \"agent.audit.read\",\n        {\n            \"session_gid\": session_gid,\n            \"user_gid\": user_gid,\n            \"tool_name\": tool_name,\n            \"is_write\": is_write,\n            \"limit\": limit,\n            \"offset\": offset,\n        },\n        _user,\n    )"
+        "expected_target_invocation": "invoke_agent_capability(\n        \"agent.audit.read\",\n        {\n            \"session_gid\": session_gid,\n            \"user_gid\": user_gid,\n            \"tool_name\": tool_name,\n            \"is_write\": is_write,\n            \"limit\": limit,\n            \"offset\": offset,\n        },\n        _user,\n        principal=principal,\n    )"
       }
     },
     {
@@ -3721,9 +3721,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 293,
-          "end_line": 295,
-          "sha256": "d8b6667721961c337b9df469e5163026b78801be81e6b6da726a13c2d99c5344"
+          "start_line": 294,
+          "end_line": 296,
+          "sha256": "72a36af227d65a8ee32968c9039ecf9470b3a7c24660d3ff2e62b36b80bbd79c"
         },
         "delegation_symbol": "_invoke_change",
         "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"tools.obsolete\", gid=gid)",
@@ -3731,7 +3731,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 57,
           "end_line": 78,
-          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+          "sha256": "2e3a650293837150ff6f75246dd7d4efc12b4804f128910b8e83ebef0971fa94"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -3748,9 +3748,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 312,
-          "end_line": 314,
-          "sha256": "f06d1077c7b291d09248019a85bda4f3a8d1d11c26756bfca76db058d65fe3bc"
+          "start_line": 313,
+          "end_line": 315,
+          "sha256": "7d35337faa9e61ec7d26baf811ee4da18efc9e287370ab1f265350fa3dff91be"
         },
         "delegation_symbol": "_invoke_change",
         "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"equipments.obsolete\", gid=gid)",
@@ -3758,7 +3758,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 57,
           "end_line": 78,
-          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+          "sha256": "2e3a650293837150ff6f75246dd7d4efc12b4804f128910b8e83ebef0971fa94"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -3775,9 +3775,9 @@
         "kind": "exact_delegation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
-          "start_line": 337,
-          "end_line": 339,
-          "sha256": "d161067fce57e5ba2dc47acbc44f953eb732c728f2a73796fb25fafa7a1a051a"
+          "start_line": 338,
+          "end_line": 340,
+          "sha256": "84cbd5b70d445eca1a0dceb34d2113e49bc232c63ac025a04b4caf0fb1f9a6d8"
         },
         "delegation_symbol": "_invoke_change",
         "expected_delegation": "_invoke_change(request, current_user, principal, gateway, \"fixtures.obsolete\", gid=gid)",
@@ -3785,7 +3785,7 @@
           "source_path": "plugins/craft/craft_backend/routers/craft_library.py",
           "start_line": 57,
           "end_line": 78,
-          "sha256": "cdfa9103ae30aa401dec3e5627b3bd248abe8b49e2729e4f5be562765454433b"
+          "sha256": "2e3a650293837150ff6f75246dd7d4efc12b4804f128910b8e83ebef0971fa94"
         },
         "expected_target_binding": "build_web_compatibility_envelope(\n        gateway, capability_id=\"craft.library.change.apply\", payload=arguments,\n        current_user=current_user, principal=principal, request_id=request_id,\n        trace_id=request.headers.get(\"X-Trace-ID\") or request_id,\n    )"
       }
@@ -3802,9 +3802,9 @@
         "kind": "capability_invocation",
         "handler": {
           "source_path": "plugins/craft/craft_backend/routers/std_op.py",
-          "start_line": 93,
-          "end_line": 95,
-          "sha256": "4e7ead5b3063532e250feda631e7374bb6ed2bc2f7bd2fa0907a70d852008fa7"
+          "start_line": 112,
+          "end_line": 113,
+          "sha256": "f4d265ee070ff16cdc9633d06f2d80b43466664f99fab4c8bcbed73832bab9a1"
         },
         "expected_target_invocation": "_invoke_standard_operation(request, current_user, principal, gateway, \"craft.standard_operation.change.apply\", \"update\", gid=gid, record=body.model_dump(exclude_none=True))"
       }

@@ -592,23 +592,23 @@ git commit -m "feat(agent): orchestrate bop repository workflows"
 - Consumes all backend/frontend commits and real test output.
 - Produces a report with exact passed/failed/skipped checks and separate machine/human/runtime states; it does not approve or publish the release.
 
-- [ ] **Step 1: Run backend focused suites**
+- [x] **Step 1: Run backend focused suites**
 
 Run: `python -m pytest backend/tests/test_bop_repository_*.py plugins/craft/tests/test_bop_repository_*.py plugins/craft/tests/test_bop_vpps_groups.py plugins/craft/tests/test_bop_collaboration.py plugins/simulation/tests/test_workspace_version_export.py plugins/agent/tests/test_bop_repository_assistant.py -q`
 
-- [ ] **Step 2: Run governance boundaries**
+- [x] **Step 2: Run governance boundaries**
 
 Run: `python -m pytest backend/tests/test_domain_table_ownership.py backend/tests/test_domain_migration_runner.py backend/tests/test_capability_provider_loading.py backend/tests/test_capability_v2_completion.py -q`
 
-- [ ] **Step 3: Run frontend suites and build**
+- [x] **Step 3: Run frontend suites and build**
 
 Run in frontend worktree: `node --test packages/sim-plugin/web/cad_sim/*.test.js && npm run build:test`
 
-- [ ] **Step 4: Record evidence honestly**
+- [x] **Step 4: Record evidence honestly**
 
 Write commands, raw outcomes, revision hashes and unavailable identifiers. Keep `human_approved` and `runtime_verified` unverified until trusted workflows provide them; do not add candidates to a stable release.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add docs/governance/reports/2026-09-09-bop-repository-collaboration-readiness.md docs/superpowers/plans/2026-09-09-bop-repository-collaboration-implementation.md
