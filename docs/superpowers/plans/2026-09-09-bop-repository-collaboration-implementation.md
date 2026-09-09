@@ -312,7 +312,7 @@ git commit -m "feat(craft): add governed repository fork workflow"
 - Produces ordered reference/generated_initial/adjustment versions and current-pointer CAS.
 - Uses `(group_version_gid,parent_scope_gid,order_key)` uniqueness and `(target_group_gid,reference_version_gid,matcher_policy_hash)` operation identity.
 
-- [ ] **Step 1: Write failing group invariants**
+- [x] **Step 1: Write failing group invariants**
 
 ```python
 def test_root_members_use_non_null_scope_and_repeat_vpps(store):
@@ -321,23 +321,23 @@ def test_root_members_use_non_null_scope_and_repeat_vpps(store):
     assert [m["vpps_gid"] for m in version["members"]].count("900") == 2
 ```
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `python -m pytest plugins/craft/tests/test_bop_vpps_groups.py -q`
 
 Expected: FAIL.
 
-- [ ] **Step 3: Implement immutable groups and candidate capabilities**
+- [x] **Step 3: Implement immutable groups and candidate capabilities**
 
 Preserve reference versions, append generated/adjustment versions, inherit hierarchy/order during matching, and require project manager acceptance before team current advances.
 
-- [ ] **Step 4: Run GREEN**
+- [x] **Step 4: Run GREEN**
 
 Run: `python -m pytest plugins/craft/tests/test_bop_vpps_groups.py -q`
 
 Expected: PASS, including duplicate VPPS members, concurrent CAS, stable rebalance hash and cross-target generation isolation.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add plugins/craft/craft_backend/data/bop_vpps_groups.py plugins/craft/craft_backend/capabilities/bop_vpps_groups.py plugins/craft/tests/test_bop_vpps_groups.py

@@ -79,6 +79,7 @@ from .resource_requirements import register_resource_requirement_capabilities
 from .process_screenshot import register_process_screenshot_capability
 from .bop_repositories import candidate_specs as bop_repository_candidate_specs
 from .bop_repository_fork import candidate_specs as bop_repository_fork_candidate_specs
+from .bop_vpps_groups import candidate_specs as bop_vpps_group_candidate_specs
 
 
 def _authorize_bop_version(resource_id, identity) -> bool:
@@ -96,6 +97,8 @@ def register_capabilities(registry: Any) -> None:
     for spec, handler in bop_repository_candidate_specs():
         native.register(spec, handler)
     for spec, handler in bop_repository_fork_candidate_specs():
+        native.register(spec, handler)
+    for spec, handler in bop_vpps_group_candidate_specs():
         native.register(spec, handler)
     register_bop_version_capabilities(native)
     register_bop_structure_capabilities(native)

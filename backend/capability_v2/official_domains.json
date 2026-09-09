@@ -90,7 +90,7 @@
         "plugin_id": "official.craft",
         "module": "craft_backend.capabilities",
         "version": "1.2.0",
-        "artifact_hash": "sha256:734ada06108af1ef0f3ab25f813d2fa92b134a4dbe71f78de601a9fc8d93e61a"
+        "artifact_hash": "sha256:6c6c7843a3b53d737d0f8efe8ceeba98fe3a023246de55fd94235bf51e0ed4ed"
       },
       "artifact_path": "plugins/craft/craft_backend",
       "allowed_owners": [
