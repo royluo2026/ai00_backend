@@ -22,6 +22,42 @@ def _gid(value: object, field: str) -> str:
 
 
 class WorkspaceRepository:
+    def get_saved_version(self, *, workspace_gid: str, version_gid: str,
+                          tenant_gid: str, owner_gid: str) -> dict[str, Any]:
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT w.gid workspace_gid,v.gid version_gid,v.status,v.content_hash,"
+                "v.manifest_artifact_ref_json manifest_artifact_ref "
+                "FROM workmanship_sim_workspaces w JOIN workmanship_sim_workspace_versions v "
+                "ON v.workspace_gid=w.gid WHERE w.gid=%s AND v.gid=%s AND w.tenant_gid=%s "
+                "AND w.owner_gid=%s AND w.removed_at IS NULL AND v.removed_at IS NULL",
+                (_gid(workspace_gid,"workspace_gid"),_gid(version_gid,"version_gid"),
+                 _gid(tenant_gid,"tenant_gid"),_gid(owner_gid,"owner_gid")),
+            )
+            row=cursor.fetchone()
+        if not row: raise WorkspaceRepositoryError("workspace_version_not_found")
+        result=dict(row)
+        result["workspace_gid"],result["version_gid"]=str(result["workspace_gid"]),str(result["version_gid"])
+        value=result.get("manifest_artifact_ref")
+        if isinstance(value,str): result["manifest_artifact_ref"]=json.loads(value)
+        return result
+
+    def record_export_ref(self, *, export_gid: str, workspace_gid: str, version_gid: str,
+                          tenant_gid: str, owner_gid: str, target_personal_space_gid: str,
+                          target_repository_gid: str, consumer_capability_id: str,
+                          consumer_major_version: int, content_hash: str, token_digest: str,
+                          idempotency_key: str, expires_at) -> None:
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO workmanship_sim_workspace_export_refs "
+                "(gid,workspace_gid,workspace_version_gid,tenant_gid,owner_gid,target_personal_space_gid,"
+                "target_repository_gid,consumer_capability_id,consumer_major_version,content_hash,token_digest,"
+                "idempotency_key,expires_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                (export_gid,workspace_gid,version_gid,tenant_gid,owner_gid,target_personal_space_gid,
+                 target_repository_gid,consumer_capability_id,consumer_major_version,content_hash,
+                 token_digest,idempotency_key,expires_at),
+            )
+
     def create(self, *, name: str, tenant_gid: str, owner_gid: str) -> dict[str, Any]:
         workspace_gid, version_gid = str(next_gid()), str(next_gid())
         with get_simulation_conn() as conn, conn.cursor() as cursor:

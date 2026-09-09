@@ -58,6 +58,7 @@ def test_workspace_candidates_are_experimental_and_user_actions_have_no_confirma
         "simulation.environment.binding.create",
         "simulation.environment.binding.remove",
         "simulation.environment.version.freeze",
+        "simulation.environment.workspace_version.export_for_import",
     ]
     create = specs[0][0]
     assert str(create.confirmation.value if hasattr(create.confirmation, "value") else create.confirmation) == "none"

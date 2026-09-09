@@ -223,7 +223,7 @@ git commit -m "feat(craft): expose repository foundation candidates"
 - Produces: `workspace_version.get` and `workspace_version.export_for_import` candidate handlers.
 - Export token claims: caller actor, tenant, target personal/repository, consumer ID/major, source workspace/version, content hash and expiry.
 
-- [ ] **Step 1: Write failing immutable-export tests**
+- [x] **Step 1: Write failing immutable-export tests**
 
 ```python
 def test_export_ref_is_bound_to_caller_target_consumer_and_hash(provider):
@@ -235,23 +235,23 @@ def test_export_ref_is_bound_to_caller_target_consumer_and_hash(provider):
     assert claims["content_hash"] == out["content_hash"]
 ```
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `python -m pytest plugins/simulation/tests/test_workspace_version_export.py backend/tests/test_simulation_context_migration.py -q`
 
 Expected: FAIL because export and migration are absent.
 
-- [ ] **Step 3: Implement signed scoped exports**
+- [x] **Step 3: Implement signed scoped exports**
 
 Only saved immutable versions can be exported. Store token digest, scope and expiry in Simulation; return an opaque reference rather than the private manifest. Reject drifting head, wrong owner, wrong target, consumer mismatch and expiry.
 
-- [ ] **Step 4: Run GREEN**
+- [x] **Step 4: Run GREEN**
 
 Run: `python -m pytest plugins/simulation/tests/test_workspace_version_export.py backend/tests/test_simulation_context_migration.py plugins/simulation/tests/test_workspace_capabilities.py -q`
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/db/migrations/domains/simulation/0012_simulation_contexts.sql plugins/simulation/simulation_backend/data/workspace_repository.py plugins/simulation/simulation_backend/capabilities/workspaces.py plugins/simulation/tests/test_workspace_version_export.py backend/tests/test_simulation_context_migration.py

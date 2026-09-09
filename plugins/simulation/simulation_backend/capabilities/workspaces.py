@@ -7,7 +7,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+from datetime import datetime, timedelta, timezone
 from typing import Any
+
+from backend.platform_sdk.ids import next_gid
 
 from backend.capability_v2.provider_contracts import (
     CapabilityBusinessError,
@@ -19,6 +22,7 @@ from backend.capability_v2.provider_contracts import (
 
 from ..data.workspace_repository import WorkspaceRepository, WorkspaceRepositoryError
 from ..application.workspace_freeze import FreezeConflict, WorkspaceFreezeService
+from ..security.export_refs import export_ref_digest, issue_export_ref
 
 
 class _ArtifactPort:
@@ -134,6 +138,44 @@ class WorkspaceProvider:
         except (WorkspaceRepositoryError, FreezeConflict) as exc:
             raise CapabilityBusinessError(str(exc), str(exc), retryable=str(exc) == "version_conflict") from exc
 
+    def export_for_import(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+        tenant_gid, owner_gid = _scope(context)
+        try:
+            source = self.repository.get_saved_version(
+                workspace_gid=str(payload.get("workspace_gid") or ""),
+                version_gid=str(payload.get("version_gid") or ""),
+                tenant_gid=tenant_gid, owner_gid=owner_gid,
+            )
+            if source.get("status") not in {"saved", "frozen"} or not source.get("content_hash"):
+                raise WorkspaceRepositoryError("source_version_not_immutable")
+            seconds = int(payload.get("expires_in_seconds", 300))
+            now = datetime.now(timezone.utc); expires_at = now + timedelta(seconds=seconds)
+            consumer = f'{payload["consumer_capability_id"]}@{payload["consumer_major_version"]}'
+            claims = {
+                "actor_gid": owner_gid, "tenant_gid": tenant_gid,
+                "target_personal_space_gid": str(payload["target_personal_space_gid"]),
+                "target_repository_gid": str(payload["target_repository_gid"]),
+                "consumer": consumer, "workspace_gid": str(source["workspace_gid"]),
+                "version_gid": str(source["version_gid"]), "content_hash": str(source["content_hash"]),
+                "expires_at_epoch": int(expires_at.timestamp()),
+            }
+            reference = issue_export_ref(claims)
+            self.repository.record_export_ref(
+                export_gid=str(next_gid()), workspace_gid=claims["workspace_gid"],
+                version_gid=claims["version_gid"], tenant_gid=tenant_gid, owner_gid=owner_gid,
+                target_personal_space_gid=claims["target_personal_space_gid"],
+                target_repository_gid=claims["target_repository_gid"],
+                consumer_capability_id=str(payload["consumer_capability_id"]),
+                consumer_major_version=int(payload["consumer_major_version"]),
+                content_hash=claims["content_hash"], token_digest=export_ref_digest(reference),
+                idempotency_key=str(payload["idempotency_key"]), expires_at=expires_at,
+            )
+            return _output({"export_ref": reference, "content_hash": claims["content_hash"],
+                            "consumer": consumer, "expires_at": expires_at.isoformat()},
+                           workspace_gid=claims["workspace_gid"], action="workspace_version_exported")
+        except WorkspaceRepositoryError as exc:
+            raise CapabilityBusinessError(str(exc), str(exc)) from exc
+
 
 def candidate_specs(provider: WorkspaceProvider | None = None) -> tuple[tuple[CapabilitySpec, Any], ...]:
     selected = provider or WorkspaceProvider()
@@ -236,6 +278,18 @@ def candidate_specs(provider: WorkspaceProvider | None = None) -> tuple[tuple[Ca
                         "status": {"type": "string", "const": "frozen"},
                         "content_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
                         "artifact_ref": {"type": "object"}}, "additionalProperties": False}, **common), selected.freeze),
+        (CapabilitySpec(id="simulation.environment.workspace_version.export_for_import", version=1,
+                        description="Issue an owner-scoped reference to one immutable private workspace version.",
+                        risk="write", confirmation="none", idempotent=True,
+                        input_schema={"type":"object","required":["workspace_gid","version_gid","target_personal_space_gid","target_repository_gid","consumer_capability_id","consumer_major_version","expires_in_seconds","idempotency_key"],
+                        "properties":{"workspace_gid":gid,"version_gid":gid,"target_personal_space_gid":gid,
+                        "target_repository_gid":gid,"consumer_capability_id":{"type":"string","const":"craft.bop.managed_personal_space.import.preview"},
+                        "consumer_major_version":{"type":"integer","const":1},"expires_in_seconds":{"type":"integer","minimum":60,"maximum":900},
+                        "idempotency_key":{"type":"string","minLength":1,"maxLength":191}},"additionalProperties":False},
+                        output_schema={"type":"object","required":["export_ref","content_hash","consumer","expires_at"],
+                        "properties":{"export_ref":{"type":"string","minLength":32},"content_hash":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},
+                        "consumer":{"type":"string","const":"craft.bop.managed_personal_space.import.preview@1"},"expires_at":{"type":"string"}},
+                        "additionalProperties":False}, **common), selected.export_for_import),
     )
 
 
