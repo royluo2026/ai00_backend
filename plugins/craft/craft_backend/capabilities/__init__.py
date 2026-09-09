@@ -77,6 +77,7 @@ from .data_exchange import register_data_exchange_capability
 from .lark_exchange import register_lark_exchange_capabilities
 from .resource_requirements import register_resource_requirement_capabilities
 from .process_screenshot import register_process_screenshot_capability
+from .bop_repositories import candidate_specs as bop_repository_candidate_specs
 
 
 def _authorize_bop_version(resource_id, identity) -> bool:
@@ -91,6 +92,8 @@ def register_capabilities(registry: Any) -> None:
     from .desktop_vpps import register_desktop_vpps
     register_desktop_vpps(registry)
     native = NativeContractRegistry(registry)
+    for spec, handler in bop_repository_candidate_specs():
+        native.register(spec, handler)
     register_bop_version_capabilities(native)
     register_bop_structure_capabilities(native)
     register_bop_navigation_capabilities(native)

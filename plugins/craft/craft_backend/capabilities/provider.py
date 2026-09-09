@@ -424,6 +424,8 @@ _RESOURCE_ERROR_CODES = {
 def _governed_spec(spec: Any) -> Any:
     if spec.id == RULE_DEFINITION_CHANGE_CAPABILITY_ID:
         return spec.model_copy(update={"plugin_callable": True})
+    if "experimental" in spec.tags:
+        return spec.model_copy(update={"plugin_callable": True})
     return spec.model_copy(update={
         "plugin_callable": True,
         "input_schema": input_schema_for(spec.id, spec.version),
@@ -444,6 +446,8 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         "lifecycle_status": (
             LifecycleStatus.DEPRECATED
             if spec.id in DEPRECATED_REVIEWED_CAPABILITIES
+            else LifecycleStatus.EXPERIMENTAL
+            if "experimental" in governed.tags
             else LifecycleStatus.STABLE
         ),
         "deprecation_message": (

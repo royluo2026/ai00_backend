@@ -177,7 +177,7 @@ git commit -m "feat(craft): persist repository and space identities"
 - Produces candidate handlers for `repository.search/get/create`, `space.search/get`, `space_version.search/get/save/freeze`, `repository_baseline.set`, archive/restore/delete and managed personal delete.
 - Consumes the Task 3 store and trusted `CapabilityContext`.
 
-- [ ] **Step 1: Write failing closed-contract tests**
+- [x] **Step 1: Write failing closed-contract tests**
 
 ```python
 def test_repository_candidates_are_closed_and_not_stable():
@@ -187,23 +187,23 @@ def test_repository_candidates_are_closed_and_not_stable():
     assert all(descriptor_for(s).lifecycle_status.value == "experimental" for s, _ in items)
 ```
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `python -m pytest plugins/craft/tests/test_bop_repository_capabilities.py -q`
 
 Expected: FAIL because candidate specs are absent.
 
-- [ ] **Step 3: Implement providers and descriptors**
+- [x] **Step 3: Implement providers and descriptors**
 
 Implement `MysqlBopRepositoryStore` with `get_craft_conn`, row locks, operation-ledger idempotency and the Task 3 Protocol. Use one Provider method per business effect, stable error mapping, resource selectors, bounded search and `confirmation=none` for explicit desktop writes. Register as experimental candidates; do not add them to a stable product release or claim approval.
 
-- [ ] **Step 4: Run GREEN and registration boundaries**
+- [x] **Step 4: Run GREEN and registration boundaries**
 
 Run: `python -m pytest plugins/craft/tests/test_bop_repository_capabilities.py backend/tests/test_capability_provider_loading.py -q`
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add plugins/craft/craft_backend/capabilities/bop_repositories.py plugins/craft/craft_backend/capabilities/__init__.py plugins/craft/craft_backend/capabilities/provider.py plugins/craft/tests/test_bop_repository_capabilities.py
