@@ -23,6 +23,10 @@
 
 Legacy BOP writes are unchanged during normal runtime. The lease/journal boundary activates only when `AI00_BOP_REPOSITORY_MIGRATION_FENCE_ENABLED=1`. The backfill mutates only when both `--apply` and `AI00_BOP_REPOSITORY_BACKFILL_MUTATION=1` are present. It records preliminary and final journal watermarks, drains pre-fence leases, performs an idempotent full rescan, quarantines records without project identity, reconciles unmapped records, and never enables product cutover itself.
 
+## Local desktop smoke
+
+The existing local test stack was verified against this checkout: backend port 8080 and Vite port 5173 both listened from the expected worktrees; `/health` returned HTTP 200; login and Simulation HTML returned HTTP 200. Electron CDP inspection showed the main page visible with the authenticated user “罗毅 · 超级管理员（super_admin）”, one tab bar containing four tabs, a 34 px status bar, injected `AI00Business` and `electronAPI`, and the Simulation iframe loaded. The Simulation page contained all four columns, the three space groups, eight records, and reported “VisMockup 已连接”. Unauthenticated `/auth/me` and `/api/v1/capabilities` probes returned the expected HTTP 401 rather than 500.
+
 ## Governance state
 
 - `machine_passed`: `unverified` for all new or changed candidate Capabilities. Local tests are engineering evidence and do not replace the trusted machine-attestation workflow.
