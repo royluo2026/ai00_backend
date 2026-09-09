@@ -269,7 +269,7 @@ git commit -m "feat(simulation): export immutable private versions"
 - Produces repository and personal `fork.preview/apply`, `fork_run.get` and `fork_workflow.get`.
 - Preview output fixes `preview_gid`, `workflow_gid`, input/plan hash, expiry, owner verdicts and allowed decisions.
 
-- [ ] **Step 1: Write failing Preview/Apply tests**
+- [x] **Step 1: Write failing Preview/Apply tests**
 
 ```python
 def test_apply_rejects_renderer_verdict_and_expired_preview(provider):
@@ -278,23 +278,23 @@ def test_apply_rejects_renderer_verdict_and_expired_preview(provider):
         provider.apply({**APPLY, "preview_gid": preview["preview_gid"], "owner_verdict": "copy"}, context())
 ```
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `python -m pytest plugins/craft/tests/test_bop_repository_fork.py -q`
 
 Expected: FAIL because Fork providers are absent.
 
-- [ ] **Step 3: Implement Preview/Apply and workflow recovery**
+- [x] **Step 3: Implement Preview/Apply and workflow recovery**
 
 Provider creates a workflow when personal Preview omits it; supplied workflow must resolve to the fixed personal child. Apply revalidates authorization, owner verdicts, plan hash, expiry and target slot before creating the Repository. Use stable child idempotency keys so personal retry never repeats team Fork.
 
-- [ ] **Step 4: Run GREEN**
+- [x] **Step 4: Run GREEN**
 
 Run: `python -m pytest plugins/craft/tests/test_bop_repository_fork.py -q`
 
 Expected: PASS for all five depths, cross-project GID derivation, partial workflow recovery and target collision.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add plugins/craft/craft_backend/data/bop_fork.py plugins/craft/craft_backend/capabilities/bop_repository_fork.py plugins/craft/tests/test_bop_repository_fork.py
