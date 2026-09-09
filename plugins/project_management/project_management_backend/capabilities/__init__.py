@@ -9,6 +9,7 @@ from .reviewed import register_reviewed_capabilities, register_desktop_v2_capabi
 from ..application.outcomes import project_outcome_port
 from ..application.service import ProjectManagementApplication
 from ..infrastructure.repository import ProjectManagementRepository
+from .org_management import register_org_management_capabilities
 
 
 def register_capabilities(registry: Any) -> None:
@@ -20,5 +21,6 @@ def register_capabilities(registry: Any) -> None:
     register_reviewed_capabilities(registry)
     register_desktop_v2_capabilities(registry)
     register_desktop_capabilities(registry)
+    register_org_management_capabilities(registry)
     from .desktop_attachments import register_attachments
     register_attachments(registry)

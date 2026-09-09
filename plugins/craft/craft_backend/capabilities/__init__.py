@@ -29,6 +29,7 @@ from .gbop_navigation import register_gbop_navigation_capability
 from .gbop_process_hierarchy import register_gbop_process_hierarchy_capability
 from .gbop_navigation_change import register_gbop_navigation_change_capability
 from .bop_entry_search import register_bop_entry_search_capability
+from .bop_active_line import register_bop_active_line_capabilities
 from .bop_alt_hierarchy import register_bop_alt_hierarchy_capability
 from .bop_line_operation_catia import register_bop_line_operation_catia_capability
 from .bop_pbom_lifecycle_read import register_bop_pbom_lifecycle_read_capability
@@ -150,6 +151,7 @@ def register_capabilities(registry: Any) -> None:
     register_gbop_process_hierarchy_capability(native)
     register_gbop_navigation_change_capability(native)
     register_bop_entry_search_capability(native)
+    register_bop_active_line_capabilities(registry)
     register_bop_alt_hierarchy_capability(native)
     register_bop_line_operation_catia_capability(native)
     register_bop_pbom_lifecycle_read_capability(native)
