@@ -1,10 +1,10 @@
 # base.team.update@1
 
-Changes the name or active state of one team under super administrator authorization.
+Changes the name, parent, or active state of one team under super administrator authorization.
 
 ## 使用判断
 
-- 适用：Changes the name or active state of one team under super administrator authorization.
+- 适用：Changes the name, parent, or active state of one team under super administrator authorization.
 - 不适用：The requested effect belongs to another named action.
 - 生命周期：`experimental`
 - 所属领域：`base`
@@ -81,6 +81,13 @@ Changes the name or active state of one team under super administrator authoriza
           "maxLength": 256,
           "minLength": 1,
           "type": "string"
+        },
+        "parent_team_gid": {
+          "maxLength": 4096,
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "type": "object"
