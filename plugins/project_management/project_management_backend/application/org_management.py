@@ -16,14 +16,28 @@ def _tenant(context: object) -> str:
     return str(getattr(context, "team_gid", None) or f"user:{getattr(context, 'user_gid', '')}")
 
 
+def _project_tenant(repository: OrgManagementRepository, project_gid: str, context: object) -> str:
+    row = repository.project(project_gid)
+    if not row or bool(row.get("is_deleted")):
+        raise CapabilityBusinessError("resource_not_found", "项目不存在")
+    owner_tenant = str(row.get("team_id") or _tenant(context))
+    if owner_tenant != _tenant(context) and "super_admin" not in set(
+        getattr(context, "active_roles", ()) or ()
+    ):
+        raise CapabilityBusinessError("permission_denied", "项目不属于当前租户")
+    return owner_tenant
+
+
 def validate_project(payload: dict[str, Any], context: object) -> dict[str, Any]:
     row = OrgManagementRepository().project(payload["project_gid"])
     if not row or bool(row.get("is_deleted")):
         raise CapabilityBusinessError("resource_not_found", "项目不存在")
     tenant = _tenant(context)
-    if str(row.get("team_id") or "") != tenant:
+    identity = getattr(context, "effective_identity", None)
+    service_id = getattr(getattr(identity, "actor", None), "service_id", None)
+    if str(row.get("team_id") or "") != tenant and service_id != "base-project-validator":
         raise CapabilityBusinessError("permission_denied", "项目不属于当前租户")
-    return {"data": {"gid": str(row["gid"]), "team_id": str(row["team_id"]),
+    return {"data": {"gid": str(row["gid"]), "team_id": str(row.get("team_id") or tenant),
                      "is_deleted": bool(row["is_deleted"])}}
 
 
@@ -41,14 +55,16 @@ def read(payload: dict[str, Any], context: object) -> dict[str, Any]:
                          "next_cursor": None}}
     if payload["operation"] == "responsibility_matrix.get":
         project_gid = str(arguments.get("project_gid") or "")
-        row = repo.project(project_gid, tenant)
+        owner_tenant = _project_tenant(repo, project_gid, context)
+        row = repo.project(project_gid)
         if not row:
             raise CapabilityBusinessError("resource_not_found", "项目不存在")
         state = decode_org_management(row.get("meta"))
         return {"data": {"items": [{"gid": str(row["gid"]), "name": str(row.get("name") or ""), **state}],
                          "next_cursor": None}}
     size = int(arguments.get("page_size") or 100)
-    items, next_cursor = repo.search(tenant, arguments.get("cursor"), size)
+    search_tenant = None if "super_admin" in set(getattr(context, "active_roles", ()) or ()) else tenant
+    items, next_cursor = repo.search(search_tenant, arguments.get("cursor"), size)
     return {"data": {"items": items, "next_cursor": next_cursor}}
 
 
@@ -57,6 +73,7 @@ async def change(payload: dict[str, Any], context: object) -> dict[str, Any]:
         raise CapabilityBusinessError("permission_denied", "仅超管可维护项目责任")
     raw = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     repository = OrgManagementRepository()
+    tenant_gid = _project_tenant(repository, str(payload["arguments"].get("project_gid") or ""), context)
     from backend.capability_v2.contracts import CorrelationRef
     from backend.capability_v2.domain_client import DomainInvocation
     correlation = CorrelationRef(
@@ -81,13 +98,13 @@ async def change(payload: dict[str, Any], context: object) -> dict[str, Any]:
         if not checked.ok:
             raise CapabilityBusinessError("resource_not_found", "BOP 线体不存在、已失效或属于其他项目")
     result = repository.apply(
-        tenant_gid=_tenant(context), actor_gid=str(getattr(context, "user_gid", "")),
+        tenant_gid=tenant_gid, actor_gid=str(getattr(context, "user_gid", "")),
         project_gid=str(payload["arguments"].get("project_gid") or ""),
         operation=payload["operation"], arguments=payload["arguments"],
         expected_revision=payload["expected_revision"], idempotency_key=payload["idempotency_key"],
         command_digest=hashlib.sha256(raw.encode("utf-8")).hexdigest(),
     )
-    pending = repository.pending_projection(result["operation_gid"], _tenant(context))
+    pending = repository.pending_projection(result["operation_gid"], tenant_gid)
     if pending is None:
         return {"data": result}
     from backend.capability_v2.delegation import InMemoryDelegationStore
@@ -95,7 +112,6 @@ async def change(payload: dict[str, Any], context: object) -> dict[str, Any]:
     from backend.capability_v2.identity import AuthenticatedPrincipal, IdentityBroker, InMemoryMountStore
     from backend.capability_v2.official_service_grants import official_service_identities
     service_id = "project-org-projection"
-    tenant_gid = _tenant(context)
     try:
         with official_service_identities.trusted_tenant(
             service_id=service_id, tenant_id=tenant_gid, source_kind="project_outbox",

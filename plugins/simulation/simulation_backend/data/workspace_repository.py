@@ -84,10 +84,10 @@ class WorkspaceRepository:
                 "SELECT w.gid workspace_gid,v.gid version_gid,v.status,v.content_hash,"
                 "v.manifest_artifact_ref_json manifest_artifact_ref "
                 "FROM workmanship_sim_workspaces w JOIN workmanship_sim_workspace_versions v "
-                "ON v.workspace_gid=w.gid WHERE w.gid=%s AND v.gid=%s AND w.tenant_gid=%s "
+                "ON v.workspace_gid=w.gid WHERE w.gid=%s AND v.gid=%s "
                 "AND (w.owner_gid=%s OR w.visibility='shared') AND w.removed_at IS NULL AND v.removed_at IS NULL",
                 (_gid(workspace_gid,"workspace_gid"),_gid(version_gid,"version_gid"),
-                 _gid(tenant_gid,"tenant_gid"),_gid(owner_gid,"owner_gid")),
+                 _gid(owner_gid,"owner_gid")),
             )
             row=cursor.fetchone()
         if not row: raise WorkspaceRepositoryError("workspace_version_not_found")
@@ -163,9 +163,9 @@ class WorkspaceRepository:
             cursor.execute(
                 "SELECT w.gid AS workspace_gid,h.version_gid,w.owner_gid,w.name,w.review_type,w.version_label,w.status,w.visibility,w.primary_project_gid,w.row_version,w.updated_at "
                 "FROM workmanship_sim_workspaces w JOIN workmanship_sim_workspace_heads h ON h.workspace_gid=w.gid "
-                "WHERE w.tenant_gid=%s AND (w.owner_gid=%s OR w.visibility='shared') AND w.removed_at IS NULL "
+                "WHERE (w.owner_gid=%s OR w.visibility='shared') AND w.removed_at IS NULL "
                 "ORDER BY w.updated_at DESC,w.gid DESC LIMIT %s OFFSET %s",
-                (_gid(tenant_gid, "tenant_gid"), _gid(owner_gid, "owner_gid"), page_size + 1, offset),
+                (_gid(owner_gid, "owner_gid"), page_size + 1, offset),
             )
             rows = [dict(row) for row in cursor.fetchall()]
             workspace_gids = [row["workspace_gid"] for row in rows]
@@ -188,31 +188,33 @@ class WorkspaceRepository:
         suffix = " FOR UPDATE" if lock else ""
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
-                "SELECT w.gid AS workspace_gid,h.version_gid,w.owner_gid,w.name,w.review_type,w.version_label,w.status,w.visibility,w.primary_project_gid,w.row_version,w.updated_at "
+                "SELECT w.gid AS workspace_gid,h.version_gid,w.tenant_gid AS workspace_tenant_gid,w.owner_gid,w.name,w.review_type,w.version_label,w.status,w.visibility,w.primary_project_gid,w.row_version,w.updated_at "
                 "FROM workmanship_sim_workspaces w JOIN workmanship_sim_workspace_heads h ON h.workspace_gid=w.gid "
-                "WHERE w.gid=%s AND w.tenant_gid=%s AND (w.owner_gid=%s OR w.visibility='shared') AND w.removed_at IS NULL" + suffix,
-                (_gid(workspace_gid, "workspace_gid"), _gid(tenant_gid, "tenant_gid"), _gid(owner_gid, "owner_gid")),
+                "WHERE w.gid=%s AND (w.owner_gid=%s OR w.visibility='shared') AND w.removed_at IS NULL" + suffix,
+                (_gid(workspace_gid, "workspace_gid"), _gid(owner_gid, "owner_gid")),
             )
             workspace = cursor.fetchone()
             if not workspace:
                 return None
+            workspace = dict(workspace)
+            source_tenant_gid = _gid(workspace.pop("workspace_tenant_gid"), "workspace_tenant_gid")
             cursor.execute("SELECT project_gid FROM workmanship_sim_workspace_projects WHERE workspace_gid=%s ORDER BY sort_order,project_gid", (workspace_gid,))
             project_gids = [str(item["project_gid"]) for item in cursor.fetchall()]
             cursor.execute(
                 "SELECT gid AS node_gid,parent_gid,node_type,name,sort_order AS position,row_version "
                 "FROM workmanship_sim_workspace_nodes WHERE workspace_gid=%s AND tenant_gid=%s "
                 "AND removed_at IS NULL ORDER BY parent_gid,sort_order,gid",
-                (workspace_gid, tenant_gid),
+                (workspace_gid, source_tenant_gid),
             )
             nodes = [dict(row) for row in cursor.fetchall()]
             cursor.execute(
                 "SELECT gid AS binding_gid,node_gid,occurrence_gid,binding_role AS role,row_version "
                 "FROM workmanship_sim_workspace_bindings WHERE workspace_gid=%s AND tenant_gid=%s "
                 "AND removed_at IS NULL ORDER BY node_gid,gid",
-                (workspace_gid, tenant_gid),
+                (workspace_gid, source_tenant_gid),
             )
             bindings = [dict(row) for row in cursor.fetchall()]
-        data = self._decorate(dict(workspace), owner_gid=owner_gid, project_gids=project_gids)
+        data = self._decorate(workspace, owner_gid=owner_gid, project_gids=project_gids)
         for row in nodes:
             row["node_gid"] = str(row["node_gid"])
             row["parent_gid"] = str(row["parent_gid"]) if row.get("parent_gid") is not None else None
@@ -244,9 +246,9 @@ class WorkspaceRepository:
                 value = replay["response_json"]
                 return json.loads(value) if isinstance(value, str) else dict(value)
             cursor.execute(
-                "SELECT row_version FROM workmanship_sim_workspaces WHERE gid=%s AND tenant_gid=%s "
+                "SELECT row_version,tenant_gid FROM workmanship_sim_workspaces WHERE gid=%s "
                 "AND owner_gid=%s AND removed_at IS NULL FOR UPDATE",
-                (workspace_gid, tenant_gid, owner_gid),
+                (workspace_gid, owner_gid),
             )
             current = cursor.fetchone()
             if not current:
@@ -274,7 +276,7 @@ class WorkspaceRepository:
     def search_saved_versions(self, *, workspace_gid: str, tenant_gid: str,
                               actor_gid: str) -> dict[str, Any]:
         with get_simulation_conn() as conn,conn.cursor() as cursor:
-            cursor.execute("SELECT v.gid version_gid,v.workspace_gid,v.sequence,v.status,v.content_hash,v.created_at FROM workmanship_sim_workspace_versions v JOIN workmanship_sim_workspaces w ON w.gid=v.workspace_gid WHERE v.workspace_gid=%s AND v.tenant_gid=%s AND (w.owner_gid=%s OR w.visibility='shared') AND w.removed_at IS NULL AND v.removed_at IS NULL AND v.status IN ('saved','frozen') ORDER BY v.sequence DESC,v.gid DESC",(_gid(workspace_gid,"workspace_gid"),_gid(tenant_gid,"tenant_gid"),_gid(actor_gid,"actor_gid")))
+            cursor.execute("SELECT v.gid version_gid,v.workspace_gid,v.sequence,v.status,v.content_hash,v.created_at FROM workmanship_sim_workspace_versions v JOIN workmanship_sim_workspaces w ON w.gid=v.workspace_gid WHERE v.workspace_gid=%s AND (w.owner_gid=%s OR w.visibility='shared') AND w.removed_at IS NULL AND v.removed_at IS NULL AND v.status IN ('saved','frozen') ORDER BY v.sequence DESC,v.gid DESC",(_gid(workspace_gid,"workspace_gid"),_gid(actor_gid,"actor_gid")))
             rows=[dict(row) for row in cursor.fetchall()]
         for row in rows:
             row["version_gid"],row["workspace_gid"]=str(row["version_gid"]),str(row["workspace_gid"])
@@ -361,13 +363,14 @@ class WorkspaceRepository:
         request_hash = hashlib.sha256(canonical.encode()).hexdigest()
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
-                "SELECT row_version,status FROM workmanship_sim_workspaces WHERE gid=%s AND tenant_gid=%s "
+                "SELECT row_version,status,tenant_gid FROM workmanship_sim_workspaces WHERE gid=%s "
                 "AND owner_gid=%s AND removed_at IS NULL FOR UPDATE",
-                (workspace_gid, tenant_gid, owner_gid),
+                (workspace_gid, owner_gid),
             )
             current = cursor.fetchone()
             if not current:
                 raise WorkspaceRepositoryError("workspace_not_found")
+            tenant_gid = _gid(current["tenant_gid"], "workspace_tenant_gid")
             cursor.execute(
                 "SELECT request_hash,response_json FROM workmanship_sim_workspace_idempotency "
                 "WHERE workspace_gid=%s AND idempotency_key=%s AND expires_at>NOW(6)",
@@ -552,15 +555,17 @@ class WorkspaceRepository:
         tenant_gid, owner_gid = _gid(tenant_gid, "tenant_gid"), _gid(owner_gid, "owner_gid")
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
-                "SELECT w.gid AS workspace_gid,h.version_gid,w.row_version,v.status AS version_status "
+                "SELECT w.gid AS workspace_gid,h.version_gid,w.tenant_gid,w.row_version,v.status AS version_status "
                 "FROM workmanship_sim_workspaces w JOIN workmanship_sim_workspace_heads h ON h.workspace_gid=w.gid "
                 "JOIN workmanship_sim_workspace_versions v ON v.gid=h.version_gid "
-                "WHERE w.gid=%s AND w.tenant_gid=%s AND w.owner_gid=%s AND w.removed_at IS NULL",
-                (workspace_gid, tenant_gid, owner_gid),
+                "WHERE w.gid=%s AND w.owner_gid=%s AND w.removed_at IS NULL",
+                (workspace_gid, owner_gid),
             )
             source = cursor.fetchone()
             if not source:
                 raise WorkspaceRepositoryError("workspace_not_found")
+            source = dict(source)
+            tenant_gid = _gid(source["tenant_gid"], "workspace_tenant_gid")
             cursor.execute(
                 "SELECT gid AS node_gid,parent_gid,node_type,name,sort_order AS position,source_bop_node_gid "
                 "FROM workmanship_sim_workspace_nodes WHERE workspace_gid=%s AND tenant_gid=%s AND owner_gid=%s "

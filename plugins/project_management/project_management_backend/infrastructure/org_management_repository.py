@@ -24,14 +24,20 @@ class OrgManagementRepository:
                 row = cursor.fetchone()
                 return dict(row) if row else None
 
-    def search(self, tenant_gid: str, cursor_gid: str | None, page_size: int) -> tuple[list[dict[str, Any]], str | None]:
+    def search(self, tenant_gid: str | None, cursor_gid: str | None, page_size: int) -> tuple[list[dict[str, Any]], str | None]:
         with get_project_management_conn() as connection:
             with connection.cursor() as cursor:
-                cursor.execute(
+                sql = (
                     "SELECT gid,name,meta FROM workmanship_proj_projects "
-                    "WHERE team_id=%s AND is_deleted=0 AND is_archived=0 AND gid>%s "
-                    "ORDER BY gid LIMIT %s", (tenant_gid, cursor_gid or "", page_size + 1),
+                    "WHERE is_deleted=0 AND is_archived=0 AND gid>%s"
                 )
+                params: list[Any] = [cursor_gid or ""]
+                if tenant_gid is not None:
+                    sql += " AND team_id=%s"
+                    params.append(tenant_gid)
+                sql += " ORDER BY gid LIMIT %s"
+                params.append(page_size + 1)
+                cursor.execute(sql, tuple(params))
                 rows = [dict(row) for row in cursor.fetchall()]
         more = len(rows) > page_size
         rows = rows[:page_size]
@@ -118,7 +124,8 @@ class OrgManagementRepository:
                         return json.loads(replay["result_json"])
                     cursor.execute(
                         "SELECT gid,meta FROM workmanship_proj_projects "
-                        "WHERE gid=%s AND team_id=%s AND is_deleted=0 FOR UPDATE",
+                        "WHERE gid=%s AND (team_id=%s OR team_id IS NULL OR team_id='') "
+                        "AND is_deleted=0 FOR UPDATE",
                         (project_gid, tenant_gid),
                     )
                     project = cursor.fetchone()

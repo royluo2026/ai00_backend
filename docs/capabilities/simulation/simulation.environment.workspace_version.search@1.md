@@ -1,10 +1,10 @@
 # simulation.environment.workspace_version.search@1
 
-Search readable immutable versions of one private Simulation workspace.
+Search readable immutable versions of one owned or shared Simulation workspace.
 
 ## 使用判断
 
-- 适用：Search readable immutable versions of one private Simulation workspace.
+- 适用：Search readable immutable versions of one owned or shared Simulation workspace.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`experimental`
 - 所属领域：`simulation`

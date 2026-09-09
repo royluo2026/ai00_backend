@@ -36,7 +36,9 @@ def _encode_cursor(gid: str) -> str:
     return base64.urlsafe_b64encode(gid.encode("utf-8")).decode("ascii").rstrip("=")
 
 
-def _active_rows(project_gid: str) -> list[dict[str, Any]]:
+def _active_line_page(
+    project_gid: str, after: str, page_size: int
+) -> tuple[list[dict[str, Any]], dict[str, dict[str, Any]]]:
     with get_craft_conn() as conn, conn.cursor() as cur:
         cur.execute(
             "SELECT e.gid,e.parent_gid,e.node_type,COALESCE(e.title,'') AS title,"
@@ -44,13 +46,44 @@ def _active_rows(project_gid: str) -> list[dict[str, Any]]:
             "FROM workmanship_bop_bop_entries e "
             "JOIN workmanship_bop_bop_versions v ON v.gid=e.version_gid "
             "WHERE v.project_gid=%s AND v.status='active' AND e.is_deleted=FALSE "
+            "AND e.node_type='line_process' AND e.gid>%s "
             "ORDER BY e.gid LIMIT %s",
-            (project_gid, MAX_NODES + 1),
+            (project_gid, after, page_size + 1),
         )
-        rows = [dict(row) for row in cur.fetchall()]
-    if len(rows) > MAX_NODES:
-        raise CapabilityBusinessError("graph_limit_exceeded", "The active BOP contains more than 5000 nodes.")
-    return rows
+        lines = [dict(row) for row in cur.fetchall()]
+        selected = lines[:page_size]
+        by_gid = {str(row["gid"]): row for row in selected}
+        frontier = {str(row["parent_gid"]) for row in selected if row.get("parent_gid")}
+        depth = 0
+        while frontier:
+            depth += 1
+            if depth > MAX_DEPTH:
+                raise CapabilityBusinessError(
+                    "graph_limit_exceeded", "The active BOP path exceeds its safe graph limit."
+                )
+            placeholders = ",".join(["%s"] * len(frontier))
+            cur.execute(
+                "SELECT e.gid,e.parent_gid,e.node_type,COALESCE(e.title,'') AS title,"
+                "v.gid AS version_gid,COALESCE(v.version_tag,'') AS version_tag "
+                "FROM workmanship_bop_bop_entries e "
+                "JOIN workmanship_bop_bop_versions v ON v.gid=e.version_gid "
+                "WHERE v.project_gid=%s AND v.status='active' AND e.is_deleted=FALSE "
+                f"AND e.gid IN ({placeholders})",
+                (project_gid, *sorted(frontier)),
+            )
+            parents = [dict(row) for row in cur.fetchall()]
+            for row in parents:
+                by_gid[str(row["gid"])] = row
+            if len(by_gid) > MAX_NODES:
+                raise CapabilityBusinessError(
+                    "graph_limit_exceeded", "The selected BOP paths exceed the safe graph limit."
+                )
+            frontier = {
+                str(row["parent_gid"])
+                for row in parents
+                if row.get("parent_gid") and str(row["parent_gid"]) not in by_gid
+            }
+    return lines, by_gid
 
 
 def _path(row: dict[str, Any], by_gid: dict[str, dict[str, Any]]) -> str:
@@ -78,12 +111,9 @@ def search_active_lines(payload: dict[str, Any], _context: object) -> dict[str, 
     if isinstance(page_size, bool) or not isinstance(page_size, int) or not 1 <= page_size <= 100:
         raise CapabilityBusinessError("invalid_page_size", "page_size must be between 1 and 100")
     after = _decode_cursor(payload.get("cursor"))
-    rows = _active_rows(project_gid)
-    by_gid = {str(row["gid"]): row for row in rows}
-    lines = [row for row in rows if row.get("node_type") == "line_process" and str(row["gid"]) > after]
-    selected = lines[: page_size + 1]
-    has_more = len(selected) > page_size
-    selected = selected[:page_size]
+    lines, by_gid = _active_line_page(project_gid, after, page_size)
+    has_more = len(lines) > page_size
+    selected = lines[:page_size]
     items = [{
         "gid": str(row["gid"]),
         "version_gid": str(row["version_gid"]),

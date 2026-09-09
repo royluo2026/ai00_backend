@@ -435,7 +435,7 @@ Execute Project Management operation tasks.update.
     "arguments": {
       "gid": "example",
       "updates": {
-        "time_estimate": "example"
+        "share_scope": "example"
       }
     }
   }

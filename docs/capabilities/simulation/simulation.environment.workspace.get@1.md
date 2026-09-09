@@ -1,10 +1,10 @@
 # simulation.environment.workspace.get@1
 
-Read one current user's private simulation workspace.
+Read one simulation workspace owned by the caller or shared with authenticated users.
 
 ## 使用判断
 
-- 适用：Read one current user's private simulation workspace.
+- 适用：Read one simulation workspace owned by the caller or shared with authenticated users.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`experimental`
 - 所属领域：`simulation`

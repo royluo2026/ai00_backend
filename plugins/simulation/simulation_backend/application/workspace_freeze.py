@@ -42,6 +42,7 @@ class WorkspaceFreezeService:
         source = self.repository.load_freeze_source(
             workspace_gid=workspace_gid, tenant_gid=tenant_gid, owner_gid=owner_gid,
         )
+        tenant_gid = str(source.get("tenant_gid") or tenant_gid)
         if int(source["row_version"]) != int(expected_row_version):
             raise FreezeConflict("version_conflict")
         if source["version_status"] != "draft":

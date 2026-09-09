@@ -61,22 +61,18 @@ def _active_principal_provider(payload: dict[str, Any], _context: object) -> dic
     return {"data": value}
 
 
-def _manager_read_provider(payload: dict[str, Any], context: object) -> dict[str, Any]:
-    from backend.base.project_responsibility import ProjectManagerService
-    return {"data": ProjectManagerService().read(_tenant(context), payload["project_gid"])}
-
-
-async def _manager_replace_provider(payload: dict[str, Any], context: object) -> dict[str, Any]:
+async def _validated_project_tenant(
+    context: object, project_gid: str, *, validation: object | None = None
+) -> str:
     from datetime import UTC, datetime
     from backend.capability_v2.contracts import CorrelationRef
     from backend.capability_v2.delegation import InMemoryDelegationStore
     from backend.capability_v2.domain_client import DomainInvocation
     from backend.capability_v2.identity import AuthenticatedPrincipal, IdentityBroker, InMemoryMountStore
     from backend.capability_v2.official_service_grants import official_service_identities
-    from backend.base.project_responsibility import ProjectManagerError, ProjectManagerService
     service_id = "base-project-validator"
     tenant_gid = _tenant(context)
-    try:
+    if validation is None:
         with official_service_identities.trusted_tenant(
             service_id=service_id, tenant_id=tenant_gid, source_kind="authenticated_request",
             source_ref=str(getattr(context, "request_id", "manager-replace")),
@@ -90,14 +86,32 @@ async def _manager_replace_provider(payload: dict[str, Any], context: object) ->
             )
             validation = await context.domain_client.invoke(
                 DomainInvocation(capability_id="project.project.validation.get", major_version=1,
-                                 payload={"project_gid": payload["project_gid"]}),
+                                 payload={"project_gid": project_gid}),
                 identity,
                 CorrelationRef(request_id=str(getattr(context, "request_id", "manager-replace")),
                                trace_id=str(getattr(context, "request_id", "manager-replace"))),
             )
-        if not validation.ok:
-            code = validation.error.code if validation.error else "provider_unavailable"
-            raise CapabilityBusinessError(code, validation.error.message if validation.error else "项目校验失败")
+    if not validation.ok:
+        code = validation.error.code if validation.error else "provider_unavailable"
+        raise CapabilityBusinessError(code, validation.error.message if validation.error else "项目校验失败")
+    data = validation.data or {}
+    project = data.get("data", data) if isinstance(data, dict) else {}
+    owner_tenant = str(project.get("team_id") or "")
+    if not owner_tenant:
+        raise CapabilityBusinessError("provider_unavailable", "项目校验未返回所属租户")
+    return owner_tenant
+
+
+async def _manager_read_provider(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.project_responsibility import ProjectManagerService
+    tenant_gid = await _validated_project_tenant(context, payload["project_gid"])
+    return {"data": ProjectManagerService().read(tenant_gid, payload["project_gid"])}
+
+
+async def _manager_replace_provider(payload: dict[str, Any], context: object) -> dict[str, Any]:
+    from backend.base.project_responsibility import ProjectManagerError, ProjectManagerService
+    try:
+        tenant_gid = await _validated_project_tenant(context, payload["project_gid"])
         value = ProjectManagerService().replace(
             tenant_gid=tenant_gid, actor_gid=str(getattr(context, "user_gid", "")),
             project_gid=payload["project_gid"], user_gids=payload["user_gids"],

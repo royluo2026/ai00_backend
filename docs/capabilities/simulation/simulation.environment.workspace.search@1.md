@@ -1,10 +1,10 @@
 # simulation.environment.workspace.search@1
 
-Search the current user's private simulation workspaces.
+Search simulation workspaces owned by the caller or shared with authenticated users.
 
 ## 使用判断
 
-- 适用：Search the current user's private simulation workspaces.
+- 适用：Search simulation workspaces owned by the caller or shared with authenticated users.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`experimental`
 - 所属领域：`simulation`

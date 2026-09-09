@@ -1,6 +1,7 @@
 """Transport-neutral Project Management value objects."""
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from copy import deepcopy
 from typing import Any, Callable
@@ -25,8 +26,23 @@ class OrgManagementError(ValueError):
         self.code = code
 
 
+def _decode_meta_root(meta: Any) -> dict[str, Any]:
+    if isinstance(meta, str):
+        if not meta.strip():
+            return {}
+        try:
+            meta = json.loads(meta)
+        except json.JSONDecodeError as exc:
+            raise OrgManagementError("invalid_state", "项目元数据损坏") from exc
+    if meta is None:
+        return {}
+    if not isinstance(meta, dict):
+        raise OrgManagementError("invalid_state", "项目元数据损坏")
+    return meta
+
+
 def decode_org_management(meta: Any) -> dict[str, Any]:
-    root = meta if isinstance(meta, dict) else {}
+    root = _decode_meta_root(meta)
     raw = root.get("org_management")
     if not isinstance(raw, dict):
         return {"revision": 0, "lines": []}
@@ -57,7 +73,7 @@ def _validate_lines(lines: list[dict[str, Any]]) -> None:
 
 def apply_line_change(meta: Any, *, operation: str, arguments: dict[str, Any],
                       expected_revision: int, new_gid: Callable[[], str]) -> tuple[dict[str, Any], dict[str, Any] | None]:
-    root = deepcopy(meta) if isinstance(meta, dict) else {}
+    root = deepcopy(_decode_meta_root(meta))
     state = decode_org_management(root)
     if state["revision"] != expected_revision:
         raise OrgManagementError("version_conflict", "项目责任配置已被其他人修改")
