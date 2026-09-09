@@ -465,7 +465,7 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 | Fork 私人仿真环境 | `simulation.environment.workspace.fork.preview@1`、`simulation.environment.workspace.fork.apply@1` | not_registered 设计候选；目标固定 private，数量不限；Preview 固定 owner portability verdict/hash/expiry，Apply 复验后发布 |
 | 保存私人环境版本 | `simulation.environment.workspace.version.save@1` | not_registered 设计候选；固定实际 source refs、VM snapshot 和 canonical manifest |
 | 读取不可变私人版本 | `simulation.environment.workspace_version.get@1` | not_registered 设计候选；只读、有界，只返回已保存 immutable version |
-| 为 Craft 导入签发来源 | `simulation.environment.workspace_version.export_for_import@1` | not_registered 设计候选；Simulation 校验 owner 并签发带 hash/scope/expiry 的 opaque ref，不接受漂移 head |
+| 为 Craft 导入签发来源 | `simulation.environment.workspace_version.export_for_import@1` | not_registered 设计候选；Simulation 校验 owner，并将 caller/tenant/精确 personal 或 repository target/consumer ID-major/source hash/expiry 写入签名 scope；不接受漂移 head或跨用途重放 |
 | 读取/生成/调整私人 VPPS 组 | `simulation.environment.vpps_group.get@1`、`simulation.environment.vpps_group.initial.generate@1`、`simulation.environment.vpps_group.adjustment.create@1`、`simulation.environment.vpps_group.current.set@1` | 均为逐项 not_registered 候选；Simulation owner；Agent/Task Tool 必须使用 private-environment 固定 profile 与 owner delegation |
 | 私人环境到受管个人空间导入 | 由 Craft owner 的 `craft.bop.managed_personal_space.import.preview@1` 与 `craft.bop.managed_personal_space.import.apply@1` 执行 | Simulation 只通过上述 export Capability 提供 opaque immutable source ref；Craft 经 Gateway 复验，不信任 Renderer manifest，不写 Simulation 表 |
 | 接受 VM 快照差异 | `simulation.document_snapshot.change.accept@1` | 新合同需固定 document/snapshot、expected head、幂等和差异集合 |
