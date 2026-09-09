@@ -66,7 +66,7 @@ Renderer、preload、Electron IPC、Electron main、AppHost、named pipe 和 Web
 
 ### 2.2 BOP Repository 与仿真覆盖层
 
-- 一个知识库项目只有一个 Craft BOP Repository 和一个团队空间；每个用户在该项目最多一个受管个人空间。
+- 一个 Project Management 权威项目（知识库页面入口）只有一个 Craft BOP Repository 和一个团队空间；每个用户在该项目最多一个受管个人空间。
 - 团队和个人空间的 BOP 写入始终由 Craft Capability 执行；Simulation Context 只保存 VM、姿态、截图和映射扩展。
 - 用户可创建不限数量的私人仿真环境；它们保存 BOP 引用和仿真覆盖层，不直接修改来源 BOP。
 - 临时层级节点拥有 Simulation GID，不预占 Craft/BOP GID。
@@ -382,7 +382,7 @@ Repository、空间、Fork、VPPS 组和提案表以 2026-09-09 细化设计为�
 - 私人环境 overlay 节点或 Repository node/lineage 引用、顺序和来源类型；
 - 每条绑定及 binding revision，包括 load、operate、resource_use；
 - 来源装配姿态和被截图使用的阶段姿态；
-- `source_bop_version_gid`、BOP content hash 和 Load 属性投影版本；
+- 可选 `source_bop_repository/version_gid`、BOP content hash 和 Load 属性投影版本；纯 VM 私人环境可以没有 Craft source；
 - `vm_document_gid`、`vm_snapshot_gid`、原始 PLMXML ArtifactRef 和 snapshot hash；
 - Knowledge、Craft、Digital Model 的不可变引用与版本；
 - 身份匹配、坐标规范化、diff 和截图计划算法版本；
@@ -464,6 +464,7 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 | 查询/读取私人环境 | `simulation.environment.workspace.search@1`、`simulation.environment.workspace.get@1` | 逐项核对真实 Registry；默认只返回授权私人环境，不冒充 Craft Repository space |
 | Fork 私人仿真环境 | `simulation.environment.workspace.fork@1` | not_registered 设计候选；目标固定 private，数量不限 |
 | 保存私人环境版本 | `simulation.environment.workspace.version.save@1` | not_registered 设计候选；固定实际 source refs、VM snapshot 和 canonical manifest |
+| 读取/生成/调整私人 VPPS 组 | `simulation.environment.vpps_group.get@1`、`simulation.environment.vpps_group.initial.generate@1`、`simulation.environment.vpps_group.adjustment.create@1`、`simulation.environment.vpps_group.current.set@1` | 均为逐项 not_registered 候选；Simulation owner；Agent/Task Tool 必须使用 private-environment 固定 profile 与 owner delegation |
 | 私人环境到受管个人空间导入 | 由 Craft owner 的 `craft.bop.managed_personal_space.import.preview@1` 与 `craft.bop.managed_personal_space.import.apply@1` 执行 | Simulation 只提供 immutable source manifest，不写 Craft 表 |
 | 接受 VM 快照差异 | `simulation.document_snapshot.change.accept@1` | 新合同需固定 document/snapshot、expected head、幂等和差异集合 |
 | 接受数模升版绑定迁移 | `simulation.environment.binding_migration.accept@1` | 新合同需固定 workspace/version/candidate、CAS 和逐项决定 |
@@ -477,8 +478,8 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 
 | 对象或规则 | Owner |
 |---|---|
-| 私人仿真环境、VM 实例、姿态、截图计划和 Simulation Context | Simulation |
-| BOP Repository、团队/受管个人空间、BOP 结构、VPPS 组、提案、Load 和资源需求 | Craft |
+| 私人仿真环境及其 VPPS 组、VM 实例、姿态、截图计划和 Simulation Context | Simulation |
+| BOP Repository、团队/受管个人空间及其 VPPS 组、BOP 结构、提案、Load 和资源需求 | Craft |
 | 数模号到知识资源的映射和反查 | Knowledge |
 | 可复用不可变 model-reference identity/version | Digital Model |
 | PLMXML、截图和 canonical manifest 的字节对象、hash、MIME 与 ArtifactRef | Base Platform（Artifact Capability）；OIS 仅为 Provider 存储实现 |
@@ -580,7 +581,7 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 6. 用户将资源拖入关系组，系统通过 Knowledge 精确反查；歧义项在面板中解决。
 7. 用户为零件建立 load 和后续 operate 关系，保存后重开环境仍保持。
 8. 倒序截图每工序生成一图，零件只在越过 load 点后隐藏。
-9. 一个知识库项目只有一个 BOP Repository/团队空间，每用户最多一个受管个人空间，但私人仿真环境数量不限。
+9. 一个 Project Management 权威项目只有一个 BOP Repository/团队空间，每用户最多一个受管个人空间，但私人仿真环境数量不限。
 10. 同一线体并发修改返回 revision 冲突并局部恢复；G-Craft-Collab 未通过时不同线体也遵循整 BOP CAS，通过后才验证线体独立并发。
 11. VisMockup/App 重启后重新连接文档，恢复实例映射和未完成环境。
 12. 数模升版时旧版本保持可复现，新版本迁移必须经用户接受。
