@@ -28,7 +28,7 @@ craft.bop.repository.create
 
 ## 授权与数据边界
 
-- 授权策略：`craft.v2:craft.bop.repository.use`
+- 授权策略：`craft.v2:craft.write_direct`
 - 自动化等级：`A1`
 - 数据分类：`confidential`
 - Delegation：`scoped`
@@ -111,129 +111,266 @@ craft.bop.repository.create
   "additionalProperties": false,
   "properties": {
     "actor_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "baseline_version_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "deleted": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": "boolean"
     },
     "deleted_at": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "deletion_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "frozen_version_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "head_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "idempotency_key": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "items": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "baseline_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_by": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "frozen_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "head_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "head_row_version": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "lifecycle_status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "manifest_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "owner_user_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "parent_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "project_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "repository_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "row_version": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "space_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "space_kind": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "version_kind": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "maxItems": 100,
+      "type": "array"
     },
     "lifecycle_status": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "manifest_hash": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "next_cursor": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "offset": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "minimum": 0,
+      "type": "integer"
     },
     "operation": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "owner_user_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "page_size": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "maximum": 100,
+      "minimum": 1,
+      "type": "integer"
     },
     "project_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "repository_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "row_version": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "minimum": 0,
+      "type": "integer"
     },
     "space_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "space_kind": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "team_space_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "tenant_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "version_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "version_kind": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "required": [],

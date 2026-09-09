@@ -28,7 +28,7 @@ craft.bop.change_proposal.get
 
 ## 授权与数据边界
 
-- 授权策略：`craft.v2:craft.bop.repository.use`
+- 授权策略：`craft.v2:craft.write_direct`
 - 自动化等级：`A2`
 - 数据分类：`confidential`
 - Delegation：`scoped`

@@ -28,7 +28,7 @@ craft.bop.fork_run.get
 
 ## 授权与数据边界
 
-- 授权策略：`craft.v2:craft.bop.repository.fork`
+- 授权策略：`craft.v2:craft.write_direct`
 - 自动化等级：`A2`
 - 数据分类：`confidential`
 - Delegation：`scoped`
@@ -104,49 +104,63 @@ craft.bop.fork_run.get
   "additionalProperties": false,
   "properties": {
     "actor_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "allowed_decisions": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "maxItems": 100,
+      "type": "array"
+    },
+    "blueprint_node_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "content_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "copied_node_count": {
+      "minimum": 0,
+      "type": "integer"
     },
     "expected_target_slot": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "minimum": 0,
+      "type": "integer"
     },
     "expires_at": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "fork_depth": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "fork_run_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "include_personal_migration": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": "boolean"
     },
     "input_hash": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "owner_verdicts": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "maxItems": 100,
+      "type": "array"
     },
     "personal": {
       "additionalProperties": false,
@@ -154,9 +168,10 @@ craft.bop.fork_run.get
       "type": "object"
     },
     "personal_space_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "personal_step": {
       "additionalProperties": false,
@@ -164,34 +179,46 @@ craft.bop.fork_run.get
       "type": "object"
     },
     "plan_hash": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "preview_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "repository_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "source_version_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "status": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "target_project_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "target_repository_gid": {
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "team": {
       "additionalProperties": false,
@@ -199,19 +226,22 @@ craft.bop.fork_run.get
       "type": "object"
     },
     "team_space_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "tenant_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "workflow_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "type": "object"
