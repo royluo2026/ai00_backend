@@ -284,17 +284,17 @@ Run: `python -m pytest plugins/craft/tests/test_bop_repository_fork.py -q`
 
 Expected: FAIL because Fork providers are absent.
 
-- [x] **Step 3: Implement Preview/Apply and workflow recovery**
+- [ ] **Step 3: Implement Preview/Apply and workflow recovery**
 
 Provider creates a workflow when personal Preview omits it; supplied workflow must resolve to the fixed personal child. Apply revalidates authorization, owner verdicts, plan hash, expiry and target slot before creating the Repository. Use stable child idempotency keys so personal retry never repeats team Fork.
 
-- [x] **Step 4: Run GREEN**
+- [ ] **Step 4: Run GREEN**
 
 Run: `python -m pytest plugins/craft/tests/test_bop_repository_fork.py -q`
 
 Expected: PASS for all five depths, cross-project GID derivation, partial workflow recovery and target collision.
 
-- [x] **Step 5: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
 git add plugins/craft/craft_backend/data/bop_fork.py plugins/craft/craft_backend/capabilities/bop_repository_fork.py plugins/craft/tests/test_bop_repository_fork.py
