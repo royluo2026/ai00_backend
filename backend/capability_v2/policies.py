@@ -56,11 +56,13 @@ class LegacyServerGatewayPolicy:
         grants_resolver: Callable[[ConsumerIdentity, dict], AuthorizationGrants],
         approval_service: ApprovalService | None = None,
         resource_authorizer: Callable[[str, ConsumerIdentity, dict], bool] | None = None,
+        service_grants_resolver: Callable[[ConsumerIdentity], AuthorizationGrants] | None = None,
     ) -> None:
         self._user_loader = user_loader
         self._grants_resolver = grants_resolver
         self._approvals = approval_service
         self._resource_authorizer = resource_authorizer
+        self._service_grants_resolver = service_grants_resolver
 
     def authorize(self, descriptor, envelope, provider) -> AuthorizationDecision:
         actor = envelope.identity.actor
@@ -82,11 +84,18 @@ class LegacyServerGatewayPolicy:
                 data_scopes=("confidential",), permissions=("simulation.use",),
             )
         if actor.user_id is None:
-            raise GatewayPolicyError("service_authorization_unavailable", "Service grants are not configured.")
-        user = self._user_loader(actor.user_id)
-        if not user or not user.get("is_active", True):
-            raise GatewayPolicyError("actor_inactive", "Actor is inactive.")
-        grants = self._grants_resolver(envelope.identity, user)
+            if self._service_grants_resolver is None:
+                raise GatewayPolicyError("service_authorization_unavailable", "Service grants are not configured.")
+            try:
+                grants = self._service_grants_resolver(envelope.identity)
+            except Exception as exc:
+                raise GatewayPolicyError("service_authorization_unavailable", "Service authorization was denied.") from exc
+            user = {}
+        else:
+            user = self._user_loader(actor.user_id)
+            if not user or not user.get("is_active", True):
+                raise GatewayPolicyError("actor_inactive", "Actor is inactive.")
+            grants = self._grants_resolver(envelope.identity, user)
         decision = CapabilityAuthorizer(lambda _identity: grants).authorize(
             descriptor, envelope, required_permissions=tuple(provider.spec.permissions)
         )

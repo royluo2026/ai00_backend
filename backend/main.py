@@ -237,6 +237,7 @@ from backend.routers import deps as _capability_deps
 from backend.services import user_service as _capability_user_service
 from backend.domain_ports.resource_authorization import resource_authorizers as _resource_authorizers
 from backend.capability_v2.artifacts import SqlArtifactStore as _CapabilityArtifactStore
+from backend.capability_v2.official_service_grants import official_service_identities as _official_service_identities
 
 
 def _authorize_owned_artifact(artifact_id, identity):
@@ -260,6 +261,7 @@ _capability_gateway = _configure_capability_gateway(
         ),
         approval_service=_ApprovalService(_SqlApprovalStore(_capability_connection)),
         resource_authorizer=lambda ref, identity, _user: _resource_authorizers.authorize(ref, identity),
+        service_grants_resolver=_official_service_identities.grants,
     ),
     reliability=_ReliabilityCoordinator(
         _SqlOutcomeStore(_capability_connection),
