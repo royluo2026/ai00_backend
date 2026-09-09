@@ -202,8 +202,8 @@ delegation 记录必须固定 workspace、owner grant、Agent service actor、�
 | 精确 Capability ID | 当前状态 | 闭合合同摘要 |
 |---|---|---|
 | `simulation.environment.workspace.create@1` | experimental，需定义变更 | 输入 name/source refs/idempotency；输出 private ad_hoc workspace/head/row_version；source 可空；Desktop 消费；单库事务；验证跨租户、幂等与 schema；重建 definition hash 并迁移消费者 |
-| `simulation.environment.workspace.search@1` | experimental | 输入 filter/cursor/page_size；输出授权 summaries/next_cursor；Desktop/Agent 只读；默认排除 deleted；验证稳定分页和裁剪 |
-| `simulation.environment.workspace.get@1` | experimental | 输入 workspace/projection page；输出 metadata/head/有界投影；Desktop/Agent 只读；验证 private/shared/project selector 和底层引用策略 |
+| `simulation.environment.workspace.search@1` | experimental，需定义变更 | 输入 filter/cursor/page_size；输出授权 summaries/next_cursor；Desktop/Agent 只读；默认排除 deleted；范围从 private 扩到 shared/project 且新增 Agent consumer，须重建 definition hash、审批证据并迁移消费者，是否升 major 由 G0 owner 判定 |
+| `simulation.environment.workspace.get@1` | experimental，需定义变更 | 输入 workspace/projection page；输出 metadata/head/有界投影；Desktop/Agent 只读；范围从 private 扩到 shared/project 且新增 Agent consumer，须重建 definition hash、审批证据并迁移消费者，是否升 major 由 G0 owner 判定 |
 | `simulation.environment.project_main.create@1` | not_registered | 输入 project/source Craft draft/ref projects/expected slot/idempotency；输出 main workspace/head；当前项目管理权限；guard 锁内单库创建；验证并发唯一、archived active 占位和 frozen/deleted 释放 |
 | `simulation.environment.workspace.metadata.update@1` | not_registered | 输入 allowlisted patch/expected row/idempotency；输出 revision/row_version；Desktop；单库 CAS；禁止改 kind/visibility/owner/project/lifecycle；审计 before/after |
 | `simulation.environment.workspace.share@1` | not_registered | 输入 workspace/expected row/idempotency；输出 shared visibility/row_version/引用授权摘要；owner；逐引用再分发校验或受控脱敏；验证拒绝与租户边界 |
@@ -213,13 +213,13 @@ delegation 记录必须固定 workspace、owner grant、Agent service actor、�
 | `simulation.environment.workspace.delete@1` | not_registered | 输入 workspace/expected row/idempotency；输出 deletion GID/deleted_at/保留引用摘要；owner 或项目删除权限；guard 锁内 tombstone；稳定错误和非级联测试见第 8 节 |
 | `simulation.environment.workspace.version.save@1` | not_registered | 输入 workspace/expected row/source list/algorithm versions/idempotency；输出 version/manifest ArtifactRef/hash/可选 anchor；Desktop/Task Tool；Artifact+Simulation saga，只有存在跨域 source 才建 anchor |
 | `simulation.environment.workspace.fork@1` | not_registered | 输入 source version 或 active workspace/expected source/idempotency；输出 private workspace/fork-base/lineage；授权读者；活动源先固定 fork-base；验证空白、纯 VM、Craft overlay 和源删除后可读 |
-| `simulation.environment.version.freeze@1` | experimental | 输入 workspace/expected row/source list/算法/idempotency；输出 final-freeze version/frozen pointer/row_version；owner 或项目管理者；guard + Artifact saga；验证不可变和后继 main |
+| `simulation.environment.version.freeze@1` | experimental，需定义变更 | 输入 workspace/expected row/source list/算法/idempotency；输出 final-freeze version/frozen pointer/row_version；owner 或项目管理者；新增 guard + Artifact saga；须重建 definition hash、审批证据并迁移消费者，是否升 major 由 G0 owner 判定 |
 | `simulation.environment.version.get@1` | not_registered | 输入 version/projection page；输出 canonical metadata/source list/page；Desktop/Agent 只读；按版本和 Artifact 策略授权 |
 | `simulation.environment.version.search@1` | not_registered | 输入 workspace/cursor/page_size；输出版本摘要；Desktop/Agent 只读；稳定排序，版本不因 workspace tombstone 消失 |
 | `simulation.environment.version_compare.start@1` | not_registered | 输入 left/right/algorithm/max_nodes/idempotency；输出 comparison/input hash/status；读权限；创建 caller-scoped 任务；审计算法和输入 |
 | `simulation.environment.version_compare.get@1` | not_registered | 输入 comparison/cursor/page_size；输出状态/摘要/分页差异/result hash；任务 owner 只读；验证移动、升版、新增、删除和限制 |
 | `simulation.environment.baseline.set@1` | not_registered | 输入 workspace/version 或 snapshot request/expected row/idempotency；输出 baseline version/pointer/row_version；owner 或项目管理者；不改变 lifecycle；验证替换 pointer 和历史不变 |
-| `simulation.environment.environment_anchor.create@1` | not_registered | 输入 project_main/Craft expected revision/hash/Simulation expected row/idempotency；输出 anchor GID/preparing state；Desktop/scheduler；启动第 5 节 saga |
+| `simulation.environment.environment_anchor.create@1` | not_registered | 输入 workspace/version source set、Craft expected revision/hash、Simulation expected row/idempotency；kind=project_main 或 ad_hoc 实际含 Craft source；project_main 强制 Craft，ad_hoc 无 Craft 时禁止创建；输出 anchor GID/preparing state；Desktop/scheduler；启动第 5 节 saga |
 | `simulation.environment.environment_anchor.get@1` | not_registered | 输入 anchor；输出 owner/source refs/hash/state；Desktop/Agent 只读；只有 ready 可作成功版本使用 |
 | `simulation.environment.environment_anchor.reconcile@1` | not_registered | 输入 anchor/expected state/idempotency；输出 ready/failed/reconciling 和 evidence refs；scheduler/受权用户；重校验双方，不盲目重做写入 |
 | `simulation.environment.main_projection_operation.get@1` | not_registered | 输入 operation；输出 Craft outcome ref/Simulation projection state/审计；Desktop/scheduler 只读；与 anchor 对账分离 |
@@ -230,7 +230,7 @@ delegation 记录必须固定 workspace、owner grant、Agent service actor、�
 | `simulation.environment.version_policy.get@1` | not_registered | 输入 workspace/policy；输出策略和 delegation 摘要；owner/Task Tool 只读，敏感字段裁剪 |
 | `simulation.environment.version_policy.evaluate@1` | not_registered | 输入 policy/resource hash/diff summary/trigger；输出 deterministic create/skip 决定及原因；Task Tool 只读；相同输入同结果，LLM 不参与决定 |
 
-现有 `simulation.environment.structure_node.create@1`、`move@1`、`remove@1`、`binding.create@1`、`binding.remove@1` 为 experimental；`structure_node.reorder@1` 和 `binding.update@1` 为 not_registered。它们沿用基础规格的闭合节点/绑定合同。Craft 线体协作能力仍是 `not_registered/owner decision required`，由 `G-Craft-Collab` 阻塞。旧 Simulation publish plan/map/outbox 能力标为 deprecated compatibility，禁止新消费者和新写入。
+现有 `simulation.environment.structure_node.create@1`、`simulation.environment.structure_node.move@1`、`simulation.environment.structure_node.remove@1`、`simulation.environment.binding.create@1`、`simulation.environment.binding.remove@1` 为 experimental。它们从 private workspace 扩展到 project_main 线体权限会改变 selector、授权和副作用合同，必须逐项做 Descriptor/Provider 差距判断、重建 definition hash、重新审批/生成证据并迁移消费者；治理规则要求不兼容升版时必须使用新 major。`simulation.environment.structure_node.reorder@1` 和 `simulation.environment.binding.update@1` 为 not_registered。Craft 线体协作能力仍是 `not_registered/owner decision required`，由 `G-Craft-Collab` 阻塞。旧 Simulation publish plan/map/outbox 能力标为 deprecated compatibility，禁止新消费者和新写入。
 
 每项实现前还须在治理变更记录中补齐真实 `capability_version_gid`、完整 Schema（`additionalProperties=false` 和大小上限）、resource selector、confirmation、审计字段、迁移、consumer contract 与 acceptance tests。上表是设计输入，不是注册、稳定性或审批证据。
 

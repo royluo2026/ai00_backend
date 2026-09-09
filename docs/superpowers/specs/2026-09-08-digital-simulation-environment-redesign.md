@@ -416,7 +416,7 @@ Craft 的执行结构投影对外规范化为 `parameters.is_load_part`，Simula
 
 ### 11.1 权威现状与复用差距
 
-以下现状来自当前受检 Catalog/Descriptor/Provider 代码；实施时仍须从运行 Registry 和当前 Catalog Release 重新读取并绑定真实 version GID。表内新 ID 和升版判断均为 advisory 候选。
+以下现状来自当前受检 Catalog/Descriptor/Provider 代码；实施时仍须从运行 Registry 和当前 Catalog Release 重新读取并绑定真实 version GID。表内用逗号、`@1/@2` 或 `*` 表示的内容只是多个现有能力的展示分组，不是可注册或可调用的 Capability ID；G0 inventory 必须把它们逐项展开为精确 ID、major、version GID 和 lifecycle。表内新 ID 和升版判断均为 advisory 候选。
 
 | 业务效果 | 现有能力 | 静态 Catalog 生命周期 | 判定 | 主要差距与处理 |
 |---|---|---|---|---|
@@ -476,9 +476,9 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 | 创建一条 load/operate/resource_use 绑定 | `simulation.environment.binding.create@1` | 同上 | 私人/共享 owner；主环境获授权线体；CAS + 幂等 | load 唯一性和引用校验；create 审计 |
 | 修改一条绑定的角色或目标 | `simulation.environment.binding.update@1` | 同上 | 私人/共享 owner；主环境获授权线体；binding CAS + 幂等 | 追加 revision；before/after 审计 |
 | 解除一条绑定 | `simulation.environment.binding.remove@1` | 同上 | 私人/共享 owner；主环境获授权线体；CAS + 幂等 | 软删除 revision；remove 审计 |
-| 保存一个不可变手动版本 | `simulation.environment.workspace.version.save@1` | Simulation / Simulation Provider / Desktop、capture | owner/项目管理者；CAS + 幂等 | Base Artifact + Simulation DB saga；完整 BOP/VM 锚点 |
+| 保存一个不可变手动版本 | `simulation.environment.workspace.version.save@1` | Simulation / Simulation Provider / Desktop、Task Tool | owner/项目管理者；CAS + 幂等 | 实际 source list + canonical manifest；仅存在跨域 source 时建立 anchor。capture 只消费已固定版本，不隐式创建 manual version |
 | Fork 一个可见环境状态 | `simulation.environment.workspace.fork@1` | Simulation / Simulation Provider / Desktop | 来源及底层引用可读；新环境固定 private；幂等 | not_registered；活动来源先建 fork-base；复用 immutable Artifact 并保留 lineage |
-| 冻结 draft 为不可变版本 | `simulation.environment.version.freeze@1` | Simulation / Simulation Provider / Desktop、capture | owner/项目管理者；CAS + 幂等；confirmation 待评审 | Base Platform Artifact Capability + Simulation DB saga；version/hash 审计 |
+| 冻结 draft 为不可变版本 | `simulation.environment.version.freeze@1` | Simulation / Simulation Provider / Desktop | owner/项目管理者；CAS + 幂等；confirmation 待评审 | Base Platform Artifact Capability + Simulation DB saga；capture 只消费冻结结果，不触发 freeze |
 | 读取一个不可变版本 | `simulation.environment.version.get@1` | Simulation / Simulation Provider / Desktop | 按来源环境可见范围；`confirmation=none`；有界 projection | 只读；not found/resource denied |
 | 查询手动版本历史 | `simulation.environment.version.search@1` | 同上 | 按来源环境可见范围；`confirmation=none`；cursor/page_size | 只读；稳定排序 |
 | 启动两个版本的大型比较 | `simulation.environment.version_compare.start@1` | Simulation / Simulation Provider / Desktop | 左右版本均可读；confirmation 待评审；幂等；max_nodes | 创建只读计算任务；input/algorithm hash 审计 |
@@ -498,6 +498,8 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 | 按数模号批量精确反查知识资源 | `knowledge.resource_model_mapping.reverse_resolve@1` | Knowledge / Knowledge Provider / Simulation | `knowledge.read`；tenant 来自可信上下文；`confirmation=none`；有界批量 | 逐项 resolved/not_found/ambiguous；查询摘要审计 |
 
 每个候选在进入代码前必须使用治理变更记录模板补齐真实 `capability_version_gid`、business effect/invariants、闭合输入输出、Provider、Gateway exposure、消费者、表/迁移、测试和当前 Snapshot。上表不能作为注册或审批依据。
+
+现有 experimental 的 `simulation.environment.workspace.create@1`、`simulation.environment.workspace.search@1`、`simulation.environment.workspace.get@1`、`simulation.environment.version.freeze@1`、三个 structure_node 写能力和两个 binding 写能力都发生了 Schema、selector、授权、消费者或副作用合同变化。每一项必须独立完成 Descriptor/Provider 差距判断、重建 definition hash、重新审批/生成证据并迁移消费者；若治理规则判定不兼容则升新 major。正式产品路由在其成为 stable release target 前不得调用。
 
 #### 11.2.1 候选契约闭合边界
 
@@ -528,7 +530,7 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 | `simulation.environment.version.search@1` | workspace、cursor/page_size | version summaries、next_cursor | 无 | owner、分页、稳定排序、归档策略 |
 | `simulation.environment.version_compare.start@1` | left/right version、algorithm version、max_nodes、幂等键 | comparison GID、input hash、status | 创建计算任务，不修改环境 | 幂等、算法缺失、节点上限、owner、input hash |
 | `simulation.environment.version_compare.get@1` | comparison GID、cursor/page_size | 状态、摘要、分页差异、result hash | 无 | unchanged/moved/upgraded/added/removed、分页/hash |
-| `simulation.environment.environment_anchor.create@1` | project_main、Craft expected revision/hash、Simulation expected row、幂等键 | anchor GID、preparing | 启动跨域 saga | 权限、并发、双侧故障、只有 ready 可用 |
+| `simulation.environment.environment_anchor.create@1` | workspace/version source set、Craft expected revision/hash、Simulation expected row、幂等键；kind=project_main 或 ad_hoc 含 Craft source | anchor GID、preparing | project_main 强制 Craft；ad_hoc 无 Craft 时禁止创建；启动跨域 saga | 三类来源、权限、并发、双侧故障、只有 ready 可用 |
 | `simulation.environment.environment_anchor.get@1` | anchor GID | source refs/hash/state | 无 | 授权、裁剪、各终态 |
 | `simulation.environment.environment_anchor.reconcile@1` | anchor、expected state、幂等键 | ready/failed/reconciling、evidence refs | 重校验两侧，不盲目重写 | 幂等、过期状态、Artifact/Craft 故障 |
 | `simulation.environment.main_projection_operation.get@1` | operation GID | Craft outcome ref、projection state、audit | 无 | 授权、裁剪、稳定终态 |
