@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_44301ef7fc8db38e3a2b93d55795ec1a",
-  "catalog_hash": "sha256:44301ef7fc8db38e3a2b93d55795ec1accc7f88e6debe14c9f78e28ac87c9b1a",
+  "release_id": "rel_439ad9271d5f416bf5b0ff2b50ade400",
+  "catalog_hash": "sha256:439ad9271d5f416bf5b0ff2b50ade400611482fb1aa2e1744fcbc43b42fd1dfd",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -31474,7 +31474,7 @@
       "description": "Check one trusted actor's project or line-scoped BOP edit authority.",
       "use_when": "The management center needs this exact Base-owned responsibility outcome.",
       "do_not_use_when": "The resource belongs to Project or Craft.",
-      "business_effect": "Check one trusted actor's project or line-scoped BOP edit authority.",
+      "business_effect": "Produces the authoritative Base decision that permits or denies a BOP edit at project or line scope.",
       "business_acceptance_criteria": [
         "The authenticated tenant and actor are derived by the Gateway.",
         "The result conforms to the closed Base contract.",
@@ -31764,7 +31764,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:d84a779a606784edfb61d00d4eaee5c42b8f4f65e7a61ce1c394a5137d168cb8"
+      "business_definition_hash": "sha256:2a96c6809068b640e62a1d5a4a13b83c0263ba91ada455f23821447ad17c5b39"
     },
     {
       "id": "base.export_template.change.apply",
@@ -36879,7 +36879,7 @@
       "description": "Return one minimal active-principal projection by Base user GID.",
       "use_when": "The management center needs this exact Base-owned responsibility outcome.",
       "do_not_use_when": "The resource belongs to Project or Craft.",
-      "business_effect": "Return one minimal active-principal projection by Base user GID.",
+      "business_effect": "Supplies the active Base identity required to assign organization responsibilities without exposing a full user record.",
       "business_acceptance_criteria": [
         "The authenticated tenant and actor are derived by the Gateway.",
         "The result conforms to the closed Base contract.",
@@ -37163,7 +37163,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:65ae6bba784d17e9e0f2d2581a3563ba568a0aae84f54b61cab46830127f853f"
+      "business_definition_hash": "sha256:1d7cf8a6792f3246cbeceb883e19688567cbc086df0991db29962aaec609c799"
     },
     {
       "id": "base.identity.admin_user.list",
@@ -44493,7 +44493,7 @@
       "description": "Read the authoritative bounded project-manager set.",
       "use_when": "The management center needs this exact Base-owned responsibility outcome.",
       "do_not_use_when": "The resource belongs to Project or Craft.",
-      "business_effect": "Read the authoritative bounded project-manager set.",
+      "business_effect": "Returns the tenant-authoritative manager assignment and revision used by organization administration.",
       "business_acceptance_criteria": [
         "The authenticated tenant and actor are derived by the Gateway.",
         "The result conforms to the closed Base contract.",
@@ -44825,7 +44825,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:d6335b3fa4c6241f04b5eb664bf65561979e12c15f133c0500cc26ec8bfb87dd"
+      "business_definition_hash": "sha256:0e6b85ea5a78cc229a5eaaca8daa0de1fd77e62a1706001dd5070b4b7cb6add9"
     },
     {
       "id": "base.project_manager.replace",
@@ -44837,7 +44837,7 @@
       "description": "Replace the authoritative project-manager set after super-admin confirmation.",
       "use_when": "The management center needs this exact Base-owned responsibility outcome.",
       "do_not_use_when": "The resource belongs to Project or Craft.",
-      "business_effect": "Replace the authoritative project-manager set after super-admin confirmation.",
+      "business_effect": "Commits a confirmed, revision-checked replacement of the tenant-authoritative project manager assignment.",
       "business_acceptance_criteria": [
         "The authenticated tenant and actor are derived by the Gateway.",
         "The result conforms to the closed Base contract.",
@@ -45191,7 +45191,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:3ca17db71b5fe12841979ab43847572bc11127de9067dff695a65f6cdd823f5a"
+      "business_definition_hash": "sha256:dfba9e81e700524d8ce5a86f795d57fe6b1e8058636b7023d61cf60ab85f3c59"
     },
     {
       "id": "base.project_responsibility.projection.apply",
@@ -45203,7 +45203,7 @@
       "description": "Apply one idempotent source-scoped BOP line responsibility projection.",
       "use_when": "The management center needs this exact Base-owned responsibility outcome.",
       "do_not_use_when": "The resource belongs to Project or Craft.",
-      "business_effect": "Apply one idempotent source-scoped BOP line responsibility projection.",
+      "business_effect": "Materializes the latest approved manual-line responsibility as idempotent Base authorization grants.",
       "business_acceptance_criteria": [
         "The authenticated tenant and actor are derived by the Gateway.",
         "The result conforms to the closed Base contract.",
@@ -45525,7 +45525,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:5c5cbc826824e69d2e378f15e80d148a5444ca5e1f530d98f13610bd940e53cc"
+      "business_definition_hash": "sha256:8296d2a6e18e392f65927f71c69016ae7d44cbc2b8a50797bad4e01d2c426850"
     },
     {
       "id": "base.project_responsibility.projection.get",
@@ -45537,7 +45537,7 @@
       "description": "Read one source-scoped BOP line projection status.",
       "use_when": "The management center needs this exact Base-owned responsibility outcome.",
       "do_not_use_when": "The resource belongs to Project or Craft.",
-      "business_effect": "Read one source-scoped BOP line projection status.",
+      "business_effect": "Reports whether a specific responsibility projection has durably completed for its source revision.",
       "business_acceptance_criteria": [
         "The authenticated tenant and actor are derived by the Gateway.",
         "The result conforms to the closed Base contract.",
@@ -45817,7 +45817,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:b2e1fe2029db9dda8f868b32052bed2546421ce14182ed507475bac11a158392"
+      "business_definition_hash": "sha256:3d1af5855cb163b9d01eac930f571485fd670d5bbf0c7f7e8d86b6a2db012fde"
     },
     {
       "id": "base.runtime.annotation.search",
@@ -57377,7 +57377,7 @@
       "description": "Governed craft.bop.active_line.search active BOP line outcome.",
       "use_when": "A responsibility editor needs an explicit active BOP line.",
       "do_not_use_when": "The caller wants to mutate BOP content.",
-      "business_effect": "Governed craft.bop.active_line.search active BOP line outcome.",
+      "business_effect": "Returns the bounded active BOP lines that may be assigned to a project responsibility node.",
       "business_acceptance_criteria": [
         "Only active-version nondeleted line_process entries are returned or accepted.",
         "Graph traversal is bounded to 5000 nodes and depth 32.",
@@ -57728,7 +57728,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:8504340e6fef7088bceccfa673c5e2925fdaa63db02c42fd03be1f48cf24c8b7"
+      "business_definition_hash": "sha256:2eab581ff6db7dc859feb6ba035aea50babdf2e5ddd036b5e25aa810025c9cdd"
     },
     {
       "id": "craft.bop.active_line.validate",
@@ -57740,7 +57740,7 @@
       "description": "Governed craft.bop.active_line.validate active BOP line outcome.",
       "use_when": "A responsibility editor needs an explicit active BOP line.",
       "do_not_use_when": "The caller wants to mutate BOP content.",
-      "business_effect": "Governed craft.bop.active_line.validate active BOP line outcome.",
+      "business_effect": "Confirms that a selected BOP line remains active, undeleted, and owned by the requested project.",
       "business_acceptance_criteria": [
         "Only active-version nondeleted line_process entries are returned or accepted.",
         "Graph traversal is bounded to 5000 nodes and depth 32.",
@@ -58009,7 +58009,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:a2f555f9d0bb276767ca49ee9b3e0279dec6a559b2564ef061c38f417dbdc0c7"
+      "business_definition_hash": "sha256:4b6b1e23593738a57b63b3ecbf4ab0079be26aef305c3253607c5e54793cd85f"
     },
     {
       "id": "craft.bop.alt_hierarchy.read",
@@ -288000,7 +288000,43 @@
               "updates": {
                 "type": "object",
                 "properties": {
-                  "severity": {
+                  "feishu_groups": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "chat_id": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "avatar": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "title": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "permanent_action": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "status": {
                     "type": [
                       "string",
                       "null"
@@ -288014,21 +288050,21 @@
                     ],
                     "maxLength": 65536
                   },
-                  "description": {
+                  "related_knowledge_gid": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "scheduled_date": {
+                  "feishu_assignee_open_id": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "feishu_group_chat_id": {
+                  "severity": {
                     "type": [
                       "string",
                       "null"
@@ -288065,35 +288101,7 @@
                       "additionalProperties": false
                     }
                   },
-                  "list_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "project_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "permanent_action": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "escape_root_cause": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "occurrence_root_cause": {
+                  "feishu_group_chat_id": {
                     "type": [
                       "string",
                       "null"
@@ -288107,7 +288115,70 @@
                     ],
                     "maxLength": 65536
                   },
-                  "feishu_assignee_open_id": {
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "bop_entry_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "occurrence_root_cause": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "escape_root_cause": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "scheduled_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "interim_action": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "project_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "approval_order_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "share_scope": {
                     "type": [
                       "string",
                       "null"
@@ -288181,64 +288252,7 @@
                       ]
                     }
                   },
-                  "bop_entry_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_groups": {
-                    "type": "array",
-                    "maxItems": 200,
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "chat_id": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "name": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "avatar": {
-                          "type": "string",
-                          "maxLength": 2048
-                        }
-                      },
-                      "additionalProperties": false
-                    }
-                  },
-                  "share_scope": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "related_knowledge_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "status": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "interim_action": {
+                  "description": {
                     "type": [
                       "string",
                       "null"
@@ -288246,20 +288260,6 @@
                     "maxLength": 65536
                   },
                   "feishu_assignee_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "approval_order_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "title": {
                     "type": [
                       "string",
                       "null"
@@ -301316,7 +301316,7 @@
       "description": "Apply one revisioned manual-line change and durably project its BOP responsibility grants.",
       "use_when": "A super administrator changes one manual project line.",
       "do_not_use_when": "The caller changes ordinary project membership.",
-      "business_effect": "Apply one revisioned manual-line change and durably project its BOP responsibility grants.",
+      "business_effect": "Commits one revision-checked manual responsibility change and starts its durable BOP authorization projection.",
       "business_acceptance_criteria": [
         "The result is tenant scoped and schema closed.",
         "Only a super administrator may change the responsibility tree.",
@@ -301688,7 +301688,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:a31c2b5b355bfe0c0188b93e8659903856a385c5f62d683db4f6829a96dd0415"
+      "business_definition_hash": "sha256:57c82053d94d911338c202caf6b141f45c3f35eb58fc86a1f41fea6cf559a2ec"
     },
     {
       "id": "project.org_management.read",
@@ -301700,7 +301700,7 @@
       "description": "Read bounded project responsibility tree, matrix, or operation status.",
       "use_when": "The super-admin management center reads manual project responsibilities.",
       "do_not_use_when": "The caller needs ordinary project members.",
-      "business_effect": "Read bounded project responsibility tree, matrix, or operation status.",
+      "business_effect": "Returns the tenant-bounded manual responsibility tree, matrix, or durable projection status used by administrators.",
       "business_acceptance_criteria": [
         "The result is tenant scoped and schema closed.",
         "Only a super administrator may change the responsibility tree.",
@@ -302167,7 +302167,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:f5e31a98cfca96fbaa915b1cf442f103cfa620c163033755ff15ae023a744314"
+      "business_definition_hash": "sha256:285ef15ac69186385d9ba86940cf07cfdd5edff75dd417575ed4e0b2f3f396df"
     },
     {
       "id": "project.permission_request.change.apply",
@@ -310309,7 +310309,7 @@
       "description": "Return a minimal project identity projection for the fixed Base validator.",
       "use_when": "Base validates a project before replacing its manager set.",
       "do_not_use_when": "A user needs normal project detail.",
-      "business_effect": "Return a minimal project identity projection for the fixed Base validator.",
+      "business_effect": "Supplies the minimal authoritative project identity needed before Base changes manager ownership.",
       "business_acceptance_criteria": [
         "The result is tenant scoped and schema closed.",
         "Only a super administrator may change the responsibility tree.",
@@ -310609,7 +310609,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:971348b78aa22f570270cb2ab2336fd3dea400650b8c12a1426d2f6733ed04cb"
+      "business_definition_hash": "sha256:2dfb3077d019d14d3a3ffc079dd030a5eea07c2c33366b7d81e737813737dde8"
     },
     {
       "id": "project.share.list",
@@ -320602,21 +320602,57 @@
               "updates": {
                 "type": "object",
                 "properties": {
-                  "canvas_y": {
-                    "type": [
-                      "integer",
-                      "number",
-                      "null"
-                    ]
+                  "feishu_groups": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "chat_id": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "avatar": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
                   },
-                  "description": {
+                  "due_date": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "feishu_assignee_name": {
+                  "canvas_x": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "priority": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "status": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "actual_start": {
                     "type": [
                       "string",
                       "null"
@@ -320653,14 +320689,49 @@
                       "additionalProperties": false
                     }
                   },
-                  "priority": {
+                  "completion": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "meeting_level": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "meeting_doc_link": {
+                  "feishu_group_chat_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "review_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "plan_end": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "scheduled_date": {
                     "type": [
                       "string",
                       "null"
@@ -320674,7 +320745,14 @@
                     ],
                     "maxLength": 65536
                   },
-                  "assignee_team_gid": {
+                  "parent_task_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "share_scope": {
                     "type": [
                       "string",
                       "null"
@@ -320748,55 +320826,21 @@
                       ]
                     }
                   },
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
                   "scheduled_start_time": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "share_scope": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "actual_start": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "actual_end": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "time_estimate": {
-                    "type": [
-                      "integer",
-                      "null"
-                    ]
-                  },
-                  "feishu_group_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "status": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "due_date": {
                     "type": [
                       "string",
                       "null"
@@ -320810,73 +320854,7 @@
                     ],
                     "maxLength": 65536
                   },
-                  "parent_task_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "plan_end": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "is_deleted": {
-                    "type": "boolean"
-                  },
-                  "completion": {
-                    "type": [
-                      "integer",
-                      "number",
-                      "null"
-                    ]
-                  },
-                  "scheduled_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
                   "canvas_icon": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_chat_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "meeting_level": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "node_type": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "list_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "plan_start": {
                     "type": [
                       "string",
                       "null"
@@ -320890,41 +320868,63 @@
                     ],
                     "maxLength": 65536
                   },
-                  "canvas_x": {
-                    "type": [
-                      "integer",
-                      "number",
-                      "null"
-                    ]
+                  "is_deleted": {
+                    "type": "boolean"
                   },
-                  "review_date": {
+                  "plan_start": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "feishu_groups": {
-                    "type": "array",
-                    "maxItems": 200,
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "chat_id": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "name": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "avatar": {
-                          "type": "string",
-                          "maxLength": 2048
-                        }
-                      },
-                      "additionalProperties": false
-                    }
+                  "canvas_y": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "node_type": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "assignee_team_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "actual_end": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "meeting_doc_link": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "time_estimate": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
                   }
                 },
                 "additionalProperties": false,
@@ -414298,13 +414298,13 @@
       "plugin_id": "official.base",
       "module": "backend.base.official_provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:d9e18df6431563d87b5ca09d295c8f1d1a73e48aec9ef31be9ce55eb17abe397"
+      "artifact_hash": "sha256:0aefa894ed499d467259492524bb057ca0bd4e10e46d43a208c836b7b3ce3a7b"
     },
     {
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:2d532422f907089e01d62af00990fc731bb768eff16171182541ea22956092ff"
+      "artifact_hash": "sha256:31eb9483d16479d850bd8966b10b6dd402eb23165da7f1f24959fa643bfbe66e"
     },
     {
       "plugin_id": "official.device",
@@ -414346,7 +414346,7 @@
       "plugin_id": "official.project-management",
       "module": "project_management_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:0ac666dd913af24636e28d5c2a5b707799667a644574ba735a58c670bc2a5e2d"
+      "artifact_hash": "sha256:688faf37488d0cead884be52ad3e1937d49d10956a32dde034309b5ab4b6d5f6"
     },
     {
       "plugin_id": "official.simulation",
@@ -414355,5 +414355,5 @@
       "artifact_hash": "sha256:b082b0802f4d50dd287cb829fa382d2b3ac9d4a9bee44b153d27ff44ab728b76"
     }
   ],
-  "created_at": "2026-09-09T08:52:57.229827Z"
+  "created_at": "2026-09-09T09:10:32.967657Z"
 }

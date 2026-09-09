@@ -115,7 +115,7 @@ def validate_active_line(payload: dict[str, Any], _context: object) -> dict[str,
     return {"data": {"gid": str(row["gid"]), "active": True}}
 
 
-def _descriptor(spec: CapabilitySpec) -> CapabilityDescriptorV2:
+def _descriptor(spec: CapabilitySpec, *, business_effect: str) -> CapabilityDescriptorV2:
     base = descriptor_from_provider_spec(spec)
     errors = tuple(DomainErrorContract(code=code, meaning=code.replace("_", " "), retryable=False) for code in (
         "invalid_input", "invalid_cursor", "invalid_page_size", "resource_not_found",
@@ -130,7 +130,7 @@ def _descriptor(spec: CapabilitySpec) -> CapabilityDescriptorV2:
         "operation_policy": "none", "idempotency_policy": "none", "consistency_policy": "strong",
         "evidence_policy": "optional", "audit_policy": "standard",
         "domain_errors": errors, "domain_errors_complete": True,
-        "business_effect": spec.description,
+        "business_effect": business_effect,
         "business_acceptance_criteria": (
             "Only active-version nondeleted line_process entries are returned or accepted.",
             "Graph traversal is bounded to 5000 nodes and depth 32.",
@@ -144,12 +144,12 @@ def _descriptor(spec: CapabilitySpec) -> CapabilityDescriptorV2:
 def register_bop_active_line_capabilities(registry: Any) -> None:
     item = _object({"gid": ID, "version_gid": ID, "version_tag": {"type": "string", "maxLength": 256}, "title": {"type": "string", "maxLength": 512}, "path": {"type": "string", "maxLength": 4096}}, ("gid", "version_gid", "version_tag", "title", "path"))
     definitions = (
-        ("craft.bop.active_line.search", search_active_lines, _object({"project_gid": ID, "cursor": {"type": ["string", "null"], "maxLength": 512}, "page_size": {"type": "integer", "minimum": 1, "maximum": 100}}, ("project_gid",)), _object({"data": _object({"items": {"type": "array", "items": item, "maxItems": 100}, "next_cursor": {"type": ["string", "null"], "maxLength": 512}}, ("items", "next_cursor"))}, ("data",))),
-        ("craft.bop.active_line.validate", validate_active_line, _object({"project_gid": ID, "bop_line_gid": ID}, ("project_gid", "bop_line_gid")), _object({"data": _object({"gid": ID, "active": {"const": True}}, ("gid", "active"))}, ("data",))),
+        ("craft.bop.active_line.search", search_active_lines, "Returns the bounded active BOP lines that may be assigned to a project responsibility node.", _object({"project_gid": ID, "cursor": {"type": ["string", "null"], "maxLength": 512}, "page_size": {"type": "integer", "minimum": 1, "maximum": 100}}, ("project_gid",)), _object({"data": _object({"items": {"type": "array", "items": item, "maxItems": 100}, "next_cursor": {"type": ["string", "null"], "maxLength": 512}}, ("items", "next_cursor"))}, ("data",))),
+        ("craft.bop.active_line.validate", validate_active_line, "Confirms that a selected BOP line remains active, undeleted, and owned by the requested project.", _object({"project_gid": ID, "bop_line_gid": ID}, ("project_gid", "bop_line_gid")), _object({"data": _object({"gid": ID, "active": {"const": True}}, ("gid", "active"))}, ("data",))),
     )
-    for capability_id, handler, input_schema, output_schema in definitions:
+    for capability_id, handler, business_effect, input_schema, output_schema in definitions:
         spec = CapabilitySpec(id=capability_id, version=1, owner="craft", description=f"Governed {capability_id} active BOP line outcome.", use_when="A responsibility editor needs an explicit active BOP line.", do_not_use_when="The caller wants to mutate BOP content.", risk=CapabilityRisk.READ, confirmation="none", permissions=("craft.read",), input_schema=input_schema, output_schema=output_schema, tags=("craft", "bop", "active_line"))
-        registry.register(spec, handler, descriptor=_descriptor(spec))
+        registry.register(spec, handler, descriptor=_descriptor(spec, business_effect=business_effect))
 
 
 __all__ = ["MAX_DEPTH", "MAX_NODES", "register_bop_active_line_capabilities", "search_active_lines", "validate_active_line"]

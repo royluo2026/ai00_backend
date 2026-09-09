@@ -92,7 +92,7 @@ def test_build_runtime_evidence_maps_exact_current_run_outcomes():
         outcome_sha256="sha256:" + "b" * 64,
     )
 
-    assert sum(len(cases) for cases in evidence["capabilities"].values()) == 3353
+    assert sum(len(cases) for cases in evidence["capabilities"].values()) == 3808
     assert set(evidence["capabilities"]) == set(manifest["capabilities"])
     assert all(
         result == "passed"

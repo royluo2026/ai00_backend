@@ -389,14 +389,14 @@ def test_acceptance_allows_distinct_exact_symbols_in_one_canonical_source(tmp_pa
     } == {node_id, other_node_id}
 
 
-def test_production_acceptance_manifest_keeps_all_3353_unique_references_valid():
+def test_production_acceptance_manifest_keeps_all_stable_references_valid():
     from backend.capability_governance_test.config import GovernanceSettings
     from backend.capability_governance_test.scanner import GovernanceScanner
 
     root = Path(__file__).parents[2]
     manifest_path = root / "backend/tests/acceptance/fixtures/case-manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    assert sum(len(cases) for cases in manifest["capabilities"].values()) == 3353
+    assert sum(len(cases) for cases in manifest["capabilities"].values()) == 3808
     scanner = GovernanceScanner(
         GovernanceSettings("test-governance", root),
         acceptance_manifest=manifest,

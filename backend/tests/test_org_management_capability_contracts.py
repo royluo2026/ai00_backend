@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from backend.capabilities.registry_next import CapabilityRegistry
 from backend.base.official_provider import register_capabilities as register_base
+from backend.capability_v2.business_definition import is_generated_business_effect
 from plugins.craft.craft_backend.capabilities import register_capabilities as register_craft
 from plugins.project_management.project_management_backend.capabilities import (
     register_capabilities as register_project,
@@ -39,8 +40,24 @@ def test_org_management_capabilities_are_registered_with_closed_governed_contrac
         item = registry.get(capability_id, version)
         assert item.descriptor is not None
         assert item.descriptor.domain_errors_complete is True
+        assert not is_generated_business_effect(
+            item.descriptor.business_effect, item.spec.description
+        )
         assert item.spec.input_schema.get("additionalProperties") is False
         assert item.spec.output_schema.get("additionalProperties") is False
+
+
+def test_project_org_management_handlers_are_owned_by_the_capability_provider_boundary():
+    registry = _registry()
+
+    for capability_id in (
+        "project.project.validation.get",
+        "project.org_management.read",
+        "project.org_management.change.apply",
+    ):
+        assert registry.get(capability_id, 1).handler.__module__.endswith(
+            ".capabilities.org_management"
+        )
 
 
 def test_permission_changing_entrypoints_have_exact_confirmation_and_exposure():
