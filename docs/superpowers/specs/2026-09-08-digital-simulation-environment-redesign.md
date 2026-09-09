@@ -333,7 +333,7 @@ Craft 的执行结构投影对外规范化为 `parameters.is_load_part`，Simula
 
 节点评审主环境直接绑定项目在线活动 BOP。项目管理者和获授权工程师的结构、零件 load/operate 及资源需求修改由 Craft Capability 写入当前活动 BOP；Simulation 同步保存 VM 实例、姿态、截图和 VisMockup 映射。普通协作不经过私人环境合并或发布流程。
 
-建立基线或冻结时，由 Simulation 拥有的 `environment_anchor` 通过可对账 saga 关联 Craft 不可变 snapshot ref、精确 capability version/content hash 与 Simulation canonical manifest。锚点经历 `preparing/ready/failed/reconciling`；只有两侧重新校验完成的 `ready` 锚点可对用户表示为同一评审版本。它不是 Project Management 的“正式项目版本”，也不构成跨域数据库事务。
+建立基线或冻结时，由 Simulation 拥有的 `environment_anchor` 通过可对账 saga 关联 Craft 不可变 snapshot ref、精确 capability version/content hash 与 Simulation canonical manifest。锚点经历 `preparing/ready/failed/reconciling`；只有两侧重新校验完成的 `ready` 锚点可对用户表示为同一评审版本。它不是 Project Management 的“正式项目版本”，也不构成跨域数据库事务。该锚点对 project_main 强制；无 Craft 来源的空白或纯 VM ad_hoc 版本只走 Artifact + Simulation saga。
 
 ### 9.2 不写入 BOP 主结构的内容
 
@@ -378,7 +378,7 @@ Craft 的执行结构投影对外规范化为 `parameters.is_load_part`，Simula
 
 ### 10.1 冻结版本与可复现性
 
-冻结版本不是只保存一个 `manifest_hash`。每个 `environment_version_gid` 必须绑定一个不可变 canonical manifest Artifact 及其 SHA-256，并在数据库中保留可查询的 version membership/projection。canonical manifest 至少固定：
+冻结版本不是只保存一个 `manifest_hash`。每个 `environment_version_gid` 必须绑定一个不可变 canonical manifest Artifact 及其 SHA-256，并在数据库中保留可查询的 version membership/projection。manifest 使用 owner/source 列表，只固定实际存在的来源；project_main 强制 Craft snapshot，ad_hoc 的 Craft source 可选。canonical manifest 至少固定：
 
 - 环境节点集合、父子关系、顺序和来源类型；
 - 每条绑定及 binding revision，包括 load、operate、resource_use；
@@ -400,6 +400,8 @@ Craft 的执行结构投影对外规范化为 `parameters.is_load_part`，Simula
 - version membership、binding revision、snapshot sequence、实例观察和环境锚点设置域内唯一键及同租户约束；跨域只保存 GID/ref/hash，不建立跨域外键或 cascade。
 - 冻结采用跨资源 saga，不能把 Base Platform Artifact Capability 和 Simulation 数据库描述成一个事务：先通过受治理 Base Platform Artifact Capability 以 operation/idempotency 创建并 finalize 不可变 Artifact；再校验 ArtifactRef、hash、tenant 和访问范围；随后在 Simulation 单库事务中写入 version、membership、ArtifactRef/hash 和审计，提交后才令版本可见。OIS 只是 Artifact 字节存储的 Provider 实现，不是并列业务 owner。
 - Simulation 数据库失败时将已完成 Artifact 标记为 orphan，交由 Base Platform Artifact Capability 的受控保留/回收流程处理；数据库成功但 Artifact 暂时不可读时将版本标记为 unavailable 并对账，禁止用重新序列化的不同 bytes 替换原 Artifact。
+- archive/delete 与 capture/materialize/snapshot/comparison/reconciliation 的 run-lease 获取在同一 workspace guard/行锁上串行化；有活动 lease 返回 `active_run_exists`，archive/tombstone 落库后禁止新 lease。
+- archived active project_main 仍占唯一槽位；只有 frozen 或 deleted 释放槽位，避免 archive→create→restore 产生两个 active main。
 - 使用新增 `0012` 迁移增加状态维度、版本种类、锚点、lineage 与 tombstone；不得修改已执行的 `0011_simulation_workspaces.sql`。0011 的 publish plan/map/outbox 停止新写入和新消费者，仅保留历史只读兼容。
 - archive 可恢复且不改变 active/frozen；delete 只写 tombstone，不删除不可变版本、Fork base、Diff、审计或其他领域数据。第一阶段不实现物理 purge。
 
@@ -422,7 +424,7 @@ Craft 的执行结构投影对外规范化为 `parameters.is_load_part`，Simula
 | 从固定来源生成 Connector manifest | `simulation.environment.compose@1/@2` | `@1 stable`；`@2 experimental` | 优先复用，先做契约差距检查 | `@2` 可用于受控开发验证；若无法绑定 frozen workspace、load/operate、算法版本和完整 VM snapshot，则新增后续主版本，不得扩写旧输出。 |
 | manifest 读取、查询、归档 | `simulation.environment.manifest.get/search/archive@1` | stable | 复用 | 查询增加 cursor/max_nodes 若属兼容可选参数；改变默认边界则升主版本。 |
 | 活动 VM 文档快照两阶段流程 | `simulation.document_snapshot.request@1/@2`、`get/action.get/dispatch@1` | `request@1 deprecated`；`request@2 experimental`；配套 get/action/dispatch experimental | 复用工作流，快照契约预计升主版本 | 新契约需绑定原始 PLMXML Artifact、文档/session、解析任务、上限、算法版本和差异；建议后续主版本，最终由 owner 差距评审决定。 |
-| 环境预检与物化 | `simulation.environment.preflight@1`、`materialize@1/@2`、`materialization_run.action.get/dispatch@1` | preflight stable；`materialize@1 deprecated`；`@2` 及 action/dispatch experimental | 复用两阶段模式 | 物化输入必须固定 frozen version 和 scene baseline；若现有 Schema 不可表达则升主版本。 |
+| 环境预检与物化 | `simulation.environment.preflight@1`、`simulation.environment.materialize@1`、`simulation.environment.materialize@2`、`simulation.environment.materialization_run.action.get@1`、`simulation.environment.materialization_run.action.dispatch@1` | preflight stable；materialize@1 deprecated；materialize@2 及 action get/dispatch experimental | 复用两阶段模式 | 物化输入必须固定 frozen version 和 scene baseline；若现有 Schema 不可表达则升主版本。 |
 | 倒序截图运行 | `simulation.capture_run.start@1/@2`、`get/action.get/dispatch/cancel@1`、`capture_step.retry@1` | `start@1 deprecated`；`start@2` 与 action/dispatch experimental；get/cancel/retry stable | 复用状态机，`start` 预计升主版本 | 新语义是每工序一图、Load 边界隐藏、场景备份/恢复和严格 outcome 对账；不得在 `start@2` 静默改义。 |
 | VM 应用、模型、树、选择、高亮、显隐和截图 | `simulation.vismockup.*@1`、Connector binding/health 相关能力 | 当前所查 `vismockup.*@1` 均 experimental；binding/health 状态由 G0 校正 | 仅用于受控开发验证并做逐项差距检查 | 全部必须改走 execution-plan/outcome v2 唯一路径；不能保留 renderer/IPC/bridge 旁路。 |
 | Artifact 导入与读取 | `base.artifact.import/get/bytes.get@1` | 当前所查均 experimental | 仅用于受控开发验证并做差距检查 | 冻结需要“创建/finalize 不可变 Artifact”的明确效果；若 import 不能保证该效果，由 Base Platform owner 新增能力，Simulation 禁止直连 OIS。 |
@@ -462,8 +464,10 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 | 查询当前用户可见的工作区列表 | `simulation.environment.workspace.search@1` | 同上 | 私人 owner、同租户共享、项目可见；`confirmation=none`；cursor/page_size | 只读；稳定分页和查询摘要审计 |
 | 读取一个可见工作区及 draft head | `simulation.environment.workspace.get@1` | 同上 | 服务端可见范围 selector；`confirmation=none`；有界 projection | 只读；not found/resource denied |
 | 修改名称或非语义元数据 | `simulation.environment.workspace.metadata.update@1` | 同上 | owner；项目主环境允许项目管理者；CAS + 幂等 | 单库 CAS；metadata revision 审计 |
-| 共享/取消共享工作区 | `simulation.environment.workspace.share/unshare@1` | 同上 | owner；逐引用验证再分发权；CAS + 幂等 | not_registered；与 create/fork/metadata update 分离 |
-| 归档/恢复工作区 | `simulation.environment.workspace.archive/restore@1` | 同上 | private/shared owner；project_main 当前项目管理者 | not_registered；不改变 active/frozen lifecycle |
+| 共享工作区 | `simulation.environment.workspace.share@1` | 同上 | owner；逐引用验证再分发权；CAS + 幂等 | not_registered；与 create/fork/metadata update 分离 |
+| 取消共享工作区 | `simulation.environment.workspace.unshare@1` | 同上 | owner；CAS + 幂等 | not_registered；既有 Fork 不失效 |
+| 归档工作区 | `simulation.environment.workspace.archive@1` | 同上 | private/shared owner；project_main 当前项目管理者；guard 锁与 run lease 串行 | not_registered；不改变 active/frozen lifecycle |
+| 恢复工作区 | `simulation.environment.workspace.restore@1` | 同上 | 原授权主体；CAS + 幂等 | not_registered；archived active main 一直占唯一槽位 |
 | 删除工作区 | `simulation.environment.workspace.delete@1` | 同上 | private/shared owner；project_main 当前项目管理/删除权限；CAS + 幂等 | tombstone；不含 purge，不级联其他领域或关闭 VisMockup |
 | 创建一个临时结构节点 | `simulation.environment.structure_node.create@1` | 同上 | 私人/共享 owner；主环境获授权线体；CAS + 幂等 | parent/type/limit 校验；create 审计 |
 | 移动一个临时结构节点 | `simulation.environment.structure_node.move@1` | 同上 | 私人/共享 owner；主环境线体权限；跨线体仅项目管理者 | parent/cycle 校验；from/to 审计 |
@@ -479,8 +483,16 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 | 查询手动版本历史 | `simulation.environment.version.search@1` | 同上 | 按来源环境可见范围；`confirmation=none`；cursor/page_size | 只读；稳定排序 |
 | 启动两个版本的大型比较 | `simulation.environment.version_compare.start@1` | Simulation / Simulation Provider / Desktop | 左右版本均可读；confirmation 待评审；幂等；max_nodes | 创建只读计算任务；input/algorithm hash 审计 |
 | 读取比较进度和分页结果 | `simulation.environment.version_compare.get@1` | 同上 | 比较任务可读；`confirmation=none`；cursor/page_size | 只读；algorithm unavailable/limit exceeded |
-| 建立/读取/对账复合锚点 | `simulation.environment.anchor.create/get/reconcile@1` | Simulation / Simulation Provider / Desktop、scheduler | 两域精确版本和 hash；幂等 | not_registered；preparing/ready/failed/reconciling saga |
-| 管理并评估版本策略 | `simulation.environment.version_policy.enable/update/disable/get/evaluate@1` | Simulation / Simulation Provider / Task Tool | owner delegation；evaluate 确定性且只读 | not_registered；第一阶段不自动清理版本 |
+| 建立复合锚点 | `simulation.environment.environment_anchor.create@1` | Simulation / Simulation Provider / Desktop、scheduler | project_main 或含 Craft source 的 ad_hoc；两域精确版本和 hash；幂等 | not_registered；创建 preparing saga |
+| 读取复合锚点 | `simulation.environment.environment_anchor.get@1` | 同上 | 授权只读 | not_registered；只有 ready 可作成功版本使用 |
+| 对账复合锚点 | `simulation.environment.environment_anchor.reconcile@1` | 同上 | expected state；幂等 | not_registered；收敛 ready/failed/reconciling |
+| 读取主环境投影操作 | `simulation.environment.main_projection_operation.get@1` | Simulation / Simulation Provider / Desktop、scheduler | 授权只读 | not_registered；返回 Craft outcome ref 与投影状态 |
+| 对账主环境投影操作 | `simulation.environment.main_projection_operation.reconcile@1` | 同上 | expected state；幂等 | not_registered；只修复 Simulation 投影，不重放 Craft 写入 |
+| 启用版本策略 | `simulation.environment.version_policy.enable@1` | Simulation / Simulation Provider / Task Tool | shared owner delegation；CAS + 幂等 | not_registered；固定 Catalog release 与 Capability majors |
+| 更新版本策略 | `simulation.environment.version_policy.update@1` | 同上 | shared owner；CAS + 幂等 | not_registered；新 policy hash/version |
+| 停用版本策略 | `simulation.environment.version_policy.disable@1` | 同上 | shared owner；CAS + 幂等 | not_registered；撤销 delegation，版本不变 |
+| 读取版本策略 | `simulation.environment.version_policy.get@1` | 同上 | owner/Task Tool 只读 | not_registered；敏感字段裁剪 |
+| 评估版本策略 | `simulation.environment.version_policy.evaluate@1` | 同上 | Task Tool；确定性只读 | not_registered；LLM 不参与创建决定 |
 | 接受一次已解析 VM 快照差异 | `simulation.document_snapshot.change.accept@1` | Simulation / Simulation Provider / Desktop | owner only；expected head + 幂等；confirmation 待评审 | 单库 CAS；accepted/rejected diff 审计 |
 | 接受数模升版后的绑定迁移 | `simulation.environment.binding_migration.accept@1` | Simulation / Simulation Provider / Desktop | owner only；expected draft + 幂等；confirmation 待评审 | 单库 CAS；predecessor/target 审计 |
 | 按数模号批量精确反查知识资源 | `knowledge.resource_model_mapping.reverse_resolve@1` | Knowledge / Knowledge Provider / Simulation | `knowledge.read`；tenant 来自可信上下文；`confirmation=none`；有界批量 | 逐项 resolved/not_found/ambiguous；查询摘要审计 |
@@ -492,10 +504,14 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 | Capability | 闭合输入 | 闭合输出 | 副作用/补偿 | 必须建立的测试证据 |
 |---|---|---|---|---|
 | `simulation.environment.workspace.create@1` | name、可选 source refs、幂等键 | private ad_hoc workspace/head GID、row version、来源摘要 | 创建私有 workspace；失败回滚；不得同时共享 | 成功、幂等冲突、来源不可见、跨租户、Schema |
+| `simulation.environment.project_main.create@1` | project、Craft draft ref、expected slot、幂等键 | project_main workspace/head、row version | guard 锁内占唯一槽位；失败回滚 | 项目权限、并发唯一、archived 占位、frozen/deleted 释放 |
 | `simulation.environment.workspace.search@1` | cursor、page_size、允许的状态/名称筛选 | summaries、next_cursor | 无 | owner 隔离、分页稳定、筛选、上限 |
 | `simulation.environment.workspace.get@1` | workspace GID、projection page selector | workspace、draft head、有限节点/绑定页 | 无 | owner 隔离、not found、分页、Schema |
 | `simulation.environment.workspace.metadata.update@1` | workspace、允许字段 patch、expected row version、幂等键 | 新 row version、metadata revision | 单库 CAS | 字段 allowlist、CAS、幂等、跨 owner |
 | `simulation.environment.workspace.archive@1` | workspace、expected row version、幂等键 | archived status、row version | 软归档；历史保留 | 活跃运行阻止、重复归档、CAS、历史读取 |
+| `simulation.environment.workspace.restore@1` | workspace、expected row version、幂等键 | archived_at=null、原 lifecycle、row version | guard 锁内恢复 | 权限、CAS、active main 唯一、重复恢复 |
+| `simulation.environment.workspace.share@1` | workspace、expected row、幂等键 | shared visibility、row version、引用授权摘要 | 校验全部来源再分发权；必要时受控脱敏 | owner、租户、分类、底层 Artifact/source 策略 |
+| `simulation.environment.workspace.unshare@1` | workspace、expected row、幂等键 | private visibility、row version、Fork 摘要 | 停止新共享访问；既有 Fork 保持 | owner、CAS、租户、既有 Fork |
 | `simulation.environment.workspace.delete@1` | workspace、expected row version、幂等键 | deletion GID、deleted_at、保留引用摘要 | tombstone；无跨域级联；不关闭 VisMockup | owner/项目权限、运行阻塞、legal hold、CAS、幂等、Fork 仍可读、槽位释放 |
 | `simulation.environment.structure_node.create@1` | workspace、parent、node type、初始字段、expected row version、幂等键 | node GID/revision、新 row version | 单库 CAS | 类型/父级/上限、幂等、跨 owner |
 | `simulation.environment.structure_node.move@1` | workspace、node、new parent/position、expected row version、幂等键 | node revision、新 row version、局部 patch | 单库 CAS | 环/父缺失/非法层级、CAS、局部刷新 |
@@ -504,11 +520,24 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 | `simulation.environment.binding.create@1` | workspace、node、occurrence/resource ref、单一 role、expected row version、幂等键 | binding GID/revision、新 row version | 单库 CAS | load 唯一、多个 operate、资源多实例、未解析、幂等 |
 | `simulation.environment.binding.update@1` | workspace、binding、允许字段 patch、expected binding/workspace version、幂等键 | 新 binding revision、row version | 追加 revision | role/target、load 冲突、CAS、旧 revision 不变 |
 | `simulation.environment.binding.remove@1` | workspace、binding、expected binding/workspace version、幂等键 | removed revision、row version | 软删除 revision | 重复解除、CAS、冻结引用保护 |
+| `simulation.environment.workspace.version.save@1` | workspace、expected row、实际 source list、算法版本、幂等键 | version、manifest ArtifactRef/hash、可选 anchor | Artifact+Simulation saga；有跨域来源才建 anchor | 空白、纯 VM、Craft overlay、并发、orphan、hash |
+| `simulation.environment.workspace.fork@1` | source version 或 active workspace、expected source、幂等键 | private workspace、fork-base、lineage | 活动源先固定；复用 immutable Artifact/ref | 三类来源、权限、幂等、源删除后仍可读 |
+| `simulation.environment.baseline.set@1` | workspace、version/snapshot request、expected row、幂等键 | baseline version/pointer、row version | 只改 pointer，不改 lifecycle | 历史不变、替换 pointer、CAS、权限 |
 | `simulation.environment.version.freeze@1` | workspace、expected draft、snapshot/source refs、算法版本、幂等键 | environment version GID、canonical ArtifactRef/hash | Artifact finalize + DB saga；DB 失败标 orphan；Artifact 暂不可读则 unavailable 并对账 | membership/hash、并发、两侧失败、orphan、不可变、算法绑定 |
 | `simulation.environment.version.get@1` | version selector、projection page | canonical metadata、projection page、next_cursor | 无 | 历史读取、owner、分页、Artifact unavailable |
 | `simulation.environment.version.search@1` | workspace、cursor/page_size | version summaries、next_cursor | 无 | owner、分页、稳定排序、归档策略 |
 | `simulation.environment.version_compare.start@1` | left/right version、algorithm version、max_nodes、幂等键 | comparison GID、input hash、status | 创建计算任务，不修改环境 | 幂等、算法缺失、节点上限、owner、input hash |
 | `simulation.environment.version_compare.get@1` | comparison GID、cursor/page_size | 状态、摘要、分页差异、result hash | 无 | unchanged/moved/upgraded/added/removed、分页/hash |
+| `simulation.environment.environment_anchor.create@1` | project_main、Craft expected revision/hash、Simulation expected row、幂等键 | anchor GID、preparing | 启动跨域 saga | 权限、并发、双侧故障、只有 ready 可用 |
+| `simulation.environment.environment_anchor.get@1` | anchor GID | source refs/hash/state | 无 | 授权、裁剪、各终态 |
+| `simulation.environment.environment_anchor.reconcile@1` | anchor、expected state、幂等键 | ready/failed/reconciling、evidence refs | 重校验两侧，不盲目重写 | 幂等、过期状态、Artifact/Craft 故障 |
+| `simulation.environment.main_projection_operation.get@1` | operation GID | Craft outcome ref、projection state、audit | 无 | 授权、裁剪、稳定终态 |
+| `simulation.environment.main_projection_operation.reconcile@1` | operation、expected state、幂等键 | projection terminal state、row/audit | 只投影既有 Craft outcome，不重放 Craft 写入 | 幂等、过期、Craft outcome 不可读、DB 故障 |
+| `simulation.environment.version_policy.enable@1` | workspace、policy、delegation、expected row、幂等键 | policy GID/version/hash | 单库事务 | owner、Catalog pin、Capability majors、有效期 |
+| `simulation.environment.version_policy.update@1` | policy、expected version、patch、幂等键 | 新 version/hash | 单库 CAS | allowlist、并发、审计 |
+| `simulation.environment.version_policy.disable@1` | policy、expected version、幂等键 | disabled_at | 撤销 delegation，版本不变 | 幂等、权限、运行竞态 |
+| `simulation.environment.version_policy.get@1` | workspace/policy | 裁剪的 policy/delegation | 无 | owner/Task Tool、敏感裁剪 |
+| `simulation.environment.version_policy.evaluate@1` | policy、resource hash、Diff 摘要、trigger | deterministic create/skip 及原因 | 只读，不创建版本 | 相同输入同结果、阈值、频率、LLM 不参与 |
 | `simulation.document_snapshot.change.accept@1` | document、candidate、accepted/rejected diff IDs、expected head、幂等键 | 新 head/sequence、未解决摘要 | 单库 CAS | 全部 diff 类型、过期候选、并发、幂等、跨文档拒绝 |
 | `simulation.environment.binding_migration.accept@1` | workspace、candidate IDs、逐项 decision、expected draft、幂等键 | binding revisions、row version、剩余歧义 | 单库 CAS | inherit/replace/keep/unbind/rebind、过期、歧义、CAS |
 | `knowledge.resource_model_mapping.reverse_resolve@1` | model numbers、允许的有效期/业务 selector、batch limit；无 tenant/actor payload | 输入逐项 resolved/not_found/ambiguous 与不可变 refs | 无 | 各资源类型、精确/非模糊、歧义、上限、敏感裁剪 |
@@ -595,6 +624,8 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 
 实现项目主环境、私人环境、共享池、项目关联、临时树、自动保存、手动版本、Fork、冻结和四列页面骨架。
 
+其中 project_main、Share、Fork、版本保存和 Freeze 只有在各自前置 Gate 通过、精确 Capability 完成注册并成为允许的 stable release target 后才能开放业务入口；此前只允许数据/UI 骨架和隔离验证，不得由产品路由调用 experimental 或 not_registered 合同。
+
 ### 阶段 3：绑定与知识分类
 
 实现拖放绑定、双向高亮、Knowledge 批量反查、待确认面板和 load/operate/resource_use 语义。
@@ -639,6 +670,9 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 22. private/shared owner 可逻辑删除环境，非 owner 被拒绝；project_main 删除按当前项目管理/删除权限执行，只删除 Simulation 扩展。
 23. 删除在活动运行、legal hold 或 row_version 冲突时被阻止；重复调用幂等；源环境删除后既有 Fork 仍可读。
 24. 删除不级联 Craft、Project、Digital Model、Knowledge 或 Artifact，不关闭 VisMockup，并释放项目活动主环境槽位。
+25. 空白 ad_hoc、纯 VM ad_hoc 和带 Craft overlay 的 ad_hoc 都能保存及 Fork；仅存在跨域 source 时创建 environment anchor。
+26. Archived active main 继续占唯一槽位；archive、delete 和新 run lease 在同一 guard 上串行化。
+27. Craft 已成功但 Simulation 投影失败时进入 projection_pending，并通过受治理的 projection operation reconcile 收敛，不重放 Craft 写入。
 
 ## 15. 明确不做
 

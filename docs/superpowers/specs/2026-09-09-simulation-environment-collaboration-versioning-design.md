@@ -22,7 +22,7 @@ Git 只作为 Fork 和结构化 Diff 的概念参考。业务数据继续使用 
 - 项目主环境不保存“尚待发布到 BOP”的临时 BOP 结构。每次结构编辑直接落到 Craft 当前可变 draft/head；稳定、基线或 released BOP 永远不可写。
 - Simulation 扩展写入失败时，Craft 已成功的业务结果仍是权威结果；操作进入待投影/对账，不能向用户伪报整体成功或盲目重试 Craft 写入。
 
-同一项目最多存在一个未删除、未归档且 `workspace_lifecycle=active` 的主环境。冻结后如需继续协作，由项目管理者从 `final_freeze` 版本创建后继主环境；旧环境保持冻结，可归档，新环境取得活动主环境槽位。
+同一项目最多存在一个未删除且 `workspace_lifecycle=active` 的主环境；归档的 active main 仍占用槽位。冻结后如需继续协作，由项目管理者从 `final_freeze` 版本创建后继主环境；旧环境保持 frozen，可归档，新环境取得活动主环境槽位。
 
 ### 2.2 零散评审环境
 
@@ -54,7 +54,7 @@ Git 只作为 Fork 和结构化 Diff 的概念参考。业务数据继续使用 
 | 保存版本 | active、未删除 | 创建 immutable manual version，head 仍 active |
 | 设置基线 | active、未删除 | 创建或选择 baseline version，更新 pointer，head 仍 active |
 | 冻结 | active、未删除、无阻塞运行 | 创建 final_freeze，设置 frozen pointer，生命周期变为 frozen |
-| 归档 | active/frozen、未删除 | 设置 archived_at，生命周期不变 |
+| 归档 | active/frozen、未删除、无活动 run lease | 在 workspace guard/行锁内设置 archived_at，生命周期不变并禁止新 lease |
 | 恢复 | 已归档、未删除 | 清空 archived_at，恢复原 active/frozen 生命周期 |
 | 删除 | active/frozen、可归档、无阻塞运行 | 写 tombstone，禁止后续编辑、使用、Fork、版本和 Connector 运行 |
 
@@ -92,7 +92,9 @@ Git 只作为 Fork 和结构化 Diff 的概念参考。业务数据继续使用 
 
 ## 5. 跨域项目版本锚点
 
-复合版本锚点由 Simulation 拥有，命名为 `environment_anchor`，不冒充 Project Management 的正式项目版本。它只关联各 owner 已生成的不可变引用，不宣称跨域数据库事务。
+canonical manifest 使用 owner/source 列表，只固定当前环境实际存在的来源。`project_main` 必须包含 Craft immutable snapshot；`ad_hoc` 的 Craft source 可选，允许空白环境和纯 VM 环境保存版本。
+
+存在 Craft 等跨域来源时，复合版本锚点由 Simulation 拥有，命名为 `environment_anchor`，不冒充 Project Management 的正式项目版本。它只关联各 owner 已生成的不可变引用，不宣称跨域数据库事务。纯 Simulation 版本直接使用 Artifact + Simulation saga，不创建空的跨域锚点。
 
 创建锚点使用可对账 saga：
 
@@ -109,7 +111,7 @@ Git 只作为 Fork 和结构化 Diff 的概念参考。业务数据继续使用 
 Fork 只复制，不同时扩大可见性：
 
 1. 来源为已保存版本时复用原 immutable Artifact/ref，不重复复制字节。
-2. 来源为活动环境时，先通过第 5 节 saga 建立 ready 的 `fork_base`。
+2. 来源为活动环境时先建立 immutable `fork_base`；只有实际包含 Craft source 时才通过第 5 节 saga 建立 ready anchor，空白或纯 VM 环境走 Artifact + Simulation saga。
 3. 使用最近一次已持久化 VM snapshot，不读取其他工作站未同步状态。
 4. 新 workspace/node/binding/version 生成新 GID；继承根 `lineage_gid`，无来源的新实体以自身 GID 作为 lineage。
 5. 新环境固定 private；需要共享时另行调用 Share。
@@ -142,9 +144,10 @@ Archive 可恢复；Delete 是 owner 发起的逻辑删除；Purge/GC 是独立�
 - private/shared 由当前 owner 删除。shared 删除前停止发放新 lease，并展示影响摘要。
 - project_main 由当前项目管理/删除权限主体删除 Simulation 扩展；创建者若已失去项目管理权无权删除。删除不触碰 Craft BOP 或 Project，并释放有效主环境槽位。
 - frozen/archived 可以删除，但不改写历史内容。
-- 运行中的 capture/materialize/snapshot/comparison/reconciliation 返回 `active_run_exists`；还需处理 `legal_hold`、`resource_version_conflict`、`resource_denied` 和 `already_deleted`。
+- Archive/Delete 与 capture/materialize/snapshot/comparison/reconciliation 的 run-lease 获取必须在同一 workspace guard/行锁上串行化。有活动 lease 时返回 `active_run_exists`；写入 archived_at 或 tombstone 后拒绝新 lease，消除“先检查、后启动”的竞争。
+- Delete 还需处理 `legal_hold`、`resource_version_conflict`、`resource_denied` 和 `already_deleted`。
 - 删除后禁止编辑、使用、Fork、保存版本和 Connector run；现有 Fork 继续依赖自身 fork-base/ArtifactRef 使用。
-- version、baseline、fork-base、final-freeze、Diff、audit、anchor 和最小 lineage tombstone 永久按策略保留；源引用可指向 tombstone，并保留源 GID、lineage、hash、deleted time 和 audit。
+- tombstone、audit 和最小 lineage metadata 永久保留。version payload、Artifact、baseline、fork-base、final-freeze、Diff 和 anchor 受 retention、reference graph 与 legal hold 约束；第一阶段不 purge。源引用可指向 tombstone，并保留源 GID、lineage、hash、deleted time 和 audit。
 - 不得级联删除 Craft、Project、Digital Model、Knowledge、Base Artifact、VisMockup 文档或进程。
 - 将来 GC 必须确认无 version/Fork/capture/comparison/anchor 引用、保留期已满且无法律保留；Renderer、owner 和 Agent 均不能直接 purge。
 
@@ -155,7 +158,7 @@ Archive 可恢复；Delete 是 owner 发起的逻辑删除；Purge/GC 是独立�
 | private ad_hoc | owner | owner | owner | owner |
 | shared ad_hoc | 同租户且底层引用授权通过 | owner | owner | owner |
 | project_main | 项目读权限 | 管理者全局；工程师在 Craft 合同允许范围内 | 当前项目管理者 | 当前项目管理/删除权限主体，仅 Simulation 扩展 |
-| frozen version | 按环境和引用策略 | 无内容修改；独立 annotation 按策略 | 按 workspace 规则 | 只 tombstone workspace，历史保留 |
+| frozen workspace | 按环境和引用策略 | 无内容修改；独立 version annotation 按策略 | 按 workspace 规则 | 只 tombstone workspace，版本本身无 delete |
 
 所有权限由 Gateway/Provider 使用可信 InvocationContext 和服务端资源解析判定。Renderer 不提交 tenant、owner 或预计算授权结论。Agent 不能删除、冻结、改 visibility/owner 或完成业务审批。
 
@@ -174,7 +177,7 @@ Archive 可恢复；Delete 是 owner 发起的逻辑删除；Purge/GC 是独立�
 | `workmanship_sim_version_annotations` | 不进入 content hash 的标签、摘要和推荐信息 |
 | `workmanship_sim_version_policies/delegations` | 确定性策略、owner 授权和 Agent 范围 |
 
-现有行回填为 `workspace_kind=ad_hoc`、`visibility=private`、`workspace_lifecycle=active`，保留原 owner 和 GID。OceanBase/MySQL 不依赖 partial unique index；使用 guard/lock 表或可验证的生成唯一键保证每项目一个有效活动主环境，唯一条件排除 archived/deleted。
+现有行回填为 `workspace_kind=ad_hoc`、`visibility=private`、`workspace_lifecycle=active`，保留原 owner 和 GID。OceanBase/MySQL 不依赖 partial unique index；使用 guard/lock 表或可验证的生成唯一键保证每项目一个未删除的 active main。Archived active main 继续占位，只有 frozen 或 deleted 环境释放 active 槽位。
 
 `0011` 中的 publish plan/map/outbox 仅保留历史兼容读取：停止新增消费者和写入，不删除旧数据；后续单独迁移受控清理。项目主环境的新流程不产生 publish plan，ad_hoc overlay 也没有写回 BOP 的入口。无跨域外键和跨域 cascade，只保存 GID/ref/hash。
 
@@ -184,7 +187,7 @@ Archive 可恢复；Delete 是 owner 发起的逻辑删除；Purge/GC 是独立�
 
 第一版只注册显式 Simulation profile，不建设动态 DSL，其他领域等出现第二个已批准需求后再抽取。
 
-Simulation Provider 提供确定性策略能力：`version_policy.enable/update/disable/get/evaluate@1`。策略判断是否达到内容 hash、时间窗、变化阈值和频率上限；Task Tool `task.version_steward.evaluate` 只按结果编排，LLM 不决定“实质变更”。第一阶段不自动清理普通版本。
+Simulation Provider 提供五个确定性策略能力：`simulation.environment.version_policy.enable@1`、`simulation.environment.version_policy.update@1`、`simulation.environment.version_policy.disable@1`、`simulation.environment.version_policy.get@1`、`simulation.environment.version_policy.evaluate@1`。evaluate 判断是否达到内容 hash、时间窗、变化阈值和频率上限；Task Tool `task.version_steward.evaluate` 只按结果编排，LLM 不决定“实质变更”。第一阶段不自动清理普通版本。
 
 调用链为：scheduler/Agent 调用 Task Tool → Tool 通过固定 Catalog Release 调用 policy.evaluate → 若结果要求创建，再调用 version.save → 可选写入独立 annotation。label/summary 必须有长度和敏感信息裁剪上限，不参与内容 hash 或创建决策。
 
@@ -194,23 +197,42 @@ delegation 记录必须固定 workspace、owner grant、Agent service actor、�
 
 ## 12. Capability 状态与边界
 
-以下是设计时状态，不构成注册或批准：
+所有 ID 必须逐项注册，一个 ID 只表达一个原子效果。下表中的 `not_registered` 只是设计候选，不能称为 experimental，也不能被消费者调用。所有能力 owner 均为 Simulation、Provider 均为 Simulation Provider；消费者按表限定。confirmation 最终由 Descriptor 风险评审确定，读取能力默认 none，写入能力不得因“用户点了按钮”而绕过 Gateway receipt 规则。
 
-| Capability | 当前状态 | 说明 |
+| 精确 Capability ID | 当前状态 | 闭合合同摘要 |
 |---|---|---|
-| `workspace.create/search/get@1`、`structure_node.create/move/remove@1`、`binding.create/remove@1`、`version.freeze@1` | experimental | 已存在候选；create 扩展字段属于定义变更，必须重建 hash 并迁移消费者 |
-| `workspace.metadata.update/reorder/binding.update/version.save/fork@1` | not_registered | 新合同；visibility 等敏感字段不进入 metadata.update |
-| `version.search/get`、`version_compare.start/get@1` | not_registered | 新只读/任务合同 |
-| `project_main.create@1` | not_registered | 与 ad_hoc private create 分离，服务端锁定活动主环境槽位 |
-| `workspace.share/unshare/archive/restore/delete@1` | not_registered | 各自原子；delete 为 tombstone，不含 purge |
-| `baseline.set@1`、`environment_anchor.create/get/reconcile@1` | not_registered | 基线 pointer 与跨域 saga |
-| `version_policy.enable/update/disable/get/evaluate@1` | not_registered | Simulation 确定性策略 |
-| Craft 线体协作合同 | not_registered/owner decision required | `G-Craft-Collab` 阻塞项 |
-| 旧 Simulation publish plan/map/outbox 能力 | deprecated compatibility | 禁止新消费者和新写入，历史只读 |
+| `simulation.environment.workspace.create@1` | experimental，需定义变更 | 输入 name/source refs/idempotency；输出 private ad_hoc workspace/head/row_version；source 可空；Desktop 消费；单库事务；验证跨租户、幂等与 schema；重建 definition hash 并迁移消费者 |
+| `simulation.environment.workspace.search@1` | experimental | 输入 filter/cursor/page_size；输出授权 summaries/next_cursor；Desktop/Agent 只读；默认排除 deleted；验证稳定分页和裁剪 |
+| `simulation.environment.workspace.get@1` | experimental | 输入 workspace/projection page；输出 metadata/head/有界投影；Desktop/Agent 只读；验证 private/shared/project selector 和底层引用策略 |
+| `simulation.environment.project_main.create@1` | not_registered | 输入 project/source Craft draft/ref projects/expected slot/idempotency；输出 main workspace/head；当前项目管理权限；guard 锁内单库创建；验证并发唯一、archived active 占位和 frozen/deleted 释放 |
+| `simulation.environment.workspace.metadata.update@1` | not_registered | 输入 allowlisted patch/expected row/idempotency；输出 revision/row_version；Desktop；单库 CAS；禁止改 kind/visibility/owner/project/lifecycle；审计 before/after |
+| `simulation.environment.workspace.share@1` | not_registered | 输入 workspace/expected row/idempotency；输出 shared visibility/row_version/引用授权摘要；owner；逐引用再分发校验或受控脱敏；验证拒绝与租户边界 |
+| `simulation.environment.workspace.unshare@1` | not_registered | 输入 workspace/expected row/idempotency；输出 private visibility/row_version/现有 Fork 摘要；owner；单库 CAS；既有 Fork 不失效 |
+| `simulation.environment.workspace.archive@1` | not_registered | 输入 workspace/expected row/idempotency；输出 archived_at/row_version；owner 或项目管理者；guard 锁内拒绝 active lease 并阻止新 lease；验证 active/frozen 生命周期保持 |
+| `simulation.environment.workspace.restore@1` | not_registered | 输入 workspace/expected row/idempotency；输出 archived_at=null/原 lifecycle/row_version；原授权主体；guard 锁内 CAS；archived active main 原本已占槽位 |
+| `simulation.environment.workspace.delete@1` | not_registered | 输入 workspace/expected row/idempotency；输出 deletion GID/deleted_at/保留引用摘要；owner 或项目删除权限；guard 锁内 tombstone；稳定错误和非级联测试见第 8 节 |
+| `simulation.environment.workspace.version.save@1` | not_registered | 输入 workspace/expected row/source list/algorithm versions/idempotency；输出 version/manifest ArtifactRef/hash/可选 anchor；Desktop/Task Tool；Artifact+Simulation saga，只有存在跨域 source 才建 anchor |
+| `simulation.environment.workspace.fork@1` | not_registered | 输入 source version 或 active workspace/expected source/idempotency；输出 private workspace/fork-base/lineage；授权读者；活动源先固定 fork-base；验证空白、纯 VM、Craft overlay 和源删除后可读 |
+| `simulation.environment.version.freeze@1` | experimental | 输入 workspace/expected row/source list/算法/idempotency；输出 final-freeze version/frozen pointer/row_version；owner 或项目管理者；guard + Artifact saga；验证不可变和后继 main |
+| `simulation.environment.version.get@1` | not_registered | 输入 version/projection page；输出 canonical metadata/source list/page；Desktop/Agent 只读；按版本和 Artifact 策略授权 |
+| `simulation.environment.version.search@1` | not_registered | 输入 workspace/cursor/page_size；输出版本摘要；Desktop/Agent 只读；稳定排序，版本不因 workspace tombstone 消失 |
+| `simulation.environment.version_compare.start@1` | not_registered | 输入 left/right/algorithm/max_nodes/idempotency；输出 comparison/input hash/status；读权限；创建 caller-scoped 任务；审计算法和输入 |
+| `simulation.environment.version_compare.get@1` | not_registered | 输入 comparison/cursor/page_size；输出状态/摘要/分页差异/result hash；任务 owner 只读；验证移动、升版、新增、删除和限制 |
+| `simulation.environment.baseline.set@1` | not_registered | 输入 workspace/version 或 snapshot request/expected row/idempotency；输出 baseline version/pointer/row_version；owner 或项目管理者；不改变 lifecycle；验证替换 pointer 和历史不变 |
+| `simulation.environment.environment_anchor.create@1` | not_registered | 输入 project_main/Craft expected revision/hash/Simulation expected row/idempotency；输出 anchor GID/preparing state；Desktop/scheduler；启动第 5 节 saga |
+| `simulation.environment.environment_anchor.get@1` | not_registered | 输入 anchor；输出 owner/source refs/hash/state；Desktop/Agent 只读；只有 ready 可作成功版本使用 |
+| `simulation.environment.environment_anchor.reconcile@1` | not_registered | 输入 anchor/expected state/idempotency；输出 ready/failed/reconciling 和 evidence refs；scheduler/受权用户；重校验双方，不盲目重做写入 |
+| `simulation.environment.main_projection_operation.get@1` | not_registered | 输入 operation；输出 Craft outcome ref/Simulation projection state/审计；Desktop/scheduler 只读；与 anchor 对账分离 |
+| `simulation.environment.main_projection_operation.reconcile@1` | not_registered | 输入 operation/expected state/idempotency；输出确定终态/投影 row/audit；scheduler；只依据既有 Craft outcome 修复 Simulation 投影，不重放 Craft 写入 |
+| `simulation.environment.version_policy.enable@1` | not_registered | 输入 workspace/policy/delegation/expected row/idempotency；输出 policy/version/hash；shared owner；单库事务；验证允许的 Capability major、Catalog release 和有效期 |
+| `simulation.environment.version_policy.update@1` | not_registered | 输入 policy/expected policy version/patch/idempotency；输出新 policy version/hash；shared owner；CAS 与审计 |
+| `simulation.environment.version_policy.disable@1` | not_registered | 输入 policy/expected version/idempotency；输出 disabled_at；shared owner；撤销 delegation，既有版本不变 |
+| `simulation.environment.version_policy.get@1` | not_registered | 输入 workspace/policy；输出策略和 delegation 摘要；owner/Task Tool 只读，敏感字段裁剪 |
+| `simulation.environment.version_policy.evaluate@1` | not_registered | 输入 policy/resource hash/diff summary/trigger；输出 deterministic create/skip 决定及原因；Task Tool 只读；相同输入同结果，LLM 不参与决定 |
 
-每项进入代码前必须记录 owner、effect/invariants、闭合 schema、selector、事务/补偿、幂等、审计、消费者、迁移、测试和真实 capability_version_gid。候选不得称为 experimental，只有已注册且生命周期为 experimental 的能力才能使用该状态。
+现有 `simulation.environment.structure_node.create@1`、`move@1`、`remove@1`、`binding.create@1`、`binding.remove@1` 为 experimental；`structure_node.reorder@1` 和 `binding.update@1` 为 not_registered。它们沿用基础规格的闭合节点/绑定合同。Craft 线体协作能力仍是 `not_registered/owner decision required`，由 `G-Craft-Collab` 阻塞。旧 Simulation publish plan/map/outbox 能力标为 deprecated compatibility，禁止新消费者和新写入。
 
-`workspace.delete@1` 输入 workspace_gid、expected_resource_version 和 Gateway 幂等键；输出 deletion GID、deleted_at 和保留引用摘要。服务端解析 owner/project scope，按 Descriptor 执行 confirmation；稳定错误见第 8 节。
+每项实现前还须在治理变更记录中补齐真实 `capability_version_gid`、完整 Schema（`additionalProperties=false` 和大小上限）、resource selector、confirmation、审计字段、迁移、consumer contract 与 acceptance tests。上表是设计输入，不是注册、稳定性或审批证据。
 
 ## 13. 验收场景
 
@@ -226,6 +248,10 @@ delegation 记录必须固定 workspace、owner grant、Agent service actor、�
 10. 所有默认查询排除 deleted；审计查询可显式包含；archive 后仍可 delete。
 11. Agent 只按 Provider 的确定性 evaluate 结果保存普通版本，不能删除、冻结、共享或审批。
 12. 迁移在 OceanBase 前向、回填和幂等重跑通过；0011 历史数据保持可读。
+13. 空白 ad_hoc、纯 VM ad_hoc 和带 Craft overlay 的 ad_hoc 均可保存版本及 Fork；只有第三类创建 environment anchor。
+14. Archived active main 仍占唯一槽位；archive→create 被拒绝，restore 不会产生两个 active main；frozen 或 deleted 后可创建后继。
+15. Archive/Delete 与 run-lease 并发时由同一 guard 串行化，不出现归档/删除后新增运行。
+16. `projection_pending` 只能通过受治理的 main projection get/reconcile 能力对账，不重放 Craft 写入。
 
 ## 14. 明确不做
 
