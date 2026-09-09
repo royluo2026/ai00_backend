@@ -14,7 +14,8 @@ def test_start_backend_uses_env_file_host_and_port():
     assert '--host "$HOST" --port "$PORT"' in text
     assert 'PROBE_HOST="$HOST"' in text
     assert 'if [[ "$HOST" == "0.0.0.0" || "$HOST" == "::" ]]; then' in text
-    assert 'http://${PROBE_HOST}:${PORT}/health' in text
+    assert 'http://${PROBE_HOST}:${PORT}/ready' in text
+    assert 'http://${PROBE_HOST}:${PORT}/health' not in text
     assert 'VENV_PY="$ROOT_DIR/.venv/Scripts/python.exe"' in text
     assert 'elif [[ -x "$ROOT_DIR/.venv/bin/python" ]]; then' in text
 

@@ -33,6 +33,18 @@ def test_memory_readiness_changes_only_at_ninety_percent(ratio, expected):
     assert result.snapshot.ratio == ratio
 
 
+def test_connector_signing_readiness_rejects_missing_signer(monkeypatch):
+    for name in (
+        "AI00_CONNECTOR_PLAN_SIGNING_P256_KEY_ID",
+        "AI00_CONNECTOR_PLAN_SIGNING_P256_PRIVATE_KEY",
+        "AI00_CONNECTOR_PLAN_SIGNING_P256_NOT_BEFORE",
+        "AI00_CONNECTOR_PLAN_SIGNING_P256_NOT_AFTER",
+    ):
+        monkeypatch.delenv(name, raising=False)
+
+    assert health.connector_signing_readiness() == "not_configured"
+
+
 def test_runtime_diagnostics_requires_super_admin():
     from backend.routers.runtime_diagnostics import require_runtime_admin
 

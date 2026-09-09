@@ -74,10 +74,10 @@ NEW_PID=$!
 echo "$NEW_PID" > "$PID_FILE"
 
 for _ in $(seq 1 15); do
-  if curl -fsS "http://${PROBE_HOST}:${PORT}/health" >/dev/null 2>&1; then
+  if curl -fsS "http://${PROBE_HOST}:${PORT}/ready" >/dev/null 2>&1; then
     echo "[OK] 后端已启动: PID=$NEW_PID"
     echo "[OK] 日志文件: $OUT_LOG"
-    echo "[OK] 健康检查: http://${PROBE_HOST}:${PORT}/health"
+    echo "[OK] 就绪检查: http://${PROBE_HOST}:${PORT}/ready"
     exit 0
   fi
   if ! kill -0 "$NEW_PID" >/dev/null 2>&1; then

@@ -31,6 +31,16 @@ def memory_readiness(sampler: MemoryPressureSampler | None = None) -> MemoryRead
     return MemoryReadiness(ready=snapshot.level != "not_ready", snapshot=snapshot)
 
 
+def connector_signing_readiness() -> str:
+    """Report whether this backend can issue governed Connector v2 plans."""
+    from plugins.simulation.simulation_backend.application.connector_protocol_v2 import PlanSigner
+
+    try:
+        return "ok" if PlanSigner.configured_from_environment() is not None else "not_configured"
+    except (TypeError, ValueError):
+        return "invalid_configuration"
+
+
 @router.get("/ready")
 def ready(request: Request):
     """Deployment readiness: routes, migrations and domain DB credentials must work."""
@@ -38,6 +48,7 @@ def ready(request: Request):
 
     memory = memory_readiness()
     checks["memory"] = "ok" if memory.ready else "not_ready"
+    checks["connector_plan_signing"] = connector_signing_readiness()
 
     required_routes = {
         "/api/tasks",
