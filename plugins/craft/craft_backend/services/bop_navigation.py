@@ -168,6 +168,16 @@ def _transport(value: Any) -> Any:
     return value.isoformat() if isinstance(value, (datetime, date)) else value
 
 
+def _legacy_boolean(value: Any) -> Any:
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized == "true":
+            return True
+        if normalized == "false":
+            return False
+    return value
+
+
 def _entity_card(value: Any) -> dict[str, Any] | None:
     card = _json_value(value, None)
     if not isinstance(card, dict):
@@ -179,6 +189,9 @@ def _entity_card(value: Any) -> dict[str, Any] | None:
     for field in ("process_flow_pic", "process_chart_pic"):
         if field in card:
             card[field] = _json_value(card.get(field), [])
+    for field in ("critical_process", "part_feed"):
+        if field in card:
+            card[field] = _legacy_boolean(card[field])
     return {key: _transport(item) for key, item in card.items()}
 
 

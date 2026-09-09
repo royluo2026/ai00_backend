@@ -5,6 +5,8 @@ from datetime import UTC, datetime
 import pytest
 
 from backend.capabilities.models_next import CapabilityBusinessError
+from backend.capabilities.validation_next import validate_payload
+from plugins.craft.craft_backend.capabilities.contracts import OUTPUT_SCHEMAS
 from plugins.craft.craft_backend.services.bop_navigation import (
     BopNavigationRepository, decode_cursor, encode_cursor,
 )
@@ -132,7 +134,7 @@ def test_work_package_projects_bounded_primary_entity_cards_and_entry_fields():
             {
                 "link_gid": "link-1", "entry_gid": "e1", "version_gid": "version1",
                 "link_type": "bop_process", "entity_gid": "process-1", "is_primary": 1,
-                "entity_data": '{"gid":"process-1","name":"P1","standard_time":12.5,"ext":{"sequence_color":"red"},"secret":"must-not-leak"}',
+                "entity_data": '{"gid":"process-1","name":"P1","standard_time":12.5,"critical_process":"true","part_feed":"false","ext":{"sequence_color":"red"},"secret":"must-not-leak"}',
             },
             {
                 "link_gid": "link-2", "entry_gid": "e2", "version_gid": "version1",
@@ -158,10 +160,15 @@ def test_work_package_projects_bounded_primary_entity_cards_and_entry_fields():
         "link_type": "bop_process", "entity_gid": "process-1", "is_primary": True,
     }
     assert process["entity_data"]["standard_time"] == 12.5
+    assert process["entity_data"]["critical_process"] is True
+    assert process["entity_data"]["part_feed"] is False
     assert process["entity_data"]["ext"] == {"sequence_color": "red"}
     assert "secret" not in process["entity_data"]
     assert operation["primary_link_count"] == 1
     assert operation["entity_data"] is None
+    validate_payload(
+        OUTPUT_SCHEMAS[("craft.bop.work_package.get", 2)], result, label="output",
+    )
 
 
 def test_revision_change_after_page_assembly_returns_conflict():
