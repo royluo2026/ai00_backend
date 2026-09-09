@@ -8,6 +8,7 @@ from typing import Any, Callable
 from backend.capability_v2.provider_contracts import (
     CapabilityBusinessError, CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef,
 )
+from backend.base.bop_edit_authorization import get_bop_edit_scope
 
 from ..data.bop_repository import BopRepositoryError, BopRepositoryStore
 from ..data.bop_repository_mysql import MysqlBopRepositoryStore
@@ -78,8 +79,30 @@ class RepositoryProvider:
         return self._call("set_baseline", p, c, repository_gid=p["repository_gid"], version_gid=p["version_gid"], expected_row_version=p["expected_row_version"], idempotency_key=p["idempotency_key"])
     def search_spaces(self, p, c):
         offset, size = self._page(p)
-        return self._call("search_spaces", p, c, repository_gid=p["repository_gid"], offset=offset, page_size=size)
-    def get_space(self, p, c): return self._call("get_space", p, c, space_gid=p["space_gid"])
+        return self._call("search_spaces", p, c, repository_gid=p["repository_gid"], owner_gid=str(c.user_gid or ""), offset=offset, page_size=size)
+    def get_space(self, p, c):
+        tenant_gid, actor_gid = _scope(c)
+        try:
+            data = self.store.get_space(space_gid=p["space_gid"], tenant_gid=tenant_gid, actor_gid=actor_gid)
+        except BopRepositoryError as exc:
+            raise CapabilityBusinessError(str(exc), str(exc)) from exc
+        nodes = data.get("nodes") or []
+        if data.get("space_kind") == "managed_personal" and data.get("project_gid"):
+            line_gids = tuple(dict.fromkeys(str(node["line_gid"]) for node in nodes if node.get("line_gid")))
+            access = get_bop_edit_scope(
+                tenant_gid=tenant_gid, user_gid=actor_gid,
+                active_roles=tuple(c.active_roles or ()), project_gid=str(data["project_gid"]),
+                line_gids=line_gids,
+            )
+            editable = set(access["editable_line_gids"])
+            for node in nodes:
+                node["access_mode"] = "editable" if access["project_wide"] or node.get("line_gid") in editable else "read_only"
+            data["access_scope"] = "project" if access["project_wide"] else ("line" if editable else "read_only")
+        else:
+            for node in nodes:
+                node["access_mode"] = "read_only"
+            data["access_scope"] = "read_only"
+        return _output(data, "get_space")
     def search_versions(self, p, c):
         offset, size = self._page(p)
         return self._call("search_space_versions", p, c, space_gid=p["space_gid"], offset=offset, page_size=size)
@@ -124,12 +147,22 @@ def candidate_specs(store: BopRepositoryStore | None = None) -> tuple[tuple[Capa
             "repository_gid", "space_gid", "version_gid", "project_gid", "team_space_gid", "head_gid",
             "baseline_version_gid", "lifecycle_status", "space_kind", "owner_user_gid", "frozen_version_gid",
             "manifest_hash", "version_kind", "deletion_gid", "deleted_at", "operation", "tenant_gid",
-            "actor_gid", "idempotency_key",
+            "actor_gid", "idempotency_key", "fork_base_version_gid", "content_hash", "created_at",
+            "updated_at",
         )},
         "row_version": {"type": "integer", "minimum": 0},
+        "head_row_version": {"type": "integer", "minimum": 0},
         "offset": {"type": "integer", "minimum": 0},
         "page_size": {"type": "integer", "minimum": 1, "maximum": 100},
         "deleted": {"type": "boolean"},
+        "access_scope": {"type": ["string", "null"], "enum": ["project", "line", "read_only", None]},
+        "nodes": {"type": "array", "maxItems": 20000, "items": {"type": "object", "properties": {
+            "node_gid": identifier, "parent_gid": identifier, "line_gid": identifier,
+            "node_type": {"type": "string"}, "name": {"type": "string"},
+            "position": {"type": ["string", "number", "integer"]},
+            "access_mode": {"type": "string", "enum": ["editable", "read_only"]},
+        }, "required": ["node_gid", "parent_gid", "line_gid", "node_type", "name", "position", "access_mode"], "additionalProperties": False}},
+        "bindings": {"type": "array", "maxItems": 5000},
     })
     common = dict(owner="craft", plugin_callable=True,
                   confirmation="none", tags=("craft", "bop", "repository", "experimental"), output_schema=output)

@@ -60,6 +60,8 @@ All rows are new, atomic business effects. `@1` is the proposed major version an
 | Craft | `craft.bop.vpps_group.initial.generate@1`, `craft.bop.vpps_group.adjustment.create@1`, `craft.bop.vpps_group.current.set@1` |
 | Craft | `craft.bop.change_proposal.create@1`, `craft.bop.change_proposal.submit@1`, `craft.bop.change_proposal.get@1`, `craft.bop.change_proposal.review@1`, `craft.bop.change_proposal.apply@1`, `craft.bop.change_proposal.cancel@1`, `craft.bop.change_proposal.withdraw@1`, `craft.bop.change_proposal.supersede@1` |
 | Craft | `craft.bop.repository_diff.start@1`, `craft.bop.repository_diff.get@1`, `craft.bop.operation.get@1`, `craft.bop.operation.reconcile@1` |
+
+个人项目空间的读取投影必须保留项目内全部线体，但编辑权限由 Base 的责任投影决定：超级管理员和正式项目经理可编辑全部线体；普通成员仅可编辑自己负责的线体。其他线体保持可见、只读，且任何写 Provider 都必须复验同一授权结果，前端只读样式不得替代服务端授权。
 | Simulation | `simulation.environment.workspace.fork.preview@1`, `simulation.environment.workspace.fork.apply@1`, `simulation.environment.workspace.delete@1`, `simulation.environment.workspace_version.get@1`, `simulation.environment.workspace_version.export_for_import@1` |
 | Simulation | `simulation.environment.vpps_group.get@1`, `simulation.environment.vpps_group.initial.generate@1`, `simulation.environment.vpps_group.adjustment.create@1`, `simulation.environment.vpps_group.current.set@1` |
 | Agent Platform | `task.bop_repository_assistant` with fixed `craft_repository` and `simulation_private_environment` profiles |

@@ -62,6 +62,16 @@ def test_search_rejects_unbounded_page_size_before_store_call():
     assert store.calls == []
 
 
+def test_space_search_only_requests_shared_and_callers_personal_spaces():
+    from plugins.craft.craft_backend.capabilities.bop_repositories import RepositoryProvider
+
+    store = StubStore()
+    RepositoryProvider(store).search_spaces({"repository_gid": "10"}, context())
+    name, args = store.calls[-1]
+    assert name == "search_spaces"
+    assert args["owner_gid"] == "30"
+
+
 def test_search_serializes_snowflake_gids_as_strings_for_javascript_clients():
     from plugins.craft.craft_backend.capabilities.bop_repositories import RepositoryProvider
 
@@ -94,3 +104,45 @@ def test_store_errors_are_stable_business_errors():
     with pytest.raises(CapabilityBusinessError) as error:
         RepositoryProvider(Broken()).get_repository({"repository_gid": "99"}, context())
     assert error.value.code == "repository_not_found"
+
+
+def test_personal_space_projects_line_editability_from_authoritative_scope(monkeypatch):
+    from plugins.craft.craft_backend.capabilities.bop_repositories import RepositoryProvider
+
+    class SpaceStore(StubStore):
+        def get_space(self, **kwargs):
+            return {
+                "space_gid": "40", "repository_gid": "10", "project_gid": "50",
+                "space_kind": "managed_personal", "owner_user_gid": "30",
+                "row_version": 1, "head_row_version": 1,
+                "nodes": [
+                    {"node_gid": "101", "parent_gid": None, "node_type": "line_process", "name": "Own", "line_gid": "legacy-1"},
+                    {"node_gid": "102", "parent_gid": None, "node_type": "line_process", "name": "Other", "line_gid": "legacy-2"},
+                    {"node_gid": "103", "parent_gid": "101", "node_type": "station_process", "name": "Station", "line_gid": "legacy-1"},
+                ],
+            }
+
+    monkeypatch.setattr(
+        "plugins.craft.craft_backend.capabilities.bop_repositories.get_bop_edit_scope",
+        lambda **_: {"project_wide": False, "editable_line_gids": ("legacy-1",), "reason": "line_leader"},
+    )
+    data = RepositoryProvider(SpaceStore()).get_space({"space_gid": "40"}, context()).data
+    assert [node["access_mode"] for node in data["nodes"]] == ["editable", "read_only", "editable"]
+    assert data["access_scope"] == "line"
+
+
+def test_space_get_output_schema_accepts_head_projection_fields():
+    from jsonschema import Draft202012Validator
+    from plugins.craft.craft_backend.capabilities.bop_repositories import candidate_specs
+
+    spec = next(spec for spec, _ in candidate_specs(StubStore()) if spec.id == "craft.bop.space.get")
+    projected = {
+        "space_gid": "40", "repository_gid": "10", "project_gid": "50",
+        "space_kind": "managed_personal", "owner_user_gid": "30",
+        "fork_base_version_gid": "60", "frozen_version_gid": None,
+        "head_gid": "70", "row_version": 1, "head_row_version": 2,
+        "content_hash": "sha256:abc", "access_scope": "project",
+        "nodes": [], "bindings": [],
+    }
+
+    assert list(Draft202012Validator(spec.output_schema).iter_errors(projected)) == []

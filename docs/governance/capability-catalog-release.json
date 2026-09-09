@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_3a5cd9e7740b8c6783da4c1fde67734f",
-  "catalog_hash": "sha256:3a5cd9e7740b8c6783da4c1fde67734f7c674347981f18e02f8eeb538aa85831",
+  "release_id": "rel_c58779cc0501fffd87c7df55e96f4707",
+  "catalog_hash": "sha256:c58779cc0501fffd87c7df55e96f47074d9e3174bc2d863fa38e58b99dc32862",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -90880,7 +90880,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -90895,6 +90923,79 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
@@ -91149,7 +91250,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -91164,12 +91293,85 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:cdd2eace58bf6ba8aa6194e0fa71f7c0f28c44a8c0b3bab4704dbca0661d1a60",
+      "schema_hash": "sha256:76f1b84bc1b6958557fd0b72acdef76e1d48fef34f833e23876fbbe5bf92211b",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -91697,7 +91899,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:2aa8c79dd9338d6e925145f576940d2f7b7a160484ebdbc3d20ee33d010ac783"
+      "business_definition_hash": "sha256:08b1b26ee0ca11f704d6fe86e507a2ddd0df1587f10201760009efeb4916945e"
     },
     {
       "id": "craft.bop.managed_personal_space.fork.apply",
@@ -99791,7 +99993,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -99806,6 +100036,79 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
@@ -100060,7 +100363,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -100075,12 +100406,85 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:2c1c42159245f6502bf292d7950b7325515395e079f13d3a29bbf6b182799390",
+      "schema_hash": "sha256:3541979677b0fc0b4bbbbf1b90aebbdb189939d63a7bb35aa6304183a66cb0a0",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -100608,7 +101012,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:25a6fff9927d849586d69caf74821d41d274a5e4f9f34a597a8c383d4ada47fd"
+      "business_definition_hash": "sha256:c476b8dfca99fd4eebfc0c9be20dedf883c809718ef997d2a9418bd6a95a7768"
     },
     {
       "id": "craft.bop.repository.create",
@@ -100911,7 +101315,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -100926,6 +101358,79 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
@@ -101180,7 +101685,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -101195,12 +101728,85 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:f677604a2451f11f4816a295172014afc30e9ed5b39beab6a507977aee5537ec",
+      "schema_hash": "sha256:cf19311d4a1eb7562138d844d9be57ea10ffb1999abd1772f007bd9e0344d6e1",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -101728,7 +102334,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:34bc488b614489ea2ffc06568966e5c83c793864bccd8d15f1a10a03808fa4d7"
+      "business_definition_hash": "sha256:6b5f2364787d076a7d5e2858dd85ca690938e1cb89d12692dad47be7432a2a84"
     },
     {
       "id": "craft.bop.repository.delete",
@@ -102046,7 +102652,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -102061,6 +102695,79 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
@@ -102315,7 +103022,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -102330,12 +103065,85 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5550b3aa5975b29df077ab5fc21aa1e3caf46361739847d691bb9ab77633fe19",
+      "schema_hash": "sha256:59842538f3fe9aac281cee181b4b72610ed084440c19b5baa6b36d9c4b47fc89",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -102863,7 +103671,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:a40beb9f2d9ce8fa2078fef8c538edd1761f25cce03622613ab376145e7ec2d6"
+      "business_definition_hash": "sha256:ea61c1fd3d287184708955137b72f6510c20d144871928c258edf1a406f09d3a"
     },
     {
       "id": "craft.bop.repository.fork.apply",
@@ -104953,7 +105761,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -104968,6 +105804,79 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
@@ -105222,7 +106131,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -105237,12 +106174,85 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6a507f8c8efadef1c889b06f0dad3a0647f8bed79ef336056d62b6a52446d02e",
+      "schema_hash": "sha256:ace2bdc9d0437ddfc2964d648c6fdaf37b36e8e7d48327afa94e53faf67fbdc8",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -105770,7 +106780,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:b44471ea0748dfed70b5520fe94c4ee16c3141d5d6af275b3cb340712767fc7e"
+      "business_definition_hash": "sha256:7f6c23c7c3941f13c49244977d21e268b8260db8bc8788911be8f67c6fc1f5c9"
     },
     {
       "id": "craft.bop.repository.restore",
@@ -106084,7 +107094,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -106099,6 +107137,79 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
@@ -106353,7 +107464,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -106368,12 +107507,85 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:2c1c42159245f6502bf292d7950b7325515395e079f13d3a29bbf6b182799390",
+      "schema_hash": "sha256:3541979677b0fc0b4bbbbf1b90aebbdb189939d63a7bb35aa6304183a66cb0a0",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -106901,7 +108113,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:aa2f6258b7af24adb6b631a62a31b3e1df1c411527248c6fe29016aff69160f1"
+      "business_definition_hash": "sha256:92709a7e5b3def2ab720469736031a4abb26d57a97132fba9b06f18d1fe53abb"
     },
     {
       "id": "craft.bop.repository.search",
@@ -107205,7 +108417,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -107220,6 +108460,79 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
@@ -107474,7 +108787,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -107489,12 +108830,85 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:7c35b1d0db9a2c23c067ce91651fcfd0f2c009679ab25cc7db3572b60fbf82df",
+      "schema_hash": "sha256:caf8cffcd3a62aafeecf2219c00a6825aea3eed377a462cd95c84e868a42499e",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -108022,7 +109436,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:98fbf4588cadb8f628db002212b0e24f1fac19343d4e0992ccdc92afae6a360d"
+      "business_definition_hash": "sha256:a80f8bac2890fa9f0551571bfc6ae6873a6ac16ee36beab275703045b6f5a921"
     },
     {
       "id": "craft.bop.repository_baseline.set",
@@ -108341,7 +109755,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -108356,6 +109798,79 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
@@ -108610,7 +110125,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -108625,12 +110168,85 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:47ff71af8510b1f0a9ded24bdda3a990eba0ec256c97db617bbd1fa943223e27",
+      "schema_hash": "sha256:8a08997c788ffc7f2065821b291b2ac4c0959c5626af8724666dacf5b69d4093",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -109158,7 +110774,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:dbacea81d7cb120239579b2afcee36bc0e0f4a80dff39687c818fa937129ba6c"
+      "business_definition_hash": "sha256:56c4600b79c0ec458d62446718cc3cd67b9997d37c2d2b6fcd5727712a3a67a2"
     },
     {
       "id": "craft.bop.repository_diff.get",
@@ -111182,7 +112798,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -111197,6 +112841,79 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
@@ -111451,7 +113168,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -111466,12 +113211,85 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:c7191868a6878de948fcde5707ee746772e49fd7f76e38acee45142935b41a25",
+      "schema_hash": "sha256:d0f3a76116b1e5144042695af833b46baf7c0598f02474709cf0999cafc246b6",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -111999,7 +113817,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:8a28a6bc0f9ef04317d306eaed1cb6906f14ac85752609edbf0f2e79aabcdfe6"
+      "business_definition_hash": "sha256:218fd41f29c519a85b48bfe9b82eb400cc7a597bed164de4c63a044898d27158"
     },
     {
       "id": "craft.bop.space.search",
@@ -112311,7 +114129,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -112326,6 +114172,79 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
@@ -112580,7 +114499,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -112595,12 +114542,85 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:db43b953130118b9c2e6c185df00304fab04e35c79b7b17634b20209f1ac6098",
+      "schema_hash": "sha256:0d76ac30c24d1cc7c6dbea9f330ba1d1c015079518b52ef877bc21c713e17419",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -113128,7 +115148,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:fb9b5dc57f1935a6f10bd6b627fd643e3ab7b5fa1fc7fcb14b36a80e4e71358b"
+      "business_definition_hash": "sha256:b5fa522f6f3eec68ead48a37dff278df296c68cb54577711a7842172cd221997"
     },
     {
       "id": "craft.bop.space_version.freeze",
@@ -113441,7 +115461,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -113456,6 +115504,79 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
@@ -113710,7 +115831,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -113725,12 +115874,85 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:cd7fd71f29ffd40c8fd1dfb04f93d4f20346da81a339b735133cefd70ceefda9",
+      "schema_hash": "sha256:5864f610fd6b546d0750be2cf7b60d585e33171b4f29e30f8751a725a9192510",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -114258,7 +116480,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:e1004351391ed7ef533befdccd005010f14b7839f3d1ab4e67d9dbacd60bc3c2"
+      "business_definition_hash": "sha256:6fdea7639bea4b4f4044cf839b62f9637db962e804d133dd1240e610ba230df7"
     },
     {
       "id": "craft.bop.space_version.get",
@@ -114555,7 +116777,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -114570,6 +116820,79 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
@@ -114824,7 +117147,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -114839,12 +117190,85 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:ceb440bf6ce93d707e8b2b9a0ff51a25a4e755763fbee635d37db87fada06fae",
+      "schema_hash": "sha256:d1a8b6f4e99ff598640f59f4836af7ad898cf0dcb7ca28e7adb8b0acbe0e26f2",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -115372,7 +117796,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:f909a05f6cf1f6506866950ec44fb41b5bfe29db122aa36fa8db9b4f22013a1e"
+      "business_definition_hash": "sha256:83dec6e3a4948f9ecd94e6511e715850bacdbfef59d97b874d66c09814d9f996"
     },
     {
       "id": "craft.bop.space_version.save",
@@ -115697,7 +118121,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -115712,6 +118164,79 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
@@ -115966,7 +118491,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -115981,12 +118534,85 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:e830d99a6b53a297ba58da23bcdecdc06f7b531c2c6b349269581d68dc233632",
+      "schema_hash": "sha256:4100ea626a0ed7b3909799ae437e19b3fab6db53fa518d31ce3bc68046d779ab",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -116514,7 +119140,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:1af3c85a30f7780ab7159e9ad7444357a4b974afac2bbac3503fb53b596965db"
+      "business_definition_hash": "sha256:db8b0ff6e2bfb59e68216b40ea42c308fbeabcdba12023a05597963959bb9717"
     },
     {
       "id": "craft.bop.space_version.search",
@@ -116826,7 +119452,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -116841,6 +119495,79 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
@@ -117095,7 +119822,35 @@
               "null"
             ]
           },
+          "fork_base_version_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "row_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "head_row_version": {
             "type": "integer",
             "minimum": 0
           },
@@ -117110,12 +119865,85 @@
           },
           "deleted": {
             "type": "boolean"
+          },
+          "access_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "project",
+              "line",
+              "read_only",
+              null
+            ]
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "parent_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line_gid": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer"
+                  ]
+                },
+                "access_mode": {
+                  "type": "string",
+                  "enum": [
+                    "editable",
+                    "read_only"
+                  ]
+                }
+              },
+              "required": [
+                "node_gid",
+                "parent_gid",
+                "line_gid",
+                "node_type",
+                "name",
+                "position",
+                "access_mode"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "maxItems": 5000
           }
         },
         "required": [],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:e55c7001a0e27359041cd6c0137b13f38a2d40aef8559ac7f056af968435fd23",
+      "schema_hash": "sha256:a182457cf518426fa1fa6863eada04adfdfc17697b8651ae30c86fe053b590cc",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -117643,7 +120471,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:d27af5e505bc53ab8c2c96e159678cfa112df4915a04769123c2add2ef760d8b"
+      "business_definition_hash": "sha256:572ca4b0fa009feae879507bff16638cc37192fb224249f16195d8492176f5bf"
     },
     {
       "id": "craft.bop.staging.change.apply",
@@ -288007,21 +290835,28 @@
               "updates": {
                 "type": "object",
                 "properties": {
-                  "share_scope": {
+                  "list_gid": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "escape_root_cause": {
+                  "approval_order_gid": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "scheduled_date": {
+                  "severity": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "interim_action": {
                     "type": [
                       "string",
                       "null"
@@ -288117,20 +290952,6 @@
                       ]
                     }
                   },
-                  "project_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "interim_action": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
                   "feishu_docs": {
                     "type": "array",
                     "maxItems": 200,
@@ -288161,69 +290982,6 @@
                       "additionalProperties": false
                     }
                   },
-                  "title": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "severity": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "assignee_team_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "description": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "related_knowledge_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_assignee_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "permanent_action": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "status": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "approval_order_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
                   "bop_entry_gid": {
                     "type": [
                       "string",
@@ -288238,7 +290996,49 @@
                     ],
                     "maxLength": 65536
                   },
-                  "list_gid": {
+                  "escape_root_cause": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "title": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "related_knowledge_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "status": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "scheduled_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_chat_id": {
                     "type": [
                       "string",
                       "null"
@@ -288252,13 +291052,6 @@
                     ],
                     "maxLength": 65536
                   },
-                  "related_task_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
                   "occurrence_root_cause": {
                     "type": [
                       "string",
@@ -288266,7 +291059,42 @@
                     ],
                     "maxLength": 65536
                   },
-                  "feishu_group_chat_id": {
+                  "permanent_action": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "assignee_team_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "project_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "related_task_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "share_scope": {
                     "type": [
                       "string",
                       "null"
@@ -320609,14 +323437,21 @@
               "updates": {
                 "type": "object",
                 "properties": {
-                  "share_scope": {
+                  "review_date": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "scheduled_date": {
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "actual_start": {
                     "type": [
                       "string",
                       "null"
@@ -320645,13 +323480,57 @@
                       "additionalProperties": false
                     }
                   },
+                  "canvas_y": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "feishu_docs": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "title": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "url": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "type": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "feishu_assignee_open_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
                   "time_estimate": {
                     "type": [
                       "integer",
                       "null"
                     ]
                   },
-                  "project_gid": {
+                  "description": {
                     "type": [
                       "string",
                       "null"
@@ -320665,56 +323544,49 @@
                       "null"
                     ]
                   },
-                  "title": {
+                  "scheduled_date": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "plan_end": {
+                  "scheduled_start_time": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "canvas_y": {
+                  "feishu_group_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "assignee_team_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "completion": {
                     "type": [
                       "integer",
                       "number",
                       "null"
                     ]
                   },
-                  "description": {
+                  "feishu_assignee_name": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "meeting_doc_link": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_assignee_open_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "list_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "plan_start": {
+                  "share_scope": {
                     "type": [
                       "string",
                       "null"
@@ -320728,26 +323600,8 @@
                     ],
                     "maxLength": 65536
                   },
-                  "parent_task_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "meeting_level": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "node_type": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
+                  "is_deleted": {
+                    "type": "boolean"
                   },
                   "attachments": {
                     "type": "array",
@@ -320816,44 +323670,14 @@
                       ]
                     }
                   },
-                  "canvas_icon": {
+                  "title": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "feishu_docs": {
-                    "type": "array",
-                    "maxItems": 200,
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "token": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "name": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "title": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "url": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "type": {
-                          "type": "string",
-                          "maxLength": 2048
-                        }
-                      },
-                      "additionalProperties": false
-                    }
-                  },
-                  "assignee_team_gid": {
+                  "meeting_doc_link": {
                     "type": [
                       "string",
                       "null"
@@ -320867,21 +323691,7 @@
                     ],
                     "maxLength": 65536
                   },
-                  "scheduled_start_time": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_assignee_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "actual_start": {
+                  "parent_task_gid": {
                     "type": [
                       "string",
                       "null"
@@ -320895,6 +323705,34 @@
                     ],
                     "maxLength": 65536
                   },
+                  "feishu_group_chat_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "node_type": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "plan_end": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "plan_start": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
                   "actual_end": {
                     "type": [
                       "string",
@@ -320902,31 +323740,21 @@
                     ],
                     "maxLength": 65536
                   },
-                  "review_date": {
+                  "project_gid": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "completion": {
-                    "type": [
-                      "integer",
-                      "number",
-                      "null"
-                    ]
-                  },
-                  "is_deleted": {
-                    "type": "boolean"
-                  },
-                  "feishu_group_name": {
+                  "meeting_level": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "feishu_group_chat_id": {
+                  "canvas_icon": {
                     "type": [
                       "string",
                       "null"
@@ -414305,13 +417133,13 @@
       "plugin_id": "official.base",
       "module": "backend.base.official_provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:e89135a587eb93bb5776d36edc9653f5d5eeb284c23971ba7a528e83813f5e24"
+      "artifact_hash": "sha256:35b2f6d47f458d3e8edcfc81a2d9508dd847a4bdd17fb728267fa7465686f0bf"
     },
     {
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:54f836db2e4cb41f1fa17070c58c9e2bb8e5e4fdb7119b6dee48386b82c91186"
+      "artifact_hash": "sha256:958e77fc5276e8992df64ec7cdd5d170baea5caea8dccf960dad298b2be13e95"
     },
     {
       "plugin_id": "official.device",
@@ -414362,5 +417190,5 @@
       "artifact_hash": "sha256:0dfbd3cff6f2e04eaf49a9b32b342f3e6107c109348da8c73b2ffa4b49fe9699"
     }
   ],
-  "created_at": "2026-09-09T12:00:53.976139Z"
+  "created_at": "2026-09-09T13:06:39.853769Z"
 }

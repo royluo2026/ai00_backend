@@ -8,6 +8,7 @@ from .connection import get_craft_conn
 
 
 def _decode(value): return json.loads(value) if isinstance(value,str) else value
+def _utcnow(): return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 def _bulk_insert(cur, statement, rows, batch_size=200):
@@ -107,29 +108,33 @@ class MysqlBopForkStore:
             return None
         cur.execute("SELECT m.logical_gid,m.node_revision_gid,m.binding_revision_gid,m.vpps_group_version_gid,m.member_kind,m.is_tombstone,r.parent_node_gid,r.node_type,r.order_key,r.properties_json,n.lineage_gid FROM workmanship_craft_bop_space_version_members m LEFT JOIN workmanship_craft_bop_node_revisions r ON r.gid=m.node_revision_gid LEFT JOIN workmanship_craft_bop_nodes n ON n.gid=m.logical_gid WHERE m.space_version_gid=%s ORDER BY m.member_kind,m.logical_gid",(source_version_gid,)); members=[dict(row) for row in cur.fetchall()]
         included_nodes={str(row["logical_gid"]) for row in members if row["member_kind"]=="node" and not row["is_tombstone"] and self._level(row["node_type"])<=max_level}
-        refs=[]
+        refs=[]; head_members=[]
         for row in members:
             kind=row["member_kind"]; logical=str(row["logical_gid"])
             include=(kind=="node" and logical in included_nodes) or (kind=="binding" and fork_depth=="all") or kind=="vpps"
             if not include:continue
-            cur.execute("INSERT INTO workmanship_craft_bop_space_head_members (gid,space_head_gid,member_kind,logical_gid,node_revision_gid,binding_revision_gid,vpps_group_version_gid,is_tombstone) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",(str(next_gid()),space_head_gid,kind,logical,row["node_revision_gid"],row["binding_revision_gid"],row["vpps_group_version_gid"],row["is_tombstone"]));refs.append((kind,logical,str(row["node_revision_gid"] or row["binding_revision_gid"] or row["vpps_group_version_gid"] or "")))
+            head_members.append((str(next_gid()),space_head_gid,kind,logical,row["node_revision_gid"],row["binding_revision_gid"],row["vpps_group_version_gid"],row["is_tombstone"]))
+            refs.append((kind,logical,str(row["node_revision_gid"] or row["binding_revision_gid"] or row["vpps_group_version_gid"] or "")))
+        _bulk_insert(cur,"INSERT INTO workmanship_craft_bop_space_head_members (gid,space_head_gid,member_kind,logical_gid,node_revision_gid,binding_revision_gid,vpps_group_version_gid,is_tombstone) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",head_members)
         blueprint_map={}
         for row in members:
             if row["member_kind"]!="node" or row["is_tombstone"] or str(row["logical_gid"]) in included_nodes:continue
             props=_decode(row["properties_json"]) or {};vpps=props.get("vpps_gid") or props.get("vpps")
             if str(vpps or "").isdigit():blueprint_map[str(row["logical_gid"])]=str(next_gid())
+        blueprints=[]
         for row in members:
             old=str(row["logical_gid"])
             if old not in blueprint_map:continue
             props=_decode(row["properties_json"]) or {};parent=str(row["parent_node_gid"]) if row["parent_node_gid"] is not None else None
-            cur.execute("INSERT INTO workmanship_craft_bop_fork_blueprint_nodes (gid,fork_run_gid,source_node_gid,source_node_lineage_gid,parent_blueprint_gid,vpps_gid,node_level,order_key) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",(blueprint_map[old],run_gid,old,str(row["lineage_gid"] or old),blueprint_map.get(parent),str(props.get("vpps_gid") or props.get("vpps")),row["node_type"],row["order_key"]))
+            blueprints.append((blueprint_map[old],run_gid,old,str(row["lineage_gid"] or old),blueprint_map.get(parent),str(props.get("vpps_gid") or props.get("vpps")),row["node_type"],row["order_key"]))
+        _bulk_insert(cur,"INSERT INTO workmanship_craft_bop_fork_blueprint_nodes (gid,fork_run_gid,source_node_gid,source_node_lineage_gid,parent_blueprint_gid,vpps_gid,node_level,order_key) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",blueprints)
         content_hash=_hash({"members":refs})
         cur.execute("UPDATE workmanship_craft_bop_space_heads SET content_hash=%s WHERE gid=%s",(content_hash,space_head_gid))
         return {"copied_node_count":len(included_nodes),"blueprint_node_count":len(blueprint_map),"content_hash":content_hash}
     def preview_repository(self,*,tenant_gid,actor_gid,source_version_gid,target_project_gid,fork_depth,include_personal_migration,expected_target_slot,idempotency_key):
         if fork_depth not in self.DEPTHS: raise BopForkError("fork_depth_invalid")
         fixed={"tenant_gid":tenant_gid,"actor_gid":actor_gid,"source_version_gid":source_version_gid,"target_project_gid":target_project_gid,"fork_depth":fork_depth,"include_personal_migration":bool(include_personal_migration),"expected_target_slot":expected_target_slot}
-        workflow_gid,preview_gid=str(next_gid()),str(next_gid()); decisions=[]; input_hash=_hash(fixed); plan_hash=_hash({**fixed,"owner_verdicts":[],"allowed_decisions":decisions}); expires=datetime.now(timezone.utc)+timedelta(minutes=10)
+        workflow_gid,preview_gid=str(next_gid()),str(next_gid()); decisions=[]; input_hash=_hash(fixed); plan_hash=_hash({**fixed,"owner_verdicts":[],"allowed_decisions":decisions}); expires=_utcnow()+timedelta(minutes=10)
         with self._connect() as conn,conn.cursor() as cur:
             cur.execute("SELECT v.gid FROM workmanship_craft_bop_space_versions v JOIN workmanship_craft_bop_spaces s ON s.gid=v.space_gid WHERE v.gid=%s AND v.tenant_gid=%s AND s.space_kind='team' AND s.deleted_at IS NULL",(source_version_gid,tenant_gid))
             if not cur.fetchone():raise BopForkError("space_version_not_found")
@@ -145,7 +150,7 @@ class MysqlBopForkStore:
         request_hash=_hash({"preview_gid":preview_gid,"plan_hash":plan_hash,"allowed_decisions":allowed_decisions,"expected_target_slot":expected_target_slot})[7:]
         with self._connect() as conn,conn.cursor() as cur:
             cur.execute("SELECT p.*,w.actor_gid,w.include_personal_migration FROM workmanship_craft_bop_fork_plans p JOIN workmanship_craft_bop_fork_workflows w ON w.gid=p.workflow_gid WHERE p.gid=%s AND p.tenant_gid=%s FOR UPDATE",(preview_gid,tenant_gid)); p=cur.fetchone()
-            if not p or str(p["actor_gid"])!=str(actor_gid) or p["expires_at"]<=datetime.now():raise BopForkError("fork_preview_expired")
+            if not p or str(p["actor_gid"])!=str(actor_gid) or p["expires_at"]<=_utcnow():raise BopForkError("fork_preview_expired")
             if p["plan_hash"]!=plan_hash or _decode(p["allowed_decisions_json"])!=allowed_decisions:raise BopForkError("fork_plan_changed")
             cur.execute("SELECT request_hash,outcome_json FROM workmanship_craft_bop_fork_runs WHERE workflow_gid=%s AND step_kind='team' AND idempotency_key=%s FOR UPDATE",(p["workflow_gid"],idempotency_key)); old=cur.fetchone()
             if old:
@@ -164,23 +169,26 @@ class MysqlBopForkStore:
     def preview_personal(self,*,tenant_gid,actor_gid,source_version_gid,target_repository_gid,fork_depth,expected_target_slot,idempotency_key,workflow_gid=None):
         if fork_depth not in self.DEPTHS:raise BopForkError("fork_depth_invalid")
         fixed={"tenant_gid":tenant_gid,"actor_gid":actor_gid,"source_version_gid":source_version_gid,"target_repository_gid":target_repository_gid,"fork_depth":fork_depth,"expected_target_slot":expected_target_slot}
-        preview_gid=str(next_gid()); decisions=[]; input_hash=_hash(fixed);plan_hash=_hash({**fixed,"owner_verdicts":[],"allowed_decisions":decisions});expires=datetime.now(timezone.utc)+timedelta(minutes=10)
+        preview_gid=str(next_gid()); decisions=[]; input_hash=_hash(fixed);plan_hash=_hash({**fixed,"owner_verdicts":[],"allowed_decisions":decisions});expires=_utcnow()+timedelta(minutes=10)
         with self._connect() as conn,conn.cursor() as cur:
+            cur.execute("SELECT tenant_gid FROM workmanship_craft_bop_repositories WHERE gid=%s AND deleted_at IS NULL",(target_repository_gid,))
+            repository=cur.fetchone()
+            if not repository:raise BopForkError("repository_not_found")
+            tenant_gid=str(repository["tenant_gid"])
             if workflow_gid:
                 cur.execute("SELECT gid FROM workmanship_craft_bop_fork_workflows WHERE gid=%s AND tenant_gid=%s AND actor_gid=%s FOR UPDATE",(workflow_gid,tenant_gid,actor_gid))
                 if not cur.fetchone():raise BopForkError("fork_workflow_not_found")
             else:
                 workflow_gid=str(next_gid());cur.execute("INSERT INTO workmanship_craft_bop_fork_workflows (gid,tenant_gid,actor_gid,include_personal_migration,status,correlation_gid) VALUES (%s,%s,%s,1,'previewing',%s)",(workflow_gid,tenant_gid,actor_gid,workflow_gid))
-            cur.execute("SELECT gid FROM workmanship_craft_bop_repositories WHERE gid=%s AND tenant_gid=%s AND deleted_at IS NULL",(target_repository_gid,tenant_gid))
-            if not cur.fetchone():raise BopForkError("repository_not_found")
             cur.execute("INSERT INTO workmanship_craft_bop_fork_plans (gid,workflow_gid,tenant_gid,source_version_gid,fork_depth,input_hash,plan_hash,owner_verdicts_json,allowed_decisions_json,expires_at) VALUES (%s,%s,%s,%s,%s,%s,%s,'[]','[]',%s)",(preview_gid,workflow_gid,tenant_gid,source_version_gid,fork_depth,input_hash,plan_hash,expires))
             cur.execute("INSERT INTO workmanship_craft_bop_personal_fork_targets (plan_gid,target_repository_gid,expected_target_slot) VALUES (%s,%s,%s)",(preview_gid,target_repository_gid,expected_target_slot))
         return {"preview_gid":preview_gid,"workflow_gid":workflow_gid,"input_hash":input_hash,"plan_hash":plan_hash,"expires_at":expires.isoformat(),"owner_verdicts":[],"allowed_decisions":[],**fixed}
     def apply_personal(self,*,preview_gid,tenant_gid,actor_gid,plan_hash,allowed_decisions,expected_target_slot,idempotency_key):
         request_hash=_hash({"preview_gid":preview_gid,"plan_hash":plan_hash,"allowed_decisions":allowed_decisions,"expected_target_slot":expected_target_slot})[7:]
         with self._connect() as conn,conn.cursor() as cur:
-            cur.execute("SELECT p.*,t.target_repository_gid,t.expected_target_slot,w.actor_gid FROM workmanship_craft_bop_fork_plans p JOIN workmanship_craft_bop_personal_fork_targets t ON t.plan_gid=p.gid JOIN workmanship_craft_bop_fork_workflows w ON w.gid=p.workflow_gid WHERE p.gid=%s AND p.tenant_gid=%s FOR UPDATE",(preview_gid,tenant_gid));p=cur.fetchone()
-            if not p or str(p["actor_gid"])!=str(actor_gid) or p["expires_at"]<=datetime.now():raise BopForkError("fork_preview_expired")
+            cur.execute("SELECT p.*,t.target_repository_gid,t.expected_target_slot,w.actor_gid FROM workmanship_craft_bop_fork_plans p JOIN workmanship_craft_bop_personal_fork_targets t ON t.plan_gid=p.gid JOIN workmanship_craft_bop_fork_workflows w ON w.gid=p.workflow_gid WHERE p.gid=%s AND w.actor_gid=%s FOR UPDATE",(preview_gid,actor_gid));p=cur.fetchone()
+            if not p or str(p["actor_gid"])!=str(actor_gid) or p["expires_at"]<=_utcnow():raise BopForkError("fork_preview_expired")
+            tenant_gid=str(p["tenant_gid"])
             if p["plan_hash"]!=plan_hash or _decode(p["allowed_decisions_json"])!=allowed_decisions or p["expected_target_slot"]!=expected_target_slot:raise BopForkError("fork_plan_changed")
             cur.execute("SELECT request_hash,outcome_json FROM workmanship_craft_bop_fork_runs WHERE workflow_gid=%s AND step_kind='personal' AND idempotency_key=%s FOR UPDATE",(p["workflow_gid"],idempotency_key));old=cur.fetchone()
             if old:
@@ -198,10 +206,10 @@ class MysqlBopForkStore:
             cur.execute("UPDATE workmanship_craft_bop_fork_runs SET status='completed',outcome_json=%s,updated_at=NOW(6) WHERE gid=%s",(json.dumps(result,separators=(",", ":")),run))
         return result
     def get_run(self,*,run_gid,tenant_gid,actor_gid):
-        with self._connect() as conn,conn.cursor() as cur:cur.execute("SELECT r.outcome_json FROM workmanship_craft_bop_fork_runs r JOIN workmanship_craft_bop_fork_workflows w ON w.gid=r.workflow_gid WHERE r.gid=%s AND w.tenant_gid=%s",(run_gid,tenant_gid));row=cur.fetchone()
+        with self._connect() as conn,conn.cursor() as cur:cur.execute("SELECT r.outcome_json FROM workmanship_craft_bop_fork_runs r JOIN workmanship_craft_bop_fork_workflows w ON w.gid=r.workflow_gid WHERE r.gid=%s AND w.actor_gid=%s",(run_gid,actor_gid));row=cur.fetchone()
         if not row:raise BopForkError("fork_run_not_found")
         return _decode(row["outcome_json"])
     def get_workflow(self,*,workflow_gid,tenant_gid,actor_gid):
-        with self._connect() as conn,conn.cursor() as cur:cur.execute("SELECT gid workflow_gid,status,target_project_gid,include_personal_migration FROM workmanship_craft_bop_fork_workflows WHERE gid=%s AND tenant_gid=%s",(workflow_gid,tenant_gid));row=cur.fetchone()
+        with self._connect() as conn,conn.cursor() as cur:cur.execute("SELECT gid workflow_gid,status,target_project_gid,include_personal_migration FROM workmanship_craft_bop_fork_workflows WHERE gid=%s AND actor_gid=%s",(workflow_gid,actor_gid));row=cur.fetchone()
         if not row:raise BopForkError("fork_workflow_not_found")
         return dict(row)

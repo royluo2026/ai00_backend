@@ -15,6 +15,10 @@ def _json(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str)
 
 
+def _decode(value: Any) -> Any:
+    return json.loads(value) if isinstance(value, str) else (value or {})
+
+
 class MysqlBopRepositoryStore:
     def __init__(self, connection_factory: Callable[..., Any] = get_craft_conn) -> None:
         self._connect = connection_factory
@@ -47,14 +51,16 @@ class MysqlBopRepositoryStore:
         return result
 
     def search_repositories(self, *, tenant_gid, actor_gid, project_gid=None, offset=0, page_size=50):
-        where, args = "tenant_gid=%s AND deleted_at IS NULL", [tenant_gid]
+        # Project repositories are organization-visible; tenant_gid remains an
+        # audit/storage partition and is not a visibility boundary.
+        where, args = "deleted_at IS NULL", []
         if project_gid: where += " AND project_gid=%s"; args.append(project_gid)
         with self._connect() as conn, conn.cursor() as cur:
             return self._page(cur, f"SELECT gid repository_gid,project_gid,baseline_version_gid,lifecycle_status,row_version,updated_at FROM workmanship_craft_bop_repositories WHERE {where} ORDER BY updated_at DESC,gid DESC", tuple(args), offset, page_size)
 
     def get_repository(self, *, repository_gid, tenant_gid, actor_gid):
         with self._connect() as conn, conn.cursor() as cur:
-            return self._row(cur, "SELECT gid repository_gid,project_gid,baseline_version_gid,lifecycle_status,row_version,created_at,updated_at FROM workmanship_craft_bop_repositories WHERE gid=%s AND tenant_gid=%s AND deleted_at IS NULL", (repository_gid,tenant_gid), "repository_not_found")
+            return self._row(cur, "SELECT gid repository_gid,project_gid,baseline_version_gid,lifecycle_status,row_version,created_at,updated_at FROM workmanship_craft_bop_repositories WHERE gid=%s AND deleted_at IS NULL", (repository_gid,), "repository_not_found")
 
     def create_repository(self, *, project_gid, tenant_gid, actor_gid, idempotency_key):
         payload={"project_gid":project_gid,"actor_gid":actor_gid}
@@ -92,13 +98,54 @@ class MysqlBopRepositoryStore:
     def restore_repository(self, **kw): return self._repository_lifecycle("restore",**kw)
     def delete_repository(self, **kw): return self._repository_lifecycle("delete",**kw)
 
-    def search_spaces(self, *, repository_gid, tenant_gid, actor_gid, offset=0, page_size=50):
+    def search_spaces(self, *, repository_gid, tenant_gid, actor_gid, owner_gid, offset=0, page_size=50):
         with self._connect() as conn, conn.cursor() as cur:
-            return self._page(cur,"SELECT s.gid space_gid,s.repository_gid,s.space_kind,s.owner_user_gid,s.fork_base_version_gid,s.frozen_version_gid,s.row_version,s.updated_at,h.gid head_gid,h.row_version head_row_version,h.content_hash FROM workmanship_craft_bop_spaces s JOIN workmanship_craft_bop_space_heads h ON h.space_gid=s.gid WHERE s.repository_gid=%s AND s.tenant_gid=%s AND s.deleted_at IS NULL ORDER BY s.updated_at DESC,s.gid DESC",(repository_gid,tenant_gid),offset,page_size)
+            return self._page(cur,"SELECT s.gid space_gid,s.repository_gid,s.space_kind,s.owner_user_gid,s.fork_base_version_gid,s.frozen_version_gid,s.row_version,s.updated_at,h.gid head_gid,h.row_version head_row_version,h.content_hash FROM workmanship_craft_bop_spaces s JOIN workmanship_craft_bop_space_heads h ON h.space_gid=s.gid WHERE s.repository_gid=%s AND s.deleted_at IS NULL AND (s.space_kind='team' OR s.owner_user_gid=%s) ORDER BY s.updated_at DESC,s.gid DESC",(repository_gid,owner_gid),offset,page_size)
 
     def get_space(self, space_gid, *, tenant_gid, actor_gid):
         with self._connect() as conn, conn.cursor() as cur:
-            return self._row(cur,"SELECT s.gid space_gid,s.repository_gid,s.space_kind,s.owner_user_gid,s.fork_base_version_gid,s.frozen_version_gid,s.row_version,h.gid head_gid,h.row_version head_row_version,h.content_hash FROM workmanship_craft_bop_spaces s JOIN workmanship_craft_bop_space_heads h ON h.space_gid=s.gid WHERE s.gid=%s AND s.tenant_gid=%s AND s.deleted_at IS NULL",(space_gid,tenant_gid),"space_not_found")
+            space = self._row(cur,"SELECT s.gid space_gid,s.repository_gid,r.project_gid,s.space_kind,s.owner_user_gid,s.fork_base_version_gid,s.frozen_version_gid,s.row_version,h.gid head_gid,h.row_version head_row_version,h.content_hash FROM workmanship_craft_bop_spaces s JOIN workmanship_craft_bop_repositories r ON r.gid=s.repository_gid JOIN workmanship_craft_bop_space_heads h ON h.space_gid=s.gid WHERE s.gid=%s AND s.deleted_at IS NULL",(space_gid,),"space_not_found")
+            cur.execute(
+                "SELECT m.logical_gid node_gid,n.lineage_gid,r.parent_node_gid parent_gid,"
+                "r.node_type,r.order_key,r.properties_json,map.legacy_gid "
+                "FROM workmanship_craft_bop_space_head_members m "
+                "JOIN workmanship_craft_bop_node_revisions r ON r.gid=m.node_revision_gid "
+                "JOIN workmanship_craft_bop_nodes n ON n.gid=m.logical_gid "
+                "LEFT JOIN workmanship_craft_bop_repository_id_map map "
+                "ON map.legacy_kind='entry' AND map.repository_gid=n.repository_gid "
+                "AND map.logical_gid=m.logical_gid "
+                "WHERE m.space_head_gid=%s AND m.member_kind='node' AND m.is_tombstone=0 "
+                "ORDER BY r.order_key,m.logical_gid LIMIT 20001", (space["head_gid"],),
+            )
+            raw_nodes = [dict(row) for row in cur.fetchall()]
+            if len(raw_nodes) > 20000:
+                raise BopRepositoryError("space_projection_limit_exceeded")
+            by_gid = {str(row["node_gid"]): row for row in raw_nodes}
+
+            def line_for(row):
+                current = row
+                visited = set()
+                while current and str(current["node_gid"]) not in visited:
+                    visited.add(str(current["node_gid"]))
+                    if current.get("node_type") in {"line", "line_process"}:
+                        return str(current.get("legacy_gid") or current["node_gid"])
+                    current = by_gid.get(str(current.get("parent_gid"))) if current.get("parent_gid") else None
+                return None
+
+            nodes = []
+            for row in raw_nodes:
+                properties = _decode(row.get("properties_json"))
+                nodes.append({
+                    "node_gid": str(row["node_gid"]),
+                    "parent_gid": str(row["parent_gid"]) if row.get("parent_gid") is not None else None,
+                    "node_type": row["node_type"],
+                    "name": str(properties.get("title") or properties.get("name") or row["node_type"]),
+                    "position": row.get("order_key") or "0",
+                    "line_gid": line_for(row),
+                })
+            space["nodes"] = nodes
+            space["bindings"] = []
+            return space
 
     def search_space_versions(self, *, space_gid, tenant_gid, actor_gid, offset=0, page_size=50):
         with self._connect() as conn, conn.cursor() as cur:

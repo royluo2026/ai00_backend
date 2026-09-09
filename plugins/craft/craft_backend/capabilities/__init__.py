@@ -97,11 +97,15 @@ def _authorize_repository_resource(table, resource_id, identity, *, owner_only=F
     column={"workmanship_craft_bop_repositories":"gid","workmanship_craft_bop_spaces":"gid","workmanship_craft_bop_change_proposals":"gid"}[table]
     with get_craft_conn() as conn,conn.cursor() as cur:
         if table=="workmanship_craft_bop_spaces" and owner_only:
-            cur.execute(f"SELECT 1 FROM {table} WHERE {column}=%s AND tenant_gid=%s AND owner_user_gid=%s AND deleted_at IS NULL",(resource_id,identity.tenant.tenant_id,identity.actor.user_id))
+            cur.execute(
+                f"SELECT 1 FROM {table} WHERE {column}=%s "
+                "AND (space_kind='team' OR owner_user_gid=%s) AND deleted_at IS NULL",
+                (resource_id,identity.actor.user_id),
+            )
         elif table=="workmanship_craft_bop_change_proposals":
             cur.execute("SELECT 1 FROM workmanship_craft_bop_change_proposals p JOIN workmanship_craft_bop_repositories r ON r.gid=p.repository_gid WHERE p.gid=%s AND r.tenant_gid=%s AND r.deleted_at IS NULL",(resource_id,identity.tenant.tenant_id))
         else:
-            cur.execute(f"SELECT 1 FROM {table} WHERE {column}=%s AND tenant_gid=%s AND deleted_at IS NULL",(resource_id,identity.tenant.tenant_id))
+            cur.execute(f"SELECT 1 FROM {table} WHERE {column}=%s AND deleted_at IS NULL",(resource_id,))
         return cur.fetchone() is not None
 
 
