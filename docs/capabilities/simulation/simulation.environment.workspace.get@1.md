@@ -142,7 +142,12 @@ Read one current user's private simulation workspace.
       },
       "type": "array"
     },
+    "is_owner": {
+      "type": "boolean"
+    },
     "name": {
+      "maxLength": 255,
+      "minLength": 1,
       "type": "string"
     },
     "nodes": {
@@ -193,15 +198,68 @@ Read one current user's private simulation workspace.
       },
       "type": "array"
     },
+    "owner_gid": {
+      "pattern": "^[1-9][0-9]*$",
+      "type": "string"
+    },
+    "primary_project_gid": {
+      "anyOf": [
+        {
+          "pattern": "^[1-9][0-9]*$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "project_gids": {
+      "items": {
+        "pattern": "^[1-9][0-9]*$",
+        "type": "string"
+      },
+      "maxItems": 50,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "review_type": {
+      "enum": [
+        "node_review",
+        "scattered_review",
+        "other"
+      ],
+      "type": "string"
+    },
     "row_version": {
       "minimum": 1,
       "type": "integer"
     },
     "status": {
+      "enum": [
+        "active",
+        "baseline",
+        "frozen",
+        "archived"
+      ],
+      "type": "string"
+    },
+    "updated_at": {
       "type": "string"
     },
     "version_gid": {
       "pattern": "^[1-9][0-9]*$",
+      "type": "string"
+    },
+    "version_label": {
+      "maxLength": 128,
+      "minLength": 1,
+      "type": "string"
+    },
+    "visibility": {
+      "enum": [
+        "private",
+        "shared"
+      ],
       "type": "string"
     },
     "workspace_gid": {
@@ -212,8 +270,16 @@ Read one current user's private simulation workspace.
   "required": [
     "workspace_gid",
     "version_gid",
+    "owner_gid",
+    "is_owner",
     "name",
+    "review_type",
+    "version_label",
     "status",
+    "visibility",
+    "project_gids",
+    "primary_project_gid",
+    "updated_at",
     "row_version",
     "nodes",
     "bindings"

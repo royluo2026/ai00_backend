@@ -79,6 +79,7 @@ def _success(value):
 
 def create_team(payload, actor):
     from backend.routers.teams import CreateTeamBody, create_team as service
+    _super(actor)
     return service(CreateTeamBody(**payload), current_user=actor)
 
 
@@ -105,11 +106,13 @@ def list_team_members(payload, actor):
 
 def add_team_member(payload, actor):
     from backend.routers.teams import AddMemberBody, add_team_member as service
+    _super(actor)
     return service(payload['team_gid'], AddMemberBody(**payload['member']), current_user=actor)
 
 
 def remove_team_member(payload, actor):
     from backend.routers.teams import remove_team_member as service
+    _super(actor)
     return service(payload['team_gid'], payload['user_gid'], current_user=actor)
 
 

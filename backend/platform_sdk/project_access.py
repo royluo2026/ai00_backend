@@ -50,6 +50,24 @@ def can_manage_project(user_gid: str, project_gid: str) -> bool:
             return bool(cur.fetchone())
 
 
+def can_edit_project_bop(user_gid: str, project_gid: str, line_gid: str | None,
+                         active_roles: Iterable[str] = ()) -> bool:
+    """Compatibility facade over Base's authoritative responsibility check."""
+    from backend.base.bop_edit_authorization import check_bop_edit
+    # Legacy callers do not carry an explicit tenant. Resolve it from the
+    # authenticated user; this value is never accepted from request payload.
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT team_id FROM workmanship_auth_users WHERE gid=%s AND is_active=1", (user_gid,))
+            row = cur.fetchone()
+    if not row:
+        return False
+    tenant_gid = str(row.get("team_id") or f"user:{user_gid}")
+    return bool(check_bop_edit(tenant_gid=tenant_gid, user_gid=user_gid,
+                               active_roles=tuple(active_roles), project_gid=project_gid,
+                               line_gid=line_gid)["allowed"])
+
+
 def list_project_access_entries(project_gid: str, line_gids: Iterable[str] = ()) -> list[dict]:
     """Return Auth-owned member/grant rows; Craft enriches line metadata itself."""
     result: list[dict] = []
@@ -197,6 +215,7 @@ def replace_section_leads(
 __all__ = [
     "add_project_member",
     "can_manage_project",
+    "can_edit_project_bop",
     "get_user_profiles",
     "list_all_project_memberships",
     "list_project_access_entries",

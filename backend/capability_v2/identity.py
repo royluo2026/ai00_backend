@@ -3,13 +3,14 @@ from __future__ import annotations
 
 import hashlib
 import secrets
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Callable, Protocol, Literal
 
 from pydantic import Field, model_validator
 
 from .contracts import (
     ActorIdentity,
+    AutomationLevel,
     ConsumerDescriptor,
     ConsumerIdentity,
     ConsumerType,
@@ -235,6 +236,24 @@ class IdentityBroker:
     def for_local_runtime(self, principal: AuthenticatedPrincipal, *, tenant_id: str, runtime_id: str) -> ConsumerIdentity:
         self._require_service(principal)
         return self._identity(principal, tenant_id, ConsumerDescriptor(type=ConsumerType.LOCAL_RUNTIME, consumer_id=runtime_id))
+
+    def for_domain_provider(self, parent: ConsumerIdentity, *, runtime_id: str,
+                            capability_id: str) -> ConsumerIdentity:
+        """Preserve a trusted actor/tenant while fixing one internal capability scope."""
+        if parent.consumer.type not in {ConsumerType.WEB, ConsumerType.PLUGIN, ConsumerType.AGENT}:
+            raise IdentityError("domain_provider_parent_invalid")
+        now = self._clock()
+        return parent.model_copy(update={
+            "consumer": ConsumerDescriptor(type=ConsumerType.LOCAL_RUNTIME, consumer_id=runtime_id),
+            "delegation": DelegationContext(
+                delegation_id=f"domain-provider-{secrets.token_hex(12)}",
+                delegated_by=parent.actor.user_id or parent.actor.service_id or "service",
+                capability_scopes=(capability_id,), resource_scopes=("*",),
+                data_scopes=("confidential",), catalog_release="runtime-derived",
+                maximum_automation_level=AutomationLevel.A2,
+                expires_at=now + timedelta(minutes=5),
+            ),
+        })
 
     @staticmethod
     def _require_service(principal: AuthenticatedPrincipal) -> None:

@@ -196,20 +196,25 @@ def _get_entry_line_gid(cur, entry_gid: str) -> Optional[str]:
 
 def _check_line_editable(cur, version_gid: str, entry_gid: str, user: dict, allow_copy: bool = False):
     from backend.platform_sdk.auth import get_user_grants, derive_org_role
+    from backend.platform_sdk.project_access import can_edit_project_bop
 
     org_role = user.get('org_role') or derive_org_role(user.get('system_role', 'external'))
-    # 组织成员可编辑所有工艺流程图，不再受项目负责人或线体负责人范围限制。
-    if org_role in ('super_admin', 'member', 'team_admin', 'project_admin'):
+    # 只有超管天然拥有全局写权限；普通成员和团队管理员必须命中责任范围。
+    if org_role == 'super_admin':
         return
 
     cur.execute("SELECT project_gid FROM workmanship_bop_bop_versions WHERE gid=%s", (version_gid,))
     ver = cur.fetchone()
     project_gid = ver['project_gid'] if ver else None
+    line_gid = _get_entry_line_gid(cur, entry_gid)
+    if project_gid and can_edit_project_bop(
+        str(user.get('gid') or ''), str(project_gid), line_gid, (str(org_role),)
+    ):
+        return
     grants = get_user_grants(user.get('gid', ''))
     if project_gid and any(g['grant_type'] == 'project_owner' and g.get('scope_gid') == project_gid for g in grants):
         return
 
-    line_gid = _get_entry_line_gid(cur, entry_gid)
     if line_gid and any(g['grant_type'] == 'section_lead' and g.get('scope_gid') == line_gid for g in grants):
         return
 

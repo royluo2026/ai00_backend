@@ -47,25 +47,8 @@ def list_teams(current_user: dict = Depends(get_current_user)):
 
 
 @router.post("", status_code=201)
-def create_team(body: CreateTeamBody, current_user: dict = Depends(get_current_user)):
-    """
-    super_admin 可创建任意团队；
-    team_admin 只能在自己管理的团队下创建子团队（需提供 parent_team_gid）。
-    """
-    org_role  = current_user.get("org_role") or current_user.get("system_role", "")
-    is_super  = org_role == "super_admin"
-
-    if not is_super:
-        # 非超管：必须是目标父团队的 team_admin
-        if not body.parent_team_gid:
-            raise HTTPException(403, "非超管必须指定 parent_team_gid")
-        grants = current_user.get("grants", [])
-        has_grant = any(
-            g["grant_type"] == "team_admin" and g["scope_gid"] == body.parent_team_gid
-            for g in grants
-        )
-        if not has_grant:
-            raise HTTPException(403, "无权在该团队下创建子团队")
+def create_team(body: CreateTeamBody, current_user: dict = Depends(_SUPER_ONLY)):
+    """Only a super administrator may change the manually maintained tree."""
 
     gid = str(next_gid())
     with get_conn() as conn:
@@ -121,7 +104,7 @@ def delete_team(gid: str, _: dict = Depends(_SUPER_ONLY)):
 def update_team_config(
     gid: str,
     body: dict = Body(...),
-    _: dict = Depends(_ADMIN_ONLY),
+    _: dict = Depends(_SUPER_ONLY),
 ):
     """增量合并更新团队配置 JSON（JSONB merge）"""
     with get_conn() as conn:
@@ -180,18 +163,11 @@ class AddMemberBody(BaseModel):
 def add_team_member(
     gid: str,
     body: AddMemberBody,
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(_SUPER_ONLY),
 ):
     """将用户的 team_id 设置为该团队（team_admin 或 super_admin）。
     支持 user_gid（已有用户）或 feishu_open_id（自动创建未注册用户）。
     """
-    org_role = current_user.get("org_role") or current_user.get("system_role", "")
-    is_super = org_role == "super_admin"
-    if not is_super:
-        grants = current_user.get("grants", [])
-        if not any(g["grant_type"] == "team_admin" and g["scope_gid"] == gid for g in grants):
-            raise HTTPException(403, "无权添加成员")
-
     target_gid = body.user_gid
 
     # 通过 feishu_open_id 查找或创建用户
@@ -224,16 +200,9 @@ def add_team_member(
 def remove_team_member(
     gid: str,
     user_gid: str,
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(_SUPER_ONLY),
 ):
     """将用户从团队移除（team_id 置 NULL）"""
-    org_role = current_user.get("org_role") or current_user.get("system_role", "")
-    is_super = org_role == "super_admin"
-    if not is_super:
-        grants = current_user.get("grants", [])
-        if not any(g["grant_type"] == "team_admin" and g["scope_gid"] == gid for g in grants):
-            raise HTTPException(403, "无权移除成员")
-
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
