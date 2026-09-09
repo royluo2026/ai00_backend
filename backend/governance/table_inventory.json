@@ -1,6 +1,6 @@
 {
   "registry_version": 1,
-  "table_count": 349,
+  "table_count": 350,
   "tables": [
     {
       "table": "workmanship_agent_canvas_audit_events",
@@ -869,6 +869,11 @@
     },
     {
       "table": "workmanship_craft_bop_operation_ledger",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_craft_bop_personal_fork_targets",
       "owner": "craft",
       "runtime_domain": "craft"
     },

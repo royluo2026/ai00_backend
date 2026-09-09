@@ -46,3 +46,21 @@ def test_target_collision_is_rejected():
     with pytest.raises(CapabilityBusinessError) as error:
         provider.repository_apply({**APPLY,"preview_gid":preview["preview_gid"],"plan_hash":preview["plan_hash"],"allowed_decisions":preview["allowed_decisions"]},ctx())
     assert error.value.code=="target_repository_exists"
+
+
+def test_default_provider_uses_persistent_store():
+    from plugins.craft.craft_backend.capabilities.bop_repository_fork import ForkProvider
+    from plugins.craft.craft_backend.data.bop_fork import MysqlBopForkStore
+    assert isinstance(ForkProvider().store, MysqlBopForkStore)
+
+
+def test_personal_preview_uses_repository_target_and_fixed_workflow():
+    from plugins.craft.craft_backend.data.bop_fork import MemoryBopForkStore
+    from plugins.craft.craft_backend.capabilities.bop_repository_fork import ForkProvider
+    store=MemoryBopForkStore(); provider=ForkProvider(store)
+    team=provider.repository_preview(SOURCE,ctx()).data
+    personal=provider.personal_preview({"source_version_gid":"100","target_repository_gid":"300",
+        "fork_depth":"process","workflow_gid":team["workflow_gid"],"expected_target_slot":0,
+        "idempotency_key":"personal-preview"},ctx()).data
+    assert personal["workflow_gid"]==team["workflow_gid"]
+    assert personal["target_repository_gid"]=="300"

@@ -1,7 +1,7 @@
 {
   "database_name": "ai00_test",
   "isolation_profile": "single_database_domain_tables",
-  "schema_sha256": "sha256:232b17548b27476124579f47cb8625f0dfca464d0b35a44593bc282f659d9662",
+  "schema_sha256": "sha256:d37a1618a3c4604cdf42848bdd42a5c59764251bb975cb806c7ad4d9e6be4a27",
   "schema_version": 1,
   "tables": [
     {
@@ -23049,6 +23049,113 @@
       "runtime_domain": "craft",
       "sources": [
         "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "plan_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0011_bop_personal_fork_targets.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "target_repository_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0011_bop_personal_fork_targets.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": "0",
+          "extra": "",
+          "name": "expected_target_slot",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0011_bop_personal_fork_targets.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0011_bop_personal_fork_targets.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "plan_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_craft_personal_fork_plan",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_craft_bop_fork_plans",
+          "sources": [
+            "backend/db/migrations/domains/craft/0011_bop_personal_fork_targets.sql"
+          ]
+        },
+        {
+          "columns": [
+            "target_repository_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_craft_personal_fork_repository",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_craft_bop_repositories",
+          "sources": [
+            "backend/db/migrations/domains/craft/0011_bop_personal_fork_targets.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "plan_gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0011_bop_personal_fork_targets.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "target_repository_gid"
+          ],
+          "name": "idx_craft_personal_fork_target",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/craft/0011_bop_personal_fork_targets.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_craft_bop_personal_fork_targets",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "sources": [
+        "backend/db/migrations/domains/craft/0011_bop_personal_fork_targets.sql"
       ]
     },
     {

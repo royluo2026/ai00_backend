@@ -34,11 +34,24 @@ class MemoryBopForkStore:
         self.applies[key]=result; self.workflows[p["workflow_gid"]]["team"]=result; self.workflows[p["workflow_gid"]]["status"]="team_completed"; return copy.deepcopy(result)
     def preview_personal(self, *, workflow_gid=None, **kw):
         if workflow_gid and workflow_gid not in self.workflows: raise BopForkError("fork_workflow_not_found")
-        row=self.preview_repository(include_personal_migration=False,**kw)
-        if workflow_gid: row["workflow_gid"]=workflow_gid; self.previews[row["preview_gid"]]["workflow_gid"]=workflow_gid
-        return row
+        target_repository_gid=str(kw.pop("target_repository_gid")); tenant_gid=str(kw["tenant_gid"]); actor_gid=str(kw["actor_gid"])
+        if workflow_gid:
+            fixed=self.workflows[workflow_gid]
+            if fixed["tenant_gid"]!=tenant_gid or fixed["actor_gid"]!=actor_gid: raise BopForkError("fork_workflow_not_found")
+        else:
+            workflow_gid=str(next_gid()); self.workflows[workflow_gid]={"workflow_gid":workflow_gid,"tenant_gid":tenant_gid,"actor_gid":actor_gid,"status":"previewed","team":None,"personal":None}
+        preview_gid=str(next_gid()); fixed={**kw,"target_repository_gid":target_repository_gid,"workflow_gid":workflow_gid}
+        decisions=[]; plan_hash=_hash({**fixed,"owner_verdicts":[],"allowed_decisions":decisions})
+        row={"preview_gid":preview_gid,**fixed,"input_hash":_hash(fixed),"plan_hash":plan_hash,"expires_at":(datetime.now(timezone.utc)+timedelta(minutes=10)).isoformat(),"owner_verdicts":[],"allowed_decisions":decisions}
+        self.previews[preview_gid]=row; return copy.deepcopy(row)
     def apply_personal(self, **kw):
-        result=self.apply_repository(**kw); result["personal_space_gid"]=result.pop("repository_gid"); return result
+        p=self.previews.get(kw["preview_gid"])
+        if not p or "target_repository_gid" not in p: raise BopForkError("fork_preview_expired")
+        if kw["plan_hash"]!=p["plan_hash"] or kw["allowed_decisions"]!=p["allowed_decisions"]: raise BopForkError("fork_plan_changed")
+        key=(kw["preview_gid"],kw["idempotency_key"])
+        if key in self.applies:return copy.deepcopy(self.applies[key])
+        result={"workflow_gid":p["workflow_gid"],"fork_run_gid":str(next_gid()),"personal_space_gid":str(next_gid()),"fork_depth":p["fork_depth"],"status":"completed"}
+        self.applies[key]=result; self.workflows[p["workflow_gid"]]["personal"]=result; return copy.deepcopy(result)
     def get_run(self, *, run_gid, tenant_gid, actor_gid):
         row=self.runs.get(run_gid)
         if not row: raise BopForkError("fork_run_not_found")
@@ -49,4 +62,10 @@ class MemoryBopForkStore:
         return copy.deepcopy(row)
 
 
-__all__=["BopForkError","MemoryBopForkStore"]
+def __getattr__(name):
+    if name == "MysqlBopForkStore":
+        from .bop_fork_mysql import MysqlBopForkStore
+        return MysqlBopForkStore
+    raise AttributeError(name)
+
+__all__=["BopForkError","MemoryBopForkStore","MysqlBopForkStore"]

@@ -3,11 +3,11 @@ from __future__ import annotations
 import hashlib,json
 from typing import Any
 from backend.capability_v2.provider_contracts import CapabilityBusinessError,CapabilityContext,CapabilityOutput,CapabilitySpec,EvidenceRef
-from ..data.bop_fork import BopForkError,MemoryBopForkStore
+from ..data.bop_fork import BopForkError,MemoryBopForkStore, MysqlBopForkStore
 
 
 class ForkProvider:
-    def __init__(self,store=None):self.store=store or MemoryBopForkStore()
+    def __init__(self,store=None):self.store=store or MysqlBopForkStore()
     def _call(self,method,p,c):
         if not c.team_gid or not c.user_gid: raise CapabilityBusinessError("repository_identity_required","repository_identity_required")
         if "owner_verdict" in p: raise CapabilityBusinessError("fork_plan_changed","fork_plan_changed")
@@ -31,7 +31,8 @@ def candidate_specs(provider=None):
     preview={"source_version_gid":gid,"target_project_gid":gid,"fork_depth":{"enum":["all","operation","process","role","station"]},"include_personal_migration":{"type":"boolean"},"expected_target_slot":{"type":"integer","minimum":0},"idempotency_key":key}
     apply={"preview_gid":gid,"plan_hash":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},"allowed_decisions":{"type":"array","maxItems":100},"expected_target_slot":{"type":"integer","minimum":0},"idempotency_key":key}
     def s(cid,h,props,req,write):return CapabilitySpec(id=cid,version=1,description=cid,risk="write" if write else "read",input_schema=schema(props,req),**common),h
-    return (s("craft.bop.repository.fork.preview",p.repository_preview,preview,preview,True),s("craft.bop.repository.fork.apply",p.repository_apply,apply,apply,True),s("craft.bop.managed_personal_space.fork.preview",p.personal_preview,{**preview,"workflow_gid":gid},preview,True),s("craft.bop.managed_personal_space.fork.apply",p.personal_apply,apply,apply,True),s("craft.bop.fork_run.get",p.get_run,{"run_gid":gid},("run_gid",),False),s("craft.bop.fork_workflow.get",p.get_workflow,{"workflow_gid":gid},("workflow_gid",),False))
+    personal_preview={"source_version_gid":gid,"target_repository_gid":gid,"fork_depth":preview["fork_depth"],"workflow_gid":gid,"expected_target_slot":{"type":"integer","minimum":0},"idempotency_key":key}
+    return (s("craft.bop.repository.fork.preview",p.repository_preview,preview,preview,True),s("craft.bop.repository.fork.apply",p.repository_apply,apply,apply,True),s("craft.bop.managed_personal_space.fork.preview",p.personal_preview,personal_preview,("source_version_gid","target_repository_gid","fork_depth","expected_target_slot","idempotency_key"),True),s("craft.bop.managed_personal_space.fork.apply",p.personal_apply,apply,apply,True),s("craft.bop.fork_run.get",p.get_run,{"run_gid":gid},("run_gid",),False),s("craft.bop.fork_workflow.get",p.get_workflow,{"workflow_gid":gid},("workflow_gid",),False))
 
 
 __all__=["ForkProvider","candidate_specs"]

@@ -1,5 +1,5 @@
 {
-  "schema_sha256": "sha256:232b17548b27476124579f47cb8625f0dfca464d0b35a44593bc282f659d9662",
+  "schema_sha256": "sha256:d37a1618a3c4604cdf42848bdd42a5c59764251bb975cb806c7ad4d9e6be4a27",
   "schema_version": 1,
   "tables": [
     {
@@ -7731,6 +7731,42 @@
         "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
       ],
       "table": "workmanship_craft_bop_operation_ledger"
+    },
+    {
+      "columns": {
+        "created_at": [
+          "backend/db/migrations/domains/craft/0011_bop_personal_fork_targets.sql"
+        ],
+        "expected_target_slot": [
+          "backend/db/migrations/domains/craft/0011_bop_personal_fork_targets.sql"
+        ],
+        "plan_gid": [
+          "backend/db/migrations/domains/craft/0011_bop_personal_fork_targets.sql"
+        ],
+        "target_repository_gid": [
+          "backend/db/migrations/domains/craft/0011_bop_personal_fork_targets.sql"
+        ]
+      },
+      "constraints": {
+        "fk_craft_personal_fork_plan": [
+          "backend/db/migrations/domains/craft/0011_bop_personal_fork_targets.sql"
+        ],
+        "fk_craft_personal_fork_repository": [
+          "backend/db/migrations/domains/craft/0011_bop_personal_fork_targets.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0011_bop_personal_fork_targets.sql"
+        ],
+        "idx_craft_personal_fork_target": [
+          "backend/db/migrations/domains/craft/0011_bop_personal_fork_targets.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0011_bop_personal_fork_targets.sql"
+      ],
+      "table": "workmanship_craft_bop_personal_fork_targets"
     },
     {
       "columns": {
