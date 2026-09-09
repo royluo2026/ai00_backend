@@ -5,7 +5,7 @@
 **适用客户端：** AI00 Windows x64 App
 **相关既有设计：** `docs/superpowers/specs/2026-09-03-simulation-ai00-connector-governance-design.md`
 
-**协作与版本细化：** `docs/superpowers/specs/2026-09-09-simulation-environment-collaboration-versioning-design.md`。该细化设计取代本文关于“仅私人工作区”、复杂选择性合并和后续才支持共享/Fork 的旧假设。
+**Repository、Fork 与版本细化：** `docs/superpowers/specs/2026-09-09-simulation-environment-collaboration-versioning-design.md`。该细化设计将项目管理聚合根固定为 Craft 拥有的 BOP Repository，并取代本文旧的“Simulation 项目主环境/共享池”模型；本文继续定义 VM、PLMXML、实例、姿态、截图和 Connector 边界。
 
 ## 1. 设计结论
 
@@ -20,13 +20,13 @@ Teamcenter / PLMXML 不可变数模链接
 VisMockup 文档中的数模实例与结构
                |
                v
-AI00 仿真环境中的引用、排列、绑定、版本和姿态
+AI00 BOP Repository 与 Simulation Context 中的引用、绑定、版本和姿态
                |
                v
 VisMockup COM 选择 / 高亮 / 显隐 / 着色 / 截图
                |
                v
-项目主环境的在线 BOP 与版本基线
+项目唯一 BOP Repository 的团队空间与版本基线
 ```
 
 这一区分是系统长期扩展的基础：来源链接不可变，AI00 拥有的编排关系和版本可以变化，VisMockup 是实际数模加载与图形执行引擎。
@@ -57,36 +57,36 @@ Renderer、preload、Electron IPC、Electron main、AppHost、named pipe 和 Web
 
 页面采用四列结构：
 
-1. **仿真环境记录列**：项目主环境、私人环境和共享池，按活动/基线/冻结/归档分组，并提供搜索、Fork、版本和同步状态。
-2. **当前仿真环境树**：引用既有 BOP，也允许在末端增加临时线体、工位、工序和操作。
+1. **项目与空间列**：项目 BOP Repository、团队空间、当前用户受管个人空间和私人仿真环境，并提供 Fork、版本、同步和提案状态。
+2. **当前 BOP/仿真树**：显示团队、个人或私人空间的 BOP 结构、VPPS 蓝图和 Simulation overlay。
 3. **VM 结构树**：展示当前 VisMockup 文档的结构化快照，并与 VisMockup 双向选择和高亮。
 4. **右侧工作区**：一期保留，用于详情、差异、冲突、截图预览和未来高级仿真工具。
 
 工具和状态入口集中在对应列头及统一状态区，不能散落在大空白画布中。
 
-### 2.2 BOP 引用与仿真覆盖层
+### 2.2 BOP Repository 与仿真覆盖层
 
-- 节点评审的项目主环境直接跟随在线活动 BOP。项目管理者可修改全部区域，工程师可修改获授权线体；BOP 写入始终由 Craft Capability 执行。
-- 零散评审的私人/共享环境保存 BOP 引用和仿真覆盖层，不直接修改来源 BOP。
+- 一个知识库项目只有一个 Craft BOP Repository 和一个团队空间；每个用户在该项目最多一个受管个人空间。
+- 团队和个人空间的 BOP 写入始终由 Craft Capability 执行；Simulation Context 只保存 VM、姿态、截图和映射扩展。
+- 用户可创建不限数量的私人仿真环境；它们保存 BOP 引用和仿真覆盖层，不直接修改来源 BOP。
 - 临时层级节点拥有 Simulation GID，不预占 Craft/BOP GID。
 - 同一个 VM 实例可以在多个工序或操作中以关系投影出现，底层实例只有一份。
 - 工具、设备、工装、套筒等需求关系可显示为虚拟关系组或关系行，不伪装成 BOP 结构节点。
 
-### 2.3 主环境在线协作
+### 2.3 团队与受管个人空间协作
 
-- 一个主项目最多有一个活动主环境，不提供 pull、push、merge、rebase 或日常工程师分支。
-- 项目管理者直接修改主环境；工程师直接修改获授权线体；跨线体调整由项目管理者处理。
+- 一个项目最多一个 Repository/团队空间，一个用户最多一个受管个人空间；不提供通用 pull、push、merge、rebase 或日常分支。
+- 项目管理者直接修改团队空间；工程师在受管个人空间设计，并可按授权直接处理团队线体；跨线体调整由项目管理者处理。
 - 线体范围授权是目标；在 `G-Craft-Collab` 通过前仍使用整 BOP CAS。跨线体移动由项目管理者执行，并要求 Craft 提供完整 checkpoint 和双线体原子合同。
-- 主环境用 Simulation 拥有的 `environment_anchor` 关联两域不可变引用；只有锚点 saga 达到 `ready` 才显示为同一评审版本。
+- 个人空间与团队空间使用 fork-base 和三方 Diff；正式变更提案只允许个人 → 团队，项目管理者按原子变更单元接受。
 
-### 2.4 私人环境、共享池、Fork 与手动版本
+### 2.4 私人环境、Fork 与版本
 
-- 零散环境创建和 Fork 后固定 private；Share/Unshare 是独立操作，且必须验证所有底层引用的再分发权限。
-- 私人环境仅 owner 可读写；共享池环境在同租户及底层授权允许时可读、可用、可 Fork，但仍只有 owner 可修改。
-- Fork 从已保存版本或活动环境的自动 fork-base 派生，不改变来源状态，也不回写来源；不可变来源复用 Artifact/ref，不复制字节。
-- 私人和共享环境只保留当前状态、Fork 起点和用户主动保存的不可变版本，不保存每次自动保存的完整 BOP/VM 历史。
+- 私人环境仅 owner 可读写，数量不限；需要正式提交时先选择性导入受管个人空间。
+- 团队空间、受管个人空间和私人环境均保留 Fork 能力。Fork 从精确不可变版本派生，不改变来源状态；不可变来源复用 Artifact/ref，不复制字节。
+- 私人环境只保留当前状态、Fork 起点和用户主动保存的少量版本，不保存每次自动保存的完整 BOP/VM 历史。
 - 同一环境任意两个手动保存版本必须支持完整结构化 Diff，包括 BOP、绑定、VM 版本、BOM 行、`catiaOccurrenceName`、坐标和姿态。
-- 生命周期仅为 active/frozen；baseline 是版本类型和指针，archive 是正交可恢复字段。owner 可逻辑删除自己的 private/shared 环境；project_main 删除要求当前项目管理/删除权限，且只删除 Simulation 扩展。
+- 跨项目 Fork 不绑定年度或换代规则。团队 Fork 只创建空目标项目的 Repository；目标个人空间已存在时使用三方 Diff 导入，不覆盖。
 
 ## 3. VisMockup 文档、窗口与同步
 
@@ -327,13 +327,13 @@ Craft 的执行结构投影对外规范化为 `parameters.is_load_part`，Simula
 
 单步失败、上传失败、取消、App/ConnectorHost/VisMockup 崩溃时停止后续步骤，并 best-effort 恢复运行前场景。恢复本身也要记录 outcome；不能证明截图或恢复结果时进入 `outcome_unknown` / `manual_review_required`。再次操作前先对账，不得通过重复截图猜测结果。成功、失败、取消和恢复都不能永久污染工程师原有场景。
 
-## 9. 项目主环境与正式 BOP 边界
+## 9. BOP Repository 与 Simulation Context 边界
 
-### 9.1 同一项目版本
+### 9.1 Repository 版本及扩展
 
-节点评审主环境直接绑定项目在线活动 BOP。项目管理者和获授权工程师的结构、零件 load/operate 及资源需求修改由 Craft Capability 写入当前活动 BOP；Simulation 同步保存 VM 实例、姿态、截图和 VisMockup 映射。普通协作不经过私人环境合并或发布流程。
+团队空间和受管个人空间的结构、零件 load/operate 及资源需求由 Craft Capability 写入对应 mutable head。Simulation Context 引用精确 Repository、space、version、node/lineage，并保存 VM 实例、姿态、截图和 VisMockup 映射。
 
-建立基线或冻结时，由 Simulation 拥有的 `environment_anchor` 通过可对账 saga 关联 Craft 不可变 snapshot ref、精确 capability version/content hash 与 Simulation canonical manifest。锚点经历 `preparing/ready/failed/reconciling`；只有两侧重新校验完成的 `ready` 锚点可对用户表示为同一评审版本。它不是 Project Management 的“正式项目版本”，也不构成跨域数据库事务。该锚点对 project_main 强制；无 Craft 来源的空白或纯 VM ad_hoc 版本只走 Artifact + Simulation saga。
+Repository 版本 manifest 由 Craft 拥有，并列出实际存在的跨域扩展 source refs。Simulation Context 生成自己的 immutable manifest Artifact；Craft 版本只保存其 GID/ref/hash，不复制 Simulation 主数据，也不宣称跨域数据库事务。
 
 ### 9.2 不写入 BOP 主结构的内容
 
@@ -351,36 +351,35 @@ Craft 的执行结构投影对外规范化为 `parameters.is_load_part`，Simula
 - 目标线体独立协作依赖 Craft owner 提供线体授权、线体 revision 或安全可交换 rebase、完整 checkpoint、双线体原子移动、幂等与审计合同。
 - 跨线体移动仅项目管理者可执行；若当前 Craft 合同不能原子保护来源与目标线体，则阻止操作。
 - revision 冲突时只重新读取受影响线体，保留用户视点和未提交意图，禁止覆盖或盲目重试。
-- 私人和共享池环境不回写项目主环境，不提供 merge、pull 或 push。
+- 私人环境不回写团队空间，只能选择性导入受管个人空间；个人到团队使用受治理的变更提案，不提供通用 merge、pull 或 push。
 
 ## 10. 建议的数据模型
 
 以下名称为实施设计候选，最终迁移前需核对现有表：
 
-协作、共享、Fork 和手动版本的实际扩展表及字段以 2026-09-09 细化设计为准；下表保留原始核心对象边界。
+Repository、空间、Fork、VPPS 组和提案表以 2026-09-09 细化设计为准；下表只列 Simulation 自有对象。
 
 | 表 | Owner | 作用 |
 |---|---|---|
-| `workmanship_sim_environment_workspaces` | simulation | 用户可变仿真环境及 draft head |
-| `workmanship_sim_environment_versions` | simulation | 冻结版本、来源 BOP 和 manifest hash |
-| `workmanship_sim_environment_nodes` | simulation | 临时节点与 BOP 引用节点的覆盖投影 |
+| `workmanship_sim_environment_workspaces` | simulation | 不限数量的私人仿真环境及 draft head |
+| `workmanship_sim_environment_versions` | simulation | 私人环境手动版本、来源 Repository ref 和 manifest hash |
+| `workmanship_sim_environment_nodes` | simulation | 私人环境临时节点与 BOP 引用投影 |
 | `workmanship_sim_vm_documents` | simulation | VM 文档演进链 |
 | `workmanship_sim_vm_sessions` | simulation | VisMockup 窗口连接会话 |
 | `workmanship_sim_vm_snapshots` | simulation | 已接受快照与原始 ArtifactRef |
 | `workmanship_sim_vm_occurrences` | simulation | 逻辑实例身份及 predecessor |
 | `workmanship_sim_vm_occurrence_observations` | simulation | 每快照观察与分类状态 |
 | `workmanship_sim_vm_poses` | simulation | 来源、阶段及运行姿态 |
-| `workmanship_sim_environment_bindings` | simulation | load、operate、resource_use 等绑定 |
-| `workmanship_sim_environment_anchors` | simulation | Craft snapshot 与 Simulation manifest 的复合锚点和 saga 状态 |
-| `workmanship_sim_main_projection_operations` | simulation | Craft 操作引用、Simulation 投影和对账状态 |
+| `workmanship_sim_environment_bindings` | simulation | 私人 overlay 中的 load、operate、resource_use 候选 |
+| `simulation_contexts` | simulation | Repository/space/version/node/lineage 的 VM、姿态和截图扩展引用 |
 
 现有环境 manifest、snapshot request、capture run 和 Connector 表继续复用。新增表不复制 Craft、Knowledge、Digital Model 或 Teamcenter 的可写主数据，仅保存带版本的引用和快照事实。
 
 ### 10.1 冻结版本与可复现性
 
-冻结版本不是只保存一个 `manifest_hash`。每个 `environment_version_gid` 必须绑定一个不可变 canonical manifest Artifact 及其 SHA-256，并在数据库中保留可查询的 version membership/projection。manifest 使用 owner/source 列表，只固定实际存在的来源；project_main 强制 Craft snapshot，ad_hoc 的 Craft source 可选。canonical manifest 至少固定：
+可复现版本不能只保存一个 `manifest_hash`。每个 Simulation environment/context version 必须绑定不可变 canonical manifest Artifact 及 SHA-256，并在数据库中保留可查询 projection。团队/个人的 BOP Repository manifest 由 Craft 拥有；Simulation manifest 使用实际 source refs 引用它。Simulation canonical manifest 至少固定：
 
-- 环境节点集合、父子关系、顺序和来源类型；
+- 私人环境 overlay 节点或 Repository node/lineage 引用、顺序和来源类型；
 - 每条绑定及 binding revision，包括 load、operate、resource_use；
 - 来源装配姿态和被截图使用的阶段姿态；
 - `source_bop_version_gid`、BOP content hash 和 Load 属性投影版本；
@@ -389,7 +388,7 @@ Craft 的执行结构投影对外规范化为 `parameters.is_load_part`，Simula
 - 身份匹配、坐标规范化、diff 和截图计划算法版本；
 - capture profile、创建者、冻结时间和敏感级别。
 
-所有历史 capture run、Diff 和可复现运行只能引用不可变 `environment_version_gid`，不能引用可变 draft head。
+所有历史 capture run、Diff 和可复现运行只能引用不可变 Repository/Simulation version，不能引用可变 head。
 
 ### 10.2 关系与并发约束
 
@@ -401,8 +400,8 @@ Craft 的执行结构投影对外规范化为 `parameters.is_load_part`，Simula
 - 冻结采用跨资源 saga，不能把 Base Platform Artifact Capability 和 Simulation 数据库描述成一个事务：先通过受治理 Base Platform Artifact Capability 以 operation/idempotency 创建并 finalize 不可变 Artifact；再校验 ArtifactRef、hash、tenant 和访问范围；随后在 Simulation 单库事务中写入 version、membership、ArtifactRef/hash 和审计，提交后才令版本可见。OIS 只是 Artifact 字节存储的 Provider 实现，不是并列业务 owner。
 - Simulation 数据库失败时将已完成 Artifact 标记为 orphan，交由 Base Platform Artifact Capability 的受控保留/回收流程处理；数据库成功但 Artifact 暂时不可读时将版本标记为 unavailable 并对账，禁止用重新序列化的不同 bytes 替换原 Artifact。
 - archive/delete 与 capture/materialize/snapshot/comparison/reconciliation 的 run-lease 获取在同一 workspace guard/行锁上串行化；有活动 lease 返回 `active_run_exists`，archive/tombstone 落库后禁止新 lease。
-- archived active project_main 仍占唯一槽位；只有 frozen 或 deleted 释放槽位，避免 archive→create→restore 产生两个 active main。
-- 使用新增 `0012` 迁移增加状态维度、版本种类、锚点、lineage 与 tombstone；不得修改已执行的 `0011_simulation_workspaces.sql`。0011 的 publish plan/map/outbox 停止新写入和新消费者，仅保留历史只读兼容。
+- Knowledge project 只允许一个有效 Craft Repository；Repository 只允许一个 team space，且每用户只允许一个 managed personal space。私人 Simulation workspace 不受数量限制。
+- 使用新增迁移建立 Craft Repository/space/Fork/VPPS/proposal 数据；不得修改已执行的 `0011_simulation_workspaces.sql`。0011 的 project-main/publish plan/map/outbox 停止新写入和新消费者，仅保留历史只读兼容。
 - archive 可恢复且不改变 active/frozen；delete 只写 tombstone，不删除不可变版本、Fork base、Diff、审计或其他领域数据。第一阶段不实现物理 purge。
 
 ### 10.3 大树读取与算法版本
@@ -455,106 +454,31 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 
 ### 11.2 新业务效果到 Capability 候选矩阵
 
-以下矩阵受 2026-09-09 协作版本细化设计约束。只有已注册且 Registry lifecycle 为 experimental 的能力可称为 experimental；其余均为 `not_registered` 设计项。最终命名、confirmation 和生命周期由 owner 基于业务风险与当前 Registry 决定。Gateway/Provider 根据资源 GID 和可信上下文在服务端解析 tenant/owner/project scope；客户端不得提交授权结论。
+项目 BOP Repository、团队/受管个人空间、复制深度、有序 VPPS 组、三方 Diff 和变更提案的 canonical Capability 清单，以 2026-09-09 细化设计第 13 节为准。旧的 `simulation.environment.project_main.*`、project-main environment anchor 和 publish plan/map/outbox 不得成为新消费者依赖。
 
-| 原子业务效果 | advisory Capability 候选 | Owner / Provider / 消费者 | 权限、确认与并发 | 事务、稳定错误和审计 |
-|---|---|---|---|---|
-| 创建私人零散工作区 | `simulation.environment.workspace.create@1` | Simulation / Simulation Provider / Desktop cad_sim | 创建后固定 private；confirmation 待风险评审；幂等 | 已有 experimental 候选需做定义变更、重建 hash 和迁移消费者 |
-| 创建项目主环境 | `simulation.environment.project_main.create@1` | 同上 | 当前项目管理权限；服务端锁定唯一槽位 | not_registered；只引用 Craft mutable draft/head |
-| 查询当前用户可见的工作区列表 | `simulation.environment.workspace.search@1` | 同上 | 私人 owner、同租户共享、项目可见；`confirmation=none`；cursor/page_size | 只读；稳定分页和查询摘要审计 |
-| 读取一个可见工作区及 draft head | `simulation.environment.workspace.get@1` | 同上 | 服务端可见范围 selector；`confirmation=none`；有界 projection | 只读；not found/resource denied |
-| 修改名称或非语义元数据 | `simulation.environment.workspace.metadata.update@1` | 同上 | owner；项目主环境允许项目管理者；CAS + 幂等 | 单库 CAS；metadata revision 审计 |
-| 共享工作区 | `simulation.environment.workspace.share@1` | 同上 | owner；逐引用验证再分发权；CAS + 幂等 | not_registered；与 create/fork/metadata update 分离 |
-| 取消共享工作区 | `simulation.environment.workspace.unshare@1` | 同上 | owner；CAS + 幂等 | not_registered；既有 Fork 不失效 |
-| 归档工作区 | `simulation.environment.workspace.archive@1` | 同上 | private/shared owner；project_main 当前项目管理者；guard 锁与 run lease 串行 | not_registered；不改变 active/frozen lifecycle |
-| 恢复工作区 | `simulation.environment.workspace.restore@1` | 同上 | 原授权主体；CAS + 幂等 | not_registered；archived active main 一直占唯一槽位 |
-| 删除工作区 | `simulation.environment.workspace.delete@1` | 同上 | private/shared owner；project_main 当前项目管理/删除权限；CAS + 幂等 | tombstone；不含 purge，不级联其他领域或关闭 VisMockup |
-| 创建一个临时结构节点 | `simulation.environment.structure_node.create@1` | 同上 | 私人/共享 owner；主环境获授权线体；CAS + 幂等 | parent/type/limit 校验；create 审计 |
-| 移动一个临时结构节点 | `simulation.environment.structure_node.move@1` | 同上 | 私人/共享 owner；主环境线体权限；跨线体仅项目管理者 | parent/cycle 校验；from/to 审计 |
-| 软删除一个临时结构节点 | `simulation.environment.structure_node.remove@1` | 同上 | 私人/共享 owner；主环境获授权线体；CAS + 幂等 | 依赖校验；remove 审计 |
-| 调整同父节点下一个节点的顺序 | `simulation.environment.structure_node.reorder@1` | 同上 | 私人/共享 owner；主环境获授权线体；CAS + 幂等 | 稳定 order key；before/after 审计 |
-| 创建一条 load/operate/resource_use 绑定 | `simulation.environment.binding.create@1` | 同上 | 私人/共享 owner；主环境获授权线体；CAS + 幂等 | load 唯一性和引用校验；create 审计 |
-| 修改一条绑定的角色或目标 | `simulation.environment.binding.update@1` | 同上 | 私人/共享 owner；主环境获授权线体；binding CAS + 幂等 | 追加 revision；before/after 审计 |
-| 解除一条绑定 | `simulation.environment.binding.remove@1` | 同上 | 私人/共享 owner；主环境获授权线体；CAS + 幂等 | 软删除 revision；remove 审计 |
-| 保存一个不可变手动版本 | `simulation.environment.workspace.version.save@1` | Simulation / Simulation Provider / Desktop、Task Tool | owner/项目管理者；CAS + 幂等 | 实际 source list + canonical manifest；仅存在跨域 source 时建立 anchor。capture 只消费已固定版本，不隐式创建 manual version |
-| Fork 一个可见环境状态 | `simulation.environment.workspace.fork@1` | Simulation / Simulation Provider / Desktop | 来源及底层引用可读；新环境固定 private；幂等 | not_registered；活动来源先建 fork-base；复用 immutable Artifact 并保留 lineage |
-| 冻结 draft 为不可变版本 | `simulation.environment.version.freeze@1` | Simulation / Simulation Provider / Desktop | owner/项目管理者；CAS + 幂等；confirmation 待评审 | Base Platform Artifact Capability + Simulation DB saga；capture 只消费冻结结果，不触发 freeze |
-| 读取一个不可变版本 | `simulation.environment.version.get@1` | Simulation / Simulation Provider / Desktop | 按来源环境可见范围；`confirmation=none`；有界 projection | 只读；not found/resource denied |
-| 查询手动版本历史 | `simulation.environment.version.search@1` | 同上 | 按来源环境可见范围；`confirmation=none`；cursor/page_size | 只读；稳定排序 |
-| 启动两个版本的大型比较 | `simulation.environment.version_compare.start@1` | Simulation / Simulation Provider / Desktop | 左右版本均可读；confirmation 待评审；幂等；max_nodes | 创建只读计算任务；input/algorithm hash 审计 |
-| 读取比较进度和分页结果 | `simulation.environment.version_compare.get@1` | 同上 | 比较任务可读；`confirmation=none`；cursor/page_size | 只读；algorithm unavailable/limit exceeded |
-| 建立复合锚点 | `simulation.environment.environment_anchor.create@1` | Simulation / Simulation Provider / Desktop、scheduler | project_main 或含 Craft source 的 ad_hoc；两域精确版本和 hash；幂等 | not_registered；创建 preparing saga |
-| 读取复合锚点 | `simulation.environment.environment_anchor.get@1` | 同上 | 授权只读 | not_registered；只有 ready 可作成功版本使用 |
-| 对账复合锚点 | `simulation.environment.environment_anchor.reconcile@1` | 同上 | expected state；幂等 | not_registered；收敛 ready/failed/reconciling |
-| 读取主环境投影操作 | `simulation.environment.main_projection_operation.get@1` | Simulation / Simulation Provider / Desktop、scheduler | 授权只读 | not_registered；返回 Craft outcome ref 与投影状态 |
-| 对账主环境投影操作 | `simulation.environment.main_projection_operation.reconcile@1` | 同上 | expected state；幂等 | not_registered；只修复 Simulation 投影，不重放 Craft 写入 |
-| 启用版本策略 | `simulation.environment.version_policy.enable@1` | Simulation / Simulation Provider / Task Tool | shared owner delegation；CAS + 幂等 | not_registered；固定 Catalog release 与 Capability majors |
-| 更新版本策略 | `simulation.environment.version_policy.update@1` | 同上 | shared owner；CAS + 幂等 | not_registered；新 policy hash/version |
-| 停用版本策略 | `simulation.environment.version_policy.disable@1` | 同上 | shared owner；CAS + 幂等 | not_registered；撤销 delegation，版本不变 |
-| 读取版本策略 | `simulation.environment.version_policy.get@1` | 同上 | owner/Task Tool 只读 | not_registered；敏感字段裁剪 |
-| 评估版本策略 | `simulation.environment.version_policy.evaluate@1` | 同上 | Task Tool；确定性只读 | not_registered；LLM 不参与创建决定 |
-| 接受一次已解析 VM 快照差异 | `simulation.document_snapshot.change.accept@1` | Simulation / Simulation Provider / Desktop | owner only；expected head + 幂等；confirmation 待评审 | 单库 CAS；accepted/rejected diff 审计 |
-| 接受数模升版后的绑定迁移 | `simulation.environment.binding_migration.accept@1` | Simulation / Simulation Provider / Desktop | owner only；expected draft + 幂等；confirmation 待评审 | 单库 CAS；predecessor/target 审计 |
-| 按数模号批量精确反查知识资源 | `knowledge.resource_model_mapping.reverse_resolve@1` | Knowledge / Knowledge Provider / Simulation | `knowledge.read`；tenant 来自可信上下文；`confirmation=none`；有界批量 | 逐项 resolved/not_found/ambiguous；查询摘要审计 |
+本规格继续负责 Simulation/VM 边界：
 
-每个候选在进入代码前必须使用治理变更记录模板补齐真实 `capability_version_gid`、business effect/invariants、闭合输入输出、Provider、Gateway exposure、消费者、表/迁移、测试和当前 Snapshot。上表不能作为注册或审批依据。
+| 原子业务效果 | 精确 Capability | 状态与边界 |
+|---|---|---|
+| 创建私人仿真环境 | `simulation.environment.workspace.create@1` | 现有 experimental 若变更 source/权限必须重建 definition hash、迁移消费者或按 owner 判断升 major |
+| 查询/读取私人环境 | `simulation.environment.workspace.search@1`、`simulation.environment.workspace.get@1` | 逐项核对真实 Registry；默认只返回授权私人环境，不冒充 Craft Repository space |
+| Fork 私人仿真环境 | `simulation.environment.workspace.fork@1` | not_registered 设计候选；目标固定 private，数量不限 |
+| 保存私人环境版本 | `simulation.environment.workspace.version.save@1` | not_registered 设计候选；固定实际 source refs、VM snapshot 和 canonical manifest |
+| 私人环境到受管个人空间导入 | 由 Craft owner 的 `craft.bop.managed_personal_space.import.preview@1` 与 `craft.bop.managed_personal_space.import.apply@1` 执行 | Simulation 只提供 immutable source manifest，不写 Craft 表 |
+| 接受 VM 快照差异 | `simulation.document_snapshot.change.accept@1` | 新合同需固定 document/snapshot、expected head、幂等和差异集合 |
+| 接受数模升版绑定迁移 | `simulation.environment.binding_migration.accept@1` | 新合同需固定 workspace/version/candidate、CAS 和逐项决定 |
+| 按数模号反查知识资源 | `knowledge.resource_model_mapping.reverse_resolve@1` | Knowledge owner 的 not_registered 候选；精确批量匹配，模糊搜索只用于人工候选 |
 
-现有 experimental 的 `simulation.environment.workspace.create@1`、`simulation.environment.workspace.search@1`、`simulation.environment.workspace.get@1`、`simulation.environment.version.freeze@1`、三个 structure_node 写能力和两个 binding 写能力都发生了 Schema、selector、授权、消费者或副作用合同变化。每一项必须独立完成 Descriptor/Provider 差距判断、重建 definition hash、重新审批/生成证据并迁移消费者；若治理规则判定不兼容则升新 major。正式产品路由在其成为 stable release target 前不得调用。
+每个 ID 只表达一个原子效果。候选不是 experimental，只有真实 Registry 中已注册且 lifecycle=experimental 的版本才能使用该状态。所有输入 Schema 必须闭合，数组、树深、字符串和分页有上限；tenant/actor 来自可信 InvocationContext，Provider 根据资源 GID 解析权限。写操作使用 expected resource version、稳定 operation GID、幂等键和审计；跨 Craft/Simulation/Artifact 只能使用可对账 saga，不能宣称单事务。
 
-#### 11.2.1 候选契约闭合边界
-
-| Capability | 闭合输入 | 闭合输出 | 副作用/补偿 | 必须建立的测试证据 |
-|---|---|---|---|---|
-| `simulation.environment.workspace.create@1` | name、可选 source refs、幂等键 | private ad_hoc workspace/head GID、row version、来源摘要 | 创建私有 workspace；失败回滚；不得同时共享 | 成功、幂等冲突、来源不可见、跨租户、Schema |
-| `simulation.environment.project_main.create@1` | project、Craft draft ref、expected slot、幂等键 | project_main workspace/head、row version | guard 锁内占唯一槽位；失败回滚 | 项目权限、并发唯一、archived 占位、frozen/deleted 释放 |
-| `simulation.environment.workspace.search@1` | cursor、page_size、允许的状态/名称筛选 | summaries、next_cursor | 无 | owner 隔离、分页稳定、筛选、上限 |
-| `simulation.environment.workspace.get@1` | workspace GID、projection page selector | workspace、draft head、有限节点/绑定页 | 无 | owner 隔离、not found、分页、Schema |
-| `simulation.environment.workspace.metadata.update@1` | workspace、允许字段 patch、expected row version、幂等键 | 新 row version、metadata revision | 单库 CAS | 字段 allowlist、CAS、幂等、跨 owner |
-| `simulation.environment.workspace.archive@1` | workspace、expected row version、幂等键 | archived status、row version | 软归档；历史保留 | 活跃运行阻止、重复归档、CAS、历史读取 |
-| `simulation.environment.workspace.restore@1` | workspace、expected row version、幂等键 | archived_at=null、原 lifecycle、row version | guard 锁内恢复 | 权限、CAS、active main 唯一、重复恢复 |
-| `simulation.environment.workspace.share@1` | workspace、expected row、幂等键 | shared visibility、row version、引用授权摘要 | 校验全部来源再分发权；必要时受控脱敏 | owner、租户、分类、底层 Artifact/source 策略 |
-| `simulation.environment.workspace.unshare@1` | workspace、expected row、幂等键 | private visibility、row version、Fork 摘要 | 停止新共享访问；既有 Fork 保持 | owner、CAS、租户、既有 Fork |
-| `simulation.environment.workspace.delete@1` | workspace、expected row version、幂等键 | deletion GID、deleted_at、保留引用摘要 | tombstone；无跨域级联；不关闭 VisMockup | owner/项目权限、运行阻塞、legal hold、CAS、幂等、Fork 仍可读、槽位释放 |
-| `simulation.environment.structure_node.create@1` | workspace、parent、node type、初始字段、expected row version、幂等键 | node GID/revision、新 row version | 单库 CAS | 类型/父级/上限、幂等、跨 owner |
-| `simulation.environment.structure_node.move@1` | workspace、node、new parent/position、expected row version、幂等键 | node revision、新 row version、局部 patch | 单库 CAS | 环/父缺失/非法层级、CAS、局部刷新 |
-| `simulation.environment.structure_node.remove@1` | workspace、node、明确依赖策略、expected row version、幂等键 | removed revision、新 row version、影响摘要 | 软删除；失败回滚 | 子节点/绑定依赖、重复删除、CAS、历史不变 |
-| `simulation.environment.structure_node.reorder@1` | workspace、node、同父目标位置、expected row version、幂等键 | order revision、新 row version、局部 patch | 单库 CAS | 跨父拒绝、边界位置、并发、稳定排序 |
-| `simulation.environment.binding.create@1` | workspace、node、occurrence/resource ref、单一 role、expected row version、幂等键 | binding GID/revision、新 row version | 单库 CAS | load 唯一、多个 operate、资源多实例、未解析、幂等 |
-| `simulation.environment.binding.update@1` | workspace、binding、允许字段 patch、expected binding/workspace version、幂等键 | 新 binding revision、row version | 追加 revision | role/target、load 冲突、CAS、旧 revision 不变 |
-| `simulation.environment.binding.remove@1` | workspace、binding、expected binding/workspace version、幂等键 | removed revision、row version | 软删除 revision | 重复解除、CAS、冻结引用保护 |
-| `simulation.environment.workspace.version.save@1` | workspace、expected row、实际 source list、算法版本、幂等键 | version、manifest ArtifactRef/hash、可选 anchor | Artifact+Simulation saga；有跨域来源才建 anchor | 空白、纯 VM、Craft overlay、并发、orphan、hash |
-| `simulation.environment.workspace.fork@1` | source version 或 active workspace、expected source、幂等键 | private workspace、fork-base、lineage | 活动源先固定；复用 immutable Artifact/ref | 三类来源、权限、幂等、源删除后仍可读 |
-| `simulation.environment.baseline.set@1` | workspace、version/snapshot request、expected row、幂等键 | baseline version/pointer、row version | 只改 pointer，不改 lifecycle | 历史不变、替换 pointer、CAS、权限 |
-| `simulation.environment.version.freeze@1` | workspace、expected draft、snapshot/source refs、算法版本、幂等键 | environment version GID、canonical ArtifactRef/hash | Artifact finalize + DB saga；DB 失败标 orphan；Artifact 暂不可读则 unavailable 并对账 | membership/hash、并发、两侧失败、orphan、不可变、算法绑定 |
-| `simulation.environment.version.get@1` | version selector、projection page | canonical metadata、projection page、next_cursor | 无 | 历史读取、owner、分页、Artifact unavailable |
-| `simulation.environment.version.search@1` | workspace、cursor/page_size | version summaries、next_cursor | 无 | owner、分页、稳定排序、归档策略 |
-| `simulation.environment.version_compare.start@1` | left/right version、algorithm version、max_nodes、幂等键 | comparison GID、input hash、status | 创建计算任务，不修改环境 | 幂等、算法缺失、节点上限、owner、input hash |
-| `simulation.environment.version_compare.get@1` | comparison GID、cursor/page_size | 状态、摘要、分页差异、result hash | 无 | unchanged/moved/upgraded/added/removed、分页/hash |
-| `simulation.environment.environment_anchor.create@1` | workspace/version source set、Craft expected revision/hash、Simulation expected row、幂等键；kind=project_main 或 ad_hoc 含 Craft source | anchor GID、preparing | project_main 强制 Craft；ad_hoc 无 Craft 时禁止创建；启动跨域 saga | 三类来源、权限、并发、双侧故障、只有 ready 可用 |
-| `simulation.environment.environment_anchor.get@1` | anchor GID | source refs/hash/state | 无 | 授权、裁剪、各终态 |
-| `simulation.environment.environment_anchor.reconcile@1` | anchor、expected state、幂等键 | ready/failed/reconciling、evidence refs | 重校验两侧，不盲目重写 | 幂等、过期状态、Artifact/Craft 故障 |
-| `simulation.environment.main_projection_operation.get@1` | operation GID | Craft outcome ref、projection state、audit | 无 | 授权、裁剪、稳定终态 |
-| `simulation.environment.main_projection_operation.reconcile@1` | operation、expected state、幂等键 | projection terminal state、row/audit | 只投影既有 Craft outcome，不重放 Craft 写入 | 幂等、过期、Craft outcome 不可读、DB 故障 |
-| `simulation.environment.version_policy.enable@1` | workspace、policy、delegation、expected row、幂等键 | policy GID/version/hash | 单库事务 | owner、Catalog pin、Capability majors、有效期 |
-| `simulation.environment.version_policy.update@1` | policy、expected version、patch、幂等键 | 新 version/hash | 单库 CAS | allowlist、并发、审计 |
-| `simulation.environment.version_policy.disable@1` | policy、expected version、幂等键 | disabled_at | 撤销 delegation，版本不变 | 幂等、权限、运行竞态 |
-| `simulation.environment.version_policy.get@1` | workspace/policy | 裁剪的 policy/delegation | 无 | owner/Task Tool、敏感裁剪 |
-| `simulation.environment.version_policy.evaluate@1` | policy、resource hash、Diff 摘要、trigger | deterministic create/skip 及原因 | 只读，不创建版本 | 相同输入同结果、阈值、频率、LLM 不参与 |
-| `simulation.document_snapshot.change.accept@1` | document、candidate、accepted/rejected diff IDs、expected head、幂等键 | 新 head/sequence、未解决摘要 | 单库 CAS | 全部 diff 类型、过期候选、并发、幂等、跨文档拒绝 |
-| `simulation.environment.binding_migration.accept@1` | workspace、candidate IDs、逐项 decision、expected draft、幂等键 | binding revisions、row version、剩余歧义 | 单库 CAS | inherit/replace/keep/unbind/rebind、过期、歧义、CAS |
-| `knowledge.resource_model_mapping.reverse_resolve@1` | model numbers、允许的有效期/业务 selector、batch limit；无 tenant/actor payload | 输入逐项 resolved/not_found/ambiguous 与不可变 refs | 无 | 各资源类型、精确/非模糊、歧义、上限、敏感裁剪 |
-| `craft.bop.draft.change.apply` 复用/升版 | Craft preview ref、expected BOP version、opaque client/correlation ref、receipt、幂等键 | Craft draft revision、Craft 节点/关系 GID、原样 opaque client_ref、Craft audit ref | Craft 只写自有草稿；不写 Simulation map | consumer contract、关系、CAS、receipt、client_ref 原样、重复 outcome |
-
-所有输入 Schema `additionalProperties=false`，GID 在 JSON 中使用十进制字符串；数组、字符串、树深和分页均有硬上限。tenant 和 actor identity 来自可信 InvocationContext；payload 只提供闭合的 workspace_gid、binding_gid、version_gid 等资源标识。Gateway/Provider 根据资源标识在服务端解析规范 resource selector、tenant/owner scope 并授权，不接受 renderer 提供的 tenant、owner identity、预计算授权 selector 或“已有权限”的结论。输出不得包含原始凭据、本地绝对路径、未授权 Teamcenter/JT 链接或完整 PLMXML 内容。
-
-候选能力的测试文件在实施计划中按 owner 放置：Simulation 放入 `plugins/simulation/tests/` 与 `backend/tests/test_simulation_*`，Knowledge 放入 `plugins/knowledge/tests/`，Craft 放入 `plugins/craft/tests/` 和 `backend/tests/test_craft_simulation_contract.py`，Connector v2 放入 `local-runtime/tests/Ai00.Connector.Tests/`。每个能力还必须进入强制 acceptance 的 success、invalid input、unauthenticated、resource denied、output contract、consumer contract 和 version pin 用例；这里列出的路径是计划，不是已通过证据。
+现有 experimental Capability 若扩大到新的 selector、消费者、权限或副作用，必须逐项完成 Descriptor/Provider gap、重建 definition hash、重新审批和 consumer migration；不兼容时升 major。正式产品路由只能指向 stable release target。
 
 ### 11.3 固定所有权
 
 | 对象或规则 | Owner |
 |---|---|
-| 仿真环境、绑定、姿态、截图计划、复合锚点和对账编排 | Simulation |
-| BOP 结构、Load 属性解释、资源需求和草稿写入 | Craft |
+| 私人仿真环境、VM 实例、姿态、截图计划和 Simulation Context | Simulation |
+| BOP Repository、团队/受管个人空间、BOP 结构、VPPS 组、提案、Load 和资源需求 | Craft |
 | 数模号到知识资源的映射和反查 | Knowledge |
 | 可复用不可变 model-reference identity/version | Digital Model |
 | PLMXML、截图和 canonical manifest 的字节对象、hash、MIME 与 ArtifactRef | Base Platform（Artifact Capability）；OIS 仅为 Provider 存储实现 |
@@ -605,7 +529,7 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 | G1 App/Connector v2 路径 | execution-plan/outcome v2、签名、generation fencing、lease/journal/reconciliation 已通过 Python/.NET golden vectors 和实际 App 调用证明；无 renderer/IPC/loopback 业务旁路 | 未通过时禁止任何新的 COM 业务操作进入产品路径 |
 | G2 PLMXML 安全与规模 | XML 安全设置和所有资源上限已确定；21MB 样本及恶意/超限夹具均有可复现工程证据 | 未通过时禁止持久化解析服务和阶段 1 交付 |
 | G3 文档/COM 实机 | Teamcenter 在线打开、多窗口、ExportEx、增量加入、实例字段、高亮和断线恢复均完成实机验证 | 未通过时禁止宣称在线文档支持或 `runtime_verified=true` |
-| G4 Craft Load 契约 | Craft owner 确认权威属性编码、空值、工序/操作优先级、版本兼容和规范化输出 Capability | 未通过时禁止实现阶段 3 的 load binding 业务规则、阶段 4 的 Load 隐藏规则和阶段 5 的主环境写入 |
+| G4 Craft Load 契约 | Craft owner 确认权威属性编码、空值、工序/操作优先级、版本兼容和规范化输出 Capability | 未通过时禁止实现阶段 3 的 load binding 业务规则、阶段 4 的 Load 隐藏规则和阶段 5 的 Repository 写入 |
 | G5 跨域 owner | Simulation、Craft、Knowledge、Digital Model、Base Platform Artifact owner 分别批准其契约；不存在跨域直表 | 未通过时阻断对应阶段写入 |
 | G6 冻结可复现性 | canonical manifest、membership、CAS、幂等、算法版本和 Base Platform Artifact/Simulation saga 故障与对账测试通过 | 未通过时禁止截图或运行引用环境版本 |
 | G-Craft-Collab 线体协作 | Craft owner 提供线体授权、线体 revision 或安全 rebase、完整 checkpoint、双线体原子移动、幂等、审计和恢复测试 | 未通过时使用整 BOP CAS，禁止宣称不同线体互不阻塞 |
@@ -622,11 +546,11 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 
 实现 VM document/session/snapshot、OIS 原件、流式解析、当前投影和差异引擎。
 
-### 阶段 2：仿真环境工作区
+### 阶段 2：Repository 与空间骨架
 
-实现项目主环境、私人环境、共享池、项目关联、临时树、自动保存、手动版本、Fork、冻结和四列页面骨架。
+实现项目唯一 BOP Repository、团队空间、每用户一个受管个人空间、不限私人环境、项目关联、自动保存和四列页面骨架。
 
-其中 project_main、Share、Fork、版本保存和 Freeze 只有在各自前置 Gate 通过、精确 Capability 完成注册并成为允许的 stable release target 后才能开放业务入口；此前只允许数据/UI 骨架和隔离验证，不得由产品路由调用 experimental 或 not_registered 合同。
+其中 Repository/space 创建、Fork、版本保存和 Freeze 只有在各自前置 Gate 通过、精确 Capability 完成注册并成为 stable release target 后才能开放业务入口；此前只允许数据/UI 骨架和隔离验证。
 
 ### 阶段 3：绑定与知识分类
 
@@ -636,13 +560,13 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 
 实现每工序一图、累计装配状态、越过 load 点隐藏、运行恢复、Artifact 上传及工序图片关联。
 
-### 阶段 5：项目主环境协同
+### 阶段 5：BOP Repository Fork 与协同
 
-实现项目管理者全局编辑、工程师线体授权编辑、局部冲突恢复以及 BOP 与 Simulation 项目版本锚点。
+实现复制深度、有序 VPPS 组、自动生成初版、用户/Agent adjustment、个人三方同步、私人选择性导入和个人到团队变更提案。
 
 ### 阶段 6：升版与高级处理
 
-实现 Teamcenter 升版比较、绑定迁移、姿态对比、环境 Fork/版本 Diff 以及后续基于不可变链接的高级 VisMockup COM 操作。
+实现 Teamcenter 升版比较、绑定迁移、姿态对比、Repository/空间/私人环境 Fork 与版本 Diff，以及后续基于不可变链接的高级 VisMockup COM 操作。
 
 每个阶段必须能独立演示和回滚；阶段 0 结论会修正规格中的未验证字段和 Adapter 操作合同。
 
@@ -656,7 +580,7 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 6. 用户将资源拖入关系组，系统通过 Knowledge 精确反查；歧义项在面板中解决。
 7. 用户为零件建立 load 和后续 operate 关系，保存后重开环境仍保持。
 8. 倒序截图每工序生成一图，零件只在越过 load 点后隐藏。
-9. 项目管理者和工程师直接修改主环境的授权区域，BOP 与 Simulation 扩展保持同一项目版本锚点。
+9. 一个知识库项目只有一个 BOP Repository/团队空间，每用户最多一个受管个人空间，但私人仿真环境数量不限。
 10. 同一线体并发修改返回 revision 冲突并局部恢复；G-Craft-Collab 未通过时不同线体也遵循整 BOP CAS，通过后才验证线体独立并发。
 11. VisMockup/App 重启后重新连接文档，恢复实例映射和未完成环境。
 12. 数模升版时旧版本保持可复现，新版本迁移必须经用户接受。
@@ -666,15 +590,15 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 16. 截图成功后恢复 visibility、color、selection 和 camera；截图、上传、关联、取消或崩溃任一失败时停止后续步骤并执行可验证恢复。
 17. Outcome 不确定时进入 `outcome_unknown`/`manual_review_required`，对账前不能重试或生成第二张截图。
 18. Renderer、Electron IPC、named pipe、WebSocket 和 legacy bridge 扫描均不存在可绕过 Gateway/plan v2 的业务执行路径。
-19. 私有环境不能被同租户其他普通用户读取；共享池环境可读、可用、可 Fork但仅 owner 可修改；跨租户访问始终拒绝。
+19. 私人环境不能被其他普通用户读取，也不能直接提交团队提案；只能选择性导入当前用户的受管个人空间。
 20. 私人环境任意两个手动保存版本可以比较 BOP、绑定、VM 版本、BOM 行、`catiaOccurrenceName`、坐标和姿态。
 21. 相同冻结环境版本在其绑定算法版本下重复生成截图计划，得到相同有序输入 hash。
-22. private/shared owner 可逻辑删除环境，非 owner 被拒绝；project_main 删除按当前项目管理/删除权限执行，只删除 Simulation 扩展。
-23. 删除在活动运行、legal hold 或 row_version 冲突时被阻止；重复调用幂等；源环境删除后既有 Fork 仍可读。
-24. 删除不级联 Craft、Project、Digital Model、Knowledge 或 Artifact，不关闭 VisMockup，并释放项目活动主环境槽位。
-25. 空白 ad_hoc、纯 VM ad_hoc 和带 Craft overlay 的 ad_hoc 都能保存及 Fork；仅存在跨域 source 时创建 environment anchor。
-26. Archived active main 继续占唯一槽位；archive、delete 和新 run lease 在同一 guard 上串行化。
-27. Craft 已成功但 Simulation 投影失败时进入 projection_pending，并通过受治理的 projection operation reconcile 收敛，不重放 Craft 写入。
+22. 团队 Fork、受管个人空间 Fork 和私人环境 Fork 遵守各自唯一约束，目标已有数据时不覆盖。
+23. 五种复制深度生成正确的正式节点边界；深度以下只显示有序 reference VPPS 蓝图，不进入正式 BOP 查询。
+24. 自动匹配生成 `generated_initial`，用户或 Agent 生成 `adjustment`；reference 永不覆盖，团队 current pointer 只由项目管理者接受后推进。
+25. 个人空间以团队 base、个人 head、团队 head 做三方 Diff，并支持依赖闭合的部分变更提案。
+26. 私人环境删除不影响 Craft Repository；Repository/空间删除只写 tombstone，不级联 Project、Knowledge、Digital Model、Artifact、Simulation Context、任务或问题，也不关闭 VisMockup。
+27. Craft 已成功但跨域投影失败时以 Craft outcome 为权威并受治理对账，不重放 Craft 写入。
 
 ## 15. 明确不做
 
@@ -689,6 +613,6 @@ Adapter operation 只描述受签名 plan 调用的本地白名单技术效果�
 - 不让 renderer 或 AppHost 生成持久业务 GID。
 - 不在现有 Capability 上静默改变业务含义。
 - 不使用 Git 软件存储仿真业务数据，也不提供 pull、push、merge 或 rebase。
-- 不为私人和共享环境的每次自动保存生成完整 BOP/VM 历史。
+- 不为私人环境的每次自动保存生成完整 BOP/VM 历史。
 - 不让旧 publish plan/map/outbox 接收新写入；它们只保留历史只读兼容。
 - 第一阶段不物理 purge workspace、版本或 Artifact。
