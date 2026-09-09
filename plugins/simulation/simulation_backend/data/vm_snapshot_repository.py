@@ -8,7 +8,7 @@ import json
 from backend.platform_sdk.ids import next_gid
 
 from .connection import get_simulation_conn
-from ..domain.vm_identity import SnapshotDiff
+from ..domain.vm_identity import SnapshotDiff, VmObservation
 
 
 class VmRepositoryError(RuntimeError):
@@ -63,6 +63,42 @@ class VmSnapshotRepository:
             if cursor.rowcount != 1:
                 raise VmRepositoryError("workspace_not_found")
         return document_gid
+
+    def load_latest_observations(self, *, document_gid: str, tenant_gid: str, owner_gid: str):
+        """Load the immutable head projection used for the next incremental comparison."""
+        with self._connection_factory() as connection, connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT o.gid occurrence_gid,o.status,o.kind,o.model_number,s.session_gid,"
+                "v.source_instance_id,v.bom_line,v.revision_code,v.catia_occurrence_name,"
+                "v.parent_path_json,v.normalized_transform_json,v.raw_transform_json,"
+                "v.representation_locations_json,h.row_version,s.sequence "
+                "FROM workmanship_sim_vm_documents d "
+                "LEFT JOIN workmanship_sim_vm_snapshot_heads h ON h.document_gid=d.gid "
+                "LEFT JOIN workmanship_sim_vm_snapshots s ON s.gid=h.snapshot_gid "
+                "LEFT JOIN workmanship_sim_vm_observations v ON v.snapshot_gid=s.gid "
+                "LEFT JOIN workmanship_sim_vm_occurrences o ON o.gid=v.occurrence_gid "
+                "WHERE d.gid=%s AND d.tenant_gid=%s AND d.owner_gid=%s AND d.removed_at IS NULL "
+                "ORDER BY o.gid",
+                (_gid(document_gid), _gid(tenant_gid), _gid(owner_gid)),
+            )
+            rows = list(cursor.fetchall())
+        if not rows:
+            return {"head_row_version": 0, "sequence": 0, "observations": ()}
+        values = tuple(
+            VmObservation(
+                occurrence_gid=str(row["occurrence_gid"]), source_instance_id=str(row["source_instance_id"]),
+                session_gid=str(row["session_gid"]), kind=str(row["kind"]), model_number=str(row["model_number"]),
+                bom_line=str(row["bom_line"]), revision=str(row["revision_code"]),
+                catia_occurrence_name=str(row["catia_occurrence_name"]),
+                normalized_transform=tuple(json.loads(row["normalized_transform_json"])),
+                parent_path=tuple(json.loads(row["parent_path_json"])),
+                raw_transform=tuple(json.loads(row["raw_transform_json"])),
+                representation_locations=tuple(json.loads(row["representation_locations_json"])),
+                removed=row["status"] == "removed",
+            ) for row in rows if row.get("occurrence_gid") is not None
+        )
+        first = rows[0]
+        return {"head_row_version": int(first.get("row_version") or 0), "sequence": int(first.get("sequence") or 0), "observations": values}
 
     def advance_head(
         self,
@@ -201,7 +237,9 @@ class VmSnapshotRepository:
                     (
                         snapshot_gid, occurrence_gid, observation.source_instance_id,
                         observation.bom_line, observation.revision, observation.catia_occurrence_name,
-                        "[]", transform_json, transform_json, "[]", match.change,
+                        json.dumps(observation.parent_path, separators=(",", ":")), transform_json,
+                        json.dumps(observation.raw_transform or observation.normalized_transform, separators=(",", ":")),
+                        json.dumps(observation.representation_locations, separators=(",", ":")), match.change,
                     ),
                 )
                 pose_gid = _gid(self._gid_factory())

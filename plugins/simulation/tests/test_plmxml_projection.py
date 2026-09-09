@@ -116,3 +116,17 @@ def test_algorithm_version_is_explicit_and_representation_location_stays_opaque(
     assert projection.stats.element_count > len(projection.instances)
     assert projection.stats.maximum_depth > 0
     assert projection.by_bom_line("W01-89184128/00;1")[0].representation_locations[0].startswith("/opaque/")
+
+
+def test_incremental_projection_reuses_moved_part_gid_and_preserves_source_refs():
+    from plugins.simulation.simulation_backend.application.document_snapshots import project_incremental_vm_snapshot
+    from plugins.simulation.simulation_backend.domain.vm_identity import VmObservation
+    projection = parse_plmxml(io.BytesIO(_representative_document()))
+    item = projection.by_bom_line("W01-89184128/00;1")[0]
+    previous = (VmObservation("70", "old", "40", "part", item.item_id, item.bom_line, item.revision,
+                              item.catia_occurrence_name, tuple("9" if i == 12 else x for i, x in enumerate(item.normalized_transform))),)
+    result = project_incremental_vm_snapshot(projection=projection, previous=previous, session_gid="41",
+                                             classify_kind=lambda _item: "part", gid_factory=iter(range(9001, 9010)).__next__)
+    match = next(value for value in result.matches if value.observation.catia_occurrence_name == "bolt-left")
+    assert match.occurrence_gid == "70" and match.change == "moved"
+    assert match.observation.representation_locations == ("/opaque/W01-89184128_00.jt",)

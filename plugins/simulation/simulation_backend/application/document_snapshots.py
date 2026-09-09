@@ -14,6 +14,25 @@ from backend.contracts.connector_execution_plan_v1 import (
 
 from .capture_worker import SimulationWorkflowError
 from .connector_plans import build_document_snapshot_plan
+from ..domain.plmxml_projection import PlmxmlProjection
+from ..domain.vm_identity import VmObservation, diff_snapshots
+
+
+def project_incremental_vm_snapshot(*, projection: PlmxmlProjection, previous, session_gid: str,
+                                    classify_kind, gid_factory):
+    """Convert a bounded PLMXML projection into identity-aware immutable observations."""
+    current = tuple(
+        VmObservation(
+            occurrence_gid=None, source_instance_id=item.instance_id, session_gid=str(session_gid),
+            kind=classify_kind(item), model_number=item.item_id or item.bom_line.split("/", 1)[0],
+            bom_line=item.bom_line, revision=item.revision,
+            catia_occurrence_name=item.catia_occurrence_name,
+            normalized_transform=item.normalized_transform, parent_path=item.parent_path,
+            raw_transform=item.transform_raw,
+            representation_locations=item.representation_locations,
+        ) for item in projection.instances
+    )
+    return diff_snapshots(previous, current, gid_factory=gid_factory)
 
 
 def _validate_snapshot(value: Any) -> dict[str, Any]:
@@ -142,4 +161,4 @@ class DocumentSnapshotWorkflow:
             )
 
 
-__all__ = ["DocumentSnapshotWorkflow"]
+__all__ = ["DocumentSnapshotWorkflow", "project_incremental_vm_snapshot"]

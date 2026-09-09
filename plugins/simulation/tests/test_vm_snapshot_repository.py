@@ -153,3 +153,17 @@ def test_persist_snapshot_writes_artifact_occurrence_observation_pose_and_head_a
     assert "INSERT INTO workmanship_sim_vm_observations" in statements
     assert "INSERT INTO workmanship_sim_vm_poses" in statements
     assert "INSERT INTO workmanship_sim_vm_snapshot_heads" in statements
+
+
+def test_load_latest_observations_preserves_identity_fields_and_head_version():
+    row = {"occurrence_gid": 60, "status": "active", "kind": "part", "model_number": "P1",
+           "session_gid": 40, "source_instance_id": "i1", "bom_line": "P1/00;1",
+           "revision_code": "00", "catia_occurrence_name": "left", "parent_path_json": '["root"]',
+           "normalized_transform_json": '["1","0"]', "raw_transform_json": '["1.0","0"]',
+           "representation_locations_json": '["opaque.jt"]', "row_version": 3, "sequence": 7}
+    cursor = _Cursor(rows=(row,))
+    cursor.fetchall = lambda: [row]
+    result = VmSnapshotRepository(lambda: _Connection(cursor)).load_latest_observations(document_gid="10", tenant_gid="20", owner_gid="30")
+    assert result["head_row_version"] == 3 and result["sequence"] == 7
+    assert result["observations"][0].parent_path == ("root",)
+    assert result["observations"][0].representation_locations == ("opaque.jt",)

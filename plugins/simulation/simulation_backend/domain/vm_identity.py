@@ -22,6 +22,9 @@ class VmObservation:
     revision: str
     catia_occurrence_name: str
     normalized_transform: tuple[str, ...]
+    parent_path: tuple[str, ...] = ()
+    raw_transform: tuple[str, ...] = ()
+    representation_locations: tuple[str, ...] = ()
     removed: bool = False
 
 

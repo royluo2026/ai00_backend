@@ -449,7 +449,7 @@ git commit -m "feat(craft): add fenced bop repository backfill"
 - Produces immutable, incrementally updated VM snapshots keyed by document/window and observed-at sequence.
 - Identity consumes BOM line number/revision, `catiaOccurrenceName`, parent occurrence path and normalized transform; bindings retain Teamcenter/Digital Model references without changing them.
 
-- [ ] **Step 1: Write failing identity and capture tests**
+- [x] **Step 1: Write failing identity and capture tests**
 
 ```python
 def test_part_pose_change_is_observation_not_new_instance(projector):
@@ -464,27 +464,27 @@ def test_reverse_capture_hides_future_parts_and_accumulates_completed_parts():
     assert plan.steps[-1].visible_occurrences == ("part-1",)
 ```
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `python -m pytest plugins/simulation/tests/test_plmxml_projection.py plugins/simulation/tests/test_vm_snapshot_repository.py backend/tests/test_simulation_process_capture_plan.py -q`
 
 Expected: FAIL on instance classification or reverse visibility semantics.
 
-- [ ] **Step 3: Implement incremental document/window snapshots**
+- [x] **Step 3: Implement incremental document/window snapshots**
 
 Compare each new PLMXML export to the latest immutable snapshot for the same VisMockup document/window. Reuse a part instance only when BOM identity plus reference pose matches, record later pose as movement, and allocate distinct instance GIDs for repeated tools/equipment/fixtures/sockets even when model numbers match. Preserve source links and BOM revision fields verbatim as refs.
 
-- [ ] **Step 4: Implement one-image-per-process capture plans**
+- [x] **Step 4: Implement one-image-per-process capture plans**
 
 Traverse selected BOP process/operation order in reverse. At each step hide parts loaded by later steps, retain all earlier accumulated parts, apply temporary color/visibility through the existing Connector plan, capture one image for the process, then restore the saved scene.
 
-- [ ] **Step 5: Run GREEN**
+- [x] **Step 5: Run GREEN**
 
 Run: `python -m pytest plugins/simulation/tests/test_plmxml_projection.py plugins/simulation/tests/test_vm_snapshot_repository.py backend/tests/test_simulation_document_snapshot_workflow.py backend/tests/test_simulation_process_capture_plan.py backend/tests/test_simulation_capture_workflow.py -q`
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add plugins/simulation/simulation_backend/domain/plmxml_projection.py plugins/simulation/simulation_backend/data/vm_snapshot_repository.py plugins/simulation/simulation_backend/application/document_snapshots.py plugins/simulation/simulation_backend/domain/process_capture_plan.py plugins/simulation/tests/test_plmxml_projection.py plugins/simulation/tests/test_vm_snapshot_repository.py backend/tests/test_simulation_process_capture_plan.py
