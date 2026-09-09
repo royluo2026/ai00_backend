@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "registry_version": 1,
-  "table_count": 307,
+  "table_count": 347,
   "tables": [
     {
       "table": "workmanship_agent_canvas_audit_events",
@@ -964,13 +964,145 @@
       "legacy_name": true
     },
     {
+      "table": "workmanship_craft_bop_binding_revisions",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_bindings",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
       "table": "workmanship_craft_bop_change_previews",
       "owner": "craft",
       "runtime_domain": "craft",
       "legacy_name": false
     },
     {
+      "table": "workmanship_craft_bop_change_proposal_conflicts",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_change_proposal_units",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_change_proposals",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_fork_blueprint_nodes",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_fork_plans",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_fork_runs",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_fork_workflows",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
       "table": "workmanship_craft_bop_import_previews",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_node_revisions",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_nodes",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_operation_ledger",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_personal_import_operations",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_repositories",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_space_head_members",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_space_heads",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_space_version_members",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_space_versions",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_spaces",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_vpps_group_members",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_vpps_group_versions",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_vpps_groups",
       "owner": "craft",
       "runtime_domain": "craft",
       "legacy_name": false
@@ -1654,6 +1786,24 @@
       "legacy_name": false
     },
     {
+      "table": "workmanship_sim_environment_publish_maps",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_environment_publish_outbox",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_environment_publish_plans",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
       "table": "workmanship_sim_environments",
       "owner": "simulation",
       "runtime_domain": "simulation",
@@ -1685,6 +1835,96 @@
     },
     {
       "table": "workmanship_sim_schema_migrations",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_vm_documents",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_vm_observations",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_vm_occurrences",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_vm_poses",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_vm_sessions",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_vm_snapshot_heads",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_vm_snapshots",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_workspace_bindings",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_workspace_freeze_outbox",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_workspace_heads",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_workspace_idempotency",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_workspace_load_claims",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_workspace_nodes",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_workspace_versions",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_workspaces",
       "owner": "simulation",
       "runtime_domain": "simulation",
       "legacy_name": false

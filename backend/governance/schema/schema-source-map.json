@@ -1,5 +1,5 @@
 {
-  "schema_sha256": "sha256:c365506653358578e88b9204f0c20b3114b9c77df75b70172f10b2fb92eb23ba",
+  "schema_sha256": "sha256:8c4b4314a05198e7141ad82c63a360aba6e3085068ae98843596f559a91d250a",
   "schema_version": 1,
   "tables": [
     {
@@ -3416,6 +3416,112 @@
         "backend/db/migrations/domains/base/0002_domain_inbox.sql"
       ],
       "table": "workmanship_base_domain_inbox"
+    },
+    {
+      "columns": {
+        "byte_size": [
+          "backend/db/migrations/domains/base/0004_historical_uploads.sql"
+        ],
+        "display_name": [
+          "backend/db/migrations/domains/base/0004_historical_uploads.sql"
+        ],
+        "media_type": [
+          "backend/db/migrations/domains/base/0004_historical_uploads.sql"
+        ],
+        "object_hash": [
+          "backend/db/migrations/domains/base/0004_historical_uploads.sql"
+        ],
+        "object_key": [
+          "backend/db/migrations/domains/base/0004_historical_uploads.sql"
+        ],
+        "owner_gid": [
+          "backend/db/migrations/domains/base/0004_historical_uploads.sql"
+        ],
+        "parents_json": [
+          "backend/db/migrations/domains/base/0004_historical_uploads.sql"
+        ],
+        "provenance_json": [
+          "backend/db/migrations/domains/base/0004_historical_uploads.sql"
+        ],
+        "registered_at": [
+          "backend/db/migrations/domains/base/0004_historical_uploads.sql"
+        ],
+        "sha256": [
+          "backend/db/migrations/domains/base/0004_historical_uploads.sql"
+        ],
+        "storage_backend": [
+          "backend/db/migrations/domains/base/0004_historical_uploads.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/base/0004_historical_uploads.sql"
+        ],
+        "uploaded_at": [
+          "backend/db/migrations/domains/base/0004_historical_uploads.sql"
+        ],
+        "uploader_gid": [
+          "backend/db/migrations/domains/base/0004_historical_uploads.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/base/0004_historical_uploads.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/base/0004_historical_uploads.sql"
+      ],
+      "table": "workmanship_base_historical_uploads"
+    },
+    {
+      "columns": {
+        "artifact_json": [
+          "backend/db/migrations/domains/base/0003_legacy_artifact_bindings.sql"
+        ],
+        "binding_hash": [
+          "backend/db/migrations/domains/base/0003_legacy_artifact_bindings.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/base/0003_legacy_artifact_bindings.sql"
+        ],
+        "object_key": [
+          "backend/db/migrations/domains/base/0003_legacy_artifact_bindings.sql"
+        ],
+        "owner_domain": [
+          "backend/db/migrations/domains/base/0003_legacy_artifact_bindings.sql"
+        ],
+        "owner_gid": [
+          "backend/db/migrations/domains/base/0003_legacy_artifact_bindings.sql"
+        ],
+        "parent_gid": [
+          "backend/db/migrations/domains/base/0003_legacy_artifact_bindings.sql"
+        ],
+        "parent_type": [
+          "backend/db/migrations/domains/base/0003_legacy_artifact_bindings.sql"
+        ],
+        "reader_gid": [
+          "backend/db/migrations/domains/base/0003_legacy_artifact_bindings.sql"
+        ],
+        "reference_hash": [
+          "backend/db/migrations/domains/base/0003_legacy_artifact_bindings.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/base/0003_legacy_artifact_bindings.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/base/0003_legacy_artifact_bindings.sql"
+        ],
+        "legacy_artifact_parent": [
+          "backend/db/migrations/domains/base/0003_legacy_artifact_bindings.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/base/0003_legacy_artifact_bindings.sql"
+      ],
+      "table": "workmanship_base_legacy_artifact_bindings"
     },
     {
       "columns": {
@@ -6918,6 +7024,108 @@
     },
     {
       "columns": {
+        "actor_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "binding_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "binding_role": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "content_hash": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "evidence_refs_json": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "properties_json": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "source_node_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "target_ref_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "target_ref_kind": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {
+        "fk_craft_bop_binding_revision_binding": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "fk_craft_bop_binding_revision_source": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "uq_craft_bop_binding_revision_hash": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_binding_revisions"
+    },
+    {
+      "columns": {
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_by": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "derived_from_binding_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "lineage_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "repository_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {
+        "fk_craft_bop_binding_repository": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "idx_craft_bop_binding_lineage": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_bindings"
+    },
+    {
+      "columns": {
         "after_hash": [
           "backend/db/migrations/202608070001_craft_bop_write_governance.sql"
         ],
@@ -6974,6 +7182,368 @@
     },
     {
       "columns": {
+        "conflict_kind": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "details_json": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "proposal_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "resolution_json": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "unit_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {
+        "fk_craft_bop_proposal_conflict_proposal": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "idx_craft_bop_proposal_conflict": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_change_proposal_conflicts"
+    },
+    {
+      "columns": {
+        "apply_outcome_json": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "component_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "dependencies_json": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "payload_json": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "proposal_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "review_decision": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "unit_kind": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {
+        "fk_craft_bop_proposal_unit_proposal": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "idx_craft_bop_proposal_component": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_change_proposal_units"
+    },
+    {
+      "columns": {
+        "apply_status": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_by": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "diff_hash": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "personal_space_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "personal_version_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "remaining_set_json": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "repository_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "review_status": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "row_version": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "team_base_version_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {
+        "check_workmanship_craft_bop_change_proposals_2": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "check_workmanship_craft_bop_change_proposals_3": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "fk_craft_bop_proposal_repository": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "idx_craft_bop_proposal_space": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_change_proposals"
+    },
+    {
+      "columns": {
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "fork_run_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "node_level": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "order_key": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "parent_blueprint_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "source_node_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "source_node_lineage_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "vpps_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {
+        "fk_craft_bop_blueprint_run": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "idx_craft_bop_blueprint_run": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_fork_blueprint_nodes"
+    },
+    {
+      "columns": {
+        "allowed_decisions_json": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "expires_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "fork_depth": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "input_hash": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "owner_verdicts_json": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "plan_hash": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "source_version_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "target_project_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "workflow_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {
+        "fk_craft_bop_fork_plan_workflow": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "uq_craft_bop_fork_plan_hash": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_fork_plans"
+    },
+    {
+      "columns": {
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "outcome_json": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "plan_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "repository_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "request_hash": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "step_kind": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "workflow_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {
+        "fk_craft_bop_fork_run_plan": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "fk_craft_bop_fork_run_workflow": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "uq_craft_bop_fork_step_idempotency": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_fork_runs"
+    },
+    {
+      "columns": {
+        "actor_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "correlation_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "include_personal_migration": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "target_project_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "uq_craft_bop_fork_correlation": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_fork_workflows"
+    },
+    {
+      "columns": {
         "content_sha256": [
           "backend/db/migrations/202608070001_craft_bop_write_governance.sql"
         ],
@@ -7009,6 +7579,706 @@
         "backend/db/migrations/202608070001_craft_bop_write_governance.sql"
       ],
       "table": "workmanship_craft_bop_import_previews"
+    },
+    {
+      "columns": {
+        "actor_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "actor_type": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "content_hash": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "evidence_refs_json": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "node_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "node_type": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "order_key": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "parent_node_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "properties_json": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {
+        "fk_craft_bop_node_revision_node": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "uq_craft_bop_node_revision_hash": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_node_revisions"
+    },
+    {
+      "columns": {
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_by": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "derived_from_node_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "lineage_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "repository_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "source_repository_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "source_version_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {
+        "fk_craft_bop_node_repository": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "idx_craft_bop_node_lineage": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_nodes"
+    },
+    {
+      "columns": {
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "operation_kind": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "outcome_json": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "request_hash": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "resource_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "uq_craft_bop_operation_idempotency": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_operation_ledger"
+    },
+    {
+      "columns": {
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "outcome_json": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "personal_space_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "preview_hash": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "source_content_hash": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "source_export_ref_hash": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "uq_craft_bop_personal_import_idempotency": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_personal_import_operations"
+    },
+    {
+      "columns": {
+        "active_project_slot": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "baseline_version_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_by": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "deleted_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "deleted_by": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "deletion_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "lifecycle_status": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "project_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "row_version": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {
+        "check_workmanship_craft_bop_repositories_1": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "uq_craft_bop_project_slot": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_repositories"
+    },
+    {
+      "columns": {
+        "binding_revision_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "is_tombstone": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "logical_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "member_kind": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "node_revision_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "space_head_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "vpps_group_version_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {
+        "fk_craft_bop_head_member_binding_revision": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "fk_craft_bop_head_member_head": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "fk_craft_bop_head_member_node_revision": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "uq_craft_bop_head_member": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_space_head_members"
+    },
+    {
+      "columns": {
+        "content_hash": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "row_version": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "space_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "updated_by": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {
+        "fk_craft_bop_head_space": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "uq_craft_bop_space_head": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_space_heads"
+    },
+    {
+      "columns": {
+        "binding_revision_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "is_tombstone": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "logical_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "member_kind": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "node_revision_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "space_version_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "vpps_group_version_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {
+        "fk_craft_bop_version_member_version": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "uq_craft_bop_version_member": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_space_version_members"
+    },
+    {
+      "columns": {
+        "algorithm_versions_json": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_by": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "manifest_artifact_ref_json": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "manifest_hash": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "parent_version_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "source_refs_json": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "space_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "version_kind": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {
+        "check_workmanship_craft_bop_space_versions_2": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "fk_craft_bop_version_space": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "idx_craft_bop_space_version": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "uq_craft_bop_space_manifest": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_space_versions"
+    },
+    {
+      "columns": {
+        "active_personal_owner_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "active_team_slot": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_by": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "deleted_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "deleted_by": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "deletion_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "fork_base_version_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "frozen_version_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "owner_user_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "repository_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "row_version": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "space_kind": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {
+        "check_workmanship_craft_bop_spaces_2": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "fk_craft_bop_space_repository": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "idx_craft_bop_space_owner": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "uq_craft_bop_personal_space": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "uq_craft_bop_team_space": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_spaces"
+    },
+    {
+      "columns": {
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "group_version_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "node_level": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "order_key": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "parent_scope_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "source_bop_node_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "source_node_lineage_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "vpps_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {
+        "fk_craft_bop_vpps_member_version": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "uq_craft_bop_vpps_sibling_order": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_vpps_group_members"
+    },
+    {
+      "columns": {
+        "actor_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "actor_type": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "content_hash": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "evidence_refs_json": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "generation_status": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "matcher_policy_hash": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "parent_version_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "reference_version_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "root_scope_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "target_group_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "version_kind": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {
+        "check_workmanship_craft_bop_vpps_group_versions_2": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "fk_craft_bop_vpps_version_group": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "uq_craft_bop_vpps_generation": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_vpps_group_versions"
+    },
+    {
+      "columns": {
+        "boundary_node_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "current_group_version_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "derived_from_group_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "group_lineage_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "reference_group_version_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "row_version": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "space_gid": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "constraints": {
+        "fk_craft_bop_vpps_group_space": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ],
+        "uq_craft_bop_vpps_boundary": [
+          "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+      ],
+      "table": "workmanship_craft_bop_vpps_groups"
     },
     {
       "columns": {
@@ -7253,8 +8523,17 @@
     },
     {
       "columns": {
+        "ai00_level": [
+          "backend/db/migrations/domains/craft/0008_standard_operation_ai00_level.sql"
+        ],
+        "bom_row": [
+          "backend/db/migrations/domains/craft/0009_standard_operation_gbop_match_fields.sql"
+        ],
         "code": [
           "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "component_type": [
+          "backend/db/migrations/domains/craft/0009_standard_operation_gbop_match_fields.sql"
         ],
         "created_at": [
           "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
@@ -7277,14 +8556,29 @@
         "level": [
           "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
         ],
+        "match_tag": [
+          "backend/db/migrations/domains/craft/0009_standard_operation_gbop_match_fields.sql"
+        ],
         "name": [
           "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "operation_vpps": [
+          "backend/db/migrations/domains/craft/0009_standard_operation_gbop_match_fields.sql"
         ],
         "parameters": [
           "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
         ],
+        "parent_bom_row": [
+          "backend/db/migrations/domains/craft/0009_standard_operation_gbop_match_fields.sql"
+        ],
         "parent_vpps": [
           "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "part_feed": [
+          "backend/db/migrations/domains/craft/0009_standard_operation_gbop_match_fields.sql"
+        ],
+        "process_vpps": [
+          "backend/db/migrations/domains/craft/0009_standard_operation_gbop_match_fields.sql"
         ],
         "required_tools": [
           "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
@@ -7324,6 +8618,9 @@
         ],
         "vpps_desc": [
           "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        ],
+        "vpps_part": [
+          "backend/db/migrations/domains/craft/0009_standard_operation_gbop_match_fields.sql"
         ]
       },
       "constraints": {},
@@ -7339,7 +8636,9 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/craft/0003_standard_operation_library.sql"
+        "backend/db/migrations/domains/craft/0003_standard_operation_library.sql",
+        "backend/db/migrations/domains/craft/0008_standard_operation_ai00_level.sql",
+        "backend/db/migrations/domains/craft/0009_standard_operation_gbop_match_fields.sql"
       ],
       "table": "workmanship_craft_standard_operations"
     },
@@ -10909,6 +12208,44 @@
     },
     {
       "columns": {
+        "actor_gid": [
+          "backend/db/migrations/domains/project_management/0003_desktop_operations.sql"
+        ],
+        "capability_id": [
+          "backend/db/migrations/domains/project_management/0003_desktop_operations.sql"
+        ],
+        "completed_at": [
+          "backend/db/migrations/domains/project_management/0003_desktop_operations.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/project_management/0003_desktop_operations.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/domains/project_management/0003_desktop_operations.sql"
+        ],
+        "payload_hash": [
+          "backend/db/migrations/domains/project_management/0003_desktop_operations.sql"
+        ],
+        "result_text": [
+          "backend/db/migrations/domains/project_management/0003_desktop_operations.sql"
+        ],
+        "team_gid": [
+          "backend/db/migrations/domains/project_management/0003_desktop_operations.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/project_management/0003_desktop_operations.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/project_management/0003_desktop_operations.sql"
+      ],
+      "table": "workmanship_proj_desktop_operations"
+    },
+    {
+      "columns": {
         "approval_order_gid": [
           "backend/db/mysql_schema.sql"
         ],
@@ -11803,6 +13140,112 @@
     },
     {
       "columns": {
+        "activated_at": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "activation_challenge_hash": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "bootstrap_encryption_jwk": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "bootstrap_nonce_hash": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "cancelled_at": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "challenge_consumed_at": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "challenge_expires_at": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "credential_envelope_json": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "credential_generation": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "device_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "device_key_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "device_signing_jwk": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "expires_at": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "owner_user_gid": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "pairing_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "protocol": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "resource_version": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "runtime_type": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "signing_challenge_hash": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "user_bound_at": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ]
+      },
+      "constraints": {
+        "check_workmanship_sim_connector_app_pairings_1": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "check_workmanship_sim_connector_app_pairings_2": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "idx_sim_app_pairing_expiry": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "idx_sim_app_pairing_owner": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "uq_sim_app_pairing_nonce": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql",
+        "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+      ],
+      "table": "workmanship_sim_connector_app_pairings"
+    },
+    {
+      "columns": {
+        "activated_at": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ],
         "capabilities": [
           "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
         ],
@@ -11824,8 +13267,14 @@
         "owner_user_gid": [
           "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
         ],
+        "pending_pairing_id": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ],
         "platform": [
           "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+        ],
+        "protocol": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
         ],
         "runtime_version": [
           "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
@@ -11862,7 +13311,9 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+        "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql",
+        "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql",
+        "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
       ],
       "table": "workmanship_sim_connector_bindings"
     },
@@ -12092,6 +13543,76 @@
     },
     {
       "columns": {
+        "bootstrap_id": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ],
+        "expires_at": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ],
+        "owner_user_gid": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ],
+        "pairing_id": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ],
+        "protocol": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "resource_version": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ],
+        "team_gid": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ],
+        "token_hash": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ]
+      },
+      "constraints": {
+        "check_workmanship_sim_connector_pairing_bootstraps_1": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ],
+        "idx_sim_connector_bootstrap_owner": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ],
+        "uq_sim_connector_bootstrap_pairing": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ],
+        "uq_sim_connector_bootstrap_token": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql",
+        "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+      ],
+      "table": "workmanship_sim_connector_pairing_bootstraps"
+    },
+    {
+      "columns": {
+        "activated_at": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ],
+        "activation_challenge_hash": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ],
+        "activation_status": [
+          "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql"
+        ],
         "approved_at": [
           "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
         ],
@@ -12133,6 +13654,9 @@
         ],
         "pairing_id": [
           "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+        ],
+        "protocol": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
         ],
         "resource_version": [
           "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
@@ -12182,7 +13706,9 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+        "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql",
+        "backend/db/migrations/domains/simulation/0007_connector_pairing_activation.sql",
+        "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
       ],
       "table": "workmanship_sim_connector_pairings"
     },
@@ -12221,6 +13747,9 @@
         "plan_json": [
           "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
         ],
+        "protocol": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
         "status": [
           "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
         ],
@@ -12244,7 +13773,8 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
+        "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql",
+        "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
       ],
       "table": "workmanship_sim_connector_plans"
     },
@@ -12304,6 +13834,461 @@
         "backend/db/migrations/domains/simulation/0005_connector_control_plane.sql"
       ],
       "table": "workmanship_sim_connector_projection_outbox"
+    },
+    {
+      "columns": {
+        "actor_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "audit_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "device_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "event_type": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "outcome_hash": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "outcome_json": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "pairing_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "plan_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "protocol": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "reason": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "recovery_instance_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "recovery_session_token_hash": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "runtime_generation": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "runtime_instance_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "session_token_hash": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ]
+      },
+      "constraints": {
+        "check_workmanship_sim_connector_runtime_audit_1": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "idx_sim_runtime_audit_device": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "idx_sim_runtime_audit_pairing": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "idx_sim_runtime_audit_plan": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+      ],
+      "table": "workmanship_sim_connector_runtime_audit"
+    },
+    {
+      "columns": {
+        "challenge_hash": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "consumed_at": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "device_id": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "device_key_id": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "expires_at": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "plan_id": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "protocol": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "runtime_generation": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "runtime_instance_id": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "runtime_type": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ]
+      },
+      "constraints": {
+        "check_workmanship_sim_connector_runtime_challenges_1": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "check_workmanship_sim_connector_runtime_challenges_2": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "check_workmanship_sim_connector_runtime_challenges_3": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "idx_sim_runtime_challenge_device": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+      ],
+      "table": "workmanship_sim_connector_runtime_challenges"
+    },
+    {
+      "columns": {
+        "activated_at": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "credential_generation": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "current_runtime_instance_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "device_credential_hash": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "device_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "device_key_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "device_signing_jwk": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "heartbeat_at": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "last_journal_sequence": [
+          "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+        ],
+        "owner_user_gid": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "protocol": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "runtime_generation": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "runtime_type": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "session_expires_at": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "session_registered_at": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "session_token_hash": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "takeover_instance_id": [
+          "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ]
+      },
+      "constraints": {
+        "check_workmanship_sim_connector_runtime_devices_1": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "check_workmanship_sim_connector_runtime_devices_2": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "check_workmanship_sim_connector_runtime_devices_3": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "check_workmanship_sim_connector_runtime_devices_4": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "idx_sim_runtime_device_owner": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "idx_sim_runtime_session_expiry": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "uq_sim_runtime_session_hash": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql",
+        "backend/db/migrations/domains/simulation/0009_connector_app_auth.sql",
+        "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+      ],
+      "table": "workmanship_sim_connector_runtime_devices"
+    },
+    {
+      "columns": {
+        "actor_gid": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "attempts": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "device_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "expires_at": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "lease_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "lease_until": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "outcome_hash": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "outcome_json": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "plan_hash": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "plan_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "plan_json": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "protocol": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "reconciled_at": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "reconciliation_state": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "runtime_generation": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "runtime_instance_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "session_token_hash": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ]
+      },
+      "constraints": {
+        "check_workmanship_sim_connector_runtime_plans_1": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "check_workmanship_sim_connector_runtime_plans_2": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "check_workmanship_sim_connector_runtime_plans_3": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "check_workmanship_sim_connector_runtime_plans_4": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "idx_sim_runtime_plan_lease": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "uq_sim_runtime_plan_idempotency": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "uq_sim_runtime_plan_lease": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+      ],
+      "table": "workmanship_sim_connector_runtime_plans"
+    },
+    {
+      "columns": {
+        "attempt": [
+          "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+        ],
+        "error_code": [
+          "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+        ],
+        "lease_owner": [
+          "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+        ],
+        "lease_until": [
+          "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+        ],
+        "next_retry_at": [
+          "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+        ],
+        "outcome_hash": [
+          "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+        ],
+        "plan_id": [
+          "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+        ],
+        "projected_at": [
+          "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+        ],
+        "target_capability": [
+          "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+        ]
+      },
+      "constraints": {
+        "check_workmanship_sim_connector_runtime_projection_outbox_1": [
+          "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+        ],
+        "idx_sim_runtime_projection_claim": [
+          "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0010_connector_v2_projection.sql"
+      ],
+      "table": "workmanship_sim_connector_runtime_projection_outbox"
+    },
+    {
+      "columns": {
+        "consumed_at": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "device_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "execution_instance_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "execution_session_token_hash": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "expires_at": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "plan_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "protocol": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "recovery_instance_id": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "runtime_generation": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "scope": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "token_hash": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ]
+      },
+      "constraints": {
+        "check_workmanship_sim_connector_runtime_recovery_sessions_1": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "check_workmanship_sim_connector_runtime_recovery_sessions_2": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "idx_sim_runtime_recovery_plan": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ],
+        "uq_sim_runtime_recovery_token": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql"
+      ],
+      "table": "workmanship_sim_connector_runtime_recovery_sessions"
     },
     {
       "columns": {
@@ -12461,6 +14446,204 @@
         "backend/db/migrations/domains/simulation/0002_connector_environments.sql"
       ],
       "table": "workmanship_sim_environment_manifests"
+    },
+    {
+      "columns": {
+        "client_ref": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "craft_node_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "environment_node_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "owner_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "publish_plan_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_environment_publish_map_plan": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "uq_sim_environment_publish_node": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "uq_sim_environment_publish_ref": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+      ],
+      "table": "workmanship_sim_environment_publish_maps"
+    },
+    {
+      "columns": {
+        "attempt": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "effect_type": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "last_error": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "lease_expires_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "lease_owner": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "owner_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "payload_json": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "publish_plan_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_environment_publish_outbox_plan": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "idx_sim_environment_publish_outbox_claim": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "uq_sim_environment_publish_effect": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+      ],
+      "table": "workmanship_sim_environment_publish_outbox"
+    },
+    {
+      "columns": {
+        "base_bop_revision": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "base_bop_version_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "craft_action_ref_json": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "craft_bop_revision": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "craft_bop_version_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "environment_version_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "last_error": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "outcome_hash": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "owner_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "plan_hash": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "plan_json": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "row_version": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "selection_hash": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "workspace_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_environment_publish_version": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "fk_sim_environment_publish_workspace": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "idx_sim_environment_publish_owner": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "uq_sim_environment_publish_key": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+      ],
+      "table": "workmanship_sim_environment_publish_plans"
     },
     {
       "columns": {
@@ -12802,6 +14985,797 @@
         "backend/db/migrations/domains/simulation/0001_simulation.sql"
       ],
       "table": "workmanship_sim_schema_migrations"
+    },
+    {
+      "columns": {
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "owner_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "removed_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "row_version": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "source_identity_hash": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "source_kind": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "workspace_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_vm_document_workspace": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "uq_sim_vm_document_source": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+      ],
+      "table": "workmanship_sim_vm_documents"
+    },
+    {
+      "columns": {
+        "bom_line": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "catia_occurrence_name": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "change_kind": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "normalized_transform_json": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "occurrence_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "parent_path_json": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "raw_transform_json": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "representation_locations_json": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "revision_code": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "snapshot_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "source_instance_id": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_vm_observation_occurrence": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "fk_sim_vm_observation_snapshot": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "idx_sim_vm_observation_occurrence": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+      ],
+      "table": "workmanship_sim_vm_observations"
+    },
+    {
+      "columns": {
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "document_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "first_session_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "kind": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "model_number": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "owner_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "predecessor_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "removed_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "row_version": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_vm_occurrence_document": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "fk_sim_vm_occurrence_predecessor": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "fk_sim_vm_occurrence_session": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "idx_sim_vm_occurrence_document": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+      ],
+      "table": "workmanship_sim_vm_occurrences"
+    },
+    {
+      "columns": {
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "normalized_transform_json": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "occurrence_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "pose_hash": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "snapshot_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_vm_pose_occurrence": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "fk_sim_vm_pose_snapshot": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "uq_sim_vm_pose_snapshot_occurrence": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+      ],
+      "table": "workmanship_sim_vm_poses"
+    },
+    {
+      "columns": {
+        "closed_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "document_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "opened_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "owner_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "row_version": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "runtime_instance_id": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "window_identity_hash": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_vm_session_document": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "idx_sim_vm_session_document": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+      ],
+      "table": "workmanship_sim_vm_sessions"
+    },
+    {
+      "columns": {
+        "document_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "row_version": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "snapshot_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_vm_snapshot_head_document": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "fk_sim_vm_snapshot_head_snapshot": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "uq_sim_vm_snapshot_head": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+      ],
+      "table": "workmanship_sim_vm_snapshot_heads"
+    },
+    {
+      "columns": {
+        "artifact_byte_size": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "artifact_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "artifact_sha256": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "captured_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "document_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "identity_algorithm_version": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "owner_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "parser_algorithm_version": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "removed_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "row_version": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "sequence": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "session_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "snapshot_hash": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_vm_snapshot_document": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "fk_sim_vm_snapshot_session": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "uq_sim_vm_snapshot_hash": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "uq_sim_vm_snapshot_sequence": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+      ],
+      "table": "workmanship_sim_vm_snapshots"
+    },
+    {
+      "columns": {
+        "binding_role": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "node_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "occurrence_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "owner_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "removed_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "row_version": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "workspace_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_workspace_binding_node": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "fk_sim_workspace_binding_workspace": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "idx_sim_workspace_binding_node": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "idx_sim_workspace_binding_occurrence": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+      ],
+      "table": "workmanship_sim_workspace_bindings"
+    },
+    {
+      "columns": {
+        "artifact_ref_json": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "content_hash": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "last_error": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "owner_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "version_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "workspace_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_workspace_freeze_version": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "fk_sim_workspace_freeze_workspace": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "idx_sim_workspace_freeze_reconcile": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "uq_sim_workspace_freeze_key": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+      ],
+      "table": "workmanship_sim_workspace_freeze_outbox"
+    },
+    {
+      "columns": {
+        "row_version": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "version_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "workspace_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_workspace_head_version": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "fk_sim_workspace_head_workspace": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "uq_sim_workspace_head_version": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+      ],
+      "table": "workmanship_sim_workspace_heads"
+    },
+    {
+      "columns": {
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "expires_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "request_hash": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "response_json": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "workspace_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_workspace_idempotency_workspace": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+      ],
+      "table": "workmanship_sim_workspace_idempotency"
+    },
+    {
+      "columns": {
+        "binding_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "occurrence_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "workspace_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_workspace_load_claim_binding": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "fk_sim_workspace_load_claim_workspace": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "uq_sim_workspace_load_binding": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+      ],
+      "table": "workmanship_sim_workspace_load_claims"
+    },
+    {
+      "columns": {
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "name": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "node_type": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "owner_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "parent_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "removed_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "row_version": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "sort_order": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "source_bop_node_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "workspace_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_workspace_node_parent": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "fk_sim_workspace_node_workspace": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "idx_sim_workspace_node_tree": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "uq_sim_workspace_node_order": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+      ],
+      "table": "workmanship_sim_workspace_nodes"
+    },
+    {
+      "columns": {
+        "algorithm_versions_json": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "content_hash": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "manifest_artifact_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "manifest_artifact_ref_json": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "owner_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "removed_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "row_version": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "sequence": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "workspace_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_workspace_version_workspace": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "uq_sim_workspace_version_sequence": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+      ],
+      "table": "workmanship_sim_workspace_versions"
+    },
+    {
+      "columns": {
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "name": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "owner_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "removed_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "row_version": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "constraints": {},
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "idx_sim_workspace_owner": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "uq_sim_workspace_owner_name": [
+          "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+      ],
+      "table": "workmanship_sim_workspaces"
     },
     {
       "columns": {

@@ -76,12 +76,17 @@ git commit -m "docs(governance): inventory bop repository capabilities"
 - Create: `backend/tests/test_bop_repository_migration.py`
 - Modify: `backend/governance/domain_table_inventory.json`
 - Modify: `backend/governance/domain_table_ownership.json`
+- Modify: `backend/governance/table_inventory.json`
+- Modify: `backend/governance/schema/expected-schema.json`
+- Modify: `backend/governance/schema/schema-source-map.json`
+- Modify: `backend/governance/schema/schema-build-summary.json`
+- Modify: `backend/tests/test_domain_migration_runner.py`
 
 **Interfaces:**
 - Consumes: snowflake decimal GIDs and existing Craft migration runner.
 - Produces: Repository, space, head, immutable space version, logical node/binding, revision, membership, idempotency and audit tables.
 
-- [ ] **Step 1: Write failing schema assertions**
+- [x] **Step 1: Write failing schema assertions**
 
 ```python
 def test_repository_schema_has_space_scoped_revision_membership():
@@ -93,23 +98,23 @@ def test_repository_schema_has_space_scoped_revision_membership():
     assert "`is_tombstone` TINYINT(1) NOT NULL DEFAULT 0" in sql
 ```
 
-- [ ] **Step 2: Run the test and verify RED**
+- [x] **Step 2: Run the test and verify RED**
 
 Run: `python -m pytest backend/tests/test_bop_repository_migration.py -q`
 
 Expected: FAIL because migration `0010` does not exist.
 
-- [ ] **Step 3: Implement OceanBase-compatible additive DDL**
+- [x] **Step 3: Implement OceanBase-compatible additive DDL**
 
 Create the tables named in spec section 12. Use generated active-slot keys for nullable tombstone uniqueness, non-null `parent_scope_gid` for VPPS ordering, unique `(space_head_gid,member_kind,logical_gid)`, and append-only version memberships. Put `frozen_version_gid` on spaces and `baseline_version_gid` on repositories.
 
-- [ ] **Step 4: Verify schema and ownership**
+- [x] **Step 4: Verify schema and ownership**
 
 Run: `python -m pytest backend/tests/test_bop_repository_migration.py backend/tests/test_domain_migration_runner.py backend/tests/test_domain_table_ownership.py -q`
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/db/migrations/domains/craft/0010_bop_repositories.sql backend/tests/test_bop_repository_migration.py backend/governance/domain_table_inventory.json
@@ -608,5 +613,3 @@ Write commands, raw outcomes, revision hashes and unavailable identifiers. Keep 
 git add docs/governance/reports/2026-09-09-bop-repository-collaboration-readiness.md docs/superpowers/plans/2026-09-09-bop-repository-collaboration-implementation.md
 git commit -m "docs(governance): report bop collaboration readiness"
 ```
-
-

@@ -45,6 +45,7 @@ No trusted running Registry Snapshot GID, exact human decision, signed release o
 2. No BOP Repository/Fork/VPPS/proposal Task Tool exists in the Agent registry. `task.bop_repository_assistant` is a new orchestration candidate.
 3. Current old BOP entry GID is scoped to an old `version_gid` and mixes identity with mutable content. Additive node/binding identity, revision and membership tables are required; renaming or reinterpreting old GIDs would be unsafe.
 4. Candidate capabilities below are absent from the inspected stable release. They are `not_registered` until real definitions, GIDs and Provider bindings exist.
+5. Simulation `0011_simulation_workspaces.sql` already defined 18 workspace/VM tables that were absent from the checked-in ownership and compiled schema documents. Task 2 registers them to the existing Simulation owner and regenerates schema metadata together with the new Craft tables; it does not change their runtime schema or ownership.
 
 ## Candidate Capability inventory
 
