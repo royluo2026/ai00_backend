@@ -15,6 +15,8 @@ Files:
 - Modify `plugins/project_management/project_management_backend/application/service.py`
 - Modify `plugins/project_management/project_management_backend/capabilities/reviewed.py`
 - Modify `plugins/project_management/project_management_backend/capabilities/provider.py`
+- Modify `backend/capability_v2/identity.py`, `backend/capability_v2/policies.py`, `backend/main.py`
+- Add `backend/capability_v2/official_service_grants.py`
 - Modify `backend/base/desktop_actions.py`, `backend/base/official_provider.py`
 - Modify `plugins/craft/craft_backend/capabilities/__init__.py`, `plugins/craft/craft_backend/capabilities/provider.py`
 - Add `backend/tests/test_org_management_capability_contracts.py`
@@ -24,7 +26,7 @@ Files:
 Steps:
 
 1. RED tests assert every ID/version/schema/error/exposure from spec §6, including closed arrays (`maxItems=50`), cursor/page size, `max_depth=32`, `max_nodes=5000`, expected revision and idempotency.
-2. RED tests assert Project writes are `confirmation='user'`; downstream Base projection is `confirmation='none'`, web/agent exposure false and restricted to Project worker identity.
+2. RED tests assert Project writes are `confirmation='user'`; downstream Base projection is `confirmation='none'`, web/agent exposure false and restricted to Project worker identity. The Project validator and Base BOP authorization check are local-runtime-only with fixed consumer IDs.
 3. RED tests freeze the breaking-major/deprecation set for Base team writes, old line assignment and affected Craft BOP writes.
 4. Record all consumer hits with `rg -n "base\.team\.|project\.member\.change\.apply|craft\.bop\..*change"` across backend and web worktrees; the minimum known list is the one in spec §6.
 5. Run `python -m pytest backend/tests/test_org_management_capability_contracts.py plugins/project_management/tests/test_project_capabilities.py plugins/craft/tests/test_bop_domain_sharing.py -q`; retain RED evidence.
@@ -36,21 +38,25 @@ Files:
 - Add `backend/base/project_responsibility.py`
 - Add `backend/base/active_principal.py`
 - Modify `backend/base/official_provider.py`
+- Modify `plugins/project_management/project_management_backend/application/service.py`, `capabilities/reviewed.py`, `capabilities/provider.py`, `capabilities/__init__.py`
+- Add `backend/capability_v2/official_service_grants.py` and modify `backend/capability_v2/policies.py`, `backend/main.py`
 - Add `backend/db/migrations/202609090001_base_project_responsibility.sql`
 - Modify `backend/governance/domain_table_ownership.json`, `backend/governance/table_inventory.json`
 - Add `backend/tests/test_base_project_manager_repository.py`
 - Add `backend/tests/test_base_project_responsibility_capabilities.py`
+- Add `backend/tests/test_official_service_grants.py`
 - Modify `backend/tests/test_bop_line_permissions.py`
 
 Steps:
 
 1. RED repository tests: unmanaged project returns legacy single manager; first replace sets managed and full zero-to-50 set; later clear stays managed; `(tenant,project,user,role)` unique; concurrent expected revision conflict; same-key replay and changed-payload conflict.
 2. RED capability tests: `base.identity.active_principal.get@1` returns only GID/name/avatar/active; inactive/missing has stable error. `base.project_manager.read@1` is bounded; `replace@1` is super-only, user-confirmed, expected-revision and idempotent.
-3. RED Base→Project dependency tests use existing `project.project.read.atomic.projects_get@1` with `IdentityBroker.for_local_runtime(..., runtime_id='base-project-validator')` and minimal projection. Web/user/other runtime identities are rejected; missing, deleted, wrong-tenant and forged tenant all fail before manager/grant/audit state changes.
-4. Implement Base transaction and migration without changing the old single-manager unique index. `can_edit_project_bop` checks the new manager table when managed and otherwise treats the legacy manager membership as project-level edit.
-5. Give each managed manager project-scoped BOP edit through source/effective metadata. Existing `project_owner` becomes `baseline_present`; new grant stores exact GID; removal preserves baseline and deletes only exact projection-owned GID after refcount zero.
-6. Test legacy manager edits before takeover, loses access when omitted on first replace, and does not reappear after clear.
-7. Run `python -m pytest backend/tests/test_base_project_manager_repository.py backend/tests/test_base_project_responsibility_capabilities.py backend/tests/test_bop_line_permissions.py backend/tests/test_domain_table_ownership.py -q`; commit.
+3. RED Base→Project dependency tests use new `project.project.validation.get@1` with `IdentityBroker.for_local_runtime(..., runtime_id='base-project-validator')` and minimal projection. Stable `projects_get@1` exposure/output is unchanged. Web/user/other runtime identities are rejected; missing, deleted, wrong-tenant and forged tenant all fail before manager/grant/audit state changes.
+4. Implement `OfficialServiceGrantResolver` in the composition root. Its closed allowlist grants `base-project-validator` only the validator capability and `project-org-projection` only projection apply/get, with confidential data and authenticated request/outbox tenant. Unknown service, tenant override and extra capability fail.
+5. Implement Base transaction and migration without changing the old single-manager unique index. `can_edit_project_bop` checks the new manager table when managed and otherwise treats the legacy manager membership as project-level edit.
+6. Give each managed manager project-scoped BOP edit through source/effective metadata. Existing `project_owner` becomes `baseline_present`; new grant stores exact GID; removal preserves baseline and deletes only exact projection-owned GID after refcount zero.
+7. Test legacy manager edits before takeover, loses access when omitted on first replace, and does not reappear after clear.
+8. Run `python -m pytest backend/tests/test_base_project_manager_repository.py backend/tests/test_base_project_responsibility_capabilities.py backend/tests/test_official_service_grants.py backend/tests/test_bop_line_permissions.py backend/tests/test_domain_table_ownership.py -q`; commit.
 
 ## Task 2 — Project manual-line codec, CAS and durable operation
 
@@ -77,6 +83,9 @@ Steps:
 Files:
 
 - Add `plugins/craft/craft_backend/capabilities/bop_active_line.py`
+- Add `backend/base/bop_edit_authorization.py` and register it in `backend/base/official_provider.py`
+- Modify `backend/capability_v2/identity.py` with `for_domain_provider`
+- Modify `plugins/craft/craft_backend/infrastructure/domain_clients.py`
 - Modify `plugins/craft/craft_backend/capabilities/__init__.py`, `plugins/craft/craft_backend/capabilities/provider.py`
 - Modify `plugins/craft/craft_backend/routers/_bop/_helpers.py`
 - Modify line-scoped files: `bop_entry_change.py`, `bop_entry_link_change.py`, `bop_checkpoint_change.py`, `bop_checkpoint_rollback.py`, `bop_lifecycle_history_change.py`, `bop_staging_lifecycle_change.py`
@@ -87,16 +96,19 @@ Files:
 - Modify compatibility routers: `plugins/craft/craft_backend/routers/_bop/entries.py`, `fork.py`, `gbop.py`, `lifecycle.py`, `staging.py`, `templates.py`, `versions.py`
 - Add `plugins/craft/tests/test_bop_active_line_capabilities.py`
 - Add `plugins/craft/tests/test_bop_mutation_authorization_inventory.py`
+- Add `plugins/craft/tests/test_base_bop_authorization_client.py`
+- Add `backend/tests/test_base_bop_edit_authorization.py`
 - Modify `plugins/craft/tests/test_bop_domain_sharing.py`, `backend/tests/test_bop_line_permissions.py`
 
 Steps:
 
 1. RED active-line search/validate tests: exact `status='active'`, project ownership, nondeleted `line_process`, deterministic GID keyset, path, max depth/nodes and `graph_limit_exceeded`.
 2. RED inventory test reads the built Catalog and fails unless its 25 `craft.bop.*` writes exactly equal spec §5.4: 24 v2 authorization changes plus unchanged asset-only picture upload v1. A newly registered BOP write must be classified before passing.
-3. RED parameterized role matrix for every inventory row: super, same/wrong-project manager, same/other-line leader, member and team admin. For line batches/snapshots any out-of-scope effect rejects the whole transaction; project operations reject missing/deleted/wrong-tenant/inactive targets.
-4. Implement Craft-owned active-line query and central Base-owned `can_edit_project_bop`/line authorization adapter. Remove broad role bypass from `_check_line_editable`; legacy routers invoke the same adapter.
-5. Publish every v2 listed in spec §5.4 through Provider/Descriptor/Catalog and its compatibility binding. `picture.upload@1` remains because it cannot bind/mutate a BOP; binding an uploaded picture still requires an authorized v2 entry operation.
-6. Run `python -m pytest plugins/craft/tests/test_bop_active_line_capabilities.py plugins/craft/tests/test_bop_mutation_authorization_inventory.py plugins/craft/tests/test_bop_domain_sharing.py backend/tests/test_bop_line_permissions.py -q`; commit.
+3. RED parameterized role matrix for every inventory row: super, same/wrong-project manager, same/other-line leader, member and team admin. For link/snapshot/history, authorization is based only on each owning entry's line; an external PBOM/resource/device target is allowed when its owning entry is in scope, while any owning-entry escape rejects the whole transaction. Project operations reject missing/deleted/wrong-tenant/inactive targets.
+4. Implement `base.bop_edit.authorization.check@1` with closed `{project_gid,line_gid?}` input/output and local-runtime-only exposure. Add `IdentityBroker.for_domain_provider` which preserves trusted parent actor/tenant, fixes consumer `craft-bop-authorizer`, and binds delegation scopes to this one capability; caller-supplied actor/tenant is impossible.
+5. Craft resolves version/entry/owning-line in Craft storage, then invokes Base check through `infrastructure/domain_clients.py` before any mutation. Base unavailable is retryable `authorization_backend_failed`; denial/wrong scope/tenant is `bop_edit_denied`. Legacy routers bind the same v2 Provider. Boundary test rejects `workmanship_auth_` SQL and platform auth/project-access imports in Craft mutation paths.
+6. Publish every v2 listed in spec §5.4 through Provider/Descriptor/Catalog and its compatibility binding. `picture.upload@1` remains because it cannot bind/mutate a BOP; binding an uploaded picture still requires an authorized v2 entry operation.
+7. Run `python -m pytest plugins/craft/tests/test_bop_active_line_capabilities.py plugins/craft/tests/test_bop_mutation_authorization_inventory.py plugins/craft/tests/test_base_bop_authorization_client.py plugins/craft/tests/test_bop_domain_sharing.py backend/tests/test_base_bop_edit_authorization.py backend/tests/test_bop_line_permissions.py -q`; commit.
 
 ## Task 4 — Base source-scoped multi-leader grant projection
 
