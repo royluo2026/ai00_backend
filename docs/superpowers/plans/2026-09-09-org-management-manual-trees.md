@@ -16,7 +16,7 @@ Files:
 - Modify `plugins/project_management/project_management_backend/capabilities/reviewed.py`
 - Modify `plugins/project_management/project_management_backend/capabilities/provider.py`
 - Modify `backend/capability_v2/identity.py`, `backend/capability_v2/policies.py`, `backend/main.py`
-- Add `backend/capability_v2/official_service_grants.py`
+- Add `backend/capability_v2/official_service_grants.py` containing `OfficialServiceIdentityRegistry` membership and grant resolvers
 - Modify `backend/base/desktop_actions.py`, `backend/base/official_provider.py`
 - Modify `plugins/craft/craft_backend/capabilities/__init__.py`, `plugins/craft/craft_backend/capabilities/provider.py`
 - Add `backend/tests/test_org_management_capability_contracts.py`
@@ -39,7 +39,7 @@ Files:
 - Add `backend/base/active_principal.py`
 - Modify `backend/base/official_provider.py`
 - Modify `plugins/project_management/project_management_backend/application/service.py`, `capabilities/reviewed.py`, `capabilities/provider.py`, `capabilities/__init__.py`
-- Add `backend/capability_v2/official_service_grants.py` and modify `backend/capability_v2/policies.py`, `backend/main.py`
+- Add `backend/capability_v2/official_service_grants.py` and modify `backend/capability_v2/identity.py`, `backend/capability_v2/policies.py`, `backend/main.py`
 - Add `backend/db/migrations/202609090001_base_project_responsibility.sql`
 - Modify `backend/governance/domain_table_ownership.json`, `backend/governance/table_inventory.json`
 - Add `backend/tests/test_base_project_manager_repository.py`
@@ -52,11 +52,12 @@ Steps:
 1. RED repository tests: unmanaged project returns legacy single manager; first replace sets managed and full zero-to-50 set; later clear stays managed; `(tenant,project,user,role)` unique; concurrent expected revision conflict; same-key replay and changed-payload conflict.
 2. RED capability tests: `base.identity.active_principal.get@1` returns only GID/name/avatar/active; inactive/missing has stable error. `base.project_manager.read@1` is bounded; `replace@1` is super-only, user-confirmed, expected-revision and idempotent.
 3. RED Base→Project dependency tests use new `project.project.validation.get@1` with `IdentityBroker.for_local_runtime(..., runtime_id='base-project-validator')` and minimal projection. Stable `projects_get@1` exposure/output is unchanged. Web/user/other runtime identities are rejected; missing, deleted, wrong-tenant and forged tenant all fail before manager/grant/audit state changes.
-4. Implement `OfficialServiceGrantResolver` in the composition root. Its closed allowlist grants `base-project-validator` only the validator capability and `project-org-projection` only projection apply/get, with confidential data and authenticated request/outbox tenant. Unknown service, tenant override and extra capability fail.
-5. Implement Base transaction and migration without changing the old single-manager unique index. `can_edit_project_bop` checks the new manager table when managed and otherwise treats the legacy manager membership as project-level edit.
-6. Give each managed manager project-scoped BOP edit through source/effective metadata. Existing `project_owner` becomes `baseline_present`; new grant stores exact GID; removal preserves baseline and deletes only exact projection-owned GID after refcount zero.
-7. Test legacy manager edits before takeover, loses access when omitted on first replace, and does not reappear after clear.
-8. Run `python -m pytest backend/tests/test_base_project_manager_repository.py backend/tests/test_base_project_responsibility_capabilities.py backend/tests/test_official_service_grants.py backend/tests/test_bop_line_permissions.py backend/tests/test_domain_table_ownership.py -q`; commit.
+4. Implement `OfficialServiceIdentityRegistry` and inject it into IdentityBroker and Gateway at the composition root. Membership resolution runs first: only allowlisted service ID plus server-sourced request/outbox tenant returns active same-tenant membership. Gateway grants run second: `base-project-validator` gets only validator read and `project-org-projection` gets only projection apply/get, with confidential data and the resolved tenant.
+5. Test exact failure order: unknown service, payload-derived tenant and cross-tenant fail during identity creation; legal validator/worker identity is created; then an extra capability fails Gateway authorization while the exact capability succeeds.
+6. Implement Base transaction and migration without changing the old single-manager unique index. `can_edit_project_bop` checks the new manager table when managed and otherwise treats the legacy manager membership as project-level edit.
+7. Give each managed manager project-scoped BOP edit through source/effective metadata. Existing `project_owner` becomes `baseline_present`; new grant stores exact GID; removal preserves baseline and deletes only exact projection-owned GID after refcount zero.
+8. Test legacy manager edits before takeover, loses access when omitted on first replace, and does not reappear after clear.
+9. Run `python -m pytest backend/tests/test_base_project_manager_repository.py backend/tests/test_base_project_responsibility_capabilities.py backend/tests/test_official_service_grants.py backend/tests/test_bop_line_permissions.py backend/tests/test_domain_table_ownership.py -q`; commit.
 
 ## Task 2 — Project manual-line codec, CAS and durable operation
 
