@@ -98,6 +98,7 @@ _RESOURCES = {
     "simulation.result.get": (("simulation-run", "run_id"),),
     "simulation.result.compare": (("simulation-run", "left_result_ref.run_id"), ("simulation-run", "right_result_ref.run_id")),
     "simulation.environment.workspace.get": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.workspace.update": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.structure_node.create": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.structure_node.move": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.structure_node.remove": (("simulation-workspace", "workspace_gid"),),

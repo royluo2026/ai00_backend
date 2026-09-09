@@ -187,7 +187,7 @@ def test_simulation_historical_0004_checksum_upgrades_through_current_chain(simu
 
     applied = apply_domain_migrations(connection, simulation_manifest, migrations)
 
-    assert applied == ("0005", "0006", "0007", "0008", "0009", "0010", "0011", "0012")
+    assert applied == ("0005", "0006", "0007", "0008", "0009", "0010", "0011", "0012", "0013")
 
 
 def test_apply_uses_domain_lock_ledger_and_artifact_version(craft_manifest):
@@ -346,4 +346,4 @@ def test_apply_configures_selected_table_prefix(monkeypatch, capsys):
 
     assert result == 0
     assert prefixes == ["test_"]
-    assert "domain=simulation migrations=12 applied=0" in capsys.readouterr().out
+    assert "domain=simulation migrations=13 applied=0" in capsys.readouterr().out

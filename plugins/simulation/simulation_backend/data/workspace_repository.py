@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+from datetime import datetime, timezone
 from typing import Any, Mapping
 
 from backend.platform_sdk.ids import next_gid
@@ -22,6 +23,26 @@ def _gid(value: object, field: str) -> str:
 
 
 class WorkspaceRepository:
+    @staticmethod
+    def _decorate(row: dict[str, Any], *, owner_gid: str, project_gids: list[str]) -> dict[str, Any]:
+        result = dict(row)
+        for key in ("workspace_gid", "version_gid", "owner_gid", "primary_project_gid"):
+            if result.get(key) is not None:
+                result[key] = str(result[key])
+        result["is_owner"] = result.get("owner_gid") == str(owner_gid)
+        result["project_gids"] = project_gids
+        if result.get("updated_at") is not None and not isinstance(result["updated_at"], str):
+            result["updated_at"] = result["updated_at"].isoformat()
+        return result
+
+    @staticmethod
+    def _replace_projects(cursor, workspace_gid: str, project_gids: list[str]) -> None:
+        cursor.execute("DELETE FROM workmanship_sim_workspace_projects WHERE workspace_gid=%s", (workspace_gid,))
+        for position, project_gid in enumerate(project_gids):
+            cursor.execute(
+                "INSERT INTO workmanship_sim_workspace_projects (workspace_gid,project_gid,sort_order) VALUES (%s,%s,%s)",
+                (workspace_gid, _gid(project_gid, "project_gid"), position),
+            )
     def get_saved_version(self, *, workspace_gid: str, version_gid: str,
                           tenant_gid: str, owner_gid: str) -> dict[str, Any]:
         with get_simulation_conn() as conn, conn.cursor() as cursor:
@@ -74,13 +95,17 @@ class WorkspaceRepository:
         claims["manifest_artifact_ref"]=json.loads(value) if isinstance(value,str) else dict(value)
         return claims
 
-    def create(self, *, name: str, tenant_gid: str, owner_gid: str) -> dict[str, Any]:
+    def create(self, *, name: str, review_type: str, version_label: str, status: str, visibility: str,
+               project_gids: list[str], primary_project_gid: str | None,
+               tenant_gid: str, owner_gid: str) -> dict[str, Any]:
         workspace_gid, version_gid = str(next_gid()), str(next_gid())
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
                 "INSERT INTO workmanship_sim_workspaces "
-                "(gid,tenant_gid,owner_gid,name,status,row_version) VALUES (%s,%s,%s,%s,'active',1)",
-                (workspace_gid, _gid(tenant_gid, "tenant_gid"), _gid(owner_gid, "owner_gid"), name),
+                "(gid,tenant_gid,owner_gid,name,review_type,version_label,status,visibility,primary_project_gid,row_version) "
+                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,1)",
+                (workspace_gid, _gid(tenant_gid, "tenant_gid"), _gid(owner_gid, "owner_gid"), name,
+                 review_type, version_label, status, visibility, primary_project_gid),
             )
             cursor.execute(
                 "INSERT INTO workmanship_sim_workspace_versions "
@@ -92,56 +117,68 @@ class WorkspaceRepository:
                 "INSERT INTO workmanship_sim_workspace_heads (workspace_gid,version_gid,row_version) VALUES (%s,%s,1)",
                 (workspace_gid, version_gid),
             )
+            self._replace_projects(cursor, workspace_gid, project_gids)
         return {"workspace_gid": workspace_gid, "version_gid": version_gid, "name": name,
-                "status": "active", "row_version": 1, "nodes": [], "bindings": []}
+                "review_type": review_type, "version_label": version_label, "status": status,
+                "visibility": visibility, "primary_project_gid": primary_project_gid,
+                "owner_gid": str(owner_gid), "is_owner": True, "project_gids": project_gids,
+                "updated_at": datetime.now(timezone.utc).isoformat(), "row_version": 1, "nodes": [], "bindings": []}
 
     def search(self, *, tenant_gid: str, owner_gid: str, offset: int, page_size: int) -> dict[str, Any]:
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
-                "SELECT w.gid AS workspace_gid,h.version_gid,w.name,w.status,w.row_version,w.updated_at "
+                "SELECT w.gid AS workspace_gid,h.version_gid,w.owner_gid,w.name,w.review_type,w.version_label,w.status,w.visibility,w.primary_project_gid,w.row_version,w.updated_at "
                 "FROM workmanship_sim_workspaces w JOIN workmanship_sim_workspace_heads h ON h.workspace_gid=w.gid "
-                "WHERE w.tenant_gid=%s AND w.owner_gid=%s AND w.removed_at IS NULL "
+                "WHERE w.tenant_gid=%s AND (w.owner_gid=%s OR w.visibility='shared') AND w.removed_at IS NULL "
                 "ORDER BY w.updated_at DESC,w.gid DESC LIMIT %s OFFSET %s",
                 (_gid(tenant_gid, "tenant_gid"), _gid(owner_gid, "owner_gid"), page_size + 1, offset),
             )
             rows = [dict(row) for row in cursor.fetchall()]
+            workspace_gids = [row["workspace_gid"] for row in rows]
+            project_map: dict[str, list[str]] = {str(value): [] for value in workspace_gids}
+            if workspace_gids:
+                marks = ",".join(["%s"] * len(workspace_gids))
+                cursor.execute(
+                    f"SELECT workspace_gid,project_gid FROM workmanship_sim_workspace_projects WHERE workspace_gid IN ({marks}) ORDER BY workspace_gid,sort_order,project_gid",
+                    workspace_gids,
+                )
+                for item in cursor.fetchall():
+                    project_map[str(item["workspace_gid"])].append(str(item["project_gid"]))
         more = len(rows) > page_size
         rows = rows[:page_size]
         for row in rows:
-            row["workspace_gid"], row["version_gid"] = str(row["workspace_gid"]), str(row["version_gid"])
-            if row.get("updated_at") is not None:
-                row["updated_at"] = row["updated_at"].isoformat()
+            row.update(self._decorate(row, owner_gid=owner_gid, project_gids=project_map.get(str(row["workspace_gid"]), [])))
         return {"items": rows, "next_cursor": str(offset + page_size) if more else None}
 
     def get(self, workspace_gid: str, *, tenant_gid: str, owner_gid: str, lock: bool = False) -> dict[str, Any] | None:
         suffix = " FOR UPDATE" if lock else ""
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
-                "SELECT w.gid AS workspace_gid,h.version_gid,w.name,w.status,w.row_version "
+                "SELECT w.gid AS workspace_gid,h.version_gid,w.owner_gid,w.name,w.review_type,w.version_label,w.status,w.visibility,w.primary_project_gid,w.row_version,w.updated_at "
                 "FROM workmanship_sim_workspaces w JOIN workmanship_sim_workspace_heads h ON h.workspace_gid=w.gid "
-                "WHERE w.gid=%s AND w.tenant_gid=%s AND w.owner_gid=%s AND w.removed_at IS NULL" + suffix,
+                "WHERE w.gid=%s AND w.tenant_gid=%s AND (w.owner_gid=%s OR w.visibility='shared') AND w.removed_at IS NULL" + suffix,
                 (_gid(workspace_gid, "workspace_gid"), _gid(tenant_gid, "tenant_gid"), _gid(owner_gid, "owner_gid")),
             )
             workspace = cursor.fetchone()
             if not workspace:
                 return None
+            cursor.execute("SELECT project_gid FROM workmanship_sim_workspace_projects WHERE workspace_gid=%s ORDER BY sort_order,project_gid", (workspace_gid,))
+            project_gids = [str(item["project_gid"]) for item in cursor.fetchall()]
             cursor.execute(
                 "SELECT gid AS node_gid,parent_gid,node_type,name,sort_order AS position,row_version "
                 "FROM workmanship_sim_workspace_nodes WHERE workspace_gid=%s AND tenant_gid=%s "
-                "AND owner_gid=%s AND removed_at IS NULL ORDER BY parent_gid,sort_order,gid",
-                (workspace_gid, tenant_gid, owner_gid),
+                "AND removed_at IS NULL ORDER BY parent_gid,sort_order,gid",
+                (workspace_gid, tenant_gid),
             )
             nodes = [dict(row) for row in cursor.fetchall()]
             cursor.execute(
                 "SELECT gid AS binding_gid,node_gid,occurrence_gid,binding_role AS role,row_version "
                 "FROM workmanship_sim_workspace_bindings WHERE workspace_gid=%s AND tenant_gid=%s "
-                "AND owner_gid=%s AND removed_at IS NULL ORDER BY node_gid,gid",
-                (workspace_gid, tenant_gid, owner_gid),
+                "AND removed_at IS NULL ORDER BY node_gid,gid",
+                (workspace_gid, tenant_gid),
             )
             bindings = [dict(row) for row in cursor.fetchall()]
-        data = dict(workspace)
-        for key in ("workspace_gid", "version_gid"):
-            data[key] = str(data[key])
+        data = self._decorate(dict(workspace), owner_gid=owner_gid, project_gids=project_gids)
         for row in nodes:
             row["node_gid"] = str(row["node_gid"])
             row["parent_gid"] = str(row["parent_gid"]) if row.get("parent_gid") is not None else None
@@ -163,7 +200,7 @@ class WorkspaceRepository:
         request_hash = hashlib.sha256(canonical.encode()).hexdigest()
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
-                "SELECT row_version FROM workmanship_sim_workspaces WHERE gid=%s AND tenant_gid=%s "
+                "SELECT row_version,status FROM workmanship_sim_workspaces WHERE gid=%s AND tenant_gid=%s "
                 "AND owner_gid=%s AND removed_at IS NULL FOR UPDATE",
                 (workspace_gid, tenant_gid, owner_gid),
             )
@@ -184,7 +221,19 @@ class WorkspaceRepository:
             if int(current["row_version"]) != expected_row_version:
                 raise WorkspaceRepositoryError("version_conflict")
 
-            if operation == "create_node":
+            if operation == "update_workspace":
+                if current["status"] == "frozen":
+                    raise WorkspaceRepositoryError("workspace_frozen")
+                project_gids = list(values["project_gids"])
+                cursor.execute(
+                    "UPDATE workmanship_sim_workspaces SET name=%s,review_type=%s,version_label=%s,status=%s,visibility=%s,primary_project_gid=%s WHERE gid=%s",
+                    (values["name"], values["review_type"], values["version_label"], values["status"],
+                     values["visibility"], values["primary_project_gid"], workspace_gid),
+                )
+                self._replace_projects(cursor, workspace_gid, project_gids)
+                entity_gid = workspace_gid
+                patch = {"op": "update_workspace", **dict(values)}
+            elif operation == "create_node":
                 parent_gid = values.get("parent_gid")
                 if parent_gid is not None:
                     parent_gid = _gid(parent_gid, "parent_gid")

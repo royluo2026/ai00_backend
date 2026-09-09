@@ -56,15 +56,49 @@ class WorkspaceProvider:
         self.freeze_service = freeze_service or WorkspaceFreezeService(self.repository, _ArtifactPort())
 
     def create(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
-        name = str(payload.get("name") or "").strip()
-        if not name or len(name) > 255:
-            raise CapabilityBusinessError("workspace_name_invalid", "workspace_name_invalid")
+        values = self._metadata(payload)
         tenant_gid, owner_gid = _scope(context)
         try:
-            data = self.repository.create(name=name, tenant_gid=tenant_gid, owner_gid=owner_gid)
+            data = self.repository.create(**values, tenant_gid=tenant_gid, owner_gid=owner_gid)
             return _output(data, workspace_gid=str(data["workspace_gid"]), action="workspace_created")
         except WorkspaceRepositoryError as exc:
             raise CapabilityBusinessError(str(exc), str(exc)) from exc
+
+    @staticmethod
+    def _metadata(payload: dict[str, Any]) -> dict[str, Any]:
+        name = str(payload.get("name") or "").strip()
+        version_label = str(payload.get("version_label") or "V1").strip()
+        review_type = str(payload.get("review_type") or "other")
+        status = str(payload.get("status") or "active")
+        visibility = str(payload.get("visibility") or "private")
+        project_gids = payload.get("project_gids") or []
+        primary = payload.get("primary_project_gid")
+        if not name or len(name) > 255:
+            raise CapabilityBusinessError("workspace_name_invalid", "workspace_name_invalid")
+        if not version_label or len(version_label) > 128:
+            raise CapabilityBusinessError("workspace_version_label_invalid", "workspace_version_label_invalid")
+        if review_type not in {"node_review", "scattered_review", "other"}:
+            raise CapabilityBusinessError("workspace_review_type_invalid", "workspace_review_type_invalid")
+        if status not in {"active", "baseline", "frozen", "archived"}:
+            raise CapabilityBusinessError("workspace_status_invalid", "workspace_status_invalid")
+        if visibility not in {"private", "shared"}:
+            raise CapabilityBusinessError("workspace_visibility_invalid", "workspace_visibility_invalid")
+        if not isinstance(project_gids, list) or len(project_gids) > 50:
+            raise CapabilityBusinessError("workspace_projects_invalid", "workspace_projects_invalid")
+        normalized = []
+        for value in project_gids:
+            text = str(value or "")
+            if not text.isdecimal() or int(text) <= 0 or text in normalized:
+                raise CapabilityBusinessError("workspace_projects_invalid", "workspace_projects_invalid")
+            normalized.append(text)
+        primary = None if primary in (None, "") else str(primary)
+        if primary is not None and primary not in normalized:
+            raise CapabilityBusinessError("workspace_primary_project_invalid", "workspace_primary_project_invalid")
+        if review_type == "node_review" and primary is None:
+            raise CapabilityBusinessError("workspace_primary_project_required", "workspace_primary_project_required")
+        return {"name": name, "review_type": review_type, "version_label": version_label,
+                "status": status, "visibility": visibility, "project_gids": normalized,
+                "primary_project_gid": primary}
 
     def search(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
         tenant_gid, owner_gid = _scope(context)
@@ -89,6 +123,10 @@ class WorkspaceProvider:
         if not row:
             raise CapabilityBusinessError("workspace_not_found", "workspace_not_found")
         return _output(row, workspace_gid=str(row["workspace_gid"]), action="workspace_loaded")
+
+    def update(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+        values = self._metadata(payload)
+        return self._mutate("update_workspace", {**payload, **values}, context)
 
     def _mutate(self, operation: str, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
         tenant_gid, owner_gid = _scope(context)
@@ -191,15 +229,21 @@ def candidate_specs(provider: WorkspaceProvider | None = None) -> tuple[tuple[Ca
                "properties": {"binding_gid": gid, "node_gid": gid, "occurrence_gid": gid,
                               "role": {"type": "string", "enum": ["load", "operate"]},
                               "row_version": {"type": "integer", "minimum": 1}}, "additionalProperties": False}
-    workspace = {"type": "object", "required": ["workspace_gid", "version_gid", "name", "status", "row_version", "nodes", "bindings"],
-                 "properties": {"workspace_gid": gid, "version_gid": gid, "name": {"type": "string"},
-                                "status": {"type": "string"}, "row_version": {"type": "integer", "minimum": 1},
+    metadata = {"name": {"type": "string", "minLength": 1, "maxLength": 255},
+                "review_type": {"type": "string", "enum": ["node_review", "scattered_review", "other"]},
+                "version_label": {"type": "string", "minLength": 1, "maxLength": 128},
+                "status": {"type": "string", "enum": ["active", "baseline", "frozen", "archived"]},
+                "visibility": {"type": "string", "enum": ["private", "shared"]},
+                "project_gids": {"type": "array", "maxItems": 50, "uniqueItems": True, "items": gid},
+                "primary_project_gid": {"anyOf": [gid, {"type": "null"}]}}
+    workspace = {"type": "object", "required": ["workspace_gid", "version_gid", "owner_gid", "is_owner", *metadata.keys(), "updated_at", "row_version", "nodes", "bindings"],
+                 "properties": {"workspace_gid": gid, "version_gid": gid, "owner_gid": gid, "is_owner": {"type": "boolean"}, **metadata,
+                                "updated_at": {"type": "string"}, "row_version": {"type": "integer", "minimum": 1},
                                 "nodes": {"type": "array", "items": node},
                                 "bindings": {"type": "array", "items": binding}}, "additionalProperties": False}
-    workspace_summary = {"type": "object", "required": ["workspace_gid", "version_gid", "name", "status", "row_version"],
-                         "properties": {"workspace_gid": gid, "version_gid": gid, "name": {"type": "string"},
-                                        "status": {"type": "string"}, "row_version": {"type": "integer", "minimum": 1},
-                                        "updated_at": {"type": "string"}}, "additionalProperties": False}
+    workspace_summary = {"type": "object", "required": ["workspace_gid", "version_gid", "owner_gid", "is_owner", *metadata.keys(), "updated_at", "row_version"],
+                         "properties": {"workspace_gid": gid, "version_gid": gid, "owner_gid": gid, "is_owner": {"type": "boolean"}, **metadata,
+                                        "updated_at": {"type": "string"}, "row_version": {"type": "integer", "minimum": 1}}, "additionalProperties": False}
     search_output = {"type": "object", "required": ["items", "next_cursor"],
                      "properties": {"items": {"type": "array", "maxItems": 100, "items": workspace_summary},
                                     "next_cursor": {"type": ["string", "null"], "pattern": "^[0-9]+$"}},
@@ -209,16 +253,27 @@ def candidate_specs(provider: WorkspaceProvider | None = None) -> tuple[tuple[Ca
         "expected_row_version": {"type": "integer", "minimum": 1},
         "idempotency_key": {"type": "string", "minLength": 1, "maxLength": 191},
     }
+    patch_schema = {"type": "object", "required": ["op"], "properties": {
+        "op": {"type": "string", "enum": ["update_workspace", "create", "move", "remove", "bind", "unbind"]},
+        "node_gid": gid, "parent_gid": {"anyOf": [gid, {"type": "null"}]},
+        "node_type": {"type": "string", "enum": ["line", "station", "process", "operation"]},
+        "name": {"type": "string"}, "position": {"type": "integer", "minimum": 0},
+        "removed_node_gids": {"type": "array", "items": gid}, "binding_gid": gid,
+        "occurrence_gid": gid, "role": {"type": "string", "enum": ["load", "operate"]},
+        "review_type": metadata["review_type"], "version_label": metadata["version_label"],
+        "status": metadata["status"], "visibility": metadata["visibility"],
+        "project_gids": metadata["project_gids"], "primary_project_gid": metadata["primary_project_gid"],
+    }, "additionalProperties": False}
     mutation_output = {
         "type": "object", "required": ["entity_gid", "row_version", "patch"],
         "properties": {"entity_gid": gid, "row_version": {"type": "integer", "minimum": 2},
-                       "patch": {"type": "object"}}, "additionalProperties": False,
+                       "patch": patch_schema}, "additionalProperties": False,
     }
     return (
         (CapabilitySpec(id="simulation.environment.workspace.create", version=1,
-                        description="Create a private versioned simulation workspace.", risk="write",
+                        description="Create a versioned private or shared simulation workspace.", risk="write",
                         confirmation="none", input_schema={"type": "object", "required": ["name"],
-                        "properties": {"name": {"type": "string", "minLength": 1, "maxLength": 255}},
+                        "properties": metadata,
                         "additionalProperties": False}, output_schema=workspace, **common), selected.create),
         (CapabilitySpec(id="simulation.environment.workspace.search", version=1,
                         description="Search the current user's private simulation workspaces.",
@@ -231,6 +286,12 @@ def candidate_specs(provider: WorkspaceProvider | None = None) -> tuple[tuple[Ca
                         input_schema={"type": "object", "required": ["workspace_gid"],
                                       "properties": {"workspace_gid": gid}, "additionalProperties": False},
                         output_schema=workspace, **common), selected.get),
+        (CapabilitySpec(id="simulation.environment.workspace.update", version=1,
+                        description="Update metadata of one owner-controlled simulation workspace.", risk="write",
+                        confirmation="none", idempotent=True, input_schema={"type": "object",
+                        "required": ["workspace_gid", "expected_row_version", "idempotency_key", *metadata.keys()],
+                        "properties": {**cas, **metadata}, "additionalProperties": False},
+                        output_schema=mutation_output, **common), selected.update),
         (CapabilitySpec(id="simulation.environment.structure_node.create", version=1,
                         description="Create one node in a private simulation workspace.", risk="write",
                         confirmation="none", idempotent=True, input_schema={"type": "object",
