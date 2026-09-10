@@ -54,6 +54,10 @@ class PlmxmlInstance:
     transform_raw: tuple[str, ...]
     normalized_transform: tuple[str, ...]
     representation_locations: tuple[str, ...]
+    pdm_occurrence_uid: str = ""
+    absolute_occurrence_uid: str = ""
+    clone_stable_chain: tuple[str, ...] = ()
+    occurrence_path: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -86,6 +90,38 @@ _REF_ATTRIBUTES = {
     "rootRefs",
 }
 _XINCLUDE_NAMESPACE = "http://www.w3.org/2001/XInclude"
+
+
+def _application_payload(label: str, function: str) -> str:
+    prefix = f"#PLMXML(PS_API-doc/{function}('"
+    suffix = "'))"
+    return label[len(prefix):-len(suffix)] if label.startswith(prefix) and label.endswith(suffix) else ""
+
+
+def _current_state_path(label: str) -> tuple[str, ...]:
+    values = tuple(value for value in _application_payload(label, "JT_PROP_NAME").split("\\0") if value)
+    return values[1:] if values and values[0].startswith("CHLD") else values
+
+
+def _clone_stable_chain(label: str) -> tuple[str, ...]:
+    marker = '$$NGID<chain>="__PLM_CLONE_STABLE_INST_UID"'
+    values = _application_payload(label, "NGID").split("\\0")
+    try:
+        start = values.index(marker) + 1
+    except ValueError:
+        return ()
+    result: list[str] = []
+    for value in values[start:]:
+        if value.startswith("$$NGID<"):
+            break
+        if value:
+            result.append(value)
+    return tuple(result)
+
+
+def _item_revision_from_path(value: str) -> tuple[str, str]:
+    match = re.match(r"^([^/]+)/([^;]+);", value)
+    return (match.group(1), match.group(2)) if match else ("", "")
 
 
 def _local_name(name: str) -> tuple[str, str]:
@@ -197,12 +233,19 @@ def parse_plmxml(
             revisions[str(current_revision["id"])] = current_revision
         elif local == "Occurrence":
             current_occurrence = {
+                "id": attrs.get("id", ""),
                 "instance_refs": _refs(attrs.get("instanceRefs", "")),
                 "user_values": {},
+                "application_refs": {},
             }
             occurrences.append(current_occurrence)
-        elif local == "ApplicationRef" and current_instance is not None:
-            current_instance["application_label"] = attrs.get("label", "")
+        elif local == "ApplicationRef":
+            if current_occurrence is not None:
+                refs = current_occurrence["application_refs"]
+                assert isinstance(refs, dict)
+                refs[attrs.get("application", "")] = attrs.get("label", "")
+            elif current_instance is not None:
+                current_instance["application_label"] = attrs.get("label", "")
         elif local == "UserValue":
             target = current_occurrence or current_revision
             if target is not None:
@@ -294,6 +337,7 @@ def parse_plmxml(
 
     occurrence_values: dict[str, str] = {}
     occurrence_paths: dict[str, tuple[str, ...]] = {}
+    occurrence_metadata: dict[str, dict[str, object]] = {}
     for occurrence in occurrences:
         path = occurrence["instance_refs"]
         if not path:
@@ -308,6 +352,7 @@ def parse_plmxml(
         if catia_name:
             occurrence_values[leaf] = catia_name
         occurrence_paths[leaf] = path[:-1]
+        occurrence_metadata[leaf] = occurrence
 
     def parent_path(instance_id: str) -> tuple[str, ...]:
         if instance_id in occurrence_paths:
@@ -333,6 +378,9 @@ def parse_plmxml(
         assert isinstance(transform, tuple)
         representations = revision["representations"]
         assert isinstance(representations, list)
+        occurrence = occurrence_metadata.get(instance_id, {})
+        occurrence_user_values = occurrence.get("user_values", {})
+        assert isinstance(occurrence_user_values, dict)
         projected.append(
             PlmxmlInstance(
                 instance_id=instance_id,
@@ -348,8 +396,74 @@ def parse_plmxml(
                 transform_raw=transform,
                 normalized_transform=tuple(_normalize_number(item) for item in transform),
                 representation_locations=tuple(str(item) for item in representations if item),
+                pdm_occurrence_uid=str(occurrence_user_values.get("__PLM_OCC_PDM_UID", "")),
+                absolute_occurrence_uid=str(occurrence_user_values.get("__PLM_ABSOCC_UID", "")),
             )
         )
+
+    current_state: list[tuple[tuple[str, ...], dict[str, object]]] = []
+    for occurrence in occurrences:
+        refs = occurrence["application_refs"]
+        assert isinstance(refs, dict)
+        path = _current_state_path(str(refs.get("__TC-VIS_APP", "")))
+        if path:
+            current_state.append((path, occurrence))
+
+    if current_state:
+        root_by_bom_line = {item.bom_line: item for item in projected if item.instance_id in _refs(document.get("root_refs", ""))}
+        path_to_instance: dict[tuple[str, ...], str] = {}
+        pdm_uids: set[str] = set()
+        for path, occurrence in sorted(current_state, key=lambda value: (len(value[0]), value[0], str(value[1]["id"]))):
+            if path in path_to_instance:
+                raise PlmxmlStructureError("duplicate_occurrence_path")
+            values = occurrence["user_values"]
+            refs = occurrence["application_refs"]
+            assert isinstance(values, dict) and isinstance(refs, dict)
+            pdm_uid = str(values.get("__PLM_OCC_PDM_UID", ""))
+            if pdm_uid and pdm_uid in pdm_uids:
+                raise PlmxmlStructureError("duplicate_pdm_occurrence_uid")
+            if pdm_uid:
+                pdm_uids.add(pdm_uid)
+
+            root = root_by_bom_line.get(_bom_line(path[0]))
+            if root is None:
+                raise PlmxmlStructureError("unresolved_current_state_root")
+            if len(path) == 1:
+                path_to_instance[path] = root.instance_id
+                continue
+            parent_id = root.instance_id if len(path) == 2 else path_to_instance.get(path[:-1])
+            if parent_id is None:
+                raise PlmxmlStructureError("unresolved_current_state_parent")
+            instance_id = "occ:" + str(occurrence["id"])
+            ancestor_ids = [root.instance_id]
+            for depth_index in range(2, len(path)):
+                ancestor = path_to_instance.get(path[:depth_index])
+                if ancestor is None:
+                    raise PlmxmlStructureError("unresolved_current_state_parent")
+                ancestor_ids.append(ancestor)
+            item_id, revision = _item_revision_from_path(path[-1])
+            projected.append(PlmxmlInstance(
+                instance_id=instance_id,
+                name=path[-1],
+                bom_line=_bom_line(path[-1]),
+                item_id=item_id,
+                revision=revision,
+                part_ref="",
+                parent_instance_id=parent_id,
+                parent_path=tuple(ancestor_ids),
+                application_label=str(refs.get("__TC-VIS_APP", "")),
+                catia_occurrence_name=str(values.get("catiaOccurrenceName", "")),
+                transform_raw=(),
+                normalized_transform=(),
+                representation_locations=(),
+                pdm_occurrence_uid=pdm_uid,
+                absolute_occurrence_uid=str(values.get("__PLM_ABSOCC_UID", "")),
+                clone_stable_chain=_clone_stable_chain(str(refs.get("__TC-VIS_NGID", ""))),
+                occurrence_path=path,
+            ))
+            path_to_instance[path] = instance_id
+            if len(projected) > limits.max_projected_instances:
+                raise PlmxmlLimitError("max_projected_instances")
 
     return PlmxmlProjection(
         schema_version=document.get("schema_version", ""),

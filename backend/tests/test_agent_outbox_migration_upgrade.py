@@ -51,7 +51,7 @@ class UpgradeCursor:
                 "state": "quarantined", "last_error": "legacy_operation_id_ambiguous",
                 "outcome_operation_id": None, "async_operation_id": None,
             })
-        elif normalized.startswith("INSERT INTO ai00_schema_migrations"):
+        elif normalized.startswith("INSERT INTO ai00_agent_schema_migrations"):
             migration_id, name, checksum, artifact_version = params
             self.connection.ledger[migration_id] = {
                 "migration_id": migration_id, "name": name, "checksum": checksum,

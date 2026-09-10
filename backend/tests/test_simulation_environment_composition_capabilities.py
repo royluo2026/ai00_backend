@@ -181,6 +181,11 @@ def test_registration_adds_new_major_one_capabilities_without_changing_legacy_sc
     assert "scope" not in registry.get("simulation.environment.compose", 1).spec.input_schema["properties"]
     assert "scope" in registry.get("simulation.environment.compose", 2).spec.input_schema["properties"]
     assert registry.get("simulation.environment.preflight", 1).descriptor.side_effect_level == "read"
+    draft = registry.get("simulation.environment.bop_vm_binding_draft.preview", 1)
+    assert draft.descriptor.side_effect_level == "read"
+    assert {item.resource_type for item in draft.descriptor.resource_selectors} == {
+        "craft-bop-version", "simulation-document-snapshot",
+    }
     compose = registry.get("simulation.environment.compose", 1).descriptor
     assert {item.resource_type for item in compose.resource_selectors} == {
         "craft-bop-version", "simulation-connector",
@@ -191,6 +196,33 @@ def test_registration_adds_new_major_one_capabilities_without_changing_legacy_sc
     assert retryability["local_execution_outcome_unknown"] is False
     legacy = registry.get("simulation.environment.get", 1)
     assert set(legacy.spec.output_schema["properties"]) == {"environment_id", "name", "status", "source"}
+
+
+def test_binding_draft_preview_uses_pinned_bop_and_confirmed_snapshot_without_mutation():
+    provider, repository = _provider()
+    registry = CapabilityRegistry()
+    register_capabilities(registry, composition_provider=provider)
+    payload = {
+        "execution_plan_ref": _payload()["execution_plan_ref"],
+        "snapshot_request_id": "snapshot-1",
+    }
+    context = CapabilityContext(
+        user_gid="user-1", team_gid="team-1", source="agent",
+        permissions=("simulation.use",),
+    )
+
+    result = asyncio.run(registry.invoke(
+        "simulation.environment.bop_vm_binding_draft.preview", payload, context, version=1,
+    ))
+
+    assert result.data["mode"] == "parts"
+    assert result.data["auto_count"] == 1
+    assert result.data["bindings"][0] == {
+        "bop_node_gid": "op-10", "vm_node_key": "bom-node-10", "role": "operate",
+        "disposition": "auto", "confidence_milli": 970,
+        "match_basis": "product_ref_exact", "conflict_code": "",
+    }
+    assert repository.manifests == {}
 
 
 def test_compose_contract_validates_through_registry_boundary():

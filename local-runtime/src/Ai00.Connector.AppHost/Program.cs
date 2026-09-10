@@ -15,16 +15,22 @@ public static class Program
             if(!OperatingSystem.IsWindows()||!Environment.Is64BitProcess)throw new PlatformNotSupportedException("windows_x64_required");
             var options=AppHostOptions.Parse(args);
             var verified=HostManifest.Verify(options);using var parent=verified.Parent;
-            var root=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"AI00","App","Connector");
+            // A development host must not share its device identity, lease journal or
+            // cache with the installed always-on Connector service. Sharing the
+            // directory lets both processes lease plans for the same connector and
+            // causes intermittent provider_failed / journal access failures.
+            var root=StateRoot(options.Development);
+            var stateSuffix=options.Development?".dev":"";
             using var key=new DeviceSigningKeyStore(root).GetOrCreate();
             var security=new DirectorySecurity();var sid=WindowsIdentity.GetCurrent().User!;
             security.SetAccessRuleProtection(true,false);security.SetOwner(sid);
             security.AddAccessRule(new FileSystemAccessRule(sid,FileSystemRights.FullControl,InheritanceFlags.ContainerInherit|InheritanceFlags.ObjectInherit,PropagationFlags.None,AccessControlType.Allow));
             new DirectoryInfo(root).SetAccessControl(security);
-            using var singleton=new FileStream(Path.Combine(root,"host.lock"),FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);
+            using var singleton=new FileStream(Path.Combine(root,$"host{stateSuffix}.lock"),FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);
             using var sta=new StaDispatcher();
             var com=new BreakawayVisMockupCom(verified.Manifest.VisMockupExecutable,verified.Manifest.VisMockupPublisher);
-            var adapter=new VisMockupAdapter(sta,new AllowedPathPolicy([Path.Combine(root,"artifacts")]),com,Path.Combine(root,"captures"));
+            var adapter=new VisMockupAdapter(sta,new AllowedPathPolicy([Path.Combine(root,"artifacts")]),com,
+                Path.Combine(root,"captures"),Path.Combine(root,$"vismockup-tree-cache{stateSuffix}.db"));
             using var http=new HttpClient(new HttpClientHandler{AllowAutoRedirect=false,UseCookies=false}){Timeout=TimeSpan.FromSeconds(30)};
             var builder=Host.CreateApplicationBuilder(new HostApplicationBuilderSettings{Args=[],DisableDefaults=true});
             builder.Logging.ClearProviders();
@@ -37,7 +43,7 @@ public static class Program
             builder.Services.AddHostedService(s=>s.GetRequiredService<DiagnosticPipeHost>());
             builder.Services.AddSingleton(new RuntimeTransport(http,options.GatewayOrigin));
             builder.Services.AddSingleton(key);builder.Services.AddSingleton(new AppCredentialStore(root,options.GatewayOrigin));
-            builder.Services.AddSingleton(new AppPlanJournal(Path.Combine(root,"execution.v2.journal")));
+            builder.Services.AddSingleton(new AppPlanJournal(Path.Combine(root,$"execution{stateSuffix}.v2.journal")));
             builder.Services.AddSingleton(adapter);builder.Services.AddSingleton(new PostConditionProbes(sta,com));
             builder.Services.AddHostedService<RuntimeSessionWorker>();
             using var host=builder.Build();
@@ -55,6 +61,9 @@ public static class Program
             return 1; // Release builds never emit launch secrets, credentials, signed plans or COM payloads.
         }
     }
+    internal static string StateRoot(bool development)=>Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "AI00","App",development?"Connector-Dev":"Connector");
     private static async Task MonitorParentAsync(System.Diagnostics.Process parent,IHostApplicationLifetime lifetime,CancellationToken ct)
     {
         try{await parent.WaitForExitAsync(ct);lifetime.StopApplication();}catch(OperationCanceledException)when(ct.IsCancellationRequested){}

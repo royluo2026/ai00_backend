@@ -434,6 +434,11 @@ class RuntimeRegisterBody(RuntimeChallengeBody):
     signature: str = Field(pattern=r'^[A-Za-z0-9_-]{86}$')
 
 
+class RuntimeRestartBody(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    runtime_instance_id: str = Field(pattern=IDENTITY_PATTERN)
+
+
 def _transport(call):
     try:
         return {'success': True, 'data': call()}
@@ -504,6 +509,12 @@ def runtime_renew(pins: dict = Depends(_runtime_auth)):
     return _transport(lambda: runtime_session_service.renew(**pins))
 
 
+@router.post('/v2/runtime/restart')
+def runtime_restart(body: RuntimeRestartBody, pins: dict = Depends(_runtime_auth)):
+    from dataclasses import asdict
+    return _transport(lambda: asdict(runtime_session_service.restart(body.runtime_instance_id, **pins)))
+
+
 @router.post('/v2/plans/lease')
 def runtime_lease(body: ConnectorLeaseBody, pins: dict = Depends(_runtime_auth)):
     return _transport(lambda: runtime_session_service.lease(**pins, lease_seconds=body.lease_seconds))
@@ -516,6 +527,10 @@ async def runtime_wake(websocket: WebSocket, pins: dict = Depends(_runtime_pins)
         await websocket.accept()
         async with connector_wake_broker.subscribe(pins['device_id']) as subscription:
             await websocket.send_json({'type': 'ready'})
+            # Close the lease/subscribe race: a plan committed between the
+            # previous empty lease and this subscription cannot miss its wake.
+            if runtime_session_service.has_queued_plan(**pins):
+                await websocket.send_json({'type': 'plan_available'})
             while True:
                 signaled = await subscription.wait(25)
                 runtime_session_service.authenticate(**pins)

@@ -45,7 +45,7 @@ public static class VisMockupTreeFingerprint
     }
 
     public static string DocumentIdentityHash(IVisMockupDocument document) =>
-        Hash(NormalizeSourceIdentity(document.SourceIdentity), document.RootNode.NodeKey);
+        Hash(NormalizeSourceIdentity(document.SourceIdentity));
 
     public static string? ExternalRevisionFingerprint(string sourceIdentity)
     {

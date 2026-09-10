@@ -150,10 +150,11 @@ def _owner_probe(connection: object, target: DatabaseProbeTarget) -> str:
 
 
 def _migration_ledger_probe(connection: object, target: DatabaseProbeTarget) -> None:
+    ledger_table = _quoted(f"ai00_{target.domain_id}_schema_migrations")
     with connection.cursor() as cursor:
         cursor.execute(
             "SELECT migration_id, name, checksum, artifact_version "
-            "FROM ai00_schema_migrations ORDER BY migration_id"
+            f"FROM {ledger_table} ORDER BY migration_id"
         )
         rows = cursor.fetchall()
     actual = []

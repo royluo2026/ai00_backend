@@ -30,8 +30,59 @@ public sealed class VisMockupExportPlmxmlTests : IDisposable
         Assert.False(File.Exists(Path.Combine(_root, "step-1.plmxml")));
     }
 
+    [Fact]
+    public void StructureExportUsesPlmxmlSaveTypeAndRestoresEveryUserOptionOnFailure()
+    {
+        var options = new RecordingSaveOptions
+        {
+            SaveExtendedInPlmxml = 9,
+            CopyParts = 8,
+            RetainReferences = 7,
+            AskEveryTime = 6,
+            SaveInsertedAssemblies = 5,
+            ForceRetainReferences = 4,
+            SaveLateLoadedProperties = 3,
+        };
+
+        Assert.Throws<InvalidOperationException>(() => VisMockupPlmxmlExport.Run(
+            options,
+            hierarchyIndex: 2,
+            export: (saveType, hierarchyIndex) =>
+            {
+                Assert.Equal(2, saveType);
+                Assert.Equal(2, hierarchyIndex);
+                Assert.Equal(0, options.SaveExtendedInPlmxml);
+                Assert.Equal(0, options.CopyParts);
+                Assert.Equal(1, options.RetainReferences);
+                Assert.Equal(0, options.AskEveryTime);
+                Assert.Equal(0, options.SaveInsertedAssemblies);
+                Assert.Equal(1, options.ForceRetainReferences);
+                Assert.Equal(0, options.SaveLateLoadedProperties);
+                throw new InvalidOperationException("export failed");
+            }));
+
+        Assert.Equal(9, options.SaveExtendedInPlmxml);
+        Assert.Equal(8, options.CopyParts);
+        Assert.Equal(7, options.RetainReferences);
+        Assert.Equal(6, options.AskEveryTime);
+        Assert.Equal(5, options.SaveInsertedAssemblies);
+        Assert.Equal(4, options.ForceRetainReferences);
+        Assert.Equal(3, options.SaveLateLoadedProperties);
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_root)) Directory.Delete(_root, true);
+    }
+
+    private sealed class RecordingSaveOptions : IVisMockupPlmxmlSaveOptions
+    {
+        public int SaveExtendedInPlmxml { get; set; }
+        public int CopyParts { get; set; }
+        public int RetainReferences { get; set; }
+        public int AskEveryTime { get; set; }
+        public int SaveInsertedAssemblies { get; set; }
+        public int ForceRetainReferences { get; set; }
+        public int SaveLateLoadedProperties { get; set; }
     }
 }

@@ -54,6 +54,8 @@ DESKTOP_CAPABILITY_BINDINGS = (
     ("simulation.vismockup.model.open.request", 1),
     ("simulation.vismockup.model.close.request", 1),
     ("simulation.vismockup.visibility.change.request", 1),
+    ("simulation.vismockup.node.visibility.change.request", 1),
+    ("simulation.vismockup.node.selection.change.request", 1),
     ("simulation.vismockup.tree.read.request", 1),
     ("simulation.vismockup.command.get", 1),
 )
@@ -86,7 +88,9 @@ DIRECT_VISMOCKUP_OPERATIONS = {
     "open": ("vismockup.model.open@1", "sha256:aabd43bb066794c250f7eeed41def7c147a4da7263e813f192efa59a0cb40e34"),
     "close": ("vismockup.model.close@1", "sha256:a1a27969ab8638c9868b384ccb546aed1ece56219ded7c7ec3bb3d6b19861771"),
     "visibility": ("vismockup.visibility.change@1", "sha256:6ecb8dd2239a2ca881bfc8d40463778f2b80f15f66f1be50a3ceb91a90bff201"),
-    "tree": ("vismockup.tree.read@1", "sha256:25ac87b341ef76d657c627b45bc0c4de129f55b92e01401dd6f2cd8649dd2f16"),
+    "node_visibility": ("vismockup.node.visibility.change@1", "sha256:b93246b1bb189e3f7e488c4ec0528378cbbf97cd2c3fdd547daf0f2007f05f6c"),
+    "node_selection": ("vismockup.node.selection.change@1", "sha256:4ca8699ef27b5de3691dc8e2b6252350e001263e23e805489d16b435b575a539"),
+    "tree": ("vismockup.tree.read@1", "sha256:b3c6a014ac8853a3b6689286ce514b7997bb450f6394253d813308afa8863af0"),
 }
 DIRECT_VISMOCKUP_OPERATION_IDS = frozenset(value[0] for value in DIRECT_VISMOCKUP_OPERATIONS.values())
 DIRECT_VISMOCKUP_CAPABILITIES = {
@@ -95,6 +99,8 @@ DIRECT_VISMOCKUP_CAPABILITIES = {
     "open": "simulation.vismockup.model.open.request",
     "close": "simulation.vismockup.model.close.request",
     "visibility": "simulation.vismockup.visibility.change.request",
+    "node_visibility": "simulation.vismockup.node.visibility.change.request",
+    "node_selection": "simulation.vismockup.node.selection.change.request",
     "tree": "simulation.vismockup.tree.read.request",
 }
 
@@ -175,7 +181,10 @@ class ConnectorControlPlane:
         self.wake_notifier = wake_notifier
         self.plan_signer = plan_signer
 
-    def queue_v2(self, plan, context: CapabilityContext, session_token: str | None = None) -> OperationRef:
+    def queue_v2(
+        self, plan, context: CapabilityContext, session_token: str | None = None,
+        *, runtime_row: dict | None = None,
+    ) -> OperationRef:
         from backend.contracts.connector_execution_plan_v2 import ConnectorExecutionPlanV2
         raw = plan.model_dump(mode='json') if isinstance(plan, ConnectorExecutionPlanV2) else dict(plan)
         if (raw['actor_id'], raw['tenant_id']) != (context.user_gid, context.team_gid):
@@ -183,7 +192,7 @@ class ConnectorControlPlane:
         if self.plan_signer is None:
             raise ConnectorError('connector_plan_signing_key_unavailable')
         try:
-            row = self.repository.runtime_device(raw['device_id'])
+            row = runtime_row or self.repository.runtime_device(raw['device_id'])
             if (row['owner_user_gid'], row['tenant_gid']) != (context.user_gid, context.team_gid):
                 raise ConnectorError('plan_identity_mismatch')
             if row['runtime_type'] != 'electron':
@@ -411,7 +420,7 @@ def _direct_vismockup_plan_v2(
             "depends_on": [],
             "payload": step_payload,
             "payload_hash": digest(step_payload),
-            "timeout_seconds": 120,
+            "timeout_seconds": 600 if action == "tree" else 120,
             "side_effect_classification": classification,
             "post_condition_probe_id": probe_id,
         }],
@@ -451,6 +460,8 @@ _VISMOCKUP_ATOMS = (
     ("simulation.vismockup.tree.get", "Read the active VisMockup product tree.", CapabilityRisk.READ),
     ("simulation.vismockup.selection.highlight", "Highlight VisMockup occurrences.", CapabilityRisk.WRITE),
     ("simulation.vismockup.visibility.change.apply", "Change VisMockup view visibility.", CapabilityRisk.WRITE),
+    ("simulation.vismockup.node.visibility.change.apply", "Change one VisMockup node's visibility.", CapabilityRisk.WRITE),
+    ("simulation.vismockup.node.selection.change.apply", "Change one VisMockup node's selection highlight.", CapabilityRisk.WRITE),
     ("simulation.vismockup.capture.create", "Create a VisMockup-internal screenshot artifact.", CapabilityRisk.WRITE),
 )
 
@@ -502,26 +513,36 @@ def register_connector_runtime_capabilities(
 
     def request_direct(action):
         def handler(payload, context):
-            binding = control_plane.repository.binding_for_user(context.user_gid, context.team_gid)
-            if not binding or not binding.get("connector_id"):
-                raise ConnectorError("connector_binding_not_found")
-            connector_id = binding["connector_id"]
+            runtime = control_plane.repository.bound_runtime_for_user(
+                context.user_gid, context.team_gid,
+            )
+            binding = None
+            if runtime:
+                connector_id = runtime["device_id"]
+            else:
+                binding = control_plane.repository.binding_for_user(
+                    context.user_gid, context.team_gid,
+                )
+                if not binding or not binding.get("connector_id"):
+                    raise ConnectorError("connector_binding_not_found")
+                connector_id = binding["connector_id"]
             plan_payload = (
                 {"artifact_ref": payload["artifact_ref"]} if action == "open"
                 else {"action": payload["action"]} if action == "visibility"
-                else {"max_depth": payload["max_depth"]} if action == "tree"
+                else {"node_key": payload["node_key"], "action": payload["action"]}
+                if action in {"node_visibility", "node_selection"}
+                else {
+                    "max_depth": payload["max_depth"],
+                    "force_refresh": bool(payload.get("force_refresh", False)),
+                } if action == "tree"
                 else {}
             )
-            try:
-                runtime = control_plane.repository.runtime_device(connector_id)
-            except ConnectorRepositoryError:
-                runtime = None
             if runtime and runtime.get("runtime_type") == "electron":
                 plan = _direct_vismockup_plan_v2(
                     action=action, connector_id=connector_id, payload=plan_payload,
                     context=context, now=control_plane.clock(),
                 )
-                operation = control_plane.queue_v2(plan, context)
+                operation = control_plane.queue_v2(plan, context, runtime_row=runtime)
                 evidence_digest = canonical_hash(plan)
             else:
                 plan = _direct_vismockup_plan(
@@ -584,6 +605,8 @@ def register_connector_runtime_capabilities(
         ("simulation.vismockup.model.open.request", "open", "Queue a signed request to open one governed model artifact."),
         ("simulation.vismockup.model.close.request", "close", "Queue a signed request to close all models in the connected VisMockup application."),
         ("simulation.vismockup.visibility.change.request", "visibility", "Queue a signed request to show or hide all nodes in the active VisMockup document."),
+        ("simulation.vismockup.node.visibility.change.request", "node_visibility", "Queue a signed request to change one tree node's visibility in the active VisMockup document."),
+        ("simulation.vismockup.node.selection.change.request", "node_selection", "Queue a signed request to change one tree node's selection highlight in the active VisMockup document."),
         ("simulation.vismockup.tree.read.request", "tree", "Queue a signed bounded read of the active VisMockup product tree."),
     ):
         register(registry, CapabilitySpec(
@@ -591,7 +614,7 @@ def register_connector_runtime_capabilities(
             use_when="The signed-in user requests one direct action on the bound workstation Connector.",
             do_not_use_when="No current user-scoped Connector binding exists.",
             risk=CapabilityRisk.WRITE,
-            confirmation="none" if action in {"attach", "visibility", "tree"} else "user",
+            confirmation="none" if action in {"attach", "visibility", "node_visibility", "node_selection", "tree"} else "user",
             permissions=("simulation.use",),
             input_schema={}, output_schema={}, tags=("simulation", "connector", "vismockup", "workflow"),
         ), request_direct(action))

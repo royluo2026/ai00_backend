@@ -76,8 +76,20 @@ public sealed class VisMockupDocumentLifecycleTests : IDisposable
         var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
         var source = File.ReadAllText(Path.Combine(root, "src", "Ai00.Connector.Adapters.VisMockup", "IVisMockupCom.cs"));
 
-        Assert.Contains("public void CloseAllDocuments() => Value.Documents.CloseAllDocuments();", source);
+        Assert.Contains("var documents = VisMockupDispatch.GetProperty(value, 4);", source);
+        Assert.Contains("VisMockupDispatch.InvokeMethod(documents, 2)", source);
         Assert.DoesNotContain("vismockup-close-method-error", source);
+    }
+
+    [Fact]
+    public void WindowsComAdapterResolvesNodeKeysWithoutWalkingTheWholeTree()
+    {
+        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
+        var source = File.ReadAllText(Path.Combine(root, "src", "Ai00.Connector.Adapters.VisMockup", "IVisMockupCom.cs"));
+
+        Assert.Contains("view.GetNodeFromKey(numericKey, ref found)", source);
+        Assert.Contains("VisMockupDispatch.SetProperty(node, 9, visible)", source);
+        Assert.Contains("VisMockupDispatch.SetProperty(node, 10, selected)", source);
     }
 
     [Fact]
@@ -97,6 +109,30 @@ public sealed class VisMockupDocumentLifecycleTests : IDisposable
         Assert.True(hidden.Ok);
         Assert.True(shown.Ok);
         Assert.Equal([false, true], document.VisibilityChanges);
+    }
+
+    [Fact]
+    public async Task GovernedNodeOperationsUseTheTreeNodeKey()
+    {
+        var document = new FakeDocument("existing-document", "user", FakeNode.FlatTree(3));
+        var application = new FakeApplication("14.2.0", document);
+        using var sta = new StaDispatcher();
+        var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([_directory]),
+            new FakeVisMockupCom { ExistingApplication = application });
+
+        var visible = await adapter.ExecuteAsync(new AdapterOperation(
+            "vismockup.node.visibility.change@1",
+            JsonSerializer.SerializeToElement(new { node_key = "node-1", action = "show" })), default);
+        var selected = await adapter.ExecuteAsync(new AdapterOperation(
+            "vismockup.node.selection.change@1",
+            JsonSerializer.SerializeToElement(new { node_key = "node-1", action = "highlight" })), default);
+
+        Assert.True(visible.Ok);
+        Assert.True(selected.Ok);
+        Assert.Contains("node-1", document.VisibleNodeKeys);
+        Assert.Contains("node-1", document.SelectedNodeKeys);
+        Assert.Contains(adapter.Manifest.Operations, item => item.OperationId == "vismockup.node.visibility.change@1");
+        Assert.Contains(adapter.Manifest.Operations, item => item.OperationId == "vismockup.node.selection.change@1");
     }
 
     public void Dispose()

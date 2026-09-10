@@ -17,7 +17,7 @@ from backend.capability_v2.identity import authenticated_user_identity
 from backend.capability_v2.contracts import ConsumerIdentity, IDENTITY_PATTERN, InvocationEnvelope
 from backend.capability_v2.gateway import get_default_gateway
 from backend.capability_v2.policies import GatewayPolicyError
-from backend.platform_sdk.request_credentials import authenticated_transport_scope
+from backend.platform_sdk.request_credentials import authenticated_transport_scope, authenticated_user_scope
 
 
 class InvokeRequest(BaseModel):
@@ -133,7 +133,8 @@ def _build_router(prefix: str) -> APIRouter:
         trace_id = _correlation_id(request.headers.get("X-Trace-ID"), request_id)
         gateway = get_default_gateway()
         try:
-            issued = await gateway.request_approval(InvocationEnvelope(
+            with authenticated_user_scope(current_user):
+                issued = await gateway.request_approval(InvocationEnvelope(
                 capability_id=capability_id,
                 major_version=body.version,
                 catalog_release=gateway.catalog_release,
@@ -143,7 +144,7 @@ def _build_router(prefix: str) -> APIRouter:
                 expected_resource_version=body.expected_resource_version,
                 request_id=request_id,
                 trace_id=trace_id,
-            ))
+                ))
         except GatewayPolicyError as exc:
             status_code = 409 if exc.code in {"confirmation_not_required"} else 403
             if exc.code in {"catalog_resolution_failed", "invalid_input"}:
@@ -193,7 +194,7 @@ def _build_router(prefix: str) -> APIRouter:
         )
         authorization = request.headers.get('Authorization', '')
         credential = authorization[7:] if authorization.lower().startswith('bearer ') else request.headers.get('X-AI00-Token', '')
-        with authenticated_transport_scope(credential):
+        with authenticated_user_scope(current_user), authenticated_transport_scope(credential):
             result = await gateway.invoke(envelope)
         data = result.data.get('data') if isinstance(result.data,dict) else None
         if result.ok and isinstance(data,dict) and data.get('stream_id') and request.headers.get('Accept') == 'text/event-stream':

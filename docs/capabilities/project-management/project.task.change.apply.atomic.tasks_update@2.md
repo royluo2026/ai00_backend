@@ -435,7 +435,7 @@ Execute Project Management operation tasks.update.
     "arguments": {
       "gid": "example",
       "updates": {
-        "feishu_group_chat_id": "example"
+        "canvas_y": "example"
       }
     }
   }

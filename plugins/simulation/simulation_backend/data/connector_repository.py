@@ -72,9 +72,35 @@ class SimulationConnectorRepository:
         self.projection_table = ('workmanship_sim_connector_runtime_projection_outbox' if self.projection_v2
                                  else 'workmanship_sim_connector_projection_outbox')
 
+    @staticmethod
+    def _repeat_is_intrinsically_safe(plan: ConnectorExecutionPlanV2) -> bool:
+        allowed = {
+            "vismockup.visibility.change@1": {"all_on", "all_off"},
+            "vismockup.node.visibility.change@1": {"show", "hide", "isolate"},
+            "vismockup.node.selection.change@1": {"highlight", "select", "unhighlight", "deselect"},
+        }
+        steps = plan.steps if hasattr(plan, "steps") else plan.get("steps", ())
+        def safe(step):
+            operation_id = step.operation_id if hasattr(step, "operation_id") else step.get("operation_id")
+            payload = step.payload if hasattr(step, "payload") else step.get("payload", {})
+            return operation_id in allowed and str(payload.get("action") or "") in allowed[operation_id]
+        return bool(steps) and all(safe(step) for step in steps)
+
     def runtime_device(self, device_id):
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             return self._locked_runtime(cursor, device_id)
+
+    def bound_runtime_for_user(self, user_gid: str, team_gid: str) -> dict | None:
+        """Resolve the active App runtime in one database round trip."""
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT * FROM workmanship_sim_connector_runtime_devices "
+                "WHERE owner_user_gid=%s AND tenant_gid=%s AND protocol=%s "
+                "AND runtime_type='electron' AND status='active' "
+                "ORDER BY heartbeat_at DESC,updated_at DESC LIMIT 1",
+                (user_gid, team_gid, PROTOCOL_V2),
+            )
+            return cursor.fetchone()
 
     def authenticate_runtime(self, device_id, generation, instance, token, now, runtime_type):
         with get_simulation_conn() as conn, conn.cursor() as cursor:
@@ -189,6 +215,55 @@ class SimulationConnectorRepository:
         )
         return cursor.fetchone() is not None
 
+    @classmethod
+    def _retire_restart_safe_read_plans(cls, cursor, row, now, *, process_restarted=False):
+        """Close expired read-only work that cannot have changed VisMockup."""
+        cursor.execute(
+            "SELECT plan_id,status,lease_until,plan_json FROM workmanship_sim_connector_runtime_plans "
+            "WHERE device_id=%s AND status IN ('leased','executing','outcome_unknown') FOR UPDATE",
+            (row["device_id"],),
+        )
+        for plan in cursor.fetchall():
+            value = json.loads(plan["plan_json"]) if isinstance(plan["plan_json"], str) else plan["plan_json"]
+            steps = value.get("steps", []) if isinstance(value, dict) else []
+            read_only = bool(steps) and all(step.get("side_effect_classification") == "read" for step in steps)
+            lease_expired = process_restarted or plan["status"] == "outcome_unknown" or (
+                plan.get("lease_until") is not None and _utc(plan["lease_until"]) <= _utc(now)
+            )
+            if not (read_only and lease_expired):
+                continue
+            cursor.execute(
+                "UPDATE workmanship_sim_connector_runtime_plans SET status='failed_without_effect',"
+                "reconciliation_state='not_required',updated_at=%s WHERE plan_id=%s "
+                "AND status IN ('leased','executing','outcome_unknown')",
+                (now, plan["plan_id"]),
+            )
+            if cursor.rowcount != 1:
+                raise ConnectorRepositoryError("plan_session_mismatch")
+            cls._runtime_audit(
+                cursor,
+                row,
+                "plan_failed_without_effect",
+                now,
+                plan_id=plan["plan_id"],
+                reason="read_only_plan_abandoned_during_runtime_restart",
+            )
+
+    def restart_runtime_session(self, device_id, runtime_generation, prior_instance, prior_token,
+                                runtime_instance_id, now, expires_at) -> RuntimeSession:
+        """Atomically fence one exited AppHost and install its replacement."""
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            row = self._authenticated_runtime(
+                cursor, device_id, runtime_generation, prior_instance, prior_token, now,
+            )
+            self._retire_restart_safe_read_plans(cursor, row, now, process_restarted=True)
+            if self._has_unresolved_plans(cursor, device_id):
+                raise ConnectorRepositoryError("runtime_plans_unresolved")
+            return self._install_runtime_session(
+                cursor, row, runtime_generation, runtime_instance_id, now, expires_at,
+                event="session_restarted", reason="app_host_process_restarted",
+            )
+
     @staticmethod
     def _runtime_audit(cursor, row, event, now, *, actor_id=None, reason=None, plan_id=None, outcome_hash=None,
                        recovery_instance_id=None, recovery_session_token_hash=None, outcome_json=None):
@@ -255,6 +330,7 @@ class SimulationConnectorRepository:
                 raise ConnectorRepositoryError("runtime_generation_invalid")
             if row["session_expires_at"] and _utc(row["session_expires_at"]) > _utc(now):
                 raise ConnectorRepositoryError("runtime_session_active")
+            self._retire_restart_safe_read_plans(cursor, row, now)
             if self._has_unresolved_plans(cursor, device_id):
                 raise ConnectorRepositoryError("runtime_plans_unresolved")
             if row.get('takeover_instance_id') and row['takeover_instance_id'] != runtime_instance_id:
@@ -418,7 +494,7 @@ class SimulationConnectorRepository:
                 if current["plan_id"] != plan.plan_id or current["plan_hash"] != plan.plan_hash:
                     raise ConnectorRepositoryError("idempotency_conflict")
                 return
-            cursor.execute("SELECT status,plan_json FROM workmanship_sim_connector_runtime_plans WHERE device_id=%s "
+            cursor.execute("SELECT plan_id,status,lease_until,plan_json FROM workmanship_sim_connector_runtime_plans WHERE device_id=%s "
                 "AND status IN ('queued','leased','executing','outcome_unknown','manual_review_required','succeeded') FOR UPDATE",
                 (plan.device_id,))
             # ponytail: scan one device's plans under its writer lock; add indexed
@@ -426,8 +502,34 @@ class SimulationConnectorRepository:
             for previous in cursor.fetchall():
                 prior = json.loads(previous['plan_json']) if isinstance(previous['plan_json'], str) else previous['plan_json']
                 fields = ('tenant_id', 'actor_id', 'capability_id', 'major_version', 'normalized_input_hash')
-                write_plan = any(step.side_effect_classification != 'read' for step in plan.steps)
-                if all(prior[f] == getattr(plan, f) for f in fields) and (previous['status'] != 'succeeded' or write_plan):
+                if all(prior[f] == getattr(plan, f) for f in fields):
+                    write_plan = any(step.side_effect_classification != 'read' for step in plan.steps)
+                    if previous['status'] == 'succeeded':
+                        same_runtime_session = (
+                            prior.get('runtime_generation'), prior.get('runtime_instance_id')
+                        ) == (plan.runtime_generation, plan.runtime_instance_id)
+                        if write_plan and not same_runtime_session and not self._repeat_is_intrinsically_safe(plan):
+                            raise ConnectorRepositoryError('reconciliation_required')
+                        continue
+                    # A read-only plan cannot leave an external side effect. If
+                    # its result was lost, an equivalent retry may safely close
+                    # the uncertain attempt instead of deadlocking the device.
+                    uncertain_read = previous['status'] in ('outcome_unknown', 'manual_review_required')
+                    expired_read_lease = (previous['status'] in ('leased', 'executing')
+                        and previous.get('lease_until') is not None and _utc(previous['lease_until']) <= now)
+                    if ((uncertain_read or expired_read_lease)
+                            and all(step.get('side_effect_classification') == 'read' for step in prior.get('steps', []))):
+                        cursor.execute(
+                            "UPDATE workmanship_sim_connector_runtime_plans SET status='failed_without_effect',"
+                            "reconciliation_state='not_required',updated_at=%s WHERE plan_id=%s "
+                            "AND status IN ('leased','executing','outcome_unknown','manual_review_required')",
+                            (now, previous['plan_id']),
+                        )
+                        if cursor.rowcount != 1:
+                            raise ConnectorRepositoryError('plan_session_mismatch')
+                        self._runtime_audit(cursor, row, 'plan_failed_without_effect', now,
+                            plan_id=previous['plan_id'], reason='read_only_plan_retried_after_uncertain_outcome')
+                        continue
                     raise ConnectorRepositoryError('reconciliation_required')
             cursor.execute(
                 "INSERT INTO workmanship_sim_connector_runtime_plans "
@@ -479,6 +581,19 @@ class SimulationConnectorRepository:
             self._runtime_audit(cursor, row, "plan_leased", now, plan_id=current["plan_id"])
             value = current["plan_json"]
             return {"lease_id": lease_id, "lease_until": lease_until, "plan": json.loads(value) if isinstance(value, str) else value}
+
+    def has_v2_queued_plan(self, device_id, generation, instance, token, now, runtime_type):
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            row = self._authenticated_runtime(cursor, device_id, generation, instance, token, _utc(now))
+            if runtime_type != 'electron' or row['runtime_type'] != runtime_type:
+                raise ConnectorRepositoryError('runtime_type_invalid')
+            cursor.execute(
+                "SELECT 1 FROM workmanship_sim_connector_runtime_plans WHERE device_id=%s "
+                "AND protocol=%s AND runtime_generation=%s AND runtime_instance_id=%s "
+                "AND session_token_hash=%s AND status='queued' AND expires_at>%s LIMIT 1",
+                (device_id, PROTOCOL_V2, generation, instance, row['session_token_hash'], _utc(now)),
+            )
+            return cursor.fetchone() is not None
 
     def acknowledge_v2_outcome(self, device_id, generation, instance, token, outcome, now):
         """Resolve a lost ACK only; recovery credentials can never create an Outcome."""

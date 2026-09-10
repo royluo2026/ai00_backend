@@ -35,6 +35,7 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
     private readonly SemaphoreSlim serial=new(1,1);
     private DateTimeOffset Now=>(clock??(()=>DateTimeOffset.UtcNow))();
     public bool ExecutionQuarantined {get;private set;}
+    public bool RequiresProcessRestart {get;private set;}
     private ExecutionPlanV2 Verify(string json)
     {
         var raw=CanonicalJsonV2.Parse(json);
@@ -82,12 +83,20 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
                     if(!result.Ok)throw new ConnectorException("adapter_effect_unknown");
                     data=result.Data;
                 }
-                catch(Exception)
+                catch(Exception exception)
                 {
-                    var readOnly=step.SideEffectClassification=="read";
-                    status=readOnly?"failed_without_effect":"outcome_unknown";
-                    error=readOnly?"read_invocation_failed":"invocation_outcome_unknown";
-                    if(!readOnly)ExecutionQuarantined=true;
+                    _ = exception;
+#if DEBUG
+                    Console.Error.WriteLine($"[ConnectorHost] adapter operation failed: {exception.GetType().Name}: {exception.Message}");
+#endif
+                    var noEffect=step.SideEffectClassification=="read"||exception is ConnectorNoEffectException;
+                    status=noEffect?"failed_without_effect":"outcome_unknown";
+                    error=exception is ConnectorNoEffectException rejected
+                        ? rejected.Code
+                        : noEffect?"read_invocation_failed":"invocation_outcome_unknown";
+                    if(exception is OperationCanceledException&&timeout.IsCancellationRequested&&!ct.IsCancellationRequested)
+                        RequiresProcessRestart=true;
+                    if(!noEffect)ExecutionQuarantined=true;
                 }
                 results.Add(StepResult(step.StepId,started,status,data,error));
                 journal.Append("step_terminal",plan.PlanId,results[^1].GetRawText());
@@ -102,7 +111,7 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
         var outcomes=new List<OutcomeV2>();
         foreach(var group in journal.Events.GroupBy(e=>e.PlanId))
         {
-            if(group.Any(e=>e.Kind=="acknowledged"||e.Kind=="reconciled"))continue;
+            if(group.Any(e=>e.Kind is "acknowledged" or "reconciled" or "abandoned_without_effect"))continue;
             var saved=group.LastOrDefault(e=>e.Kind=="outcome");
             if(saved!=null){outcomes.Add(OutcomeV2.ParseAndVerify(saved.Data,signingKey.PublicJwk.GetRawText()));continue;}
             var leaseEvent=group.FirstOrDefault(e=>e.Kind=="lease_acquired");

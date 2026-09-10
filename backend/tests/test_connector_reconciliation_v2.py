@@ -345,6 +345,37 @@ def test_unknown_outcome_blocks_equivalent_normalized_input(database):
         service.repository.insert_v2_plan(replacement, session.session_token, NOW)
 
 
+def test_unknown_read_only_outcome_is_safely_terminalized_before_equivalent_retry(database):
+    service, key, session, plan, leased, pins = running(database, probe=False)
+    service.outcome(session.session_token, outcome(plan, leased, key, 'outcome_unknown'), **pins)
+    cloud, _ = signer()
+    replacement = cloud.sign({**plan.model_dump(mode='json'), 'plan_id':'replacement', 'idempotency_key':'new-key'})
+
+    service.repository.insert_v2_plan(replacement, session.session_token, NOW)
+
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute('SELECT plan_id,status FROM workmanship_sim_connector_runtime_plans ORDER BY created_at,plan_id')
+        assert {row['plan_id']: row['status'] for row in cur.fetchall()} == {
+            plan.plan_id: 'failed_without_effect',
+            replacement.plan_id: 'queued',
+        }
+        cur.execute("SELECT reason FROM workmanship_sim_connector_runtime_audit WHERE plan_id=%s AND event_type='plan_failed_without_effect'", (plan.plan_id,))
+        assert cur.fetchone()['reason'] == 'read_only_plan_retried_after_uncertain_outcome'
+
+
+def test_expired_read_only_lease_is_safely_terminalized_before_equivalent_retry(database):
+    service, key, session, plan, leased, pins = running(database, probe=False)
+    later = NOW + timedelta(seconds=121)
+    cloud, _ = signer()
+    replacement = cloud.sign({**plan.model_dump(mode='json'), 'plan_id':'replacement', 'idempotency_key':'new-key'})
+
+    service.repository.insert_v2_plan(replacement, session.session_token, later)
+
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute('SELECT status FROM workmanship_sim_connector_runtime_plans WHERE plan_id=%s', (plan.plan_id,))
+        assert cur.fetchone()['status'] == 'failed_without_effect'
+
+
 def test_recovery_context_binds_original_lease_and_never_returns_mutation(database):
     service, key, session, plan, leased, pins = running(database)
     service.clock = lambda: NOW+timedelta(minutes=6)

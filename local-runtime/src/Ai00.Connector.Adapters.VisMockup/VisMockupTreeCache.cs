@@ -8,7 +8,7 @@ internal sealed record CachedTreeNode(
     string NodeKey, string? ParentNodeKey, int ChildOrder, int Depth,
     string Name, string CatiaOccurrenceName, bool HasMore);
 
-internal sealed record CachedTree(IReadOnlyList<CachedTreeNode> Nodes, int MaxDepth);
+internal sealed record CachedTree(IReadOnlyList<CachedTreeNode> Nodes, int MaxDepth, string CacheState);
 
 internal sealed record VisMockupTreeCachePolicy(
     long HardLimitBytes = 2L * 1024 * 1024 * 1024,
@@ -74,8 +74,6 @@ internal sealed class VisMockupTreeCache
         var sameUnversionedSession = currentExternalRevision is null &&
             storedExternalRevision.Length == 0 &&
             string.Equals(storedDocumentId, document.DocumentId, StringComparison.Ordinal);
-        if (!externallyVerified && !sameUnversionedSession) return null;
-
         using var command = connection.CreateCommand();
         command.CommandText = """
             SELECT external_node_key,parent_external_node_key,child_order,depth,
@@ -95,13 +93,20 @@ internal sealed class VisMockupTreeCache
             reader.GetString(5), reader.GetBoolean(6)));
         reader.Close();
         if (nodes.Count == 0) return null;
+        var crossSessionStableProjection = currentExternalRevision is null &&
+            storedExternalRevision.Length == 0 &&
+            !string.Equals(storedDocumentId, document.DocumentId, StringComparison.Ordinal) &&
+            nodes.All(node => node.NodeKey.StartsWith("pdm:", StringComparison.Ordinal));
+        if (!externallyVerified && !sameUnversionedSession && !crossSessionStableProjection)
+            return null;
 
         using var touch = connection.CreateCommand();
         touch.CommandText = "UPDATE vm_cache_documents SET last_accessed_utc=$now WHERE local_id=$local_id";
         touch.Parameters.AddWithValue("$now", DateTimeOffset.UtcNow.ToString("O"));
         touch.Parameters.AddWithValue("$local_id", localId);
         touch.ExecuteNonQuery();
-        return new(nodes, maxDepth);
+        return new(nodes, maxDepth,
+            crossSessionStableProjection ? "verifying" : "verified");
     }
 
     public void Replace(IVisMockupDocument document, int maxDepth, IReadOnlyList<CachedTreeNode> nodes)
@@ -206,6 +211,72 @@ internal sealed class VisMockupTreeCache
             publish.ExecuteNonQuery();
         }
         transaction.Commit();
+    }
+
+    public void ReplaceProjection(IVisMockupDocument document, VisMockupPlmxmlProjection projection)
+    {
+        if (projection.Nodes.Count == 0 ||
+            !projection.Nodes.Any(node => string.Equals(
+                node.StableOccurrenceKey, projection.RootStableOccurrenceKey, StringComparison.Ordinal)))
+            throw new InvalidDataException("vismockup_cache_projection_invalid");
+        var parents = projection.Nodes
+            .Where(node => node.ParentStableOccurrenceKey is not null)
+            .Select(node => node.ParentStableOccurrenceKey!)
+            .ToHashSet(StringComparer.Ordinal);
+        Replace(document, 64, projection.Nodes.Select(node => new CachedTreeNode(
+            node.StableOccurrenceKey,
+            node.ParentStableOccurrenceKey,
+            node.ChildOrder,
+            node.Depth,
+            node.PrintableName,
+            node.CatiaOccurrenceName,
+            parents.Contains(node.StableOccurrenceKey))).ToArray());
+    }
+
+    public string ResolveSessionNodeKey(IVisMockupDocument document, string stableOccurrenceKey)
+    {
+        if (string.IsNullOrWhiteSpace(stableOccurrenceKey))
+            throw new InvalidDataException("vismockup_cache_node_identity_invalid");
+        using var connection = Open();
+        using var command = connection.CreateCommand();
+        command.CommandText = """
+            WITH RECURSIVE lineage(node_key,parent_key,child_order,depth,printable_name) AS (
+              SELECT n.external_node_key,n.parent_external_node_key,n.child_order,n.depth,n.printable_name
+              FROM vm_cache_nodes n
+              JOIN vm_cache_documents d ON d.local_id=n.document_local_id
+              WHERE d.document_identity_hash=$identity
+                AND n.generation=d.current_generation
+                AND n.external_node_key=$node_key
+              UNION ALL
+              SELECT p.external_node_key,p.parent_external_node_key,p.child_order,p.depth,p.printable_name
+              FROM vm_cache_nodes p
+              JOIN vm_cache_documents d ON d.local_id=p.document_local_id
+              JOIN lineage child ON child.parent_key=p.external_node_key
+              WHERE d.document_identity_hash=$identity
+                AND p.generation=d.current_generation
+            )
+            SELECT node_key,child_order,depth,printable_name FROM lineage ORDER BY depth
+            """;
+        command.Parameters.AddWithValue("$identity", Identity(document));
+        command.Parameters.AddWithValue("$node_key", stableOccurrenceKey);
+        using var reader = command.ExecuteReader();
+        var lineage = new List<(string Key, int ChildOrder, int Depth, string Name)>();
+        while (reader.Read()) lineage.Add((reader.GetString(0), reader.GetInt32(1), reader.GetInt32(2), reader.GetString(3)));
+        if (lineage.Count == 0 || lineage[0].Depth != 0)
+            throw new InvalidDataException("vismockup_cache_node_not_found");
+
+        var current = document.RootNode;
+        for (var index = 1; index < lineage.Count; index++)
+        {
+            var step = lineage[index];
+            var children = current.Children;
+            if (step.ChildOrder < 0 || step.ChildOrder >= children.Count)
+                throw new InvalidDataException("vismockup_session_node_path_changed");
+            current = children[step.ChildOrder];
+            if (!string.Equals(current.PrintableName, step.Name, StringComparison.Ordinal))
+                throw new InvalidDataException("vismockup_session_node_path_changed");
+        }
+        return current.NodeKey;
     }
 
     private bool EnsureCapacity(string protectedIdentity, long incomingBytes)

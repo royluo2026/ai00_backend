@@ -14,10 +14,12 @@ from backend.capability_v2.provider_contracts import (
 from backend.domain_ports.craft import CraftExecutionPlanPort
 from backend.domain_ports.digital_model import ActiveDocumentSnapshotPort
 from backend.domain_ports.knowledge import ResourceModelMappingPort
+from backend.contracts.connector_execution_plan_v1 import canonical_hash
 
 from ..data.environment_repository import EnvironmentManifestRepository, repository
 from ..data.document_snapshot_repository import repository as document_snapshot_repository
 from ..domain.environment_manifest import REQUIRED_CONNECTOR_OPERATIONS, compose_manifest
+from ..domain.bop_vm_binding import build_binding_draft
 from ..application.runtime_ports import (
     craft_execution_port, connector_port, knowledge_mapping_port,
 )
@@ -116,6 +118,41 @@ class EnvironmentCompositionProvider:
             ),),
         )
 
+    async def preview_binding_draft(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+        reference = dict(payload["execution_plan_ref"])
+        execution = dict(await self.craft_port.get_execution_plan(reference, context))
+        source = execution.get("source") or {}
+        expected = (reference["version_gid"], reference["revision"], reference["content_hash"])
+        actual = (source.get("bop_version_gid"), source.get("revision"), execution.get("content_hash"))
+        if actual != expected:
+            raise CapabilityBusinessError(
+                "environment_source_changed", "Craft execution plan no longer matches the pinned reference",
+                details={"expected": expected, "actual": actual},
+            )
+        request_id = str(payload["snapshot_request_id"])
+        snapshot_row = self.snapshot_repository.get_request(request_id, context)
+        if not snapshot_row or snapshot_row.get("status") != "completed" or not snapshot_row.get("snapshot"):
+            raise CapabilityBusinessError(
+                "active_document_snapshot_required", "A confirmed active-document snapshot is required", retryable=True,
+            )
+        snapshot = dict(snapshot_row["snapshot"])
+        draft = build_binding_draft(execution, snapshot)
+        data = {
+            **draft,
+            "source": {
+                "bop_version_gid": str(source["bop_version_gid"]),
+                "revision": int(source["revision"]),
+                "content_hash": str(execution["content_hash"]),
+                "snapshot_request_id": request_id,
+                "snapshot_hash": str(snapshot["snapshot_hash"]),
+            },
+        }
+        return CapabilityOutput(data=data, evidence=(EvidenceRef(
+            kind="simulation.bop_vm_binding_draft",
+            reference=f"simulation://binding-draft/{source['bop_version_gid']}/{request_id}",
+            digest=canonical_hash(data),
+        ),))
+
     def get_manifest(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
         manifest = self.repository.get_manifest(
             str(payload["environment_id"]), int(payload["environment_version"]), context,
@@ -204,6 +241,7 @@ def specs(provider: EnvironmentCompositionProvider = default_provider):
     return (
         (CapabilitySpec(id="simulation.environment.compose", version=1, description="Compose an immutable Connector environment from pinned owning-domain sources.", risk=CapabilityRisk.WRITE, confirmation="user", **{key: value for key, value in common.items() if key != "version"}), provider.compose),
         (CapabilitySpec(id="simulation.environment.compose", version=2, description="Compose an immutable Connector environment from a pinned whole BOP or one exact line scope.", risk=CapabilityRisk.WRITE, confirmation="user", **{key: value for key, value in common.items() if key != "version"}), provider.compose),
+        (CapabilitySpec(id="simulation.environment.bop_vm_binding_draft.preview", description="Preview a deterministic first-pass BOP-to-VM binding draft without mutating either domain.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.preview_binding_draft),
         (CapabilitySpec(id="simulation.environment.manifest.get", description="Read one immutable Connector environment manifest.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.get_manifest),
         (CapabilitySpec(id="simulation.environment.manifest.search", description="Search visible Connector environment manifests.", risk=CapabilityRisk.READ, confirmation="none", **common), provider.search),
         (CapabilitySpec(id="simulation.environment.manifest.archive", description="Archive a Connector environment identity without mutating its manifests.", risk=CapabilityRisk.WRITE, confirmation="user", **common), provider.archive),

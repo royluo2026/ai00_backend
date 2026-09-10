@@ -13,6 +13,8 @@ from backend.capability_v2.domain_migrations import (
 )
 from backend.scripts.run_domain_migrations import main
 from backend.scripts import run_domain_migrations as runner_module
+from backend.db.table_prefix import configure_table_prefix
+from backend.db.versioned_migrations import prepare_resumable_statement
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -172,6 +174,25 @@ class RecordingConnection:
         self.rollbacks += 1
 
 
+class OceanBaseNoNamedLockCursor(RecordingCursor):
+    def execute(self, sql, params=()):
+        if "GET_LOCK" in " ".join(sql.split()):
+            raise RuntimeError(1305, "FUNCTION GET_LOCK does not exist")
+        return super().execute(sql, params)
+
+
+class OceanBaseNoNamedLockConnection(RecordingConnection):
+    def cursor(self):
+        return OceanBaseNoNamedLockCursor(self)
+
+
+class ExistingPrefixedColumnCursor(RecordingCursor):
+    def execute(self, sql, params=()):
+        super().execute(sql, params)
+        if "information_schema.COLUMNS" in " ".join(sql.split()):
+            self._one = (1 if params[0] == "test_workmanship_sim_capture_requests" else 0,)
+
+
 def test_simulation_historical_0004_checksum_upgrades_through_current_chain(simulation_manifest):
     migrations = discover_domain_migrations(ROOT, simulation_manifest)
     old = next(item for item in migrations if item.migration_id == "0004")
@@ -187,7 +208,7 @@ def test_simulation_historical_0004_checksum_upgrades_through_current_chain(simu
 
     applied = apply_domain_migrations(connection, simulation_manifest, migrations)
 
-    assert applied == ("0005", "0006", "0007", "0008", "0009", "0010", "0011", "0012", "0013", "0014", "0015")
+    assert applied == ("0005", "0006", "0007", "0008", "0009", "0010", "0011", "0012", "0013", "0014", "0015", "0016")
 
 
 def test_apply_uses_domain_lock_ledger_and_artifact_version(craft_manifest):
@@ -204,11 +225,11 @@ def test_apply_uses_domain_lock_ledger_and_artifact_version(craft_manifest):
     applied = apply_domain_migrations(connection, craft_manifest, (migration,))
 
     assert applied == ("0001",)
-    assert any("CREATE TABLE IF NOT EXISTS ai00_schema_migrations" in sql for sql, _ in connection.statements)
+    assert any("CREATE TABLE IF NOT EXISTS ai00_craft_schema_migrations" in sql for sql, _ in connection.statements)
     assert any(params == ("ai00:migrations:craft:v1", 30) for sql, params in connection.statements if "GET_LOCK" in sql)
     ledger_insert = next(
         (sql, params) for sql, params in connection.statements
-        if sql.startswith("INSERT INTO ai00_schema_migrations")
+        if sql.startswith("INSERT INTO ai00_craft_schema_migrations")
     )
     assert "artifact_version" in ledger_insert[0]
     assert ledger_insert[1] == (
@@ -218,6 +239,61 @@ def test_apply_uses_domain_lock_ledger_and_artifact_version(craft_manifest):
         craft_manifest.artifact.version,
     )
     assert any("RELEASE_LOCK" in sql for sql, _ in connection.statements)
+
+
+def test_apply_falls_back_when_oceanbase_has_no_named_lock(craft_manifest):
+    migration = DomainMigration(
+        migration_id="0001",
+        name="initial",
+        path=Path("0001_initial.sql"),
+        sql="CREATE TABLE IF NOT EXISTS craft_versions (id VARCHAR(64) PRIMARY KEY)",
+        checksum="a" * 64,
+        artifact_version=craft_manifest.artifact.version,
+    )
+    connection = OceanBaseNoNamedLockConnection()
+
+    assert apply_domain_migrations(connection, craft_manifest, (migration,)) == ("0001",)
+    assert not any("RELEASE_LOCK" in sql for sql, _ in connection.statements)
+
+
+def test_domains_use_distinct_migration_ledgers(craft_manifest, simulation_manifest):
+    migration = lambda manifest: DomainMigration(
+        migration_id="0001",
+        name="initial",
+        path=Path("0001_initial.sql"),
+        sql="CREATE TABLE IF NOT EXISTS owned_table (id VARCHAR(64) PRIMARY KEY)",
+        checksum="a" * 64,
+        artifact_version=manifest.artifact.version,
+    )
+    craft_connection = RecordingConnection()
+    simulation_connection = RecordingConnection()
+
+    apply_domain_migrations(craft_connection, craft_manifest, (migration(craft_manifest),))
+    apply_domain_migrations(
+        simulation_connection, simulation_manifest, (migration(simulation_manifest),)
+    )
+
+    assert any("ai00_craft_schema_migrations" in sql for sql, _ in craft_connection.statements)
+    assert any(
+        "ai00_simulation_schema_migrations" in sql
+        for sql, _ in simulation_connection.statements
+    )
+
+
+def test_resumable_column_probe_honors_active_table_prefix():
+    connection = RecordingConnection()
+    connection.cursor = lambda: ExistingPrefixedColumnCursor(connection)
+    configure_table_prefix("test_")
+    try:
+        prepared = prepare_resumable_statement(
+            connection,
+            "ALTER TABLE workmanship_sim_capture_requests "
+            "ADD COLUMN IF NOT EXISTS plan_json JSON NULL",
+        )
+    finally:
+        configure_table_prefix("")
+
+    assert prepared is None
 
 
 def test_marked_foreign_key_drop_is_replay_safe_when_constraint_is_absent(craft_manifest):
@@ -346,4 +422,4 @@ def test_apply_configures_selected_table_prefix(monkeypatch, capsys):
 
     assert result == 0
     assert prefixes == ["test_"]
-    assert "domain=simulation migrations=15 applied=0" in capsys.readouterr().out
+    assert "domain=simulation migrations=16 applied=0" in capsys.readouterr().out

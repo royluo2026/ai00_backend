@@ -172,7 +172,7 @@ def build_document_snapshot_plan(
     operation_id = "vismockup.document.snapshot@1"
     step = _step(
         REQUIRED_CONNECTOR_OPERATIONS, 1, operation_id,
-        {"max_nodes": 10_000, "max_depth": 64}, (),
+        {"max_nodes": 250_000, "max_depth": 64}, (),
     )
     raw = {
         "protocol": "ai00.connector.execution-plan.v1",

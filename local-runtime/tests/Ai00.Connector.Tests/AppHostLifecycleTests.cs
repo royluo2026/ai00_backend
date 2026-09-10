@@ -4,6 +4,21 @@ using Xunit;
 namespace Ai00.Connector.Tests;
 public sealed class AppHostLifecycleTests
 {
+    [Fact] public void RuntimeRequestsTheLargestServerSupportedPlanLease()
+    {
+        Assert.Equal(300, RuntimeSessionWorker.PlanLeaseSeconds);
+    }
+
+    [Theory]
+    [InlineData("http://127.0.0.1:8080/", "ws://127.0.0.1:8080/api/v1/simulation/connectors/v2/plans/wake")]
+    [InlineData("https://ai00.example.com/base/", "wss://ai00.example.com/base/api/v1/simulation/connectors/v2/plans/wake")]
+    public void V2WakeEndpointPreservesTheGatewayTransportSecurity(string gateway, string expected)
+    {
+        var transport = new RuntimeTransport(new HttpClient(), new Uri(gateway));
+
+        Assert.Equal(expected, transport.WakeEndpoint().AbsoluteUri);
+    }
+
     [Theory]
     [InlineData("top_duplicate")] [InlineData("key_duplicate")] [InlineData("key_unknown")]
     [InlineData("jwk_duplicate")] [InlineData("jwk_unknown")] [InlineData("map_duplicate")]
@@ -59,6 +74,29 @@ public sealed class AppHostLifecycleTests
         }
         finally{Directory.Delete(root,true);}
     }
+    [Fact] public async Task FailedWithoutEffectRecoveryConflictDoesNotBlockLaterPlans()
+    {
+        var root=Path.Combine(Path.GetTempPath(),"ai00-read-recovery-test-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
+        try
+        {
+            using var key=new Ai00.Connector.Contracts.V2.DeviceSigningKeyStore(root).GetOrCreate();
+            var journal=new AppPlanJournal(Path.Combine(root,"journal"));
+            var plan=ProtocolV2VectorTests.Vector["plan"]!.DeepClone().AsObject();
+            plan["steps"]![0]!["side_effect_classification"]="read";plan["steps"]![0]!["post_condition_probe_id"]=null;
+            using var cloud=ProtocolV2VectorTests.TestKey("plan");ProtocolV2VectorTests.SignPlan(plan,cloud);
+            var adapter=new OutcomeUnknownRecoveryTests.FakeAdapter(()=>Task.FromResult(new Ai00.Connector.Contracts.AdapterResult(false)));
+            var worker=new PlanExecutionWorker(journal,adapter,key,"device-key-001",new Dictionary<string,TrustedPlanKey>{{"cloud-plan-key-2026-09",new(ProtocolV2VectorTests.Vector["plan_public_jwk"]!.ToJsonString(),DateTimeOffset.Parse("2026-09-06T00:00:00Z"),DateTimeOffset.Parse("2026-09-08T00:00:00Z"),false)}},()=>DateTimeOffset.Parse("2026-09-07T01:03:00Z"));
+            var outcome=await worker.ExecuteAsync(OutcomeUnknownRecoveryTests.Lease() with{PlanJson=plan.ToJsonString()},OutcomeUnknownRecoveryTests.Session(),CancellationToken.None);
+            using var http=new HttpClient(new InspectRequest(_=>new HttpResponseMessage(System.Net.HttpStatusCode.Conflict){Content=new StringContent("{\"detail\":{\"code\":\"outcome_acknowledgement_conflict\"}}")}));
+
+            await new OutcomeDelivery(new RuntimeTransport(http,new Uri("https://gateway.example.com")),journal,()=>DateTimeOffset.Parse("2026-09-08T01:03:00Z")).DeliverAsync(
+                outcome,OutcomeUnknownRecoveryTests.Session(),_=>Task.FromResult(OutcomeUnknownRecoveryTests.Session() with{InstanceId="recovery",Token="recovery",ExpiresAt=DateTimeOffset.Parse("2026-09-09T01:03:00Z")}),CancellationToken.None);
+
+            Assert.Contains(journal.Events,e=>e.Kind=="abandoned_without_effect");
+            Assert.Empty(worker.Recover());
+        }
+        finally{Directory.Delete(root,true);}
+    }
     [Fact] public void CredentialCiphertextIsCurrentUserAndOriginBound()
     {
         var root=Path.Combine(Path.GetTempPath(),"ai00-credential-test-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
@@ -110,6 +148,19 @@ public sealed class AppHostLifecycleTests
         Assert.ThrowsAny<Exception>(()=>AppHostOptions.Parse([]));
         Assert.ThrowsAny<Exception>(()=>AppHostOptions.Parse(Args.Concat(new[]{"--command","launch"}).ToArray()));
         Assert.ThrowsAny<Exception>(()=>AppHostOptions.Parse(Args.Concat(new[]{"--parent-pid","42"}).ToArray()));
+    }
+    [Fact] public void DevelopmentRuntimeNeverSharesInstalledConnectorIdentityOrJournal()
+    {
+        Assert.EndsWith(Path.Combine("AI00","App","Connector"),Program.StateRoot(false));
+        Assert.EndsWith(Path.Combine("AI00","App","Connector-Dev"),Program.StateRoot(true));
+        Assert.NotEqual(Program.StateRoot(false),Program.StateRoot(true));
+    }
+    [Fact] public void RuntimeHeartbeatIsPeriodicInsteadOfBlockingEveryPlanLease()
+    {
+        var now=DateTimeOffset.Parse("2026-09-10T00:00:00Z");
+        Assert.True(RuntimeSessionWorker.HeartbeatDue(now,DateTimeOffset.MinValue));
+        Assert.False(RuntimeSessionWorker.HeartbeatDue(now,now.AddSeconds(-29)));
+        Assert.True(RuntimeSessionWorker.HeartbeatDue(now,now.AddSeconds(-30)));
     }
     [Theory] [InlineData("http://localhost")] [InlineData("https://gateway.example.com/path")] [InlineData("https://user:pass@gateway.example.com")] [InlineData("https://gateway.example.com?token=x")]
     public void InvalidOriginsAreRejected(string origin){var a=Args;a[^1]=origin;Assert.ThrowsAny<Exception>(()=>AppHostOptions.Parse(a));}

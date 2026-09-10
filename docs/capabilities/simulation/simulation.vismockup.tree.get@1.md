@@ -111,6 +111,13 @@ Read the active VisMockup product tree.
 {
   "additionalProperties": false,
   "properties": {
+    "cache_state": {
+      "enum": [
+        "verified",
+        "verifying"
+      ],
+      "type": "string"
+    },
     "max_depth": {
       "type": "integer"
     },
@@ -152,7 +159,8 @@ Read the active VisMockup product tree.
   },
   "required": [
     "nodes",
-    "max_depth"
+    "max_depth",
+    "cache_state"
   ],
   "type": "object"
 }

@@ -49,8 +49,10 @@ public sealed class FakeApplication(string productVersion, IVisMockupDocument? a
 public sealed class FakeDocument(string documentId, string sourceIdentity, IVisMockupNode rootNode) : IVisMockupDocument
 {
     private readonly HashSet<string> _visible = [];
+    private readonly HashSet<string> _selected = [];
     public string DocumentId { get; } = documentId;
     public string SourceIdentity { get; } = sourceIdentity;
+    public int HierarchyCount => 1;
     public IVisMockupNode RootNode { get; } = rootNode;
     public int CaptureImageCalls { get; private set; }
     public int ExportPlmxmlCalls { get; private set; }
@@ -59,10 +61,17 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
     public CaptureProfile Profile { get; private set; } = new("png", 1, 1, "current");
     public IReadOnlyCollection<string> AllNodeKeys => Traverse().Select(item => item.NodeKey).ToArray();
     public IReadOnlyCollection<string> VisibleNodeKeys => _visible.ToArray();
+    public IReadOnlyCollection<string> SelectedNodeKeys => _selected.ToArray();
+    public bool IsNodeVisible(string nodeKey) => _visible.Contains(nodeKey);
     public void SetNodeVisible(string nodeKey, bool visible)
     {
         if (!AllNodeKeys.Contains(nodeKey, StringComparer.Ordinal)) throw new InvalidOperationException("node not found");
         if (visible) _visible.Add(nodeKey); else _visible.Remove(nodeKey);
+    }
+    public void SetNodeSelected(string nodeKey, bool selected)
+    {
+        if (!AllNodeKeys.Contains(nodeKey, StringComparer.Ordinal)) throw new InvalidOperationException("node not found");
+        if (selected) _selected.Add(nodeKey); else _selected.Remove(nodeKey);
     }
     public void ApplyCaptureProfile(CaptureProfile profile) => Profile = profile;
     public string AttachModel(string path) => "attached-" + Path.GetFileNameWithoutExtension(path);

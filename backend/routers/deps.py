@@ -186,6 +186,7 @@ async def reject_consumer_identity_overrides(request: Request) -> None:
 
 def get_authenticated_principal(
     x_ai00_token: str = Depends(_request_token),
+    user: dict = Depends(get_current_user),
     _identity_guard=Depends(reject_consumer_identity_overrides),
 ) -> AuthenticatedPrincipal:
     """Build a trusted Web principal without accepting client source or permission headers."""
@@ -193,13 +194,14 @@ def get_authenticated_principal(
         payload = jwt_service.verify(x_ai00_token)
     except pyjwt.InvalidTokenError as exc:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Invalid token: {exc}") from exc
-    try:
-        user = user_service.get_by_gid(payload["sub"])
-    except Exception as exc:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                            detail=f"User lookup failed: {exc}") from exc
-    if not user or not user.get("is_active"):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found or inactive")
+    if not isinstance(user, dict):
+        try:
+            user = user_service.get_by_gid(payload["sub"])
+        except Exception as exc:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                detail=f"User lookup failed: {exc}") from exc
+    if not user or str(user.get("gid")) != str(payload.get("sub")) or not user.get("is_active"):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User identity mismatch")
     authenticated_at = _authentication_time(payload)
     from backend.capability_v2.identity import DesktopConsumerClaim
     from pydantic import ValidationError
@@ -356,7 +358,7 @@ def scope_visible_clause(current_user: dict,
 
 
 
-def build_profile(user: dict) -> dict:
+def build_profile(user: dict, *, load_grants: bool = True) -> dict:
     """构建前端用的用户 profile（含权限列表 + grants 数组）"""
     role     = user.get("system_role", "external")
     org_role = user.get("org_role") or _derive_org_role(role)
@@ -375,7 +377,7 @@ def build_profile(user: dict) -> dict:
         base_perms.add("system.user.manage")
 
     # 叠加 grants
-    grants = _get_user_grants(user["gid"])
+    grants = _get_user_grants(user["gid"]) if load_grants else []
     grant_perms = set()
     for g in grants:
         grant_perms |= set(_GRANT_PERMISSIONS.get(g["grant_type"], set()))
@@ -437,7 +439,10 @@ def build_capability_authorization_grants(
     """Translate reviewed legacy roles into explicit V2 resource/data grants."""
     from backend.capability_v2.authorization import AuthorizationGrants
 
-    profile = build_profile(user)
+    is_super_admin = (user.get("org_role") or _derive_org_role(
+        user.get("system_role", "external")
+    )) == "super_admin"
+    profile = build_profile(user, load_grants=not is_super_admin)
     if consumer_type == "plugin":
         if identity is None or not identity.consumer.mount_session_id:
             raise PermissionError("plugin mount identity is required")
@@ -471,12 +476,17 @@ def build_capability_authorization_grants(
     # ordinary members must receive the scoped project reference just like
     # project owners.  A lookup failure intentionally yields no project
     # grants (fail closed) rather than trusting a client-supplied project_gid.
-    try:
-        from backend.platform_sdk.project_access import list_user_project_memberships
-        member_projects = list_user_project_memberships(str(user.get("gid") or ""))
-    except Exception:
-        _log.warning("project membership lookup failed; denying project resource scopes", exc_info=True)
+    if profile.get("org_role") == "super_admin":
+        # The wildcard below already grants every project resource. Avoid a
+        # redundant remote membership query on every super-admin invocation.
         member_projects = []
+    else:
+        try:
+            from backend.platform_sdk.project_access import list_user_project_memberships
+            member_projects = list_user_project_memberships(str(user.get("gid") or ""))
+        except Exception:
+            _log.warning("project membership lookup failed; denying project resource scopes", exc_info=True)
+            member_projects = []
     for membership in member_projects:
         scope_gid = str(membership.get("project_gid") or "").strip()
         if scope_gid:

@@ -56,6 +56,33 @@ def _representative_document() -> bytes:
     )
 
 
+def _current_state_document() -> bytes:
+    root = "ROOT/00;1-Root.asm;-1;0:"
+    assembly = "ASSY-1/A;1-Assembly.asm;-1;10:"
+    part = "PART-2/B;1-Part.prt;-1;20:"
+    return _document(
+        '<ProductInstance id="inst-root" name="ROOT/00;1-Root" partRef="#view-root"/>',
+        '<ProductRevisionView id="view-root" name="ROOT/00;1-Root">'
+        '<UserData><UserValue title="__PLM_ITEM_ID" value="ROOT"/>'
+        '<UserValue title="__PLM_REVISION_ID" value="00"/></UserData>'
+        '</ProductRevisionView>',
+        '<Occurrence id="occ-assembly">'
+        f'<ApplicationRef application="__TC-VIS_APP" label="#PLMXML(PS_API-doc/JT_PROP_NAME(&apos;CHLD0000\\0{root}\\0{assembly}\\0\\0&apos;))"/>'
+        '<ApplicationRef application="__TC-VIS_NGID" label="#PLMXML(PS_API-doc/NGID(&apos;$$NGID&lt;chain&gt;=&quot;__PLM_CLONE_STABLE_INST_UID&quot;\\0clone-root\\0clone-assembly\\0$$NGID&lt;chain&gt;=&quot;JT_PROP_NAME&quot;\\0ignored\\0&apos;))"/>'
+        '<UserData><UserValue title="__PLM_OCC_PDM_UID" value="pdm-assembly"/>'
+        '<UserValue title="__PLM_ABSOCC_UID" value="abs-assembly"/>'
+        '<UserValue title="catiaOccurrenceName" value="assembly-occ"/></UserData>'
+        '</Occurrence>',
+        '<Occurrence id="occ-part">'
+        f'<ApplicationRef application="__TC-VIS_APP" label="#PLMXML(PS_API-doc/JT_PROP_NAME(&apos;CHLD0000\\0{root}\\0{assembly}\\0{part}\\0\\0&apos;))"/>'
+        '<ApplicationRef application="__TC-VIS_NGID" label="#PLMXML(PS_API-doc/NGID(&apos;$$NGID&lt;chain&gt;=&quot;__PLM_CLONE_STABLE_INST_UID&quot;\\0clone-root\\0clone-assembly\\0clone-part\\0$$NGID&lt;chain&gt;=&quot;JT_PROP_NAME&quot;\\0ignored\\0&apos;))"/>'
+        '<UserData><UserValue title="__PLM_OCC_PDM_UID" value="pdm-part"/>'
+        '<UserValue title="__PLM_ABSOCC_UID" value="abs-part"/>'
+        '<UserValue title="catiaOccurrenceName" value="part-occ"/></UserData>'
+        '</Occurrence>',
+    )
+
+
 def test_projects_bom_revision_occurrence_path_transform_and_duplicate_instances():
     projection = parse_plmxml(io.BytesIO(_representative_document()))
 
@@ -70,6 +97,24 @@ def test_projects_bom_revision_occurrence_path_transform_and_duplicate_instances
     assert right.catia_occurrence_name == "bolt-right"
     assert left.normalized_transform[-4:] == ("0.0635", "0.311", "0", "1")
     assert left.representation_locations == ("/opaque/W01-89184128_00.jt",)
+
+
+def test_projects_vismockup_current_state_occurrence_paths_and_stable_identity():
+    projection = parse_plmxml(io.BytesIO(_current_state_document()))
+
+    assert len(projection.instances) == 3
+    root, assembly, part = projection.instances
+    assert root.instance_id == "inst-root"
+    assert assembly.parent_instance_id == "inst-root"
+    assert part.parent_instance_id == assembly.instance_id
+    assert part.parent_path == ("inst-root", assembly.instance_id)
+    assert (assembly.item_id, assembly.revision) == ("ASSY-1", "A")
+    assert (part.item_id, part.revision) == ("PART-2", "B")
+    assert part.pdm_occurrence_uid == "pdm-part"
+    assert part.absolute_occurrence_uid == "abs-part"
+    assert part.clone_stable_chain == ("clone-root", "clone-assembly", "clone-part")
+    assert part.occurrence_path[-1] == "PART-2/B;1-Part.prt;-1;20:"
+    assert part.catia_occurrence_name == "part-occ"
 
 
 def test_broken_part_reference_is_structured_error():

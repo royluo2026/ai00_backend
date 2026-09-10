@@ -20,7 +20,7 @@ from .domain_manifest import DomainManifest
 
 
 MIGRATION_FILE_RE = re.compile(r"^(?P<id>\d{4})_(?P<name>[a-z][a-z0-9_]*)\.sql$")
-LEDGER_TABLE = "ai00_schema_migrations"
+LEDGER_TABLE = "ai00_{domain_id}_schema_migrations"
 _HISTORICAL_SIMULATION_0004 = "be3e9cefefa42b1fc196ffdf275d4740d30d8acffff0e80dc0408008e03ada04"
 _QUALIFIED_IDENTIFIER_RE = re.compile(
     r"(?i)(?:`?[a-z_][a-z0-9_]*`?)\s*\.\s*(?:`?[a-z_][a-z0-9_]*`?)"
@@ -151,10 +151,14 @@ def _scalar(row):
     return row[0]
 
 
-def _ensure_ledger(conn) -> None:
+def _ledger_table(manifest: DomainManifest) -> str:
+    return LEDGER_TABLE.format(domain_id=manifest.domain_id)
+
+
+def _ensure_ledger(conn, ledger_table: str) -> None:
     with conn.cursor() as cursor:
         cursor.execute(
-            f"""CREATE TABLE IF NOT EXISTS {LEDGER_TABLE} (
+            f"""CREATE TABLE IF NOT EXISTS {ledger_table} (
                 migration_id CHAR(4) PRIMARY KEY,
                 name VARCHAR(191) NOT NULL,
                 checksum CHAR(64) NOT NULL,
@@ -178,17 +182,24 @@ def apply_domain_migrations(
         _validate_domain_sql(migration.path, migration.sql)
 
     lock_name = f"ai00:migrations:{manifest.domain_id}:v1"
-    with conn.cursor() as cursor:
-        cursor.execute("SELECT GET_LOCK(%s, %s)", (lock_name, 30))
-        if _scalar(cursor.fetchone()) != 1:
-            raise MigrationError(f"could not acquire domain migration lock: {manifest.domain_id}")
+    ledger_table = _ledger_table(manifest)
+    named_lock_acquired = False
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT GET_LOCK(%s, %s)", (lock_name, 30))
+            if _scalar(cursor.fetchone()) != 1:
+                raise MigrationError(f"could not acquire domain migration lock: {manifest.domain_id}")
+            named_lock_acquired = True
+    except Exception as exc:
+        if not (exc.args and exc.args[0] == 1305 and "GET_LOCK" in str(exc)):
+            raise
 
     applied: list[str] = []
     try:
-        _ensure_ledger(conn)
+        _ensure_ledger(conn, ledger_table)
         with conn.cursor() as cursor:
             cursor.execute(
-                f"SELECT migration_id, checksum, artifact_version FROM {LEDGER_TABLE}"
+                f"SELECT migration_id, checksum, artifact_version FROM {ledger_table}"
             )
             rows = cursor.fetchall()
         existing = {
@@ -214,7 +225,7 @@ def apply_domain_migrations(
                     conn.commit()
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        f"""INSERT INTO {LEDGER_TABLE}
+                        f"""INSERT INTO {ledger_table}
                             (migration_id, name, checksum, artifact_version)
                             VALUES (%s, %s, %s, %s)""",
                         (
@@ -235,8 +246,9 @@ def apply_domain_migrations(
                 ) from exc
         return tuple(applied)
     finally:
-        with conn.cursor() as cursor:
-            cursor.execute("SELECT RELEASE_LOCK(%s)", (lock_name,))
+        if named_lock_acquired:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT RELEASE_LOCK(%s)", (lock_name,))
 
 
 __all__ = [

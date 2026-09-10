@@ -8,6 +8,32 @@ namespace Ai00.Connector.Tests;
 
 public sealed class VisMockupSnapshotTests
 {
+    [Fact]
+    public void LeafNodesNeverOpenTheComChildrenCollection()
+    {
+        var calls = 0;
+
+        var children = WindowsVisMockupCom.MaterializeChildren(0, _ =>
+        {
+            calls++;
+            return FakeNode.FlatTree(1);
+        });
+
+        Assert.Empty(children);
+        Assert.Equal(0, calls);
+    }
+
+    [Fact]
+    public void UnreadableComChildSlotsDoNotDiscardReadableSiblings()
+    {
+        var children = WindowsVisMockupCom.MaterializeChildren(3, index =>
+            index == 1
+                ? throw new ConnectorException("vismockup_dispatch_d3_h80020009")
+                : new FakeNode($"node-{index}", $"Node {index}", "", "", []));
+
+        Assert.Equal(["node-0", "node-2"], children.Select(child => child.NodeKey));
+    }
+
     private sealed class CountingNode(
         string nodeKey, IReadOnlyList<IVisMockupNode> children) : IVisMockupNode
     {
@@ -124,7 +150,7 @@ public sealed class VisMockupSnapshotTests
 
         var operation = adapter.Manifest.Operations.Single(item => item.OperationId == "vismockup.tree.read@1");
 
-        Assert.Equal("sha256:25ac87b341ef76d657c627b45bc0c4de129f55b92e01401dd6f2cd8649dd2f16", operation.ContractHash);
+        Assert.Equal("sha256:b3c6a014ac8853a3b6689286ce514b7997bb450f6394253d813308afa8863af0", operation.ContractHash);
     }
 
     [Fact]
@@ -176,6 +202,57 @@ public sealed class VisMockupSnapshotTests
     }
 
     [Fact]
+    public async Task InteractiveTreeRefreshUsesTheLightweightComTreeAndNeverBlocksOnPlmxmlExport()
+    {
+        var directory = NewCacheDirectory("explicit-refresh");
+        try
+        {
+            var leaf = new CountingNode("leaf", []);
+            var root = new CountingNode("root", [leaf]);
+            var document = new FakeDocument("BOM-1", "tc://bom/1", root);
+            var fake = new FakeVisMockupCom
+            {
+                ExistingApplication = new FakeApplication("14.2.0", document),
+            };
+            using var sta = new StaDispatcher();
+            var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([Path.GetTempPath()]), fake,
+                Path.Combine(directory, "captures"));
+
+            await adapter.TreeAsync(3);
+            await adapter.TreeAsync(3);
+            Assert.Equal(0, document.ExportPlmxmlCalls);
+            var readsBeforeRefresh = root.ChildrenReads;
+
+            await adapter.TreeAsync(3, forceRefresh: true);
+
+            Assert.Equal(0, document.ExportPlmxmlCalls);
+            Assert.True(root.ChildrenReads > readsBeforeRefresh);
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
+    public async Task DisplayDepthDoesNotTruncateTheCompleteCachedGeneration()
+    {
+        IVisMockupNode node = new FakeNode("leaf", "Leaf", "", "", []);
+        for (var depth = 8; depth >= 0; depth--)
+            node = new FakeNode($"node-{depth}", $"Node {depth}", "", "", [node]);
+        var fake = new FakeVisMockupCom
+        {
+            ExistingApplication = new FakeApplication(
+                "14.2.0", new FakeDocument("BOM-1", "tc://bom/1", node)),
+        };
+        using var sta = new StaDispatcher();
+        var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([Path.GetTempPath()]), fake);
+
+        var result = await adapter.ExecuteAsync(
+            new AdapterOperation("vismockup.tree.read@1", JsonSerializer.SerializeToElement(new { max_depth = 8 })),
+            default);
+
+        Assert.Equal(9, JsonSerializer.SerializeToElement(result.Data).GetProperty("nodes").GetArrayLength());
+    }
+
+    [Fact]
     public void TreeCacheIncrementallyUpsertsChangedNodesAndRemovesMissingNodes()
     {
         var directory = Path.Combine(Path.GetTempPath(), "ai00-vm-tree-cache-diff-tests", Guid.NewGuid().ToString("N"));
@@ -202,6 +279,98 @@ public sealed class VisMockupSnapshotTests
     }
 
     [Fact]
+    public void CompletePlmxmlProjectionIsCachedOnceAndDisplayDepthOnlyFiltersTheRead()
+    {
+        var directory = NewCacheDirectory("plmxml-projection");
+        try
+        {
+            var root = new FakeNode("session-root", "Root", "", "", [
+                new FakeNode("session-child", "Child", "", "", [
+                    new FakeNode("session-leaf", "Leaf", "", "", []),
+                ]),
+            ]);
+            var document = new FakeDocument("SESSION-1", "tc://bom/W10", root);
+            var cache = new VisMockupTreeCache(Path.Combine(directory, "tree.db"));
+            var projection = new VisMockupPlmxmlProjection("pdm:root", [
+                new("pdm:root", null, 0, 0, "Root", "W10", "A", "root", "", [], ["Root"], ""),
+                new("pdm:child", "pdm:root", 0, 1, "Child", "W10-1", "A", "child", "", [], ["Root", "Child"], ""),
+                new("pdm:leaf", "pdm:child", 0, 2, "Leaf", "W10-2", "A", "leaf", "", [], ["Root", "Child", "Leaf"], ""),
+            ], "sha256:" + new string('a', 64));
+
+            cache.ReplaceProjection(document, projection);
+
+            var shallow = cache.TryRead(document, 1)!;
+            Assert.Equal(["pdm:root", "pdm:child"], shallow.Nodes.Select(node => node.NodeKey));
+            Assert.True(shallow.Nodes.Single(node => node.NodeKey == "pdm:child").HasMore);
+            Assert.Equal("session-leaf", cache.ResolveSessionNodeKey(document, "pdm:leaf"));
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
+    public async Task StableCachedOccurrenceResolvesToTheCurrentSessionNodeForControl()
+    {
+        var directory = NewCacheDirectory("session-node-control");
+        try
+        {
+            var leaf = new FakeNode("session-leaf", "Leaf", "", "", []);
+            var root = new FakeNode("session-root", "Root", "", "", [leaf]);
+            var document = new FakeDocument("SESSION-1", "tc://bom/W10", root);
+            var databasePath = Path.Combine(directory, "tree.db");
+            var cache = new VisMockupTreeCache(databasePath);
+            cache.ReplaceProjection(document, new("pdm:root", [
+                new("pdm:root", null, 0, 0, "Root", "W10", "A", "root", "", [], ["Root"], ""),
+                new("pdm:leaf", "pdm:root", 0, 1, "Leaf", "W10-1", "A", "leaf", "", [], ["Root", "Leaf"], ""),
+            ], "sha256:" + new string('b', 64)));
+            var fake = new FakeVisMockupCom { ExistingApplication = new FakeApplication("14.2.0", document) };
+            using var sta = new StaDispatcher();
+            var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([Path.GetTempPath()]), fake,
+                Path.Combine(directory, "captures"), databasePath);
+
+            await adapter.ChangeNodeSelectionAsync("pdm:leaf", "highlight");
+
+            Assert.Contains("session-leaf", document.SelectedNodeKeys);
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
+    public async Task ActivePlmxmlSourceHydratesStableNodeMappingBeforeControl()
+    {
+        var directory = NewCacheDirectory("source-plmxml-control");
+        var source = Path.Combine(directory, "W10.plmxml");
+        File.WriteAllText(source, """
+            <PLMXML><InstanceGraph rootRefs="root-instance">
+              <ProductInstance id="root-instance" name="Root"/>
+              <ProductInstance id="leaf-instance" name="Leaf"/>
+              <Occurrence instanceRefs="#root-instance"><UserData>
+                <UserValue title="__PLM_OCC_PDM_UID" value="root"/>
+              </UserData></Occurrence>
+              <Occurrence instanceRefs="#root-instance #leaf-instance"><UserData>
+                <UserValue title="__PLM_OCC_PDM_UID" value="leaf"/>
+              </UserData></Occurrence>
+            </InstanceGraph></PLMXML>
+            """);
+        try
+        {
+            var leaf = new FakeNode("session-leaf", "Leaf", "", "", []);
+            var root = new FakeNode("session-root", "Root", "", "", [leaf]);
+            var document = new FakeDocument("SESSION-1", source, root);
+            var fake = new FakeVisMockupCom { ExistingApplication = new FakeApplication("14.2.0", document) };
+            var artifactRoot = Path.Combine(directory, "artifacts");
+            Directory.CreateDirectory(artifactRoot);
+            using var sta = new StaDispatcher();
+            var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([artifactRoot]), fake,
+                Path.Combine(directory, "captures"), Path.Combine(directory, "tree.db"));
+
+            await adapter.ChangeNodeSelectionAsync("pdm:leaf", "highlight");
+
+            Assert.Contains("session-leaf", document.SelectedNodeKeys);
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
     public void TreeCacheSurvivesAVisMockupRestartForTheSameSourceModel()
     {
         var directory = Path.Combine(Path.GetTempPath(), "ai00-vm-tree-cache-reopen-tests", Guid.NewGuid().ToString("N"));
@@ -212,7 +381,7 @@ public sealed class VisMockupSnapshotTests
         {
             var cache = new VisMockupTreeCache(Path.Combine(directory, "tree.db"));
             var firstSession = new FakeDocument("SESSION-1", modelPath, FakeNode.FlatTree(1));
-            cache.Replace(firstSession, 3, [new("root", null, 0, 0, "W10", "", false)]);
+            cache.Replace(firstSession, 3, [new("pdm:root", null, 0, 0, "W10", "", false)]);
 
             var reopened = new FakeDocument("SESSION-2", modelPath, FakeNode.FlatTree(1));
             var value = cache.TryRead(reopened, 3);
@@ -238,6 +407,27 @@ public sealed class VisMockupSnapshotTests
             var reopened = new FakeDocument("SESSION-2", "tc://bom/W10", FakeNode.FlatTree(1));
 
             Assert.Null(cache.TryRead(reopened, 3));
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
+    public void StableProjectionCanBeShownAsVerifyingAcrossVisMockupSessions()
+    {
+        var directory = NewCacheDirectory("stable-reopen");
+        try
+        {
+            var cache = new VisMockupTreeCache(Path.Combine(directory, "tree.db"));
+            cache.Replace(
+                new FakeDocument("SESSION-1", "tc://bom/W10", FakeNode.FlatTree(1)),
+                64,
+                [new("pdm:root", null, 0, 0, "W10", "", false)]);
+
+            var reopened = new FakeDocument("SESSION-2", "tc://bom/W10", FakeNode.FlatTree(1));
+            var value = cache.TryRead(reopened, 3);
+
+            Assert.NotNull(value);
+            Assert.Equal("verifying", value!.CacheState);
         }
         finally { Directory.Delete(directory, true); }
     }

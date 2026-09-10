@@ -176,7 +176,8 @@ def session(database, *, now=NOW, instance="runtime-instance-001"):
     return SimulationConnectorRepository().register_runtime_session(database[1], 7, instance, now, now + timedelta(seconds=60))
 
 
-def queue(database, registered, *, now=NOW, idempotency_key=None, expires_at="2026-09-07T12:10:00Z"):
+def queue(database, registered, *, now=NOW, idempotency_key=None, normalized_input_hash=None,
+          side_effect_classification=None, expires_at="2026-09-07T12:10:00Z"):
     source = json.loads((ROOT / "backend/tests/fixtures/connector_execution_plan_v2.json").read_text())["plan"]
     source.update(device_id=database[1], plan_id="plan-" + uuid.uuid4().hex,
                   runtime_generation=registered.runtime_generation,
@@ -185,6 +186,10 @@ def queue(database, registered, *, now=NOW, idempotency_key=None, expires_at="20
     if idempotency_key is not None:
         source["idempotency_key"] = idempotency_key
         source['normalized_input_hash'] = 'sha256:' + hashlib.sha256(idempotency_key.encode()).hexdigest()
+    if normalized_input_hash is not None:
+        source['normalized_input_hash'] = normalized_input_hash
+    if side_effect_classification is not None:
+        source['steps'][0]['side_effect_classification'] = side_effect_classification
     source['steps'][0]['post_condition_probe_id'] = 'vismockup.application.postcondition@1'
     source["plan_hash"] = compute_plan_hash(source)
     plan = ConnectorExecutionPlanV2.model_validate(source)
@@ -265,10 +270,28 @@ def test_expired_session_replaced_and_stale_token_fenced(database):
         lease(database, old, NOW + timedelta(seconds=61))
 
 
+def test_authenticated_process_restart_rotates_session_and_retires_old_queued_reads(database):
+    old = session(database)
+    queued = queue(database, old, side_effect_classification="read")
+
+    new = SimulationConnectorRepository().restart_runtime_session(
+        database[1], old.runtime_generation, old.runtime_instance_id,
+        old.session_token, "replacement", NOW + timedelta(seconds=1),
+        NOW + timedelta(seconds=61),
+    )
+
+    assert new.runtime_instance_id == "replacement"
+    assert new.session_token != old.session_token
+    assert read(database, "runtime_plans")["status"] == "failed_without_effect"
+    with pytest.raises(ConnectorRepositoryError, match="runtime_session_invalid"):
+        lease(database, old, NOW + timedelta(seconds=1))
+    assert lease(database, new, NOW + timedelta(seconds=1)) is None
+
+
 @pytest.mark.parametrize("status", ["leased", "executing", "outcome_unknown", "manual_review_required"])
-def test_unresolved_plan_blocks_registration_and_takeover(database, status):
+def test_unresolved_write_plan_blocks_registration_and_takeover(database, status):
     registered = session(database)
-    current = queue(database, registered)
+    current = queue(database, registered, side_effect_classification="write")
     lease(database, registered)
     transaction, _ = database
     with transaction() as conn, conn.cursor() as cur:
@@ -278,6 +301,43 @@ def test_unresolved_plan_blocks_registration_and_takeover(database, status):
     with pytest.raises(ConnectorRepositoryError, match="runtime_plans_unresolved"):
         takeover(database, registered, 8)
     assert read(database)["runtime_generation"] == 7
+
+
+@pytest.mark.parametrize("status", ["leased", "executing", "outcome_unknown"])
+def test_expired_read_only_plan_does_not_deadlock_runtime_restart(database, status):
+    registered = session(database)
+    current = queue(database, registered)
+    lease(database, registered)
+    transaction, _ = database
+    with transaction() as conn, conn.cursor() as cur:
+        cur.execute("UPDATE workmanship_sim_connector_runtime_plans SET status=%s WHERE plan_id=%s", (status, current.plan_id))
+
+    replacement = session(database, now=NOW + timedelta(seconds=61), instance="replacement")
+
+    assert replacement.runtime_instance_id == "replacement"
+    assert read(database, "runtime_plans")["status"] == "failed_without_effect"
+    with transaction() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT reason FROM workmanship_sim_connector_runtime_audit "
+            "WHERE plan_id=%s AND event_type='plan_failed_without_effect'",
+            (current.plan_id,),
+        )
+        assert cur.fetchone()["reason"] == "read_only_plan_abandoned_during_runtime_restart"
+
+
+def test_manual_review_read_plan_still_blocks_runtime_restart(database):
+    registered = session(database)
+    current = queue(database, registered)
+    lease(database, registered)
+    transaction, _ = database
+    with transaction() as conn, conn.cursor() as cur:
+        cur.execute(
+            "UPDATE workmanship_sim_connector_runtime_plans SET status='manual_review_required' WHERE plan_id=%s",
+            (current.plan_id,),
+        )
+
+    with pytest.raises(ConnectorRepositoryError, match="runtime_plans_unresolved"):
+        session(database, now=NOW + timedelta(seconds=61), instance="replacement")
 
 
 def takeover(database, registered, new_generation):
@@ -343,6 +403,34 @@ def test_completion_idempotency_conflict_and_reconciliation(database):
     with pytest.raises(ConnectorRepositoryError, match='journal_sequence_invalid'):
         complete(database, registered, success, reconciled=True)
 
+
+def test_completed_write_allows_a_later_intentional_repeat_with_new_idempotency_key(database):
+    registered = session(database)
+    normalized = 'sha256:' + hashlib.sha256(b'all_off').hexdigest()
+    first = queue(database, registered, idempotency_key='hide-1', normalized_input_hash=normalized,
+                  side_effect_classification='write')
+    complete(database, registered, outcome_for(first, lease(database, registered)))
+
+    second = queue(database, registered, idempotency_key='hide-2', normalized_input_hash=normalized,
+                   side_effect_classification='write')
+    assert second.plan_id != first.plan_id
+    assert lease(database, registered)['plan']['plan_id'] == second.plan_id
+
+
+def test_wake_subscription_can_close_the_empty_lease_race_by_checking_the_queue(database):
+    registered = session(database)
+    repository = SimulationConnectorRepository()
+    queue(database, registered, idempotency_key='wake-check')
+
+    assert repository.has_v2_queued_plan(
+        database[1], registered.runtime_generation, registered.runtime_instance_id,
+        registered.session_token, NOW, 'electron',
+    ) is True
+    lease(database, registered)
+    assert repository.has_v2_queued_plan(
+        database[1], registered.runtime_generation, registered.runtime_instance_id,
+        registered.session_token, NOW, 'electron',
+    ) is False
 
 @pytest.mark.parametrize("field,value", [
     ("device_id", "other"), ("runtime_generation", 8), ("runtime_instance_id", "other"),

@@ -142,7 +142,7 @@ Queue one immutable compatible execution plan for the bound AI00 Connector as a 
                     "type": "integer"
                   },
                   "max_nodes": {
-                    "maximum": 10000,
+                    "maximum": 250000,
                     "minimum": 1,
                     "type": "integer"
                   }

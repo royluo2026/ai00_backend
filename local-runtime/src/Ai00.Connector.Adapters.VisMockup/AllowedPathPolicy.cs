@@ -14,6 +14,16 @@ public sealed class AllowedPathPolicy
         return full;
     }
 
+    public string ValidateActivePlmxmlSource(string candidate)
+    {
+        if (!Path.IsPathFullyQualified(candidate)) throw new UnauthorizedAccessException("Active document source is not absolute");
+        var full = Path.GetFullPath(candidate);
+        if (!string.Equals(Path.GetExtension(full), ".plmxml", StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException("Active document source is not PLMXML");
+        if (!File.Exists(full)) throw new FileNotFoundException("Active PLMXML source not found", full);
+        return full;
+    }
+
     public string RequireVerifiedArtifact(string candidate, string expectedSha256)
     {
         var full = ValidateModelPath(candidate);

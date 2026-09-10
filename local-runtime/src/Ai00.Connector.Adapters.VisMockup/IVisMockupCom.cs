@@ -24,10 +24,13 @@ public interface IVisMockupDocument
 {
     string DocumentId { get; }
     string SourceIdentity { get; }
+    int HierarchyCount { get; }
     IVisMockupNode RootNode { get; }
     IReadOnlyCollection<string> AllNodeKeys { get; }
     IReadOnlyCollection<string> VisibleNodeKeys { get; }
+    bool IsNodeVisible(string nodeKey);
     void SetNodeVisible(string nodeKey, bool visible);
+    void SetNodeSelected(string nodeKey, bool selected);
     void SetAllNodesVisible(bool visible);
     void ApplyCaptureProfile(CaptureProfile profile);
     string AttachModel(string path);
@@ -43,6 +46,58 @@ public interface IVisMockupNode
     string OccurrenceId { get; }
     string ModelId { get; }
     IReadOnlyList<IVisMockupNode> Children { get; }
+}
+
+internal interface IVisMockupPlmxmlSaveOptions
+{
+    int SaveExtendedInPlmxml { get; set; }
+    int CopyParts { get; set; }
+    int RetainReferences { get; set; }
+    int AskEveryTime { get; set; }
+    int SaveInsertedAssemblies { get; set; }
+    int ForceRetainReferences { get; set; }
+    int SaveLateLoadedProperties { get; set; }
+}
+
+internal static class VisMockupPlmxmlExport
+{
+    public static void Run(
+        IVisMockupPlmxmlSaveOptions options,
+        int hierarchyIndex,
+        Action<int, int> export)
+    {
+        var original = new[]
+        {
+            options.SaveExtendedInPlmxml,
+            options.CopyParts,
+            options.RetainReferences,
+            options.AskEveryTime,
+            options.SaveInsertedAssemblies,
+            options.ForceRetainReferences,
+            options.SaveLateLoadedProperties,
+        };
+        try
+        {
+            options.SaveExtendedInPlmxml = 0;
+            options.CopyParts = 0;
+            options.RetainReferences = 1;
+            options.AskEveryTime = 0;
+            options.SaveInsertedAssemblies = 0;
+            options.ForceRetainReferences = 1;
+            options.SaveLateLoadedProperties = 0;
+            export(2, hierarchyIndex);
+        }
+        finally
+        {
+            options.SaveExtendedInPlmxml = original[0];
+            options.CopyParts = original[1];
+            options.RetainReferences = original[2];
+            options.AskEveryTime = original[3];
+            options.SaveInsertedAssemblies = original[4];
+            options.ForceRetainReferences = original[5];
+            options.SaveLateLoadedProperties = original[6];
+        }
+    }
 }
 
 public sealed record VisMockupProcessState(bool Running, string ProductVersion);
@@ -80,6 +135,43 @@ internal static class VisMockupDispatch
 
     public static object InvokeMethod(object value, int dispatchId, params object?[]? args)
         => Invoke(value, dispatchId, 1, allowEmptyResult: true, args: args);
+
+    public static void SetProperty(object value, int dispatchId, object? propertyValue)
+    {
+        const int variantBytes = 32;
+        const int dispatchPropertyPut = -3;
+        var argument = Marshal.AllocCoTaskMem(variantBytes);
+        var namedArgument = Marshal.AllocCoTaskMem(sizeof(int));
+        try
+        {
+            for (var index = 0; index < variantBytes; index++) Marshal.WriteByte(argument, index, 0);
+            Marshal.GetNativeVariantForObject(propertyValue, argument);
+            Marshal.WriteInt32(namedArgument, dispatchPropertyPut);
+            var parameters = new DispatchParameters
+            {
+                Arguments = argument,
+                NamedArguments = namedArgument,
+                ArgumentCount = 1,
+                NamedArgumentCount = 1,
+            };
+            var empty = Guid.Empty;
+            var hresult = ((IDispatch)value).Invoke(
+                dispatchId, ref empty, 0x0409, 4, ref parameters,
+                IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
+            Marshal.ThrowExceptionForHR(hresult);
+        }
+        catch (COMException error)
+        {
+            throw new ConnectorException(
+                $"vismockup_dispatch_d{dispatchId}_h{unchecked((uint)error.HResult):x8}");
+        }
+        finally
+        {
+            _ = VariantClear(argument);
+            Marshal.FreeCoTaskMem(argument);
+            Marshal.FreeCoTaskMem(namedArgument);
+        }
+    }
 
     public static uint InvokeUInt32OutParameter(object value, int dispatchId)
     {
@@ -124,15 +216,17 @@ internal static class VisMockupDispatch
         var values = args ?? [];
         const int variantBytes = 32;
         var arguments = values.Length == 0 ? IntPtr.Zero : Marshal.AllocCoTaskMem(variantBytes * values.Length);
-        var result = Marshal.AllocCoTaskMem(variantBytes);
+        var result = allowEmptyResult ? IntPtr.Zero : Marshal.AllocCoTaskMem(variantBytes);
         try
         {
             for (var index = 0; index < values.Length; index++)
             {
                 var target = IntPtr.Add(arguments, variantBytes * index);
+                for (var offset = 0; offset < variantBytes; offset++) Marshal.WriteByte(target, offset, 0);
                 Marshal.GetNativeVariantForObject(values[values.Length - index - 1], target);
             }
-            for (var index = 0; index < variantBytes; index++) Marshal.WriteByte(result, index, 0);
+            if (result != IntPtr.Zero)
+                for (var index = 0; index < variantBytes; index++) Marshal.WriteByte(result, index, 0);
             var parameters = new DispatchParameters
             {
                 Arguments = arguments,
@@ -143,10 +237,9 @@ internal static class VisMockupDispatch
                 dispatchId, ref empty, 0x0409, flags, ref parameters,
                 result, IntPtr.Zero, IntPtr.Zero);
             Marshal.ThrowExceptionForHR(hresult);
-            var managedResult = Marshal.GetObjectForNativeVariant(result);
-            return managedResult ?? (allowEmptyResult
-                ? DBNull.Value
-                : throw new COMException($"VisMockup DISPID {dispatchId} returned null"));
+            if (allowEmptyResult) return DBNull.Value;
+            return Marshal.GetObjectForNativeVariant(result)
+                ?? throw new COMException($"VisMockup DISPID {dispatchId} returned null");
         }
         catch (COMException error)
         {
@@ -155,8 +248,11 @@ internal static class VisMockupDispatch
         }
         finally
         {
-            _ = VariantClear(result);
-            Marshal.FreeCoTaskMem(result);
+            if (result != IntPtr.Zero)
+            {
+                _ = VariantClear(result);
+                Marshal.FreeCoTaskMem(result);
+            }
             if (arguments != IntPtr.Zero)
             {
                 for (var index = 0; index < values.Length; index++)
@@ -171,6 +267,24 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
 {
     private const string ProgId = "VFFrame.Application";
     private IVisMockupApplication? _application;
+
+    internal static IReadOnlyList<IVisMockupNode> MaterializeChildren(
+        int count, Func<int, IVisMockupNode> childAt)
+    {
+        if (count <= 0) return [];
+        var result = new List<IVisMockupNode>(count);
+        for (var index = 0; index < count; index++)
+        {
+            try { result.Add(childAt(index)); }
+            catch (ConnectorException error) when (error.Code == "vismockup_dispatch_d3_h80020009")
+            {
+#if DEBUG
+                Console.Error.WriteLine($"[ConnectorHost] skipped unreadable VisMockup child slot {index}");
+#endif
+            }
+        }
+        return result;
+    }
 
     public VisMockupProcessState InspectProcess()
     {
@@ -266,32 +380,63 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
                 var documents = VisMockupDispatch.GetProperty(value, 4);
                 var count = Convert.ToInt32(VisMockupDispatch.GetProperty(documents, 3));
                 if (count <= 0) return null;
-                var activeDocument = VisMockupDispatch.GetProperty(value, 21);
+                var activeApplication = VisMockupDispatch.GetProperty(value, 21);
+                var activeDocument = VisMockupDispatch.GetProperty(activeApplication, 4);
                 return new DynamicDocument(
                     activeDocument,
-                    VisMockupDispatch.GetProperty(activeDocument, 5));
+                    VisMockupDispatch.GetProperty(activeApplication, 5),
+                    new DynamicPlmxmlSaveOptions(
+                        VisMockupDispatch.GetProperty(activeApplication, 69)));
             }
         }
-        public IVisMockupDocument OpenDocument(string path) =>
-            new DynamicDocument(Value.Documents.Open(path));
-        public void CloseAllDocuments() => Value.Documents.CloseAllDocuments();
+        public IVisMockupDocument OpenDocument(string path)
+        {
+            var previousDocumentId = ActiveDocument?.DocumentId;
+            _ = Value.Documents.Open(path);
+            var expectedPath = Path.GetFullPath(path);
+            var deadline = DateTimeOffset.UtcNow.AddMinutes(2);
+            while (DateTimeOffset.UtcNow < deadline)
+            {
+                var document = ActiveDocument;
+                if (document is not null &&
+                    (!string.Equals(document.DocumentId, previousDocumentId, StringComparison.Ordinal) ||
+                     (Path.IsPathFullyQualified(document.SourceIdentity) &&
+                      string.Equals(Path.GetFullPath(document.SourceIdentity), expectedPath, StringComparison.OrdinalIgnoreCase))))
+                    return document;
+                Thread.Sleep(250);
+            }
+            throw new ConnectorException("vismockup_document_open_timeout");
+        }
+        public void CloseAllDocuments()
+        {
+            var documents = VisMockupDispatch.GetProperty(value, 4);
+            _ = VisMockupDispatch.InvokeMethod(documents, 2);
+        }
     }
 
-    private sealed class DynamicDocument(object value, object? activeView = null) : IVisMockupDocument
+    private sealed class DynamicDocument(
+        object value,
+        object activeView,
+        IVisMockupPlmxmlSaveOptions saveOptions) : IVisMockupDocument
     {
         private dynamic Value => value;
-        private object ActiveView => activeView ?? Value.ActiveView;
-        public string DocumentId => ReadString("FullName", "Name");
-        public string SourceIdentity => ReadString("FullName", "Name");
+        private object ActiveView => activeView;
+        public string DocumentId => Convert.ToString(VisMockupDispatch.GetProperty(value, 6)) ?? "";
+        public string SourceIdentity => Convert.ToString(VisMockupDispatch.GetProperty(value, 11)) ?? "";
+        public int HierarchyCount => Convert.ToInt32(VisMockupDispatch.GetProperty(value, 14));
         public IVisMockupNode RootNode => new DynamicNode(VisMockupDispatch.GetProperty(ActiveView, 11));
         public IReadOnlyCollection<string> AllNodeKeys => Traverse().Select(NodeKey).ToArray();
         public IReadOnlyCollection<string> VisibleNodeKeys => Traverse().Where(IsVisible).Select(NodeKey).ToArray();
+        public bool IsNodeVisible(string nodeKey) => IsVisible(FindNode(nodeKey));
         public void SetNodeVisible(string nodeKey, bool visible)
         {
-            dynamic node = Traverse().SingleOrDefault(item => string.Equals(NodeKey(item), nodeKey, StringComparison.Ordinal))
-                ?? throw new InvalidOperationException("VisMockup node not found");
-            try { node.Visible = visible; }
-            catch { throw new ConnectorException("visibility_control_unsupported"); }
+            var node = FindNode(nodeKey);
+            VisMockupDispatch.SetProperty(node, 9, visible);
+        }
+        public void SetNodeSelected(string nodeKey, bool selected)
+        {
+            var node = FindNode(nodeKey);
+            VisMockupDispatch.SetProperty(node, 10, selected);
         }
         public void SetAllNodesVisible(bool visible)
         {
@@ -312,7 +457,8 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         public void ExportPlmxml(string path, int hierarchyIndex)
         {
             if (hierarchyIndex < 0) throw new ConnectorException("vismockup_hierarchy_index_invalid");
-            _ = VisMockupDispatch.InvokeMethod(value, 13, 0, path, "", hierarchyIndex);
+            VisMockupPlmxmlExport.Run(saveOptions, hierarchyIndex, (saveType, selectedHierarchy) =>
+                Value.ExportEx(saveType, path, "", selectedHierarchy));
         }
         public void Close() => Value.CloseDocument();
         private List<object> Traverse()
@@ -337,15 +483,64 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         }
         private static bool IsVisible(object value)
         {
-            dynamic node = value;
-            try { return Convert.ToBoolean(node.Visible); }
-            catch { throw new ConnectorException("visibility_read_unsupported"); }
+            return Convert.ToBoolean(VisMockupDispatch.GetProperty(value, 9));
         }
-        private string ReadString(string primary, string fallback)
+        private object FindNode(string nodeKey)
         {
-            try { return Convert.ToString(Value.GetType().InvokeMember(primary, System.Reflection.BindingFlags.GetProperty, null, value, null)) ?? ""; }
-            catch { return Convert.ToString(Value.GetType().InvokeMember(fallback, System.Reflection.BindingFlags.GetProperty, null, value, null)) ?? ""; }
+            if (!uint.TryParse(nodeKey, out var numericKey))
+                throw new ConnectorException("vismockup_node_key_invalid");
+            try
+            {
+                dynamic view = ActiveView;
+                object? found = null;
+                view.GetNodeFromKey(numericKey, ref found);
+                return found ?? throw new ConnectorException("vismockup_node_not_found");
+            }
+            catch (ConnectorException) { throw; }
+            catch { throw new ConnectorException("vismockup_node_lookup_unsupported"); }
         }
+    }
+
+    private sealed class DynamicPlmxmlSaveOptions(object value) : IVisMockupPlmxmlSaveOptions
+    {
+        public int SaveExtendedInPlmxml
+        {
+            get => Read(1);
+            set => Write(1, value);
+        }
+        public int CopyParts
+        {
+            get => Read(2);
+            set => Write(2, value);
+        }
+        public int RetainReferences
+        {
+            get => Read(3);
+            set => Write(3, value);
+        }
+        public int AskEveryTime
+        {
+            get => Read(4);
+            set => Write(4, value);
+        }
+        public int SaveInsertedAssemblies
+        {
+            get => Read(6);
+            set => Write(6, value);
+        }
+        public int ForceRetainReferences
+        {
+            get => Read(7);
+            set => Write(7, value);
+        }
+        public int SaveLateLoadedProperties
+        {
+            get => Read(8);
+            set => Write(8, value);
+        }
+
+        private int Read(int dispatchId) => Convert.ToInt32(VisMockupDispatch.GetProperty(value, dispatchId));
+        private void Write(int dispatchId, int option) => VisMockupDispatch.SetProperty(value, dispatchId, option);
     }
 
     private sealed class DynamicNode(object value) : IVisMockupNode
@@ -359,12 +554,17 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         {
             get
             {
-                var count = Convert.ToInt32(VisMockupDispatch.GetProperty(value, 3));
+                int count;
+                try { count = Convert.ToInt32(VisMockupDispatch.GetProperty(value, 3)); }
+                catch (ConnectorException error) when (error.Code == "vismockup_dispatch_d3_h80020009")
+                {
+                    return [];
+                }
+                if (count <= 0) return [];
                 var children = VisMockupDispatch.GetProperty(value, 13);
-                var result = new List<IVisMockupNode>(count);
-                for (var index = 0; index < count; index++)
-                    result.Add(new DynamicNode(VisMockupDispatch.GetProperty(children, 3, index)));
-                return result;
+                var collectionCount = Convert.ToInt32(VisMockupDispatch.GetProperty(children, 2));
+                return MaterializeChildren(collectionCount,
+                    index => new DynamicNode(VisMockupDispatch.GetProperty(children, 3, index)));
             }
         }
     }

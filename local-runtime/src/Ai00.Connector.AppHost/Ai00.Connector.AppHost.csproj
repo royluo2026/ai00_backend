@@ -6,6 +6,7 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="Ai00.Connector.Tests" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
     <ProjectReference Include="..\Ai00.Connector.Contracts.V2\Ai00.Connector.Contracts.V2.csproj" />
     <ProjectReference Include="..\Ai00.Connector.Adapters.VisMockup\Ai00.Connector.Adapters.VisMockup.csproj" />

@@ -28,6 +28,7 @@ def test_pairing_http_surface_is_canonical_simulation_owned():
         "/api/v1/simulation/connectors/v2/runtime/reconciliation/register",
         "/api/v1/simulation/connectors/v2/heartbeat",
         "/api/v1/simulation/connectors/v2/runtime/renew",
+        "/api/v1/simulation/connectors/v2/runtime/restart",
         "/api/v1/simulation/connectors/v2/plans/lease",
         "/api/v1/simulation/connectors/v2/plans/wake",
         "/api/v1/simulation/connectors/v2/plans/{plan_id}/outcome",
@@ -69,3 +70,45 @@ def test_v2_rejects_browser_identity_without_device_session():
         for path in ('heartbeat', 'runtime/renew', 'plans/lease'):
             response = client.post('/api/v1/simulation/connectors/v2/' + path, json={}, headers={'Authorization': 'Bearer web-token'})
             assert response.status_code in (401, 422)
+
+
+def test_runtime_restart_uses_authenticated_old_instance_and_body_new_instance(monkeypatch):
+    from datetime import UTC, datetime
+    from plugins.simulation.simulation_backend.data.connector_repository import RuntimeSession
+
+    calls = []
+
+    class FakeRuntimeSessions:
+        def authenticate(self, **pins):
+            return pins
+
+        def restart(self, new_runtime_instance_id, token, **pins):
+            calls.append((new_runtime_instance_id, token, pins))
+            return RuntimeSession("device-1", 7, new_runtime_instance_id, datetime.now(UTC), "new-token")
+
+    monkeypatch.setattr(simulation_connector, "runtime_session_service", FakeRuntimeSessions())
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+    app = FastAPI()
+    app.include_router(simulation_connector.router)
+    headers = {
+        "X-AI00-Device-ID": "device-1",
+        "X-AI00-Runtime-Generation": "7",
+        "X-AI00-Runtime-Instance-ID": "old-app",
+        "X-AI00-Runtime-Type": "electron",
+        "X-AI00-Runtime-Session": "session-token",
+    }
+    with TestClient(app) as client:
+        response = client.post(
+            "/api/v1/simulation/connectors/v2/runtime/restart",
+            headers=headers,
+            json={"runtime_instance_id": "new-app"},
+        )
+
+    assert response.status_code == 200
+    assert calls == [("new-app", "session-token", {
+        "device_id": "device-1",
+        "generation": 7,
+        "runtime_instance_id": "old-app",
+        "runtime_type": "electron",
+    })]

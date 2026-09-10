@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from backend.governance import DomainRegistry, OwnershipError, load_registry
+from backend.db.table_prefix import rewrite_sql
 
 MIGRATION_RE = re.compile(
     r"^(?P<id>\d{12})_(?P<domain>base|craft|digital_model|project_management|simulation|agent|device|ontology|knowledge)_(?P<name>[a-z0-9_]+)\.sql$"
@@ -336,7 +337,7 @@ def prepare_resumable_statement(conn, statement: str) -> str | None:
             cur.execute(
                 "SELECT COUNT(*) FROM information_schema.COLUMNS "
                 "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s AND COLUMN_NAME=%s",
-                (table, "creator_gid"),
+                (rewrite_sql(table), "creator_gid"),
             )
             creator_exists = int(_scalar(cur.fetchone())) > 0
         if not creator_exists:
@@ -354,7 +355,7 @@ def prepare_resumable_statement(conn, statement: str) -> str | None:
             cur.execute(
                 "SELECT COUNT(*) FROM information_schema.COLUMNS "
                 "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s AND COLUMN_NAME=%s",
-                (table, column),
+                (rewrite_sql(table), column),
             )
             exists = int(_scalar(cur.fetchone())) > 0
         if exists:
@@ -383,7 +384,7 @@ def prepare_resumable_statement(conn, statement: str) -> str | None:
             cur.execute(
                 "SELECT COUNT(*) FROM information_schema.STATISTICS "
                 "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s AND INDEX_NAME=%s",
-                (table, index),
+                (rewrite_sql(table), index),
             )
             exists = int(_scalar(cur.fetchone())) > 0
         if exists:
@@ -402,7 +403,7 @@ def prepare_resumable_statement(conn, statement: str) -> str | None:
             cur.execute(
                 "SELECT IS_NULLABLE, COLUMN_TYPE FROM information_schema.COLUMNS "
                 "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s AND COLUMN_NAME=%s",
-                (table, column),
+                (rewrite_sql(table), column),
             )
             row = cur.fetchone()
         if row is not None:
@@ -434,7 +435,7 @@ def prepare_resumable_statement(conn, statement: str) -> str | None:
                 "SELECT COLUMN_NAME FROM information_schema.STATISTICS "
                 "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s AND INDEX_NAME='PRIMARY' "
                 "ORDER BY SEQ_IN_INDEX",
-                (table,),
+                (rewrite_sql(table),),
             )
             rows = cur.fetchall()
         current = tuple(
@@ -458,7 +459,7 @@ def prepare_resumable_statement(conn, statement: str) -> str | None:
                 "SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS "
                 "WHERE CONSTRAINT_SCHEMA=DATABASE() AND TABLE_NAME=%s "
                 "AND CONSTRAINT_NAME=%s AND CONSTRAINT_TYPE='FOREIGN KEY'",
-                (table, constraint),
+                (rewrite_sql(table), constraint),
             )
             exists = int(_scalar(cur.fetchone())) > 0
         return statement if exists else None

@@ -207,7 +207,25 @@ DOCUMENT_SNAPSHOT_REQUEST = obj({
     "snapshot": {"anyOf": [DOCUMENT_SNAPSHOT, {"type": "null"}]},
     "failure_code": STRING, "operation_ref": OPERATION_REF,
 }, ("snapshot_request_id", "device_id", "plan_id", "status", "snapshot", "failure_code", "operation_ref"))
-
+BOP_VM_BINDING = obj({
+    "bop_node_gid": STRING, "vm_node_key": STRING,
+    "role": {"type": "string", "enum": ["load", "operate"]},
+    "disposition": {"type": "string", "enum": ["auto", "ambiguous", "conflict"]},
+    "confidence_milli": {"type": "integer", "minimum": 0, "maximum": 1000},
+    "match_basis": {"type": "string", "enum": ["product_ref_exact", "vpps_exact"]},
+    "conflict_code": STRING,
+}, ("bop_node_gid", "vm_node_key", "role", "disposition", "confidence_milli", "match_basis", "conflict_code"))
+BOP_VM_BINDING_DRAFT = obj({
+    "mode": {"type": "string", "enum": ["parts", "vpps", "structure_only"]},
+    "bindings": {"type": "array", "items": BOP_VM_BINDING, "maxItems": 10000},
+    "auto_count": NONNEGATIVE_INTEGER, "review_count": NONNEGATIVE_INTEGER,
+    "unmatched_bop_node_gids": {"type": "array", "items": STRING, "maxItems": 10000},
+    "unmatched_vm_node_keys": {"type": "array", "items": STRING, "maxItems": 10000},
+    "source": obj({
+        "bop_version_gid": STRING, "revision": POSITIVE_INTEGER, "content_hash": HASH,
+        "snapshot_request_id": STRING, "snapshot_hash": HASH,
+    }, ("bop_version_gid", "revision", "content_hash", "snapshot_request_id", "snapshot_hash")),
+}, ("mode", "bindings", "auto_count", "review_count", "unmatched_bop_node_gids", "unmatched_vm_node_keys", "source"))
 
 INPUT_SCHEMAS = {
     "simulation.environment.workspace.cache_lease.get": obj({
@@ -238,6 +256,9 @@ INPUT_SCHEMAS = {
         "snapshot_request_id": STRING, "capture_profile": CAPTURE_PROFILE,
         "scope": EXECUTION_SCOPE,
     }, ("name", "device_id", "execution_plan_ref", "snapshot_request_id", "capture_profile")),
+    "simulation.environment.bop_vm_binding_draft.preview": obj({
+        "execution_plan_ref": EXECUTION_PLAN_REF, "snapshot_request_id": STRING,
+    }, ("execution_plan_ref", "snapshot_request_id")),
     "simulation.document_snapshot.request": obj({"device_id": STRING, "request_key": STRING}, ("device_id", "request_key")),
     "simulation.document_snapshot.get": obj({"snapshot_request_id": STRING}, ("snapshot_request_id",)),
     "simulation.document_snapshot.action.get": obj({"snapshot_request_id": STRING}, ("snapshot_request_id",)),
@@ -330,6 +351,7 @@ OUTPUT_SCHEMAS = {
     "simulation.result.compare": obj({"left_result_ref": RESULT_REF, "right_result_ref": RESULT_REF, "same_inputs": {"type": "boolean"}, "changes": {"type": "array", "items": RESULT_CHANGE}}, ("left_result_ref", "right_result_ref", "same_inputs", "changes")),
     "simulation.environment.compose": COMPOSE_OUTPUT,
     ("simulation.environment.compose", 2): COMPOSE_OUTPUT,
+    "simulation.environment.bop_vm_binding_draft.preview": BOP_VM_BINDING_DRAFT,
     "simulation.environment.manifest.get": MANIFEST,
     "simulation.environment.manifest.search": obj({"items": {"type": "array", "items": MANIFEST, "maxItems": 200}, "total": NONNEGATIVE_INTEGER}, ("items", "total")),
     "simulation.environment.manifest.archive": obj({"environment_id": STRING, "status": {"type": "string", "enum": ["archived"]}}, ("environment_id", "status")),

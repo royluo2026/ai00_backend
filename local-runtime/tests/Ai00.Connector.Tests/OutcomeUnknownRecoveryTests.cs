@@ -64,7 +64,7 @@ public sealed class OutcomeUnknownRecoveryTests : IDisposable
         var outcome=await worker.ExecuteAsync(Lease() with{PlanJson=plan.ToJsonString()},Session(),CancellationToken.None);
         Assert.Equal("outcome_unknown",outcome.OverallStatus);Assert.Equal(1,adapter.Calls);Assert.Equal(1,outcome.Steps.GetArrayLength());
     }
-    [Fact] public async Task ReadTimeoutIsFailedWithoutEffectAndDoesNotQuarantineRuntime()
+    [Fact] public async Task ReadTimeoutIsFailedWithoutEffectAndRequiresFreshProcess()
     {
         using var key = new DeviceSigningKeyStore(root).GetOrCreate();
         var plan=ProtocolV2VectorTests.Vector["plan"]!.DeepClone().AsObject();
@@ -78,6 +78,23 @@ public sealed class OutcomeUnknownRecoveryTests : IDisposable
         var outcome=await worker.ExecuteAsync(Lease() with{PlanJson=plan.ToJsonString()},Session(),CancellationToken.None);
 
         Assert.Equal("failed_without_effect",outcome.OverallStatus);
+        Assert.False(worker.ExecutionQuarantined);
+        Assert.True(worker.RequiresProcessRestart);
+    }
+    [Fact] public async Task AdapterRejectionBeforeComIsFailedWithoutEffectForWritePlan()
+    {
+        using var key = new DeviceSigningKeyStore(root).GetOrCreate();
+        var plan=ProtocolV2VectorTests.Vector["plan"]!.DeepClone().AsObject();
+        plan["steps"]![0]!["side_effect_classification"]="write";
+        plan["steps"]![0]!["post_condition_probe_id"]="vismockup.document.snapshot@1";
+        using var cloud=ProtocolV2VectorTests.TestKey("plan");ProtocolV2VectorTests.SignPlan(plan,cloud);
+        var adapter=new FakeAdapter(()=>throw new ConnectorNoEffectException("vismockup_session_node_mapping_stale"));
+        var worker=Worker(new AppPlanJournal(Path.Combine(root,"journal")),adapter,key);
+
+        var outcome=await worker.ExecuteAsync(Lease() with{PlanJson=plan.ToJsonString()},Session(),CancellationToken.None);
+
+        Assert.Equal("failed_without_effect",outcome.OverallStatus);
+        Assert.Equal("vismockup_session_node_mapping_stale",outcome.Steps[0].GetProperty("error_code").GetString());
         Assert.False(worker.ExecutionQuarantined);
     }
     [Fact] public async Task ArtifactOperationsFailBeforeInvocationWhenV2TransportIsUnavailable()

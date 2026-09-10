@@ -170,13 +170,81 @@ def test_direct_app_plan_uses_v2_and_keeps_attach_read_only():
     }]
 
 
+def test_complete_tree_read_gets_a_long_timeout_without_slowing_other_commands():
+    context = CapabilityContext(
+        user_gid="user-001", team_gid="tenant-001", request_id="request-001",
+        catalog_release="rel_1234567890abcdef1234567890abcdef",
+        normalized_input_hash=canonical_hash({"max_depth": 8}),
+        capability_version_gid="cv2_1234567890abcdef12345678",
+        business_definition_hash="sha256:" + "2" * 64,
+    )
+
+    tree = _direct_vismockup_plan_v2(
+        action="tree", connector_id="device-001",
+        payload={"max_depth": 8, "force_refresh": True},
+        context=context, now=NOW,
+    )
+    attach = _direct_vismockup_plan_v2(
+        action="attach", connector_id="device-001", payload={},
+        context=context, now=NOW,
+    )
+
+    assert tree["steps"][0]["timeout_seconds"] == 600
+    assert tree["steps"][0]["payload"] == {"max_depth": 8, "force_refresh": True}
+    assert attach["steps"][0]["timeout_seconds"] == 120
+
+
+def test_direct_node_actions_use_separate_v2_adapter_contracts():
+    context = CapabilityContext(
+        user_gid="user-001", team_gid="tenant-001", request_id="request-001",
+        catalog_release="rel_1234567890abcdef1234567890abcdef",
+        normalized_input_hash=canonical_hash({"node_key": "42", "action": "hide"}),
+        capability_version_gid="cv2_1234567890abcdef12345678",
+        business_definition_hash="sha256:" + "2" * 64,
+    )
+
+    visibility = _direct_vismockup_plan_v2(
+        action="node_visibility", connector_id="device-001",
+        payload={"node_key": "42", "action": "hide"}, context=context, now=NOW,
+    )
+    selection = _direct_vismockup_plan_v2(
+        action="node_selection", connector_id="device-001",
+        payload={"node_key": "42", "action": "highlight"}, context=context, now=NOW,
+    )
+
+    assert visibility["capability_id"] == "simulation.vismockup.node.visibility.change.request"
+    assert visibility["steps"][0]["operation_id"] == "vismockup.node.visibility.change@1"
+    assert visibility["steps"][0]["side_effect_classification"] == "write"
+    assert selection["capability_id"] == "simulation.vismockup.node.selection.change.request"
+    assert selection["steps"][0]["operation_id"] == "vismockup.node.selection.change@1"
+
+
+def test_only_explicit_set_style_vismockup_commands_are_safe_to_repeat():
+    context = CapabilityContext(
+        user_gid="user-001", team_gid="tenant-001", request_id="request-001",
+        catalog_release="rel_1234567890abcdef1234567890abcdef",
+        normalized_input_hash=canonical_hash({"action": "all_off"}),
+        capability_version_gid="cv2_1234567890abcdef12345678",
+        business_definition_hash="sha256:" + "2" * 64,
+    )
+    all_off = _direct_vismockup_plan_v2(
+        action="visibility", connector_id="device-001", payload={"action": "all_off"},
+        context=context, now=NOW,
+    )
+    toggle = _direct_vismockup_plan_v2(
+        action="node_visibility", connector_id="device-001",
+        payload={"node_key": "42", "action": "toggle_visible"}, context=context, now=NOW,
+    )
+
+    from plugins.simulation.simulation_backend.data.connector_repository import SimulationConnectorRepository
+    assert SimulationConnectorRepository._repeat_is_intrinsically_safe(all_off)
+    assert not SimulationConnectorRepository._repeat_is_intrinsically_safe(toggle)
+
+
 def test_direct_app_request_queues_v2_instead_of_fenced_legacy_plan():
     class Repository:
-        def binding_for_user(self, user_id, tenant_id):
-            return {"connector_id": "device-001"}
-
-        def runtime_device(self, device_id):
-            return {"runtime_type": "electron"}
+        def bound_runtime_for_user(self, user_id, tenant_id):
+            return {"device_id": "device-001", "runtime_type": "electron"}
 
     class Control:
         def __init__(self):
@@ -186,8 +254,9 @@ def test_direct_app_request_queues_v2_instead_of_fenced_legacy_plan():
         def clock(self):
             return NOW
 
-        def queue_v2(self, value, context):
+        def queue_v2(self, value, context, *, runtime_row=None):
             self.queued = value
+            self.runtime_row = runtime_row
             return OperationRef(operation_id=value["plan_id"], status=OperationStatus.ACCEPTED)
 
     class Registry:
@@ -205,6 +274,7 @@ def test_direct_app_request_queues_v2_instead_of_fenced_legacy_plan():
     )
 
     assert control.queued["protocol"] == "ai00.connector.execution-plan.v2"
+    assert control.runtime_row == {"device_id": "device-001", "runtime_type": "electron"}
     assert result.data["operation_id"] == control.queued["plan_id"]
 
 
@@ -486,6 +556,8 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
         ("simulation.vismockup.model.open.request", 1),
         ("simulation.vismockup.model.close.request", 1),
         ("simulation.vismockup.visibility.change.request", 1),
+        ("simulation.vismockup.node.visibility.change.request", 1),
+        ("simulation.vismockup.node.selection.change.request", 1),
         ("simulation.vismockup.tree.read.request", 1),
         ("simulation.vismockup.command.get", 1),
         ("simulation.vismockup.status.get", 1),
@@ -494,6 +566,8 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
         ("simulation.vismockup.tree.get", 1),
         ("simulation.vismockup.selection.highlight", 1),
         ("simulation.vismockup.visibility.change.apply", 1),
+        ("simulation.vismockup.node.visibility.change.apply", 1),
+        ("simulation.vismockup.node.selection.change.apply", 1),
         ("simulation.vismockup.capture.create", 1),
     }
     for spec, descriptor in by_id.values():
@@ -517,6 +591,8 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
         "simulation.vismockup.model.open.request",
         "simulation.vismockup.model.close.request",
         "simulation.vismockup.visibility.change.request",
+        "simulation.vismockup.node.visibility.change.request",
+        "simulation.vismockup.node.selection.change.request",
         "simulation.vismockup.tree.read.request",
         "simulation.vismockup.command.get",
     ):
@@ -526,7 +602,12 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
         assert descriptor.operation_policy == ("optional" if spec.risk.value == "write" else "none")
     assert by_id[("simulation.vismockup.application.attach.request", 1)][0].confirmation == "none"
     assert by_id[("simulation.vismockup.visibility.change.request", 1)][0].confirmation == "none"
+    assert by_id[("simulation.vismockup.node.visibility.change.request", 1)][0].confirmation == "none"
+    assert by_id[("simulation.vismockup.node.selection.change.request", 1)][0].confirmation == "none"
     assert by_id[("simulation.vismockup.tree.read.request", 1)][0].confirmation == "none"
+    assert set(by_id[("simulation.vismockup.tree.read.request", 1)][0].input_schema["properties"]) == {
+        "max_depth", "force_refresh",
+    }
     for capability_id, (_spec, descriptor) in by_id.items():
         if capability_id[0].startswith("simulation.vismockup.") and not capability_id[0].endswith(".request") and capability_id[0] != "simulation.vismockup.command.get":
             assert descriptor.exposure.local_runtime

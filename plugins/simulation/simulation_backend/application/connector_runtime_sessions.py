@@ -77,27 +77,34 @@ class RuntimeSessionService:
                 'audit_ref': f'connector-runtime-takeover:{device_id}:{generation + 1}'}
 
     def heartbeat(self, token, **pins):
-        self.authenticate(token, **pins)
+        # The repository authenticates under the same transaction as the write.
         self.repository.heartbeat_runtime(pins['device_id'], pins['generation'], pins['runtime_instance_id'], token, self.clock())
         return {'accepted': True}
 
     def renew(self, token, **pins):
-        self.authenticate(token, **pins)
         now = self.clock()
         return self.repository.renew_runtime(pins['device_id'], pins['generation'], pins['runtime_instance_id'], token, now, now + timedelta(minutes=5))
 
+    def restart(self, new_runtime_instance_id, token, **pins):
+        now = self.clock()
+        return self.repository.restart_runtime_session(
+            pins['device_id'], pins['generation'], pins['runtime_instance_id'], token,
+            new_runtime_instance_id, now, now + timedelta(minutes=5),
+        )
+
     def lease(self, token, *, lease_seconds=60, **pins):
-        self.authenticate(token, **pins)
         return self.repository.lease_v2_plan(pins['device_id'], pins['generation'], pins['runtime_instance_id'], token, self.clock(), lease_seconds)
+
+    def has_queued_plan(self, token, **pins):
+        return self.repository.has_v2_queued_plan(
+            pins['device_id'], pins['generation'], pins['runtime_instance_id'],
+            token, self.clock(), pins['runtime_type'],
+        )
 
     def probe(self, token, *, plan_id, **pins):
         return self.repository.reconciliation_plan(pins['device_id'], pins['generation'], pins['runtime_instance_id'], token, plan_id, self.clock(), pins['runtime_type'])
 
     def outcome(self, token, outcome, *, reconcile=False, **pins):
-        if reconcile:
-            self.authenticate_reconciliation(token, plan_id=outcome.plan_id, **pins)
-        else:
-            self.authenticate(token, **pins)
         # The repository verifies the signature and registered key under the
         # same device lock as journal fencing, outcome, and projection intent.
         method = self.repository.mark_reconciled if reconcile else self.repository.complete_v2_plan
@@ -105,7 +112,6 @@ class RuntimeSessionService:
         return {'accepted': True}
 
     def acknowledge(self, token, outcome, **pins):
-        self.authenticate_reconciliation(token, plan_id=outcome.plan_id, **pins)
         return self.repository.acknowledge_v2_outcome(pins['device_id'], pins['generation'],
             pins['runtime_instance_id'], token, outcome, self.clock())
 

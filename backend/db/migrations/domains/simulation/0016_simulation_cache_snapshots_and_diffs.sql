@@ -4,13 +4,6 @@ ALTER TABLE `workmanship_sim_workspaces`
     NOT NULL DEFAULT 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
     AFTER `row_version`;
 
-UPDATE `workmanship_sim_workspaces`
-SET `cache_revision_hash` = CONCAT(
-  'sha256:',
-  SHA2(CONCAT_WS('|', `gid`, `owner_gid`, `name`, `status`, `row_version`), 256)
-)
-WHERE `cache_revision_hash` = 'sha256:0000000000000000000000000000000000000000000000000000000000000000';
-
 CREATE TABLE IF NOT EXISTS `workmanship_sim_vm_checkpoints` (
   `gid` BIGINT UNSIGNED NOT NULL,
   `snapshot_gid` BIGINT UNSIGNED NOT NULL,

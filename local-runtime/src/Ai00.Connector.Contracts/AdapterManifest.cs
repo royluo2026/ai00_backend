@@ -57,6 +57,15 @@ public sealed class ConnectorException(string code, string? localPath = null) : 
     public string? LocalPath { get; } = localPath;
 }
 
+/// <summary>
+/// The adapter rejected an operation before calling the external application.
+/// This is safe to report as failed_without_effect even for a write plan.
+/// </summary>
+public sealed class ConnectorNoEffectException(string code) : Exception(code)
+{
+    public string Code { get; } = code;
+}
+
 public sealed class AdapterManifestLoader(
     IAdapterSignatureVerifier signatureVerifier,
     IEnumerable<string> administratorAllowlistedDirectories)

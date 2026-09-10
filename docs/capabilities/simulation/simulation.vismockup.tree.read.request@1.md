@@ -70,6 +70,9 @@ Queue a signed bounded read of the active VisMockup product tree.
 {
   "additionalProperties": false,
   "properties": {
+    "force_refresh": {
+      "type": "boolean"
+    },
     "max_depth": {
       "maximum": 8,
       "minimum": 1,

@@ -40,6 +40,17 @@ public sealed class RuntimeTransport(HttpClient http,Uri origin)
         ["X-AI00-Device-ID"]=session.DeviceId,["X-AI00-Runtime-Generation"]=session.Generation.ToString(System.Globalization.CultureInfo.InvariantCulture),
         ["X-AI00-Runtime-Instance-ID"]=session.InstanceId,["X-AI00-Runtime-Type"]="electron",["X-AI00-Runtime-Session"]=session.Token
     };
+    internal Uri WakeEndpoint()
+    {
+        var endpoint = new UriBuilder(Endpoint("plans/wake"));
+        endpoint.Scheme = endpoint.Scheme switch
+        {
+            "http" => "ws",
+            "https" => "wss",
+            _ => throw new InvalidDataException("gateway_scheme_invalid"),
+        };
+        return endpoint.Uri;
+    }
     public async Task WaitForWakeAsync(RuntimeSession session,CancellationToken ct)
     {
         using var timeout=CancellationTokenSource.CreateLinkedTokenSource(ct);timeout.CancelAfter(TimeSpan.FromSeconds(25));
@@ -47,8 +58,7 @@ public sealed class RuntimeTransport(HttpClient http,Uri origin)
         {
             using var socket=new ClientWebSocket();
             foreach(var header in Headers(session))socket.Options.SetRequestHeader(header.Key,header.Value);
-            var endpoint=new UriBuilder(Endpoint("plans/wake")){Scheme="wss"};
-            await socket.ConnectAsync(endpoint.Uri,timeout.Token);
+            await socket.ConnectAsync(WakeEndpoint(),timeout.Token);
             var buffer=new byte[256];
             while(true)
             {
@@ -94,6 +104,11 @@ public sealed class OutcomeDelivery(RuntimeTransport transport,AppPlanJournal jo
             catch(RuntimeTransportException e)when(e.Message=="runtime_session_invalid")
             {
                 if(useRecovery)recovery=null;else original=null;
+            }
+            catch(RuntimeTransportException e)when(useRecovery&&outcome.OverallStatus=="failed_without_effect"&&
+                e.Message is "outcome_acknowledgement_conflict" or "plan_lease_invalid")
+            {
+                journal.Append("abandoned_without_effect",outcome.PlanId,"{}");return;
             }
             catch(RuntimeTransportException e)when(e.Message=="plan_lease_invalid")
             {
@@ -166,6 +181,10 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
     AppCredentialStore credentials,AppPlanJournal journal,VisMockupAdapter adapter,PostConditionProbes probes,
     HostManifest manifest,IHostApplicationLifetime lifetime):BackgroundService
 {
+    internal const int PlanLeaseSeconds=300;
+    internal static bool HeartbeatDue(DateTimeOffset now,DateTimeOffset lastHeartbeat) =>
+        now-lastHeartbeat>=TimeSpan.FromSeconds(30);
+
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
         await diagnostics.Ready.WaitAsync(ct);
@@ -191,8 +210,16 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
                 lifetime.StopApplication();return;
             }
         }
-        var session=savedSession is not null&&savedSession.ExpiresAt>DateTimeOffset.UtcNow ? savedSession : await RegisterAsync(deviceId,tenantId,generation,secret,null,ct);
+        RuntimeSession session;
+        if(savedSession is not null&&savedSession.ExpiresAt>DateTimeOffset.UtcNow)
+        {
+            try{session=await RestartAsync(savedSession,ct);}
+            catch(RuntimeTransportException e)when(e.Message=="runtime_session_invalid")
+            {session=await RegisterAsync(deviceId,tenantId,generation,secret,null,ct);}
+        }
+        else session=await RegisterAsync(deviceId,tenantId,generation,secret,null,ct);
         credentials.SaveSession(session);
+        var lastHeartbeat=DateTimeOffset.MinValue;
         while(!ct.IsCancellationRequested)
         {
             JsonElement leased;
@@ -204,8 +231,13 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
                     session=session with{ExpiresAt=renewed.GetProperty("expires_at").GetDateTimeOffset()};
                     credentials.SaveSession(session);
                 }
-                await transport.SendAsync(HttpMethod.Post,"heartbeat",null,ct,session);
-                leased=await transport.SendAsync(HttpMethod.Post,"plans/lease",new{lease_seconds=120},ct,session);
+                var now=DateTimeOffset.UtcNow;
+                if(HeartbeatDue(now,lastHeartbeat))
+                {
+                    await transport.SendAsync(HttpMethod.Post,"heartbeat",null,ct,session);
+                    lastHeartbeat=DateTimeOffset.UtcNow;
+                }
+                leased=await transport.SendAsync(HttpMethod.Post,"plans/lease",new{lease_seconds=PlanLeaseSeconds},ct,session);
             }
             catch(RuntimeTransportException e)when(e.Transient){await Task.Delay(TimeSpan.FromSeconds(5),ct);continue;}
             catch(HttpRequestException){await Task.Delay(TimeSpan.FromSeconds(5),ct);continue;}
@@ -215,6 +247,12 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
             if(outcome.OverallStatus is "succeeded" or "failed_without_effect")
             {
                 await DeliverNormalAsync(outcome,session,deviceId,tenantId,generation,secret,ct);
+                if(executor.RequiresProcessRestart)
+                {
+                    // A timed-out COM call can keep the process-owned STA blocked
+                    // after the await has ended. Only a fresh process is safe.
+                    lifetime.StopApplication();return;
+                }
                 if(session.ExpiresAt<=DateTimeOffset.UtcNow){lifetime.StopApplication();return;}
                 continue;
             }
@@ -232,6 +270,14 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
     }
     private Task DeliverNormalAsync(OutcomeV2 outcome,RuntimeSession? original,string deviceId,string tenantId,long generation,string secret,CancellationToken ct) =>
         new OutcomeDelivery(transport,journal).DeliverAsync(outcome,original,token=>RegisterAsync(deviceId,tenantId,generation,secret,outcome.PlanId,token),ct);
+    private async Task<RuntimeSession> RestartAsync(RuntimeSession prior,CancellationToken ct)
+    {
+        var instance="app-"+Guid.NewGuid().ToString("N");
+        var result=await transport.SendAsync(HttpMethod.Post,"runtime/restart",new{runtime_instance_id=instance},ct,prior);
+        if(result.GetProperty("device_id").GetString()!=prior.DeviceId||result.GetProperty("runtime_generation").GetInt64()!=prior.Generation||result.GetProperty("runtime_instance_id").GetString()!=instance)
+            throw new InvalidDataException("runtime_session_binding_invalid");
+        return new(prior.DeviceId,prior.TenantId,prior.Generation,instance,result.GetProperty("session_token").GetString()!,result.GetProperty("expires_at").GetDateTimeOffset());
+    }
     private void ValidateCredential(JsonElement credential)
     {
         var keyId="device-key-"+CanonicalJsonV2.HexHash(CanonicalJsonV2.Serialize(key.PublicJwk));
@@ -299,7 +345,13 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
         {
             object observation;
             try{observation=await probes.ObserveAsync(probe.GetProperty("probe_id").GetString()!,ct);}
-            catch(Ai00.Connector.Contracts.ConnectorException){observation=new{classification="inconclusive",observed_result=(object?)null};}
+            catch(Exception error) when(error is Ai00.Connector.Contracts.ConnectorException or TimeoutException)
+            {
+                // A recovery probe is read-only. Unsupported or timed-out probes must
+                // produce durable inconclusive evidence instead of crashing the host
+                // and leaving the write permanently in pending reconciliation.
+                observation=new{classification="inconclusive",observed_result=(object?)null};
+            }
             var observed=JsonSerializer.SerializeToElement(observation);
             observations.Add(new{step_id=probe.GetProperty("step_id").GetString(),probe_id=probe.GetProperty("probe_id").GetString(),classification=observed.GetProperty("classification").GetString(),observed_result=observed.GetProperty("observed_result")});
         }

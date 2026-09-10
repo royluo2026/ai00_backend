@@ -68,7 +68,7 @@ DOCUMENT_SNAPSHOT_STEP = obj({
     "contract_hash": HASH,
     "depends_on": {"type": "array", "items": STRING, "maxItems": 0},
     "payload": obj({
-        "max_nodes": {"type": "integer", "minimum": 1, "maximum": 10000},
+        "max_nodes": {"type": "integer", "minimum": 1, "maximum": 250000},
         "max_depth": {"type": "integer", "minimum": 1, "maximum": 100},
     }, ("max_nodes", "max_depth")),
     "payload_hash": HASH,
@@ -148,7 +148,18 @@ INPUT_SCHEMAS = {
     "simulation.vismockup.model.open.request": obj({"artifact_ref": ARTIFACT_REF}, ("artifact_ref",)),
     "simulation.vismockup.model.close.request": obj({}, ()),
     "simulation.vismockup.visibility.change.request": obj({"action": {"type": "string", "enum": ["all_on", "all_off"]}}, ("action",)),
-    "simulation.vismockup.tree.read.request": obj({"max_depth": {"type": "integer", "minimum": 1, "maximum": 8}}, ("max_depth",)),
+    "simulation.vismockup.node.visibility.change.request": obj({
+        "node_key": STRING,
+        "action": {"type": "string", "enum": ["show", "hide", "toggle_visible", "isolate"]},
+    }, ("node_key", "action")),
+    "simulation.vismockup.node.selection.change.request": obj({
+        "node_key": STRING,
+        "action": {"type": "string", "enum": ["highlight", "unhighlight", "select", "deselect"]},
+    }, ("node_key", "action")),
+    "simulation.vismockup.tree.read.request": obj({
+        "max_depth": {"type": "integer", "minimum": 1, "maximum": 8},
+        "force_refresh": {"type": "boolean"},
+    }, ("max_depth",)),
     "simulation.vismockup.command.get": obj({"operation_id": STRING}, ("operation_id",)),
     "simulation.vismockup.status.get": obj(CONNECTOR, ("connector_id",)),
     "simulation.vismockup.application.launch": obj(CONNECTOR, ("connector_id",)),
@@ -156,6 +167,14 @@ INPUT_SCHEMAS = {
     "simulation.vismockup.tree.get": obj({**CONNECTOR, "max_depth": {"type": "integer", "minimum": 1, "maximum": 100}, "force": {"type": "boolean"}}, ("connector_id",)),
     "simulation.vismockup.selection.highlight": obj({**CONNECTOR, "catia_names": {"type": "array", "items": STRING, "minItems": 1, "maxItems": 1000}}, ("connector_id", "catia_names")),
     "simulation.vismockup.visibility.change.apply": obj({**CONNECTOR, "action": {"type": "string", "enum": ["all_on", "all_off", "deselect"]}}, ("connector_id", "action")),
+    "simulation.vismockup.node.visibility.change.apply": obj({
+        **CONNECTOR, "node_key": STRING,
+        "action": {"type": "string", "enum": ["show", "hide", "toggle_visible", "isolate"]},
+    }, ("connector_id", "node_key", "action")),
+    "simulation.vismockup.node.selection.change.apply": obj({
+        **CONNECTOR, "node_key": STRING,
+        "action": {"type": "string", "enum": ["highlight", "unhighlight", "select", "deselect"]},
+    }, ("connector_id", "node_key", "action")),
     "simulation.vismockup.capture.create": obj(CONNECTOR, ("connector_id",)),
     "simulation.connector.pairing.request": obj({
         "bootstrap_token": STRING, "installation_id": STRING, "verifier_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
@@ -200,9 +219,15 @@ TREE_NODE = obj({
     "name": {"type": "string"}, "catia_occurrence_name": {"type": "string"},
     "has_more": {"type": "boolean"},
 }, ("node_key", "parent_node_key", "name", "catia_occurrence_name", "has_more"))
-TREE_RESULT = obj({"nodes": {"type": "array", "items": TREE_NODE}, "max_depth": {"type": "integer"}}, ("nodes", "max_depth"))
+TREE_RESULT = obj({
+    "nodes": {"type": "array", "items": TREE_NODE},
+    "max_depth": {"type": "integer"},
+    "cache_state": {"type": "string", "enum": ["verified", "verifying"]},
+}, ("nodes", "max_depth", "cache_state"))
 HIGHLIGHT_RESULT = obj({"matched": {"type": "integer", "minimum": 0}, "not_found": {"type": "array", "items": STRING}}, ("matched", "not_found"))
 VISIBILITY_RESULT = obj({"action": {"type": "string", "enum": ["all_on", "all_off", "deselect"]}}, ("action",))
+NODE_VISIBILITY_RESULT = obj({"node_key": STRING, "visible": {"type": "boolean"}}, ("node_key", "visible"))
+NODE_SELECTION_RESULT = obj({"node_key": STRING, "selected": {"type": "boolean"}}, ("node_key", "selected"))
 CAPTURE_RESULT = obj({"artifact_ref": ARTIFACT_REF}, ("artifact_ref",))
 PAIRING_SUMMARY = obj({
     "pairing_id": STRING, "user_code": STRING, "device_name": STRING,
@@ -219,6 +244,8 @@ OUTPUT_SCHEMAS = {
     "simulation.vismockup.model.open.request": OPERATION_REF,
     "simulation.vismockup.model.close.request": OPERATION_REF,
     "simulation.vismockup.visibility.change.request": OPERATION_REF,
+    "simulation.vismockup.node.visibility.change.request": OPERATION_REF,
+    "simulation.vismockup.node.selection.change.request": OPERATION_REF,
     "simulation.vismockup.tree.read.request": OPERATION_REF,
     "simulation.vismockup.command.get": obj({
         "operation_id": STRING,
@@ -233,6 +260,8 @@ OUTPUT_SCHEMAS = {
     "simulation.vismockup.tree.get": TREE_RESULT,
     "simulation.vismockup.selection.highlight": HIGHLIGHT_RESULT,
     "simulation.vismockup.visibility.change.apply": VISIBILITY_RESULT,
+    "simulation.vismockup.node.visibility.change.apply": NODE_VISIBILITY_RESULT,
+    "simulation.vismockup.node.selection.change.apply": NODE_SELECTION_RESULT,
     "simulation.vismockup.capture.create": CAPTURE_RESULT,
     "simulation.connector.pairing.request": obj({
         "pairing_id": STRING, "user_code": STRING, "verification_uri": STRING,

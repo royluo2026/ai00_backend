@@ -23,7 +23,7 @@ public sealed class DocumentSnapshotReader
 {
     public VisMockupDocumentSnapshot Read(IVisMockupDocument document, int maxNodes, int maxDepth)
     {
-        if (maxNodes is < 1 or > 10_000 || maxDepth is < 0 or > 64)
+        if (maxNodes is < 1 or > 250_000 || maxDepth is < 0 or > 64)
             throw new ConnectorException("bom_snapshot_limit_invalid");
         var nodes = new List<VisMockupSnapshotNode>();
         var seen = new HashSet<string>(StringComparer.Ordinal);

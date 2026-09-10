@@ -28,8 +28,8 @@
 
 - Connector 已有 `VisMockupTreeCache`，使用 SQLite 保存文档和节点，能够在同一来源模型关闭重开后复用结构。
 - Connector 当前以 `SourceIdentity + RootNodeKey` 的哈希识别文档，以 VM `NodeKey` 识别节点。
-- 2026-09-10 对当前 W10 文档的真实探针确认：完整 Product Structure COM 遍历约 54.48 秒；使用正确 PLMXML 类型导出当前状态约 15.92 秒，文件约 37.2 MB，导出前后 `NumLoadedNodes` 均为 12,753，没有额外打开 JT 几何。
-- 当前 Connector 的 `ExportEx` 实现传入 `SaveType=0`，而 VisAutomation 类型库定义 `0=DIRECTMODEL`、`2=PLMXML`。这是此前导出慢、可能拖住 VisMockup 的直接实现错误。
+- 2026-09-10 对当前 W10 文档的真实探针确认：完整 Product Structure COM 遍历约 54.48 秒；一份由 VisMockup 生成的 current-state PLMXML 约 37.2 MB，解析得到 14,183 个 `Occurrence`，且不需要 AI00 打开 JT 几何。
+- 后续在干净 VisMockup 14.2 进程中的复验纠正了早先结论：跨进程 `ActiveDocument.Export/ExportEx` 使用 `SaveType=0/2` 均可能只生成约 17 KB、2 个 Occurrence 的 ProductDef 外壳；`SaveInsertedAssemblies=1` 对 Teamcenter 多插入装配文档可能进入长时间不可抢占调用。因此“约 15.92 秒”只能证明 current-state PLMXML 文件本身可快速解析，不能证明现有跨进程 ExportEx 已可靠生成该文件。
 - 当前 VisMockup 14.2 导出的 current-state PLMXML 以 `Occurrence` 和厂商扩展 `PS_API-doc` 为主，而不是为每个节点生成标准 `ProductInstance`。实测包含 14,183 个 `Occurrence`、14,181 条唯一 JT 路径和最大 23 层结构。
 - `__PLM_OCC_PDM_UID` 在 14,182 个有效 occurrence 上全部存在且零重复；完整 JT 路径也零重复。单独使用 clone-stable 叶 UID 有 1,950 个重复，不能作为唯一持久身份。
 - 同一次 PLMXML 导出期间，另一只读 COM 调用等待约 15.10 秒，证明 VisMockup 服务端会串行化这些调用；把导出放到另一个线程不能消除控制延迟。
@@ -137,15 +137,15 @@
 
 ### 5.2 PLMXML 获取与规范化
 
-当前完整结构以 VisMockup 原生 PLMXML 导出为首选来源，不再用逐节点 COM 遍历作为全量采集主路径：
+当前完整结构仍优先尝试 VisMockup 原生 PLMXML 导出，但必须对导出结果做完整性校验；在跨进程导出只能得到 ProductDef 外壳时，回退一次完整轻量 COM 遍历，且只允许完整结果发布为缓存 generation：
 
 1. 从 `VFFrame.Application` 取得当前 VisAutomation Application、ActiveDocument 和 `PLMXMLSaveOptions`。
 2. 临时设置 `AskEveryTime=0`、`CopyParts=0`、`RetainReferences=1`、`ForceRetainRefs=1`、`SaveLateLoadedProperties=0`、`SaveExtendedInPLMXML=0` 和 `SaveInsertedAssemblies=0`。
-3. 调用 `ActiveDocument.ExportEx(PLMXML=2, tempPath, "", hierarchyIndex)`；禁止继续使用 `DIRECTMODEL=0`。
+3. 调用 `ActiveDocument.ExportEx(PLMXML=2, tempPath, "", hierarchyIndex)`；禁止继续使用 `DIRECTMODEL=0`。此调用是候选采集路径，不因返回成功就视为完整。
 4. 在 `finally` 中恢复用户原 PLMXML 保存选项。不得修改用户注册表中的全局导出模式作为运行时方案。
 5. 流式解析标准 `ProductInstance/ProductRevisionView` 和 VisMockup 14.2 current-state `Occurrence/ApplicationRef` 两种投影。对 current-state 格式，从 `PS_API-doc/JT_PROP_NAME` 恢复完整父子路径，从 `PS_API-doc/NGID` 与 UserValue 提取 PDM UID、absolute UID 和 clone-stable 链。
-6. 校验 XML 安全限制、节点总数、唯一身份覆盖率、父子闭包、根身份和文档来源；任何一项不完整都不得发布为 `valid` generation。
-7. 规范化并计算 Snapshot Hash 后删除临时 PLMXML。只有用户手动快照、共享基准或审计流程明确要求 Artifact 时，才通过既有 Artifact 链保存不可变原始文件。
+6. 校验 XML 安全限制、节点总数、唯一身份覆盖率、父子闭包、根身份和文档来源；任何一项不完整都不得发布为 `valid` generation。若只得到外壳，则执行一次有界的完整轻量 COM 树遍历；该回退不读取会触发 JT 加载的 occurrence 元数据。
+7. 规范化并计算 Snapshot Hash 后删除临时 PLMXML。只有用户手动快照、共享基准或审计流程明确要求 Artifact 时，才通过既有 Artifact 链保存不可变原始文件。PLMXML 和 COM 回退均失败时保留上一个完整 generation，不循环自动重试。
 
 此路径不依赖 AI00 直接访问 Teamcenter。当前文档即使最初来自 Teamcenter，AI00 采集的是 VisMockup 已经持有的产品结构与元数据。
 

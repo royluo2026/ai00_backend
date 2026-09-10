@@ -238,6 +238,11 @@ from backend.services import user_service as _capability_user_service
 from backend.domain_ports.resource_authorization import resource_authorizers as _resource_authorizers
 from backend.capability_v2.artifacts import SqlArtifactStore as _CapabilityArtifactStore
 from backend.capability_v2.official_service_grants import official_service_identities as _official_service_identities
+from backend.platform_sdk.request_credentials import authenticated_request_user as _authenticated_request_user
+
+
+def _capability_user_loader(gid):
+    return _authenticated_request_user(gid) or _capability_user_service.get_by_gid(gid)
 
 
 def _authorize_owned_artifact(artifact_id, identity):
@@ -253,7 +258,7 @@ _resource_authorizers.register("artifact", _authorize_owned_artifact)
 _capability_gateway = _configure_capability_gateway(
     _capability_registry,
     policy=_LegacyGatewayPolicy(
-        user_loader=lambda gid: _capability_user_service.get_by_gid(gid),
+        user_loader=_capability_user_loader,
         grants_resolver=lambda identity, user: (
             _capability_deps.build_capability_authorization_grants(
                 user, identity.tenant.tenant_id, identity.consumer.type.value, identity
