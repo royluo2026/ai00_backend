@@ -268,6 +268,7 @@ def candidate_specs(provider: WorkspaceProvider | None = None) -> tuple[tuple[Ca
     common = dict(owner="simulation", plugin_callable=True, permissions=("simulation.use",),
                   tags=("simulation", "workspace", "experimental"))
     gid = {"type": "string", "pattern": "^[1-9][0-9]*$"}
+    cache_revision = {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
     node = {"type": "object", "required": ["node_gid", "parent_gid", "node_type", "name", "position", "row_version"],
             "properties": {"node_gid": gid, "parent_gid": {"type": ["string", "null"], "pattern": "^[1-9][0-9]*$"},
                            "node_type": {"type": "string", "enum": ["line", "station", "process", "operation"]},
@@ -284,14 +285,16 @@ def candidate_specs(provider: WorkspaceProvider | None = None) -> tuple[tuple[Ca
                 "visibility": {"type": "string", "enum": ["private", "shared"]},
                 "project_gids": {"type": "array", "maxItems": 50, "uniqueItems": True, "items": gid},
                 "primary_project_gid": {"anyOf": [gid, {"type": "null"}]}}
-    workspace = {"type": "object", "required": ["workspace_gid", "version_gid", "owner_gid", "is_owner", *metadata.keys(), "updated_at", "row_version", "nodes", "bindings"],
+    workspace = {"type": "object", "required": ["workspace_gid", "version_gid", "owner_gid", "is_owner", *metadata.keys(), "updated_at", "row_version", "cache_revision_hash", "nodes", "bindings"],
                  "properties": {"workspace_gid": gid, "version_gid": gid, "owner_gid": gid, "is_owner": {"type": "boolean"}, **metadata,
                                 "updated_at": {"type": "string"}, "row_version": {"type": "integer", "minimum": 1},
+                                "cache_revision_hash": cache_revision,
                                 "nodes": {"type": "array", "items": node},
                                 "bindings": {"type": "array", "items": binding}}, "additionalProperties": False}
-    workspace_summary = {"type": "object", "required": ["workspace_gid", "version_gid", "owner_gid", "is_owner", *metadata.keys(), "updated_at", "row_version"],
+    workspace_summary = {"type": "object", "required": ["workspace_gid", "version_gid", "owner_gid", "is_owner", *metadata.keys(), "updated_at", "row_version", "cache_revision_hash"],
                          "properties": {"workspace_gid": gid, "version_gid": gid, "owner_gid": gid, "is_owner": {"type": "boolean"}, **metadata,
-                                        "updated_at": {"type": "string"}, "row_version": {"type": "integer", "minimum": 1}}, "additionalProperties": False}
+                                        "updated_at": {"type": "string"}, "row_version": {"type": "integer", "minimum": 1},
+                                        "cache_revision_hash": cache_revision}, "additionalProperties": False}
     search_output = {"type": "object", "required": ["items", "next_cursor"],
                      "properties": {"items": {"type": "array", "maxItems": 100, "items": workspace_summary},
                                     "next_cursor": {"type": ["string", "null"], "pattern": "^[0-9]+$"}},
@@ -313,8 +316,9 @@ def candidate_specs(provider: WorkspaceProvider | None = None) -> tuple[tuple[Ca
         "project_gids": metadata["project_gids"], "primary_project_gid": metadata["primary_project_gid"],
     }, "additionalProperties": False}
     mutation_output = {
-        "type": "object", "required": ["entity_gid", "row_version", "patch"],
+        "type": "object", "required": ["entity_gid", "row_version", "cache_revision_hash", "patch"],
         "properties": {"entity_gid": gid, "row_version": {"type": "integer", "minimum": 2},
+                       "cache_revision_hash": cache_revision,
                        "patch": patch_schema}, "additionalProperties": False,
     }
     return (
@@ -346,9 +350,10 @@ def candidate_specs(provider: WorkspaceProvider | None = None) -> tuple[tuple[Ca
                         "required": ["workspace_gid", "expected_row_version", "idempotency_key"],
                         "properties": cas, "additionalProperties": False},
                         output_schema={"type": "object",
-                        "required": ["workspace_gid", "deleted", "deletion_gid", "row_version"],
+                        "required": ["workspace_gid", "deleted", "deletion_gid", "row_version", "cache_revision_hash"],
                         "properties": {"workspace_gid": gid, "deleted": {"const": True},
-                                       "deletion_gid": gid, "row_version": {"type": "integer", "minimum": 2}},
+                                       "deletion_gid": gid, "row_version": {"type": "integer", "minimum": 2},
+                                       "cache_revision_hash": cache_revision},
                         "additionalProperties": False}, **common), selected.delete),
         (CapabilitySpec(id="simulation.environment.workspace.fork.preview", version=1,
                         description="Preview a private workspace Fork from an immutable readable version.",risk="write",confirmation="none",
@@ -406,11 +411,12 @@ def candidate_specs(provider: WorkspaceProvider | None = None) -> tuple[tuple[Ca
                         "additionalProperties": {"type": "string", "minLength": 1, "maxLength": 64}}},
                         "additionalProperties": False},
                         output_schema={"type": "object",
-                        "required": ["workspace_gid", "version_gid", "status", "content_hash", "artifact_ref"],
+                        "required": ["workspace_gid", "version_gid", "status", "content_hash", "artifact_ref", "row_version", "cache_revision_hash"],
                         "properties": {"workspace_gid": gid, "version_gid": gid,
                         "status": {"type": "string", "const": "frozen"},
                         "content_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
-                        "artifact_ref": {"type": "object"}}, "additionalProperties": False}, **common), selected.freeze),
+                        "artifact_ref": {"type": "object"}, "row_version": {"type": "integer", "minimum": 2},
+                        "cache_revision_hash": cache_revision}, "additionalProperties": False}, **common), selected.freeze),
         (CapabilitySpec(id="simulation.environment.workspace_version.export_for_import", version=1,
                         description="Issue an owner-scoped reference to one immutable private workspace version.",
                         risk="write", confirmation="none", idempotent=True,

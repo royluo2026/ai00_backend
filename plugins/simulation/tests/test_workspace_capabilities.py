@@ -3,6 +3,9 @@ from backend.capabilities.validation_next import validate_payload
 from plugins.simulation.simulation_backend.capabilities.workspaces import WorkspaceProvider, candidate_specs
 
 
+_CACHE_REVISION_HASH = "sha256:" + "a" * 64
+
+
 class StubRepository:
     def __init__(self):
         self.calls = []
@@ -13,29 +16,34 @@ class StubRepository:
                 "review_type": kwargs["review_type"], "version_label": kwargs["version_label"],
                 "status": kwargs["status"], "visibility": kwargs["visibility"], "owner_gid": kwargs["owner_gid"],
                 "is_owner": True, "project_gids": kwargs["project_gids"], "primary_project_gid": kwargs["primary_project_gid"],
-                "updated_at": "2026-09-09T12:00:00", "row_version": 1, "nodes": [], "bindings": []}
+                "updated_at": "2026-09-09T12:00:00", "row_version": 1,
+                "cache_revision_hash": _CACHE_REVISION_HASH, "nodes": [], "bindings": []}
 
     def search(self, **kwargs):
         self.calls.append(("search", kwargs))
         return {"items": [{"workspace_gid": "101", "version_gid": "102", "name": "Environment", "review_type": "other",
                            "version_label": "V1", "status": "active", "visibility": "private", "owner_gid": "30", "is_owner": True,
-                           "project_gids": [], "primary_project_gid": None, "updated_at": "2026-09-09T12:00:00", "row_version": 1}], "next_cursor": None}
+                           "project_gids": [], "primary_project_gid": None, "updated_at": "2026-09-09T12:00:00", "row_version": 1,
+                           "cache_revision_hash": _CACHE_REVISION_HASH}], "next_cursor": None}
 
     def get(self, workspace_gid, **kwargs):
         self.calls.append(("get", {"workspace_gid": workspace_gid, **kwargs}))
         return {"workspace_gid": workspace_gid, "version_gid": "102", "name": "Environment", "review_type": "other",
                 "version_label": "V1", "status": "active", "visibility": "private", "owner_gid": "30", "is_owner": True,
-                "project_gids": [], "primary_project_gid": None, "updated_at": "2026-09-09T12:00:00", "row_version": 1, "nodes": [], "bindings": []}
+                "project_gids": [], "primary_project_gid": None, "updated_at": "2026-09-09T12:00:00", "row_version": 1,
+                "cache_revision_hash": _CACHE_REVISION_HASH, "nodes": [], "bindings": []}
 
     def mutate(self, **kwargs):
         self.calls.append(("mutate", kwargs))
         return {"entity_gid": "103", "row_version": kwargs["expected_row_version"] + 1,
+                "cache_revision_hash": _CACHE_REVISION_HASH,
                 "patch": {"op": kwargs["operation"], **(kwargs["values"] if kwargs["operation"] == "update_workspace" else {})}}
 
     def delete(self, **kwargs):
         self.calls.append(("delete", kwargs))
         return {"workspace_gid": kwargs["workspace_gid"], "deleted": True,
-                "deletion_gid": "901", "row_version": kwargs["expected_row_version"] + 1}
+                "deletion_gid": "901", "row_version": kwargs["expected_row_version"] + 1,
+                "cache_revision_hash": _CACHE_REVISION_HASH}
 
 
 def _context():
@@ -95,6 +103,26 @@ def test_workspace_candidate_output_contracts_accept_real_provider_results():
         validate_payload(dict(spec.output_schema), outputs[spec.id], label="output")
 
 
+def test_workspace_outputs_expose_authoritative_cache_revision_hash():
+    specs = {spec.id: spec for spec, _handler in candidate_specs(WorkspaceProvider(StubRepository()))}
+    for capability_id in (
+        "simulation.environment.workspace.create",
+        "simulation.environment.workspace.search",
+        "simulation.environment.workspace.get",
+        "simulation.environment.workspace.update",
+        "simulation.environment.workspace.delete",
+        "simulation.environment.structure_node.create",
+        "simulation.environment.structure_node.move",
+        "simulation.environment.structure_node.remove",
+        "simulation.environment.binding.create",
+        "simulation.environment.binding.remove",
+    ):
+        schema = specs[capability_id].output_schema
+        item_schema = schema["properties"]["items"]["items"] if capability_id.endswith("workspace.search") else schema
+        assert "cache_revision_hash" in item_schema["required"]
+        assert item_schema["properties"]["cache_revision_hash"]["pattern"] == "^sha256:[0-9a-f]{64}$"
+
+
 def test_workspace_update_forwards_metadata_as_owner_scoped_atomic_mutation():
     repo = StubRepository(); provider = WorkspaceProvider(repo)
     output = provider.update({"workspace_gid": "101", "expected_row_version": 3, "idempotency_key": "edit-1", "name": "Updated", "review_type": "node_review", "version_label": "V2", "status": "baseline", "visibility": "shared", "project_gids": ["501"], "primary_project_gid": "501"}, _context())
@@ -148,7 +176,8 @@ def test_workspace_delete_is_owner_scoped_cas_and_has_no_confirmation_popup():
     output = provider.delete({"workspace_gid": "101", "expected_row_version": 3,
                               "idempotency_key": "delete-1"}, _context())
     assert output.data == {"workspace_gid": "101", "deleted": True,
-                           "deletion_gid": "901", "row_version": 4}
+                           "deletion_gid": "901", "row_version": 4,
+                           "cache_revision_hash": _CACHE_REVISION_HASH}
     assert repo.calls[-1] == ("delete", {"workspace_gid": "101", "tenant_gid": "20",
                                          "owner_gid": "30", "expected_row_version": 3,
                                          "idempotency_key": "delete-1"})

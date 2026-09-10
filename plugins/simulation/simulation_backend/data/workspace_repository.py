@@ -15,6 +15,19 @@ class WorkspaceRepositoryError(RuntimeError):
     pass
 
 
+_EMPTY_CACHE_REVISION_HASH = "sha256:" + "0" * 64
+
+
+def next_cache_revision_hash(
+    previous: str, patch: Mapping[str, Any], next_row_version: int,
+) -> str:
+    if not isinstance(previous, str) or not previous.startswith("sha256:") or len(previous) != 71:
+        raise WorkspaceRepositoryError("cache_revision_hash_invalid")
+    canonical = json.dumps(patch, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    payload = f"{previous}|{canonical}|{next_row_version}".encode("utf-8")
+    return "sha256:" + hashlib.sha256(payload).hexdigest()
+
+
 _FORK_DEPTH_RANK = {"station": 1, "role": 2, "process": 3, "operation": 4}
 _NODE_DEPTH_RANK = {
     "line": 0, "line_process": 0,
@@ -133,13 +146,20 @@ class WorkspaceRepository:
                project_gids: list[str], primary_project_gid: str | None,
                tenant_gid: str, owner_gid: str) -> dict[str, Any]:
         workspace_gid, version_gid = str(next_gid()), str(next_gid())
+        create_patch = {
+            "op": "create", "workspace_gid": workspace_gid, "version_gid": version_gid,
+            "name": name, "review_type": review_type, "version_label": version_label,
+            "status": status, "visibility": visibility, "project_gids": list(project_gids),
+            "primary_project_gid": primary_project_gid,
+        }
+        cache_revision_hash = next_cache_revision_hash(_EMPTY_CACHE_REVISION_HASH, create_patch, 1)
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
                 "INSERT INTO workmanship_sim_workspaces "
-                "(gid,tenant_gid,owner_gid,name,review_type,version_label,status,visibility,primary_project_gid,row_version) "
-                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,1)",
+                "(gid,tenant_gid,owner_gid,name,review_type,version_label,status,visibility,primary_project_gid,cache_revision_hash,row_version) "
+                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,1)",
                 (workspace_gid, _gid(tenant_gid, "tenant_gid"), _gid(owner_gid, "owner_gid"), name,
-                 review_type, version_label, status, visibility, primary_project_gid),
+                 review_type, version_label, status, visibility, primary_project_gid, cache_revision_hash),
             )
             cursor.execute(
                 "INSERT INTO workmanship_sim_workspace_versions "
@@ -156,12 +176,13 @@ class WorkspaceRepository:
                 "review_type": review_type, "version_label": version_label, "status": status,
                 "visibility": visibility, "primary_project_gid": primary_project_gid,
                 "owner_gid": str(owner_gid), "is_owner": True, "project_gids": project_gids,
-                "updated_at": datetime.now(timezone.utc).isoformat(), "row_version": 1, "nodes": [], "bindings": []}
+                "updated_at": datetime.now(timezone.utc).isoformat(), "row_version": 1,
+                "cache_revision_hash": cache_revision_hash, "nodes": [], "bindings": []}
 
     def search(self, *, tenant_gid: str, owner_gid: str, offset: int, page_size: int) -> dict[str, Any]:
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
-                "SELECT w.gid AS workspace_gid,h.version_gid,w.owner_gid,w.name,w.review_type,w.version_label,w.status,w.visibility,w.primary_project_gid,w.row_version,w.updated_at "
+                "SELECT w.gid AS workspace_gid,h.version_gid,w.owner_gid,w.name,w.review_type,w.version_label,w.status,w.visibility,w.primary_project_gid,w.cache_revision_hash,w.row_version,w.updated_at "
                 "FROM workmanship_sim_workspaces w JOIN workmanship_sim_workspace_heads h ON h.workspace_gid=w.gid "
                 "WHERE (w.owner_gid=%s OR w.visibility='shared') AND w.removed_at IS NULL "
                 "ORDER BY w.updated_at DESC,w.gid DESC LIMIT %s OFFSET %s",
@@ -188,7 +209,7 @@ class WorkspaceRepository:
         suffix = " FOR UPDATE" if lock else ""
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
-                "SELECT w.gid AS workspace_gid,h.version_gid,w.tenant_gid AS workspace_tenant_gid,w.owner_gid,w.name,w.review_type,w.version_label,w.status,w.visibility,w.primary_project_gid,w.row_version,w.updated_at "
+                "SELECT w.gid AS workspace_gid,h.version_gid,w.tenant_gid AS workspace_tenant_gid,w.owner_gid,w.name,w.review_type,w.version_label,w.status,w.visibility,w.primary_project_gid,w.cache_revision_hash,w.row_version,w.updated_at "
                 "FROM workmanship_sim_workspaces w JOIN workmanship_sim_workspace_heads h ON h.workspace_gid=w.gid "
                 "WHERE w.gid=%s AND (w.owner_gid=%s OR w.visibility='shared') AND w.removed_at IS NULL" + suffix,
                 (_gid(workspace_gid, "workspace_gid"), _gid(owner_gid, "owner_gid")),
@@ -246,7 +267,7 @@ class WorkspaceRepository:
                 value = replay["response_json"]
                 return json.loads(value) if isinstance(value, str) else dict(value)
             cursor.execute(
-                "SELECT row_version,tenant_gid FROM workmanship_sim_workspaces WHERE gid=%s "
+                "SELECT row_version,tenant_gid,cache_revision_hash FROM workmanship_sim_workspaces WHERE gid=%s "
                 "AND owner_gid=%s AND removed_at IS NULL FOR UPDATE",
                 (workspace_gid, owner_gid),
             )
@@ -256,14 +277,22 @@ class WorkspaceRepository:
             if int(current["row_version"]) != expected_row_version:
                 raise WorkspaceRepositoryError("version_conflict")
             deletion_gid = str(next_gid())
+            next_version = expected_row_version + 1
+            cache_revision_hash = next_cache_revision_hash(
+                str(current["cache_revision_hash"]),
+                {"op": "delete", "deletion_gid": deletion_gid},
+                next_version,
+            )
             cursor.execute(
-                "UPDATE workmanship_sim_workspaces SET removed_at=NOW(6),row_version=row_version+1,updated_at=NOW(6) "
-                "WHERE gid=%s AND row_version=%s", (workspace_gid, expected_row_version),
+                "UPDATE workmanship_sim_workspaces SET removed_at=NOW(6),cache_revision_hash=%s,row_version=%s,updated_at=NOW(6) "
+                "WHERE gid=%s AND row_version=%s",
+                (cache_revision_hash, next_version, workspace_gid, expected_row_version),
             )
             if cursor.rowcount != 1:
                 raise WorkspaceRepositoryError("version_conflict")
             result = {"workspace_gid": workspace_gid, "deleted": True,
-                      "deletion_gid": deletion_gid, "row_version": expected_row_version + 1}
+                      "deletion_gid": deletion_gid, "row_version": next_version,
+                      "cache_revision_hash": cache_revision_hash}
             cursor.execute(
                 "INSERT INTO workmanship_sim_workspace_idempotency "
                 "(workspace_gid,idempotency_key,request_hash,response_json,expires_at) "
@@ -330,11 +359,20 @@ class WorkspaceRepository:
             cursor.execute("SELECT 1 FROM workmanship_sim_workspaces WHERE tenant_gid=%s AND owner_gid=%s AND name=%s AND removed_at IS NULL FOR UPDATE",(tenant_gid,actor_gid,plan["target_name"]))
             if cursor.fetchone():raise WorkspaceRepositoryError("workspace_name_exists")
             workspace_gid,version_gid=str(next_gid()),str(next_gid())
-            cursor.execute("INSERT INTO workmanship_sim_workspaces (gid,tenant_gid,owner_gid,name,review_type,version_label,status,visibility,primary_project_gid,row_version) VALUES (%s,%s,%s,%s,%s,%s,'active','private',%s,1)",(workspace_gid,tenant_gid,actor_gid,plan["target_name"],plan["review_type"],plan["target_version_label"],plan["primary_project_gid"]))
+            projected=project_manifest_for_fork(manifest,str(plan["fork_depth"]))
+            fork_patch={"op":"fork","workspace_gid":workspace_gid,"version_gid":version_gid,
+                        "source_workspace_gid":str(plan["source_workspace_gid"]),
+                        "source_version_gid":str(plan["source_version_gid"]),
+                        "source_content_hash":str(plan["content_hash"]),
+                        "fork_depth":str(plan["fork_depth"]),"name":plan["target_name"],
+                        "version_label":plan["target_version_label"],
+                        "project_gids":list(plan["project_gids"]),
+                        "node_count":len(projected["nodes"]),"binding_count":len(projected["bindings"])}
+            cache_revision_hash=next_cache_revision_hash(_EMPTY_CACHE_REVISION_HASH,fork_patch,1)
+            cursor.execute("INSERT INTO workmanship_sim_workspaces (gid,tenant_gid,owner_gid,name,review_type,version_label,status,visibility,primary_project_gid,cache_revision_hash,row_version) VALUES (%s,%s,%s,%s,%s,%s,'active','private',%s,%s,1)",(workspace_gid,tenant_gid,actor_gid,plan["target_name"],plan["review_type"],plan["target_version_label"],plan["primary_project_gid"],cache_revision_hash))
             cursor.execute("INSERT INTO workmanship_sim_workspace_versions (gid,workspace_gid,tenant_gid,owner_gid,sequence,status,row_version) VALUES (%s,%s,%s,%s,1,'draft',1)",(version_gid,workspace_gid,tenant_gid,actor_gid))
             cursor.execute("INSERT INTO workmanship_sim_workspace_heads (workspace_gid,version_gid,row_version) VALUES (%s,%s,1)",(workspace_gid,version_gid))
             self._replace_projects(cursor,workspace_gid,list(plan["project_gids"]))
-            projected=project_manifest_for_fork(manifest,str(plan["fork_depth"]))
             node_map={str(row["node_gid"]):str(next_gid()) for row in projected["nodes"]}
             nodes=[]
             for row in projected["nodes"]:
@@ -347,7 +385,7 @@ class WorkspaceRepository:
                 if not node_gid:raise WorkspaceRepositoryError("fork_manifest_invalid")
                 binding_gid=str(next_gid());cursor.execute("INSERT INTO workmanship_sim_workspace_bindings (gid,workspace_gid,tenant_gid,owner_gid,node_gid,occurrence_gid,binding_role,row_version) VALUES (%s,%s,%s,%s,%s,%s,%s,1)",(binding_gid,workspace_gid,tenant_gid,actor_gid,node_gid,row["occurrence_gid"],row.get("role","operate")))
                 bindings.append({"binding_gid":binding_gid,"node_gid":node_gid,"occurrence_gid":str(row["occurrence_gid"]),"role":row.get("role","operate"),"row_version":1})
-            result={"workspace_gid":workspace_gid,"version_gid":version_gid,"owner_gid":str(actor_gid),"is_owner":True,"name":plan["target_name"],"review_type":plan["review_type"],"version_label":plan["target_version_label"],"status":"active","visibility":"private","primary_project_gid":str(plan["primary_project_gid"]) if plan["primary_project_gid"] is not None else None,"project_gids":list(plan["project_gids"]),"updated_at":datetime.now(timezone.utc).isoformat(),"row_version":1,"nodes":nodes,"bindings":bindings,"fork_base":{"workspace_gid":str(plan["source_workspace_gid"]),"version_gid":str(plan["source_version_gid"]),"content_hash":plan["content_hash"],"fork_depth":str(plan["fork_depth"])}}
+            result={"workspace_gid":workspace_gid,"version_gid":version_gid,"owner_gid":str(actor_gid),"is_owner":True,"name":plan["target_name"],"review_type":plan["review_type"],"version_label":plan["target_version_label"],"status":"active","visibility":"private","primary_project_gid":str(plan["primary_project_gid"]) if plan["primary_project_gid"] is not None else None,"project_gids":list(plan["project_gids"]),"updated_at":datetime.now(timezone.utc).isoformat(),"row_version":1,"cache_revision_hash":cache_revision_hash,"nodes":nodes,"bindings":bindings,"fork_base":{"workspace_gid":str(plan["source_workspace_gid"]),"version_gid":str(plan["source_version_gid"]),"content_hash":plan["content_hash"],"fork_depth":str(plan["fork_depth"])}}
             cursor.execute("UPDATE workmanship_sim_workspace_fork_plans SET apply_idempotency_key=%s,apply_request_hash=%s,outcome_json=%s,updated_at=NOW(6) WHERE gid=%s",(idempotency_key,request_hash,json.dumps(result,ensure_ascii=False,separators=(",",":")),plan["gid"]))
         return result
 
@@ -363,7 +401,7 @@ class WorkspaceRepository:
         request_hash = hashlib.sha256(canonical.encode()).hexdigest()
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
-                "SELECT row_version,status,tenant_gid FROM workmanship_sim_workspaces WHERE gid=%s "
+                "SELECT row_version,status,tenant_gid,cache_revision_hash FROM workmanship_sim_workspaces WHERE gid=%s "
                 "AND owner_gid=%s AND removed_at IS NULL FOR UPDATE",
                 (workspace_gid, owner_gid),
             )
@@ -535,13 +573,22 @@ class WorkspaceRepository:
                 raise WorkspaceRepositoryError("operation_invalid")
 
             next_version = expected_row_version + 1
+            cache_revision_hash = next_cache_revision_hash(
+                str(current["cache_revision_hash"]), patch, next_version,
+            )
             cursor.execute(
-                "UPDATE workmanship_sim_workspaces SET row_version=%s,updated_at=NOW(6) WHERE gid=%s AND row_version=%s",
-                (next_version, workspace_gid, expected_row_version),
+                "UPDATE workmanship_sim_workspaces SET cache_revision_hash=%s,row_version=%s,updated_at=NOW(6) "
+                "WHERE gid=%s AND row_version=%s",
+                (cache_revision_hash, next_version, workspace_gid, expected_row_version),
             )
             if cursor.rowcount != 1:
                 raise WorkspaceRepositoryError("version_conflict")
-            result = {"entity_gid": entity_gid, "row_version": next_version, "patch": patch}
+            result = {
+                "entity_gid": entity_gid,
+                "row_version": next_version,
+                "cache_revision_hash": cache_revision_hash,
+                "patch": patch,
+            }
             cursor.execute(
                 "INSERT INTO workmanship_sim_workspace_idempotency "
                 "(workspace_gid,idempotency_key,request_hash,response_json,expires_at) "
@@ -597,8 +644,9 @@ class WorkspaceRepository:
                            request_hash: str) -> dict[str, Any] | None:
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
-                "SELECT version_gid,content_hash,artifact_ref_json,status FROM workmanship_sim_workspace_freeze_outbox "
-                "WHERE workspace_gid=%s AND idempotency_key=%s",
+                "SELECT o.version_gid,o.content_hash,o.artifact_ref_json,o.status,w.row_version,w.cache_revision_hash "
+                "FROM workmanship_sim_workspace_freeze_outbox o JOIN workmanship_sim_workspaces w ON w.gid=o.workspace_gid "
+                "WHERE o.workspace_gid=%s AND o.idempotency_key=%s",
                 (_gid(workspace_gid, "workspace_gid"), idempotency_key),
             )
             row = cursor.fetchone()
@@ -612,7 +660,9 @@ class WorkspaceRepository:
         if isinstance(artifact, str):
             artifact = json.loads(artifact)
         return {"workspace_gid": str(workspace_gid), "version_gid": str(row["version_gid"]),
-                "status": "frozen", "content_hash": request_hash, "artifact_ref": artifact}
+                "status": "frozen", "content_hash": request_hash, "artifact_ref": artifact,
+                "row_version": int(row["row_version"]),
+                "cache_revision_hash": str(row["cache_revision_hash"])}
 
     def complete_freeze(
         self, *, workspace_gid: str, tenant_gid: str, owner_gid: str, version_gid: str,
@@ -622,7 +672,7 @@ class WorkspaceRepository:
         outbox_gid = str(next_gid())
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
-                "SELECT w.row_version,v.status FROM workmanship_sim_workspaces w "
+                "SELECT w.row_version,w.cache_revision_hash,v.status FROM workmanship_sim_workspaces w "
                 "JOIN workmanship_sim_workspace_versions v ON v.gid=%s AND v.workspace_gid=w.gid "
                 "WHERE w.gid=%s AND w.tenant_gid=%s AND w.owner_gid=%s FOR UPDATE",
                 (version_gid, workspace_gid, tenant_gid, owner_gid),
@@ -634,6 +684,13 @@ class WorkspaceRepository:
                 raise WorkspaceRepositoryError("version_conflict")
             if current["status"] != "draft":
                 raise WorkspaceRepositoryError("workspace_version_not_draft")
+            next_version = expected_row_version + 1
+            cache_revision_hash = next_cache_revision_hash(
+                str(current["cache_revision_hash"]),
+                {"op": "freeze", "version_gid": str(version_gid), "content_hash": content_hash,
+                 "artifact_ref": dict(artifact_ref), "algorithms": dict(algorithms)},
+                next_version,
+            )
             cursor.execute(
                 "INSERT INTO workmanship_sim_workspace_freeze_outbox "
                 "(gid,workspace_gid,version_gid,tenant_gid,owner_gid,idempotency_key,content_hash,artifact_ref_json,status) "
@@ -651,13 +708,14 @@ class WorkspaceRepository:
             if cursor.rowcount != 1:
                 raise WorkspaceRepositoryError("workspace_version_not_draft")
             cursor.execute(
-                "UPDATE workmanship_sim_workspaces SET row_version=row_version+1,updated_at=NOW(6) "
-                "WHERE gid=%s AND row_version=%s", (workspace_gid, expected_row_version),
+                "UPDATE workmanship_sim_workspaces SET cache_revision_hash=%s,row_version=%s,updated_at=NOW(6) WHERE gid=%s "
+                "AND row_version=%s", (cache_revision_hash, next_version, workspace_gid, expected_row_version),
             )
             if cursor.rowcount != 1:
                 raise WorkspaceRepositoryError("version_conflict")
         return {"workspace_gid": str(workspace_gid), "version_gid": str(version_gid), "status": "frozen",
-                "content_hash": content_hash, "artifact_ref": dict(artifact_ref)}
+                "content_hash": content_hash, "artifact_ref": dict(artifact_ref),
+                "row_version": next_version, "cache_revision_hash": cache_revision_hash}
 
     def record_orphan(
         self, *, workspace_gid: str, version_gid: str, tenant_gid: str, owner_gid: str,
