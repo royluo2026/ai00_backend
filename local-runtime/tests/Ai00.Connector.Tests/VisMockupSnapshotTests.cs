@@ -1,5 +1,6 @@
 using Ai00.Connector.Adapters.VisMockup;
 using Ai00.Connector.Contracts;
+using Microsoft.Data.Sqlite;
 using System.Text.Json;
 using Xunit;
 
@@ -12,7 +13,8 @@ public sealed class VisMockupSnapshotTests
     {
         public string NodeKey => nodeKey;
         public string PrintableName => nodeKey;
-        public string OccurrenceId => nodeKey;
+        public int OccurrenceReads { get; private set; }
+        public string OccurrenceId { get { OccurrenceReads++; return nodeKey; } }
         public string ModelId => nodeKey;
         public int ChildrenReads { get; private set; }
         public IReadOnlyList<IVisMockupNode> Children
@@ -140,5 +142,207 @@ public sealed class VisMockupSnapshotTests
         Assert.Equal(3, json.GetProperty("nodes").GetArrayLength());
         Assert.Equal("node-0", json.GetProperty("nodes")[0].GetProperty("node_key").GetString());
         Assert.Equal("Node 0", json.GetProperty("nodes")[0].GetProperty("name").GetString());
+    }
+
+    [Fact]
+    public async Task LightweightTreeReadReusesTheCurrentDocumentSqliteSnapshot()
+    {
+        var leaf = new CountingNode("leaf", []);
+        var root = new CountingNode("root", [leaf]);
+        var fake = new FakeVisMockupCom
+        {
+            ExistingApplication = new FakeApplication("14.2.0", new FakeDocument("BOM-1", "tc://bom/1", root)),
+        };
+        var directory = Path.Combine(Path.GetTempPath(), "ai00-vm-tree-cache-tests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        try
+        {
+            using var sta = new StaDispatcher();
+            var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([Path.GetTempPath()]), fake,
+                Path.Combine(directory, "captures"), Path.Combine(directory, "tree.db"));
+            var operation = new AdapterOperation(
+                "vismockup.tree.read@1", JsonSerializer.SerializeToElement(new { max_depth = 3 }));
+
+            await adapter.ExecuteAsync(operation, default);
+            var firstReads = root.ChildrenReads + leaf.ChildrenReads;
+            Assert.Equal(0, root.OccurrenceReads + leaf.OccurrenceReads);
+            var cached = await adapter.ExecuteAsync(operation, default);
+
+            Assert.Equal(firstReads, root.ChildrenReads + leaf.ChildrenReads);
+            Assert.Equal(2, JsonSerializer.SerializeToElement(cached.Data).GetProperty("nodes").GetArrayLength());
+            Assert.True(File.Exists(Path.Combine(directory, "tree.db")));
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
+    public void TreeCacheIncrementallyUpsertsChangedNodesAndRemovesMissingNodes()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "ai00-vm-tree-cache-diff-tests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        try
+        {
+            var document = new FakeDocument("BOM-1", "tc://bom/1", FakeNode.FlatTree(1));
+            var cache = new VisMockupTreeCache(Path.Combine(directory, "tree.db"));
+            cache.Replace(document, 3, [
+                new("root", null, 0, 0, "Root", "", false),
+                new("old", "root", 0, 1, "Old", "", false),
+            ]);
+
+            cache.Replace(document, 3, [
+                new("root", null, 0, 0, "Root renamed", "", false),
+                new("new", "root", 0, 1, "New", "", false),
+            ]);
+
+            var value = cache.TryRead(document, 3)!;
+            Assert.Equal(["root", "new"], value.Nodes.Select(item => item.NodeKey));
+            Assert.Equal("Root renamed", value.Nodes[0].Name);
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
+    public void TreeCacheSurvivesAVisMockupRestartForTheSameSourceModel()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "ai00-vm-tree-cache-reopen-tests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        var modelPath = Path.Combine(directory, "W10.vfz");
+        File.WriteAllText(modelPath, "model");
+        try
+        {
+            var cache = new VisMockupTreeCache(Path.Combine(directory, "tree.db"));
+            var firstSession = new FakeDocument("SESSION-1", modelPath, FakeNode.FlatTree(1));
+            cache.Replace(firstSession, 3, [new("root", null, 0, 0, "W10", "", false)]);
+
+            var reopened = new FakeDocument("SESSION-2", modelPath, FakeNode.FlatTree(1));
+            var value = cache.TryRead(reopened, 3);
+
+            Assert.NotNull(value);
+            Assert.Equal("W10", value!.Nodes[0].Name);
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
+    public void TreeCacheRejectsAnUnversionedCrossSessionHit()
+    {
+        var directory = NewCacheDirectory("uncertain-reopen");
+        try
+        {
+            var cache = new VisMockupTreeCache(Path.Combine(directory, "tree.db"));
+            cache.Replace(
+                new FakeDocument("SESSION-1", "tc://bom/W10", FakeNode.FlatTree(1)),
+                3,
+                [new("root", null, 0, 0, "W10", "", false)]);
+
+            var reopened = new FakeDocument("SESSION-2", "tc://bom/W10", FakeNode.FlatTree(1));
+
+            Assert.Null(cache.TryRead(reopened, 3));
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
+    public void TreeCacheRejectsAChangedLocalSourceRevision()
+    {
+        var directory = NewCacheDirectory("source-revision");
+        var modelPath = Path.Combine(directory, "W10.vfz");
+        File.WriteAllText(modelPath, "before");
+        try
+        {
+            var cache = new VisMockupTreeCache(Path.Combine(directory, "tree.db"));
+            var document = new FakeDocument("SESSION-1", modelPath, FakeNode.FlatTree(1));
+            cache.Replace(document, 3, [new("root", null, 0, 0, "W10", "", false)]);
+            Assert.NotNull(cache.TryRead(document, 3));
+
+            File.AppendAllText(modelPath, "-after");
+            File.SetLastWriteTimeUtc(modelPath, DateTime.UtcNow.AddMinutes(1));
+
+            Assert.Null(cache.TryRead(document, 3));
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
+    public void TreeCacheKeepsPriorCompleteGenerations()
+    {
+        var directory = NewCacheDirectory("generations");
+        var modelPath = Path.Combine(directory, "W10.vfz");
+        File.WriteAllText(modelPath, "model");
+        var databasePath = Path.Combine(directory, "tree.db");
+        try
+        {
+            var cache = new VisMockupTreeCache(databasePath);
+            var document = new FakeDocument("SESSION-1", modelPath, FakeNode.FlatTree(1));
+            cache.Replace(document, 3, [new("root", null, 0, 0, "Before", "", false)]);
+            cache.Replace(document, 3, [new("root", null, 0, 0, "After", "", false)]);
+
+            using (var connection = new SqliteConnection($"Data Source={databasePath};Pooling=False"))
+            {
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT COUNT(*) FROM vm_cache_generations";
+                Assert.Equal(2L, (long)command.ExecuteScalar()!);
+            }
+            Assert.Equal("After", cache.TryRead(document, 3)!.Nodes[0].Name);
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
+    public void FailedGenerationPublishLeavesThePreviousHeadReadable()
+    {
+        var directory = NewCacheDirectory("failed-generation");
+        var modelPath = Path.Combine(directory, "W10.vfz");
+        File.WriteAllText(modelPath, "model");
+        try
+        {
+            var cache = new VisMockupTreeCache(Path.Combine(directory, "tree.db"));
+            var document = new FakeDocument("SESSION-1", modelPath, FakeNode.FlatTree(1));
+            cache.Replace(document, 3, [new("root", null, 0, 0, "Good", "", false)]);
+
+            Assert.Throws<SqliteException>(() => cache.Replace(document, 3, [
+                new("root", null, 0, 0, "Broken 1", "", false),
+                new("root", null, 1, 0, "Broken 2", "", false),
+            ]));
+
+            Assert.Equal("Good", cache.TryRead(document, 3)!.Nodes[0].Name);
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
+    public void LegacyCacheSchemaIsDiscardedInsteadOfTrustedAsFresh()
+    {
+        var directory = NewCacheDirectory("legacy-schema");
+        var databasePath = Path.Combine(directory, "tree.db");
+        try
+        {
+            using (var connection = new SqliteConnection($"Data Source={databasePath};Pooling=False"))
+            {
+                connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = "CREATE TABLE document_cache(document_identity TEXT PRIMARY KEY, max_depth INTEGER NOT NULL);";
+                command.ExecuteNonQuery();
+            }
+
+            var cache = new VisMockupTreeCache(databasePath);
+            var document = new FakeDocument("SESSION-1", "tc://bom/W10", FakeNode.FlatTree(1));
+
+            Assert.Null(cache.TryRead(document, 3));
+            using var migrated = new SqliteConnection($"Data Source={databasePath};Pooling=False");
+            migrated.Open();
+            using var table = migrated.CreateCommand();
+            table.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='vm_cache_documents'";
+            Assert.Equal(1L, (long)table.ExecuteScalar()!);
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    private static string NewCacheDirectory(string name)
+    {
+        var directory = Path.Combine(Path.GetTempPath(), $"ai00-vm-tree-cache-{name}-tests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        return directory;
     }
 }

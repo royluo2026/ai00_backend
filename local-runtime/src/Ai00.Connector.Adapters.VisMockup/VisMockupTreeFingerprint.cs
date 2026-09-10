@@ -30,9 +30,8 @@ public static class VisMockupTreeFingerprint
 {
     public static VmTreeManifest Create(IVisMockupDocument document)
     {
-        var sourceIdentity = NormalizeSourceIdentity(document.SourceIdentity);
-        var documentIdentity = Hash(sourceIdentity, document.RootNode.NodeKey);
-        var externalRevision = ExternalRevision(document.SourceIdentity);
+        var documentIdentity = DocumentIdentityHash(document);
+        var externalRevision = ExternalRevisionFingerprint(document.SourceIdentity);
         var nodes = new List<VmTreeNodeFingerprint>();
         var seen = new HashSet<string>(StringComparer.Ordinal);
         var rootHash = Visit(document.RootNode, nodes, seen);
@@ -43,6 +42,17 @@ public static class VisMockupTreeFingerprint
             externalRevision ?? "",
             externalRevision is null ? CacheFreshness.Uncertain : CacheFreshness.Fresh,
             nodes);
+    }
+
+    public static string DocumentIdentityHash(IVisMockupDocument document) =>
+        Hash(NormalizeSourceIdentity(document.SourceIdentity), document.RootNode.NodeKey);
+
+    public static string? ExternalRevisionFingerprint(string sourceIdentity)
+    {
+        if (!Path.IsPathFullyQualified(sourceIdentity) || !File.Exists(sourceIdentity)) return null;
+        var file = new FileInfo(sourceIdentity);
+        file.Refresh();
+        return Hash(file.Length.ToString(System.Globalization.CultureInfo.InvariantCulture), file.LastWriteTimeUtc.Ticks.ToString(System.Globalization.CultureInfo.InvariantCulture));
     }
 
     private static string Visit(
@@ -67,14 +77,6 @@ public static class VisMockupTreeFingerprint
             .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
             .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar)
             .ToUpperInvariant();
-    }
-
-    private static string? ExternalRevision(string sourceIdentity)
-    {
-        if (!Path.IsPathFullyQualified(sourceIdentity) || !File.Exists(sourceIdentity)) return null;
-        var file = new FileInfo(sourceIdentity);
-        file.Refresh();
-        return Hash(file.Length.ToString(System.Globalization.CultureInfo.InvariantCulture), file.LastWriteTimeUtc.Ticks.ToString(System.Globalization.CultureInfo.InvariantCulture));
     }
 
     private static string Hash(params string[] values)
