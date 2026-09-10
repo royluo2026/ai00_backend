@@ -1,7 +1,7 @@
 # 数模仿真三层缓存、手动快照与版本差异设计
 
 **日期：** 2026-09-10  
-**状态：** AI 自审完成，等待业务 Owner 与架构 Owner 评审  
+**状态：** 方案方向已确认，等待书面规格复核与 Capability 治理审批
 **领域 Owner：** Simulation  
 **关联设计：**
 
@@ -18,6 +18,8 @@
 
 在三层缓存之上复用同一组不可变 VM Snapshot，提供用户手动快照、自动或单次版本对比、节点级差异提示和不可变差异报告。缓存只优化读取和计算，不成为新的业务权威数据源，不绕过 Capability Gateway、权限、确认、幂等、审计或领域写入规则。
 
+三层缓存共享同一条获取与连接策略：页面先显示最近一次完整、已验证的缓存；Connector 使用 VisMockup 原生 PLMXML 导出取得当前完整结构和稳定 occurrence 身份；当前会话中的 COM NodeKey 只按需解析并只在该进程、文档会话内复用。PLMXML 校验与显隐、高亮等控制命令不能并发争抢 VisMockup COM，必须由单一调度器按优先级和独占规则执行。
+
 本设计明确不包含 BOP 缓存。BOP 只作为既有绑定候选和影响对象被引用，不在本轮增加 BOP 缓存表、BOP 版本规则或 BOP 写链。
 
 ## 2. 当前事实与问题
@@ -26,6 +28,11 @@
 
 - Connector 已有 `VisMockupTreeCache`，使用 SQLite 保存文档和节点，能够在同一来源模型关闭重开后复用结构。
 - Connector 当前以 `SourceIdentity + RootNodeKey` 的哈希识别文档，以 VM `NodeKey` 识别节点。
+- 2026-09-10 对当前 W10 文档的真实探针确认：完整 Product Structure COM 遍历约 54.48 秒；使用正确 PLMXML 类型导出当前状态约 15.92 秒，文件约 37.2 MB，导出前后 `NumLoadedNodes` 均为 12,753，没有额外打开 JT 几何。
+- 当前 Connector 的 `ExportEx` 实现传入 `SaveType=0`，而 VisAutomation 类型库定义 `0=DIRECTMODEL`、`2=PLMXML`。这是此前导出慢、可能拖住 VisMockup 的直接实现错误。
+- 当前 VisMockup 14.2 导出的 current-state PLMXML 以 `Occurrence` 和厂商扩展 `PS_API-doc` 为主，而不是为每个节点生成标准 `ProductInstance`。实测包含 14,183 个 `Occurrence`、14,181 条唯一 JT 路径和最大 23 层结构。
+- `__PLM_OCC_PDM_UID` 在 14,182 个有效 occurrence 上全部存在且零重复；完整 JT 路径也零重复。单独使用 clone-stable 叶 UID 有 1,950 个重复，不能作为唯一持久身份。
+- 同一次 PLMXML 导出期间，另一只读 COM 调用等待约 15.10 秒，证明 VisMockup 服务端会串行化这些调用；把导出放到另一个线程不能消除控制延迟。
 - 服务端已有 `workmanship_sim_vm_documents`、`vm_sessions`、`vm_snapshots`、`vm_snapshot_heads`、`vm_occurrences`、`vm_observations` 和 `vm_poses`，持久实体使用后端雪花 GID。
 - `project_incremental_vm_snapshot` 与 `diff_snapshots` 已能基于 PLMXML 投影识别实例延续和部分版本变化。
 - 仿真环境结构由 `workmanship_sim_workspace_*` 持久化，Workspace 每次受治理写入均推进 `row_version`。
@@ -36,6 +43,9 @@
 
 - 相同来源和根节点并不代表内部零件 Revision 没有变化，现有 VM 缓存可能错误命中旧结构。
 - VM 缓存没有节点版本指纹和子树 Hash，无法只刷新变化分支。
+- 现有实现误把会话 NodeKey 当成可持久节点身份；VisMockup 重启或文档重载后可能把控制命令发给错误节点。
+- 现有规格不能假定在读取当前完整结构之前即可知道哪些子树未变化。子树 Hash 只能减少规范化后的 SQLite 写入和差异计算，不能替代源端完整校验。
+- PLMXML 导出是不可抢占的长 COM 操作；若与显隐、高亮共用普通 FIFO 队列，会使直接控制出现十余秒延迟。
 - 仿真环境结构每次打开都依赖网络和全量渲染，不能先显示上次已验证数据。
 - 绑定缓存没有同时固定 VM Snapshot 与 Workspace Revision，无法确定是否仍有效。
 - 用户不能主动创建有名称、有备注、可长期保存的版本快照。
@@ -59,8 +69,9 @@
 
 ### 4.1 稳定身份与版本身份分离
 
-- `document_identity_hash`：规范化 `SourceIdentity + RootNodeKey` 的 SHA-256，用于判断是否为同一来源模型。
-- `external_node_key`：VM 提供的稳定节点键；当其只在会话内稳定时，使用受控 PLMXML `instance_id` 或可证明唯一的 occurrence path。
+- `document_identity_hash`：规范化根 Item/BOM View 身份、来源模型标识和根产品身份后的 SHA-256，用于判断是否为同一逻辑来源模型。VisMockup 进程 ID、文档句柄和 RootKey 不进入持久文档身份。
+- `stable_occurrence_key`：优先使用受控 PLMXML 的 `__PLM_OCC_PDM_UID`；缺失时依次使用可证明唯一的 `__PLM_ABSOCC_UID`，或经唯一性校验的 clone-stable 链、产品身份与 occurrence path 组合。它是来源系统身份或其 Hash，不冒充服务端 GID。
+- `session_node_key`：VisMockup 当前进程内的 COM NodeKey，只用于控制句柄；它必须绑定 `server_process_id + document_handle + root_key`，不得跨会话作为持久节点身份。
 - `revision_fingerprint`：节点当前内容版本摘要，用于判断同一节点是否发生变化。
 - `subtree_hash`：节点自身指纹与有序子节点 Hash 的 Merkle Hash，用于跳过整棵未变化子树。
 - `document_gid`、`snapshot_gid`、`occurrence_gid`、`binding_gid`、`diff_report_gid`、`diff_item_gid`：服务端雪花 GID。
@@ -74,7 +85,7 @@
 因此：
 
 - 服务端持久业务实体必须使用 `backend.platform_sdk.ids.next_gid()`；
-- SQLite 使用本地 `INTEGER PRIMARY KEY` 作为实现行号，并对 `document_identity_hash`、`(cache_document_id, external_node_key)` 建唯一约束；
+- SQLite 使用本地 `INTEGER PRIMARY KEY` 作为实现行号，并对 `document_identity_hash`、`(cache_document_id, stable_occurrence_key)` 建唯一约束；
 - 服务端确认身份后，将真实 `document_gid`、`occurrence_gid` 写入 SQLite 映射列；
 - 本地行号永不暴露为 API GID、Snapshot 身份或绑定身份；
 - 当前 SHA-256 身份不是 UUID，也不替代服务端雪花 GID。
@@ -103,8 +114,13 @@
 - `local_id INTEGER PRIMARY KEY`
 - `cache_document_id INTEGER NOT NULL`
 - `occurrence_gid TEXT NULL`
-- `external_node_key TEXT NOT NULL`
-- `parent_external_node_key TEXT NULL`
+- `external_node_key TEXT NULL`
+- `stable_occurrence_key TEXT NOT NULL`
+- `pdm_occurrence_uid TEXT NULL`
+- `absolute_occurrence_uid TEXT NULL`
+- `clone_stable_chain_json TEXT NOT NULL`
+- `occurrence_path_json TEXT NOT NULL`
+- `parent_stable_occurrence_key TEXT NULL`
 - `child_order INTEGER NOT NULL`
 - `depth INTEGER NOT NULL`
 - `printable_name TEXT NOT NULL`
@@ -117,9 +133,34 @@
 - `last_seen_snapshot_gid TEXT NULL`
 - `removed_at_utc TEXT NULL`
 
-唯一约束为 `(cache_document_id, external_node_key)`。节点 GID 映射不是判断同一节点的唯一依据，因为首次本地读取时服务端可能尚未分配 Occurrence GID。
+唯一约束为 `(cache_document_id, stable_occurrence_key)`。`external_node_key` 仅保留为来源/诊断字段，不再承担跨会话唯一约束。节点 GID 映射不是判断同一节点的唯一依据，因为首次本地读取时服务端可能尚未分配 Occurrence GID。
 
-### 5.2 节点版本指纹
+### 5.2 PLMXML 获取与规范化
+
+当前完整结构以 VisMockup 原生 PLMXML 导出为首选来源，不再用逐节点 COM 遍历作为全量采集主路径：
+
+1. 从 `VFFrame.Application` 取得当前 VisAutomation Application、ActiveDocument 和 `PLMXMLSaveOptions`。
+2. 临时设置 `AskEveryTime=0`、`CopyParts=0`、`RetainReferences=1`、`ForceRetainRefs=1`、`SaveLateLoadedProperties=0`、`SaveExtendedInPLMXML=0` 和 `SaveInsertedAssemblies=0`。
+3. 调用 `ActiveDocument.ExportEx(PLMXML=2, tempPath, "", hierarchyIndex)`；禁止继续使用 `DIRECTMODEL=0`。
+4. 在 `finally` 中恢复用户原 PLMXML 保存选项。不得修改用户注册表中的全局导出模式作为运行时方案。
+5. 流式解析标准 `ProductInstance/ProductRevisionView` 和 VisMockup 14.2 current-state `Occurrence/ApplicationRef` 两种投影。对 current-state 格式，从 `PS_API-doc/JT_PROP_NAME` 恢复完整父子路径，从 `PS_API-doc/NGID` 与 UserValue 提取 PDM UID、absolute UID 和 clone-stable 链。
+6. 校验 XML 安全限制、节点总数、唯一身份覆盖率、父子闭包、根身份和文档来源；任何一项不完整都不得发布为 `valid` generation。
+7. 规范化并计算 Snapshot Hash 后删除临时 PLMXML。只有用户手动快照、共享基准或审计流程明确要求 Artifact 时，才通过既有 Artifact 链保存不可变原始文件。
+
+此路径不依赖 AI00 直接访问 Teamcenter。当前文档即使最初来自 Teamcenter，AI00 采集的是 VisMockup 已经持有的产品结构与元数据。
+
+### 5.3 Occurrence 身份与跨版本匹配
+
+同一 Snapshot 内的精确身份优先级固定为：
+
+1. `__PLM_OCC_PDM_UID`；
+2. `__PLM_ABSOCC_UID`；
+3. 经唯一性校验的完整 clone-stable 链、产品身份和 occurrence path 组合；
+4. 以上均不可用时标记 `uncertain_identity`，不得静默生成“稳定身份”。
+
+跨 Snapshot 延续匹配先使用相同 PDM/absolute UID；再使用叶 clone-stable UID、产品 Item 身份和父链上下文联合匹配。叶 clone UID、名称、VPPS 或路径单项均不能自动确认延续。多个候选必须产生 `ambiguous_identity`，交由用户复核。
+
+### 5.4 节点版本指纹
 
 按固定字段顺序 canonical JSON 后计算 SHA-256：
 
@@ -135,27 +176,51 @@
 
 显隐、选择、高亮、相机和窗口状态不进入结构指纹。
 
-### 5.3 轻量新鲜度来源优先级
+### 5.5 新鲜度证据优先级
 
-1. PLMXML `instance_id/item_id/revision/representation location`；
-2. Teamcenter 暴露的 Item Revision UID；
+1. 当前完整 PLMXML 的规范化 Snapshot Hash；
+2. PLMXML 中的 PDM occurrence UID、Item Revision UID、Revision code 与 representation location；
 3. 本地 JT/模型引用文件的路径、长度和修改时间；
-4. 只能取得 VM NodeKey 与名称时，状态为 `uncertain`，执行有界结构扫描，不静默声称缓存有效。
+4. 当前 VisMockup `server_process_id + document_handle + root_key` 只证明同一活动会话，不证明内部 Revision 未变化；
+5. 只能取得 VM NodeKey 与名称时，状态为 `uncertain`，不得静默声称缓存有效。
 
 不得为了读取 `catiaOccurrenceName` 或其他属性触发 JT 几何加载。若 VisMockup COM 某属性会隐式打开 JT，该属性只能进入显式后台深度采集，不进入交互热路径。
 
-### 5.4 增量刷新算法
+### 5.6 完整校验后的增量发布算法
 
-1. 连接当前文档，计算稳定文档身份。
-2. 获取有界轻量 manifest，不加载几何。
-3. 计算节点 `revision_fingerprint`，自底向上计算 `subtree_hash`。
-4. 根 Hash 相同：返回 SQLite 缓存。
-5. 根 Hash 不同：从根向下比较；子树 Hash 相同则复用整棵子树。
-6. 只读取新增、变化、移动或不确定节点的结构字段。
-7. 在一个 SQLite 事务内 upsert 变化节点、软删除消失节点、更新文档 head。
-8. 提交后返回新 Snapshot 候选；事务失败继续保留旧的 `valid` 快照，并将新构建标记失败，不产生半棵树。
+1. 连接当前文档，计算稳定文档身份，并立即返回上一个完整 generation，状态显示为 `verifying`。
+2. 按 5.2 导出并规范化当前完整 PLMXML，不加载 JT 几何。
+3. 计算节点 `revision_fingerprint`，自底向上计算 `subtree_hash` 和文档 Snapshot Hash。
+4. Snapshot Hash 相同：只推进校验时间和当前会话证明，不重写节点、不生成重复技术 Snapshot。
+5. Snapshot Hash 不同：比较两棵已完整读取的规范化树；子树 Hash 相同则复用 SQLite 行和已有 diff 结果，只 upsert 新增、变化、移动或顺序变化节点。
+6. 在一个 SQLite 事务内写入新 generation、软删除消失节点并原子切换文档 head。
+7. 提交后返回新 Snapshot 候选；事务失败继续保留旧的完整 generation，并将本次构建标记失败，不产生半棵树。
+
+Merkle Hash 优化的是完整读取后的比较、写入和报告生成，不得描述为“无需读取当前源子树即可证明其未变化”。
 
 当来源文件被重命名或移动时默认形成新文档身份。用户可通过受治理的“声明为同一模型来源”流程建立 lineage，本地缓存不得只凭文件名猜测继承。
+
+### 5.7 当前会话 NodeKey 映射
+
+NodeKey 映射是易失控制索引，不是第四份业务缓存：
+
+- 映射键固定为 `server_process_id + process_start_time + document_handle + root_key + stable_occurrence_key`；
+- Connector 或 VisMockup 重启、ActiveDocument 改变、RootKey 改变时整体丢弃；
+- 页面树始终使用 `occurrence_gid/stable_occurrence_key`，不得把 NodeKey 暴露为业务身份；
+- 用户第一次控制一个节点时，Connector 根据已验证 occurrence 的子序号路径逐级调用 `GetChildrenKeysPS`，只解析该路径并缓存结果，不遍历整棵树；
+- 能安全读取时校验叶节点名称/产品引用；校验不一致立即停止控制并要求重新同步，不使用相邻节点或名称模糊匹配兜底；
+- 全显、全隐直接使用视图级 COM；对子树操作只解析子树根 NodeKey；重复操作复用当前会话映射。
+
+### 5.8 COM 调度与连接状态
+
+所有 VisMockup 调用经过一个调度器，但分成两个等级：
+
+- 高优先级控制：显隐、高亮、选择、视角、打开/关闭；
+- 低优先级独占采集：PLMXML 导出、完整快照和手动版本采集。
+
+自动采集只有在高优先级队列为空且连续 10 秒没有控制请求时才能开始；开始前有新控制即继续延期。`ExportEx` 开始后视为不可抢占，页面显示“结构校验中”，不得重复提交第二个导出。手动“创建快照/重新同步”允许显式进入独占采集，但必须显示进度。
+
+导出在可回收的 Connector 工作进程中执行并设置一次性超时。超时后终止工作进程、保留上一完整缓存、标记 exporter degraded，且不得自动循环重试或强杀 VisMockup；只有 VisMockup 响应性探针恢复或用户明确重试后才能再次采集。进程隔离保护 Connector 控制面，但不虚假声称能够取消已经进入 VisMockup 服务端的 COM 操作。
 
 ## 6. 第二层：AI00 仿真环境结构投影缓存
 
@@ -350,6 +415,10 @@
 
 ## 12. 一致性、并发与失败处理
 
+- VM 树读取状态固定为 `verified | verifying | stale | unavailable`。`verified` 才能用于自动绑定、版本报告或需要当前结构证据的写入；`verifying` 可显示最近完整缓存并允许通过当前会话路径校验的查看/控制；`stale` 只读且显著提示；`unavailable` 不显示业务节点。
+- 自动 PLMXML 校验触发条件固定为：首次连接无缓存、VisMockup 进程/活动文档/RootKey 改变、用户重新同步、用户创建手动快照，或业务写入要求当前 Snapshot。不得因页面重渲染、轮询或重复连接事件反复导出。
+- 同一活动会话且 Snapshot 已验证时，重开页面、前端刷新和 Connector 心跳不得重新扫描 VM 树。
+- 自动校验可以延后但不能被省略为“已验证”；自动绑定、Checkpoint、Diff Report 和依赖当前结构的提交在校验完成前 fail closed。
 - SQLite 增量替换必须是单事务；进程崩溃后保留上一个完整 head。
 - 服务端 Snapshot 与报告不可变；Head 推进使用 expected row version。
 - 同一文档并发采集只允许一个构建者推进 head，失败方重新读取 head，不覆盖胜者。
@@ -420,11 +489,13 @@
 
 - Connector SQLite 已命中且无需重建时，本地缓存查询 P95 小于 100 ms，不含 Gateway 调度时延。
 - 仿真环境 IndexedDB 缓存命中时，页面骨架和上次确认结构在 300 ms 内可见。
-- 只有一个节点分支变化时，不得重新读取已证明 Hash 相同的兄弟子树。
+- 当前会话 NodeKey 已解析时，单节点显隐/高亮的 Connector 内部控制 P95 小于 100 ms；首次按路径解析一个节点的 P95 小于 300 ms，不含 VisMockup 自身重绘时间。
+- 对约 15,000 个 occurrence 的 current-state PLMXML，试点机结构导出目标 P95 小于 30 秒、规范化解析 P95 小于 2 秒，且导出前后 `NumLoadedNodes` 不增加。
+- 只有一个节点分支变化时，完整 PLMXML 仍允许读取全部当前结构，但不得重写 Hash 相同的兄弟子树或重新生成等价差异明细。
 - 5000 节点报告分页首屏不读取超过 200 条 Diff Item。
 - 自动对比关闭时，不执行报告持久化和明细加载；新鲜度检查仍执行。
 - `technical_auto` 先按内容 Hash 去重；每文档最多保留 20 份未被引用且不超过 30 天的不同内容 Snapshot。手动 Checkpoint 引用的 Snapshot 不自动删除。
-- 缓存不得使显隐、高亮等 COM 操作增加同步等待。
+- 自动导出不得在控制活跃期开始。不可抢占导出开始后的固有等待必须被页面明确显示并计入 `plmxml_export_blocked_control_ms`，不得隐藏在普通控制耗时中。
 
 性能验收同时记录本地缓存耗时、Gateway 排队耗时、Connector COM 耗时和页面渲染耗时，不能只报告总时间掩盖瓶颈。
 
@@ -432,15 +503,22 @@
 
 ### 16.1 VM 缓存
 
+- `ExportEx` 必须使用 `SaveType=2`；回归测试应证明 `0` 被拒绝为 PLMXML 导出参数。
+- 导出临时关闭交互、零件复制和 late-loaded 属性，结束后恢复原设置；失败路径同样恢复。
+- 真实 VisMockup current-state PLMXML 能从 `Occurrence/ApplicationRef` 还原完整父子结构、PDM UID、stable clone 链、产品身份和最大层级。
+- 真实约 14,000 节点采集前后 `NumLoadedNodes` 不增加，导出目录不产生 JT 副本。
 - 同一来源模型使用不同会话 Document ID 时命中同一文档缓存。
 - 内部一个零件 Revision 改变，只更新该节点及祖先 Hash。
-- 子树 Hash 相同时不读取其后代。
+- 完整 PLMXML 读取后，子树 Hash 相同时不重写其后代、不生成重复差异明细。
 - 节点新增、删除、移动、重排分别得到正确增量。
 - 文件时间变化但无内容 SHA 时不误报几何变化。
 - 无可靠版本字段时缓存状态为 `uncertain` 并重建。
 - SQLite 中途失败后仍能读取上一完整 generation。
 - SQLite 达到 80% 上限后按 LRU 清理到 60% 以下；达到 2 GiB 硬上限时允许淘汰已关闭旧文档的最后 valid generation，但保留当前文档和未同步 generation。
 - 清理期间显隐、高亮和缓存读取不等待全库 vacuum。
+- VisMockup/Connector 重启后旧 NodeKey 全部失效；首次控制只解析目标路径，不能批量预热完整 NodeKey 树。
+- PLMXML 导出期间并发只读探针被 VisMockup 排队时，调度器记录阻塞且不会启动第二个导出。
+- 导出超时后保留上一完整 generation、停止自动重试且不强杀 VisMockup。
 
 ### 16.2 仿真结构缓存
 
@@ -484,7 +562,7 @@
 
 ### 阶段 A：VM 缓存正确性
 
-补齐节点指纹、子树 Hash、SQLite generation、跨会话命中和不确定缓存重建。该阶段完成前不得启用自动差异报告。
+先修复 `ExportEx SaveType` 和保存选项，增加 VisMockup 14.2 current-state PLMXML 规范化，再补齐稳定 occurrence 身份、节点指纹、子树 Hash、SQLite generation、跨会话命中、NodeKey 按需映射和 COM 调度。该阶段完成前不得启用自动差异报告。
 
 ### 阶段 B：仿真结构与绑定读取缓存
 
@@ -513,6 +591,12 @@
 11. **不可变历史不能等于无限保留。** 已区分可重建本地缓存、滚动技术历史和人工/审计证据，并增加硬容量、LRU、水位线、引用保护与清理审计。
 12. **Diff Report 对 Snapshot 的引用会阻止所有清理。** 已增加自动报告摘要压缩和强/弱引用语义，并固定“先压缩报告、再清理 Snapshot”的顺序。
 13. **轻量校验不能为了算 Hash 重新读取完整结构。** 已增加写事务内推进的 `cache_revision_hash`；它只用于失效检测，不冒充语义内容 Hash。
+14. **Merkle Hash 不能让 Connector 在未读取当前结构时跳过源端子树。** 已改为完整轻量 PLMXML 后做增量比较和 SQLite 发布，不再承诺无法证明的源端局部扫描。
+15. **会话 NodeKey 不能作为持久 occurrence 身份。** 已将 PDM occurrence UID 作为首选身份，并把 NodeKey 限定为按需解析、会话失效的控制索引。
+16. **单独 clone UID 不唯一。** 真实 W10 样本出现 1,950 个重复叶 UID；已要求 PDM/absolute UID 优先，clone UID 必须与产品身份及父链联合且通过唯一性检查。
+17. **把 PLMXML 导出放到后台线程不能避免控制延迟。** 真实并发探针显示只读 COM 调用仍等待约 15 秒；已增加控制优先、空闲启动、独占导出和禁止重复导出规则。
+18. **当前 Connector 传错导出类型。** 类型库确认 `0=DIRECTMODEL`、`2=PLMXML`；阶段 A 首先修复参数并验证不复制/不加载 JT。
+19. **不能要求 Teamcenter 作为缓存新鲜度依赖。** 当前方案只读取 VisMockup 已持有结构，Teamcenter 来源仅作为不可变引用证据；无法访问 Teamcenter 不阻塞本地快照。
 
 ### 18.2 仍需人工评审的业务决策
 
@@ -521,4 +605,4 @@
 
 ### 18.3 自审结论
 
-本设计覆盖缓存身份、版本失效、三层所有权、用户手动快照、自动对比开关、关闭状态下单次对比、节点差异报告、权限、并发、迁移、回滚和验收。共享基准授权固定为环境 Owner、项目经理和 super_admin；个人快照只能由创建者归档。未发现未声明的跨域写入；新增写能力仅属于 Simulation，Artifact 仅保存不可变报告字节。AI 自审不构成人工批准，实施前必须由用户确认本规格，并在 Capability 治理中心完成业务描述和新增能力审批。
+本设计覆盖缓存身份、PLMXML 获取、会话 NodeKey、版本失效、三层所有权、用户手动快照、自动对比开关、关闭状态下单次对比、节点差异报告、权限、并发、迁移、回滚和验收。最快路径固定为“缓存立即显示、当前节点按需解析”；准确路径固定为“完整轻量 PLMXML、不可变 Snapshot、业务写前强校验”；稳定路径固定为“控制优先、导出独占、失败保留上一完整 generation”。共享基准授权固定为环境 Owner、项目经理和 super_admin；个人快照只能由创建者归档。未发现未声明的跨域写入；新增写能力仅属于 Simulation，Artifact 仅保存不可变报告字节。AI 自审不构成人工批准，实施前必须由用户确认本规格，并在 Capability 治理中心完成业务描述和新增能力审批。
