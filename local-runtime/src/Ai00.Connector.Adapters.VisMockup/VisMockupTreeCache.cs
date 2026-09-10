@@ -10,11 +10,25 @@ internal sealed record CachedTreeNode(
 
 internal sealed record CachedTree(IReadOnlyList<CachedTreeNode> Nodes, int MaxDepth);
 
+internal sealed record VisMockupTreeCachePolicy(
+    long HardLimitBytes = 2L * 1024 * 1024 * 1024,
+    double CleanupTriggerRatio = 0.8,
+    double CleanupTargetRatio = 0.6)
+{
+    public void Validate()
+    {
+        if (HardLimitBytes < 1 || CleanupTriggerRatio is <= 0 or >= 1 ||
+            CleanupTargetRatio is <= 0 or >= 1 || CleanupTargetRatio >= CleanupTriggerRatio)
+            throw new ArgumentOutOfRangeException(nameof(HardLimitBytes), "vismockup_cache_policy_invalid");
+    }
+}
+
 internal sealed class VisMockupTreeCache
 {
     private readonly string connectionString;
+    private readonly VisMockupTreeCachePolicy policy;
 
-    public VisMockupTreeCache(string path)
+    public VisMockupTreeCache(string path, VisMockupTreeCachePolicy? policy = null)
     {
         var fullPath = Path.GetFullPath(path);
         Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
@@ -25,6 +39,8 @@ internal sealed class VisMockupTreeCache
             Cache = SqliteCacheMode.Private,
             Pooling = false,
         }.ToString();
+        this.policy = policy ?? new();
+        this.policy.Validate();
         Initialize();
     }
 
@@ -91,9 +107,12 @@ internal sealed class VisMockupTreeCache
     public void Replace(IVisMockupDocument document, int maxDepth, IReadOnlyList<CachedTreeNode> nodes)
     {
         var identity = Identity(document);
-        var treeHash = "sha256:" + Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(
+        var serialized = JsonSerializer.SerializeToUtf8Bytes(
             nodes.OrderBy(node => node.Depth).ThenBy(node => node.ParentNodeKey).ThenBy(node => node.ChildOrder)
-                .ThenBy(node => node.NodeKey)))).ToLowerInvariant();
+                .ThenBy(node => node.NodeKey));
+        var byteSize = serialized.LongLength;
+        if (!EnsureCapacity(identity, byteSize)) return;
+        var treeHash = "sha256:" + Convert.ToHexString(SHA256.HashData(serialized)).ToLowerInvariant();
         var externalRevision = VisMockupTreeFingerprint.ExternalRevisionFingerprint(document.SourceIdentity) ?? "";
         var now = DateTimeOffset.UtcNow.ToString("O");
 
@@ -141,8 +160,8 @@ internal sealed class VisMockupTreeCache
             insertGeneration.Transaction = transaction;
             insertGeneration.CommandText = """
                 INSERT INTO vm_cache_generations(
-                    document_local_id,generation,root_subtree_hash,freshness,max_depth,node_count,completed_utc)
-                VALUES($document_local_id,$generation,$tree_hash,$freshness,$max_depth,$node_count,$now)
+                    document_local_id,generation,root_subtree_hash,freshness,max_depth,node_count,byte_size,completed_utc)
+                VALUES($document_local_id,$generation,$tree_hash,$freshness,$max_depth,$node_count,$byte_size,$now)
                 """;
             insertGeneration.Parameters.AddWithValue("$document_local_id", localId);
             insertGeneration.Parameters.AddWithValue("$generation", generation);
@@ -150,6 +169,7 @@ internal sealed class VisMockupTreeCache
             insertGeneration.Parameters.AddWithValue("$freshness", externalRevision.Length == 0 ? "uncertain" : "fresh");
             insertGeneration.Parameters.AddWithValue("$max_depth", maxDepth);
             insertGeneration.Parameters.AddWithValue("$node_count", nodes.Count);
+            insertGeneration.Parameters.AddWithValue("$byte_size", byteSize);
             insertGeneration.Parameters.AddWithValue("$now", now);
             insertGeneration.ExecuteNonQuery();
         }
@@ -188,6 +208,84 @@ internal sealed class VisMockupTreeCache
         transaction.Commit();
     }
 
+    private bool EnsureCapacity(string protectedIdentity, long incomingBytes)
+    {
+        using var connection = Open();
+        using var transaction = connection.BeginTransaction();
+        var total = Scalar(connection, transaction, "SELECT COALESCE(SUM(byte_size),0) FROM vm_cache_generations");
+        var projected = total + incomingBytes;
+        if (projected <= policy.HardLimitBytes * policy.CleanupTriggerRatio) return true;
+        var target = (long)(policy.HardLimitBytes * policy.CleanupTargetRatio);
+
+        using (var oldGenerations = connection.CreateCommand())
+        {
+            oldGenerations.Transaction = transaction;
+            oldGenerations.CommandText = """
+                SELECT g.document_local_id,g.generation,g.byte_size
+                FROM vm_cache_generations g
+                JOIN vm_cache_documents d ON d.local_id=g.document_local_id
+                WHERE g.generation<>d.current_generation
+                ORDER BY g.completed_utc,g.document_local_id,g.generation
+                """;
+            using var reader = oldGenerations.ExecuteReader();
+            var candidates = new List<(long DocumentId, long Generation, long Bytes)>();
+            while (reader.Read()) candidates.Add((reader.GetInt64(0), reader.GetInt64(1), reader.GetInt64(2)));
+            reader.Close();
+            foreach (var candidate in candidates)
+            {
+                if (projected <= target) break;
+                using var delete = connection.CreateCommand();
+                delete.Transaction = transaction;
+                delete.CommandText = "DELETE FROM vm_cache_generations WHERE document_local_id=$document_id AND generation=$generation";
+                delete.Parameters.AddWithValue("$document_id", candidate.DocumentId);
+                delete.Parameters.AddWithValue("$generation", candidate.Generation);
+                delete.ExecuteNonQuery();
+                projected -= candidate.Bytes;
+            }
+        }
+
+        using (var closedDocuments = connection.CreateCommand())
+        {
+            closedDocuments.Transaction = transaction;
+            closedDocuments.CommandText = """
+                SELECT d.local_id,COALESCE(SUM(g.byte_size),0)
+                FROM vm_cache_documents d
+                LEFT JOIN vm_cache_generations g ON g.document_local_id=d.local_id
+                WHERE d.document_identity_hash<>$protected_identity
+                GROUP BY d.local_id,d.last_accessed_utc
+                ORDER BY d.last_accessed_utc,d.local_id
+                """;
+            closedDocuments.Parameters.AddWithValue("$protected_identity", protectedIdentity);
+            using var reader = closedDocuments.ExecuteReader();
+            var candidates = new List<(long DocumentId, long Bytes)>();
+            while (reader.Read()) candidates.Add((reader.GetInt64(0), reader.GetInt64(1)));
+            reader.Close();
+            foreach (var candidate in candidates)
+            {
+                if (projected <= target) break;
+                using var delete = connection.CreateCommand();
+                delete.Transaction = transaction;
+                delete.CommandText = "DELETE FROM vm_cache_documents WHERE local_id=$document_id";
+                delete.Parameters.AddWithValue("$document_id", candidate.DocumentId);
+                delete.ExecuteNonQuery();
+                projected -= candidate.Bytes;
+            }
+        }
+        transaction.Commit();
+        using var vacuum = connection.CreateCommand();
+        vacuum.CommandText = "PRAGMA incremental_vacuum";
+        vacuum.ExecuteNonQuery();
+        return projected <= policy.HardLimitBytes;
+    }
+
+    private static long Scalar(SqliteConnection connection, SqliteTransaction transaction, string sql)
+    {
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = sql;
+        return Convert.ToInt64(command.ExecuteScalar());
+    }
+
     private SqliteConnection Open()
     {
         var connection = new SqliteConnection(connectionString);
@@ -201,6 +299,11 @@ internal sealed class VisMockupTreeCache
     private void Initialize()
     {
         using var connection = Open();
+        using (var journal = connection.CreateCommand())
+        {
+            journal.CommandText = "PRAGMA journal_mode=WAL";
+            journal.ExecuteNonQuery();
+        }
         using var transaction = connection.BeginTransaction();
         using (var migrate = connection.CreateCommand())
         {
@@ -215,7 +318,6 @@ internal sealed class VisMockupTreeCache
         {
             command.Transaction = transaction;
             command.CommandText = """
-                PRAGMA journal_mode=WAL;
                 CREATE TABLE IF NOT EXISTS vm_cache_documents(
                   local_id INTEGER PRIMARY KEY,
                   document_identity_hash TEXT NOT NULL UNIQUE,
@@ -232,6 +334,7 @@ internal sealed class VisMockupTreeCache
                   freshness TEXT NOT NULL,
                   max_depth INTEGER NOT NULL,
                   node_count INTEGER NOT NULL,
+                  byte_size INTEGER NOT NULL,
                   completed_utc TEXT NOT NULL,
                   PRIMARY KEY(document_local_id,generation),
                   FOREIGN KEY(document_local_id) REFERENCES vm_cache_documents(local_id) ON DELETE CASCADE);
@@ -254,5 +357,21 @@ internal sealed class VisMockupTreeCache
             command.ExecuteNonQuery();
         }
         transaction.Commit();
+        if (!ColumnExists(connection, "vm_cache_generations", "byte_size"))
+        {
+            using var addByteSize = connection.CreateCommand();
+            addByteSize.CommandText = "ALTER TABLE vm_cache_generations ADD COLUMN byte_size INTEGER NOT NULL DEFAULT 0";
+            addByteSize.ExecuteNonQuery();
+        }
+    }
+
+    private static bool ColumnExists(SqliteConnection connection, string table, string column)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText = $"PRAGMA table_info({table})";
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+            if (string.Equals(reader.GetString(1), column, StringComparison.Ordinal)) return true;
+        return false;
     }
 }
