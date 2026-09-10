@@ -109,6 +109,9 @@ _RESOURCES = {
     "simulation.environment.binding.create": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.binding.remove": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.version.freeze": (("simulation-workspace", "workspace_gid"),),
+    "simulation.vm_checkpoint.create": (("simulation-workspace", "workspace_gid"), ("simulation-document-snapshot", "snapshot_request_id")),
+    "simulation.vm_checkpoint.search": (("simulation-workspace", "workspace_gid"),),
+    "simulation.vm_checkpoint.archive": (("simulation-vm-checkpoint", "checkpoint_gid"), ("simulation-workspace", "workspace_gid")),
 }
 _ERROR_PAIRS = (
     ('runtime_owner_mismatch', 'The authenticated user and tenant do not own this runtime device.'),
@@ -477,6 +480,28 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                 DomainErrorContract(code="cache_lease_ttl_invalid", meaning="The requested cache lease lifetime must be between 60 and 300 seconds.", is_caller_error=True),
                 DomainErrorContract(code="cache_lease_signing_key_unavailable", meaning="The server cannot issue authenticated cache leases until signing material is configured."),
             ),
+            "domain_errors_complete": True,
+        })
+    if governed.id.startswith("simulation.vm_checkpoint."):
+        updates.update({
+            "business_effect": "Persist or read immutable user-named VM version evidence without deleting its underlying technical snapshot.",
+            "business_acceptance_criteria": (
+                "A checkpoint references only an exact completed Connector snapshot already projected into authoritative VM persistence.",
+                "Personal checkpoints remain caller-private while shared baselines require workspace ownership, project management, or super-admin authority.",
+                "Archive preserves the checkpoint row and all referenced snapshot evidence.",
+            ),
+            "business_invariants": (),
+            "no_business_invariant_reason": _CONNECTOR_READ_REASON,
+            "domain_errors": tuple(DomainErrorContract(code=code, meaning=meaning, retryable=retryable, is_caller_error=caller) for code, meaning, retryable, caller in (
+                ("workspace_not_found", "The checkpoint workspace is unavailable or unreadable.", False, True),
+                ("document_snapshot_not_found", "The source snapshot request is unavailable to this caller.", False, True),
+                ("document_snapshot_not_completed", "The source snapshot request has not completed.", True, True),
+                ("snapshot_hash_mismatch", "The supplied hash differs from the authoritative completed snapshot.", False, True),
+                ("vm_snapshot_projection_required", "The completed Connector snapshot has not yet been projected into authoritative VM persistence.", True, False),
+                ("vm_checkpoint_shared_forbidden", "The caller cannot create or archive a shared project baseline.", False, True),
+                ("vm_checkpoint_not_found_or_conflict", "The checkpoint is unavailable or its row version changed.", True, True),
+                ("idempotency_conflict", "The idempotency key is bound to different checkpoint content.", False, True),
+            )),
             "domain_errors_complete": True,
         })
     if governed.id.startswith("simulation.connector_") and governed.id.endswith("_outcome.apply"):

@@ -23,6 +23,15 @@ WORKSPACE_CACHE_LEASE = obj({
     "read_lease": {"type": "string", "minLength": 32},
 }, ("auth_subject_gid", "workspace_gid", "permission_version", "row_version",
     "cache_revision_hash", "expires_at", "expires_in_seconds", "read_lease"))
+VM_CHECKPOINT = obj({
+    "checkpoint_gid": GID, "snapshot_gid": GID, "workspace_gid": GID, "created_by": GID,
+    "scope": {"type": "string", "enum": ["personal", "shared_baseline"]},
+    "name": {"type": "string", "minLength": 1, "maxLength": 255},
+    "note": {"anyOf": [{"type": "string", "maxLength": 4000}, {"type": "null"}]},
+    "row_version": POSITIVE_INTEGER, "created_at": STRING,
+    "archived_at": {"anyOf": [STRING, {"type": "null"}]},
+}, ("checkpoint_gid", "snapshot_gid", "workspace_gid", "created_by", "scope", "name",
+    "note", "row_version", "created_at", "archived_at"))
 ARTIFACT_REF = obj({
     "artifact_id": STRING, "media_type": STRING,
     "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$", "example": "0" * 64},
@@ -216,6 +225,22 @@ INPUT_SCHEMAS = {
     "simulation.document_snapshot.get": obj({"snapshot_request_id": STRING}, ("snapshot_request_id",)),
     "simulation.document_snapshot.action.get": obj({"snapshot_request_id": STRING}, ("snapshot_request_id",)),
     "simulation.document_snapshot.dispatch": obj({"snapshot_request_id": STRING}, ("snapshot_request_id",)),
+    "simulation.vm_checkpoint.create": obj({
+        "snapshot_request_id": STRING, "snapshot_hash": HASH, "workspace_gid": GID,
+        "scope": {"type": "string", "enum": ["personal", "shared_baseline"]},
+        "name": {"type": "string", "minLength": 1, "maxLength": 255},
+        "note": {"type": "string", "maxLength": 4000},
+        "idempotency_key": {"type": "string", "minLength": 1, "maxLength": 191},
+    }, ("snapshot_request_id", "snapshot_hash", "workspace_gid", "scope", "name", "idempotency_key")),
+    "simulation.vm_checkpoint.search": obj({
+        "workspace_gid": GID, "cursor": STRING,
+        "page_size": {"type": "integer", "minimum": 1, "maximum": 200},
+        "include_archived": {"type": "boolean"},
+    }, ("workspace_gid",)),
+    "simulation.vm_checkpoint.archive": obj({
+        "checkpoint_gid": GID, "workspace_gid": GID, "expected_row_version": POSITIVE_INTEGER,
+        "idempotency_key": {"type": "string", "minLength": 1, "maxLength": 191},
+    }, ("checkpoint_gid", "workspace_gid", "expected_row_version", "idempotency_key")),
     "simulation.environment.manifest.get": obj({"environment_id": STRING, "environment_version": POSITIVE_INTEGER}, ("environment_id", "environment_version")),
     "simulation.environment.manifest.search": obj({"limit": {"type": "integer", "minimum": 1, "maximum": 200}}),
     "simulation.environment.manifest.archive": obj({"environment_id": STRING}, ("environment_id",)),
@@ -248,6 +273,12 @@ OUTPUT_SCHEMAS = {
         "action": {"anyOf": [DOWNSTREAM_ACTION, {"type": "null"}]},
     }, ("action",)),
     "simulation.document_snapshot.dispatch": DOCUMENT_SNAPSHOT_REQUEST,
+    "simulation.vm_checkpoint.create": VM_CHECKPOINT,
+    "simulation.vm_checkpoint.search": obj({
+        "items": {"type": "array", "items": VM_CHECKPOINT, "maxItems": 200},
+        "next_cursor": {"anyOf": [STRING, {"type": "null"}]},
+    }, ("items", "next_cursor")),
+    "simulation.vm_checkpoint.archive": VM_CHECKPOINT,
     "simulation.parameter_set.create": PARAMETER_SET,
     "simulation.parameter_set.get": PARAMETER_SET,
     "simulation.parameter_set.search": obj({"items": {"type": "array", "items": PARAMETER_SET}, "total": INTEGER, "query": STRING}, ("items", "total", "query")),
