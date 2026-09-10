@@ -3,11 +3,44 @@
   "domain": "Base Platform",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:0f0d81ef5b60bb103f657d4b4a62afc096b4793f85f204805298389c01e8049a",
-    "catalog_release": "rel_04c998e59a4188758c8eda43f25b0488",
-    "catalog_sha256": "sha256:1be2b5f26178a57830b0ae1f54bbb170b6ca35e062bb1044abc2da19eba7fa02"
+    "registry_sha256": "sha256:06edf22fded2c04b9c85699c6c95e77360663ee51c703953898cda0425089337",
+    "catalog_release": "rel_78a4ed0c60a509804255a8c831dad3b6",
+    "catalog_sha256": "sha256:2a04a6b1a6bd7354840783a605e371a8c6e34ffbbda493452be93cded6106613"
   },
-  "unreviewed_functions": {},
+  "unreviewed_functions": {
+    "rest:GET:/api/skills?limit=50": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "dist/web/workbench/workbench.js"
+      ],
+      "owner": "Base Platform",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:POST:/auth/desktop/revoke": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "backend/routers/desktop_auth.py"
+      ],
+      "owner": "Base Platform",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:POST:/auth/desktop/start": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "backend/routers/desktop_auth.py"
+      ],
+      "owner": "Base Platform",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:POST:/auth/desktop/token": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "backend/routers/desktop_auth.py"
+      ],
+      "owner": "Base Platform",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    }
+  },
   "excluded_functions": {
     "capability:plugin.upgrade.finish": {
       "resolution": "excluded",
@@ -3409,6 +3442,34 @@
       "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
     },
     {
+      "table": "workmanship_base_capability_business_purposes",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_business_review_requests",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_business_reviews",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_business_rules",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
       "table": "workmanship_base_capability_catalog_releases",
       "owner_domain": "Base Platform",
       "access_mode": "read_write",
@@ -3500,6 +3561,13 @@
       "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
     },
     {
+      "table": "workmanship_base_capability_relation_candidates",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
       "table": "workmanship_base_capability_release_reports",
       "owner_domain": "Base Platform",
       "access_mode": "read_write",
@@ -3508,6 +3576,13 @@
     },
     {
       "table": "workmanship_base_capability_reviews",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_rule_effectiveness",
       "owner_domain": "Base Platform",
       "access_mode": "read_write",
       "migration_stream": "base",
@@ -3529,6 +3604,13 @@
     },
     {
       "table": "workmanship_base_capability_snapshots",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_standard_review_requests",
       "owner_domain": "Base Platform",
       "access_mode": "read_write",
       "migration_stream": "base",
@@ -3577,7 +3659,70 @@
       "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
     },
     {
+      "table": "workmanship_base_desktop_families",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_desktop_refresh_tokens",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_desktop_transactions",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
       "table": "workmanship_base_domain_inbox",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_historical_uploads",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_legacy_artifact_bindings",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_line_projection_operations",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_line_responsibility_source_targets",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_line_responsibility_sources",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_line_responsibility_targets",
       "owner_domain": "Base Platform",
       "access_mode": "read_write",
       "migration_stream": "base",
@@ -3606,6 +3751,27 @@
     },
     {
       "table": "workmanship_base_plugin_lifecycle_idempotency",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_project_manager_assignments",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_project_manager_heads",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_project_manager_operations",
       "owner_domain": "Base Platform",
       "access_mode": "read_write",
       "migration_stream": "base",
@@ -3816,7 +3982,7 @@
   },
   "official_provider_capabilities": {
     "module": "backend.base.official_provider",
-    "artifact_sha256": "sha256:2293315d161db082ac3f2b2fabe736b31a58de3d271423294ec50143bfbe6c85",
+    "artifact_sha256": "sha256:eeb3ea87d98f5a8aac9b30d12654e44dab2f29e455c7a133fd0ce16b83210091",
     "capability_ids": [
       "base.annotation.change.apply",
       "base.annotation.read",
@@ -3825,15 +3991,43 @@
       "base.approval.request.decide",
       "base.approval.request.get",
       "base.approval.request.search",
+      "base.artifact.batch.import",
+      "base.artifact.bytes.get",
+      "base.artifact.get",
+      "base.artifact.import",
+      "base.artifact.revise",
+      "base.artifact.text.create",
+      "base.artifact.text.get",
       "base.authorization.grant.change.apply",
       "base.authorization.grant.create",
       "base.authorization.grant.list",
       "base.authorization.grant.read",
       "base.authorization.grant.revoke",
+      "base.bop_edit.authorization.check",
       "base.export_template.change.apply",
+      "base.export_template.create",
+      "base.export_template.list",
       "base.export_template.read",
+      "base.export_template.update",
+      "base.feishu.calendar.day.get",
+      "base.feishu.calendar.event.get",
+      "base.feishu.calendar.event.update",
+      "base.feishu.calendar.rsvp.set",
+      "base.feishu.chat.search",
+      "base.feishu.document.search",
+      "base.feishu.event.search",
+      "base.feishu.list_share.send",
+      "base.feishu.meeting.search",
+      "base.feishu.organization_user.search",
+      "base.feishu.user.search",
+      "base.file_store.minio_config.set",
+      "base.file_store.minio_connection.test",
+      "base.file_store.ois_config.set",
+      "base.file_store.ois_connection.test",
       "base.file_store.public_config.get",
+      "base.identity.active_principal.get",
       "base.identity.admin_user.list",
+      "base.identity.current.get",
       "base.identity.directory.feishu.sync",
       "base.identity.directory.sync",
       "base.identity.role.assign",
@@ -3854,9 +4048,23 @@
       "base.plugin.marketplace.publisher.register",
       "base.plugin.marketplace.release.change.apply",
       "base.plugin.marketplace.search",
+      "base.project_manager.read",
+      "base.project_manager.replace",
+      "base.project_responsibility.projection.apply",
+      "base.project_responsibility.projection.get",
+      "base.runtime.annotation.search",
+      "base.runtime.capability_note.set",
+      "base.runtime.capability_status.set",
       "base.runtime.database_config.change.apply",
       "base.runtime.database_config.get",
       "base.runtime.database_connection.test",
+      "base.runtime.feature_flags.get",
+      "base.runtime.feature_flags.replace",
+      "base.runtime.feishu_app_id.get",
+      "base.runtime.feishu_app_id.set",
+      "base.runtime.feishu_app_secret.set",
+      "base.runtime.list_note.set",
+      "base.runtime.log.search",
       "base.saved_view.change.apply",
       "base.saved_view.copy",
       "base.saved_view.create",
@@ -3868,10 +4076,16 @@
       "base.self_annotation.change.apply",
       "base.self_annotation.record.get",
       "base.self_annotation.search",
+      "base.team.archive",
       "base.team.change.apply",
+      "base.team.create",
       "base.team.directory.list",
+      "base.team.member.add",
+      "base.team.member.list",
+      "base.team.member.remove",
       "base.team.membership.change.apply",
       "base.team.read",
+      "base.team.update",
       "base.workspace.template.publish",
       "base.workspace.template.read",
       "identity.principal.search",

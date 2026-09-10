@@ -116,6 +116,18 @@ craft.bop.repository.archive
 {
   "additionalProperties": false,
   "properties": {
+    "access_scope": {
+      "enum": [
+        "project",
+        "line",
+        "read_only",
+        null
+      ],
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "actor_gid": {
       "type": [
         "string",
@@ -123,6 +135,22 @@ craft.bop.repository.archive
       ]
     },
     "baseline_version_gid": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "bindings": {
+      "maxItems": 5000,
+      "type": "array"
+    },
+    "content_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "created_at": {
       "type": [
         "string",
         "null"
@@ -143,6 +171,12 @@ craft.bop.repository.archive
         "null"
       ]
     },
+    "fork_base_version_gid": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "frozen_version_gid": {
       "type": [
         "string",
@@ -154,6 +188,10 @@ craft.bop.repository.archive
         "string",
         "null"
       ]
+    },
+    "head_row_version": {
+      "minimum": 0,
+      "type": "integer"
     },
     "idempotency_key": {
       "type": [
@@ -305,6 +343,63 @@ craft.bop.repository.archive
         "null"
       ]
     },
+    "nodes": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "access_mode": {
+            "enum": [
+              "editable",
+              "read_only"
+            ],
+            "type": "string"
+          },
+          "line_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "node_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "node_type": {
+            "type": "string"
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "position": {
+            "type": [
+              "string",
+              "number",
+              "integer"
+            ]
+          }
+        },
+        "required": [
+          "node_gid",
+          "parent_gid",
+          "line_gid",
+          "node_type",
+          "name",
+          "position",
+          "access_mode"
+        ],
+        "type": "object"
+      },
+      "maxItems": 20000,
+      "type": "array"
+    },
     "offset": {
       "minimum": 0,
       "type": "integer"
@@ -361,6 +456,12 @@ craft.bop.repository.archive
       ]
     },
     "tenant_gid": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "updated_at": {
       "type": [
         "string",
         "null"

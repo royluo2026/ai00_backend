@@ -8,6 +8,7 @@
 | Agent | `agent.canvas.execution.resume` | none |
 | Agent | `agent.canvas.execution.start` | none |
 | Agent | `agent.canvas.options.resolve` | none |
+| Agent | `agent.catalog_tool.confirm.apply` | web, rest |
 | Agent | `agent.flow.change.apply` | rest |
 | Agent | `agent.flow.read` | rest |
 | Agent | `agent.interaction.cancel` | none |
@@ -15,6 +16,14 @@
 | Agent | `agent.interaction.request` | agent |
 | Agent | `agent.memory.change.apply` | agent |
 | Agent | `agent.memory.read` | agent |
+| Agent | `agent.orchestration.binding.delete` | none |
+| Agent | `agent.orchestration.graph.read` | web |
+| Agent | `agent.orchestration.graph.save` | none |
+| Agent | `agent.orchestration.metric.read` | web |
+| Agent | `agent.orchestration.panorama.read` | web |
+| Agent | `agent.orchestration.run.start` | none |
+| Agent | `agent.orchestration.run.transition` | none |
+| Agent | `agent.orchestration.version.publish` | none |
 | Agent | `agent.run.change.apply` | rest, agent |
 | Agent | `agent.run.read` | agent |
 | Agent | `agent.runtime.config.read` | none |
@@ -71,6 +80,7 @@
 | Craft | `craft.bop.entry.change.apply` | none |
 | Craft | `craft.bop.entry.detail.get` | none |
 | Craft | `craft.bop.entry.legacy_read` | web, rest |
+| Craft | `craft.bop.entry.relation.list` | none |
 | Craft | `craft.bop.entry.search` | web, rest |
 | Craft | `craft.bop.entry_link.change.apply` | none |
 | Craft | `craft.bop.execution_structure.get` | rest, agent |
@@ -91,6 +101,7 @@
 | Craft | `craft.bop.lifecycle.stats.refresh.apply` | none |
 | Craft | `craft.bop.lifecycle.step.rollback.apply` | none |
 | Craft | `craft.bop.line_operation_catia.read` | web, rest |
+| Craft | `craft.bop.linked_entity.detail.get` | none |
 | Craft | `craft.bop.linked_parts.get` | rest |
 | Craft | `craft.bop.pbom.change_point.get` | web, rest |
 | Craft | `craft.bop.pbom_lifecycle.read` | web, rest |
@@ -172,6 +183,16 @@
 | Craft | `craft.pbom.version.publish` | none |
 | Craft | `craft.pbom.version.search` | rest |
 | Craft | `craft.pbom.version.submit` | none |
+| Craft | `craft.process_screenshot.attach` | none |
+| Craft | `craft.resource_requirement.alias.create` | none |
+| Craft | `craft.resource_requirement.alias.delete` | none |
+| Craft | `craft.resource_requirement.create` | none |
+| Craft | `craft.resource_requirement.retire` | none |
+| Craft | `craft.resource_requirement.search` | none |
+| Craft | `craft.resource_requirement.staging.ignore` | none |
+| Craft | `craft.resource_requirement.staging.resolve` | none |
+| Craft | `craft.resource_requirement.staging.search` | none |
+| Craft | `craft.resource_requirement.update` | none |
 | Craft | `craft.rule.change.apply` | rest |
 | Craft | `craft.rule.definition.change.apply` | none |
 | Craft | `craft.rule.draft.create` | none |
@@ -282,6 +303,7 @@
 | Knowledge | `knowledge.reference_data.change.apply` | none |
 | Knowledge | `knowledge.reference_data.read` | none |
 | Knowledge | `knowledge.reference_dataset.publish` | none |
+| Knowledge | `knowledge.resource_model_mapping.resolve` | web, rest, plugin, agent, mcp |
 | Knowledge | `knowledge.search` | rest, agent |
 | Knowledge | `knowledge.space.change.apply` | none |
 | Knowledge | `knowledge.space.create` | rest |
@@ -335,10 +357,42 @@
 | Project Management | `project.task_template.read` | rest |
 | Project Management | `project.workbench.change.apply` | rest |
 | Project Management | `project.workbench.read` | rest |
+| Simulation | `simulation.capture_run.action.get` | none |
+| Simulation | `simulation.capture_run.cancel` | none |
+| Simulation | `simulation.capture_run.dispatch` | none |
+| Simulation | `simulation.capture_run.get` | none |
+| Simulation | `simulation.capture_run.start` | none |
+| Simulation | `simulation.capture_step.retry` | none |
+| Simulation | `simulation.connector.binding.get` | none |
+| Simulation | `simulation.connector.health.get` | none |
+| Simulation | `simulation.connector.pairing.activate` | none |
+| Simulation | `simulation.connector.pairing.approve` | none |
+| Simulation | `simulation.connector.pairing.bootstrap.create` | none |
+| Simulation | `simulation.connector.pairing.bootstrap.get` | none |
+| Simulation | `simulation.connector.pairing.cancel` | none |
+| Simulation | `simulation.connector.pairing.complete` | none |
+| Simulation | `simulation.connector.pairing.request` | none |
+| Simulation | `simulation.connector.pairing.summary.get` | none |
+| Simulation | `simulation.connector.plan.queue` | none |
+| Simulation | `simulation.connector_capture_outcome.apply` | none |
+| Simulation | `simulation.connector_document_snapshot_outcome.apply` | none |
+| Simulation | `simulation.connector_materialization_outcome.apply` | none |
+| Simulation | `simulation.document_snapshot.action.get` | none |
+| Simulation | `simulation.document_snapshot.dispatch` | none |
+| Simulation | `simulation.document_snapshot.get` | none |
+| Simulation | `simulation.document_snapshot.request` | none |
 | Simulation | `simulation.environment.archive` | none |
+| Simulation | `simulation.environment.compose` | none |
 | Simulation | `simulation.environment.create` | none |
 | Simulation | `simulation.environment.get` | none |
+| Simulation | `simulation.environment.manifest.archive` | none |
+| Simulation | `simulation.environment.manifest.get` | none |
+| Simulation | `simulation.environment.manifest.search` | none |
+| Simulation | `simulation.environment.materialize` | none |
+| Simulation | `simulation.environment.preflight` | none |
 | Simulation | `simulation.environment.search` | rest |
+| Simulation | `simulation.materialization_run.action.get` | none |
+| Simulation | `simulation.materialization_run.dispatch` | none |
 | Simulation | `simulation.parameter_set.create` | none |
 | Simulation | `simulation.parameter_set.get` | none |
 | Simulation | `simulation.parameter_set.search` | none |
@@ -350,3 +404,17 @@
 | Simulation | `simulation.solver_profile.create` | none |
 | Simulation | `simulation.solver_profile.get` | none |
 | Simulation | `simulation.solver_profile.search` | none |
+| Simulation | `simulation.vismockup.application.attach.request` | none |
+| Simulation | `simulation.vismockup.application.launch` | none |
+| Simulation | `simulation.vismockup.application.launch.request` | none |
+| Simulation | `simulation.vismockup.capture.create` | none |
+| Simulation | `simulation.vismockup.command.get` | none |
+| Simulation | `simulation.vismockup.model.close.request` | none |
+| Simulation | `simulation.vismockup.model.open` | none |
+| Simulation | `simulation.vismockup.model.open.request` | none |
+| Simulation | `simulation.vismockup.selection.highlight` | none |
+| Simulation | `simulation.vismockup.status.get` | none |
+| Simulation | `simulation.vismockup.tree.get` | none |
+| Simulation | `simulation.vismockup.tree.read.request` | none |
+| Simulation | `simulation.vismockup.visibility.change.apply` | none |
+| Simulation | `simulation.vismockup.visibility.change.request` | none |

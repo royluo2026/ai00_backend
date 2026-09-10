@@ -116,6 +116,10 @@ Logically delete one owner-controlled simulation workspace.
 {
   "additionalProperties": false,
   "properties": {
+    "cache_revision_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
     "deleted": {
       "const": true
     },
@@ -136,7 +140,8 @@ Logically delete one owner-controlled simulation workspace.
     "workspace_gid",
     "deleted",
     "deletion_gid",
-    "row_version"
+    "row_version",
+    "cache_revision_hash"
   ],
   "type": "object"
 }

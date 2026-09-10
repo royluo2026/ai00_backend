@@ -129,6 +129,10 @@ Move one node in a private simulation workspace.
 {
   "additionalProperties": false,
   "properties": {
+    "cache_revision_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
     "entity_gid": {
       "pattern": "^[1-9][0-9]*$",
       "type": "string"
@@ -263,6 +267,7 @@ Move one node in a private simulation workspace.
   "required": [
     "entity_gid",
     "row_version",
+    "cache_revision_hash",
     "patch"
   ],
   "type": "object"

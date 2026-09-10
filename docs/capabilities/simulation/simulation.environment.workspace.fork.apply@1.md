@@ -155,6 +155,10 @@ Apply a validated private workspace Fork without mutating its immutable source.
       },
       "type": "array"
     },
+    "cache_revision_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
     "fork_base": {
       "additionalProperties": false,
       "properties": {

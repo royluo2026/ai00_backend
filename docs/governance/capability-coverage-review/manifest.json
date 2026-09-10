@@ -5,10 +5,10 @@
     "maximum_catalog_capabilities": 170,
     "maximum_domain_additions": 40
   },
-  "catalog_descriptors": 495,
-  "current_catalog_capabilities": 479,
+  "catalog_descriptors": 737,
+  "current_catalog_capabilities": 544,
   "candidate_capabilities": 0,
-  "proposed_final_catalog_capabilities": 479,
+  "proposed_final_catalog_capabilities": 544,
   "candidate_additions_by_domain": {
     "Base Platform": 0,
     "Project Management": 0,
@@ -24,15 +24,15 @@
   },
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:0f0d81ef5b60bb103f657d4b4a62afc096b4793f85f204805298389c01e8049a",
-    "catalog_release": "rel_04c998e59a4188758c8eda43f25b0488",
-    "catalog_sha256": "sha256:1be2b5f26178a57830b0ae1f54bbb170b6ca35e062bb1044abc2da19eba7fa02"
+    "registry_sha256": "sha256:06edf22fded2c04b9c85699c6c95e77360663ee51c703953898cda0425089337",
+    "catalog_release": "rel_78a4ed0c60a509804255a8c831dad3b6",
+    "catalog_sha256": "sha256:2a04a6b1a6bd7354840783a605e371a8c6e34ffbbda493452be93cded6106613"
   },
-  "ownership_sha256": "sha256:81126f3bc6ab4b06ad12744e7331685e7a0d7b4e56417303c4ec2d428824aff8",
-  "table_inventory_sha256": "sha256:d75eea337f664b3a0b0379ee33fee91e8b90e20126a9bfb7c4532ad245154cd6",
-  "dependency_baseline_sha256": "sha256:ace08005807e63d7184e942f6b61f069ad8700f3ba9b7c245c3c15ce7c7e2514",
+  "ownership_sha256": "sha256:2ce124d4375481b497eda5243dcfe41ceb97787a23a429ce14a1536260fcd3b3",
+  "table_inventory_sha256": "sha256:2e25efc8e9c9e500867943c4afedf8f3d5a240ca67b4a6fb8cac445474b17717",
+  "dependency_baseline_sha256": "sha256:b145c45a317c143009fb5c7a5e89752021e2d960bdfcb5252af532f6906491f2",
   "boundary_baseline_sha256": "sha256:c3455d713d20121a5863c79027c704d4472061764eb522235cf0873c67082330",
-  "runtime_ownership_sha256": "sha256:6d86c4d5e93c70bd258e1d030d9ca327728fe2204d2ab39b4fe4fc3599a7575c",
+  "runtime_ownership_sha256": "sha256:69d9a9fab818e92169eae266520b881a69ae156a376dcdc6b28f09380d52ca19",
   "domains": [
     "Base Platform",
     "Project Management",

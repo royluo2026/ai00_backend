@@ -137,6 +137,10 @@ Bind one VM occurrence to one simulation workspace node.
 {
   "additionalProperties": false,
   "properties": {
+    "cache_revision_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
     "entity_gid": {
       "pattern": "^[1-9][0-9]*$",
       "type": "string"
@@ -271,6 +275,7 @@ Bind one VM occurrence to one simulation workspace node.
   "required": [
     "entity_gid",
     "row_version",
+    "cache_revision_hash",
     "patch"
   ],
   "type": "object"

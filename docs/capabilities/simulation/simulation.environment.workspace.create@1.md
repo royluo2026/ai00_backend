@@ -192,6 +192,10 @@ Create a versioned private or shared simulation workspace.
       },
       "type": "array"
     },
+    "cache_revision_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
     "is_owner": {
       "type": "boolean"
     },
@@ -331,6 +335,7 @@ Create a versioned private or shared simulation workspace.
     "primary_project_gid",
     "updated_at",
     "row_version",
+    "cache_revision_hash",
     "nodes",
     "bindings"
   ],

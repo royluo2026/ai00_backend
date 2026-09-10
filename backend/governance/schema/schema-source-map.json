@@ -1,5 +1,5 @@
 {
-  "schema_sha256": "sha256:62b2879d872234e608c2747d8c0002f1af58af9ca252d53f782169477054d88b",
+  "schema_sha256": "sha256:6db964d054bb6f5afa6863f5e606a60bd01009ae932f2ee5b0d1af339e89edc7",
   "schema_version": 1,
   "tables": [
     {
@@ -15268,6 +15268,195 @@
     },
     {
       "columns": {
+        "archived_at": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "created_by": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "idempotency_key": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "name": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "note": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "request_hash": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "row_version": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "scope": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "snapshot_gid": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "workspace_gid": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_vm_checkpoint_snapshot": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "fk_sim_vm_checkpoint_workspace": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "idx_sim_vm_checkpoint_workspace": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "uq_sim_vm_checkpoint_request": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+      ],
+      "table": "workmanship_sim_vm_checkpoints"
+    },
+    {
+      "columns": {
+        "after_occurrence_gid": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "before_occurrence_gid": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "change_type": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "payload_json": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "report_gid": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "sequence": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "severity": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_vm_diff_item_report": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "idx_sim_vm_diff_item_type": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "uq_sim_vm_diff_item_sequence": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+      ],
+      "table": "workmanship_sim_vm_diff_items"
+    },
+    {
+      "columns": {
+        "after_snapshot_gid": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "algorithm_version": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "archived_at": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "before_snapshot_gid": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "compacted_at": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "created_by": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "report_kind": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "row_version": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "status": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "summary_json": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "workspace_gid": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_vm_diff_after": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "fk_sim_vm_diff_before": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "fk_sim_vm_diff_workspace": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "idx_sim_vm_diff_workspace": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
+        "uq_sim_vm_diff_pair": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+      ],
+      "table": "workmanship_sim_vm_diff_reports"
+    },
+    {
+      "columns": {
         "created_at": [
           "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
         ],
@@ -15790,6 +15979,105 @@
     },
     {
       "columns": {
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0015_simulation_workspace_fork_depth.sql"
+        ],
+        "fork_depth": [
+          "backend/db/migrations/domains/simulation/0015_simulation_workspace_fork_depth.sql"
+        ],
+        "plan_gid": [
+          "backend/db/migrations/domains/simulation/0015_simulation_workspace_fork_depth.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_workspace_fork_option_plan": [
+          "backend/db/migrations/domains/simulation/0015_simulation_workspace_fork_depth.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0015_simulation_workspace_fork_depth.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0015_simulation_workspace_fork_depth.sql"
+      ],
+      "table": "workmanship_sim_workspace_fork_plan_options"
+    },
+    {
+      "columns": {
+        "actor_gid": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ],
+        "apply_idempotency_key": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ],
+        "apply_request_hash": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ],
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ],
+        "expires_at": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ],
+        "gid": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ],
+        "input_hash": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ],
+        "outcome_json": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ],
+        "plan_hash": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ],
+        "source_version_gid": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ],
+        "source_workspace_gid": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ],
+        "target_name": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ],
+        "target_version_label": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ],
+        "tenant_gid": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ],
+        "updated_at": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_workspace_fork_source": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ],
+        "fk_sim_workspace_fork_version": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ],
+        "idx_sim_workspace_fork_actor": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ],
+        "idx_sim_workspace_fork_source": [
+          "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0014_simulation_workspace_forks.sql"
+      ],
+      "table": "workmanship_sim_workspace_fork_plans"
+    },
+    {
+      "columns": {
         "artifact_ref_json": [
           "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
         ],
@@ -16024,6 +16312,39 @@
     },
     {
       "columns": {
+        "created_at": [
+          "backend/db/migrations/domains/simulation/0013_simulation_workspace_metadata.sql"
+        ],
+        "project_gid": [
+          "backend/db/migrations/domains/simulation/0013_simulation_workspace_metadata.sql"
+        ],
+        "sort_order": [
+          "backend/db/migrations/domains/simulation/0013_simulation_workspace_metadata.sql"
+        ],
+        "workspace_gid": [
+          "backend/db/migrations/domains/simulation/0013_simulation_workspace_metadata.sql"
+        ]
+      },
+      "constraints": {
+        "fk_sim_workspace_project_workspace": [
+          "backend/db/migrations/domains/simulation/0013_simulation_workspace_metadata.sql"
+        ]
+      },
+      "indexes": {
+        "PRIMARY": [
+          "backend/db/migrations/domains/simulation/0013_simulation_workspace_metadata.sql"
+        ],
+        "idx_sim_workspace_project": [
+          "backend/db/migrations/domains/simulation/0013_simulation_workspace_metadata.sql"
+        ]
+      },
+      "sources": [
+        "backend/db/migrations/domains/simulation/0013_simulation_workspace_metadata.sql"
+      ],
+      "table": "workmanship_sim_workspace_projects"
+    },
+    {
+      "columns": {
         "algorithm_versions_json": [
           "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
         ],
@@ -16087,6 +16408,9 @@
     },
     {
       "columns": {
+        "cache_revision_hash": [
+          "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
+        ],
         "created_at": [
           "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
         ],
@@ -16099,8 +16423,14 @@
         "owner_gid": [
           "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
         ],
+        "primary_project_gid": [
+          "backend/db/migrations/domains/simulation/0013_simulation_workspace_metadata.sql"
+        ],
         "removed_at": [
           "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "review_type": [
+          "backend/db/migrations/domains/simulation/0013_simulation_workspace_metadata.sql"
         ],
         "row_version": [
           "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
@@ -16113,6 +16443,12 @@
         ],
         "updated_at": [
           "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        ],
+        "version_label": [
+          "backend/db/migrations/domains/simulation/0013_simulation_workspace_metadata.sql"
+        ],
+        "visibility": [
+          "backend/db/migrations/domains/simulation/0013_simulation_workspace_metadata.sql"
         ]
       },
       "constraints": {},
@@ -16128,7 +16464,9 @@
         ]
       },
       "sources": [
-        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql",
+        "backend/db/migrations/domains/simulation/0013_simulation_workspace_metadata.sql",
+        "backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql"
       ],
       "table": "workmanship_sim_workspaces"
     },

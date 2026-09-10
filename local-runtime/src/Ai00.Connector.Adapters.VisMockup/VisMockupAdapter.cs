@@ -16,20 +16,24 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     private readonly SceneController _scene;
     private readonly ModelAttacher _attacher;
     private readonly InternalCapture _capture;
+    private readonly VisMockupTreeCache? _treeCache;
     private object? _application;
     private string? _ownedDocumentId;
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, string executable)
         : this(sta, paths, new WindowsVisMockupCom(executable), executable,
-            Path.Combine(Path.GetTempPath(), "AI00", "captures")) { }
+            Path.Combine(Path.GetTempPath(), "AI00", "captures"), null) { }
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com)
-        : this(sta, paths, com, "", Path.Combine(Path.GetTempPath(), "AI00", "captures")) { }
+        : this(sta, paths, com, "", Path.Combine(Path.GetTempPath(), "AI00", "captures"), null) { }
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string captureRoot)
-        : this(sta, paths, com, "", captureRoot) { }
+        : this(sta, paths, com, "", captureRoot, null) { }
 
-    private VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string executable, string captureRoot)
+    public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string captureRoot, string treeCachePath)
+        : this(sta, paths, com, "", captureRoot, new VisMockupTreeCache(treeCachePath)) { }
+
+    private VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string executable, string captureRoot, VisMockupTreeCache? treeCache)
     {
         _sta = sta;
         _paths = paths;
@@ -39,6 +43,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         _scene = new SceneController(_state);
         _attacher = new ModelAttacher(paths, _state);
         _capture = new InternalCapture(captureRoot);
+        _treeCache = treeCache;
     }
     public AdapterManifest Manifest { get; } = new(
         "ai00.vismockup", 1, "siemens.vismockup", "14.0.0",
@@ -230,28 +235,39 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     {
         if (maxDepth is < 1 or > 8) throw new ConnectorException("vismockup_tree_depth_invalid");
         var document = _connection.RequireActiveDocument();
+        var cached = _treeCache?.TryRead(document, maxDepth);
+        if (cached is not null) return TreeResult(cached.Nodes, maxDepth);
         var root = document.RootNode;
-        var nodes = new List<object>();
-        var queue = new Queue<(IVisMockupNode Node, string? Parent, int Depth)>();
-        queue.Enqueue((root, null, 0));
+        var nodes = new List<CachedTreeNode>();
+        var queue = new Queue<(IVisMockupNode Node, string? Parent, int ChildOrder, int Depth)>();
+        queue.Enqueue((root, null, 0, 0));
         while (queue.Count > 0)
         {
             var item = queue.Dequeue();
             var nodeKey = item.Node.NodeKey;
             var children = item.Node.Children;
-            nodes.Add(new {
-                node_key = nodeKey, parent_node_key = item.Parent,
-                name = item.Node.PrintableName, catia_occurrence_name = item.Node.OccurrenceId,
-                has_more = item.Depth >= maxDepth && children.Count > 0,
-            });
+            nodes.Add(new(nodeKey, item.Parent, item.ChildOrder, item.Depth,
+                item.Node.PrintableName, "", item.Depth >= maxDepth && children.Count > 0));
             if (item.Depth < maxDepth)
             {
                 for (var index = 0; index < children.Count; index++)
-                    queue.Enqueue((children[index], nodeKey, item.Depth + 1));
+                    queue.Enqueue((children[index], nodeKey, index, item.Depth + 1));
             }
         }
-        return new { nodes, max_depth = maxDepth };
+        _treeCache?.Replace(document, maxDepth, nodes);
+        return TreeResult(nodes, maxDepth);
     });
+
+    private static object TreeResult(IReadOnlyList<CachedTreeNode> nodes, int maxDepth) => new
+    {
+        nodes = nodes.Select(node => new
+        {
+            node_key = node.NodeKey, parent_node_key = node.ParentNodeKey,
+            name = node.Name, catia_occurrence_name = node.CatiaOccurrenceName,
+            has_more = node.HasMore,
+        }).ToArray(),
+        max_depth = maxDepth,
+    };
     public Task<object> HighlightAsync(IReadOnlySet<string> catiaNames) => _sta.InvokeAsync<object>(() =>
     {
         dynamic app = Connect(); dynamic documents = app.Documents;

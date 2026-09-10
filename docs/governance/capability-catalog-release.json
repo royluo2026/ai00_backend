@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_c58779cc0501fffd87c7df55e96f4707",
-  "catalog_hash": "sha256:c58779cc0501fffd87c7df55e96f47074d9e3174bc2d863fa38e58b99dc32862",
+  "release_id": "rel_78a4ed0c60a509804255a8c831dad3b6",
+  "catalog_hash": "sha256:78a4ed0c60a509804255a8c831dad3b6eda771ccf8159f37ca22b47528ff7303",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -290835,14 +290835,35 @@
               "updates": {
                 "type": "object",
                 "properties": {
-                  "list_gid": {
+                  "related_task_gid": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "approval_order_gid": {
+                  "share_scope": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_chat_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "title": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "related_knowledge_gid": {
                     "type": [
                       "string",
                       "null"
@@ -290850,6 +290871,13 @@
                     "maxLength": 65536
                   },
                   "severity": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_open_id": {
                     "type": [
                       "string",
                       "null"
@@ -290884,6 +290912,127 @@
                       },
                       "additionalProperties": false
                     }
+                  },
+                  "approval_order_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "project_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "permanent_action": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "scheduled_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "status": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "bop_entry_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_docs": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "title": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "url": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "type": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "escape_root_cause": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "assignee_team_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "occurrence_root_cause": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
                   },
                   "attachments": {
                     "type": "array",
@@ -290951,155 +291100,6 @@
                         "artifact_ref"
                       ]
                     }
-                  },
-                  "feishu_docs": {
-                    "type": "array",
-                    "maxItems": 200,
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "token": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "name": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "title": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "url": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "type": {
-                          "type": "string",
-                          "maxLength": 2048
-                        }
-                      },
-                      "additionalProperties": false
-                    }
-                  },
-                  "bop_entry_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_assignee_open_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "escape_root_cause": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "title": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "related_knowledge_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "description": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "status": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "scheduled_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_chat_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "occurrence_root_cause": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "permanent_action": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "assignee_team_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "project_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "related_task_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_assignee_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "share_scope": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
                   }
                 },
                 "additionalProperties": false,
@@ -323437,6 +323437,30 @@
               "updates": {
                 "type": "object",
                 "properties": {
+                  "feishu_group_chat_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "is_deleted": {
+                    "type": "boolean"
+                  },
+                  "meeting_level": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "completion": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
                   "review_date": {
                     "type": [
                       "string",
@@ -323444,43 +323468,14 @@
                     ],
                     "maxLength": 65536
                   },
-                  "list_gid": {
+                  "description": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "actual_start": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_groups": {
-                    "type": "array",
-                    "maxItems": 200,
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "chat_id": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "name": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "avatar": {
-                          "type": "string",
-                          "maxLength": 2048
-                        }
-                      },
-                      "additionalProperties": false
-                    }
-                  },
-                  "canvas_y": {
+                  "canvas_x": {
                     "type": [
                       "integer",
                       "number",
@@ -323517,40 +323512,6 @@
                       "additionalProperties": false
                     }
                   },
-                  "feishu_assignee_open_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "time_estimate": {
-                    "type": [
-                      "integer",
-                      "null"
-                    ]
-                  },
-                  "description": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "canvas_x": {
-                    "type": [
-                      "integer",
-                      "number",
-                      "null"
-                    ]
-                  },
-                  "scheduled_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
                   "scheduled_start_time": {
                     "type": [
                       "string",
@@ -323565,43 +323526,26 @@
                     ],
                     "maxLength": 65536
                   },
-                  "assignee_team_gid": {
+                  "list_gid": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "completion": {
-                    "type": [
-                      "integer",
-                      "number",
-                      "null"
-                    ]
-                  },
-                  "feishu_assignee_name": {
+                  "canvas_icon": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "share_scope": {
+                  "priority": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
-                  },
-                  "due_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "is_deleted": {
-                    "type": "boolean"
                   },
                   "attachments": {
                     "type": "array",
@@ -323670,6 +323614,19 @@
                       ]
                     }
                   },
+                  "time_estimate": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "share_scope": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
                   "title": {
                     "type": [
                       "string",
@@ -323677,42 +323634,7 @@
                     ],
                     "maxLength": 65536
                   },
-                  "meeting_doc_link": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "priority": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "parent_task_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "status": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_chat_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "node_type": {
+                  "feishu_assignee_open_id": {
                     "type": [
                       "string",
                       "null"
@@ -323726,19 +323648,34 @@
                     ],
                     "maxLength": 65536
                   },
-                  "plan_start": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
                   "actual_end": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
+                  },
+                  "feishu_groups": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "chat_id": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "avatar": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
                   },
                   "project_gid": {
                     "type": [
@@ -323747,19 +323684,82 @@
                     ],
                     "maxLength": 65536
                   },
-                  "meeting_level": {
+                  "due_date": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "canvas_icon": {
+                  "scheduled_date": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
+                  },
+                  "status": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "meeting_doc_link": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "actual_start": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "parent_task_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "plan_start": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "assignee_team_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "node_type": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "canvas_y": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
                   }
                 },
                 "additionalProperties": false,
@@ -371279,6 +371279,7 @@
         "required": [
           "entity_gid",
           "row_version",
+          "cache_revision_hash",
           "patch"
         ],
         "properties": {
@@ -371289,6 +371290,10 @@
           "row_version": {
             "type": "integer",
             "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           },
           "patch": {
             "type": "object",
@@ -371420,6 +371425,7 @@
         "required": [
           "entity_gid",
           "row_version",
+          "cache_revision_hash",
           "patch"
         ],
         "properties": {
@@ -371430,6 +371436,10 @@
           "row_version": {
             "type": "integer",
             "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           },
           "patch": {
             "type": "object",
@@ -371556,7 +371566,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:ffb3d3b067e1c9c58bb35ed9a11a14f52ef252f9009f1fed37599def1af96d8d",
+      "schema_hash": "sha256:308fca3d28f289dd0c0ee6f23720cf7a247a1b373af1de07b051d16ad334215f",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -371748,7 +371758,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:6f33cddb0ee271b85be837396dd6bf0b5838eedf9a504d65c76fdf65f60c7a84"
+      "business_definition_hash": "sha256:ebb696fe6f6fe86b9a1a7b47f6f59b3fdd3fb67d93249cc3fa6daf10b6c4ead3"
     },
     {
       "id": "simulation.environment.binding.remove",
@@ -371823,6 +371833,7 @@
         "required": [
           "entity_gid",
           "row_version",
+          "cache_revision_hash",
           "patch"
         ],
         "properties": {
@@ -371833,6 +371844,10 @@
           "row_version": {
             "type": "integer",
             "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           },
           "patch": {
             "type": "object",
@@ -371964,6 +371979,7 @@
         "required": [
           "entity_gid",
           "row_version",
+          "cache_revision_hash",
           "patch"
         ],
         "properties": {
@@ -371974,6 +371990,10 @@
           "row_version": {
             "type": "integer",
             "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           },
           "patch": {
             "type": "object",
@@ -372100,7 +372120,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:f1a8d4076f520dd65860e529070a9e53ebca213b5d093ed7c7c297ac4f99d8d3",
+      "schema_hash": "sha256:7c9e8cb174756584eeeed2ca3730b3799935f921fcddcda9cfea381c6a2b0307",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -372292,7 +372312,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:df5194ec4c5b4336bc98119535332a0fffda0009c1fef298314e3440d88f47e4"
+      "business_definition_hash": "sha256:ec9919a6238fb8151038841f846633480a38e4fb9a178f82710fa4f89c5796a4"
     },
     {
       "id": "simulation.environment.compose",
@@ -385836,6 +385856,7 @@
         "required": [
           "entity_gid",
           "row_version",
+          "cache_revision_hash",
           "patch"
         ],
         "properties": {
@@ -385846,6 +385867,10 @@
           "row_version": {
             "type": "integer",
             "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           },
           "patch": {
             "type": "object",
@@ -385977,6 +386002,7 @@
         "required": [
           "entity_gid",
           "row_version",
+          "cache_revision_hash",
           "patch"
         ],
         "properties": {
@@ -385987,6 +386013,10 @@
           "row_version": {
             "type": "integer",
             "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           },
           "patch": {
             "type": "object",
@@ -386113,7 +386143,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:0e592a2a98e52c95423a2f6ec7bde04932e6d7f57ad8a82912b95db1ab29e248",
+      "schema_hash": "sha256:417660c0acabd21d74538a4fa7cb192886b07128d35075c2e6174864f0cfdcbf",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -386305,7 +386335,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:2e9a74c7b747c4e63d521e2dd15e4acb93798bc64b512869d9dacc4a74610adb"
+      "business_definition_hash": "sha256:fe8a442b273ccbb582aa7286c0d9b7e05da6986933f84ea7baa5133a2fb89fa7"
     },
     {
       "id": "simulation.environment.structure_node.move",
@@ -386387,6 +386417,7 @@
         "required": [
           "entity_gid",
           "row_version",
+          "cache_revision_hash",
           "patch"
         ],
         "properties": {
@@ -386397,6 +386428,10 @@
           "row_version": {
             "type": "integer",
             "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           },
           "patch": {
             "type": "object",
@@ -386528,6 +386563,7 @@
         "required": [
           "entity_gid",
           "row_version",
+          "cache_revision_hash",
           "patch"
         ],
         "properties": {
@@ -386538,6 +386574,10 @@
           "row_version": {
             "type": "integer",
             "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           },
           "patch": {
             "type": "object",
@@ -386664,7 +386704,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:79d3a5a731744a73ac43c650b261776e77d609b1bc988f432612d91f8cc6d97c",
+      "schema_hash": "sha256:c0bba8b1241bae939ae23d17f061bac1e3188e5eb6a9e26dc717612e2026e240",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -386856,7 +386896,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:806798dafada5bafcd2083532ef32323576d26f613a3cf87a9e0fdb93dac33ff"
+      "business_definition_hash": "sha256:e6eac9f33991402c126eab4a1757ab704768d60273a3af067336fb3210804694"
     },
     {
       "id": "simulation.environment.structure_node.remove",
@@ -386931,6 +386971,7 @@
         "required": [
           "entity_gid",
           "row_version",
+          "cache_revision_hash",
           "patch"
         ],
         "properties": {
@@ -386941,6 +386982,10 @@
           "row_version": {
             "type": "integer",
             "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           },
           "patch": {
             "type": "object",
@@ -387072,6 +387117,7 @@
         "required": [
           "entity_gid",
           "row_version",
+          "cache_revision_hash",
           "patch"
         ],
         "properties": {
@@ -387082,6 +387128,10 @@
           "row_version": {
             "type": "integer",
             "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           },
           "patch": {
             "type": "object",
@@ -387208,7 +387258,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:7b25763f16ea034cda16e0c50800c4de7567dafc5141a23cad7b21b11043ff73",
+      "schema_hash": "sha256:3a9ba36c17c14ae6718140da0fa323259196130f8889a089c3a2d847b49243b9",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -387400,7 +387450,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:051ea59d3d02c36ca618c150ed415e2da2a2635ce8a9f362a2e20d84a7ee95be"
+      "business_definition_hash": "sha256:833b7918a67e64c82d36bbe0b5a3ae5b0ab70c1b9eb5354871b140cb222908ac"
     },
     {
       "id": "simulation.environment.version.freeze",
@@ -387479,7 +387529,9 @@
           "version_gid",
           "status",
           "content_hash",
-          "artifact_ref"
+          "artifact_ref",
+          "row_version",
+          "cache_revision_hash"
         ],
         "properties": {
           "workspace_gid": {
@@ -387502,6 +387554,14 @@
             "type": "object",
             "properties": {},
             "additionalProperties": false
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           }
         },
         "additionalProperties": false
@@ -387513,7 +387573,9 @@
           "version_gid",
           "status",
           "content_hash",
-          "artifact_ref"
+          "artifact_ref",
+          "row_version",
+          "cache_revision_hash"
         ],
         "properties": {
           "workspace_gid": {
@@ -387536,11 +387598,19 @@
             "type": "object",
             "properties": {},
             "additionalProperties": false
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:1901fa6a5ad06958ebec00dc6beeeef1bbbd0cd9c9296720080a19dd1548fcf7",
+      "schema_hash": "sha256:afd41e2ed8ba2d281438fec69d6f9ae992b8c5c1a355f52bd61f0334df6e7e74",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -387732,7 +387802,284 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:a30325b2b2b4d20d614bf44a4803c08700ce249a3dbbcb412dd5bf75c64cda92"
+      "business_definition_hash": "sha256:0379d2985f1c0f5d7aa6a181a66df2a9640002f41fd77fdcf3a680841c853583"
+    },
+    {
+      "id": "simulation.environment.workspace.cache_lease.get",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.environment.workspace.cache_lease.get",
+      "description": "Authorize one caller to reuse one exact cached simulation workspace projection for at most five minutes.",
+      "use_when": "Authorize one caller to reuse one exact cached simulation workspace projection for at most five minutes.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Authorize one caller to reuse one exact cached simulation workspace projection for at most five minutes.",
+      "business_acceptance_criteria": [],
+      "business_invariants": [],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "read",
+      "side_effects": "Reads simulation domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-workspace",
+          "payload_path": "workspace_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "expires_in_seconds": {
+            "type": "integer",
+            "minimum": 60,
+            "maximum": 300
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "workspace_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "auth_subject_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "permission_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "expires_at": {
+            "type": "string"
+          },
+          "expires_in_seconds": {
+            "type": "integer",
+            "minimum": 60,
+            "maximum": 300
+          },
+          "read_lease": {
+            "type": "string",
+            "minLength": 32
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "auth_subject_gid",
+          "workspace_gid",
+          "permission_version",
+          "row_version",
+          "cache_revision_hash",
+          "expires_at",
+          "expires_in_seconds",
+          "read_lease"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "auth_subject_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "permission_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "expires_at": {
+            "type": "string"
+          },
+          "expires_in_seconds": {
+            "type": "integer",
+            "minimum": 60,
+            "maximum": 300
+          },
+          "read_lease": {
+            "type": "string",
+            "minLength": 32
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "auth_subject_gid",
+          "workspace_gid",
+          "permission_version",
+          "row_version",
+          "cache_revision_hash",
+          "expires_at",
+          "expires_in_seconds",
+          "read_lease"
+        ]
+      },
+      "schema_hash": "sha256:4ff7d534c4efde004d1402df18899a54d0434809342f9280423803ea54add501",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "workspace_not_found",
+          "meaning": "The requested workspace is unavailable or no longer readable.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "cache_lease_ttl_invalid",
+          "meaning": "The requested cache lease lifetime must be between 60 and 300 seconds.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "cache_lease_signing_key_unavailable",
+          "meaning": "The server cannot issue authenticated cache leases until signing material is configured.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_0552857b7471dc50286ccc76",
+      "error_schema": [
+        {
+          "error_code": "workspace_not_found",
+          "message_template": "The requested workspace is unavailable or no longer readable.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "cache_lease_ttl_invalid",
+          "message_template": "The requested cache lease lifetime must be between 60 and 300 seconds.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "cache_lease_signing_key_unavailable",
+          "message_template": "The server cannot issue authenticated cache leases until signing material is configured.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.environment.workspace.cache_lease.get:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.environment.workspace.cache_lease.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.environment.workspace.cache_lease.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.environment.workspace.cache_lease.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.environment.workspace.cache_lease.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.environment.workspace.cache_lease.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.environment.workspace.cache_lease.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.environment.workspace.cache_lease.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:0b0bd1d7317ec759b219c8c552d38f25dccfec572b2889445ee3b2c10ff8f243"
     },
     {
       "id": "simulation.environment.workspace.create",
@@ -387846,6 +388193,7 @@
           "primary_project_gid",
           "updated_at",
           "row_version",
+          "cache_revision_hash",
           "nodes",
           "bindings"
         ],
@@ -387925,6 +388273,10 @@
           "row_version": {
             "type": "integer",
             "minimum": 1
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           },
           "nodes": {
             "type": "array",
@@ -388032,6 +388384,7 @@
           "primary_project_gid",
           "updated_at",
           "row_version",
+          "cache_revision_hash",
           "nodes",
           "bindings"
         ],
@@ -388111,6 +388464,10 @@
           "row_version": {
             "type": "integer",
             "minimum": 1
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           },
           "nodes": {
             "type": "array",
@@ -388202,7 +388559,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:98d80b9ce1552afa6e19adddb8b119438417f591e15544c71aa1eae2060af0d1",
+      "schema_hash": "sha256:32407151034436200193c5f407b30cc326f1eabf71bf98167c9a2e3400de2758",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -388394,7 +388751,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:ebf0a77f81ec575af097a4516b514f9e2c4946175b06a04868fde74d861fc7d4"
+      "business_definition_hash": "sha256:6630e824602df497615b1bdade82f2d16fd174f6b57ab30c1908a3f4134c290f"
     },
     {
       "id": "simulation.environment.workspace.delete",
@@ -388465,7 +388822,8 @@
           "workspace_gid",
           "deleted",
           "deletion_gid",
-          "row_version"
+          "row_version",
+          "cache_revision_hash"
         ],
         "properties": {
           "workspace_gid": {
@@ -388482,6 +388840,10 @@
           "row_version": {
             "type": "integer",
             "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           }
         },
         "additionalProperties": false
@@ -388492,7 +388854,8 @@
           "workspace_gid",
           "deleted",
           "deletion_gid",
-          "row_version"
+          "row_version",
+          "cache_revision_hash"
         ],
         "properties": {
           "workspace_gid": {
@@ -388509,11 +388872,15 @@
           "row_version": {
             "type": "integer",
             "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:dc830191c4b0de11b1bc983c11a8ed941df659546c72a687c673cb9f96cd20ff",
+      "schema_hash": "sha256:f9ceae0a220e4aafd2d55c91c0cc96fd7075a3641faa1f71e2aa24c8c0772f6c",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -388705,7 +389072,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:01d372c8828a333600203de5cf288d23a52137f2e7c3eac3e0b291e4b0e346ed"
+      "business_definition_hash": "sha256:8b6b519b276d1b2348513e1d8ba37b60237f763093576eed7b84d7a004da7fee"
     },
     {
       "id": "simulation.environment.workspace.fork.apply",
@@ -388860,6 +389227,10 @@
           "row_version": {
             "type": "integer",
             "minimum": 1
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           },
           "nodes": {
             "type": "array",
@@ -389082,6 +389453,10 @@
             "type": "integer",
             "minimum": 1
           },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
           "nodes": {
             "type": "array",
             "items": {
@@ -389206,7 +389581,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:f2d07736f88a984e6170d144e83644a0b7bbd9bf2524360e728f5e2ac80e6f72",
+      "schema_hash": "sha256:dde2832f6c4fee03910b59565826837808cafc7d235b7c1c77c6b2f258890672",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -389398,7 +389773,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:8f9183d2de906a70d7b8b3b1421b090477bdfe07587240d87619e32c1e27ffcc"
+      "business_definition_hash": "sha256:f545ff57b129cd162ade871e511424b464ea133e5e64ba6029c89f8f824e17e4"
     },
     {
       "id": "simulation.environment.workspace.fork.preview",
@@ -389870,6 +390245,7 @@
           "primary_project_gid",
           "updated_at",
           "row_version",
+          "cache_revision_hash",
           "nodes",
           "bindings"
         ],
@@ -389949,6 +390325,10 @@
           "row_version": {
             "type": "integer",
             "minimum": 1
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           },
           "nodes": {
             "type": "array",
@@ -390056,6 +390436,7 @@
           "primary_project_gid",
           "updated_at",
           "row_version",
+          "cache_revision_hash",
           "nodes",
           "bindings"
         ],
@@ -390135,6 +390516,10 @@
           "row_version": {
             "type": "integer",
             "minimum": 1
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           },
           "nodes": {
             "type": "array",
@@ -390226,7 +390611,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:beb74bc1abe24a9135dad9fa6611c8132dc41e4486fb6e048b3ab083deeeaf7e",
+      "schema_hash": "sha256:7200f302d87b0b201eae3d3f8e3a5ab2aa92f19049d99f4bae91dbb418badfc7",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -390418,7 +390803,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:68223a14983ea364f9adeccbc4ec42b327e39513056747c07b47ad204ad2be9e"
+      "business_definition_hash": "sha256:fe79c5ca11501c5d996967bffe26cd5ef5833005661e855f463714e7e2c3da02"
     },
     {
       "id": "simulation.environment.workspace.search",
@@ -390493,7 +390878,8 @@
                 "project_gids",
                 "primary_project_gid",
                 "updated_at",
-                "row_version"
+                "row_version",
+                "cache_revision_hash"
               ],
               "properties": {
                 "workspace_gid": {
@@ -390571,6 +390957,10 @@
                 "row_version": {
                   "type": "integer",
                   "minimum": 1
+                },
+                "cache_revision_hash": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$"
                 }
               },
               "additionalProperties": false
@@ -390611,7 +391001,8 @@
                 "project_gids",
                 "primary_project_gid",
                 "updated_at",
-                "row_version"
+                "row_version",
+                "cache_revision_hash"
               ],
               "properties": {
                 "workspace_gid": {
@@ -390689,6 +391080,10 @@
                 "row_version": {
                   "type": "integer",
                   "minimum": 1
+                },
+                "cache_revision_hash": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$"
                 }
               },
               "additionalProperties": false
@@ -390704,7 +391099,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:3dd9451ba1c410dc3313c826c9ddc7b16df0bfdfc1d5c1b2ea548df3944bf0e1",
+      "schema_hash": "sha256:c500ee8ca27ca8061c519c517f86b8b98dd266ae548b9305aae5d295e5cb039f",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -390896,7 +391291,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:444bcc67d63d68d58dfd435f6958c35a64d29ee3e14c29e92c11f04aec647e9c"
+      "business_definition_hash": "sha256:c29fedc0a8d32b9e9ae9b009b923a5baa330d3231adde808caa19134c1c6bc29"
     },
     {
       "id": "simulation.environment.workspace.update",
@@ -391027,6 +391422,7 @@
         "required": [
           "entity_gid",
           "row_version",
+          "cache_revision_hash",
           "patch"
         ],
         "properties": {
@@ -391037,6 +391433,10 @@
           "row_version": {
             "type": "integer",
             "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           },
           "patch": {
             "type": "object",
@@ -391168,6 +391568,7 @@
         "required": [
           "entity_gid",
           "row_version",
+          "cache_revision_hash",
           "patch"
         ],
         "properties": {
@@ -391178,6 +391579,10 @@
           "row_version": {
             "type": "integer",
             "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           },
           "patch": {
             "type": "object",
@@ -391304,7 +391709,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:76fb6dc698108ea0fc06a294ff9a4a2f513d3babd110f231824568aab2ce64b6",
+      "schema_hash": "sha256:93b0907091fa6961baea2d6045718790616fb9cfcc592d6b3d93dc6b1c66f4ef",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -391496,7 +391901,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:6fbcfda4980d3bb94ac2a5829e62f4e3f665f3d424c42bcf930ff1b258be8f05"
+      "business_definition_hash": "sha256:af426cfbd8b7740c31fea8dbaac168edb858e046abdeffa7e719f3ea2f0622be"
     },
     {
       "id": "simulation.environment.workspace_version.export_for_import",
@@ -413335,6 +413740,2315 @@
       "business_definition_hash": "sha256:3696611c6f30db4a525e3fc34e3933759a9057eb8d2851d91071f25bde6ef4f9"
     },
     {
+      "id": "simulation.vm_checkpoint.archive",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.vm_checkpoint.archive",
+      "description": "Archive a governed VM checkpoint without deleting its evidence.",
+      "use_when": "Archive a governed VM checkpoint without deleting its evidence.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Persist or read immutable user-named VM version evidence without deleting its underlying technical snapshot.",
+      "business_acceptance_criteria": [
+        "A checkpoint references only an exact completed Connector snapshot already projected into authoritative VM persistence.",
+        "Personal checkpoints remain caller-private while shared baselines require workspace ownership, project management, or super-admin authority.",
+        "Archive preserves the checkpoint row and all referenced snapshot evidence."
+      ],
+      "business_invariants": [],
+      "no_business_invariant_reason": "This capability returns a bounded projection or compatibility diagnosis and does not decide or mutate domain state.",
+      "side_effect_level": "write",
+      "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-vm-checkpoint",
+          "payload_path": "checkpoint_gid",
+          "required": true
+        },
+        {
+          "resource_type": "simulation-workspace",
+          "payload_path": "workspace_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "checkpoint_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "expected_row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 191
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "checkpoint_gid",
+          "workspace_gid",
+          "expected_row_version",
+          "idempotency_key"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "checkpoint_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "created_by": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "personal",
+              "shared_baseline"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "checkpoint_gid",
+          "snapshot_gid",
+          "workspace_gid",
+          "created_by",
+          "scope",
+          "name",
+          "note",
+          "row_version",
+          "created_at",
+          "archived_at"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "checkpoint_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "created_by": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "personal",
+              "shared_baseline"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "checkpoint_gid",
+          "snapshot_gid",
+          "workspace_gid",
+          "created_by",
+          "scope",
+          "name",
+          "note",
+          "row_version",
+          "created_at",
+          "archived_at"
+        ]
+      },
+      "schema_hash": "sha256:c98cc32e47b85b3a9625aa2ced930b625690df3defa0b8736e3a34f1c74fdf1b",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "workspace_not_found",
+          "meaning": "The checkpoint workspace is unavailable or unreadable.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "document_snapshot_not_found",
+          "meaning": "The source snapshot request is unavailable to this caller.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "document_snapshot_not_completed",
+          "meaning": "The source snapshot request has not completed.",
+          "retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "code": "snapshot_hash_mismatch",
+          "meaning": "The supplied hash differs from the authoritative completed snapshot.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "vm_snapshot_projection_required",
+          "meaning": "The completed Connector snapshot has not yet been projected into authoritative VM persistence.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "vm_checkpoint_shared_forbidden",
+          "meaning": "The caller cannot create or archive a shared project baseline.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "vm_checkpoint_not_found_or_conflict",
+          "meaning": "The checkpoint is unavailable or its row version changed.",
+          "retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to different checkpoint content.",
+          "retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_332c604f74225bc721494425",
+      "error_schema": [
+        {
+          "error_code": "workspace_not_found",
+          "message_template": "The checkpoint workspace is unavailable or unreadable.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "document_snapshot_not_found",
+          "message_template": "The source snapshot request is unavailable to this caller.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "document_snapshot_not_completed",
+          "message_template": "The source snapshot request has not completed.",
+          "is_retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "snapshot_hash_mismatch",
+          "message_template": "The supplied hash differs from the authoritative completed snapshot.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "vm_snapshot_projection_required",
+          "message_template": "The completed Connector snapshot has not yet been projected into authoritative VM persistence.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "vm_checkpoint_shared_forbidden",
+          "message_template": "The caller cannot create or archive a shared project baseline.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "vm_checkpoint_not_found_or_conflict",
+          "message_template": "The checkpoint is unavailable or its row version changed.",
+          "is_retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to different checkpoint content.",
+          "is_retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.vm_checkpoint.archive:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.vm_checkpoint.archive@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.vm_checkpoint.archive@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.vm_checkpoint.archive@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.vm_checkpoint.archive@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.vm_checkpoint.archive@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.vm_checkpoint.archive@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.vm_checkpoint.archive@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:f9bc94648a563b7d10f0cbd0f5eccb4c438e190f878511544468cf1db96a3af3"
+    },
+    {
+      "id": "simulation.vm_checkpoint.create",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.vm_checkpoint.create",
+      "description": "Create a governed personal checkpoint or authorized shared VM baseline from an exact completed snapshot.",
+      "use_when": "Create a governed personal checkpoint or authorized shared VM baseline from an exact completed snapshot.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Persist or read immutable user-named VM version evidence without deleting its underlying technical snapshot.",
+      "business_acceptance_criteria": [
+        "A checkpoint references only an exact completed Connector snapshot already projected into authoritative VM persistence.",
+        "Personal checkpoints remain caller-private while shared baselines require workspace ownership, project management, or super-admin authority.",
+        "Archive preserves the checkpoint row and all referenced snapshot evidence."
+      ],
+      "business_invariants": [],
+      "no_business_invariant_reason": "This capability returns a bounded projection or compatibility diagnosis and does not decide or mutate domain state.",
+      "side_effect_level": "write",
+      "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-workspace",
+          "payload_path": "workspace_gid",
+          "required": true
+        },
+        {
+          "resource_type": "simulation-document-snapshot",
+          "payload_path": "snapshot_request_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "snapshot_request_id": {
+            "type": "string"
+          },
+          "snapshot_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "personal",
+              "shared_baseline"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 4000
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 191
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "snapshot_request_id",
+          "snapshot_hash",
+          "workspace_gid",
+          "scope",
+          "name",
+          "idempotency_key"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "checkpoint_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "created_by": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "personal",
+              "shared_baseline"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "checkpoint_gid",
+          "snapshot_gid",
+          "workspace_gid",
+          "created_by",
+          "scope",
+          "name",
+          "note",
+          "row_version",
+          "created_at",
+          "archived_at"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "checkpoint_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "created_by": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "personal",
+              "shared_baseline"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "checkpoint_gid",
+          "snapshot_gid",
+          "workspace_gid",
+          "created_by",
+          "scope",
+          "name",
+          "note",
+          "row_version",
+          "created_at",
+          "archived_at"
+        ]
+      },
+      "schema_hash": "sha256:1d36999996c063fbaa909bc10255968cd5bc137492a82f1b8bf31946e51158e4",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "workspace_not_found",
+          "meaning": "The checkpoint workspace is unavailable or unreadable.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "document_snapshot_not_found",
+          "meaning": "The source snapshot request is unavailable to this caller.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "document_snapshot_not_completed",
+          "meaning": "The source snapshot request has not completed.",
+          "retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "code": "snapshot_hash_mismatch",
+          "meaning": "The supplied hash differs from the authoritative completed snapshot.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "vm_snapshot_projection_required",
+          "meaning": "The completed Connector snapshot has not yet been projected into authoritative VM persistence.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "vm_checkpoint_shared_forbidden",
+          "meaning": "The caller cannot create or archive a shared project baseline.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "vm_checkpoint_not_found_or_conflict",
+          "meaning": "The checkpoint is unavailable or its row version changed.",
+          "retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to different checkpoint content.",
+          "retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_5690214a89b6a540e80cf96f",
+      "error_schema": [
+        {
+          "error_code": "workspace_not_found",
+          "message_template": "The checkpoint workspace is unavailable or unreadable.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "document_snapshot_not_found",
+          "message_template": "The source snapshot request is unavailable to this caller.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "document_snapshot_not_completed",
+          "message_template": "The source snapshot request has not completed.",
+          "is_retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "snapshot_hash_mismatch",
+          "message_template": "The supplied hash differs from the authoritative completed snapshot.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "vm_snapshot_projection_required",
+          "message_template": "The completed Connector snapshot has not yet been projected into authoritative VM persistence.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "vm_checkpoint_shared_forbidden",
+          "message_template": "The caller cannot create or archive a shared project baseline.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "vm_checkpoint_not_found_or_conflict",
+          "message_template": "The checkpoint is unavailable or its row version changed.",
+          "is_retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to different checkpoint content.",
+          "is_retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.vm_checkpoint.create:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.vm_checkpoint.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.vm_checkpoint.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.vm_checkpoint.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.vm_checkpoint.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.vm_checkpoint.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.vm_checkpoint.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.vm_checkpoint.create@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:efd06877d1ae80e7148f2d16a2dd6a9c277d130216be7670585a05aa3b361975"
+    },
+    {
+      "id": "simulation.vm_checkpoint.search",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.vm_checkpoint.search",
+      "description": "Search caller-visible personal and shared VM checkpoints.",
+      "use_when": "Search caller-visible personal and shared VM checkpoints.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Persist or read immutable user-named VM version evidence without deleting its underlying technical snapshot.",
+      "business_acceptance_criteria": [
+        "A checkpoint references only an exact completed Connector snapshot already projected into authoritative VM persistence.",
+        "Personal checkpoints remain caller-private while shared baselines require workspace ownership, project management, or super-admin authority.",
+        "Archive preserves the checkpoint row and all referenced snapshot evidence."
+      ],
+      "business_invariants": [],
+      "no_business_invariant_reason": "This capability returns a bounded projection or compatibility diagnosis and does not decide or mutate domain state.",
+      "side_effect_level": "read",
+      "side_effects": "Reads simulation domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-workspace",
+          "payload_path": "workspace_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "page_size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "include_archived": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "workspace_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "checkpoint_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "snapshot_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "workspace_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "created_by": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "scope": {
+                  "type": "string",
+                  "enum": [
+                    "personal",
+                    "shared_baseline"
+                  ]
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "note": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 4000
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "row_version": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "created_at": {
+                  "type": "string"
+                },
+                "archived_at": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "checkpoint_gid",
+                "snapshot_gid",
+                "workspace_gid",
+                "created_by",
+                "scope",
+                "name",
+                "note",
+                "row_version",
+                "created_at",
+                "archived_at"
+              ]
+            },
+            "maxItems": 200
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "next_cursor"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "checkpoint_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "snapshot_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "workspace_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "created_by": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "scope": {
+                  "type": "string",
+                  "enum": [
+                    "personal",
+                    "shared_baseline"
+                  ]
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "note": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 4000
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "row_version": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "created_at": {
+                  "type": "string"
+                },
+                "archived_at": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "checkpoint_gid",
+                "snapshot_gid",
+                "workspace_gid",
+                "created_by",
+                "scope",
+                "name",
+                "note",
+                "row_version",
+                "created_at",
+                "archived_at"
+              ]
+            },
+            "maxItems": 200
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "next_cursor"
+        ]
+      },
+      "schema_hash": "sha256:41f34e4f2c8e7773f310b452b3162b32f2d5225d75799e6924640275354c786f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "workspace_not_found",
+          "meaning": "The checkpoint workspace is unavailable or unreadable.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "document_snapshot_not_found",
+          "meaning": "The source snapshot request is unavailable to this caller.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "document_snapshot_not_completed",
+          "meaning": "The source snapshot request has not completed.",
+          "retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "code": "snapshot_hash_mismatch",
+          "meaning": "The supplied hash differs from the authoritative completed snapshot.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "vm_snapshot_projection_required",
+          "meaning": "The completed Connector snapshot has not yet been projected into authoritative VM persistence.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "vm_checkpoint_shared_forbidden",
+          "meaning": "The caller cannot create or archive a shared project baseline.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "vm_checkpoint_not_found_or_conflict",
+          "meaning": "The checkpoint is unavailable or its row version changed.",
+          "retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to different checkpoint content.",
+          "retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_37fd8f568d9642fba4fa67ef",
+      "error_schema": [
+        {
+          "error_code": "workspace_not_found",
+          "message_template": "The checkpoint workspace is unavailable or unreadable.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "document_snapshot_not_found",
+          "message_template": "The source snapshot request is unavailable to this caller.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "document_snapshot_not_completed",
+          "message_template": "The source snapshot request has not completed.",
+          "is_retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "snapshot_hash_mismatch",
+          "message_template": "The supplied hash differs from the authoritative completed snapshot.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "vm_snapshot_projection_required",
+          "message_template": "The completed Connector snapshot has not yet been projected into authoritative VM persistence.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "vm_checkpoint_shared_forbidden",
+          "message_template": "The caller cannot create or archive a shared project baseline.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "vm_checkpoint_not_found_or_conflict",
+          "message_template": "The checkpoint is unavailable or its row version changed.",
+          "is_retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to different checkpoint content.",
+          "is_retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.vm_checkpoint.search:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.vm_checkpoint.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.vm_checkpoint.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.vm_checkpoint.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.vm_checkpoint.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.vm_checkpoint.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.vm_checkpoint.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.vm_checkpoint.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:ed49ee8684b82c3d6b783f4130cc93850bfcf5d67b698a00a73856ef6dac59b1"
+    },
+    {
+      "id": "simulation.vm_diff_item.search",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.vm_diff_item.search",
+      "description": "Page through atomic caller-visible VM difference items.",
+      "use_when": "Page through atomic caller-visible VM difference items.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Generate or read an immutable deterministic node-level difference report between two governed VM checkpoints.",
+      "business_acceptance_criteria": [
+        "Both source checkpoints are caller-visible and belong to the same Simulation workspace.",
+        "Identity ambiguity is reported for review and is never resolved by guessing.",
+        "Repeated generation for the same snapshot pair and algorithm returns the same immutable report."
+      ],
+      "business_invariants": [],
+      "no_business_invariant_reason": "This capability returns a bounded projection or compatibility diagnosis and does not decide or mutate domain state.",
+      "side_effect_level": "read",
+      "side_effects": "Reads simulation domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-vm-diff-report",
+          "payload_path": "report_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "report_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "page_size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "report_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "sequence": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "change_type": {
+                  "type": "string"
+                },
+                "before_occurrence_gid": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[1-9][0-9]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "after_occurrence_gid": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[1-9][0-9]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "info",
+                    "warning",
+                    "critical"
+                  ]
+                },
+                "payload": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "sequence",
+                "change_type",
+                "before_occurrence_gid",
+                "after_occurrence_gid",
+                "severity",
+                "payload"
+              ]
+            },
+            "maxItems": 200
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "next_cursor"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "sequence": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "change_type": {
+                  "type": "string"
+                },
+                "before_occurrence_gid": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[1-9][0-9]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "after_occurrence_gid": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[1-9][0-9]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "info",
+                    "warning",
+                    "critical"
+                  ]
+                },
+                "payload": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "sequence",
+                "change_type",
+                "before_occurrence_gid",
+                "after_occurrence_gid",
+                "severity",
+                "payload"
+              ]
+            },
+            "maxItems": 200
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "next_cursor"
+        ]
+      },
+      "schema_hash": "sha256:f810116e16543ebde11c661347cc3adc484399aee297d5965b3c79641e2720c2",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "vm_checkpoint_not_found",
+          "meaning": "One or both source checkpoints are unavailable.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "vm_diff_workspace_mismatch",
+          "meaning": "The checkpoints belong to different workspaces.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "vm_diff_report_not_found",
+          "meaning": "The report is unavailable or unreadable.",
+          "retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_67965930b755f57712fd5ed4",
+      "error_schema": [
+        {
+          "error_code": "vm_checkpoint_not_found",
+          "message_template": "One or both source checkpoints are unavailable.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "vm_diff_workspace_mismatch",
+          "message_template": "The checkpoints belong to different workspaces.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "vm_diff_report_not_found",
+          "message_template": "The report is unavailable or unreadable.",
+          "is_retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.vm_diff_item.search:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.vm_diff_item.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.vm_diff_item.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.vm_diff_item.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.vm_diff_item.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.vm_diff_item.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.vm_diff_item.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.vm_diff_item.search@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:b0cffeb8adb5b8c539597b83f000cf9bdd30917af6ff031c6b6e3a4b5dc00084"
+    },
+    {
+      "id": "simulation.vm_diff_report.generate",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.vm_diff_report.generate",
+      "description": "Generate one immutable node-level difference report from two visible VM checkpoints.",
+      "use_when": "Generate one immutable node-level difference report from two visible VM checkpoints.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Generate or read an immutable deterministic node-level difference report between two governed VM checkpoints.",
+      "business_acceptance_criteria": [
+        "Both source checkpoints are caller-visible and belong to the same Simulation workspace.",
+        "Identity ambiguity is reported for review and is never resolved by guessing.",
+        "Repeated generation for the same snapshot pair and algorithm returns the same immutable report."
+      ],
+      "business_invariants": [],
+      "no_business_invariant_reason": "This capability returns a bounded projection or compatibility diagnosis and does not decide or mutate domain state.",
+      "side_effect_level": "write",
+      "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-vm-checkpoint",
+          "payload_path": "before_checkpoint_gid",
+          "required": true
+        },
+        {
+          "resource_type": "simulation-vm-checkpoint",
+          "payload_path": "after_checkpoint_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "before_checkpoint_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "after_checkpoint_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "report_kind": {
+            "type": "string",
+            "enum": [
+              "manual",
+              "automatic"
+            ]
+          },
+          "algorithm_version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 191
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "before_checkpoint_gid",
+          "after_checkpoint_gid",
+          "report_kind",
+          "algorithm_version",
+          "idempotency_key"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "report_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "before_snapshot_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "after_snapshot_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "report_kind": {
+            "type": "string",
+            "enum": [
+              "manual",
+              "automatic"
+            ]
+          },
+          "algorithm_version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "completed"
+            ]
+          },
+          "summary": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "report_gid",
+          "workspace_gid",
+          "before_snapshot_gid",
+          "after_snapshot_gid",
+          "report_kind",
+          "algorithm_version",
+          "status",
+          "summary",
+          "row_version",
+          "created_at",
+          "archived_at"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "report_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "before_snapshot_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "after_snapshot_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "report_kind": {
+            "type": "string",
+            "enum": [
+              "manual",
+              "automatic"
+            ]
+          },
+          "algorithm_version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "completed"
+            ]
+          },
+          "summary": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "report_gid",
+          "workspace_gid",
+          "before_snapshot_gid",
+          "after_snapshot_gid",
+          "report_kind",
+          "algorithm_version",
+          "status",
+          "summary",
+          "row_version",
+          "created_at",
+          "archived_at"
+        ]
+      },
+      "schema_hash": "sha256:70ab8ec4d557771be1c98ea9e444603f9d86be78e19c9fa1bd526858a3a33633",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "vm_checkpoint_not_found",
+          "meaning": "One or both source checkpoints are unavailable.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "vm_diff_workspace_mismatch",
+          "meaning": "The checkpoints belong to different workspaces.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "vm_diff_report_not_found",
+          "meaning": "The report is unavailable or unreadable.",
+          "retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_d06acd7f9b7010ac4a9f9774",
+      "error_schema": [
+        {
+          "error_code": "vm_checkpoint_not_found",
+          "message_template": "One or both source checkpoints are unavailable.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "vm_diff_workspace_mismatch",
+          "message_template": "The checkpoints belong to different workspaces.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "vm_diff_report_not_found",
+          "message_template": "The report is unavailable or unreadable.",
+          "is_retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.vm_diff_report.generate:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.vm_diff_report.generate@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.vm_diff_report.generate@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.vm_diff_report.generate@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.vm_diff_report.generate@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.vm_diff_report.generate@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.vm_diff_report.generate@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.vm_diff_report.generate@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:fe3a1a92ec97bec222c279ffa9e932c79bc18fe60d5fcfc7fa1e70f6e6f6ed4e"
+    },
+    {
+      "id": "simulation.vm_diff_report.get",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.vm_diff_report.get",
+      "description": "Read one caller-visible immutable VM difference report summary.",
+      "use_when": "Read one caller-visible immutable VM difference report summary.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Generate or read an immutable deterministic node-level difference report between two governed VM checkpoints.",
+      "business_acceptance_criteria": [
+        "Both source checkpoints are caller-visible and belong to the same Simulation workspace.",
+        "Identity ambiguity is reported for review and is never resolved by guessing.",
+        "Repeated generation for the same snapshot pair and algorithm returns the same immutable report."
+      ],
+      "business_invariants": [],
+      "no_business_invariant_reason": "This capability returns a bounded projection or compatibility diagnosis and does not decide or mutate domain state.",
+      "side_effect_level": "read",
+      "side_effects": "Reads simulation domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-vm-diff-report",
+          "payload_path": "report_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "report_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "report_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "report_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "before_snapshot_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "after_snapshot_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "report_kind": {
+            "type": "string",
+            "enum": [
+              "manual",
+              "automatic"
+            ]
+          },
+          "algorithm_version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "completed"
+            ]
+          },
+          "summary": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "report_gid",
+          "workspace_gid",
+          "before_snapshot_gid",
+          "after_snapshot_gid",
+          "report_kind",
+          "algorithm_version",
+          "status",
+          "summary",
+          "row_version",
+          "created_at",
+          "archived_at"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "report_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "before_snapshot_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "after_snapshot_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "report_kind": {
+            "type": "string",
+            "enum": [
+              "manual",
+              "automatic"
+            ]
+          },
+          "algorithm_version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "completed"
+            ]
+          },
+          "summary": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "report_gid",
+          "workspace_gid",
+          "before_snapshot_gid",
+          "after_snapshot_gid",
+          "report_kind",
+          "algorithm_version",
+          "status",
+          "summary",
+          "row_version",
+          "created_at",
+          "archived_at"
+        ]
+      },
+      "schema_hash": "sha256:193acf894f03904672c354107f3482a74a29d82c5821f68d276f607d608c9296",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "vm_checkpoint_not_found",
+          "meaning": "One or both source checkpoints are unavailable.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "vm_diff_workspace_mismatch",
+          "meaning": "The checkpoints belong to different workspaces.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "vm_diff_report_not_found",
+          "meaning": "The report is unavailable or unreadable.",
+          "retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_8933781b36c3b8c8e3426abc",
+      "error_schema": [
+        {
+          "error_code": "vm_checkpoint_not_found",
+          "message_template": "One or both source checkpoints are unavailable.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "vm_diff_workspace_mismatch",
+          "message_template": "The checkpoints belong to different workspaces.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "vm_diff_report_not_found",
+          "message_template": "The report is unavailable or unreadable.",
+          "is_retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.vm_diff_report.get:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.vm_diff_report.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.vm_diff_report.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.vm_diff_report.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.vm_diff_report.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.vm_diff_report.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.vm_diff_report.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.vm_diff_report.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:30dc8f3605ea253181d8211495dd1cd73f18c5febe87125e1af05f23f16364bc"
+    },
+    {
       "id": "system.activity.search",
       "major_version": 1,
       "owner_domain": "base",
@@ -417187,8 +419901,8 @@
       "plugin_id": "official.simulation",
       "module": "simulation_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:0dfbd3cff6f2e04eaf49a9b32b342f3e6107c109348da8c73b2ffa4b49fe9699"
+      "artifact_hash": "sha256:83071f3b785e7a5af07ed19eed09e01d36261334c598e0326860e703c53e4a53"
     }
   ],
-  "created_at": "2026-09-09T13:06:39.853769Z"
+  "created_at": "2026-09-10T02:12:47.053463Z"
 }

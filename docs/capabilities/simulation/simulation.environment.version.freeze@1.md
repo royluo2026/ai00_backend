@@ -129,9 +129,17 @@ Freeze one private simulation workspace version as an immutable Base Artifact.
       "properties": {},
       "type": "object"
     },
+    "cache_revision_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
     "content_hash": {
       "pattern": "^sha256:[0-9a-f]{64}$",
       "type": "string"
+    },
+    "row_version": {
+      "minimum": 2,
+      "type": "integer"
     },
     "status": {
       "const": "frozen",
@@ -151,7 +159,9 @@ Freeze one private simulation workspace version as an immutable Base Artifact.
     "version_gid",
     "status",
     "content_hash",
-    "artifact_ref"
+    "artifact_ref",
+    "row_version",
+    "cache_revision_hash"
   ],
   "type": "object"
 }

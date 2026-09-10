@@ -1,6 +1,6 @@
 {
   "registry_version": 1,
-  "table_count": 367,
+  "table_count": 370,
   "tables": [
     {
       "table": "workmanship_agent_canvas_audit_events",
@@ -1609,6 +1609,21 @@
     },
     {
       "table": "workmanship_sim_schema_migrations",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
+      "table": "workmanship_sim_vm_checkpoints",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
+      "table": "workmanship_sim_vm_diff_items",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
+      "table": "workmanship_sim_vm_diff_reports",
       "owner": "simulation",
       "runtime_domain": "simulation"
     },

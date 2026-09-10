@@ -20,6 +20,7 @@
 | Agent | `capability:agent.canvas.execution.resume` | existing_capability | `agent.canvas.execution.resume` |
 | Agent | `capability:agent.canvas.execution.start` | existing_capability | `agent.canvas.execution.start` |
 | Agent | `capability:agent.canvas.options.resolve` | existing_capability | `agent.canvas.options.resolve` |
+| Agent | `capability:agent.catalog_tool.confirm.apply` | existing_capability | `agent.catalog_tool.confirm.apply` |
 | Agent | `capability:agent.flow.change.apply` | existing_capability | `agent.flow.change.apply` |
 | Agent | `rest:DELETE:/api/flows/{gid}` | existing_capability | `agent.flow.change.apply` |
 | Agent | `rest:POST:/api/flows` | existing_capability | `agent.flow.change.apply` |
@@ -45,6 +46,14 @@
 | Agent | `agent_tool:list_preferences` | existing_capability | `agent.memory.read` |
 | Agent | `agent_tool:recall_memory` | existing_capability | `agent.memory.read` |
 | Agent | `capability:agent.memory.read` | existing_capability | `agent.memory.read` |
+| Agent | `capability:agent.orchestration.binding.delete` | existing_capability | `agent.orchestration.binding.delete` |
+| Agent | `capability:agent.orchestration.graph.read` | existing_capability | `agent.orchestration.graph.read` |
+| Agent | `capability:agent.orchestration.graph.save` | existing_capability | `agent.orchestration.graph.save` |
+| Agent | `capability:agent.orchestration.metric.read` | existing_capability | `agent.orchestration.metric.read` |
+| Agent | `capability:agent.orchestration.panorama.read` | existing_capability | `agent.orchestration.panorama.read` |
+| Agent | `capability:agent.orchestration.run.start` | existing_capability | `agent.orchestration.run.start` |
+| Agent | `capability:agent.orchestration.run.transition` | existing_capability | `agent.orchestration.run.transition` |
+| Agent | `capability:agent.orchestration.version.publish` | existing_capability | `agent.orchestration.version.publish` |
 | Agent | `agent_runtime:POST:/v1/runs` | existing_capability | `agent.run.change.apply` |
 | Agent | `agent_runtime:POST:/v1/runs/{session_gid}/(pause|resume|cancel)` | existing_capability | `agent.run.change.apply` |
 | Agent | `agent_runtime:POST:/v1/runs/{session_gid}/approvals/{parameter_2}/decision` | existing_capability | `agent.run.change.apply` |
@@ -79,6 +88,10 @@
 | Agent | `rest:GET:/api/skills` | existing_capability | `agent.skill.read` |
 | Agent | `capability:agent.tool_catalog.read` | existing_capability | `agent.tool_catalog.read` |
 | Agent | `capability:agent.workflow.node.test.execute` | existing_capability | `agent.workflow.node.test.execute` |
+| Base Platform | `rest:GET:/api/skills?limit=50` | unreviewed | — |
+| Base Platform | `rest:POST:/auth/desktop/revoke` | unreviewed | — |
+| Base Platform | `rest:POST:/auth/desktop/start` | unreviewed | — |
+| Base Platform | `rest:POST:/auth/desktop/token` | unreviewed | — |
 | Base Platform | `capability:plugin.upgrade.finish` | excluded | — |
 | Base Platform | `capability:system.worker.outbox.health` | excluded | — |
 | Base Platform | `rest:DELETE:/admin/config/{key}` | excluded | — |
@@ -228,6 +241,15 @@
 | Base Platform | `agent_tool:global_search` | existing_capability | `system.search` |
 | Base Platform | `agent_tool:search` | existing_capability | `system.search` |
 | Base Platform | `capability:system.search` | existing_capability | `system.search` |
+| Craft | `rest:DELETE:/api/craft/resource-requirements/{resource_gid}/aliases/{alias_gid}` | unreviewed | — |
+| Craft | `rest:GET:/api/craft/resource-requirements` | unreviewed | — |
+| Craft | `rest:GET:/api/craft/tc-resource-staging` | unreviewed | — |
+| Craft | `rest:PATCH:/api/craft/resource-requirements/{gid}` | unreviewed | — |
+| Craft | `rest:POST:/api/craft/resource-requirements` | unreviewed | — |
+| Craft | `rest:POST:/api/craft/resource-requirements/{gid}/retire` | unreviewed | — |
+| Craft | `rest:POST:/api/craft/resource-requirements/{resource_gid}/aliases` | unreviewed | — |
+| Craft | `rest:POST:/api/craft/tc-resource-staging/{staging_gid}/ignore` | unreviewed | — |
+| Craft | `rest:POST:/api/craft/tc-resource-staging/{staging_gid}/resolve` | unreviewed | — |
 | Craft | `rest:POST:/api/bop/pics/upload` | excluded | — |
 | Craft | `rest:POST:/api/import-export/lark-bitable/read` | excluded | — |
 | Craft | `rest:POST:/api/import-export/lark-bitable/write` | excluded | — |
@@ -307,6 +329,7 @@
 | Craft | `rest:GET:/api/bop/versions/{version_gid}/line-operations` | existing_capability | `craft.bop.entry.legacy_read` |
 | Craft | `rest:GET:/api/bop/versions/{version_gid}/link-summary` | existing_capability | `craft.bop.entry.legacy_read` |
 | Craft | `rest:POST:/api/bop/resolve-gids` | existing_capability | `craft.bop.entry.legacy_read` |
+| Craft | `capability:craft.bop.entry.relation.list` | existing_capability | `craft.bop.entry.relation.list` |
 | Craft | `capability:craft.bop.entry.search` | existing_capability | `craft.bop.entry.search` |
 | Craft | `rest:GET:/api/bop/entries/search` | existing_capability | `craft.bop.entry.search` |
 | Craft | `capability:craft.bop.entry_link.change.apply` | existing_capability | `craft.bop.entry_link.change.apply` |
@@ -348,6 +371,7 @@
 | Craft | `capability:craft.bop.lifecycle.step.rollback.apply` | existing_capability | `craft.bop.lifecycle.step.rollback.apply` |
 | Craft | `capability:craft.bop.line_operation_catia.read` | existing_capability | `craft.bop.line_operation_catia.read` |
 | Craft | `rest:GET:/api/bop/versions/{version_gid}/line-op-catia-parts` | existing_capability | `craft.bop.line_operation_catia.read` |
+| Craft | `capability:craft.bop.linked_entity.detail.get` | existing_capability | `craft.bop.linked_entity.detail.get` |
 | Craft | `capability:craft.bop.linked_parts.get` | existing_capability | `craft.bop.linked_parts.get` |
 | Craft | `rest:GET:/api/bop/versions/{gid}/pbom-change-point` | existing_capability | `craft.bop.linked_parts.get` |
 | Craft | `rest:GET:/api/bop/versions/{version_gid}/linked-parts` | existing_capability | `craft.bop.linked_parts.get` |
@@ -589,6 +613,16 @@
 | Craft | `rest:GET:/api/bop/pbom-snapshots` | existing_capability | `craft.pbom.version.search` |
 | Craft | `rest:GET:/api/bop/pbom-versions` | existing_capability | `craft.pbom.version.search` |
 | Craft | `capability:craft.pbom.version.submit` | existing_capability | `craft.pbom.version.submit` |
+| Craft | `capability:craft.process_screenshot.attach` | existing_capability | `craft.process_screenshot.attach` |
+| Craft | `capability:craft.resource_requirement.alias.create` | existing_capability | `craft.resource_requirement.alias.create` |
+| Craft | `capability:craft.resource_requirement.alias.delete` | existing_capability | `craft.resource_requirement.alias.delete` |
+| Craft | `capability:craft.resource_requirement.create` | existing_capability | `craft.resource_requirement.create` |
+| Craft | `capability:craft.resource_requirement.retire` | existing_capability | `craft.resource_requirement.retire` |
+| Craft | `capability:craft.resource_requirement.search` | existing_capability | `craft.resource_requirement.search` |
+| Craft | `capability:craft.resource_requirement.staging.ignore` | existing_capability | `craft.resource_requirement.staging.ignore` |
+| Craft | `capability:craft.resource_requirement.staging.resolve` | existing_capability | `craft.resource_requirement.staging.resolve` |
+| Craft | `capability:craft.resource_requirement.staging.search` | existing_capability | `craft.resource_requirement.staging.search` |
+| Craft | `capability:craft.resource_requirement.update` | existing_capability | `craft.resource_requirement.update` |
 | Craft | `capability:craft.rule.change.apply` | existing_capability | `craft.rule.change.apply` |
 | Craft | `rest:DELETE:/api/rules/{gid}` | existing_capability | `craft.rule.change.apply` |
 | Craft | `rest:PATCH:/api/rules/{gid}` | existing_capability | `craft.rule.change.apply` |
@@ -619,6 +653,7 @@
 | Craft | `capability:craft.standard_operation.read` | existing_capability | `craft.standard_operation.read` |
 | Craft | `capability:craft.vpps_audit.change.apply` | existing_capability | `craft.vpps_audit.change.apply` |
 | Craft | `capability:craft.vpps_audit.read` | existing_capability | `craft.vpps_audit.read` |
+| Device | `rest:POST:/api/v1/connector/activate` | unreviewed | — |
 | Device | `rest:GET:/api/v1/device-runtime/commands/{command_gid}/artifacts/{artifact_id}` | excluded | — |
 | Device | `rest:POST:/api/v1/device-runtime/activate` | excluded | — |
 | Device | `rest:POST:/api/v1/device-runtime/commands/lease` | excluded | — |
@@ -692,6 +727,11 @@
 | Integration | `capability:integration.mapping_target.search` | existing_capability | `integration.mapping_target.search` |
 | Integration | `capability:integration.mapping_target.upsert` | existing_capability | `integration.mapping_target.upsert` |
 | Integration | `capability:integration.sync.start` | existing_capability | `integration.sync.start` |
+| Knowledge | `rest:GET:/api/knowledge_hub/folders?scope_type=personal` | unreviewed | — |
+| Knowledge | `rest:GET:/api/knowledge_hub/folders?scope_type=public` | unreviewed | — |
+| Knowledge | `rest:GET:/api/knowledge_hub/items?scope_type=personal` | unreviewed | — |
+| Knowledge | `rest:GET:/api/knowledge_hub/items?scope_type=public` | unreviewed | — |
+| Knowledge | `rest:GET:/api/knowledge_hub/items?scope_type=public&show_hidden=true` | unreviewed | — |
 | Knowledge | `agent_tool:recommend_practice` | existing_capability | `knowledge.context.retrieve` |
 | Knowledge | `agent_tool:search_knowledge` | existing_capability | `knowledge.context.retrieve` |
 | Knowledge | `capability:knowledge.context.retrieve` | existing_capability | `knowledge.context.retrieve` |
@@ -726,6 +766,7 @@
 | Knowledge | `capability:knowledge.reference_data.change.apply` | existing_capability | `knowledge.reference_data.change.apply` |
 | Knowledge | `capability:knowledge.reference_data.read` | existing_capability | `knowledge.reference_data.read` |
 | Knowledge | `capability:knowledge.reference_dataset.publish` | existing_capability | `knowledge.reference_dataset.publish` |
+| Knowledge | `capability:knowledge.resource_model_mapping.resolve` | existing_capability | `knowledge.resource_model_mapping.resolve` |
 | Knowledge | `agent_tool:find_similar_cases` | existing_capability | `knowledge.search` |
 | Knowledge | `capability:knowledge.search` | existing_capability | `knowledge.search` |
 | Knowledge | `capability:knowledge.space.change.apply` | existing_capability | `knowledge.space.change.apply` |
@@ -921,13 +962,70 @@
 | Project Management | `capability:project.workbench.read` | existing_capability | `project.workbench.read` |
 | Project Management | `rest:GET:/api/workbenches` | existing_capability | `project.workbench.read` |
 | Project Management | `rest:GET:/api/workbenches/{gid}/override` | existing_capability | `project.workbench.read` |
+| Simulation | `rest:GET:/api/v1/simulation/connectors/binding` | unreviewed | — |
+| Simulation | `rest:GET:/api/v1/simulation/connectors/pairings/{user_code}` | unreviewed | — |
+| Simulation | `rest:GET:/api/v1/simulation/connectors/plans/{plan_id}/artifacts/{artifact_id}` | unreviewed | — |
+| Simulation | `rest:GET:/api/v1/simulation/connectors/plans/{plan_id}/artifacts/{artifact_id}/content` | unreviewed | — |
+| Simulation | `rest:GET:/api/v1/simulation/connectors/v2/plans/{plan_id}/probe` | unreviewed | — |
+| Simulation | `rest:POST:/api/v1/simulation/connectors/heartbeat` | unreviewed | — |
+| Simulation | `rest:POST:/api/v1/simulation/connectors/pairings` | unreviewed | — |
+| Simulation | `rest:POST:/api/v1/simulation/connectors/pairings/{pairing_id}/activate` | unreviewed | — |
+| Simulation | `rest:POST:/api/v1/simulation/connectors/pairings/{pairing_id}/complete` | unreviewed | — |
+| Simulation | `rest:POST:/api/v1/simulation/connectors/pairings/{user_code}/approve` | unreviewed | — |
+| Simulation | `rest:POST:/api/v1/simulation/connectors/plans/lease` | unreviewed | — |
+| Simulation | `rest:POST:/api/v1/simulation/connectors/plans/{plan_id}/complete` | unreviewed | — |
+| Simulation | `rest:POST:/api/v1/simulation/connectors/v2/heartbeat` | unreviewed | — |
+| Simulation | `rest:POST:/api/v1/simulation/connectors/v2/pairings` | unreviewed | — |
+| Simulation | `rest:POST:/api/v1/simulation/connectors/v2/pairings/{pairing_id}/activate` | unreviewed | — |
+| Simulation | `rest:POST:/api/v1/simulation/connectors/v2/plans/lease` | unreviewed | — |
+| Simulation | `rest:POST:/api/v1/simulation/connectors/v2/plans/{plan_id}/acknowledge` | unreviewed | — |
+| Simulation | `rest:POST:/api/v1/simulation/connectors/v2/plans/{plan_id}/outcome` | unreviewed | — |
+| Simulation | `rest:POST:/api/v1/simulation/connectors/v2/plans/{plan_id}/reconcile` | unreviewed | — |
+| Simulation | `rest:POST:/api/v1/simulation/connectors/v2/runtime/challenge` | unreviewed | — |
+| Simulation | `rest:POST:/api/v1/simulation/connectors/v2/runtime/reconciliation/register` | unreviewed | — |
+| Simulation | `rest:POST:/api/v1/simulation/connectors/v2/runtime/register` | unreviewed | — |
+| Simulation | `rest:POST:/api/v1/simulation/connectors/v2/runtime/renew` | unreviewed | — |
+| Simulation | `rest:PUT:/api/v1/simulation/connectors/plans/{plan_id}/steps/{step_id}/result-artifact` | unreviewed | — |
+| Simulation | `rest:WEBSOCKET:/api/v1/simulation/connectors/v2/plans/wake` | unreviewed | — |
+| Simulation | `capability:simulation.capture_run.action.get` | existing_capability | `simulation.capture_run.action.get` |
+| Simulation | `capability:simulation.capture_run.cancel` | existing_capability | `simulation.capture_run.cancel` |
+| Simulation | `capability:simulation.capture_run.dispatch` | existing_capability | `simulation.capture_run.dispatch` |
+| Simulation | `capability:simulation.capture_run.get` | existing_capability | `simulation.capture_run.get` |
+| Simulation | `capability:simulation.capture_run.start` | existing_capability | `simulation.capture_run.start` |
+| Simulation | `capability:simulation.capture_step.retry` | existing_capability | `simulation.capture_step.retry` |
+| Simulation | `capability:simulation.connector.binding.get` | existing_capability | `simulation.connector.binding.get` |
+| Simulation | `capability:simulation.connector.health.get` | existing_capability | `simulation.connector.health.get` |
+| Simulation | `capability:simulation.connector.pairing.activate` | existing_capability | `simulation.connector.pairing.activate` |
+| Simulation | `capability:simulation.connector.pairing.approve` | existing_capability | `simulation.connector.pairing.approve` |
+| Simulation | `capability:simulation.connector.pairing.bootstrap.create` | existing_capability | `simulation.connector.pairing.bootstrap.create` |
+| Simulation | `capability:simulation.connector.pairing.bootstrap.get` | existing_capability | `simulation.connector.pairing.bootstrap.get` |
+| Simulation | `capability:simulation.connector.pairing.cancel` | existing_capability | `simulation.connector.pairing.cancel` |
+| Simulation | `capability:simulation.connector.pairing.complete` | existing_capability | `simulation.connector.pairing.complete` |
+| Simulation | `capability:simulation.connector.pairing.request` | existing_capability | `simulation.connector.pairing.request` |
+| Simulation | `capability:simulation.connector.pairing.summary.get` | existing_capability | `simulation.connector.pairing.summary.get` |
+| Simulation | `capability:simulation.connector.plan.queue` | existing_capability | `simulation.connector.plan.queue` |
+| Simulation | `capability:simulation.connector_capture_outcome.apply` | existing_capability | `simulation.connector_capture_outcome.apply` |
+| Simulation | `capability:simulation.connector_document_snapshot_outcome.apply` | existing_capability | `simulation.connector_document_snapshot_outcome.apply` |
+| Simulation | `capability:simulation.connector_materialization_outcome.apply` | existing_capability | `simulation.connector_materialization_outcome.apply` |
+| Simulation | `capability:simulation.document_snapshot.action.get` | existing_capability | `simulation.document_snapshot.action.get` |
+| Simulation | `capability:simulation.document_snapshot.dispatch` | existing_capability | `simulation.document_snapshot.dispatch` |
+| Simulation | `capability:simulation.document_snapshot.get` | existing_capability | `simulation.document_snapshot.get` |
+| Simulation | `capability:simulation.document_snapshot.request` | existing_capability | `simulation.document_snapshot.request` |
 | Simulation | `capability:simulation.environment.archive` | existing_capability | `simulation.environment.archive` |
+| Simulation | `capability:simulation.environment.compose` | existing_capability | `simulation.environment.compose` |
 | Simulation | `capability:simulation.environment.create` | existing_capability | `simulation.environment.create` |
 | Simulation | `rest:POST:/api/simulation/environments` | existing_capability | `simulation.environment.create` |
 | Simulation | `capability:simulation.environment.get` | existing_capability | `simulation.environment.get` |
 | Simulation | `rest:GET:/api/simulation/environments/{environment_gid}` | existing_capability | `simulation.environment.get` |
+| Simulation | `capability:simulation.environment.manifest.archive` | existing_capability | `simulation.environment.manifest.archive` |
+| Simulation | `capability:simulation.environment.manifest.get` | existing_capability | `simulation.environment.manifest.get` |
+| Simulation | `capability:simulation.environment.manifest.search` | existing_capability | `simulation.environment.manifest.search` |
+| Simulation | `capability:simulation.environment.materialize` | existing_capability | `simulation.environment.materialize` |
+| Simulation | `capability:simulation.environment.preflight` | existing_capability | `simulation.environment.preflight` |
 | Simulation | `capability:simulation.environment.search` | existing_capability | `simulation.environment.search` |
 | Simulation | `rest:GET:/api/simulation/environments` | existing_capability | `simulation.environment.search` |
+| Simulation | `capability:simulation.materialization_run.action.get` | existing_capability | `simulation.materialization_run.action.get` |
+| Simulation | `capability:simulation.materialization_run.dispatch` | existing_capability | `simulation.materialization_run.dispatch` |
 | Simulation | `capability:simulation.parameter_set.create` | existing_capability | `simulation.parameter_set.create` |
 | Simulation | `capability:simulation.parameter_set.get` | existing_capability | `simulation.parameter_set.get` |
 | Simulation | `capability:simulation.parameter_set.search` | existing_capability | `simulation.parameter_set.search` |
@@ -939,3 +1037,17 @@
 | Simulation | `capability:simulation.solver_profile.create` | existing_capability | `simulation.solver_profile.create` |
 | Simulation | `capability:simulation.solver_profile.get` | existing_capability | `simulation.solver_profile.get` |
 | Simulation | `capability:simulation.solver_profile.search` | existing_capability | `simulation.solver_profile.search` |
+| Simulation | `capability:simulation.vismockup.application.attach.request` | existing_capability | `simulation.vismockup.application.attach.request` |
+| Simulation | `capability:simulation.vismockup.application.launch` | existing_capability | `simulation.vismockup.application.launch` |
+| Simulation | `capability:simulation.vismockup.application.launch.request` | existing_capability | `simulation.vismockup.application.launch.request` |
+| Simulation | `capability:simulation.vismockup.capture.create` | existing_capability | `simulation.vismockup.capture.create` |
+| Simulation | `capability:simulation.vismockup.command.get` | existing_capability | `simulation.vismockup.command.get` |
+| Simulation | `capability:simulation.vismockup.model.close.request` | existing_capability | `simulation.vismockup.model.close.request` |
+| Simulation | `capability:simulation.vismockup.model.open` | existing_capability | `simulation.vismockup.model.open` |
+| Simulation | `capability:simulation.vismockup.model.open.request` | existing_capability | `simulation.vismockup.model.open.request` |
+| Simulation | `capability:simulation.vismockup.selection.highlight` | existing_capability | `simulation.vismockup.selection.highlight` |
+| Simulation | `capability:simulation.vismockup.status.get` | existing_capability | `simulation.vismockup.status.get` |
+| Simulation | `capability:simulation.vismockup.tree.get` | existing_capability | `simulation.vismockup.tree.get` |
+| Simulation | `capability:simulation.vismockup.tree.read.request` | existing_capability | `simulation.vismockup.tree.read.request` |
+| Simulation | `capability:simulation.vismockup.visibility.change.apply` | existing_capability | `simulation.vismockup.visibility.change.apply` |
+| Simulation | `capability:simulation.vismockup.visibility.change.request` | existing_capability | `simulation.vismockup.visibility.change.request` |

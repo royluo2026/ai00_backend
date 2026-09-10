@@ -142,6 +142,10 @@ Read one simulation workspace owned by the caller or shared with authenticated u
       },
       "type": "array"
     },
+    "cache_revision_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
     "is_owner": {
       "type": "boolean"
     },
@@ -281,6 +285,7 @@ Read one simulation workspace owned by the caller or shared with authenticated u
     "primary_project_gid",
     "updated_at",
     "row_version",
+    "cache_revision_hash",
     "nodes",
     "bindings"
   ],

@@ -7,7 +7,23 @@
 | Agent | `workmanship_agent_canvas_invocations` | Agent | agent |
 | Agent | `workmanship_agent_canvas_runs` | Agent | agent |
 | Agent | `workmanship_agent_canvas_runtime_results` | Agent | agent |
+| Agent | `workmanship_agent_capability_outbox` | Agent | agent |
 | Agent | `workmanship_agent_capability_resources` | Agent | agent |
+| Agent | `workmanship_agent_confirmation_tokens` | Agent | agent |
+| Agent | `workmanship_agent_orch_acceptance_facts` | Agent | agent |
+| Agent | `workmanship_agent_orch_axis_views` | Agent | agent |
+| Agent | `workmanship_agent_orch_business_nodes` | Agent | agent |
+| Agent | `workmanship_agent_orch_capability_bindings` | Agent | agent |
+| Agent | `workmanship_agent_orch_context_bindings` | Agent | agent |
+| Agent | `workmanship_agent_orch_flow_edges` | Agent | agent |
+| Agent | `workmanship_agent_orch_item_edges` | Agent | agent |
+| Agent | `workmanship_agent_orch_items` | Agent | agent |
+| Agent | `workmanship_agent_orch_metric_snapshots` | Agent | agent |
+| Agent | `workmanship_agent_orch_panoramas` | Agent | agent |
+| Agent | `workmanship_agent_orch_run_events` | Agent | agent |
+| Agent | `workmanship_agent_orch_runs` | Agent | agent |
+| Agent | `workmanship_agent_orch_versions` | Agent | agent |
+| Agent | `workmanship_agent_orch_workload_baselines` | Agent | agent |
 | Agent | `workmanship_agent_run_approvals` | Agent | agent |
 | Agent | `workmanship_agent_run_participants` | Agent | agent |
 | Agent | `workmanship_agent_run_tool_results` | Agent | agent |
@@ -44,6 +60,10 @@
 | Base Platform | `workmanship_base_capability_audit_ledger` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_audit_outbox` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_bindings` | Base Platform | base |
+| Base Platform | `workmanship_base_capability_business_purposes` | Base Platform | base |
+| Base Platform | `workmanship_base_capability_business_review_requests` | Base Platform | base |
+| Base Platform | `workmanship_base_capability_business_reviews` | Base Platform | base |
+| Base Platform | `workmanship_base_capability_business_rules` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_catalog_releases` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_change_proposals` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_entries` | Base Platform | base |
@@ -57,22 +77,37 @@
 | Base Platform | `workmanship_base_capability_operations` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_outcomes` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_rate_windows` | Base Platform | base |
+| Base Platform | `workmanship_base_capability_relation_candidates` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_release_reports` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_reviews` | Base Platform | base |
+| Base Platform | `workmanship_base_capability_rule_effectiveness` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_scan_runs` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_snapshot_entries` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_snapshots` | Base Platform | base |
+| Base Platform | `workmanship_base_capability_standard_review_requests` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_test_results` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_test_runs` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_versions` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_waivers` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_worker_leases` | Base Platform | base |
 | Base Platform | `workmanship_base_consumer_delegations` | Base Platform | base |
+| Base Platform | `workmanship_base_desktop_families` | Base Platform | base |
+| Base Platform | `workmanship_base_desktop_refresh_tokens` | Base Platform | base |
+| Base Platform | `workmanship_base_desktop_transactions` | Base Platform | base |
 | Base Platform | `workmanship_base_domain_inbox` | Base Platform | base |
+| Base Platform | `workmanship_base_historical_uploads` | Base Platform | base |
+| Base Platform | `workmanship_base_legacy_artifact_bindings` | Base Platform | base |
+| Base Platform | `workmanship_base_line_projection_operations` | Base Platform | base |
+| Base Platform | `workmanship_base_line_responsibility_source_targets` | Base Platform | base |
+| Base Platform | `workmanship_base_line_responsibility_sources` | Base Platform | base |
+| Base Platform | `workmanship_base_line_responsibility_targets` | Base Platform | base |
 | Base Platform | `workmanship_base_notification_preferences` | Base Platform | base |
 | Base Platform | `workmanship_base_notifications` | Base Platform | base |
 | Base Platform | `workmanship_base_plugin_invocation_audit` | Base Platform | base |
 | Base Platform | `workmanship_base_plugin_lifecycle_idempotency` | Base Platform | base |
+| Base Platform | `workmanship_base_project_manager_assignments` | Base Platform | base |
+| Base Platform | `workmanship_base_project_manager_heads` | Base Platform | base |
+| Base Platform | `workmanship_base_project_manager_operations` | Base Platform | base |
 | Base Platform | `workmanship_base_revision_branches` | Base Platform | base |
 | Base Platform | `workmanship_base_revision_changesets` | Base Platform | base |
 | Base Platform | `workmanship_base_revision_commit_parents` | Base Platform | base |
@@ -136,11 +171,44 @@
 | Craft | `workmanship_bop_pbom_versions` | Craft | craft |
 | Craft | `workmanship_bop_project_roles` | Craft | craft |
 | Craft | `workmanship_bop_vpps_operations` | Craft | craft |
+| Craft | `workmanship_craft_bop_binding_revisions` | Craft | craft |
+| Craft | `workmanship_craft_bop_bindings` | Craft | craft |
 | Craft | `workmanship_craft_bop_change_previews` | Craft | craft |
+| Craft | `workmanship_craft_bop_change_proposal_conflicts` | Craft | craft |
+| Craft | `workmanship_craft_bop_change_proposal_units` | Craft | craft |
+| Craft | `workmanship_craft_bop_change_proposals` | Craft | craft |
+| Craft | `workmanship_craft_bop_fork_blueprint_nodes` | Craft | craft |
+| Craft | `workmanship_craft_bop_fork_plans` | Craft | craft |
+| Craft | `workmanship_craft_bop_fork_runs` | Craft | craft |
+| Craft | `workmanship_craft_bop_fork_workflows` | Craft | craft |
 | Craft | `workmanship_craft_bop_import_previews` | Craft | craft |
+| Craft | `workmanship_craft_bop_node_revisions` | Craft | craft |
+| Craft | `workmanship_craft_bop_nodes` | Craft | craft |
+| Craft | `workmanship_craft_bop_operation_ledger` | Craft | craft |
+| Craft | `workmanship_craft_bop_personal_fork_targets` | Craft | craft |
+| Craft | `workmanship_craft_bop_personal_import_operations` | Craft | craft |
+| Craft | `workmanship_craft_bop_repositories` | Craft | craft |
+| Craft | `workmanship_craft_bop_repository_id_map` | Craft | craft |
+| Craft | `workmanship_craft_bop_repository_migration_control` | Craft | craft |
+| Craft | `workmanship_craft_bop_repository_migration_leases` | Craft | craft |
+| Craft | `workmanship_craft_bop_repository_quarantine` | Craft | craft |
+| Craft | `workmanship_craft_bop_repository_write_journal` | Craft | craft |
+| Craft | `workmanship_craft_bop_space_head_members` | Craft | craft |
+| Craft | `workmanship_craft_bop_space_heads` | Craft | craft |
+| Craft | `workmanship_craft_bop_space_version_members` | Craft | craft |
+| Craft | `workmanship_craft_bop_space_versions` | Craft | craft |
+| Craft | `workmanship_craft_bop_spaces` | Craft | craft |
+| Craft | `workmanship_craft_bop_vpps_group_members` | Craft | craft |
+| Craft | `workmanship_craft_bop_vpps_group_versions` | Craft | craft |
+| Craft | `workmanship_craft_bop_vpps_groups` | Craft | craft |
 | Craft | `workmanship_craft_bop_write_idempotency` | Craft | craft |
 | Craft | `workmanship_craft_pbom_change_previews` | Craft | craft |
+| Craft | `workmanship_craft_process_screenshots` | Craft | craft |
+| Craft | `workmanship_craft_resource_aliases` | Craft | craft |
+| Craft | `workmanship_craft_resource_requirements` | Craft | craft |
 | Craft | `workmanship_craft_schema_migrations` | Craft | craft |
+| Craft | `workmanship_craft_standard_operations` | Craft | craft |
+| Craft | `workmanship_craft_tc_resource_staging` | Craft | craft |
 | Craft | `workmanship_craft_validation_policies` | Craft | craft |
 | Craft | `workmanship_craft_validation_policy_checks` | Craft | craft |
 | Craft | `workmanship_know_craft_rules` | Craft | craft |
@@ -154,6 +222,10 @@
 | Craft | `workmanship_tpl_vpps_fixtures` | Craft | craft |
 | Craft | `workmanship_tpl_vpps_parts` | Craft | craft |
 | Craft | `workmanship_tpl_vpps_tools` | Craft | craft |
+| Device | `workmanship_device_connector_health` | Device | device |
+| Device | `workmanship_device_connector_heartbeat_audit` | Device | device |
+| Device | `workmanship_device_connector_plans` | Device | device |
+| Device | `workmanship_device_connector_projection_outbox` | Device | device |
 | Device | `workmanship_runtime_commands` | Device | local_integration |
 | Device | `workmanship_runtime_devices` | Device | local_integration |
 | Device | `workmanship_runtime_enrollments` | Device | local_integration |
@@ -200,6 +272,7 @@
 | Knowledge | `workmanship_know_reference_versions` | Knowledge | knowledge |
 | Knowledge | `workmanship_know_revisions` | Knowledge | knowledge |
 | Knowledge | `workmanship_know_spaces` | Knowledge | knowledge |
+| Knowledge | `workmanship_knowledge_resource_model_mappings` | Knowledge | knowledge |
 | Knowledge | `workmanship_knowledge_schema_migrations` | Knowledge | knowledge |
 | Ontology | `workmanship_base_ontology_active_refs` | Ontology | ontology |
 | Ontology | `workmanship_base_ontology_change_proposals` | Ontology | ontology |
@@ -219,8 +292,11 @@
 | Project Management | `workmanship_proj_approval_orders` | Project Management | project_management |
 | Project Management | `workmanship_proj_approval_rejection_operations` | Project Management | project_management |
 | Project Management | `workmanship_proj_collab_sessions` | Project Management | project_management |
+| Project Management | `workmanship_proj_desktop_operations` | Project Management | project_management |
 | Project Management | `workmanship_proj_issues` | Project Management | project_management |
 | Project Management | `workmanship_proj_notification_outbox` | Project Management | project_management |
+| Project Management | `workmanship_proj_org_management_operations` | Project Management | project_management |
+| Project Management | `workmanship_proj_org_management_outbox` | Project Management | project_management |
 | Project Management | `workmanship_proj_projects` | Project Management | project_management |
 | Project Management | `workmanship_proj_task_dependencies` | Project Management | project_management |
 | Project Management | `workmanship_proj_tasks` | Project Management | project_management |
@@ -242,11 +318,61 @@
 | Project Management | `workmanship_work_task_template_items` | Project Management | project_management |
 | Project Management | `workmanship_work_task_templates` | Project Management | project_management |
 | Project Management | `workmanship_work_tasks` | Project Management | project_management |
+| Simulation | `workmanship_sim_capture_artifact_refs` | Simulation | simulation |
+| Simulation | `workmanship_sim_capture_runs` | Simulation | simulation |
+| Simulation | `workmanship_sim_capture_steps` | Simulation | simulation |
+| Simulation | `workmanship_sim_connector_app_pairings` | Simulation | simulation |
+| Simulation | `workmanship_sim_connector_bindings` | Simulation | simulation |
+| Simulation | `workmanship_sim_connector_enrollments` | Simulation | simulation |
+| Simulation | `workmanship_sim_connector_environments` | Simulation | simulation |
+| Simulation | `workmanship_sim_connector_health` | Simulation | simulation |
+| Simulation | `workmanship_sim_connector_heartbeat_audit` | Simulation | simulation |
+| Simulation | `workmanship_sim_connector_legacy_commands` | Simulation | simulation |
+| Simulation | `workmanship_sim_connector_pairing_bootstraps` | Simulation | simulation |
+| Simulation | `workmanship_sim_connector_pairings` | Simulation | simulation |
+| Simulation | `workmanship_sim_connector_plans` | Simulation | simulation |
+| Simulation | `workmanship_sim_connector_projection_outbox` | Simulation | simulation |
+| Simulation | `workmanship_sim_connector_runtime_audit` | Simulation | simulation |
+| Simulation | `workmanship_sim_connector_runtime_challenges` | Simulation | simulation |
+| Simulation | `workmanship_sim_connector_runtime_devices` | Simulation | simulation |
+| Simulation | `workmanship_sim_connector_runtime_plans` | Simulation | simulation |
+| Simulation | `workmanship_sim_connector_runtime_projection_outbox` | Simulation | simulation |
+| Simulation | `workmanship_sim_connector_runtime_recovery_sessions` | Simulation | simulation |
+| Simulation | `workmanship_sim_contexts` | Simulation | simulation |
+| Simulation | `workmanship_sim_document_snapshot_requests` | Simulation | simulation |
+| Simulation | `workmanship_sim_environment_bindings` | Simulation | simulation |
+| Simulation | `workmanship_sim_environment_manifests` | Simulation | simulation |
+| Simulation | `workmanship_sim_environment_publish_maps` | Simulation | simulation |
+| Simulation | `workmanship_sim_environment_publish_outbox` | Simulation | simulation |
+| Simulation | `workmanship_sim_environment_publish_plans` | Simulation | simulation |
 | Simulation | `workmanship_sim_environments` | Simulation | simulation |
+| Simulation | `workmanship_sim_materialization_runs` | Simulation | simulation |
 | Simulation | `workmanship_sim_parameter_sets` | Simulation | simulation |
 | Simulation | `workmanship_sim_profiles` | Simulation | simulation |
 | Simulation | `workmanship_sim_runs` | Simulation | simulation |
 | Simulation | `workmanship_sim_schema_migrations` | Simulation | simulation |
+| Simulation | `workmanship_sim_vm_checkpoints` | Simulation | simulation |
+| Simulation | `workmanship_sim_vm_diff_items` | Simulation | simulation |
+| Simulation | `workmanship_sim_vm_diff_reports` | Simulation | simulation |
+| Simulation | `workmanship_sim_vm_documents` | Simulation | simulation |
+| Simulation | `workmanship_sim_vm_observations` | Simulation | simulation |
+| Simulation | `workmanship_sim_vm_occurrences` | Simulation | simulation |
+| Simulation | `workmanship_sim_vm_poses` | Simulation | simulation |
+| Simulation | `workmanship_sim_vm_sessions` | Simulation | simulation |
+| Simulation | `workmanship_sim_vm_snapshot_heads` | Simulation | simulation |
+| Simulation | `workmanship_sim_vm_snapshots` | Simulation | simulation |
+| Simulation | `workmanship_sim_workspace_bindings` | Simulation | simulation |
+| Simulation | `workmanship_sim_workspace_export_refs` | Simulation | simulation |
+| Simulation | `workmanship_sim_workspace_fork_plan_options` | Simulation | simulation |
+| Simulation | `workmanship_sim_workspace_fork_plans` | Simulation | simulation |
+| Simulation | `workmanship_sim_workspace_freeze_outbox` | Simulation | simulation |
+| Simulation | `workmanship_sim_workspace_heads` | Simulation | simulation |
+| Simulation | `workmanship_sim_workspace_idempotency` | Simulation | simulation |
+| Simulation | `workmanship_sim_workspace_load_claims` | Simulation | simulation |
+| Simulation | `workmanship_sim_workspace_nodes` | Simulation | simulation |
+| Simulation | `workmanship_sim_workspace_projects` | Simulation | simulation |
+| Simulation | `workmanship_sim_workspace_versions` | Simulation | simulation |
+| Simulation | `workmanship_sim_workspaces` | Simulation | simulation |
 | Agent | `backend/db/migrations/202608030001_agent_private_sessions.sql` | migration | agent |
 | Agent | `backend/db/migrations/202608030002_agent_memory_skills_audit.sql` | migration | agent |
 | Agent | `backend/db/migrations/202608030003_agent_private_flows.sql` | migration | agent |
@@ -289,3 +415,12 @@
 | Base Platform | `backend/db/migrations/202608280005_base_structural_owner_hardening.sql` | migration | base |
 | Base Platform | `backend/db/migrations/202608280006_base_historical_tenant_repair.sql` | migration | base |
 | Craft | `backend/db/migrations/202608310001_craft_rule_identity_backfill.sql` | migration | craft |
+| Craft | `backend/db/migrations/202609010001_craft_rule_identity_compatibility.sql` | migration | craft |
+| Base Platform | `backend/db/migrations/202609010002_base_self_annotation_collation.sql` | migration | base |
+| Base Platform | `backend/db/migrations/202609010003_base_capability_release_binding.sql` | migration | base |
+| Base Platform | `backend/db/migrations/202609070002_base_desktop_oauth.sql` | migration | base |
+| Base Platform | `backend/db/migrations/202609080001_base_legacy_artifact_bindings.sql` | migration | base |
+| Base Platform | `backend/db/migrations/202609080002_base_historical_uploads.sql` | migration | base |
+| Base Platform | `backend/db/migrations/202609090001_base_project_responsibility.sql` | migration | base |
+| Project Management | `backend/db/migrations/202609090002_project_management_org_management_operations.sql` | migration | project_management |
+| Base Platform | `backend/db/migrations/202609090003_base_line_responsibility_projection.sql` | migration | base |

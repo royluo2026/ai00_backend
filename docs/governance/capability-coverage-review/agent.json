@@ -3,9 +3,9 @@
   "domain": "Agent",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:0f0d81ef5b60bb103f657d4b4a62afc096b4793f85f204805298389c01e8049a",
-    "catalog_release": "rel_04c998e59a4188758c8eda43f25b0488",
-    "catalog_sha256": "sha256:1be2b5f26178a57830b0ae1f54bbb170b6ca35e062bb1044abc2da19eba7fa02"
+    "registry_sha256": "sha256:06edf22fded2c04b9c85699c6c95e77360663ee51c703953898cda0425089337",
+    "catalog_release": "rel_78a4ed0c60a509804255a8c831dad3b6",
+    "catalog_sha256": "sha256:2a04a6b1a6bd7354840783a605e371a8c6e34ffbbda493452be93cded6106613"
   },
   "unreviewed_functions": {},
   "excluded_functions": {
@@ -978,6 +978,398 @@
         }
       }
     },
+    "agent.orchestration.binding.delete": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:agent.orchestration.binding.delete": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/capabilities/contracts.py",
+            "plugins/agent/agent_backend/capabilities/provider.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-09-04"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "Write consumer pending MVP approval.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No direct REST consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No direct plugin consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No agent consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No MCP consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No local runtime consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        }
+      }
+    },
+    "agent.orchestration.graph.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:agent.orchestration.graph.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/capabilities/contracts.py",
+            "plugins/agent/agent_backend/capabilities/provider.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-09-04"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Governed canvas consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No direct REST consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No direct plugin consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No agent consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No MCP consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No local runtime consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        }
+      }
+    },
+    "agent.orchestration.graph.save": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:agent.orchestration.graph.save": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/capabilities/contracts.py",
+            "plugins/agent/agent_backend/capabilities/provider.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-09-04"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "Write consumer pending MVP approval.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No direct REST consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No direct plugin consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No agent consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No MCP consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No local runtime consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        }
+      }
+    },
+    "agent.orchestration.metric.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:agent.orchestration.metric.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/capabilities/contracts.py",
+            "plugins/agent/agent_backend/capabilities/provider.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-09-04"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Governed canvas consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No direct REST consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No direct plugin consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No agent consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No MCP consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No local runtime consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        }
+      }
+    },
+    "agent.orchestration.panorama.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:agent.orchestration.panorama.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/capabilities/contracts.py",
+            "plugins/agent/agent_backend/capabilities/provider.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-09-04"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Governed canvas consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No direct REST consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No direct plugin consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No agent consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No MCP consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No local runtime consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        }
+      }
+    },
+    "agent.orchestration.run.start": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:agent.orchestration.run.start": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/capabilities/contracts.py",
+            "plugins/agent/agent_backend/capabilities/provider.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-09-04"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "Write consumer pending MVP approval.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No direct REST consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No direct plugin consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No agent consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No MCP consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No local runtime consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        }
+      }
+    },
+    "agent.orchestration.run.transition": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:agent.orchestration.run.transition": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/capabilities/contracts.py",
+            "plugins/agent/agent_backend/capabilities/provider.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-09-04"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "Write consumer pending MVP approval.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No direct REST consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No direct plugin consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No agent consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No MCP consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No local runtime consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        }
+      }
+    },
+    "agent.orchestration.version.publish": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:agent.orchestration.version.publish": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/capabilities/contracts.py",
+            "plugins/agent/agent_backend/capabilities/provider.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-09-04"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "Write consumer pending MVP approval.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No direct REST consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No direct plugin consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No agent consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No MCP consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No local runtime consumer.",
+          "policy_ref": "agent-orchestration-governed"
+        }
+      }
+    },
     "agent.run.change.apply": {
       "kind": "existing",
       "function_dispositions": {
@@ -1707,15 +2099,7 @@
           "policy_ref": "existing-registry-policy"
         }
       }
-    },
-    "agent.orchestration.panorama.read":{"kind":"existing","function_dispositions":{"capability:agent.orchestration.panorama.read":{"resolution":"existing_capability","source_paths":["plugins/agent/agent_backend/capabilities/contracts.py","plugins/agent/agent_backend/capabilities/provider.py"],"owner":"Agent","evidence":"The bound Registry maps this stable function to the frozen Capability Catalog.","reviewer":"existing-user-function-registry","reviewed_at":"2026-09-04"}},"consumer_exposure":{"shared_pipeline":"capability_provider_gateway","web":{"enabled":true,"reason":"Governed canvas consumer.","policy_ref":"agent-orchestration-governed"},"rest":{"enabled":false,"reason":"No direct REST consumer.","policy_ref":"agent-orchestration-governed"},"plugin":{"enabled":false,"reason":"No direct plugin consumer.","policy_ref":"agent-orchestration-governed"},"agent":{"enabled":false,"reason":"No agent consumer.","policy_ref":"agent-orchestration-governed"},"mcp":{"enabled":false,"reason":"No MCP consumer.","policy_ref":"agent-orchestration-governed"},"local_runtime":{"enabled":false,"reason":"No local runtime consumer.","policy_ref":"agent-orchestration-governed"}}},
-    "agent.orchestration.graph.read":{"kind":"existing","function_dispositions":{"capability:agent.orchestration.graph.read":{"resolution":"existing_capability","source_paths":["plugins/agent/agent_backend/capabilities/contracts.py","plugins/agent/agent_backend/capabilities/provider.py"],"owner":"Agent","evidence":"The bound Registry maps this stable function to the frozen Capability Catalog.","reviewer":"existing-user-function-registry","reviewed_at":"2026-09-04"}},"consumer_exposure":{"shared_pipeline":"capability_provider_gateway","web":{"enabled":true,"reason":"Governed canvas consumer.","policy_ref":"agent-orchestration-governed"},"rest":{"enabled":false,"reason":"No direct REST consumer.","policy_ref":"agent-orchestration-governed"},"plugin":{"enabled":false,"reason":"No direct plugin consumer.","policy_ref":"agent-orchestration-governed"},"agent":{"enabled":false,"reason":"No agent consumer.","policy_ref":"agent-orchestration-governed"},"mcp":{"enabled":false,"reason":"No MCP consumer.","policy_ref":"agent-orchestration-governed"},"local_runtime":{"enabled":false,"reason":"No local runtime consumer.","policy_ref":"agent-orchestration-governed"}}},
-    "agent.orchestration.metric.read":{"kind":"existing","function_dispositions":{"capability:agent.orchestration.metric.read":{"resolution":"existing_capability","source_paths":["plugins/agent/agent_backend/capabilities/contracts.py","plugins/agent/agent_backend/capabilities/provider.py"],"owner":"Agent","evidence":"The bound Registry maps this stable function to the frozen Capability Catalog.","reviewer":"existing-user-function-registry","reviewed_at":"2026-09-04"}},"consumer_exposure":{"shared_pipeline":"capability_provider_gateway","web":{"enabled":true,"reason":"Governed canvas consumer.","policy_ref":"agent-orchestration-governed"},"rest":{"enabled":false,"reason":"No direct REST consumer.","policy_ref":"agent-orchestration-governed"},"plugin":{"enabled":false,"reason":"No direct plugin consumer.","policy_ref":"agent-orchestration-governed"},"agent":{"enabled":false,"reason":"No agent consumer.","policy_ref":"agent-orchestration-governed"},"mcp":{"enabled":false,"reason":"No MCP consumer.","policy_ref":"agent-orchestration-governed"},"local_runtime":{"enabled":false,"reason":"No local runtime consumer.","policy_ref":"agent-orchestration-governed"}}},
-    "agent.orchestration.graph.save":{"kind":"existing","function_dispositions":{"capability:agent.orchestration.graph.save":{"resolution":"existing_capability","source_paths":["plugins/agent/agent_backend/capabilities/contracts.py","plugins/agent/agent_backend/capabilities/provider.py"],"owner":"Agent","evidence":"The bound Registry maps this stable function to the frozen Capability Catalog.","reviewer":"existing-user-function-registry","reviewed_at":"2026-09-04"}},"consumer_exposure":{"shared_pipeline":"capability_provider_gateway","web":{"enabled":false,"reason":"Write consumer pending MVP approval.","policy_ref":"agent-orchestration-governed"},"rest":{"enabled":false,"reason":"No direct REST consumer.","policy_ref":"agent-orchestration-governed"},"plugin":{"enabled":false,"reason":"No direct plugin consumer.","policy_ref":"agent-orchestration-governed"},"agent":{"enabled":false,"reason":"No agent consumer.","policy_ref":"agent-orchestration-governed"},"mcp":{"enabled":false,"reason":"No MCP consumer.","policy_ref":"agent-orchestration-governed"},"local_runtime":{"enabled":false,"reason":"No local runtime consumer.","policy_ref":"agent-orchestration-governed"}}},
-    "agent.orchestration.version.publish":{"kind":"existing","function_dispositions":{"capability:agent.orchestration.version.publish":{"resolution":"existing_capability","source_paths":["plugins/agent/agent_backend/capabilities/contracts.py","plugins/agent/agent_backend/capabilities/provider.py"],"owner":"Agent","evidence":"The bound Registry maps this stable function to the frozen Capability Catalog.","reviewer":"existing-user-function-registry","reviewed_at":"2026-09-04"}},"consumer_exposure":{"shared_pipeline":"capability_provider_gateway","web":{"enabled":false,"reason":"Write consumer pending MVP approval.","policy_ref":"agent-orchestration-governed"},"rest":{"enabled":false,"reason":"No direct REST consumer.","policy_ref":"agent-orchestration-governed"},"plugin":{"enabled":false,"reason":"No direct plugin consumer.","policy_ref":"agent-orchestration-governed"},"agent":{"enabled":false,"reason":"No agent consumer.","policy_ref":"agent-orchestration-governed"},"mcp":{"enabled":false,"reason":"No MCP consumer.","policy_ref":"agent-orchestration-governed"},"local_runtime":{"enabled":false,"reason":"No local runtime consumer.","policy_ref":"agent-orchestration-governed"}}},
-    "agent.orchestration.binding.delete":{"kind":"existing","function_dispositions":{"capability:agent.orchestration.binding.delete":{"resolution":"existing_capability","source_paths":["plugins/agent/agent_backend/capabilities/contracts.py","plugins/agent/agent_backend/capabilities/provider.py"],"owner":"Agent","evidence":"The bound Registry maps this stable function to the frozen Capability Catalog.","reviewer":"existing-user-function-registry","reviewed_at":"2026-09-04"}},"consumer_exposure":{"shared_pipeline":"capability_provider_gateway","web":{"enabled":false,"reason":"Write consumer pending MVP approval.","policy_ref":"agent-orchestration-governed"},"rest":{"enabled":false,"reason":"No direct REST consumer.","policy_ref":"agent-orchestration-governed"},"plugin":{"enabled":false,"reason":"No direct plugin consumer.","policy_ref":"agent-orchestration-governed"},"agent":{"enabled":false,"reason":"No agent consumer.","policy_ref":"agent-orchestration-governed"},"mcp":{"enabled":false,"reason":"No MCP consumer.","policy_ref":"agent-orchestration-governed"},"local_runtime":{"enabled":false,"reason":"No local runtime consumer.","policy_ref":"agent-orchestration-governed"}}},
-    "agent.orchestration.run.start":{"kind":"existing","function_dispositions":{"capability:agent.orchestration.run.start":{"resolution":"existing_capability","source_paths":["plugins/agent/agent_backend/capabilities/contracts.py","plugins/agent/agent_backend/capabilities/provider.py"],"owner":"Agent","evidence":"The bound Registry maps this stable function to the frozen Capability Catalog.","reviewer":"existing-user-function-registry","reviewed_at":"2026-09-04"}},"consumer_exposure":{"shared_pipeline":"capability_provider_gateway","web":{"enabled":false,"reason":"Write consumer pending MVP approval.","policy_ref":"agent-orchestration-governed"},"rest":{"enabled":false,"reason":"No direct REST consumer.","policy_ref":"agent-orchestration-governed"},"plugin":{"enabled":false,"reason":"No direct plugin consumer.","policy_ref":"agent-orchestration-governed"},"agent":{"enabled":false,"reason":"No agent consumer.","policy_ref":"agent-orchestration-governed"},"mcp":{"enabled":false,"reason":"No MCP consumer.","policy_ref":"agent-orchestration-governed"},"local_runtime":{"enabled":false,"reason":"No local runtime consumer.","policy_ref":"agent-orchestration-governed"}}},
-    "agent.orchestration.run.transition":{"kind":"existing","function_dispositions":{"capability:agent.orchestration.run.transition":{"resolution":"existing_capability","source_paths":["plugins/agent/agent_backend/capabilities/contracts.py","plugins/agent/agent_backend/capabilities/provider.py"],"owner":"Agent","evidence":"The bound Registry maps this stable function to the frozen Capability Catalog.","reviewer":"existing-user-function-registry","reviewed_at":"2026-09-04"}},"consumer_exposure":{"shared_pipeline":"capability_provider_gateway","web":{"enabled":false,"reason":"Write consumer pending MVP approval.","policy_ref":"agent-orchestration-governed"},"rest":{"enabled":false,"reason":"No direct REST consumer.","policy_ref":"agent-orchestration-governed"},"plugin":{"enabled":false,"reason":"No direct plugin consumer.","policy_ref":"agent-orchestration-governed"},"agent":{"enabled":false,"reason":"No agent consumer.","policy_ref":"agent-orchestration-governed"},"mcp":{"enabled":false,"reason":"No MCP consumer.","policy_ref":"agent-orchestration-governed"},"local_runtime":{"enabled":false,"reason":"No local runtime consumer.","policy_ref":"agent-orchestration-governed"}}}
+    }
   },
   "code_extractions": [
     {
@@ -1759,7 +2143,119 @@
       "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
     },
     {
+      "table": "workmanship_agent_capability_outbox",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
       "table": "workmanship_agent_capability_resources",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_agent_confirmation_tokens",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_agent_orch_acceptance_facts",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_agent_orch_axis_views",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_agent_orch_business_nodes",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_agent_orch_capability_bindings",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_agent_orch_context_bindings",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_agent_orch_flow_edges",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_agent_orch_item_edges",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_agent_orch_items",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_agent_orch_metric_snapshots",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_agent_orch_panoramas",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_agent_orch_run_events",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_agent_orch_runs",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_agent_orch_versions",
+      "owner_domain": "Agent",
+      "access_mode": "read_write",
+      "migration_stream": "agent",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_agent_orch_workload_baselines",
       "owner_domain": "Agent",
       "access_mode": "read_write",
       "migration_stream": "agent",

@@ -166,7 +166,14 @@
         "backend/db/migrations/202608280003_base_plugin_lifecycle_governance.sql",
         "backend/db/migrations/202608280004_base_plugin_lifecycle_idempotency_scope.sql",
         "backend/db/migrations/202608280005_base_structural_owner_hardening.sql",
-        "backend/db/migrations/202608280006_base_historical_tenant_repair.sql"
+        "backend/db/migrations/202608280006_base_historical_tenant_repair.sql",
+        "backend/db/migrations/202609010002_base_self_annotation_collation.sql",
+        "backend/db/migrations/202609010003_base_capability_release_binding.sql",
+        "backend/db/migrations/202609070002_base_desktop_oauth.sql",
+        "backend/db/migrations/202609080001_base_legacy_artifact_bindings.sql",
+        "backend/db/migrations/202609080002_base_historical_uploads.sql",
+        "backend/db/migrations/202609090001_base_project_responsibility.sql",
+        "backend/db/migrations/202609090003_base_line_responsibility_projection.sql"
       ],
       "test_paths": ["backend/tests/test_base_*.py"],
       "documentation_paths": ["docs/capabilities/base-platform/**"]
@@ -209,7 +216,8 @@
         "backend/db/migrations/202608060001_craft_bop_revision.sql",
         "backend/db/migrations/202608060004_craft_validation_policies.sql",
         "backend/db/migrations/202608070001_craft_bop_write_governance.sql",
-        "backend/db/migrations/202608310001_craft_rule_identity_backfill.sql"
+        "backend/db/migrations/202608310001_craft_rule_identity_backfill.sql",
+        "backend/db/migrations/202609010001_craft_rule_identity_compatibility.sql"
       ],
       "test_paths": ["plugins/craft/**/test_*.py", "backend/tests/test_craft_*.py"],
       "documentation_paths": ["docs/capabilities/craft/**"]
@@ -282,7 +290,8 @@
       "provider_paths": ["plugins/project_management/project_management_backend/capabilities/**"],
       "migration_paths": [
         "backend/db/migrations/202608050002_craft_work_collaboration_tables.sql",
-        "backend/db/migrations/202608050003_craft_list_team_visibility.sql"
+        "backend/db/migrations/202608050003_craft_list_team_visibility.sql",
+        "backend/db/migrations/202609090002_project_management_org_management_operations.sql"
       ],
       "test_paths": ["plugins/project_management/tests/**", "backend/tests/test_project_management_*.py"],
       "documentation_paths": ["docs/capabilities/project-management/**"]
