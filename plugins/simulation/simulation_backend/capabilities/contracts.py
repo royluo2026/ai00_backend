@@ -10,10 +10,19 @@ def obj(properties: dict, required: tuple[str, ...] = ()) -> dict:
 
 
 STRING = {"type": "string"}
+GID = {"type": "string", "pattern": "^[1-9][0-9]*$"}
 INTEGER = {"type": "integer"}
 POSITIVE_INTEGER = {"type": "integer", "minimum": 1}
 NONNEGATIVE_INTEGER = {"type": "integer", "minimum": 0}
 HASH = {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$", "example": "sha256:" + "0" * 64}
+WORKSPACE_CACHE_LEASE = obj({
+    "auth_subject_gid": GID, "workspace_gid": GID,
+    "permission_version": POSITIVE_INTEGER, "row_version": POSITIVE_INTEGER,
+    "cache_revision_hash": HASH, "expires_at": STRING,
+    "expires_in_seconds": {"type": "integer", "minimum": 60, "maximum": 300},
+    "read_lease": {"type": "string", "minLength": 32},
+}, ("auth_subject_gid", "workspace_gid", "permission_version", "row_version",
+    "cache_revision_hash", "expires_at", "expires_in_seconds", "read_lease"))
 ARTIFACT_REF = obj({
     "artifact_id": STRING, "media_type": STRING,
     "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$", "example": "0" * 64},
@@ -175,6 +184,10 @@ DOCUMENT_SNAPSHOT_REQUEST = obj({
 
 
 INPUT_SCHEMAS = {
+    "simulation.environment.workspace.cache_lease.get": obj({
+        "workspace_gid": GID,
+        "expires_in_seconds": {"type": "integer", "minimum": 60, "maximum": 300},
+    }, ("workspace_gid",)),
     "simulation.parameter_set.create": obj({"name": STRING, "parameters": {"type": "array", "items": PARAMETER}}, ("name", "parameters")),
     "simulation.parameter_set.get": obj({"parameter_set_ref": PARAMETER_SET_REF}, ("parameter_set_ref",)),
     "simulation.parameter_set.search": obj({"query": STRING, "limit": {"type": "integer", "minimum": 1, "maximum": 200}}),
@@ -228,6 +241,7 @@ INPUT_SCHEMAS = {
 }
 
 OUTPUT_SCHEMAS = {
+    "simulation.environment.workspace.cache_lease.get": WORKSPACE_CACHE_LEASE,
     "simulation.document_snapshot.request": DOCUMENT_SNAPSHOT_REQUEST,
     "simulation.document_snapshot.get": DOCUMENT_SNAPSHOT_REQUEST,
     "simulation.document_snapshot.action.get": obj({

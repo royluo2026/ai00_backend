@@ -98,6 +98,7 @@ _RESOURCES = {
     "simulation.result.get": (("simulation-run", "run_id"),),
     "simulation.result.compare": (("simulation-run", "left_result_ref.run_id"), ("simulation-run", "right_result_ref.run_id")),
     "simulation.environment.workspace.get": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.workspace.cache_lease.get": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.workspace.update": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.workspace.delete": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.workspace.fork.preview": (("simulation-workspace", "source_workspace_gid"),),
@@ -468,6 +469,15 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             "agent_output_schema": None,
             "deprecation_message": f"Immediate dispatch is closed; migrate to {governed.id}@2 and its action/dispatch workflow.",
             "no_consumer_reason": "The unsafe immediate-dispatch contract is frozen with no verified runtime consumer and accepts no new traffic.",
+        })
+    if governed.id == "simulation.environment.workspace.cache_lease.get":
+        updates.update({
+            "domain_errors": (
+                DomainErrorContract(code="workspace_not_found", meaning="The requested workspace is unavailable or no longer readable.", is_caller_error=True),
+                DomainErrorContract(code="cache_lease_ttl_invalid", meaning="The requested cache lease lifetime must be between 60 and 300 seconds.", is_caller_error=True),
+                DomainErrorContract(code="cache_lease_signing_key_unavailable", meaning="The server cannot issue authenticated cache leases until signing material is configured."),
+            ),
+            "domain_errors_complete": True,
         })
     if governed.id.startswith("simulation.connector_") and governed.id.endswith("_outcome.apply"):
         updates.update({

@@ -23,6 +23,7 @@ from backend.capability_v2.provider_contracts import (
 from ..data.workspace_repository import WorkspaceRepository, WorkspaceRepositoryError
 from ..application.workspace_freeze import FreezeConflict, WorkspaceFreezeService
 from ..security.export_refs import export_ref_digest, issue_export_ref
+from ..domain.cache_lease import CacheLeaseError, issue_cache_lease, permission_version
 
 
 class _ArtifactPort:
@@ -55,9 +56,10 @@ def _output(data: Any, *, workspace_gid: str | None = None, action: str) -> Capa
 
 
 class WorkspaceProvider:
-    def __init__(self, repository: WorkspaceRepository | None = None, freeze_service=None) -> None:
+    def __init__(self, repository: WorkspaceRepository | None = None, freeze_service=None, clock=None) -> None:
         self.repository = repository or WorkspaceRepository()
         self.freeze_service = freeze_service or WorkspaceFreezeService(self.repository, _ArtifactPort())
+        self.clock = clock or (lambda: datetime.now(timezone.utc))
 
     def create(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
         values = self._metadata(payload)
@@ -127,6 +129,35 @@ class WorkspaceProvider:
         if not row:
             raise CapabilityBusinessError("workspace_not_found", "workspace_not_found")
         return _output(row, workspace_gid=str(row["workspace_gid"]), action="workspace_loaded")
+
+    def cache_lease_get(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+        tenant_gid, owner_gid = _scope(context)
+        seconds = payload.get("expires_in_seconds", 300)
+        if isinstance(seconds, bool) or not isinstance(seconds, int) or not 60 <= seconds <= 300:
+            raise CapabilityBusinessError("cache_lease_ttl_invalid", "cache_lease_ttl_invalid")
+        row = self.repository.get(
+            str(payload.get("workspace_gid") or ""), tenant_gid=tenant_gid, owner_gid=owner_gid,
+        )
+        if not row:
+            raise CapabilityBusinessError("workspace_not_found", "workspace_not_found")
+        now = self.clock()
+        expires_at = now + timedelta(seconds=seconds)
+        data = {
+            "auth_subject_gid": owner_gid,
+            "workspace_gid": str(row["workspace_gid"]),
+            "permission_version": permission_version(context),
+            "row_version": int(row["row_version"]),
+            "cache_revision_hash": str(row["cache_revision_hash"]),
+            "expires_at": expires_at.isoformat().replace("+00:00", "Z"),
+            "expires_in_seconds": seconds,
+        }
+        try:
+            data["read_lease"] = issue_cache_lease({
+                **data, "expires_at_epoch": int(expires_at.timestamp()),
+            })
+        except CacheLeaseError as exc:
+            raise CapabilityBusinessError(str(exc), str(exc)) from exc
+        return _output(data, workspace_gid=data["workspace_gid"], action="workspace_cache_lease_issued")
 
     def update(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
         values = self._metadata(payload)
@@ -338,6 +369,22 @@ def candidate_specs(provider: WorkspaceProvider | None = None) -> tuple[tuple[Ca
                         input_schema={"type": "object", "required": ["workspace_gid"],
                                       "properties": {"workspace_gid": gid}, "additionalProperties": False},
                         output_schema=workspace, **common), selected.get),
+        (CapabilitySpec(id="simulation.environment.workspace.cache_lease.get", version=1,
+                        description="Authorize one caller to reuse one exact cached simulation workspace projection for at most five minutes.",
+                        input_schema={"type": "object", "required": ["workspace_gid"],
+                                      "properties": {"workspace_gid": gid,
+                                                     "expires_in_seconds": {"type": "integer", "minimum": 60, "maximum": 300}},
+                                      "additionalProperties": False},
+                        output_schema={"type": "object",
+                                       "required": ["auth_subject_gid", "workspace_gid", "permission_version", "row_version", "cache_revision_hash", "expires_at", "expires_in_seconds", "read_lease"],
+                                       "properties": {"auth_subject_gid": gid, "workspace_gid": gid,
+                                                      "permission_version": {"type": "integer", "minimum": 1},
+                                                      "row_version": {"type": "integer", "minimum": 1},
+                                                      "cache_revision_hash": cache_revision,
+                                                      "expires_at": {"type": "string"},
+                                                      "expires_in_seconds": {"type": "integer", "minimum": 60, "maximum": 300},
+                                                      "read_lease": {"type": "string", "minLength": 32}},
+                                       "additionalProperties": False}, **common), selected.cache_lease_get),
         (CapabilitySpec(id="simulation.environment.workspace.update", version=1,
                         description="Update metadata of one owner-controlled simulation workspace.", risk="write",
                         confirmation="none", idempotent=True, input_schema={"type": "object",
