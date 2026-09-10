@@ -281,6 +281,50 @@ class VmSnapshotRepository:
                 raise VmRepositoryError("version_conflict")
         return {"snapshot_gid": snapshot_gid, "head_row_version": next_head_version}
 
+    def list_retention_candidates(self, *, document_gid: str, tenant_gid: str, owner_gid: str):
+        with self._connection_factory() as connection, connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT s.gid snapshot_gid,s.sequence,s.captured_at FROM workmanship_sim_vm_snapshots s "
+                "JOIN workmanship_sim_vm_documents d ON d.gid=s.document_gid "
+                "WHERE s.document_gid=%s AND s.tenant_gid=%s AND s.owner_gid=%s AND s.removed_at IS NULL "
+                "AND d.removed_at IS NULL ORDER BY s.captured_at DESC,s.sequence DESC LIMIT 1000",
+                (_gid(document_gid), _gid(tenant_gid), _gid(owner_gid)),
+            )
+            return list(cursor.fetchall())
+
+    def protected_snapshot_gids(self, *, document_gid: str, tenant_gid: str, owner_gid: str):
+        with self._connection_factory() as connection, connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT DISTINCT snapshot_gid FROM ("
+                "SELECT c.snapshot_gid FROM workmanship_sim_vm_checkpoints c JOIN workmanship_sim_vm_snapshots s ON s.gid=c.snapshot_gid "
+                "WHERE s.document_gid=%s AND c.tenant_gid=%s "
+                "UNION ALL SELECT r.before_snapshot_gid FROM workmanship_sim_vm_diff_reports r JOIN workmanship_sim_vm_snapshots s ON s.gid=r.before_snapshot_gid "
+                "WHERE s.document_gid=%s AND r.tenant_gid=%s AND r.report_kind='manual' "
+                "UNION ALL SELECT r.after_snapshot_gid FROM workmanship_sim_vm_diff_reports r JOIN workmanship_sim_vm_snapshots s ON s.gid=r.after_snapshot_gid "
+                "WHERE s.document_gid=%s AND r.tenant_gid=%s AND r.report_kind='manual') protected",
+                (_gid(document_gid), _gid(tenant_gid), _gid(document_gid), _gid(tenant_gid),
+                 _gid(document_gid), _gid(tenant_gid)),
+            )
+            return {str(row["snapshot_gid"]) for row in cursor.fetchall()}
+
+    def prune_snapshot_payload(self, snapshot_gid: str, *, document_gid: str, tenant_gid: str, owner_gid: str):
+        with self._connection_factory() as connection, connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT 1 FROM workmanship_sim_vm_snapshots s WHERE s.gid=%s AND s.document_gid=%s "
+                "AND s.tenant_gid=%s AND s.owner_gid=%s AND s.removed_at IS NULL "
+                "AND NOT EXISTS (SELECT 1 FROM workmanship_sim_vm_checkpoints c WHERE c.snapshot_gid=s.gid) "
+                "AND NOT EXISTS (SELECT 1 FROM workmanship_sim_vm_diff_reports r WHERE r.report_kind='manual' "
+                "AND (r.before_snapshot_gid=s.gid OR r.after_snapshot_gid=s.gid)) FOR UPDATE",
+                (_gid(snapshot_gid), _gid(document_gid), _gid(tenant_gid), _gid(owner_gid)),
+            )
+            if not cursor.fetchone():
+                return False
+            cursor.execute("DELETE FROM workmanship_sim_vm_poses WHERE snapshot_gid=%s", (_gid(snapshot_gid),))
+            cursor.execute("DELETE FROM workmanship_sim_vm_observations WHERE snapshot_gid=%s", (_gid(snapshot_gid),))
+            cursor.execute("UPDATE workmanship_sim_vm_snapshots SET removed_at=NOW(6),row_version=row_version+1 "
+                           "WHERE gid=%s AND removed_at IS NULL", (_gid(snapshot_gid),))
+            return cursor.rowcount == 1
+
 
 repository = VmSnapshotRepository()
 

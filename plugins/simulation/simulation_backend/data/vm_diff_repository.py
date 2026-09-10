@@ -125,6 +125,20 @@ class VmDiffRepository:
     def can_read(self, report_gid, *, tenant_gid, created_by):
         return self.get_report(report_gid, tenant_gid=tenant_gid, created_by=created_by) is not None
 
+    def compact_automatic_reports_for_snapshot(self, snapshot_gid, *, tenant_gid, owner_gid):
+        del owner_gid
+        with self._connection_factory() as connection, connection.cursor() as cursor:
+            cursor.execute("SELECT gid FROM workmanship_sim_vm_diff_reports WHERE tenant_gid=%s "
+                "AND report_kind='automatic' AND compacted_at IS NULL "
+                "AND (before_snapshot_gid=%s OR after_snapshot_gid=%s) FOR UPDATE",
+                (_gid(tenant_gid, "tenant_gid"), _gid(snapshot_gid, "snapshot_gid"), _gid(snapshot_gid, "snapshot_gid")))
+            report_gids = [str(row["gid"]) for row in cursor.fetchall()]
+            for report_gid in report_gids:
+                cursor.execute("DELETE FROM workmanship_sim_vm_diff_items WHERE report_gid=%s", (report_gid,))
+                cursor.execute("UPDATE workmanship_sim_vm_diff_reports SET compacted_at=NOW(6),row_version=row_version+1 "
+                               "WHERE gid=%s AND compacted_at IS NULL", (report_gid,))
+            return len(report_gids)
+
 
 repository = VmDiffRepository()
 
