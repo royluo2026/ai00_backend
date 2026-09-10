@@ -26,6 +26,9 @@ class VmObservation:
     raw_transform: tuple[str, ...] = ()
     representation_locations: tuple[str, ...] = ()
     removed: bool = False
+    order_index: int = 0
+    geometry_hash: str = ""
+    attributes: tuple[tuple[str, str], ...] = ()
 
 
 @dataclass(frozen=True)

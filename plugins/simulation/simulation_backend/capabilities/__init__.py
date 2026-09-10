@@ -23,6 +23,8 @@ from .provider import register
 from .workspaces import candidate_specs as workspace_specs
 from .vm_checkpoints import default_provider as default_checkpoint_provider
 from .vm_checkpoints import specs as vm_checkpoint_specs
+from .vm_diffs import default_provider as default_vm_diff_provider
+from .vm_diffs import specs as vm_diff_specs
 from ..data.workspace_repository import WorkspaceRepository
 
 
@@ -107,6 +109,13 @@ def _authorize_vm_checkpoint(resource_id, identity) -> bool:
     )
 
 
+def _authorize_vm_diff_report(resource_id, identity) -> bool:
+    scope = _identity_scope(identity)
+    return bool(scope["user_gid"]) and default_vm_diff_provider.repository.can_read(
+        resource_id, tenant_gid=scope["team_gid"], created_by=scope["user_gid"],
+    )
+
+
 def register_capabilities(
     registry: Any, *, composition_provider: EnvironmentCompositionProvider | None = None,
     capture_provider: CaptureRunProvider | None = None,
@@ -122,6 +131,7 @@ def register_capabilities(
     resource_authorizers.register("simulation-connector", _authorize_connector)
     resource_authorizers.register("simulation-workspace", _authorize_workspace)
     resource_authorizers.register("simulation-vm-checkpoint", _authorize_vm_checkpoint)
+    resource_authorizers.register("simulation-vm-diff-report", _authorize_vm_diff_report)
     selected_capture_provider = capture_provider or default_capture_provider
     for spec, handler in specs():
         register(registry, spec, handler)
@@ -142,6 +152,8 @@ def register_capabilities(
     for spec, handler in workspace_specs():
         register(registry, spec, handler)
     for spec, handler in vm_checkpoint_specs():
+        register(registry, spec, handler)
+    for spec, handler in vm_diff_specs():
         register(registry, spec, handler)
 
 

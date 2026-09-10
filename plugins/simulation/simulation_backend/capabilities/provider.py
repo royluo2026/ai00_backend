@@ -112,6 +112,9 @@ _RESOURCES = {
     "simulation.vm_checkpoint.create": (("simulation-workspace", "workspace_gid"), ("simulation-document-snapshot", "snapshot_request_id")),
     "simulation.vm_checkpoint.search": (("simulation-workspace", "workspace_gid"),),
     "simulation.vm_checkpoint.archive": (("simulation-vm-checkpoint", "checkpoint_gid"), ("simulation-workspace", "workspace_gid")),
+    "simulation.vm_diff_report.generate": (("simulation-vm-checkpoint", "before_checkpoint_gid"), ("simulation-vm-checkpoint", "after_checkpoint_gid")),
+    "simulation.vm_diff_report.get": (("simulation-vm-diff-report", "report_gid"),),
+    "simulation.vm_diff_item.search": (("simulation-vm-diff-report", "report_gid"),),
 }
 _ERROR_PAIRS = (
     ('runtime_owner_mismatch', 'The authenticated user and tenant do not own this runtime device.'),
@@ -503,6 +506,21 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                 ("idempotency_conflict", "The idempotency key is bound to different checkpoint content.", False, True),
             )),
             "domain_errors_complete": True,
+        })
+    if governed.id.startswith("simulation.vm_diff_"):
+        updates.update({
+            "business_effect": "Generate or read an immutable deterministic node-level difference report between two governed VM checkpoints.",
+            "business_acceptance_criteria": (
+                "Both source checkpoints are caller-visible and belong to the same Simulation workspace.",
+                "Identity ambiguity is reported for review and is never resolved by guessing.",
+                "Repeated generation for the same snapshot pair and algorithm returns the same immutable report.",
+            ),
+            "business_invariants": (), "no_business_invariant_reason": _CONNECTOR_READ_REASON,
+            "domain_errors": (
+                DomainErrorContract(code="vm_checkpoint_not_found", meaning="One or both source checkpoints are unavailable.", is_caller_error=True),
+                DomainErrorContract(code="vm_diff_workspace_mismatch", meaning="The checkpoints belong to different workspaces.", is_caller_error=True),
+                DomainErrorContract(code="vm_diff_report_not_found", meaning="The report is unavailable or unreadable.", is_caller_error=True),
+            ), "domain_errors_complete": True,
         })
     if governed.id.startswith("simulation.connector_") and governed.id.endswith("_outcome.apply"):
         updates.update({

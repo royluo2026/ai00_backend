@@ -32,6 +32,23 @@ VM_CHECKPOINT = obj({
     "archived_at": {"anyOf": [STRING, {"type": "null"}]},
 }, ("checkpoint_gid", "snapshot_gid", "workspace_gid", "created_by", "scope", "name",
     "note", "row_version", "created_at", "archived_at"))
+VM_DIFF_REPORT = obj({
+    "report_gid": GID, "workspace_gid": GID, "before_snapshot_gid": GID, "after_snapshot_gid": GID,
+    "report_kind": {"type": "string", "enum": ["manual", "automatic"]},
+    "algorithm_version": {"type": "string", "minLength": 1, "maxLength": 64},
+    "status": {"type": "string", "enum": ["completed"]},
+    "summary": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+    "row_version": POSITIVE_INTEGER, "created_at": STRING,
+    "archived_at": {"anyOf": [STRING, {"type": "null"}]},
+}, ("report_gid", "workspace_gid", "before_snapshot_gid", "after_snapshot_gid", "report_kind",
+    "algorithm_version", "status", "summary", "row_version", "created_at", "archived_at"))
+VM_DIFF_ITEM = obj({
+    "sequence": POSITIVE_INTEGER, "change_type": STRING,
+    "before_occurrence_gid": {"anyOf": [GID, {"type": "null"}]},
+    "after_occurrence_gid": {"anyOf": [GID, {"type": "null"}]},
+    "severity": {"type": "string", "enum": ["info", "warning", "critical"]},
+    "payload": {"type": "object"},
+}, ("sequence", "change_type", "before_occurrence_gid", "after_occurrence_gid", "severity", "payload"))
 ARTIFACT_REF = obj({
     "artifact_id": STRING, "media_type": STRING,
     "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$", "example": "0" * 64},
@@ -241,6 +258,17 @@ INPUT_SCHEMAS = {
         "checkpoint_gid": GID, "workspace_gid": GID, "expected_row_version": POSITIVE_INTEGER,
         "idempotency_key": {"type": "string", "minLength": 1, "maxLength": 191},
     }, ("checkpoint_gid", "workspace_gid", "expected_row_version", "idempotency_key")),
+    "simulation.vm_diff_report.generate": obj({
+        "before_checkpoint_gid": GID, "after_checkpoint_gid": GID,
+        "report_kind": {"type": "string", "enum": ["manual", "automatic"]},
+        "algorithm_version": {"type": "string", "minLength": 1, "maxLength": 64},
+        "idempotency_key": {"type": "string", "minLength": 1, "maxLength": 191},
+    }, ("before_checkpoint_gid", "after_checkpoint_gid", "report_kind", "algorithm_version", "idempotency_key")),
+    "simulation.vm_diff_report.get": obj({"report_gid": GID}, ("report_gid",)),
+    "simulation.vm_diff_item.search": obj({
+        "report_gid": GID, "cursor": STRING,
+        "page_size": {"type": "integer", "minimum": 1, "maximum": 200},
+    }, ("report_gid",)),
     "simulation.environment.manifest.get": obj({"environment_id": STRING, "environment_version": POSITIVE_INTEGER}, ("environment_id", "environment_version")),
     "simulation.environment.manifest.search": obj({"limit": {"type": "integer", "minimum": 1, "maximum": 200}}),
     "simulation.environment.manifest.archive": obj({"environment_id": STRING}, ("environment_id",)),
@@ -279,6 +307,12 @@ OUTPUT_SCHEMAS = {
         "next_cursor": {"anyOf": [STRING, {"type": "null"}]},
     }, ("items", "next_cursor")),
     "simulation.vm_checkpoint.archive": VM_CHECKPOINT,
+    "simulation.vm_diff_report.generate": VM_DIFF_REPORT,
+    "simulation.vm_diff_report.get": VM_DIFF_REPORT,
+    "simulation.vm_diff_item.search": obj({
+        "items": {"type": "array", "items": VM_DIFF_ITEM, "maxItems": 200},
+        "next_cursor": {"anyOf": [STRING, {"type": "null"}]},
+    }, ("items", "next_cursor")),
     "simulation.parameter_set.create": PARAMETER_SET,
     "simulation.parameter_set.get": PARAMETER_SET,
     "simulation.parameter_set.search": obj({"items": {"type": "array", "items": PARAMETER_SET}, "total": INTEGER, "query": STRING}, ("items", "total", "query")),
