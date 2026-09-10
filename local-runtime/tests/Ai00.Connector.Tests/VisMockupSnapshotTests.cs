@@ -159,7 +159,7 @@ public sealed class VisMockupSnapshotTests
         {
             using var sta = new StaDispatcher();
             var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([Path.GetTempPath()]), fake,
-                Path.Combine(directory, "captures"), Path.Combine(directory, "tree.db"));
+                Path.Combine(directory, "captures"));
             var operation = new AdapterOperation(
                 "vismockup.tree.read@1", JsonSerializer.SerializeToElement(new { max_depth = 3 }));
 
@@ -170,7 +170,7 @@ public sealed class VisMockupSnapshotTests
 
             Assert.Equal(firstReads, root.ChildrenReads + leaf.ChildrenReads);
             Assert.Equal(2, JsonSerializer.SerializeToElement(cached.Data).GetProperty("nodes").GetArrayLength());
-            Assert.True(File.Exists(Path.Combine(directory, "tree.db")));
+            Assert.True(File.Exists(Path.Combine(directory, "vismockup-tree-cache.db")));
         }
         finally { Directory.Delete(directory, true); }
     }

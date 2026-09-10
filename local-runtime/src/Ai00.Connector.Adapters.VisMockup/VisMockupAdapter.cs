@@ -22,13 +22,15 @@ public sealed class VisMockupAdapter : IConnectorAdapter
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, string executable)
         : this(sta, paths, new WindowsVisMockupCom(executable), executable,
-            Path.Combine(Path.GetTempPath(), "AI00", "captures"), null) { }
+            Path.Combine(Path.GetTempPath(), "AI00", "captures"),
+            new VisMockupTreeCache(Path.Combine(Path.GetTempPath(), "AI00", "vismockup-tree-cache.db"))) { }
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com)
         : this(sta, paths, com, "", Path.Combine(Path.GetTempPath(), "AI00", "captures"), null) { }
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string captureRoot)
-        : this(sta, paths, com, "", captureRoot, null) { }
+        : this(sta, paths, com, "", captureRoot,
+            new VisMockupTreeCache(Path.Combine(Path.GetDirectoryName(captureRoot) ?? captureRoot, "vismockup-tree-cache.db"))) { }
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string captureRoot, string treeCachePath)
         : this(sta, paths, com, "", captureRoot, new VisMockupTreeCache(treeCachePath)) { }
