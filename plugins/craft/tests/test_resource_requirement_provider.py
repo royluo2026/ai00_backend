@@ -6,6 +6,7 @@ import pytest
 
 
 EXPECTED_IDS = {
+    "craft.resource_requirement.get",
     "craft.resource_requirement.search",
     "craft.resource_requirement.create",
     "craft.resource_requirement.update",
@@ -41,10 +42,13 @@ def test_resource_requirement_capabilities_are_atomic_and_paged():
         "socket", "tool", "fixture", "equipment",
     ]
     for capability_id in EXPECTED_IDS - {
+        "craft.resource_requirement.get",
         "craft.resource_requirement.search",
         "craft.resource_requirement.staging.search",
     }:
         assert registry.items[capability_id][0].risk.value in {"write", "destructive"}
+    get_spec, _ = registry.items["craft.resource_requirement.get"]
+    assert get_spec.input_schema["required"] == ["gid"]
 
 
 def test_resource_requirement_migration_is_additive_and_versioned():

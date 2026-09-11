@@ -45,6 +45,27 @@ public sealed class VisMockupBreakawayTests
         Assert.Contains($"classification = {expectedClassification}", result.ToString());
     }
 
+    [Theory]
+    [InlineData(false, false, "succeeded")]
+    [InlineData(true, true, "succeeded")]
+    [InlineData(false, true, "failed_without_effect")]
+    public async Task GlobalVisibilityRecoveryProbeClassifiesTheObservedDocumentState(
+        bool actualVisible, bool expectedVisible, string expectedClassification)
+    {
+        var document = new FakeDocument("document", "user", FakeNode.FlatTree(2));
+        foreach (var key in document.AllNodeKeys) document.SetNodeVisible(key, actualVisible);
+        var com = new FakeVisMockupCom { ExistingApplication = new FakeApplication("14.2.0", document) };
+        using var sta = new StaDispatcher();
+        var probes = new PostConditionProbes(sta, com);
+        var input = System.Text.Json.JsonSerializer.SerializeToElement(
+            new { expected_all_visible = expectedVisible });
+
+        var result = await probes.ObserveAsync(
+            "vismockup.document.snapshot@1", input, CancellationToken.None);
+
+        Assert.Contains($"classification = {expectedClassification}", result.ToString());
+    }
+
     [Fact]
     public async Task VisibilityRecoveryHasNoLingeringEffectAfterTheTargetDocumentWasClosed()
     {

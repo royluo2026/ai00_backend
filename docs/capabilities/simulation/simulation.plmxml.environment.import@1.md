@@ -106,6 +106,62 @@ Import one immutable primary or supplemental PLMXML Artifact into an owned draft
       ],
       "type": "object"
     },
+    "dependency_artifacts": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "media_type": {
+                "enum": [
+                  "application/plmxml+xml",
+                  "application/vnd.siemens.plmxml+xml",
+                  "model/vnd.jt",
+                  "model/jt"
+                ],
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^(sha256:)?[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "version": {
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size",
+              "version"
+            ],
+            "type": "object"
+          },
+          "location": {
+            "maxLength": 2048,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "location",
+          "artifact_ref"
+        ],
+        "type": "object"
+      },
+      "maxItems": 10000,
+      "type": "array"
+    },
     "display_name": {
       "maxLength": 255,
       "minLength": 1,
@@ -286,15 +342,16 @@ Import one immutable primary or supplemental PLMXML Artifact into an owned draft
 
 领域错误：
 
-- `source_resolver_unavailable`：A required owning-domain resolver is unavailable.（retryable=true）
-- `source_version_mismatch`：A referenced source no longer matches its immutable hash or version.（retryable=false）
-- `parameter_set_not_found`：The immutable parameter set is unavailable or not visible.（retryable=false）
-- `simulation_profile_not_found`：The immutable Simulation profile is unavailable or not visible.（retryable=false）
-- `solver_not_allowed`：The requested solver coordinate is not in the governed allowlist.（retryable=false）
-- `simulation_environment_not_found`：The Simulation environment is unavailable or not visible.（retryable=false）
-- `simulation_run_not_found`：The Simulation run is unavailable or not visible.（retryable=false）
-- `simulation_result_not_ready`：The Simulation run has no completed result artifacts.（retryable=true）
-- `idempotency_conflict`：The idempotency key is bound to a different Simulation request.（retryable=false）
+- `plmxml_artifact_hash_mismatch`：The PLMXML Artifact bytes do not match the immutable reference hash.（retryable=false）
+- `plmxml_artifact_unavailable`：The immutable PLMXML Artifact is unavailable or outside the caller scope.（retryable=false）
+- `plmxml_dependency_artifact_required`：Every external PLMXML dependency must resolve to an immutable Artifact.（retryable=false）
+- `plmxml_dependency_artifact_invalid`：A supplied PLMXML dependency Artifact reference is malformed or duplicated.（retryable=false）
+- `plmxml_dependency_media_type_mismatch`：A dependency Artifact media type does not match the PLMXML reference.（retryable=false）
+- `plmxml_dependency_artifact_unavailable`：A dependency Artifact is unavailable or outside the caller scope.（retryable=false）
+- `plmxml_dependency_artifact_hash_mismatch`：A dependency Artifact does not match its immutable SHA-256 reference.（retryable=false）
+- `plmxml_insert_mode_required`：PLMXML insertion requires an explicit model-only or selected-hierarchy mode.（retryable=false）
+- `plmxml_hierarchy_selection_invalid`：The selected hierarchy identities are invalid for this inspected PLMXML.（retryable=false）
+- `plmxml_inspection_changed`：The inspected PLMXML projection changed before the requested write.（retryable=false）
 
 `domain_errors_complete=false`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

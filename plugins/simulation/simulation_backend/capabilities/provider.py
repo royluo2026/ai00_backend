@@ -130,6 +130,11 @@ _RESOURCES = {
     "simulation.environment.placement.create": (("simulation-alternate-hierarchy", "hierarchy_gid"),),
     "simulation.environment.placement.move": (("simulation-placement", "placement_gid"),),
     "simulation.environment.placement.remove": (("simulation-placement", "placement_gid"),),
+    "simulation.environment.bop_projection.preview": (("simulation-workspace", "workspace_gid"), ("craft-bop-version", "version_gid")),
+    "simulation.environment.bop_projection.apply": (("simulation-workspace", "workspace_gid"), ("craft-bop-version", "version_gid")),
+    "simulation.plmxml.environment.inspect": (("artifact", "artifact_ref.artifact_id"),),
+    "simulation.environment.restore_from_plmxml": (("artifact", "artifact_ref.artifact_id"),),
+    "simulation.environment.plmxml.insert": (("simulation-workspace", "workspace_gid"), ("artifact", "artifact_ref.artifact_id")),
     "simulation.plmxml.environment.import": (("simulation-workspace", "workspace_gid"), ("artifact", "artifact_ref.artifact_id")),
     "simulation.plmxml.environment.export": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.workspace.cache_lease.get": (("simulation-workspace", "workspace_gid"),),
@@ -241,6 +246,25 @@ _RETRYABLE_ERROR_CODES = frozenset({
     "connector_offline", "interactive_session_missing", "vismockup_unavailable",
     "capture_failed", "artifact_upload_unconfirmed", "craft_screenshot_attach_failed",
 })
+
+_PLMXML_ERROR_PAIRS = (
+    ("plmxml_artifact_hash_mismatch", "The PLMXML Artifact bytes do not match the immutable reference hash."),
+    ("plmxml_artifact_unavailable", "The immutable PLMXML Artifact is unavailable or outside the caller scope."),
+    ("plmxml_dependency_artifact_required", "Every external PLMXML dependency must resolve to an immutable Artifact."),
+    ("plmxml_dependency_artifact_invalid", "A supplied PLMXML dependency Artifact reference is malformed or duplicated."),
+    ("plmxml_dependency_media_type_mismatch", "A dependency Artifact media type does not match the PLMXML reference."),
+    ("plmxml_dependency_artifact_unavailable", "A dependency Artifact is unavailable or outside the caller scope."),
+    ("plmxml_dependency_artifact_hash_mismatch", "A dependency Artifact does not match its immutable SHA-256 reference."),
+    ("plmxml_insert_mode_required", "PLMXML insertion requires an explicit model-only or selected-hierarchy mode."),
+    ("plmxml_hierarchy_selection_invalid", "The selected hierarchy identities are invalid for this inspected PLMXML."),
+    ("plmxml_inspection_changed", "The inspected PLMXML projection changed before the requested write."),
+)
+
+_PLMXML_WEB_BUSINESS_EFFECTS = {
+    "simulation.plmxml.environment.inspect": "Return a bounded, immutable inspection of one PLMXML Artifact so a user can explicitly choose which model and alternate-hierarchy projections to import.",
+    "simulation.environment.restore_from_plmxml": "Create one private Simulation workspace whose draft faithfully restores the selected immutable PLMXML model, hierarchies and verified external dependencies.",
+    "simulation.environment.plmxml.insert": "Add one immutable PLMXML model and only the explicitly selected alternate hierarchies to one exact owned Simulation workspace draft.",
+}
 
 _CONNECTOR_BUSINESS_EFFECTS = {
     "simulation.document_snapshot.request": "Queue one bounded immutable snapshot of the bound user's currently active VisMockup BOM for later environment composition.",
@@ -540,6 +564,62 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                 DomainErrorContract(code="cache_lease_ttl_invalid", meaning="The requested cache lease lifetime must be between 60 and 300 seconds.", is_caller_error=True),
                 DomainErrorContract(code="cache_lease_signing_key_unavailable", meaning="The server cannot issue authenticated cache leases until signing material is configured."),
             ),
+            "domain_errors_complete": True,
+        })
+    if governed.id.startswith("simulation.plmxml.environment.") or governed.id in {
+        "simulation.environment.restore_from_plmxml",
+        "simulation.environment.plmxml.insert",
+    }:
+        updates.update({
+            "domain_errors": tuple(
+                DomainErrorContract(code=code, meaning=meaning, is_caller_error=True)
+                for code, meaning in _PLMXML_ERROR_PAIRS
+            ),
+            "domain_errors_complete": False,
+        })
+    if governed.id in _PLMXML_WEB_BUSINESS_EFFECTS:
+        updates.update({
+            "exposure": ExposurePolicy(web=True),
+            "business_effect": _PLMXML_WEB_BUSINESS_EFFECTS[governed.id],
+            "business_acceptance_criteria": (
+                "The source and every dependency are immutable Artifact references whose bytes match the declared SHA-256 hash.",
+                "An inspection hash binds the user's explicit import decision to the exact parsed projection.",
+                "Rejected input creates no partial workspace, document, hierarchy or placement state.",
+            ),
+            "business_invariants": (),
+            "no_business_invariant_reason": "Artifact immutability, explicit selection, optimistic concurrency and one Simulation transaction fully determine this atomic boundary.",
+        })
+    if governed.id in {"simulation.environment.bop_projection.preview", "simulation.environment.bop_projection.apply"}:
+        updates.update({
+            "exposure": ExposurePolicy(web=True),
+            "business_effect": (
+                "Preview the exact published Craft BOP process skeleton for insertion into one owned Simulation environment."
+                if governed.id.endswith(".preview") else
+                "Atomically insert the previously previewed exact Craft BOP process skeleton as one editable alternate hierarchy."
+            ),
+            "business_acceptance_criteria": (
+                "The source is read only through craft.bop.execution_structure.get@1 and remains pinned by version, revision and content hash.",
+                "Product and resource references are counted as separate source references and are never copied into the editable process skeleton as hierarchy nodes.",
+                "Apply recomputes the projection and rejects a changed source, target row version or plan hash without partial writes.",
+            ),
+            "business_invariants": (),
+            "no_business_invariant_reason": "The exact owner projection, deterministic plan hash, optimistic concurrency and one Simulation transaction fully determine this experimental boundary.",
+            "consistency_policy": "strong",
+            "domain_errors": tuple(DomainErrorContract(code=code, meaning=meaning, retryable=retryable, is_caller_error=True) for code, meaning, retryable in (
+                ("workspace_not_found", "The target Simulation environment is unavailable or not owned by the caller.", False),
+                ("version_conflict", "The target environment row version changed.", True),
+                ("fork_depth_invalid", "The requested BOP projection depth is unsupported.", False),
+                ("bop_projection_hash_invalid", "The Craft execution structure has no valid immutable hash.", False),
+                ("bop_projection_node_invalid", "The Craft execution structure contains an invalid node.", False),
+                ("bop_projection_line_not_found", "The requested line is not present in the exact Craft execution structure.", False),
+                ("bop_projection_parent_missing", "The projected process skeleton references a missing parent.", False),
+                ("bop_projection_cycle", "The projected process skeleton contains a cycle.", False),
+                ("bop_projection_plan_changed", "The exact preview no longer matches the current source or target.", True),
+                ("bop_projection_already_inserted", "The exact BOP projection is already present in the target environment.", False),
+                ("bop_execution_structure_failed", "The owning Craft capability could not return the exact published execution structure.", True),
+                ("domain_client_unavailable", "The governed owning-domain invocation boundary is unavailable.", True),
+                ("idempotency_conflict", "The idempotency key is bound to another BOP projection request.", False),
+            )),
             "domain_errors_complete": True,
         })
     if governed.id.startswith("simulation.vm_checkpoint."):

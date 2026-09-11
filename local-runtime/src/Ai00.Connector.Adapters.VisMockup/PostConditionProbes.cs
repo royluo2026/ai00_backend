@@ -28,6 +28,26 @@ public sealed class PostConditionProbes(StaDispatcher sta,IVisMockupCom com,VisM
             catch(Exception error) when(error is ConnectorException or TimeoutException)
             {return new{classification="inconclusive",observed_result=(object?)null};}
         }
+        if(probeId=="vismockup.document.snapshot@1" && probeInput is {ValueKind:JsonValueKind.Object} globalInput
+            && globalInput.TryGetProperty("expected_all_visible",out var expectedAll))
+        {
+            try
+            {
+                return await sta.InvokeAsync<object>(()=>
+                {
+                    if(!com.TryGetActiveApplication(out var app)||app!.ActiveDocument is not {} document)
+                        return new{classification="failed_without_effect",observed_result=(object)new{document_open=false}};
+                    var keys=document.AllNodeKeys;
+                    if(keys.Count==0)return new{classification="inconclusive",observed_result=(object?)null};
+                    var expectedVisible=expectedAll.GetBoolean();
+                    var matches=keys.All(key=>document.IsNodeVisible(key)==expectedVisible);
+                    return new{classification=matches?"succeeded":"failed_without_effect",
+                        observed_result=(object)new{all_visible=expectedVisible&&matches,all_hidden=!expectedVisible&&matches,node_count=keys.Count}};
+                }).WaitAsync(TimeSpan.FromSeconds(10),ct);
+            }
+            catch(Exception error) when(error is ConnectorException or TimeoutException)
+            {return new{classification="inconclusive",observed_result=(object?)null};}
+        }
         return await sta.InvokeAsync<object>(()=>
         {
             if(!com.TryGetActiveApplication(out var app))return new{classification="inconclusive",observed_result=(object?)null};

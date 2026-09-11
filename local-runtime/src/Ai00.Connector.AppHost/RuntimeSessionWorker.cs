@@ -228,6 +228,7 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
                     // Retain the signed local record, but do not let a plan the
                     // server no longer owns block newer recovery work.
                     journal.Append("reconciliation_retry_v3",outcome.PlanId,"{\"result\":\"server_plan_unavailable\"}");
+                    journal.Append("acknowledged",outcome.PlanId,"{}");
                     continue;
                 }
             }
@@ -386,8 +387,11 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
         await transport.SendAsync(HttpMethod.Post,"plans/"+Uri.EscapeDataString(outcome.PlanId)+"/reconcile",evidence,ct,session);
         journal.Append("reconciled",outcome.PlanId,"{}");
         journal.Append("reconciliation_retry_v3",outcome.PlanId,"{}");
-        // Inconclusive observations deliberately remain blocked for cloud/manual resolution.
+        // A conclusive read-back is terminal locally as well as on the server.
+        // Keeping the old manual-review marker would make every later App start
+        // attempt to reconcile an already-closed plan and permanently starve the host.
         if(hasInconclusive)journal.Append("manual_review_required",outcome.PlanId,"{}");
+        else journal.Append("acknowledged",outcome.PlanId,"{}");
     }
     internal static bool IsObsoleteRecovery(string code)=>code=="plan_reconciliation_invalid";
     private static byte[] Decode(string text)=>Convert.FromBase64String(text.Replace('-','+').Replace('_','/')+new string('=',(4-text.Length%4)%4));

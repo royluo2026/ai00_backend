@@ -219,6 +219,9 @@ def probe_context(plan_row, recovery, *, last_journal_sequence):
                 and payload.get('action') in {'show', 'hide'}):
             probe['probe_input'] = dict(node_key=payload['node_key'],
                 expected_visible=payload['action'] == 'show')
+        if (step['operation_id'] == 'vismockup.visibility.change@1'
+                and payload.get('action') in {'all_on', 'all_off'}):
+            probe['probe_input'] = dict(expected_all_visible=payload['action'] == 'all_on')
         required.append(probe)
     probed = {p['step_id'] for p in required}
     completed = {s.step_id for s in original.steps if s.status == 'succeeded'} if original else set()

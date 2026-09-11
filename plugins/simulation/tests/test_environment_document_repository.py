@@ -25,6 +25,7 @@ class _Cursor:
         self.current = next(self.rows, None) if sql.lstrip().upper().startswith("SELECT") else None
         self.rowcount = 1
     def fetchone(self): return self.current
+    def fetchall(self): return self.current if isinstance(self.current, list) else ([] if self.current is None else [self.current])
 
 
 class _Connection:
@@ -95,6 +96,37 @@ def test_runtime_projection_migration_binds_exact_connector_plan():
     assert "workmanship_sim_runtime_package_projections" in migration
     assert "connector_plan_id" in migration
     assert "uq_sim_runtime_package_plan" in migration
+
+
+def test_plmxml_restore_migration_scopes_idempotency_to_actor():
+    migration = (Path(__file__).resolve().parents[3] / "backend/db/migrations/domains/simulation/0021_simulation_plmxml_restore_requests.sql").read_text(encoding="utf-8")
+    assert "workmanship_sim_plmxml_restore_requests" in migration
+    assert "`tenant_gid`,`actor_gid`,`idempotency_key`" in migration
+    assert "fk_sim_plmxml_restore_workspace" in migration
+
+
+def test_restore_environment_projection_creates_workspace_and_projection_atomically(monkeypatch):
+    from plugins.simulation.simulation_backend.domain.plmxml_environment_codec import (
+        AlternateHierarchyProjection, EnvironmentImportProjection,
+    )
+    cursor = _install(monkeypatch, [None])
+    projection = EnvironmentImportProjection(
+        hierarchies=(AlternateHierarchyProjection(name="ALT", projection_identity="alt", root_refs=()),),
+        dependencies=(), original_sha256="sha256:" + "b" * 64,
+        algorithm_version="environment-codec.v1",
+    )
+    result = WorkspaceRepository().restore_environment_projection(
+        name="Restored", display_name="source.plmxml",
+        artifact_ref={"artifact_id":"source","sha256":"b" * 64}, projection=projection,
+        resolved_dependencies={},
+        tenant_gid="20", actor_gid="30", idempotency_key="restore-1",
+    )
+    statements = [sql for sql, _ in cursor.calls]
+    assert result["workspace_row_version"] == 2
+    assert any(sql.startswith("INSERT INTO workmanship_sim_workspaces") for sql in statements)
+    assert any(sql.startswith("INSERT INTO workmanship_sim_vm_documents") for sql in statements)
+    assert any(sql.startswith("INSERT INTO workmanship_sim_workspace_hierarchies") for sql in statements)
+    assert any(sql.startswith("INSERT INTO workmanship_sim_plmxml_restore_requests") for sql in statements)
 
 
 def test_runtime_outcome_records_tree_readback_but_not_semantic_verification(monkeypatch):

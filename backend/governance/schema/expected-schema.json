@@ -1,7 +1,7 @@
 {
   "database_name": "ai00_test",
   "isolation_profile": "single_database_domain_tables",
-  "schema_sha256": "sha256:8e90c06348fb26f05bcf6a0a5c35754a8aa6d7b901c710352f2573c6d62494ea",
+  "schema_sha256": "sha256:c40f1ded41cf807a34a20b83d1e654ca3aed33699aa0962decaa2fbc61006188",
   "schema_version": 1,
   "tables": [
     {
@@ -45181,6 +45181,162 @@
     {
       "columns": [
         {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0021_simulation_plmxml_restore_requests.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0021_simulation_plmxml_restore_requests.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0021_simulation_plmxml_restore_requests.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "idempotency_key",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0021_simulation_plmxml_restore_requests.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "request_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0021_simulation_plmxml_restore_requests.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "workspace_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0021_simulation_plmxml_restore_requests.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "response_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0021_simulation_plmxml_restore_requests.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0021_simulation_plmxml_restore_requests.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "expires_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0021_simulation_plmxml_restore_requests.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "workspace_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_sim_plmxml_restore_workspace",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_sim_workspaces",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0021_simulation_plmxml_restore_requests.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0021_simulation_plmxml_restore_requests.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "workspace_gid",
+            "created_at"
+          ],
+          "name": "idx_sim_plmxml_restore_workspace",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0021_simulation_plmxml_restore_requests.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "actor_gid",
+            "idempotency_key"
+          ],
+          "name": "uq_sim_plmxml_restore_actor_key",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0021_simulation_plmxml_restore_requests.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_plmxml_restore_requests",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0021_simulation_plmxml_restore_requests.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
           "data_type": "VARCHAR(128)",
           "default": null,
           "extra": "",
@@ -49249,6 +49405,16 @@
           "sources": [
             "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
           ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "source_refs_json",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0022_simulation_bop_projection_source_refs.sql"
+          ]
         }
       ],
       "constraints": [
@@ -49312,7 +49478,8 @@
       "owner": "simulation",
       "runtime_domain": "simulation",
       "sources": [
-        "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+        "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql",
+        "backend/db/migrations/domains/simulation/0022_simulation_bop_projection_source_refs.sql"
       ]
     },
     {

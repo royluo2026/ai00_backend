@@ -1,10 +1,10 @@
 # simulation.environment.alternate_hierarchy.get@1
 
-Read one alternate hierarchy and its placements.
+Read one alternate hierarchy, its editable node tree, separated source references, and placements.
 
 ## 使用判断
 
-- 适用：Read one alternate hierarchy and its placements.
+- 适用：Read one alternate hierarchy, its editable node tree, separated source references, and placements.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
@@ -110,6 +110,73 @@ Read one alternate hierarchy and its placements.
     "name": {
       "type": "string"
     },
+    "nodes": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "hierarchy_gid": {
+            "pattern": "^[1-9][0-9]*$",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "node_gid": {
+            "pattern": "^[1-9][0-9]*$",
+            "type": "string"
+          },
+          "node_type": {
+            "type": "string"
+          },
+          "parent_gid": {
+            "anyOf": [
+              {
+                "pattern": "^[1-9][0-9]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "row_version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "sort_order": {
+            "type": "integer"
+          },
+          "source_bop_node_gid": {
+            "anyOf": [
+              {
+                "pattern": "^[1-9][0-9]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "workspace_gid": {
+            "pattern": "^[1-9][0-9]*$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "node_gid",
+          "workspace_gid",
+          "hierarchy_gid",
+          "parent_gid",
+          "node_type",
+          "name",
+          "sort_order",
+          "source_bop_node_gid",
+          "row_version"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
     "placements": {
       "items": {
         "additionalProperties": false,
@@ -132,6 +199,32 @@ Read one alternate hierarchy and its placements.
       "minimum": 1,
       "type": "integer"
     },
+    "source_refs": {
+      "additionalProperties": false,
+      "properties": {
+        "model_references": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "resource_references": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "model_references",
+        "resource_references"
+      ],
+      "type": "object"
+    },
     "status": {
       "type": "string"
     },
@@ -147,6 +240,8 @@ Read one alternate hierarchy and its placements.
     "status",
     "projection_identity",
     "row_version",
+    "source_refs",
+    "nodes",
     "placements"
   ],
   "type": "object"

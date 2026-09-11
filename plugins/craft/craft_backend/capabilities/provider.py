@@ -22,6 +22,7 @@ from .rule_descriptors import RULE_DEFINITION_CHANGE_CAPABILITY_ID
 
 
 _RESOURCE_FIELDS: dict[str, tuple[tuple[str, str], ...]] = {
+    "craft.resource_requirement.get": (("craft-resource-requirement", "gid"),),
     "craft.resource_requirement.create": (("craft-resource-requirement-type", "resource_type"),),
     "craft.resource_requirement.update": (("craft-resource-requirement", "gid"),),
     "craft.resource_requirement.retire": (("craft-resource-requirement", "gid"),),
@@ -429,6 +430,7 @@ _DOMAIN_ERRORS = tuple(
 )
 _DOMAIN_ERROR_BY_CODE = {item.code: item for item in _DOMAIN_ERRORS}
 _RESOURCE_ERROR_CODES = {
+    "get": ("resource_not_found",),
     "search": ("invalid_page_size",),
     "create": ("resource_code_conflict",),
     "update": ("resource_not_found", "resource_code_conflict", "resource_version_conflict"),
@@ -500,6 +502,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
     if spec.id.startswith("craft.resource_requirement."):
         action = spec.id.removeprefix("craft.resource_requirement.")
         effects = {
+            "get": "Return one exact versioned Craft process resource requirement standard by GID.",
             "search": "Return a bounded page of active or retired Craft process resource requirement standards.",
             "create": "Create one reusable Craft process resource requirement standard with a type-scoped code.",
             "update": "Update one active Craft process resource requirement standard at its expected version.",

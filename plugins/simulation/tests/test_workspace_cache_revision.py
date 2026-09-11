@@ -136,8 +136,8 @@ def test_every_workspace_write_path_persists_cache_revision_hash():
     source = Path(
         "plugins/simulation/simulation_backend/data/workspace_repository.py"
     ).read_text(encoding="utf-8")
-    assert source.count("INSERT INTO workmanship_sim_workspaces") == 2
-    assert source.count("primary_project_gid,cache_revision_hash,row_version)") == 2
+    assert source.count("INSERT INTO workmanship_sim_workspaces") == 3
+    assert source.count("primary_project_gid,cache_revision_hash,row_version)") == 3
     assert "SET removed_at=NOW(6),cache_revision_hash=%s,row_version=%s" in source
     assert "SET cache_revision_hash=%s,row_version=%s,updated_at=NOW(6)" in source
     assert "SET cache_revision_hash=%s,row_version=%s,updated_at=NOW(6) WHERE gid=%s" in source

@@ -126,8 +126,11 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
             if(group.Any(e=>e.Kind is "acknowledged" or "abandoned_without_effect"))continue;
             var reconciled=group.Any(e=>e.Kind=="reconciled");
             var manualReview=group.Any(e=>e.Kind=="manual_review_required");
-            var upgradedProbeAttempted=group.Any(e=>e.Kind=="reconciliation_retry_v3");
-            if(reconciled&&(!manualReview||upgradedProbeAttempted))continue;
+            // A manual-review marker means the prior read-only post-condition
+            // probe was inconclusive, not that the write may be replayed. Keep
+            // recovering the signed outcome on later App starts so a healthy
+            // VisMockup process can be probed again and release the server fence.
+            if(reconciled&&!manualReview)continue;
             var saved=group.LastOrDefault(e=>e.Kind=="outcome");
             if(saved!=null){outcomes.Add(OutcomeV2.ParseAndVerify(saved.Data,signingKey.PublicJwk.GetRawText()));continue;}
             var leaseEvent=group.FirstOrDefault(e=>e.Kind=="lease_acquired");

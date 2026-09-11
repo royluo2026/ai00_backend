@@ -1,10 +1,10 @@
 # simulation.environment.alternate_hierarchy.create@1
 
-Create one empty editable alternate hierarchy; BOP-derived hierarchies must use the governed fork bootstrap capability.
+Create one editable alternate hierarchy with an atomic root node; BOP-derived hierarchies must use the governed fork bootstrap capability.
 
 ## 使用判断
 
-- 适用：Create one empty editable alternate hierarchy; BOP-derived hierarchies must use the governed fork bootstrap capability.
+- 适用：Create one editable alternate hierarchy with an atomic root node; BOP-derived hierarchies must use the governed fork bootstrap capability.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
@@ -130,6 +130,10 @@ Create one empty editable alternate hierarchy; BOP-derived hierarchies must use 
     "name": {
       "type": "string"
     },
+    "root_node_gid": {
+      "pattern": "^[1-9][0-9]*$",
+      "type": "string"
+    },
     "row_version": {
       "minimum": 1,
       "type": "integer"
@@ -141,6 +145,7 @@ Create one empty editable alternate hierarchy; BOP-derived hierarchies must use 
   },
   "required": [
     "hierarchy_gid",
+    "root_node_gid",
     "workspace_gid",
     "name",
     "row_version"

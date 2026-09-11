@@ -632,18 +632,23 @@ Simulation 不直接写 Craft 表。回传失败不回滚或破坏 Simulation �
 | 登记、查询、解除环境模型文档 | `simulation.environment.model_document.add/search/remove@1` |
 | 创建、读取、修改、归档备选层次 | `simulation.environment.alternate_hierarchy.create/search/get/update/archive@1` |
 | 创建、移动、移除放置引用 | `simulation.environment.placement.create/move/remove@1` |
-| 预览和执行 PLMXML 导入 | `simulation.plmxml.environment.import.preview/apply@1`，是否需要升版由现有合同核对决定 |
+| 检查 PLMXML 并返回可选模型、层次和风险 | `simulation.plmxml.environment.inspect@1` |
+| 从 PLMXML 恢复新的个人仿真环境 | `simulation.environment.restore_from_plmxml@1` |
+| 向已打开环境插入 PLMXML 模型及可选层次 | `simulation.environment.plmxml.insert@1` |
 | 保存不可变环境版本 | 复用或补全现有 workspace version create 能力 |
 | 预览、执行、查询运行同步 | `simulation.environment.runtime_sync.preview/apply/get@1` |
 | 预览、执行、查询 BOP 回传 | 由 Simulation 准备投影，Craft 执行 owner 写能力 |
 
-PLMXML import 合同必须显式包含：
+PLMXML inspect 合同读取不可变 Artifact 并返回文件哈希、模型/Occurrence 统计、层次引用、依赖和风险，不产生环境写入。随后由两个独立写 Capability 接受用户决定：
 
-- `purpose`: `restore_environment | insert_model_and_selected_hierarchies | insert_model_only`；
-- `selected_hierarchy_refs`：仅第二种用途允许且必填；
-- 目标 environment/draft expected version；恢复新环境时不允许目标环境；
+- `restore_from_plmxml` 创建一个新的个人仿真环境，接收新名称、项目上下文、inspect report/hash 和幂等键；
+- `plmxml.insert` 修改一个已打开环境，接收目标 environment/draft expected version、`hierarchy_policy: selected | model_only`、所选层次引用和幂等键；
+- `selected_hierarchy_refs` 仅在 `hierarchy_policy=selected` 时必填且非空；
 - 原始 ArtifactRef、内容哈希和解析报告；
-- 唯一幂等键。
+- inspect report/hash 必须与 Apply 时重新读取的 Artifact 和解析结果一致；
+- 两个写能力分别使用唯一幂等键。
+
+现有 `simulation.plmxml.environment.import@1` 只表达“向已有环境导入一个主或补充文件”，不能静默扩大为创建环境。它在兼容期内保留原合同；新 UI 只调用上面的 inspect、restore 和 insert 能力。
 
 BOP 插入合同必须携带 `source_version_gid`、线体选择、`fork_depth`、目标环境/草稿版本、预览/plan hash 和幂等键。
 
@@ -811,7 +816,7 @@ BOP 插入合同必须携带 `source_version_gid`、线体选择、`fork_depth`�
 - Simulation 拥有环境、草稿、版本、模型投影、备选层次、Placement、PLMXML 转换和运行同步。
 - Craft 拥有 BOP Repository、空间、版本、Fork 投影和回传写入。
 - Base Artifact 拥有不可变文件字节和 ArtifactRef；Connector 仅保管本机路径 token 和执行状态。
-- 导入、保存、同步、导出和回传具有不同授权、失败、幂等和审计语义，不能合并为一个万能 Capability。
+- 检查、恢复、插入、保存、同步、导出和回传具有不同授权、失败、幂等和审计语义，不能合并为一个万能 Capability。
 - 优先补全现有 experimental 能力；不得静默扩大 stable 合同。
 
 ### Verification evidence

@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_e1bf5fb9d835cbb609995fbba19eb500",
-  "catalog_hash": "sha256:e1bf5fb9d835cbb609995fbba19eb50080dfbd4142f78b6a6ca8c1a7bd05d54b",
+  "release_id": "rel_ac9779f395598ccad447aea06d4d0705",
+  "catalog_hash": "sha256:ac9779f395598ccad447aea06d4d0705e500c8d9b89bef5a1adbd4302161044d",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -183607,6 +183607,640 @@
       "business_definition_hash": "sha256:56757e8a3f7106c423b53ea668a4100432cd43c9c757117e7cab66ff643df77b"
     },
     {
+      "id": "craft.resource_requirement.get",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "craft.resource_requirement.get",
+      "description": "Governed Craft resource requirement get outcome.",
+      "use_when": "A governed consumer manages or resolves a Craft process resource requirement standard.",
+      "do_not_use_when": "The object is a physical Factory asset or a legacy VPPS template row.",
+      "business_effect": "Return one exact versioned Craft process resource requirement standard by GID.",
+      "business_acceptance_criteria": [
+        "The result is scoped to the Craft-owned process resource requirement identity.",
+        "Inputs and outputs satisfy the closed published schema.",
+        "Writes preserve type identity and return a stable domain error on rejected state."
+      ],
+      "business_invariants": [],
+      "no_business_invariant_reason": "This read returns a bounded, resource-scoped projection and does not decide or change domain state.",
+      "side_effect_level": "read",
+      "side_effects": "Reads craft domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "craft.v2:craft.read",
+      "resource_selectors": [
+        {
+          "resource_type": "craft-resource-requirement",
+          "payload_path": "gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "socket",
+              "tool",
+              "fixture",
+              "equipment"
+            ]
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "gun_model": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "matou_part_no": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "importance": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "gun_type": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "wireless": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "output_square": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "torque_min": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "torque_recommended": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "cad_model_no": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "socket_model": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "fastener_type": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "fastener_params": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "extension_model": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "socket_cad_no": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "extension_cad_no": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "category": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "legacy_spec": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "retired"
+            ]
+          },
+          "resource_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "updated_by": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "aliases": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "alias_value": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "normalized_value": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "type": "string"
+                },
+                "updated_at": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "resource_gid",
+                "alias_value"
+              ]
+            }
+          }
+        },
+        "required": [
+          "gid",
+          "resource_type",
+          "code",
+          "name",
+          "attributes",
+          "source",
+          "status",
+          "resource_version"
+        ],
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "socket",
+              "tool",
+              "fixture",
+              "equipment"
+            ]
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "gun_model": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "matou_part_no": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "importance": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "gun_type": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "wireless": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "output_square": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "torque_min": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "torque_recommended": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "cad_model_no": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "socket_model": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "fastener_type": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "fastener_params": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "extension_model": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "socket_cad_no": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "extension_cad_no": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "category": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "legacy_spec": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "retired"
+            ]
+          },
+          "resource_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "updated_by": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "aliases": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "properties": {
+                "gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "alias_value": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "normalized_value": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "type": "string"
+                },
+                "updated_at": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "gid",
+                "resource_gid",
+                "alias_value"
+              ]
+            }
+          }
+        },
+        "required": [
+          "gid",
+          "resource_type",
+          "code",
+          "name",
+          "attributes",
+          "source",
+          "status",
+          "resource_version"
+        ],
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:f285e5cbd1c216013825dfbc80d72f0cce7e6cb4720c850e02b90d8bf98485e0",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "paged",
+        "max_page_size": 200,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested active Craft resource requirement does not exist.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_3a36e4a605e198ec50a778a3",
+      "error_schema": [
+        {
+          "error_code": "resource_not_found",
+          "message_template": "The requested active Craft resource requirement does not exist.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "craft.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/craft.resource_requirement.get:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.resource_requirement.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.resource_requirement.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.resource_requirement.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.resource_requirement.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.resource_requirement.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.resource_requirement.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.resource_requirement.get@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:713f1121516d0357a876102302291d9b992d2c65ed7e6decb26292acc90534cc"
+    },
+    {
       "id": "craft.resource_requirement.retire",
       "major_version": 1,
       "owner_domain": "craft",
@@ -291952,35 +292586,47 @@
               "updates": {
                 "type": "object",
                 "properties": {
-                  "feishu_docs": {
-                    "type": "array",
-                    "maxItems": 200,
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "token": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "name": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "title": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "url": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "type": {
-                          "type": "string",
-                          "maxLength": 2048
-                        }
-                      },
-                      "additionalProperties": false
-                    }
+                  "escape_root_cause": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "interim_action": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "assignee_team_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_open_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "scheduled_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
                   },
                   "attachments": {
                     "type": "array",
@@ -292049,7 +292695,28 @@
                       ]
                     }
                   },
-                  "share_scope": {
+                  "status": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_chat_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "related_task_gid": {
                     "type": [
                       "string",
                       "null"
@@ -292063,7 +292730,21 @@
                     ],
                     "maxLength": 65536
                   },
-                  "status": {
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "permanent_action": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "title": {
                     "type": [
                       "string",
                       "null"
@@ -292084,63 +292765,7 @@
                     ],
                     "maxLength": 65536
                   },
-                  "occurrence_root_cause": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_assignee_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "escape_root_cause": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "interim_action": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
                   "related_knowledge_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "scheduled_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_chat_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "bop_entry_gid": {
                     "type": [
                       "string",
                       "null"
@@ -292169,49 +292794,58 @@
                       "additionalProperties": false
                     }
                   },
-                  "permanent_action": {
+                  "feishu_assignee_name": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "assignee_team_gid": {
+                  "occurrence_root_cause": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "list_gid": {
+                  "bop_entry_gid": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "related_task_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
+                  "feishu_docs": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "title": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "url": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "type": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
                   },
-                  "description": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_assignee_open_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "title": {
+                  "share_scope": {
                     "type": [
                       "string",
                       "null"
@@ -324554,72 +325188,14 @@
               "updates": {
                 "type": "object",
                 "properties": {
-                  "feishu_docs": {
-                    "type": "array",
-                    "maxItems": 200,
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "token": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "name": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "title": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "url": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "type": {
-                          "type": "string",
-                          "maxLength": 2048
-                        }
-                      },
-                      "additionalProperties": false
-                    }
-                  },
-                  "due_date": {
+                  "plan_start": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "review_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "priority": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "completion": {
-                    "type": [
-                      "integer",
-                      "number",
-                      "null"
-                    ]
-                  },
-                  "meeting_doc_link": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "project_gid": {
+                  "assignee_team_gid": {
                     "type": [
                       "string",
                       "null"
@@ -324633,62 +325209,6 @@
                     ],
                     "maxLength": 65536
                   },
-                  "plan_end": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "scheduled_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_chat_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "canvas_icon": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "actual_start": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "node_type": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "description": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "parent_task_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
                   "scheduled_start_time": {
                     "type": [
                       "string",
@@ -324696,10 +325216,14 @@
                     ],
                     "maxLength": 65536
                   },
-                  "is_deleted": {
-                    "type": "boolean"
+                  "meeting_level": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
                   },
-                  "feishu_assignee_open_id": {
+                  "scheduled_date": {
                     "type": [
                       "string",
                       "null"
@@ -324773,14 +325297,93 @@
                       ]
                     }
                   },
-                  "share_scope": {
+                  "feishu_assignee_open_id": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "actual_start": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "completion": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
                   "actual_end": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_docs": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "title": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "url": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "type": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "due_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "plan_end": {
                     "type": [
                       "string",
                       "null"
@@ -324794,27 +325397,55 @@
                     ],
                     "maxLength": 65536
                   },
-                  "time_estimate": {
-                    "type": [
-                      "integer",
-                      "null"
-                    ]
-                  },
-                  "meeting_level": {
+                  "feishu_group_chat_id": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "canvas_y": {
+                  "parent_task_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "meeting_doc_link": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "priority": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "time_estimate": {
                     "type": [
                       "integer",
-                      "number",
                       "null"
                     ]
                   },
-                  "feishu_assignee_name": {
+                  "title": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "review_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "project_gid": {
                     "type": [
                       "string",
                       "null"
@@ -324843,14 +325474,14 @@
                       "additionalProperties": false
                     }
                   },
-                  "assignee_team_gid": {
+                  "canvas_icon": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "list_gid": {
+                  "node_type": {
                     "type": [
                       "string",
                       "null"
@@ -324864,14 +325495,17 @@
                       "null"
                     ]
                   },
-                  "plan_start": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
+                  "is_deleted": {
+                    "type": "boolean"
                   },
-                  "title": {
+                  "canvas_y": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "share_scope": {
                     "type": [
                       "string",
                       "null"
@@ -377579,10 +378213,10 @@
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "simulation.environment.alternate_hierarchy.create",
-      "description": "Create one empty editable alternate hierarchy; BOP-derived hierarchies must use the governed fork bootstrap capability.",
-      "use_when": "Create one empty editable alternate hierarchy; BOP-derived hierarchies must use the governed fork bootstrap capability.",
+      "description": "Create one editable alternate hierarchy with an atomic root node; BOP-derived hierarchies must use the governed fork bootstrap capability.",
+      "use_when": "Create one editable alternate hierarchy with an atomic root node; BOP-derived hierarchies must use the governed fork bootstrap capability.",
       "do_not_use_when": "Use the owning domain's governed Capability.",
-      "business_effect": "Create one empty editable alternate hierarchy; BOP-derived hierarchies must use the governed fork bootstrap capability.",
+      "business_effect": "Create one editable alternate hierarchy with an atomic root node; BOP-derived hierarchies must use the governed fork bootstrap capability.",
       "business_acceptance_criteria": [],
       "business_invariants": [],
       "no_business_invariant_reason": null,
@@ -377645,12 +378279,17 @@
         "type": "object",
         "required": [
           "hierarchy_gid",
+          "root_node_gid",
           "workspace_gid",
           "name",
           "row_version"
         ],
         "properties": {
           "hierarchy_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "root_node_gid": {
             "type": "string",
             "pattern": "^[1-9][0-9]*$"
           },
@@ -377672,12 +378311,17 @@
         "type": "object",
         "required": [
           "hierarchy_gid",
+          "root_node_gid",
           "workspace_gid",
           "name",
           "row_version"
         ],
         "properties": {
           "hierarchy_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "root_node_gid": {
             "type": "string",
             "pattern": "^[1-9][0-9]*$"
           },
@@ -377695,7 +378339,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:c8b513c62822e366671a12a65d7c06845bd5c601464190c75efe239599c3d8fb",
+      "schema_hash": "sha256:1d0a950b81c73b71cf2e6894557640233c44cd6b8531908725a284892ca1dec7",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -377887,7 +378531,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:0de43e28884f5e82b516947d7770b0fc974079a35c4773d823eb7297fea1e95a"
+      "business_definition_hash": "sha256:ebe2006c2ce2e7c2cace95983c1b04714e7506734b182dc47dd612d04fd479c6"
     },
     {
       "id": "simulation.environment.alternate_hierarchy.get",
@@ -377896,10 +378540,10 @@
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "simulation.environment.alternate_hierarchy.get",
-      "description": "Read one alternate hierarchy and its placements.",
-      "use_when": "Read one alternate hierarchy and its placements.",
+      "description": "Read one alternate hierarchy, its editable node tree, separated source references, and placements.",
+      "use_when": "Read one alternate hierarchy, its editable node tree, separated source references, and placements.",
       "do_not_use_when": "Use the owning domain's governed Capability.",
-      "business_effect": "Read one alternate hierarchy and its placements.",
+      "business_effect": "Read one alternate hierarchy, its editable node tree, separated source references, and placements.",
       "business_acceptance_criteria": [],
       "business_invariants": [],
       "no_business_invariant_reason": null,
@@ -377950,6 +378594,8 @@
           "status",
           "projection_identity",
           "row_version",
+          "source_refs",
+          "nodes",
           "placements"
         ],
         "properties": {
@@ -377980,6 +378626,99 @@
           "row_version": {
             "type": "integer",
             "minimum": 1
+          },
+          "source_refs": {
+            "type": "object",
+            "required": [
+              "model_references",
+              "resource_references"
+            ],
+            "properties": {
+              "model_references": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "resource_references": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "node_gid",
+                "workspace_gid",
+                "hierarchy_gid",
+                "parent_gid",
+                "node_type",
+                "name",
+                "sort_order",
+                "source_bop_node_gid",
+                "row_version"
+              ],
+              "properties": {
+                "node_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "workspace_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "hierarchy_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "parent_gid": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[1-9][0-9]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "sort_order": {
+                  "type": "integer"
+                },
+                "source_bop_node_gid": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[1-9][0-9]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "row_version": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            }
           },
           "placements": {
             "type": "array",
@@ -378001,6 +378740,8 @@
           "status",
           "projection_identity",
           "row_version",
+          "source_refs",
+          "nodes",
           "placements"
         ],
         "properties": {
@@ -378032,6 +378773,99 @@
             "type": "integer",
             "minimum": 1
           },
+          "source_refs": {
+            "type": "object",
+            "required": [
+              "model_references",
+              "resource_references"
+            ],
+            "properties": {
+              "model_references": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "resource_references": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "node_gid",
+                "workspace_gid",
+                "hierarchy_gid",
+                "parent_gid",
+                "node_type",
+                "name",
+                "sort_order",
+                "source_bop_node_gid",
+                "row_version"
+              ],
+              "properties": {
+                "node_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "workspace_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "hierarchy_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "parent_gid": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[1-9][0-9]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "sort_order": {
+                  "type": "integer"
+                },
+                "source_bop_node_gid": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[1-9][0-9]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "row_version": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
           "placements": {
             "type": "array",
             "items": {
@@ -378043,7 +378877,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b234b5998f2692be03e0fde81caab1e3732b923c0262d2919bb9d5ccc27a5d35",
+      "schema_hash": "sha256:635e751ab14d0dd57aadd6777f1d14a273d35c150ffeb736ad0c005919fba812",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -378235,7 +379069,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:1378f91d16a04ca4daf9a313d31a63bb7584b0504a96d802277c5cf1d25f5d88"
+      "business_definition_hash": "sha256:073f8e943eec7c588578c636467c00c59a5fa7c3675907de23481d0b44b12b16"
     },
     {
       "id": "simulation.environment.alternate_hierarchy.search",
@@ -380879,6 +381713,1201 @@
         }
       ],
       "business_definition_hash": "sha256:ec9919a6238fb8151038841f846633480a38e4fb9a178f82710fa4f89c5796a4"
+    },
+    {
+      "id": "simulation.environment.bop_projection.apply",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.environment.bop_projection.apply",
+      "description": "Atomically insert the exact previewed BOP process skeleton as one alternate hierarchy after revalidating the Craft source and plan hash.",
+      "use_when": "Atomically insert the exact previewed BOP process skeleton as one alternate hierarchy after revalidating the Craft source and plan hash.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Atomically insert the previously previewed exact Craft BOP process skeleton as one editable alternate hierarchy.",
+      "business_acceptance_criteria": [
+        "The source is read only through craft.bop.execution_structure.get@1 and remains pinned by version, revision and content hash.",
+        "Product and resource references are counted as separate source references and are never copied into the editable process skeleton as hierarchy nodes.",
+        "Apply recomputes the projection and rejects a changed source, target row version or plan hash without partial writes."
+      ],
+      "business_invariants": [],
+      "no_business_invariant_reason": "The exact owner projection, deterministic plan hash, optimistic concurrency and one Simulation transaction fully determine this experimental boundary.",
+      "side_effect_level": "write",
+      "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-workspace",
+          "payload_path": "workspace_gid",
+          "required": true
+        },
+        {
+          "resource_type": "craft-bop-version",
+          "payload_path": "version_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "version_gid",
+          "line_gid",
+          "fork_depth",
+          "hierarchy_name",
+          "expected_row_version",
+          "plan_hash",
+          "idempotency_key"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "version_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "line_gid": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[1-9][0-9]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fork_depth": {
+            "type": "string",
+            "enum": [
+              "all",
+              "operation",
+              "process",
+              "role",
+              "station"
+            ]
+          },
+          "hierarchy_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "expected_row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "plan_hash": {
+            "type": "string",
+            "pattern": "^(sha256:)?[0-9a-f]{64}$"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 191
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "hierarchy_gid",
+          "workspace_gid",
+          "name",
+          "row_version",
+          "workspace_row_version",
+          "status",
+          "node_count"
+        ],
+        "properties": {
+          "hierarchy_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "workspace_row_version": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "status": {
+            "const": "active"
+          },
+          "node_count": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "hierarchy_gid",
+          "workspace_gid",
+          "name",
+          "row_version",
+          "workspace_row_version",
+          "status",
+          "node_count"
+        ],
+        "properties": {
+          "hierarchy_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "workspace_row_version": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "status": {
+            "const": "active"
+          },
+          "node_count": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:4abbcb22c5783a0265de4e0117aa578ca5026d48f602bd1a28c6ec324a3a8fd9",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "workspace_not_found",
+          "meaning": "The target Simulation environment is unavailable or not owned by the caller.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The target environment row version changed.",
+          "retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "code": "fork_depth_invalid",
+          "meaning": "The requested BOP projection depth is unsupported.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_projection_hash_invalid",
+          "meaning": "The Craft execution structure has no valid immutable hash.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_projection_node_invalid",
+          "meaning": "The Craft execution structure contains an invalid node.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_projection_line_not_found",
+          "meaning": "The requested line is not present in the exact Craft execution structure.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_projection_parent_missing",
+          "meaning": "The projected process skeleton references a missing parent.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_projection_cycle",
+          "meaning": "The projected process skeleton contains a cycle.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_projection_plan_changed",
+          "meaning": "The exact preview no longer matches the current source or target.",
+          "retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_projection_already_inserted",
+          "meaning": "The exact BOP projection is already present in the target environment.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_execution_structure_failed",
+          "meaning": "The owning Craft capability could not return the exact published execution structure.",
+          "retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "code": "domain_client_unavailable",
+          "meaning": "The governed owning-domain invocation boundary is unavailable.",
+          "retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to another BOP projection request.",
+          "retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_0b58dc3e82b9c3264b159ba2",
+      "error_schema": [
+        {
+          "error_code": "workspace_not_found",
+          "message_template": "The target Simulation environment is unavailable or not owned by the caller.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The target environment row version changed.",
+          "is_retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "fork_depth_invalid",
+          "message_template": "The requested BOP projection depth is unsupported.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_projection_hash_invalid",
+          "message_template": "The Craft execution structure has no valid immutable hash.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_projection_node_invalid",
+          "message_template": "The Craft execution structure contains an invalid node.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_projection_line_not_found",
+          "message_template": "The requested line is not present in the exact Craft execution structure.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_projection_parent_missing",
+          "message_template": "The projected process skeleton references a missing parent.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_projection_cycle",
+          "message_template": "The projected process skeleton contains a cycle.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_projection_plan_changed",
+          "message_template": "The exact preview no longer matches the current source or target.",
+          "is_retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_projection_already_inserted",
+          "message_template": "The exact BOP projection is already present in the target environment.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_execution_structure_failed",
+          "message_template": "The owning Craft capability could not return the exact published execution structure.",
+          "is_retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "domain_client_unavailable",
+          "message_template": "The governed owning-domain invocation boundary is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to another BOP projection request.",
+          "is_retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.environment.bop_projection.apply:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.environment.bop_projection.apply@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.environment.bop_projection.apply@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.environment.bop_projection.apply@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.environment.bop_projection.apply@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.environment.bop_projection.apply@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.environment.bop_projection.apply@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.environment.bop_projection.apply@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:de9bbfc6f9fed093125993d1249d0be6c2084d1ceab76cfef79c22b02e58397f"
+    },
+    {
+      "id": "simulation.environment.bop_projection.preview",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.environment.bop_projection.preview",
+      "description": "Preview a deterministic BOP skeleton projection from the exact published Craft execution structure without copying product or resource references as hierarchy nodes.",
+      "use_when": "Preview a deterministic BOP skeleton projection from the exact published Craft execution structure without copying product or resource references as hierarchy nodes.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Preview the exact published Craft BOP process skeleton for insertion into one owned Simulation environment.",
+      "business_acceptance_criteria": [
+        "The source is read only through craft.bop.execution_structure.get@1 and remains pinned by version, revision and content hash.",
+        "Product and resource references are counted as separate source references and are never copied into the editable process skeleton as hierarchy nodes.",
+        "Apply recomputes the projection and rejects a changed source, target row version or plan hash without partial writes."
+      ],
+      "business_invariants": [],
+      "no_business_invariant_reason": "The exact owner projection, deterministic plan hash, optimistic concurrency and one Simulation transaction fully determine this experimental boundary.",
+      "side_effect_level": "read",
+      "side_effects": "Reads simulation domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-workspace",
+          "payload_path": "workspace_gid",
+          "required": true
+        },
+        {
+          "resource_type": "craft-bop-version",
+          "payload_path": "version_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "version_gid",
+          "line_gid",
+          "fork_depth",
+          "hierarchy_name",
+          "expected_row_version"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "version_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "line_gid": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[1-9][0-9]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fork_depth": {
+            "type": "string",
+            "enum": [
+              "all",
+              "operation",
+              "process",
+              "role",
+              "station"
+            ]
+          },
+          "hierarchy_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "expected_row_version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "expected_workspace_version",
+          "source_project_gid",
+          "source_version_gid",
+          "source_revision",
+          "source_content_hash",
+          "line_gid",
+          "fork_depth",
+          "hierarchy_name",
+          "nodes",
+          "node_count",
+          "model_references",
+          "resource_references",
+          "model_reference_count",
+          "resource_reference_count",
+          "conflicts",
+          "plan_hash"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "expected_workspace_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "source_project_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "source_version_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "source_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "source_content_hash": {
+            "type": "string",
+            "pattern": "^(sha256:)?[0-9a-f]{64}$"
+          },
+          "line_gid": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[1-9][0-9]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fork_depth": {
+            "type": "string",
+            "enum": [
+              "all",
+              "operation",
+              "process",
+              "role",
+              "station"
+            ]
+          },
+          "hierarchy_name": {
+            "type": "string"
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {
+              "type": "object",
+              "required": [
+                "source_gid",
+                "parent_source_gid",
+                "node_type",
+                "name",
+                "position"
+              ],
+              "properties": {
+                "source_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "parent_source_gid": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[1-9][0-9]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "node_type": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 32
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "position": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "node_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "model_references": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {
+              "type": "object",
+              "required": [
+                "source_node_gid",
+                "reference"
+              ],
+              "properties": {
+                "source_node_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "reference": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "resource_references": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {
+              "type": "object",
+              "required": [
+                "source_node_gid",
+                "resource_type",
+                "reference"
+              ],
+              "properties": {
+                "source_node_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "resource_type": {
+                  "type": "string",
+                  "enum": [
+                    "tool",
+                    "fixture",
+                    "equipment"
+                  ]
+                },
+                "reference": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "model_reference_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "resource_reference_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "conflicts": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "type": "object",
+              "required": [
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "detail": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "plan_hash": {
+            "type": "string",
+            "pattern": "^(sha256:)?[0-9a-f]{64}$"
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "expected_workspace_version",
+          "source_project_gid",
+          "source_version_gid",
+          "source_revision",
+          "source_content_hash",
+          "line_gid",
+          "fork_depth",
+          "hierarchy_name",
+          "nodes",
+          "node_count",
+          "model_references",
+          "resource_references",
+          "model_reference_count",
+          "resource_reference_count",
+          "conflicts",
+          "plan_hash"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "expected_workspace_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "source_project_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "source_version_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "source_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "source_content_hash": {
+            "type": "string",
+            "pattern": "^(sha256:)?[0-9a-f]{64}$"
+          },
+          "line_gid": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[1-9][0-9]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fork_depth": {
+            "type": "string",
+            "enum": [
+              "all",
+              "operation",
+              "process",
+              "role",
+              "station"
+            ]
+          },
+          "hierarchy_name": {
+            "type": "string"
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {
+              "type": "object",
+              "required": [
+                "source_gid",
+                "parent_source_gid",
+                "node_type",
+                "name",
+                "position"
+              ],
+              "properties": {
+                "source_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "parent_source_gid": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[1-9][0-9]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "node_type": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 32
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "position": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "node_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "model_references": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {
+              "type": "object",
+              "required": [
+                "source_node_gid",
+                "reference"
+              ],
+              "properties": {
+                "source_node_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "reference": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "resource_references": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {
+              "type": "object",
+              "required": [
+                "source_node_gid",
+                "resource_type",
+                "reference"
+              ],
+              "properties": {
+                "source_node_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "resource_type": {
+                  "type": "string",
+                  "enum": [
+                    "tool",
+                    "fixture",
+                    "equipment"
+                  ]
+                },
+                "reference": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "model_reference_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "resource_reference_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "conflicts": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "type": "object",
+              "required": [
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "detail": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "plan_hash": {
+            "type": "string",
+            "pattern": "^(sha256:)?[0-9a-f]{64}$"
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:c70abe5dc8a5d9597ca9d80f0c031189953f87aee937af15e84d182535127245",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "workspace_not_found",
+          "meaning": "The target Simulation environment is unavailable or not owned by the caller.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The target environment row version changed.",
+          "retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "code": "fork_depth_invalid",
+          "meaning": "The requested BOP projection depth is unsupported.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_projection_hash_invalid",
+          "meaning": "The Craft execution structure has no valid immutable hash.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_projection_node_invalid",
+          "meaning": "The Craft execution structure contains an invalid node.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_projection_line_not_found",
+          "meaning": "The requested line is not present in the exact Craft execution structure.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_projection_parent_missing",
+          "meaning": "The projected process skeleton references a missing parent.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_projection_cycle",
+          "meaning": "The projected process skeleton contains a cycle.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_projection_plan_changed",
+          "meaning": "The exact preview no longer matches the current source or target.",
+          "retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_projection_already_inserted",
+          "meaning": "The exact BOP projection is already present in the target environment.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_execution_structure_failed",
+          "meaning": "The owning Craft capability could not return the exact published execution structure.",
+          "retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "code": "domain_client_unavailable",
+          "meaning": "The governed owning-domain invocation boundary is unavailable.",
+          "retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to another BOP projection request.",
+          "retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "domain_errors_complete": true,
+      "capability_version_gid": "cv2_2294c942f8d703893bab0ab8",
+      "error_schema": [
+        {
+          "error_code": "workspace_not_found",
+          "message_template": "The target Simulation environment is unavailable or not owned by the caller.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "version_conflict",
+          "message_template": "The target environment row version changed.",
+          "is_retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "fork_depth_invalid",
+          "message_template": "The requested BOP projection depth is unsupported.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_projection_hash_invalid",
+          "message_template": "The Craft execution structure has no valid immutable hash.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_projection_node_invalid",
+          "message_template": "The Craft execution structure contains an invalid node.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_projection_line_not_found",
+          "message_template": "The requested line is not present in the exact Craft execution structure.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_projection_parent_missing",
+          "message_template": "The projected process skeleton references a missing parent.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_projection_cycle",
+          "message_template": "The projected process skeleton contains a cycle.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_projection_plan_changed",
+          "message_template": "The exact preview no longer matches the current source or target.",
+          "is_retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_projection_already_inserted",
+          "message_template": "The exact BOP projection is already present in the target environment.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_execution_structure_failed",
+          "message_template": "The owning Craft capability could not return the exact published execution structure.",
+          "is_retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "domain_client_unavailable",
+          "message_template": "The governed owning-domain invocation boundary is unavailable.",
+          "is_retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The idempotency key is bound to another BOP projection request.",
+          "is_retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.environment.bop_projection.preview:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.environment.bop_projection.preview@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.environment.bop_projection.preview@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.environment.bop_projection.preview@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.environment.bop_projection.preview@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.environment.bop_projection.preview@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.environment.bop_projection.preview@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.environment.bop_projection.preview@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:801ca346431f8203567869e397bb5787366af5bfc6fd8639c8ecc05e1762cfcb"
     },
     {
       "id": "simulation.environment.bop_vm_binding_draft.preview",
@@ -397213,6 +399242,605 @@
       "business_definition_hash": "sha256:afe0f5a40fd6806542f68c76193f2007ecec9c9382db7b81db6f834ba0b8394d"
     },
     {
+      "id": "simulation.environment.plmxml.insert",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.environment.plmxml.insert",
+      "description": "Insert one inspected PLMXML model document and an explicit set of alternate hierarchies into one owned draft environment.",
+      "use_when": "Insert one inspected PLMXML model document and an explicit set of alternate hierarchies into one owned draft environment.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Add one immutable PLMXML model and only the explicitly selected alternate hierarchies to one exact owned Simulation workspace draft.",
+      "business_acceptance_criteria": [
+        "The source and every dependency are immutable Artifact references whose bytes match the declared SHA-256 hash.",
+        "An inspection hash binds the user's explicit import decision to the exact parsed projection.",
+        "Rejected input creates no partial workspace, document, hierarchy or placement state."
+      ],
+      "business_invariants": [],
+      "no_business_invariant_reason": "Artifact immutability, explicit selection, optimistic concurrency and one Simulation transaction fully determine this atomic boundary.",
+      "side_effect_level": "write",
+      "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-workspace",
+          "payload_path": "workspace_gid",
+          "required": true
+        },
+        {
+          "resource_type": "artifact",
+          "payload_path": "artifact_ref.artifact_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "expected_row_version",
+          "artifact_ref",
+          "display_name",
+          "mode",
+          "selected_hierarchy_identities",
+          "inspection_hash",
+          "idempotency_key"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "expected_row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "artifact_ref": {
+            "type": "object",
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size",
+              "version"
+            ],
+            "properties": {
+              "artifact_id": {
+                "type": "string"
+              },
+              "media_type": {
+                "type": "string",
+                "enum": [
+                  "application/plmxml+xml",
+                  "application/vnd.siemens.plmxml+xml"
+                ]
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^(sha256:)?[0-9a-f]{64}$"
+              },
+              "byte_size": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false
+          },
+          "dependency_artifacts": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {
+              "type": "object",
+              "required": [
+                "location",
+                "artifact_ref"
+              ],
+              "properties": {
+                "location": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                },
+                "artifact_ref": {
+                  "type": "object",
+                  "required": [
+                    "artifact_id",
+                    "media_type",
+                    "sha256",
+                    "byte_size",
+                    "version"
+                  ],
+                  "properties": {
+                    "artifact_id": {
+                      "type": "string"
+                    },
+                    "media_type": {
+                      "type": "string",
+                      "enum": [
+                        "application/plmxml+xml",
+                        "application/vnd.siemens.plmxml+xml",
+                        "model/vnd.jt",
+                        "model/jt"
+                      ]
+                    },
+                    "sha256": {
+                      "type": "string",
+                      "pattern": "^(sha256:)?[0-9a-f]{64}$"
+                    },
+                    "byte_size": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "display_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "model_and_selected_hierarchies",
+              "model_only"
+            ]
+          },
+          "selected_hierarchy_identities": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {
+              "type": "string"
+            }
+          },
+          "inspection_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 191
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "document_gid",
+          "hierarchy_gids",
+          "workspace_row_version",
+          "cache_revision_hash",
+          "mode",
+          "selected_hierarchy_identities",
+          "inspection_hash",
+          "report"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "document_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "hierarchy_gids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*$"
+            }
+          },
+          "workspace_row_version": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "model_and_selected_hierarchies",
+              "model_only"
+            ]
+          },
+          "selected_hierarchy_identities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "inspection_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "report": {
+            "type": "object",
+            "required": [
+              "semantic_hash",
+              "document_count",
+              "hierarchy_count",
+              "placement_count"
+            ],
+            "properties": {
+              "semantic_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "document_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "hierarchy_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "placement_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "dependency_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "algorithm_version": {
+                "type": "string"
+              },
+              "unresolved_refs": {
+                "type": "array"
+              },
+              "omitted_ai00_only_records": {
+                "type": "array"
+              },
+              "original_artifact_passthrough_eligible": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "document_gid",
+          "hierarchy_gids",
+          "workspace_row_version",
+          "cache_revision_hash",
+          "mode",
+          "selected_hierarchy_identities",
+          "inspection_hash",
+          "report"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "document_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "hierarchy_gids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*$"
+            }
+          },
+          "workspace_row_version": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "model_and_selected_hierarchies",
+              "model_only"
+            ]
+          },
+          "selected_hierarchy_identities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "inspection_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "report": {
+            "type": "object",
+            "required": [
+              "semantic_hash",
+              "document_count",
+              "hierarchy_count",
+              "placement_count"
+            ],
+            "properties": {
+              "semantic_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "document_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "hierarchy_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "placement_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "dependency_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "algorithm_version": {
+                "type": "string"
+              },
+              "unresolved_refs": {
+                "type": "array"
+              },
+              "omitted_ai00_only_records": {
+                "type": "array"
+              },
+              "original_artifact_passthrough_eligible": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:d107120bc3a366c0390dcb9c623c4272aad3875af4435c1fbd708452a5eb78b6",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "plmxml_artifact_hash_mismatch",
+          "meaning": "The PLMXML Artifact bytes do not match the immutable reference hash.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_artifact_unavailable",
+          "meaning": "The immutable PLMXML Artifact is unavailable or outside the caller scope.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_dependency_artifact_required",
+          "meaning": "Every external PLMXML dependency must resolve to an immutable Artifact.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_dependency_artifact_invalid",
+          "meaning": "A supplied PLMXML dependency Artifact reference is malformed or duplicated.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_dependency_media_type_mismatch",
+          "meaning": "A dependency Artifact media type does not match the PLMXML reference.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_dependency_artifact_unavailable",
+          "meaning": "A dependency Artifact is unavailable or outside the caller scope.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_dependency_artifact_hash_mismatch",
+          "meaning": "A dependency Artifact does not match its immutable SHA-256 reference.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_insert_mode_required",
+          "meaning": "PLMXML insertion requires an explicit model-only or selected-hierarchy mode.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_hierarchy_selection_invalid",
+          "meaning": "The selected hierarchy identities are invalid for this inspected PLMXML.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_inspection_changed",
+          "meaning": "The inspected PLMXML projection changed before the requested write.",
+          "retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_c8505079fe28dc87edba44cf",
+      "error_schema": [
+        {
+          "error_code": "plmxml_artifact_hash_mismatch",
+          "message_template": "The PLMXML Artifact bytes do not match the immutable reference hash.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_artifact_unavailable",
+          "message_template": "The immutable PLMXML Artifact is unavailable or outside the caller scope.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_dependency_artifact_required",
+          "message_template": "Every external PLMXML dependency must resolve to an immutable Artifact.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_dependency_artifact_invalid",
+          "message_template": "A supplied PLMXML dependency Artifact reference is malformed or duplicated.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_dependency_media_type_mismatch",
+          "message_template": "A dependency Artifact media type does not match the PLMXML reference.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_dependency_artifact_unavailable",
+          "message_template": "A dependency Artifact is unavailable or outside the caller scope.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_dependency_artifact_hash_mismatch",
+          "message_template": "A dependency Artifact does not match its immutable SHA-256 reference.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_insert_mode_required",
+          "message_template": "PLMXML insertion requires an explicit model-only or selected-hierarchy mode.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_hierarchy_selection_invalid",
+          "message_template": "The selected hierarchy identities are invalid for this inspected PLMXML.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_inspection_changed",
+          "message_template": "The inspected PLMXML projection changed before the requested write.",
+          "is_retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.environment.plmxml.insert:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.environment.plmxml.insert@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.environment.plmxml.insert@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.environment.plmxml.insert@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.environment.plmxml.insert@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.environment.plmxml.insert@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.environment.plmxml.insert@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.environment.plmxml.insert@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:c9d8ad64353aa53042755d74b883c2febe916fb992ac79257586abb27ad694bc"
+    },
+    {
       "id": "simulation.environment.preflight",
       "major_version": 1,
       "owner_domain": "simulation",
@@ -398322,6 +400950,560 @@
         }
       ],
       "business_definition_hash": "sha256:7a1ac95bc65ac8f6476e0c390a7f4c834018c2e5b6675e0021817cb19207e4c1"
+    },
+    {
+      "id": "simulation.environment.restore_from_plmxml",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.environment.restore_from_plmxml",
+      "description": "Create one private draft Simulation environment from one inspected immutable PLMXML Artifact.",
+      "use_when": "Create one private draft Simulation environment from one inspected immutable PLMXML Artifact.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Create one private Simulation workspace whose draft faithfully restores the selected immutable PLMXML model, hierarchies and verified external dependencies.",
+      "business_acceptance_criteria": [
+        "The source and every dependency are immutable Artifact references whose bytes match the declared SHA-256 hash.",
+        "An inspection hash binds the user's explicit import decision to the exact parsed projection.",
+        "Rejected input creates no partial workspace, document, hierarchy or placement state."
+      ],
+      "business_invariants": [],
+      "no_business_invariant_reason": "Artifact immutability, explicit selection, optimistic concurrency and one Simulation transaction fully determine this atomic boundary.",
+      "side_effect_level": "write",
+      "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "artifact",
+          "payload_path": "artifact_ref.artifact_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "artifact_ref",
+          "name",
+          "display_name",
+          "inspection_hash",
+          "idempotency_key"
+        ],
+        "properties": {
+          "artifact_ref": {
+            "type": "object",
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size",
+              "version"
+            ],
+            "properties": {
+              "artifact_id": {
+                "type": "string"
+              },
+              "media_type": {
+                "type": "string",
+                "enum": [
+                  "application/plmxml+xml",
+                  "application/vnd.siemens.plmxml+xml"
+                ]
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^(sha256:)?[0-9a-f]{64}$"
+              },
+              "byte_size": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false
+          },
+          "dependency_artifacts": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {
+              "type": "object",
+              "required": [
+                "location",
+                "artifact_ref"
+              ],
+              "properties": {
+                "location": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                },
+                "artifact_ref": {
+                  "type": "object",
+                  "required": [
+                    "artifact_id",
+                    "media_type",
+                    "sha256",
+                    "byte_size",
+                    "version"
+                  ],
+                  "properties": {
+                    "artifact_id": {
+                      "type": "string"
+                    },
+                    "media_type": {
+                      "type": "string",
+                      "enum": [
+                        "application/plmxml+xml",
+                        "application/vnd.siemens.plmxml+xml",
+                        "model/vnd.jt",
+                        "model/jt"
+                      ]
+                    },
+                    "sha256": {
+                      "type": "string",
+                      "pattern": "^(sha256:)?[0-9a-f]{64}$"
+                    },
+                    "byte_size": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "display_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "inspection_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 191
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "version_gid",
+          "document_gid",
+          "hierarchy_gids",
+          "workspace_row_version",
+          "cache_revision_hash",
+          "inspection_hash",
+          "report"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "version_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "document_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "hierarchy_gids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*$"
+            }
+          },
+          "workspace_row_version": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "inspection_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "report": {
+            "type": "object",
+            "required": [
+              "semantic_hash",
+              "document_count",
+              "hierarchy_count",
+              "placement_count"
+            ],
+            "properties": {
+              "semantic_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "document_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "hierarchy_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "placement_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "dependency_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "algorithm_version": {
+                "type": "string"
+              },
+              "unresolved_refs": {
+                "type": "array"
+              },
+              "omitted_ai00_only_records": {
+                "type": "array"
+              },
+              "original_artifact_passthrough_eligible": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "workspace_gid",
+          "version_gid",
+          "document_gid",
+          "hierarchy_gids",
+          "workspace_row_version",
+          "cache_revision_hash",
+          "inspection_hash",
+          "report"
+        ],
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "version_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "document_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "hierarchy_gids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*$"
+            }
+          },
+          "workspace_row_version": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "cache_revision_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "inspection_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "report": {
+            "type": "object",
+            "required": [
+              "semantic_hash",
+              "document_count",
+              "hierarchy_count",
+              "placement_count"
+            ],
+            "properties": {
+              "semantic_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "document_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "hierarchy_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "placement_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "dependency_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "algorithm_version": {
+                "type": "string"
+              },
+              "unresolved_refs": {
+                "type": "array"
+              },
+              "omitted_ai00_only_records": {
+                "type": "array"
+              },
+              "original_artifact_passthrough_eligible": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:d1ae2e4d304abc076fca286a8ad056cd384b1d52e31e3e2b3c914f7bb1c172b6",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "plmxml_artifact_hash_mismatch",
+          "meaning": "The PLMXML Artifact bytes do not match the immutable reference hash.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_artifact_unavailable",
+          "meaning": "The immutable PLMXML Artifact is unavailable or outside the caller scope.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_dependency_artifact_required",
+          "meaning": "Every external PLMXML dependency must resolve to an immutable Artifact.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_dependency_artifact_invalid",
+          "meaning": "A supplied PLMXML dependency Artifact reference is malformed or duplicated.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_dependency_media_type_mismatch",
+          "meaning": "A dependency Artifact media type does not match the PLMXML reference.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_dependency_artifact_unavailable",
+          "meaning": "A dependency Artifact is unavailable or outside the caller scope.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_dependency_artifact_hash_mismatch",
+          "meaning": "A dependency Artifact does not match its immutable SHA-256 reference.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_insert_mode_required",
+          "meaning": "PLMXML insertion requires an explicit model-only or selected-hierarchy mode.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_hierarchy_selection_invalid",
+          "meaning": "The selected hierarchy identities are invalid for this inspected PLMXML.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_inspection_changed",
+          "meaning": "The inspected PLMXML projection changed before the requested write.",
+          "retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_e62870cfe2365a59e492bc7f",
+      "error_schema": [
+        {
+          "error_code": "plmxml_artifact_hash_mismatch",
+          "message_template": "The PLMXML Artifact bytes do not match the immutable reference hash.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_artifact_unavailable",
+          "message_template": "The immutable PLMXML Artifact is unavailable or outside the caller scope.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_dependency_artifact_required",
+          "message_template": "Every external PLMXML dependency must resolve to an immutable Artifact.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_dependency_artifact_invalid",
+          "message_template": "A supplied PLMXML dependency Artifact reference is malformed or duplicated.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_dependency_media_type_mismatch",
+          "message_template": "A dependency Artifact media type does not match the PLMXML reference.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_dependency_artifact_unavailable",
+          "message_template": "A dependency Artifact is unavailable or outside the caller scope.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_dependency_artifact_hash_mismatch",
+          "message_template": "A dependency Artifact does not match its immutable SHA-256 reference.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_insert_mode_required",
+          "message_template": "PLMXML insertion requires an explicit model-only or selected-hierarchy mode.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_hierarchy_selection_invalid",
+          "message_template": "The selected hierarchy identities are invalid for this inspected PLMXML.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_inspection_changed",
+          "message_template": "The inspected PLMXML projection changed before the requested write.",
+          "is_retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.environment.restore_from_plmxml:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.environment.restore_from_plmxml@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.environment.restore_from_plmxml@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.environment.restore_from_plmxml@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.environment.restore_from_plmxml@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.environment.restore_from_plmxml@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.environment.restore_from_plmxml@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.environment.restore_from_plmxml@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:c1b9f548e0e15d0483ec12f3d340fc6b5efe3a0ba4e861e77180bfc41bcc5233"
     },
     {
       "id": "simulation.environment.runtime_package.open.request",
@@ -410499,116 +413681,128 @@
       "deprecation_message": null,
       "domain_errors": [
         {
-          "code": "source_resolver_unavailable",
-          "meaning": "A required owning-domain resolver is unavailable.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "source_version_mismatch",
-          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "code": "plmxml_artifact_hash_mismatch",
+          "meaning": "The PLMXML Artifact bytes do not match the immutable reference hash.",
           "retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "code": "parameter_set_not_found",
-          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "code": "plmxml_artifact_unavailable",
+          "meaning": "The immutable PLMXML Artifact is unavailable or outside the caller scope.",
           "retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "code": "simulation_profile_not_found",
-          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "code": "plmxml_dependency_artifact_required",
+          "meaning": "Every external PLMXML dependency must resolve to an immutable Artifact.",
           "retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "code": "solver_not_allowed",
-          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "code": "plmxml_dependency_artifact_invalid",
+          "meaning": "A supplied PLMXML dependency Artifact reference is malformed or duplicated.",
           "retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "code": "simulation_environment_not_found",
-          "meaning": "The Simulation environment is unavailable or not visible.",
+          "code": "plmxml_dependency_media_type_mismatch",
+          "meaning": "A dependency Artifact media type does not match the PLMXML reference.",
           "retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "code": "simulation_run_not_found",
-          "meaning": "The Simulation run is unavailable or not visible.",
+          "code": "plmxml_dependency_artifact_unavailable",
+          "meaning": "A dependency Artifact is unavailable or outside the caller scope.",
           "retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "code": "simulation_result_not_ready",
-          "meaning": "The Simulation run has no completed result artifacts.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "code": "plmxml_dependency_artifact_hash_mismatch",
+          "meaning": "A dependency Artifact does not match its immutable SHA-256 reference.",
           "retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_insert_mode_required",
+          "meaning": "PLMXML insertion requires an explicit model-only or selected-hierarchy mode.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_hierarchy_selection_invalid",
+          "meaning": "The selected hierarchy identities are invalid for this inspected PLMXML.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_inspection_changed",
+          "meaning": "The inspected PLMXML projection changed before the requested write.",
+          "retryable": false,
+          "is_caller_error": true
         }
       ],
       "domain_errors_complete": false,
       "capability_version_gid": "cv2_58e42c914d2b6cb669dac7c9",
       "error_schema": [
         {
-          "error_code": "source_resolver_unavailable",
-          "message_template": "A required owning-domain resolver is unavailable.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "source_version_mismatch",
-          "message_template": "A referenced source no longer matches its immutable hash or version.",
+          "error_code": "plmxml_artifact_hash_mismatch",
+          "message_template": "The PLMXML Artifact bytes do not match the immutable reference hash.",
           "is_retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "error_code": "parameter_set_not_found",
-          "message_template": "The immutable parameter set is unavailable or not visible.",
+          "error_code": "plmxml_artifact_unavailable",
+          "message_template": "The immutable PLMXML Artifact is unavailable or outside the caller scope.",
           "is_retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "error_code": "simulation_profile_not_found",
-          "message_template": "The immutable Simulation profile is unavailable or not visible.",
+          "error_code": "plmxml_dependency_artifact_required",
+          "message_template": "Every external PLMXML dependency must resolve to an immutable Artifact.",
           "is_retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "error_code": "solver_not_allowed",
-          "message_template": "The requested solver coordinate is not in the governed allowlist.",
+          "error_code": "plmxml_dependency_artifact_invalid",
+          "message_template": "A supplied PLMXML dependency Artifact reference is malformed or duplicated.",
           "is_retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "error_code": "simulation_environment_not_found",
-          "message_template": "The Simulation environment is unavailable or not visible.",
+          "error_code": "plmxml_dependency_media_type_mismatch",
+          "message_template": "A dependency Artifact media type does not match the PLMXML reference.",
           "is_retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "error_code": "simulation_run_not_found",
-          "message_template": "The Simulation run is unavailable or not visible.",
+          "error_code": "plmxml_dependency_artifact_unavailable",
+          "message_template": "A dependency Artifact is unavailable or outside the caller scope.",
           "is_retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "error_code": "simulation_result_not_ready",
-          "message_template": "The Simulation run has no completed result artifacts.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different Simulation request.",
+          "error_code": "plmxml_dependency_artifact_hash_mismatch",
+          "message_template": "A dependency Artifact does not match its immutable SHA-256 reference.",
           "is_retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_insert_mode_required",
+          "message_template": "PLMXML insertion requires an explicit model-only or selected-hierarchy mode.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_hierarchy_selection_invalid",
+          "message_template": "The selected hierarchy identities are invalid for this inspected PLMXML.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_inspection_changed",
+          "message_template": "The inspected PLMXML projection changed before the requested write.",
+          "is_retryable": false,
+          "is_caller_error": true
         }
       ],
       "transaction_policy": {
@@ -410763,6 +413957,62 @@
               }
             },
             "additionalProperties": false
+          },
+          "dependency_artifacts": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {
+              "type": "object",
+              "required": [
+                "location",
+                "artifact_ref"
+              ],
+              "properties": {
+                "location": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                },
+                "artifact_ref": {
+                  "type": "object",
+                  "required": [
+                    "artifact_id",
+                    "media_type",
+                    "sha256",
+                    "byte_size",
+                    "version"
+                  ],
+                  "properties": {
+                    "artifact_id": {
+                      "type": "string"
+                    },
+                    "media_type": {
+                      "type": "string",
+                      "enum": [
+                        "application/plmxml+xml",
+                        "application/vnd.siemens.plmxml+xml",
+                        "model/vnd.jt",
+                        "model/jt"
+                      ]
+                    },
+                    "sha256": {
+                      "type": "string",
+                      "pattern": "^(sha256:)?[0-9a-f]{64}$"
+                    },
+                    "byte_size": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            }
           },
           "display_name": {
             "type": "string",
@@ -410946,7 +414196,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:06cbca2840af8fbcfc30ed76ea26ba41d86249a6a8cd18cba34b9e58296282df",
+      "schema_hash": "sha256:6ec465d57334a4bde973e335b35b697c359133077bc3ff8caebff86a90171665",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -410972,116 +414222,128 @@
       "deprecation_message": null,
       "domain_errors": [
         {
-          "code": "source_resolver_unavailable",
-          "meaning": "A required owning-domain resolver is unavailable.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "source_version_mismatch",
-          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "code": "plmxml_artifact_hash_mismatch",
+          "meaning": "The PLMXML Artifact bytes do not match the immutable reference hash.",
           "retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "code": "parameter_set_not_found",
-          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "code": "plmxml_artifact_unavailable",
+          "meaning": "The immutable PLMXML Artifact is unavailable or outside the caller scope.",
           "retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "code": "simulation_profile_not_found",
-          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "code": "plmxml_dependency_artifact_required",
+          "meaning": "Every external PLMXML dependency must resolve to an immutable Artifact.",
           "retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "code": "solver_not_allowed",
-          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "code": "plmxml_dependency_artifact_invalid",
+          "meaning": "A supplied PLMXML dependency Artifact reference is malformed or duplicated.",
           "retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "code": "simulation_environment_not_found",
-          "meaning": "The Simulation environment is unavailable or not visible.",
+          "code": "plmxml_dependency_media_type_mismatch",
+          "meaning": "A dependency Artifact media type does not match the PLMXML reference.",
           "retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "code": "simulation_run_not_found",
-          "meaning": "The Simulation run is unavailable or not visible.",
+          "code": "plmxml_dependency_artifact_unavailable",
+          "meaning": "A dependency Artifact is unavailable or outside the caller scope.",
           "retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "code": "simulation_result_not_ready",
-          "meaning": "The Simulation run has no completed result artifacts.",
-          "retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "code": "plmxml_dependency_artifact_hash_mismatch",
+          "meaning": "A dependency Artifact does not match its immutable SHA-256 reference.",
           "retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_insert_mode_required",
+          "meaning": "PLMXML insertion requires an explicit model-only or selected-hierarchy mode.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_hierarchy_selection_invalid",
+          "meaning": "The selected hierarchy identities are invalid for this inspected PLMXML.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_inspection_changed",
+          "meaning": "The inspected PLMXML projection changed before the requested write.",
+          "retryable": false,
+          "is_caller_error": true
         }
       ],
       "domain_errors_complete": false,
       "capability_version_gid": "cv2_12114417aac19bb2a089b83f",
       "error_schema": [
         {
-          "error_code": "source_resolver_unavailable",
-          "message_template": "A required owning-domain resolver is unavailable.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "source_version_mismatch",
-          "message_template": "A referenced source no longer matches its immutable hash or version.",
+          "error_code": "plmxml_artifact_hash_mismatch",
+          "message_template": "The PLMXML Artifact bytes do not match the immutable reference hash.",
           "is_retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "error_code": "parameter_set_not_found",
-          "message_template": "The immutable parameter set is unavailable or not visible.",
+          "error_code": "plmxml_artifact_unavailable",
+          "message_template": "The immutable PLMXML Artifact is unavailable or outside the caller scope.",
           "is_retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "error_code": "simulation_profile_not_found",
-          "message_template": "The immutable Simulation profile is unavailable or not visible.",
+          "error_code": "plmxml_dependency_artifact_required",
+          "message_template": "Every external PLMXML dependency must resolve to an immutable Artifact.",
           "is_retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "error_code": "solver_not_allowed",
-          "message_template": "The requested solver coordinate is not in the governed allowlist.",
+          "error_code": "plmxml_dependency_artifact_invalid",
+          "message_template": "A supplied PLMXML dependency Artifact reference is malformed or duplicated.",
           "is_retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "error_code": "simulation_environment_not_found",
-          "message_template": "The Simulation environment is unavailable or not visible.",
+          "error_code": "plmxml_dependency_media_type_mismatch",
+          "message_template": "A dependency Artifact media type does not match the PLMXML reference.",
           "is_retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "error_code": "simulation_run_not_found",
-          "message_template": "The Simulation run is unavailable or not visible.",
+          "error_code": "plmxml_dependency_artifact_unavailable",
+          "message_template": "A dependency Artifact is unavailable or outside the caller scope.",
           "is_retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
         },
         {
-          "error_code": "simulation_result_not_ready",
-          "message_template": "The Simulation run has no completed result artifacts.",
-          "is_retryable": true,
-          "is_caller_error": false
-        },
-        {
-          "error_code": "idempotency_conflict",
-          "message_template": "The idempotency key is bound to a different Simulation request.",
+          "error_code": "plmxml_dependency_artifact_hash_mismatch",
+          "message_template": "A dependency Artifact does not match its immutable SHA-256 reference.",
           "is_retryable": false,
-          "is_caller_error": false
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_insert_mode_required",
+          "message_template": "PLMXML insertion requires an explicit model-only or selected-hierarchy mode.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_hierarchy_selection_invalid",
+          "message_template": "The selected hierarchy identities are invalid for this inspected PLMXML.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_inspection_changed",
+          "message_template": "The inspected PLMXML projection changed before the requested write.",
+          "is_retryable": false,
+          "is_caller_error": true
         }
       ],
       "transaction_policy": {
@@ -411138,7 +414400,542 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:816d59b9744c7f82654cd1f0037193d1b2e061312850d9a2ff399f2f24372f67"
+      "business_definition_hash": "sha256:cfdca7fb4e59c1fb7c9fd7550e786938a8f4cb3d7560ab6a259c20bfe3f25f10"
+    },
+    {
+      "id": "simulation.plmxml.environment.inspect",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.plmxml.environment.inspect",
+      "description": "Inspect one immutable PLMXML Artifact and return selectable model and alternate-hierarchy projections without mutating an environment.",
+      "use_when": "Inspect one immutable PLMXML Artifact and return selectable model and alternate-hierarchy projections without mutating an environment.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Return a bounded, immutable inspection of one PLMXML Artifact so a user can explicitly choose which model and alternate-hierarchy projections to import.",
+      "business_acceptance_criteria": [
+        "The source and every dependency are immutable Artifact references whose bytes match the declared SHA-256 hash.",
+        "An inspection hash binds the user's explicit import decision to the exact parsed projection.",
+        "Rejected input creates no partial workspace, document, hierarchy or placement state."
+      ],
+      "business_invariants": [],
+      "no_business_invariant_reason": "Artifact immutability, explicit selection, optimistic concurrency and one Simulation transaction fully determine this atomic boundary.",
+      "side_effect_level": "read",
+      "side_effects": "Reads simulation domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "artifact",
+          "payload_path": "artifact_ref.artifact_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "artifact_ref"
+        ],
+        "properties": {
+          "artifact_ref": {
+            "type": "object",
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size",
+              "version"
+            ],
+            "properties": {
+              "artifact_id": {
+                "type": "string"
+              },
+              "media_type": {
+                "type": "string",
+                "enum": [
+                  "application/plmxml+xml",
+                  "application/vnd.siemens.plmxml+xml"
+                ]
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^(sha256:)?[0-9a-f]{64}$"
+              },
+              "byte_size": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "artifact_sha256",
+          "semantic_hash",
+          "algorithm_version",
+          "inspection_hash",
+          "hierarchies",
+          "dependencies",
+          "report"
+        ],
+        "properties": {
+          "artifact_sha256": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "semantic_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "algorithm_version": {
+            "type": "string"
+          },
+          "inspection_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "hierarchies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "projection_identity",
+                "name",
+                "placement_count"
+              ],
+              "properties": {
+                "projection_identity": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "placement_count": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "location",
+                "media_type"
+              ],
+              "properties": {
+                "location": {
+                  "type": "string"
+                },
+                "media_type": {
+                  "type": "string",
+                  "enum": [
+                    "application/plmxml+xml",
+                    "model/vnd.jt"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "report": {
+            "type": "object",
+            "required": [
+              "semantic_hash",
+              "document_count",
+              "hierarchy_count",
+              "placement_count"
+            ],
+            "properties": {
+              "semantic_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "document_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "hierarchy_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "placement_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "dependency_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "algorithm_version": {
+                "type": "string"
+              },
+              "unresolved_refs": {
+                "type": "array"
+              },
+              "omitted_ai00_only_records": {
+                "type": "array"
+              },
+              "original_artifact_passthrough_eligible": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "artifact_sha256",
+          "semantic_hash",
+          "algorithm_version",
+          "inspection_hash",
+          "hierarchies",
+          "dependencies",
+          "report"
+        ],
+        "properties": {
+          "artifact_sha256": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "semantic_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "algorithm_version": {
+            "type": "string"
+          },
+          "inspection_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "hierarchies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "projection_identity",
+                "name",
+                "placement_count"
+              ],
+              "properties": {
+                "projection_identity": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "placement_count": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "location",
+                "media_type"
+              ],
+              "properties": {
+                "location": {
+                  "type": "string"
+                },
+                "media_type": {
+                  "type": "string",
+                  "enum": [
+                    "application/plmxml+xml",
+                    "model/vnd.jt"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "report": {
+            "type": "object",
+            "required": [
+              "semantic_hash",
+              "document_count",
+              "hierarchy_count",
+              "placement_count"
+            ],
+            "properties": {
+              "semantic_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "document_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "hierarchy_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "placement_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "dependency_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "algorithm_version": {
+                "type": "string"
+              },
+              "unresolved_refs": {
+                "type": "array"
+              },
+              "omitted_ai00_only_records": {
+                "type": "array"
+              },
+              "original_artifact_passthrough_eligible": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:fdf7a9da5f19852358713fc416c137da96caed8cc5c8ffa10477b4a482093069",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "plmxml_artifact_hash_mismatch",
+          "meaning": "The PLMXML Artifact bytes do not match the immutable reference hash.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_artifact_unavailable",
+          "meaning": "The immutable PLMXML Artifact is unavailable or outside the caller scope.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_dependency_artifact_required",
+          "meaning": "Every external PLMXML dependency must resolve to an immutable Artifact.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_dependency_artifact_invalid",
+          "meaning": "A supplied PLMXML dependency Artifact reference is malformed or duplicated.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_dependency_media_type_mismatch",
+          "meaning": "A dependency Artifact media type does not match the PLMXML reference.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_dependency_artifact_unavailable",
+          "meaning": "A dependency Artifact is unavailable or outside the caller scope.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_dependency_artifact_hash_mismatch",
+          "meaning": "A dependency Artifact does not match its immutable SHA-256 reference.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_insert_mode_required",
+          "meaning": "PLMXML insertion requires an explicit model-only or selected-hierarchy mode.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_hierarchy_selection_invalid",
+          "meaning": "The selected hierarchy identities are invalid for this inspected PLMXML.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_inspection_changed",
+          "meaning": "The inspected PLMXML projection changed before the requested write.",
+          "retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_c879f93cabc373c9bb98af8c",
+      "error_schema": [
+        {
+          "error_code": "plmxml_artifact_hash_mismatch",
+          "message_template": "The PLMXML Artifact bytes do not match the immutable reference hash.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_artifact_unavailable",
+          "message_template": "The immutable PLMXML Artifact is unavailable or outside the caller scope.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_dependency_artifact_required",
+          "message_template": "Every external PLMXML dependency must resolve to an immutable Artifact.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_dependency_artifact_invalid",
+          "message_template": "A supplied PLMXML dependency Artifact reference is malformed or duplicated.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_dependency_media_type_mismatch",
+          "message_template": "A dependency Artifact media type does not match the PLMXML reference.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_dependency_artifact_unavailable",
+          "message_template": "A dependency Artifact is unavailable or outside the caller scope.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_dependency_artifact_hash_mismatch",
+          "message_template": "A dependency Artifact does not match its immutable SHA-256 reference.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_insert_mode_required",
+          "message_template": "PLMXML insertion requires an explicit model-only or selected-hierarchy mode.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_hierarchy_selection_invalid",
+          "message_template": "The selected hierarchy identities are invalid for this inspected PLMXML.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_inspection_changed",
+          "message_template": "The inspected PLMXML projection changed before the requested write.",
+          "is_retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.plmxml.environment.inspect:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.plmxml.environment.inspect@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.plmxml.environment.inspect@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.plmxml.environment.inspect@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.plmxml.environment.inspect@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.plmxml.environment.inspect@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.plmxml.environment.inspect@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.plmxml.environment.inspect@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:7b67a90fe76e9c3d56cd5e20459f83d67cff8a63d6185244b846811d017886f3"
     },
     {
       "id": "simulation.result.compare",
@@ -444154,7 +447951,7 @@
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:04f3c7b1e55b849142a709d422bb84bc142e7effd0d6f6445b2d5ead51aa7405"
+      "artifact_hash": "sha256:3f3db2bef95cc2d8c68f084e0fe94f1d0dae6100858f0feadb095faa0f9b3dcd"
     },
     {
       "plugin_id": "official.device",
@@ -444202,8 +447999,8 @@
       "plugin_id": "official.simulation",
       "module": "simulation_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:0101a532b3c74da890307b21cd6ebf2588ead1bc944bb6baa769d573a27ad3c3"
+      "artifact_hash": "sha256:bb7e6795653fa0d53b5cdd187dfa56b30027c53b3b870b2065e8ea0b8e1c4c85"
     }
   ],
-  "created_at": "2026-09-11T01:32:12.691765Z"
+  "created_at": "2026-09-11T06:01:48.531856Z"
 }

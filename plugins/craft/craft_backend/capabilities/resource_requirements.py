@@ -248,6 +248,27 @@ def search_resource_requirements(payload: dict[str, Any], _context: CapabilityCo
     return CapabilityOutput(data={"items": page, "next_cursor": page[-1]["gid"] if len(rows) > page_size else None})
 
 
+def get_resource_requirement(payload: dict[str, Any], _context: CapabilityContext) -> CapabilityOutput:
+    gid = normalize_nonblank(payload.get("gid"), "gid", 64)
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT gid,resource_type,code,name,attributes,source,status,resource_version,"
+                "created_by,updated_by,created_at,updated_at FROM workmanship_craft_resource_requirements "
+                "WHERE gid=%s", (gid,),
+            )
+            row = cur.fetchone()
+            if not row:
+                raise CapabilityBusinessError("resource_not_found", "resource_not_found")
+            item = _transport(dict(row))
+            cur.execute(
+                "SELECT gid,resource_gid,alias_value,normalized_value,created_at,updated_at "
+                "FROM workmanship_craft_resource_aliases WHERE resource_gid=%s ORDER BY normalized_value", (gid,),
+            )
+            item["aliases"] = [_transport(dict(alias)) for alias in cur.fetchall()]
+    return CapabilityOutput(data=item)
+
+
 def create_resource_requirement(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
     resource_type = normalize_resource_type(payload.get("resource_type"))
     code = normalize_nonblank(payload.get("code"), "code", 128)
@@ -505,6 +526,10 @@ STAGING_ROW = _object({
 
 
 SCHEMAS: dict[str, tuple[dict[str, Any], dict[str, Any]]] = {
+    "craft.resource_requirement.get": (
+        _object({"gid": STRING}, "gid"),
+        RESOURCE_ROW,
+    ),
     "craft.resource_requirement.search": (
         _object({"resource_type": RESOURCE_TYPE, "status": {"type": "string", "enum": ["active", "retired", "all"]}, "q": {"type": "string", "maxLength": 200}, "cursor": {"type": "string"}, "page_size": {"type": "integer", "minimum": 1, "maximum": 200}}),
         _object({"items": {"type": "array", "maxItems": 200, "items": RESOURCE_ROW}, "next_cursor": CURSOR}, "items", "next_cursor"),
@@ -545,7 +570,7 @@ SCHEMAS: dict[str, tuple[dict[str, Any], dict[str, Any]]] = {
 
 
 def _spec(capability_id: str, handler: Callable[..., CapabilityOutput]) -> tuple[CapabilitySpec, Callable[..., CapabilityOutput]]:
-    is_read = capability_id.endswith(".search")
+    is_read = capability_id.endswith((".search", ".get"))
     noun = capability_id.removeprefix("craft.resource_requirement.")
     input_schema, output_schema = SCHEMAS[capability_id]
     budget = CapabilityExecutionBudget(collection_policy=CapabilityCollectionPolicy.PAGED, max_page_size=200) if is_read else None
@@ -570,6 +595,7 @@ def _spec(capability_id: str, handler: Callable[..., CapabilityOutput]) -> tuple
 
 def register_resource_requirement_capabilities(registry: Any) -> None:
     handlers = {
+        "craft.resource_requirement.get": get_resource_requirement,
         "craft.resource_requirement.search": search_resource_requirements,
         "craft.resource_requirement.create": create_resource_requirement,
         "craft.resource_requirement.update": update_resource_requirement,
@@ -588,7 +614,7 @@ __all__ = [
     "RESOURCE_LINK_TYPES", "RESOURCE_TYPES_BY_LINK", "TC_RESOURCE_NODES", "SCHEMAS",
     "normalize_nonblank", "normalize_resource_type", "normalize_resource_match_value",
     "validate_resource_link", "ensure_resource_not_referenced", "resolve_tc_resource_for_import",
-    "register_resource_requirement_capabilities", "search_resource_requirements",
+    "register_resource_requirement_capabilities", "search_resource_requirements", "get_resource_requirement",
     "create_resource_requirement", "update_resource_requirement", "retire_resource_requirement",
     "create_resource_alias", "delete_resource_alias", "search_resource_staging",
     "resolve_resource_staging", "ignore_resource_staging",

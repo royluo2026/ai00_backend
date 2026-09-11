@@ -178,7 +178,7 @@ public sealed class OutcomeUnknownRecoveryTests : IDisposable
         Assert.Equal(2,recovered.Steps.GetArrayLength());
         Assert.Equal("invocation_not_started",recovered.Steps[1].GetProperty("error_code").GetString());
     }
-    [Fact] public void APreviouslyInconclusiveManualReviewGetsOneUpgradedProbeAttempt()
+    [Fact] public void APreviouslyInconclusiveManualReviewCanBeProbedAgainAfterAnotherAppRestart()
     {
         using var key = new DeviceSigningKeyStore(root).GetOrCreate();
         var journal = new AppPlanJournal(Path.Combine(root,"journal"));
@@ -196,7 +196,7 @@ public sealed class OutcomeUnknownRecoveryTests : IDisposable
 
         Assert.Equal(original.ToJson(), retry.ToJson());
         journal.Append("reconciliation_retry_v3","plan-002","{}");
-        Assert.Empty(Worker(new AppPlanJournal(journal.Path),adapter,key).Recover());
+        Assert.Single(Worker(new AppPlanJournal(journal.Path),adapter,key).Recover());
     }
     [Theory]
     [InlineData("plan_reconciliation_invalid", true)]

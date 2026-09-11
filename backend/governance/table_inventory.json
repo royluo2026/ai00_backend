@@ -1608,6 +1608,11 @@
       "runtime_domain": "simulation"
     },
     {
+      "table": "workmanship_sim_plmxml_restore_requests",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
       "table": "workmanship_sim_profiles",
       "owner": "simulation",
       "runtime_domain": "simulation"

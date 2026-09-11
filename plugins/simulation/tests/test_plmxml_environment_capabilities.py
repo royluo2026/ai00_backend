@@ -5,9 +5,12 @@ import json
 
 from backend.capability_v2.provider_contracts import CapabilityContext
 from plugins.simulation.simulation_backend.capabilities.plmxml_environments import PlmxmlEnvironmentProvider, specs
+from plugins.simulation.simulation_backend.capabilities.provider import descriptor_for
 
 
 XML = b'<PLMXML><ProductView id="a" name="ALT" usage="variant"/></PLMXML>'
+XML_TWO = b'<PLMXML><ProductView id="a" name="ALT A" usage="variant"/><ProductView id="b" name="ALT B" usage="variant"/></PLMXML>'
+XML_DEP = b'<PLMXML><Representation location="parts/a.jt"/></PLMXML>'
 
 
 class _Artifacts:
@@ -20,7 +23,13 @@ class _Artifacts:
 
 
 class _Repo:
-    def import_environment_projection(self, **kwargs): return {"workspace_gid": kwargs["workspace_gid"], "document_gid": "9", "hierarchy_gids": ["10"], "workspace_row_version": 2, "cache_revision_hash": "sha256:" + "0" * 64}
+    def __init__(self): self.import_calls = []
+    def import_environment_projection(self, **kwargs):
+        self.import_calls.append(kwargs)
+        return {"workspace_gid": kwargs["workspace_gid"], "document_gid": "9", "hierarchy_gids": ["10"], "workspace_row_version": 2, "cache_revision_hash": "sha256:" + "0" * 64}
+    def restore_environment_projection(self, **kwargs):
+        self.restore_call = kwargs
+        return {"workspace_gid": "11", "version_gid": "12", "document_gid": "13", "hierarchy_gids": ["14"], "workspace_row_version": 2, "cache_revision_hash": "sha256:" + "0" * 64}
     def load_environment_runtime_model(self, **kwargs):
         from plugins.simulation.simulation_backend.domain.plmxml_environment_codec import EnvironmentRuntimeModel
         return EnvironmentRuntimeModel(environment_gid=kwargs["workspace_gid"], documents=(), hierarchies=())
@@ -63,7 +72,7 @@ def test_frozen_runtime_package_prepares_one_top_level_open_with_staged_dependen
     assert output["open_payload"]["package_dependencies"][1]["artifact_ref"]["media_type"] == "model/vnd.jt"
     assert output["manifest"]["open_only_top_level"] is True
     from backend.capabilities.validation_next import validate_payload
-    validate_payload(dict(specs(provider)[2][0].output_schema), output, label="output")
+    validate_payload(dict(specs(provider)[5][0].output_schema), output, label="output")
 
 
 def test_bound_runtime_supplies_device_identity_for_device_bound_documents():
@@ -108,7 +117,106 @@ def test_plmxml_import_and_export_are_separate_artifact_capabilities():
     exported = provider.export_environment({"workspace_gid": "10", "idempotency_key": "export-1"}, ctx)
     assert imported.data["report"]["hierarchy_count"] == 1
     assert exported.data["artifact_ref"]["artifact_id"] == "out"
-    assert [item[0].id for item in specs(provider)] == ["simulation.plmxml.environment.import", "simulation.plmxml.environment.export", "simulation.environment.runtime_package.prepare"]
+    assert [item[0].id for item in specs(provider)] == [
+        "simulation.plmxml.environment.inspect", "simulation.environment.restore_from_plmxml",
+        "simulation.environment.plmxml.insert", "simulation.plmxml.environment.import",
+        "simulation.plmxml.environment.export", "simulation.environment.runtime_package.prepare",
+    ]
     from backend.capabilities.validation_next import validate_payload
-    for spec, output in zip((item[0] for item in specs(provider)), (imported.data, exported.data)):
+    for spec, output in zip((specs(provider)[3][0], specs(provider)[4][0]), (imported.data, exported.data)):
         validate_payload(dict(spec.output_schema), output, label="output")
+
+
+def test_plmxml_inspect_is_read_only_and_returns_explicit_hierarchy_choices():
+    repo = _Repo()
+    provider = PlmxmlEnvironmentProvider(repo, _Artifacts())
+    digest = hashlib.sha256(XML).hexdigest()
+    output = provider.inspect_environment({"artifact_ref": {
+        "artifact_id": "in", "media_type": "application/plmxml+xml", "sha256": digest,
+        "byte_size": len(XML), "version": 1,
+    }}, CapabilityContext(user_gid="30", team_gid="20", request_id="inspect-1")).data
+    assert output["inspection_hash"].startswith("sha256:")
+    assert output["artifact_sha256"] == "sha256:" + digest
+    assert output["hierarchies"] == [{"projection_identity": "a", "name": "ALT", "placement_count": 0}]
+    assert output["dependencies"] == []
+    assert not hasattr(repo, "last_import")
+    from backend.capabilities.validation_next import validate_payload
+    validate_payload(dict(specs(provider)[0][0].output_schema), output, label="output")
+
+
+def test_plmxml_insert_requires_matching_inspection_and_explicit_hierarchy_selection():
+    class Artifacts(_Artifacts):
+        def read(self, reference, context): return XML_TWO
+    repo = _Repo(); provider = PlmxmlEnvironmentProvider(repo, Artifacts())
+    ref = {"artifact_id":"in","media_type":"application/plmxml+xml",
+           "sha256":hashlib.sha256(XML_TWO).hexdigest(),"byte_size":len(XML_TWO),"version":1}
+    ctx = CapabilityContext(user_gid="30", team_gid="20", request_id="insert-1")
+    inspection = provider.inspect_environment({"artifact_ref": ref}, ctx).data
+    inserted = provider.insert_environment({"workspace_gid":"10","expected_row_version":1,
+        "artifact_ref":ref,"display_name":"source","mode":"model_and_selected_hierarchies",
+        "selected_hierarchy_identities":["b"],"inspection_hash":inspection["inspection_hash"],
+        "idempotency_key":"insert-1"}, ctx).data
+    assert inserted["selected_hierarchy_identities"] == ["b"]
+    assert [item.projection_identity for item in repo.import_calls[-1]["projection"].hierarchies] == ["b"]
+
+
+def test_plmxml_restore_creates_new_environment_without_reusing_import_contract():
+    repo = _Repo(); provider = PlmxmlEnvironmentProvider(repo, _Artifacts())
+    ref = {"artifact_id":"in","media_type":"application/plmxml+xml",
+           "sha256":hashlib.sha256(XML).hexdigest(),"byte_size":len(XML),"version":1}
+    ctx = CapabilityContext(user_gid="30", team_gid="20", request_id="restore-1")
+    inspection = provider.inspect_environment({"artifact_ref": ref}, ctx).data
+    restored = provider.restore_environment({"artifact_ref":ref,"name":"Restored ALT","display_name":"source",
+        "inspection_hash":inspection["inspection_hash"],"idempotency_key":"restore-1"},ctx).data
+    assert restored["workspace_gid"] == "11"
+    assert repo.restore_call["name"] == "Restored ALT"
+
+
+def test_plmxml_restore_fails_closed_until_every_external_dependency_is_an_artifact():
+    import pytest
+    class Artifacts(_Artifacts):
+        def read(self, reference, context):
+            return XML_DEP if reference["artifact_id"] == "in" else b"JT"
+    repo = _Repo(); provider = PlmxmlEnvironmentProvider(repo, Artifacts())
+    ref = {"artifact_id":"in","media_type":"application/plmxml+xml",
+           "sha256":hashlib.sha256(XML_DEP).hexdigest(),"byte_size":len(XML_DEP),"version":1}
+    ctx = CapabilityContext(user_gid="30", team_gid="20", request_id="restore-deps")
+    inspection = provider.inspect_environment({"artifact_ref": ref}, ctx).data
+    payload = {"artifact_ref":ref,"name":"Restored","display_name":"source",
+        "inspection_hash":inspection["inspection_hash"],"idempotency_key":"restore-deps"}
+    with pytest.raises(Exception, match="plmxml_dependency_artifact_required"):
+        provider.restore_environment(payload, ctx)
+    dep = {"artifact_id":"jt","media_type":"model/vnd.jt","sha256":hashlib.sha256(b"JT").hexdigest(),"byte_size":2,"version":1}
+    provider.restore_environment({**payload, "dependency_artifacts":[{"location":"parts/a.jt","artifact_ref":dep}]}, ctx)
+    assert repo.restore_call["resolved_dependencies"]["parts/a.jt"]["artifact_id"] == "jt"
+
+
+def test_plmxml_capabilities_publish_every_stable_dependency_and_inspection_error():
+    provider = PlmxmlEnvironmentProvider(_Repo(), _Artifacts())
+    by_id = {spec.id: descriptor_for(spec) for spec, _ in specs(provider)}
+    inspect_codes = {error.code for error in by_id["simulation.plmxml.environment.inspect"].domain_errors}
+    write_codes = {error.code for error in by_id["simulation.environment.plmxml.insert"].domain_errors}
+
+    assert {"plmxml_artifact_hash_mismatch", "plmxml_artifact_unavailable"} <= inspect_codes
+    assert {
+        "plmxml_dependency_artifact_required",
+        "plmxml_dependency_artifact_invalid",
+        "plmxml_dependency_media_type_mismatch",
+        "plmxml_dependency_artifact_unavailable",
+        "plmxml_dependency_artifact_hash_mismatch",
+        "plmxml_insert_mode_required",
+        "plmxml_hierarchy_selection_invalid",
+        "plmxml_inspection_changed",
+    } <= write_codes
+
+
+def test_experimental_plmxml_capabilities_are_exposed_only_to_the_real_web_consumer():
+    descriptors = [descriptor_for(spec) for spec, _ in specs(PlmxmlEnvironmentProvider(_Repo(), _Artifacts()))]
+    for descriptor in descriptors[:3]:
+        assert descriptor.lifecycle_status.value == "experimental"
+        assert descriptor.exposure.web is True
+        assert descriptor.exposure.api is False
+        assert descriptor.exposure.plugin is False
+        assert descriptor.exposure.agent is False
+        assert descriptor.exposure.mcp is False
+        assert not descriptor.business_effect.startswith("Governed ")
