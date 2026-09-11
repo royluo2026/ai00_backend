@@ -56,6 +56,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             new("vismockup.application.probe@1", "sha256:197cfad8bc3453030fdc288ea78c3abc21699274dd48d4482444af4f62380a37"),
             new("vismockup.document.snapshot@1", "sha256:aa7c11c2501026c470a9cc7bfcbbecc7339879c18bf2b6b86f68ed7fc2e1861b"),
             new("vismockup.model.open@1", "sha256:aabd43bb066794c250f7eeed41def7c147a4da7263e813f192efa59a0cb40e34"),
+            new("vismockup.model.insert@1", "sha256:70e68f565989a75406fabb5ffcc5b6f87233f2e55be9a011b202671a26f7c370"),
             new("vismockup.model.close@1", "sha256:a1a27969ab8638c9868b384ccb546aed1ece56219ded7c7ec3bb3d6b19861771"),
             new("vismockup.visibility.change@1", "sha256:6ecb8dd2239a2ca881bfc8d40463778f2b80f15f66f1be50a3ceb91a90bff201"),
             new("vismockup.node.visibility.change@1", "sha256:b93246b1bb189e3f7e488c4ec0528378cbbf97cd2c3fdd547daf0f2007f05f6c"),
@@ -139,6 +140,8 @@ public sealed class VisMockupAdapter : IConnectorAdapter
                 operation.Payload.GetProperty("max_depth").GetInt32()),
             "vismockup.model.open@1" => await OpenManagedFileAsync(
                 operation.Payload.GetProperty("local_artifact_path").GetString() ?? ""),
+            "vismockup.model.insert@1" => await InsertManagedFileAsync(
+                operation.Payload.GetProperty("local_artifact_path").GetString() ?? ""),
             "vismockup.model.close@1" => await CloseManagedFileAsync(),
             "vismockup.visibility.change@1" => await ChangeAllVisibilityAsync(
                 operation.Payload.GetProperty("action").GetString() ?? ""),
@@ -185,6 +188,24 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         return new { opened = true, document_id = document.DocumentId };
     });
 
+    public Task<object> InsertManagedFileAsync(string filePath) => _sta.InvokeAsync<object>(() =>
+    {
+        var safePath = _paths.ValidateModelPath(filePath);
+        var document = _connection.RequireActiveDocument();
+        var expected = Path.GetFullPath(safePath);
+        var existing = document.InsertedDocumentPaths.FirstOrDefault(item =>
+            Path.IsPathFullyQualified(item) &&
+            string.Equals(Path.GetFullPath(item), expected, StringComparison.OrdinalIgnoreCase));
+        var insertedPath = existing ?? document.InsertDocument(expected);
+        return new
+        {
+            document_id = document.DocumentId,
+            inserted_path = insertedPath,
+            inserted_count = document.InsertedDocumentPaths.Count,
+            already_present = existing is not null,
+        };
+    });
+
     public Task<object> CloseManagedFileAsync() => _sta.InvokeAsync<object>(() =>
     {
         var application = _connection.RequireActiveApplication(false);
@@ -210,16 +231,37 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     {
         var document = _connection.RequireActiveDocument();
         var sessionNodeKey = ResolveSessionNodeKey(document, nodeKey);
+        if (action == "isolate")
+        {
+            document.SetAllNodesVisible(false);
+            document.SetNodeVisible(sessionNodeKey, true);
+            return new { node_key = nodeKey, visible = true };
+        }
+
+        bool before;
+        try { before = document.IsNodeVisible(sessionNodeKey); }
+        catch (Exception) { throw new ConnectorNoEffectException("vismockup_node_visibility_lookup_failed"); }
         var visible = action switch
         {
             "show" => true,
             "hide" => false,
-            "toggle_visible" => !document.IsNodeVisible(sessionNodeKey),
-            "isolate" => true,
+            "toggle_visible" => !before,
             _ => throw new ConnectorException("node_visibility_action_unsupported"),
         };
-        if (action == "isolate") document.SetAllNodesVisible(false);
-        document.SetNodeVisible(sessionNodeKey, visible);
+        if (before == visible) return new { node_key = nodeKey, visible };
+
+        try { document.SetNodeVisible(sessionNodeKey, visible); }
+        catch (Exception writeError)
+        {
+            bool after;
+            try { after = document.IsNodeVisible(sessionNodeKey); }
+            catch (Exception) { throw writeError; }
+            if (after == visible) return new { node_key = nodeKey, visible };
+            throw new ConnectorNoEffectException("vismockup_node_visibility_write_rejected");
+        }
+
+        if (document.IsNodeVisible(sessionNodeKey) != visible)
+            throw new ConnectorNoEffectException("vismockup_node_visibility_write_rejected");
         return new { node_key = nodeKey, visible };
     });
 
@@ -234,6 +276,38 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         var document = _connection.RequireActiveDocument();
         document.SetNodeSelected(ResolveSessionNodeKey(document, nodeKey), selected);
         return new { node_key = nodeKey, selected };
+    });
+
+    public Task<bool> ObserveNodeVisibilityAsync(string nodeKey) => _sta.InvokeAsync(() =>
+    {
+        if (!nodeKey.StartsWith("pdm:", StringComparison.Ordinal))
+            return _connection.RequireActiveDocument().IsNodeVisible(nodeKey);
+        var application = _connection.RequireActiveApplication(false);
+        foreach (var document in application.OpenDocuments)
+        {
+            try
+            {
+                var sessionNodeKey = _treeCache!.ResolveSessionNodeKey(document, nodeKey, verifyPrintableName: false);
+                return document.IsNodeVisible(sessionNodeKey);
+            }
+            catch (InvalidDataException) when (_treeCache!.IsNodeKnownForDifferentDocument(document, nodeKey))
+            {
+                // Stable PDM occurrence keys are document-scoped in the cache.
+                // If the signed key is known only for another document, avoid a
+                // costly PLMXML rebuild of this unrelated open document.
+            }
+            catch (InvalidDataException) when (TryHydrateTreeCacheFromActivePlmxml(document))
+            {
+                try
+                {
+                    var sessionNodeKey = _treeCache!.ResolveSessionNodeKey(document, nodeKey, verifyPrintableName: false);
+                    return document.IsNodeVisible(sessionNodeKey);
+                }
+                catch (InvalidDataException) { }
+            }
+            catch (InvalidDataException) { }
+        }
+        throw new ConnectorException("vismockup_recovery_node_unavailable");
     });
 
     private string ResolveSessionNodeKey(IVisMockupDocument document, string key)

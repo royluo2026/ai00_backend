@@ -16,6 +16,7 @@ public interface IVisMockupApplication
 {
     string ProductVersion { get; }
     IVisMockupDocument? ActiveDocument { get; }
+    IReadOnlyList<IVisMockupDocument> OpenDocuments { get; }
     IVisMockupDocument OpenDocument(string path);
     void CloseAllDocuments();
 }
@@ -34,6 +35,8 @@ public interface IVisMockupDocument
     void SetAllNodesVisible(bool visible);
     void ApplyCaptureProfile(CaptureProfile profile);
     string AttachModel(string path);
+    string InsertDocument(string path);
+    IReadOnlyList<string> InsertedDocumentPaths { get; }
     void CaptureImage(string path);
     void ExportPlmxml(string path, int hierarchyIndex);
     void Close();
@@ -389,6 +392,45 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
                         VisMockupDispatch.GetProperty(activeApplication, 69)));
             }
         }
+        public IReadOnlyList<IVisMockupDocument> OpenDocuments
+        {
+            get
+            {
+                var documents = VisMockupDispatch.GetProperty(value, 4);
+                var count = Convert.ToInt32(VisMockupDispatch.GetProperty(documents, 3));
+                if (count <= 0) return [];
+
+                // VisMockup 14.2 exposes the active full document reliably, but
+                // some installations reject the documented DocByIndex dispatch
+                // call.  A single open document is therefore still completely
+                // enumerable without using that unstable member.
+                var activeDocument = ActiveDocument;
+                if (count == 1)
+                    return activeDocument is null ? [] : [activeDocument];
+
+                var activeApplication = VisMockupDispatch.GetProperty(value, 21);
+                var saveOptions = new DynamicPlmxmlSaveOptions(VisMockupDispatch.GetProperty(activeApplication, 69));
+                var result = new List<IVisMockupDocument>(count);
+                try
+                {
+                    for (var index = 0; index < count; index++)
+                    {
+                        var document = VisMockupDispatch.GetProperty(documents, 7, index);
+                        var views = VisMockupDispatch.GetProperty(document, 3);
+                        if (Convert.ToInt32(VisMockupDispatch.GetProperty(views, 1)) <= 0) continue;
+                        var view = VisMockupDispatch.GetProperty(views, 2, 0);
+                        result.Add(new DynamicDocument(document, view, saveOptions));
+                    }
+                }
+                catch (Exception error) when (error is not ConnectorException)
+                {
+                    // With multiple documents we must not mistake an incomplete
+                    // enumeration for proof that the target document is closed.
+                    throw new ConnectorException("vismockup_document_enumeration_unavailable");
+                }
+                return result;
+            }
+        }
         public IVisMockupDocument OpenDocument(string path)
         {
             var previousDocumentId = ActiveDocument?.DocumentId;
@@ -452,6 +494,32 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
             dynamic view = Value.ActiveView;
             dynamic created = view.AddModel(path);
             return Convert.ToString(created.GetNodeKey()) ?? throw new InvalidOperationException("Attached node has no key");
+        }
+        public IReadOnlyList<string> InsertedDocumentPaths
+        {
+            get
+            {
+                var count = Convert.ToInt32(VisMockupDispatch.GetProperty(value, 8));
+                var result = new List<string>(count);
+                for (var index = 0; index < count; index++)
+                    result.Add(Convert.ToString(VisMockupDispatch.GetProperty(value, 12, index)) ?? "");
+                return result;
+            }
+        }
+        public string InsertDocument(string path)
+        {
+            _ = VisMockupDispatch.InvokeMethod(value, 1, path);
+            var expected = Path.GetFullPath(path);
+            var deadline = DateTimeOffset.UtcNow.AddMinutes(2);
+            while (DateTimeOffset.UtcNow < deadline)
+            {
+                var inserted = InsertedDocumentPaths.FirstOrDefault(item =>
+                    Path.IsPathFullyQualified(item) &&
+                    string.Equals(Path.GetFullPath(item), expected, StringComparison.OrdinalIgnoreCase));
+                if (inserted is not null) return inserted;
+                Thread.Sleep(250);
+            }
+            throw new ConnectorException("vismockup_document_insert_timeout");
         }
         public void CaptureImage(string path) => Value.ActiveView.CaptureImage(path);
         public void ExportPlmxml(string path, int hierarchyIndex)

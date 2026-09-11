@@ -208,9 +208,18 @@ def probe_context(plan_row, recovery, *, last_journal_sequence):
     # no original Outcome, every side effect needs a probe; read execution is unproven.
     invoked = plan['steps'][:len(original.steps)] if original else plan['steps']
     has_effects = any(s['side_effect_classification'] != 'read' for s in plan['steps'])
-    required = [dict(step_id=s['step_id'], probe_id=s['post_condition_probe_id'])
-                for s in invoked if s['post_condition_probe_id']
-                and (s['side_effect_classification'] != 'read' or not has_effects)]
+    required = []
+    for step in invoked:
+        if not step['post_condition_probe_id'] or not (
+                step['side_effect_classification'] != 'read' or not has_effects):
+            continue
+        probe = dict(step_id=step['step_id'], probe_id=step['post_condition_probe_id'])
+        payload = step.get('payload') or {}
+        if (step['operation_id'] == 'vismockup.node.visibility.change@1'
+                and payload.get('action') in {'show', 'hide'}):
+            probe['probe_input'] = dict(node_key=payload['node_key'],
+                expected_visible=payload['action'] == 'show')
+        required.append(probe)
     probed = {p['step_id'] for p in required}
     completed = {s.step_id for s in original.steps if s.status == 'succeeded'} if original else set()
     coverage = dict(

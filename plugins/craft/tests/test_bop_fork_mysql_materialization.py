@@ -44,6 +44,48 @@ def test_cross_repository_fork_allocates_new_gid_and_keeps_lineage():
     assert node_insert[5]=="400" and node_insert[6]=="501"
 
 
+def test_cross_repository_fork_reads_organization_visible_source_version_across_storage_partitions():
+    class CrossPartitionCursor(Cursor):
+        def execute(self,sql,args=()):
+            super().execute(sql,args)
+            if "SELECT s.repository_gid" in sql and "v.tenant_gid=%s" in sql:self.rows=[]
+    cursor=CrossPartitionCursor("400")
+    result=MysqlBopForkStore()._copy_version(
+        cursor,source_version_gid="501",repository_gid="402",space_head_gid="601",
+        run_gid="701",fork_depth="all",tenant_gid="target-partition",actor_gid="30",
+    )
+    source_query=next((sql,args) for sql,args in cursor.executed if "SELECT s.repository_gid" in sql)
+    assert source_query[1]==("501",)
+    assert result["copied_node_count"]==1
+
+
+def test_repository_fork_preview_accepts_organization_visible_source_version_across_partitions():
+    class PreviewCursor:
+        def __init__(self):self.rows=[];self.executed=[];self.rowcount=1
+        def execute(self,sql,args=()):
+            self.executed.append((sql,args))
+            if "SELECT v.gid FROM workmanship_craft_bop_space_versions" in sql:
+                self.rows=[] if "v.tenant_gid=%s" in sql else [{"gid":"501"}]
+            else:self.rows=[]
+        def fetchone(self):return self.rows[0] if self.rows else None
+        def __enter__(self):return self
+        def __exit__(self,*_):return False
+    class Connection:
+        def __init__(self,cursor):self.value=cursor
+        def cursor(self):return self.value
+        def __enter__(self):return self
+        def __exit__(self,*_):return False
+    cursor=PreviewCursor()
+    result=MysqlBopForkStore(lambda:Connection(cursor)).preview_repository(
+        tenant_gid="target-partition",actor_gid="30",source_version_gid="501",
+        target_project_gid="200",fork_depth="all",include_personal_migration=False,
+        expected_target_slot=0,idempotency_key="preview-cross-partition",
+    )
+    source_query=next((sql,args) for sql,args in cursor.executed if "SELECT v.gid FROM workmanship_craft_bop_space_versions" in sql)
+    assert source_query[1]==("501",)
+    assert result["source_version_gid"]=="501"
+
+
 def test_large_cross_repository_fork_batches_database_writes():
     class ManyCursor(Cursor):
         def execute(self, sql, args=()):

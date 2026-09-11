@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS `workmanship_sim_runtime_package_projections` (
+  `gid` BIGINT UNSIGNED NOT NULL,
+  `workspace_gid` BIGINT UNSIGNED NOT NULL,
+  `version_gid` BIGINT UNSIGNED NOT NULL,
+  `tenant_gid` BIGINT UNSIGNED NOT NULL,
+  `actor_gid` BIGINT UNSIGNED NOT NULL,
+  `connector_plan_id` VARCHAR(256) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `state` VARCHAR(24) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `manifest_hash` CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `runtime_package_artifact_ref_json` JSON NOT NULL,
+  `connector_device_id` VARCHAR(191) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `report_json` JSON NOT NULL,
+  `created_at` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (`gid`),
+  UNIQUE KEY `uq_sim_runtime_package_plan` (`connector_plan_id`),
+  KEY `idx_sim_runtime_package_workspace` (`tenant_gid`,`workspace_gid`,`version_gid`,`actor_gid`,`updated_at`),
+  CONSTRAINT `fk_sim_runtime_package_workspace` FOREIGN KEY (`workspace_gid`) REFERENCES `workmanship_sim_workspaces` (`gid`),
+  CONSTRAINT `fk_sim_runtime_package_version` FOREIGN KEY (`version_gid`) REFERENCES `workmanship_sim_workspace_versions` (`gid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

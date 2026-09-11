@@ -159,7 +159,7 @@ Create an immutable ordered VPPS adjustment.
   "catalog_release": "<catalog_release>",
   "major_version": 1,
   "payload": {
-    "expected_current": "example",
+    "expected_current": null,
     "group_gid": "1",
     "idempotency_key": "example",
     "members": []

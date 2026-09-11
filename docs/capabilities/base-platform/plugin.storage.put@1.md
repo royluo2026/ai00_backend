@@ -104,7 +104,7 @@ Create or replace a value using optimistic versioning.
   "major_version": 1,
   "payload": {
     "key": "example",
-    "value": "example"
+    "value": null
   }
 }
 ```

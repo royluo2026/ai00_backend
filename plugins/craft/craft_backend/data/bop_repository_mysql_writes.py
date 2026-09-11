@@ -19,10 +19,10 @@ def save_space_version(store, *, space_gid, tenant_gid, actor_gid, expected_head
         raise BopRepositoryError("version_kind_invalid")
     with store._connect() as conn, conn.cursor() as cur:
         def effect():
-            head = store._row(cur, "SELECT h.gid,h.row_version,h.content_hash,s.repository_gid FROM workmanship_craft_bop_space_heads h JOIN workmanship_craft_bop_spaces s ON s.gid=h.space_gid WHERE h.space_gid=%s AND h.tenant_gid=%s AND s.deleted_at IS NULL FOR UPDATE", (space_gid, tenant_gid), "space_not_found")
+            head = store._row(cur, "SELECT h.gid,h.row_version,h.content_hash,h.tenant_gid,s.repository_gid FROM workmanship_craft_bop_space_heads h JOIN workmanship_craft_bop_spaces s ON s.gid=h.space_gid WHERE h.space_gid=%s AND s.deleted_at IS NULL FOR UPDATE", (space_gid,), "space_not_found")
             if head["row_version"] != expected_head_version: raise BopRepositoryError("resource_version_conflict")
             vg = str(next_gid()); manifest = "sha256:" + hashlib.sha256(_json({"head":head["content_hash"],"source_refs":source_refs,"algorithm_versions":algorithm_versions}).encode()).hexdigest()
-            cur.execute("INSERT INTO workmanship_craft_bop_space_versions (gid,space_gid,tenant_gid,version_kind,source_refs_json,algorithm_versions_json,manifest_hash,created_by) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",(vg,space_gid,tenant_gid,version_kind,_json(source_refs),_json(algorithm_versions),manifest,actor_gid))
+            cur.execute("INSERT INTO workmanship_craft_bop_space_versions (gid,space_gid,tenant_gid,version_kind,source_refs_json,algorithm_versions_json,manifest_hash,created_by) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",(vg,space_gid,head["tenant_gid"],version_kind,_json(source_refs),_json(algorithm_versions),manifest,actor_gid))
             cur.execute("SELECT member_kind,logical_gid,node_revision_gid,binding_revision_gid,vpps_group_version_gid,is_tombstone FROM workmanship_craft_bop_space_head_members WHERE space_head_gid=%s ORDER BY member_kind,logical_gid", (head["gid"],))
             for member in cur.fetchall():
                 cur.execute("INSERT INTO workmanship_craft_bop_space_version_members (gid,space_version_gid,member_kind,logical_gid,node_revision_gid,binding_revision_gid,vpps_group_version_gid,is_tombstone) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (str(next_gid()),vg,member["member_kind"],member["logical_gid"],member["node_revision_gid"],member["binding_revision_gid"],member["vpps_group_version_gid"],member["is_tombstone"]))

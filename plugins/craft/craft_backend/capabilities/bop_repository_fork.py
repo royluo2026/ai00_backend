@@ -20,30 +20,40 @@ class ForkProvider:
         except BopForkError as exc: raise CapabilityBusinessError(str(exc),str(exc),retryable=str(exc)=="target_repository_exists") from exc
         digest="sha256:"+hashlib.sha256(json.dumps(data,sort_keys=True,default=str).encode()).hexdigest()
         return CapabilityOutput(data=_json_safe(data),evidence=(EvidenceRef(kind="craft.bop.fork",reference=f"craft://bop-fork/{data.get('workflow_gid','status')}",digest=digest),))
-    def repository_preview(self,p,c):self._require_main_fork_admin(c);return self._call("preview_repository",p,c)
+    def repository_preview(self,p,c):
+        self._require_main_fork_admin(c)
+        target_name=str(p.get("target_name") or "").strip()
+        project_name=str(p.get("target_project_name") or "").strip()
+        if not target_name:raise CapabilityBusinessError("fork_name_required","fork_name_required")
+        if project_name and target_name.casefold()==project_name.casefold():
+            raise CapabilityBusinessError("fork_name_conflicts_with_project","fork_name_conflicts_with_project")
+        return self._call("preview_repository",{**p,"target_name":target_name,"target_project_name":project_name},c)
     def repository_apply(self,p,c):self._require_main_fork_admin(c);return self._call("apply_repository",p,c)
     def personal_preview(self,p,c):return self._call("preview_personal",p,c)
     def personal_apply(self,p,c):return self._call("apply_personal",p,c)
     def get_run(self,p,c):return self._call("get_run",p,c)
     def get_workflow(self,p,c):return self._call("get_workflow",p,c)
+    def get_projection(self,p,c):return self._call("get_projection",p,c)
 
 
 def candidate_specs(provider=None):
     p=provider or ForkProvider(); gid={"type":"string","pattern":"^[1-9][0-9]*$"}; key={"type":"string","minLength":1,"maxLength":191}
     def schema(props,req):return {"type":"object","properties":props,"required":list(req),"additionalProperties":False}
     out={"type":"object","properties":{
-        **{k:{"type":["string","null"]} for k in ("preview_gid","workflow_gid","fork_run_gid","repository_gid","team_space_gid","personal_space_gid","fork_depth","status","input_hash","plan_hash","expires_at","tenant_gid","actor_gid","source_version_gid","target_project_gid","target_repository_gid","content_hash")},
+        **{k:{"type":["string","null"]} for k in ("preview_gid","workflow_gid","fork_run_gid","repository_gid","team_space_gid","personal_space_gid","fork_depth","status","input_hash","plan_hash","expires_at","tenant_gid","actor_gid","source_repository_gid","source_version_gid","source_content_hash","target_project_gid","target_repository_gid","target_name","content_hash")},
         "owner_verdicts":{"type":"array","maxItems":100},"allowed_decisions":{"type":"array","maxItems":100},
         "personal_step":{"type":"object","additionalProperties":True},"team":{"type":"object","additionalProperties":True},"personal":{"type":"object","additionalProperties":True},
         "include_personal_migration":{"type":"boolean"},
         **{k:{"type":"integer","minimum":0} for k in ("expected_target_slot","copied_node_count","blueprint_node_count")},
     },"additionalProperties":False}
     common=dict(owner="craft",permissions=("craft.write_direct",),plugin_callable=True,confirmation="none",tags=("craft","bop","fork","experimental"),output_schema=out)
-    preview={"source_version_gid":gid,"target_project_gid":gid,"fork_depth":{"enum":["all","operation","process","role","station"]},"include_personal_migration":{"type":"boolean"},"expected_target_slot":{"type":"integer","minimum":0},"idempotency_key":key}
+    preview={"source_version_gid":gid,"target_project_gid":gid,"target_name":{"type":"string","minLength":1,"maxLength":255},"target_project_name":{"type":"string","maxLength":255},"fork_depth":{"enum":["all","operation","process","role","station"]},"include_personal_migration":{"type":"boolean"},"expected_target_slot":{"type":"integer","minimum":0},"idempotency_key":key}
     apply={"preview_gid":gid,"plan_hash":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},"allowed_decisions":{"type":"array","maxItems":100},"expected_target_slot":{"type":"integer","minimum":0},"idempotency_key":key}
     def s(cid,h,props,req,write):return CapabilitySpec(id=cid,version=1,description=cid,risk="write" if write else "read",input_schema=schema(props,req),**common),h
     personal_preview={"source_version_gid":gid,"target_repository_gid":gid,"fork_depth":preview["fork_depth"],"workflow_gid":gid,"expected_target_slot":{"type":"integer","minimum":0},"idempotency_key":key}
-    return (s("craft.bop.repository.fork.preview",p.repository_preview,preview,preview,True),s("craft.bop.repository.fork.apply",p.repository_apply,apply,apply,True),s("craft.bop.managed_personal_space.fork.preview",p.personal_preview,personal_preview,("source_version_gid","target_repository_gid","fork_depth","expected_target_slot","idempotency_key"),True),s("craft.bop.managed_personal_space.fork.apply",p.personal_apply,apply,apply,True),s("craft.bop.fork_run.get",p.get_run,{"run_gid":gid},("run_gid",),False),s("craft.bop.fork_workflow.get",p.get_workflow,{"workflow_gid":gid},("workflow_gid",),False))
+    projection_out={"type":"object","required":["source_repository_gid","source_version_gid","source_content_hash","fork_operation_gid","nodes"],"properties":{"source_repository_gid":gid,"source_version_gid":gid,"source_content_hash":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},"fork_operation_gid":gid,"nodes":{"type":"array","maxItems":10000,"items":{"type":"object","required":["node_gid","parent_gid","node_type","name","position"],"properties":{"node_gid":gid,"parent_gid":{"anyOf":[gid,{"type":"null"}]},"node_type":{"type":"string","maxLength":32},"name":{"type":"string","maxLength":255},"position":{"type":"integer","minimum":0}},"additionalProperties":False}}},"additionalProperties":False}
+    projection_common={**common,"permissions":("craft.read",),"output_schema":projection_out}
+    return (s("craft.bop.repository.fork.preview",p.repository_preview,preview,preview,True),s("craft.bop.repository.fork.apply",p.repository_apply,apply,apply,True),s("craft.bop.managed_personal_space.fork.preview",p.personal_preview,personal_preview,("source_version_gid","target_repository_gid","fork_depth","expected_target_slot","idempotency_key"),True),s("craft.bop.managed_personal_space.fork.apply",p.personal_apply,apply,apply,True),s("craft.bop.fork_run.get",p.get_run,{"run_gid":gid},("run_gid",),False),s("craft.bop.fork_workflow.get",p.get_workflow,{"workflow_gid":gid},("workflow_gid",),False),(CapabilitySpec(id="craft.bop.fork_projection.get",version=1,description="Read the immutable BOP snapshot projection used by one completed fork.",risk="read",input_schema=schema({"fork_run_gid":gid},("fork_run_gid",)),**projection_common),p.get_projection))
 
 
 __all__=["ForkProvider","candidate_specs"]

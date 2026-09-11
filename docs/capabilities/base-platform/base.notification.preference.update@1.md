@@ -101,7 +101,7 @@ Execute base.notification.preference.update in the Base collaboration service.
   "major_version": 1,
   "payload": {
     "expected_version": 0,
-    "preferences": "example"
+    "preferences": null
   }
 }
 ```

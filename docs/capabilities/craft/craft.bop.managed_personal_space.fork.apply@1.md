@@ -221,6 +221,18 @@ craft.bop.managed_personal_space.fork.apply
         "null"
       ]
     },
+    "source_content_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_repository_gid": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "source_version_gid": {
       "type": [
         "string",
@@ -228,6 +240,12 @@ craft.bop.managed_personal_space.fork.apply
       ]
     },
     "status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "target_name": {
       "type": [
         "string",
         "null"

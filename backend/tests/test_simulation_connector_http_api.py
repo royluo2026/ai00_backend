@@ -30,6 +30,8 @@ def test_pairing_http_surface_is_canonical_simulation_owned():
         "/api/v1/simulation/connectors/v2/runtime/renew",
         "/api/v1/simulation/connectors/v2/runtime/restart",
         "/api/v1/simulation/connectors/v2/plans/lease",
+        "/api/v1/simulation/connectors/v2/plans/{plan_id}/artifacts/{artifact_id}",
+        "/api/v1/simulation/connectors/v2/plans/{plan_id}/artifacts/{artifact_id}/content",
         "/api/v1/simulation/connectors/v2/plans/wake",
         "/api/v1/simulation/connectors/v2/plans/{plan_id}/outcome",
         "/api/v1/simulation/connectors/v2/plans/{plan_id}/acknowledge",

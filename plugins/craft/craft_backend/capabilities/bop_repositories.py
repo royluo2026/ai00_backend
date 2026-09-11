@@ -134,7 +134,7 @@ def candidate_specs(store: BopRepositoryStore | None = None) -> tuple[tuple[Capa
             "created_by",
         )},
         **{name: {"type": ["string", "null"]} for name in (
-            "lifecycle_status", "space_kind", "content_hash", "version_kind", "manifest_hash",
+            "lifecycle_status", "space_kind", "display_name", "content_hash", "version_kind", "manifest_hash",
             "created_at", "updated_at",
         )},
         "row_version": {"type": "integer", "minimum": 0},

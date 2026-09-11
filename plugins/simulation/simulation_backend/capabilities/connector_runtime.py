@@ -52,6 +52,8 @@ DESKTOP_CAPABILITY_BINDINGS = (
     ("simulation.vismockup.application.attach.request", 1),
     ("simulation.vismockup.application.launch.request", 1),
     ("simulation.vismockup.model.open.request", 1),
+    ("simulation.environment.runtime_package.open.request", 1),
+    ("simulation.vismockup.model.insert.request", 1),
     ("simulation.vismockup.model.close.request", 1),
     ("simulation.vismockup.visibility.change.request", 1),
     ("simulation.vismockup.node.visibility.change.request", 1),
@@ -74,6 +76,8 @@ DESKTOP_TRANSPORT_BINDINGS = tuple(dict(method=method,
     ("POST", "heartbeat", "runtime_heartbeat", "runtime_session"),
     ("POST", "runtime/renew", "runtime_renew", "runtime_session"),
     ("POST", "plans/lease", "runtime_lease", "runtime_session"),
+    ("GET", "plans/{plan_id}/artifacts/{artifact_id}", "runtime_artifact_grant", "runtime_session_and_plan_lease"),
+    ("GET", "plans/{plan_id}/artifacts/{artifact_id}/content", "runtime_artifact_content", "runtime_session_and_plan_lease"),
     ("WEBSOCKET", "plans/wake", "runtime_wake", "runtime_session"),
     ("POST", "plans/{plan_id}/outcome", "runtime_outcome", "runtime_session_and_signed_outcome"),
     ("POST", "plans/{plan_id}/acknowledge", "runtime_outcome_acknowledge", "plan_scoped_session_and_exact_stored_outcome"),
@@ -86,6 +90,7 @@ DIRECT_VISMOCKUP_OPERATIONS = {
     "attach": ("vismockup.application.probe@1", "sha256:197cfad8bc3453030fdc288ea78c3abc21699274dd48d4482444af4f62380a37"),
     "launch": ("vismockup.application.probe@1", "sha256:197cfad8bc3453030fdc288ea78c3abc21699274dd48d4482444af4f62380a37"),
     "open": ("vismockup.model.open@1", "sha256:aabd43bb066794c250f7eeed41def7c147a4da7263e813f192efa59a0cb40e34"),
+    "insert": ("vismockup.model.insert@1", "sha256:70e68f565989a75406fabb5ffcc5b6f87233f2e55be9a011b202671a26f7c370"),
     "close": ("vismockup.model.close@1", "sha256:a1a27969ab8638c9868b384ccb546aed1ece56219ded7c7ec3bb3d6b19861771"),
     "visibility": ("vismockup.visibility.change@1", "sha256:6ecb8dd2239a2ca881bfc8d40463778f2b80f15f66f1be50a3ceb91a90bff201"),
     "node_visibility": ("vismockup.node.visibility.change@1", "sha256:b93246b1bb189e3f7e488c4ec0528378cbbf97cd2c3fdd547daf0f2007f05f6c"),
@@ -97,6 +102,7 @@ DIRECT_VISMOCKUP_CAPABILITIES = {
     "attach": "simulation.vismockup.application.attach.request",
     "launch": "simulation.vismockup.application.launch.request",
     "open": "simulation.vismockup.model.open.request",
+    "insert": "simulation.vismockup.model.insert.request",
     "close": "simulation.vismockup.model.close.request",
     "visibility": "simulation.vismockup.visibility.change.request",
     "node_visibility": "simulation.vismockup.node.visibility.change.request",
@@ -365,7 +371,7 @@ def _direct_vismockup_plan(
 
 def _direct_vismockup_plan_v2(
     *, action: str, connector_id: str, payload: dict, context: CapabilityContext,
-    now: datetime,
+    now: datetime, capability_id: str | None = None, readback: bool = False,
 ) -> dict:
     """Build the unsigned App-runtime plan; queue_v2 pins the live runtime then signs it."""
     now = now.astimezone(UTC).replace(microsecond=0)
@@ -389,10 +395,43 @@ def _direct_vismockup_plan_v2(
         else "vismockup.document.snapshot@1"
     )
     digest = lambda value: "sha256:" + hashlib.sha256(canonicalize_v2(value)).hexdigest()
+    plan_identity = hashlib.sha256(canonicalize_v2({
+        "capability_id": capability_id or DIRECT_VISMOCKUP_CAPABILITIES[action],
+        "tenant_id": context.team_gid,
+        "actor_id": context.user_gid,
+        "device_id": connector_id,
+        "idempotency_key": idempotency_key,
+        "normalized_input_hash": normalized_input_hash,
+    })).hexdigest()
+    steps = [{
+        "step_id": "step-00001",
+        "operation_id": operation_id,
+        "contract_hash": contract_hash,
+        "depends_on": [],
+        "payload": step_payload,
+        "payload_hash": digest(step_payload),
+        "timeout_seconds": 600 if action == "tree" else 120,
+        "side_effect_classification": classification,
+        "post_condition_probe_id": probe_id,
+    }]
+    if readback:
+        readback_payload = {"max_depth": 8, "force_refresh": True}
+        readback_operation, readback_contract = DIRECT_VISMOCKUP_OPERATIONS["tree"]
+        steps.append({
+            "step_id": "step-00002",
+            "operation_id": readback_operation,
+            "contract_hash": readback_contract,
+            "depends_on": ["step-00001"],
+            "payload": readback_payload,
+            "payload_hash": digest(readback_payload),
+            "timeout_seconds": 600,
+            "side_effect_classification": "read",
+            "post_condition_probe_id": None,
+        })
     return {
         "protocol": "ai00.connector.execution-plan.v2",
-        "plan_id": "vismockup-command-" + secrets.token_hex(16),
-        "capability_id": DIRECT_VISMOCKUP_CAPABILITIES[action],
+        "plan_id": "vismockup-command-" + plan_identity,
+        "capability_id": capability_id or DIRECT_VISMOCKUP_CAPABILITIES[action],
         "major_version": 1,
         "capability_version_gid": capability_version_gid,
         "business_definition_hash": definition_hash,
@@ -413,17 +452,7 @@ def _direct_vismockup_plan_v2(
         "normalized_input_hash": normalized_input_hash,
         "confirmation_receipt_id": getattr(context, "confirmation_token", None),
         "idempotency_key": idempotency_key,
-        "steps": [{
-            "step_id": "step-00001",
-            "operation_id": operation_id,
-            "contract_hash": contract_hash,
-            "depends_on": [],
-            "payload": step_payload,
-            "payload_hash": digest(step_payload),
-            "timeout_seconds": 600 if action == "tree" else 120,
-            "side_effect_classification": classification,
-            "post_condition_probe_id": probe_id,
-        }],
+        "steps": steps,
         "issued_at": now.isoformat().replace("+00:00", "Z"),
         "expires_at": (now + timedelta(minutes=15)).isoformat().replace("+00:00", "Z"),
     }
@@ -457,6 +486,7 @@ _VISMOCKUP_ATOMS = (
     ("simulation.vismockup.status.get", "Read VisMockup connection state.", CapabilityRisk.READ),
     ("simulation.vismockup.application.launch", "Launch or connect to VisMockup.", CapabilityRisk.WRITE),
     ("simulation.vismockup.model.open", "Open one authorized model artifact in VisMockup.", CapabilityRisk.WRITE),
+    ("simulation.vismockup.model.insert", "Insert one authorized model artifact into the active VisMockup document.", CapabilityRisk.WRITE),
     ("simulation.vismockup.tree.get", "Read the active VisMockup product tree.", CapabilityRisk.READ),
     ("simulation.vismockup.selection.highlight", "Highlight VisMockup occurrences.", CapabilityRisk.WRITE),
     ("simulation.vismockup.visibility.change.apply", "Change VisMockup view visibility.", CapabilityRisk.WRITE),
@@ -524,10 +554,12 @@ def register_connector_runtime_capabilities(
                     context.user_gid, context.team_gid,
                 )
                 if not binding or not binding.get("connector_id"):
-                    raise ConnectorError("connector_binding_not_found")
+                    raise CapabilityBusinessError(
+                        "connector_binding_not_found", "connector_binding_not_found",
+                    )
                 connector_id = binding["connector_id"]
             plan_payload = (
-                {"artifact_ref": payload["artifact_ref"]} if action == "open"
+                {"artifact_ref": payload["artifact_ref"]} if action in {"open", "insert"}
                 else {"action": payload["action"]} if action == "visibility"
                 else {"node_key": payload["node_key"], "action": payload["action"]}
                 if action in {"node_visibility", "node_selection"}
@@ -537,25 +569,58 @@ def register_connector_runtime_capabilities(
                 } if action == "tree"
                 else {}
             )
-            if runtime and runtime.get("runtime_type") == "electron":
-                plan = _direct_vismockup_plan_v2(
-                    action=action, connector_id=connector_id, payload=plan_payload,
-                    context=context, now=control_plane.clock(),
-                )
-                operation = control_plane.queue_v2(plan, context, runtime_row=runtime)
-                evidence_digest = canonical_hash(plan)
-            else:
-                plan = _direct_vismockup_plan(
-                    action=action, connector_id=connector_id, payload=plan_payload,
-                    context=context, now=control_plane.clock(),
-                )
-                operation = control_plane.queue_plan(plan, context)
-                evidence_digest = plan.plan_hash
+            try:
+                if runtime and runtime.get("runtime_type") == "electron":
+                    plan = _direct_vismockup_plan_v2(
+                        action=action, connector_id=connector_id, payload=plan_payload,
+                        context=context, now=control_plane.clock(),
+                    )
+                    operation = control_plane.queue_v2(plan, context, runtime_row=runtime)
+                    evidence_digest = canonical_hash(plan)
+                else:
+                    plan = _direct_vismockup_plan(
+                        action=action, connector_id=connector_id, payload=plan_payload,
+                        context=context, now=control_plane.clock(),
+                    )
+                    operation = control_plane.queue_plan(plan, context)
+                    evidence_digest = plan.plan_hash
+            except ConnectorError as exc:
+                code = str(exc)
+                raise CapabilityBusinessError(code, code) from exc
             return CapabilityOutput(data=operation.model_dump(mode="json"), evidence=(EvidenceRef(
                 kind="simulation.vismockup.command",
                 reference=f"connector-plan:{operation.operation_id}", digest=evidence_digest,
             ),))
         return handler
+
+    def open_runtime_package(payload, context):
+        runtime = control_plane.repository.bound_runtime_for_user(context.user_gid, context.team_gid)
+        if not runtime or runtime.get("runtime_type") != "electron":
+            raise ConnectorError("runtime_v2_required")
+        from .plmxml_environments import PlmxmlEnvironmentProvider
+        prepared = PlmxmlEnvironmentProvider().prepare_runtime_package(
+            payload, context, connector_device_id=runtime["device_id"],
+        ).data
+        plan = _direct_vismockup_plan_v2(
+            action="open", connector_id=runtime["device_id"], payload=prepared["open_payload"],
+            context=context, now=control_plane.clock(),
+            capability_id="simulation.environment.runtime_package.open.request",
+            readback=True,
+        )
+        PlmxmlEnvironmentProvider().repository.save_runtime_package_projection(
+            workspace_gid=payload["workspace_gid"], version_gid=payload["version_gid"],
+            connector_plan_id=plan["plan_id"], manifest_hash=prepared["manifest_hash"],
+            report={"manifest": prepared["manifest"], "semantic_verification": "pending"},
+            tenant_gid=str(context.team_gid or ""), actor_gid=str(context.user_gid or ""),
+            runtime_package_artifact_ref=prepared["top_level_artifact_ref"],
+            connector_device_id=runtime["device_id"],
+        )
+        operation = control_plane.queue_v2(plan, context, runtime_row=runtime)
+        return CapabilityOutput(data=operation.model_dump(mode="json"), evidence=(EvidenceRef(
+            kind="simulation.environment.runtime_package",
+            reference=f"simulation://workspace/{payload['workspace_gid']}/version/{payload['version_gid']}",
+            digest=prepared["manifest_hash"],
+        ),))
 
     def get_direct(payload, context):
         value = control_plane.repository.get_plan_result(
@@ -603,6 +668,7 @@ def register_connector_runtime_capabilities(
         ("simulation.vismockup.application.attach.request", "attach", "Queue a signed attach-only probe for an already-running VisMockup application."),
         ("simulation.vismockup.application.launch.request", "launch", "Queue a signed request to launch or attach to VisMockup."),
         ("simulation.vismockup.model.open.request", "open", "Queue a signed request to open one governed model artifact."),
+        ("simulation.vismockup.model.insert.request", "insert", "Queue a signed request to insert one governed model artifact into the active document."),
         ("simulation.vismockup.model.close.request", "close", "Queue a signed request to close all models in the connected VisMockup application."),
         ("simulation.vismockup.visibility.change.request", "visibility", "Queue a signed request to show or hide all nodes in the active VisMockup document."),
         ("simulation.vismockup.node.visibility.change.request", "node_visibility", "Queue a signed request to change one tree node's visibility in the active VisMockup document."),
@@ -618,6 +684,14 @@ def register_connector_runtime_capabilities(
             permissions=("simulation.use",),
             input_schema={}, output_schema={}, tags=("simulation", "connector", "vismockup", "workflow"),
         ), request_direct(action))
+    register(registry, CapabilitySpec(
+        id="simulation.environment.runtime_package.open.request", owner="simulation", version=1,
+        description="Prepare and queue one frozen environment package, opening only its generated top-level PLMXML.",
+        use_when="A user replays one exact frozen Simulation environment in the bound AI00 App runtime.",
+        do_not_use_when="The environment is editable, not frozen, or the runtime is not the App v2 Connector.",
+        risk=CapabilityRisk.WRITE, confirmation="user", permissions=("simulation.use",),
+        input_schema={}, output_schema={}, tags=("simulation","connector","environment","workflow","experimental"),
+    ), open_runtime_package)
     register(registry, CapabilitySpec(
         id="simulation.vismockup.command.get", owner="simulation", version=1,
         description="Read one caller-scoped direct VisMockup command outcome.",

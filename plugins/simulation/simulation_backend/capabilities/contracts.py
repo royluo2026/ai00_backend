@@ -312,6 +312,9 @@ INPUT_SCHEMAS = {
     "simulation.connector_document_snapshot_outcome.apply": obj({
         "snapshot_request_id": STRING, "plan_json": STRING, "outcome_json": STRING,
     }, ("snapshot_request_id", "plan_json", "outcome_json")),
+    "simulation.connector_environment_runtime_outcome.apply": obj({
+        "connector_plan_id": STRING, "plan_json": STRING, "outcome_json": STRING,
+    }, ("connector_plan_id", "plan_json", "outcome_json")),
 }
 
 OUTPUT_SCHEMAS = {
@@ -379,6 +382,7 @@ OUTPUT_SCHEMAS = {
     "simulation.connector_capture_outcome.apply": OUTCOME_APPLY_OUTPUT,
     "simulation.connector_materialization_outcome.apply": OUTCOME_APPLY_OUTPUT,
     "simulation.connector_document_snapshot_outcome.apply": OUTCOME_APPLY_OUTPUT,
+    "simulation.connector_environment_runtime_outcome.apply": OUTCOME_APPLY_OUTPUT,
 }
 
 __all__ = ["INPUT_SCHEMAS", "OUTPUT_SCHEMAS"]

@@ -101,6 +101,12 @@ class RuntimeSessionService:
             token, self.clock(), pins['runtime_type'],
         )
 
+    def leased_plan(self, token, *, plan_id, lease_id, **pins):
+        return self.repository.leased_v2_plan(
+            pins['device_id'], pins['generation'], pins['runtime_instance_id'], token,
+            plan_id, lease_id, self.clock(), pins['runtime_type'],
+        )
+
     def probe(self, token, *, plan_id, **pins):
         return self.repository.reconciliation_plan(pins['device_id'], pins['generation'], pins['runtime_instance_id'], token, plan_id, self.clock(), pins['runtime_type'])
 

@@ -1,13 +1,33 @@
 using Ai00.Connector.Contracts;
+using System.Text.Json;
 namespace Ai00.Connector.Adapters.VisMockup;
 
-public sealed class PostConditionProbes(StaDispatcher sta,IVisMockupCom com)
+public sealed class PostConditionProbes(StaDispatcher sta,IVisMockupCom com,VisMockupAdapter? adapter=null)
 {
     // Recovery context supplies identifiers only. Never infer success of a write
     // from process presence or dispatch its original operation/payload again.
-    public async Task<object> ObserveAsync(string probeId,CancellationToken ct)
+    public async Task<object> ObserveAsync(string probeId,JsonElement? probeInput,CancellationToken ct)
     {
         if(probeId!="vismockup.application.probe@1" && probeId!="vismockup.document.snapshot@1")throw new ConnectorException("post_condition_probe_unsupported");
+        if(probeId=="vismockup.document.snapshot@1" && adapter is not null && probeInput is {ValueKind:JsonValueKind.Object} input
+            && input.TryGetProperty("node_key",out var nodeKey) && input.TryGetProperty("expected_visible",out var expected))
+        {
+            try
+            {
+                var visible=await adapter.ObserveNodeVisibilityAsync(nodeKey.GetString()!).WaitAsync(TimeSpan.FromSeconds(10),ct);
+                return new{classification=visible==expected.GetBoolean()?"succeeded":"failed_without_effect",
+                    observed_result=(object)new{node_key=nodeKey.GetString(),visible}};
+            }
+            catch(ConnectorException error) when(error.Code=="vismockup_recovery_node_unavailable")
+            {
+                // Visibility is an in-memory document property. Once no open
+                // document contains the signed target node, no effect remains.
+                return new{classification="failed_without_effect",
+                    observed_result=(object)new{node_key=nodeKey.GetString(),document_open=false}};
+            }
+            catch(Exception error) when(error is ConnectorException or TimeoutException)
+            {return new{classification="inconclusive",observed_result=(object?)null};}
+        }
         return await sta.InvokeAsync<object>(()=>
         {
             if(!com.TryGetActiveApplication(out var app))return new{classification="inconclusive",observed_result=(object?)null};

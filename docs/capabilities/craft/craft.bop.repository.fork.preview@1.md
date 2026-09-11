@@ -95,14 +95,25 @@ craft.bop.repository.fork.preview
       "pattern": "^[1-9][0-9]*$",
       "type": "string"
     },
+    "target_name": {
+      "maxLength": 255,
+      "minLength": 1,
+      "type": "string"
+    },
     "target_project_gid": {
       "pattern": "^[1-9][0-9]*$",
+      "type": "string"
+    },
+    "target_project_name": {
+      "maxLength": 255,
       "type": "string"
     }
   },
   "required": [
     "source_version_gid",
     "target_project_gid",
+    "target_name",
+    "target_project_name",
     "fork_depth",
     "include_personal_migration",
     "expected_target_slot",
@@ -125,7 +136,9 @@ craft.bop.repository.fork.preview
     "idempotency_key": "example",
     "include_personal_migration": false,
     "source_version_gid": "1",
-    "target_project_gid": "1"
+    "target_name": "example",
+    "target_project_gid": "1",
+    "target_project_name": "example"
   }
 }
 ```
@@ -231,6 +244,18 @@ craft.bop.repository.fork.preview
         "null"
       ]
     },
+    "source_content_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_repository_gid": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "source_version_gid": {
       "type": [
         "string",
@@ -238,6 +263,12 @@ craft.bop.repository.fork.preview
       ]
     },
     "status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "target_name": {
       "type": [
         "string",
         "null"

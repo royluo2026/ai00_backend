@@ -196,6 +196,18 @@ craft.bop.fork_workflow.get
         "null"
       ]
     },
+    "source_content_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_repository_gid": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "source_version_gid": {
       "type": [
         "string",
@@ -203,6 +215,12 @@ craft.bop.fork_workflow.get
       ]
     },
     "status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "target_name": {
       "type": [
         "string",
         "null"

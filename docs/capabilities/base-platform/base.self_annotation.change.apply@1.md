@@ -168,7 +168,7 @@ Execute exact Base outcome base.self_annotation.change.apply.
     "idempotency_key": "example",
     "item_gid": "example",
     "note": "example",
-    "schedule": "example",
+    "schedule": null,
     "status": "example"
   }
 }

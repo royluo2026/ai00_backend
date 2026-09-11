@@ -133,7 +133,7 @@ Apply one idempotent source-scoped BOP line responsibility projection.
   "catalog_release": "<catalog_release>",
   "major_version": 1,
   "payload": {
-    "bop_line_gid": "example",
+    "bop_line_gid": null,
     "idempotency_key": "example",
     "operation_gid": "example",
     "project_gid": "example",

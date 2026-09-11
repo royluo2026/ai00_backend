@@ -31,11 +31,13 @@ public sealed class FakeApplication(string productVersion, IVisMockupDocument? a
 {
     public string ProductVersion { get; } = productVersion;
     public IVisMockupDocument? ActiveDocument { get; set; } = activeDocument;
+    public IReadOnlyList<IVisMockupDocument> OpenDocuments { get; set; } = activeDocument is null ? [] : [activeDocument];
     public FakeDocument? LastOpenedDocument { get; private set; }
     public IVisMockupDocument OpenDocument(string path)
     {
         LastOpenedDocument = new FakeDocument(Path.GetFullPath(path), Path.GetFullPath(path), FakeNode.FlatTree(1));
         ActiveDocument = LastOpenedDocument;
+        OpenDocuments = [LastOpenedDocument];
         return LastOpenedDocument;
     }
     public void CloseAllDocuments()
@@ -44,12 +46,14 @@ public sealed class FakeApplication(string productVersion, IVisMockupDocument? a
         if (LastOpenedDocument is not null && !ReferenceEquals(LastOpenedDocument, ActiveDocument))
             LastOpenedDocument.Close();
         ActiveDocument = null;
+        OpenDocuments = [];
     }
 }
 public sealed class FakeDocument(string documentId, string sourceIdentity, IVisMockupNode rootNode) : IVisMockupDocument
 {
     private readonly HashSet<string> _visible = [];
     private readonly HashSet<string> _selected = [];
+    private readonly List<string> _insertedDocumentPaths = [];
     public string DocumentId { get; } = documentId;
     public string SourceIdentity { get; } = sourceIdentity;
     public int HierarchyCount => 1;
@@ -58,6 +62,11 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
     public int ExportPlmxmlCalls { get; private set; }
     public bool Closed { get; private set; }
     public List<bool> VisibilityChanges { get; } = [];
+    public int SetNodeVisibleCalls { get; private set; }
+    public Exception? SetNodeVisibleError { get; set; }
+    public bool ApplyVisibilityBeforeThrow { get; set; }
+    public IReadOnlyList<string> InsertedDocumentPaths => _insertedDocumentPaths;
+    public int InsertDocumentCalls { get; private set; }
     public CaptureProfile Profile { get; private set; } = new("png", 1, 1, "current");
     public IReadOnlyCollection<string> AllNodeKeys => Traverse().Select(item => item.NodeKey).ToArray();
     public IReadOnlyCollection<string> VisibleNodeKeys => _visible.ToArray();
@@ -65,8 +74,17 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
     public bool IsNodeVisible(string nodeKey) => _visible.Contains(nodeKey);
     public void SetNodeVisible(string nodeKey, bool visible)
     {
+        SetNodeVisibleCalls++;
         if (!AllNodeKeys.Contains(nodeKey, StringComparer.Ordinal)) throw new InvalidOperationException("node not found");
         if (visible) _visible.Add(nodeKey); else _visible.Remove(nodeKey);
+        if (SetNodeVisibleError is not null)
+        {
+            if (!ApplyVisibilityBeforeThrow)
+            {
+                if (visible) _visible.Remove(nodeKey); else _visible.Add(nodeKey);
+            }
+            throw SetNodeVisibleError;
+        }
     }
     public void SetNodeSelected(string nodeKey, bool selected)
     {
@@ -75,6 +93,13 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
     }
     public void ApplyCaptureProfile(CaptureProfile profile) => Profile = profile;
     public string AttachModel(string path) => "attached-" + Path.GetFileNameWithoutExtension(path);
+    public string InsertDocument(string path)
+    {
+        InsertDocumentCalls++;
+        var fullPath = Path.GetFullPath(path);
+        _insertedDocumentPaths.Add(fullPath);
+        return fullPath;
+    }
     public void CaptureImage(string path)
     {
         CaptureImageCalls++;

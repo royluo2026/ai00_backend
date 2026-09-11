@@ -13,10 +13,11 @@
 ## Global Constraints
 
 - Preserve existing unrelated dirty changes. Before implementation, inventory and isolate overlapping edits in `VisMockupAdapter.cs`, `workspaces.py`, `workspace_repository.py`, `cad_sim.js`, `cad_sim.css`, and `index.html`; never reset or overwrite them.
-- Resolve the two existing `0016_simulation_*.sql` migrations before adding this feature migration. The accepted baseline must contain unique, monotonically increasing migration numbers. This plan uses `0017` only after that prerequisite is true.
+- Resolve the two existing `0016_simulation_*.sql` migrations before adding this feature migration. The accepted baseline must contain unique, monotonically increasing migration numbers. The untracked fork-visibility migration becomes `0017`; this plan uses `0018` for the new feature.
 - Use snowflake GIDs through the repository's existing `next_gid()` path for all database identities. Do not introduce UUID primary keys.
 - The database is authoritative for mutable environment drafts. PLMXML is an import/export/runtime artifact, not the live write store.
 - Preserve original uploaded bytes as immutable Artifacts. Byte-for-byte export is promised only when returning an unedited original Artifact; edited environments promise semantic round-trip equivalence.
+- Build and validate a document dependency graph before synchronization. Reject cycles and do not insert a PLMXML that already references the active primary document as its dependency.
 - Never persist local filesystem paths as portable business identity. Persist Artifact refs, hashes, portability class, display names, and source metadata. Device-bound paths remain Connector-local.
 - Do not directly read or write Craft tables from Simulation. Cross-domain references are immutable GIDs/hashes resolved through governed Capabilities.
 - Every local side effect uses a prepare/dispatch/outcome or equivalent idempotent two-phase workflow. Unknown outcomes remain reconcilable and are never silently retried.
@@ -34,7 +35,7 @@
 - Inspect: `plugins/simulation/simulation_backend/capabilities/workspaces.py`
 - Inspect: `plugins/simulation/simulation_backend/data/workspace_repository.py`
 - Inspect: `backend/db/migrations/domains/simulation/0016_simulation_cache_snapshots_and_diffs.sql`
-- Inspect: `backend/db/migrations/domains/simulation/0016_simulation_workspace_fork_visibility.sql`
+- Inspect: `backend/db/migrations/domains/simulation/0017_simulation_workspace_fork_visibility.sql`
 - Inspect in frontend worktree: `packages/sim-plugin/web/cad_sim/cad_sim.js`
 - Inspect in frontend worktree: `packages/sim-plugin/web/cad_sim/cad_sim.css`
 - Inspect in frontend worktree: `packages/sim-plugin/web/cad_sim/index.html`
@@ -121,7 +122,7 @@ dotnet test local-runtime/tests/Ai00.Connector.Tests/Ai00.Connector.Tests.csproj
 dotnet test local-runtime/tests/Ai00.Connector.Tests/Ai00.Connector.Tests.csproj --filter "FullyQualifiedName~VisMockupDocumentLifecycleTests|FullyQualifiedName~AdapterManifestTests|FullyQualifiedName~PlanRecoveryTests"
 ```
 
-- [ ] With a disposable VisMockup session, run the pilot script against one small PLMXML as the primary document and one JT/PLMXML as the inserted document. Record product version, active document identity, inserted count/path, and whether the inserted occurrence is addressable. If the real COM call fails, stop this task and retain the failing HRESULT as evidence; do not substitute `AddModel`.
+- [ ] With a disposable VisMockup session, run the pilot script against one small PLMXML as the primary document and one independent JT/PLMXML as the inserted document. Record product version, active document identity, inserted count/path, and whether the inserted occurrence is addressable. Do not use `W10-2.plmxml` as a supplement to the old W10 file because it already references that file; this is a dependency-cycle case. If an independent real COM call fails, stop this task and retain the failing HRESULT as evidence; do not substitute `AddModel`.
 - [ ] Commit the Connector slice.
 
 ```powershell
@@ -169,7 +170,7 @@ def export_environment_plmxml(model: EnvironmentRuntimeModel) -> EnvironmentExpo
     raise NotImplementedError
 ```
 
-- [ ] Write failing tests for: populated `ProductView usage="variant"`; multiple alternate hierarchies; external PLMXML references; local JT references; stable occurrence identity; empty hierarchy represented in the database model even when absent from PLMXML; unknown XML extension preservation via the original Artifact; deterministic semantic output for identical input.
+- [ ] Write failing tests for: populated `ProductView usage="variant"`; multiple alternate hierarchies; external PLMXML references; local JT references; stable occurrence identity; empty hierarchy represented in the database model even when absent from PLMXML; unknown XML extension preservation via the original Artifact; deterministic semantic output for identical input; dependency deduplication; and `model_document_dependency_cycle` when a supplemental PLMXML points back to the active primary.
 - [ ] Write security-limit tests for DTD/entity input, unsupported URI schemes, path traversal, excessive external references, excessive hierarchy depth, and excessive nodes.
 - [ ] Run the new tests and confirm the codec is absent.
 
@@ -199,7 +200,7 @@ git commit -m "feat(simulation): add semantic PLMXML environment codec"
 ### Task 3: Persist model documents, alternate hierarchies, placements, and verification state
 
 **Files:**
-- Create: `backend/db/migrations/domains/simulation/0017_simulation_environment_documents_and_hierarchies.sql`
+- Create: `backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql`
 - Modify: `plugins/simulation/simulation_backend/data/workspace_repository.py`
 - Create: `plugins/simulation/tests/test_environment_document_repository.py`
 - Create: `plugins/simulation/tests/test_environment_hierarchy_repository.py`
@@ -213,7 +214,7 @@ ALTER TABLE workmanship_sim_vm_documents
   ADD COLUMN primary_slot TINYINT UNSIGNED NULL,
   ADD COLUMN display_name VARCHAR(255) NOT NULL DEFAULT '',
   ADD COLUMN media_type VARCHAR(96) NOT NULL DEFAULT 'application/plmxml+xml',
-  ADD COLUMN artifact_gid BIGINT UNSIGNED NULL,
+  ADD COLUMN artifact_ref_json JSON NULL,
   ADD COLUMN content_sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '',
   ADD COLUMN portability VARCHAR(16) NOT NULL DEFAULT 'portable',
   ADD COLUMN sort_order INT UNSIGNED NOT NULL DEFAULT 0,
@@ -252,7 +253,7 @@ CREATE TABLE workmanship_sim_workspace_placements (
   workspace_gid BIGINT UNSIGNED NOT NULL,
   tenant_gid BIGINT UNSIGNED NOT NULL,
   owner_gid BIGINT UNSIGNED NOT NULL,
-  target_node_gid BIGINT UNSIGNED NOT NULL,
+  target_node_gid BIGINT UNSIGNED NULL,
   parent_placement_gid BIGINT UNSIGNED NULL,
   source_kind VARCHAR(32) NOT NULL,
   source_ref_json JSON NOT NULL,
@@ -307,8 +308,8 @@ CREATE TABLE workmanship_sim_materialization_verifications (
   actor_gid BIGINT UNSIGNED NOT NULL,
   state VARCHAR(24) NOT NULL,
   manifest_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  runtime_package_artifact_gid BIGINT UNSIGNED NULL,
-  connector_device_gid BIGINT UNSIGNED NULL,
+  runtime_package_artifact_ref_json JSON NULL,
+  connector_device_id VARCHAR(191) NULL,
   report_json JSON NOT NULL,
   created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
@@ -362,7 +363,7 @@ python -m pytest plugins/simulation/tests/test_environment_document_repository.p
 - [ ] Commit the persistence slice.
 
 ```powershell
-git add backend/db/migrations/domains/simulation/0017_simulation_environment_documents_and_hierarchies.sql plugins/simulation/simulation_backend/data/workspace_repository.py plugins/simulation/tests/test_environment_document_repository.py plugins/simulation/tests/test_environment_hierarchy_repository.py plugins/simulation/tests/test_workspace_cache_revision.py
+git add backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql plugins/simulation/simulation_backend/data/workspace_repository.py plugins/simulation/tests/test_environment_document_repository.py plugins/simulation/tests/test_environment_hierarchy_repository.py plugins/simulation/tests/test_workspace_cache_revision.py
 git commit -m "feat(simulation): persist environment documents and hierarchies"
 ```
 

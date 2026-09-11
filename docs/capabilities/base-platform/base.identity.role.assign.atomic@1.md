@@ -112,7 +112,7 @@ Execute exact Base outcome base.identity.role.assign.atomic.
   "catalog_release": "<catalog_release>",
   "major_version": 1,
   "payload": {
-    "external_subtype": "example",
+    "external_subtype": null,
     "new_role": "super_admin",
     "user_gid": "example"
   }

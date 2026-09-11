@@ -270,6 +270,23 @@ def test_unprobeable_write_is_visible_and_cannot_be_cleared_by_another_probe(cla
         classifications=[classification], coverage=context['coverage'])) == 'manual_review_required'
 
 
+def test_visibility_probe_context_carries_only_the_signed_post_condition():
+    from plugins.simulation.simulation_backend.application.connector_protocol_v2 import probe_context
+    raw = deepcopy(VECTOR['plan'])
+    raw['steps'][0].update(operation_id='vismockup.node.visibility.change@1',
+        side_effect_classification='write', post_condition_probe_id='vismockup.document.snapshot@1',
+        payload={'node_key': 'node-7', 'action': 'show'})
+    row = dict(plan_json=raw, plan_id=raw['plan_id'], plan_hash=raw['plan_hash'], lease_id='lease-1',
+        device_id=raw['device_id'], tenant_gid=raw['tenant_id'], runtime_generation=7,
+        runtime_instance_id=raw['runtime_instance_id'])
+
+    context = probe_context(row, dict(token_hash='a'*64), last_journal_sequence=0)
+
+    assert context['required_probes'] == [dict(step_id=raw['steps'][0]['step_id'],
+        probe_id='vismockup.document.snapshot@1',
+        probe_input={'node_key': 'node-7', 'expected_visible': True})]
+
+
 @pytest.mark.parametrize('crash', [True, False])
 def test_recovery_supplies_exact_journal_cursor_without_predecessor_state(database, crash):
     service, key, session, plan, leased, pins = running(database)

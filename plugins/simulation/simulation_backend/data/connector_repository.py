@@ -75,6 +75,7 @@ class SimulationConnectorRepository:
     @staticmethod
     def _repeat_is_intrinsically_safe(plan: ConnectorExecutionPlanV2) -> bool:
         allowed = {
+            "vismockup.application.probe@1": {True},
             "vismockup.visibility.change@1": {"all_on", "all_off"},
             "vismockup.node.visibility.change@1": {"show", "hide", "isolate"},
             "vismockup.node.selection.change@1": {"highlight", "select", "unhighlight", "deselect"},
@@ -83,7 +84,8 @@ class SimulationConnectorRepository:
         def safe(step):
             operation_id = step.operation_id if hasattr(step, "operation_id") else step.get("operation_id")
             payload = step.payload if hasattr(step, "payload") else step.get("payload", {})
-            return operation_id in allowed and str(payload.get("action") or "") in allowed[operation_id]
+            value = payload.get("allow_launch") if operation_id == "vismockup.application.probe@1" else str(payload.get("action") or "")
+            return operation_id in allowed and value in allowed[operation_id]
         return bool(steps) and all(safe(step) for step in steps)
 
     def runtime_device(self, device_id):
@@ -594,6 +596,25 @@ class SimulationConnectorRepository:
                 (device_id, PROTOCOL_V2, generation, instance, row['session_token_hash'], _utc(now)),
             )
             return cursor.fetchone() is not None
+
+    def leased_v2_plan(self, device_id, generation, instance, token, plan_id, lease_id, now, runtime_type):
+        """Return only the exact live plan leased by this fenced App runtime."""
+        now = _utc(now)
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            row = self._authenticated_runtime(cursor, device_id, generation, instance, token, now)
+            if runtime_type != 'electron' or row['runtime_type'] != runtime_type:
+                raise ConnectorRepositoryError('runtime_type_invalid')
+            cursor.execute(
+                "SELECT plan_json FROM workmanship_sim_connector_runtime_plans WHERE plan_id=%s "
+                "AND device_id=%s AND protocol=%s AND runtime_generation=%s AND runtime_instance_id=%s "
+                "AND session_token_hash=%s AND status='leased' AND lease_id=%s AND lease_until>%s AND expires_at>%s",
+                (plan_id, device_id, PROTOCOL_V2, generation, instance, row['session_token_hash'], lease_id, now, now),
+            )
+            current = cursor.fetchone()
+            if current is None:
+                raise ConnectorRepositoryError('plan_lease_invalid')
+            value = current['plan_json']
+            return json.loads(value) if isinstance(value, str) else value
 
     def acknowledge_v2_outcome(self, device_id, generation, instance, token, outcome, now):
         """Resolve a lost ACK only; recovery credentials can never create an Outcome."""

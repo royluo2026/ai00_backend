@@ -14,7 +14,21 @@ public static class DurableJsonFile
                 JsonSerializer.Serialize(stream,value);
                 stream.Flush(true);
             }
-            File.Move(temporary,path,true);
+            // Windows can briefly deny replacement while another in-process
+            // reader or security scanner still owns a non-delete-sharing handle.
+            // The temporary file is already durable, so retrying only this local
+            // idempotent replace is safe; external connector actions are never
+            // retried here.
+            for(var attempt=0;;attempt++)
+            {
+                try{File.Move(temporary,path,true);break;}
+                catch(Exception error) when(
+                    attempt<7 &&
+                    (error is IOException || error is UnauthorizedAccessException))
+                {
+                    Thread.Sleep(50*(attempt+1));
+                }
+            }
         }
         finally{if(File.Exists(temporary))File.Delete(temporary);}
     }

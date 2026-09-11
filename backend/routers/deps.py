@@ -525,6 +525,7 @@ def build_capability_authorization_grants(
             "simulation.connector_capture_outcome.apply",
             "simulation.connector_document_snapshot_outcome.apply",
             "simulation.connector_materialization_outcome.apply",
+            "simulation.connector_environment_runtime_outcome.apply",
         )
         policy_version = f"connector-plan-lease-v1:{identity.consumer.installation_id}"
     if consumer_type in {"agent", "mcp"}:

@@ -12,10 +12,12 @@ def _hash(v): return "sha256:"+hashlib.sha256(json.dumps(v,sort_keys=True,separa
 class MemoryBopForkStore:
     DEPTHS={"all","operation","process","role","station"}
     def __init__(self):
-        self.previews={}; self.workflows={}; self.runs={}; self.applies={}; self.occupied_projects=set(); self.team_apply_count=0
-    def preview_repository(self, *, tenant_gid, actor_gid, source_version_gid, target_project_gid, fork_depth, include_personal_migration, expected_target_slot, idempotency_key):
+        self.previews={}; self.workflows={}; self.runs={}; self.applies={}; self.projections={}; self.source_projections={}; self.occupied_projects=set(); self.personal_spaces=set(); self.team_apply_count=0
+    def seed_projection(self, *, version_gid, repository_gid, content_hash, nodes):
+        self.source_projections[str(version_gid)]={"source_repository_gid":str(repository_gid),"source_version_gid":str(version_gid),"source_content_hash":str(content_hash),"nodes":copy.deepcopy(list(nodes))}
+    def preview_repository(self, *, tenant_gid, actor_gid, source_version_gid, target_project_gid, fork_depth, include_personal_migration, expected_target_slot, idempotency_key, target_name=None, target_project_name=None):
         if fork_depth not in self.DEPTHS: raise BopForkError("fork_depth_invalid")
-        fixed={"tenant_gid":tenant_gid,"actor_gid":actor_gid,"source_version_gid":source_version_gid,"target_project_gid":target_project_gid,"fork_depth":fork_depth,"include_personal_migration":bool(include_personal_migration),"expected_target_slot":expected_target_slot}
+        fixed={"tenant_gid":tenant_gid,"actor_gid":actor_gid,"source_version_gid":source_version_gid,"target_project_gid":target_project_gid,"target_name":target_name or f"Fork {target_project_gid}","fork_depth":fork_depth,"include_personal_migration":bool(include_personal_migration),"expected_target_slot":expected_target_slot}
         workflow_gid=str(next_gid()); preview_gid=str(next_gid()); decisions=[]; plan_hash=_hash({**fixed,"owner_verdicts":[],"allowed_decisions":decisions})
         row={"preview_gid":preview_gid,"workflow_gid":workflow_gid,"input_hash":_hash(fixed),"plan_hash":plan_hash,"expires_at":(datetime.now(timezone.utc)+timedelta(minutes=10)).isoformat(),"owner_verdicts":[],"allowed_decisions":decisions,**fixed}
         self.previews[preview_gid]=row; self.workflows[workflow_gid]={"workflow_gid":workflow_gid,"status":"previewed","team":None,"personal":None,**fixed}; return copy.deepcopy(row)
@@ -29,8 +31,11 @@ class MemoryBopForkStore:
         slot=(tenant_gid,p["target_project_gid"])
         if slot in self.occupied_projects: raise BopForkError("target_repository_exists")
         self.occupied_projects.add(slot); self.team_apply_count+=1
-        result={"workflow_gid":p["workflow_gid"],"fork_run_gid":str(next_gid()),"repository_gid":str(next_gid()),"team_space_gid":str(next_gid()),"fork_depth":p["fork_depth"],"status":"completed"}
+        source=self.source_projections.get(str(p["source_version_gid"]),{"source_repository_gid":str(p["source_version_gid"]),"source_version_gid":str(p["source_version_gid"]),"source_content_hash":_hash({"source_version_gid":str(p["source_version_gid"])}),"nodes":[]})
+        result={"workflow_gid":p["workflow_gid"],"fork_run_gid":str(next_gid()),"repository_gid":str(next_gid()),"team_space_gid":str(next_gid()),"target_name":p["target_name"],"fork_depth":p["fork_depth"],"status":"completed",**{k:source[k] for k in ("source_repository_gid","source_version_gid","source_content_hash")}}
         if p["include_personal_migration"]: result["personal_step"]={"status":"pending","step_key":f'{p["workflow_gid"]}:personal'}
+        projection={**copy.deepcopy(source),"fork_operation_gid":result["fork_run_gid"]}
+        self.projections[result["fork_run_gid"]]=projection; self.runs[result["fork_run_gid"]]=copy.deepcopy(result)
         self.applies[key]=result; self.workflows[p["workflow_gid"]]["team"]=result; self.workflows[p["workflow_gid"]]["status"]="team_completed"; return copy.deepcopy(result)
     def preview_personal(self, *, workflow_gid=None, **kw):
         if workflow_gid and workflow_gid not in self.workflows: raise BopForkError("fork_workflow_not_found")
@@ -50,11 +55,18 @@ class MemoryBopForkStore:
         if kw["plan_hash"]!=p["plan_hash"] or kw["allowed_decisions"]!=p["allowed_decisions"]: raise BopForkError("fork_plan_changed")
         key=(kw["preview_gid"],kw["idempotency_key"])
         if key in self.applies:return copy.deepcopy(self.applies[key])
+        slot=(p["tenant_gid"],p["target_repository_gid"],p["actor_gid"])
+        if slot in self.personal_spaces:raise BopForkError("managed_personal_space_exists")
+        self.personal_spaces.add(slot)
         result={"workflow_gid":p["workflow_gid"],"fork_run_gid":str(next_gid()),"personal_space_gid":str(next_gid()),"fork_depth":p["fork_depth"],"status":"completed"}
         self.applies[key]=result; self.workflows[p["workflow_gid"]]["personal"]=result; return copy.deepcopy(result)
     def get_run(self, *, run_gid, tenant_gid, actor_gid):
         row=self.runs.get(run_gid)
         if not row: raise BopForkError("fork_run_not_found")
+        return copy.deepcopy(row)
+    def get_projection(self, *, fork_run_gid, tenant_gid, actor_gid):
+        row=self.projections.get(str(fork_run_gid))
+        if not row: raise BopForkError("fork_projection_not_found")
         return copy.deepcopy(row)
     def get_workflow(self, *, workflow_gid, tenant_gid, actor_gid):
         row=self.workflows.get(workflow_gid)

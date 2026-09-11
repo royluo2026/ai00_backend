@@ -35,6 +35,22 @@ public sealed class RuntimeTransport(HttpClient http,Uri origin)
         if(!json.GetProperty("success").GetBoolean())throw new InvalidDataException("cloud_response_invalid");
         return json.GetProperty("data").Clone();
     }
+    public async Task DownloadAsync(Uri source,string destination,long expectedSize,RuntimeSession session,CancellationToken ct)
+    {
+        if(expectedSize<0||expectedSize>2L*1024*1024*1024)throw new InvalidDataException("artifact_ref_invalid");
+        var endpoint=source.IsAbsoluteUri?source:new Uri(origin,source);
+        using var request=new HttpRequestMessage(HttpMethod.Get,endpoint);
+        if(endpoint.Scheme is not ("http" or "https"))throw new InvalidDataException("artifact_download_scheme_invalid");
+        if(string.Equals(endpoint.Host,origin.Host,StringComparison.OrdinalIgnoreCase)&&endpoint.Port==origin.Port)
+            foreach(var header in Headers(session))request.Headers.Add(header.Key,header.Value);
+        using var response=await http.SendAsync(request,HttpCompletionOption.ResponseHeadersRead,ct);
+        response.EnsureSuccessStatusCode();
+        await using var input=await response.Content.ReadAsStreamAsync(ct);
+        await using var output=new FileStream(destination,FileMode.CreateNew,FileAccess.Write,FileShare.None,81920,true);
+        var buffer=new byte[81920];long total=0;
+        while(true){var count=await input.ReadAsync(buffer,ct);if(count==0)break;total+=count;if(total>expectedSize)throw new InvalidDataException("artifact_size_mismatch");await output.WriteAsync(buffer.AsMemory(0,count),ct);}
+        if(total!=expectedSize)throw new InvalidDataException("artifact_size_mismatch");
+    }
     internal static Dictionary<string,string> Headers(RuntimeSession session)=>new()
     {
         ["X-AI00-Device-ID"]=session.DeviceId,["X-AI00-Runtime-Generation"]=session.Generation.ToString(System.Globalization.CultureInfo.InvariantCulture),
@@ -179,7 +195,7 @@ public sealed class AppCredentialStore(string root,Uri origin)
 
 public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeTransport transport,DeviceSigningKey key,
     AppCredentialStore credentials,AppPlanJournal journal,VisMockupAdapter adapter,PostConditionProbes probes,
-    HostManifest manifest,IHostApplicationLifetime lifetime):BackgroundService
+    HostManifest manifest,IAppArtifactMaterializer artifactMaterializer,IHostApplicationLifetime lifetime):BackgroundService
 {
     internal const int PlanLeaseSeconds=300;
     internal static bool HeartbeatDue(DateTimeOffset now,DateTimeOffset lastHeartbeat) =>
@@ -193,7 +209,7 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
         var deviceId=credential.GetProperty("device_id").GetString()!;var tenantId=credential.GetProperty("tenant_gid").GetString()!;
         var generation=credential.GetProperty("runtime_generation").GetInt64();var secret=credential.GetProperty("device_credential").GetString()!;
         var keyId=credential.GetProperty("device_key_id").GetString()!;
-        var executor=new PlanExecutionWorker(journal,adapter,key,keyId,manifest.PlanKeys);
+        var executor=new PlanExecutionWorker(journal,adapter,key,keyId,manifest.PlanKeys,null,artifactMaterializer);
         var savedSession=credentials.LoadSession();
         var recovered=executor.Recover();
         if(recovered.Count>0)
@@ -206,9 +222,16 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
                     continue;
                 }
                 await diagnostics.SendAsync(new{type="diagnostic",code="recovery_required"},ct);
-                await ReconcileAsync(outcome,deviceId,tenantId,generation,secret,keyId,ct);
-                lifetime.StopApplication();return;
+                try{await ReconcileAsync(outcome,deviceId,tenantId,generation,secret,keyId,ct);}
+                catch(RuntimeTransportException error) when(IsObsoleteRecovery(error.Message))
+                {
+                    // Retain the signed local record, but do not let a plan the
+                    // server no longer owns block newer recovery work.
+                    journal.Append("reconciliation_retry_v3",outcome.PlanId,"{\"result\":\"server_plan_unavailable\"}");
+                    continue;
+                }
             }
+            lifetime.StopApplication();return;
         }
         RuntimeSession session;
         if(savedSession is not null&&savedSession.ExpiresAt>DateTimeOffset.UtcNow)
@@ -340,12 +363,13 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
         }
         var context=await transport.SendAsync(HttpMethod.Get,"plans/"+Uri.EscapeDataString(outcome.PlanId)+"/probe",null,ct,session);
         if(context.GetProperty("scope").GetString()!="read_only_post_condition_probe"||context.GetProperty("plan_id").GetString()!=outcome.PlanId||context.GetProperty("plan_hash").GetString()!=outcome.PlanHash||context.GetProperty("lease_id").GetString()!=outcome.LeaseId||context.GetProperty("device_id").GetString()!=session.DeviceId||context.GetProperty("tenant_id").GetString()!=session.TenantId||context.GetProperty("runtime_generation").GetInt64()!=session.Generation||context.GetProperty("runtime_instance_id").GetString()!=outcome.RuntimeInstanceId||context.GetProperty("recovery_instance_id").GetString()!=session.InstanceId)throw new InvalidDataException("recovery_context_invalid");
-        var observations=new List<object>();
+        var observations=new List<object>();var hasInconclusive=false;
         foreach(var probe in context.GetProperty("required_probes").EnumerateArray())
         {
             object observation;
-            try{observation=await probes.ObserveAsync(probe.GetProperty("probe_id").GetString()!,ct);}
-            catch(Exception error) when(error is Ai00.Connector.Contracts.ConnectorException or TimeoutException)
+            try{observation=await probes.ObserveAsync(probe.GetProperty("probe_id").GetString()!,
+                probe.TryGetProperty("probe_input",out var input)?input:null,ct);}
+            catch(Exception error) when(error is not (OutOfMemoryException or StackOverflowException))
             {
                 // A recovery probe is read-only. Unsupported or timed-out probes must
                 // produce durable inconclusive evidence instead of crashing the host
@@ -353,6 +377,7 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
                 observation=new{classification="inconclusive",observed_result=(object?)null};
             }
             var observed=JsonSerializer.SerializeToElement(observation);
+            hasInconclusive|=observed.GetProperty("classification").GetString()=="inconclusive";
             observations.Add(new{step_id=probe.GetProperty("step_id").GetString(),probe_id=probe.GetProperty("probe_id").GetString(),classification=observed.GetProperty("classification").GetString(),observed_result=observed.GetProperty("observed_result")});
         }
         var evidence=JsonSerializer.SerializeToNode(new{protocol="ai00.connector.reconciliation-evidence.v2",scope="read_only_post_condition_probe",plan_id=outcome.PlanId,plan_hash=outcome.PlanHash,lease_id=outcome.LeaseId,tenant_id=session.TenantId,device_id=session.DeviceId,runtime_generation=session.Generation,runtime_instance_id=outcome.RuntimeInstanceId,recovery_instance_id=session.InstanceId,recovery_session_id=context.GetProperty("recovery_session_id").GetString(),nonce=context.GetProperty("nonce").GetString(),probes=observations,journal_sequence=context.GetProperty("next_journal_sequence").GetInt64(),reported_at=PlanExecutionWorker.Timestamp(DateTimeOffset.UtcNow),device_key_id=keyId,signature_algorithm="ecdsa-p256-sha256"})!.AsObject();
@@ -360,8 +385,10 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
         journal.Append("reconciliation_evidence",outcome.PlanId,evidence.ToJsonString());
         await transport.SendAsync(HttpMethod.Post,"plans/"+Uri.EscapeDataString(outcome.PlanId)+"/reconcile",evidence,ct,session);
         journal.Append("reconciled",outcome.PlanId,"{}");
+        journal.Append("reconciliation_retry_v3",outcome.PlanId,"{}");
         // Inconclusive observations deliberately remain blocked for cloud/manual resolution.
-        journal.Append("manual_review_required",outcome.PlanId,"{}");
+        if(hasInconclusive)journal.Append("manual_review_required",outcome.PlanId,"{}");
     }
+    internal static bool IsObsoleteRecovery(string code)=>code=="plan_reconciliation_invalid";
     private static byte[] Decode(string text)=>Convert.FromBase64String(text.Replace('-','+').Replace('_','/')+new string('=',(4-text.Length%4)%4));
 }

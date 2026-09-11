@@ -128,7 +128,10 @@ class GovernedSimulationRuntimeClient:
     @staticmethod
     def connector_outcome_target(plan):
         operations = {step.operation_id for step in plan.steps}
-        if operations == {"vismockup.document.snapshot@1"}:
+        if getattr(plan, "capability_id", "") == "simulation.environment.runtime_package.open.request":
+            capability_id = "simulation.connector_environment_runtime_outcome.apply"
+            resource_payload = {"connector_plan_id": plan.plan_id}
+        elif operations == {"vismockup.document.snapshot@1"}:
             capability_id = "simulation.connector_document_snapshot_outcome.apply"
             resource_payload = {"snapshot_request_id": plan.plan_id}
         elif "vismockup.view.capture@1" in operations:

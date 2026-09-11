@@ -189,14 +189,14 @@ def test_workspace_delete_is_owner_scoped_cas_and_has_no_confirmation_popup():
     assert spec.input_schema["additionalProperties"] is False
 
 
-def test_private_fork_uses_immutable_manifest_and_stays_private():
+def test_workspace_fork_preserves_requested_private_or_shared_visibility():
     import hashlib, json
     manifest={"schema":"ai00.simulation.environment-manifest.v1","workspace_gid":"101",
               "version_gid":"102","nodes":[],"bindings":[],"algorithms":{}}
     content=json.dumps(manifest,sort_keys=True,separators=(",", ":")).encode()
     class ForkRepo(StubRepository):
         def create_fork_preview(self, **kwargs):
-            self.calls.append(("fork_preview",kwargs));return {"preview_gid":"701","plan_hash":"sha256:"+"b"*64,"source_workspace_gid":"101","source_version_gid":"102","source_content_hash":"sha256:"+hashlib.sha256(content).hexdigest(),"target_name":kwargs["target_name"],"target_version_label":kwargs["target_version_label"],"fork_depth":kwargs["fork_depth"],"visibility":"private","expires_at":"2026-09-09T12:10:00+00:00"}
+            self.calls.append(("fork_preview",kwargs));return {"preview_gid":"701","plan_hash":"sha256:"+"b"*64,"source_workspace_gid":"101","source_version_gid":"102","source_content_hash":"sha256:"+hashlib.sha256(content).hexdigest(),"target_name":kwargs["target_name"],"target_version_label":kwargs["target_version_label"],"fork_depth":kwargs["fork_depth"],"visibility":kwargs["visibility"],"expires_at":"2026-09-09T12:10:00+00:00"}
         def get_fork_plan(self, **kwargs):
             return {"gid":"701","plan_hash":kwargs["plan_hash"],"source_workspace_gid":"101","source_version_gid":"102","content_hash":"sha256:"+hashlib.sha256(content).hexdigest(),"fork_depth":"process","manifest_artifact_ref":{"artifact_id":"900"}}
         def apply_fork(self, **kwargs):
@@ -207,9 +207,10 @@ def test_private_fork_uses_immutable_manifest_and_stays_private():
     class Freeze:
         artifact_port=Port()
     repo=ForkRepo();provider=WorkspaceProvider(repo,freeze_service=Freeze())
-    preview=provider.fork_preview({"source_workspace_gid":"101","source_version_gid":"102","target_name":"Fork 1","target_version_label":"V1","fork_depth":"process"},_context()).data
+    preview=provider.fork_preview({"source_workspace_gid":"101","source_version_gid":"102","target_name":"Fork 1","target_version_label":"V1","fork_depth":"process","visibility":"shared"},_context()).data
     applied=provider.fork_apply({"preview_gid":"701","plan_hash":preview["plan_hash"],"idempotency_key":"fork-1"},_context()).data
-    assert preview["visibility"]=="private" and preview["fork_depth"]=="process" and applied["workspace_gid"]=="801"
+    assert preview["visibility"]=="shared" and preview["fork_depth"]=="process" and applied["workspace_gid"]=="801"
+    assert repo.calls[0][1]["visibility"] == "shared"
 
 
 def test_private_fork_copy_depth_filters_nodes_and_resource_bindings():

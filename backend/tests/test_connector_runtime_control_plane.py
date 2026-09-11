@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 from backend.capability_v2.contracts import OperationRef, OperationStatus
-from backend.capability_v2.provider_contracts import CapabilityContext
+from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext
 from backend.contracts.connector_execution_plan_v1 import (
     ConnectorExecutionPlanV1,
     ConnectorPlanOutcomeV1,
@@ -235,9 +235,13 @@ def test_only_explicit_set_style_vismockup_commands_are_safe_to_repeat():
         action="node_visibility", connector_id="device-001",
         payload={"node_key": "42", "action": "toggle_visible"}, context=context, now=NOW,
     )
+    launch = _direct_vismockup_plan_v2(
+        action="launch", connector_id="device-001", payload={}, context=context, now=NOW,
+    )
 
     from plugins.simulation.simulation_backend.data.connector_repository import SimulationConnectorRepository
     assert SimulationConnectorRepository._repeat_is_intrinsically_safe(all_off)
+    assert SimulationConnectorRepository._repeat_is_intrinsically_safe(launch)
     assert not SimulationConnectorRepository._repeat_is_intrinsically_safe(toggle)
 
 
@@ -276,6 +280,87 @@ def test_direct_app_request_queues_v2_instead_of_fenced_legacy_plan():
     assert control.queued["protocol"] == "ai00.connector.execution-plan.v2"
     assert control.runtime_row == {"device_id": "device-001", "runtime_type": "electron"}
     assert result.data["operation_id"] == control.queued["plan_id"]
+
+
+def test_direct_app_request_preserves_actionable_connector_error_code():
+    class Repository:
+        def bound_runtime_for_user(self, user_id, tenant_id):
+            return {"device_id": "device-001", "runtime_type": "electron"}
+
+    class Control:
+        repository = Repository()
+        clock = staticmethod(lambda: NOW)
+
+        def queue_v2(self, value, context, *, runtime_row=None):
+            raise ConnectorError("reconciliation_required")
+
+    class Registry:
+        def __init__(self): self.handlers = {}
+        def register(self, spec, handler, *, descriptor): self.handlers[(spec.id, spec.version)] = handler
+
+    registry = Registry()
+    register_connector_runtime_capabilities(registry, Control())
+    with pytest.raises(CapabilityBusinessError, match="reconciliation_required") as error:
+        registry.handlers[("simulation.vismockup.application.launch.request", 1)](
+            {}, CapabilityContext(
+                user_gid="user-001", team_gid="tenant-001", request_id="request-001",
+                catalog_release="rel_1234567890abcdef1234567890abcdef",
+                normalized_input_hash=canonical_hash({}),
+                capability_version_gid="cv2_1234567890abcdef12345678",
+                business_definition_hash="sha256:" + "2" * 64,
+            ),
+        )
+    assert error.value.code == "reconciliation_required"
+
+
+def test_frozen_runtime_plan_opens_one_root_then_reads_back_the_tree():
+    plan = _direct_vismockup_plan_v2(
+        action="open", connector_id="device-001",
+        payload={"artifact_ref": {"artifact_id": "root"}, "package_dependencies": []},
+        context=CapabilityContext(
+            user_gid="user-001", team_gid="tenant-001", request_id="request-001",
+            catalog_release="rel_1234567890abcdef1234567890abcdef",
+            normalized_input_hash=canonical_hash({"workspace_gid": "10"}),
+            capability_version_gid="cv2_simulation_runtime_package_open_v1",
+            business_definition_hash="sha256:" + "1" * 64,
+            idempotency_key="runtime-open-10",
+        ), now=NOW, capability_id="simulation.environment.runtime_package.open.request",
+        readback=True,
+    )
+
+    assert [step["operation_id"] for step in plan["steps"]] == [
+        "vismockup.model.open@1", "vismockup.tree.read@1",
+    ]
+    assert plan["steps"][1]["depends_on"] == ["step-00001"]
+    assert plan["steps"][1]["payload"] == {"max_depth": 8, "force_refresh": True}
+
+
+def test_frozen_runtime_plan_has_dedicated_outcome_projection():
+    from types import SimpleNamespace
+    from backend.domain_ports.simulation_runtime import GovernedSimulationRuntimeClient
+    plan = SimpleNamespace(
+        plan_id="runtime-plan-1",
+        capability_id="simulation.environment.runtime_package.open.request",
+        steps=[SimpleNamespace(operation_id="vismockup.model.open@1"), SimpleNamespace(operation_id="vismockup.tree.read@1")],
+    )
+    assert GovernedSimulationRuntimeClient.connector_outcome_target(plan) == (
+        "simulation.connector_environment_runtime_outcome.apply",
+        {"connector_plan_id": "runtime-plan-1"},
+    )
+
+
+def test_v2_plan_identity_is_stable_for_the_same_idempotent_request():
+    context = CapabilityContext(
+        user_gid="user-001", team_gid="tenant-001", request_id="request-001",
+        catalog_release="rel_1234567890abcdef1234567890abcdef",
+        normalized_input_hash=canonical_hash({"workspace_gid": "10"}),
+        capability_version_gid="cv2_simulation_runtime_package_open_v1",
+        business_definition_hash="sha256:" + "1" * 64,
+        idempotency_key="runtime-open-10",
+    )
+    first = _direct_vismockup_plan_v2(action="open", connector_id="device-001", payload={"artifact_ref": {"artifact_id": "root"}}, context=context, now=NOW)
+    second = _direct_vismockup_plan_v2(action="open", connector_id="device-001", payload={"artifact_ref": {"artifact_id": "root"}}, context=context, now=NOW)
+    assert first["plan_id"] == second["plan_id"]
 
 
 class MemoryRepository:
@@ -554,6 +639,8 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
         ("simulation.vismockup.application.attach.request", 1),
         ("simulation.vismockup.application.launch.request", 1),
         ("simulation.vismockup.model.open.request", 1),
+        ("simulation.environment.runtime_package.open.request", 1),
+        ("simulation.vismockup.model.insert.request", 1),
         ("simulation.vismockup.model.close.request", 1),
         ("simulation.vismockup.visibility.change.request", 1),
         ("simulation.vismockup.node.visibility.change.request", 1),
@@ -563,6 +650,7 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
         ("simulation.vismockup.status.get", 1),
         ("simulation.vismockup.application.launch", 1),
         ("simulation.vismockup.model.open", 1),
+        ("simulation.vismockup.model.insert", 1),
         ("simulation.vismockup.tree.get", 1),
         ("simulation.vismockup.selection.highlight", 1),
         ("simulation.vismockup.visibility.change.apply", 1),
@@ -589,6 +677,8 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
         "simulation.vismockup.application.attach.request",
         "simulation.vismockup.application.launch.request",
         "simulation.vismockup.model.open.request",
+        "simulation.environment.runtime_package.open.request",
+        "simulation.vismockup.model.insert.request",
         "simulation.vismockup.model.close.request",
         "simulation.vismockup.visibility.change.request",
         "simulation.vismockup.node.visibility.change.request",

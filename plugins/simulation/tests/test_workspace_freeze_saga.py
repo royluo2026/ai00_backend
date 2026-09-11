@@ -18,6 +18,7 @@ class MemoryRepository:
             "version_status": "draft",
             "nodes": [{"node_gid": "20", "name": "工序A"}],
             "bindings": [],
+            "runtime_model": {"environment_gid": "10", "documents": [{"document_gid": "30"}], "hierarchies": []},
         }
         self.completed = None
         self.fail_complete = False
@@ -74,6 +75,7 @@ def test_freeze_pins_canonical_manifest_and_is_replay_safe():
     assert len(artifacts.calls) == 1
     manifest = json.loads(artifacts.calls[0][0])
     assert manifest["workspace_gid"] == "10"
+    assert manifest["runtime_model"]["environment_gid"] == "10"
     assert manifest["algorithms"] == {"identity": "v1", "parser": "v1"}
     assert repository.completed["content_hash"].startswith("sha256:")
 

@@ -155,6 +155,57 @@ public sealed class OutcomeUnknownRecoveryTests : IDisposable
         journal.Append("reconciled","plan-002","{}");
         Assert.Empty(Worker(new AppPlanJournal(journal.Path),adapter,key).Recover());
     }
+    [Fact] public void CrashBeforeASecondStepDoesNotReportThePartiallyExecutedPlanAsSucceeded()
+    {
+        using var key = new DeviceSigningKeyStore(root).GetOrCreate();
+        var plan=ProtocolV2VectorTests.Vector["plan"]!.DeepClone().AsObject();
+        var second=plan["steps"]![0]!.DeepClone();second["step_id"]="step-00002";
+        plan["steps"]!.AsArray().Add(second);
+        using var cloud=ProtocolV2VectorTests.TestKey("plan");ProtocolV2VectorTests.SignPlan(plan,cloud);
+        var lease=Lease() with{PlanJson=plan.ToJsonString()};
+        var journal=new AppPlanJournal(Path.Combine(root,"journal"));
+        journal.Append("plan_received","plan-002",lease.PlanJson);
+        journal.Append("lease_acquired","plan-002",JsonSerializer.Serialize(lease));
+        var result=JsonSerializer.SerializeToElement(new{connected=true});
+        journal.Append("step_terminal","plan-002",JsonSerializer.Serialize(new {
+            step_id="step-00001",started_at=PlanExecutionWorker.Timestamp(Now),completed_at=PlanExecutionWorker.Timestamp(Now),
+            status="succeeded",result,result_hash=CanonicalJsonV2.Hash(result),
+            error_code=(string?)null,reconciliation_state="not_required"}));
+
+        var recovered=Assert.Single(Worker(journal,new FakeAdapter(()=>throw new Exception("must not run")),key).Recover());
+
+        Assert.Equal("failed_without_effect",recovered.OverallStatus);
+        Assert.Equal(2,recovered.Steps.GetArrayLength());
+        Assert.Equal("invocation_not_started",recovered.Steps[1].GetProperty("error_code").GetString());
+    }
+    [Fact] public void APreviouslyInconclusiveManualReviewGetsOneUpgradedProbeAttempt()
+    {
+        using var key = new DeviceSigningKeyStore(root).GetOrCreate();
+        var journal = new AppPlanJournal(Path.Combine(root,"journal"));
+        var adapter = new FakeAdapter(() => throw new Exception("recovery must only probe"));
+        var outcome = Worker(journal,adapter,key).Recover();
+        Assert.Empty(outcome);
+        journal.Append("plan_received","plan-002",Lease().PlanJson);
+        journal.Append("lease_acquired","plan-002",JsonSerializer.Serialize(Lease()));
+        journal.Append("invocation_started","plan-002",JsonSerializer.Serialize(new {step_id="step-00001",started_at=Now.ToString("O")}));
+        var original = Assert.Single(Worker(journal,adapter,key).Recover());
+        journal.Append("reconciled","plan-002","{}");
+        journal.Append("manual_review_required","plan-002","{}");
+
+        var retry = Assert.Single(Worker(new AppPlanJournal(journal.Path),adapter,key).Recover());
+
+        Assert.Equal(original.ToJson(), retry.ToJson());
+        journal.Append("reconciliation_retry_v3","plan-002","{}");
+        Assert.Empty(Worker(new AppPlanJournal(journal.Path),adapter,key).Recover());
+    }
+    [Theory]
+    [InlineData("plan_reconciliation_invalid", true)]
+    [InlineData("runtime_session_conflict", false)]
+    [InlineData("cloud_temporarily_unavailable", false)]
+    public void OnlyACloudRejectedHistoricalRecoveryCanBeSkipped(string code, bool expected)
+    {
+        Assert.Equal(expected, RuntimeSessionWorker.IsObsoleteRecovery(code));
+    }
     [Theory] [InlineData("device")] [InlineData("generation")] [InlineData("instance")] [InlineData("expiry")] [InlineData("key")] [InlineData("lease")]
     public async Task InvalidBindingsNeverReachAdapter(string field)
     {

@@ -56,7 +56,7 @@ class MysqlBopRepositoryStore:
         where, args = "deleted_at IS NULL", []
         if project_gid: where += " AND project_gid=%s"; args.append(project_gid)
         with self._connect() as conn, conn.cursor() as cur:
-            return self._page(cur, f"SELECT gid repository_gid,project_gid,baseline_version_gid,lifecycle_status,row_version,updated_at FROM workmanship_craft_bop_repositories WHERE {where} ORDER BY updated_at DESC,gid DESC", tuple(args), offset, page_size)
+            return self._page(cur, f"SELECT gid repository_gid,project_gid,display_name,baseline_version_gid,lifecycle_status,row_version,updated_at FROM workmanship_craft_bop_repositories WHERE {where} ORDER BY updated_at DESC,gid DESC", tuple(args), offset, page_size)
 
     def get_repository(self, *, repository_gid, tenant_gid, actor_gid):
         with self._connect() as conn, conn.cursor() as cur:
@@ -149,7 +149,7 @@ class MysqlBopRepositoryStore:
 
     def search_space_versions(self, *, space_gid, tenant_gid, actor_gid, offset=0, page_size=50):
         with self._connect() as conn, conn.cursor() as cur:
-            return self._page(cur,"SELECT gid version_gid,space_gid,version_kind,parent_version_gid,manifest_hash,created_by,created_at FROM workmanship_craft_bop_space_versions WHERE space_gid=%s AND tenant_gid=%s ORDER BY created_at DESC,gid DESC",(space_gid,tenant_gid),offset,page_size)
+            return self._page(cur,"SELECT gid version_gid,space_gid,version_kind,parent_version_gid,manifest_hash,created_by,created_at FROM workmanship_craft_bop_space_versions WHERE space_gid=%s ORDER BY created_at DESC,gid DESC",(space_gid,),offset,page_size)
 
     def get_space_version(self, *, version_gid, tenant_gid, actor_gid):
         with self._connect() as conn, conn.cursor() as cur:

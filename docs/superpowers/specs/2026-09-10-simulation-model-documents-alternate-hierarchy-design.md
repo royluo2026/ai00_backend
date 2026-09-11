@@ -44,6 +44,8 @@
 
 数据库是协作语义与版本的权威来源；PLMXML 是 VisMockup 兼容的交换、导入、导出和快照制品。JT/PLMXML 原始字节不复制进普通业务表。一个环境可以引用多个来源文件，但每个可复现环境版本对 VisMockup 只发布一个顶层运行 PLMXML；该文件及其已解析依赖共同构成 runtime package。
 
+模型文档必须先形成有向依赖图。若待插入 PLMXML 已外部引用当前主文档，或其依赖闭包与当前运行文档形成回指/重复根，它不能再作为普通补充文档执行 `InsertDocument`；系统必须将它提升为新的顶层候选，或在物化时对共同依赖去重。检测到环路时以 `model_document_dependency_cycle` 拒绝同步，不能把 VisMockup 卡死或崩溃当成普通超时。
+
 AI00 与 VisMockup 不需要拥有完全相同的对象模型，但必须对环境中“会影响数模分析执行”的部分达成可验证的一致认识。未经 VisMockup 物化、回读和控制验证的数据库状态只能是草稿，不能标记为可复现版本。
 
 ## 2. 样本证据与修正
@@ -331,6 +333,7 @@ Import 必须同时保存原始不可变 Artifact、规范化数据库投影和�
 - `model_document_duplicate`
 - `model_document_format_unsupported`
 - `model_document_version_changed`
+- `model_document_dependency_cycle`
 - `local_file_token_expired`
 - `local_file_hash_mismatch`
 - `vismockup_active_document_missing`

@@ -31,6 +31,51 @@ public sealed class VisMockupDocumentLifecycleTests : IDisposable
     }
 
     [Fact]
+    public async Task InsertsIntoTheActiveDocumentWithoutOpeningAnotherDocumentAndSkipsDuplicatePath()
+    {
+        Directory.CreateDirectory(_directory);
+        var insertedPath = Path.Combine(_directory, "inserted.jt");
+        File.WriteAllBytes(insertedPath, [1, 2, 3]);
+        var active = new FakeDocument("active-document", "primary.plmxml", FakeNode.FlatTree(1));
+        var application = new FakeApplication("14.2.0", active);
+        using var sta = new StaDispatcher();
+        var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([_directory]),
+            new FakeVisMockupCom { ExistingApplication = application });
+
+        var first = await adapter.ExecuteAsync(new AdapterOperation(
+            "vismockup.model.insert@1",
+            JsonSerializer.SerializeToElement(new { local_artifact_path = insertedPath }),
+            "insert-step-1"), default);
+        var second = await adapter.ExecuteAsync(new AdapterOperation(
+            "vismockup.model.insert@1",
+            JsonSerializer.SerializeToElement(new { local_artifact_path = insertedPath }),
+            "insert-step-1"), default);
+
+        Assert.True(first.Ok);
+        Assert.True(second.Ok);
+        Assert.Same(active, application.ActiveDocument);
+        Assert.Equal(1, active.InsertDocumentCalls);
+        Assert.Equal([Path.GetFullPath(insertedPath)], active.InsertedDocumentPaths);
+        Assert.Contains(adapter.Manifest.Operations,
+            item => item.OperationId == "vismockup.model.insert@1");
+    }
+
+    [Fact]
+    public void WindowsComDocumentInsertUsesTheDocumentDispatchContract()
+    {
+        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
+        var source = File.ReadAllText(Path.Combine(root, "src", "Ai00.Connector.Adapters.VisMockup", "IVisMockupCom.cs"));
+
+        Assert.Contains("VisMockupDispatch.InvokeMethod(value, 1, path)", source);
+        Assert.Contains("VisMockupDispatch.GetProperty(value, 8)", source);
+        Assert.Contains("VisMockupDispatch.GetProperty(value, 12, index)", source);
+        var insertStart = source.LastIndexOf("public string InsertDocument", StringComparison.Ordinal);
+        var insertEnd = source.IndexOf("public void CaptureImage", insertStart, StringComparison.Ordinal);
+        Assert.DoesNotContain("AddModel(path)", source[insertStart..insertEnd]);
+    }
+
+
+    [Fact]
     public async Task CloseTakesOverVisMockupAndClosesUserSelectedDocumentsToo()
     {
         Directory.CreateDirectory(_directory);
@@ -133,6 +178,110 @@ public sealed class VisMockupDocumentLifecycleTests : IDisposable
         Assert.Contains("node-1", document.SelectedNodeKeys);
         Assert.Contains(adapter.Manifest.Operations, item => item.OperationId == "vismockup.node.visibility.change@1");
         Assert.Contains(adapter.Manifest.Operations, item => item.OperationId == "vismockup.node.selection.change@1");
+    }
+
+    [Fact]
+    public async Task NodeVisibilitySkipsAnAlreadySatisfiedWrite()
+    {
+        var document = new FakeDocument("existing-document", "user", FakeNode.FlatTree(1));
+        document.SetNodeVisible("node-0", true);
+        var application = new FakeApplication("14.2.0", document);
+        using var sta = new StaDispatcher();
+        var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([_directory]),
+            new FakeVisMockupCom { ExistingApplication = application });
+        var callsBefore = document.SetNodeVisibleCalls;
+
+        var result = await adapter.ChangeNodeVisibilityAsync("node-0", "show");
+
+        Assert.Equal(callsBefore, document.SetNodeVisibleCalls);
+        Assert.Contains("visible = True", result.ToString());
+    }
+
+    [Fact]
+    public async Task NodeVisibilityAcceptsAWriteThatThrowsAfterTakingEffect()
+    {
+        var document = new FakeDocument("existing-document", "user", FakeNode.FlatTree(1))
+        {
+            SetNodeVisibleError = new InvalidOperationException("late COM failure"),
+            ApplyVisibilityBeforeThrow = true,
+        };
+        var application = new FakeApplication("14.2.0", document);
+        using var sta = new StaDispatcher();
+        var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([_directory]),
+            new FakeVisMockupCom { ExistingApplication = application });
+
+        var result = await adapter.ChangeNodeVisibilityAsync("node-0", "show");
+
+        Assert.True(document.IsNodeVisible("node-0"));
+        Assert.Contains("visible = True", result.ToString());
+    }
+
+    [Fact]
+    public async Task NodeVisibilityClassifiesARejectedWriteAsNoEffect()
+    {
+        var document = new FakeDocument("existing-document", "user", FakeNode.FlatTree(1))
+        {
+            SetNodeVisibleError = new InvalidOperationException("COM rejected write"),
+        };
+        var application = new FakeApplication("14.2.0", document);
+        using var sta = new StaDispatcher();
+        var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([_directory]),
+            new FakeVisMockupCom { ExistingApplication = application });
+
+        var error = await Assert.ThrowsAsync<ConnectorNoEffectException>(
+            () => adapter.ChangeNodeVisibilityAsync("node-0", "show"));
+
+        Assert.Equal("vismockup_node_visibility_write_rejected", error.Message);
+        Assert.False(document.IsNodeVisible("node-0"));
+    }
+
+    [Fact]
+    public async Task ReadOnlyVisibilityRecoveryFindsTheTargetInANonActiveOpenDocument()
+    {
+        Directory.CreateDirectory(_directory);
+        var active = new FakeDocument("active", "tc://active", FakeNode.FlatTree(1));
+        var target = new FakeDocument("target", "tc://target",
+            new FakeNode("session-root", "Root", "", "", [
+                new FakeNode("session-leaf", "Leaf", "", "", []),
+            ]));
+        var cachePath = Path.Combine(_directory, "tree.db");
+        new VisMockupTreeCache(cachePath).ReplaceProjection(target, new("pdm:root", [
+            new("pdm:root", null, 0, 0, "Root", "W10", "A", "root", "", [], ["Root"], ""),
+            new("pdm:leaf", "pdm:root", 0, 1, "Leaf", "W10-1", "A", "leaf", "", [], ["Root", "Leaf"], ""),
+        ], "sha256:" + new string('d', 64)));
+        var application = new FakeApplication("14.2.0", active) { OpenDocuments = [active, target] };
+        using var sta = new StaDispatcher();
+        var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([_directory]),
+            new FakeVisMockupCom { ExistingApplication = application }, Path.Combine(_directory, "captures"), cachePath);
+
+        var visible = await adapter.ObserveNodeVisibilityAsync("pdm:leaf");
+
+        Assert.False(visible);
+    }
+
+    [Fact]
+    public async Task ReadOnlyVisibilityRecoveryRejectsACachedTargetWhoseDocumentIsClosed()
+    {
+        Directory.CreateDirectory(_directory);
+        var active = new FakeDocument("active", "tc://active", FakeNode.FlatTree(1));
+        var closed = new FakeDocument("closed", "tc://closed",
+            new FakeNode("session-root", "Root", "", "", [
+                new FakeNode("session-leaf", "Leaf", "", "", []),
+            ]));
+        var cachePath = Path.Combine(_directory, "tree.db");
+        new VisMockupTreeCache(cachePath).ReplaceProjection(closed, new("pdm:root", [
+            new("pdm:root", null, 0, 0, "Root", "W10", "A", "root", "", [], ["Root"], ""),
+            new("pdm:leaf", "pdm:root", 0, 1, "Leaf", "W10-1", "A", "leaf", "", [], ["Root", "Leaf"], ""),
+        ], "sha256:" + new string('e', 64)));
+        var application = new FakeApplication("14.2.0", active) { OpenDocuments = [active] };
+        using var sta = new StaDispatcher();
+        var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([_directory]),
+            new FakeVisMockupCom { ExistingApplication = application }, Path.Combine(_directory, "captures"), cachePath);
+
+        var error = await Assert.ThrowsAsync<ConnectorException>(
+            () => adapter.ObserveNodeVisibilityAsync("pdm:leaf"));
+
+        Assert.Equal("vismockup_recovery_node_unavailable", error.Code);
     }
 
     public void Dispose()

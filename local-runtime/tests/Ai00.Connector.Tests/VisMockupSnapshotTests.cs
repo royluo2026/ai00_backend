@@ -308,6 +308,28 @@ public sealed class VisMockupSnapshotTests
     }
 
     [Fact]
+    public void ReadOnlyRecoveryCanFollowFreshProjectionOrderAcrossDisplayNameEncodingDifferences()
+    {
+        var directory = NewCacheDirectory("read-only-recovery-name-encoding");
+        try
+        {
+            var document = new FakeDocument("SESSION-1", "tc://bom/W10",
+                new FakeNode("session-root", "Root 正常编码", "", "", [
+                    new FakeNode("session-leaf", "Leaf 正常编码", "", "", []),
+                ]));
+            var cache = new VisMockupTreeCache(Path.Combine(directory, "tree.db"));
+            cache.ReplaceProjection(document, new("pdm:root", [
+                new("pdm:root", null, 0, 0, "Root 乱码", "W10", "A", "root", "", [], ["Root"], ""),
+                new("pdm:leaf", "pdm:root", 0, 1, "Leaf 乱码", "W10-1", "A", "leaf", "", [], ["Root", "Leaf"], ""),
+            ], "sha256:" + new string('c', 64)));
+
+            Assert.Throws<InvalidDataException>(() => cache.ResolveSessionNodeKey(document, "pdm:leaf"));
+            Assert.Equal("session-leaf", cache.ResolveSessionNodeKey(document, "pdm:leaf", verifyPrintableName: false));
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
     public async Task StableCachedOccurrenceResolvesToTheCurrentSessionNodeForControl()
     {
         var directory = NewCacheDirectory("session-node-control");

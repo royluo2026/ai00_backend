@@ -1,7 +1,7 @@
 {
   "database_name": "ai00_test",
   "isolation_profile": "single_database_domain_tables",
-  "schema_sha256": "sha256:6db964d054bb6f5afa6863f5e606a60bd01009ae932f2ee5b0d1af339e89edc7",
+  "schema_sha256": "sha256:8e90c06348fb26f05bcf6a0a5c35754a8aa6d7b901c710352f2573c6d62494ea",
   "schema_version": 1,
   "tables": [
     {
@@ -22456,6 +22456,16 @@
           "sources": [
             "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
           ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "target_name",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0013_bop_repository_display_name.sql"
+          ]
         }
       ],
       "constraints": [],
@@ -22488,7 +22498,8 @@
       "owner": "craft",
       "runtime_domain": "craft",
       "sources": [
-        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql",
+        "backend/db/migrations/domains/craft/0013_bop_repository_display_name.sql"
       ]
     },
     {
@@ -23426,6 +23437,16 @@
           "sources": [
             "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
           ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "display_name",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/craft/0013_bop_repository_display_name.sql"
+          ]
         }
       ],
       "constraints": [
@@ -23472,7 +23493,8 @@
       "owner": "craft",
       "runtime_domain": "craft",
       "sources": [
-        "backend/db/migrations/domains/craft/0010_bop_repositories.sql"
+        "backend/db/migrations/domains/craft/0010_bop_repositories.sql",
+        "backend/db/migrations/domains/craft/0013_bop_repository_display_name.sql"
       ]
     },
     {
@@ -44813,6 +44835,209 @@
     {
       "columns": [
         {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "workspace_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "version_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(24)",
+          "default": null,
+          "extra": "",
+          "name": "state",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "manifest_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "runtime_package_artifact_ref_json",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "connector_device_id",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "report_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "version_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_sim_verification_version",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_sim_workspace_versions",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "columns": [
+            "workspace_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_sim_verification_workspace",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_sim_workspaces",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "workspace_gid",
+            "state",
+            "updated_at"
+          ],
+          "name": "idx_sim_verification_workspace",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "version_gid",
+            "manifest_hash"
+          ],
+          "name": "uq_sim_verification_version_manifest",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_materialization_verifications",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
           "data_type": "VARCHAR(128)",
           "default": null,
           "extra": "",
@@ -45388,6 +45613,218 @@
       "sources": [
         "backend/db/migrations/202608100010_simulation_reproducibility.sql",
         "backend/db/migrations/domains/simulation/0001_simulation.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0019_simulation_runtime_package_projection.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "workspace_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0019_simulation_runtime_package_projection.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "version_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0019_simulation_runtime_package_projection.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0019_simulation_runtime_package_projection.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "actor_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0019_simulation_runtime_package_projection.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(256)",
+          "default": null,
+          "extra": "",
+          "name": "connector_plan_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0019_simulation_runtime_package_projection.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(24)",
+          "default": null,
+          "extra": "",
+          "name": "state",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0019_simulation_runtime_package_projection.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "manifest_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0019_simulation_runtime_package_projection.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "runtime_package_artifact_ref_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0019_simulation_runtime_package_projection.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "connector_device_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0019_simulation_runtime_package_projection.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "report_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0019_simulation_runtime_package_projection.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0019_simulation_runtime_package_projection.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0019_simulation_runtime_package_projection.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "version_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_sim_runtime_package_version",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_sim_workspace_versions",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0019_simulation_runtime_package_projection.sql"
+          ]
+        },
+        {
+          "columns": [
+            "workspace_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_sim_runtime_package_workspace",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_sim_workspaces",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0019_simulation_runtime_package_projection.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0019_simulation_runtime_package_projection.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "workspace_gid",
+            "version_gid",
+            "actor_gid",
+            "updated_at"
+          ],
+          "name": "idx_sim_runtime_package_workspace",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0019_simulation_runtime_package_projection.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "connector_plan_id"
+          ],
+          "name": "uq_sim_runtime_package_plan",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0019_simulation_runtime_package_projection.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_runtime_package_projections",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0019_simulation_runtime_package_projection.sql"
       ]
     },
     {
@@ -46161,6 +46598,96 @@
           "sources": [
             "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
           ]
+        },
+        {
+          "data_type": "VARCHAR(16)",
+          "default": "'inserted'",
+          "extra": "",
+          "name": "document_role",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "TINYINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "primary_slot",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": "''",
+          "extra": "",
+          "name": "display_name",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(96)",
+          "default": "'application/plmxml+xml'",
+          "extra": "",
+          "name": "media_type",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "artifact_ref_json",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": "''",
+          "extra": "",
+          "name": "content_sha256",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(16)",
+          "default": "'portable'",
+          "extra": "",
+          "name": "portability",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "INT UNSIGNED",
+          "default": "0",
+          "extra": "",
+          "name": "sort_order",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "connector_device_id",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0020_simulation_document_device_binding_and_primary_backfill.sql"
+          ]
         }
       ],
       "constraints": [
@@ -46194,6 +46721,45 @@
         },
         {
           "columns": [
+            "tenant_gid",
+            "connector_device_id",
+            "removed_at"
+          ],
+          "name": "idx_sim_vm_document_device",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0020_simulation_document_device_binding_and_primary_backfill.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "workspace_gid",
+            "removed_at",
+            "sort_order"
+          ],
+          "name": "idx_sim_vm_document_order",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "workspace_gid",
+            "primary_slot"
+          ],
+          "name": "uq_sim_vm_document_primary",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
             "workspace_gid",
             "source_identity_hash"
           ],
@@ -46210,7 +46776,9 @@
       "owner": "simulation",
       "runtime_domain": "simulation",
       "sources": [
-        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql",
+        "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql",
+        "backend/db/migrations/domains/simulation/0020_simulation_document_device_binding_and_primary_backfill.sql"
       ]
     },
     {
@@ -46743,6 +47311,216 @@
       "runtime_domain": "simulation",
       "sources": [
         "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "session_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "document_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "owner_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(16)",
+          "default": null,
+          "extra": "",
+          "name": "document_role",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "INT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "inserted_index",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "actual_identity_hash",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "actual_content_sha256",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "sync_state",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": "1",
+          "extra": "",
+          "name": "row_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "document_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_sim_session_document_document",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_sim_vm_documents",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "columns": [
+            "session_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_sim_session_document_session",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_sim_vm_sessions",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "session_gid",
+            "document_gid"
+          ],
+          "name": "uq_sim_session_document",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "session_gid",
+            "inserted_index"
+          ],
+          "name": "uq_sim_session_inserted_index",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_vm_session_documents",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
       ]
     },
     {
@@ -47721,6 +48499,16 @@
           "sources": [
             "backend/db/migrations/domains/simulation/0015_simulation_workspace_fork_depth.sql"
           ]
+        },
+        {
+          "data_type": "VARCHAR(16)",
+          "default": "'private'",
+          "extra": "",
+          "name": "visibility",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0017_simulation_workspace_fork_visibility.sql"
+          ]
         }
       ],
       "constraints": [
@@ -47758,7 +48546,8 @@
       "owner": "simulation",
       "runtime_domain": "simulation",
       "sources": [
-        "backend/db/migrations/domains/simulation/0015_simulation_workspace_fork_depth.sql"
+        "backend/db/migrations/domains/simulation/0015_simulation_workspace_fork_depth.sql",
+        "backend/db/migrations/domains/simulation/0017_simulation_workspace_fork_visibility.sql"
       ]
     },
     {
@@ -48305,6 +49094,233 @@
           "data_type": "BIGINT UNSIGNED",
           "default": null,
           "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "workspace_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "owner_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": null,
+          "extra": "",
+          "name": "name",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "source_bop_repository_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "source_bop_version_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "source_bop_fork_run_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(71)",
+          "default": null,
+          "extra": "",
+          "name": "source_bop_content_hash",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "projection_identity",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": "'active'",
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "INT UNSIGNED",
+          "default": "0",
+          "extra": "",
+          "name": "sort_order",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": "1",
+          "extra": "",
+          "name": "row_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "removed_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "workspace_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_sim_alt_hierarchy_workspace",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_sim_workspaces",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "workspace_gid",
+            "removed_at",
+            "sort_order"
+          ],
+          "name": "idx_sim_alt_hierarchy_workspace",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "workspace_gid",
+            "source_bop_fork_run_gid"
+          ],
+          "name": "uq_sim_alt_hierarchy_fork",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ],
+          "unique": true
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_workspace_hierarchies",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
           "name": "workspace_gid",
           "nullable": false,
           "sources": [
@@ -48630,6 +49646,16 @@
           "sources": [
             "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
           ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "hierarchy_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
         }
       ],
       "constraints": [
@@ -48679,6 +49705,20 @@
         {
           "columns": [
             "workspace_gid",
+            "hierarchy_gid",
+            "parent_gid",
+            "removed_at"
+          ],
+          "name": "idx_sim_workspace_node_hierarchy",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "workspace_gid",
             "parent_gid",
             "removed_at"
           ],
@@ -48708,7 +49748,281 @@
       "owner": "simulation",
       "runtime_domain": "simulation",
       "sources": [
-        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql"
+        "backend/db/migrations/domains/simulation/0011_simulation_workspaces.sql",
+        "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "hierarchy_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "workspace_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "tenant_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "owner_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "target_node_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": null,
+          "extra": "",
+          "name": "parent_placement_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "source_kind",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "source_ref_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "JSON",
+          "default": null,
+          "extra": "",
+          "name": "transform_json",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": "''",
+          "extra": "",
+          "name": "display_name",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "INT UNSIGNED",
+          "default": "0",
+          "extra": "",
+          "name": "sort_order",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT UNSIGNED",
+          "default": "1",
+          "extra": "",
+          "name": "row_version",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": null,
+          "extra": "",
+          "name": "removed_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "updated_at",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "columns": [
+            "hierarchy_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_sim_placement_hierarchy",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_sim_workspace_hierarchies",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "columns": [
+            "parent_placement_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_sim_placement_parent",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_sim_workspace_placements",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "columns": [
+            "target_node_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_sim_placement_target_node",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_sim_workspace_nodes",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        },
+        {
+          "columns": [
+            "workspace_gid"
+          ],
+          "expression": null,
+          "kind": "foreign_key",
+          "name": "fk_sim_placement_workspace",
+          "referenced_columns": [
+            "gid"
+          ],
+          "referenced_table": "workmanship_sim_workspaces",
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "gid"
+          ],
+          "name": "PRIMARY",
+          "primary": true,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "hierarchy_gid",
+            "removed_at",
+            "sort_order"
+          ],
+          "name": "idx_sim_placement_hierarchy",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "tenant_gid",
+            "workspace_gid",
+            "removed_at"
+          ],
+          "name": "idx_sim_placement_workspace",
+          "primary": false,
+          "sources": [
+            "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
+          ],
+          "unique": false
+        }
+      ],
+      "legacy_name": false,
+      "name": "workmanship_sim_workspace_placements",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "sources": [
+        "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql"
       ]
     },
     {

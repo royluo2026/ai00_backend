@@ -145,6 +145,8 @@ class RecordingCursor:
             self._all = list(self.connection.ledger_rows)
         elif "information_schema.TABLE_CONSTRAINTS" in normalized:
             self._one = (0,)
+        elif "information_schema.STATISTICS" in normalized:
+            self._one = (0,)
         elif "information_schema.COLUMNS" in normalized:
             self._one = (0,)
         elif normalized == "SELECT VERSION()":
@@ -208,7 +210,7 @@ def test_simulation_historical_0004_checksum_upgrades_through_current_chain(simu
 
     applied = apply_domain_migrations(connection, simulation_manifest, migrations)
 
-    assert applied == ("0005", "0006", "0007", "0008", "0009", "0010", "0011", "0012", "0013", "0014", "0015", "0016")
+    assert applied == ("0005", "0006", "0007", "0008", "0009", "0010", "0011", "0012", "0013", "0014", "0015", "0016", "0017", "0018", "0019", "0020")
 
 
 def test_apply_uses_domain_lock_ledger_and_artifact_version(craft_manifest):
@@ -348,7 +350,7 @@ def test_apply_rejects_changed_checksum_for_applied_migration(craft_manifest):
 
 def test_check_mode_validates_empty_domain_without_connecting(capsys):
     assert main(["--domain", "craft", "--check"], root=ROOT, environ={}) == 0
-    assert capsys.readouterr().out.strip() == "domain=craft migrations=12 mode=check"
+    assert capsys.readouterr().out.strip() == "domain=craft migrations=13 mode=check"
 
 
 def test_apply_requires_only_the_selected_domains_ddl_credential(monkeypatch, capsys):
@@ -388,7 +390,7 @@ def test_apply_requires_only_the_selected_domains_ddl_credential(monkeypatch, ca
     assert result == 0
     assert captured[0].username == "craft_ddl"
     assert connection.closed is True
-    assert "domain=craft migrations=12 applied=0" in capsys.readouterr().out
+    assert "domain=craft migrations=13 applied=0" in capsys.readouterr().out
 
 
 def test_apply_configures_selected_table_prefix(monkeypatch, capsys):
@@ -422,4 +424,4 @@ def test_apply_configures_selected_table_prefix(monkeypatch, capsys):
 
     assert result == 0
     assert prefixes == ["test_"]
-    assert "domain=simulation migrations=16 applied=0" in capsys.readouterr().out
+    assert "domain=simulation migrations=20 applied=0" in capsys.readouterr().out

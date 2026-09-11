@@ -105,7 +105,7 @@ Execute base.workspace.template.publish in the Base collaboration service.
   "major_version": 1,
   "payload": {
     "expected_version": 0,
-    "template": "example",
+    "template": null,
     "template_id": "example"
   }
 }

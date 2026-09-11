@@ -21,6 +21,9 @@ from .connector_runtime import (
 from .connector_pairing import specs as connector_pairing_specs
 from .provider import register
 from .workspaces import candidate_specs as workspace_specs
+from .environment_documents import specs as environment_document_specs
+from .alternate_hierarchies import specs as alternate_hierarchy_specs
+from .plmxml_environments import specs as plmxml_environment_specs
 from .vm_checkpoints import default_provider as default_checkpoint_provider
 from .vm_checkpoints import specs as vm_checkpoint_specs
 from .vm_diffs import default_provider as default_vm_diff_provider
@@ -102,6 +105,20 @@ def _authorize_workspace(resource_id, identity) -> bool:
     ) is not None
 
 
+def _authorize_alternate_hierarchy(resource_id, identity) -> bool:
+    scope = _identity_scope(identity)
+    return bool(scope["user_gid"]) and _workspace_repository.get_alternate_hierarchy(
+        hierarchy_gid=resource_id, tenant_gid=scope["team_gid"], actor_gid=scope["user_gid"],
+    ) is not None
+
+
+def _authorize_placement(resource_id, identity) -> bool:
+    scope = _identity_scope(identity)
+    return bool(scope["user_gid"]) and _workspace_repository.can_read_placement(
+        resource_id, tenant_gid=scope["team_gid"], actor_gid=scope["user_gid"],
+    )
+
+
 def _authorize_vm_checkpoint(resource_id, identity) -> bool:
     scope = _identity_scope(identity)
     return bool(scope["user_gid"]) and default_checkpoint_provider.repository.can_read(
@@ -130,6 +147,8 @@ def register_capabilities(
     resource_authorizers.register("simulation-run", _authorize_run)
     resource_authorizers.register("simulation-connector", _authorize_connector)
     resource_authorizers.register("simulation-workspace", _authorize_workspace)
+    resource_authorizers.register("simulation-alternate-hierarchy", _authorize_alternate_hierarchy)
+    resource_authorizers.register("simulation-placement", _authorize_placement)
     resource_authorizers.register("simulation-vm-checkpoint", _authorize_vm_checkpoint)
     resource_authorizers.register("simulation-vm-diff-report", _authorize_vm_diff_report)
     selected_capture_provider = capture_provider or default_capture_provider
@@ -150,6 +169,12 @@ def register_capabilities(
     for spec, handler in connector_pairing_specs():
         register(registry, spec, handler)
     for spec, handler in workspace_specs():
+        register(registry, spec, handler)
+    for spec, handler in environment_document_specs():
+        register(registry, spec, handler)
+    for spec, handler in alternate_hierarchy_specs():
+        register(registry, spec, handler)
+    for spec, handler in plmxml_environment_specs():
         register(registry, spec, handler)
     for spec, handler in vm_checkpoint_specs():
         register(registry, spec, handler)

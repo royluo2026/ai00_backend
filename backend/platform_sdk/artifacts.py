@@ -51,9 +51,11 @@ def read_artifact(ref, context, *, maximum=5*1024*1024):
     return artifact_service().read(ArtifactRef.model_validate(ref),artifact_identity(context),maximum=maximum)
 
 
-def create_artifact(data,media_type,context):
+def create_artifact(data,media_type,context,*,maximum=5*1024*1024):
     import hashlib, io
-    if len(data)>5*1024*1024: raise ValueError('generated artifact exceeds 5 MiB')
+    if not isinstance(maximum,int) or maximum<1 or maximum>256*1024*1024:
+        raise ValueError('artifact maximum invalid')
+    if len(data)>maximum: raise ValueError('generated artifact exceeds configured maximum')
     service=artifact_service();identity=artifact_identity(context)
     digest=hashlib.sha256(data).hexdigest()
     session=service.create_upload(identity,media_type=media_type,expected_sha256=digest,expected_byte_size=len(data))

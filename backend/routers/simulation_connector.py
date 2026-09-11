@@ -11,6 +11,7 @@ from plugins.simulation.simulation_backend.data.connector_repository import Conn
 
 from datetime import datetime, timezone
 import hashlib
+import logging
 import tempfile
 import uuid
 
@@ -31,6 +32,8 @@ from backend.capability_v2.web_compatibility import build_trusted_web_envelope, 
 from backend.capability_v2.operations import SqlOperationStore
 from backend.contracts.connector_execution_plan_v1 import ConnectorPlanOutcomeV1, verify_connector_outcome
 from backend.db.connection import get_conn
+
+_log = logging.getLogger(__name__)
 
 
 router = APIRouter(prefix="/api/v1/simulation/connectors", tags=["simulation-connector"])
@@ -290,7 +293,8 @@ def _plan_artifact(plan, artifact_id: str):
                     return found
         return None
 
-    return visit(plan.model_dump(mode="json"))
+    value = plan.model_dump(mode="json") if hasattr(plan, "model_dump") else plan
+    return visit(value)
 
 
 @router.get("/plans/{plan_id}/artifacts/{artifact_id}")
@@ -444,6 +448,7 @@ def _transport(call):
         return {'success': True, 'data': call()}
     except (PairingError, ConnectorRepositoryError) as exc:
         code = str(exc)
+        _log.warning("Connector transport rejected: %s", code)
         status = 401 if code in {'runtime_session_invalid', 'device_credential_invalid', 'runtime_proof_invalid', 'runtime_type_invalid'} else 409
         raise HTTPException(status_code=status, detail={'code': code}) from exc
 
@@ -518,6 +523,58 @@ def runtime_restart(body: RuntimeRestartBody, pins: dict = Depends(_runtime_auth
 @router.post('/v2/plans/lease')
 def runtime_lease(body: ConnectorLeaseBody, pins: dict = Depends(_runtime_auth)):
     return _transport(lambda: runtime_session_service.lease(**pins, lease_seconds=body.lease_seconds))
+
+
+@router.get('/v2/plans/{plan_id}/artifacts/{artifact_id}')
+def runtime_artifact_grant(
+    plan_id: str, artifact_id: str, lease_id: str = Query(min_length=1),
+    pins: dict = Depends(_runtime_auth),
+):
+    def grant():
+        plan = runtime_session_service.leased_plan(**pins, plan_id=plan_id, lease_id=lease_id)
+        expected = _plan_artifact(plan, artifact_id)
+        if expected is None:
+            raise ConnectorRepositoryError('artifact_not_bound_to_plan')
+        from backend.capability_v2.artifacts import FilesystemObjectStorage, SqlArtifactStore, configured_object_storage
+        record = SqlArtifactStore(get_conn).get_artifact(artifact_id)
+        if record.artifact_ref.model_dump(mode='json') != expected:
+            raise ConnectorRepositoryError('artifact_ref_mismatch')
+        storage = configured_object_storage()
+        if isinstance(storage, FilesystemObjectStorage):
+            url = (f'/api/v1/simulation/connectors/v2/plans/{plan_id}/artifacts/{artifact_id}/content'
+                   f'?lease_id={lease_id}')
+        else:
+            from backend.core.ois_storage import generate_access_url
+            url = generate_access_url(record.object_key, expire_in_seconds=120)
+        if not url:
+            raise ConnectorRepositoryError('artifact_download_unavailable')
+        return {'artifact_ref': expected, 'download_url': url}
+    return _transport(grant)
+
+
+@router.get('/v2/plans/{plan_id}/artifacts/{artifact_id}/content')
+def runtime_artifact_content(
+    plan_id: str, artifact_id: str, lease_id: str = Query(min_length=1),
+    pins: dict = Depends(_runtime_auth),
+):
+    try:
+        plan = runtime_session_service.leased_plan(**pins, plan_id=plan_id, lease_id=lease_id)
+        expected = _plan_artifact(plan, artifact_id)
+        if expected is None:
+            raise ConnectorRepositoryError('artifact_not_bound_to_plan')
+        from backend.capability_v2.artifacts import FilesystemObjectStorage, SqlArtifactStore, configured_object_storage
+        record = SqlArtifactStore(get_conn).get_artifact(artifact_id)
+        if record.artifact_ref.model_dump(mode='json') != expected:
+            raise ConnectorRepositoryError('artifact_ref_mismatch')
+        storage = configured_object_storage()
+        if not isinstance(storage, FilesystemObjectStorage):
+            raise ConnectorRepositoryError('local_artifact_transport_disabled')
+        from fastapi.responses import FileResponse
+        return FileResponse(storage.path_for(record.object_key), media_type=record.artifact_ref.media_type)
+    except ConnectorRepositoryError as exc:
+        raise HTTPException(status_code=409, detail={'code': str(exc)}) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail={'code': 'artifact_download_unavailable'}) from exc
 
 
 @router.websocket('/v2/plans/wake')

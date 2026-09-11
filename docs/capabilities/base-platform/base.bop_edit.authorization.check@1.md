@@ -99,7 +99,7 @@ Check one trusted actor's project or line-scoped BOP edit authority.
   "catalog_release": "<catalog_release>",
   "major_version": 1,
   "payload": {
-    "line_gid": "example",
+    "line_gid": null,
     "project_gid": "example"
   }
 }

@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 from contextlib import contextmanager
 
 import pytest
+from types import SimpleNamespace
 
 from backend.capability_v2.provider_contracts import CapabilityContext
 from backend.capabilities.registry_next import CapabilityRegistry
@@ -112,6 +113,25 @@ def test_empty_unknown_capture_outcome_stops_the_serial_workflow():
     assert workflow.next_action("run-1", _context()) is None
 
 
+def test_environment_runtime_outcome_records_readback_without_claiming_semantic_verification():
+    calls = []
+    repository = SimpleNamespace(apply_runtime_package_outcome=lambda **values: (
+        calls.append(values) or {"verification_gid": "901", "state": "read_back"}
+    ))
+    provider = ConnectorOutcomeProvider(object(), None, repository)
+    plan = SimpleNamespace(plan_id="runtime-plan-1", capability_id="simulation.environment.runtime_package.open.request")
+    outcome = SimpleNamespace(overall_status="succeeded")
+    provider._contracts = lambda _payload: (plan, outcome)
+
+    result = asyncio.run(provider.apply_environment_runtime({
+        "connector_plan_id": "runtime-plan-1", "plan_json": "{}", "outcome_json": "{}",
+    }, CapabilityContext(user_gid="user-1", team_gid="team-1")))
+
+    assert result.data == {"resource_id": "901", "status": "applied"}
+    assert calls[0]["connector_plan_id"] == "runtime-plan-1"
+    assert calls[0]["tenant_gid"] == "team-1"
+
+
 def test_authenticated_connector_outcome_reaches_simulation_through_real_gateway(monkeypatch):
     from backend.routers import deps
 
@@ -130,7 +150,7 @@ def test_authenticated_connector_outcome_reaches_simulation_through_real_gateway
     descriptor = registry.get("simulation.connector_capture_outcome.apply", 1).descriptor
     release = build_release([descriptor])
     catalog_store = InMemoryCatalogStore(); catalog_store.publish(release)
-    monkeypatch.setattr(deps, "build_profile", lambda _user: {
+    monkeypatch.setattr(deps, "build_profile", lambda _user, **_kwargs: {
         "permissions": ["simulation.use"], "org_role": "member", "grants": [],
     })
     policy = LegacyServerGatewayPolicy(

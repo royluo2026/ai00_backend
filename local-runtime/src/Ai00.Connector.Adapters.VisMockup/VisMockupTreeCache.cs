@@ -233,7 +233,7 @@ internal sealed class VisMockupTreeCache
             parents.Contains(node.StableOccurrenceKey))).ToArray());
     }
 
-    public string ResolveSessionNodeKey(IVisMockupDocument document, string stableOccurrenceKey)
+    public string ResolveSessionNodeKey(IVisMockupDocument document, string stableOccurrenceKey, bool verifyPrintableName = true)
     {
         if (string.IsNullOrWhiteSpace(stableOccurrenceKey))
             throw new InvalidDataException("vismockup_cache_node_identity_invalid");
@@ -273,10 +273,32 @@ internal sealed class VisMockupTreeCache
             if (step.ChildOrder < 0 || step.ChildOrder >= children.Count)
                 throw new InvalidDataException("vismockup_session_node_path_changed");
             current = children[step.ChildOrder];
-            if (!string.Equals(current.PrintableName, step.Name, StringComparison.Ordinal))
+            if (verifyPrintableName && !string.Equals(current.PrintableName, step.Name, StringComparison.Ordinal))
                 throw new InvalidDataException("vismockup_session_node_path_changed");
         }
         return current.NodeKey;
+    }
+
+    public bool IsNodeKnownForDifferentDocument(IVisMockupDocument document, string stableOccurrenceKey)
+    {
+        using var connection = Open();
+        using var command = connection.CreateCommand();
+        command.CommandText = """
+            SELECT
+              COUNT(*),
+              SUM(CASE WHEN d.document_identity_hash=$identity THEN 1 ELSE 0 END)
+            FROM vm_cache_nodes n
+            JOIN vm_cache_documents d
+              ON d.local_id=n.document_local_id AND d.current_generation=n.generation
+            WHERE n.external_node_key=$node_key
+            """;
+        command.Parameters.AddWithValue("$identity", Identity(document));
+        command.Parameters.AddWithValue("$node_key", stableOccurrenceKey);
+        using var reader = command.ExecuteReader();
+        if (!reader.Read()) return false;
+        var total = reader.GetInt64(0);
+        var matching = reader.IsDBNull(1) ? 0 : reader.GetInt64(1);
+        return total > 0 && matching == 0;
     }
 
     private bool EnsureCapacity(string protectedIdentity, long incomingBytes)

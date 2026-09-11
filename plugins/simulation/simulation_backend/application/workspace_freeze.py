@@ -17,6 +17,7 @@ def _canonical_manifest(source: Mapping[str, Any], algorithms: Mapping[str, str]
         "version_gid": str(source["version_gid"]),
         "nodes": source.get("nodes", []),
         "bindings": source.get("bindings", []),
+        "runtime_model": source.get("runtime_model"),
         "algorithms": dict(sorted((str(key), str(value)) for key, value in algorithms.items())),
     }
     return json.dumps(manifest, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")

@@ -42,9 +42,11 @@ public static class Program
             builder.Services.AddSingleton<DiagnosticPipeHost>();
             builder.Services.AddHostedService(s=>s.GetRequiredService<DiagnosticPipeHost>());
             builder.Services.AddSingleton(new RuntimeTransport(http,options.GatewayOrigin));
+            builder.Services.AddSingleton<IAppArtifactMaterializer>(services=>new AppArtifactMaterializer(
+                services.GetRequiredService<RuntimeTransport>(),Path.Combine(root,"artifacts")));
             builder.Services.AddSingleton(key);builder.Services.AddSingleton(new AppCredentialStore(root,options.GatewayOrigin));
             builder.Services.AddSingleton(new AppPlanJournal(Path.Combine(root,$"execution{stateSuffix}.v2.journal")));
-            builder.Services.AddSingleton(adapter);builder.Services.AddSingleton(new PostConditionProbes(sta,com));
+            builder.Services.AddSingleton(adapter);builder.Services.AddSingleton(new PostConditionProbes(sta,com,adapter));
             builder.Services.AddHostedService<RuntimeSessionWorker>();
             using var host=builder.Build();
             using var monitorCancellation=new CancellationTokenSource();

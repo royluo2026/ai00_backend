@@ -1,6 +1,6 @@
 {
   "registry_version": 1,
-  "table_count": 370,
+  "table_count": 375,
   "tables": [
     {
       "table": "workmanship_agent_canvas_audit_events",
@@ -1598,6 +1598,16 @@
       "runtime_domain": "simulation"
     },
     {
+      "table": "workmanship_sim_materialization_verifications",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
+      "table": "workmanship_sim_runtime_package_projections",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
       "table": "workmanship_sim_profiles",
       "owner": "simulation",
       "runtime_domain": "simulation"
@@ -1653,6 +1663,11 @@
       "runtime_domain": "simulation"
     },
     {
+      "table": "workmanship_sim_vm_session_documents",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
       "table": "workmanship_sim_vm_snapshot_heads",
       "owner": "simulation",
       "runtime_domain": "simulation"
@@ -1693,6 +1708,11 @@
       "runtime_domain": "simulation"
     },
     {
+      "table": "workmanship_sim_workspace_hierarchies",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
       "table": "workmanship_sim_workspace_idempotency",
       "owner": "simulation",
       "runtime_domain": "simulation"
@@ -1704,6 +1724,11 @@
     },
     {
       "table": "workmanship_sim_workspace_nodes",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
+      "table": "workmanship_sim_workspace_placements",
       "owner": "simulation",
       "runtime_domain": "simulation"
     },

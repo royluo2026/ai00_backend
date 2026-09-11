@@ -259,6 +259,17 @@ Queue exact Connector materialization for an immutable environment.
 - `materialization_action_not_ready`：The materialization action is not ready to dispatch.（retryable=false）
 - `plan_outcome_invalid`：The Connector outcome does not match the immutable execution plan.（retryable=false）
 - `capability_migration_required`：This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow.（retryable=false）
+- `primary_model_document_exists`：The environment already has an active primary model document.（retryable=false）
+- `primary_model_document_required`：Exactly one active primary model document is required.（retryable=false）
+- `model_document_dependency_cycle`：The selected model document would create a cyclic PLMXML dependency.（retryable=false）
+- `plmxml_artifact_hash_mismatch`：The PLMXML Artifact bytes do not match the immutable reference hash.（retryable=false）
+- `plmxml_artifact_unavailable`：The immutable PLMXML Artifact is unavailable or outside the caller scope.（retryable=false）
+- `alternate_hierarchy_not_found`：The alternate hierarchy is unavailable or outside the caller scope.（retryable=false）
+- `bop_fork_projection_failed`：The completed Craft fork projection could not be loaded for repair.（retryable=false）
+- `bop_fork_already_bootstrapped`：The Craft fork already has an alternate hierarchy in this environment.（retryable=false）
+- `bop_projection_hash_invalid`：The Craft fork projection has no valid immutable content hash.（retryable=false）
+- `bop_projection_parent_missing`：The Craft fork projection references a missing parent node.（retryable=false）
+- `bop_projection_cycle`：The Craft fork projection contains a node cycle.（retryable=false）
 - `pairing_not_found`：The Connector pairing request does not exist.（retryable=false）
 - `pairing_bootstrap_not_found`：The Connector bootstrap ticket does not exist or is not visible to this user.（retryable=false）
 - `pairing_bootstrap_expired`：The two-minute Connector bootstrap ticket expired.（retryable=false）

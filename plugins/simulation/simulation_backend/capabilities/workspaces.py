@@ -179,11 +179,13 @@ class WorkspaceProvider:
         tenant_gid, actor_gid = _scope(context)
         name=str(payload.get("target_name") or "").strip();label=str(payload.get("target_version_label") or "V1").strip()
         fork_depth=str(payload.get("fork_depth") or "")
+        visibility=str(payload.get("visibility") or "private")
         if not name or len(name)>255:raise CapabilityBusinessError("workspace_name_invalid","workspace_name_invalid")
         if not label or len(label)>128:raise CapabilityBusinessError("workspace_version_label_invalid","workspace_version_label_invalid")
         if fork_depth not in {"all","operation","process","role","station"}:raise CapabilityBusinessError("fork_depth_invalid","fork_depth_invalid")
+        if visibility not in {"private","shared"}:raise CapabilityBusinessError("workspace_visibility_invalid","workspace_visibility_invalid")
         try:
-            data=self.repository.create_fork_preview(workspace_gid=str(payload.get("source_workspace_gid") or ""),version_gid=str(payload.get("source_version_gid") or ""),target_name=name,target_version_label=label,fork_depth=fork_depth,tenant_gid=tenant_gid,actor_gid=actor_gid)
+            data=self.repository.create_fork_preview(workspace_gid=str(payload.get("source_workspace_gid") or ""),version_gid=str(payload.get("source_version_gid") or ""),target_name=name,target_version_label=label,fork_depth=fork_depth,visibility=visibility,tenant_gid=tenant_gid,actor_gid=actor_gid)
             return _output(data,workspace_gid=str(payload.get("source_workspace_gid") or ""),action="workspace_fork_previewed")
         except WorkspaceRepositoryError as exc:raise CapabilityBusinessError(str(exc),str(exc)) from exc
 
@@ -405,9 +407,9 @@ def candidate_specs(provider: WorkspaceProvider | None = None) -> tuple[tuple[Ca
         (CapabilitySpec(id="simulation.environment.workspace.fork.preview", version=1,
                         description="Preview a private workspace Fork from an immutable readable version.",risk="write",confirmation="none",
                         input_schema={"type":"object","required":["source_workspace_gid","source_version_gid","target_name","target_version_label","fork_depth"],
-                        "properties":{"source_workspace_gid":gid,"source_version_gid":gid,"target_name":metadata["name"],"target_version_label":metadata["version_label"],"fork_depth":{"type":"string","enum":["all","operation","process","role","station"]}},"additionalProperties":False},
+                        "properties":{"source_workspace_gid":gid,"source_version_gid":gid,"target_name":metadata["name"],"target_version_label":metadata["version_label"],"fork_depth":{"type":"string","enum":["all","operation","process","role","station"]},"visibility":metadata["visibility"]},"additionalProperties":False},
                         output_schema={"type":"object","required":["preview_gid","plan_hash","source_workspace_gid","source_version_gid","source_content_hash","target_name","target_version_label","fork_depth","visibility","expires_at"],
-                        "properties":{"preview_gid":gid,"plan_hash":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},"source_workspace_gid":gid,"source_version_gid":gid,"source_content_hash":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},"target_name":metadata["name"],"target_version_label":metadata["version_label"],"fork_depth":{"type":"string","enum":["all","operation","process","role","station"]},"visibility":{"const":"private"},"expires_at":{"type":"string"}},"additionalProperties":False},**common),selected.fork_preview),
+                        "properties":{"preview_gid":gid,"plan_hash":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},"source_workspace_gid":gid,"source_version_gid":gid,"source_content_hash":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},"target_name":metadata["name"],"target_version_label":metadata["version_label"],"fork_depth":{"type":"string","enum":["all","operation","process","role","station"]},"visibility":metadata["visibility"],"expires_at":{"type":"string"}},"additionalProperties":False},**common),selected.fork_preview),
         (CapabilitySpec(id="simulation.environment.workspace.fork.apply", version=1,
                         description="Apply a validated private workspace Fork without mutating its immutable source.",risk="write",confirmation="none",idempotent=True,
                         input_schema={"type":"object","required":["preview_gid","plan_hash","idempotency_key"],"properties":{"preview_gid":gid,"plan_hash":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},"idempotency_key":{"type":"string","minLength":1,"maxLength":191}},"additionalProperties":False},

@@ -146,6 +146,8 @@ INPUT_SCHEMAS = {
     "simulation.vismockup.application.attach.request": obj({}, ()),
     "simulation.vismockup.application.launch.request": obj({}, ()),
     "simulation.vismockup.model.open.request": obj({"artifact_ref": ARTIFACT_REF}, ("artifact_ref",)),
+    "simulation.environment.runtime_package.open.request": obj({"workspace_gid": STRING,"version_gid": STRING,"idempotency_key": STRING}, ("workspace_gid","version_gid","idempotency_key")),
+    "simulation.vismockup.model.insert.request": obj({"artifact_ref": ARTIFACT_REF}, ("artifact_ref",)),
     "simulation.vismockup.model.close.request": obj({}, ()),
     "simulation.vismockup.visibility.change.request": obj({"action": {"type": "string", "enum": ["all_on", "all_off"]}}, ("action",)),
     "simulation.vismockup.node.visibility.change.request": obj({
@@ -164,6 +166,7 @@ INPUT_SCHEMAS = {
     "simulation.vismockup.status.get": obj(CONNECTOR, ("connector_id",)),
     "simulation.vismockup.application.launch": obj(CONNECTOR, ("connector_id",)),
     "simulation.vismockup.model.open": obj({**CONNECTOR, "artifact_ref": ARTIFACT_REF}, ("connector_id", "artifact_ref")),
+    "simulation.vismockup.model.insert": obj({**CONNECTOR, "artifact_ref": ARTIFACT_REF}, ("connector_id", "artifact_ref")),
     "simulation.vismockup.tree.get": obj({**CONNECTOR, "max_depth": {"type": "integer", "minimum": 1, "maximum": 100}, "force": {"type": "boolean"}}, ("connector_id",)),
     "simulation.vismockup.selection.highlight": obj({**CONNECTOR, "catia_names": {"type": "array", "items": STRING, "minItems": 1, "maxItems": 1000}}, ("connector_id", "catia_names")),
     "simulation.vismockup.visibility.change.apply": obj({**CONNECTOR, "action": {"type": "string", "enum": ["all_on", "all_off", "deselect"]}}, ("connector_id", "action")),
@@ -214,6 +217,11 @@ OPERATION_REF = obj({
 STATUS_RESULT = obj({"connected": {"type": "boolean"}, "platform": {"type": "string", "enum": ["windows"]}}, ("connected", "platform"))
 LAUNCH_RESULT = obj({"status": {"type": "string", "enum": ["starting", "already_running"]}}, ("status",))
 OPEN_RESULT = obj({"opened": {"type": "boolean"}}, ("opened",))
+INSERT_RESULT = obj({
+    "document_id": STRING, "inserted_path": STRING,
+    "inserted_count": {"type": "integer", "minimum": 0},
+    "already_present": {"type": "boolean"},
+}, ("document_id", "inserted_path", "inserted_count", "already_present"))
 TREE_NODE = obj({
     "node_key": STRING, "parent_node_key": {"type": ["string", "null"]},
     "name": {"type": "string"}, "catia_occurrence_name": {"type": "string"},
@@ -242,6 +250,8 @@ OUTPUT_SCHEMAS = {
     "simulation.vismockup.application.attach.request": OPERATION_REF,
     "simulation.vismockup.application.launch.request": OPERATION_REF,
     "simulation.vismockup.model.open.request": OPERATION_REF,
+    "simulation.environment.runtime_package.open.request": OPERATION_REF,
+    "simulation.vismockup.model.insert.request": OPERATION_REF,
     "simulation.vismockup.model.close.request": OPERATION_REF,
     "simulation.vismockup.visibility.change.request": OPERATION_REF,
     "simulation.vismockup.node.visibility.change.request": OPERATION_REF,
@@ -257,6 +267,7 @@ OUTPUT_SCHEMAS = {
     "simulation.vismockup.status.get": STATUS_RESULT,
     "simulation.vismockup.application.launch": LAUNCH_RESULT,
     "simulation.vismockup.model.open": OPEN_RESULT,
+    "simulation.vismockup.model.insert": INSERT_RESULT,
     "simulation.vismockup.tree.get": TREE_RESULT,
     "simulation.vismockup.selection.highlight": HIGHLIGHT_RESULT,
     "simulation.vismockup.visibility.change.apply": VISIBILITY_RESULT,

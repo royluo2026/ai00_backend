@@ -19,6 +19,7 @@ from ..application.document_snapshots import DocumentSnapshotWorkflow
 from ..application.connector_protocol_v2 import parse_plan, parse_v2_outcome
 from backend.contracts.connector_execution_plan_v2 import ConnectorExecutionPlanV2
 from ..data.connector_repository import SimulationConnectorRepository
+from ..data.workspace_repository import WorkspaceRepository, WorkspaceRepositoryError
 
 
 class ConnectorOutcomeProvider:
@@ -26,9 +27,11 @@ class ConnectorOutcomeProvider:
         self,
         workflow: CaptureWorkflow,
         snapshot_workflow: DocumentSnapshotWorkflow | None,
+        workspace_repository: WorkspaceRepository | None = None,
     ) -> None:
         self.workflow = workflow
         self.snapshot_workflow = snapshot_workflow
+        self.workspace_repository = workspace_repository or WorkspaceRepository()
 
     @staticmethod
     def _contracts(payload):
@@ -86,6 +89,21 @@ class ConnectorOutcomeProvider:
             raise CapabilityBusinessError(str(exc), str(exc)) from exc
         return self._result(payload["snapshot_request_id"], "document-snapshot-outcome")
 
+    async def apply_environment_runtime(self, payload, context):
+        plan, outcome = self._contracts(payload)
+        if plan.plan_id != payload["connector_plan_id"]:
+            raise CapabilityBusinessError("plan_outcome_invalid", "plan_outcome_invalid")
+        try:
+            projected = self.workspace_repository.apply_runtime_package_outcome(
+                connector_plan_id=payload["connector_plan_id"], plan=plan, outcome=outcome,
+                tenant_gid=str(context.team_gid or ""), actor_gid=str(context.user_gid or ""),
+            )
+        except WorkspaceRepositoryError as exc:
+            raise CapabilityBusinessError(str(exc), str(exc)) from exc
+        return CapabilityOutput(data={"resource_id": projected["verification_gid"], "status": "applied"}, evidence=(
+            EvidenceRef(kind="environment-runtime-outcome", reference=f"simulation://environment-runtime/{projected['verification_gid']}"),
+        ))
+
 
 def specs(provider: ConnectorOutcomeProvider):
     common = {
@@ -97,6 +115,7 @@ def specs(provider: ConnectorOutcomeProvider):
         (CapabilitySpec(id="simulation.connector_capture_outcome.apply", description="Project one authenticated Connector capture outcome into its exact Simulation capture run.", **common), provider.apply_capture),
         (CapabilitySpec(id="simulation.connector_materialization_outcome.apply", description="Project one authenticated Connector materialization outcome into its exact Simulation run.", **common), provider.apply_materialization),
         (CapabilitySpec(id="simulation.connector_document_snapshot_outcome.apply", description="Project one authenticated Connector document snapshot outcome into its exact Simulation request.", **common), provider.apply_document_snapshot),
+        (CapabilitySpec(id="simulation.connector_environment_runtime_outcome.apply", description="Project one authenticated frozen-environment runtime readback without claiming semantic verification.", **common), provider.apply_environment_runtime),
     )
 
 

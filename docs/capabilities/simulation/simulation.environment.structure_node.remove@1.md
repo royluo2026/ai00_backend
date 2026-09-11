@@ -10,7 +10,7 @@ Soft-delete one simulation workspace subtree.
 - 所属领域：`simulation`
 - Catalog Release：`<catalog_release>`（调用时使用 Host 当前固定的目录版本）
 - Schema 精度：`typed`
-- 暂未开放原因：`experimental_lifecycle`
+- 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
 ## 消费者可用性
 
@@ -309,7 +309,7 @@ Soft-delete one simulation workspace subtree.
 - `simulation_result_not_ready`：The Simulation run has no completed result artifacts.（retryable=true）
 - `idempotency_conflict`：The idempotency key is bound to a different Simulation request.（retryable=false）
 
-`domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
+`domain_errors_complete=false`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 
 ## 版本与迁移
 

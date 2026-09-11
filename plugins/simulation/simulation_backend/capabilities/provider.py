@@ -27,6 +27,8 @@ _VISMOCKUP_WEB_WORKFLOWS = {
     "simulation.vismockup.application.attach.request",
     "simulation.vismockup.application.launch.request",
     "simulation.vismockup.model.open.request",
+    "simulation.environment.runtime_package.open.request",
+    "simulation.vismockup.model.insert.request",
     "simulation.vismockup.model.close.request",
     "simulation.vismockup.visibility.change.request",
     "simulation.vismockup.node.visibility.change.request",
@@ -41,6 +43,9 @@ _RESOURCES = {
     "simulation.vismockup.application.attach.request": (),
     "simulation.vismockup.application.launch.request": (),
     "simulation.vismockup.model.open.request": (("artifact", "artifact_ref.artifact_id"),),
+    "simulation.environment.runtime_package.open.request": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.runtime_package.prepare": (("simulation-workspace", "workspace_gid"),),
+    "simulation.vismockup.model.insert.request": (("artifact", "artifact_ref.artifact_id"),),
     "simulation.vismockup.model.close.request": (),
     "simulation.vismockup.visibility.change.request": (),
     "simulation.vismockup.node.visibility.change.request": (),
@@ -74,6 +79,10 @@ _RESOURCES = {
         ("craft-bop-version", "execution_plan_ref.version_gid"),
         ("simulation-connector", "device_id"),
     ),
+    "simulation.vismockup.model.insert": (
+        ("simulation-connector", "connector_id"),
+        ("artifact", "artifact_ref.artifact_id"),
+    ),
     "simulation.environment.bop_vm_binding_draft.preview": (
         ("craft-bop-version", "execution_plan_ref.version_gid"),
         ("simulation-document-snapshot", "snapshot_request_id"),
@@ -103,11 +112,26 @@ _RESOURCES = {
     "simulation.connector_capture_outcome.apply": (("simulation-capture-run", "capture_run_id"),),
     "simulation.connector_materialization_outcome.apply": (("simulation-materialization-run", "run_id"),),
     "simulation.connector_document_snapshot_outcome.apply": (("simulation-document-snapshot", "snapshot_request_id"),),
+    "simulation.connector_environment_runtime_outcome.apply": (),
     "simulation.run.start": (("simulation-environment", "environment_id"),),
     "simulation.run.get": (("simulation-run", "run_id"),),
     "simulation.result.get": (("simulation-run", "run_id"),),
     "simulation.result.compare": (("simulation-run", "left_result_ref.run_id"), ("simulation-run", "right_result_ref.run_id")),
     "simulation.environment.workspace.get": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.model_document.search": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.model_document.add": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.model_document.remove": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.alternate_hierarchy.search": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.alternate_hierarchy.get": (("simulation-alternate-hierarchy", "hierarchy_gid"),),
+    "simulation.environment.alternate_hierarchy.create": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.alternate_hierarchy.bootstrap_from_bop_fork": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.alternate_hierarchy.update": (("simulation-alternate-hierarchy", "hierarchy_gid"),),
+    "simulation.environment.alternate_hierarchy.archive": (("simulation-alternate-hierarchy", "hierarchy_gid"),),
+    "simulation.environment.placement.create": (("simulation-alternate-hierarchy", "hierarchy_gid"),),
+    "simulation.environment.placement.move": (("simulation-placement", "placement_gid"),),
+    "simulation.environment.placement.remove": (("simulation-placement", "placement_gid"),),
+    "simulation.plmxml.environment.import": (("simulation-workspace", "workspace_gid"), ("artifact", "artifact_ref.artifact_id")),
+    "simulation.plmxml.environment.export": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.workspace.cache_lease.get": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.workspace.update": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.workspace.delete": (("simulation-workspace", "workspace_gid"),),
@@ -178,6 +202,17 @@ _ERROR_PAIRS = (
     ("materialization_action_not_ready", "The materialization action is not ready to dispatch."),
     ("plan_outcome_invalid", "The Connector outcome does not match the immutable execution plan."),
     ("capability_migration_required", "This deprecated immediate-dispatch version must migrate to the @2 two-phase workflow."),
+    ("primary_model_document_exists", "The environment already has an active primary model document."),
+    ("primary_model_document_required", "Exactly one active primary model document is required."),
+    ("model_document_dependency_cycle", "The selected model document would create a cyclic PLMXML dependency."),
+    ("plmxml_artifact_hash_mismatch", "The PLMXML Artifact bytes do not match the immutable reference hash."),
+    ("plmxml_artifact_unavailable", "The immutable PLMXML Artifact is unavailable or outside the caller scope."),
+    ("alternate_hierarchy_not_found", "The alternate hierarchy is unavailable or outside the caller scope."),
+    ("bop_fork_projection_failed", "The completed Craft fork projection could not be loaded for repair."),
+    ("bop_fork_already_bootstrapped", "The Craft fork already has an alternate hierarchy in this environment."),
+    ("bop_projection_hash_invalid", "The Craft fork projection has no valid immutable content hash."),
+    ("bop_projection_parent_missing", "The Craft fork projection references a missing parent node."),
+    ("bop_projection_cycle", "The Craft fork projection contains a node cycle."),
     ("pairing_not_found", "The Connector pairing request does not exist."),
     ("pairing_bootstrap_not_found", "The Connector bootstrap ticket does not exist or is not visible to this user."),
     ("pairing_bootstrap_expired", "The two-minute Connector bootstrap ticket expired."),
@@ -230,6 +265,7 @@ _CONNECTOR_BUSINESS_EFFECTS = {
     "simulation.connector_capture_outcome.apply": "Project one authenticated Simulation-owned Connector outcome into the exact caller-visible capture run without dispatching later work.",
     "simulation.connector_materialization_outcome.apply": "Project one authenticated Simulation-owned Connector outcome into the exact caller-visible materialization run.",
     "simulation.connector_document_snapshot_outcome.apply": "Project one authenticated Simulation-owned Connector outcome into the exact caller-visible document snapshot request.",
+    "simulation.connector_environment_runtime_outcome.apply": "Project one authenticated frozen-environment open and tree-readback outcome without prematurely claiming semantic equivalence.",
 }
 _TWO_PHASE_BUSINESS_EFFECTS = {
     "simulation.document_snapshot.request": "Prepare one bounded immutable snapshot request for later user-confirmed Connector dispatch.",
@@ -372,6 +408,16 @@ _CONNECTOR_BUSINESS_INVARIANTS = {
             test_refs=("backend/tests/test_simulation_document_snapshot_workflow.py::test_snapshot_request_is_idempotent_and_completes_only_from_connector_outcome",),
         ),
     ),
+    "simulation.connector_environment_runtime_outcome.apply": (
+        BusinessInvariantContract(
+            rule_id="simulation.connector_outcome.environment_runtime_identity", version=1,
+            statement="A frozen-environment runtime outcome updates only the pending verification bound to its exact immutable Connector plan and tree readback never implies semantic verification.",
+            applies_when="an authenticated frozen-environment runtime outcome is projected",
+            enforcement_ref="plugins/simulation/simulation_backend/data/workspace_repository.py:WorkspaceRepository.apply_runtime_package_outcome",
+            error_code="plan_outcome_invalid",
+            test_refs=("backend/tests/test_simulation_connector_outcome_capabilities.py::test_environment_runtime_outcome_records_readback_without_claiming_semantic_verification",),
+        ),
+    ),
 }
 
 
@@ -478,7 +524,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             governed.id.startswith("simulation.connector")
             or governed.id.startswith("simulation.vismockup.")
         )),
-        "domain_errors_complete": True,
+        "domain_errors_complete": "experimental" not in governed.tags,
     }
     if governed.id in _TWO_PHASE_ENTRYPOINTS and governed.version == 1:
         updates.update({
@@ -532,6 +578,24 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                 DomainErrorContract(code="vm_diff_workspace_mismatch", meaning="The checkpoints belong to different workspaces.", is_caller_error=True),
                 DomainErrorContract(code="vm_diff_report_not_found", meaning="The report is unavailable or unreadable.", is_caller_error=True),
             ), "domain_errors_complete": True,
+        })
+    if governed.id == "simulation.environment.runtime_package.open.request":
+        updates.update({
+            "business_effect": "Materialize one exact frozen Simulation environment and queue one App-runtime plan that opens only its generated top-level PLMXML.",
+            "business_acceptance_criteria": (
+                "The selected workspace version is frozen, caller-visible, and resolves to one immutable runtime model.",
+                "Every referenced dependency is staged with its exact Artifact hash before VisMockup opens the generated top-level PLMXML.",
+                "The queued plan contains exactly one model-open step and preserves outcome-unknown reconciliation semantics.",
+            ),
+            "business_invariants": (BusinessInvariantContract(
+                rule_id="simulation.environment.runtime_package.single_root", version=1,
+                statement="Frozen replay opens exactly one generated top-level PLMXML while its immutable dependencies are staged beside it.",
+                applies_when="a frozen Simulation environment is opened in the AI00 App runtime",
+                enforcement_ref="plugins/simulation/simulation_backend/capabilities/connector_runtime.py:open_runtime_package",
+                error_code="frozen_workspace_version_not_found",
+                test_refs=("plugins/simulation/tests/test_plmxml_environment_capabilities.py::test_frozen_runtime_package_prepares_one_top_level_open_with_staged_dependencies",),
+            ),),
+            "no_business_invariant_reason": None,
         })
     if governed.id.startswith("simulation.connector_") and governed.id.endswith("_outcome.apply"):
         updates.update({

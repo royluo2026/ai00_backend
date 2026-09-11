@@ -30,7 +30,7 @@ public sealed class AppPlanJournal
 public sealed record RuntimeSession(string DeviceId,string TenantId,long Generation,string InstanceId,string Token,DateTimeOffset ExpiresAt);
 public sealed record LeasedPlan(string LeaseId,DateTimeOffset LeaseUntil,string PlanJson);
 public sealed record TrustedPlanKey(string PublicJwk,DateTimeOffset NotBefore,DateTimeOffset NotAfter,bool Revoked);
-public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter adapter,DeviceSigningKey signingKey,string deviceKeyId,IReadOnlyDictionary<string,TrustedPlanKey> keys,Func<DateTimeOffset>? clock=null)
+public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter adapter,DeviceSigningKey signingKey,string deviceKeyId,IReadOnlyDictionary<string,TrustedPlanKey> keys,Func<DateTimeOffset>? clock=null,IAppArtifactMaterializer? artifactMaterializer=null)
 {
     private readonly SemaphoreSlim serial=new(1,1);
     private DateTimeOffset Now=>(clock??(()=>DateTimeOffset.UtcNow))();
@@ -63,7 +63,8 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
             var manifest=adapter.Manifest;
             if(plan.AdapterId!=manifest.AdapterId||plan.AdapterMajor!=manifest.AdapterMajor||plan.TargetProduct.GetProperty("product_id").GetString()!=manifest.ProductId||Version.Parse(manifest.ProductVersion)<Version.Parse(plan.TargetProduct.GetProperty("minimum_version").GetString()!)||Version.Parse(manifest.ProductVersion)>=Version.Parse(plan.TargetProduct.GetProperty("maximum_version_exclusive").GetString()!)||plan.Steps.Any(s=>!manifest.Supports(s.OperationId,s.ContractHash)))throw new InvalidDataException("adapter_contract_mismatch");
             ct.ThrowIfCancellationRequested();
-            if(plan.Steps.Any(s=>s.OperationId is "vismockup.model.open@1" or "vismockup.model.attach@1" or "vismockup.view.capture@1"))throw new InvalidDataException("v2_artifact_transport_unavailable");
+            if(plan.Steps.Any(s=>s.OperationId is "vismockup.model.open@1" or "vismockup.model.insert@1" or "vismockup.model.attach@1")&&artifactMaterializer is null)throw new InvalidDataException("v2_artifact_transport_unavailable");
+            if(plan.Steps.Any(s=>s.OperationId=="vismockup.view.capture@1"))throw new InvalidDataException("v2_artifact_upload_unavailable");
             journal.Append("plan_received",plan.PlanId,lease.PlanJson);
             journal.Append("lease_acquired",plan.PlanId,JsonSerializer.Serialize(lease));
             var results=new List<JsonElement>();
@@ -72,13 +73,24 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
                 ct.ThrowIfCancellationRequested();
                 if(Now>=lease.LeaseUntil||Now>=session.ExpiresAt)throw new InvalidDataException("lease_expired");
                 var started=Now;
-                journal.Append("invocation_started",plan.PlanId,JsonSerializer.Serialize(new{step_id=step.StepId,started_at=Timestamp(started)}));
                 using var timeout=CancellationTokenSource.CreateLinkedTokenSource(ct);
                 timeout.CancelAfter(new[]{TimeSpan.FromSeconds(step.TimeoutSeconds),lease.LeaseUntil-Now,session.ExpiresAt-Now}.Min());
+                JsonElement payload;
+                try{payload=artifactMaterializer is null?step.Payload:await artifactMaterializer.MaterializeAsync(plan.PlanId,lease.LeaseId,step,session,timeout.Token);}
+                catch(Exception exception)
+                {
+                    var code=exception is ConnectorNoEffectException rejected?rejected.Code
+                        : exception is RuntimeTransportException transportError?transportError.Message
+                        : exception is OperationCanceledException?"artifact_materialization_timeout":"artifact_materialization_failed";
+                    results.Add(StepResult(step.StepId,started,"failed_without_effect",null,code));
+                    journal.Append("step_terminal",plan.PlanId,results[^1].GetRawText());
+                    break;
+                }
+                journal.Append("invocation_started",plan.PlanId,JsonSerializer.Serialize(new{step_id=step.StepId,started_at=Timestamp(started)}));
                 string status="succeeded";object? data=null;string? error=null;
                 try
                 {
-                    var result=await adapter.ExecuteAsync(new(step.OperationId,step.Payload,step.StepId,step.ContractHash),timeout.Token).WaitAsync(timeout.Token);
+                    var result=await adapter.ExecuteAsync(new(step.OperationId,payload,step.StepId,step.ContractHash),timeout.Token).WaitAsync(timeout.Token);
                     timeout.Token.ThrowIfCancellationRequested();
                     if(!result.Ok)throw new ConnectorException("adapter_effect_unknown");
                     data=result.Data;
@@ -100,7 +112,7 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
                 }
                 results.Add(StepResult(step.StepId,started,status,data,error));
                 journal.Append("step_terminal",plan.PlanId,results[^1].GetRawText());
-                if(status=="outcome_unknown")break;
+                if(status!="succeeded")break;
             }
             return PersistOutcome(plan,lease,results);
         }
@@ -111,7 +123,11 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
         var outcomes=new List<OutcomeV2>();
         foreach(var group in journal.Events.GroupBy(e=>e.PlanId))
         {
-            if(group.Any(e=>e.Kind is "acknowledged" or "reconciled" or "abandoned_without_effect"))continue;
+            if(group.Any(e=>e.Kind is "acknowledged" or "abandoned_without_effect"))continue;
+            var reconciled=group.Any(e=>e.Kind=="reconciled");
+            var manualReview=group.Any(e=>e.Kind=="manual_review_required");
+            var upgradedProbeAttempted=group.Any(e=>e.Kind=="reconciliation_retry_v3");
+            if(reconciled&&(!manualReview||upgradedProbeAttempted))continue;
             var saved=group.LastOrDefault(e=>e.Kind=="outcome");
             if(saved!=null){outcomes.Add(OutcomeV2.ParseAndVerify(saved.Data,signingKey.PublicJwk.GetRawText()));continue;}
             var leaseEvent=group.FirstOrDefault(e=>e.Kind=="lease_acquired");
@@ -125,7 +141,11 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
                 if(results.Any(r=>r.GetProperty("step_id").GetString()==id))continue;
                 results.Add(StepResult(id,item.GetProperty("started_at").GetDateTimeOffset(),"outcome_unknown",null,"process_recovery_outcome_unknown"));
             }
-            if(results.Count==0)results.Add(StepResult(plan.Steps[0].StepId,Now,"failed_without_effect",null,"invocation_not_started"));
+            if(!results.Any(item=>item.GetProperty("status").GetString()=="outcome_unknown"))
+            {
+                var pending=plan.Steps.FirstOrDefault(step=>!results.Any(item=>item.GetProperty("step_id").GetString()==step.StepId));
+                if(pending!=null)results.Add(StepResult(pending.StepId,Now,"failed_without_effect",null,"invocation_not_started"));
+            }
             outcomes.Add(PersistOutcome(plan,lease,results));
         }
         ExecutionQuarantined=outcomes.Any(o=>o.OverallStatus=="outcome_unknown");

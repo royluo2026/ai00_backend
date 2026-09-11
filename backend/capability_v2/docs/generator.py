@@ -88,6 +88,10 @@ def example_for_schema(schema: Mapping[str, Any]) -> Any:
     if "example" in schema:
         return schema["example"]
     expected = schema.get("type")
+    if isinstance(expected, (list, tuple)):
+        if "null" in expected:
+            return None
+        return example_for_schema({**schema, "type": expected[0]}) if expected else None
     if expected == "object":
         properties = schema.get("properties") or {}
         required = list(schema.get("required") or ())
@@ -127,7 +131,7 @@ def example_for_schema(schema: Mapping[str, Any]) -> Any:
         pattern = schema.get("pattern")
         if pattern == "^sha256:[0-9a-f]{64}$":
             return "sha256:" + "0" * 64
-        if pattern in {"^[0-9a-f]{64}$", "^[a-f0-9]{64}$"}:
+        if pattern in {"^[0-9a-f]{64}$", "^[a-f0-9]{64}$", "^(sha256:)?[0-9a-f]{64}$"}:
             return "0" * 64
         if pattern == "^[1-9][0-9]*$":
             return "1"

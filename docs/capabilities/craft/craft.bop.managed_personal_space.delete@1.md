@@ -227,6 +227,12 @@ craft.bop.managed_personal_space.delete
               "null"
             ]
           },
+          "display_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "fork_base_version_gid": {
             "type": [
               "string",
