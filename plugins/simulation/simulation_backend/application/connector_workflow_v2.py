@@ -91,6 +91,8 @@ def same_workflow_intent(source: ConnectorExecutionPlanV1, actual: ConnectorExec
          source.adapter_id, source.adapter_major)
         or actual.target_product.model_dump(mode="json") != source.target_product.model_dump(mode="json")
         or actual.normalized_input_hash != source.plan_hash
+        or actual.idempotency_key != source.plan_id
+        or not actual.confirmation_receipt_id
         or len(actual.steps) != len(source.steps)
     ):
         return False

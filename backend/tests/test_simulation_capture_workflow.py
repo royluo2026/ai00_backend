@@ -186,6 +186,8 @@ def test_prepared_capture_intent_reissues_as_signed_v2_plan_for_current_app_sess
     assert same_workflow_intent(source, signed)
     changed = signed.model_copy(update={"normalized_input_hash": "sha256:" + "0" * 64})
     assert not same_workflow_intent(source, changed)
+    unconfirmed = signed.model_copy(update={"confirmation_receipt_id": None})
+    assert not same_workflow_intent(source, unconfirmed)
     unsafe = signed.model_copy(update={"steps": [*signed.steps[:-1],
         signed.steps[-1].model_copy(update={"side_effect_classification": "read"})]})
     assert not same_workflow_intent(source, unsafe)
