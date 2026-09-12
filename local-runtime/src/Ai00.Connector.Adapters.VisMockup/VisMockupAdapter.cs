@@ -422,6 +422,13 @@ public sealed class VisMockupAdapter : IConnectorAdapter
                 document, document.DocumentId, 0, "snapshot-" + Guid.NewGuid().ToString("N"));
             using var stream = File.OpenRead(artifact.Path);
             var projection = new VisMockupPlmxmlProjectionReader().Read(stream, maxNodes);
+            if (projection.Nodes.Any(node => node.Depth > maxDepth))
+                throw new ConnectorException("bom_snapshot_limit_exceeded");
+            var exportedTopLevelCount = projection.Nodes.Count(node =>
+                string.Equals(node.ParentStableOccurrenceKey, projection.RootStableOccurrenceKey,
+                    StringComparison.Ordinal));
+            if (exportedTopLevelCount != document.RootNode.Children.Count)
+                throw new ConnectorException("plmxml_current_state_incomplete");
             _treeCache?.ReplaceProjection(document, projection);
             var nodes = projection.Nodes.Select(node => new VisMockupSnapshotNode(
                 node.StableOccurrenceKey,

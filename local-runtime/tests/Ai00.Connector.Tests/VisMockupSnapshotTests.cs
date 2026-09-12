@@ -232,6 +232,82 @@ public sealed class VisMockupSnapshotTests
     }
 
     [Fact]
+    public async Task SnapshotRejectsExportShellThatOmitsLiveTopLevelChildren()
+    {
+        var directory = NewCacheDirectory("export-shell");
+        try
+        {
+            var document = new FakeDocument("SESSION-1", "tc://bom/W10", FakeNode.FlatTree(4))
+            {
+                ExportPlmxmlContent = """
+                    <PLMXML><InstanceGraph rootRefs="root">
+                      <ProductInstance id="root" name="Root"/>
+                      <ProductInstance id="child" name="Child"/>
+                      <Occurrence instanceRefs="#root"><UserData>
+                        <UserValue title="__PLM_OCC_PDM_UID" value="root-pdm"/>
+                      </UserData></Occurrence>
+                      <Occurrence instanceRefs="#root #child"><UserData>
+                        <UserValue title="__PLM_OCC_PDM_UID" value="child-pdm"/>
+                      </UserData></Occurrence>
+                    </InstanceGraph></PLMXML>
+                    """,
+            };
+            var cachePath = Path.Combine(directory, "tree.db");
+            var cache = new VisMockupTreeCache(cachePath);
+            cache.Replace(document, 64, [new("prior-root", null, 0, 0, "Prior Root", "", false)]);
+            using var sta = new StaDispatcher();
+            var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([Path.GetTempPath()]),
+                new FakeVisMockupCom { ExistingApplication = new FakeApplication("14.2.0", document) },
+                Path.Combine(directory, "captures"), cachePath);
+
+            var error = await Assert.ThrowsAsync<ConnectorException>(() => adapter.SnapshotAsync(10_000, 64));
+
+            Assert.Equal("plmxml_current_state_incomplete", error.Code);
+            Assert.Equal("prior-root", cache.TryRead(document, 1)!.Nodes[0].NodeKey);
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
+    public async Task PlmxmlSnapshotHonorsTheGovernedDepthLimitBeforePublishingCache()
+    {
+        var directory = NewCacheDirectory("plmxml-depth-limit");
+        try
+        {
+            var document = new FakeDocument("SESSION-1", "tc://bom/W10", FakeNode.FlatTree(2))
+            {
+                ExportPlmxmlContent = """
+                    <PLMXML><InstanceGraph rootRefs="root">
+                      <ProductInstance id="root" name="Root"/>
+                      <ProductInstance id="child" name="Child"/>
+                      <ProductInstance id="leaf" name="Leaf"/>
+                      <Occurrence instanceRefs="#root"><UserData>
+                        <UserValue title="__PLM_OCC_PDM_UID" value="root-pdm"/>
+                      </UserData></Occurrence>
+                      <Occurrence instanceRefs="#root #child"><UserData>
+                        <UserValue title="__PLM_OCC_PDM_UID" value="child-pdm"/>
+                      </UserData></Occurrence>
+                      <Occurrence instanceRefs="#root #child #leaf"><UserData>
+                        <UserValue title="__PLM_OCC_PDM_UID" value="leaf-pdm"/>
+                      </UserData></Occurrence>
+                    </InstanceGraph></PLMXML>
+                    """,
+            };
+            var cachePath = Path.Combine(directory, "tree.db");
+            using var sta = new StaDispatcher();
+            var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([Path.GetTempPath()]),
+                new FakeVisMockupCom { ExistingApplication = new FakeApplication("14.2.0", document) },
+                Path.Combine(directory, "captures"), cachePath);
+
+            var error = await Assert.ThrowsAsync<ConnectorException>(() => adapter.SnapshotAsync(10_000, 1));
+
+            Assert.Equal("bom_snapshot_limit_exceeded", error.Code);
+            Assert.Null(new VisMockupTreeCache(cachePath).TryRead(document, 1));
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
     public async Task DisplayDepthDoesNotTruncateTheCompleteCachedGeneration()
     {
         IVisMockupNode node = new FakeNode("leaf", "Leaf", "", "", []);
