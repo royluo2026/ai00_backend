@@ -37,7 +37,7 @@ class ProcessScreenshotRepository:
                     cursor.execute(
                         "SELECT gid FROM workmanship_bop_bop_entries "
                         "WHERE gid=%s AND version_gid=%s AND is_deleted=0 AND "
-                        "node_type IN ('operation','bop_operation','bop_steps','step')",
+                        "node_type IN ('process','bop_process','operation','bop_operation','bop_steps','step')",
                         (operation_id, bop_version_gid),
                     )
                     if not cursor.fetchone():
@@ -152,8 +152,8 @@ def register_process_screenshot_capability(registry, repository=None, artifact_r
     provider = ProcessScreenshotProvider(repository, artifact_resolver)
     register_capability(registry, CapabilitySpec(
         id="craft.process_screenshot.attach", version=1, owner="craft",
-        description="Associate one verified screenshot artifact with one BOP operation.",
-        use_when="A governed capture run has finalized a screenshot for a BOP operation.",
+        description="Associate one verified screenshot artifact with one BOP process or operation.",
+        use_when="A governed capture run has finalized a screenshot for a BOP process or operation.",
         do_not_use_when="The image has not been finalized by the Artifact Service.",
         risk=CapabilityRisk.WRITE, confirmation="user", idempotent=True,
         permissions=("craft.write",),
