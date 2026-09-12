@@ -100,16 +100,17 @@ class Repository:
 
 
 class Connector:
-    def __init__(self): self.plans = []
-    async def queue_plan(self, plan, context, approval_reference=None):
+    def __init__(self): self.plans = []; self.major_versions = []
+    async def queue_plan(self, plan, context, approval_reference=None, major_version=1):
         self.plans.append((plan, approval_reference))
+        self.major_versions.append(major_version)
         return {"operation_id": plan.plan_id, "status": "accepted"}
     @property
     def last_plan(self): return self.plans[-1][0]
 
 
 class OfflineConnector(Connector):
-    async def queue_plan(self, plan, context, approval_reference=None):
+    async def queue_plan(self, plan, context, approval_reference=None, major_version=1):
         raise SimulationWorkflowError("connector_offline")
 
 
@@ -142,14 +143,16 @@ def test_capture_prepares_then_dispatches_only_the_first_reverse_order_operation
     asyncio.run(workflow.start_capture("env-1", 1, "device-1", _context()))
     assert connector.plans == []
     action = workflow.next_action("run-1", _context())
+    assert action["major_version"] == 2
     assert action["capability_id"] == "simulation.connector.plan.queue"
-    assert action["major_version"] == 1
+    assert action["major_version"] == 2
     asyncio.run(workflow.dispatch_next("run-1", "approval-device-1", _context()))
 
     captures = [step.payload["operation_id"] for plan, _approval in connector.plans for step in plan.steps
                 if step.operation_id == "vismockup.view.capture@1"]
     assert captures == ["op-30"]
     assert connector.plans[0][1] == "approval-device-1"
+    assert connector.major_versions == [2]
     assert all(len(plan.steps) == 3 for plan, _approval in connector.plans)
     assert all(
         step.payload["artifact_resource_refs"] == ["craft-bop-version:bop-v1"]
@@ -360,8 +363,9 @@ def test_materialization_plan_attaches_models_before_scene_verification():
     assert connector.plans == []
     action = workflow.next_materialization_action("run-1", _context())
     assert action["capability_id"] == "simulation.connector.plan.queue"
-    assert action["major_version"] == 1
+    assert action["major_version"] == 2
     asyncio.run(workflow.dispatch_materialization("run-1", "approval-materialize", _context()))
+    assert connector.major_versions == [2]
 
     operation_ids = [step.operation_id for step in connector.last_plan.steps]
     assert operation_ids[0] == "vismockup.application.probe@1"
@@ -469,7 +473,7 @@ def test_capture_dispatch_consumes_the_user_approved_exact_downstream_action():
 
     action = provider.action({"capture_run_id": "run-1"}, _context()).data["action"]
     assert action["capability_id"] == "simulation.connector.plan.queue"
-    assert action["major_version"] == 1
+    assert action["major_version"] == 2
     assert action["payload_hash"] == canonical_hash(json.loads(action["payload_json"]))
 
     approved_context = _context().model_copy(update={"confirmation_token": "approved-exact-action"})

@@ -85,7 +85,7 @@ class CaptureWorkflow:
             return None
         plan = ConnectorExecutionPlanV1.model_validate(run["plan"])
         return {
-            "capability_id": "simulation.connector.plan.queue", "major_version": 1,
+            "capability_id": "simulation.connector.plan.queue", "major_version": 2,
             "payload": {"plan": plan.model_dump(mode="json")},
             "idempotency_key": plan.plan_id,
         }
@@ -101,6 +101,7 @@ class CaptureWorkflow:
         plan = ConnectorExecutionPlanV1.model_validate(action["payload"]["plan"])
         await self.connector_port.queue_plan(
             plan, context, approval_reference=approval_reference,
+            major_version=action["major_version"],
         )
         self.repository.update_materialization_run(run_id, status="running")
         return self.repository.get_materialization_run(run_id, context)
@@ -180,7 +181,7 @@ class CaptureWorkflow:
             return None
         plan = ConnectorExecutionPlanV1.model_validate(step["plan"])
         return {
-            "capability_id": "simulation.connector.plan.queue", "major_version": 1,
+            "capability_id": "simulation.connector.plan.queue", "major_version": 2,
             "payload": {"plan": plan.model_dump(mode="json")},
             "idempotency_key": plan.plan_id,
         }
@@ -198,6 +199,7 @@ class CaptureWorkflow:
             plan = ConnectorExecutionPlanV1.model_validate(payload["plan"])
             await self.connector_port.queue_plan(
                 plan, context, approval_reference=approval_reference,
+                major_version=action["major_version"],
             )
             operation_id = next(
                 str(step.payload["operation_id"]) for step in plan.steps
