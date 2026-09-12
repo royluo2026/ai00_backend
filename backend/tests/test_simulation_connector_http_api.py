@@ -177,3 +177,32 @@ def test_v2_capture_upload_requires_the_leased_capture_step(monkeypatch):
             pins={"device_id": "device-1"},
         ))
     assert rejected.value.status_code == 409
+
+
+def test_app_heartbeat_forwards_a_bounded_adapter_probe_with_runtime_pins(monkeypatch):
+    calls = []
+
+    class Sessions:
+        def heartbeat(self, **kwargs):
+            calls.append(kwargs)
+            return {"accepted": True}
+
+    monkeypatch.setattr(simulation_connector, "runtime_session_service", Sessions())
+    body = simulation_connector.RuntimeHeartbeatBody.model_validate({
+        "adapter": {
+            "adapter_id": "ai00.vismockup", "adapter_major": 1,
+            "product_id": "siemens.vismockup", "product_version": "14.0.0",
+            "operations": [{"operation_id": "vismockup.view.capture@1",
+                            "contract_hash": "sha256:" + "a" * 64}],
+        },
+        "health": {"ready": True, "status": "ready", "process_ready": True,
+                   "document_ready": True, "product_version": "14.3.0"},
+    })
+
+    result = simulation_connector.runtime_heartbeat(
+        body, pins={"device_id": "device-1", "token": "session-1"},
+    )
+
+    assert result["data"] == {"accepted": True}
+    assert calls[0]["device_id"] == "device-1"
+    assert calls[0]["advertisement"]["health"]["product_version"] == "14.3.0"

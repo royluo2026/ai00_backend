@@ -4,6 +4,7 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 import hashlib
 import hmac
+import json
 import os
 import secrets
 
@@ -47,7 +48,9 @@ class ConnectorError(RuntimeError):
 DESKTOP_CAPABILITY_BINDINGS = (
     ("simulation.connector.runtime.takeover", 1),
     ("simulation.connector.health.get", 1),
+    ("simulation.connector.health.get", 2),
     ("simulation.connector.plan.queue", 2),
+    ("simulation.connector.plan.queue", 3),
     ("simulation.environment.preflight", 1),
     ("simulation.vismockup.application.attach.request", 1),
     ("simulation.vismockup.application.launch.request", 1),
@@ -240,6 +243,38 @@ class ConnectorControlPlane:
         self.repository.save_health(connector_id, health)
 
     def get_health(self, connector_id: str, context: CapabilityContext) -> ConnectorHealth:
+        find_runtime = getattr(self.repository, "bound_runtime_for_user", None)
+        runtime = find_runtime(context.user_gid, context.team_gid) if find_runtime else None
+        if runtime and runtime.get("device_id") == connector_id:
+            now = self.clock()
+            heartbeat = runtime.get("heartbeat_at")
+            expiry = runtime.get("session_expires_at")
+            current_instance = runtime.get("current_runtime_instance_id")
+            if not heartbeat or not expiry or not current_instance:
+                raise ConnectorError("connector_offline")
+            heartbeat = heartbeat.replace(tzinfo=UTC) if heartbeat.tzinfo is None else heartbeat.astimezone(UTC)
+            expiry = expiry.replace(tzinfo=UTC) if expiry.tzinfo is None else expiry.astimezone(UTC)
+            if heartbeat <= now - timedelta(minutes=2) or expiry <= now:
+                raise ConnectorError("connector_offline")
+            raw = runtime.get("adapter_health_json")
+            advertisement = json.loads(raw) if isinstance(raw, str) else raw
+            if not isinstance(advertisement, dict) or (
+                advertisement.get("runtime_generation"), advertisement.get("runtime_instance_id")
+            ) != (runtime.get("runtime_generation"), current_instance):
+                raise ConnectorError("adapter_health_unavailable")
+            try:
+                adapter = AdapterAdvertisement.model_validate(advertisement["adapter"])
+                observed = advertisement["health"]
+                adapter = adapter.model_copy(update={"product_version": observed.get("product_version") or "0.0.0"})
+                return ConnectorHealth(
+                    connector_version="AppHost-2", protocol_versions=("ai00.connector.execution-plan.v2",),
+                    bound_user_id=context.user_gid, session_id=current_instance,
+                    user_session_present=bool(observed["ready"]),
+                    session_host_ready=bool(observed["ready"] and observed["document_ready"]),
+                    system_awake=True, adapters=(adapter,), reported_at=heartbeat,
+                )
+            except (KeyError, TypeError, ValueError) as exc:
+                raise ConnectorError("adapter_health_unavailable") from exc
         health = self.repository.get_health(connector_id)
         if health is None:
             raise ConnectorError("connector_offline")
@@ -662,6 +697,14 @@ def register_connector_runtime_capabilities(
         input_schema={}, output_schema={}, tags=("simulation", "connector", "health"),
     ), get_health)
     register(registry, CapabilitySpec(
+        id="simulation.connector.health.get", owner="simulation", version=2,
+        description="Read the bound Simulation workstation runtime and adapter health.",
+        use_when="A Simulation workflow preflights a bound desktop runtime.",
+        do_not_use_when="The caller needs to execute VisMockup work.",
+        risk=CapabilityRisk.READ, confirmation="none", permissions=("simulation.use",),
+        input_schema={}, output_schema={}, tags=("simulation", "connector", "health"),
+    ), get_health)
+    register(registry, CapabilitySpec(
         id="simulation.connector.plan.queue", owner="simulation", version=1,
         description="Queue one immutable compatible execution plan for the bound AI00 Connector.",
         use_when="A Simulation workflow has an exact version-pinned local plan.",
@@ -674,6 +717,14 @@ def register_connector_runtime_capabilities(
         description="Queue one immutable compatible execution plan for the bound AI00 Connector as a Simulation user.",
         use_when="A Simulation workflow has an exact version-pinned local plan.",
         do_not_use_when="Connector compatibility or session preflight has not passed.",
+        risk=CapabilityRisk.WRITE, confirmation="user", permissions=("simulation.use",),
+        input_schema={}, output_schema={}, tags=("simulation", "connector", "plan"),
+    ), queue_plan)
+    register(registry, CapabilitySpec(
+        id="simulation.connector.plan.queue", owner="simulation", version=3,
+        description="Queue one confirmed materialization or capture plan for a Simulation workstation.",
+        use_when="A Simulation workflow has prepared an exact workstation plan with its own user confirmation.",
+        do_not_use_when="The plan, runtime session, or confirmation is not current.",
         risk=CapabilityRisk.WRITE, confirmation="user", permissions=("simulation.use",),
         input_schema={}, output_schema={}, tags=("simulation", "connector", "plan"),
     ), queue_plan)

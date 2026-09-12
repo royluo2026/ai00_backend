@@ -143,6 +143,9 @@ INPUT_SCHEMAS = {
     ("simulation.connector.plan.queue", 2): obj(
         {"plan": DOCUMENT_SNAPSHOT_CONNECTOR_PLAN}, ("plan",),
     ),
+    ("simulation.connector.plan.queue", 3): obj(
+        {"plan": CONNECTOR_PLAN}, ("plan",),
+    ),
     "simulation.vismockup.application.attach.request": obj({}, ()),
     "simulation.vismockup.application.launch.request": obj({}, ()),
     "simulation.vismockup.model.open.request": obj({"artifact_ref": ARTIFACT_REF}, ("artifact_ref",)),

@@ -85,7 +85,7 @@ class CaptureWorkflow:
             return None
         plan = ConnectorExecutionPlanV1.model_validate(run["plan"])
         return {
-            "capability_id": "simulation.connector.plan.queue", "major_version": 2,
+            "capability_id": "simulation.connector.plan.queue", "major_version": 3,
             "payload": {"plan": plan.model_dump(mode="json")},
             "idempotency_key": plan.plan_id,
         }
@@ -181,7 +181,7 @@ class CaptureWorkflow:
             return None
         plan = ConnectorExecutionPlanV1.model_validate(step["plan"])
         return {
-            "capability_id": "simulation.connector.plan.queue", "major_version": 2,
+            "capability_id": "simulation.connector.plan.queue", "major_version": 3,
             "payload": {"plan": plan.model_dump(mode="json")},
             "idempotency_key": plan.plan_id,
         }

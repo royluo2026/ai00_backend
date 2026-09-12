@@ -191,7 +191,10 @@ class EnvironmentCompositionProvider:
         def add(code: str, expected: Any, actual: Any) -> None:
             problems.append({"code": code, "expected": None if expected is None else str(expected), "actual": None if actual is None else str(actual)})
 
-        if requirement.protocol not in health.get("protocol_versions", ()):
+        protocols = health.get("protocol_versions", ())
+        app_bridge = (requirement.protocol == "ai00.connector.execution-plan.v1"
+                      and "ai00.connector.execution-plan.v2" in protocols)
+        if requirement.protocol not in protocols and not app_bridge:
             add("connector_version_incompatible", requirement.protocol, ",".join(health.get("protocol_versions", ())))
         if health.get("bound_user_id") != context.user_gid:
             add("bound_user_mismatch", context.user_gid, health.get("bound_user_id"))

@@ -172,6 +172,25 @@ def test_preflight_checks_exact_connector_contracts_without_queueing_work():
     assert report == {"compatible": True, "problems": []}
 
 
+def test_preflight_accepts_authenticated_app_v2_adapter_for_prepared_v1_intent():
+    provider, _ = _provider()
+    composed = asyncio.run(provider.compose(_payload(), _context())).data
+
+    class AppConnectorPort(ConnectorPort):
+        async def get_health(self, device_id, context):
+            health = await super().get_health(device_id, context)
+            return {**health, "protocol_versions": ["ai00.connector.execution-plan.v2"]}
+
+    provider.connector_port = AppConnectorPort()
+    report = asyncio.run(provider.preflight({
+        "environment_id": composed["environment_id"],
+        "environment_version": composed["environment_version"],
+        "device_id": "device-1",
+    }, _context())).data
+
+    assert report == {"compatible": True, "problems": []}
+
+
 def test_registration_adds_new_major_one_capabilities_without_changing_legacy_schema():
     registry = CapabilityRegistry()
     register_capabilities(registry, composition_provider=_provider()[0])

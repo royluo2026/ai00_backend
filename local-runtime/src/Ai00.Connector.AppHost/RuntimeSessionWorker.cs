@@ -289,7 +289,8 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
                 var now=DateTimeOffset.UtcNow;
                 if(HeartbeatDue(now,lastHeartbeat))
                 {
-                    await transport.SendAsync(HttpMethod.Post,"heartbeat",null,ct,session);
+                    var health=await adapter.ProbeAsync(ct);
+                    await transport.SendAsync(HttpMethod.Post,"heartbeat",new{adapter=adapter.Manifest,health},ct,session);
                     lastHeartbeat=DateTimeOffset.UtcNow;
                 }
                 leased=await transport.SendAsync(HttpMethod.Post,"plans/lease",new{lease_seconds=PlanLeaseSeconds},ct,session);

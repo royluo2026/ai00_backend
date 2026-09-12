@@ -136,10 +136,19 @@ class SimulationConnectorRepository:
             if cursor.rowcount != 1:
                 raise ConnectorRepositoryError('runtime_proof_invalid')
 
-    def heartbeat_runtime(self, device_id, generation, instance, token, now):
+    def heartbeat_runtime(self, device_id, generation, instance, token, now, advertisement=None):
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             self._authenticated_runtime(cursor, device_id, generation, instance, token, now)
-            cursor.execute('UPDATE workmanship_sim_connector_runtime_devices SET heartbeat_at=%s WHERE device_id=%s', (now, device_id))
+            if advertisement is None:
+                cursor.execute('UPDATE workmanship_sim_connector_runtime_devices SET heartbeat_at=%s WHERE device_id=%s', (now, device_id))
+            else:
+                envelope = json.dumps({
+                    'runtime_generation': generation, 'runtime_instance_id': instance,
+                    **advertisement,
+                }, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+                cursor.execute('UPDATE workmanship_sim_connector_runtime_devices '
+                    'SET heartbeat_at=%s,adapter_health_json=%s WHERE device_id=%s',
+                    (now, envelope, device_id))
 
     def renew_runtime(self, device_id, generation, instance, token, now, expires_at):
         with get_simulation_conn() as conn, conn.cursor() as cursor:

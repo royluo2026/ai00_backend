@@ -76,9 +76,9 @@ class RuntimeSessionService:
         return {'device_id': device_id, 'runtime_generation': generation + 1, 'runtime_instance_id': runtime_instance_id,
                 'audit_ref': f'connector-runtime-takeover:{device_id}:{generation + 1}'}
 
-    def heartbeat(self, token, **pins):
+    def heartbeat(self, token, advertisement=None, **pins):
         # The repository authenticates under the same transaction as the write.
-        self.repository.heartbeat_runtime(pins['device_id'], pins['generation'], pins['runtime_instance_id'], token, self.clock())
+        self.repository.heartbeat_runtime(pins['device_id'], pins['generation'], pins['runtime_instance_id'], token, self.clock(), advertisement)
         return {'accepted': True}
 
     def renew(self, token, **pins):

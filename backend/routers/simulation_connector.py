@@ -23,6 +23,7 @@ from plugins.simulation.simulation_backend.capabilities.connector_runtime import
     ConnectorHealth, complete_connector_plan, get_leased_connector_plan,
     lease_connector_plan, record_connector_heartbeat,
 )
+from plugins.simulation.simulation_backend.capabilities.connector_contracts import AdapterAdvertisement
 from plugins.simulation.simulation_backend.data.connector_repository import SimulationConnectorRepository
 from plugins.simulation.simulation_backend.application.connector_wakeup import connector_wake_broker
 from plugins.simulation.simulation_backend.domain.connector_pairing import PairingRequest
@@ -443,6 +444,21 @@ class RuntimeRestartBody(BaseModel):
     runtime_instance_id: str = Field(pattern=IDENTITY_PATTERN)
 
 
+class RuntimeAdapterHealth(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    ready: bool
+    status: str = Field(min_length=1, max_length=64)
+    process_ready: bool
+    document_ready: bool
+    product_version: str = Field(max_length=64)
+
+
+class RuntimeHeartbeatBody(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    adapter: AdapterAdvertisement
+    health: RuntimeAdapterHealth
+
+
 def _transport(call):
     try:
         return {'success': True, 'data': call()}
@@ -505,8 +521,10 @@ def runtime_reconciliation_register(body: RuntimeRegisterBody, device_credential
 
 
 @router.post('/v2/heartbeat')
-def runtime_heartbeat(pins: dict = Depends(_runtime_auth)):
-    return _transport(lambda: runtime_session_service.heartbeat(**pins))
+def runtime_heartbeat(body: RuntimeHeartbeatBody | None = None, pins: dict = Depends(_runtime_auth)):
+    return _transport(lambda: runtime_session_service.heartbeat(
+        advertisement=body.model_dump(mode='json') if body else None, **pins,
+    ))
 
 
 @router.post('/v2/runtime/renew')

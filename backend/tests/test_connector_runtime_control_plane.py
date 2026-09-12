@@ -61,6 +61,33 @@ def healthy(session_id="session-1"):
     })
 
 
+def test_app_health_is_bound_to_current_runtime_session_and_actual_adapter_version():
+    advertisement = {
+        "runtime_generation": 7, "runtime_instance_id": "app-session-1",
+        "adapter": healthy().adapters[0].model_dump(mode="json"),
+        "health": {"ready": True, "status": "ready", "process_ready": True,
+                   "document_ready": True, "product_version": "14.3.0"},
+    }
+    row = {"device_id": "device-001", "runtime_type": "electron",
+           "runtime_generation": 7, "current_runtime_instance_id": "app-session-1",
+           "heartbeat_at": (NOW-timedelta(seconds=10)).replace(tzinfo=None),
+           "session_expires_at": (NOW+timedelta(minutes=5)).replace(tzinfo=None),
+           "adapter_health_json": json.dumps(advertisement)}
+
+    class Repository:
+        def bound_runtime_for_user(self, user_id, tenant_id): return row
+        def get_health(self, *_): raise AssertionError("legacy health must not serve App runtime")
+
+    control = ConnectorControlPlane(Repository(), clock=lambda: NOW)
+    context = CapabilityContext(user_gid="user-001", team_gid="tenant-001")
+    health = control.get_health("device-001", context)
+    assert health.protocol_versions == ("ai00.connector.execution-plan.v2",)
+    assert health.adapters[0].product_version == "14.3.0"
+    row["current_runtime_instance_id"] = "app-session-2"
+    with pytest.raises(ConnectorError, match="adapter_health_unavailable"):
+        control.get_health("device-001", context)
+
+
 def plan():
     return ConnectorExecutionPlanV1.model_validate(VECTOR["plan"])
 
@@ -673,8 +700,10 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
     assert set(by_id) == {
         ("simulation.connector.runtime.takeover", 1),
         ("simulation.connector.health.get", 1),
+        ("simulation.connector.health.get", 2),
         ("simulation.connector.plan.queue", 1),
         ("simulation.connector.plan.queue", 2),
+        ("simulation.connector.plan.queue", 3),
         ("simulation.vismockup.application.attach.request", 1),
         ("simulation.vismockup.application.launch.request", 1),
         ("simulation.vismockup.model.open.request", 1),
@@ -706,6 +735,9 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
     assert by_id[("simulation.connector.plan.queue", 1)][1].lifecycle_status == "experimental"
     assert by_id[("simulation.connector.plan.queue", 1)][0].permissions == ("agent.run",)
     assert by_id[("simulation.connector.plan.queue", 2)][0].permissions == ("simulation.use",)
+    assert by_id[("simulation.connector.plan.queue", 3)][0].permissions == ("simulation.use",)
+    assert by_id[("simulation.connector.health.get", 2)][0].permissions == ("simulation.use",)
+    assert by_id[("simulation.connector.plan.queue", 3)][0].input_schema == by_id[("simulation.connector.plan.queue", 1)][0].input_schema
     snapshot_payload_schema = (
         by_id[("simulation.connector.plan.queue", 2)][0]
         .input_schema["properties"]["plan"]["properties"]["steps"]["items"]
