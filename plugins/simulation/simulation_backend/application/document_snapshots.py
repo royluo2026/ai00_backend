@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from .connector_protocol_v2 import parse_plan, projection_status
+from .connector_workflow_v2 import matches_prepared_plan
 
 import secrets
 from datetime import UTC, datetime
@@ -134,7 +135,7 @@ class DocumentSnapshotWorkflow:
         if persisted is None:
             raise SimulationWorkflowError("document_snapshot_not_found")
         expected_plan = parse_plan(persisted.get("plan"))
-        if expected_plan.plan_hash != plan.plan_hash or expected_plan != plan:
+        if not matches_prepared_plan(expected_plan, plan):
             raise SimulationWorkflowError("plan_outcome_invalid")
         if outcome.plan_id != plan.plan_id:
             raise SimulationWorkflowError("plan_outcome_invalid")

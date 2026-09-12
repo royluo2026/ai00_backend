@@ -15,6 +15,7 @@ from backend.contracts.connector_execution_plan_v1 import (
 )
 
 from .connector_plans import build_capture_plan, build_materialization_plan
+from .connector_workflow_v2 import matches_prepared_plan
 
 
 class SimulationWorkflowError(RuntimeError):
@@ -264,7 +265,7 @@ class CaptureWorkflow:
         if persisted is None:
             raise SimulationWorkflowError("materialization_run_not_found")
         expected_plan = parse_plan(persisted.get("plan"))
-        if expected_plan.plan_hash != plan.plan_hash or expected_plan != plan:
+        if not matches_prepared_plan(expected_plan, plan):
             raise SimulationWorkflowError("plan_outcome_invalid")
         status = {
             "completed": "completed", "failed": "failed",
@@ -302,7 +303,7 @@ class CaptureWorkflow:
         if persisted_step is None:
             raise SimulationWorkflowError("capture_step_not_found")
         expected_plan = parse_plan(persisted_step.get("plan"))
-        if expected_plan.plan_hash != plan.plan_hash or expected_plan != plan:
+        if not matches_prepared_plan(expected_plan, plan):
             raise SimulationWorkflowError("plan_outcome_invalid")
         terminal_status = projection_status(outcome)
         v2 = outcome.protocol == 'ai00.connector.execution-plan.v2'

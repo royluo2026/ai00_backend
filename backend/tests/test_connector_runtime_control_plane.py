@@ -282,6 +282,45 @@ def test_direct_app_request_queues_v2_instead_of_fenced_legacy_plan():
     assert result.data["operation_id"] == control.queued["plan_id"]
 
 
+def test_prepared_workflow_queue_uses_v2_for_bound_electron_runtime():
+    source = ConnectorExecutionPlanV1.model_validate(json.loads(
+        (Path(__file__).parent / "fixtures" / "connector_execution_plan_v1.json").read_text()
+    )["plan"])
+
+    class Repository:
+        def bound_runtime_for_user(self, user_id, tenant_id):
+            return {"device_id": source.device_id, "runtime_type": "electron"}
+
+    class Control:
+        repository = Repository()
+        clock = staticmethod(lambda: NOW)
+        queued = None
+
+        def queue_v2(self, value, context, *, runtime_row=None):
+            self.queued = value
+            assert runtime_row["device_id"] == source.device_id
+            return OperationRef(operation_id=value["plan_id"], status=OperationStatus.ACCEPTED)
+
+        def queue_plan(self, *_args):
+            raise AssertionError("legacy queue must not receive an Electron workflow")
+
+    class Registry:
+        def __init__(self): self.handlers = {}
+        def register(self, spec, handler, *, descriptor): self.handlers[(spec.id, spec.version)] = handler
+
+    registry, control = Registry(), Control()
+    register_connector_runtime_capabilities(registry, control)
+    result = registry.handlers[("simulation.connector.plan.queue", 1)](
+        {"plan": source.model_dump(mode="json")},
+        CapabilityContext(user_gid=source.user_id, team_gid=source.tenant_id,
+                          catalog_release="rel_test", confirmation_token="receipt-1"),
+    )
+
+    assert result.data["operation_id"] == source.plan_id
+    assert control.queued["protocol"] == "ai00.connector.execution-plan.v2"
+    assert control.queued["normalized_input_hash"] == source.plan_hash
+
+
 def test_direct_app_request_preserves_actionable_connector_error_code():
     class Repository:
         def bound_runtime_for_user(self, user_id, tenant_id):

@@ -534,7 +534,20 @@ def register_connector_runtime_capabilities(
 
     def queue_plan(payload, context):
         plan = ConnectorExecutionPlanV1.model_validate(payload["plan"])
-        operation = control_plane.queue_plan(plan, context)
+        runtime = control_plane.repository.bound_runtime_for_user(context.user_gid, context.team_gid)
+        try:
+            if runtime and runtime.get("runtime_type") == "electron":
+                from ..application.connector_workflow_v2 import workflow_plan_v2_draft
+                draft = workflow_plan_v2_draft(
+                    plan, catalog_release=str(getattr(context, "catalog_release", "") or ""),
+                    confirmation_receipt_id=getattr(context, "confirmation_token", None),
+                    now=control_plane.clock(),
+                )
+                operation = control_plane.queue_v2(draft, context, runtime_row=runtime)
+            else:
+                operation = control_plane.queue_plan(plan, context)
+        except (ConnectorError, ValueError) as exc:
+            raise CapabilityBusinessError(str(exc), str(exc)) from exc
         return CapabilityOutput(data=operation.model_dump(mode="json"), evidence=(EvidenceRef(
             kind="simulation.connector.plan",
             reference=f"connector-plan:{plan.plan_id}",

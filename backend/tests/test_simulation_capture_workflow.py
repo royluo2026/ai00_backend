@@ -21,6 +21,9 @@ from plugins.simulation.simulation_backend.application.capture_worker import (
     CaptureWorkflow,
     SimulationWorkflowError,
 )
+from plugins.simulation.simulation_backend.application.connector_workflow_v2 import (
+    same_workflow_intent, workflow_plan_v2_draft,
+)
 from plugins.simulation.simulation_backend.domain.environment_manifest import compose_manifest
 from plugins.craft.craft_backend.services.execution_structure import BopAggregate, _normalize
 
@@ -153,6 +156,72 @@ def test_capture_prepares_then_dispatches_only_the_first_reverse_order_operation
         for plan, _approval in connector.plans for step in plan.steps
         if step.operation_id == "vismockup.view.capture@1"
     )
+
+
+def test_prepared_capture_intent_reissues_as_signed_v2_plan_for_current_app_session():
+    from datetime import timedelta
+    from cryptography.hazmat.primitives.asymmetric import ec
+    from plugins.simulation.simulation_backend.application.connector_protocol_v2 import PlanSigner
+
+    workflow, repository, _, _ = _workflow()
+    asyncio.run(workflow.start_capture("env-1", 1, "device-1", _context()))
+    source = workflow.next_action("run-1", _context())["payload"]["plan"]
+    from backend.contracts.connector_execution_plan_v1 import ConnectorExecutionPlanV1
+    source = ConnectorExecutionPlanV1.model_validate(source)
+    now = datetime(2026, 9, 4, tzinfo=UTC)
+    draft = workflow_plan_v2_draft(
+        source, catalog_release="rel_test", confirmation_receipt_id="receipt-1", now=now,
+    )
+    key = ec.generate_private_key(ec.SECP256R1())
+    signer = PlanSigner(lambda _id: {
+        "private_key": key, "not_before": now-timedelta(days=1),
+        "not_after": now+timedelta(days=1), "revoked": False,
+    }, key_id="test-key", clock=lambda: now)
+    signed = signer.sign(draft)
+
+    assert signed.plan_id == source.plan_id
+    assert signed.steps[-1].operation_id == "vismockup.view.capture@1"
+    assert signed.steps[-1].side_effect_classification == "write"
+    assert signed.issued_at.startswith("2026-09-04")
+    assert same_workflow_intent(source, signed)
+    changed = signed.model_copy(update={"normalized_input_hash": "sha256:" + "0" * 64})
+    assert not same_workflow_intent(source, changed)
+    unsafe = signed.model_copy(update={"steps": [*signed.steps[:-1],
+        signed.steps[-1].model_copy(update={"side_effect_classification": "read"})]})
+    assert not same_workflow_intent(source, unsafe)
+
+
+def test_signed_v2_capture_result_projects_into_prepared_reverse_run():
+    from datetime import timedelta
+    from types import SimpleNamespace
+    from cryptography.hazmat.primitives.asymmetric import ec
+    from plugins.simulation.simulation_backend.application.connector_protocol_v2 import PlanSigner
+
+    workflow, repository, _, _ = _workflow()
+    asyncio.run(workflow.start_capture("env-1", 1, "device-1", _context()))
+    asyncio.run(workflow.dispatch_next("run-1", "receipt-1", _context()))
+    from backend.contracts.connector_execution_plan_v1 import ConnectorExecutionPlanV1
+    source = ConnectorExecutionPlanV1.model_validate(repository.runs["run-1"]["steps"][0]["plan"])
+    now = datetime(2026, 9, 4, tzinfo=UTC)
+    draft = workflow_plan_v2_draft(source, catalog_release="rel_test",
+                                   confirmation_receipt_id="receipt-1", now=now)
+    key = ec.generate_private_key(ec.SECP256R1())
+    signer = PlanSigner(lambda _id: {"private_key": key,
+        "not_before": now-timedelta(days=1), "not_after": now+timedelta(days=1),
+        "revoked": False}, key_id="test-key", clock=lambda: now)
+    signed = signer.sign(draft)
+    outcome = SimpleNamespace(
+        plan_id=signed.plan_id, protocol=signed.protocol, overall_status="succeeded",
+        steps=[SimpleNamespace(step_id=step.step_id, status="succeeded",
+                               result={"artifact": ARTIFACT} if step.operation_id == "vismockup.view.capture@1" else {})
+               for step in signed.steps],
+    )
+
+    result = asyncio.run(workflow.apply_connector_outcome(signed, outcome, _context()))
+
+    assert result["steps"][0]["status"] == "completed"
+    assert result["steps"][0]["artifact_ref"] == ARTIFACT
+    assert workflow.next_action("run-1", _context())["capability_id"] == "craft.process_screenshot.attach"
 
 
 def test_capture_runs_processes_in_reverse_station_order_without_child_operation_images():

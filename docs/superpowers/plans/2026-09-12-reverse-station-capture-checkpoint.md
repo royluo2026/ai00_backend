@@ -9,12 +9,13 @@ Capture stations in descending Craft `sort_order`. Within each station, capture 
 - The manifest groups child operation products and resources under their owning process, without generating extra child-operation screenshots. Its cumulative product scene remains keyed by the process ID. `CaptureWorkflow.start_capture` orders plans by descending execution sequence.
 - The V1 Service and interactive SessionHost now share a ProgramData capture directory, so the Service can read PNGs written in the user session.
 - The V2 App Host uploads PNGs under the authenticated lease and step, records only the returned ArtifactRef in its signed outcome, and quarantines uncertain uploads. The server authorizes the exact leased capture step before accepting bytes.
+- The existing prepared Simulation workflow now routes its V1 intent to a freshly signed V2 plan when the bound runtime is Electron. The V2 projection must match the persisted V1 plan's identity, steps, payloads, hashes, and effect classifications before changing capture state. Direct Service runtimes continue to use the V1 queue.
 - Craft screenshot attachment now accepts both `process`/`bop_process` and direct operation node types.
 - Verification: Connector project 230/230, Python HTTP/capture/manifest/Craft boundary 33/33, frontend capture workflow 7/7. These are code-level tests, not a live VisMockup capture.
 
 ## Remaining before runtime verification
 
-1. The web capture workflow still queues V1 plans; the supported Electron App leases V2 plans only. A governed V2 plan producer and projection bridge are required before this flow can use the supported App. The installed legacy Service binary predates the shared capture-directory fix.
+1. The V2 plan producer/projection bridge has code-level coverage but has not been exercised against a real paired Electron App and database. The installed legacy Service binary predates the shared capture-directory fix.
 2. No backend listener or isolated test database was configured in this worktree. `backend/.env` lacks `AI00_SIMULATION_TEST_DB_URL`. A BOP version with station/process hierarchy and an open VisMockup model are needed for a real run. Use only a configured test database and `test_` tables for local validation.
 3. Verify each produced PNG's scene and BOP attachment, including all station/process boundaries, in an interactive session. The local scene controller does not yet save and restore the pre-run scene; this remains an acceptance gap.
 4. Offline governance scan is blocked by `pinned_product_descriptor_count_mismatch` (checked release: 546 stable descriptors; scanner pin: 545). Generated Catalog and checked release also differ. Do not adjust the pin or publish the release solely to clear this gate.
