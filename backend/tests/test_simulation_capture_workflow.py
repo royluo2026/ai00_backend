@@ -224,6 +224,51 @@ def test_signed_v2_capture_result_projects_into_prepared_reverse_run():
     assert workflow.next_action("run-1", _context())["capability_id"] == "craft.process_screenshot.attach"
 
 
+def test_materialization_from_previous_electron_session_cannot_authorize_capture(monkeypatch):
+    import sqlite3
+    from plugins.simulation.simulation_backend.capabilities import capture_runs
+
+    db = sqlite3.connect(":memory:")
+    try:
+        db.executescript("""
+            CREATE TABLE workmanship_sim_materialization_runs (
+                environment_id TEXT, environment_version INTEGER, device_id TEXT,
+                plan_id TEXT, status TEXT, owner_gid TEXT, team_gid TEXT);
+            CREATE TABLE workmanship_sim_connector_runtime_devices (
+                device_id TEXT, runtime_type TEXT, runtime_generation INTEGER,
+                current_runtime_instance_id TEXT);
+            CREATE TABLE workmanship_sim_connector_runtime_plans (
+                plan_id TEXT, device_id TEXT, protocol TEXT, status TEXT,
+                runtime_generation INTEGER, runtime_instance_id TEXT);
+            INSERT INTO workmanship_sim_materialization_runs VALUES
+                ('env-1',1,'device-1','materialize-1','completed','user-1','team-1');
+            INSERT INTO workmanship_sim_connector_runtime_devices VALUES
+                ('device-1','electron',7,'session-a');
+            INSERT INTO workmanship_sim_connector_runtime_plans VALUES
+                ('materialize-1','device-1','ai00.connector.execution-plan.v2','succeeded',7,'session-a');
+        """)
+
+        class Cursor:
+            def __init__(self): self.value = db.cursor()
+            def __enter__(self): return self
+            def __exit__(self, *_): self.value.close()
+            def execute(self, sql, params): return self.value.execute(sql.replace("%s", "?"), params)
+            def fetchone(self): return self.value.fetchone()
+
+        class Connection:
+            def __enter__(self): return self
+            def __exit__(self, *_): pass
+            def cursor(self): return Cursor()
+
+        monkeypatch.setattr(capture_runs, "get_simulation_conn", Connection)
+        repository = capture_runs.SqlCaptureWorkflowRepository()
+        assert repository.has_completed_materialization("env-1", 1, "device-1", _context())
+        db.execute("UPDATE workmanship_sim_connector_runtime_devices SET current_runtime_instance_id='session-b'")
+        assert not repository.has_completed_materialization("env-1", 1, "device-1", _context())
+    finally:
+        db.close()
+
+
 def test_capture_runs_processes_in_reverse_station_order_without_child_operation_images():
     workflow, repository, connector, _ = _workflow()
     repository.manifest = compose_manifest(

@@ -97,9 +97,15 @@ class SqlCaptureWorkflowRepository:
     ):
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
-                "SELECT 1 FROM workmanship_sim_materialization_runs "
-                "WHERE environment_id=%s AND environment_version=%s AND device_id=%s "
-                "AND status='completed' AND (owner_gid=%s OR (%s IS NOT NULL AND team_gid=%s)) "
+                "SELECT 1 FROM workmanship_sim_materialization_runs m "
+                "LEFT JOIN workmanship_sim_connector_runtime_devices d ON d.device_id=m.device_id "
+                "LEFT JOIN workmanship_sim_connector_runtime_plans p ON p.plan_id=m.plan_id "
+                "AND p.device_id=m.device_id AND p.protocol='ai00.connector.execution-plan.v2' "
+                "WHERE m.environment_id=%s AND m.environment_version=%s AND m.device_id=%s "
+                "AND m.status='completed' AND (m.owner_gid=%s OR (%s IS NOT NULL AND m.team_gid=%s)) "
+                "AND (d.device_id IS NULL OR d.runtime_type<>'electron' OR "
+                "(p.status='succeeded' AND p.runtime_generation=d.runtime_generation "
+                "AND p.runtime_instance_id=d.current_runtime_instance_id)) "
                 "LIMIT 1",
                 (
                     environment_id, environment_version, device_id,

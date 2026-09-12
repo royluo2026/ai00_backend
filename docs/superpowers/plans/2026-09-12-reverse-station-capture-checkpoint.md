@@ -10,6 +10,7 @@ Capture stations in descending Craft `sort_order`. Within each station, capture 
 - The V1 Service and interactive SessionHost now share a ProgramData capture directory, so the Service can read PNGs written in the user session.
 - The V2 App Host uploads PNGs under the authenticated lease and step, records only the returned ArtifactRef in its signed outcome, and quarantines uncertain uploads. The server authorizes the exact leased capture step before accepting bytes.
 - The existing prepared Simulation workflow now routes its V1 intent to a freshly signed V2 plan when the bound runtime is Electron. The V2 projection must match the persisted V1 plan's identity, steps, payloads, hashes, and effect classifications before changing capture state. Direct Service runtimes continue to use the V1 queue.
+- Capture admission for an Electron runtime requires materialization completed in that exact runtime generation and instance. If the App restarted, the browser prepares and separately dispatches a new materialization before starting capture.
 - Craft screenshot attachment now accepts both `process`/`bop_process` and direct operation node types.
 - Verification: Connector project 230/230, Python HTTP/capture/manifest/Craft boundary 33/33, frontend capture workflow 7/7. These are code-level tests, not a live VisMockup capture.
 
