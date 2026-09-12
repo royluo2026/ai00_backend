@@ -286,7 +286,10 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
     {
         var path = Path.GetFullPath(executable);
         var processName = Path.GetFileNameWithoutExtension(path);
-        var processes = System.Diagnostics.Process.GetProcesses();
+        var processes = string.IsNullOrWhiteSpace(processName)
+            ? []
+            : System.Diagnostics.Process.GetProcessesByName(processName)
+                .Concat(System.Diagnostics.Process.GetProcessesByName(processName + "_NG")).ToArray();
         var matches = new List<(int Id, long Started)>();
         var running = false;
         var processCount = 0;
@@ -294,8 +297,6 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         {
             foreach (var process in processes)
             {
-                if (string.IsNullOrWhiteSpace(processName) ||
-                    !MatchesProcessName(processName, process.ProcessName)) continue;
                 running = true;
                 processCount++;
                 try { matches.Add((process.Id, process.StartTime.ToUniversalTime().Ticks)); }
