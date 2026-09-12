@@ -357,8 +357,9 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             var source = _paths.ValidateActivePlmxmlSource(document.SourceIdentity);
             if (new FileInfo(source).Length > 64L * 1024 * 1024) return false;
             using var stream = File.OpenRead(source);
-            _treeCache.ReplaceProjection(document,
-                new VisMockupPlmxmlProjectionReader().Read(stream, 250_000));
+            var projection = new VisMockupPlmxmlProjectionReader().Read(stream, 250_000);
+            EnsureTopLevelMatches(document, projection);
+            _treeCache.ReplaceProjection(document, projection);
             _sessionNodeKeys.Clear();
             return true;
         }
@@ -448,11 +449,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             var projection = new VisMockupPlmxmlProjectionReader().Read(stream, maxNodes);
             if (projection.Nodes.Any(node => node.Depth > maxDepth))
                 throw new ConnectorException("bom_snapshot_limit_exceeded");
-            var exportedTopLevelCount = projection.Nodes.Count(node =>
-                string.Equals(node.ParentStableOccurrenceKey, projection.RootStableOccurrenceKey,
-                    StringComparison.Ordinal));
-            if (exportedTopLevelCount != document.RootNode.Children.Count)
-                throw new ConnectorException("plmxml_current_state_incomplete");
+            EnsureTopLevelMatches(document, projection);
             _treeCache?.ReplaceProjection(document, projection);
             var nodes = projection.Nodes.Select(node => new VisMockupSnapshotNode(
                 node.StableOccurrenceKey,
@@ -469,6 +466,15 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         {
             if (artifact is not null && File.Exists(artifact.Path)) File.Delete(artifact.Path);
         }
+    }
+
+    private static void EnsureTopLevelMatches(IVisMockupDocument document, VisMockupPlmxmlProjection projection)
+    {
+        var exportedCount = projection.Nodes.Count(node =>
+            string.Equals(node.ParentStableOccurrenceKey, projection.RootStableOccurrenceKey,
+                StringComparison.Ordinal));
+        if (exportedCount != document.RootNode.Children.Count)
+            throw new ConnectorException("plmxml_current_state_incomplete");
     }
 
     private static IReadOnlyList<CachedTreeNode> ReadCompleteComTree(IVisMockupDocument document)

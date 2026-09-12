@@ -469,6 +469,45 @@ public sealed class VisMockupSnapshotTests
     }
 
     [Fact]
+    public async Task ActivePlmxmlSourceCannotHydrateAnIncompleteControlMap()
+    {
+        var directory = NewCacheDirectory("incomplete-active-plmxml");
+        var source = Path.Combine(directory, "W10.plmxml");
+        File.WriteAllText(source, """
+            <PLMXML><InstanceGraph rootRefs="root">
+              <ProductInstance id="root" name="Root"/>
+              <ProductInstance id="leaf" name="Leaf"/>
+              <Occurrence instanceRefs="#root"><UserData>
+                <UserValue title="__PLM_OCC_PDM_UID" value="root"/>
+              </UserData></Occurrence>
+              <Occurrence instanceRefs="#root #leaf"><UserData>
+                <UserValue title="__PLM_OCC_PDM_UID" value="leaf"/>
+              </UserData></Occurrence>
+            </InstanceGraph></PLMXML>
+            """);
+        try
+        {
+            var document = new FakeDocument("SESSION-1", source,
+                new FakeNode("session-root", "Root", "", "", [
+                    new FakeNode("session-leaf", "Leaf", "", "", []),
+                    new FakeNode("session-other", "Other", "", "", []),
+                ]));
+            var cachePath = Path.Combine(directory, "tree.db");
+            using var sta = new StaDispatcher();
+            var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([directory]),
+                new FakeVisMockupCom { ExistingApplication = new FakeApplication("14.2.0", document) },
+                Path.Combine(directory, "captures"), cachePath);
+
+            await Assert.ThrowsAsync<ConnectorNoEffectException>(() =>
+                adapter.ChangeNodeSelectionAsync("pdm:leaf", "highlight"));
+
+            Assert.Empty(document.SelectedNodeKeys);
+            Assert.Null(new VisMockupTreeCache(cachePath).TryRead(document, 1));
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
     public async Task NodeControlReusesMappingOnlyWithinTheSameVmProcessSession()
     {
         var directory = NewCacheDirectory("session-node-map");
