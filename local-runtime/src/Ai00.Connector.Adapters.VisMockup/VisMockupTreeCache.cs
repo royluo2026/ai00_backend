@@ -105,8 +105,7 @@ internal sealed class VisMockupTreeCache
         touch.Parameters.AddWithValue("$now", DateTimeOffset.UtcNow.ToString("O"));
         touch.Parameters.AddWithValue("$local_id", localId);
         touch.ExecuteNonQuery();
-        return new(nodes, maxDepth,
-            crossSessionStableProjection ? "verifying" : "verified");
+        return new(nodes, maxDepth, externallyVerified ? "verified" : "verifying");
     }
 
     public void Replace(IVisMockupDocument document, int maxDepth, IReadOnlyList<CachedTreeNode> nodes)

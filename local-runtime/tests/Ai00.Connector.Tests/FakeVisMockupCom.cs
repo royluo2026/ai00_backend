@@ -5,7 +5,10 @@ namespace Ai00.Connector.Tests;
 public sealed class FakeVisMockupCom : IVisMockupCom
 {
     public bool ProcessRunning { get; set; }
-    public VisMockupProcessState InspectProcess() => new(ProcessRunning || ExistingApplication is not null, "14.2.0");
+    public int? ProcessId { get; set; }
+    public long? ProcessStartUtcTicks { get; set; }
+    public VisMockupProcessState InspectProcess() => new(ProcessRunning || ExistingApplication is not null,
+        "14.2.0", ProcessId, ProcessStartUtcTicks);
     public IVisMockupApplication? ExistingApplication { get; set; }
     public int LaunchCalls { get; private set; }
     public HashSet<int> ThreadIds { get; } = [];

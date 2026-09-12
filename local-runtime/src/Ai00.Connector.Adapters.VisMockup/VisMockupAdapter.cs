@@ -21,6 +21,8 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     private readonly string _plmxmlRoot;
     private object? _application;
     private string? _ownedDocumentId;
+    private (int ProcessId, long Started, string DocumentId, string Source, string RootKey)? _mappedSession;
+    private readonly Dictionary<string, string> _sessionNodeKeys = new(StringComparer.Ordinal);
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, string executable)
         : this(sta, paths, new WindowsVisMockupCom(executable), executable,
@@ -96,6 +98,8 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         _sta.InvokeAsync(() =>
         {
             var document = _connection.RequireActiveDocument();
+            _sessionNodeKeys.Clear();
+            _mappedSession = null;
             try { return ReadPlmxmlSnapshot(document, maxNodes, maxDepth); }
             catch (ConnectorException error) when (error.Code is
                 "plmxml_current_state_structure_missing" or
@@ -313,13 +317,31 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     private string ResolveSessionNodeKey(IVisMockupDocument document, string key)
     {
         if (!key.StartsWith("pdm:", StringComparison.Ordinal)) return key;
-        try { return _treeCache?.ResolveSessionNodeKey(document, key) ?? throw new InvalidDataException(); }
+        var process = _com.InspectProcess();
+        (int, long, string, string, string)? session =
+            process.ProcessId is int id && process.ProcessStartUtcTicks is long started
+                ? (id, started, document.DocumentId, document.SourceIdentity, document.RootNode.NodeKey)
+                : null;
+        if (session != _mappedSession)
+        {
+            _sessionNodeKeys.Clear();
+            _mappedSession = session;
+        }
+        if (session is not null && _sessionNodeKeys.TryGetValue(key, out var known)) return known;
+        string resolved;
+        try { resolved = _treeCache?.ResolveSessionNodeKey(document, key) ?? throw new InvalidDataException(); }
         catch (InvalidDataException) when (TryHydrateTreeCacheFromActivePlmxml(document))
         {
-            try { return _treeCache!.ResolveSessionNodeKey(document, key); }
+            try { resolved = _treeCache!.ResolveSessionNodeKey(document, key); }
             catch (InvalidDataException) { throw new ConnectorNoEffectException("vismockup_session_node_mapping_stale"); }
         }
         catch (InvalidDataException) { throw new ConnectorNoEffectException("vismockup_session_node_mapping_stale"); }
+        if (session is not null)
+        {
+            if (_sessionNodeKeys.Count >= 4096) _sessionNodeKeys.Clear();
+            _sessionNodeKeys[key] = resolved;
+        }
+        return resolved;
     }
 
     private bool TryHydrateTreeCacheFromActivePlmxml(IVisMockupDocument document)
@@ -337,6 +359,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             using var stream = File.OpenRead(source);
             _treeCache.ReplaceProjection(document,
                 new VisMockupPlmxmlProjectionReader().Read(stream, 250_000));
+            _sessionNodeKeys.Clear();
             return true;
         }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException or
@@ -399,6 +422,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     {
         if (maxDepth is < 1 or > 8) throw new ConnectorException("vismockup_tree_depth_invalid");
         var document = _connection.RequireActiveDocument();
+        if (forceRefresh) { _sessionNodeKeys.Clear(); _mappedSession = null; }
         var cached = forceRefresh ? null : _treeCache?.TryRead(document, maxDepth);
         if (cached is not null) return TreeResult(cached.Nodes, maxDepth, cached.CacheState);
         // The interactive tree must not wait on VisMockup's non-cancellable

@@ -103,7 +103,8 @@ internal static class VisMockupPlmxmlExport
     }
 }
 
-public sealed record VisMockupProcessState(bool Running, string ProductVersion);
+public sealed record VisMockupProcessState(
+    bool Running, string ProductVersion, int? ProcessId = null, long? ProcessStartUtcTicks = null);
 
 internal static class VisMockupDispatch
 {
@@ -277,15 +278,7 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         if (count <= 0) return [];
         var result = new List<IVisMockupNode>(count);
         for (var index = 0; index < count; index++)
-        {
-            try { result.Add(childAt(index)); }
-            catch (ConnectorException error) when (error.Code == "vismockup_dispatch_d3_h80020009")
-            {
-#if DEBUG
-                Console.Error.WriteLine($"[ConnectorHost] skipped unreadable VisMockup child slot {index}");
-#endif
-            }
-        }
+            result.Add(childAt(index));
         return result;
     }
 
@@ -293,12 +286,29 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
     {
         var path = Path.GetFullPath(executable);
         var processName = Path.GetFileNameWithoutExtension(path);
-        var running = !string.IsNullOrWhiteSpace(processName) &&
-            System.Diagnostics.Process.GetProcesses().Any(process => MatchesProcessName(processName, process.ProcessName));
+        var processes = System.Diagnostics.Process.GetProcesses();
+        var matches = new List<(int Id, long Started)>();
+        var running = false;
+        var processCount = 0;
+        try
+        {
+            foreach (var process in processes)
+            {
+                if (string.IsNullOrWhiteSpace(processName) ||
+                    !MatchesProcessName(processName, process.ProcessName)) continue;
+                running = true;
+                processCount++;
+                try { matches.Add((process.Id, process.StartTime.ToUniversalTime().Ticks)); }
+                catch (Exception error) when (error is System.ComponentModel.Win32Exception or InvalidOperationException) { }
+            }
+        }
+        finally { foreach (var process in processes) process.Dispose(); }
         var version = File.Exists(path)
             ? System.Diagnostics.FileVersionInfo.GetVersionInfo(path).ProductVersion ?? "unknown"
             : "unknown";
-        return new(running, version);
+        return processCount == 1 && matches.Count == 1
+            ? new(true, version, matches[0].Id, matches[0].Started)
+            : new(running, version);
     }
 
     public bool TryGetActiveApplication(out IVisMockupApplication? application)
