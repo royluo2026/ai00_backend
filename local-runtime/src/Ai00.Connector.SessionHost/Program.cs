@@ -15,7 +15,8 @@ var userId = Environment.GetEnvironmentVariable("AI00_CONNECTOR_USER_ID")
 using var instance = SingleInstanceGuard.Acquire(connectorId, windowsSid);
 var presencePath = SessionHostPresencePath.For(windowsSid);
 using var sta = new StaDispatcher();
-var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy(options.AllowedRoots.Append(options.ArtifactCacheRoot)), options.VisMockupExe);
+var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy(options.AllowedRoots.Append(options.ArtifactCacheRoot)),
+    options.VisMockupExe, options.CaptureRoot);
 var planHost = new PlanPipeHost(
     new ValidatedPlanDispatcher([adapter]),
     ConnectorPipeName.PlanFor(connectorId, windowsSid));

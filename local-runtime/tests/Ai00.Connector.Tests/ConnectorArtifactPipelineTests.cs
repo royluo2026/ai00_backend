@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using Ai00.Connector.Contracts;
 using Ai00.Connector.Service;
+using Ai00.Connector.SessionHost;
 using Microsoft.Extensions.Options;
 using Xunit;
 
@@ -11,6 +12,17 @@ namespace Ai00.Connector.Tests;
 public sealed class ConnectorArtifactPipelineTests : IDisposable
 {
     private readonly string _root = Path.Combine(Path.GetTempPath(), "ai00-plan-artifacts", Guid.NewGuid().ToString("N"));
+
+    [Fact]
+    public void ServiceAndInteractiveSessionShareTheCaptureRoot()
+    {
+        var expected = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+            "AI00", "SessionHost", "captures");
+
+        Assert.Equal(expected, new RuntimeOptions().CaptureRoot);
+        Assert.Equal(expected, SessionHostOptions.FromEnvironment().CaptureRoot);
+    }
 
     [Fact]
     public async Task CaptureUploadReplacesLocalPathWithArtifactRef()

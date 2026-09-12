@@ -7,6 +7,6 @@ public sealed class RuntimeOptions
     public string Version { get; set; } = "1.0.0";
     public string PipeSecret { get; set; } = "";
     public string ArtifactCacheRoot { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "AI00", "artifacts");
-    public string CaptureRoot { get; set; } = Path.Combine(Path.GetTempPath(), "AI00", "captures");
+    public string CaptureRoot { get; set; } = Ai00.Connector.Contracts.ConnectorCapturePaths.DefaultRoot;
     public int PollSeconds { get; set; } = 30;
 }

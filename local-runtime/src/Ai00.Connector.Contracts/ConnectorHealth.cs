@@ -25,3 +25,10 @@ public static class SessionHostPresencePath
         "AI00", "SessionHost", Convert.ToHexString(digest).ToLowerInvariant() + ".json");
     }
 }
+
+public static class ConnectorCapturePaths
+{
+    public static string DefaultRoot => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+        "AI00", "SessionHost", "captures");
+}
