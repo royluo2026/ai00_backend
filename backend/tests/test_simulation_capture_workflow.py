@@ -196,6 +196,35 @@ def test_prepared_capture_intent_reissues_as_signed_v2_plan_for_current_app_sess
     assert not same_workflow_intent(source, unsafe)
 
 
+def test_materialization_and_snapshot_intents_are_valid_v2_app_plans():
+    from datetime import timedelta
+    from cryptography.hazmat.primitives.asymmetric import ec
+    from plugins.simulation.simulation_backend.application.connector_plans import (
+        build_document_snapshot_plan, build_materialization_plan,
+    )
+    from plugins.simulation.simulation_backend.application.connector_protocol_v2 import PlanSigner
+
+    now = datetime(2026, 9, 4, tzinfo=UTC)
+    common = dict(device_id="device-1", tenant_id="team-1", user_id="user-1",
+                  issued_at=now-timedelta(days=1), capability_version_gid="cv2_test",
+                  business_definition_hash="sha256:"+"d"*64)
+    plans = (
+        (build_materialization_plan(_manifest(), plan_id="materialize-1", **common),
+         "simulation.environment.materialize"),
+        (build_document_snapshot_plan(plan_id="snapshot-1", **common),
+         "simulation.document_snapshot.request"),
+    )
+    key = ec.generate_private_key(ec.SECP256R1())
+    signer = PlanSigner(lambda _id: {"private_key": key,
+        "not_before": now-timedelta(days=1), "not_after": now+timedelta(days=1),
+        "revoked": False}, key_id="test-key", clock=lambda: now)
+    for source, expected_capability in plans:
+        signed = signer.sign(workflow_plan_v2_draft(source, catalog_release="rel_test",
+                                                   confirmation_receipt_id="receipt-1", now=now))
+        assert signed.capability_id == expected_capability
+        assert same_workflow_intent(source, signed)
+
+
 def test_signed_v2_capture_result_projects_into_prepared_reverse_run():
     from datetime import timedelta
     from types import SimpleNamespace
