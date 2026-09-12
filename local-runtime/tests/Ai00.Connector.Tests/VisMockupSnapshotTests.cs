@@ -544,6 +544,42 @@ public sealed class VisMockupSnapshotTests
     }
 
     [Fact]
+    public async Task NodeControlInvalidatesMappingWhenTheLocalSourceRevisionChanges()
+    {
+        var directory = NewCacheDirectory("source-revision-node-map");
+        var source = Path.Combine(directory, "model.jt");
+        File.WriteAllText(source, "original");
+        try
+        {
+            var leaf = new FakeNode("session-leaf", "Leaf", "", "", []);
+            var document = new FakeDocument("SESSION-1", source,
+                new FakeNode("session-root", "Root", "", "", [leaf]));
+            var cachePath = Path.Combine(directory, "tree.db");
+            new VisMockupTreeCache(cachePath).ReplaceProjection(document, new("pdm:root", [
+                new("pdm:root", null, 0, 0, "Root", "W10", "A", "root", "", [], ["Root"], ""),
+                new("pdm:leaf", "pdm:root", 0, 1, "Leaf", "W10-1", "A", "leaf", "", [], ["Root", "Leaf"], ""),
+            ], "sha256:" + new string('a', 64)));
+            var fake = new FakeVisMockupCom
+            {
+                ExistingApplication = new FakeApplication("14.2.0", document),
+                ProcessId = 41,
+                ProcessStartUtcTicks = 1000,
+            };
+            using var sta = new StaDispatcher();
+            var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([directory]), fake,
+                Path.Combine(directory, "captures"), cachePath);
+
+            await adapter.ChangeNodeSelectionAsync("pdm:leaf", "highlight");
+            File.WriteAllText(source, "changed source revision");
+
+            await Assert.ThrowsAsync<ConnectorNoEffectException>(() =>
+                adapter.ChangeNodeSelectionAsync("pdm:leaf", "highlight"));
+            Assert.Single(document.SelectedNodeKeys);
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
     public void TreeCacheSurvivesAVisMockupRestartForTheSameSourceModel()
     {
         var directory = Path.Combine(Path.GetTempPath(), "ai00-vm-tree-cache-reopen-tests", Guid.NewGuid().ToString("N"));

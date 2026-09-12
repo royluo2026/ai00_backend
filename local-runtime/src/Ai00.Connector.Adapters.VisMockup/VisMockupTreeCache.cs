@@ -236,6 +236,8 @@ internal sealed class VisMockupTreeCache
     {
         if (string.IsNullOrWhiteSpace(stableOccurrenceKey))
             throw new InvalidDataException("vismockup_cache_node_identity_invalid");
+        if (TryRead(document, 0) is null)
+            throw new InvalidDataException("vismockup_cache_source_revision_changed");
         using var connection = Open();
         using var command = connection.CreateCommand();
         command.CommandText = """

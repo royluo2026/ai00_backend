@@ -21,7 +21,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     private readonly string _plmxmlRoot;
     private object? _application;
     private string? _ownedDocumentId;
-    private (int ProcessId, long Started, string DocumentId, string Source, string RootKey)? _mappedSession;
+    private (int ProcessId, long Started, string DocumentId, string Source, string RootKey, string? SourceRevision)? _mappedSession;
     private readonly Dictionary<string, string> _sessionNodeKeys = new(StringComparer.Ordinal);
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, string executable)
@@ -318,9 +318,10 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     {
         if (!key.StartsWith("pdm:", StringComparison.Ordinal)) return key;
         var process = _com.InspectProcess();
-        (int, long, string, string, string)? session =
+        (int, long, string, string, string, string?)? session =
             process.ProcessId is int id && process.ProcessStartUtcTicks is long started
-                ? (id, started, document.DocumentId, document.SourceIdentity, document.RootNode.NodeKey)
+                ? (id, started, document.DocumentId, document.SourceIdentity, document.RootNode.NodeKey,
+                    VisMockupTreeFingerprint.ExternalRevisionFingerprint(document.SourceIdentity))
                 : null;
         if (session != _mappedSession)
         {
