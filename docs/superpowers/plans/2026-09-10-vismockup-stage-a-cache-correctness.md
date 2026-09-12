@@ -126,3 +126,11 @@
 - Classification: implementation fix; no published input/output, permission, confirmation, idempotency, audit, or business-effect change.
 - Database impact: no production MySQL/OceanBase migration in Stage A; SQLite cache schema is local and rebuildable.
 - `machine_passed`, `human_approved`, and `runtime_verified` remain separate and are reported only from current evidence.
+
+## Implementation checkpoint (2026-09-12)
+
+- Tasks 1-4 have implementation and focused test coverage. The Connector test project passes 226 tests; the browser tree test passes 7; the Simulation PLMXML and document-snapshot tests pass 13. The local parser normalized 14,182 occurrences from the existing W10 sample file, which is sample evidence rather than a live export.
+- The Connector now rejects incomplete top-level PLMXML projections and unreadable child collection slots before cache publication, retains the previous generation on failed refresh, and resolves persistent occurrence keys through a process-scoped map that is invalidated on process or local source revision changes. A matching top-level count alone does not prove deep completeness; the live export still needs verification.
+- Task 5 has a server-side queue improvement: queued document snapshots lease after queued non-snapshot plans. The control-plane and SQL test set passes 85 tests with 56 native-MySQL cases skipped. A snapshot already executing in COM cannot be preempted. Ten-second idle scheduling, duplicate automatic-export coalescing, and timeout behavior remain unverified in a live Connector session.
+- No automatic dispatch was added: `simulation.document_snapshot.request@2` and `dispatch@1` require a separately confirmed action. Automatic export cannot bypass that governed confirmation contract.
+- Governance status is `machine_passed=false` (offline scan blocked by `pinned_product_descriptor_count_mismatch`: current checked-in release has 546 stable product descriptors while the scanner pin is 545), `human_approved=unverified`, and `runtime_verified=unverified`. The current generated Catalog also differs from the checked-in release. Neither the pin nor the release was changed to clear these findings.
