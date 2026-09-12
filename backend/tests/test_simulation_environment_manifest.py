@@ -92,6 +92,37 @@ def test_reverse_scene_uses_cumulative_products_and_current_resources_only():
     assert scene.visible_resources == ("resource-node-tool-20",)
 
 
+def test_craft_station_tree_yields_one_capture_scene_per_process():
+    fixture = _fixture()
+    fixture["execution_plan"]["nodes"] = [
+        {"node_id": "station-a", "parent_id": None},
+        {"node_id": "process-a", "parent_id": "station-a"},
+        {"node_id": "work-a", "parent_id": "process-a"},
+        {"node_id": "station-b", "parent_id": None},
+        {"node_id": "process-b", "parent_id": "station-b"},
+        {"node_id": "work-b", "parent_id": "process-b"},
+    ]
+    fixture["execution_plan"]["operations"] = [
+        {"operation_id": "process-a", "kind": "process", "sequence": 10, "products": [], "resources": []},
+        {"operation_id": "work-a", "kind": "operation", "sequence": 20,
+         "parameters": {"parent_node_id": "process-a"},
+         "products": [{"product_ref": "P-10", "action": "install"}],
+         "resources": [{"resource_type": "tool", "code": "T-10"}]},
+        {"operation_id": "process-b", "kind": "process", "sequence": 30, "products": [], "resources": []},
+        {"operation_id": "work-b", "kind": "operation", "sequence": 40,
+         "parameters": {"parent_node_id": "process-b"},
+         "products": [{"product_ref": "P-20", "action": "install"}],
+         "resources": [{"resource_type": "tool", "code": "T-20"}]},
+    ]
+
+    manifest = compose_manifest(**fixture).manifest
+
+    assert [item.operation_id for item in manifest.operations] == ["process-a", "process-b"]
+    assert manifest.scene_for("process-a").visible_products == ("bom-node-10",)
+    assert manifest.scene_for("process-b").visible_products == ("bom-node-10", "bom-node-20")
+    assert manifest.scene_for("process-b").visible_resources == ("resource-node-tool-20",)
+
+
 def test_composition_returns_every_binding_problem_without_partial_manifest():
     fixture = _fixture()
     fixture["execution_plan"]["operations"][0]["products"] = [

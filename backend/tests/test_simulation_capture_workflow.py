@@ -22,6 +22,7 @@ from plugins.simulation.simulation_backend.application.capture_worker import (
     SimulationWorkflowError,
 )
 from plugins.simulation.simulation_backend.domain.environment_manifest import compose_manifest
+from plugins.craft.craft_backend.services.execution_structure import BopAggregate, _normalize
 
 
 ARTIFACT = {
@@ -152,6 +153,77 @@ def test_capture_prepares_then_dispatches_only_the_first_reverse_order_operation
         for plan, _approval in connector.plans for step in plan.steps
         if step.operation_id == "vismockup.view.capture@1"
     )
+
+
+def test_capture_runs_processes_in_reverse_station_order_without_child_operation_images():
+    workflow, repository, connector, _ = _workflow()
+    repository.manifest = compose_manifest(
+        execution_plan={
+            "source": {"bop_version_gid": "bop-v1", "revision": 1, "project_gid": "project-1"},
+            "content_hash": "sha256:" + "a" * 64,
+            "nodes": [
+                {"node_id": "station-a", "parent_id": None},
+                {"node_id": "process-a", "parent_id": "station-a"},
+                {"node_id": "work-a", "parent_id": "process-a"},
+                {"node_id": "station-b", "parent_id": None},
+                {"node_id": "process-b", "parent_id": "station-b"},
+                {"node_id": "work-b", "parent_id": "process-b"},
+            ],
+            "operations": [
+                {"operation_id": "process-a", "kind": "process", "sequence": 10},
+                {"operation_id": "work-a", "kind": "operation", "sequence": 20,
+                 "parameters": {"parent_node_id": "process-a"},
+                 "products": [{"product_ref": "P-A", "action": "install"}]},
+                {"operation_id": "process-b", "kind": "process", "sequence": 30},
+                {"operation_id": "work-b", "kind": "operation", "sequence": 40,
+                 "parameters": {"parent_node_id": "process-b"},
+                 "products": [{"product_ref": "P-B", "action": "install"}]},
+            ],
+        },
+        document_snapshot={"document_id": "BOM-1", "root_node_key": "root",
+                           "source_identity": "tc://BOM-1/A", "snapshot_hash": "sha256:" + "b" * 64,
+                           "nodes": [{"node_key": "node-a", "product_ref": "P-A"},
+                                     {"node_key": "node-b", "product_ref": "P-B"}]},
+        model_mappings={"resolved": [], "unresolved": [], "ambiguous": [],
+                        "mapping_snapshot_hash": "sha256:" + "c" * 64},
+        capture_profile={"format": "png", "width": 1920, "height": 1080, "background": "current"},
+    ).manifest
+
+    run = asyncio.run(workflow.start_capture("env-1", 1, "device-1", _context()))
+    assert [step["operation_id"] for step in run["steps"]] == ["process-b", "process-a"]
+    asyncio.run(workflow.dispatch_next(run["capture_run_id"], "approval-device-1", _context()))
+    assert [step.payload["operation_id"] for step in connector.last_plan.steps
+            if step.operation_id == "vismockup.view.capture@1"] == ["process-b"]
+
+
+def test_craft_station_sort_order_drives_reverse_capture_steps():
+    workflow, repository, _, _ = _workflow()
+    entries = (
+        {"gid": "station-b", "parent_gid": None, "node_type": "station_process", "sort_order": 20},
+        {"gid": "b-2", "parent_gid": "station-b", "node_type": "operation", "sort_order": 20},
+        {"gid": "a-1", "parent_gid": "station-a", "node_type": "operation", "sort_order": 10},
+        {"gid": "station-a", "parent_gid": None, "node_type": "station_process", "sort_order": 10},
+        {"gid": "b-1", "parent_gid": "station-b", "node_type": "operation", "sort_order": 10},
+        {"gid": "a-2", "parent_gid": "station-a", "node_type": "operation", "sort_order": 20},
+    )
+    execution = _normalize(BopAggregate(
+        version={"gid": "bop-v1", "project_gid": "project-1", "revision": 1},
+        entries=entries, links=(),
+    ))
+    execution["content_hash"] = "sha256:" + "a" * 64
+    repository.manifest = compose_manifest(
+        execution_plan=execution,
+        document_snapshot={"document_id": "BOM-1", "root_node_key": "root",
+                           "source_identity": "tc://BOM-1/A", "snapshot_hash": "sha256:" + "b" * 64,
+                           "nodes": [{"node_key": "root", "product_ref": "ROOT"}]},
+        model_mappings={"resolved": [], "unresolved": [], "ambiguous": [],
+                        "mapping_snapshot_hash": "sha256:" + "c" * 64},
+        capture_profile={"format": "png", "width": 1920, "height": 1080, "background": "current"},
+    ).manifest
+
+    run = asyncio.run(workflow.start_capture("env-1", 1, "device-1", _context()))
+
+    assert [step["operation_id"] for step in run["steps"]] == ["b-2", "b-1", "a-2", "a-1"]
 
 
 def test_capture_cannot_start_before_exact_environment_materialization_completes():

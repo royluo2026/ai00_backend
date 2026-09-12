@@ -171,6 +171,57 @@ def _resource_node_keys(keys: tuple[tuple[str, str], ...]) -> dict[tuple[str, st
     }
 
 
+def _capture_operations(execution_plan: Mapping[str, Any]) -> list[dict[str, Any]]:
+    ordered = sorted(
+        (dict(item) for item in execution_plan.get("operations", ())),
+        key=lambda item: (int(item.get("sequence", 0)), str(item.get("operation_id", ""))),
+    )
+    process_ids = {
+        str(item["operation_id"]) for item in ordered if item.get("kind") == "process"
+    }
+    if not process_ids:
+        return ordered
+    parents = {
+        str(node["node_id"]): str(node["parent_id"]) if node.get("parent_id") else None
+        for node in execution_plan.get("nodes", ())
+    }
+    members: dict[str, list[dict[str, Any]]] = {key: [] for key in process_ids}
+    for item in ordered:
+        key = str(item["operation_id"])
+        if key not in process_ids:
+            parameters = item.get("parameters") or {}
+            parent = parameters.get("parent_node_id") or parents.get(key)
+            visited: set[str] = set()
+            while parent and str(parent) not in process_ids:
+                if str(parent) in visited:
+                    raise ValueError("capture_process_hierarchy_invalid")
+                visited.add(str(parent))
+                parent = parents.get(str(parent))
+            if not parent:
+                raise ValueError("capture_process_owner_missing")
+            key = str(parent)
+        members[key].append(item)
+    grouped = []
+    for item in ordered:
+        key = str(item["operation_id"])
+        if key not in process_ids:
+            continue
+        products = {
+            (str(part["product_ref"]), str(part.get("action") or "use"))
+            for member in members[key] for part in member.get("products", ())
+        }
+        resources = {
+            (str(resource["resource_type"]), str(resource["code"]))
+            for member in members[key] for resource in member.get("resources", ())
+        }
+        grouped.append({
+            **item,
+            "products": [dict(product_ref=ref, action=action) for ref, action in sorted(products)],
+            "resources": [dict(resource_type=kind, code=code) for kind, code in sorted(resources)],
+        })
+    return grouped
+
+
 def compose_manifest(
     execution_plan: Mapping[str, Any],
     document_snapshot: Mapping[str, Any],
@@ -178,10 +229,7 @@ def compose_manifest(
     capture_profile: Mapping[str, Any],
 ) -> CompositionResult:
     """Resolve every binding, then build a deterministic immutable manifest."""
-    operations = sorted(
-        (dict(item) for item in execution_plan.get("operations", ())),
-        key=lambda item: (int(item.get("sequence", 0)), str(item.get("operation_id", ""))),
-    )
+    operations = _capture_operations(execution_plan)
     product_candidates: dict[str, list[str]] = {}
     for raw in document_snapshot.get("nodes", ()):
         product_ref = str(raw.get("product_ref") or "").strip()
