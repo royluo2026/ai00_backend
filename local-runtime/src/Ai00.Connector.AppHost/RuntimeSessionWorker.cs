@@ -35,6 +35,37 @@ public sealed class RuntimeTransport(HttpClient http,Uri origin)
         if(!json.GetProperty("success").GetBoolean())throw new InvalidDataException("cloud_response_invalid");
         return json.GetProperty("data").Clone();
     }
+    public async Task<JsonElement> UploadCaptureAsync(
+        string planId,string leaseId,string stepId,Stream content,string sha256,long byteSize,
+        RuntimeSession session,CancellationToken ct)
+    {
+        var path=$"plans/{Uri.EscapeDataString(planId)}/steps/{Uri.EscapeDataString(stepId)}/result-artifact"+
+            $"?lease_id={Uri.EscapeDataString(leaseId)}";
+        using var request=new HttpRequestMessage(HttpMethod.Put,Endpoint(path));
+        foreach(var header in Headers(session))request.Headers.Add(header.Key,header.Value);
+        request.Headers.Add("X-AI00-Content-SHA256",sha256);
+        request.Headers.Add("X-AI00-Content-Length",byteSize.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        request.Content=new StreamContent(content);
+        request.Content.Headers.ContentType=new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+        using var response=await http.SendAsync(request,HttpCompletionOption.ResponseHeadersRead,ct);
+        await using var input=await response.Content.ReadAsStreamAsync(ct);
+        using var bytes=new MemoryStream();var buffer=new byte[8192];
+        while(true)
+        {
+            var count=await input.ReadAsync(buffer,ct);if(count==0)break;
+            if(bytes.Length+count>4*1024*1024)throw new InvalidDataException("cloud_response_size_invalid");
+            bytes.Write(buffer,0,count);
+        }
+        var envelope=CanonicalJsonV2.Parse(Encoding.UTF8.GetString(bytes.ToArray()));
+        if(!response.IsSuccessStatusCode)
+        {
+            var code=envelope.TryGetProperty("detail",out var detail)&&detail.ValueKind==JsonValueKind.Object&&
+                detail.TryGetProperty("code",out var item)?item.GetString():"artifact_upload_failed";
+            throw new RuntimeTransportException(code??"artifact_upload_failed");
+        }
+        if(!envelope.GetProperty("success").GetBoolean())throw new InvalidDataException("cloud_response_invalid");
+        return envelope.GetProperty("data").GetProperty("artifact_ref").Clone();
+    }
     public async Task DownloadAsync(Uri source,string destination,long expectedSize,RuntimeSession session,CancellationToken ct)
     {
         if(expectedSize<0||expectedSize>2L*1024*1024*1024)throw new InvalidDataException("artifact_ref_invalid");
@@ -195,7 +226,7 @@ public sealed class AppCredentialStore(string root,Uri origin)
 
 public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeTransport transport,DeviceSigningKey key,
     AppCredentialStore credentials,AppPlanJournal journal,VisMockupAdapter adapter,PostConditionProbes probes,
-    HostManifest manifest,IAppArtifactMaterializer artifactMaterializer,IHostApplicationLifetime lifetime):BackgroundService
+    HostManifest manifest,IAppArtifactMaterializer artifactMaterializer,IAppCaptureUploader captureUploader,IHostApplicationLifetime lifetime):BackgroundService
 {
     internal const int PlanLeaseSeconds=300;
     internal static bool HeartbeatDue(DateTimeOffset now,DateTimeOffset lastHeartbeat) =>
@@ -209,7 +240,7 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
         var deviceId=credential.GetProperty("device_id").GetString()!;var tenantId=credential.GetProperty("tenant_gid").GetString()!;
         var generation=credential.GetProperty("runtime_generation").GetInt64();var secret=credential.GetProperty("device_credential").GetString()!;
         var keyId=credential.GetProperty("device_key_id").GetString()!;
-        var executor=new PlanExecutionWorker(journal,adapter,key,keyId,manifest.PlanKeys,null,artifactMaterializer);
+        var executor=new PlanExecutionWorker(journal,adapter,key,keyId,manifest.PlanKeys,null,artifactMaterializer,captureUploader);
         var savedSession=credentials.LoadSession();
         var recovered=executor.Recover();
         if(recovered.Count>0)

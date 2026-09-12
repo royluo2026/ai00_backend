@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Ai00.Connector.Contracts;
 using Ai00.Connector.Contracts.V2;
+using Ai00.Connector.Adapters.VisMockup;
 namespace Ai00.Connector.AppHost;
 
 public sealed record AppJournalEvent(long Sequence,string Kind,string PlanId,string Data);
@@ -30,7 +31,7 @@ public sealed class AppPlanJournal
 public sealed record RuntimeSession(string DeviceId,string TenantId,long Generation,string InstanceId,string Token,DateTimeOffset ExpiresAt);
 public sealed record LeasedPlan(string LeaseId,DateTimeOffset LeaseUntil,string PlanJson);
 public sealed record TrustedPlanKey(string PublicJwk,DateTimeOffset NotBefore,DateTimeOffset NotAfter,bool Revoked);
-public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter adapter,DeviceSigningKey signingKey,string deviceKeyId,IReadOnlyDictionary<string,TrustedPlanKey> keys,Func<DateTimeOffset>? clock=null,IAppArtifactMaterializer? artifactMaterializer=null)
+public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter adapter,DeviceSigningKey signingKey,string deviceKeyId,IReadOnlyDictionary<string,TrustedPlanKey> keys,Func<DateTimeOffset>? clock=null,IAppArtifactMaterializer? artifactMaterializer=null,IAppCaptureUploader? captureUploader=null)
 {
     private readonly SemaphoreSlim serial=new(1,1);
     private DateTimeOffset Now=>(clock??(()=>DateTimeOffset.UtcNow))();
@@ -64,7 +65,7 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
             if(plan.AdapterId!=manifest.AdapterId||plan.AdapterMajor!=manifest.AdapterMajor||plan.TargetProduct.GetProperty("product_id").GetString()!=manifest.ProductId||Version.Parse(manifest.ProductVersion)<Version.Parse(plan.TargetProduct.GetProperty("minimum_version").GetString()!)||Version.Parse(manifest.ProductVersion)>=Version.Parse(plan.TargetProduct.GetProperty("maximum_version_exclusive").GetString()!)||plan.Steps.Any(s=>!manifest.Supports(s.OperationId,s.ContractHash)))throw new InvalidDataException("adapter_contract_mismatch");
             ct.ThrowIfCancellationRequested();
             if(plan.Steps.Any(s=>s.OperationId is "vismockup.model.open@1" or "vismockup.model.insert@1" or "vismockup.model.attach@1")&&artifactMaterializer is null)throw new InvalidDataException("v2_artifact_transport_unavailable");
-            if(plan.Steps.Any(s=>s.OperationId=="vismockup.view.capture@1"))throw new InvalidDataException("v2_artifact_upload_unavailable");
+            if(plan.Steps.Any(s=>s.OperationId=="vismockup.view.capture@1")&&captureUploader is null)throw new InvalidDataException("v2_artifact_upload_unavailable");
             journal.Append("plan_received",plan.PlanId,lease.PlanJson);
             journal.Append("lease_acquired",plan.PlanId,JsonSerializer.Serialize(lease));
             var results=new List<JsonElement>();
@@ -93,7 +94,13 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
                     var result=await adapter.ExecuteAsync(new(step.OperationId,payload,step.StepId,step.ContractHash),timeout.Token).WaitAsync(timeout.Token);
                     timeout.Token.ThrowIfCancellationRequested();
                     if(!result.Ok)throw new ConnectorException("adapter_effect_unknown");
-                    data=result.Data;
+                    if(step.OperationId=="vismockup.view.capture@1")
+                    {
+                        if(result.Data is not LocalCaptureArtifact capture)throw new ConnectorException("capture_result_invalid");
+                        var artifact=await captureUploader!.UploadAsync(plan.PlanId,lease.LeaseId,step.StepId,capture,session,timeout.Token);
+                        data=new{artifact};
+                    }
+                    else data=result.Data;
                 }
                 catch(Exception exception)
                 {
@@ -101,7 +108,8 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
 #if DEBUG
                     Console.Error.WriteLine($"[ConnectorHost] adapter operation failed: {exception.GetType().Name}: {exception.Message}");
 #endif
-                    var noEffect=step.SideEffectClassification=="read"||exception is ConnectorNoEffectException;
+                    var noEffect=exception is ConnectorNoEffectException ||
+                        (step.OperationId!="vismockup.view.capture@1"&&step.SideEffectClassification=="read");
                     status=noEffect?"failed_without_effect":"outcome_unknown";
                     error=exception is ConnectorNoEffectException rejected
                         ? rejected.Code

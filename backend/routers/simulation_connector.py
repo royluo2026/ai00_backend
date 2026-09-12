@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from typing import Literal
-from backend.contracts.connector_execution_plan_v2 import ConnectorPlanOutcomeV2, IDENTITY_PATTERN
+from backend.contracts.connector_execution_plan_v2 import ConnectorExecutionPlanV2, ConnectorPlanOutcomeV2, IDENTITY_PATTERN
 from plugins.simulation.simulation_backend.application.connector_protocol_v2 import ConnectorReconciliationEvidenceV2
 from plugins.simulation.simulation_backend.application.connector_runtime_sessions import runtime_session_service
 from plugins.simulation.simulation_backend.capabilities.connector_pairing import app_pairing_service
@@ -531,7 +531,9 @@ def runtime_artifact_grant(
     pins: dict = Depends(_runtime_auth),
 ):
     def grant():
-        plan = runtime_session_service.leased_plan(**pins, plan_id=plan_id, lease_id=lease_id)
+        plan = ConnectorExecutionPlanV2.model_validate(
+            runtime_session_service.leased_plan(**pins, plan_id=plan_id, lease_id=lease_id)
+        )
         expected = _plan_artifact(plan, artifact_id)
         if expected is None:
             raise ConnectorRepositoryError('artifact_not_bound_to_plan')
@@ -558,7 +560,9 @@ def runtime_artifact_content(
     pins: dict = Depends(_runtime_auth),
 ):
     try:
-        plan = runtime_session_service.leased_plan(**pins, plan_id=plan_id, lease_id=lease_id)
+        plan = ConnectorExecutionPlanV2.model_validate(
+            runtime_session_service.leased_plan(**pins, plan_id=plan_id, lease_id=lease_id)
+        )
         expected = _plan_artifact(plan, artifact_id)
         if expected is None:
             raise ConnectorRepositoryError('artifact_not_bound_to_plan')
@@ -575,6 +579,55 @@ def runtime_artifact_content(
         raise HTTPException(status_code=409, detail={'code': str(exc)}) from exc
     except Exception as exc:
         raise HTTPException(status_code=503, detail={'code': 'artifact_download_unavailable'}) from exc
+
+
+@router.put('/v2/plans/{plan_id}/steps/{step_id}/result-artifact')
+async def runtime_capture_artifact(
+    plan_id: str, step_id: str, request: Request,
+    lease_id: str = Query(min_length=1),
+    content_sha256: str = Header(alias='X-AI00-Content-SHA256', pattern='^[0-9a-f]{64}$'),
+    content_length: int = Header(alias='X-AI00-Content-Length', ge=24, le=100 * 1024 * 1024),
+    pins: dict = Depends(_runtime_auth),
+):
+    from backend.capability_v2.artifacts import ArtifactIntegrityError, ArtifactService, SqlArtifactStore, configured_object_storage
+    try:
+        plan = ConnectorExecutionPlanV2.model_validate(
+            runtime_session_service.leased_plan(**pins, plan_id=plan_id, lease_id=lease_id)
+        )
+        step = next((item for item in plan.steps if item.step_id == step_id), None)
+        if step is None or step.operation_id != 'vismockup.view.capture@1':
+            raise ConnectorRepositoryError('capture_step_not_bound_to_plan')
+        refs = step.payload.get('artifact_resource_refs', ())
+        if not isinstance(refs, list) or any(not isinstance(item, str) or not item for item in refs):
+            raise ValueError('artifact_resource_refs_invalid')
+        identity = ConsumerIdentity(
+            actor=ActorIdentity(user_id=plan.actor_id, authentication_method='connector-delegated',
+                                authenticated_at=datetime.now(timezone.utc)),
+            tenant=TenantIdentity(tenant_id=plan.tenant_id, membership='connector'),
+            consumer=ConsumerDescriptor(type=ConsumerType.LOCAL_RUNTIME, consumer_id=pins['device_id']),
+        )
+        service = ArtifactService(SqlArtifactStore(get_conn), configured_object_storage())
+        session = service.create_upload(
+            identity, media_type='image/png', expected_sha256=content_sha256,
+            expected_byte_size=content_length, resource_refs=tuple(refs),
+        )
+        with tempfile.SpooledTemporaryFile(max_size=8 * 1024 * 1024) as stream:
+            size = 0
+            async for chunk in request.stream():
+                size += len(chunk)
+                if size > content_length:
+                    raise ArtifactIntegrityError('uploaded object exceeds expected byte size')
+                stream.write(chunk)
+            stream.seek(0)
+            service.upload_stream(session.upload_id, identity, stream)
+        ref = service.finalize(session.upload_id, identity, reported_sha256=content_sha256)
+        return {'success': True, 'data': {'artifact_ref': ref.model_dump(mode='json')}}
+    except ConnectorRepositoryError as exc:
+        raise HTTPException(status_code=409, detail={'code': str(exc)}) from exc
+    except (ValueError, ArtifactIntegrityError) as exc:
+        raise HTTPException(status_code=409, detail={'code': 'artifact_integrity_failed'}) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail={'code': 'artifact_upload_failed'}) from exc
 
 
 @router.websocket('/v2/plans/wake')

@@ -1,6 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
+import asyncio
+import hashlib
+import json
+from types import SimpleNamespace
 
 import pytest
 from fastapi import HTTPException
@@ -32,6 +36,7 @@ def test_pairing_http_surface_is_canonical_simulation_owned():
         "/api/v1/simulation/connectors/v2/plans/lease",
         "/api/v1/simulation/connectors/v2/plans/{plan_id}/artifacts/{artifact_id}",
         "/api/v1/simulation/connectors/v2/plans/{plan_id}/artifacts/{artifact_id}/content",
+        "/api/v1/simulation/connectors/v2/plans/{plan_id}/steps/{step_id}/result-artifact",
         "/api/v1/simulation/connectors/v2/plans/wake",
         "/api/v1/simulation/connectors/v2/plans/{plan_id}/outcome",
         "/api/v1/simulation/connectors/v2/plans/{plan_id}/acknowledge",
@@ -114,3 +119,61 @@ def test_runtime_restart_uses_authenticated_old_instance_and_body_new_instance(m
         "runtime_instance_id": "old-app",
         "runtime_type": "electron",
     })]
+
+
+def test_v2_capture_upload_requires_the_leased_capture_step(monkeypatch):
+    from starlette.requests import Request
+    from backend.contracts.connector_execution_plan_v2 import canonicalize_v2, compute_plan_hash
+    plan = json.loads((Path(__file__).parent / "fixtures" / "connector_execution_plan_v2.json").read_text())["plan"]
+    plan["actor_id"], plan["tenant_id"] = "user-1", "team-1"
+    step = plan["steps"][0]
+    step["step_id"] = "step-1"
+    step["operation_id"] = "vismockup.view.capture@1"
+    step["payload"] = {"artifact_resource_refs": ["craft-bop-version:bop-1"]}
+    step["payload_hash"] = "sha256:" + hashlib.sha256(canonicalize_v2(step["payload"])).hexdigest()
+    plan["plan_hash"] = compute_plan_hash(plan)
+    payload = b"capture bytes representing png"
+    digest = hashlib.sha256(payload).hexdigest()
+    calls = []
+
+    class Sessions:
+        def leased_plan(self, **pins):
+            calls.append(pins)
+            return plan
+
+    class Artifacts:
+        def __init__(self, *_args): pass
+        def create_upload(self, identity, **kwargs):
+            calls.append((identity.actor.user_id, kwargs["resource_refs"], kwargs["expected_sha256"]))
+            return SimpleNamespace(upload_id="upload-1")
+        def upload_stream(self, upload_id, _identity, stream):
+            calls.append((upload_id, stream.read()))
+        def finalize(self, upload_id, _identity, **kwargs):
+            calls.append((upload_id, kwargs["reported_sha256"]))
+            return SimpleNamespace(model_dump=lambda **_kwargs: {"artifact_id": "artifact-1"})
+
+    monkeypatch.setattr(simulation_connector, "runtime_session_service", Sessions())
+    import backend.capability_v2.artifacts as artifacts
+    monkeypatch.setattr(artifacts, "ArtifactService", Artifacts)
+    monkeypatch.setattr(artifacts, "SqlArtifactStore", lambda *_args: object())
+    monkeypatch.setattr(artifacts, "configured_object_storage", lambda: object())
+
+    async def receive():
+        return {"type": "http.request", "body": payload, "more_body": False}
+
+    result = asyncio.run(simulation_connector.runtime_capture_artifact(
+        "plan-1", "step-1", Request({"type": "http"}, receive),
+        lease_id="lease-1", content_sha256=digest, content_length=len(payload),
+        pins={"device_id": "device-1"},
+    ))
+    assert result["data"]["artifact_ref"]["artifact_id"] == "artifact-1"
+    assert ("user-1", ("craft-bop-version:bop-1",), digest) in calls
+    assert ("upload-1", payload) in calls
+
+    with pytest.raises(HTTPException) as rejected:
+        asyncio.run(simulation_connector.runtime_capture_artifact(
+            "plan-1", "other-step", Request({"type": "http"}, receive),
+            lease_id="lease-1", content_sha256=digest, content_length=len(payload),
+            pins={"device_id": "device-1"},
+        ))
+    assert rejected.value.status_code == 409
