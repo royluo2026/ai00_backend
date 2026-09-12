@@ -177,7 +177,7 @@ def session(database, *, now=NOW, instance="runtime-instance-001"):
 
 
 def queue(database, registered, *, now=NOW, idempotency_key=None, normalized_input_hash=None,
-          side_effect_classification=None, expires_at="2026-09-07T12:10:00Z"):
+          side_effect_classification=None, operation_id=None, expires_at="2026-09-07T12:10:00Z"):
     source = json.loads((ROOT / "backend/tests/fixtures/connector_execution_plan_v2.json").read_text())["plan"]
     source.update(device_id=database[1], plan_id="plan-" + uuid.uuid4().hex,
                   runtime_generation=registered.runtime_generation,
@@ -190,6 +190,8 @@ def queue(database, registered, *, now=NOW, idempotency_key=None, normalized_inp
         source['normalized_input_hash'] = normalized_input_hash
     if side_effect_classification is not None:
         source['steps'][0]['side_effect_classification'] = side_effect_classification
+    if operation_id is not None:
+        source['steps'][0]['operation_id'] = operation_id
     source['steps'][0]['post_condition_probe_id'] = 'vismockup.application.postcondition@1'
     source["plan_hash"] = compute_plan_hash(source)
     plan = ConnectorExecutionPlanV2.model_validate(source)
@@ -200,6 +202,21 @@ def queue(database, registered, *, now=NOW, idempotency_key=None, normalized_inp
 def lease(database, registered, now=NOW):
     return SimulationConnectorRepository().lease_v2_plan(database[1], registered.runtime_generation,
         registered.runtime_instance_id, registered.session_token, now, lease_seconds=15)
+
+
+def test_interactive_plan_leases_before_earlier_structure_export(database):
+    registered = session(database)
+    export = queue(database, registered, idempotency_key="export", operation_id="vismockup.document.snapshot@1")
+    control = queue(database, registered, now=NOW + timedelta(seconds=1),
+                    idempotency_key="control", operation_id="vismockup.node.visibility.change@1")
+
+    selected = lease(database, registered, NOW + timedelta(seconds=2))
+
+    assert selected["plan"]["plan_id"] == control.plan_id
+    transaction, _ = database
+    with transaction() as conn, conn.cursor() as cur:
+        cur.execute("SELECT status FROM workmanship_sim_connector_runtime_plans WHERE plan_id=%s", (export.plan_id,))
+        assert cur.fetchone()["status"] == "queued"
 
 
 def outcome_for(plan, leased, status="succeeded"):

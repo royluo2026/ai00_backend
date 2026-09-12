@@ -566,7 +566,10 @@ class SimulationConnectorRepository:
                 return None
             cursor.execute(
                 "SELECT plan_id,plan_json,expires_at FROM workmanship_sim_connector_runtime_plans WHERE " + scope +
-                " AND status='queued' AND expires_at>%s ORDER BY created_at,plan_id LIMIT 1 FOR UPDATE", (*identity, now),
+                " AND status='queued' AND expires_at>%s "
+                "ORDER BY CASE WHEN REPLACE(CAST(JSON_EXTRACT(plan_json, '$.steps[0].operation_id') AS CHAR), '\"', '')=%s THEN 1 ELSE 0 END,"
+                "created_at,plan_id LIMIT 1 FOR UPDATE",
+                (*identity, now, "vismockup.document.snapshot@1"),
             )
             current = cursor.fetchone()
             if current is None:
