@@ -215,9 +215,14 @@ Apply a validated private workspace Fork without mutating its immutable source.
           "node_type": {
             "enum": [
               "line",
+              "line_process",
               "station",
+              "station_process",
+              "role",
+              "operator_process",
               "process",
-              "operation"
+              "operation",
+              "alternate_hierarchy"
             ],
             "type": "string"
           },

@@ -2,6 +2,7 @@ import pymysql
 
 from backend.db.table_prefix import configure_table_prefix
 from backend.scripts import run_migrations
+from backend.db.versioned_migrations import apply_migrations
 
 
 class Cursor:
@@ -51,3 +52,19 @@ def test_migration_entrypoint_wraps_ddl_connection_with_table_prefix(monkeypatch
         assert connection.created[0].query == "CREATE TABLE test_workmanship_probe (id BIGINT)"
     finally:
         configure_table_prefix("")
+
+
+def test_base_migration_runner_handles_oceanbase_without_named_locks(tmp_path):
+    class Cursor:
+        def __enter__(self): return self
+        def __exit__(self, *_args): return False
+        def execute(self, query, args=None):
+            if "GET_LOCK" in query:
+                raise RuntimeError(1305, "FUNCTION GET_LOCK does not exist")
+        def fetchall(self): return []
+
+    class Connection:
+        def cursor(self): return Cursor()
+        def commit(self): pass
+
+    assert apply_migrations(Connection(), directory=tmp_path, registry=object()) == []

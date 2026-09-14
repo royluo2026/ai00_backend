@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS workmanship_app_operational_alerts (
 CREATE TABLE IF NOT EXISTS workmanship_app_feishu_search_cache (
     user_gid CHAR(36) NOT NULL, entity_type VARCHAR(64) NOT NULL,
     entity_id VARCHAR(255) NOT NULL, name TEXT NOT NULL,
-    search_ext TEXT NOT NULL, data JSON NULL,
+    search_ext TEXT NOT NULL, data JSON NOT NULL DEFAULT (JSON_OBJECT()),
     updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
     PRIMARY KEY (user_gid, entity_type, entity_id),
     INDEX idx_feishu_cache_name (user_gid, entity_type, name(191)),

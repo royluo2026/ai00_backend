@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from types import MappingProxyType
+import pytest
 
 from backend.base import provider as base_provider
 from backend.capability_v2.bootstrap import (
@@ -140,6 +141,19 @@ def test_http_gateway_overlays_governance_catalog_only_for_explicit_test_profile
     product_gateway = configure_default_gateway(build_capability_registry(ROOT))
     assert product_gateway.catalog().descriptor("base.capability_registry.search", 1) is None
     assert product_gateway.catalog().descriptor("craft.bop.version.list", 1) is not None
+
+
+def test_local_test_catalog_override_requires_isolated_app(monkeypatch, tmp_path):
+    from backend.capability_v2.gateway import _local_test_release_path
+
+    candidate = tmp_path / "candidate.json"
+    monkeypatch.setenv("AI00_LOCAL_TEST_CATALOG_PATH", str(candidate))
+    monkeypatch.setenv("AI00_LOCAL_TEST_APP", "1")
+    monkeypatch.setenv("TABLE_PREFIX", "test_")
+    assert _local_test_release_path() == candidate
+    monkeypatch.setenv("TABLE_PREFIX", "")
+    with pytest.raises(RuntimeError, match="test_prefix_required"):
+        _local_test_release_path()
 
 
 def test_default_test_governance_bootstrap_wires_scan_and_projection_runtime(monkeypatch):

@@ -43,6 +43,16 @@ class ApplicationMigrationBoundaryTests(unittest.TestCase):
         with self.assertRaises(DatabaseNotMigratedError):
             assert_migrations_applied(Connection([]), root / "backend/db/migrations")
 
+    def test_previously_applied_compatible_migration_is_ready(self):
+        from backend.db.versioned_migrations import discover_migrations
+
+        root = Path(__file__).resolve().parents[2]
+        migrations = discover_migrations(root / "backend/db/migrations")
+        rows = [{"migration_id": item.migration_id, "checksum": item.checksum, "status": "applied"} for item in migrations]
+        prior = next(row for row in rows if row["migration_id"] == "202608030006")
+        prior["checksum"] = "3a7d7fba9a8492087c157e89a4a1144898d92091a516d56a9eca826595cf0ccc"
+        assert_migrations_applied(Connection(rows), root / "backend/db/migrations")
+
 
 if __name__ == "__main__":
     unittest.main()

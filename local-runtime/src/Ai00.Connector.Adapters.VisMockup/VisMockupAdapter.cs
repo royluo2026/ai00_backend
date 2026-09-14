@@ -69,6 +69,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             new("vismockup.node.visibility.change@1", "sha256:b93246b1bb189e3f7e488c4ec0528378cbbf97cd2c3fdd547daf0f2007f05f6c"),
             new("vismockup.node.selection.change@1", "sha256:4ca8699ef27b5de3691dc8e2b6252350e001263e23e805489d16b435b575a539"),
             new("vismockup.tree.read@1", "sha256:b3c6a014ac8853a3b6689286ce514b7997bb450f6394253d813308afa8863af0"),
+            new("vismockup.tree.read@2", "sha256:5d69cc98e38bd721fb55623b62df5162e68cbfb9bcb51c1b6c25d351c486de7c"),
             new("vismockup.model.attach@1", "sha256:444b6b8a963b5a7e04d6b607cfe53699a5c93196a5bf78c98843d12d073fe844"),
             new("vismockup.scene.apply@1", "sha256:fce8ff3a33d996a26c3121d015839e2d68bc3c631a8c8c1091201e95d0bcabd3"),
             new("vismockup.scene.verify@1", "sha256:e99bf5896c3f655afc7470fc140d261225d6f37a1d8224b7e9438a2e7b7a211a"),
@@ -163,6 +164,10 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             "vismockup.tree.read@1" => await TreeAsync(
                 operation.Payload.GetProperty("max_depth").GetInt32(),
                 operation.Payload.TryGetProperty("force_refresh", out var forceRefresh) && forceRefresh.GetBoolean()),
+            "vismockup.tree.read@2" => await TreeAsync(
+                operation.Payload.GetProperty("max_depth").GetInt32(),
+                operation.Payload.TryGetProperty("force_refresh", out var liveForceRefresh) && liveForceRefresh.GetBoolean(),
+                includeVisibility: true),
             "vismockup.model.attach@1" => await AttachModelAsync(
                 operation.Payload.GetProperty("document_id").GetString() ?? "",
                 operation.Payload.GetProperty("baseline_snapshot_hash").GetString() ?? "",
@@ -425,21 +430,25 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         switch (action) { case "all_on": view.AllNodesOn(); break; case "all_off": view.AllNodesOff(); break; case "deselect": view.DeSelectAllNodes(); break; default: throw new InvalidOperationException("Unsupported visibility action"); }
         return new { action };
     });
-    public Task<object> TreeAsync(int maxDepth, bool forceRefresh = false) => _sta.InvokeAsync<object>(() =>
+    public Task<object> TreeAsync(int maxDepth, bool forceRefresh = false, bool includeVisibility = false) => _sta.InvokeAsync<object>(() =>
     {
         if (maxDepth is < 1 or > 8) throw new ConnectorException("vismockup_tree_depth_invalid");
         var document = _connection.RequireActiveDocument();
         if (forceRefresh) { _sessionNodeKeys.Clear(); _mappedSession = null; }
         var cached = forceRefresh ? null : _treeCache?.TryRead(document, maxDepth);
-        if (cached is not null) return TreeResult(cached.Nodes, maxDepth, cached.CacheState);
+        if (cached is not null) return TreeResult(cached.Nodes, maxDepth, cached.CacheState,
+            includeVisibility ? ReadLiveVisibility(document, cached.Nodes, maxDepth, cached.CacheState) : null);
         // The interactive tree must not wait on VisMockup's non-cancellable
         // ExportEx call. The governed document-snapshot workflow owns PLMXML
         // acquisition; this read path mirrors the proven direct COM traversal.
         var complete = ReadCompleteComTree(document);
         _treeCache?.Replace(document, 64, complete);
         cached = _treeCache?.TryRead(document, maxDepth);
-        if (cached is not null) return TreeResult(cached.Nodes, maxDepth, cached.CacheState);
-        return TreeResult(complete.Where(node => node.Depth <= maxDepth).ToArray(), maxDepth, "verified");
+        if (cached is not null) return TreeResult(cached.Nodes, maxDepth, cached.CacheState,
+            includeVisibility ? ReadLiveVisibility(document, cached.Nodes, maxDepth, cached.CacheState) : null);
+        var shallow = complete.Where(node => node.Depth <= maxDepth).ToArray();
+        return TreeResult(shallow, maxDepth, "verified",
+            includeVisibility ? ReadLiveVisibility(document, shallow, maxDepth, "verified") : null);
     });
 
     private VisMockupDocumentSnapshot ReadPlmxmlSnapshot(IVisMockupDocument document, int maxNodes, int maxDepth)
@@ -510,17 +519,69 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         return nodes;
     }
 
-    private static object TreeResult(IReadOnlyList<CachedTreeNode> nodes, int maxDepth, string cacheState) => new
+    private static IReadOnlyDictionary<string, bool?> ReadLiveVisibility(
+        IVisMockupDocument document, IReadOnlyList<CachedTreeNode> nodes, int maxDepth, string cacheState)
     {
-        nodes = nodes.Select(node => new
+        try { return ReadLiveVisibilityCore(document, nodes, maxDepth, cacheState); }
+        catch { return new Dictionary<string, bool?>(StringComparer.Ordinal); }
+    }
+
+    private static IReadOnlyDictionary<string, bool?> ReadLiveVisibilityCore(
+        IVisMockupDocument document, IReadOnlyList<CachedTreeNode> nodes, int maxDepth, string cacheState)
+    {
+        var visible = new Dictionary<string, bool?>(StringComparer.Ordinal);
+        var childrenByParent = nodes.Where(node => node.ParentNodeKey is not null)
+            .GroupBy(node => node.ParentNodeKey!, StringComparer.Ordinal)
+            .ToDictionary(group => group.Key, group => group.OrderBy(node => node.ChildOrder).ToArray(), StringComparer.Ordinal);
+        var roots = nodes.Where(node => node.ParentNodeKey is null).ToArray();
+        if (roots.Length != 1) return visible;
+        var queue = new Queue<(IVisMockupNode Runtime, CachedTreeNode Cached)>();
+        queue.Enqueue((document.RootNode, roots[0]));
+        while (queue.TryDequeue(out var item))
         {
-            node_key = node.NodeKey, parent_node_key = node.ParentNodeKey,
-            name = node.Name, catia_occurrence_name = node.CatiaOccurrenceName,
-            has_more = node.HasMore,
-        }).ToArray(),
-        max_depth = maxDepth,
-        cache_state = cacheState,
-    };
+            var stable = item.Cached.NodeKey.StartsWith("pdm:", StringComparison.Ordinal);
+            if ((!stable && item.Runtime.NodeKey != item.Cached.NodeKey) ||
+                (stable && cacheState == "verifying" && item.Runtime.PrintableName != item.Cached.Name))
+                return new Dictionary<string, bool?>(StringComparer.Ordinal);
+            try { visible[item.Cached.NodeKey] = item.Runtime.IsVisible; }
+            catch { visible[item.Cached.NodeKey] = null; }
+            if (item.Cached.Depth >= maxDepth) continue;
+            childrenByParent.TryGetValue(item.Cached.NodeKey, out var expected);
+            expected ??= [];
+            var current = item.Runtime.Children;
+            if (current.Count != expected.Length) return new Dictionary<string, bool?>(StringComparer.Ordinal);
+            for (var index = 0; index < expected.Length; index++)
+            {
+                if (expected[index].ChildOrder != index)
+                    return new Dictionary<string, bool?>(StringComparer.Ordinal);
+                queue.Enqueue((current[index], expected[index]));
+            }
+        }
+        return visible;
+    }
+
+    private static object TreeResult(IReadOnlyList<CachedTreeNode> nodes, int maxDepth, string cacheState,
+        IReadOnlyDictionary<string, bool?>? visibility)
+    {
+        if (visibility is null) return new
+        {
+            nodes = nodes.Select(node => new {
+                node_key = node.NodeKey, parent_node_key = node.ParentNodeKey,
+                name = node.Name, catia_occurrence_name = node.CatiaOccurrenceName,
+                has_more = node.HasMore,
+            }).ToArray(),
+            max_depth = maxDepth, cache_state = cacheState,
+        };
+        return new {
+            nodes = nodes.Select(node => new {
+                node_key = node.NodeKey, parent_node_key = node.ParentNodeKey,
+                name = node.Name, catia_occurrence_name = node.CatiaOccurrenceName,
+                has_more = node.HasMore,
+                visible = visibility.TryGetValue(node.NodeKey, out var live) ? live : null,
+            }).ToArray(),
+            max_depth = maxDepth, cache_state = cacheState,
+        };
+    }
     public Task<object> HighlightAsync(IReadOnlySet<string> catiaNames) => _sta.InvokeAsync<object>(() =>
     {
         dynamic app = Connect(); dynamic documents = app.Documents;

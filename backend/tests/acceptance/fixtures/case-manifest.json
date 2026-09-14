@@ -1917,6 +1917,15 @@
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.resource_requirement.create@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.resource_requirement.create@1]"
     },
+    "craft.resource_requirement.get@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.resource_requirement.get@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.resource_requirement.get@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.resource_requirement.get@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.resource_requirement.get@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.resource_requirement.get@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.resource_requirement.get@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.resource_requirement.get@1]"
+    },
     "craft.resource_requirement.retire@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.resource_requirement.retire@1]",
       "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.resource_requirement.retire@1]",
@@ -4671,6 +4680,15 @@
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.environment.archive@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.environment.archive@1]"
     },
+    "simulation.environment.bop_vm_binding_draft.preview@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.environment.bop_vm_binding_draft.preview@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.environment.bop_vm_binding_draft.preview@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.environment.bop_vm_binding_draft.preview@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.environment.bop_vm_binding_draft.preview@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.environment.bop_vm_binding_draft.preview@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.environment.bop_vm_binding_draft.preview@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.environment.bop_vm_binding_draft.preview@1]"
+    },
     "simulation.environment.compose@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.environment.compose@1]",
       "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.environment.compose@1]",
@@ -4897,7 +4915,7 @@
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[system.search@1]"
     }
   },
-  "catalog_release": "rel_3afc1298e1aa2fbf55232ebb8671f16e",
+  "catalog_release": "rel_571dc0fd2eb458c532ec806ff51db7e6",
   "mandatory_cases": [
     "success",
     "invalid_input",

@@ -1,10 +1,10 @@
 # simulation.environment.bop_projection.preview@1
 
-Preview a deterministic BOP skeleton projection from the exact published Craft execution structure without copying product or resource references as hierarchy nodes.
+Preview a deterministic BOP skeleton projection from an exact published or explicitly selected active Craft execution structure without copying product or resource references as hierarchy nodes.
 
 ## 使用判断
 
-- 适用：Preview a deterministic BOP skeleton projection from the exact published Craft execution structure without copying product or resource references as hierarchy nodes.
+- 适用：Preview a deterministic BOP skeleton projection from an exact published or explicitly selected active Craft execution structure without copying product or resource references as hierarchy nodes.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
@@ -398,7 +398,9 @@ Preview a deterministic BOP skeleton projection from the exact published Craft e
 - `bop_projection_cycle`：The projected process skeleton contains a cycle.（retryable=false）
 - `bop_projection_plan_changed`：The exact preview no longer matches the current source or target.（retryable=true）
 - `bop_projection_already_inserted`：The exact BOP projection is already present in the target environment.（retryable=false）
-- `bop_execution_structure_failed`：The owning Craft capability could not return the exact published execution structure.（retryable=true）
+- `bop_execution_structure_failed`：The owning Craft capability could not return the exact revision-pinned execution structure.（retryable=true）
+- `bop_version_resolution_failed`：The owning Craft capability could not resolve the selected BOP revision.（retryable=true）
+- `bop_revision_unavailable`：The selected BOP did not expose a valid revision for a draft preview.（retryable=false）
 - `domain_client_unavailable`：The governed owning-domain invocation boundary is unavailable.（retryable=true）
 - `idempotency_conflict`：The idempotency key is bound to another BOP projection request.（retryable=false）
 

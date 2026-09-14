@@ -123,6 +123,34 @@ class VersionedMigrationFileTests(unittest.TestCase):
         self.assertIsNone(prepare_resumable_statement(Connection(1), statement))
         self.assertEqual(prepare_resumable_statement(Connection(0), statement), statement)
 
+    def test_test_prefix_trigger_probe_ignores_production_trigger(self):
+        from backend.db.table_prefix import configure_table_prefix
+
+        statement = (
+            "-- AI00: RESUMABLE CREATE TRIGGER\n"
+            "CREATE TRIGGER base_historical_uploads_no_update BEFORE UPDATE "
+            "ON workmanship_base_historical_uploads FOR EACH ROW SIGNAL SQLSTATE '45000'"
+        )
+
+        class Cursor:
+            def __enter__(self): return self
+            def __exit__(self, *_args): return False
+            def execute(self, sql, params=()):
+                self.params = params
+            def fetchone(self): return (0,)
+
+        class Connection:
+            def __init__(self): self.probe = Cursor()
+            def cursor(self): return self.probe
+
+        connection = Connection()
+        configure_table_prefix("test_")
+        try:
+            assert prepare_resumable_statement(connection, statement) == statement
+            assert connection.probe.params == ("test_base_historical_uploads_no_update",)
+        finally:
+            configure_table_prefix("")
+
     def test_completed_not_null_and_primary_key_steps_are_skipped(self):
         class MetadataCursor:
             def __init__(self):

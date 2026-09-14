@@ -168,9 +168,14 @@ Read one simulation workspace owned by the caller or shared with authenticated u
           "node_type": {
             "enum": [
               "line",
+              "line_process",
               "station",
+              "station_process",
+              "role",
+              "operator_process",
               "process",
-              "operation"
+              "operation",
+              "alternate_hierarchy"
             ],
             "type": "string"
           },

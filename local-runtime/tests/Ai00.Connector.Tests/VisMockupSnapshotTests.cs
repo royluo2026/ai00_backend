@@ -38,6 +38,7 @@ public sealed class VisMockupSnapshotTests
         string nodeKey, IReadOnlyList<IVisMockupNode> children) : IVisMockupNode
     {
         public string NodeKey => nodeKey;
+        public bool IsVisible => true;
         public string PrintableName => nodeKey;
         public int OccurrenceReads { get; private set; }
         public string OccurrenceId { get { OccurrenceReads++; return nodeKey; } }
@@ -151,6 +152,8 @@ public sealed class VisMockupSnapshotTests
         var operation = adapter.Manifest.Operations.Single(item => item.OperationId == "vismockup.tree.read@1");
 
         Assert.Equal("sha256:b3c6a014ac8853a3b6689286ce514b7997bb450f6394253d813308afa8863af0", operation.ContractHash);
+        var liveOperation = adapter.Manifest.Operations.Single(item => item.OperationId == "vismockup.tree.read@2");
+        Assert.Equal("sha256:5d69cc98e38bd721fb55623b62df5162e68cbfb9bcb51c1b6c25d351c486de7c", liveOperation.ContractHash);
     }
 
     [Fact]
@@ -168,6 +171,7 @@ public sealed class VisMockupSnapshotTests
         Assert.Equal(3, json.GetProperty("nodes").GetArrayLength());
         Assert.Equal("node-0", json.GetProperty("nodes")[0].GetProperty("node_key").GetString());
         Assert.Equal("Node 0", json.GetProperty("nodes")[0].GetProperty("name").GetString());
+        Assert.False(json.GetProperty("nodes")[0].TryGetProperty("visible", out _));
     }
 
     [Fact]
@@ -195,10 +199,84 @@ public sealed class VisMockupSnapshotTests
             var cached = await adapter.ExecuteAsync(operation, default);
 
             Assert.Equal(firstReads, root.ChildrenReads + leaf.ChildrenReads);
+            Assert.Equal(0, root.OccurrenceReads + leaf.OccurrenceReads);
             Assert.Equal(2, JsonSerializer.SerializeToElement(cached.Data).GetProperty("nodes").GetArrayLength());
             Assert.True(File.Exists(Path.Combine(directory, "vismockup-tree-cache.db")));
         }
         finally { Directory.Delete(directory, true); }
+    }
+
+    private sealed class UnreadableVisibilityNode : IVisMockupNode
+    {
+        public string NodeKey => "node-0";
+        public bool IsVisible => throw new InvalidOperationException("visibility read failed");
+        public string PrintableName => "Node 0";
+        public string OccurrenceId => "";
+        public string ModelId => "";
+        public IReadOnlyList<IVisMockupNode> Children => [];
+    }
+
+    [Fact]
+    public async Task InteractiveTreeReportsLiveVisibilityOnFreshAndCachedReads()
+    {
+        var directory = NewCacheDirectory("live-visibility");
+        try
+        {
+            var document = new FakeDocument("SESSION-1", "tc://bom/live", FakeNode.FlatTree(2));
+            var fake = new FakeVisMockupCom { ExistingApplication = new FakeApplication("14.2.0", document) };
+            using var sta = new StaDispatcher();
+            var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([Path.GetTempPath()]), fake,
+                Path.Combine(directory, "captures"));
+            var operation = new AdapterOperation("vismockup.tree.read@2",
+                JsonSerializer.SerializeToElement(new { max_depth = 3 }));
+
+            var fresh = JsonSerializer.SerializeToElement((await adapter.ExecuteAsync(operation, default)).Data);
+            Assert.False(fresh.GetProperty("nodes")[1].GetProperty("visible").GetBoolean());
+
+            document.SetNodeVisible("node-1", true);
+            var cached = JsonSerializer.SerializeToElement((await adapter.ExecuteAsync(operation, default)).Data);
+            Assert.True(cached.GetProperty("nodes")[1].GetProperty("visible").GetBoolean());
+            Assert.Equal(1, document.SetNodeVisibleCalls);
+            Assert.Equal(0, document.ExportPlmxmlCalls);
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
+    public async Task CachedTreeWithDifferentTopologyReportsUnknownVisibility()
+    {
+        var directory = NewCacheDirectory("visibility-topology-mismatch");
+        try
+        {
+            var document = new FakeDocument("SESSION-1", "tc://bom/mismatch", FakeNode.FlatTree(2));
+            var cachePath = Path.Combine(directory, "tree.db");
+            var cache = new VisMockupTreeCache(cachePath);
+            cache.Replace(document, 64, [new("node-0", null, 0, 0, "Root", "", true)]);
+            using var sta = new StaDispatcher();
+            var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([Path.GetTempPath()]),
+                new FakeVisMockupCom { ExistingApplication = new FakeApplication("14.2.0", document) },
+                Path.Combine(directory, "captures"), cachePath);
+
+            var result = JsonSerializer.SerializeToElement(await adapter.TreeAsync(3, includeVisibility: true));
+
+            Assert.Equal(JsonValueKind.Null, result.GetProperty("nodes")[0].GetProperty("visible").ValueKind);
+            Assert.Equal(0, document.SetNodeVisibleCalls);
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
+    public async Task UnreadableLiveVisibilityIsUnknownAndDoesNotAbortTreeRead()
+    {
+        var document = new FakeDocument("SESSION-1", "tc://bom/unreadable", new UnreadableVisibilityNode());
+        using var sta = new StaDispatcher();
+        var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([Path.GetTempPath()]),
+            new FakeVisMockupCom { ExistingApplication = new FakeApplication("14.2.0", document) });
+
+        var result = JsonSerializer.SerializeToElement(await adapter.TreeAsync(3, includeVisibility: true));
+
+        Assert.Equal(JsonValueKind.Null, result.GetProperty("nodes")[0].GetProperty("visible").ValueKind);
+        Assert.Equal(0, document.SetNodeVisibleCalls);
     }
 
     [Fact]

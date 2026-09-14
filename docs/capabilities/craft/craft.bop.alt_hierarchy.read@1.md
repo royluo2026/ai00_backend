@@ -70,6 +70,14 @@ Read a bounded BOP hierarchy enriched with linked PBOM CATIA occurrences.
 {
   "additionalProperties": false,
   "properties": {
+    "node_types": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 20,
+      "type": "array"
+    },
     "version_gid": {
       "type": "string"
     }

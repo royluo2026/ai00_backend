@@ -243,7 +243,9 @@ Atomically insert the exact previewed BOP process skeleton as one alternate hier
 - `bop_projection_cycle`：The projected process skeleton contains a cycle.（retryable=false）
 - `bop_projection_plan_changed`：The exact preview no longer matches the current source or target.（retryable=true）
 - `bop_projection_already_inserted`：The exact BOP projection is already present in the target environment.（retryable=false）
-- `bop_execution_structure_failed`：The owning Craft capability could not return the exact published execution structure.（retryable=true）
+- `bop_execution_structure_failed`：The owning Craft capability could not return the exact revision-pinned execution structure.（retryable=true）
+- `bop_version_resolution_failed`：The owning Craft capability could not resolve the selected BOP revision.（retryable=true）
+- `bop_revision_unavailable`：The selected BOP did not expose a valid revision for a draft preview.（retryable=false）
 - `domain_client_unavailable`：The governed owning-domain invocation boundary is unavailable.（retryable=true）
 - `idempotency_conflict`：The idempotency key is bound to another BOP projection request.（retryable=false）
 

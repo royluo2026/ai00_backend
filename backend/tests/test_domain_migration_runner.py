@@ -210,7 +210,7 @@ def test_simulation_historical_0004_checksum_upgrades_through_current_chain(simu
 
     applied = apply_domain_migrations(connection, simulation_manifest, migrations)
 
-    assert applied == ("0005", "0006", "0007", "0008", "0009", "0010", "0011", "0012", "0013", "0014", "0015", "0016", "0017", "0018", "0019", "0020")
+    assert applied == tuple(item.migration_id for item in migrations if item.migration_id > "0004")
 
 
 def test_apply_uses_domain_lock_ledger_and_artifact_version(craft_manifest):
@@ -393,7 +393,7 @@ def test_apply_requires_only_the_selected_domains_ddl_credential(monkeypatch, ca
     assert "domain=craft migrations=13 applied=0" in capsys.readouterr().out
 
 
-def test_apply_configures_selected_table_prefix(monkeypatch, capsys):
+def test_apply_configures_selected_table_prefix(monkeypatch, capsys, simulation_manifest):
     class Connection:
         def close(self):
             pass
@@ -424,4 +424,4 @@ def test_apply_configures_selected_table_prefix(monkeypatch, capsys):
 
     assert result == 0
     assert prefixes == ["test_"]
-    assert "domain=simulation migrations=20 applied=0" in capsys.readouterr().out
+    assert f"domain=simulation migrations={len(discover_domain_migrations(ROOT, simulation_manifest))} applied=0" in capsys.readouterr().out

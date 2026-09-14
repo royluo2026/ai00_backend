@@ -104,6 +104,20 @@ def test_workspace_candidate_output_contracts_accept_real_provider_results():
         validate_payload(dict(spec.output_schema), outputs[spec.id], label="output")
 
 
+def test_workspace_get_accepts_auto_created_alternate_hierarchy_root_node():
+    repo = StubRepository()
+    base = repo.get("101")
+    base["nodes"] = [{
+        "node_gid": "104", "parent_gid": None, "node_type": "alternate_hierarchy",
+        "name": "当前仿真环境", "position": 0, "row_version": 1,
+    }]
+    repo.get = lambda workspace_gid, **kwargs: base
+    spec = next(spec for spec, _handler in candidate_specs(WorkspaceProvider(repo))
+                if spec.id == "simulation.environment.workspace.get")
+    validate_payload(dict(spec.output_schema), WorkspaceProvider(repo).get({"workspace_gid": "101"}, _context()).data,
+                     label="output")
+
+
 def test_workspace_outputs_expose_authoritative_cache_revision_hash():
     specs = {spec.id: spec for spec, _handler in candidate_specs(WorkspaceProvider(StubRepository()))}
     for capability_id in (

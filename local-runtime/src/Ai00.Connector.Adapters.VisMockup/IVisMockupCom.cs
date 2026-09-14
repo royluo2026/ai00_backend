@@ -45,6 +45,7 @@ public interface IVisMockupDocument
 public interface IVisMockupNode
 {
     string NodeKey { get; }
+    bool IsVisible { get; }
     string PrintableName { get; }
     string OccurrenceId { get; }
     string ModelId { get; }
@@ -271,6 +272,7 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
 {
     private const string ProgId = "VFFrame.Application";
     private IVisMockupApplication? _application;
+    private (int ProcessId, long Started)? _attachedProcess;
 
     internal static IReadOnlyList<IVisMockupNode> MaterializeChildren(
         int count, Func<int, IVisMockupNode> childAt)
@@ -314,13 +316,22 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
 
     public bool TryGetActiveApplication(out IVisMockupApplication? application)
     {
+        var process = InspectProcess();
+        var identity = process.ProcessId is int pid && process.ProcessStartUtcTicks is long started
+            ? (pid, started) : ((int, long)?)null;
+        if (identity != _attachedProcess)
+        {
+            _application = null;
+            _attachedProcess = null;
+        }
+
         if (_application is not null)
         {
             application = _application;
             return true;
         }
 
-        if (!InspectProcess().Running)
+        if (identity is null)
         {
             application = null;
             return false;
@@ -328,7 +339,8 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
 
         try
         {
-            _application = AttachActive();
+            _application = AttachActive(process.ProductVersion);
+            _attachedProcess = identity;
             application = _application;
             return true;
         }
@@ -348,6 +360,7 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         var path = Path.GetFullPath(executable);
         if (!File.Exists(path)) throw new FileNotFoundException("VisMockup executable not found", path);
         _application = null;
+        _attachedProcess = null;
         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(path)
         {
             UseShellExecute = true,
@@ -365,12 +378,11 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         throw new TimeoutException("VisMockup active object timeout");
     }
 
-    private IVisMockupApplication AttachActive()
+    private IVisMockupApplication AttachActive(string installedVersion)
     {
         var type = Type.GetTypeFromProgID(ProgId, throwOnError: true)!;
         var instance = Activator.CreateInstance(type)
             ?? throw new COMException("Unable to connect to VisMockup COM application");
-        var installedVersion = InspectProcess().ProductVersion;
         return new DynamicApplication(instance, installedVersion);
     }
 
@@ -532,7 +544,9 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
             }
             throw new ConnectorException("vismockup_document_insert_timeout");
         }
-        public void CaptureImage(string path) => Value.ActiveView.CaptureImage(path);
+        // VisAutomation.tlb: IVisDisp3DView.CaptureImage is DISPID 27.
+        public void CaptureImage(string path) =>
+            _ = VisMockupDispatch.InvokeMethod(ActiveView, 27, path);
         public void ExportPlmxml(string path, int hierarchyIndex)
         {
             if (hierarchyIndex < 0) throw new ConnectorException("vismockup_hierarchy_index_invalid");
@@ -626,6 +640,7 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
     {
         private dynamic Value => value;
         public string NodeKey => VisMockupDispatch.InvokeUInt32OutParameter(value, 21).ToString();
+        public bool IsVisible => Convert.ToBoolean(VisMockupDispatch.GetProperty(value, 9));
         public string PrintableName => Convert.ToString(VisMockupDispatch.GetProperty(value, 7)) ?? "";
         public string OccurrenceId { get { try { return Convert.ToString(Value.MetaDataProperties.GetPropertyByName("catiaOccurrenceName")) ?? ""; } catch { return ""; } } }
         public string ModelId { get { try { return Convert.ToString(Value.MetaDataProperties.GetPropertyByName("itemId")) ?? ""; } catch { return ""; } } }

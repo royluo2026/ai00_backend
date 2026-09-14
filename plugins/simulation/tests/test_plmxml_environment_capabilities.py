@@ -11,6 +11,14 @@ from plugins.simulation.simulation_backend.capabilities.provider import descript
 XML = b'<PLMXML><ProductView id="a" name="ALT" usage="variant"/></PLMXML>'
 XML_TWO = b'<PLMXML><ProductView id="a" name="ALT A" usage="variant"/><ProductView id="b" name="ALT B" usage="variant"/></PLMXML>'
 XML_DEP = b'<PLMXML><Representation location="parts/a.jt"/></PLMXML>'
+XML_MODEL = b'''<PLMXML><ProductDef><InstanceGraph id="graph" rootRefs="root">
+<ProductInstance id="root" name="ROOT/00;1-Root" partRef="#view-root"/>
+<ProductInstance id="child" name="PART/01;1-Child" partRef="#view-child"/>
+<ProductRevisionView id="view-root" instanceRefs="child"/><ProductRevisionView id="view-child"/>
+</InstanceGraph></ProductDef></PLMXML>'''
+XML_MODEL_WITH_EXTERNAL_PRODUCT = b'''<PLMXML>
+<ProductInstance id="external-root" name="External product" partRef="base.plmxml#base-view"/>
+</PLMXML>'''
 
 
 class _Artifacts:
@@ -121,6 +129,7 @@ def test_plmxml_import_and_export_are_separate_artifact_capabilities():
         "simulation.plmxml.environment.inspect", "simulation.environment.restore_from_plmxml",
         "simulation.environment.plmxml.insert", "simulation.plmxml.environment.import",
         "simulation.plmxml.environment.export", "simulation.environment.runtime_package.prepare",
+        "simulation.plmxml.model_tree.read",
     ]
     from backend.capabilities.validation_next import validate_payload
     for spec, output in zip((specs(provider)[3][0], specs(provider)[4][0]), (imported.data, exported.data)):
@@ -144,6 +153,145 @@ def test_plmxml_inspect_is_read_only_and_returns_explicit_hierarchy_choices():
     validate_payload(dict(specs(provider)[0][0].output_schema), output, label="output")
 
 
+def test_plmxml_model_tree_read_projects_product_nodes_without_mutation():
+    class Artifacts(_Artifacts):
+        def read(self, reference, context): return XML_MODEL
+    provider = PlmxmlEnvironmentProvider(_Repo(), Artifacts())
+    digest = hashlib.sha256(XML_MODEL).hexdigest()
+    ref = {"artifact_id":"model","media_type":"application/plmxml+xml",
+           "sha256":digest,"byte_size":len(XML_MODEL),"version":1}
+    output = provider.read_model_tree(
+        {"artifact_ref":ref}, CapabilityContext(user_gid="30", team_gid="20", request_id="tree-1"),
+    ).data
+    assert output["state"] == "ready"
+    assert output["node_count"] == 2
+    assert output["nodes"] == [
+        {"node_key":"root","parent_key":None,"child_order":0,"name":"ROOT/00;1-Root",
+         "bom_line":"ROOT/00;1","item_id":"","revision":"","occurrence_id":"","has_more":True},
+        {"node_key":"child","parent_key":"root","child_order":0,"name":"PART/01;1-Child",
+         "bom_line":"PART/01;1","item_id":"","revision":"","occurrence_id":"","has_more":False},
+    ]
+    assert output["next_offset"] is None
+    from backend.capabilities.validation_next import validate_payload
+    validate_payload(dict(specs(provider)[6][0].output_schema), output, label="output")
+
+
+def test_plmxml_model_tree_read_pages_large_trees_without_losing_total_count():
+    class Artifacts(_Artifacts):
+        def read(self, reference, context): return XML_MODEL
+    provider = PlmxmlEnvironmentProvider(_Repo(), Artifacts())
+    digest = hashlib.sha256(XML_MODEL).hexdigest()
+    ref = {"artifact_id":"model","media_type":"application/plmxml+xml",
+           "sha256":digest,"byte_size":len(XML_MODEL),"version":1}
+    context = CapabilityContext(user_gid="30", team_gid="20", request_id="tree-page")
+
+    first = provider.read_model_tree({"artifact_ref":ref, "offset":0, "limit":1}, context).data
+    second = provider.read_model_tree({"artifact_ref":ref, "offset":1, "limit":1}, context).data
+
+    assert first["node_count"] == second["node_count"] == 2
+    assert [item["node_key"] for item in first["nodes"]] == ["root"]
+    assert first["next_offset"] == 1
+    assert [item["node_key"] for item in second["nodes"]] == ["child"]
+    assert second["next_offset"] is None
+
+
+def test_imported_model_tree_reads_database_cache_without_reopening_artifact(monkeypatch):
+    from plugins.simulation.simulation_backend.capabilities import plmxml_environments as module
+    ref = {"artifact_id":"model","media_type":"application/plmxml+xml",
+           "sha256":"a" * 64,"byte_size":100,"version":1}
+    tree = {"state":"ready", "nodes":[{"node_key":"part-1"}, {"node_key":"part-2"}],
+            "dependency_locations":[]}
+    monkeypatch.setattr(module, "read_product_tree", lambda **kwargs: tree)
+    class Artifacts:
+        def read(self, reference, context): raise AssertionError("artifact reopened on cache hit")
+    provider = PlmxmlEnvironmentProvider(_Repo(), Artifacts())
+    output = provider.read_model_tree({"artifact_ref":ref, "document_gid":"44", "offset":1, "limit":1},
+        CapabilityContext(user_gid="30", team_gid="20", request_id="tree-cached")).data
+    assert output["node_count"] == 2
+    assert output["nodes"] == [{"node_key":"part-2"}]
+    assert output["next_offset"] is None
+
+
+def test_cached_tree_still_authorizes_dependency_artifacts(monkeypatch):
+    from plugins.simulation.simulation_backend.capabilities import plmxml_environments as module
+    checked = []
+    monkeypatch.setattr(module, "require_artifact", lambda ref, context: checked.append(ref["artifact_id"]))
+    monkeypatch.setattr(module, "read_product_tree", lambda **kwargs: {
+        "state":"ready", "nodes":[], "dependency_locations":[]})
+    provider = PlmxmlEnvironmentProvider(_Repo())
+    provider.read_model_tree({"artifact_ref":{"artifact_id":"primary"}, "document_gid":"44",
+        "dependency_artifacts":[{"location":"base.plmxml", "artifact_ref":{"artifact_id":"dependency"}}]},
+        CapabilityContext(user_gid="30", team_gid="20", request_id="tree-auth"))
+    assert checked == ["dependency"]
+
+
+def test_imported_model_tree_backfills_once_then_pages_from_database(monkeypatch):
+    from plugins.simulation.simulation_backend.capabilities import plmxml_environments as module
+    cached = {}
+    monkeypatch.setattr(module, "read_product_tree", lambda **kwargs: cached.get("tree"))
+    monkeypatch.setattr(module, "save_product_tree", lambda **kwargs: cached.update(tree=kwargs["tree"]))
+    class Artifacts:
+        reads = 0
+        def read(self, reference, context):
+            self.reads += 1
+            return XML_MODEL
+    artifacts = Artifacts()
+    provider = PlmxmlEnvironmentProvider(_Repo(), artifacts)
+    ref = {"artifact_id":"model","media_type":"application/plmxml+xml",
+           "sha256":hashlib.sha256(XML_MODEL).hexdigest(),"byte_size":len(XML_MODEL),"version":1}
+    context = CapabilityContext(user_gid="30", team_gid="20", request_id="tree-backfill")
+    first = provider.read_model_tree({"artifact_ref":ref,"document_gid":"44","limit":1}, context).data
+    second = provider.read_model_tree({"artifact_ref":ref,"document_gid":"44","offset":1,"limit":1}, context).data
+    assert [row["node_key"] for row in first["nodes"]] == ["root"]
+    assert [row["node_key"] for row in second["nodes"]] == ["child"]
+    assert artifacts.reads == 1
+    assert len(cached["tree"]["nodes"]) == 2
+
+
+def test_plmxml_model_tree_read_reports_external_product_document_dependency():
+    class Artifacts(_Artifacts):
+        def read(self, reference, context): return XML_MODEL_WITH_EXTERNAL_PRODUCT
+    provider = PlmxmlEnvironmentProvider(_Repo(), Artifacts())
+    digest = hashlib.sha256(XML_MODEL_WITH_EXTERNAL_PRODUCT).hexdigest()
+    ref = {"artifact_id":"external-model","media_type":"application/plmxml+xml",
+           "sha256":digest,"byte_size":len(XML_MODEL_WITH_EXTERNAL_PRODUCT),"version":1}
+
+    output = provider.read_model_tree(
+        {"artifact_ref":ref}, CapabilityContext(user_gid="30", team_gid="20", request_id="tree-external"),
+    ).data
+
+    assert output == {
+        "state": "dependency_required", "node_count": 0, "nodes": [],
+        "dependency_locations": ["base.plmxml"], "next_offset": None,
+    }
+
+
+def test_plmxml_model_tree_read_uses_supplied_product_document_dependency():
+    class Artifacts:
+        def read(self, reference, context):
+            return XML_MODEL_WITH_EXTERNAL_PRODUCT if reference["artifact_id"] == "primary" else XML_MODEL
+
+    provider = PlmxmlEnvironmentProvider(_Repo(), Artifacts())
+    primary_digest = hashlib.sha256(XML_MODEL_WITH_EXTERNAL_PRODUCT).hexdigest()
+    dependency_digest = hashlib.sha256(XML_MODEL).hexdigest()
+    primary_ref = {"artifact_id": "primary", "media_type": "application/plmxml+xml",
+                   "sha256": primary_digest, "byte_size": len(XML_MODEL_WITH_EXTERNAL_PRODUCT), "version": 1}
+    dependency_ref = {"artifact_id": "dependency", "media_type": "application/vnd.siemens.plmxml+xml",
+                      "sha256": dependency_digest, "byte_size": len(XML_MODEL), "version": 1}
+
+    output = provider.read_model_tree(
+        {"artifact_ref": primary_ref, "dependency_artifacts": [
+            {"location": "base.plmxml", "artifact_ref": dependency_ref},
+        ]},
+        CapabilityContext(user_gid="30", team_gid="20", request_id="tree-external-resolved"),
+    ).data
+
+    assert output["state"] == "ready"
+    assert output["node_count"] == 2
+    assert [item["node_key"] for item in output["nodes"]] == ["root", "child"]
+    assert output["dependency_locations"] == []
+
+
 def test_plmxml_insert_requires_matching_inspection_and_explicit_hierarchy_selection():
     class Artifacts(_Artifacts):
         def read(self, reference, context): return XML_TWO
@@ -157,6 +305,7 @@ def test_plmxml_insert_requires_matching_inspection_and_explicit_hierarchy_selec
         "selected_hierarchy_identities":["b"],"inspection_hash":inspection["inspection_hash"],
         "idempotency_key":"insert-1"}, ctx).data
     assert inserted["selected_hierarchy_identities"] == ["b"]
+    assert repo.import_calls[-1]["document_role"] == "auto"
     assert [item.projection_identity for item in repo.import_calls[-1]["projection"].hierarchies] == ["b"]
 
 
@@ -172,8 +321,7 @@ def test_plmxml_restore_creates_new_environment_without_reusing_import_contract(
     assert repo.restore_call["name"] == "Restored ALT"
 
 
-def test_plmxml_restore_fails_closed_until_every_external_dependency_is_an_artifact():
-    import pytest
+def test_plmxml_restore_records_unresolved_external_dependencies_without_forcing_upload():
     class Artifacts(_Artifacts):
         def read(self, reference, context):
             return XML_DEP if reference["artifact_id"] == "in" else b"JT"
@@ -184,11 +332,46 @@ def test_plmxml_restore_fails_closed_until_every_external_dependency_is_an_artif
     inspection = provider.inspect_environment({"artifact_ref": ref}, ctx).data
     payload = {"artifact_ref":ref,"name":"Restored","display_name":"source",
         "inspection_hash":inspection["inspection_hash"],"idempotency_key":"restore-deps"}
-    with pytest.raises(Exception, match="plmxml_dependency_artifact_required"):
-        provider.restore_environment(payload, ctx)
+    restored = provider.restore_environment(payload, ctx).data
+    assert repo.restore_call["resolved_dependencies"] == {}
+    assert restored["report"]["unresolved_refs"] == ["parts/a.jt"]
+    assert restored["report"]["document_count"] == 1
     dep = {"artifact_id":"jt","media_type":"model/vnd.jt","sha256":hashlib.sha256(b"JT").hexdigest(),"byte_size":2,"version":1}
     provider.restore_environment({**payload, "dependency_artifacts":[{"location":"parts/a.jt","artifact_ref":dep}]}, ctx)
     assert repo.restore_call["resolved_dependencies"]["parts/a.jt"]["artifact_id"] == "jt"
+
+
+def test_plmxml_insert_records_structure_without_requesting_external_files():
+    class Artifacts(_Artifacts):
+        def read(self, reference, context): return XML_DEP
+    repo = _Repo(); provider = PlmxmlEnvironmentProvider(repo, Artifacts())
+    ref = {"artifact_id":"in","media_type":"application/plmxml+xml",
+           "sha256":hashlib.sha256(XML_DEP).hexdigest(),"byte_size":len(XML_DEP),"version":1}
+    ctx = CapabilityContext(user_gid="30", team_gid="20", request_id="insert-deps")
+    inspection = provider.inspect_environment({"artifact_ref": ref}, ctx).data
+    inserted = provider.insert_environment({"workspace_gid":"10","expected_row_version":1,
+        "artifact_ref":ref,"display_name":"source","mode":"model_only",
+        "selected_hierarchy_identities":[],"inspection_hash":inspection["inspection_hash"],
+        "idempotency_key":"insert-deps"}, ctx).data
+    assert repo.import_calls[-1]["resolved_dependencies"] == {}
+    assert inserted["report"]["unresolved_refs"] == ["parts/a.jt"]
+
+
+def test_plmxml_insert_reads_the_immutable_artifact_once_after_inspection():
+    class Artifacts(_Artifacts):
+        def __init__(self): super().__init__(); self.read_calls = 0
+        def read(self, reference, context): self.read_calls += 1; return XML_TWO
+    artifacts = Artifacts(); provider = PlmxmlEnvironmentProvider(_Repo(), artifacts)
+    ref = {"artifact_id":"in","media_type":"application/plmxml+xml",
+           "sha256":hashlib.sha256(XML_TWO).hexdigest(),"byte_size":len(XML_TWO),"version":1}
+    ctx = CapabilityContext(user_gid="30", team_gid="20", request_id="insert-single-read")
+    inspection = provider.inspect_environment({"artifact_ref": ref}, ctx).data
+    artifacts.read_calls = 0
+    provider.insert_environment({"workspace_gid":"10","expected_row_version":1,
+        "artifact_ref":ref,"display_name":"source","mode":"model_only",
+        "selected_hierarchy_identities":[],"inspection_hash":inspection["inspection_hash"],
+        "idempotency_key":"insert-single-read"}, ctx)
+    assert artifacts.read_calls == 1
 
 
 def test_plmxml_capabilities_publish_every_stable_dependency_and_inspection_error():
@@ -199,7 +382,6 @@ def test_plmxml_capabilities_publish_every_stable_dependency_and_inspection_erro
 
     assert {"plmxml_artifact_hash_mismatch", "plmxml_artifact_unavailable"} <= inspect_codes
     assert {
-        "plmxml_dependency_artifact_required",
         "plmxml_dependency_artifact_invalid",
         "plmxml_dependency_media_type_mismatch",
         "plmxml_dependency_artifact_unavailable",

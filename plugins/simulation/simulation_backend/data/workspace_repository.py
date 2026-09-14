@@ -458,6 +458,7 @@ class WorkspaceRepository:
                        "resource_references": list(plan.get("resource_references") or [])}
         hierarchy_gid = str(next_gid())
         with get_simulation_conn() as conn, conn.cursor() as cursor:
+            conn.begin()
             workspace = self._lock_owned_workspace(cursor, workspace_gid=workspace_gid,
                 tenant_gid=tenant_gid, actor_gid=actor_gid, expected_row_version=expected_workspace_version)
             request_hash, replay = self._idempotency_begin(cursor, workspace_gid=workspace_gid,
@@ -475,12 +476,16 @@ class WorkspaceRepository:
                  projection_identity, hierarchy_position))
             node_map = {item["source_gid"]: str(next_gid()) for item in ordered}
             sibling_positions: dict[str | None, int] = {}
+            node_rows = []
             for item in ordered:
                 parent_source = item["parent_source_gid"]
                 position = sibling_positions.get(parent_source, 0); sibling_positions[parent_source] = position + 1
-                cursor.execute("INSERT INTO workmanship_sim_workspace_nodes (gid,workspace_gid,tenant_gid,owner_gid,hierarchy_gid,parent_gid,node_type,name,sort_order,source_bop_node_gid,row_version) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,1)",
-                    (node_map[item["source_gid"]], workspace_gid, tenant_gid, actor_gid, hierarchy_gid,
-                     node_map.get(parent_source), item["node_type"], item["name"], position, item["source_gid"]))
+                node_rows.append((node_map[item["source_gid"]], workspace_gid, tenant_gid, actor_gid,
+                                  hierarchy_gid, node_map.get(parent_source), item["node_type"],
+                                  item["name"], position, item["source_gid"]))
+            node_insert = "INSERT INTO workmanship_sim_workspace_nodes (gid,workspace_gid,tenant_gid,owner_gid,hierarchy_gid,parent_gid,node_type,name,sort_order,source_bop_node_gid,row_version) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,1)"
+            for offset in range(0, len(node_rows), 500):
+                cursor.executemany(node_insert, node_rows[offset:offset + 500])
             next_version, cache_hash = self._advance_workspace_revision(cursor, workspace_gid=workspace_gid,
                 current=workspace, patch={"op":"insert_bop_projection","hierarchy_gid":hierarchy_gid,
                     "source_version_gid":source_version_gid,"source_content_hash":source_hash,"plan_hash":plan_hash})
@@ -635,6 +640,13 @@ class WorkspaceRepository:
                     canonical_source_ref["artifact_version"] = str(artifact_ref["version"])
                 if document.get("connector_device_id"):
                     canonical_source_ref["connector_device_id"] = str(document["connector_device_id"])
+                if source_ref.get("node_key"):
+                    node_key = str(source_ref["node_key"])
+                    if len(node_key) > 255:
+                        raise WorkspaceRepositoryError("model_node_key_invalid")
+                    canonical_source_ref["node_key"] = node_key
+                    if source_ref.get("occurrence_id"):
+                        canonical_source_ref["occurrence_id"] = str(source_ref["occurrence_id"])
                 if source_kind == "vm_occurrence":
                     occurrence_gid = _gid(source_ref.get("occurrence_gid"), "occurrence_gid")
                     canonical_source_ref["occurrence_gid"] = occurrence_gid
@@ -903,7 +915,7 @@ class WorkspaceRepository:
         if not idempotency_key or len(idempotency_key) > 191:
             raise WorkspaceRepositoryError("idempotency_key_invalid")
         artifact_hash = _sha256_body(artifact_ref.get("sha256"), "artifact_sha256")
-        if document_role not in {"primary", "inserted"}:
+        if document_role not in {"auto", "primary", "inserted"}:
             raise WorkspaceRepositoryError("model_document_role_invalid")
         request_hash = hashlib.sha256(json.dumps({"artifact": dict(artifact_ref), "name": display_name, "role": document_role}, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
         document_gid = str(next_gid())
@@ -919,7 +931,10 @@ class WorkspaceRepository:
                 value = replay["response_json"]
                 return json.loads(value) if isinstance(value, str) else dict(value)
             cursor.execute("SELECT gid FROM workmanship_sim_vm_documents WHERE workspace_gid=%s AND primary_slot=1 AND removed_at IS NULL FOR UPDATE", (workspace_gid,))
-            if cursor.fetchone() and document_role == "primary":
+            primary = cursor.fetchone()
+            if document_role == "auto":
+                document_role = "inserted" if primary else "primary"
+            elif primary and document_role == "primary":
                 raise WorkspaceRepositoryError("primary_model_document_exists")
             cursor.execute(
                 "INSERT INTO workmanship_sim_vm_documents (gid,workspace_gid,tenant_gid,owner_gid,document_role,primary_slot,display_name,media_type,artifact_ref_json,content_sha256,portability,sort_order,source_kind,source_identity_hash,status,row_version) "
@@ -929,7 +944,8 @@ class WorkspaceRepository:
                  json.dumps(dict(artifact_ref), ensure_ascii=False, sort_keys=True, separators=(",", ":")),
                  artifact_hash, artifact_hash),
             )
-            for order, dependency in enumerate(projection.dependencies, start=1):
+            resolved = (item for item in projection.dependencies if item.location in resolved_dependencies)
+            for order, dependency in enumerate(resolved, start=1):
                 dependency_gid = str(next_gid())
                 dependency_ref = dict(resolved_dependencies.get(dependency.location) or {})
                 dependency_hash = _sha256_body(dependency_ref.get("sha256"), "dependency_artifact_sha256")
@@ -1033,7 +1049,8 @@ class WorkspaceRepository:
                  json.dumps(dict(artifact_ref), ensure_ascii=False, sort_keys=True, separators=(",", ":")),
                  artifact_hash, artifact_hash),
             )
-            for order, dependency in enumerate(projection.dependencies, start=1):
+            resolved = (item for item in projection.dependencies if item.location in resolved_dependencies)
+            for order, dependency in enumerate(resolved, start=1):
                 dependency_gid = str(next_gid())
                 dependency_ref = dict(resolved_dependencies.get(dependency.location) or {})
                 dependency_hash = _sha256_body(dependency_ref.get("sha256"), "dependency_artifact_sha256")

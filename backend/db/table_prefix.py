@@ -25,6 +25,8 @@ import logging
 _log = logging.getLogger("backend.db.table_prefix")
 
 _TABLE_RE = re.compile(r"(?<![A-Za-z0-9_])workmanship_")
+_DOMAIN_LEDGER_RE = re.compile(r"(?<![A-Za-z0-9_])ai00_[a-z0-9_]+_schema_migrations\b")
+_TRIGGER_RE = re.compile(r"(?i)(\bCREATE\s+TRIGGER\s+`?)(base_historical_uploads_no_(?:update|delete))\b")
 _PREFIX: str = ""
 
 
@@ -40,7 +42,15 @@ def rewrite_sql(sql: str) -> str:
     """Rewrite ``workmanship_`` → ``<prefix>workmanship_`` if prefix is set."""
     if not _PREFIX:
         return sql
-    return _TABLE_RE.sub(_PREFIX + "workmanship_", sql)
+    sql = _TABLE_RE.sub(_PREFIX + "workmanship_", sql)
+    sql = _DOMAIN_LEDGER_RE.sub(lambda match: _PREFIX + match.group(), sql)
+    return _TRIGGER_RE.sub(lambda match: match.group(1) + _PREFIX + match.group(2), sql)
+
+
+def prefixed_trigger_name(name: str) -> str:
+    if _PREFIX and name in {"base_historical_uploads_no_update", "base_historical_uploads_no_delete"}:
+        return _PREFIX + name
+    return name
 
 
 def table_prefix_active() -> bool:

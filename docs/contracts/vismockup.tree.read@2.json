@@ -1,0 +1,1 @@
+{"id":"vismockup.tree.read@2","input":{"max_depth":"integer[1,8]","force_refresh":"boolean?"},"output":{"nodes":[{"node_key":"string","parent_node_key":"string?","name":"string","catia_occurrence_name":"string","has_more":"boolean","visible":"boolean?"}],"max_depth":"integer","cache_state":"verified|verifying"}}

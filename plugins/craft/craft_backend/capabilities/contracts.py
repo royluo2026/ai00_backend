@@ -833,8 +833,30 @@ INPUT_SCHEMAS[("craft.gbop.navigation.change.apply", 1)] = _object({"operation":
 OUTPUT_SCHEMAS[("craft.gbop.navigation.change.apply", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
 INPUT_SCHEMAS[("craft.bop.entry.search", 1)] = _object({"q": {"type": "string"}, "node_types": {"type": "array", "items": {"type": "string"}, "maxItems": 20}, "limit": {"type": "integer", "minimum": 1, "maximum": 500}})
 OUTPUT_SCHEMAS[("craft.bop.entry.search", 1)] = _object({"data": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}}}, required=("data",))
-INPUT_SCHEMAS[("craft.bop.alt_hierarchy.read", 1)] = _object({"version_gid": {"type": "string"}}, required=("version_gid",))
-OUTPUT_SCHEMAS[("craft.bop.alt_hierarchy.read", 1)] = _object({"entries": {"type": "array", "maxItems": 1000, "items": {"type": "object", "additionalProperties": True}}}, required=("entries",))
+INPUT_SCHEMAS[("craft.bop.alt_hierarchy.read", 1)] = _object({
+    "version_gid": {"type": "string"},
+    "node_types": {
+        "type": "array",
+        "maxItems": 20,
+        "items": {"type": "string", "minLength": 1},
+    },
+}, required=("version_gid",))
+_ALT_HIERARCHY_PART = _object({
+    "gid": STRING, "part_no": {"type": "string"}, "catia_occ": {"type": "string"},
+    "name": {"type": "string"}, "vpps": {"type": "string"},
+    "quantity": {"description": "Provider-validated PBOM quantity."},
+}, required=("gid", "part_no", "catia_occ", "name", "vpps", "quantity"))
+_ALT_HIERARCHY_ENTRY = _object({
+    "gid": STRING, "parent_gid": {"type": ["string", "null"]},
+    "node_type": STRING, "sort_order": {"type": ["number", "null"]},
+    "title": {"type": ["string", "null"]}, "vpps": {"type": ["string", "null"]},
+    "level": {"type": ["integer", "null"]},
+    "ai00_level": {"type": ["integer", "null"]},
+    "parts": {"type": "array", "maxItems": 1000, "items": _ALT_HIERARCHY_PART},
+}, required=("gid", "parent_gid", "node_type", "sort_order", "title", "vpps", "level", "ai00_level", "parts"))
+OUTPUT_SCHEMAS[("craft.bop.alt_hierarchy.read", 1)] = _object({
+    "entries": {"type": "array", "maxItems": 1000, "items": _ALT_HIERARCHY_ENTRY},
+}, required=("entries",))
 INPUT_SCHEMAS[("craft.bop.line_operation_catia.read", 1)] = _object({"line_entry_gid": {"type": "string"}}, required=("line_entry_gid",))
 OUTPUT_SCHEMAS[("craft.bop.line_operation_catia.read", 1)] = _object({"ok": {"type": "boolean"}, "data": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}}}, required=("ok", "data"))
 INPUT_SCHEMAS[("craft.bop.pbom_lifecycle.read", 1)] = _object({"operation": {"type": "string", "enum": ["link_stats", "diff_queue"]}, "gid": {"type": "string"}, "status": {"type": "string"}}, required=("operation", "gid"))

@@ -377,7 +377,7 @@ Execute Project Management operation issues.update.
     "arguments": {
       "gid": "example",
       "updates": {
-        "escape_root_cause": null
+        "list_gid": null
       }
     }
   }

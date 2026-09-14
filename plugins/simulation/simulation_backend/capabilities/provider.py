@@ -133,6 +133,7 @@ _RESOURCES = {
     "simulation.environment.bop_projection.preview": (("simulation-workspace", "workspace_gid"), ("craft-bop-version", "version_gid")),
     "simulation.environment.bop_projection.apply": (("simulation-workspace", "workspace_gid"), ("craft-bop-version", "version_gid")),
     "simulation.plmxml.environment.inspect": (("artifact", "artifact_ref.artifact_id"),),
+    "simulation.plmxml.model_tree.read": (("artifact", "artifact_ref.artifact_id"),),
     "simulation.environment.restore_from_plmxml": (("artifact", "artifact_ref.artifact_id"),),
     "simulation.environment.plmxml.insert": (("simulation-workspace", "workspace_gid"), ("artifact", "artifact_ref.artifact_id")),
     "simulation.plmxml.environment.import": (("simulation-workspace", "workspace_gid"), ("artifact", "artifact_ref.artifact_id")),
@@ -250,7 +251,6 @@ _RETRYABLE_ERROR_CODES = frozenset({
 _PLMXML_ERROR_PAIRS = (
     ("plmxml_artifact_hash_mismatch", "The PLMXML Artifact bytes do not match the immutable reference hash."),
     ("plmxml_artifact_unavailable", "The immutable PLMXML Artifact is unavailable or outside the caller scope."),
-    ("plmxml_dependency_artifact_required", "Every external PLMXML dependency must resolve to an immutable Artifact."),
     ("plmxml_dependency_artifact_invalid", "A supplied PLMXML dependency Artifact reference is malformed or duplicated."),
     ("plmxml_dependency_media_type_mismatch", "A dependency Artifact media type does not match the PLMXML reference."),
     ("plmxml_dependency_artifact_unavailable", "A dependency Artifact is unavailable or outside the caller scope."),
@@ -262,7 +262,8 @@ _PLMXML_ERROR_PAIRS = (
 
 _PLMXML_WEB_BUSINESS_EFFECTS = {
     "simulation.plmxml.environment.inspect": "Return a bounded, immutable inspection of one PLMXML Artifact so a user can explicitly choose which model and alternate-hierarchy projections to import.",
-    "simulation.environment.restore_from_plmxml": "Create one private Simulation workspace whose draft faithfully restores the selected immutable PLMXML model, hierarchies and verified external dependencies.",
+    "simulation.plmxml.model_tree.read": "Return the bounded read-only product occurrence tree of one authorized immutable PLMXML Artifact for the Simulation model-document panel.",
+    "simulation.environment.restore_from_plmxml": "Create one private Simulation workspace from an immutable PLMXML model and its selected hierarchies, retaining unresolved external references for later explicit materialization.",
     "simulation.environment.plmxml.insert": "Add one immutable PLMXML model and only the explicitly selected alternate hierarchies to one exact owned Simulation workspace draft.",
 }
 
@@ -567,6 +568,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             "domain_errors_complete": True,
         })
     if governed.id.startswith("simulation.plmxml.environment.") or governed.id in {
+        "simulation.plmxml.model_tree.read",
         "simulation.environment.restore_from_plmxml",
         "simulation.environment.plmxml.insert",
     }:
@@ -593,18 +595,18 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         updates.update({
             "exposure": ExposurePolicy(web=True),
             "business_effect": (
-                "Preview the exact published Craft BOP process skeleton for insertion into one owned Simulation environment."
+                "Preview the exact published or explicitly selected active Craft BOP process skeleton for insertion into one owned Simulation environment."
                 if governed.id.endswith(".preview") else
                 "Atomically insert the previously previewed exact Craft BOP process skeleton as one editable alternate hierarchy."
             ),
             "business_acceptance_criteria": (
-                "The source is read only through craft.bop.execution_structure.get@1 and remains pinned by version, revision and content hash.",
+                "The source is read only through Craft's revision-pinned execution structure contract: published versions use get@1 and an explicitly selected active version uses preview@1 after resolving its current revision.",
                 "Product and resource references are counted as separate source references and are never copied into the editable process skeleton as hierarchy nodes.",
                 "Apply recomputes the projection and rejects a changed source, target row version or plan hash without partial writes.",
             ),
             "business_invariants": (),
             "no_business_invariant_reason": "The exact owner projection, deterministic plan hash, optimistic concurrency and one Simulation transaction fully determine this experimental boundary.",
-            "consistency_policy": "strong",
+            "consistency_policy": "external" if governed.id.endswith(".apply") else "strong",
             "domain_errors": tuple(DomainErrorContract(code=code, meaning=meaning, retryable=retryable, is_caller_error=True) for code, meaning, retryable in (
                 ("workspace_not_found", "The target Simulation environment is unavailable or not owned by the caller.", False),
                 ("version_conflict", "The target environment row version changed.", True),
@@ -616,7 +618,9 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                 ("bop_projection_cycle", "The projected process skeleton contains a cycle.", False),
                 ("bop_projection_plan_changed", "The exact preview no longer matches the current source or target.", True),
                 ("bop_projection_already_inserted", "The exact BOP projection is already present in the target environment.", False),
-                ("bop_execution_structure_failed", "The owning Craft capability could not return the exact published execution structure.", True),
+                ("bop_execution_structure_failed", "The owning Craft capability could not return the exact revision-pinned execution structure.", True),
+                ("bop_version_resolution_failed", "The owning Craft capability could not resolve the selected BOP revision.", True),
+                ("bop_revision_unavailable", "The selected BOP did not expose a valid revision for a draft preview.", False),
                 ("domain_client_unavailable", "The governed owning-domain invocation boundary is unavailable.", True),
                 ("idempotency_conflict", "The idempotency key is bound to another BOP projection request.", False),
             )),
@@ -733,6 +737,12 @@ def register(registry: Any, spec: Any, handler: Any) -> None:
             "capability_version_gid": descriptor.capability_version_gid,
             "business_definition_hash": definition_hash,
         }))
+
+    # Preserve the Provider's transaction-participant declaration through the
+    # governance context adapter.  The Gateway inspects the registered
+    # callable (the wrapper), not the original bound method.
+    if getattr(handler, "__capability_transactional__", False):
+        governed_handler.__capability_transactional__ = True
 
     registry.register(governed, governed_handler, descriptor=descriptor)
 

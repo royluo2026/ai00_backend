@@ -2,6 +2,7 @@ import asyncio
 from types import SimpleNamespace
 import pytest
 from backend.capability_v2.provider_contracts import CapabilityContext
+from plugins.craft.craft_backend.capabilities import bop_alt_hierarchy
 from plugins.simulation.simulation_backend.capabilities.alternate_hierarchies import AlternateHierarchyProvider, build_bop_projection_plan, specs
 from plugins.simulation.simulation_backend.capabilities.provider import descriptor_for
 
@@ -93,6 +94,68 @@ def test_bop_projection_preview_and_apply_recheck_owner_source_and_plan_hash():
             "idempotency_key":"bop-apply-2"}, context))
 
 
+def test_bop_projection_preview_falls_back_to_active_revision_pinned_preview():
+    execution = {"source": {"bop_version_gid": "100", "project_gid": "200", "revision": 1},
+        "content_hash": "sha256:" + "a" * 64, "nodes": [
+            {"node_id":"1","parent_id":None,"kind":"line_process","sequence":10,"name":"L1","part_refs":[]},
+        ], "operations": [], "dependencies": [], "conditions": []}
+
+    class Client:
+        def __init__(self): self.calls = []
+
+        async def invoke(self, invocation, identity, correlation):
+            self.calls.append((invocation.capability_id, invocation.payload))
+            if invocation.capability_id == "craft.bop.execution_structure.get":
+                return SimpleNamespace(ok=False, data=None,
+                    error=SimpleNamespace(code="version_not_published"))
+            if invocation.capability_id == "craft.bop.version.get":
+                return SimpleNamespace(ok=True, data={"revision": 1}, error=None)
+            assert invocation.capability_id == "craft.bop.execution_structure.preview"
+            assert invocation.payload == {"version_gid": "100", "expected_revision": 1}
+            assert invocation.expected_resource_version == "1"
+            return SimpleNamespace(ok=True, data=execution, error=None)
+
+    client = Client(); repo = _Repo(); provider = AlternateHierarchyProvider(repo)
+    context = CapabilityContext(user_gid="30", team_gid="20", request_id="bop-active-1",
+        domain_client=client, effective_identity=SimpleNamespace())
+    payload = {"workspace_gid":"10","version_gid":"100","line_gid":"1","fork_depth":"all",
+        "hierarchy_name":"L1 active","expected_row_version":3}
+    result = asyncio.run(provider.preview_bop_projection(payload, context)).data
+    assert result["source_revision"] == 1
+    assert [call[0] for call in client.calls] == [
+        "craft.bop.execution_structure.get", "craft.bop.version.get",
+        "craft.bop.execution_structure.preview",
+    ]
+
+
+def test_bop_alt_hierarchy_can_bound_line_discovery_without_loading_the_full_tree(monkeypatch):
+    class Cursor:
+        def __init__(self): self.sql = ""; self.params = []
+        def __enter__(self): return self
+        def __exit__(self, *_): return None
+        def execute(self, sql, params): self.sql, self.params = sql, list(params)
+        def fetchall(self):
+            return [{"gid": "1", "parent_gid": None, "node_type": "line_process", "sort_order": 0,
+                     "title": "L1", "vpps": None, "level": 1, "ai00_level": 1,
+                     "part_gid": None, "part_no": None, "catia_occurrence_name": None,
+                     "part_name": None, "part_vpps": None, "quantity": None}]
+
+    class Connection:
+        def __init__(self): self.cursor_obj = Cursor()
+        def __enter__(self): return self
+        def __exit__(self, *_): return None
+        def cursor(self): return self.cursor_obj
+
+    connection = Connection()
+    monkeypatch.setattr(bop_alt_hierarchy, "get_craft_conn", lambda: connection)
+    result = bop_alt_hierarchy.read_bop_alt_hierarchy(
+        {"version_gid": "100", "node_types": ["line", "line_process"]}, None,
+    )
+    assert result.data["entries"][0]["node_type"] == "line_process"
+    assert "e.node_type IN (%s,%s)" in connection.cursor_obj.sql
+    assert connection.cursor_obj.params == ["100", "line", "line_process"]
+
+
 def test_bop_projection_descriptors_are_web_only_and_governance_complete():
     values = [descriptor_for(spec) for spec, _ in specs(AlternateHierarchyProvider(_Repo())) if spec.id.startswith("simulation.environment.bop_projection.")]
     assert len(values) == 2
@@ -103,6 +166,34 @@ def test_bop_projection_descriptors_are_web_only_and_governance_complete():
         assert descriptor.domain_errors_complete is True
         assert descriptor.business_effect
         assert descriptor.business_acceptance_criteria
+    apply = next(descriptor for descriptor in values if descriptor.id.endswith(".apply"))
+    assert apply.consistency_policy == "external"
+
+
+def test_alternate_hierarchy_detail_contract_accepts_bop_source_references():
+    from backend.capabilities.validation_next import validate_payload
+    descriptor = next(descriptor_for(spec) for spec, _ in specs(AlternateHierarchyProvider(_Repo()))
+                      if spec.id == "simulation.environment.alternate_hierarchy.get")
+    validate_payload(descriptor.output_schema, {
+        "hierarchy_gid": "12", "workspace_gid": "10", "name": "前悬分装线",
+        "status": "active", "projection_identity": "craft-bop:100:1:station:sha256:x",
+        "row_version": 1,
+        "source_refs": {"model_references": [{"source_node_gid": "21", "reference": "part:22"}],
+                        "resource_references": [{"source_node_gid": "21", "resource_type": "tool", "reference": "tool:23"}]},
+        "nodes": [{"node_gid": "20", "workspace_gid": "10", "hierarchy_gid": "12",
+                   "parent_gid": None, "node_type": "line_process", "name": "前悬分装线",
+                   "sort_order": 0, "source_bop_node_gid": "21", "row_version": 1}],
+        "placements": [{"placement_gid": "30", "hierarchy_gid": "12", "workspace_gid": "10",
+                        "target_node_gid": "20", "parent_placement_gid": None,
+                        "source_kind": "plmxml", "source_ref": {"document_gid": "44", "node_key": "part-7",
+                        "occurrence_id": "occ-7"}, "transform": [1.0] * 16,
+                        "display_name": "零件7", "sort_order": 0, "row_version": 1}],
+    })
+    create_descriptor = next(descriptor_for(spec) for spec, _ in specs(AlternateHierarchyProvider(_Repo()))
+                             if spec.id == "simulation.environment.placement.create")
+    validate_payload(create_descriptor.input_schema, {"hierarchy_gid": "12", "target_node_gid": "20",
+        "source_kind": "plmxml", "source_ref": {"document_gid": "44", "node_key": "part-7"},
+        "transform": [1.0] * 16, "expected_row_version": 1, "idempotency_key": "place-part-7"})
 
 
 def test_bop_fork_bootstrap_consumes_governed_projection_and_is_repairable():

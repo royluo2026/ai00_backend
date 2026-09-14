@@ -75,6 +75,24 @@ def test_wrap_connection_rewrites_once():
     assert cursor._inner.query == "SELECT * FROM test_workmanship_proj_projects"
 
 
+def test_domain_migration_ledger_uses_test_prefix():
+    configure_table_prefix("test_")
+    connection = wrap_connection(Connection())
+    connection.cursor().execute("SELECT migration_id FROM ai00_simulation_schema_migrations")
+    assert connection.created[-1].query == "SELECT migration_id FROM test_ai00_simulation_schema_migrations"
+
+
+def test_historical_upload_trigger_uses_test_prefix():
+    configure_table_prefix("test_")
+    connection = wrap_connection(Connection())
+    connection.cursor().execute(
+        "CREATE TRIGGER base_historical_uploads_no_update BEFORE UPDATE "
+        "ON workmanship_base_historical_uploads FOR EACH ROW SIGNAL SQLSTATE '45000'"
+    )
+    assert "CREATE TRIGGER test_base_historical_uploads_no_update" in connection.created[-1].query
+    assert "ON test_workmanship_base_historical_uploads" in connection.created[-1].query
+
+
 @pytest.mark.parametrize(("module_name", "context_name"), DOMAIN_CONNECTIONS)
 def test_domain_connection_rewrites_sql(monkeypatch, module_name, context_name):
     configure_table_prefix("test_")

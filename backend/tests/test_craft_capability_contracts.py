@@ -175,6 +175,32 @@ def test_all_stable_craft_capabilities_have_native_open_contracts():
         assert item.spec.plugin_callable is True
 
 
+def test_bop_alt_hierarchy_contract_accepts_a_bounded_node_type_filter():
+    descriptor = _registrations()["craft.bop.alt_hierarchy.read"].descriptor
+    node_types = descriptor.input_schema["properties"]["node_types"]
+
+    assert node_types == {
+        "type": "array",
+        "maxItems": 20,
+        "items": {"type": "string", "minLength": 1},
+    }
+    validate_payload(descriptor.input_schema, {
+        "version_gid": "205576954294833152",
+        "node_types": ["line", "line_process"],
+    })
+
+
+def test_bop_alt_hierarchy_contract_accepts_provider_nodes_with_ai00_level():
+    descriptor = _registrations()["craft.bop.alt_hierarchy.read"].descriptor
+    validate_payload(descriptor.output_schema, {"entries": [{
+        "gid": "line-1", "parent_gid": None, "node_type": "line_process",
+        "sort_order": 21.0, "title": "前悬分装线", "vpps": None,
+        "level": 1, "ai00_level": 1,
+        "parts": [{"gid": "part-1", "part_no": "P1", "catia_occ": "P1.1",
+                   "name": "零件", "vpps": "V1", "quantity": 1}],
+    }]})
+
+
 def test_changed_craft_provider_descriptors_have_substantive_business_definitions():
     registrations = _registrations()
     changed = {

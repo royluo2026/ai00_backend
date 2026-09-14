@@ -294,7 +294,6 @@ Inspect one immutable PLMXML Artifact and return selectable model and alternate-
 
 - `plmxml_artifact_hash_mismatch`：The PLMXML Artifact bytes do not match the immutable reference hash.（retryable=false）
 - `plmxml_artifact_unavailable`：The immutable PLMXML Artifact is unavailable or outside the caller scope.（retryable=false）
-- `plmxml_dependency_artifact_required`：Every external PLMXML dependency must resolve to an immutable Artifact.（retryable=false）
 - `plmxml_dependency_artifact_invalid`：A supplied PLMXML dependency Artifact reference is malformed or duplicated.（retryable=false）
 - `plmxml_dependency_media_type_mismatch`：A dependency Artifact media type does not match the PLMXML reference.（retryable=false）
 - `plmxml_dependency_artifact_unavailable`：A dependency Artifact is unavailable or outside the caller scope.（retryable=false）

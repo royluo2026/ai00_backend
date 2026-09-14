@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_ac9779f395598ccad447aea06d4d0705",
-  "catalog_hash": "sha256:ac9779f395598ccad447aea06d4d0705e500c8d9b89bef5a1adbd4302161044d",
+  "release_id": "rel_155886f9d2c64f0939cf46e7dea769c3",
+  "catalog_hash": "sha256:155886f9d2c64f0939cf46e7dea769c39ef748753a0f54bcf271e60c9cccd384",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -58056,6 +58056,14 @@
         "properties": {
           "version_gid": {
             "type": "string"
+          },
+          "node_types": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
           }
         },
         "additionalProperties": false,
@@ -58099,7 +58107,7 @@
           "entries"
         ]
       },
-      "schema_hash": "sha256:2746b33c622db2b3992ba5928b83d49934654bedf8ebb7d1f32864190959ca9c",
+      "schema_hash": "sha256:19ec1457a2bf20b1fdfd45be84c68484e88a72cbe6cf0e4a14af71108b29a601",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -58627,7 +58635,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:3fdb0afcc300dbdae05cc552ee3cd0b4475f54bbebdc3948379cbc16476c0749"
+      "business_definition_hash": "sha256:b0b9aa9f385a74fb7067e428b922e783c04b29f64daf177520abd0ebdeb56b55"
     },
     {
       "id": "craft.bop.change_proposal.apply",
@@ -74143,10 +74151,10 @@
       "execution_budget": {
         "memory_class": "small",
         "max_input_bytes": 1048576,
-        "max_output_bytes": 4194304,
+        "max_output_bytes": 33554432,
         "collection_policy": "bounded",
         "max_page_size": null,
-        "max_parallel_per_consumer": 4,
+        "max_parallel_per_consumer": 1,
         "max_parallel_per_tenant": 32,
         "overload_policy": "reject"
       },
@@ -74826,10 +74834,10 @@
       "execution_budget": {
         "memory_class": "small",
         "max_input_bytes": 1048576,
-        "max_output_bytes": 4194304,
+        "max_output_bytes": 33554432,
         "collection_policy": "bounded",
         "max_page_size": null,
-        "max_parallel_per_consumer": 4,
+        "max_parallel_per_consumer": 1,
         "max_parallel_per_tenant": 32,
         "overload_policy": "reject"
       },
@@ -292586,42 +292594,21 @@
               "updates": {
                 "type": "object",
                 "properties": {
-                  "escape_root_cause": {
+                  "list_gid": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "interim_action": {
+                  "bop_entry_gid": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "assignee_team_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_assignee_open_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "scheduled_date": {
+                  "description": {
                     "type": [
                       "string",
                       "null"
@@ -292695,34 +292682,6 @@
                       ]
                     }
                   },
-                  "status": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_chat_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "list_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "related_task_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
                   "severity": {
                     "type": [
                       "string",
@@ -292730,21 +292689,14 @@
                     ],
                     "maxLength": 65536
                   },
-                  "description": {
+                  "scheduled_date": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "permanent_action": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "title": {
+                  "feishu_group_name": {
                     "type": [
                       "string",
                       "null"
@@ -292758,7 +292710,7 @@
                     ],
                     "maxLength": 65536
                   },
-                  "approval_order_gid": {
+                  "feishu_assignee_open_id": {
                     "type": [
                       "string",
                       "null"
@@ -292772,29 +292724,35 @@
                     ],
                     "maxLength": 65536
                   },
-                  "feishu_groups": {
-                    "type": "array",
-                    "maxItems": 200,
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "chat_id": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "name": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "avatar": {
-                          "type": "string",
-                          "maxLength": 2048
-                        }
-                      },
-                      "additionalProperties": false
-                    }
-                  },
                   "feishu_assignee_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "permanent_action": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "share_scope": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "escape_root_cause": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "approval_order_gid": {
                     "type": [
                       "string",
                       "null"
@@ -292808,7 +292766,7 @@
                     ],
                     "maxLength": 65536
                   },
-                  "bop_entry_gid": {
+                  "interim_action": {
                     "type": [
                       "string",
                       "null"
@@ -292845,7 +292803,57 @@
                       "additionalProperties": false
                     }
                   },
-                  "share_scope": {
+                  "feishu_groups": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "chat_id": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "avatar": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "assignee_team_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "title": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "related_task_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_chat_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "status": {
                     "type": [
                       "string",
                       "null"
@@ -325188,21 +325196,14 @@
               "updates": {
                 "type": "object",
                 "properties": {
-                  "plan_start": {
+                  "meeting_level": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "assignee_team_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_name": {
+                  "list_gid": {
                     "type": [
                       "string",
                       "null"
@@ -325216,14 +325217,14 @@
                     ],
                     "maxLength": 65536
                   },
-                  "meeting_level": {
+                  "canvas_icon": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "scheduled_date": {
+                  "plan_start": {
                     "type": [
                       "string",
                       "null"
@@ -325297,21 +325298,21 @@
                       ]
                     }
                   },
-                  "feishu_assignee_open_id": {
+                  "scheduled_date": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "list_gid": {
+                  "node_type": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "description": {
+                  "feishu_group_name": {
                     "type": [
                       "string",
                       "null"
@@ -325325,21 +325326,28 @@
                     ],
                     "maxLength": 65536
                   },
-                  "feishu_assignee_name": {
+                  "plan_end": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "completion": {
+                  "canvas_y": {
                     "type": [
                       "integer",
                       "number",
                       "null"
                     ]
                   },
-                  "actual_end": {
+                  "feishu_assignee_open_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "priority": {
                     "type": [
                       "string",
                       "null"
@@ -325376,81 +325384,8 @@
                       "additionalProperties": false
                     }
                   },
-                  "due_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "plan_end": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "status": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_chat_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "parent_task_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "meeting_doc_link": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "priority": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "time_estimate": {
-                    "type": [
-                      "integer",
-                      "null"
-                    ]
-                  },
-                  "title": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "review_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "project_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
+                  "is_deleted": {
+                    "type": "boolean"
                   },
                   "feishu_groups": {
                     "type": "array",
@@ -325474,31 +325409,76 @@
                       "additionalProperties": false
                     }
                   },
-                  "canvas_icon": {
+                  "assignee_team_gid": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "node_type": {
+                  "meeting_doc_link": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "canvas_x": {
+                  "actual_end": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "review_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "due_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "parent_task_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "project_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "time_estimate": {
                     "type": [
                       "integer",
-                      "number",
                       "null"
                     ]
                   },
-                  "is_deleted": {
-                    "type": "boolean"
+                  "feishu_assignee_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
                   },
-                  "canvas_y": {
+                  "completion": {
                     "type": [
                       "integer",
                       "number",
@@ -325511,6 +325491,34 @@
                       "null"
                     ],
                     "maxLength": 65536
+                  },
+                  "title": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_chat_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "status": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "canvas_x": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
                   }
                 },
                 "additionalProperties": false,
@@ -381726,7 +381734,7 @@
       "do_not_use_when": "Use the owning domain's governed Capability.",
       "business_effect": "Atomically insert the previously previewed exact Craft BOP process skeleton as one editable alternate hierarchy.",
       "business_acceptance_criteria": [
-        "The source is read only through craft.bop.execution_structure.get@1 and remains pinned by version, revision and content hash.",
+        "The source is read only through Craft's revision-pinned execution structure contract: published versions use get@1 and an explicitly selected active version uses preview@1 after resolving its current revision.",
         "Product and resource references are counted as separate source references and are never copied into the editable process skeleton as hierarchy nodes.",
         "Apply recomputes the projection and rejects a changed source, target row version or plan hash without partial writes."
       ],
@@ -381994,8 +382002,20 @@
         },
         {
           "code": "bop_execution_structure_failed",
-          "meaning": "The owning Craft capability could not return the exact published execution structure.",
+          "meaning": "The owning Craft capability could not return the exact revision-pinned execution structure.",
           "retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_version_resolution_failed",
+          "meaning": "The owning Craft capability could not resolve the selected BOP revision.",
+          "retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The selected BOP did not expose a valid revision for a draft preview.",
+          "retryable": false,
           "is_caller_error": true
         },
         {
@@ -382076,8 +382096,20 @@
         },
         {
           "error_code": "bop_execution_structure_failed",
-          "message_template": "The owning Craft capability could not return the exact published execution structure.",
+          "message_template": "The owning Craft capability could not return the exact revision-pinned execution structure.",
           "is_retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_version_resolution_failed",
+          "message_template": "The owning Craft capability could not resolve the selected BOP revision.",
+          "is_retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_revision_unavailable",
+          "message_template": "The selected BOP did not expose a valid revision for a draft preview.",
+          "is_retryable": false,
           "is_caller_error": true
         },
         {
@@ -382147,7 +382179,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:de9bbfc6f9fed093125993d1249d0be6c2084d1ceab76cfef79c22b02e58397f"
+      "business_definition_hash": "sha256:0bb1cbc5349b7f92f29f269949565a43d95b3cd5645428b228ff4fb831b4318c"
     },
     {
       "id": "simulation.environment.bop_projection.preview",
@@ -382156,12 +382188,12 @@
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "simulation.environment.bop_projection.preview",
-      "description": "Preview a deterministic BOP skeleton projection from the exact published Craft execution structure without copying product or resource references as hierarchy nodes.",
-      "use_when": "Preview a deterministic BOP skeleton projection from the exact published Craft execution structure without copying product or resource references as hierarchy nodes.",
+      "description": "Preview a deterministic BOP skeleton projection from an exact published or explicitly selected active Craft execution structure without copying product or resource references as hierarchy nodes.",
+      "use_when": "Preview a deterministic BOP skeleton projection from an exact published or explicitly selected active Craft execution structure without copying product or resource references as hierarchy nodes.",
       "do_not_use_when": "Use the owning domain's governed Capability.",
-      "business_effect": "Preview the exact published Craft BOP process skeleton for insertion into one owned Simulation environment.",
+      "business_effect": "Preview the exact published or explicitly selected active Craft BOP process skeleton for insertion into one owned Simulation environment.",
       "business_acceptance_criteria": [
-        "The source is read only through craft.bop.execution_structure.get@1 and remains pinned by version, revision and content hash.",
+        "The source is read only through Craft's revision-pinned execution structure contract: published versions use get@1 and an explicitly selected active version uses preview@1 after resolving its current revision.",
         "Product and resource references are counted as separate source references and are never copied into the editable process skeleton as hierarchy nodes.",
         "Apply recomputes the projection and rejects a changed source, target row version or plan hash without partial writes."
       ],
@@ -382754,8 +382786,20 @@
         },
         {
           "code": "bop_execution_structure_failed",
-          "meaning": "The owning Craft capability could not return the exact published execution structure.",
+          "meaning": "The owning Craft capability could not return the exact revision-pinned execution structure.",
           "retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_version_resolution_failed",
+          "meaning": "The owning Craft capability could not resolve the selected BOP revision.",
+          "retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The selected BOP did not expose a valid revision for a draft preview.",
+          "retryable": false,
           "is_caller_error": true
         },
         {
@@ -382836,8 +382880,20 @@
         },
         {
           "error_code": "bop_execution_structure_failed",
-          "message_template": "The owning Craft capability could not return the exact published execution structure.",
+          "message_template": "The owning Craft capability could not return the exact revision-pinned execution structure.",
           "is_retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_version_resolution_failed",
+          "message_template": "The owning Craft capability could not resolve the selected BOP revision.",
+          "is_retryable": true,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "bop_revision_unavailable",
+          "message_template": "The selected BOP did not expose a valid revision for a draft preview.",
+          "is_retryable": false,
           "is_caller_error": true
         },
         {
@@ -382907,7 +382963,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:801ca346431f8203567869e397bb5787366af5bfc6fd8639c8ecc05e1762cfcb"
+      "business_definition_hash": "sha256:3a23781c3db7c41f134a7b42327dc51d908b2655aee103cbacd0ca0525f963a7"
     },
     {
       "id": "simulation.environment.bop_vm_binding_draft.preview",
@@ -399672,12 +399728,6 @@
           "is_caller_error": true
         },
         {
-          "code": "plmxml_dependency_artifact_required",
-          "meaning": "Every external PLMXML dependency must resolve to an immutable Artifact.",
-          "retryable": false,
-          "is_caller_error": true
-        },
-        {
           "code": "plmxml_dependency_artifact_invalid",
           "meaning": "A supplied PLMXML dependency Artifact reference is malformed or duplicated.",
           "retryable": false,
@@ -399732,12 +399782,6 @@
         {
           "error_code": "plmxml_artifact_unavailable",
           "message_template": "The immutable PLMXML Artifact is unavailable or outside the caller scope.",
-          "is_retryable": false,
-          "is_caller_error": true
-        },
-        {
-          "error_code": "plmxml_dependency_artifact_required",
-          "message_template": "Every external PLMXML dependency must resolve to an immutable Artifact.",
           "is_retryable": false,
           "is_caller_error": true
         },
@@ -400961,7 +401005,7 @@
       "description": "Create one private draft Simulation environment from one inspected immutable PLMXML Artifact.",
       "use_when": "Create one private draft Simulation environment from one inspected immutable PLMXML Artifact.",
       "do_not_use_when": "Use the owning domain's governed Capability.",
-      "business_effect": "Create one private Simulation workspace whose draft faithfully restores the selected immutable PLMXML model, hierarchies and verified external dependencies.",
+      "business_effect": "Create one private Simulation workspace from an immutable PLMXML model and its selected hierarchies, retaining unresolved external references for later explicit materialization.",
       "business_acceptance_criteria": [
         "The source and every dependency are immutable Artifact references whose bytes match the declared SHA-256 hash.",
         "An inspection hash binds the user's explicit import decision to the exact parsed projection.",
@@ -401337,12 +401381,6 @@
           "is_caller_error": true
         },
         {
-          "code": "plmxml_dependency_artifact_required",
-          "meaning": "Every external PLMXML dependency must resolve to an immutable Artifact.",
-          "retryable": false,
-          "is_caller_error": true
-        },
-        {
           "code": "plmxml_dependency_artifact_invalid",
           "meaning": "A supplied PLMXML dependency Artifact reference is malformed or duplicated.",
           "retryable": false,
@@ -401397,12 +401435,6 @@
         {
           "error_code": "plmxml_artifact_unavailable",
           "message_template": "The immutable PLMXML Artifact is unavailable or outside the caller scope.",
-          "is_retryable": false,
-          "is_caller_error": true
-        },
-        {
-          "error_code": "plmxml_dependency_artifact_required",
-          "message_template": "Every external PLMXML dependency must resolve to an immutable Artifact.",
           "is_retryable": false,
           "is_caller_error": true
         },
@@ -401503,7 +401535,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:c1b9f548e0e15d0483ec12f3d340fc6b5efe3a0ba4e861e77180bfc41bcc5233"
+      "business_definition_hash": "sha256:dd19cb222c0e7020c0c4a6d06e376b60ed11a1e99e7b9ff68813826058c5b86b"
     },
     {
       "id": "simulation.environment.runtime_package.open.request",
@@ -405628,9 +405660,14 @@
                   "type": "string",
                   "enum": [
                     "line",
+                    "line_process",
                     "station",
+                    "station_process",
+                    "role",
+                    "operator_process",
                     "process",
-                    "operation"
+                    "operation",
+                    "alternate_hierarchy"
                   ]
                 },
                 "name": {
@@ -405819,9 +405856,14 @@
                   "type": "string",
                   "enum": [
                     "line",
+                    "line_process",
                     "station",
+                    "station_process",
+                    "role",
+                    "operator_process",
                     "process",
-                    "operation"
+                    "operation",
+                    "alternate_hierarchy"
                   ]
                 },
                 "name": {
@@ -405881,7 +405923,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:32407151034436200193c5f407b30cc326f1eabf71bf98167c9a2e3400de2758",
+      "schema_hash": "sha256:7fc4fc9d0cfff8c448b2edac5d000419570bafd5624d1f60efe55bb5d413f884",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -406073,7 +406115,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:6630e824602df497615b1bdade82f2d16fd174f6b57ab30c1908a3f4134c290f"
+      "business_definition_hash": "sha256:58df8ebbc3a81eb5ba86384d5afc5d43a898c3c59c223b50d49538323cd930db"
     },
     {
       "id": "simulation.environment.workspace.delete",
@@ -406582,9 +406624,14 @@
                   "type": "string",
                   "enum": [
                     "line",
+                    "line_process",
                     "station",
+                    "station_process",
+                    "role",
+                    "operator_process",
                     "process",
-                    "operation"
+                    "operation",
+                    "alternate_hierarchy"
                   ]
                 },
                 "name": {
@@ -406807,9 +406854,14 @@
                   "type": "string",
                   "enum": [
                     "line",
+                    "line_process",
                     "station",
+                    "station_process",
+                    "role",
+                    "operator_process",
                     "process",
-                    "operation"
+                    "operation",
+                    "alternate_hierarchy"
                   ]
                 },
                 "name": {
@@ -406903,7 +406955,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:dde2832f6c4fee03910b59565826837808cafc7d235b7c1c77c6b2f258890672",
+      "schema_hash": "sha256:d830df5a4a0767880db7437fe2ec0d20cd650f346716ff21fcdaf54c5320f17d",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -407095,7 +407147,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:f545ff57b129cd162ade871e511424b464ea133e5e64ba6029c89f8f824e17e4"
+      "business_definition_hash": "sha256:641096ec06e4d0c285eb5c7c1cc5ef2f24d8fc8835c201bf3920a0a17f5b9546"
     },
     {
       "id": "simulation.environment.workspace.fork.preview",
@@ -407695,9 +407747,14 @@
                   "type": "string",
                   "enum": [
                     "line",
+                    "line_process",
                     "station",
+                    "station_process",
+                    "role",
+                    "operator_process",
                     "process",
-                    "operation"
+                    "operation",
+                    "alternate_hierarchy"
                   ]
                 },
                 "name": {
@@ -407886,9 +407943,14 @@
                   "type": "string",
                   "enum": [
                     "line",
+                    "line_process",
                     "station",
+                    "station_process",
+                    "role",
+                    "operator_process",
                     "process",
-                    "operation"
+                    "operation",
+                    "alternate_hierarchy"
                   ]
                 },
                 "name": {
@@ -407948,7 +408010,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:7200f302d87b0b201eae3d3f8e3a5ab2aa92f19049d99f4bae91dbb418badfc7",
+      "schema_hash": "sha256:4312d683ad581981ca471005ee422219bf0b1a7bd29276e2b4367ffa6e2d80e8",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -408140,7 +408202,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:fe79c5ca11501c5d996967bffe26cd5ef5833005661e855f463714e7e2c3da02"
+      "business_definition_hash": "sha256:d79d9fb73e8f4551289a45d8fdc53496f469dbb767a7474c764a9465b392820e"
     },
     {
       "id": "simulation.environment.workspace.search",
@@ -413693,12 +413755,6 @@
           "is_caller_error": true
         },
         {
-          "code": "plmxml_dependency_artifact_required",
-          "meaning": "Every external PLMXML dependency must resolve to an immutable Artifact.",
-          "retryable": false,
-          "is_caller_error": true
-        },
-        {
           "code": "plmxml_dependency_artifact_invalid",
           "meaning": "A supplied PLMXML dependency Artifact reference is malformed or duplicated.",
           "retryable": false,
@@ -413753,12 +413809,6 @@
         {
           "error_code": "plmxml_artifact_unavailable",
           "message_template": "The immutable PLMXML Artifact is unavailable or outside the caller scope.",
-          "is_retryable": false,
-          "is_caller_error": true
-        },
-        {
-          "error_code": "plmxml_dependency_artifact_required",
-          "message_template": "Every external PLMXML dependency must resolve to an immutable Artifact.",
           "is_retryable": false,
           "is_caller_error": true
         },
@@ -414234,12 +414284,6 @@
           "is_caller_error": true
         },
         {
-          "code": "plmxml_dependency_artifact_required",
-          "meaning": "Every external PLMXML dependency must resolve to an immutable Artifact.",
-          "retryable": false,
-          "is_caller_error": true
-        },
-        {
           "code": "plmxml_dependency_artifact_invalid",
           "meaning": "A supplied PLMXML dependency Artifact reference is malformed or duplicated.",
           "retryable": false,
@@ -414294,12 +414338,6 @@
         {
           "error_code": "plmxml_artifact_unavailable",
           "message_template": "The immutable PLMXML Artifact is unavailable or outside the caller scope.",
-          "is_retryable": false,
-          "is_caller_error": true
-        },
-        {
-          "error_code": "plmxml_dependency_artifact_required",
-          "message_template": "Every external PLMXML dependency must resolve to an immutable Artifact.",
           "is_retryable": false,
           "is_caller_error": true
         },
@@ -414769,12 +414807,6 @@
           "is_caller_error": true
         },
         {
-          "code": "plmxml_dependency_artifact_required",
-          "meaning": "Every external PLMXML dependency must resolve to an immutable Artifact.",
-          "retryable": false,
-          "is_caller_error": true
-        },
-        {
           "code": "plmxml_dependency_artifact_invalid",
           "meaning": "A supplied PLMXML dependency Artifact reference is malformed or duplicated.",
           "retryable": false,
@@ -414829,12 +414861,6 @@
         {
           "error_code": "plmxml_artifact_unavailable",
           "message_template": "The immutable PLMXML Artifact is unavailable or outside the caller scope.",
-          "is_retryable": false,
-          "is_caller_error": true
-        },
-        {
-          "error_code": "plmxml_dependency_artifact_required",
-          "message_template": "Every external PLMXML dependency must resolve to an immutable Artifact.",
           "is_retryable": false,
           "is_caller_error": true
         },
@@ -414936,6 +414962,547 @@
         }
       ],
       "business_definition_hash": "sha256:7b67a90fe76e9c3d56cd5e20459f83d67cff8a63d6185244b846811d017886f3"
+    },
+    {
+      "id": "simulation.plmxml.model_tree.read",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.plmxml.model_tree.read",
+      "description": "Read one bounded page of the product occurrence tree from one authorized immutable PLMXML Artifact without mutating an environment.",
+      "use_when": "Read one bounded page of the product occurrence tree from one authorized immutable PLMXML Artifact without mutating an environment.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Return the bounded read-only product occurrence tree of one authorized immutable PLMXML Artifact for the Simulation model-document panel.",
+      "business_acceptance_criteria": [
+        "The source and every dependency are immutable Artifact references whose bytes match the declared SHA-256 hash.",
+        "An inspection hash binds the user's explicit import decision to the exact parsed projection.",
+        "Rejected input creates no partial workspace, document, hierarchy or placement state."
+      ],
+      "business_invariants": [],
+      "no_business_invariant_reason": "Artifact immutability, explicit selection, optimistic concurrency and one Simulation transaction fully determine this atomic boundary.",
+      "side_effect_level": "read",
+      "side_effects": "Reads simulation domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "artifact",
+          "payload_path": "artifact_ref.artifact_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "artifact_ref"
+        ],
+        "properties": {
+          "artifact_ref": {
+            "type": "object",
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size",
+              "version"
+            ],
+            "properties": {
+              "artifact_id": {
+                "type": "string"
+              },
+              "media_type": {
+                "type": "string",
+                "enum": [
+                  "application/plmxml+xml",
+                  "application/vnd.siemens.plmxml+xml"
+                ]
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^(sha256:)?[0-9a-f]{64}$"
+              },
+              "byte_size": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false
+          },
+          "dependency_artifacts": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {
+              "type": "object",
+              "required": [
+                "location",
+                "artifact_ref"
+              ],
+              "properties": {
+                "location": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                },
+                "artifact_ref": {
+                  "type": "object",
+                  "required": [
+                    "artifact_id",
+                    "media_type",
+                    "sha256",
+                    "byte_size",
+                    "version"
+                  ],
+                  "properties": {
+                    "artifact_id": {
+                      "type": "string"
+                    },
+                    "media_type": {
+                      "type": "string",
+                      "enum": [
+                        "application/plmxml+xml",
+                        "application/vnd.siemens.plmxml+xml",
+                        "model/vnd.jt",
+                        "model/jt"
+                      ]
+                    },
+                    "sha256": {
+                      "type": "string",
+                      "pattern": "^(sha256:)?[0-9a-f]{64}$"
+                    },
+                    "byte_size": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 250000
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "state",
+          "node_count",
+          "nodes",
+          "dependency_locations",
+          "next_offset"
+        ],
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "dependency_required"
+            ]
+          },
+          "node_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 5000,
+            "items": {
+              "type": "object",
+              "required": [
+                "node_key",
+                "parent_key",
+                "child_order",
+                "name",
+                "bom_line",
+                "item_id",
+                "revision",
+                "occurrence_id",
+                "has_more"
+              ],
+              "properties": {
+                "node_key": {
+                  "type": "string"
+                },
+                "parent_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "child_order": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "name": {
+                  "type": "string"
+                },
+                "bom_line": {
+                  "type": "string"
+                },
+                "item_id": {
+                  "type": "string"
+                },
+                "revision": {
+                  "type": "string"
+                },
+                "occurrence_id": {
+                  "type": "string"
+                },
+                "has_more": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "dependency_locations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "next_offset": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "state",
+          "node_count",
+          "nodes",
+          "dependency_locations",
+          "next_offset"
+        ],
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "dependency_required"
+            ]
+          },
+          "node_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 5000,
+            "items": {
+              "type": "object",
+              "required": [
+                "node_key",
+                "parent_key",
+                "child_order",
+                "name",
+                "bom_line",
+                "item_id",
+                "revision",
+                "occurrence_id",
+                "has_more"
+              ],
+              "properties": {
+                "node_key": {
+                  "type": "string"
+                },
+                "parent_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "child_order": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "name": {
+                  "type": "string"
+                },
+                "bom_line": {
+                  "type": "string"
+                },
+                "item_id": {
+                  "type": "string"
+                },
+                "revision": {
+                  "type": "string"
+                },
+                "occurrence_id": {
+                  "type": "string"
+                },
+                "has_more": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "dependency_locations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "next_offset": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:a323317e4db4fe548402c8f933e04ff73192d15b536d37d9411979828a50aaab",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "paged",
+        "max_page_size": 5000,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "plmxml_artifact_hash_mismatch",
+          "meaning": "The PLMXML Artifact bytes do not match the immutable reference hash.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_artifact_unavailable",
+          "meaning": "The immutable PLMXML Artifact is unavailable or outside the caller scope.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_dependency_artifact_invalid",
+          "meaning": "A supplied PLMXML dependency Artifact reference is malformed or duplicated.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_dependency_media_type_mismatch",
+          "meaning": "A dependency Artifact media type does not match the PLMXML reference.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_dependency_artifact_unavailable",
+          "meaning": "A dependency Artifact is unavailable or outside the caller scope.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_dependency_artifact_hash_mismatch",
+          "meaning": "A dependency Artifact does not match its immutable SHA-256 reference.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_insert_mode_required",
+          "meaning": "PLMXML insertion requires an explicit model-only or selected-hierarchy mode.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_hierarchy_selection_invalid",
+          "meaning": "The selected hierarchy identities are invalid for this inspected PLMXML.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "plmxml_inspection_changed",
+          "meaning": "The inspected PLMXML projection changed before the requested write.",
+          "retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_4d04df2f53e0bcd155b48ffa",
+      "error_schema": [
+        {
+          "error_code": "plmxml_artifact_hash_mismatch",
+          "message_template": "The PLMXML Artifact bytes do not match the immutable reference hash.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_artifact_unavailable",
+          "message_template": "The immutable PLMXML Artifact is unavailable or outside the caller scope.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_dependency_artifact_invalid",
+          "message_template": "A supplied PLMXML dependency Artifact reference is malformed or duplicated.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_dependency_media_type_mismatch",
+          "message_template": "A dependency Artifact media type does not match the PLMXML reference.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_dependency_artifact_unavailable",
+          "message_template": "A dependency Artifact is unavailable or outside the caller scope.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_dependency_artifact_hash_mismatch",
+          "message_template": "A dependency Artifact does not match its immutable SHA-256 reference.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_insert_mode_required",
+          "message_template": "PLMXML insertion requires an explicit model-only or selected-hierarchy mode.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_hierarchy_selection_invalid",
+          "message_template": "The selected hierarchy identities are invalid for this inspected PLMXML.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "plmxml_inspection_changed",
+          "message_template": "The inspected PLMXML projection changed before the requested write.",
+          "is_retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "owning_domain"
+      },
+      "consumer_refs": [],
+      "no_consumer_reason": "No verified consumer is registered for this provider capability.",
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.plmxml.model_tree.read:invoke"
+      ],
+      "test_refs": [
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[simulation.plmxml.model_tree.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[simulation.plmxml.model_tree.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[simulation.plmxml.model_tree.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[simulation.plmxml.model_tree.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[simulation.plmxml.model_tree.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[simulation.plmxml.model_tree.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        },
+        {
+          "test_type": "contract",
+          "test_node_id": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[simulation.plmxml.model_tree.read@1]",
+          "code_revision": "sha256:4c5e6cfcae885ed90f329b3d505437b0ee00036923f2f3b6e60b905e7ca668c2",
+          "path": "backend/tests/acceptance/test_mandatory_cases.py"
+        }
+      ],
+      "business_definition_hash": "sha256:1e3bd996c9ff5473014f4311468effd33a6fe054720b7fc2c5506bc7626046b8"
     },
     {
       "id": "simulation.result.compare",
@@ -447951,7 +448518,7 @@
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:3f3db2bef95cc2d8c68f084e0fe94f1d0dae6100858f0feadb095faa0f9b3dcd"
+      "artifact_hash": "sha256:cec708d4d37bdaab4e22f411033ea32268242ae9f890264a8fed9a7c82016707"
     },
     {
       "plugin_id": "official.device",
@@ -447999,8 +448566,8 @@
       "plugin_id": "official.simulation",
       "module": "simulation_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:bb7e6795653fa0d53b5cdd187dfa56b30027c53b3b870b2065e8ea0b8e1c4c85"
+      "artifact_hash": "sha256:81a8d2f8f05f9447ba138982bac91fc444bb84cde060bc0622500094c0f043a2"
     }
   ],
-  "created_at": "2026-09-11T06:01:48.531856Z"
+  "created_at": "2026-09-12T05:13:18.466879Z"
 }

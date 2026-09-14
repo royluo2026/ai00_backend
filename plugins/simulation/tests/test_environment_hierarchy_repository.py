@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from itertools import count
+
 import pytest
 
 from plugins.simulation.simulation_backend.data import workspace_repository as module
@@ -71,12 +73,40 @@ def test_insert_bop_projection_is_one_owned_workspace_transaction(monkeypatch):
         },
     )
     assert result["node_count"] == 2
+    assert cursor.transaction_started is True
     hierarchy_insert = next(call for call in cursor.calls if call[0].startswith("INSERT INTO workmanship_sim_workspace_hierarchies"))
     assert hierarchy_insert[1][5] == "100"
     assert hierarchy_insert[1][6] == "sha256:" + "a" * 64
     assert '"model_references"' in hierarchy_insert[1][7]
-    assert len([call for call in cursor.calls if call[0].startswith("INSERT INTO workmanship_sim_workspace_nodes")]) == 2
+    node_inserts = [call for call in cursor.calls if call[0].startswith("INSERT INTO workmanship_sim_workspace_nodes")]
+    assert len(node_inserts) == 1
+    assert len(node_inserts[0][1]) == 2
+    assert node_inserts[0][1][0][5] is None
+    assert node_inserts[0][1][1][5] == node_inserts[0][1][0][0]
     assert any(call[0].startswith("INSERT INTO workmanship_sim_workspace_idempotency") for call in cursor.calls)
+
+
+def test_insert_bop_projection_batches_large_node_sets(monkeypatch):
+    cursor = _install(monkeypatch, [
+        {"row_version": 3, "cache_revision_hash": "sha256:" + "0" * 64, "status": "active"},
+        None, None, {"position": 0},
+    ])
+    gids = count(9001)
+    monkeypatch.setattr(module, "next_gid", lambda: next(gids))
+    nodes = [{"source_gid": str(gid), "parent_source_gid": str(gid - 1) if gid > 1 else None,
+              "node_type": "process", "name": f"P{gid}", "position": gid} for gid in range(1, 502)]
+    result = WorkspaceRepository().insert_bop_projection(
+        workspace_gid="10", expected_workspace_version=3, actor_gid="30", tenant_gid="20",
+        idempotency_key="bop-large", plan={
+            "source_version_gid": "100", "source_content_hash": "sha256:" + "a" * 64,
+            "line_gid": "1", "fork_depth": "all", "hierarchy_name": "L1",
+            "plan_hash": "sha256:" + "b" * 64, "nodes": nodes,
+        },
+    )
+    batches = [params for sql, params in cursor.calls if sql.startswith("INSERT INTO workmanship_sim_workspace_nodes")]
+    assert result["node_count"] == 501
+    assert [len(batch) for batch in batches] == [500, 1]
+    assert batches[1][0][5] == batches[0][-1][0]
 
 
 def test_same_source_can_be_placed_more_than_once(monkeypatch):
@@ -131,6 +161,22 @@ def test_placement_persists_authoritative_model_document_evidence(monkeypatch):
     insert = next(call for call in cursor.calls if call[0].startswith("INSERT INTO workmanship_sim_workspace_placements"))
     persisted = insert[1][8]
     assert persisted == '{"artifact_id":"artifact-44","artifact_version":"3","content_sha256":"sha256:' + "b" * 64 + '","document_gid":"44","source_identity_hash":"sha256:' + "a" * 64 + '"}'
+
+
+def test_placement_persists_only_selected_model_node(monkeypatch):
+    cursor = _install(monkeypatch, [
+        {"row_version": 2, "workspace_gid": 10, "workspace_row_version": 4}, {"ok": 1},
+        {"document_gid": 44, "artifact_ref_json": '{"artifact_id":"artifact-44","version":3}',
+         "content_sha256": "b" * 64, "source_identity_hash": "a" * 64}, {"position": 0},
+    ])
+    WorkspaceRepository().add_placement(
+        hierarchy_gid="12", target_node_gid="14", parent_placement_gid=None,
+        source_kind="plmxml", source_ref={"document_gid": "44", "node_key": "part-7", "occurrence_id": "occ-7"},
+        transform=[1.0] * 16, expected_hierarchy_version=2, actor_gid="30", tenant_gid="20",
+    )
+    insert = next(call for call in cursor.calls if call[0].startswith("INSERT INTO workmanship_sim_workspace_placements"))
+    assert '"node_key":"part-7"' in insert[1][8]
+    assert '"occurrence_id":"occ-7"' in insert[1][8]
 
 
 def test_placement_rejects_target_outside_the_workspace(monkeypatch):

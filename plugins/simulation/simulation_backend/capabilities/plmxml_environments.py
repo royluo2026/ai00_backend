@@ -6,11 +6,20 @@ import io
 import json
 from typing import Any
 
-from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
-from backend.platform_sdk.artifacts import create_artifact, read_artifact
+from backend.capability_v2.provider_contracts import (
+    CapabilityBusinessError,
+    CapabilityCollectionPolicy,
+    CapabilityContext,
+    CapabilityExecutionBudget,
+    CapabilityOutput,
+    CapabilitySpec,
+    EvidenceRef,
+)
+from backend.platform_sdk.artifacts import create_artifact, read_artifact, require_artifact
 from backend.capability_v2.artifacts import ArtifactError
 
 from ..data.workspace_repository import WorkspaceRepository, WorkspaceRepositoryError
+from ..data.plmxml_tree_cache import read_product_tree, save_product_tree
 from ..domain.plmxml_environment_codec import (
     EnvironmentImportProjection,
     EnvironmentDocumentDependencyError,
@@ -18,7 +27,7 @@ from ..domain.plmxml_environment_codec import (
     import_environment_plmxml,
     runtime_model_from_dict,
 )
-from ..domain.plmxml_projection import PlmxmlError, PlmxmlLimits
+from ..domain.plmxml_projection import PlmxmlError, PlmxmlLimits, PlmxmlStructureError, parse_plmxml
 from ..application.environment_materialization import EnvironmentMaterializationError, build_runtime_package
 
 
@@ -45,15 +54,13 @@ class PlmxmlEnvironmentProvider:
         self.repository=repository or WorkspaceRepository(); self.artifacts=artifacts or _Artifacts()
 
     def _read_projection(self, ref: dict[str, Any], context: CapabilityContext):
-        if ref.get("media_type") not in {"application/plmxml+xml", "application/vnd.siemens.plmxml+xml"}:
-            raise CapabilityBusinessError("plmxml_artifact_media_type_invalid", "plmxml_artifact_media_type_invalid")
-        try:
-            content = self.artifacts.read(ref, context)
-        except (ArtifactError, ValueError) as exc:
-            raise CapabilityBusinessError("plmxml_artifact_unavailable", "plmxml_artifact_unavailable") from exc
-        actual = hashlib.sha256(content).hexdigest()
-        if actual != str(ref.get("sha256") or "").removeprefix("sha256:"):
-            raise CapabilityBusinessError("plmxml_artifact_hash_mismatch", "plmxml_artifact_hash_mismatch")
+        content, actual = self._read_verified_content(
+            ref, context,
+            media_types={"application/plmxml+xml", "application/vnd.siemens.plmxml+xml"},
+            unavailable_code="plmxml_artifact_unavailable",
+            hash_code="plmxml_artifact_hash_mismatch",
+            media_code="plmxml_artifact_media_type_invalid",
+        )
         try:
             projection = import_environment_plmxml(
                 io.BytesIO(content), limits=PlmxmlLimits(), algorithm_version="environment-codec.v1",
@@ -61,6 +68,27 @@ class PlmxmlEnvironmentProvider:
         except PlmxmlError as exc:
             raise CapabilityBusinessError(str(exc), str(exc)) from exc
         return actual, projection
+
+    def _read_verified_content(
+        self,
+        ref: dict[str, Any],
+        context: CapabilityContext,
+        *,
+        media_types: set[str],
+        unavailable_code: str,
+        hash_code: str,
+        media_code: str,
+    ) -> tuple[bytes, str]:
+        if ref.get("media_type") not in media_types:
+            raise CapabilityBusinessError(media_code, media_code)
+        try:
+            content = self.artifacts.read(ref, context)
+        except (ArtifactError, ValueError) as exc:
+            raise CapabilityBusinessError(unavailable_code, unavailable_code) from exc
+        actual = hashlib.sha256(content).hexdigest()
+        if actual != str(ref.get("sha256") or "").removeprefix("sha256:"):
+            raise CapabilityBusinessError(hash_code, hash_code)
+        return content, actual
 
     def _resolve_dependencies(self, payload: dict[str, Any], projection: EnvironmentImportProjection,
                               context: CapabilityContext) -> dict[str, dict[str, Any]]:
@@ -71,15 +99,18 @@ class PlmxmlEnvironmentProvider:
                 raise CapabilityBusinessError("plmxml_dependency_artifact_invalid", "plmxml_dependency_artifact_invalid")
             supplied[location] = dict(item.get("artifact_ref") or {})
         required = {item.location: item for item in projection.dependencies}
-        if set(supplied) != set(required):
-            raise CapabilityBusinessError("plmxml_dependency_artifact_required", "plmxml_dependency_artifact_required")
+        if not set(supplied) <= set(required):
+            raise CapabilityBusinessError("plmxml_dependency_artifact_invalid", "plmxml_dependency_artifact_invalid")
         resolved: dict[str, dict[str, Any]] = {}
-        for location, dependency in required.items():
-            ref = supplied[location]
+        for location, ref in supplied.items():
+            dependency = required[location]
             supplied_media = str(ref.get("media_type") or "")
-            media_matches = supplied_media == dependency.media_type or {
-                supplied_media, dependency.media_type,
-            } == {"model/jt", "model/vnd.jt"}
+            media_pair = {supplied_media, dependency.media_type}
+            media_matches = supplied_media == dependency.media_type or media_pair in ({
+                "model/jt", "model/vnd.jt",
+            }, {
+                "application/plmxml+xml", "application/vnd.siemens.plmxml+xml",
+            })
             if not media_matches:
                 raise CapabilityBusinessError("plmxml_dependency_media_type_mismatch", "plmxml_dependency_media_type_mismatch")
             try:
@@ -92,10 +123,23 @@ class PlmxmlEnvironmentProvider:
             resolved[location] = ref
         return resolved
 
-    def inspect_environment(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
-        _scope(context)
-        ref = dict(payload.get("artifact_ref") or {})
-        actual, projection = self._read_projection(ref, context)
+    @staticmethod
+    def _import_report(projection: EnvironmentImportProjection,
+                       resolved: dict[str, dict[str, Any]]) -> dict[str, Any]:
+        return {
+            "semantic_hash": projection.original_sha256,
+            "document_count": 1 + len(resolved),
+            "hierarchy_count": len(projection.hierarchies),
+            "placement_count": sum(len(item.placements) for item in projection.hierarchies),
+            "dependency_count": len(projection.dependencies),
+            "unresolved_refs": [
+                item.location for item in projection.dependencies if item.location not in resolved
+            ],
+            "algorithm_version": projection.algorithm_version,
+        }
+
+    @staticmethod
+    def _inspection_data(actual: str, projection: EnvironmentImportProjection) -> dict[str, Any]:
         hierarchies = [{
             "projection_identity": item.projection_identity,
             "name": item.name,
@@ -121,13 +165,139 @@ class PlmxmlEnvironmentProvider:
             "dependency_count": len(projection.dependencies),
             "algorithm_version": projection.algorithm_version,
         }
-        return _output({**inspection_payload, "inspection_hash": inspection_hash, "report": report},
-                       "plmxml_environment_inspected", str(ref.get("artifact_id") or "artifact"))
+        return {**inspection_payload, "inspection_hash": inspection_hash, "report": report}
+
+    def inspect_environment(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+        _scope(context)
+        ref = dict(payload.get("artifact_ref") or {})
+        actual, projection = self._read_projection(ref, context)
+        return _output(self._inspection_data(actual, projection), "plmxml_environment_inspected",
+                       str(ref.get("artifact_id") or "artifact"))
+
+    def read_model_tree(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+        tenant_gid, actor_gid = _scope(context)
+        offset = int(payload.get("offset") or 0)
+        limit = int(payload.get("limit") or 5000)
+        ref = dict(payload.get("artifact_ref") or {})
+        document_gid = str(payload.get("document_gid") or "")
+        dependencies = list(payload.get("dependency_artifacts") or [])
+        if document_gid:
+            for item in dependencies:
+                try:
+                    require_artifact(dict(item.get("artifact_ref") or {}), context)
+                except (ArtifactError, ValueError) as exc:
+                    raise CapabilityBusinessError("plmxml_dependency_artifact_unavailable",
+                                                  "plmxml_dependency_artifact_unavailable") from exc
+            try:
+                cached = read_product_tree(document_gid=document_gid, artifact_ref=ref, dependencies=dependencies,
+                    tenant_gid=tenant_gid, actor_gid=actor_gid)
+            except ValueError as exc:
+                raise CapabilityBusinessError(str(exc), str(exc)) from exc
+            if cached is not None:
+                return _output(self._product_tree_page(cached, offset, limit), "plmxml_model_tree_cached", document_gid)
+        content, _ = self._read_verified_content(
+            ref, context,
+            media_types={"application/plmxml+xml", "application/vnd.siemens.plmxml+xml"},
+            unavailable_code="plmxml_artifact_unavailable",
+            hash_code="plmxml_artifact_hash_mismatch",
+            media_code="plmxml_artifact_media_type_invalid",
+        )
+        try:
+            projection = parse_plmxml(io.BytesIO(content), limits=PlmxmlLimits())
+        except PlmxmlStructureError as exc:
+            if str(exc) != "unresolved_part_ref":
+                raise CapabilityBusinessError(str(exc), str(exc)) from exc
+            try:
+                environment = import_environment_plmxml(
+                    io.BytesIO(content), limits=PlmxmlLimits(), algorithm_version="environment-codec.v1",
+                )
+            except PlmxmlError as nested:
+                raise CapabilityBusinessError(str(nested), str(nested)) from nested
+            resolved = self._resolve_dependencies(payload, environment, context)
+            dependency_locations = [
+                item.location for item in environment.dependencies if item.location not in resolved
+            ]
+            dependency_projections = []
+            for location, dependency_ref in resolved.items():
+                if str(dependency_ref.get("media_type") or "").casefold() not in {
+                    "application/plmxml+xml", "application/vnd.siemens.plmxml+xml",
+                }:
+                    continue
+                try:
+                    dependency_content, _ = self._read_verified_content(
+                        dependency_ref, context,
+                        media_types={"application/plmxml+xml", "application/vnd.siemens.plmxml+xml"},
+                        unavailable_code="plmxml_dependency_artifact_unavailable",
+                        hash_code="plmxml_dependency_artifact_hash_mismatch",
+                        media_code="plmxml_dependency_media_type_mismatch",
+                    )
+                    dependency_projections.append((location, parse_plmxml(
+                        io.BytesIO(dependency_content), limits=PlmxmlLimits(),
+                    )))
+                except PlmxmlStructureError as dependency_error:
+                    if str(dependency_error) == "unresolved_part_ref":
+                        dependency_locations.append(location)
+                        continue
+                    raise CapabilityBusinessError(str(dependency_error), str(dependency_error)) from dependency_error
+                except PlmxmlError as dependency_error:
+                    raise CapabilityBusinessError(str(dependency_error), str(dependency_error)) from dependency_error
+            if not dependency_projections:
+                tree = {"state": "dependency_required", "nodes": [],
+                        "dependency_locations": list(dict.fromkeys(dependency_locations))}
+                self._cache_product_tree(document_gid, ref, dependencies, tenant_gid, actor_gid, tree)
+                return _output(self._product_tree_page(tree, offset, limit), "plmxml_model_tree_dependency_required", str(ref.get("artifact_id") or "artifact"))
+            nodes = self._product_tree_nodes(dependency_projections)
+            tree = {"state": "ready", "nodes": nodes,
+                    "dependency_locations": list(dict.fromkeys(dependency_locations))}
+            self._cache_product_tree(document_gid, ref, dependencies, tenant_gid, actor_gid, tree)
+            return _output(self._product_tree_page(tree, offset, limit), "plmxml_model_tree_dependency_resolved", str(ref.get("artifact_id") or "artifact"))
+        except PlmxmlError as exc:
+            raise CapabilityBusinessError(str(exc), str(exc)) from exc
+        nodes = self._product_tree_nodes((("primary", projection),))
+        tree = {"state": "ready", "nodes": nodes, "dependency_locations": []}
+        self._cache_product_tree(document_gid, ref, dependencies, tenant_gid, actor_gid, tree)
+        return _output(self._product_tree_page(tree, offset, limit), "plmxml_model_tree_read", str(ref.get("artifact_id") or "artifact"))
+
+    @staticmethod
+    def _product_tree_page(tree: dict[str, Any], offset: int, limit: int) -> dict[str, Any]:
+        nodes = tree["nodes"]
+        page = nodes[offset:offset + limit]
+        consumed = offset + len(page)
+        return {"state": tree["state"], "node_count": len(nodes), "nodes": page,
+                "dependency_locations": tree["dependency_locations"],
+                "next_offset": consumed if consumed < len(nodes) else None}
+
+    @staticmethod
+    def _cache_product_tree(document_gid, ref, dependencies, tenant_gid, actor_gid, tree):
+        if document_gid:
+            save_product_tree(document_gid=document_gid, artifact_ref=ref, dependencies=dependencies,
+                tenant_gid=tenant_gid, actor_gid=actor_gid, tree=tree)
+
+    @staticmethod
+    def _product_tree_nodes(projections) -> list[dict[str, Any]]:
+        multiple = len(projections) > 1
+        nodes: list[dict[str, Any]] = []
+        for location, projection in projections:
+            prefix = "" if not multiple else hashlib.sha256(str(location).encode("utf-8")).hexdigest()[:12] + ":"
+            children: dict[str | None, int] = {}
+            parent_ids = {item.parent_instance_id for item in projection.instances if item.parent_instance_id}
+            for item in projection.instances:
+                order = children.get(item.parent_instance_id, 0)
+                children[item.parent_instance_id] = order + 1
+                nodes.append({
+                    "node_key": prefix + item.instance_id,
+                    "parent_key": (prefix + item.parent_instance_id) if item.parent_instance_id else None,
+                    "child_order": order, "name": item.name, "bom_line": item.bom_line,
+                    "item_id": item.item_id, "revision": item.revision,
+                    "occurrence_id": item.pdm_occurrence_uid or item.absolute_occurrence_uid or item.catia_occurrence_name,
+                    "has_more": item.instance_id in parent_ids,
+                })
+        return nodes
 
     def _checked_projection(self, payload: dict[str, Any], context: CapabilityContext):
         ref = dict(payload.get("artifact_ref") or {})
         actual, projection = self._read_projection(ref, context)
-        inspected = self.inspect_environment({"artifact_ref": ref}, context).data
+        inspected = self._inspection_data(actual, projection)
         if str(payload.get("inspection_hash") or "") != inspected["inspection_hash"]:
             raise CapabilityBusinessError("plmxml_inspection_changed", "plmxml_inspection_changed")
         resolved = self._resolve_dependencies(payload, projection, context)
@@ -146,7 +316,7 @@ class PlmxmlEnvironmentProvider:
         except WorkspaceRepositoryError as exc:
             raise CapabilityBusinessError(str(exc), str(exc)) from exc
         return _output({**stored, "inspection_hash": inspected["inspection_hash"],
-                        "report": inspected["report"]}, "plmxml_environment_restored",
+                        "report": self._import_report(projection, resolved)}, "plmxml_environment_restored",
                        str(stored["workspace_gid"]))
 
     def insert_environment(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
@@ -170,7 +340,7 @@ class PlmxmlEnvironmentProvider:
         try:
             stored = self.repository.import_environment_projection(
                 workspace_gid=workspace_gid, expected_workspace_version=payload.get("expected_row_version"),
-                display_name=str(payload.get("display_name") or ""), document_role="inserted",
+                display_name=str(payload.get("display_name") or ""), document_role="auto",
                 artifact_ref=ref, projection=filtered, tenant_gid=tenant_gid, actor_gid=actor_gid,
                 resolved_dependencies=resolved,
                 idempotency_key=str(payload.get("idempotency_key") or ""),
@@ -178,7 +348,8 @@ class PlmxmlEnvironmentProvider:
         except WorkspaceRepositoryError as exc:
             raise CapabilityBusinessError(str(exc), str(exc), retryable=str(exc) == "version_conflict") from exc
         return _output({**stored, "mode": mode, "selected_hierarchy_identities": selected,
-                        "inspection_hash": inspected["inspection_hash"], "report": inspected["report"]},
+                        "inspection_hash": inspected["inspection_hash"],
+                        "report": self._import_report(filtered, resolved)},
                        "plmxml_environment_inserted", workspace_gid)
 
     def import_environment(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
@@ -188,7 +359,7 @@ class PlmxmlEnvironmentProvider:
         try:
             stored=self.repository.import_environment_projection(workspace_gid=workspace_gid,expected_workspace_version=payload.get("expected_row_version"),display_name=str(payload.get("display_name") or ""),document_role=str(payload.get("role") or "primary"),artifact_ref=ref,projection=projection,resolved_dependencies=resolved,tenant_gid=tenant_gid,actor_gid=actor_gid,idempotency_key=str(payload.get("idempotency_key") or ""))
         except (PlmxmlError,WorkspaceRepositoryError) as exc: raise CapabilityBusinessError(str(exc),str(exc),retryable=str(exc)=="version_conflict") from exc
-        report={"semantic_hash":projection.original_sha256,"document_count":1+len(projection.dependencies),"hierarchy_count":len(projection.hierarchies),"placement_count":sum(len(item.placements) for item in projection.hierarchies),"dependency_count":len(projection.dependencies),"algorithm_version":projection.algorithm_version}
+        report=self._import_report(projection,resolved)
         return _output({**stored,"report":report},"plmxml_environment_imported",workspace_gid)
 
     def export_environment(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
@@ -248,6 +419,8 @@ def specs(provider: PlmxmlEnvironmentProvider | None = None):
     dependency_artifacts={"type":"array","maxItems":10000,"items":dependency_artifact}
     dependency={"type":"object","required":["document_gid","package_path","artifact_ref","content_sha256"],"properties":{"document_gid":gid,"package_path":{"type":"string"},"artifact_ref":runtime_artifact,"content_sha256":semantic_hash},"additionalProperties":False}
     runtime_output={"type":"object","required":["workspace_gid","version_gid","top_level_artifact_ref","dependencies","open_payload","manifest","manifest_hash"],"properties":{"workspace_gid":gid,"version_gid":gid,"top_level_artifact_ref":artifact,"dependencies":{"type":"array","items":dependency},"open_payload":{"type":"object"},"manifest":{"type":"object"},"manifest_hash":semantic_hash},"additionalProperties":False}
+    model_tree_node={"type":"object","required":["node_key","parent_key","child_order","name","bom_line","item_id","revision","occurrence_id","has_more"],"properties":{"node_key":{"type":"string"},"parent_key":{"anyOf":[{"type":"string"},{"type":"null"}]},"child_order":{"type":"integer","minimum":0},"name":{"type":"string"},"bom_line":{"type":"string"},"item_id":{"type":"string"},"revision":{"type":"string"},"occurrence_id":{"type":"string"},"has_more":{"type":"boolean"}},"additionalProperties":False}
+    model_tree_output={"type":"object","required":["state","node_count","nodes","dependency_locations","next_offset"],"properties":{"state":{"type":"string","enum":["ready","dependency_required"]},"node_count":{"type":"integer","minimum":0},"nodes":{"type":"array","maxItems":5000,"items":model_tree_node},"dependency_locations":{"type":"array","items":{"type":"string"}},"next_offset":{"anyOf":[{"type":"integer","minimum":1},{"type":"null"}]}},"additionalProperties":False}
     inspect_output={"type":"object","required":["artifact_sha256","semantic_hash","algorithm_version","inspection_hash","hierarchies","dependencies","report"],"properties":{"artifact_sha256":semantic_hash,"semantic_hash":semantic_hash,"algorithm_version":{"type":"string"},"inspection_hash":semantic_hash,"hierarchies":{"type":"array","items":{"type":"object","required":["projection_identity","name","placement_count"],"properties":{"projection_identity":{"type":"string"},"name":{"type":"string"},"placement_count":{"type":"integer","minimum":0}},"additionalProperties":False}},"dependencies":{"type":"array","items":{"type":"object","required":["location","media_type"],"properties":{"location":{"type":"string"},"media_type":{"type":"string","enum":["application/plmxml+xml","model/vnd.jt"]}},"additionalProperties":False}},"report":report},"additionalProperties":False}
     restore_output={"type":"object","required":["workspace_gid","version_gid","document_gid","hierarchy_gids","workspace_row_version","cache_revision_hash","inspection_hash","report"],"properties":{"workspace_gid":gid,"version_gid":gid,"document_gid":gid,"hierarchy_gids":{"type":"array","items":gid},"workspace_row_version":{"type":"integer","minimum":2},"cache_revision_hash":semantic_hash,"inspection_hash":semantic_hash,"report":report},"additionalProperties":False}
     insert_output={"type":"object","required":["workspace_gid","document_gid","hierarchy_gids","workspace_row_version","cache_revision_hash","mode","selected_hierarchy_identities","inspection_hash","report"],"properties":{"workspace_gid":gid,"document_gid":gid,"hierarchy_gids":{"type":"array","items":gid},"workspace_row_version":{"type":"integer","minimum":2},"cache_revision_hash":semantic_hash,"mode":{"type":"string","enum":["model_and_selected_hierarchies","model_only"]},"selected_hierarchy_identities":{"type":"array","items":{"type":"string"}},"inspection_hash":semantic_hash,"report":report},"additionalProperties":False}
@@ -258,6 +431,7 @@ def specs(provider: PlmxmlEnvironmentProvider | None = None):
         (CapabilitySpec(id="simulation.plmxml.environment.import",version=1,description="Import one immutable primary or supplemental PLMXML Artifact into an owned draft environment.",risk="write",confirmation="none",idempotent=True,input_schema={"type":"object","required":["workspace_gid","expected_row_version","artifact_ref","display_name","idempotency_key"],"properties":{"workspace_gid":gid,"expected_row_version":{"type":"integer","minimum":1},"artifact_ref":artifact,"dependency_artifacts":dependency_artifacts,"display_name":{"type":"string","minLength":1,"maxLength":255},"role":{"type":"string","enum":["primary","inserted"]},"idempotency_key":key},"additionalProperties":False},output_schema=import_output,**common),selected.import_environment),
         (CapabilitySpec(id="simulation.plmxml.environment.export",version=1,description="Export one readable environment as an immutable deterministic PLMXML Artifact.",risk="write",confirmation="none",idempotent=True,input_schema={"type":"object","required":["workspace_gid","idempotency_key"],"properties":{"workspace_gid":gid,"idempotency_key":key},"additionalProperties":False},output_schema=export_output,**common),selected.export_environment),
         (CapabilitySpec(id="simulation.environment.runtime_package.prepare",version=1,description="Prepare one deterministic frozen VisMockup package whose generated top-level PLMXML is the only document opened.",risk="write",confirmation="none",idempotent=True,input_schema={"type":"object","required":["workspace_gid","version_gid","idempotency_key"],"properties":{"workspace_gid":gid,"version_gid":gid,"idempotency_key":key},"additionalProperties":False},output_schema=runtime_output,**common),selected.prepare_runtime_package),
+        (CapabilitySpec(id="simulation.plmxml.model_tree.read",version=1,description="Read one bounded page of the product occurrence tree from one authorized immutable PLMXML Artifact without mutating an environment.",risk="read",confirmation="none",idempotent=True,input_schema={"type":"object","required":["artifact_ref"],"properties":{"artifact_ref":artifact,"document_gid":gid,"dependency_artifacts":dependency_artifacts,"offset":{"type":"integer","minimum":0,"maximum":250000},"limit":{"type":"integer","minimum":1,"maximum":5000}},"additionalProperties":False},output_schema=model_tree_output,execution_budget=CapabilityExecutionBudget(collection_policy=CapabilityCollectionPolicy.PAGED,max_page_size=5000),**common),selected.read_model_tree),
     )
 
 

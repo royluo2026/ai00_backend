@@ -98,7 +98,7 @@ DOCUMENT_SNAPSHOT_CONNECTOR_PLAN = connector_plan(DOCUMENT_SNAPSHOT_STEP, max_st
 
 
 class AdapterOperation(FrozenModel):
-    operation_id: str = Field(pattern=r"^[a-z][a-z0-9_.-]{2,127}@1$")
+    operation_id: str = Field(pattern=r"^[a-z][a-z0-9_.-]{2,127}@[1-9][0-9]*$")
     contract_hash: str = Field(pattern=HASH_PATTERN)
 
 

@@ -1086,18 +1086,28 @@ class CapabilityGatewayService:
 _default_gateway: CapabilityGatewayService | None = None
 
 
+def _local_test_release_path() -> Path | None:
+    raw = os.environ.get("AI00_LOCAL_TEST_CATALOG_PATH", "").strip()
+    if not raw:
+        return None
+    if os.environ.get("AI00_LOCAL_TEST_APP") != "1" or not os.environ.get("TABLE_PREFIX", "").startswith("test_"):
+        raise RuntimeError("test_prefix_required_for_local_catalog")
+    return Path(raw).resolve()
+
+
 def configure_default_gateway(registry, *, policy: GatewayPolicy | None = None,
                               reliability: ReliabilityCoordinator | None = None,
                               operations: OperationService | None = None,
                               release_path: Path | None = None) -> CapabilityGatewayService:
     global _default_gateway
-    path = release_path or Path(__file__).resolve().parents[2] / "docs" / "governance" / "capability-catalog-release.json"
+    local_test_path = _local_test_release_path() if release_path is None else None
+    path = release_path or local_test_path or Path(__file__).resolve().parents[2] / "docs" / "governance" / "capability-catalog-release.json"
     release = load_catalog_release(path.read_text(encoding="utf-8"))
     # The governance extension is a test-only catalog overlay.  It must be
     # visible to the HTTP Gateway only when the explicitly selected test
     # profile has also loaded the extension providers.  Production keeps the
     # immutable product release untouched and never probes this path.
-    if release_path is None and _test_governance_registry_loaded(registry):
+    if release_path is None and local_test_path is None and _test_governance_registry_loaded(registry):
         extension_path = path.parent / "test-extension" / (
             "capability-" + "governance" + "-catalog-release.json"
         )

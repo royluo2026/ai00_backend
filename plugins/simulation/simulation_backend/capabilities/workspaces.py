@@ -304,7 +304,15 @@ def candidate_specs(provider: WorkspaceProvider | None = None) -> tuple[tuple[Ca
     cache_revision = {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
     node = {"type": "object", "required": ["node_gid", "parent_gid", "node_type", "name", "position", "row_version"],
             "properties": {"node_gid": gid, "parent_gid": {"type": ["string", "null"], "pattern": "^[1-9][0-9]*$"},
-                           "node_type": {"type": "string", "enum": ["line", "station", "process", "operation"]},
+                           # BOP Fork creates one non-editable root marker for the
+                           # alternate hierarchy.  It is returned by workspace.get
+                           # alongside editable process nodes and must be part of the
+                           # read contract (creation remains restricted below).
+                           "node_type": {"type": "string", "enum": [
+                               "line", "line_process", "station", "station_process",
+                               "role", "operator_process", "process", "operation",
+                               "alternate_hierarchy",
+                           ]},
                            "name": {"type": "string"}, "position": {"type": "integer", "minimum": 0},
                            "row_version": {"type": "integer", "minimum": 1}}, "additionalProperties": False}
     binding = {"type": "object", "required": ["binding_gid", "node_gid", "occurrence_gid", "role", "row_version"],

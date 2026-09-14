@@ -24,6 +24,11 @@ class _Cursor:
         self.calls.append((" ".join(sql.split()), tuple(params)))
         self.current = next(self.rows, None) if sql.lstrip().upper().startswith("SELECT") else None
         self.rowcount = 1
+    def executemany(self, sql, params):
+        rows = [tuple(row) for row in params]
+        self.calls.append((" ".join(sql.split()), rows))
+        self.current = None
+        self.rowcount = len(rows)
     def fetchone(self): return self.current
     def fetchall(self): return self.current if isinstance(self.current, list) else ([] if self.current is None else [self.current])
 
@@ -33,6 +38,7 @@ class _Connection:
     def __enter__(self): return self
     def __exit__(self, *_args): return False
     def cursor(self): return self.value
+    def begin(self): self.value.transaction_started = True
 
 
 def _install(monkeypatch, rows):
@@ -127,6 +133,23 @@ def test_restore_environment_projection_creates_workspace_and_projection_atomica
     assert any(sql.startswith("INSERT INTO workmanship_sim_vm_documents") for sql in statements)
     assert any(sql.startswith("INSERT INTO workmanship_sim_workspace_hierarchies") for sql in statements)
     assert any(sql.startswith("INSERT INTO workmanship_sim_plmxml_restore_requests") for sql in statements)
+
+
+def test_first_inserted_plmxml_becomes_the_primary_document_atomically(monkeypatch):
+    from plugins.simulation.simulation_backend.domain.plmxml_environment_codec import EnvironmentImportProjection
+    cursor = _install(monkeypatch, [
+        {"row_version": 1, "cache_revision_hash": "sha256:" + "0" * 64, "status": "active"},
+        None,
+        None,
+    ])
+    WorkspaceRepository().import_environment_projection(
+        workspace_gid="10", expected_workspace_version=1, display_name="source.plmxml",
+        document_role="auto", artifact_ref={"artifact_id": "source", "sha256": "b" * 64},
+        projection=EnvironmentImportProjection(hierarchies=(), dependencies=(), original_sha256="sha256:" + "b" * 64, algorithm_version="v1"),
+        resolved_dependencies={}, tenant_gid="20", actor_gid="30", idempotency_key="insert-first",
+    )
+    _, params = next(call for call in cursor.calls if call[0].startswith("INSERT INTO workmanship_sim_vm_documents"))
+    assert params[4:6] == ("primary", 1)
 
 
 def test_runtime_outcome_records_tree_readback_but_not_semantic_verification(monkeypatch):

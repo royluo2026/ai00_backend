@@ -395,7 +395,7 @@ def test_frozen_runtime_plan_opens_one_root_then_reads_back_the_tree():
     )
 
     assert [step["operation_id"] for step in plan["steps"]] == [
-        "vismockup.model.open@1", "vismockup.tree.read@1",
+        "vismockup.model.open@1", "vismockup.tree.read@2",
     ]
     assert plan["steps"][1]["depends_on"] == ["step-00001"]
     assert plan["steps"][1]["payload"] == {"max_depth": 8, "force_refresh": True}
@@ -407,7 +407,7 @@ def test_frozen_runtime_plan_has_dedicated_outcome_projection():
     plan = SimpleNamespace(
         plan_id="runtime-plan-1",
         capability_id="simulation.environment.runtime_package.open.request",
-        steps=[SimpleNamespace(operation_id="vismockup.model.open@1"), SimpleNamespace(operation_id="vismockup.tree.read@1")],
+        steps=[SimpleNamespace(operation_id="vismockup.model.open@1"), SimpleNamespace(operation_id="vismockup.tree.read@2")],
     )
     assert GovernedSimulationRuntimeClient.connector_outcome_target(plan) == (
         "simulation.connector_environment_runtime_outcome.apply",

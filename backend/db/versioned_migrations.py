@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from backend.governance import DomainRegistry, OwnershipError, load_registry
-from backend.db.table_prefix import rewrite_sql
+from backend.db.table_prefix import prefixed_trigger_name, rewrite_sql
 
 MIGRATION_RE = re.compile(
     r"^(?P<id>\d{12})_(?P<domain>base|craft|digital_model|project_management|simulation|agent|device|ontology|knowledge)_(?P<name>[a-z0-9_]+)\.sql$"
@@ -304,7 +304,7 @@ def prepare_resumable_statement(conn, statement: str) -> str | None:
             cur.execute(
                 "SELECT COUNT(*) FROM information_schema.TRIGGERS "
                 "WHERE TRIGGER_SCHEMA=DATABASE() AND TRIGGER_NAME=%s",
-                (create_trigger.group(1),),
+                (prefixed_trigger_name(create_trigger.group(1)),),
             )
             exists = int(_scalar(cur.fetchone())) > 0
         return None if exists else statement
@@ -539,10 +539,16 @@ def apply_migrations(conn, directory: Path | None = None, registry: DomainRegist
     for migration in migrations:
         validate_migration(migration, registry)
 
-    with conn.cursor() as cur:
-        cur.execute("SELECT GET_LOCK(%s, %s)", (LOCK_NAME, 30))
-        if _scalar(cur.fetchone()) != 1:
-            raise MigrationError("could not acquire database migration lock")
+    named_lock_acquired = False
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT GET_LOCK(%s, %s)", (LOCK_NAME, 30))
+            if _scalar(cur.fetchone()) != 1:
+                raise MigrationError("could not acquire database migration lock")
+            named_lock_acquired = True
+    except Exception as exc:
+        if not (exc.args and exc.args[0] == 1305 and "GET_LOCK" in str(exc)):
+            raise
 
     applied: list[str] = []
     try:
@@ -602,5 +608,6 @@ def apply_migrations(conn, directory: Path | None = None, registry: DomainRegist
                 raise MigrationError(f"migration {migration.migration_id} failed: {exc}") from exc
         return applied
     finally:
-        with conn.cursor() as cur:
-            cur.execute("SELECT RELEASE_LOCK(%s)", (LOCK_NAME,))
+        if named_lock_acquired:
+            with conn.cursor() as cur:
+                cur.execute("SELECT RELEASE_LOCK(%s)", (LOCK_NAME,))

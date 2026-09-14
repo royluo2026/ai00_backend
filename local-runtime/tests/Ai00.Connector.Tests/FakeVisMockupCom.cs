@@ -81,11 +81,14 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
         SetNodeVisibleCalls++;
         if (!AllNodeKeys.Contains(nodeKey, StringComparer.Ordinal)) throw new InvalidOperationException("node not found");
         if (visible) _visible.Add(nodeKey); else _visible.Remove(nodeKey);
+        var fakeNode = Traverse().OfType<FakeNode>().FirstOrDefault(node => node.NodeKey == nodeKey);
+        if (fakeNode is not null) fakeNode.IsVisible = visible;
         if (SetNodeVisibleError is not null)
         {
             if (!ApplyVisibilityBeforeThrow)
             {
                 if (visible) _visible.Remove(nodeKey); else _visible.Add(nodeKey);
+                if (fakeNode is not null) fakeNode.IsVisible = !visible;
             }
             throw SetNodeVisibleError;
         }
@@ -139,6 +142,7 @@ public sealed record FakeNode(
     string ModelId,
     IReadOnlyList<IVisMockupNode> Children) : IVisMockupNode
 {
+    public bool IsVisible { get; set; }
     public static IVisMockupNode FlatTree(int count)
     {
         var children = Enumerable.Range(1, Math.Max(0, count - 1))

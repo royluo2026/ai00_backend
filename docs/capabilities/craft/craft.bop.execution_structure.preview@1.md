@@ -57,10 +57,10 @@ Preview a draft BOP execution structure at an exact revision.
 
 - `memory_class`：`small`
 - `max_input_bytes`：1048576
-- `max_output_bytes`：4194304
+- `max_output_bytes`：33554432
 - `collection_policy`：`bounded`
 - `max_page_size`：None
-- `max_parallel_per_consumer`：4
+- `max_parallel_per_consumer`：1
 - `max_parallel_per_tenant`：32
 - `overload_policy`：`reject`
 

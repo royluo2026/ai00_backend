@@ -218,9 +218,14 @@ Create a versioned private or shared simulation workspace.
           "node_type": {
             "enum": [
               "line",
+              "line_process",
               "station",
+              "station_process",
+              "role",
+              "operator_process",
               "process",
-              "operation"
+              "operation",
+              "alternate_hierarchy"
             ],
             "type": "string"
           },

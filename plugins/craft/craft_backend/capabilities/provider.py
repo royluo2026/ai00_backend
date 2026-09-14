@@ -499,6 +499,17 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         "domain_errors": _DOMAIN_ERRORS,
         "domain_errors_complete": True,
     }
+    # Large BOPs are still returned as one revision-pinned structure to the
+    # Simulation projection provider.  The default 4 MiB gateway budget is
+    # smaller than legitimate W10/X11 structures (the provider otherwise
+    # returns a deterministic but unusable `capability_output_limit_exceeded`).
+    # Keep the bound finite and scoped to this read contract; do not loosen the
+    # global capability limit or any write capability.
+    if spec.id in {"craft.bop.execution_structure.get", "craft.bop.execution_structure.preview"}:
+        updates["execution_budget"] = descriptor.execution_budget.model_copy(update={
+            "max_output_bytes": 32 * 1024 * 1024,
+            "max_parallel_per_consumer": 1,
+        })
     if spec.id.startswith("craft.resource_requirement."):
         action = spec.id.removeprefix("craft.resource_requirement.")
         effects = {
