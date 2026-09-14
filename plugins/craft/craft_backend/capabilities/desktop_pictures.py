@@ -15,7 +15,7 @@ def parent_attachments(kind,gid,context):
         parent=cursor.fetchone()
         if not parent:raise CapabilityBusinessError('resource_not_found','The BOP version is unavailable.')
         owner=str(parent.get('owner_gid') or parent.get('created_by') or '')
-        authorize_parent(owner,parent.get('shared_team_gid'),parent.get('visibility'),parent.get('project_gid'),context)
+        authorize_parent(owner,parent.get('shared_team_gid'),parent.get('visibility'),parent.get('project_gid'),context,allow_moved_owner=True)
         cursor.execute("SELECT process_flow_pic,process_chart_pic FROM workmanship_bop_bop_entries WHERE version_gid=%s AND is_deleted=FALSE AND ((process_flow_pic IS NOT NULL AND process_flow_pic NOT IN ('','[]','null')) OR (process_chart_pic IS NOT NULL AND process_chart_pic NOT IN ('','[]','null'))) LIMIT %s",(gid,MAX_PICTURE_ENTRIES+1))
         rows=cursor.fetchall()
     if len(rows)>MAX_PICTURE_ENTRIES:raise CapabilityBusinessError('dataset_too_large','Select a BOP version with at most 5000 picture entries.')
@@ -25,21 +25,21 @@ def parent_attachments(kind,gid,context):
             values=records(row.get(field))
             if len(values)>15:raise CapabilityBusinessError('provider_error','Stored picture list exceeds its bound.')
             attachments.extend(values)
-    return owner,attachments
+    return owner,attachments,str(parent.get('shared_team_gid') or context.team_gid)
 
 
 def resolve_picture(payload,context):
-    owner,values=parent_attachments('bop_version',payload['version_gid'],context)
+    owner,values,evidence_tenant=parent_attachments('bop_version',payload['version_gid'],context)
     record=select_record(values,payload['reference_hash'])
-    result=resolve_stored('craft','bop_version',payload['version_gid'],owner,record,context,static_root=_BOP_PICS_DIR.parent)
+    result=resolve_stored('craft','bop_version',payload['version_gid'],owner,record,context,static_root=_BOP_PICS_DIR.parent,evidence_tenant_gid=evidence_tenant)
     if not result['artifact_ref']['media_type'].startswith('image/'):raise ValueError('image_required')
     return result
 
 
 def list_picture_access(payload,context):
-    owner,values=parent_attachments('bop_version',payload['version_gid'],context)
+    owner,values,evidence_tenant=parent_attachments('bop_version',payload['version_gid'],context)
     unique={reference_hash(value):value for value in values}
-    trusted,unavailable=trusted_objects(list(unique.values()),'craft','bop_version',payload['version_gid'],owner,context)
+    trusted,unavailable=trusted_objects(list(unique.values()),'craft','bop_version',payload['version_gid'],owner,context,evidence_tenant_gid=evidence_tenant)
     ois_urls=ois_storage.generate_access_urls([record['object_key'] for record in trusted.values() if record['storage']=='ois'],600)
     minio_public=storage._get_minio_config().get('public_url','').rstrip('/')
     items=[]

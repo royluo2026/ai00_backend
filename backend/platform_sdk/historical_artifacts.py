@@ -33,13 +33,16 @@ def records(value):
     return [{'url':row} if isinstance(row,str) else row for row in value if isinstance(row,(str,dict))]
 
 
-def authorize_parent(owner_gid,tenant_gid,visibility,project_gid,context):
+def authorize_parent(owner_gid,tenant_gid,visibility,project_gid,context,*,allow_moved_owner=False):
     owner_gid=str(owner_gid or '')
     owner=get_user_summaries([owner_gid]).get(owner_gid)
     tenant=str(tenant_gid or (owner or {}).get('team_id') or '')
     reader_tenant=str(context.team_gid or '')
-    owner_tenant=str((owner or {}).get('team_id') or '')
-    if not owner or not tenant or tenant!=reader_tenant or owner_tenant!=tenant:
+    # The parent's stored tenant remains authoritative after its owner moves teams.
+    # The upload registry independently proves tenant, owner, and parent binding.
+    moved_owner=(allow_moved_owner and owner_gid==str(context.user_gid or '')
+                 and str((owner or {}).get('team_id') or '')==reader_tenant)
+    if not owner or not tenant or (tenant!=reader_tenant and not moved_owner):
         raise CapabilityBusinessError('resource_not_found','The attachment parent is unavailable in this tenant.')
     if str(context.user_gid or '')==owner_gid:return
     if visibility in ('team','global'):return
@@ -77,13 +80,13 @@ def object_hash(backend,key):
     return hashlib.sha256(json.dumps([backend,_key(key)],separators=(',',':')).encode()).hexdigest()
 
 
-def trusted_object(record,owner_domain,parent_type,parent_gid,owner_gid,context):
+def trusted_object(record,owner_domain,parent_type,parent_gid,owner_gid,context,*,evidence_tenant_gid=None):
     backend,key=object_location(record)
     with get_conn() as conn,conn.cursor() as cursor:
         cursor.execute('SELECT * FROM workmanship_base_historical_uploads WHERE object_hash=%s',(object_hash(backend,key),))
         row=cursor.fetchone()
     parent={'owner_domain':owner_domain,'parent_type':parent_type,'parent_gid':parent_gid}
-    if (not row or row['tenant_gid']!=context.team_gid or row['owner_gid']!=owner_gid
+    if (not row or row['tenant_gid']!=(evidence_tenant_gid or context.team_gid) or row['owner_gid']!=owner_gid
         or row['storage_backend']!=backend or row['object_key']!=key
         or parent not in json.loads(row['parents_json']) or not row['provenance_json']):
         raise CapabilityBusinessError('object_ownership_unverified','Independent upload ownership evidence is required for this parent.')
@@ -91,7 +94,7 @@ def trusted_object(record,owner_domain,parent_type,parent_gid,owner_gid,context)
     return {'storage':backend,'object_key':key,'name':row['display_name'],'mime':row['media_type'],'sha256':row['sha256'],'byte_size':row['byte_size']}
 
 
-def trusted_objects(values,owner_domain,parent_type,parent_gid,owner_gid,context):
+def trusted_objects(values,owner_domain,parent_type,parent_gid,owner_gid,context,*,evidence_tenant_gid=None):
     """Resolve a bounded parent attachment set with one registry query per chunk."""
     located=[];unavailable=[];configured=((storage._get_minio_config().get('public_url'),'minio'),(ois_storage._get_ois_config().get('public_base_url'),'ois'))
     for record in values:
@@ -109,7 +112,7 @@ def trusted_objects(values,owner_domain,parent_type,parent_gid,owner_gid,context
     trusted={}
     for record,backend,key,digest in located:
         ref=reference_hash(record);row=rows.get(digest)
-        if (not row or row['tenant_gid']!=context.team_gid or row['owner_gid']!=owner_gid
+        if (not row or row['tenant_gid']!=(evidence_tenant_gid or context.team_gid) or row['owner_gid']!=owner_gid
             or row['storage_backend']!=backend or row['object_key']!=key
             or parent not in json.loads(row['parents_json']) or not row['provenance_json']):
             unavailable.append(ref);continue
@@ -182,9 +185,9 @@ def _verify(record,digest,size,mime):
     if declared and declared!=mime:raise ValueError('attachment_mime_mismatch')
 
 
-def resolve_stored(owner_domain,parent_type,parent_gid,owner_gid,record,context,*,static_root=UPLOADS):
+def resolve_stored(owner_domain,parent_type,parent_gid,owner_gid,record,context,*,static_root=UPLOADS,evidence_tenant_gid=None):
     """Caller has just re-read/authorized the parent and proven record membership."""
-    trusted=trusted_object(record,owner_domain,parent_type,parent_gid,owner_gid,context)
+    trusted=trusted_object(record,owner_domain,parent_type,parent_gid,owner_gid,context,evidence_tenant_gid=evidence_tenant_gid)
     binding=hashlib.sha256(json.dumps([owner_domain,parent_type,parent_gid,context.team_gid,owner_gid,context.user_gid,reference_hash(record)],separators=(',',':')).encode()).hexdigest()
     name=str(record.get('name') or Path(urlsplit(str(record.get('url') or '')).path or str(record.get('object_key') or '')).name)
     if not name or len(name)>255 or '/' in name or '\\' in name:raise ValueError('invalid_attachment_name')

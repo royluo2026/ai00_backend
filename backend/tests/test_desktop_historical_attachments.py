@@ -145,8 +145,8 @@ def test_historical_attachment_reader_checks_content_and_fixed_paths(tmp_path):
 
 def test_historical_parent_rejects_cross_tenant_and_dangling_owner():
     from backend.platform_sdk.historical_artifacts import authorize_parent
-    context=SimpleNamespace(user_gid='owner',team_gid='tenant',active_roles=())
-    for identity in ({},{'owner':{'team_id':'other'}}):
+    for identity,reader_tenant in (({},'tenant'),({'owner':{'team_id':'other'}},'other')):
+        context=SimpleNamespace(user_gid='owner',team_gid=reader_tenant,active_roles=())
         with patch('backend.platform_sdk.historical_artifacts.get_user_summaries',return_value=identity):
             with pytest.raises(Exception):authorize_parent('owner','tenant','local',None,context)
 
@@ -173,6 +173,32 @@ def test_bop_picture_access_is_batched_and_grant_is_identity_bound(monkeypatch):
     trusted=redeem_picture_grant(result['items'][0]['access_grant'],'owner','tenant')
     assert read_stored_attachment(trusted)==(picture,'image/png')
     with pytest.raises(Exception):redeem_picture_grant(result['items'][0]['access_grant'],'other','tenant')
+
+
+def test_bop_picture_access_survives_owner_team_move_with_original_provenance(monkeypatch):
+    from backend.platform_sdk.historical_artifacts import redeem_picture_grant
+    from plugins.craft.craft_backend.capabilities.desktop_pictures import list_picture_access
+
+    db=LocalDatabase();photo={'storage':'ois','object_key':'owned/moved-owner.png','name':'photo.png','mime':'image/png'}
+    db.db.execute('INSERT INTO workmanship_bop_bop_versions VALUES(?,?,?,?,?,?)',('bop-one','owner','owner','tenant','team',None))
+    db.db.execute('INSERT INTO workmanship_bop_bop_entries VALUES(?,?,?,?)',('bop-one',json.dumps([photo]),'[]',0))
+    trust_fixture_upload(db,'ois','owned/moved-owner.png',b'\x89PNG\r\n\x1a\nfixture','image/png',
+                         [{'owner_domain':'craft','parent_type':'bop_version','parent_gid':'bop-one'}])
+    db.db.execute('UPDATE workmanship_auth_users SET team_id=? WHERE gid=?',('new-tenant','owner'))
+    monkeypatch.setattr('plugins.craft.craft_backend.capabilities.desktop_pictures.get_craft_conn',lambda:db)
+    monkeypatch.setattr('backend.platform_sdk.historical_artifacts.get_conn',lambda:db)
+    monkeypatch.setattr('backend.platform_sdk.historical_artifacts.get_user_summaries',lambda gids:{'owner':{'team_id':'new-tenant'}})
+    monkeypatch.setattr('backend.platform_sdk.historical_artifacts.get_settings',lambda:SimpleNamespace(jwt_secret='picture-test-secret-32-bytes-long'))
+    monkeypatch.setattr('backend.core.ois_storage.generate_access_urls',lambda keys,expire_in_seconds=600:{})
+    reader=SimpleNamespace(user_gid='admin',team_gid='tenant',active_roles=())
+    assert len(list_picture_access({'version_gid':'bop-one'},reader)['items'])==1
+    moved_owner=SimpleNamespace(user_gid='owner',team_gid='new-tenant',active_roles=())
+    result=list_picture_access({'version_gid':'bop-one'},moved_owner)
+    assert len(result['items'])==1
+    assert redeem_picture_grant(result['items'][0]['access_grant'],'owner','new-tenant')['object_key']=='owned/moved-owner.png'
+    with pytest.raises(Exception):redeem_picture_grant(result['items'][0]['access_grant'],'owner','tenant')
+    with pytest.raises(Exception):
+        list_picture_access({'version_gid':'bop-one'},SimpleNamespace(user_gid='intruder',team_gid='new-tenant',active_roles=()))
 
 
 def test_bop_picture_access_keeps_valid_history_when_one_locator_is_invalid(monkeypatch):

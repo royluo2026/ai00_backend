@@ -102,7 +102,7 @@ def test_picture_parent_scan_supports_xab_scale():
     ]
     ctx = SimpleNamespace(user_gid='fixture-user', team_gid='fixture-team')
     with patch('plugins.craft.craft_backend.capabilities.desktop_pictures.get_craft_conn', return_value=picture), patch('plugins.craft.craft_backend.capabilities.desktop_pictures.authorize_parent'):
-        owner, attachments = parent_attachments('bop_version', 'xab-version', ctx)
+        owner, attachments, _tenant = parent_attachments('bop_version', 'xab-version', ctx)
     assert owner == 'fixture-user'
     assert len(attachments) == 866
     assert cursor.execute.call_args_list[1].args[1] == ('xab-version', 5001)

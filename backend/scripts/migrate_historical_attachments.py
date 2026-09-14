@@ -29,7 +29,7 @@ def migrate(owner,kind,context,*,after='',limit=100,apply=False):
     for parent in parents:
         gid=parent['gid']
         try:
-            _,values=service.parent_attachments(kind,gid,context)
+            _,values,*_=service.parent_attachments(kind,gid,context)
             for value in values:
                 if value.get('artifact_ref') or str(value.get('url') or '').startswith('artifact:'):continue
                 discovered+=1
