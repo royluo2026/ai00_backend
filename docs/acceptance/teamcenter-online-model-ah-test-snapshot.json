@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "artifact_kind": "teamcenter_online_model_test_candidate",
+  "status": "machine_verified_runtime_blocked",
+  "generated_at": "2026-09-16T00:00:00+08:00",
+  "backend_commit": "1631e46c9",
+  "frontend_commit": "47102587",
+  "catalog_release": "rel_750aa241a3cdb14036412575522a80d7",
+  "catalog_sha256": "sha256:34753f3cc346e18b8d6f8000dab7b94dda05b5cc56f33b79e7bcda001e4663a8",
+  "target_branch": "test",
+  "scope": {
+    "domain": "simulation",
+    "teamcenter_access": "read_only",
+    "product_structure_policy": "immutable_online_source_snapshot",
+    "vismockup_open_policy": "official_teamcenter_launch_only",
+    "alternate_hierarchy_write_enabled": false
+  },
+  "machine_passed": true,
+  "human_approved": false,
+  "runtime_verified": false,
+  "release_ready": false,
+  "migration_applied": false,
+  "evidence": {
+    "backend_simulation_and_governance": "307 passed",
+    "connector_dotnet": "263 passed; 0 failed",
+    "online_occurrence_mapping": "2 focused tests passed, including ambiguity fail-closed",
+    "simulation_web": "156 passed",
+    "electron_security": "passed",
+    "business_facade": "passed",
+    "test_governance_build": "passed",
+    "production_web_build": "passed",
+    "catalog_check": "passed; 791 descriptors",
+    "catalog_docs_check": "passed",
+    "table_ownership": "382 registered tables; zero unowned tables",
+    "git_diff_check": "passed before commit",
+    "remote_readback": "backend and frontend test branches matched devteam/test and github/test after push"
+  },
+  "known_baseline_debt": [
+    "desktop business-bypass scan still reports two pre-existing dynamic network call sites and eight documented exceptions",
+    "domain audit still reports 22 pre-existing cross-domain/import debt items",
+    "domain governance check still reports pre-existing CODEOWNERS gaps for old top-level migrations"
+  ],
+  "blockers": [
+    "missing AI00_SIMULATION_DDL_DB_URL for applying migration 0026 with a dedicated Simulation DDL identity",
+    "no packaged credentialed end-to-end run of the new workflow",
+    "Tool2025 and W10 completeness/performance measurements not recorded against the packaged implementation",
+    "password, VVI body, SessionID and CredToken persistence scan not completed against a live run",
+    "human approval not recorded"
+  ],
+  "safety_assertions": [
+    "Teamcenter credentials remain in the current-user local runtime and are not capability arguments or persisted business data",
+    "AI00 never reconstructs the cached product tree inside VisMockup",
+    "VisMockup receives the official Teamcenter online launch source",
+    "duplicate product names and repeated occurrences are kept as distinct instances",
+    "ambiguous occurrence mapping fails closed",
+    "unverified native alternate-hierarchy mutation is not advertised or enabled"
+  ]
+}
