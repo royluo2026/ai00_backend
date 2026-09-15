@@ -12,7 +12,9 @@
 
 ## 测试环境启用
 
-先由平台管理员为 Simulation 域提供独立 DDL 身份 `AI00_SIMULATION_DDL_DB_URL`，再按版本迁移工具应用 `0026`。运行账户继续只持有 DML 权限；不得用 `USERS_DB_URL` 代替 DDL 身份。测试环境仍使用共享数据库中的 `test_` 表投影。
+本地测试环境读取现有后端 `.env` 的 `USERS_DB_URL`，使用共享数据库中的 `test_` 表投影，不使用独立测试数据库。执行迁移时必须在当前进程显式设置 `TABLE_PREFIX=test_`；不得对这个共享数据库使用空前缀。当前迁移账本已有 `0001`–`0025`，`0026` 会新增三张 `test_` 在线结构表。
+
+当前 `.env` 账号具备 schema 权限，但 `run_domain_migrations.py` 的正式接口仍将 DDL 地址建模为 `AI00_SIMULATION_DDL_DB_URL`。若测试环境明确授权复用该账号，只能在单次迁移进程中把现有 URL 映射到该变量；不得写回 `.env`、打印连接信息或改变生产配置。迁移完成后立即重放一次，必须显示零项新增。
 
 迁移后依次确认：
 
@@ -45,7 +47,7 @@
 - 同名在线模型与 PLMXML 同时存在：以 source identity、insertion timestamp 和 occurrence identity 区分。
 - 映射歧义或缺失：禁用高亮/显示隐藏写操作，允许用户刷新映射。
 - 官方打开失败：保留 AI00 的只读树，不降级为缓存树重建。
-- 迁移或治理门禁失败：保持 capability 不可用，不修改 Catalog 证据，不借用其他域权限。
+- 迁移或治理门禁失败：保持 capability 不可用，不修改 Catalog 证据；测试环境只能操作 `test_` 命名空间。
 
 ## 敏感信息检查
 

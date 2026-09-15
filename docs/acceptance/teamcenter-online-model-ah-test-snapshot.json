@@ -20,6 +20,13 @@
   "runtime_verified": false,
   "release_ready": false,
   "migration_applied": false,
+  "test_database": {
+    "isolation": "shared_database_test_table_prefix",
+    "table_prefix": "test_",
+    "configuration_source": "existing backend .env",
+    "simulation_ledger": "0001-0025 present; 0026 pending",
+    "target_tables_present": false
+  },
   "evidence": {
     "backend_simulation_and_governance": "307 passed",
     "connector_dotnet": "263 passed; 0 failed",
@@ -41,7 +48,7 @@
     "domain governance check still reports pre-existing CODEOWNERS gaps for old top-level migrations"
   ],
   "blockers": [
-    "missing AI00_SIMULATION_DDL_DB_URL for applying migration 0026 with a dedicated Simulation DDL identity",
+    "migration 0026 is not yet applied to the shared database test_ namespace; the existing .env account has schema privileges, but using USERS_DB_URL as the migration identity requires an explicit shared-test DDL authorization",
     "no packaged credentialed end-to-end run of the new workflow",
     "Tool2025 and W10 completeness/performance measurements not recorded against the packaged implementation",
     "password, VVI body, SessionID and CredToken persistence scan not completed against a live run",
