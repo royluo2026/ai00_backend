@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "artifact_kind": "teamcenter_online_model_test_candidate",
-  "status": "machine_verified_runtime_blocked",
+  "status": "machine_verified_live_database_smoke_passed",
   "generated_at": "2026-09-16T00:00:00+08:00",
   "backend_commit": "1631e46c9",
   "frontend_commit": "47102587",
@@ -19,13 +19,13 @@
   "human_approved": false,
   "runtime_verified": false,
   "release_ready": false,
-  "migration_applied": false,
+  "migration_applied": true,
   "test_database": {
     "isolation": "shared_database_test_table_prefix",
     "table_prefix": "test_",
     "configuration_source": "existing backend .env",
-    "simulation_ledger": "0001-0025 present; 0026 pending",
-    "target_tables_present": false
+    "simulation_ledger": "0001-0026 present; immediate replay applied zero migrations",
+    "target_tables_present": true
   },
   "evidence": {
     "backend_simulation_and_governance": "307 passed",
@@ -40,7 +40,11 @@
     "catalog_docs_check": "passed",
     "table_ownership": "382 registered tables; zero unowned tables",
     "git_diff_check": "passed before commit",
-    "remote_readback": "backend and frontend test branches matched devteam/test and github/test after push"
+    "remote_readback": "backend and frontend test branches matched devteam/test and github/test after push",
+    "migration_0026": "applied one migration to the shared test_ namespace on OceanBase 5.7.25-OceanBase-v3.2.3.3; immediate replay applied zero",
+    "live_database_smoke": "three tables and ledger present; source/observation/chunk write and read returned one row; explicit cleanup returned zero residue",
+    "isolated_backend_smoke": "health ok; readiness ready; all nine required local Catalog descriptors present; unauthenticated Gateway invocation returned 401",
+    "post_migration_targeted_tests": "38 passed; 4 Python 3.12 sqlite datetime deprecation warnings"
   },
   "known_baseline_debt": [
     "desktop business-bypass scan still reports two pre-existing dynamic network call sites and eight documented exceptions",
@@ -48,7 +52,6 @@
     "domain governance check still reports pre-existing CODEOWNERS gaps for old top-level migrations"
   ],
   "blockers": [
-    "migration 0026 is not yet applied to the shared database test_ namespace; the existing .env account has schema privileges, but using USERS_DB_URL as the migration identity requires an explicit shared-test DDL authorization",
     "no packaged credentialed end-to-end run of the new workflow",
     "Tool2025 and W10 completeness/performance measurements not recorded against the packaged implementation",
     "password, VVI body, SessionID and CredToken persistence scan not completed against a live run",
