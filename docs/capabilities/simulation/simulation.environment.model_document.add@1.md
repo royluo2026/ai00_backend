@@ -128,7 +128,8 @@ Add one PLMXML or JT model document to an owned Simulation environment.
         "application/plmxml+xml",
         "application/vnd.siemens.plmxml+xml",
         "model/vnd.jt",
-        "model/jt"
+        "model/jt",
+        "application/vnd.siemens.teamcenter.visualization-document"
       ],
       "type": "string"
     },
@@ -154,7 +155,8 @@ Add one PLMXML or JT model document to an owned Simulation environment.
       "enum": [
         "artifact",
         "local_file",
-        "generated"
+        "generated",
+        "live_document"
       ],
       "type": "string"
     },

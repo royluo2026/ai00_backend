@@ -113,7 +113,100 @@ Read a bounded BOP hierarchy enriched with linked PBOM CATIA occurrences.
     "entries": {
       "items": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "ai00_level": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "gid": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "level": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "node_type": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "parts": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "catia_occ": {
+                  "type": "string"
+                },
+                "gid": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "part_no": {
+                  "type": "string"
+                },
+                "quantity": {
+                  "description": "Provider-validated PBOM quantity."
+                },
+                "vpps": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "gid",
+                "part_no",
+                "catia_occ",
+                "name",
+                "vpps",
+                "quantity"
+              ],
+              "type": "object"
+            },
+            "maxItems": 1000,
+            "type": "array"
+          },
+          "sort_order": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "vpps": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "gid",
+          "parent_gid",
+          "node_type",
+          "sort_order",
+          "title",
+          "vpps",
+          "level",
+          "ai00_level",
+          "parts"
+        ],
         "type": "object"
       },
       "maxItems": 1000,

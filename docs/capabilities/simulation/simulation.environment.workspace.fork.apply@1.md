@@ -292,6 +292,7 @@ Apply a validated private workspace Fork without mutating its immutable source.
     },
     "status": {
       "enum": [
+        "draft",
         "active",
         "baseline",
         "frozen",

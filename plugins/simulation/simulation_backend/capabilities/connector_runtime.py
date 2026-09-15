@@ -62,6 +62,12 @@ DESKTOP_CAPABILITY_BINDINGS = (
     ("simulation.vismockup.node.visibility.change.request", 1),
     ("simulation.vismockup.node.selection.change.request", 1),
     ("simulation.vismockup.tree.read.request", 1),
+    ("simulation.vismockup.document.identity.read.request", 1),
+    ("simulation.vismockup.document.hierarchy_inventory.read.request", 1),
+    ("simulation.environment.live_document.adopt", 1),
+    ("simulation.environment.live_document.adopt", 2),
+    ("simulation.environment.live_document.binding.get", 1),
+    ("simulation.environment.live_document.inventory.apply", 1),
     ("simulation.vismockup.command.get", 1),
 )
 
@@ -90,6 +96,8 @@ DESKTOP_TRANSPORT_BINDINGS = tuple(dict(method=method,
 
 
 DIRECT_VISMOCKUP_OPERATIONS = {
+    "identity": ("vismockup.document.identity.read@1", "sha256:2a8b6e89d3a13cf35b0584a989ed79977700d3cd3fe9fcc918c3b871d1c8c4d7"),
+    "hierarchy_inventory": ("vismockup.document.hierarchy_inventory.read@1", "sha256:a89bdc3fbb04ee643f1434dee83c653df8a04fc406ac7fff1e61ce39ee99685a"),
     "attach": ("vismockup.application.probe@1", "sha256:197cfad8bc3453030fdc288ea78c3abc21699274dd48d4482444af4f62380a37"),
     "launch": ("vismockup.application.probe@1", "sha256:197cfad8bc3453030fdc288ea78c3abc21699274dd48d4482444af4f62380a37"),
     "open": ("vismockup.model.open@1", "sha256:aabd43bb066794c250f7eeed41def7c147a4da7263e813f192efa59a0cb40e34"),
@@ -102,6 +110,8 @@ DIRECT_VISMOCKUP_OPERATIONS = {
 }
 DIRECT_VISMOCKUP_OPERATION_IDS = frozenset(value[0] for value in DIRECT_VISMOCKUP_OPERATIONS.values())
 DIRECT_VISMOCKUP_CAPABILITIES = {
+    "identity": "simulation.vismockup.document.identity.read.request",
+    "hierarchy_inventory": "simulation.vismockup.document.hierarchy_inventory.read.request",
     "attach": "simulation.vismockup.application.attach.request",
     "launch": "simulation.vismockup.application.launch.request",
     "open": "simulation.vismockup.model.open.request",
@@ -373,6 +383,8 @@ def _direct_vismockup_plan(
     *, action: str, connector_id: str, payload: dict, context: CapabilityContext,
     now: datetime,
 ) -> ConnectorExecutionPlanV1:
+    if action == 'identity':
+        raise ConnectorError('runtime_v2_required')
     # execution-plan.v1 canonicalizes timestamps to whole UTC seconds in the
     # Windows runtime.  Match that wire contract before computing the hash.
     now = now.astimezone(UTC).replace(microsecond=0)
@@ -424,7 +436,7 @@ def _direct_vismockup_plan_v2(
         raise ConnectorError("capability_provenance_required")
     operation_id, contract_hash = DIRECT_VISMOCKUP_OPERATIONS[action]
     step_payload = {"allow_launch": action == "launch"} if action in {"attach", "launch"} else payload
-    classification = "read" if action in {"attach", "tree"} else "write"
+    classification = "read" if action in {"attach", "tree", "identity", "hierarchy_inventory"} else "write"
     probe_id = None if classification == "read" else (
         "vismockup.application.probe@1" if action in {"launch", "close"}
         else "vismockup.document.snapshot@1"
@@ -445,7 +457,7 @@ def _direct_vismockup_plan_v2(
         "depends_on": [],
         "payload": step_payload,
         "payload_hash": digest(step_payload),
-        "timeout_seconds": 600 if action == "tree" else 120,
+        "timeout_seconds": 600 if action in {"tree", "hierarchy_inventory"} else 120,
         "side_effect_classification": classification,
         "post_condition_probe_id": probe_id,
     }]
@@ -591,9 +603,13 @@ def register_connector_runtime_capabilities(
 
     def request_direct(action):
         def handler(payload, context):
+            if action == 'identity' and (payload != {} or not context.user_gid or not context.team_gid):
+                raise CapabilityBusinessError('live_document_input_invalid', 'Identity read takes an empty payload.')
             runtime = control_plane.repository.bound_runtime_for_user(
                 context.user_gid, context.team_gid,
             )
+            if action in {"identity", "hierarchy_inventory"} and (context.source != 'web' or not runtime or runtime.get('runtime_type') != 'electron'):
+                raise CapabilityBusinessError('runtime_v2_required', 'A current user-bound App runtime is required.')
             binding = None
             if runtime:
                 connector_id = runtime["device_id"]
@@ -615,6 +631,9 @@ def register_connector_runtime_capabilities(
                     "max_depth": payload["max_depth"],
                     "force_refresh": bool(payload.get("force_refresh", False)),
                 } if action == "tree"
+                else {"document_session": payload["document_session"], "start_index": payload["start_index"],
+                      "page_size": payload["page_size"], "max_nodes": payload["max_nodes"]}
+                if action == "hierarchy_inventory"
                 else {}
             )
             try:
@@ -738,16 +757,25 @@ def register_connector_runtime_capabilities(
         ("simulation.vismockup.node.visibility.change.request", "node_visibility", "Queue a signed request to change one tree node's visibility in the active VisMockup document."),
         ("simulation.vismockup.node.selection.change.request", "node_selection", "Queue a signed request to change one tree node's selection highlight in the active VisMockup document."),
         ("simulation.vismockup.tree.read.request", "tree", "Queue a signed bounded read of the active VisMockup product tree."),
+        ("simulation.vismockup.document.identity.read.request", "identity", "Queue a read of the current native document identity without launching VisMockup."),
+        ("simulation.vismockup.document.hierarchy_inventory.read.request", "hierarchy_inventory", "Queue one bounded page read of the current document's alternate hierarchies."),
     ):
+        request_schema = ({"type":"object","required":["document_session","start_index","page_size","max_nodes"],
+            "properties":{"document_session":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},
+                "start_index":{"type":"integer","minimum":0},"page_size":{"type":"integer","minimum":1,"maximum":16},
+                "max_nodes":{"type":"integer","minimum":1,"maximum":100000}},"additionalProperties":False}
+            if action == "hierarchy_inventory" else {})
         register(registry, CapabilitySpec(
             id=capability_id, owner="simulation", version=1, description=description,
             use_when="The signed-in user requests one direct action on the bound workstation Connector.",
             do_not_use_when="No current user-scoped Connector binding exists.",
             risk=CapabilityRisk.WRITE,
-            confirmation="none" if action in {"attach", "visibility", "node_visibility", "node_selection", "tree"} else "user",
+            confirmation="none" if action in {"attach", "visibility", "node_visibility", "node_selection", "tree", "identity", "hierarchy_inventory"} else "user",
             permissions=("simulation.use",),
-            input_schema={}, output_schema={}, tags=("simulation", "connector", "vismockup", "workflow"),
+            input_schema=request_schema, output_schema={}, tags=("simulation", "connector", "vismockup", "workflow"),
         ), request_direct(action))
+    from .live_documents import register_live_document_capabilities
+    register_live_document_capabilities(registry, control_plane)
     register(registry, CapabilitySpec(
         id="simulation.environment.runtime_package.open.request", owner="simulation", version=1,
         description="Prepare and queue one frozen environment package, opening only its generated top-level PLMXML.",

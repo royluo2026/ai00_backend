@@ -4,6 +4,8 @@ import json
 import os
 import subprocess
 import sys
+import re
+import pytest
 from pathlib import Path
 
 from backend.scripts.migrate_capability_governance_test import (
@@ -13,6 +15,64 @@ from backend.scripts.migrate_capability_governance_test import (
 
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_shared_test_schema_prefixes_backfill_dependencies_and_preserves_checksums():
+    original = compile_governance_migrations(ROOT)
+    isolated = compile_governance_migrations(ROOT, table_prefix="test_")
+    assert all(name.startswith("test_workmanship_") for name in isolated.tables)
+    assert not re.search(r"(?<![A-Za-z0-9_])workmanship_", isolated.normalized_sql)
+    assert "JOIN test_workmanship_base_capability_catalog_releases" in isolated.normalized_sql
+    assert [m.checksum for m in original.migrations] == [m.checksum for m in isolated.migrations]
+
+
+@pytest.mark.parametrize("prefix", ["prod_", "test_unsafe;", "test_other_", " test_", None])
+def test_governance_migration_rejects_unrecognized_namespace(prefix):
+    from backend.db.versioned_migrations import MigrationError
+    with pytest.raises(MigrationError, match="table prefix"):
+        compile_governance_migrations(ROOT, table_prefix=prefix)
+
+
+@pytest.mark.parametrize("missing_named_lock", [False, True])
+def test_shared_test_apply_never_probes_or_writes_unprefixed_tables(missing_named_lock):
+    from backend.scripts.migrate_capability_governance_test import migrate
+
+    class RecordingConnection:
+        def __init__(self):
+            self.statements = []
+        def cursor(self):
+            return self
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+        def execute(self, sql, args=None):
+            self.statements.append((sql, args))
+            if missing_named_lock and "GET_LOCK" in sql:
+                raise RuntimeError(1305, "FUNCTION GET_LOCK does not exist")
+        def fetchone(self):
+            return (1,) if "GET_LOCK" in self.statements[-1][0] else (0,)
+        def commit(self):
+            pass
+        def rollback(self):
+            pass
+
+    connection = RecordingConnection()
+    applied = migrate(connection, table_prefix="test_", externally_serialized=missing_named_lock)
+    assert len(applied) == 9
+    assert connection.statements[0][1] == ("ai00:capability-governance:test:v1:test_", 30)
+    if not missing_named_lock:
+        assert connection.statements[-1][1] == ("ai00:capability-governance:test:v1:test_",)
+    else:
+        assert not any("RELEASE_LOCK" in sql for sql, _ in connection.statements)
+    assert any(args == ("test_workmanship_base_capability_governance_migrations",)
+               for _, args in connection.statements)
+    assert sum(sql.startswith("INSERT INTO test_workmanship_base_capability_governance_migrations")
+               for sql, _ in connection.statements) == 9
+    for sql, args in connection.statements:
+        assert not re.search(r"(?<![A-Za-z0-9_])workmanship_", sql)
+        if "information_schema" in sql:
+            assert args[0].startswith("test_workmanship_")
 
 EXPECTED_TABLES = {
     "workmanship_base_capability_entries",
@@ -44,6 +104,25 @@ EXPECTED_TABLES = {
     "workmanship_base_capability_standard_review_requests",
     "workmanship_base_capability_rule_effectiveness",
 }
+
+
+@pytest.mark.parametrize("code,external", [(1305, False), (1205, True), (1045, True)])
+def test_migration_lock_errors_fail_before_any_ddl(code, external):
+    from backend.scripts.migrate_capability_governance_test import migrate
+    statements = []
+    class RefusingConnection:
+        def cursor(self):
+            return self
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+        def execute(self, sql, args=None):
+            statements.append(sql)
+            raise RuntimeError(code, "GET_LOCK failure")
+    with pytest.raises(RuntimeError):
+        migrate(RefusingConnection(), table_prefix="test_", externally_serialized=external)
+    assert statements == ["SELECT GET_LOCK(%s, %s)"]
 
 
 def test_test_governance_schema_is_complete_and_oceanbase_safe():

@@ -64,6 +64,18 @@ def test_workspace_provider_scopes_create_search_and_get_to_current_owner():
     assert repo.calls[0][1]["project_gids"] == ["501", "502"]
 
 
+def test_workspace_search_contract_accepts_live_document_draft_environments():
+    specs = candidate_specs(WorkspaceProvider(StubRepository()))
+    search_spec = next(spec for spec, _handler in specs if spec.id == "simulation.environment.workspace.search")
+    get_spec = next(spec for spec, _handler in specs if spec.id == "simulation.environment.workspace.get")
+    payload = StubRepository().search()
+    payload["items"][0]["status"] = "draft"
+    validate_payload(dict(search_spec.output_schema), payload, label="output")
+    workspace = StubRepository().get("101")
+    workspace["status"] = "draft"
+    validate_payload(dict(get_spec.output_schema), workspace, label="output")
+
+
 def test_workspace_candidates_are_experimental_and_user_actions_have_no_confirmation_popup():
     specs = candidate_specs(WorkspaceProvider(StubRepository()))
     ids = [spec.id for spec, _handler in specs]

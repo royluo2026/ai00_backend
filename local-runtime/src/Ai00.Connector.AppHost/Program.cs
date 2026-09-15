@@ -15,12 +15,10 @@ public static class Program
             if(!OperatingSystem.IsWindows()||!Environment.Is64BitProcess)throw new PlatformNotSupportedException("windows_x64_required");
             var options=AppHostOptions.Parse(args);
             var verified=HostManifest.Verify(options);using var parent=verified.Parent;
-            // A development host must not share its device identity, lease journal or
-            // cache with the installed always-on Connector service. Sharing the
-            // directory lets both processes lease plans for the same connector and
-            // causes intermittent provider_failed / journal access failures.
+            // The App-owned test host has its own identity, journal and cache. It
+            // never consumes state from the separately installed Connector service.
             var root=StateRoot(options.Development);
-            var stateSuffix=options.Development?".dev":"";
+            var stateSuffix=options.Development?".test":"";
             using var key=new DeviceSigningKeyStore(root).GetOrCreate();
             var security=new DirectorySecurity();var sid=WindowsIdentity.GetCurrent().User!;
             security.SetAccessRuleProtection(true,false);security.SetOwner(sid);
@@ -67,7 +65,7 @@ public static class Program
     }
     internal static string StateRoot(bool development)=>Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "AI00","App",development?"Connector-Dev":"Connector");
+        "AI00","App",development?"Connector-Test":"Connector");
     private static async Task MonitorParentAsync(System.Diagnostics.Process parent,IHostApplicationLifetime lifetime,CancellationToken ct)
     {
         try{await parent.WaitForExitAsync(ct);lifetime.StopApplication();}catch(OperationCanceledException)when(ct.IsCancellationRequested){}

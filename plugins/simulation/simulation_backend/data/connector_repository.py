@@ -92,6 +92,35 @@ class SimulationConnectorRepository:
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             return self._locked_runtime(cursor, device_id)
 
+    def verified_document_identity(self, operation_id, *, actor_id, tenant_id, now):
+        from ..application.live_document_identity import verify_identity_evidence
+        runtime = self.bound_runtime_for_user(actor_id, tenant_id)
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM workmanship_sim_connector_runtime_plans "
+                "WHERE plan_id=%s AND actor_gid=%s AND tenant_gid=%s AND protocol=%s",
+                (operation_id, actor_id, tenant_id, PROTOCOL_V2))
+            row = cursor.fetchone()
+        try:
+            return verify_identity_evidence(row, runtime, actor_id=actor_id, tenant_id=tenant_id, now=now)
+        except ValueError as exc:
+            code = 'live_document_identity_stale' if str(exc) == 'live_document_identity_stale' else 'live_document_identity_unavailable'
+            raise ConnectorRepositoryError(code) from exc
+
+    def verified_hierarchy_inventory(self, operation_id, *, actor_id, tenant_id, now):
+        from ..application.live_document_inventory import verify_hierarchy_inventory_evidence
+        runtime = self.bound_runtime_for_user(actor_id, tenant_id)
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM workmanship_sim_connector_runtime_plans "
+                "WHERE plan_id=%s AND actor_gid=%s AND tenant_gid=%s AND protocol=%s",
+                (operation_id, actor_id, tenant_id, PROTOCOL_V2))
+            row = cursor.fetchone()
+        try:
+            return verify_hierarchy_inventory_evidence(row, runtime,
+                actor_id=actor_id, tenant_id=tenant_id, now=now)
+        except ValueError as exc:
+            code = 'live_document_inventory_stale' if str(exc) == 'live_document_inventory_stale' else 'live_document_inventory_unavailable'
+            raise ConnectorRepositoryError(code) from exc
+
     def bound_runtime_for_user(self, user_gid: str, team_gid: str) -> dict | None:
         """Resolve the active App runtime in one database round trip."""
         with get_simulation_conn() as conn, conn.cursor() as cursor:
@@ -231,7 +260,7 @@ class SimulationConnectorRepository:
         """Close expired read-only work that cannot have changed VisMockup."""
         cursor.execute(
             "SELECT plan_id,status,lease_until,plan_json FROM workmanship_sim_connector_runtime_plans "
-            "WHERE device_id=%s AND status IN ('leased','executing','outcome_unknown') FOR UPDATE",
+            "WHERE device_id=%s AND status IN ('leased','executing','outcome_unknown','manual_review_required') FOR UPDATE",
             (row["device_id"],),
         )
         for plan in cursor.fetchall():
@@ -246,7 +275,7 @@ class SimulationConnectorRepository:
             cursor.execute(
                 "UPDATE workmanship_sim_connector_runtime_plans SET status='failed_without_effect',"
                 "reconciliation_state='not_required',updated_at=%s WHERE plan_id=%s "
-                "AND status IN ('leased','executing','outcome_unknown')",
+                "AND status IN ('leased','executing','outcome_unknown','manual_review_required')",
                 (now, plan["plan_id"]),
             )
             if cursor.rowcount != 1:
@@ -505,7 +534,7 @@ class SimulationConnectorRepository:
                 if current["plan_id"] != plan.plan_id or current["plan_hash"] != plan.plan_hash:
                     raise ConnectorRepositoryError("idempotency_conflict")
                 return
-            cursor.execute("SELECT plan_id,status,lease_until,plan_json FROM workmanship_sim_connector_runtime_plans WHERE device_id=%s "
+            cursor.execute("SELECT plan_id,status,lease_until,expires_at,plan_json FROM workmanship_sim_connector_runtime_plans WHERE device_id=%s "
                 "AND status IN ('queued','leased','executing','outcome_unknown','manual_review_required','succeeded') FOR UPDATE",
                 (plan.device_id,))
             # ponytail: scan one device's plans under its writer lock; add indexed
@@ -528,12 +557,14 @@ class SimulationConnectorRepository:
                     uncertain_read = previous['status'] in ('outcome_unknown', 'manual_review_required')
                     expired_read_lease = (previous['status'] in ('leased', 'executing')
                         and previous.get('lease_until') is not None and _utc(previous['lease_until']) <= now)
-                    if ((uncertain_read or expired_read_lease)
+                    expired_queued_read = (previous['status'] == 'queued'
+                        and previous.get('expires_at') is not None and _utc(previous['expires_at']) <= now)
+                    if ((uncertain_read or expired_read_lease or expired_queued_read)
                             and all(step.get('side_effect_classification') == 'read' for step in prior.get('steps', []))):
                         cursor.execute(
                             "UPDATE workmanship_sim_connector_runtime_plans SET status='failed_without_effect',"
                             "reconciliation_state='not_required',updated_at=%s WHERE plan_id=%s "
-                            "AND status IN ('leased','executing','outcome_unknown','manual_review_required')",
+                            "AND status IN ('queued','leased','executing','outcome_unknown','manual_review_required')",
                             (now, previous['plan_id']),
                         )
                         if cursor.rowcount != 1:
@@ -737,12 +768,16 @@ class SimulationConnectorRepository:
             if intent and intent['status'] == 'projecting':
                 raise ConnectorRepositoryError('projection_in_progress')
             from backend.domain_ports.simulation_runtime import GovernedSimulationRuntimeClient
-            target = GovernedSimulationRuntimeClient.connector_outcome_target(plan)[0]
+            from ..application.live_document_identity import evidence_only_plan
+            evidence_read = evidence_only_plan(plan)
+            if evidence_read and intent:
+                raise ConnectorRepositoryError('projection_target_mismatch')
+            target = GovernedSimulationRuntimeClient.connector_outcome_target(plan)[0] if not evidence_read else None
             if intent:
                 cursor.execute("UPDATE workmanship_sim_connector_runtime_projection_outbox SET outcome_hash=%s,target_capability=%s,"
                     "status='pending',attempt=0,next_retry_at=%s,lease_owner=NULL,lease_until=NULL,projected_at=NULL,updated_at=%s WHERE plan_id=%s",
                     (digest, target, now, now, outcome.plan_id))
-            else:
+            elif not evidence_read:
                 cursor.execute("INSERT INTO workmanship_sim_connector_runtime_projection_outbox "
                     "(plan_id,outcome_hash,target_capability,status,next_retry_at,created_at,updated_at) VALUES (%s,%s,%s,'pending',%s,%s,%s)",
                     (outcome.plan_id, digest, target, now, now, now))

@@ -44,6 +44,63 @@ public sealed class VisMockupPlmxmlProjectionReaderTests
         Assert.Equal("child-catia", projection.Nodes[1].CatiaOccurrenceName);
     }
 
+    [Fact]
+    public void DuplicateRootInstanceReferencesChooseTheDocumentRootDeterministically()
+    {
+        const string xml = """
+            <PLMXML xmlns="http://www.plmxml.org/Schemas/PLMXMLSchema">
+              <InstanceGraph rootRefs="inst-root">
+                <ProductInstance id="inst-root" name="AI00_RUNTIME_PROBE"/>
+                <Occurrence instanceRefs="#inst-root">
+                  <UserData><UserValue title="__PLM_OCC_PDM_UID" value="root-pdm"/></UserData>
+                </Occurrence>
+                <Occurrence instanceRefs="#inst-root">
+                  <ApplicationRef application="__TC-VIS_APP" label="#PLMXML(PS_API-doc/JT_PROP_NAME('CHLD0000\0ROOT/00;1-Root.asm;-1;0:\0'))"/>
+                  <UserData><UserValue title="__PLM_OCC_PDM_UID" value="clone-pdm"/></UserData>
+                </Occurrence>
+                <ProductInstance id="inst-child" name="LAU-53010242/03;1-后背门灯总成"/>
+                <Occurrence instanceRefs="#inst-root #inst-child">
+                  <UserData><UserValue title="__PLM_OCC_PDM_UID" value="child-pdm"/></UserData>
+                </Occurrence>
+              </InstanceGraph>
+            </PLMXML>
+            """;
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+
+        var projection = new VisMockupPlmxmlProjectionReader().Read(stream, maxNodes: 100);
+
+        Assert.Equal("pdm:root-pdm", projection.RootStableOccurrenceKey);
+        Assert.Equal("AI00_RUNTIME_PROBE", projection.Nodes[0].PrintableName);
+    }
+
+    [Fact]
+    public void AlternateHierarchyExportCreatesSyntheticRootAndAttachesCpsPaths()
+    {
+        const string xml = """
+            <PLMXML xmlns="http://www.plmxml.org/Schemas/PLMXMLSchema">
+              <InstanceGraph rootRefs="altInst3431">
+                <ProductInstance id="altInst3431" name="AI00_RUNTIME_PROBE"/>
+                <Occurrence instanceRefs="#altInst3431">
+                  <ApplicationRef application="__TC-VIS_APP" label="#PLMXML(PS_API-doc/JT_PROP_NAME('CHLD0000\0W10/00;1-Root\0LAU/03;1-Lamp\0'))"/>
+                  <UserData><UserValue title="__PLM_OCC_PDM_UID" value="lamp-pdm"/></UserData>
+                </Occurrence>
+                <Occurrence instanceRefs="#altInst3431">
+                  <ApplicationRef application="__TC-VIS_APP" label="#PLMXML(PS_API-doc/JT_PROP_NAME('CHLD0000\0W10/00;1-Root\0LAU/03;1-Lamp\0PART/01;1-Child\0'))"/>
+                  <UserData><UserValue title="__PLM_OCC_PDM_UID" value="part-pdm"/></UserData>
+                </Occurrence>
+              </InstanceGraph>
+            </PLMXML>
+            """;
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+
+        var projection = new VisMockupPlmxmlProjectionReader().Read(stream, maxNodes: 100);
+
+        Assert.Equal(3, projection.Nodes.Count);
+        Assert.Equal("AI00_RUNTIME_PROBE", projection.Nodes[0].PrintableName);
+        Assert.Equal(projection.Nodes[0].StableOccurrenceKey, projection.Nodes[1].ParentStableOccurrenceKey);
+        Assert.Equal(projection.Nodes[1].StableOccurrenceKey, projection.Nodes[2].ParentStableOccurrenceKey);
+    }
+
     private const string RootPath = "ROOT/00;1-Root.asm;-1;0:";
     private const string AssemblyPath = "ASSY-1/A;1-Assembly.asm;-1;10:";
     private const string PartPath = "PART-2/B;1-Part.prt;-1;20:";

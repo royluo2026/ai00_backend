@@ -158,8 +158,15 @@ Search model documents in one readable Simulation environment.
             ]
           },
           "content_sha256": {
-            "pattern": "^sha256:[0-9a-f]{64}$",
-            "type": "string"
+            "anyOf": [
+              {
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "display_name": {
             "maxLength": 255,
@@ -174,7 +181,8 @@ Search model documents in one readable Simulation environment.
               "application/plmxml+xml",
               "application/vnd.siemens.plmxml+xml",
               "model/vnd.jt",
-              "model/jt"
+              "model/jt",
+              "application/vnd.siemens.teamcenter.visualization-document"
             ],
             "type": "string"
           },

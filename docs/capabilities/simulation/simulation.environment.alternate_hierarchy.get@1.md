@@ -180,7 +180,136 @@ Read one alternate hierarchy, its editable node tree, separated source reference
     "placements": {
       "items": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "display_name": {
+            "type": "string"
+          },
+          "hierarchy_gid": {
+            "pattern": "^[1-9][0-9]*$",
+            "type": "string"
+          },
+          "parent_placement_gid": {
+            "anyOf": [
+              {
+                "pattern": "^[1-9][0-9]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "placement_gid": {
+            "pattern": "^[1-9][0-9]*$",
+            "type": "string"
+          },
+          "row_version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "sort_order": {
+            "type": "integer"
+          },
+          "source_kind": {
+            "type": "string"
+          },
+          "source_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "type": "string"
+              },
+              "artifact_version": {
+                "type": "string"
+              },
+              "connector_device_id": {
+                "type": "string"
+              },
+              "content_sha256": {
+                "type": "string"
+              },
+              "document_gid": {
+                "type": "string"
+              },
+              "node_key": {
+                "type": "string"
+              },
+              "occurrence_gid": {
+                "type": "string"
+              },
+              "occurrence_id": {
+                "type": "string"
+              },
+              "occurrence_key": {
+                "type": "string"
+              },
+              "projection_identity": {
+                "type": "string"
+              },
+              "resource_code": {
+                "type": "string"
+              },
+              "resource_gid": {
+                "type": "string"
+              },
+              "resource_name": {
+                "type": "string"
+              },
+              "resource_type": {
+                "type": "string"
+              },
+              "resource_version": {
+                "type": "string"
+              },
+              "source_identity_hash": {
+                "type": "string"
+              },
+              "source_projection_hash": {
+                "type": "string"
+              },
+              "stable_identity": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "target_node_gid": {
+            "anyOf": [
+              {
+                "pattern": "^[1-9][0-9]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "transform": {
+            "items": {
+              "type": "number"
+            },
+            "maxItems": 16,
+            "minItems": 16,
+            "type": "array"
+          },
+          "workspace_gid": {
+            "pattern": "^[1-9][0-9]*$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "placement_gid",
+          "hierarchy_gid",
+          "workspace_gid",
+          "target_node_gid",
+          "parent_placement_gid",
+          "source_kind",
+          "source_ref",
+          "transform",
+          "display_name",
+          "sort_order",
+          "row_version"
+        ],
         "type": "object"
       },
       "type": "array"
@@ -205,7 +334,21 @@ Read one alternate hierarchy, its editable node tree, separated source reference
         "model_references": {
           "items": {
             "additionalProperties": false,
-            "properties": {},
+            "properties": {
+              "reference": {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              },
+              "source_node_gid": {
+                "pattern": "^[1-9][0-9]*$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_node_gid",
+              "reference"
+            ],
             "type": "object"
           },
           "type": "array"
@@ -213,7 +356,30 @@ Read one alternate hierarchy, its editable node tree, separated source reference
         "resource_references": {
           "items": {
             "additionalProperties": false,
-            "properties": {},
+            "properties": {
+              "reference": {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              },
+              "resource_type": {
+                "enum": [
+                  "tool",
+                  "fixture",
+                  "equipment"
+                ],
+                "type": "string"
+              },
+              "source_node_gid": {
+                "pattern": "^[1-9][0-9]*$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_node_gid",
+              "resource_type",
+              "reference"
+            ],
             "type": "object"
           },
           "type": "array"

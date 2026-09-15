@@ -133,7 +133,6 @@ public sealed class VisMockupDocumentLifecycleTests : IDisposable
         var source = File.ReadAllText(Path.Combine(root, "src", "Ai00.Connector.Adapters.VisMockup", "IVisMockupCom.cs"));
 
         Assert.Contains("view.GetNodeFromKey(numericKey, ref found)", source);
-        Assert.Contains("VisMockupDispatch.SetProperty(node, 9, visible)", source);
         Assert.Contains("VisMockupDispatch.SetProperty(node, 10, selected)", source);
     }
 
@@ -181,7 +180,7 @@ public sealed class VisMockupDocumentLifecycleTests : IDisposable
     }
 
     [Fact]
-    public async Task NodeVisibilitySkipsAnAlreadySatisfiedWrite()
+    public async Task NodeVisibilityDoesNotSkipDisplayForAnAlreadyVisibleUnloadedNode()
     {
         var document = new FakeDocument("existing-document", "user", FakeNode.FlatTree(1));
         document.SetNodeVisible("node-0", true);
@@ -193,7 +192,7 @@ public sealed class VisMockupDocumentLifecycleTests : IDisposable
 
         var result = await adapter.ChangeNodeVisibilityAsync("node-0", "show");
 
-        Assert.Equal(callsBefore, document.SetNodeVisibleCalls);
+        Assert.Equal(callsBefore + 1, document.SetNodeVisibleCalls);
         Assert.Contains("visible = True", result.ToString());
     }
 

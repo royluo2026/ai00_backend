@@ -1,10 +1,10 @@
 # craft.process_screenshot.attach@1
 
-Associate one verified screenshot artifact with one BOP operation.
+Associate one verified screenshot artifact with one BOP process or operation.
 
 ## 使用判断
 
-- 适用：A governed capture run has finalized a screenshot for a BOP operation.
+- 适用：A governed capture run has finalized a screenshot for a BOP process or operation.
 - 不适用：The image has not been finalized by the Artifact Service.
 - 生命周期：`stable`
 - 所属领域：`craft`

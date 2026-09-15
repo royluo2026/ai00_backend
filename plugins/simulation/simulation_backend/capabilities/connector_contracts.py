@@ -138,6 +138,13 @@ class ConnectorHealth(FrozenModel):
 
 
 INPUT_SCHEMAS = {
+    "simulation.vismockup.document.identity.read.request": obj({}, ()),
+    "simulation.vismockup.document.hierarchy_inventory.read.request": obj({
+        "document_session": HASH,
+        "start_index": {"type": "integer", "minimum": 0},
+        "page_size": {"type": "integer", "minimum": 1, "maximum": 16},
+        "max_nodes": {"type": "integer", "minimum": 1, "maximum": 100000},
+    }, ("document_session", "start_index", "page_size", "max_nodes")),
     "simulation.connector.health.get": obj(CONNECTOR, ("connector_id",)),
     "simulation.connector.plan.queue": obj({"plan": CONNECTOR_PLAN}, ("plan",)),
     ("simulation.connector.plan.queue", 2): obj(
@@ -248,6 +255,8 @@ PAIRING_SUMMARY = obj({
 }, ("pairing_id", "user_code", "device_name", "runtime_version", "masked_windows_user", "status", "expires_at", "resource_version"))
 
 OUTPUT_SCHEMAS = {
+    "simulation.vismockup.document.identity.read.request": OPERATION_REF,
+    "simulation.vismockup.document.hierarchy_inventory.read.request": OPERATION_REF,
     "simulation.connector.health.get": CONNECTOR_HEALTH,
     "simulation.connector.plan.queue": OPERATION_REF,
     "simulation.vismockup.application.attach.request": OPERATION_REF,

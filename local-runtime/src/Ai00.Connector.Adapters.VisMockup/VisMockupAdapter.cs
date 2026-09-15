@@ -19,6 +19,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     private readonly InternalCapture _capture;
     private readonly VisMockupTreeCache? _treeCache;
     private readonly string _plmxmlRoot;
+    private readonly ILiveHierarchyInventoryReader _liveHierarchyReader;
     private object? _application;
     private string? _ownedDocumentId;
     private (int ProcessId, long Started, string DocumentId, string Source, string RootKey, string? SourceRevision)? _mappedSession;
@@ -27,24 +28,29 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, string executable)
         : this(sta, paths, new WindowsVisMockupCom(executable), executable,
             Path.Combine(Path.GetTempPath(), "AI00", "captures"),
-            new VisMockupTreeCache(Path.Combine(Path.GetTempPath(), "AI00", "vismockup-tree-cache.db"))) { }
+            new VisMockupTreeCache(Path.Combine(Path.GetTempPath(), "AI00", "vismockup-tree-cache.db")), null) { }
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, string executable, string captureRoot)
         : this(sta, paths, new WindowsVisMockupCom(executable), executable, captureRoot,
             new VisMockupTreeCache(Path.Combine(Path.GetDirectoryName(captureRoot) ?? captureRoot,
-                "vismockup-tree-cache.db"))) { }
+                "vismockup-tree-cache.db")), null) { }
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com)
-        : this(sta, paths, com, "", Path.Combine(Path.GetTempPath(), "AI00", "captures"), null) { }
+        : this(sta, paths, com, "", Path.Combine(Path.GetTempPath(), "AI00", "captures"), null, null) { }
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string captureRoot)
         : this(sta, paths, com, "", captureRoot,
-            new VisMockupTreeCache(Path.Combine(Path.GetDirectoryName(captureRoot) ?? captureRoot, "vismockup-tree-cache.db"))) { }
+            new VisMockupTreeCache(Path.Combine(Path.GetDirectoryName(captureRoot) ?? captureRoot, "vismockup-tree-cache.db")), null) { }
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string captureRoot, string treeCachePath)
-        : this(sta, paths, com, "", captureRoot, new VisMockupTreeCache(treeCachePath)) { }
+        : this(sta, paths, com, "", captureRoot, new VisMockupTreeCache(treeCachePath), null) { }
 
-    private VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string executable, string captureRoot, VisMockupTreeCache? treeCache = null)
+    internal VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com,
+        string captureRoot, ILiveHierarchyInventoryReader liveHierarchyReader)
+        : this(sta, paths, com, "", captureRoot, null, liveHierarchyReader) { }
+
+    private VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string executable,
+        string captureRoot, VisMockupTreeCache? treeCache, ILiveHierarchyInventoryReader? liveHierarchyReader)
     {
         _sta = sta;
         _paths = paths;
@@ -56,11 +62,15 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         _capture = new InternalCapture(captureRoot);
         _treeCache = treeCache;
         _plmxmlRoot = Path.Combine(Path.GetDirectoryName(captureRoot) ?? captureRoot, "plmxml");
+        _liveHierarchyReader = liveHierarchyReader ?? new VisMockupInProcessHierarchyReader(
+            Path.Combine(Path.GetDirectoryName(captureRoot) ?? captureRoot, "native-hierarchy"));
     }
     public AdapterManifest Manifest { get; } = new(
         "ai00.vismockup", 1, "siemens.vismockup", "14.0.0",
         [
             new("vismockup.application.probe@1", "sha256:197cfad8bc3453030fdc288ea78c3abc21699274dd48d4482444af4f62380a37"),
+            new("vismockup.document.identity.read@1", "sha256:2a8b6e89d3a13cf35b0584a989ed79977700d3cd3fe9fcc918c3b871d1c8c4d7"),
+            new("vismockup.document.hierarchy_inventory.read@1", "sha256:a89bdc3fbb04ee643f1434dee83c653df8a04fc406ac7fff1e61ce39ee99685a"),
             new("vismockup.document.snapshot@1", "sha256:aa7c11c2501026c470a9cc7bfcbbecc7339879c18bf2b6b86f68ed7fc2e1861b"),
             new("vismockup.model.open@1", "sha256:aabd43bb066794c250f7eeed41def7c147a4da7263e813f192efa59a0cb40e34"),
             new("vismockup.model.insert@1", "sha256:70e68f565989a75406fabb5ffcc5b6f87233f2e55be9a011b202671a26f7c370"),
@@ -98,6 +108,82 @@ public sealed class VisMockupAdapter : IConnectorAdapter
                     process.Running, false, process.ProductVersion);
             }
         });
+    }
+
+    private async Task<object> ReadDocumentIdentityAsync(System.Text.Json.JsonElement payload, CancellationToken cancellationToken)
+    {
+        if (payload.ValueKind != System.Text.Json.JsonValueKind.Object || payload.EnumerateObject().Any())
+            throw new ConnectorException("vismockup_document_identity_input_invalid");
+        cancellationToken.ThrowIfCancellationRequested();
+        var result = await _sta.InvokeAsync<object>(() =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var before = RequireProcessIdentity();
+            var handle = _connection.RequireActiveDocument(allowLaunch: false).DocumentId;
+            if (string.IsNullOrWhiteSpace(handle))
+                throw new ConnectorException("vismockup_document_handle_unavailable");
+            var handleAfter = _connection.RequireActiveDocument(allowLaunch: false).DocumentId;
+            var after = RequireProcessIdentity();
+            if (before.ProcessId != after.ProcessId || before.ProcessStartUtcTicks != after.ProcessStartUtcTicks ||
+                !string.Equals(handle, handleAfter, StringComparison.Ordinal))
+                throw new ConnectorException("vismockup_document_identity_changed");
+            var ticks = before.ProcessStartUtcTicks!.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            // Polling cannot detect a handle closed and reused entirely between reads.
+            var session = CanonicalJson.Hash(new { process_id = before.ProcessId!.Value,
+                process_started_utc_ticks = ticks, document_handle = handle });
+            return new { document_session = session, process_id = before.ProcessId.Value,
+                process_started_utc_ticks = ticks, document_handle = handle };
+        });
+        cancellationToken.ThrowIfCancellationRequested();
+        return result;
+    }
+
+    private async Task<object> ReadHierarchyInventoryAsync(System.Text.Json.JsonElement payload, CancellationToken cancellationToken)
+    {
+        if (payload.ValueKind != System.Text.Json.JsonValueKind.Object
+            || payload.EnumerateObject().Any(item => item.Name is not ("document_session" or "start_index" or "page_size" or "max_nodes")))
+            throw new ConnectorException("vismockup_hierarchy_inventory_input_invalid");
+        var expectedSession = payload.GetProperty("document_session").GetString() ?? "";
+        var startIndex = payload.GetProperty("start_index").GetInt32();
+        var pageSize = payload.GetProperty("page_size").GetInt32();
+        var maxNodes = payload.GetProperty("max_nodes").GetInt32();
+        if (!expectedSession.StartsWith("sha256:", StringComparison.Ordinal) || expectedSession.Length != 71
+            || startIndex < 0 || pageSize is < 1 or > 16 || maxNodes is < 1 or > 100_000)
+            throw new ConnectorException("vismockup_hierarchy_inventory_input_invalid");
+        cancellationToken.ThrowIfCancellationRequested();
+        var result = await _sta.InvokeAsync<object>(() =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var before = RequireProcessIdentity();
+            var document = _connection.RequireActiveDocument(allowLaunch: false);
+            var session = DocumentSession(before, document.DocumentId);
+            if (!string.Equals(session, expectedSession, StringComparison.Ordinal))
+                throw new ConnectorException("vismockup_document_changed");
+            var page = _liveHierarchyReader.Read(before, document.DocumentId, document.SourceIdentity,
+                session, startIndex, pageSize, maxNodes);
+            var after = RequireProcessIdentity();
+            var documentAfter = _connection.RequireActiveDocument(allowLaunch: false);
+            if (!string.Equals(session, DocumentSession(after, documentAfter.DocumentId), StringComparison.Ordinal))
+                throw new ConnectorException("vismockup_document_changed");
+            return page;
+        });
+        cancellationToken.ThrowIfCancellationRequested();
+        return result;
+    }
+
+    private static string DocumentSession(VisMockupProcessState process, string documentHandle)
+    {
+        var ticks = process.ProcessStartUtcTicks!.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        return CanonicalJson.Hash(new { process_id = process.ProcessId!.Value,
+            process_started_utc_ticks = ticks, document_handle = documentHandle });
+    }
+
+    private VisMockupProcessState RequireProcessIdentity()
+    {
+        var process = _com.InspectProcess();
+        if (!process.Running || process.ProcessId is not > 0 || process.ProcessStartUtcTicks is not > 0)
+            throw new ConnectorException("vismockup_process_identity_unavailable");
+        return process;
     }
 
     public Task<VisMockupDocumentSnapshot> SnapshotAsync(int maxNodes, int maxDepth) =>
@@ -143,6 +229,8 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         cancellationToken.ThrowIfCancellationRequested();
         object result = operation.OperationId switch
         {
+            "vismockup.document.identity.read@1" => await ReadDocumentIdentityAsync(operation.Payload, cancellationToken),
+            "vismockup.document.hierarchy_inventory.read@1" => await ReadHierarchyInventoryAsync(operation.Payload, cancellationToken),
             "vismockup.application.probe@1" => await ProbeAsync(
                 operation.Payload.TryGetProperty("allow_launch", out var allowLaunch) && allowLaunch.GetBoolean(), cancellationToken),
             "vismockup.document.snapshot@1" => await SnapshotAsync(
@@ -262,7 +350,8 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             "toggle_visible" => !before,
             _ => throw new ConnectorException("node_visibility_action_unsupported"),
         };
-        if (before == visible) return new { node_key = nodeKey, visible };
+        // A true node flag does not imply loaded geometry or visible descendants.
+        // Always issue the explicit view operation, including repeated show/hide.
 
         try { document.SetNodeVisible(sessionNodeKey, visible); }
         catch (Exception writeError)
@@ -441,14 +530,10 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         // The interactive tree must not wait on VisMockup's non-cancellable
         // ExportEx call. The governed document-snapshot workflow owns PLMXML
         // acquisition; this read path mirrors the proven direct COM traversal.
-        var complete = ReadCompleteComTree(document);
-        _treeCache?.Replace(document, 64, complete);
-        cached = _treeCache?.TryRead(document, maxDepth);
-        if (cached is not null) return TreeResult(cached.Nodes, maxDepth, cached.CacheState,
-            includeVisibility ? ReadLiveVisibility(document, cached.Nodes, maxDepth, cached.CacheState) : null);
-        var shallow = complete.Where(node => node.Depth <= maxDepth).ToArray();
-        return TreeResult(shallow, maxDepth, "verified",
-            includeVisibility ? ReadLiveVisibility(document, shallow, maxDepth, "verified") : null);
+        var visibility = includeVisibility ? new Dictionary<string, bool?>(StringComparer.Ordinal) : null;
+        var complete = ReadCompleteComTree(document, maxDepth, visibility);
+        _treeCache?.Replace(document, maxDepth, complete);
+        return TreeResult(complete, maxDepth, "verified", visibility);
     });
 
     private VisMockupDocumentSnapshot ReadPlmxmlSnapshot(IVisMockupDocument document, int maxNodes, int maxDepth)
@@ -492,10 +577,10 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             throw new ConnectorException("plmxml_current_state_incomplete");
     }
 
-    private static IReadOnlyList<CachedTreeNode> ReadCompleteComTree(IVisMockupDocument document)
+    private static IReadOnlyList<CachedTreeNode> ReadCompleteComTree(IVisMockupDocument document, int maxDepth,
+        Dictionary<string, bool?>? visibility = null)
     {
         const int maxNodes = 250_000;
-        const int maxDepth = 64;
         var root = document.RootNode;
         var nodes = new List<CachedTreeNode>();
         var queue = new Queue<(IVisMockupNode Node, string? Parent, int ChildOrder, int Depth)>();
@@ -507,12 +592,18 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             if (item.Depth > maxDepth) throw new ConnectorException("vismockup_tree_depth_limit_exceeded");
             var nodeKey = item.Node.NodeKey;
             var children = item.Node.Children;
+            if (visibility is not null)
+            {
+                try { visibility[nodeKey] = item.Node.IsVisible; }
+                catch { visibility[nodeKey] = null; }
+            }
             // Keep the interactive tree on VisMockup's lightweight product-
             // structure path. Occurrence metadata can open JT payloads and turn
             // a shallow tree read into a multi-minute geometry scan.
             nodes.Add(new(nodeKey, item.Parent, item.ChildOrder, item.Depth,
                 item.Node.PrintableName, "",
                 children.Count > 0));
+            if (item.Depth == maxDepth) continue;
             for (var index = 0; index < children.Count; index++)
                 queue.Enqueue((children[index], nodeKey, index, item.Depth + 1));
         }

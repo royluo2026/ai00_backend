@@ -59,11 +59,12 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
     private readonly List<string> _insertedDocumentPaths = [];
     public string DocumentId { get; } = documentId;
     public string SourceIdentity { get; } = sourceIdentity;
-    public int HierarchyCount => 1;
+    public int HierarchyCount { get; set; } = 1;
     public IVisMockupNode RootNode { get; } = rootNode;
     public int CaptureImageCalls { get; private set; }
     public int ExportPlmxmlCalls { get; private set; }
     public string? ExportPlmxmlContent { get; set; }
+    public Dictionary<int, string> ExportPlmxmlByHierarchy { get; } = [];
     public bool Closed { get; private set; }
     public List<bool> VisibilityChanges { get; } = [];
     public int SetNodeVisibleCalls { get; private set; }
@@ -120,7 +121,8 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
     {
         ExportPlmxmlCalls++;
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        File.WriteAllText(path, ExportPlmxmlContent ?? $"<PLMXML hierarchy=\"{hierarchyIndex}\"/>");
+        File.WriteAllText(path, ExportPlmxmlByHierarchy.GetValueOrDefault(hierarchyIndex)
+            ?? ExportPlmxmlContent ?? $"<PLMXML hierarchy=\"{hierarchyIndex}\"/>");
     }
     public void SetAllNodesVisible(bool visible) => VisibilityChanges.Add(visible);
     public void Close() => Closed = true;

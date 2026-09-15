@@ -161,6 +161,10 @@ Read one bounded page of the product occurrence tree from one authorized immutab
       "maxItems": 10000,
       "type": "array"
     },
+    "document_gid": {
+      "pattern": "^[1-9][0-9]*$",
+      "type": "string"
+    },
     "limit": {
       "maximum": 5000,
       "minimum": 1,

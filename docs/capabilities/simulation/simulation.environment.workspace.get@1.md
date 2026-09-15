@@ -245,6 +245,7 @@ Read one simulation workspace owned by the caller or shared with authenticated u
     },
     "status": {
       "enum": [
+        "draft",
         "active",
         "baseline",
         "frozen",

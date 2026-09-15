@@ -698,6 +698,12 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
 
     by_id = {(spec.id, spec.version): (spec, descriptor) for spec, descriptor in registry.items}
     assert set(by_id) == {
+        ("simulation.vismockup.document.identity.read.request", 1),
+        ("simulation.vismockup.document.hierarchy_inventory.read.request", 1),
+        ("simulation.environment.live_document.adopt", 1),
+        ("simulation.environment.live_document.adopt", 2),
+        ("simulation.environment.live_document.binding.get", 1),
+        ("simulation.environment.live_document.inventory.apply", 1),
         ("simulation.connector.runtime.takeover", 1),
         ("simulation.connector.health.get", 1),
         ("simulation.connector.health.get", 2),

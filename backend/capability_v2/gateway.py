@@ -1120,6 +1120,7 @@ def configure_default_gateway(registry, *, policy: GatewayPolicy | None = None,
                 (*release.provider_artifacts, *extension.provider_artifacts),
                 created_at=release.created_at,
             )
+    _validate_test_governance_catalog(registry, release)
     store = InMemoryCatalogStore()
     store.publish(release)
     _default_gateway = CapabilityGatewayService(
@@ -1147,6 +1148,33 @@ def _test_governance_registry_loaded(registry: Any) -> bool:
     except Exception:
         return False
     return any(str(key[0]).startswith("base.capability_") for key in keys)
+
+
+def _validate_test_governance_catalog(registry: Any, release: CatalogRelease) -> None:
+    """Fail fast when a test-governance process is bound to a product-only release.
+
+    Serving the process in this state makes every governance-page request look
+    like a transient ``catalog_resolution_failed`` and leaves the UI showing
+    stale data.  Startup is the only safe point to reject the inconsistent
+    registry/release pair, before the gateway can accept traffic.
+    """
+    if os.environ.get("AI00_DEPLOYMENT_PROFILE", "").strip() != "test-governance":
+        return
+    try:
+        governance_keys = {
+            (str(key[0]), int(key[1]))
+            for key in registry.keys()
+            if str(key[0]).startswith("base.capability_")
+        }
+    except Exception as exc:
+        raise RuntimeError("test_governance_registry_unavailable") from exc
+    if not governance_keys:
+        raise RuntimeError("test_governance_registry_missing")
+    release_keys = {(item.id, item.major_version) for item in release.descriptors}
+    missing = sorted(governance_keys - release_keys)
+    if missing:
+        labels = ",".join(f"{capability_id}@{major}" for capability_id, major in missing)
+        raise RuntimeError(f"test_governance_catalog_missing:{labels}")
 
 
 def get_default_gateway() -> CapabilityGatewayService:

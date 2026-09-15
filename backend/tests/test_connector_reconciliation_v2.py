@@ -393,6 +393,24 @@ def test_expired_read_only_lease_is_safely_terminalized_before_equivalent_retry(
         assert cur.fetchone()['status'] == 'failed_without_effect'
 
 
+@pytest.mark.parametrize('expired', [False, True])
+def test_queued_read_retry_only_closes_expired_request(database, expired):
+    service, key, session, plan, leased, pins = running(database, probe=False)
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute("UPDATE workmanship_sim_connector_runtime_plans SET status='queued',expires_at=%s WHERE plan_id=%s",
+            (NOW - timedelta(seconds=1) if expired else NOW + timedelta(minutes=2), plan.plan_id))
+    cloud, _ = signer()
+    replacement = cloud.sign({**plan.model_dump(mode='json'), 'plan_id':'replacement', 'idempotency_key':'new-key'})
+    if not expired:
+        with pytest.raises(RuntimeError, match='reconciliation_required'):
+            service.repository.insert_v2_plan(replacement, session.session_token, NOW)
+        return
+    service.repository.insert_v2_plan(replacement, session.session_token, NOW)
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute('SELECT status FROM workmanship_sim_connector_runtime_plans WHERE plan_id=%s', (plan.plan_id,))
+        assert cur.fetchone()['status'] == 'failed_without_effect'
+
+
 def test_recovery_context_binds_original_lease_and_never_returns_mutation(database):
     service, key, session, plan, leased, pins = running(database)
     service.clock = lambda: NOW+timedelta(minutes=6)

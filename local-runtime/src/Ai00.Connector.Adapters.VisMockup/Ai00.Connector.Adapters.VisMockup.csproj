@@ -6,4 +6,8 @@
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.8" />
     <ProjectReference Include="..\Ai00.Connector.Contracts\Ai00.Connector.Contracts.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\native\VisMockupHierarchyBridge\Ai00.VisMockup.HierarchyBridge.dll"
+             Link="Ai00.VisMockup.HierarchyBridge.fd3ced5f.dll" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

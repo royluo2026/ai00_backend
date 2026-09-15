@@ -24,6 +24,8 @@ _TWO_PHASE_ENTRYPOINTS = {
 }
 
 _VISMOCKUP_WEB_WORKFLOWS = {
+    "simulation.vismockup.document.identity.read.request",
+    "simulation.vismockup.document.hierarchy_inventory.read.request",
     "simulation.vismockup.application.attach.request",
     "simulation.vismockup.application.launch.request",
     "simulation.vismockup.model.open.request",
@@ -51,6 +53,7 @@ _RESOURCES = {
     "simulation.vismockup.node.visibility.change.request": (),
     "simulation.vismockup.node.selection.change.request": (),
     "simulation.vismockup.tree.read.request": (),
+    "simulation.vismockup.document.hierarchy_inventory.read.request": (),
     "simulation.vismockup.command.get": (("simulation-connector-command", "operation_id"),),
     "simulation.vismockup.status.get": (("simulation-connector", "connector_id"),),
     "simulation.vismockup.application.launch": (("simulation-connector", "connector_id"),),
@@ -724,6 +727,64 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                 "Identity, contract and execution-plan validation fully determine this atomic boundary; no additional business-state rule is decided here."
             ),
         })
+    if governed.id in {"simulation.vismockup.document.identity.read.request",
+                       "simulation.vismockup.document.hierarchy_inventory.read.request"} or "live_document" in governed.tags:
+        from backend.capability_v2.identity import DESKTOP_CONSUMER_ID
+        effects = {
+            "simulation.vismockup.document.identity.read.request": "Queue one signed read identifying the active native document on the owner's current App workstation.",
+            "simulation.vismockup.document.hierarchy_inventory.read.request": "Queue one signed bounded read of alternate hierarchies from an exact active document session.",
+            "simulation.environment.live_document.adopt": ("Bind the owner's already-open native document and register it as the environment's primary live model."
+                if governed.version >= 2 else "Bind the owner's already-open native document to one durable private importing environment."),
+            "simulation.environment.live_document.binding.get": "Resolve the owner's saved document-to-environment association for document and environment selection.",
+            "simulation.environment.live_document.inventory.apply": "Persist one signed complete page of alternate hierarchies into the bound environment without mutating VisMockup.",
+        }
+        updates.update(exposure=ExposurePolicy(web=True), execution_mode=ExecutionMode.CLOUD_SYNC,
+            lifecycle_status=LifecycleStatus.EXPERIMENTAL,
+            business_effect=effects[governed.id],
+            business_acceptance_criteria=(
+                "Identity is derived only from the caller-owned persisted signed read outcome and current App session.",
+                ("Duplicate adoption preserves the same environment and primary live model; AH ingestion remains a separate observed operation."
+                 if governed.version >= 2 else "Duplicate adoption preserves the same environment and model/AH ingestion is never implied."),
+                "Unavailable or other-owner evidence cannot disclose or create a binding."),
+            business_invariants=(BusinessInvariantContract(rule_id="simulation.live_document.attested_identity", version=1,
+                statement="A native document adoption uses only fresh signed identity evidence bound to the current owner App session.",
+                applies_when="an existing native document is adopted or its identity is resolved",
+                enforcement_ref="plugins/simulation/simulation_backend/application/live_document_identity.py:verify_identity_evidence",
+                error_code="live_document_identity_unavailable",
+                test_refs=("plugins/simulation/tests/test_live_document_identity_evidence.py::test_verifies_only_persisted_signed_identity",)),),
+            no_business_invariant_reason=None,
+            consumer_refs=({'consumer_id':DESKTOP_CONSUMER_ID,'consumer_type':'web','version_constraint':'==1'},),
+            test_refs=({'path':'plugins/simulation/tests/test_live_document_capabilities.py'},
+                       {'path':'plugins/simulation/tests/test_live_document_identity_evidence.py'},
+                       {'path':'backend/tests/test_simulation_connector_runtime_v2_sql.py'},),
+            transaction_policy={
+                'owner':'simulation', 'atomicity':(
+                    'signed AH page/hierarchies/nodes/workspace revision/idempotency in one repository transaction'
+                    if governed.id.endswith('.inventory.apply') else
+                    'workspace create/version/head/binding/primary live model/idempotency reservation in one repository transaction'
+                    if governed.id.endswith('.adopt') and governed.version >= 2 else
+                    'workspace create/version/head/binding/idempotency reservation in one repository transaction'
+                    if governed.id.endswith('.adopt') else
+                    'read or signed queue persistence only; no workspace mutation'),
+                'native_atomicity':'identity read and adoption are not atomic with native document changes',
+                'tables': ['workmanship_sim_connector_runtime_plans','workmanship_sim_connector_runtime_devices',
+                    'workmanship_sim_live_document_bindings','workmanship_sim_live_document_adoptions',
+                    'workmanship_sim_workspaces','workmanship_sim_workspace_versions','workmanship_sim_workspace_heads',
+                    *(['workmanship_sim_vm_documents'] if governed.id.endswith('.adopt') and governed.version >= 2 else []),
+                    *(['workmanship_sim_workspace_hierarchies','workmanship_sim_workspace_nodes','workmanship_sim_workspace_idempotency']
+                      if governed.id.endswith('.inventory.apply') else [])],
+                'migration_refs':['backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql',
+                    'backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql'],
+                'dependencies':['vismockup.document.identity.read@1','vismockup.document.hierarchy_inventory.read@1','simulation.vismockup.command.get@1'],
+                'idempotency':'owner/tenant/key plus exact device/session/name' + ('/document display name' if governed.version >= 2 else '') + '; retained responses forbid recreation'},
+            domain_errors=tuple(DomainErrorContract(code=code, meaning=meaning) for code, meaning in (
+                ('live_document_identity_unavailable','The authenticated native identity cannot be established.'),
+                ('live_document_identity_stale','The signed native identity or server receipt is stale.'),
+                ('live_document_owner_required','The authenticated web owner and tenant are required.'),
+                ('live_document_input_invalid','The closed live document request is invalid.'),
+                ('live_document_binding_stale','The prior binding cannot be reused safely.'),
+                ('idempotency_conflict','The request key was already used for different adoption input.'),
+                ('runtime_v2_required','A current App v2 runtime is required.'))), domain_errors_complete=False)
     return CapabilityDescriptorV2.model_validate({**descriptor.model_dump(), **updates})
 
 

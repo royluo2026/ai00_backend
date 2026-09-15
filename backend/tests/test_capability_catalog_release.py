@@ -227,8 +227,9 @@ def test_checked_in_catalog_has_verified_stable_descriptor_pin():
     release = load_catalog_release(catalog_path.read_text(encoding="utf-8"))
     stable_count = sum(item.lifecycle_status is LifecycleStatus.STABLE for item in release.descriptors)
 
-    assert len(release.descriptors) == 730
-    assert stable_count == 544
+    # Includes eight live-document/runtime descriptors; not a human release approval.
+    assert len(release.descriptors) == 777
+    assert stable_count == 546
     assert PINNED_STABLE_PRODUCT_DESCRIPTOR_COUNT == stable_count
 
 

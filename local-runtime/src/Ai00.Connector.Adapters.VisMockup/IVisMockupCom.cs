@@ -292,7 +292,7 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
             ? []
             : System.Diagnostics.Process.GetProcessesByName(processName)
                 .Concat(System.Diagnostics.Process.GetProcessesByName(processName + "_NG")).ToArray();
-        var matches = new List<(int Id, long Started)>();
+        var matches = new List<(int Id, long Started, bool HasMainWindow)>();
         var running = false;
         var processCount = 0;
         try
@@ -301,7 +301,8 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
             {
                 running = true;
                 processCount++;
-                try { matches.Add((process.Id, process.StartTime.ToUniversalTime().Ticks)); }
+                try { matches.Add((process.Id, process.StartTime.ToUniversalTime().Ticks,
+                    process.MainWindowHandle != IntPtr.Zero)); }
                 catch (Exception error) when (error is System.ComponentModel.Win32Exception or InvalidOperationException) { }
             }
         }
@@ -309,9 +310,19 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         var version = File.Exists(path)
             ? System.Diagnostics.FileVersionInfo.GetVersionInfo(path).ProductVersion ?? "unknown"
             : "unknown";
-        return processCount == 1 && matches.Count == 1
-            ? new(true, version, matches[0].Id, matches[0].Started)
+        var identity = SelectProcessIdentity(matches);
+        return identity is { } selected
+            ? new(true, version, selected.Id, selected.Started)
             : new(running, version);
+    }
+
+    internal static (int Id, long Started)? SelectProcessIdentity(
+        IReadOnlyList<(int Id, long Started, bool HasMainWindow)> processes)
+    {
+        var windowed = processes.Where(process => process.HasMainWindow).ToArray();
+        if (windowed.Length == 1) return (windowed[0].Id, windowed[0].Started);
+        if (windowed.Length > 1 || processes.Count != 1) return null;
+        return (processes[0].Id, processes[0].Started);
     }
 
     public bool TryGetActiveApplication(out IVisMockupApplication? application)
@@ -319,19 +330,16 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         var process = InspectProcess();
         var identity = process.ProcessId is int pid && process.ProcessStartUtcTicks is long started
             ? (pid, started) : ((int, long)?)null;
-        if (identity != _attachedProcess)
-        {
-            _application = null;
-            _attachedProcess = null;
-        }
-
-        if (_application is not null)
+        if (_application is not null && CanReuseCachedApplication(process, _attachedProcess))
         {
             application = _application;
             return true;
         }
 
-        if (identity is null)
+        _application = null;
+        _attachedProcess = null;
+
+        if (!process.Running)
         {
             application = null;
             return false;
@@ -350,6 +358,10 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
             return false;
         }
     }
+
+    internal static bool CanReuseCachedApplication(VisMockupProcessState process, (int ProcessId, long Started)? attached) =>
+        process.Running && (process.ProcessId is not int pid || process.ProcessStartUtcTicks is not long started ||
+            attached == (pid, started));
 
     internal static bool MatchesProcessName(string configuredName, string runningName) =>
         string.Equals(configuredName, runningName, StringComparison.OrdinalIgnoreCase) ||
@@ -496,12 +508,18 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         public void SetNodeVisible(string nodeKey, bool visible)
         {
             var node = FindNode(nodeKey);
-            VisMockupDispatch.SetProperty(node, 9, visible);
+            // visible PUT changes a flag even for unloaded parts. The view
+            // command performs the display/load operation for the selected branch.
+            var nodes = VisMockupDispatch.InvokeMethod(ActiveView, 35);
+            VisMockupDispatch.InvokeMethod(nodes, 4, node);
+            VisMockupDispatch.InvokeMethod(ActiveView, visible ? 19 : 20, nodes);
+            VisMockupDispatch.InvokeMethod(ActiveView, 31);
         }
         public void SetNodeSelected(string nodeKey, bool selected)
         {
             var node = FindNode(nodeKey);
             VisMockupDispatch.SetProperty(node, 10, selected);
+            VisMockupDispatch.InvokeMethod(ActiveView, 31);
         }
         public void SetAllNodesVisible(bool visible)
         {

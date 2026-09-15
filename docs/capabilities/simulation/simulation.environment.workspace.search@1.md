@@ -157,6 +157,7 @@ Search simulation workspaces owned by the caller or shared with authenticated us
           },
           "status": {
             "enum": [
+              "draft",
               "active",
               "baseline",
               "frozen",

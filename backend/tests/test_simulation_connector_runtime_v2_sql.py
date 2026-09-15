@@ -228,6 +228,37 @@ def outcome_for(plan, leased, status="succeeded"):
     return ConnectorPlanOutcomeV2.model_validate(source)
 
 
+def test_identity_outcome_persists_without_materialization_projection_and_verifies(database):
+    from plugins.simulation.tests.test_live_document_identity_evidence import evidence
+    from backend.contracts.connector_execution_plan_v2 import canonicalize_v2
+    row, _ = evidence()
+    registered = session(database)
+    raw = row['plan_json']
+    raw.update(device_id=database[1], runtime_generation=registered.runtime_generation,
+        runtime_instance_id=registered.runtime_instance_id, issued_at='2026-09-07T12:00:00Z',
+        expires_at='2026-09-07T12:10:00Z')
+    raw['plan_hash'] = compute_plan_hash(raw)
+    plan = ConnectorExecutionPlanV2.model_validate(raw)
+    repo = SimulationConnectorRepository()
+    repo.heartbeat_runtime(database[1], registered.runtime_generation, registered.runtime_instance_id,
+        registered.session_token, NOW)
+    repo.insert_v2_plan(plan, registered.session_token, NOW)
+    leased = lease(database, registered)
+    outcome = row['outcome_json']
+    outcome.update(device_id=database[1],plan_hash=plan.plan_hash,lease_id=leased['lease_id'],reported_at='2026-09-07T12:00:02Z',device_key_id='device-key-001')
+    outcome['steps'][0].update(started_at='2026-09-07T12:00:00Z',completed_at='2026-09-07T12:00:01Z')
+    outcome['signature'] = sign_outcome(outcome)
+    repo.complete_v2_plan(database[1], registered.runtime_generation, registered.runtime_instance_id,
+        registered.session_token, outcome, NOW + timedelta(seconds=3))
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute('SELECT * FROM workmanship_sim_connector_runtime_projection_outbox WHERE plan_id=%s',(plan.plan_id,))
+        assert cur.fetchone() is None
+    identity = repo.verified_document_identity(plan.plan_id,actor_id='user-001',tenant_id='tenant-001',now=NOW+timedelta(seconds=4))
+    assert identity == dict(connector_device_id=database[1],document_session=outcome['steps'][0]['result']['document_session'])
+    with pytest.raises(ConnectorRepositoryError,match='identity_unavailable'):
+        repo.verified_document_identity(plan.plan_id,actor_id='other',tenant_id='tenant-001',now=NOW+timedelta(seconds=4))
+
+
 def sign_outcome(source):
     import base64
     from cryptography.hazmat.primitives import hashes
@@ -320,7 +351,7 @@ def test_unresolved_write_plan_blocks_registration_and_takeover(database, status
     assert read(database)["runtime_generation"] == 7
 
 
-@pytest.mark.parametrize("status", ["leased", "executing", "outcome_unknown"])
+@pytest.mark.parametrize("status", ["leased", "executing", "outcome_unknown", "manual_review_required"])
 def test_expired_read_only_plan_does_not_deadlock_runtime_restart(database, status):
     registered = session(database)
     current = queue(database, registered)
@@ -342,15 +373,15 @@ def test_expired_read_only_plan_does_not_deadlock_runtime_restart(database, stat
         assert cur.fetchone()["reason"] == "read_only_plan_abandoned_during_runtime_restart"
 
 
-def test_manual_review_read_plan_still_blocks_runtime_restart(database):
+def test_manual_review_read_plan_with_live_lease_still_blocks_runtime_restart(database):
     registered = session(database)
     current = queue(database, registered)
     lease(database, registered)
     transaction, _ = database
     with transaction() as conn, conn.cursor() as cur:
         cur.execute(
-            "UPDATE workmanship_sim_connector_runtime_plans SET status='manual_review_required' WHERE plan_id=%s",
-            (current.plan_id,),
+            "UPDATE workmanship_sim_connector_runtime_plans SET status='manual_review_required',lease_until=%s WHERE plan_id=%s",
+            (NOW + timedelta(minutes=5), current.plan_id),
         )
 
     with pytest.raises(ConnectorRepositoryError, match="runtime_plans_unresolved"):
@@ -663,8 +694,10 @@ def test_crash_before_report_can_recover_after_lease_and_session_expire(database
         reconciled_outcome(database, plan, instance='recovery-1', token='recovery-secret', now=now), now)
     # A crash gives no signed execution evidence for this read step.
     assert read(database, 'runtime_plans')['status'] == 'manual_review_required'
-    with pytest.raises(ConnectorRepositoryError, match='runtime_plans_unresolved'):
-        session(database, now=now, instance='new-normal')
+    evidence = read(database, 'runtime_plans')['outcome_json']
+    assert session(database, now=now, instance='new-normal').runtime_instance_id == 'new-normal'
+    assert read(database, 'runtime_plans')['status'] == 'failed_without_effect'
+    assert read(database, 'runtime_plans')['outcome_json'] == evidence
 
 
 @pytest.mark.parametrize("failure_at", ["expiry_audit", "session_audit"])

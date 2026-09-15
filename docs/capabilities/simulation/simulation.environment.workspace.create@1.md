@@ -295,6 +295,7 @@ Create a versioned private or shared simulation workspace.
     },
     "status": {
       "enum": [
+        "draft",
         "active",
         "baseline",
         "frozen",

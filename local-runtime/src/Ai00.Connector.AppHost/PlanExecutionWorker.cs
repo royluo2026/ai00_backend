@@ -113,6 +113,8 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
                     status=noEffect?"failed_without_effect":"outcome_unknown";
                     error=exception is ConnectorNoEffectException rejected
                         ? rejected.Code
+                        : exception is ConnectorException connectorError
+                        ? connectorError.Code
                         : noEffect?"read_invocation_failed":"invocation_outcome_unknown";
                     if(exception is OperationCanceledException&&timeout.IsCancellationRequested&&!ct.IsCancellationRequested)
                         RequiresProcessRestart=true;

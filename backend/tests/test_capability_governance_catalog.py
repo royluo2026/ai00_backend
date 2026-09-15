@@ -143,6 +143,21 @@ def test_http_gateway_overlays_governance_catalog_only_for_explicit_test_profile
     assert product_gateway.catalog().descriptor("craft.bop.version.list", 1) is not None
 
 
+def test_test_governance_gateway_rejects_release_without_extension(monkeypatch, tmp_path):
+    """A test-governance process must fail at startup instead of serving a broken catalog."""
+    monkeypatch.setenv("AI00_DEPLOYMENT_PROFILE", "test-governance")
+    monkeypatch.setenv("AI00_GID_MACHINE_ID", "41")
+    registry = build_capability_registry(ROOT, include_test_governance=True)
+    product_path = tmp_path / "product-only.json"
+    product_path.write_text(
+        (ROOT / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(RuntimeError, match="test_governance_catalog_missing"):
+        configure_default_gateway(registry, release_path=product_path)
+
+
 def test_local_test_catalog_override_requires_isolated_app(monkeypatch, tmp_path):
     from backend.capability_v2.gateway import _local_test_release_path
 

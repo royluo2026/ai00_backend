@@ -47,7 +47,7 @@ Atomically insert the exact previewed BOP process skeleton as one alternate hier
 - 幂等：`required`
 - 并发：`none`
 - 无预期版本信封要求。
-- 一致性：`strong`
+- 一致性：`external`
 - Operation：`optional`
 - Artifact：`none`
 - 审计：`standard`

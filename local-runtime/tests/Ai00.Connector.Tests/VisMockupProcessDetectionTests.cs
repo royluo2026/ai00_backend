@@ -19,4 +19,16 @@ public sealed class VisMockupProcessDetectionTests
     {
         Assert.False(WindowsVisMockupCom.MatchesProcessName("VisView", "OtherViewer"));
     }
+
+    [Fact]
+    public void ExtraBackgroundProcessDoesNotDiscardAnExistingAutomationConnection()
+    {
+        var attached = (ProcessId: 41, Started: 1000L);
+        Assert.True(WindowsVisMockupCom.CanReuseCachedApplication(
+            new VisMockupProcessState(true, "14.2.0"), attached));
+        Assert.False(WindowsVisMockupCom.CanReuseCachedApplication(
+            new VisMockupProcessState(false, "14.2.0"), attached));
+        Assert.False(WindowsVisMockupCom.CanReuseCachedApplication(
+            new VisMockupProcessState(true, "14.2.0", 42, 2000), attached));
+    }
 }

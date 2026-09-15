@@ -75,11 +75,20 @@ internal sealed class VisMockupPlmxmlProjectionReader
                 current = null;
         }
 
-        var rootOccurrence = occurrences.SingleOrDefault(value => value.InstanceRefs.Count == 1 && value.InstanceRefs[0] == rootInstanceId)
-            ?? throw new ConnectorException("plmxml_current_state_root_identity_missing");
-        var rootPdmUid = Value(rootOccurrence, "__PLM_OCC_PDM_UID");
-        if (string.IsNullOrWhiteSpace(rootPdmUid))
+        // Alternate-hierarchy exports can contain more than one occurrence that
+        // references the graph root instance.  The document root is the
+        // deterministic shortest-path candidate; cloned/link occurrences carry
+        // a longer current-state path and must not make the read ambiguous.
+        var rootOccurrence = occurrences
+            .Where(value => value.InstanceRefs.Count == 1 && value.InstanceRefs[0] == rootInstanceId
+                && !string.IsNullOrWhiteSpace(Value(value, "__PLM_OCC_PDM_UID")))
+            .Where(value => CurrentStatePath(value.ApplicationRefs.GetValueOrDefault("__TC-VIS_APP", "")).Count == 0)
+            .OrderBy(value => value.Ordinal)
+            .FirstOrDefault();
+        var syntheticAlternateRoot = rootOccurrence is null && rootInstanceId.StartsWith("altInst", StringComparison.Ordinal);
+        if (rootOccurrence is null && !syntheticAlternateRoot)
             throw new ConnectorException("plmxml_current_state_root_identity_missing");
+        var rootPdmUid = syntheticAlternateRoot ? "alt:" + rootInstanceId : Value(rootOccurrence!, "__PLM_OCC_PDM_UID");
         var paths = occurrences
             .Select(value => new PathEntry(
                 CurrentStatePath(value.ApplicationRefs.GetValueOrDefault("__TC-VIS_APP", "")), value, null))
@@ -98,22 +107,25 @@ internal sealed class VisMockupPlmxmlProjectionReader
                 .ToArray();
         if (paths.Length == 0) throw new ConnectorException("plmxml_current_state_structure_missing");
 
-        var rootPath = paths[0].Path[0];
+        var rootPath = syntheticAlternateRoot ? rootName : paths[0].Path[0];
         var rootKey = StableKey(rootPdmUid);
         var rootProduct = ItemRevision(rootPath);
         var nodes = new List<VisMockupPlmxmlNode>
         {
             new(rootKey, null, 0, 0, string.IsNullOrWhiteSpace(rootName) ? rootPath : rootName,
                 rootProduct.Item, rootProduct.Revision, rootPdmUid,
-                Value(rootOccurrence, "__PLM_ABSOCC_UID"), [], [rootPath],
-                Value(rootOccurrence, "catiaOccurrenceName")),
+                syntheticAlternateRoot ? "" : Value(rootOccurrence!, "__PLM_ABSOCC_UID"), [],
+                string.IsNullOrWhiteSpace(rootPath) ? [] : [rootPath],
+                syntheticAlternateRoot ? "" : Value(rootOccurrence!, "catiaOccurrenceName")),
         };
-        var keyByPath = new Dictionary<string, string>(StringComparer.Ordinal) { [PathKey([rootPath])] = rootKey };
+        var keyByPath = syntheticAlternateRoot
+            ? new Dictionary<string, string>(StringComparer.Ordinal)
+            : new Dictionary<string, string>(StringComparer.Ordinal) { [PathKey([rootPath])] = rootKey };
         var pdmUids = new HashSet<string>(StringComparer.Ordinal) { rootPdmUid };
         var childOrders = new Dictionary<string, int>(StringComparer.Ordinal);
         foreach (var entry in paths)
         {
-            if (entry.Path.Count == 1) continue;
+            if (!syntheticAlternateRoot && entry.Path.Count == 1) continue;
             if (nodes.Count >= maxNodes) throw new ConnectorException("bom_snapshot_limit_exceeded");
             var pdmUid = Value(entry.Occurrence, "__PLM_OCC_PDM_UID");
             if (string.IsNullOrWhiteSpace(pdmUid) || !pdmUids.Add(pdmUid))
@@ -122,8 +134,14 @@ internal sealed class VisMockupPlmxmlProjectionReader
             if (keyByPath.ContainsKey(pathKey))
                 throw new ConnectorException("plmxml_current_state_identity_ambiguous");
             var parentPath = entry.Path.Take(entry.Path.Count - 1).ToArray();
-            if (!keyByPath.TryGetValue(PathKey(parentPath), out var parentKey))
-                throw new ConnectorException("plmxml_current_state_parent_missing");
+            string? parentKey = null;
+            for (var length = parentPath.Length; length > 0 && parentKey is null; length--)
+                keyByPath.TryGetValue(PathKey(parentPath.Take(length)), out parentKey);
+            if (parentKey is null)
+            {
+                if (!syntheticAlternateRoot) throw new ConnectorException("plmxml_current_state_parent_missing");
+                parentKey = rootKey;
+            }
             var printableName = entry.PrintableName ?? entry.Path[^1];
             var product = ItemRevision(printableName);
             var order = childOrders.GetValueOrDefault(parentKey);

@@ -16,6 +16,36 @@ is a deliberate fail-closed external prerequisite.
 
 ## Normal test-environment sequence
 
+### Shared database with test-prefixed tables
+
+The local AI00 test environment uses a shared database with `TABLE_PREFIX=test_`.
+This is table-namespace isolation, not a requirement for a separate database.
+Use its explicitly selected environment file for runtime connections. Keep DDL
+credentials explicit in `AI00_BASE_DDL_DB_URL`; do not automatically promote a
+runtime credential into a migration credential.
+
+For that environment, set `TABLE_PREFIX=test_` together with the test-governance
+profile before running the commands below. The migration command rewrites SQL
+before metadata checks, including the Catalog backfill dependency, and uses a
+separate test-prefixed migration ledger and lock. It accepts only exact `test_`
+or the existing empty-prefix dedicated-database mode; never use empty-prefix
+mode against the shared database. Source migration checksums remain unchanged.
+`--check` is offline. The test Catalog release table must exist before migration
+0009. Never copy production approvals into test tables to make a release pass.
+
+If OceanBase returns error 1305 specifically for `GET_LOCK`, the default remains
+fail-closed. `--externally-serialized` requires the operator to guarantee a single
+migration executor for that target. It does not suppress lock timeouts, permission
+errors or migration failures. A workstation mutex does not coordinate remote jobs.
+
+The 2026-09-14 shared-test initialization required empty-table recovery on engine
+`5.7.25-OceanBase-v3.2.3.3`: VARCHAR-to-VARBINARY and nullable-to-NOT-NULL changes
+were rejected. Five newly created empty tables were rebuilt with binary hashes;
+their empty originals remain as `test_workmanship_cg_hash_backup_0_20260914`
+through `_4_20260914`. The empty snapshot hash column was recreated NOT NULL.
+No evidence rows were removed or manufactured. This is not a populated-table
+upgrade path. All nine ledger entries completed; replay applied zero migrations.
+
 ```powershell
 $env:AI00_DEPLOYMENT_PROFILE = 'test-governance'
 python backend/scripts/migrate_capability_governance_test.py --apply

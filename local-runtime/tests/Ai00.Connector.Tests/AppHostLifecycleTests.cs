@@ -149,10 +149,10 @@ public sealed class AppHostLifecycleTests
         Assert.ThrowsAny<Exception>(()=>AppHostOptions.Parse(Args.Concat(new[]{"--command","launch"}).ToArray()));
         Assert.ThrowsAny<Exception>(()=>AppHostOptions.Parse(Args.Concat(new[]{"--parent-pid","42"}).ToArray()));
     }
-    [Fact] public void DevelopmentRuntimeNeverSharesInstalledConnectorIdentityOrJournal()
+    [Fact] public void TestRuntimeNeverSharesInstalledConnectorIdentityOrJournal()
     {
         Assert.EndsWith(Path.Combine("AI00","App","Connector"),Program.StateRoot(false));
-        Assert.EndsWith(Path.Combine("AI00","App","Connector-Dev"),Program.StateRoot(true));
+        Assert.EndsWith(Path.Combine("AI00","App","Connector-Test"),Program.StateRoot(true));
         Assert.NotEqual(Program.StateRoot(false),Program.StateRoot(true));
     }
     [Fact] public void RuntimeHeartbeatIsPeriodicInsteadOfBlockingEveryPlanLease()

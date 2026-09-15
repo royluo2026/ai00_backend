@@ -326,14 +326,17 @@ def candidate_specs(provider: WorkspaceProvider | None = None) -> tuple[tuple[Ca
                 "visibility": {"type": "string", "enum": ["private", "shared"]},
                 "project_gids": {"type": "array", "maxItems": 50, "uniqueItems": True, "items": gid},
                 "primary_project_gid": {"anyOf": [gid, {"type": "null"}]}}
-    workspace = {"type": "object", "required": ["workspace_gid", "version_gid", "owner_gid", "is_owner", *metadata.keys(), "updated_at", "row_version", "cache_revision_hash", "nodes", "bindings"],
-                 "properties": {"workspace_gid": gid, "version_gid": gid, "owner_gid": gid, "is_owner": {"type": "boolean"}, **metadata,
+    # Adoption creates a draft before its first synchronized model snapshot.
+    # Draft is readable, but interactive create/update inputs stay restricted.
+    read_metadata = {**metadata, "status": {"type": "string", "enum": ["draft", "active", "baseline", "frozen", "archived"]}}
+    workspace = {"type": "object", "required": ["workspace_gid", "version_gid", "owner_gid", "is_owner", *read_metadata.keys(), "updated_at", "row_version", "cache_revision_hash", "nodes", "bindings"],
+                 "properties": {"workspace_gid": gid, "version_gid": gid, "owner_gid": gid, "is_owner": {"type": "boolean"}, **read_metadata,
                                 "updated_at": {"type": "string"}, "row_version": {"type": "integer", "minimum": 1},
                                 "cache_revision_hash": cache_revision,
                                 "nodes": {"type": "array", "items": node},
                                 "bindings": {"type": "array", "items": binding}}, "additionalProperties": False}
-    workspace_summary = {"type": "object", "required": ["workspace_gid", "version_gid", "owner_gid", "is_owner", *metadata.keys(), "updated_at", "row_version", "cache_revision_hash"],
-                         "properties": {"workspace_gid": gid, "version_gid": gid, "owner_gid": gid, "is_owner": {"type": "boolean"}, **metadata,
+    workspace_summary = {"type": "object", "required": ["workspace_gid", "version_gid", "owner_gid", "is_owner", *read_metadata.keys(), "updated_at", "row_version", "cache_revision_hash"],
+                         "properties": {"workspace_gid": gid, "version_gid": gid, "owner_gid": gid, "is_owner": {"type": "boolean"}, **read_metadata,
                                         "updated_at": {"type": "string"}, "row_version": {"type": "integer", "minimum": 1},
                                         "cache_revision_hash": cache_revision}, "additionalProperties": False}
     search_output = {"type": "object", "required": ["items", "next_cursor"],

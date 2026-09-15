@@ -8,7 +8,7 @@ import os
 import re
 import sys
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
@@ -100,8 +100,10 @@ def _created_tables(sql: str) -> set[str]:
     return tables
 
 
-def compile_governance_migrations(root: Path = REPOSITORY_ROOT) -> CompiledGovernanceMigrations:
+def compile_governance_migrations(root: Path = REPOSITORY_ROOT, *, table_prefix: str = "") -> CompiledGovernanceMigrations:
     """Compile the separate, UTF-8 governance stream without product schema discovery."""
+    if table_prefix not in ("", "test_"):
+        raise MigrationError("unsupported governance table prefix")
     directory = Path(root) / MIGRATION_DIRECTORY
     migrations: list[GovernanceMigration] = []
     seen: set[str] = set()
@@ -133,6 +135,13 @@ def compile_governance_migrations(root: Path = REPOSITORY_ROOT) -> CompiledGover
         raise MigrationError(
             f"governance table contract mismatch: missing={sorted(expected - entity_tables)}, extra={sorted(entity_tables - expected)}"
         )
+    # Keep immutable source checksums; namespace is isolated by its own ledger.
+    # Rewrite before metadata probes, including the Catalog backfill dependency.
+    if table_prefix:
+        migrations = [replace(item, sql=re.sub(
+            r"(?<![A-Za-z0-9_])workmanship_", table_prefix + "workmanship_", item.sql,
+        )) for item in migrations]
+        entity_tables = {table_prefix + name for name in entity_tables}
     return CompiledGovernanceMigrations(
         migrations=tuple(migrations),
         tables=tuple(sorted(entity_tables)),
@@ -140,29 +149,39 @@ def compile_governance_migrations(root: Path = REPOSITORY_ROOT) -> CompiledGover
     )
 
 
-def _ledger_exists(connection) -> bool:
+def _ledger_exists(connection, ledger_table: str = LEDGER_TABLE) -> bool:
     with connection.cursor() as cursor:
         cursor.execute(
             "SELECT COUNT(*) FROM information_schema.TABLES "
             "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s",
-            (LEDGER_TABLE,),
+            (ledger_table,),
         )
         return int(_scalar(cursor.fetchone())) > 0
 
 
-def migrate(connection) -> tuple[str, ...]:
+def migrate(connection, *, table_prefix: str = "", root: Path = REPOSITORY_ROOT,
+            externally_serialized: bool = False) -> tuple[str, ...]:
     """Apply verified governance migrations and return just-applied migration IDs."""
-    compiled = compile_governance_migrations()
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT GET_LOCK(%s, %s)", (LOCK_NAME, 30))
-        if _scalar(cursor.fetchone()) != 1:
-            raise MigrationError("could not acquire capability governance migration lock")
+    compiled = compile_governance_migrations(root, table_prefix=table_prefix)
+    ledger_table = table_prefix + LEDGER_TABLE
+    lock_name = LOCK_NAME + (":" + table_prefix if table_prefix else "")
+    named_lock_acquired = False
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT GET_LOCK(%s, %s)", (lock_name, 30))
+            if _scalar(cursor.fetchone()) != 1:
+                raise MigrationError("could not acquire capability governance migration lock")
+            named_lock_acquired = True
+    except Exception as exc:
+        if not (externally_serialized and exc.args and exc.args[0] == 1305
+                and "GET_LOCK" in str(exc).upper()):
+            raise
     applied: list[str] = []
     try:
         existing = {}
-        if _ledger_exists(connection):
+        if _ledger_exists(connection, ledger_table):
             with connection.cursor() as cursor:
-                cursor.execute(f"SELECT migration_id, checksum FROM {LEDGER_TABLE}")
+                cursor.execute(f"SELECT migration_id, checksum FROM {ledger_table}")
                 rows = cursor.fetchall()
             existing = {
                 row["migration_id"] if isinstance(row, dict) else row[0]: row
@@ -187,7 +206,7 @@ def migrate(connection) -> tuple[str, ...]:
                     connection.commit()
                 with connection.cursor() as cursor:
                     cursor.execute(
-                        f"INSERT INTO {LEDGER_TABLE} (migration_id, name, checksum) VALUES (%s, %s, %s)",
+                        f"INSERT INTO {ledger_table} (migration_id, name, checksum) VALUES (%s, %s, %s)",
                         (migration.migration_id, migration.name, migration.checksum),
                     )
                 connection.commit()
@@ -201,8 +220,9 @@ def migrate(connection) -> tuple[str, ...]:
                 ) from exc
         return tuple(applied)
     finally:
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT RELEASE_LOCK(%s)", (LOCK_NAME,))
+        if named_lock_acquired:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT RELEASE_LOCK(%s)", (lock_name,))
 
 
 def _connect_test_ddl(url: str):
@@ -240,14 +260,17 @@ def main(
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--check", action="store_true")
     mode.add_argument("--apply", action="store_true")
+    parser.add_argument("--externally-serialized", action="store_true",
+                        help="operator guarantees one migration runner; permits unsupported GET_LOCK only")
     args = parser.parse_args(argv)
     environment = os.environ if environ is None else environ
     if environment.get("AI00_DEPLOYMENT_PROFILE") != "test-governance":
         raise MigrationError("Capability Governance migrations require AI00_DEPLOYMENT_PROFILE=test-governance")
 
-    compiled = compile_governance_migrations(root)
+    table_prefix = environment.get("TABLE_PREFIX", "")
+    compiled = compile_governance_migrations(root, table_prefix=table_prefix)
     if args.check:
-        print(f"profile=test-governance migrations={len(compiled.migrations)} tables={len(compiled.tables)} mode=check")
+        print(f"profile=test-governance prefix={table_prefix or '(dedicated)'} migrations={len(compiled.migrations)} tables={len(compiled.tables)} mode=check")
         return 0
 
     ddl_url = str(environment.get("AI00_BASE_DDL_DB_URL", "")).strip()
@@ -256,7 +279,8 @@ def main(
     connection = _connect_test_ddl(ddl_url)
     try:
         profile = verify_live_server(connection)
-        applied = migrate(connection)
+        applied = migrate(connection, table_prefix=table_prefix, root=root,
+                          externally_serialized=args.externally_serialized)
         print(
             f"profile=test-governance migrations={len(compiled.migrations)} tables={len(compiled.tables)} "
             f"applied={len(applied)} oceanbase={profile['version']}"

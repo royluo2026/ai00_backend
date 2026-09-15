@@ -109,8 +109,62 @@ Place a model-document occurrence or resource reference under one hierarchy node
     },
     "source_ref": {
       "additionalProperties": false,
-      "maxProperties": 16,
-      "properties": {},
+      "properties": {
+        "artifact_id": {
+          "type": "string"
+        },
+        "artifact_version": {
+          "type": "string"
+        },
+        "connector_device_id": {
+          "type": "string"
+        },
+        "content_sha256": {
+          "type": "string"
+        },
+        "document_gid": {
+          "type": "string"
+        },
+        "node_key": {
+          "type": "string"
+        },
+        "occurrence_gid": {
+          "type": "string"
+        },
+        "occurrence_id": {
+          "type": "string"
+        },
+        "occurrence_key": {
+          "type": "string"
+        },
+        "projection_identity": {
+          "type": "string"
+        },
+        "resource_code": {
+          "type": "string"
+        },
+        "resource_gid": {
+          "type": "string"
+        },
+        "resource_name": {
+          "type": "string"
+        },
+        "resource_type": {
+          "type": "string"
+        },
+        "resource_version": {
+          "type": "string"
+        },
+        "source_identity_hash": {
+          "type": "string"
+        },
+        "source_projection_hash": {
+          "type": "string"
+        },
+        "stable_identity": {
+          "type": "string"
+        }
+      },
       "type": "object"
     },
     "target_node_gid": {

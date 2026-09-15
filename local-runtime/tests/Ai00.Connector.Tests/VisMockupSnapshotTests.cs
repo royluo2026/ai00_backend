@@ -217,6 +217,23 @@ public sealed class VisMockupSnapshotTests
     }
 
     [Fact]
+    public async Task FreshInteractiveTreeCollectsStructureAndVisibilityInOneTraversal()
+    {
+        var leaf = new CountingNode("leaf", []);
+        var root = new CountingNode("root", [leaf]);
+        var document = new FakeDocument("SESSION-1", "tc://bom/one-pass", root);
+        var fake = new FakeVisMockupCom { ExistingApplication = new FakeApplication("14.2.0", document) };
+        using var sta = new StaDispatcher();
+        var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([Path.GetTempPath()]), fake);
+        var result = JsonSerializer.SerializeToElement(await adapter.TreeAsync(3, forceRefresh: true, includeVisibility: true));
+        Assert.Equal(1, root.ChildrenReads);
+        Assert.Equal(1, leaf.ChildrenReads);
+        Assert.True(result.GetProperty("nodes")[1].GetProperty("visible").GetBoolean());
+        Assert.Equal(0, leaf.OccurrenceReads);
+        Assert.Equal(0, document.ExportPlmxmlCalls);
+    }
+
+    [Fact]
     public async Task InteractiveTreeReportsLiveVisibilityOnFreshAndCachedReads()
     {
         var directory = NewCacheDirectory("live-visibility");
