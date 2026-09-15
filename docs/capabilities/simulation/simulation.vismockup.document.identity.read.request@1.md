@@ -29,7 +29,7 @@ Queue a read of the current native document identity without launching VisMockup
 ## 授权与数据边界
 
 - 授权策略：`simulation.v2:simulation.use`
-- 自动化等级：`A1`
+- 自动化等级：`A2`
 - 数据分类：`confidential`
 - Delegation：`scoped`
 - 认证新鲜度：0 秒
@@ -39,15 +39,15 @@ Queue a read of the current native document identity without launching VisMockup
 
 ## 执行与可靠性
 
-- 副作用：`write`
+- 副作用：`read`
 - 执行模式：`cloud_sync`
 - 超时：30 秒
 - 审批：`none`
-- 幂等：`required`
+- 幂等：`none`
 - 并发：`none`
 - 无预期版本信封要求。
-- 一致性：`external`
-- Operation：`optional`
+- 一致性：`strong`
+- Operation：`none`
 - Artifact：`none`
 - 审计：`standard`
 - Evidence：`required`
@@ -154,6 +154,9 @@ Queue a read of the current native document identity without launching VisMockup
 - `live_document_owner_required`：The authenticated web owner and tenant are required.（retryable=false）
 - `live_document_input_invalid`：The closed live document request is invalid.（retryable=false）
 - `live_document_binding_stale`：The prior binding cannot be reused safely.（retryable=false）
+- `document_session_changed`：The saved binding changed before the explicit rebind committed.（retryable=false）
+- `live_document_already_bound`：The newly attested native session belongs to another environment.（retryable=false）
+- `primary_live_document_unavailable`：The selected environment has no unique primary live document to rebind.（retryable=false）
 - `idempotency_conflict`：The request key was already used for different adoption input.（retryable=false）
 - `runtime_v2_required`：A current App v2 runtime is required.（retryable=false）
 

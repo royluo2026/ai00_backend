@@ -435,7 +435,7 @@ Execute Project Management operation tasks.update.
     "arguments": {
       "gid": "example",
       "updates": {
-        "assignee_team_gid": null
+        "scheduled_date": null
       }
     }
   }

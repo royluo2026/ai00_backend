@@ -252,12 +252,37 @@ class WorkspaceRepository:
                 (workspace_gid, _gid(tenant_gid, "tenant_gid"), _gid(actor_gid, "actor_gid")),
             )
             rows = [dict(row) for row in cursor.fetchall()]
+            online_by_document: dict[str, dict[str, Any]] = {}
+            try:
+                cursor.execute(
+                    "SELECT s.document_gid,s.gid AS online_source_gid,s.source_selector_json,latest.observation_id,"
+                    "latest.captured_at AS observation_captured_at,latest.node_count AS observation_node_count "
+                    "FROM workmanship_sim_online_model_sources s LEFT JOIN workmanship_sim_product_structure_observations latest ON latest.gid=("
+                    "SELECT o.gid FROM workmanship_sim_product_structure_observations o WHERE o.source_gid=s.gid AND o.complete=1 "
+                    "ORDER BY o.captured_at DESC,o.gid DESC LIMIT 1) "
+                    "WHERE s.workspace_gid=%s AND s.tenant_gid=%s AND s.owner_gid=%s",
+                    (workspace_gid, _gid(tenant_gid, "tenant_gid"), _gid(actor_gid, "actor_gid")),
+                )
+                online_by_document = {str(item["document_gid"]): dict(item) for item in cursor.fetchall()}
+            except Exception as exc:
+                message = str(exc).lower()
+                if "no such table" not in message and "doesn't exist" not in message:
+                    raise
         for row in rows:
             for key in ("document_gid", "workspace_gid"):
                 if row.get(key) is not None:
                     row[key] = str(row[key])
             artifact = row.pop("artifact_ref_json", None)
             row["artifact_ref"] = json.loads(artifact) if isinstance(artifact, str) else artifact
+            metadata = online_by_document.get(str(row["document_gid"]), {})
+            row.update({key: metadata.get(key) for key in ("online_source_gid", "source_selector_json",
+                "observation_id", "observation_captured_at", "observation_node_count")})
+            selector = row.pop("source_selector_json", None)
+            row["source_selector"] = json.loads(selector) if isinstance(selector, str) else selector
+            if row.get("online_source_gid") is not None:
+                row["online_source_gid"] = str(row["online_source_gid"])
+            if row.get("observation_captured_at") is not None:
+                row["observation_captured_at"] = str(row["observation_captured_at"])
             row["source_identity_hash"] = "sha256:" + str(row["source_identity_hash"])
             row["content_sha256"] = ("sha256:" + str(row["content_sha256"])) if row.get("content_sha256") else None
         return {"items": rows}
@@ -1273,7 +1298,107 @@ class WorkspaceRepository:
             binding = cursor.fetchone()
             if binding is None:
                 return None
+            if binding["state"] == "superseded":
+                return None
             return self._live_document_bound_result(cursor, binding, tenant_gid=scope[0], actor_gid=scope[1])
+
+    def rebind_live_document(self, *, workspace_gid: str, tenant_gid: str, actor_gid: str,
+                             connector_device_id: str, document_session: str,
+                             expected_document_session: str, expected_workspace_row_version: int,
+                             idempotency_key: str) -> dict[str, Any]:
+        """Explicitly rotate one owner's live runtime binding after a native restart."""
+        workspace_gid = _gid(workspace_gid, "workspace_gid")
+        tenant_gid, actor_gid = _gid(tenant_gid, "tenant_gid"), _gid(actor_gid, "actor_gid")
+        new_scope = self._live_document_identity(tenant_gid, actor_gid, connector_device_id, document_session)
+        if not isinstance(expected_document_session, str) or not expected_document_session.strip():
+            raise WorkspaceRepositoryError("expected_document_session_invalid")
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT row_version,cache_revision_hash,status FROM workmanship_sim_workspaces "
+                "WHERE gid=%s AND tenant_gid=%s AND owner_gid=%s AND removed_at IS NULL FOR UPDATE",
+                (workspace_gid, tenant_gid, actor_gid),
+            )
+            workspace = cursor.fetchone()
+            if not workspace:
+                raise WorkspaceRepositoryError("workspace_not_found")
+            if str(workspace.get("status") or "") == "frozen":
+                raise WorkspaceRepositoryError("workspace_frozen")
+            request_hash, replay = self._idempotency_begin(
+                cursor, workspace_gid=workspace_gid, idempotency_key=idempotency_key,
+                request={"op": "rebind_live_document", "connector_device_id": connector_device_id,
+                         "document_session": document_session,
+                         "expected_document_session": expected_document_session},
+            )
+            if replay is not None:
+                return replay
+            if int(workspace["row_version"]) != expected_workspace_row_version:
+                raise WorkspaceRepositoryError("version_conflict")
+            cursor.execute(
+                "SELECT session_identity_hash,connector_device_id,document_session,state FROM "
+                "workmanship_sim_live_document_bindings WHERE workspace_gid=%s AND tenant_gid=%s "
+                "AND actor_gid=%s AND state IN ('importing','bound') FOR UPDATE",
+                (workspace_gid, tenant_gid, actor_gid),
+            )
+            active = cursor.fetchall()
+            if len(active) != 1:
+                raise WorkspaceRepositoryError("live_document_binding_unavailable")
+            previous = active[0]
+            if previous["document_session"] != expected_document_session:
+                raise WorkspaceRepositoryError("document_session_changed")
+            cursor.execute(
+                "SELECT workspace_gid,state FROM workmanship_sim_live_document_bindings WHERE "
+                "tenant_gid=%s AND actor_gid=%s AND session_identity_hash=%s FOR UPDATE", new_scope,
+            )
+            observed = cursor.fetchone()
+            if observed and str(observed.get("workspace_gid") or "") not in {"", workspace_gid}:
+                raise WorkspaceRepositoryError("live_document_already_bound")
+            cursor.execute(
+                "UPDATE workmanship_sim_live_document_bindings SET state='superseded' WHERE "
+                "workspace_gid=%s AND tenant_gid=%s AND actor_gid=%s AND state IN ('importing','bound')",
+                (workspace_gid, tenant_gid, actor_gid),
+            )
+            if observed:
+                cursor.execute(
+                    "UPDATE workmanship_sim_live_document_bindings SET workspace_gid=%s,state=%s,"
+                    "connector_device_id=%s,document_session=%s WHERE tenant_gid=%s AND actor_gid=%s "
+                    "AND session_identity_hash=%s",
+                    (workspace_gid, previous["state"], connector_device_id, document_session, *new_scope),
+                )
+            else:
+                cursor.execute(
+                    "INSERT INTO workmanship_sim_live_document_bindings "
+                    "(tenant_gid,actor_gid,session_identity_hash,connector_device_id,document_session,workspace_gid,state) "
+                    "VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                    (*new_scope, connector_device_id, document_session, workspace_gid, previous["state"]),
+                )
+            cursor.execute(
+                "SELECT gid FROM workmanship_sim_vm_documents WHERE workspace_gid=%s AND tenant_gid=%s "
+                "AND owner_gid=%s AND document_role='primary' AND source_kind='live_document' "
+                "AND removed_at IS NULL FOR UPDATE",
+                (workspace_gid, tenant_gid, actor_gid),
+            )
+            documents = cursor.fetchall()
+            if len(documents) != 1:
+                raise WorkspaceRepositoryError("primary_live_document_unavailable")
+            document_gid = str(documents[0]["gid"])
+            cursor.execute(
+                "UPDATE workmanship_sim_vm_documents SET source_identity_hash=%s,connector_device_id=%s,"
+                "row_version=row_version+1 WHERE gid=%s",
+                (new_scope[2], connector_device_id, document_gid),
+            )
+            next_version, cache_hash = self._advance_workspace_revision(
+                cursor, workspace_gid=workspace_gid, current=workspace,
+                patch={"op": "rebind_live_document", "document_gid": document_gid,
+                       "prior_session_identity_hash": previous["session_identity_hash"],
+                       "session_identity_hash": new_scope[2]},
+            )
+            result = {"workspace_gid": workspace_gid, "document_gid": document_gid,
+                      "state": previous["state"], "connector_device_id": connector_device_id,
+                      "document_session": document_session, "workspace_row_version": next_version,
+                      "cache_revision_hash": cache_hash}
+            self._idempotency_finish(cursor, workspace_gid=workspace_gid, idempotency_key=idempotency_key,
+                                     request_hash=request_hash, response=result)
+            return result
 
     def _ensure_live_document_primary(self, cursor, *, workspace_gid: str, tenant_gid: str,
                                       actor_gid: str, connector_device_id: str,
@@ -1383,6 +1508,7 @@ class WorkspaceRepository:
                 "JOIN workmanship_sim_workspace_heads h ON h.workspace_gid=w.gid "
                 "JOIN workmanship_sim_workspace_versions v ON v.gid=h.version_gid AND v.workspace_gid=w.gid "
                 "WHERE b.workspace_gid=%s AND b.tenant_gid=%s AND b.actor_gid=%s "
+                "AND b.state IN ('importing','bound') "
                 "AND w.tenant_gid=%s AND w.owner_gid=%s AND w.removed_at IS NULL "
                 "AND v.tenant_gid=%s AND v.owner_gid=%s AND v.removed_at IS NULL LIMIT 2",
                 (_gid(workspace_gid, 'workspace_gid'), _gid(tenant_gid, 'tenant_gid'), _gid(actor_gid, 'actor_gid'),

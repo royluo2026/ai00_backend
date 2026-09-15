@@ -180,6 +180,45 @@ public sealed class VisMockupDocumentLifecycleTests : IDisposable
     }
 
     [Fact]
+    public async Task OnlineOccurrenceKeyResolvesToTheUniqueLiveVisMockupInstance()
+    {
+        var document = new FakeDocument("existing-document", "tc://bom/1",
+            new FakeNode("session-root", "Root", "root-occ", "root", [
+                new FakeNode("session-leaf", "Leaf", "tc-occ-42", "part", []),
+            ]));
+        var application = new FakeApplication("14.2.0", document);
+        using var sta = new StaDispatcher();
+        var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([_directory]),
+            new FakeVisMockupCom { ExistingApplication = application });
+
+        await adapter.ChangeNodeVisibilityAsync("tc:tc-occ-42", "show");
+        await adapter.ChangeNodeSelectionAsync("tc:tc-occ-42", "highlight");
+
+        Assert.Contains("session-leaf", document.VisibleNodeKeys);
+        Assert.Contains("session-leaf", document.SelectedNodeKeys);
+    }
+
+    [Fact]
+    public async Task OnlineOccurrenceKeyFailsClosedWhenLiveIdentityIsAmbiguous()
+    {
+        var document = new FakeDocument("existing-document", "tc://bom/1",
+            new FakeNode("session-root", "Root", "root-occ", "root", [
+                new FakeNode("session-left", "Same Part", "duplicate-occ", "part", []),
+                new FakeNode("session-right", "Same Part", "duplicate-occ", "part", []),
+            ]));
+        var application = new FakeApplication("14.2.0", document);
+        using var sta = new StaDispatcher();
+        var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([_directory]),
+            new FakeVisMockupCom { ExistingApplication = application });
+
+        var error = await Assert.ThrowsAsync<ConnectorNoEffectException>(
+            () => adapter.ChangeNodeVisibilityAsync("tc:duplicate-occ", "hide"));
+
+        Assert.Equal("vismockup_online_occurrence_ambiguous", error.Message);
+        Assert.Empty(document.VisibleNodeKeys);
+    }
+
+    [Fact]
     public async Task NodeVisibilityDoesNotSkipDisplayForAnAlreadyVisibleUnloadedNode()
     {
         var document = new FakeDocument("existing-document", "user", FakeNode.FlatTree(1));

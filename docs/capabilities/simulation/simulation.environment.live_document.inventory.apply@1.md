@@ -198,6 +198,9 @@ Persist one signed bounded alternate-hierarchy inventory page into its bound env
 - `live_document_owner_required`：The authenticated web owner and tenant are required.（retryable=false）
 - `live_document_input_invalid`：The closed live document request is invalid.（retryable=false）
 - `live_document_binding_stale`：The prior binding cannot be reused safely.（retryable=false）
+- `document_session_changed`：The saved binding changed before the explicit rebind committed.（retryable=false）
+- `live_document_already_bound`：The newly attested native session belongs to another environment.（retryable=false）
+- `primary_live_document_unavailable`：The selected environment has no unique primary live document to rebind.（retryable=false）
 - `idempotency_conflict`：The request key was already used for different adoption input.（retryable=false）
 - `runtime_v2_required`：A current App v2 runtime is required.（retryable=false）
 

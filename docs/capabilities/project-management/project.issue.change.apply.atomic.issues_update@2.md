@@ -377,7 +377,7 @@ Execute Project Management operation issues.update.
     "arguments": {
       "gid": "example",
       "updates": {
-        "assignee_team_gid": null
+        "occurrence_root_cause": null
       }
     }
   }

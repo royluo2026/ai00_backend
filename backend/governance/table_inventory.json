@@ -1,6 +1,6 @@
 {
   "registry_version": 1,
-  "table_count": 375,
+  "table_count": 382,
   "tables": [
     {
       "table": "workmanship_agent_canvas_audit_events",
@@ -1588,6 +1588,16 @@
       "runtime_domain": "simulation"
     },
     {
+      "table": "workmanship_sim_live_document_adoptions",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
+      "table": "workmanship_sim_live_document_bindings",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
       "table": "workmanship_sim_materialization_runs",
       "owner": "simulation",
       "runtime_domain": "simulation"
@@ -1609,6 +1619,26 @@
     },
     {
       "table": "workmanship_sim_plmxml_restore_requests",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
+      "table": "workmanship_sim_plmxml_product_tree_cache",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
+      "table": "workmanship_sim_online_model_sources",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
+      "table": "workmanship_sim_product_structure_chunks",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
+      "table": "workmanship_sim_product_structure_observations",
       "owner": "simulation",
       "runtime_domain": "simulation"
     },

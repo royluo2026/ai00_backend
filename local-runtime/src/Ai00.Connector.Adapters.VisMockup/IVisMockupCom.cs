@@ -660,7 +660,19 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         public string NodeKey => VisMockupDispatch.InvokeUInt32OutParameter(value, 21).ToString();
         public bool IsVisible => Convert.ToBoolean(VisMockupDispatch.GetProperty(value, 9));
         public string PrintableName => Convert.ToString(VisMockupDispatch.GetProperty(value, 7)) ?? "";
-        public string OccurrenceId { get { try { return Convert.ToString(Value.MetaDataProperties.GetPropertyByName("catiaOccurrenceName")) ?? ""; } catch { return ""; } } }
+        public string OccurrenceId
+        {
+            get
+            {
+                foreach (var name in new[] { "__PLM_INST_UID", "bl_occurrence_uid", "catiaOccurrenceName" })
+                {
+                    try { var result = Convert.ToString(Value.MetaDataProperties.GetPropertyByName(name)) ?? "";
+                        if (!string.IsNullOrWhiteSpace(result)) return result; }
+                    catch { }
+                }
+                return "";
+            }
+        }
         public string ModelId { get { try { return Convert.ToString(Value.MetaDataProperties.GetPropertyByName("itemId")) ?? ""; } catch { return ""; } } }
         public IReadOnlyList<IVisMockupNode> Children
         {

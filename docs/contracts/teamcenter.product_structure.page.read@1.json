@@ -1,0 +1,18 @@
+{
+  "id": "teamcenter.product_structure.page.read@1",
+  "input": {"type":"object","properties":{"observation_id":{"type":"string","pattern":"^tcobs:[a-f0-9]{64}$"},"cursor":{"type":"integer","minimum":0,"maximum":250000},"page_size":{"type":"integer","minimum":1,"maximum":1000}},"required":["observation_id","cursor","page_size"],"additionalProperties":false},
+  "output": {
+    "type":"object",
+    "properties": {
+      "observation_id":{"type":"string","pattern":"^tcobs:[a-f0-9]{64}$"},"cursor":{"type":"integer","minimum":0},"next_cursor":{"type":["integer","null"],"minimum":0},
+      "nodes":{"type":"array","maxItems":1000,"items":{"type":"object","properties":{
+        "occurrence_id":{"type":"string","minLength":1,"maxLength":512},"parent_occurrence_id":{"type":["string","null"],"maxLength":512},"depth":{"type":"integer","minimum":0,"maximum":128},"child_order":{"type":"integer","minimum":0},"name":{"type":"string","maxLength":2048},
+        "item_uid":{"type":"string","maxLength":128},"item_id":{"type":"string","maxLength":256},"item_revision_uid":{"type":"string","maxLength":128},"revision_id":{"type":"string","maxLength":128},"component_type":{"type":"string","maxLength":256},"owning_user":{"type":"string","maxLength":256},"owning_group":{"type":"string","maxLength":256},
+        "transform":{"type":["array","null"],"minItems":16,"maxItems":16,"items":{"type":"number"}},"absolute_transform":{"type":["array","null"],"minItems":16,"maxItems":16,"items":{"type":"number"}},"transform_unit":{"type":"string","maxLength":32},"transform_convention":{"type":"string","maxLength":64},"bbox":{"type":["array","null"],"minItems":6,"maxItems":6,"items":{"type":"number"}},"bbox_unit":{"type":"string","maxLength":32},
+        "torque_raw":{"type":["string","null"],"maxLength":256},"torque_importance":{"type":["string","null"],"maxLength":256},"weight_raw":{"type":["string","null"],"maxLength":256},"unit_weight_raw":{"type":["string","null"],"maxLength":256},
+        "geometry_refs":{"type":"array","maxItems":64,"items":{"type":"object","properties":{"dataset_uid":{"type":"string","maxLength":128},"file_uid":{"type":"string","maxLength":128},"file_name":{"type":"string","maxLength":1024},"relation_type":{"type":"string","minLength":1,"maxLength":128}},"required":["dataset_uid","file_uid","file_name","relation_type"],"additionalProperties":false}}
+      },"required":["occurrence_id","parent_occurrence_id","depth","child_order","name","item_uid","item_id","item_revision_uid","revision_id","component_type","owning_user","owning_group","transform","absolute_transform","transform_unit","transform_convention","bbox","bbox_unit","torque_raw","torque_importance","weight_raw","unit_weight_raw","geometry_refs"],"additionalProperties":false}},
+      "page_hash":{"type":"string","pattern":"^sha256:[a-f0-9]{64}$"}
+    },"required":["observation_id","cursor","next_cursor","nodes","page_hash"],"additionalProperties":false
+  }
+}

@@ -29,7 +29,7 @@ Queue a signed bounded read of the active VisMockup product tree.
 ## 授权与数据边界
 
 - 授权策略：`simulation.v2:simulation.use`
-- 自动化等级：`A1`
+- 自动化等级：`A2`
 - 数据分类：`confidential`
 - Delegation：`scoped`
 - 认证新鲜度：0 秒
@@ -39,15 +39,15 @@ Queue a signed bounded read of the active VisMockup product tree.
 
 ## 执行与可靠性
 
-- 副作用：`write`
+- 副作用：`read`
 - 执行模式：`cloud_sync`
 - 超时：30 秒
 - 审批：`none`
-- 幂等：`required`
+- 幂等：`none`
 - 并发：`none`
 - 无预期版本信封要求。
-- 一致性：`external`
-- Operation：`optional`
+- 一致性：`strong`
+- Operation：`none`
 - Artifact：`none`
 - 审计：`standard`
 - Evidence：`required`

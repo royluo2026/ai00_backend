@@ -96,6 +96,46 @@ def connector_plan(step_schema: dict, *, max_steps: int) -> dict:
 CONNECTOR_PLAN = connector_plan(CONNECTOR_STEP, max_steps=10000)
 DOCUMENT_SNAPSHOT_CONNECTOR_PLAN = connector_plan(DOCUMENT_SNAPSHOT_STEP, max_steps=1)
 
+SOURCE_SELECTOR = obj({
+    "endpoint_id": {"type":"string","minLength":1,"maxLength":128},
+    "object_uid": {"type":"string","minLength":1,"maxLength":128},
+    "item_revision_uid": {"type":"string","maxLength":128},
+    "bom_view_uid": {"type":"string","maxLength":128},
+    "revision_rule": {"type":"string","minLength":1,"maxLength":128},
+    "configuration_date": {"type":"string","format":"date-time"},
+}, ("endpoint_id", "object_uid", "revision_rule", "configuration_date"))
+EXACT_SOURCE_SELECTOR = obj({
+    "endpoint_id": {"type":"string", "const":"tc-production"},
+    "object_uid": {"type":"string","minLength":1,"maxLength":128},
+    "item_revision_uid": {"type":"string","minLength":1,"maxLength":128},
+    "bom_view_uid": {"type":"string","minLength":1,"maxLength":128},
+    "revision_rule": {"type":"string","minLength":1,"maxLength":128},
+    "configuration_date": {"type":"string","format":"date-time"},
+}, ("endpoint_id", "object_uid", "item_revision_uid", "bom_view_uid", "revision_rule", "configuration_date"))
+TC_SEARCH_INPUT = obj({
+    "endpoint_id": {"type": "string", "const": "tc-production"},
+    "item_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "revision_id": {"type": "string", "minLength": 1, "maxLength": 64},
+    "revision_rule": {"type": "string", "minLength": 1, "maxLength": 128},
+    "configuration_date": {"type": "string", "format": "date-time"},
+}, ("endpoint_id", "item_id", "revision_id", "revision_rule", "configuration_date"))
+TC_OBSERVE_INPUT = obj({"source_selector":SOURCE_SELECTOR,
+    "max_nodes":{"type":"integer","minimum":1,"maximum":250000},
+    "max_depth":{"type":"integer","minimum":1,"maximum":128},
+    "property_projection":{"type":"string","pattern":"^[a-z0-9_.-]{1,64}$"},
+}, ("source_selector","max_nodes","max_depth","property_projection"))
+TC_PAGE_INPUT = obj({"observation_id":{"type":"string","pattern":"^tcobs:[a-f0-9]{64}$"},
+    "cursor":{"type":"integer","minimum":0,"maximum":250000},
+    "page_size":{"type":"integer","minimum":1,"maximum":1000}},
+    ("observation_id","cursor","page_size"))
+TC_LAUNCH_INPUT = obj({"source_selector":SOURCE_SELECTOR,
+    "expected_visdoc_uid":{"type":"string","maxLength":128}},
+    ("source_selector","expected_visdoc_uid"))
+AH_APPLY_INPUT = obj({"document_session":HASH,"hierarchy_gid":{"type":"string","pattern":"^[1-9][0-9]*$"},
+    "base_hash":HASH,"desired_hash":HASH,"cursor":{"type":"integer","minimum":0},
+    "max_operations":{"type":"integer","minimum":1,"maximum":256}},
+    ("document_session","hierarchy_gid","base_hash","desired_hash","cursor","max_operations"))
+
 
 class AdapterOperation(FrozenModel):
     operation_id: str = Field(pattern=r"^[a-z][a-z0-9_.-]{2,127}@[1-9][0-9]*$")
@@ -138,6 +178,14 @@ class ConnectorHealth(FrozenModel):
 
 
 INPUT_SCHEMAS = {
+    "simulation.teamcenter.product.search.request": TC_SEARCH_INPUT,
+    "simulation.teamcenter.product_structure.observe.request": TC_OBSERVE_INPUT,
+    "simulation.teamcenter.product_structure.page.read.request": TC_PAGE_INPUT,
+    "simulation.teamcenter.visualization.launch.request": TC_LAUNCH_INPUT,
+    "simulation.teamcenter.product_structure.observe": TC_OBSERVE_INPUT,
+    "simulation.teamcenter.product.search": TC_SEARCH_INPUT,
+    "simulation.teamcenter.product_structure.page.read": TC_PAGE_INPUT,
+    "simulation.teamcenter.visualization.launch": TC_LAUNCH_INPUT,
     "simulation.vismockup.document.identity.read.request": obj({}, ()),
     "simulation.vismockup.document.hierarchy_inventory.read.request": obj({
         "document_session": HASH,
@@ -247,6 +295,72 @@ VISIBILITY_RESULT = obj({"action": {"type": "string", "enum": ["all_on", "all_of
 NODE_VISIBILITY_RESULT = obj({"node_key": STRING, "visible": {"type": "boolean"}}, ("node_key", "visible"))
 NODE_SELECTION_RESULT = obj({"node_key": STRING, "selected": {"type": "boolean"}}, ("node_key", "selected"))
 CAPTURE_RESULT = obj({"artifact_ref": ARTIFACT_REF}, ("artifact_ref",))
+TC_OBSERVE_RESULT = obj({"observation_id":{"type":"string","pattern":"^tcobs:[a-f0-9]{64}$"},
+    "source_identity_hash":HASH,"captured_at":{"type":"string","format":"date-time"},
+    "node_count":{"type":"integer","minimum":1,"maximum":250000},
+    "page_count":{"type":"integer","minimum":1,"maximum":250000},"complete":{"type":"boolean"}},
+    ("observation_id","source_identity_hash","captured_at","node_count","page_count","complete"))
+TC_GEOMETRY_REF = obj({
+    "dataset_uid": STRING,
+    "file_uid": STRING,
+    "file_name": {"type": "string"},
+    "relation_type": STRING,
+}, ("dataset_uid", "file_uid", "file_name", "relation_type"))
+TC_OCCURRENCE = obj({
+    "occurrence_id": STRING,
+    "parent_occurrence_id": {"type": ["string", "null"]},
+    "depth": {"type": "integer", "minimum": 0, "maximum": 128},
+    "child_order": {"type": "integer", "minimum": 0},
+    "name": {"type": "string"},
+    "item_uid": {"type": "string"},
+    "item_id": {"type": "string"},
+    "item_revision_uid": {"type": "string"},
+    "revision_id": {"type": "string"},
+    "component_type": {"type": "string"},
+    "owning_user": {"type": "string"},
+    "owning_group": {"type": "string"},
+    "transform": {"type": ["array", "null"], "items": {"type": "number"}, "minItems": 16, "maxItems": 16},
+    "absolute_transform": {"type": ["array", "null"], "items": {"type": "number"}, "minItems": 16, "maxItems": 16},
+    "transform_unit": {"type": "string", "maxLength": 32},
+    "transform_convention": {"type": "string", "maxLength": 64},
+    "bbox": {"type": ["array", "null"], "items": {"type": "number"}, "minItems": 6, "maxItems": 6},
+    "bbox_unit": {"type": "string", "maxLength": 32},
+    "torque_raw": {"type": ["string", "null"], "maxLength": 256},
+    "torque_importance": {"type": ["string", "null"], "maxLength": 256},
+    "weight_raw": {"type": ["string", "null"], "maxLength": 256},
+    "unit_weight_raw": {"type": ["string", "null"], "maxLength": 256},
+    "geometry_refs": {"type": "array", "items": TC_GEOMETRY_REF, "maxItems": 256},
+}, (
+    "occurrence_id", "parent_occurrence_id", "depth", "child_order", "name",
+    "item_uid", "item_id", "item_revision_uid", "revision_id", "component_type",
+    "owning_user", "owning_group", "transform", "absolute_transform", "transform_unit",
+    "transform_convention", "bbox", "bbox_unit", "torque_raw", "torque_importance",
+    "weight_raw", "unit_weight_raw", "geometry_refs",
+))
+TC_PAGE_RESULT = obj({"observation_id":{"type":"string","pattern":"^tcobs:[a-f0-9]{64}$"},
+    "cursor":{"type":"integer","minimum":0},"next_cursor":{"type":["integer","null"],"minimum":0},
+    "nodes":{"type":"array","maxItems":1000,"items":TC_OCCURRENCE},
+    "page_hash":HASH}, ("observation_id","cursor","next_cursor","nodes","page_hash"))
+TC_LAUNCH_RESULT = obj({"launch_id":{"type":"string","pattern":"^tclaunch:[a-f0-9]{64}$"},
+    "runner_started":{"type":"boolean"},"expected_visdoc_uid":{"type":"string","maxLength":128},
+    "source_identity_hash":HASH}, ("launch_id","runner_started","expected_visdoc_uid","source_identity_hash"))
+TC_SEARCH_ITEM = obj({
+    "display_name": {"type": "string", "maxLength": 512},
+    "item_id": {"type": "string", "maxLength": 128},
+    "revision_id": {"type": "string", "maxLength": 64},
+    "component_type": {"type": "string", "maxLength": 256},
+    "owning_user": {"type": "string", "maxLength": 256},
+    "owning_group": {"type": "string", "maxLength": 256},
+    "source_selector": EXACT_SOURCE_SELECTOR,
+}, ("display_name", "item_id", "revision_id", "component_type", "owning_user", "owning_group", "source_selector"))
+TC_SEARCH_RESULT = obj({
+    "items": {"type": "array", "items": TC_SEARCH_ITEM, "maxItems": 20},
+}, ("items",))
+AH_APPLY_RESULT = obj({"document_session":HASH,"hierarchy_gid":{"type":"string","pattern":"^[1-9][0-9]*$"},
+    "applied":{"type":"integer","minimum":0,"maximum":256},"skipped":{"type":"integer","minimum":0,"maximum":256},
+    "conflicts":{"type":"array","maxItems":256,"items":{"type":"string","maxLength":256}},
+    "next_cursor":{"type":["integer","null"],"minimum":0},"result_hash":HASH},
+    ("document_session","hierarchy_gid","applied","skipped","conflicts","next_cursor","result_hash"))
 PAIRING_SUMMARY = obj({
     "pairing_id": STRING, "user_code": STRING, "device_name": STRING,
     "runtime_version": STRING, "masked_windows_user": STRING,
@@ -255,6 +369,14 @@ PAIRING_SUMMARY = obj({
 }, ("pairing_id", "user_code", "device_name", "runtime_version", "masked_windows_user", "status", "expires_at", "resource_version"))
 
 OUTPUT_SCHEMAS = {
+    "simulation.teamcenter.product.search.request": OPERATION_REF,
+    "simulation.teamcenter.product_structure.observe.request": OPERATION_REF,
+    "simulation.teamcenter.product_structure.page.read.request": OPERATION_REF,
+    "simulation.teamcenter.visualization.launch.request": OPERATION_REF,
+    "simulation.teamcenter.product_structure.observe": TC_OBSERVE_RESULT,
+    "simulation.teamcenter.product.search": TC_SEARCH_RESULT,
+    "simulation.teamcenter.product_structure.page.read": TC_PAGE_RESULT,
+    "simulation.teamcenter.visualization.launch": TC_LAUNCH_RESULT,
     "simulation.vismockup.document.identity.read.request": OPERATION_REF,
     "simulation.vismockup.document.hierarchy_inventory.read.request": OPERATION_REF,
     "simulation.connector.health.get": CONNECTOR_HEALTH,

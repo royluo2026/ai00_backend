@@ -163,9 +163,65 @@ def test_adopted_live_document_is_immediately_searchable_as_primary_model(databa
         "portability": "device_bound",
         "connector_device_id": "device-A",
         "sort_order": 0,
-        "row_version": 1,
-        "artifact_ref": None,
-    }]}
+            "row_version": 1,
+            "artifact_ref": None,
+            "online_source_gid": None,
+            "source_selector": None,
+            "observation_id": None,
+            "observation_captured_at": None,
+            "observation_node_count": None,
+        }]}
+
+
+def test_explicit_rebind_rotates_runtime_session_without_creating_an_environment(database):
+    created = adopt()
+    result = module.WorkspaceRepository().rebind_live_document(
+        workspace_gid=created["workspace_gid"], tenant_gid="20", actor_gid="30",
+        connector_device_id="device-A", document_session="process-incarnation/document-B",
+        expected_document_session="process-incarnation/document-A",
+        expected_workspace_row_version=2, idempotency_key="rebind-A",
+    )
+
+    assert result["workspace_gid"] == created["workspace_gid"]
+    assert result["document_session"] == "process-incarnation/document-B"
+    assert result["workspace_row_version"] == 3
+    assert lookup() is None
+    assert lookup(document_session="process-incarnation/document-B")["workspace_gid"] == created["workspace_gid"]
+    assert count(database, "workspaces") == 1
+    with sqlite3.connect(database) as db:
+        assert db.execute(
+            "SELECT state,document_session FROM workmanship_sim_live_document_bindings ORDER BY document_session"
+        ).fetchall() == [
+            ("superseded", "process-incarnation/document-A"),
+            ("importing", "process-incarnation/document-B"),
+        ]
+        source_hash, row_version = db.execute(
+            "SELECT source_identity_hash,row_version FROM workmanship_sim_vm_documents"
+        ).fetchone()
+    assert source_hash == hashlib.sha256(
+        json.dumps(["device-A", "process-incarnation/document-B"],
+                   ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    assert row_version == 2
+    assert module.WorkspaceRepository().rebind_live_document(
+        workspace_gid=created["workspace_gid"], tenant_gid="20", actor_gid="30",
+        connector_device_id="device-A", document_session="process-incarnation/document-B",
+        expected_document_session="process-incarnation/document-A",
+        expected_workspace_row_version=2, idempotency_key="rebind-A",
+    ) == result
+
+
+def test_rebind_rejects_a_stale_expected_session_without_mutation(database):
+    created = adopt()
+    with pytest.raises(module.WorkspaceRepositoryError, match="document_session_changed"):
+        module.WorkspaceRepository().rebind_live_document(
+            workspace_gid=created["workspace_gid"], tenant_gid="20", actor_gid="30",
+            connector_device_id="device-A", document_session="process-incarnation/document-B",
+            expected_document_session="not-the-bound-session",
+            expected_workspace_row_version=2, idempotency_key="rebind-A",
+        )
+    assert lookup()["workspace_gid"] == created["workspace_gid"]
+    assert lookup(document_session="process-incarnation/document-B") is None
 
 
 @pytest.mark.parametrize("changed", [{"name": "other"}, {"document_session": "new"}, {"connector_device_id": "new"}])

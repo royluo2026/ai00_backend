@@ -186,6 +186,48 @@ Search model documents in one readable Simulation environment.
             ],
             "type": "string"
           },
+          "observation_captured_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "observation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "observation_node_count": {
+            "anyOf": [
+              {
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "online_source_gid": {
+            "anyOf": [
+              {
+                "pattern": "^[1-9][0-9]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "portability": {
             "enum": [
               "portable",
@@ -215,6 +257,45 @@ Search model documents in one readable Simulation environment.
           "source_kind": {
             "type": "string"
           },
+          "source_selector": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "bom_view_uid": {
+                    "type": "string"
+                  },
+                  "configuration_date": {
+                    "type": "string"
+                  },
+                  "endpoint_id": {
+                    "type": "string"
+                  },
+                  "item_revision_uid": {
+                    "type": "string"
+                  },
+                  "object_uid": {
+                    "type": "string"
+                  },
+                  "revision_rule": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "endpoint_id",
+                  "object_uid",
+                  "item_revision_uid",
+                  "bom_view_uid",
+                  "revision_rule",
+                  "configuration_date"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "workspace_gid": {
             "pattern": "^[1-9][0-9]*$",
             "type": "string"
@@ -233,7 +314,12 @@ Search model documents in one readable Simulation environment.
           "portability",
           "connector_device_id",
           "sort_order",
-          "row_version"
+          "row_version",
+          "online_source_gid",
+          "source_selector",
+          "observation_id",
+          "observation_captured_at",
+          "observation_node_count"
         ],
         "type": "object"
       },

@@ -9,5 +9,8 @@
   <ItemGroup>
     <Content Include="..\..\native\VisMockupHierarchyBridge\Ai00.VisMockup.HierarchyBridge.dll"
              Link="Ai00.VisMockup.HierarchyBridge.fd3ced5f.dll" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="teamcenter_readonly_worker.js" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="teamcenter_visualization_launch.js" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="teamcenter_visualization_compat.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

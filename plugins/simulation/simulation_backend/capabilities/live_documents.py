@@ -9,6 +9,7 @@ from ..data.workspace_repository import WorkspaceRepository, WorkspaceRepository
 
 KEY = {'type': 'string', 'minLength': 1, 'maxLength': 191}
 GID = {'type': 'string', 'pattern': '^[1-9][0-9]*$'}
+HASH = {'type': 'string', 'pattern': '^sha256:[0-9a-f]{64}$'}
 def obj(properties, required=None):
     return dict(type='object', properties=properties, required=list(properties if required is None else required), additionalProperties=False)
 
@@ -18,6 +19,9 @@ ADOPT_INPUT = obj(dict(identity_operation_id=KEY, name={'type':'string','minLeng
     document_display_name={'type':'string','minLength':1,'maxLength':255}, idempotency_key=KEY))
 BINDING_INPUT = {**obj(dict(identity_operation_id=KEY, workspace_gid=GID), []),
     'oneOf': [{'required':['identity_operation_id']}, {'required':['workspace_gid']} ]}
+REBIND_INPUT = obj(dict(workspace_gid=GID, identity_operation_id=KEY,
+    expected_document_session=HASH, expected_workspace_row_version={'type':'integer','minimum':1},
+    idempotency_key=KEY))
 ADOPT_OUTPUT_V1 = obj(dict(workspace_gid=GID, version_gid=GID,
     state={'type':'string','enum':['importing']}, created={'type':'boolean'}))
 ADOPT_OUTPUT = obj(dict(workspace_gid=GID, version_gid=GID, model_document_gid=GID,
@@ -25,6 +29,10 @@ ADOPT_OUTPUT = obj(dict(workspace_gid=GID, version_gid=GID, model_document_gid=G
 BINDING_OUTPUT = obj(dict(state={'type':'string','enum':['unbound','unavailable','importing','bound']},
     workspace_gid={'type':['string','null']}, version_gid={'type':['string','null']},
     connector_device_id={'type':['string','null']}, document_session={'type':['string','null']}))
+REBIND_OUTPUT = obj(dict(workspace_gid=GID, document_gid=GID,
+    state={'type':'string','enum':['importing','bound']}, connector_device_id=KEY,
+    document_session=HASH, workspace_row_version={'type':'integer','minimum':1},
+    cache_revision_hash=HASH))
 INVENTORY_APPLY_INPUT = obj(dict(workspace_gid=GID, inventory_operation_id=KEY, idempotency_key=KEY))
 INVENTORY_APPLY_OUTPUT = obj(dict(workspace_gid=GID,
     imported_hierarchy_count={'type':'integer','minimum':0}, next_index={'type':['integer','null'],'minimum':0},
@@ -97,6 +105,21 @@ class LiveDocumentProvider:
             result = {**empty, 'state':'unavailable'}
         return self._output(result)
 
+    def rebind(self, payload, context):
+        scope = self._scope(payload, context, REBIND_INPUT)
+        try:
+            identity = self.connectors.verified_document_identity(
+                payload['identity_operation_id'], actor_id=context.user_gid,
+                tenant_id=context.team_gid, now=self.clock())
+            result = self.workspaces.rebind_live_document(
+                **scope, **identity, workspace_gid=payload['workspace_gid'],
+                expected_document_session=payload['expected_document_session'],
+                expected_workspace_row_version=payload['expected_workspace_row_version'],
+                idempotency_key=payload['idempotency_key'])
+        except (ConnectorRepositoryError, WorkspaceRepositoryError) as exc:
+            raise CapabilityBusinessError(str(exc), str(exc)) from exc
+        return self._output(result)
+
     def apply_inventory(self, payload, context):
         scope = self._scope(payload, context, INVENTORY_APPLY_INPUT)
         try:
@@ -120,10 +143,11 @@ def register_live_document_capabilities(registry, control_plane):
         ('adopt', 1, 'Create or reuse a private importing environment for one authenticated native document.', CapabilityRisk.WRITE, ADOPT_INPUT_V1, ADOPT_OUTPUT_V1, provider.adopt_v1),
         ('adopt', 2, 'Create or reuse an importing environment and register its primary live VisMockup document.', CapabilityRisk.WRITE, ADOPT_INPUT, ADOPT_OUTPUT, provider.adopt),
         ('binding.get', 1, 'Resolve the owner-scoped environment binding of a native document or selected environment.', CapabilityRisk.READ, BINDING_INPUT, BINDING_OUTPUT, provider.binding),
+        ('rebind', 1, 'Explicitly bind the selected environment to a freshly attested current native document session.', CapabilityRisk.WRITE, REBIND_INPUT, REBIND_OUTPUT, provider.rebind),
         ('inventory.apply', 1, 'Persist one signed bounded alternate-hierarchy inventory page into its bound environment.', CapabilityRisk.WRITE, INVENTORY_APPLY_INPUT, INVENTORY_APPLY_OUTPUT, provider.apply_inventory),
     ):
         register(registry, CapabilitySpec(id='simulation.environment.live_document.'+name, owner='simulation', version=version,
             description=description, use_when='The owner links or selects an already-open native document.',
             do_not_use_when='Native identity is unavailable or another user owns the binding.', risk=risk,
-            confirmation='none', permissions=('simulation.use',), input_schema=input_schema, output_schema=output_schema,
+            confirmation='user' if name == 'rebind' else 'none', permissions=('simulation.use',), input_schema=input_schema, output_schema=output_schema,
             tags=('simulation','live_document','experimental')), handler)

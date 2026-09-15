@@ -22,6 +22,7 @@ from .connector_pairing import specs as connector_pairing_specs
 from .provider import register
 from .workspaces import candidate_specs as workspace_specs
 from .environment_documents import specs as environment_document_specs
+from .product_structures import specs as product_structure_specs
 from .alternate_hierarchies import specs as alternate_hierarchy_specs
 from .plmxml_environments import specs as plmxml_environment_specs
 from .vm_checkpoints import default_provider as default_checkpoint_provider
@@ -171,6 +172,8 @@ def register_capabilities(
     for spec, handler in workspace_specs():
         register(registry, spec, handler)
     for spec, handler in environment_document_specs():
+        register(registry, spec, handler)
+    for spec, handler in product_structure_specs():
         register(registry, spec, handler)
     for spec, handler in alternate_hierarchy_specs():
         register(registry, spec, handler)

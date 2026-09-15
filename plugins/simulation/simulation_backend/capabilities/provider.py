@@ -24,6 +24,10 @@ _TWO_PHASE_ENTRYPOINTS = {
 }
 
 _VISMOCKUP_WEB_WORKFLOWS = {
+    "simulation.teamcenter.product.search.request",
+    "simulation.teamcenter.product_structure.observe.request",
+    "simulation.teamcenter.product_structure.page.read.request",
+    "simulation.teamcenter.visualization.launch.request",
     "simulation.vismockup.document.identity.read.request",
     "simulation.vismockup.document.hierarchy_inventory.read.request",
     "simulation.vismockup.application.attach.request",
@@ -124,6 +128,11 @@ _RESOURCES = {
     "simulation.environment.model_document.search": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.model_document.add": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.model_document.remove": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.online_source.bind": (("simulation-workspace", "workspace_gid"),),
+    "simulation.product_structure.observation.begin": (("simulation-workspace", "workspace_gid"),),
+    "simulation.product_structure.observation.page.append": (),
+    "simulation.product_structure.observation.publish": (),
+    "simulation.product_structure.snapshot.page.get": (),
     "simulation.environment.alternate_hierarchy.search": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.alternate_hierarchy.get": (("simulation-alternate-hierarchy", "hierarchy_gid"),),
     "simulation.environment.alternate_hierarchy.create": (("simulation-workspace", "workspace_gid"),),
@@ -151,6 +160,7 @@ _RESOURCES = {
     "simulation.environment.structure_node.remove": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.binding.create": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.binding.remove": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.live_document.rebind": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.version.freeze": (("simulation-workspace", "workspace_gid"),),
     "simulation.vm_checkpoint.create": (("simulation-workspace", "workspace_gid"), ("simulation-document-snapshot", "snapshot_request_id")),
     "simulation.vm_checkpoint.search": (("simulation-workspace", "workspace_gid"),),
@@ -486,6 +496,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             }
             or governed.id.startswith("simulation.connector")
             or governed.id.startswith("simulation.vismockup.")
+            or governed.id.startswith("simulation.teamcenter.")
             or "experimental" in governed.tags
             else LifecycleStatus.STABLE
         ),
@@ -493,7 +504,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True)
             if governed.id in _VISMOCKUP_WEB_WORKFLOWS
             else ExposurePolicy(local_runtime=True)
-            if governed.id.startswith("simulation.vismockup.")
+            if governed.id.startswith("simulation.vismockup.") or governed.id.startswith("simulation.teamcenter.")
             or governed.id in {
                 "simulation.connector.pairing.request",
                 "simulation.connector.pairing.complete",
@@ -521,7 +532,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             ExecutionMode.CLOUD_SYNC
             if governed.id in _VISMOCKUP_WEB_WORKFLOWS
             else ExecutionMode.LOCAL
-            if governed.id.startswith("simulation.vismockup.")
+            if governed.id.startswith("simulation.vismockup.") or governed.id.startswith("simulation.teamcenter.")
             or governed.id in {
                 "simulation.connector.pairing.request",
                 "simulation.connector.pairing.complete",
@@ -539,7 +550,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         "operation_policy": (
             "optional" if governed.id in _VISMOCKUP_WEB_WORKFLOWS and is_write
             else "none" if governed.id in _VISMOCKUP_WEB_WORKFLOWS
-            else "required" if governed.id.startswith("simulation.vismockup.") or governed.id == "simulation.run.start"
+            else "required" if governed.id.startswith(("simulation.vismockup.", "simulation.teamcenter.")) or governed.id == "simulation.run.start"
             else "optional" if is_write else "none"
         ),
         "concurrency_policy": "none", "idempotency_policy": "required" if is_write else "none",
@@ -548,9 +559,11 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             "connector_environment" in governed.tags
             or governed.id.startswith("simulation.connector")
             or governed.id.startswith("simulation.vismockup.")
+            or governed.id.startswith("simulation.teamcenter.")
         ), include_runtime_errors=(
             governed.id.startswith("simulation.connector")
             or governed.id.startswith("simulation.vismockup.")
+            or governed.id.startswith("simulation.teamcenter.")
         )),
         "domain_errors_complete": "experimental" not in governed.tags,
     }
@@ -708,11 +721,17 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
     if (
         governed.id.startswith("simulation.connector.")
         or governed.id.startswith("simulation.vismockup.")
+        or governed.id.startswith("simulation.teamcenter.")
     ):
+        is_teamcenter = governed.id.startswith("simulation.teamcenter.")
         updates.update({
             "business_effect": (
                 "Validate and persist one exact Connector control-plane operation for the caller-bound Simulation runtime."
                 if governed.id.startswith("simulation.connector.")
+                else "Queue one exact read-only Teamcenter observation or official Visualization launch through the caller-bound App runtime."
+                if is_teamcenter and governed.id in _VISMOCKUP_WEB_WORKFLOWS
+                else "Expose one exact Teamcenter read-only adapter atom exclusively to a signed Simulation Connector execution plan."
+                if is_teamcenter
                 else "Queue or read one user-scoped signed VisMockup command through the bound Simulation Connector."
                 if governed.id in _VISMOCKUP_WEB_WORKFLOWS
                 else "Expose one exact VisMockup adapter atom exclusively to a signed Simulation Connector execution plan."
@@ -720,7 +739,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             "business_acceptance_criteria": (
                 "The operation is scoped to the caller's single bound Simulation Connector.",
                 "The closed request and response contracts preserve exact Connector and Adapter identity.",
-                "Rejected operations do not create ungoverned VisMockup side effects.",
+                "Rejected operations do not create ungoverned Teamcenter product-data or VisMockup side effects.",
             ),
             "business_invariants": (),
             "no_business_invariant_reason": (
@@ -736,6 +755,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             "simulation.environment.live_document.adopt": ("Bind the owner's already-open native document and register it as the environment's primary live model."
                 if governed.version >= 2 else "Bind the owner's already-open native document to one durable private importing environment."),
             "simulation.environment.live_document.binding.get": "Resolve the owner's saved document-to-environment association for document and environment selection.",
+            "simulation.environment.live_document.rebind": "Explicitly rotate one owned environment to the freshly attested current native document session while retaining the prior session as history.",
             "simulation.environment.live_document.inventory.apply": "Persist one signed complete page of alternate hierarchies into the bound environment without mutating VisMockup.",
         }
         updates.update(exposure=ExposurePolicy(web=True), execution_mode=ExecutionMode.CLOUD_SYNC,
@@ -743,7 +763,9 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             business_effect=effects[governed.id],
             business_acceptance_criteria=(
                 "Identity is derived only from the caller-owned persisted signed read outcome and current App session.",
-                ("Duplicate adoption preserves the same environment and primary live model; AH ingestion remains a separate observed operation."
+                ("Explicit rebind supersedes the prior runtime session, preserves the environment, and never matches by display name."
+                 if governed.id.endswith('.rebind') else
+                 "Duplicate adoption preserves the same environment and primary live model; AH ingestion remains a separate observed operation."
                  if governed.version >= 2 else "Duplicate adoption preserves the same environment and model/AH ingestion is never implied."),
                 "Unavailable or other-owner evidence cannot disclose or create a binding."),
             business_invariants=(BusinessInvariantContract(rule_id="simulation.live_document.attested_identity", version=1,
@@ -761,28 +783,41 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                 'owner':'simulation', 'atomicity':(
                     'signed AH page/hierarchies/nodes/workspace revision/idempotency in one repository transaction'
                     if governed.id.endswith('.inventory.apply') else
+                    'active binding rotation/primary live model/workspace revision/idempotency in one repository transaction'
+                    if governed.id.endswith('.rebind') else
                     'workspace create/version/head/binding/primary live model/idempotency reservation in one repository transaction'
                     if governed.id.endswith('.adopt') and governed.version >= 2 else
                     'workspace create/version/head/binding/idempotency reservation in one repository transaction'
                     if governed.id.endswith('.adopt') else
                     'read or signed queue persistence only; no workspace mutation'),
-                'native_atomicity':'identity read and adoption are not atomic with native document changes',
-                'tables': ['workmanship_sim_connector_runtime_plans','workmanship_sim_connector_runtime_devices',
+                'native_atomicity':'identity read and the following binding mutation are not atomic with native document changes',
+                'tables': (['workmanship_sim_connector_runtime_plans','workmanship_sim_connector_runtime_devices',
+                    'workmanship_sim_live_document_bindings','workmanship_sim_workspaces',
+                    'workmanship_sim_vm_documents','workmanship_sim_materialization_verifications',
+                    'workmanship_sim_workspace_idempotency'] if governed.id.endswith('.rebind') else
+                    ['workmanship_sim_connector_runtime_plans','workmanship_sim_connector_runtime_devices',
                     'workmanship_sim_live_document_bindings','workmanship_sim_live_document_adoptions',
                     'workmanship_sim_workspaces','workmanship_sim_workspace_versions','workmanship_sim_workspace_heads',
-                    *(['workmanship_sim_vm_documents'] if governed.id.endswith('.adopt') and governed.version >= 2 else []),
-                    *(['workmanship_sim_workspace_hierarchies','workmanship_sim_workspace_nodes','workmanship_sim_workspace_idempotency']
-                      if governed.id.endswith('.inventory.apply') else [])],
+                    *(['workmanship_sim_vm_documents'] if ((governed.id.endswith('.adopt') and governed.version >= 2) or governed.id.endswith('.rebind')) else []),
+                    *(['workmanship_sim_workspace_hierarchies','workmanship_sim_workspace_nodes']
+                      if governed.id.endswith('.inventory.apply') else []),
+                    *(['workmanship_sim_workspace_idempotency']
+                      if governed.id.endswith('.inventory.apply') or governed.id.endswith('.rebind') else [])]),
                 'migration_refs':['backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql',
                     'backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql'],
                 'dependencies':['vismockup.document.identity.read@1','vismockup.document.hierarchy_inventory.read@1','simulation.vismockup.command.get@1'],
-                'idempotency':'owner/tenant/key plus exact device/session/name' + ('/document display name' if governed.version >= 2 else '') + '; retained responses forbid recreation'},
+                'idempotency':('workspace/key plus exact prior and newly attested session' if governed.id.endswith('.rebind') else
+                    'owner/tenant/key plus exact device/session/name' + ('/document display name' if governed.version >= 2 else ''))
+                    + '; retained responses forbid recreation'},
             domain_errors=tuple(DomainErrorContract(code=code, meaning=meaning) for code, meaning in (
                 ('live_document_identity_unavailable','The authenticated native identity cannot be established.'),
                 ('live_document_identity_stale','The signed native identity or server receipt is stale.'),
                 ('live_document_owner_required','The authenticated web owner and tenant are required.'),
                 ('live_document_input_invalid','The closed live document request is invalid.'),
                 ('live_document_binding_stale','The prior binding cannot be reused safely.'),
+                ('document_session_changed','The saved binding changed before the explicit rebind committed.'),
+                ('live_document_already_bound','The newly attested native session belongs to another environment.'),
+                ('primary_live_document_unavailable','The selected environment has no unique primary live document to rebind.'),
                 ('idempotency_conflict','The request key was already used for different adoption input.'),
                 ('runtime_v2_required','A current App v2 runtime is required.'))), domain_errors_complete=False)
     return CapabilityDescriptorV2.model_validate({**descriptor.model_dump(), **updates})

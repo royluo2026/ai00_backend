@@ -698,11 +698,16 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
 
     by_id = {(spec.id, spec.version): (spec, descriptor) for spec, descriptor in registry.items}
     assert set(by_id) == {
+        ("simulation.teamcenter.product.search.request", 1),
+        ("simulation.teamcenter.product_structure.observe.request", 1),
+        ("simulation.teamcenter.product_structure.page.read.request", 1),
+        ("simulation.teamcenter.visualization.launch.request", 1),
         ("simulation.vismockup.document.identity.read.request", 1),
         ("simulation.vismockup.document.hierarchy_inventory.read.request", 1),
         ("simulation.environment.live_document.adopt", 1),
         ("simulation.environment.live_document.adopt", 2),
         ("simulation.environment.live_document.binding.get", 1),
+        ("simulation.environment.live_document.rebind", 1),
         ("simulation.environment.live_document.inventory.apply", 1),
         ("simulation.connector.runtime.takeover", 1),
         ("simulation.connector.health.get", 1),
@@ -731,6 +736,10 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
         ("simulation.vismockup.node.visibility.change.apply", 1),
         ("simulation.vismockup.node.selection.change.apply", 1),
         ("simulation.vismockup.capture.create", 1),
+        ("simulation.teamcenter.product_structure.observe", 1),
+        ("simulation.teamcenter.product.search", 1),
+        ("simulation.teamcenter.product_structure.page.read", 1),
+        ("simulation.teamcenter.visualization.launch", 1),
     }
     for spec, descriptor in by_id.values():
         assert spec.input_schema["additionalProperties"] is False
@@ -772,9 +781,23 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
     assert by_id[("simulation.vismockup.node.visibility.change.request", 1)][0].confirmation == "none"
     assert by_id[("simulation.vismockup.node.selection.change.request", 1)][0].confirmation == "none"
     assert by_id[("simulation.vismockup.tree.read.request", 1)][0].confirmation == "none"
+    assert by_id[("simulation.environment.live_document.rebind", 1)][0].confirmation == "user"
     assert set(by_id[("simulation.vismockup.tree.read.request", 1)][0].input_schema["properties"]) == {
         "max_depth", "force_refresh",
     }
+    assert set(by_id[("simulation.teamcenter.product_structure.observe.request", 1)][0].input_schema["properties"]) == {
+        "source_selector", "max_nodes", "max_depth", "property_projection",
+    }
+    assert set(by_id[("simulation.teamcenter.product.search.request", 1)][0].input_schema["properties"]) == {
+        "endpoint_id", "item_id", "revision_id", "revision_rule", "configuration_date",
+    }
+    assert by_id[("simulation.teamcenter.product.search.request", 1)][0].risk.value == "read"
+    assert set(by_id[("simulation.teamcenter.product_structure.page.read.request", 1)][0].input_schema["properties"]) == {
+        "observation_id", "cursor", "page_size",
+    }
+    assert by_id[("simulation.teamcenter.product_structure.observe.request", 1)][0].risk.value == "read"
+    assert by_id[("simulation.teamcenter.product_structure.page.read.request", 1)][0].risk.value == "read"
+    assert by_id[("simulation.teamcenter.visualization.launch.request", 1)][0].risk.value == "write"
     for capability_id, (_spec, descriptor) in by_id.items():
         if capability_id[0].startswith("simulation.vismockup.") and not capability_id[0].endswith(".request") and capability_id[0] != "simulation.vismockup.command.get":
             assert descriptor.exposure.local_runtime

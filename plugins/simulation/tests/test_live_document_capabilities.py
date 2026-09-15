@@ -47,6 +47,38 @@ def test_adoption_uses_trusted_identity_and_duplicate_is_durable(database):
     assert native['document_session'] == 'sha256:'+'a'*64
 
 
+def test_rebind_uses_fresh_signed_identity_for_the_owned_workspace(database):
+    connectors = Connectors()
+    provider = LiveDocumentProvider(connectors, clock=lambda: NOW)
+    created = provider.adopt(request(), context()).data
+    connectors.verified_document_identity = lambda operation_id, **scope: dict(
+        connector_device_id='device-A', document_session='sha256:'+'b'*64)
+
+    result = provider.rebind({
+        'workspace_gid': created['workspace_gid'],
+        'identity_operation_id': 'new-identity-op',
+        'expected_document_session': 'sha256:'+'a'*64,
+        'expected_workspace_row_version': 2,
+        'idempotency_key': 'rebind-key',
+    }, context()).data
+
+    assert result['document_session'] == 'sha256:'+'b'*64
+    assert provider.binding({'identity_operation_id':'new-identity-op'}, context()).data['workspace_gid'] == created['workspace_gid']
+
+
+def test_rebind_never_accepts_a_raw_or_other_owner_identity(database):
+    connectors = Connectors()
+    provider = LiveDocumentProvider(connectors, clock=lambda: NOW)
+    created = provider.adopt(request(), context()).data
+    payload = {'workspace_gid': created['workspace_gid'], 'identity_operation_id':'new-identity-op',
+        'expected_document_session':'sha256:'+'a'*64, 'expected_workspace_row_version':2,
+        'idempotency_key':'rebind-key'}
+    with pytest.raises(CapabilityBusinessError):
+        provider.rebind({**payload, 'document_session':'raw'}, context())
+    with pytest.raises(CapabilityBusinessError, match='workspace_not_found'):
+        provider.rebind(payload, context().model_copy(update={'user_gid':'31'}))
+
+
 def test_refused_evidence_and_raw_ui_session_never_create(database):
     connectors = Connectors(); connectors.fail = True
     provider = LiveDocumentProvider(connectors,clock=lambda: NOW)
@@ -101,7 +133,7 @@ def test_identity_read_is_empty_read_only_app_plan_and_candidate_web_only():
     assert step['operation_id'] == 'vismockup.document.identity.read@1'
     for name in ('simulation.vismockup.document.identity.read.request','simulation.vismockup.document.hierarchy_inventory.read.request',
                  'simulation.environment.live_document.adopt','simulation.environment.live_document.binding.get',
-                 'simulation.environment.live_document.inventory.apply'):
+                 'simulation.environment.live_document.rebind','simulation.environment.live_document.inventory.apply'):
         d = registry.items[name][2]
         assert d.lifecycle_status.value == 'experimental'
         assert {key for key,value in d.exposure.model_dump().items() if value} == {'web'}

@@ -20,6 +20,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     private readonly VisMockupTreeCache? _treeCache;
     private readonly string _plmxmlRoot;
     private readonly ILiveHierarchyInventoryReader _liveHierarchyReader;
+    private readonly TeamcenterReadOnlyRuntime _teamcenter;
     private object? _application;
     private string? _ownedDocumentId;
     private (int ProcessId, long Started, string DocumentId, string Source, string RootKey, string? SourceRevision)? _mappedSession;
@@ -28,29 +29,34 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, string executable)
         : this(sta, paths, new WindowsVisMockupCom(executable), executable,
             Path.Combine(Path.GetTempPath(), "AI00", "captures"),
-            new VisMockupTreeCache(Path.Combine(Path.GetTempPath(), "AI00", "vismockup-tree-cache.db")), null) { }
+            new VisMockupTreeCache(Path.Combine(Path.GetTempPath(), "AI00", "vismockup-tree-cache.db")), null, null) { }
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, string executable, string captureRoot)
         : this(sta, paths, new WindowsVisMockupCom(executable), executable, captureRoot,
             new VisMockupTreeCache(Path.Combine(Path.GetDirectoryName(captureRoot) ?? captureRoot,
-                "vismockup-tree-cache.db")), null) { }
+                "vismockup-tree-cache.db")), null, null) { }
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com)
-        : this(sta, paths, com, "", Path.Combine(Path.GetTempPath(), "AI00", "captures"), null, null) { }
+        : this(sta, paths, com, "", Path.Combine(Path.GetTempPath(), "AI00", "captures"), null, null, null) { }
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string captureRoot)
         : this(sta, paths, com, "", captureRoot,
-            new VisMockupTreeCache(Path.Combine(Path.GetDirectoryName(captureRoot) ?? captureRoot, "vismockup-tree-cache.db")), null) { }
+            new VisMockupTreeCache(Path.Combine(Path.GetDirectoryName(captureRoot) ?? captureRoot, "vismockup-tree-cache.db")), null, null) { }
 
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string captureRoot, string treeCachePath)
-        : this(sta, paths, com, "", captureRoot, new VisMockupTreeCache(treeCachePath), null) { }
+        : this(sta, paths, com, "", captureRoot, new VisMockupTreeCache(treeCachePath), null, null) { }
+
+    public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string captureRoot,
+        string treeCachePath, TeamcenterReadOnlyRuntime teamcenter)
+        : this(sta, paths, com, "", captureRoot, new VisMockupTreeCache(treeCachePath), null, teamcenter) { }
 
     internal VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com,
         string captureRoot, ILiveHierarchyInventoryReader liveHierarchyReader)
-        : this(sta, paths, com, "", captureRoot, null, liveHierarchyReader) { }
+        : this(sta, paths, com, "", captureRoot, null, liveHierarchyReader, null) { }
 
     private VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string executable,
-        string captureRoot, VisMockupTreeCache? treeCache, ILiveHierarchyInventoryReader? liveHierarchyReader)
+        string captureRoot, VisMockupTreeCache? treeCache, ILiveHierarchyInventoryReader? liveHierarchyReader,
+        TeamcenterReadOnlyRuntime? teamcenter)
     {
         _sta = sta;
         _paths = paths;
@@ -64,6 +70,8 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         _plmxmlRoot = Path.Combine(Path.GetDirectoryName(captureRoot) ?? captureRoot, "plmxml");
         _liveHierarchyReader = liveHierarchyReader ?? new VisMockupInProcessHierarchyReader(
             Path.Combine(Path.GetDirectoryName(captureRoot) ?? captureRoot, "native-hierarchy"));
+        _teamcenter = teamcenter ?? TeamcenterReadOnlyRuntime.CreateInstalled(
+            Path.GetDirectoryName(captureRoot) ?? captureRoot);
     }
     public AdapterManifest Manifest { get; } = new(
         "ai00.vismockup", 1, "siemens.vismockup", "14.0.0",
@@ -84,6 +92,10 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             new("vismockup.scene.apply@1", "sha256:fce8ff3a33d996a26c3121d015839e2d68bc3c631a8c8c1091201e95d0bcabd3"),
             new("vismockup.scene.verify@1", "sha256:e99bf5896c3f655afc7470fc140d261225d6f37a1d8224b7e9438a2e7b7a211a"),
             new("vismockup.view.capture@1", "sha256:10a4b5540a34fb32a2e6a4d24fd1efbe7afb929e2cc3c9fed44f6b4d9893962d"),
+            new("teamcenter.product.search@1", "sha256:212e3c2396bf642456efa5e12674878fdbc201fc60250bcb3f150e19353d0acc"),
+            new("teamcenter.product_structure.observe@1", "sha256:704e6c398c551cc7a667d1ccf4d00c1b7f6330649676dbdd8b4fa9d92857a32b"),
+            new("teamcenter.product_structure.page.read@1", "sha256:0ef57b5769664cebca42562cbb711228994e6257901786f84f5dfb82a8a6c6ad"),
+            new("teamcenter.visualization.launch@1", "sha256:d74338b54d5abd84dad3435768aa56756ef4fbb560f1d605b2b1bb9cc18519a8"),
         ]);
 
     public async Task<AdapterHealth> ProbeAsync(CancellationToken cancellationToken)
@@ -269,6 +281,13 @@ public sealed class VisMockupAdapter : IConnectorAdapter
                 operation.Payload.GetProperty("operation_id").GetString() ?? "",
                 operation.Payload.GetProperty("expected_scene_hash").GetString() ?? ""),
             "vismockup.view.capture@1" => await CaptureAsync(ReadCaptureRequest(operation.Payload, operation.StepId)),
+            "teamcenter.product_structure.observe@1" => await _teamcenter.ObserveAsync(operation.Payload, cancellationToken),
+            "teamcenter.product.search@1" => await _teamcenter.SearchAsync(operation.Payload, cancellationToken),
+            "teamcenter.product_structure.page.read@1" => await _teamcenter.ReadPageAsync(
+                operation.Payload.GetProperty("observation_id").GetString() ?? "",
+                operation.Payload.GetProperty("cursor").GetInt32(),
+                operation.Payload.GetProperty("page_size").GetInt32(), cancellationToken),
+            "teamcenter.visualization.launch@1" => await _teamcenter.LaunchAsync(operation.Payload, cancellationToken),
             "vismockup.status" => await StatusAsync(),
             "vismockup.launch" => await LaunchAsync(),
             "vismockup.model.open" => await OpenFileAsync(operation.Payload.GetProperty("file_path").GetString() ?? ""),
@@ -415,7 +434,6 @@ public sealed class VisMockupAdapter : IConnectorAdapter
 
     private string ResolveSessionNodeKey(IVisMockupDocument document, string key)
     {
-        if (!key.StartsWith("pdm:", StringComparison.Ordinal)) return key;
         var process = _com.InspectProcess();
         (int, long, string, string, string, string?)? session =
             process.ProcessId is int id && process.ProcessStartUtcTicks is long started
@@ -427,6 +445,28 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             _sessionNodeKeys.Clear();
             _mappedSession = session;
         }
+        if (key.StartsWith("tc:", StringComparison.Ordinal))
+        {
+            var occurrence = key[3..];
+            if (string.IsNullOrWhiteSpace(occurrence))
+                throw new ConnectorNoEffectException("vismockup_session_node_mapping_stale");
+            if (_sessionNodeKeys.TryGetValue(key, out var onlineKnown)) return onlineKnown;
+            var matches = new List<string>();
+            var pending = new Queue<IVisMockupNode>(); pending.Enqueue(document.RootNode);
+            while (pending.Count > 0 && matches.Count < 2)
+            {
+                var node = pending.Dequeue();
+                if (string.Equals(node.OccurrenceId, occurrence, StringComparison.Ordinal)) matches.Add(node.NodeKey);
+                foreach (var child in node.Children) pending.Enqueue(child);
+            }
+            if (matches.Count != 1)
+                throw new ConnectorNoEffectException(matches.Count == 0
+                    ? "vismockup_online_occurrence_unmapped" : "vismockup_online_occurrence_ambiguous");
+            if (_sessionNodeKeys.Count >= 4096) _sessionNodeKeys.Clear();
+            _sessionNodeKeys[key] = matches[0];
+            return matches[0];
+        }
+        if (!key.StartsWith("pdm:", StringComparison.Ordinal)) return key;
         if (session is not null && _sessionNodeKeys.TryGetValue(key, out var known)) return known;
         string resolved;
         try { resolved = _treeCache?.ResolveSessionNodeKey(document, key) ?? throw new InvalidDataException(); }
