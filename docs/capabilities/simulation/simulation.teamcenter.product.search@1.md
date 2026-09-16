@@ -1,6 +1,6 @@
 # simulation.teamcenter.product.search@1
 
-Resolve one exact Teamcenter item and revision into an immutable online-source selector.
+Search Teamcenter item IDs and names with deterministic exact, prefix, and contains matching.
 
 ## 使用判断
 
@@ -78,14 +78,18 @@ Resolve one exact Teamcenter item and revision into an immutable online-source s
       "const": "tc-production",
       "type": "string"
     },
-    "item_id": {
+    "limit": {
+      "maximum": 20,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "query": {
       "maxLength": 128,
       "minLength": 1,
       "type": "string"
     },
     "revision_id": {
       "maxLength": 64,
-      "minLength": 1,
       "type": "string"
     },
     "revision_rule": {
@@ -96,10 +100,11 @@ Resolve one exact Teamcenter item and revision into an immutable online-source s
   },
   "required": [
     "endpoint_id",
-    "item_id",
+    "query",
     "revision_id",
     "revision_rule",
-    "configuration_date"
+    "configuration_date",
+    "limit"
   ],
   "type": "object"
 }
@@ -115,7 +120,8 @@ Resolve one exact Teamcenter item and revision into an immutable online-source s
   "payload": {
     "configuration_date": "example",
     "endpoint_id": "tc-production",
-    "item_id": "example",
+    "limit": 1,
+    "query": "example",
     "revision_id": "example",
     "revision_rule": "example"
   }

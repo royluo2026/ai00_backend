@@ -1,6 +1,6 @@
-# simulation.teamcenter.visualization.launch.request@1
+# simulation.teamcenter.revision_rule.search.request@1
 
-Queue an official Teamcenter Visualization launch for one exact online source.
+Read the available revision rules from the signed-in Teamcenter session.
 
 ## 使用判断
 
@@ -29,7 +29,7 @@ Queue an official Teamcenter Visualization launch for one exact online source.
 ## 授权与数据边界
 
 - 授权策略：`simulation.v2:simulation.use`
-- 自动化等级：`A1`
+- 自动化等级：`A2`
 - 数据分类：`confidential`
 - Delegation：`scoped`
 - 认证新鲜度：0 秒
@@ -39,15 +39,15 @@ Queue an official Teamcenter Visualization launch for one exact online source.
 
 ## 执行与可靠性
 
-- 副作用：`write`
+- 副作用：`read`
 - 执行模式：`cloud_sync`
 - 超时：30 秒
-- 审批：`user`
-- 幂等：`required`
+- 审批：`none`
+- 幂等：`none`
 - 并发：`none`
 - 无预期版本信封要求。
-- 一致性：`external`
-- Operation：`optional`
+- 一致性：`strong`
+- Operation：`none`
 - Artifact：`none`
 - 审计：`standard`
 - Evidence：`required`
@@ -70,54 +70,13 @@ Queue an official Teamcenter Visualization launch for one exact online source.
 {
   "additionalProperties": false,
   "properties": {
-    "expected_visdoc_uid": {
-      "maxLength": 128,
+    "endpoint_id": {
+      "const": "tc-production",
       "type": "string"
-    },
-    "source_selector": {
-      "additionalProperties": false,
-      "properties": {
-        "bom_view_uid": {
-          "maxLength": 128,
-          "type": "string"
-        },
-        "configuration_date": {
-          "format": "date-time",
-          "type": "string"
-        },
-        "endpoint_id": {
-          "const": "tc-production",
-          "type": "string"
-        },
-        "item_revision_uid": {
-          "maxLength": 128,
-          "type": "string"
-        },
-        "object_uid": {
-          "maxLength": 128,
-          "minLength": 1,
-          "type": "string"
-        },
-        "revision_rule": {
-          "maxLength": 128,
-          "minLength": 1,
-          "type": "string"
-        }
-      },
-      "required": [
-        "endpoint_id",
-        "object_uid",
-        "item_revision_uid",
-        "bom_view_uid",
-        "revision_rule",
-        "configuration_date"
-      ],
-      "type": "object"
     }
   },
   "required": [
-    "source_selector",
-    "expected_visdoc_uid"
+    "endpoint_id"
   ],
   "type": "object"
 }
@@ -127,19 +86,11 @@ Queue an official Teamcenter Visualization launch for one exact online source.
 
 ```json
 {
-  "capability_id": "simulation.teamcenter.visualization.launch.request",
+  "capability_id": "simulation.teamcenter.revision_rule.search.request",
   "catalog_release": "<catalog_release>",
   "major_version": 1,
   "payload": {
-    "expected_visdoc_uid": "example",
-    "source_selector": {
-      "bom_view_uid": "example",
-      "configuration_date": "example",
-      "endpoint_id": "tc-production",
-      "item_revision_uid": "example",
-      "object_uid": "example",
-      "revision_rule": "example"
-    }
+    "endpoint_id": "tc-production"
   }
 }
 ```

@@ -1,6 +1,6 @@
-# simulation.teamcenter.visualization.launch.request@1
+# simulation.teamcenter.visualization.insert.request@1
 
-Queue an official Teamcenter Visualization launch for one exact online source.
+Insert one exact Teamcenter online source into the active VisMockup document.
 
 ## 使用判断
 
@@ -127,7 +127,7 @@ Queue an official Teamcenter Visualization launch for one exact online source.
 
 ```json
 {
-  "capability_id": "simulation.teamcenter.visualization.launch.request",
+  "capability_id": "simulation.teamcenter.visualization.insert.request",
   "catalog_release": "<catalog_release>",
   "major_version": 1,
   "payload": {

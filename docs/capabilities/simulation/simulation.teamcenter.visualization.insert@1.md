@@ -1,11 +1,11 @@
-# simulation.teamcenter.visualization.launch.request@1
+# simulation.teamcenter.visualization.insert@1
 
-Queue an official Teamcenter Visualization launch for one exact online source.
+Insert one Teamcenter online source into the active VisMockup document.
 
 ## 使用判断
 
-- 适用：The signed-in user requests one direct action on the bound workstation Connector.
-- 不适用：No current user-scoped Connector binding exists.
+- 适用：A signed Simulation Connector plan invokes this exact VisMockup atom.
+- 不适用：The caller is outside the trusted local Connector runtime.
 - 生命周期：`experimental`
 - 所属领域：`simulation`
 - Catalog Release：`<catalog_release>`（调用时使用 Host 当前固定的目录版本）
@@ -16,19 +16,19 @@ Queue an official Teamcenter Visualization launch for one exact online source.
 
 | 消费者 | 状态 |
 |---|---|
-| web | 可用 |
-| plugin | 可用 |
-| agent | 可用 |
-| api | 可用 |
-| mcp | 可用 |
+| web | 不可用 |
+| plugin | 不可用 |
+| agent | 不可用 |
+| api | 不可用 |
+| mcp | 不可用 |
 | worker | 不可用 |
-| local_runtime | 不可用 |
+| local_runtime | 可用 |
 
 插件和 Agent 只有在上表对应值为“可用”，且安装/Mount 或 Delegation 明确授权时才可调用。
 
 ## 授权与数据边界
 
-- 授权策略：`simulation.v2:simulation.use`
+- 授权策略：`simulation.v2:agent.run`
 - 自动化等级：`A1`
 - 数据分类：`confidential`
 - Delegation：`scoped`
@@ -40,14 +40,14 @@ Queue an official Teamcenter Visualization launch for one exact online source.
 ## 执行与可靠性
 
 - 副作用：`write`
-- 执行模式：`cloud_sync`
+- 执行模式：`local`
 - 超时：30 秒
-- 审批：`user`
+- 审批：`none`
 - 幂等：`required`
 - 并发：`none`
 - 无预期版本信封要求。
 - 一致性：`external`
-- Operation：`optional`
+- Operation：`required`
 - Artifact：`none`
 - 审计：`standard`
 - Evidence：`required`
@@ -127,7 +127,7 @@ Queue an official Teamcenter Visualization launch for one exact online source.
 
 ```json
 {
-  "capability_id": "simulation.teamcenter.visualization.launch.request",
+  "capability_id": "simulation.teamcenter.visualization.insert",
   "catalog_release": "<catalog_release>",
   "major_version": 1,
   "payload": {
@@ -146,31 +146,33 @@ Queue an official Teamcenter Visualization launch for one exact online source.
 
 ## 输出 Schema
 
-领域数据必须符合下列 Schema，并封装在完整 `CapabilityResultV2` 中：
+首次调用返回 `status=accepted`、`data=null` 和持久化 `operation_ref`；下列输出 Schema 适用于 Operation 完成后的领域结果。
 
 ```json
 {
   "additionalProperties": false,
   "properties": {
-    "operation_id": {
-      "minLength": 1,
+    "expected_visdoc_uid": {
+      "maxLength": 128,
       "type": "string"
     },
-    "status": {
-      "enum": [
-        "accepted"
-      ],
+    "launch_id": {
+      "pattern": "^tclaunch:[a-f0-9]{64}$",
       "type": "string"
     },
-    "version": {
-      "minimum": 1,
-      "type": "integer"
+    "runner_started": {
+      "type": "boolean"
+    },
+    "source_identity_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
     }
   },
   "required": [
-    "operation_id",
-    "status",
-    "version"
+    "launch_id",
+    "runner_started",
+    "expected_visdoc_uid",
+    "source_identity_hash"
   ],
   "type": "object"
 }

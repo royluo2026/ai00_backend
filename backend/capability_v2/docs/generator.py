@@ -133,6 +133,8 @@ def example_for_schema(schema: Mapping[str, Any]) -> Any:
             return "sha256:" + "0" * 64
         if pattern in {"^[0-9a-f]{64}$", "^[a-f0-9]{64}$", "^(sha256:)?[0-9a-f]{64}$"}:
             return "0" * 64
+        if pattern in {"^tcobs:[a-f0-9]{64}$", "^tclaunch:[a-f0-9]{64}$"}:
+            return pattern[1:pattern.index(":") + 1] + "0" * 64
         if pattern == "^[1-9][0-9]*$":
             return "1"
         if pattern == "^[0-9]+$":

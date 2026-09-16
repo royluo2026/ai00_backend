@@ -103,7 +103,7 @@ Queue one bounded page read from an existing local Teamcenter structure observat
   "major_version": 1,
   "payload": {
     "cursor": 0,
-    "observation_id": "example",
+    "observation_id": "tcobs:0000000000000000000000000000000000000000000000000000000000000000",
     "page_size": 1
   }
 }

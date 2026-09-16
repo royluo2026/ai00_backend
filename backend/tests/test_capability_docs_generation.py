@@ -58,6 +58,8 @@ def test_v1_adapter_preserves_explicit_typed_any_json_schema():
     (
         ("^sha256:[0-9a-f]{64}$", "sha256:" + "0" * 64),
         ("^[0-9a-f]{64}$", "0" * 64),
+        ("^tcobs:[a-f0-9]{64}$", "tcobs:" + "0" * 64),
+        ("^tclaunch:[a-f0-9]{64}$", "tclaunch:" + "0" * 64),
     ),
 )
 def test_minimal_example_satisfies_sha256_string_patterns(pattern, expected):
