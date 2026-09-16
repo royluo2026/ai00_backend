@@ -35,7 +35,7 @@ Search Teamcenter item IDs and names with deterministic exact, prefix, and conta
 - 认证新鲜度：0 秒
 
 资源选择器：
-- 无资源选择器；仍受租户、身份与权限策略约束。
+- `teamcenter-endpoint` ← `endpoint_id`（必填）
 
 ## 执行与可靠性
 

@@ -83,6 +83,32 @@ public sealed class TeamcenterReadOnlyRuntimeTests
     }
 
     [Fact]
+    public async Task Request_waiting_behind_logout_cannot_reuse_old_credentials()
+    {
+        var worker = new RecordingTeamcenterWorker
+        {
+            ObserveStarted = new(TaskCreationOptions.RunContinuationsAsynchronously),
+            ReleaseObserve = new(TaskCreationOptions.RunContinuationsAsynchronously),
+        };
+        using var runtime = new TeamcenterReadOnlyRuntime(worker, Path.GetTempFileName());
+        await runtime.LoginAsync("tc-production", "user", "secret", CancellationToken.None);
+        using var observePayload = JsonDocument.Parse("""{"source_selector":{"endpoint_id":"tc-production","object_uid":"obj","item_revision_uid":"rev","bom_view_uid":"view","revision_rule":"Latest Working","configuration_date":"2026-09-16T00:00:00Z"},"max_nodes":100,"max_depth":20,"property_projection":"simulation-default-v1"}""");
+        using var searchPayload = JsonDocument.Parse("""{"endpoint_id":"tc-production","query":"A","revision_id":"","revision_rule":"Latest Working","configuration_date":"2026-09-16T00:00:00Z","limit":20}""");
+        var observation = runtime.ObserveAsync(observePayload.RootElement, CancellationToken.None);
+        await worker.ObserveStarted.Task;
+        var logout = runtime.LogoutAsync(CancellationToken.None);
+        var queuedSearch = runtime.SearchV2Async(searchPayload.RootElement, CancellationToken.None);
+
+        worker.ReleaseObserve.SetResult();
+        await observation;
+        await logout;
+        var error = await Assert.ThrowsAsync<ConnectorException>(() => queuedSearch);
+
+        Assert.Equal("teamcenter_login_required", error.Message);
+        Assert.Equal(0, worker.SearchCalls);
+    }
+
+    [Fact]
     public void Policy_has_no_generic_or_persistent_write_operation()
     {
         Assert.Equal(new[] { "status", "revision_rules", "search", "observe", "launch" }, TeamcenterReadOnlyPolicy.WorkerCommands);
@@ -171,6 +197,9 @@ public sealed class TeamcenterReadOnlyRuntimeTests
         public IReadOnlyList<string> RevisionRules { get; init; } = ["Latest Working"];
         public IReadOnlyList<TeamcenterProductSearchItem> SearchItems { get; init; } = [];
         public ConnectorException? SearchError { get; init; }
+        public TaskCompletionSource? ObserveStarted { get; init; }
+        public TaskCompletionSource? ReleaseObserve { get; init; }
+        public int SearchCalls { get; private set; }
         public IReadOnlyList<TeamcenterOccurrence> Nodes { get; init; } =
         [new("root", null, 0, 0, "Root", "i", "A", "r", "01", "Assembly", "u", "g", Identity, null, [])];
         public Task ValidateCredentialsAsync(string endpointId, string username, string password, CancellationToken ct)
@@ -178,9 +207,16 @@ public sealed class TeamcenterReadOnlyRuntimeTests
         public Task<IReadOnlyList<string>> GetRevisionRulesAsync(string username, string password, CancellationToken ct)
         { PasswordSeen = password; return Task.FromResult(RevisionRules); }
         public Task<TeamcenterProductSearchResult> SearchAsync(string itemId, string revisionId, string revisionRule, string configurationDate, string username, string password, CancellationToken ct)
-        { PasswordSeen = password; return SearchError is null ? Task.FromResult(new TeamcenterProductSearchResult(SearchItems)) : Task.FromException<TeamcenterProductSearchResult>(SearchError); }
+        { PasswordSeen = password; SearchCalls++; return SearchError is null ? Task.FromResult(new TeamcenterProductSearchResult(SearchItems)) : Task.FromException<TeamcenterProductSearchResult>(SearchError); }
         public Task<IReadOnlyList<TeamcenterOccurrence>> ObserveAsync(TeamcenterSourceSelector selector, int maxNodes, int maxDepth, string propertyProjection, string username, string password, CancellationToken ct)
-        { PasswordSeen = password; return Task.FromResult(Nodes); }
+        {
+            PasswordSeen = password;
+            if (ReleaseObserve is null) return Task.FromResult(Nodes);
+            ObserveStarted!.SetResult();
+            return CompleteObserveAsync(ReleaseObserve.Task, ct);
+        }
+        private async Task<IReadOnlyList<TeamcenterOccurrence>> CompleteObserveAsync(Task release, CancellationToken ct)
+        { await release.WaitAsync(ct); return Nodes; }
         public Task<TeamcenterLaunchResult> LaunchAsync(TeamcenterSourceSelector selector, string expectedVisdocUid, string username, string password, CancellationToken ct)
         { PasswordSeen = password; return Task.FromResult(new TeamcenterLaunchResult("tclaunch:" + new string('a', 64), true, expectedVisdocUid, selector.IdentityHash)); }
         public Task<TeamcenterLaunchResult> ConsumeVisualizationAsync(TeamcenterSourceSelector selector, string expectedVisdocUid, Func<string, CancellationToken, Task> consumer, string username, string password, CancellationToken ct)

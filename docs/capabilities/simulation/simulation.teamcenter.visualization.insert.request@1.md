@@ -35,7 +35,8 @@ Insert one exact Teamcenter online source into the active VisMockup document.
 - 认证新鲜度：0 秒
 
 资源选择器：
-- 无资源选择器；仍受租户、身份与权限策略约束。
+- `teamcenter-endpoint` ← `source_selector.endpoint_id`（必填）
+- `teamcenter-online-source` ← `source_selector.object_uid`（必填）
 
 ## 执行与可靠性
 

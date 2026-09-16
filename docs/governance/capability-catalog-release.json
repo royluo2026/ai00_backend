@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_5abd1d9f1d8c796e1f0b4d782cb01b72",
-  "catalog_hash": "sha256:5abd1d9f1d8c796e1f0b4d782cb01b72bf89524e2570364135dbe78b2f105a35",
+  "release_id": "rel_721bb5964de8b31eeafdbbf5e3a05987",
+  "catalog_hash": "sha256:721bb5964de8b31eeafdbbf5e3a0598747a504092018223367c70093f01fa0c9",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -292780,6 +292780,27 @@
               "updates": {
                 "type": "object",
                 "properties": {
+                  "severity": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "related_knowledge_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "permanent_action": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
                   "bop_entry_gid": {
                     "type": [
                       "string",
@@ -292794,6 +292815,34 @@
                     ],
                     "maxLength": 65536
                   },
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "status": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "interim_action": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
                   "related_task_gid": {
                     "type": [
                       "string",
@@ -292801,12 +292850,56 @@
                     ],
                     "maxLength": 65536
                   },
-                  "description": {
+                  "occurrence_root_cause": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
+                  },
+                  "feishu_assignee_open_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_docs": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "title": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "url": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "type": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
                   },
                   "attachments": {
                     "type": "array",
@@ -292875,64 +292968,6 @@
                       ]
                     }
                   },
-                  "permanent_action": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_assignee_open_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_docs": {
-                    "type": "array",
-                    "maxItems": 200,
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "token": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "name": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "title": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "url": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "type": {
-                          "type": "string",
-                          "maxLength": 2048
-                        }
-                      },
-                      "additionalProperties": false
-                    }
-                  },
-                  "status": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "approval_order_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
                   "assignee_team_gid": {
                     "type": [
                       "string",
@@ -292940,7 +292975,14 @@
                     ],
                     "maxLength": 65536
                   },
-                  "occurrence_root_cause": {
+                  "share_scope": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "title": {
                     "type": [
                       "string",
                       "null"
@@ -292969,56 +293011,21 @@
                       "additionalProperties": false
                     }
                   },
-                  "related_knowledge_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "share_scope": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "interim_action": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "severity": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "scheduled_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "title": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_assignee_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
                   "escape_root_cause": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "approval_order_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "description": {
                     "type": [
                       "string",
                       "null"
@@ -293032,14 +293039,7 @@
                     ],
                     "maxLength": 65536
                   },
-                  "list_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_name": {
+                  "scheduled_date": {
                     "type": [
                       "string",
                       "null"
@@ -325382,14 +325382,7 @@
               "updates": {
                 "type": "object",
                 "properties": {
-                  "plan_start": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "description": {
+                  "plan_end": {
                     "type": [
                       "string",
                       "null"
@@ -325402,6 +325395,88 @@
                       "number",
                       "null"
                     ]
+                  },
+                  "canvas_icon": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_chat_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "actual_end": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "is_deleted": {
+                    "type": "boolean"
+                  },
+                  "canvas_x": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "meeting_level": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_open_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_docs": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "title": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "url": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "type": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
                   },
                   "attachments": {
                     "type": "array",
@@ -325470,143 +325545,12 @@
                       ]
                     }
                   },
-                  "review_date": {
+                  "meeting_doc_link": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
-                  },
-                  "feishu_assignee_open_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "status": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "parent_task_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "assignee_team_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "due_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "is_deleted": {
-                    "type": "boolean"
-                  },
-                  "meeting_level": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_assignee_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "project_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "plan_end": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "scheduled_start_time": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_chat_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_docs": {
-                    "type": "array",
-                    "maxItems": 200,
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "token": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "name": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "title": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "url": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "type": {
-                          "type": "string",
-                          "maxLength": 2048
-                        }
-                      },
-                      "additionalProperties": false
-                    }
-                  },
-                  "canvas_x": {
-                    "type": [
-                      "integer",
-                      "number",
-                      "null"
-                    ]
-                  },
-                  "actual_end": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "canvas_y": {
-                    "type": [
-                      "integer",
-                      "number",
-                      "null"
-                    ]
                   },
                   "feishu_groups": {
                     "type": "array",
@@ -325630,21 +325574,41 @@
                       "additionalProperties": false
                     }
                   },
-                  "share_scope": {
+                  "priority": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "canvas_icon": {
+                  "time_estimate": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "node_type": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "actual_start": {
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "project_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "scheduled_start_time": {
                     "type": [
                       "string",
                       "null"
@@ -325658,41 +325622,14 @@
                     ],
                     "maxLength": 65536
                   },
-                  "title": {
+                  "status": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "meeting_doc_link": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "priority": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "node_type": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "time_estimate": {
-                    "type": [
-                      "integer",
-                      "null"
-                    ]
-                  },
-                  "list_gid": {
+                  "due_date": {
                     "type": [
                       "string",
                       "null"
@@ -325705,6 +325642,69 @@
                       "null"
                     ],
                     "maxLength": 65536
+                  },
+                  "feishu_assignee_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "assignee_team_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "title": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "review_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "parent_task_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "plan_start": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "share_scope": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "actual_start": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "canvas_y": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
                   }
                 },
                 "additionalProperties": false,
@@ -426457,7 +426457,13 @@
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
       "authorization_policy": "simulation.v2:agent.run",
-      "resource_selectors": [],
+      "resource_selectors": [
+        {
+          "resource_type": "teamcenter-endpoint",
+          "payload_path": "endpoint_id",
+          "required": true
+        }
+      ],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
       "delegation_policy": "scoped",
@@ -427781,7 +427787,13 @@
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
       "authorization_policy": "simulation.v2:simulation.use",
-      "resource_selectors": [],
+      "resource_selectors": [
+        {
+          "resource_type": "teamcenter-endpoint",
+          "payload_path": "endpoint_id",
+          "required": true
+        }
+      ],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
       "delegation_policy": "scoped",
@@ -428950,7 +428962,7 @@
       "description": "Create one bounded local read-only Teamcenter product-structure observation.",
       "use_when": "A signed Simulation Connector plan invokes this exact VisMockup atom.",
       "do_not_use_when": "The caller is outside the trusted local Connector runtime.",
-      "business_effect": "Create one bounded local read-only Teamcenter product-structure observation.",
+      "business_effect": "Materialize a temporary local observation identity and node-count evidence for an exact Teamcenter product structure.",
       "business_acceptance_criteria": [
         "The operation is scoped to the caller's single bound Simulation Connector.",
         "The closed request and response contracts preserve exact Connector and Adapter identity.",
@@ -428973,7 +428985,18 @@
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
       "authorization_policy": "simulation.v2:agent.run",
-      "resource_selectors": [],
+      "resource_selectors": [
+        {
+          "resource_type": "teamcenter-endpoint",
+          "payload_path": "source_selector.endpoint_id",
+          "required": true
+        },
+        {
+          "resource_type": "teamcenter-online-source",
+          "payload_path": "source_selector.object_uid",
+          "required": true
+        }
+      ],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
       "delegation_policy": "scoped",
@@ -430176,7 +430199,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:b6d0485cd4eac71ce980781d7b5700e130f6e2687a8fd5c332d64cf72c5e20ef"
+      "business_definition_hash": "sha256:b047f49c8e65edd23e803e46dd0ce493e4901cd52eafb4432edb43e876a880b7"
     },
     {
       "id": "simulation.teamcenter.product_structure.observe.request",
@@ -430211,7 +430234,18 @@
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
       "authorization_policy": "simulation.v2:simulation.use",
-      "resource_selectors": [],
+      "resource_selectors": [
+        {
+          "resource_type": "teamcenter-endpoint",
+          "payload_path": "source_selector.endpoint_id",
+          "required": true
+        },
+        {
+          "resource_type": "teamcenter-online-source",
+          "payload_path": "source_selector.object_uid",
+          "required": true
+        }
+      ],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
       "delegation_policy": "scoped",
@@ -431404,7 +431438,7 @@
       "description": "Read one bounded page from a local Teamcenter product-structure observation.",
       "use_when": "A signed Simulation Connector plan invokes this exact VisMockup atom.",
       "do_not_use_when": "The caller is outside the trusted local Connector runtime.",
-      "business_effect": "Read one bounded page from a local Teamcenter product-structure observation.",
+      "business_effect": "Return cached occurrence rows, continuation position, and an integrity hash from a local Teamcenter observation.",
       "business_acceptance_criteria": [
         "The operation is scoped to the caller's single bound Simulation Connector.",
         "The closed request and response contracts preserve exact Connector and Adapter identity.",
@@ -431427,7 +431461,13 @@
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
       "authorization_policy": "simulation.v2:agent.run",
-      "resource_selectors": [],
+      "resource_selectors": [
+        {
+          "resource_type": "teamcenter-observation",
+          "payload_path": "observation_id",
+          "required": true
+        }
+      ],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
       "delegation_policy": "scoped",
@@ -432940,7 +432980,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:03d32acfffb4a7a9e194571ad8f64d224aaf281d17faf04b4150d938fecc3f9c"
+      "business_definition_hash": "sha256:64c2bbed6f7899255fc7f6ca7d6283ecb086d5b3dcac033ab464ee84037e0f9a"
     },
     {
       "id": "simulation.teamcenter.product_structure.page.read.request",
@@ -432952,7 +432992,7 @@
       "description": "Queue one bounded page read from an existing local Teamcenter structure observation.",
       "use_when": "The signed-in user requests one direct action on the bound workstation Connector.",
       "do_not_use_when": "No current user-scoped Connector binding exists.",
-      "business_effect": "Queue one bounded page read from an existing local Teamcenter structure observation.",
+      "business_effect": "Return a signed operation receipt for retrieving occurrence rows from an existing local Teamcenter observation.",
       "business_acceptance_criteria": [
         "The operation is scoped to the caller's single bound Simulation Connector.",
         "The closed request and response contracts preserve exact Connector and Adapter identity.",
@@ -432975,7 +433015,13 @@
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
       "authorization_policy": "simulation.v2:simulation.use",
-      "resource_selectors": [],
+      "resource_selectors": [
+        {
+          "resource_type": "teamcenter-observation",
+          "payload_path": "observation_id",
+          "required": true
+        }
+      ],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
       "delegation_policy": "scoped",
@@ -434116,7 +434162,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:a8aee40d02ed572707d63e2f9230c33bcb33e5ebaad6224046269d53e18657a7"
+      "business_definition_hash": "sha256:2d5e290509d54c738b7f47daadd0234fe32e70c6c5f6ff1f2326e9370cc7d1c3"
     },
     {
       "id": "simulation.teamcenter.revision_rule.search",
@@ -434151,7 +434197,13 @@
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
       "authorization_policy": "simulation.v2:agent.run",
-      "resource_selectors": [],
+      "resource_selectors": [
+        {
+          "resource_type": "teamcenter-endpoint",
+          "payload_path": "endpoint_id",
+          "required": true
+        }
+      ],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
       "delegation_policy": "scoped",
@@ -435297,7 +435349,13 @@
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A2",
       "authorization_policy": "simulation.v2:simulation.use",
-      "resource_selectors": [],
+      "resource_selectors": [
+        {
+          "resource_type": "teamcenter-endpoint",
+          "payload_path": "endpoint_id",
+          "required": true
+        }
+      ],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
       "delegation_policy": "scoped",
@@ -436461,7 +436519,18 @@
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
       "authorization_policy": "simulation.v2:agent.run",
-      "resource_selectors": [],
+      "resource_selectors": [
+        {
+          "resource_type": "teamcenter-endpoint",
+          "payload_path": "source_selector.endpoint_id",
+          "required": true
+        },
+        {
+          "resource_type": "teamcenter-online-source",
+          "payload_path": "source_selector.object_uid",
+          "required": true
+        }
+      ],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
       "delegation_policy": "scoped",
@@ -437664,7 +437733,18 @@
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
       "authorization_policy": "simulation.v2:simulation.use",
-      "resource_selectors": [],
+      "resource_selectors": [
+        {
+          "resource_type": "teamcenter-endpoint",
+          "payload_path": "source_selector.endpoint_id",
+          "required": true
+        },
+        {
+          "resource_type": "teamcenter-online-source",
+          "payload_path": "source_selector.object_uid",
+          "required": true
+        }
+      ],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
       "delegation_policy": "scoped",
@@ -438869,7 +438949,18 @@
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
       "authorization_policy": "simulation.v2:agent.run",
-      "resource_selectors": [],
+      "resource_selectors": [
+        {
+          "resource_type": "teamcenter-endpoint",
+          "payload_path": "source_selector.endpoint_id",
+          "required": true
+        },
+        {
+          "resource_type": "teamcenter-online-source",
+          "payload_path": "source_selector.object_uid",
+          "required": true
+        }
+      ],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
       "delegation_policy": "scoped",
@@ -440072,7 +440163,18 @@
       "exposure_policy_source": "provider_explicit",
       "automation_level": "A1",
       "authorization_policy": "simulation.v2:simulation.use",
-      "resource_selectors": [],
+      "resource_selectors": [
+        {
+          "resource_type": "teamcenter-endpoint",
+          "payload_path": "source_selector.endpoint_id",
+          "required": true
+        },
+        {
+          "resource_type": "teamcenter-online-source",
+          "payload_path": "source_selector.object_uid",
+          "required": true
+        }
+      ],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
       "delegation_policy": "scoped",
@@ -471575,8 +471677,8 @@
       "plugin_id": "official.simulation",
       "module": "simulation_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:46a4b8db99810a81635d8be692f2750c3592f3afd584079d9cdf6aee285fff3a"
+      "artifact_hash": "sha256:0f5aa1aa055e568f3296863dea80a4748ac4bf9a574c4b66da883cfc511a7e22"
     }
   ],
-  "created_at": "2026-09-16T03:23:03.967704Z"
+  "created_at": "2026-09-16T03:41:43.095914Z"
 }

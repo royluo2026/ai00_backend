@@ -249,13 +249,17 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
         var maxDepth = payload.GetProperty("max_depth").GetInt32();
         var projection = payload.GetProperty("property_projection").GetString() ?? "";
         if (maxNodes is < 1 or > 250_000 || maxDepth is < 1 or > 128
-            || projection.Length is < 1 or > 64 || selector.EndpointId != endpointId)
+            || projection.Length is < 1 or > 64)
             throw new ConnectorException("teamcenter_observe_input_invalid");
-        var credentials = RequireCredentials();
         IReadOnlyList<TeamcenterOccurrence> nodes;
         await gate.WaitAsync(ct);
-        try { nodes = await worker.ObserveAsync(selector, maxNodes, maxDepth, projection,
-                credentials.User, credentials.Password, ct); }
+        try
+        {
+            var credentials = RequireCredentials();
+            if (selector.EndpointId != endpointId) throw new ConnectorException("teamcenter_observe_input_invalid");
+            nodes = await worker.ObserveAsync(selector, maxNodes, maxDepth, projection,
+                credentials.User, credentials.Password, ct);
+        }
         catch (ConnectorException error) when (InvalidatesSession(error)) { ClearCredentials(); throw; }
         finally { gate.Release(); }
         ValidateNodes(nodes, maxNodes, maxDepth);
@@ -278,11 +282,14 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
         if (endpoint != "tc-production" || itemId.Length is < 1 or > 128 || revisionId.Length is < 1 or > 64
             || revisionRule.Length is < 1 or > 128 || !DateTimeOffset.TryParse(configurationDate, out _))
             throw new ConnectorException("teamcenter_search_input_invalid");
-        var credentials = RequireCredentials();
         TeamcenterProductSearchResult found;
         await gate.WaitAsync(ct);
-        try { found = await worker.SearchAsync(itemId, revisionId, revisionRule, configurationDate,
-                credentials.User, credentials.Password, ct); }
+        try
+        {
+            var credentials = RequireCredentials();
+            found = await worker.SearchAsync(itemId, revisionId, revisionRule, configurationDate,
+                credentials.User, credentials.Password, ct);
+        }
         catch (ConnectorException error) when (InvalidatesSession(error)) { ClearCredentials(); throw; }
         finally { gate.Release(); }
         return new TeamcenterProductSearchResult(found.Items.Where(item =>
@@ -296,10 +303,13 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
         Closed(payload, "endpoint_id");
         if ((payload.GetProperty("endpoint_id").GetString() ?? "") != "tc-production")
             throw new ConnectorException("teamcenter_revision_rules_input_invalid");
-        var credentials = RequireCredentials();
         IReadOnlyList<string> raw;
         await gate.WaitAsync(ct);
-        try { raw = await worker.GetRevisionRulesAsync(credentials.User, credentials.Password, ct); }
+        try
+        {
+            var credentials = RequireCredentials();
+            raw = await worker.GetRevisionRulesAsync(credentials.User, credentials.Password, ct);
+        }
         catch (ConnectorException error) when (InvalidatesSession(error)) { ClearCredentials(); throw; }
         finally { gate.Release(); }
         var rules = raw.Where(rule => !string.IsNullOrWhiteSpace(rule) && rule.Length <= 128)
@@ -322,11 +332,14 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
             || revisionId.Length > 64 || revisionId.Any(char.IsControl) || revisionRule.Length is < 1 or > 128
             || !DateTimeOffset.TryParse(configurationDate, out _) || limit is < 1 or > 20)
             throw new ConnectorException("teamcenter_search_input_invalid");
-        var credentials = RequireCredentials();
         TeamcenterProductSearchResult found;
         await gate.WaitAsync(ct);
-        try { found = await worker.SearchAsync(query, revisionId, revisionRule, configurationDate,
-                credentials.User, credentials.Password, ct); }
+        try
+        {
+            var credentials = RequireCredentials();
+            found = await worker.SearchAsync(query, revisionId, revisionRule, configurationDate,
+                credentials.User, credentials.Password, ct);
+        }
         catch (ConnectorException error) when (InvalidatesSession(error)) { ClearCredentials(); throw; }
         finally { gate.Release(); }
         return new TeamcenterProductSearchResult(RankSearchItems(found.Items, query, revisionId, limit));
@@ -385,12 +398,16 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
         Closed(payload, "source_selector", "expected_visdoc_uid");
         var selector = ReadSelector(payload.GetProperty("source_selector"));
         var expected = payload.GetProperty("expected_visdoc_uid").GetString() ?? "";
-        if (expected.Length > 128 || selector.EndpointId != endpointId)
+        if (expected.Length > 128)
             throw new ConnectorException("teamcenter_launch_input_invalid");
-        var credentials = RequireCredentials();
         await gate.WaitAsync(ct);
-        try { return await worker.ConsumeVisualizationAsync(selector, expected, consumer,
-                credentials.User, credentials.Password, ct); }
+        try
+        {
+            var credentials = RequireCredentials();
+            if (selector.EndpointId != endpointId) throw new ConnectorException("teamcenter_launch_input_invalid");
+            return await worker.ConsumeVisualizationAsync(selector, expected, consumer,
+                credentials.User, credentials.Password, ct);
+        }
         catch (ConnectorException error) when (InvalidatesSession(error)) { ClearCredentials(); throw; }
         finally { gate.Release(); }
     }

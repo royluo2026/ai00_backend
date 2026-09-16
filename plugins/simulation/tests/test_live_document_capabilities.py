@@ -149,14 +149,14 @@ def test_teamcenter_requests_are_web_only_with_action_specific_effects():
         'simulation.teamcenter.product.search.request': 'exact, prefix, and contains search',
         'simulation.teamcenter.revision_rule.search.request': 'revision rules',
         'simulation.teamcenter.product_structure.observe.request': 'product structure',
-        'simulation.teamcenter.product_structure.page.read.request': 'page read',
+        'simulation.teamcenter.product_structure.page.read.request': 'occurrence rows',
         'simulation.teamcenter.visualization.launch.request': 'new VisMockup document',
         'simulation.teamcenter.visualization.insert.request': 'active VisMockup document',
     }
     for capability_id, phrase in expectations.items():
         descriptor = registry.items[capability_id][2]
         assert {key for key, value in descriptor.exposure.model_dump().items() if value} == {'web'}
-        assert descriptor.resource_selectors == ()
+        assert descriptor.resource_selectors
         assert phrase in descriptor.business_effect
 
 

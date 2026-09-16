@@ -28,6 +28,9 @@ public sealed class TeamcenterWorkerContractTests
         }
         Assert.Contains("teamcenter_session_expired", script);
         Assert.Contains("teamcenter_authentication_failed", script);
+        Assert.Contains("maxNumToReturn=5001", script.Replace(" ", ""));
+        Assert.Contains("objects.length>5000", script.Replace(" ", ""));
+        Assert.Contains("teamcenter_search_too_broad", script);
     }
 
     [Fact]

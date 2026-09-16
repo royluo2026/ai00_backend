@@ -108,9 +108,9 @@ try {
       var saved=new SavedQueryInput(),entries=[entry],values=[value];
       if(revisionId){entries.push('item_revision_id');values.push(revisionId);}
       saved.query=queryDefinition;saved.entries=Java.to(entries,'java.lang.String[]');saved.values=Java.to(values,'java.lang.String[]');
-      saved.limitList=Java.to([],'com.teamcenter.soa.client.model.ModelObject[]');saved.limitListCount=0;saved.maxNumToReturn=100;saved.maxNumToInflate=100;saved.resultsType=0;
+      saved.limitList=Java.to([],'com.teamcenter.soa.client.model.ModelObject[]');saved.limitListCount=0;saved.maxNumToReturn=5001;saved.maxNumToInflate=5001;saved.resultsType=0;
       var response=queryService.executeSavedQueries(Java.to([saved],'com.teamcenter.services.strong.query._2007_06.SavedQuery$SavedQueryInput[]'));
-      Java.from(response.arrayOfResults||[]).forEach(function(result){Java.from(result.objects||[]).forEach(function(object){var uid=String(object.getUid());if(!matches[uid]){matches[uid]=object;ordered.push(object);}});});
+      Java.from(response.arrayOfResults||[]).forEach(function(result){var objects=Java.from(result.objects||[]);if(objects.length>5000)fail('teamcenter_search_too_broad');objects.forEach(function(object){var uid=String(object.getUid());if(!matches[uid]){matches[uid]=object;ordered.push(object);}});});
     }
     execute('items_tag.item_id',query);
     execute('items_tag.item_id',query+'*');
