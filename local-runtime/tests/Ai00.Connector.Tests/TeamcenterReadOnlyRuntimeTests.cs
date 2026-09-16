@@ -72,10 +72,57 @@ public sealed class TeamcenterReadOnlyRuntimeTests
     [Fact]
     public void Policy_has_no_generic_or_persistent_write_operation()
     {
-        Assert.Equal(new[] { "status", "search", "observe", "launch" }, TeamcenterReadOnlyPolicy.WorkerCommands);
+        Assert.Equal(new[] { "status", "revision_rules", "search", "observe", "launch" }, TeamcenterReadOnlyPolicy.WorkerCommands);
+        Assert.Contains("executeSavedQueries", TeamcenterReadOnlyPolicy.AllowedServiceTokens);
         Assert.DoesNotContain(TeamcenterReadOnlyPolicy.ForbiddenServiceTokens,
             token => TeamcenterReadOnlyPolicy.AllowedServiceTokens.Contains(token));
     }
+
+    [Fact]
+    public async Task Revision_rules_prefer_latest_working_and_remove_duplicates()
+    {
+        var worker = new RecordingTeamcenterWorker
+        {
+            RevisionRules = ["Released", "Latest Working", "Released", ""]
+        };
+        using var runtime = new TeamcenterReadOnlyRuntime(worker, Path.GetTempFileName());
+        await runtime.LoginAsync("tc-production", "user", "secret", CancellationToken.None);
+        using var payload = JsonDocument.Parse("""{"endpoint_id":"tc-production"}""");
+
+        var result = Assert.IsType<TeamcenterRevisionRulesResult>(
+            await runtime.GetRevisionRulesAsync(payload.RootElement, CancellationToken.None));
+
+        Assert.Equal(["Latest Working", "Released"], result.Rules);
+    }
+
+    [Fact]
+    public async Task Search_v2_ranks_exact_prefix_contains_then_name_and_keeps_revision_exact()
+    {
+        var worker = new RecordingTeamcenterWorker
+        {
+            SearchItems =
+            [
+                SearchItem("X-100", "01", "Target in name"),
+                SearchItem("A-TARGET-Z", "01", "Contains"),
+                SearchItem("TARGET-200", "01", "Prefix"),
+                SearchItem("TARGET", "01", "Exact"),
+                SearchItem("TARGET", "02", "Wrong revision"),
+            ]
+        };
+        using var runtime = new TeamcenterReadOnlyRuntime(worker, Path.GetTempFileName());
+        await runtime.LoginAsync("tc-production", "user", "secret", CancellationToken.None);
+        using var payload = JsonDocument.Parse("""{"endpoint_id":"tc-production","query":"target","revision_id":"01","revision_rule":"Latest Working","configuration_date":"2026-09-16T00:00:00Z","limit":20}""");
+
+        var result = Assert.IsType<TeamcenterProductSearchResult>(
+            await runtime.SearchV2Async(payload.RootElement, CancellationToken.None));
+
+        Assert.Equal(["TARGET", "TARGET-200", "A-TARGET-Z", "X-100"], result.Items.Select(item => item.ItemId));
+        Assert.All(result.Items, item => Assert.Equal("01", item.RevisionId));
+    }
+
+    private static TeamcenterProductSearchItem SearchItem(string itemId, string revision, string name) =>
+        new(name, itemId, revision, "ItemRevision", "user", "group",
+            new("tc-production", "item-" + itemId, "rev-" + itemId + "-" + revision, "", "Latest Working", "2026-09-16T00:00:00Z"));
 
     [Fact]
     public void Visualization_compatibility_asset_is_hash_pinned_and_materializes_only_known_classes()
@@ -92,15 +139,32 @@ public sealed class TeamcenterReadOnlyRuntimeTests
         finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
     }
 
+    [Fact]
+    public void Worker_search_uses_saved_query_wildcards_without_semantic_or_typo_expansion()
+    {
+        var script = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "teamcenter_readonly_worker.js"));
+
+        Assert.Contains("SavedQueryService", script);
+        Assert.Contains("__Item_Revision_name_ID_and_rev", script);
+        Assert.Contains("items_tag.item_id", script);
+        Assert.Contains("'*'+query+'*'", script.Replace(" ", ""));
+        Assert.DoesNotContain("levenshtein", script, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("semantic", script, StringComparison.OrdinalIgnoreCase);
+    }
+
     private sealed class RecordingTeamcenterWorker : ITeamcenterWorker
     {
         public string PasswordSeen { get; private set; } = "";
+        public IReadOnlyList<string> RevisionRules { get; init; } = ["Latest Working"];
+        public IReadOnlyList<TeamcenterProductSearchItem> SearchItems { get; init; } = [];
         public IReadOnlyList<TeamcenterOccurrence> Nodes { get; init; } =
         [new("root", null, 0, 0, "Root", "i", "A", "r", "01", "Assembly", "u", "g", Identity, null, [])];
         public Task ValidateCredentialsAsync(string endpointId, string username, string password, CancellationToken ct)
         { PasswordSeen = password; return Task.CompletedTask; }
+        public Task<IReadOnlyList<string>> GetRevisionRulesAsync(string username, string password, CancellationToken ct)
+        { PasswordSeen = password; return Task.FromResult(RevisionRules); }
         public Task<TeamcenterProductSearchResult> SearchAsync(string itemId, string revisionId, string revisionRule, string configurationDate, string username, string password, CancellationToken ct)
-        { PasswordSeen = password; return Task.FromResult(new TeamcenterProductSearchResult([])); }
+        { PasswordSeen = password; return Task.FromResult(new TeamcenterProductSearchResult(SearchItems)); }
         public Task<IReadOnlyList<TeamcenterOccurrence>> ObserveAsync(TeamcenterSourceSelector selector, int maxNodes, int maxDepth, string propertyProjection, string username, string password, CancellationToken ct)
         { PasswordSeen = password; return Task.FromResult(Nodes); }
         public Task<TeamcenterLaunchResult> LaunchAsync(TeamcenterSourceSelector selector, string expectedVisdocUid, string username, string password, CancellationToken ct)

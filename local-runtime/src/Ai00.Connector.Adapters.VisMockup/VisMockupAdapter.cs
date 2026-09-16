@@ -93,6 +93,8 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             new("vismockup.scene.verify@1", "sha256:e99bf5896c3f655afc7470fc140d261225d6f37a1d8224b7e9438a2e7b7a211a"),
             new("vismockup.view.capture@1", "sha256:10a4b5540a34fb32a2e6a4d24fd1efbe7afb929e2cc3c9fed44f6b4d9893962d"),
             new("teamcenter.product.search@1", "sha256:212e3c2396bf642456efa5e12674878fdbc201fc60250bcb3f150e19353d0acc"),
+            new("teamcenter.product.search@2", "sha256:6ef619b8abeb6705574ffa7e0902708b3c998773c80da4649a0f3f38b01c3310"),
+            new("teamcenter.revision_rule.search@1", "sha256:1b6c1a36b0fa4a4654efa3ce4a67111403f2c862aeb20283206786c5ba86d9c0"),
             new("teamcenter.product_structure.observe@1", "sha256:704e6c398c551cc7a667d1ccf4d00c1b7f6330649676dbdd8b4fa9d92857a32b"),
             new("teamcenter.product_structure.page.read@1", "sha256:0ef57b5769664cebca42562cbb711228994e6257901786f84f5dfb82a8a6c6ad"),
             new("teamcenter.visualization.launch@1", "sha256:d74338b54d5abd84dad3435768aa56756ef4fbb560f1d605b2b1bb9cc18519a8"),
@@ -283,6 +285,8 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             "vismockup.view.capture@1" => await CaptureAsync(ReadCaptureRequest(operation.Payload, operation.StepId)),
             "teamcenter.product_structure.observe@1" => await _teamcenter.ObserveAsync(operation.Payload, cancellationToken),
             "teamcenter.product.search@1" => await _teamcenter.SearchAsync(operation.Payload, cancellationToken),
+            "teamcenter.product.search@2" => await _teamcenter.SearchV2Async(operation.Payload, cancellationToken),
+            "teamcenter.revision_rule.search@1" => await _teamcenter.GetRevisionRulesAsync(operation.Payload, cancellationToken),
             "teamcenter.product_structure.page.read@1" => await _teamcenter.ReadPageAsync(
                 operation.Payload.GetProperty("observation_id").GetString() ?? "",
                 operation.Payload.GetProperty("cursor").GetInt32(),

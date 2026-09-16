@@ -11,9 +11,9 @@ namespace Ai00.Connector.Adapters.VisMockup;
 
 public static class TeamcenterReadOnlyPolicy
 {
-    public static readonly string[] WorkerCommands = ["status", "search", "observe", "launch"];
+    public static readonly string[] WorkerCommands = ["status", "revision_rules", "search", "observe", "launch"];
     public static readonly string[] AllowedServiceTokens =
-        ["login", "logout", "loadObjects", "getItemFromId", "getProperties", "getRevisionRules", "createBOMWindows", "expandPSAllLevels", "closeBOMWindows", "expandGRMRelationsForPrimary", "createLaunchInfo"];
+        ["login", "logout", "loadObjects", "getItemFromId", "getProperties", "getRevisionRules", "getSavedQueries", "executeSavedQueries", "createBOMWindows", "expandPSAllLevels", "closeBOMWindows", "expandGRMRelationsForPrimary", "createLaunchInfo"];
     public static readonly string[] ForbiddenServiceTokens =
         ["setProperties", "saveBOMWindows", "createObjects", "deleteObjects", "setDatasetFile", "getFileWriteTickets", "commitDatasetFiles"];
 }
@@ -102,11 +102,14 @@ public sealed record TeamcenterProductSearchItem(
     [property: JsonPropertyName("source_selector")] TeamcenterSourceSelector SourceSelector);
 public sealed record TeamcenterProductSearchResult(
     [property: JsonPropertyName("items")] IReadOnlyList<TeamcenterProductSearchItem> Items);
+public sealed record TeamcenterRevisionRulesResult(
+    [property: JsonPropertyName("rules")] IReadOnlyList<string> Rules);
 public sealed record TeamcenterSessionStatus(string State, string MaskedUsername);
 
 public interface ITeamcenterWorker
 {
     Task ValidateCredentialsAsync(string endpointId, string username, string password, CancellationToken ct);
+    Task<IReadOnlyList<string>> GetRevisionRulesAsync(string username, string password, CancellationToken ct);
     Task<TeamcenterProductSearchResult> SearchAsync(string itemId, string revisionId,
         string revisionRule, string configurationDate, string username, string password, CancellationToken ct);
     Task<IReadOnlyList<TeamcenterOccurrence>> ObserveAsync(TeamcenterSourceSelector selector,
@@ -264,10 +267,71 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
             || revisionRule.Length is < 1 or > 128 || !DateTimeOffset.TryParse(configurationDate, out _))
             throw new ConnectorException("teamcenter_search_input_invalid");
         var credentials = RequireCredentials();
+        TeamcenterProductSearchResult found;
         await gate.WaitAsync(ct);
-        try { return await worker.SearchAsync(itemId, revisionId, revisionRule, configurationDate,
+        try { found = await worker.SearchAsync(itemId, revisionId, revisionRule, configurationDate,
                 credentials.User, credentials.Password, ct); }
         finally { gate.Release(); }
+        return new TeamcenterProductSearchResult(found.Items.Where(item =>
+                string.Equals(item.ItemId, itemId, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(item.RevisionId, revisionId, StringComparison.Ordinal))
+            .Take(20).ToArray());
+    }
+
+    public async Task<object> GetRevisionRulesAsync(JsonElement payload, CancellationToken ct)
+    {
+        Closed(payload, "endpoint_id");
+        if ((payload.GetProperty("endpoint_id").GetString() ?? "") != "tc-production")
+            throw new ConnectorException("teamcenter_revision_rules_input_invalid");
+        var credentials = RequireCredentials();
+        IReadOnlyList<string> raw;
+        await gate.WaitAsync(ct);
+        try { raw = await worker.GetRevisionRulesAsync(credentials.User, credentials.Password, ct); }
+        finally { gate.Release(); }
+        var rules = raw.Where(rule => !string.IsNullOrWhiteSpace(rule) && rule.Length <= 128)
+            .Distinct(StringComparer.Ordinal).OrderBy(rule => rule == "Latest Working" ? 0 : 1)
+            .ThenBy(rule => rule, StringComparer.Ordinal).ToArray();
+        if (rules.Length == 0) throw new ConnectorException("teamcenter_revision_rules_unavailable");
+        return new TeamcenterRevisionRulesResult(rules);
+    }
+
+    public async Task<object> SearchV2Async(JsonElement payload, CancellationToken ct)
+    {
+        Closed(payload, "endpoint_id", "query", "revision_id", "revision_rule", "configuration_date", "limit");
+        var endpoint = payload.GetProperty("endpoint_id").GetString() ?? "";
+        var query = (payload.GetProperty("query").GetString() ?? "").Trim();
+        var revisionId = payload.GetProperty("revision_id").GetString() ?? "";
+        var revisionRule = payload.GetProperty("revision_rule").GetString() ?? "";
+        var configurationDate = payload.GetProperty("configuration_date").GetString() ?? "";
+        var limit = payload.GetProperty("limit").GetInt32();
+        if (endpoint != "tc-production" || query.Length is < 1 or > 128 || query.Any(char.IsControl)
+            || revisionId.Length > 64 || revisionId.Any(char.IsControl) || revisionRule.Length is < 1 or > 128
+            || !DateTimeOffset.TryParse(configurationDate, out _) || limit is < 1 or > 20)
+            throw new ConnectorException("teamcenter_search_input_invalid");
+        var credentials = RequireCredentials();
+        TeamcenterProductSearchResult found;
+        await gate.WaitAsync(ct);
+        try { found = await worker.SearchAsync(query, revisionId, revisionRule, configurationDate,
+                credentials.User, credentials.Password, ct); }
+        finally { gate.Release(); }
+        return new TeamcenterProductSearchResult(RankSearchItems(found.Items, query, revisionId, limit));
+    }
+
+    public static IReadOnlyList<TeamcenterProductSearchItem> RankSearchItems(
+        IEnumerable<TeamcenterProductSearchItem> items, string query, string revisionId, int limit)
+    {
+        static int Rank(TeamcenterProductSearchItem item, string value)
+        {
+            if (string.Equals(item.ItemId, value, StringComparison.OrdinalIgnoreCase)) return 0;
+            if (item.ItemId.StartsWith(value, StringComparison.OrdinalIgnoreCase)) return 1;
+            if (item.ItemId.Contains(value, StringComparison.OrdinalIgnoreCase)) return 2;
+            return item.DisplayName.Contains(value, StringComparison.OrdinalIgnoreCase) ? 3 : int.MaxValue;
+        }
+        return items.Where(item => (revisionId.Length == 0 || string.Equals(item.RevisionId, revisionId, StringComparison.Ordinal))
+                && Rank(item, query) != int.MaxValue)
+            .GroupBy(item => item.SourceSelector.ItemRevisionUid, StringComparer.Ordinal).Select(group => group.First())
+            .OrderBy(item => Rank(item, query)).ThenBy(item => item.ItemId, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(item => item.RevisionId, StringComparer.Ordinal).Take(limit).ToArray();
     }
 
     public Task<TeamcenterObservationPage> ReadPageAsync(string observationId, int cursor, int pageSize, CancellationToken ct)
@@ -412,6 +476,7 @@ internal sealed class UnavailableTeamcenterWorker : ITeamcenterWorker
 {
     private static ConnectorException Error() => new("teamcenter_runtime_unavailable");
     public Task ValidateCredentialsAsync(string endpointId, string username, string password, CancellationToken ct) => Task.FromException(Error());
+    public Task<IReadOnlyList<string>> GetRevisionRulesAsync(string username, string password, CancellationToken ct) => Task.FromException<IReadOnlyList<string>>(Error());
     public Task<TeamcenterProductSearchResult> SearchAsync(string itemId, string revisionId, string revisionRule, string configurationDate, string username, string password, CancellationToken ct) => Task.FromException<TeamcenterProductSearchResult>(Error());
     public Task<IReadOnlyList<TeamcenterOccurrence>> ObserveAsync(TeamcenterSourceSelector selector, int maxNodes, int maxDepth, string propertyProjection, string username, string password, CancellationToken ct) => Task.FromException<IReadOnlyList<TeamcenterOccurrence>>(Error());
     public Task<TeamcenterLaunchResult> LaunchAsync(TeamcenterSourceSelector selector, string expectedVisdocUid, string username, string password, CancellationToken ct) => Task.FromException<TeamcenterLaunchResult>(Error());
@@ -442,6 +507,13 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
 
     public async Task ValidateCredentialsAsync(string endpointId, string username, string password, CancellationToken ct)
         => _ = await RunAsync("status", new { endpoint_id = endpointId }, username, password, ct);
+
+    public async Task<IReadOnlyList<string>> GetRevisionRulesAsync(string username, string password, CancellationToken ct)
+    {
+        var result = await RunAsync("revision_rules", new { endpoint_id = "tc-production" }, username, password, ct);
+        return result.GetProperty("rules").Deserialize<string[]>(JsonOptions)
+            ?? throw new ConnectorException("teamcenter_worker_response_invalid");
+    }
 
     public async Task<TeamcenterProductSearchResult> SearchAsync(string itemId, string revisionId,
         string revisionRule, string configurationDate, string username, string password, CancellationToken ct)
