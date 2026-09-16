@@ -591,8 +591,9 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
                 { type = consumerError is null ? "material_consumed" : "material_failed" }));
             await process.StandardInput.FlushAsync();
             process.StandardInput.Close();
-            var finalLine = await ReadLineBoundedAsync(process.StandardOutput, 64 * 1024, CancellationToken.None);
-            await process.WaitForExitAsync(CancellationToken.None);
+            using var cleanupTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            var finalLine = await ReadLineBoundedAsync(process.StandardOutput, 64 * 1024, cleanupTimeout.Token);
+            await process.WaitForExitAsync(cleanupTimeout.Token);
             var diagnostic = await diagnosticTask;
             if (consumerError is not null)
                 System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(consumerError).Throw();
