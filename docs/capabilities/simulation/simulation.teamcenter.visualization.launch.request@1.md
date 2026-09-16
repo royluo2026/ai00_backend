@@ -17,10 +17,10 @@ Queue an official Teamcenter Visualization launch for one exact online source.
 | 消费者 | 状态 |
 |---|---|
 | web | 可用 |
-| plugin | 可用 |
-| agent | 可用 |
-| api | 可用 |
-| mcp | 可用 |
+| plugin | 不可用 |
+| agent | 不可用 |
+| api | 不可用 |
+| mcp | 不可用 |
 | worker | 不可用 |
 | local_runtime | 不可用 |
 

@@ -103,17 +103,22 @@ try {
     var definitions=queryService.getSavedQueries(),queryDefinition=null;
     Java.from(definitions.queries||[]).some(function(definition){if(String(definition.name)===queryName){queryDefinition=definition.query;return true;}return false;});
     if(!queryDefinition)fail('teamcenter_saved_query_not_found');
-    var query=String(search.item_id),revisionId=String(search.revision_id||''),matches={};
+    var query=String(search.item_id),revisionId=String(search.revision_id||''),matches={},ordered=[];
     function execute(entry,value){
       var saved=new SavedQueryInput(),entries=[entry],values=[value];
       if(revisionId){entries.push('item_revision_id');values.push(revisionId);}
       saved.query=queryDefinition;saved.entries=Java.to(entries,'java.lang.String[]');saved.values=Java.to(values,'java.lang.String[]');
       saved.limitList=Java.to([],'com.teamcenter.soa.client.model.ModelObject[]');saved.limitListCount=0;saved.maxNumToReturn=100;saved.maxNumToInflate=100;saved.resultsType=0;
       var response=queryService.executeSavedQueries(Java.to([saved],'com.teamcenter.services.strong.query._2007_06.SavedQuery$SavedQueryInput[]'));
-      Java.from(response.arrayOfResults||[]).forEach(function(result){Java.from(result.objects||[]).forEach(function(object){matches[String(object.getUid())]=object;});});
+      Java.from(response.arrayOfResults||[]).forEach(function(result){Java.from(result.objects||[]).forEach(function(object){var uid=String(object.getUid());if(!matches[uid]){matches[uid]=object;ordered.push(object);}});});
     }
-    execute('items_tag.item_id','*'+query+'*');execute('object_name','*'+query+'*');
-    var revisions=Object.keys(matches).map(function(uid){return matches[uid];}),items=[];
+    execute('items_tag.item_id',query);
+    execute('items_tag.item_id',query+'*');
+    execute('items_tag.item_id','*'+query+'*');
+    execute('object_name',query);
+    execute('object_name',query+'*');
+    execute('object_name','*'+query+'*');
+    var revisions=ordered,items=[];
     if(revisions.length)dmSearch.getProperties(Java.to(revisions,'com.teamcenter.soa.client.model.ModelObject[]'),Java.to(['object_name','object_string','item_id','item_revision_id','owning_user','owning_group','items_tag'],'java.lang.String[]'));
     revisions.forEach(function(revision){
       var item=modelObject(revision,'items_tag');if(!item)return;
@@ -278,7 +283,10 @@ try {
 } catch (error) {
   var message = String(error && error.message ? error.message : error);
   var marker = message.indexOf('AI00_CODE:');
-  var code = marker >= 0 ? message.substring(marker + 10).replace(/\s.*$/, '') : 'teamcenter_worker_failed';
+  var code = marker >= 0 ? message.substring(marker + 10).replace(/\s.*$/, '')
+    : /authentication_failed|invalid credentials|login failed/i.test(message) ? 'teamcenter_authentication_failed'
+    : /session.*(?:expired|invalid)|not logged/i.test(message) ? 'teamcenter_session_expired'
+    : 'teamcenter_worker_failed';
   java.lang.System.err.println(code);
   print(JSON.stringify({ ok: false, code: code }));
 } finally {

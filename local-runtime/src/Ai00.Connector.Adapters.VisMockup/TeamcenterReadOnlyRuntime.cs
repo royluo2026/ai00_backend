@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Security.Cryptography;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -157,7 +159,7 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
             var jars = new[] { compatibilityRoot }.Concat(Directory.EnumerateFiles(lib, "*.jar")
                 .Order(StringComparer.OrdinalIgnoreCase)).ToArray();
             var materialRoot = Path.Combine(stateRoot, "teamcenter-visualization");
-            Directory.CreateDirectory(materialRoot);
+            TeamcenterProcessWorker.SecureVisualizationMaterialRoot(materialRoot);
             return new TeamcenterReadOnlyRuntime(new TeamcenterProcessWorker(java, script, launcher, jars, materialRoot),
                 Path.Combine(stateRoot, "teamcenter-structure-cache.db"));
         }
@@ -212,6 +214,11 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
                 endpointId = endpoint; username = user.ToCharArray(); password = secret.ToCharArray();
             }
         }
+        catch (ConnectorException error) when (InvalidatesSession(error))
+        {
+            ClearCredentials();
+            throw;
+        }
         finally { gate.Release(); }
     }
 
@@ -249,6 +256,7 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
         await gate.WaitAsync(ct);
         try { nodes = await worker.ObserveAsync(selector, maxNodes, maxDepth, projection,
                 credentials.User, credentials.Password, ct); }
+        catch (ConnectorException error) when (InvalidatesSession(error)) { ClearCredentials(); throw; }
         finally { gate.Release(); }
         ValidateNodes(nodes, maxNodes, maxDepth);
         var captured = DateTimeOffset.UtcNow;
@@ -275,6 +283,7 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
         await gate.WaitAsync(ct);
         try { found = await worker.SearchAsync(itemId, revisionId, revisionRule, configurationDate,
                 credentials.User, credentials.Password, ct); }
+        catch (ConnectorException error) when (InvalidatesSession(error)) { ClearCredentials(); throw; }
         finally { gate.Release(); }
         return new TeamcenterProductSearchResult(found.Items.Where(item =>
                 string.Equals(item.ItemId, itemId, StringComparison.OrdinalIgnoreCase)
@@ -291,9 +300,10 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
         IReadOnlyList<string> raw;
         await gate.WaitAsync(ct);
         try { raw = await worker.GetRevisionRulesAsync(credentials.User, credentials.Password, ct); }
+        catch (ConnectorException error) when (InvalidatesSession(error)) { ClearCredentials(); throw; }
         finally { gate.Release(); }
         var rules = raw.Where(rule => !string.IsNullOrWhiteSpace(rule) && rule.Length <= 128)
-            .Distinct(StringComparer.Ordinal).OrderBy(rule => rule == "Latest Working" ? 0 : 1)
+            .Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(rule => string.Equals(rule, "Latest Working", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
             .ThenBy(rule => rule, StringComparer.Ordinal).ToArray();
         if (rules.Length == 0) throw new ConnectorException("teamcenter_revision_rules_unavailable");
         return new TeamcenterRevisionRulesResult(rules);
@@ -317,6 +327,7 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
         await gate.WaitAsync(ct);
         try { found = await worker.SearchAsync(query, revisionId, revisionRule, configurationDate,
                 credentials.User, credentials.Password, ct); }
+        catch (ConnectorException error) when (InvalidatesSession(error)) { ClearCredentials(); throw; }
         finally { gate.Release(); }
         return new TeamcenterProductSearchResult(RankSearchItems(found.Items, query, revisionId, limit));
     }
@@ -331,7 +342,8 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
             if (item.ItemId.Contains(value, StringComparison.OrdinalIgnoreCase)) return 2;
             return item.DisplayName.Contains(value, StringComparison.OrdinalIgnoreCase) ? 3 : int.MaxValue;
         }
-        return items.Where(item => (revisionId.Length == 0 || string.Equals(item.RevisionId, revisionId, StringComparison.Ordinal))
+        return items.Where(item => !string.IsNullOrWhiteSpace(item.SourceSelector.ItemRevisionUid)
+                && (revisionId.Length == 0 || string.Equals(item.RevisionId, revisionId, StringComparison.Ordinal))
                 && Rank(item, query) != int.MaxValue)
             .GroupBy(item => item.SourceSelector.ItemRevisionUid, StringComparer.Ordinal).Select(group => group.First())
             .OrderBy(item => Rank(item, query)).ThenBy(item => item.ItemId, StringComparer.OrdinalIgnoreCase)
@@ -379,6 +391,7 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
         await gate.WaitAsync(ct);
         try { return await worker.ConsumeVisualizationAsync(selector, expected, consumer,
                 credentials.User, credentials.Password, ct); }
+        catch (ConnectorException error) when (InvalidatesSession(error)) { ClearCredentials(); throw; }
         finally { gate.Release(); }
     }
 
@@ -472,6 +485,9 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
         lock (credentialState) ClearCredentialsUnsafe();
     }
 
+    private static bool InvalidatesSession(ConnectorException error) =>
+        error.Message is "teamcenter_authentication_failed" or "teamcenter_session_expired";
+
     private void ClearCredentialsUnsafe()
     { Array.Clear(username); Array.Clear(password); username = []; password = []; endpointId = ""; }
 
@@ -493,6 +509,25 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
     IReadOnlyList<string> classpath, string visualizationMaterialRoot) : ITeamcenterWorker
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = false };
+
+    internal static void SecureVisualizationMaterialRoot(string path)
+    {
+        if (!OperatingSystem.IsWindows()) throw new PlatformNotSupportedException("windows_required");
+        var full = Path.GetFullPath(path);
+        Directory.CreateDirectory(full);
+        var directory = new DirectoryInfo(full);
+        if ((directory.Attributes & FileAttributes.ReparsePoint) != 0)
+            throw new IOException("teamcenter_visualization_material_root_invalid");
+        using var identity = WindowsIdentity.GetCurrent();
+        var sid = identity.User ?? throw new IOException("windows_user_required");
+        var security = new DirectorySecurity();
+        security.SetAccessRuleProtection(true, false);
+        security.SetOwner(sid);
+        security.AddAccessRule(new FileSystemAccessRule(sid, FileSystemRights.FullControl,
+            InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+            PropagationFlags.None, AccessControlType.Allow));
+        directory.SetAccessControl(security);
+    }
 
     public static ProcessStartInfo CreateStartInfo(string javaPath, string scriptPath, IReadOnlyList<string> classpath)
     {
@@ -555,11 +590,22 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
         string username, string password, CancellationToken ct)
     {
         var materialRoot = Path.GetFullPath(visualizationMaterialRoot);
-        Directory.CreateDirectory(materialRoot);
+        SecureVisualizationMaterialRoot(materialRoot);
+        var operationRoot = Path.Combine(materialRoot, Guid.NewGuid().ToString("N"));
+        SecureVisualizationMaterialRoot(operationRoot);
         using var process = new Process { StartInfo = CreateStartInfo(javaPath, launcherPath, classpath) };
-        if (!process.Start()) throw new ConnectorException("teamcenter_worker_start_failed");
+        try
+        {
+            if (!process.Start()) throw new ConnectorException("teamcenter_worker_start_failed");
+        }
+        catch
+        {
+            try { Directory.Delete(operationRoot, true); } catch { }
+            throw;
+        }
         var diagnosticTask = ReadBoundedAsync(process.StandardError, 8192, ct);
         Exception? consumerError = null;
+        string? materialPath = null;
         try
         {
             await process.StandardInput.WriteLineAsync(username.AsMemory(), ct);
@@ -568,7 +614,7 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
             {
                 command = "consume",
                 payload = new { source_selector = selector, expected_visdoc_uid = expectedVisdocUid,
-                    source_identity_hash = selector.IdentityHash, material_root = materialRoot }
+                    source_identity_hash = selector.IdentityHash, material_root = operationRoot }
             }).AsMemory(), ct);
             await process.StandardInput.FlushAsync(ct);
 
@@ -582,7 +628,7 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
                 || ready.GetProperty("expected_visdoc_uid").GetString() != expectedVisdocUid
                 || ready.GetProperty("source_identity_hash").GetString() != selector.IdentityHash)
                 throw new ConnectorException("teamcenter_worker_response_invalid");
-            var materialPath = ValidateMaterialPath(materialRoot,
+            materialPath = ValidateMaterialPath(operationRoot,
                 ready.GetProperty("material_path").GetString() ?? "");
             try { await consumer(materialPath, ct); }
             catch (Exception error) { consumerError = error; }
@@ -611,6 +657,16 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
             if (consumerError is not null)
                 System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(consumerError).Throw();
             throw;
+        }
+        finally
+        {
+            if (materialPath is not null)
+            {
+                try { File.Delete(materialPath); }
+                catch { /* Java also cleans up; a later state-root sweep handles a locked file. */ }
+            }
+            try { if (Directory.Exists(operationRoot)) Directory.Delete(operationRoot, true); }
+            catch { /* Never replace the consumer result with best-effort material cleanup. */ }
         }
     }
 

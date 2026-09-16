@@ -304,7 +304,7 @@
         "plugin_id": "official.simulation",
         "module": "simulation_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:2e6342af495320ab1fdd423f4601b852b69d1b3a76b4c9f88e4534e8a09c4e6e"
+        "artifact_hash": "sha256:46a4b8db99810a81635d8be692f2750c3592f3afd584079d9cdf6aee285fff3a"
       },
       "artifact_path": "plugins/simulation/simulation_backend",
       "allowed_owners": [

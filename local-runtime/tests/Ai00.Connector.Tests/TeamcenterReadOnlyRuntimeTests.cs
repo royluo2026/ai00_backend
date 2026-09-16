@@ -70,6 +70,19 @@ public sealed class TeamcenterReadOnlyRuntimeTests
     }
 
     [Fact]
+    public async Task Expired_worker_session_clears_retained_credentials()
+    {
+        var worker = new RecordingTeamcenterWorker { SearchError = new ConnectorException("teamcenter_session_expired") };
+        using var runtime = new TeamcenterReadOnlyRuntime(worker, Path.GetTempFileName());
+        await runtime.LoginAsync("tc-production", "user", "secret", CancellationToken.None);
+        using var payload = JsonDocument.Parse("""{"endpoint_id":"tc-production","query":"A","revision_id":"","revision_rule":"Latest Working","configuration_date":"2026-09-16T00:00:00Z","limit":20}""");
+
+        await Assert.ThrowsAsync<ConnectorException>(() => runtime.SearchV2Async(payload.RootElement, CancellationToken.None));
+
+        Assert.Equal("logged_out", runtime.GetSessionStatus().State);
+    }
+
+    [Fact]
     public void Policy_has_no_generic_or_persistent_write_operation()
     {
         Assert.Equal(new[] { "status", "revision_rules", "search", "observe", "launch" }, TeamcenterReadOnlyPolicy.WorkerCommands);
@@ -157,6 +170,7 @@ public sealed class TeamcenterReadOnlyRuntimeTests
         public string PasswordSeen { get; private set; } = "";
         public IReadOnlyList<string> RevisionRules { get; init; } = ["Latest Working"];
         public IReadOnlyList<TeamcenterProductSearchItem> SearchItems { get; init; } = [];
+        public ConnectorException? SearchError { get; init; }
         public IReadOnlyList<TeamcenterOccurrence> Nodes { get; init; } =
         [new("root", null, 0, 0, "Root", "i", "A", "r", "01", "Assembly", "u", "g", Identity, null, [])];
         public Task ValidateCredentialsAsync(string endpointId, string username, string password, CancellationToken ct)
@@ -164,7 +178,7 @@ public sealed class TeamcenterReadOnlyRuntimeTests
         public Task<IReadOnlyList<string>> GetRevisionRulesAsync(string username, string password, CancellationToken ct)
         { PasswordSeen = password; return Task.FromResult(RevisionRules); }
         public Task<TeamcenterProductSearchResult> SearchAsync(string itemId, string revisionId, string revisionRule, string configurationDate, string username, string password, CancellationToken ct)
-        { PasswordSeen = password; return Task.FromResult(new TeamcenterProductSearchResult(SearchItems)); }
+        { PasswordSeen = password; return SearchError is null ? Task.FromResult(new TeamcenterProductSearchResult(SearchItems)) : Task.FromException<TeamcenterProductSearchResult>(SearchError); }
         public Task<IReadOnlyList<TeamcenterOccurrence>> ObserveAsync(TeamcenterSourceSelector selector, int maxNodes, int maxDepth, string propertyProjection, string username, string password, CancellationToken ct)
         { PasswordSeen = password; return Task.FromResult(Nodes); }
         public Task<TeamcenterLaunchResult> LaunchAsync(TeamcenterSourceSelector selector, string expectedVisdocUid, string username, string password, CancellationToken ct)

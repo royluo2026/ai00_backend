@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_b5aac6f3a7756ffba1d1b3e9425c6b21",
-  "catalog_hash": "sha256:b5aac6f3a7756ffba1d1b3e9425c6b21bafc566ba4a1178381292729d08ffa71",
+  "release_id": "rel_5abd1d9f1d8c796e1f0b4d782cb01b72",
+  "catalog_hash": "sha256:5abd1d9f1d8c796e1f0b4d782cb01b72bf89524e2570364135dbe78b2f105a35",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -292780,6 +292780,34 @@
               "updates": {
                 "type": "object",
                 "properties": {
+                  "bop_entry_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_chat_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "related_task_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
                   "attachments": {
                     "type": "array",
                     "maxItems": 200,
@@ -292847,99 +292875,14 @@
                       ]
                     }
                   },
-                  "feishu_groups": {
-                    "type": "array",
-                    "maxItems": 200,
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "chat_id": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "name": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "avatar": {
-                          "type": "string",
-                          "maxLength": 2048
-                        }
-                      },
-                      "additionalProperties": false
-                    }
-                  },
-                  "severity": {
+                  "permanent_action": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "interim_action": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "project_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "list_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_chat_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "description": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "approval_order_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "scheduled_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "related_knowledge_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "bop_entry_gid": {
+                  "feishu_assignee_open_id": {
                     "type": [
                       "string",
                       "null"
@@ -292976,28 +292919,21 @@
                       "additionalProperties": false
                     }
                   },
-                  "feishu_assignee_open_id": {
+                  "status": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "related_task_gid": {
+                  "approval_order_gid": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "title": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "share_scope": {
+                  "assignee_team_gid": {
                     "type": [
                       "string",
                       "null"
@@ -293011,21 +292947,64 @@
                     ],
                     "maxLength": 65536
                   },
-                  "status": {
+                  "feishu_groups": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "chat_id": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "avatar": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "related_knowledge_gid": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "escape_root_cause": {
+                  "share_scope": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "permanent_action": {
+                  "interim_action": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "severity": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "scheduled_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "title": {
                     "type": [
                       "string",
                       "null"
@@ -293039,7 +293018,28 @@
                     ],
                     "maxLength": 65536
                   },
-                  "assignee_team_gid": {
+                  "escape_root_cause": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "project_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_name": {
                     "type": [
                       "string",
                       "null"
@@ -325382,14 +325382,7 @@
               "updates": {
                 "type": "object",
                 "properties": {
-                  "review_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "project_gid": {
+                  "plan_start": {
                     "type": [
                       "string",
                       "null"
@@ -325403,112 +325396,12 @@
                     ],
                     "maxLength": 65536
                   },
-                  "due_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "node_type": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
                   "completion": {
                     "type": [
                       "integer",
                       "number",
                       "null"
                     ]
-                  },
-                  "feishu_group_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "canvas_y": {
-                    "type": [
-                      "integer",
-                      "number",
-                      "null"
-                    ]
-                  },
-                  "feishu_docs": {
-                    "type": "array",
-                    "maxItems": 200,
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "token": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "name": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "title": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "url": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "type": {
-                          "type": "string",
-                          "maxLength": 2048
-                        }
-                      },
-                      "additionalProperties": false
-                    }
-                  },
-                  "actual_end": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "parent_task_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "actual_start": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "share_scope": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "scheduled_start_time": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_assignee_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
                   },
                   "attachments": {
                     "type": "array",
@@ -325577,6 +325470,144 @@
                       ]
                     }
                   },
+                  "review_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_open_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "status": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "parent_task_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "assignee_team_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "due_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "is_deleted": {
+                    "type": "boolean"
+                  },
+                  "meeting_level": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "project_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "plan_end": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "scheduled_start_time": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_chat_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_docs": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "title": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "url": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "type": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "canvas_x": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "actual_end": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "canvas_y": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
+                  },
                   "feishu_groups": {
                     "type": "array",
                     "maxItems": 200,
@@ -325599,28 +325630,7 @@
                       "additionalProperties": false
                     }
                   },
-                  "plan_start": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "list_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_chat_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "scheduled_date": {
+                  "share_scope": {
                     "type": [
                       "string",
                       "null"
@@ -325634,7 +325644,14 @@
                     ],
                     "maxLength": 65536
                   },
-                  "feishu_assignee_open_id": {
+                  "actual_start": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "scheduled_date": {
                     "type": [
                       "string",
                       "null"
@@ -325648,30 +325665,7 @@
                     ],
                     "maxLength": 65536
                   },
-                  "is_deleted": {
-                    "type": "boolean"
-                  },
-                  "meeting_level": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "plan_end": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "time_estimate": {
-                    "type": [
-                      "integer",
-                      "null"
-                    ]
-                  },
-                  "status": {
+                  "meeting_doc_link": {
                     "type": [
                       "string",
                       "null"
@@ -325685,21 +325679,27 @@
                     ],
                     "maxLength": 65536
                   },
-                  "canvas_x": {
-                    "type": [
-                      "integer",
-                      "number",
-                      "null"
-                    ]
-                  },
-                  "meeting_doc_link": {
+                  "node_type": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "assignee_team_gid": {
+                  "time_estimate": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_group_name": {
                     "type": [
                       "string",
                       "null"
@@ -426434,7 +426434,7 @@
       "description": "Search Teamcenter item IDs and names with deterministic exact, prefix, and contains matching.",
       "use_when": "A signed Simulation Connector plan invokes this exact VisMockup atom.",
       "do_not_use_when": "The caller is outside the trusted local Connector runtime.",
-      "business_effect": "Expose one exact Teamcenter read-only adapter atom exclusively to a signed Simulation Connector execution plan.",
+      "business_effect": "Search Teamcenter item IDs and names using deterministic exact, prefix, and contains matching.",
       "business_acceptance_criteria": [
         "The operation is scoped to the caller's single bound Simulation Connector.",
         "The closed request and response contracts preserve exact Connector and Adapter identity.",
@@ -427746,7 +427746,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:9a8b9da325a50928dddd1662734e4cdf41a11bf1238fc788eeb20a9dd1e34d72"
+      "business_definition_hash": "sha256:25c2de786568d828d8da73b98d3719fefbb8d799b9df09027463ee1188c3319f"
     },
     {
       "id": "simulation.teamcenter.product.search.request",
@@ -427758,7 +427758,7 @@
       "description": "Search Teamcenter item IDs and names by exact, prefix, or contains matching without mutating Teamcenter.",
       "use_when": "The signed-in user requests one direct action on the bound workstation Connector.",
       "do_not_use_when": "No current user-scoped Connector binding exists.",
-      "business_effect": "Queue one exact read-only Teamcenter observation or official Visualization launch through the caller-bound App runtime.",
+      "business_effect": "Queue a deterministic exact, prefix, and contains search of Teamcenter item IDs and names without mutating Teamcenter.",
       "business_acceptance_criteria": [
         "The operation is scoped to the caller's single bound Simulation Connector.",
         "The closed request and response contracts preserve exact Connector and Adapter identity.",
@@ -427771,10 +427771,10 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -428938,7 +428938,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:c2304eaffe9935c9a97440b145a2fd92b4f46a37b3cde8dcc3cd5094ca5b998f"
+      "business_definition_hash": "sha256:56e2408ed5b4c913f8571616f8d991bb00b861a5f1063d1180fdd262ac1d4957"
     },
     {
       "id": "simulation.teamcenter.product_structure.observe",
@@ -428950,7 +428950,7 @@
       "description": "Create one bounded local read-only Teamcenter product-structure observation.",
       "use_when": "A signed Simulation Connector plan invokes this exact VisMockup atom.",
       "do_not_use_when": "The caller is outside the trusted local Connector runtime.",
-      "business_effect": "Expose one exact Teamcenter read-only adapter atom exclusively to a signed Simulation Connector execution plan.",
+      "business_effect": "Create one bounded local read-only Teamcenter product-structure observation.",
       "business_acceptance_criteria": [
         "The operation is scoped to the caller's single bound Simulation Connector.",
         "The closed request and response contracts preserve exact Connector and Adapter identity.",
@@ -430176,7 +430176,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:70de580233f3cfd1f06761251f2215b1fa51a371171651c91ba548eaf9ac73c8"
+      "business_definition_hash": "sha256:b6d0485cd4eac71ce980781d7b5700e130f6e2687a8fd5c332d64cf72c5e20ef"
     },
     {
       "id": "simulation.teamcenter.product_structure.observe.request",
@@ -430188,7 +430188,7 @@
       "description": "Queue one bounded read-only Teamcenter product-structure observation on the App workstation.",
       "use_when": "The signed-in user requests one direct action on the bound workstation Connector.",
       "do_not_use_when": "No current user-scoped Connector binding exists.",
-      "business_effect": "Queue one exact read-only Teamcenter observation or official Visualization launch through the caller-bound App runtime.",
+      "business_effect": "Queue one bounded read-only observation of the selected Teamcenter product structure.",
       "business_acceptance_criteria": [
         "The operation is scoped to the caller's single bound Simulation Connector.",
         "The closed request and response contracts preserve exact Connector and Adapter identity.",
@@ -430201,10 +430201,10 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -431392,7 +431392,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:af48cc52ac92d941e2a33c6d788ed9179e831a84a90e54842936b10a6c991b0b"
+      "business_definition_hash": "sha256:317d38bac269a5992107728fba2d036a58a7bed25efcc3158fc6668438065c6e"
     },
     {
       "id": "simulation.teamcenter.product_structure.page.read",
@@ -431404,7 +431404,7 @@
       "description": "Read one bounded page from a local Teamcenter product-structure observation.",
       "use_when": "A signed Simulation Connector plan invokes this exact VisMockup atom.",
       "do_not_use_when": "The caller is outside the trusted local Connector runtime.",
-      "business_effect": "Expose one exact Teamcenter read-only adapter atom exclusively to a signed Simulation Connector execution plan.",
+      "business_effect": "Read one bounded page from a local Teamcenter product-structure observation.",
       "business_acceptance_criteria": [
         "The operation is scoped to the caller's single bound Simulation Connector.",
         "The closed request and response contracts preserve exact Connector and Adapter identity.",
@@ -432940,7 +432940,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:2a40125949c79aec793d48399ea22a6016fb7154478fb11ed9eb8cdbf171efef"
+      "business_definition_hash": "sha256:03d32acfffb4a7a9e194571ad8f64d224aaf281d17faf04b4150d938fecc3f9c"
     },
     {
       "id": "simulation.teamcenter.product_structure.page.read.request",
@@ -432952,7 +432952,7 @@
       "description": "Queue one bounded page read from an existing local Teamcenter structure observation.",
       "use_when": "The signed-in user requests one direct action on the bound workstation Connector.",
       "do_not_use_when": "No current user-scoped Connector binding exists.",
-      "business_effect": "Queue one exact read-only Teamcenter observation or official Visualization launch through the caller-bound App runtime.",
+      "business_effect": "Queue one bounded page read from an existing local Teamcenter structure observation.",
       "business_acceptance_criteria": [
         "The operation is scoped to the caller's single bound Simulation Connector.",
         "The closed request and response contracts preserve exact Connector and Adapter identity.",
@@ -432965,10 +432965,10 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -434116,7 +434116,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:289ce3ecda561d5b86e36bd833952215b93fd47268c50febde50648a3c17b1f6"
+      "business_definition_hash": "sha256:a8aee40d02ed572707d63e2f9230c33bcb33e5ebaad6224046269d53e18657a7"
     },
     {
       "id": "simulation.teamcenter.revision_rule.search",
@@ -434128,7 +434128,7 @@
       "description": "Read the available Teamcenter revision rules.",
       "use_when": "A signed Simulation Connector plan invokes this exact VisMockup atom.",
       "do_not_use_when": "The caller is outside the trusted local Connector runtime.",
-      "business_effect": "Expose one exact Teamcenter read-only adapter atom exclusively to a signed Simulation Connector execution plan.",
+      "business_effect": "Read the revision rules available to the current in-memory Teamcenter session.",
       "business_acceptance_criteria": [
         "The operation is scoped to the caller's single bound Simulation Connector.",
         "The closed request and response contracts preserve exact Connector and Adapter identity.",
@@ -435262,7 +435262,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:04a08b9fc08beb37bb812b20cee1e367ab9eff1a6ab53e0f4881d34dd4c1a6a9"
+      "business_definition_hash": "sha256:c9ef649659ac02bf77f1c9c4485c0414bc45f389d2200a247bd2359c8edf59ce"
     },
     {
       "id": "simulation.teamcenter.revision_rule.search.request",
@@ -435274,7 +435274,7 @@
       "description": "Read the available revision rules from the signed-in Teamcenter session.",
       "use_when": "The signed-in user requests one direct action on the bound workstation Connector.",
       "do_not_use_when": "No current user-scoped Connector binding exists.",
-      "business_effect": "Queue one exact read-only Teamcenter observation or official Visualization launch through the caller-bound App runtime.",
+      "business_effect": "Queue a read of the revision rules available to the current in-memory Teamcenter session.",
       "business_acceptance_criteria": [
         "The operation is scoped to the caller's single bound Simulation Connector.",
         "The closed request and response contracts preserve exact Connector and Adapter identity.",
@@ -435287,10 +435287,10 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -436426,7 +436426,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:6172c58ad98ee733472e7b3d37640577cd7792da15584a3775570815bce075ec"
+      "business_definition_hash": "sha256:b98415b8a91040ff07bb23149971b8904e73cbe7d69d0e048cde4aa48bf7349f"
     },
     {
       "id": "simulation.teamcenter.visualization.insert",
@@ -436438,7 +436438,7 @@
       "description": "Insert one Teamcenter online source into the active VisMockup document.",
       "use_when": "A signed Simulation Connector plan invokes this exact VisMockup atom.",
       "do_not_use_when": "The caller is outside the trusted local Connector runtime.",
-      "business_effect": "Expose one exact Teamcenter read-only adapter atom exclusively to a signed Simulation Connector execution plan.",
+      "business_effect": "Insert one exact Teamcenter online source into the active VisMockup document using official launch information.",
       "business_acceptance_criteria": [
         "The operation is scoped to the caller's single bound Simulation Connector.",
         "The closed request and response contracts preserve exact Connector and Adapter identity.",
@@ -437629,7 +437629,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:6a398be462e1c3b8e4c21ca2ec986e3b74701055d9b31555f0a7f29780f4d975"
+      "business_definition_hash": "sha256:ddddff197a82b7fc1db11a4d28e3c6ff782f2b0ca4ba012e5f94f6dfb8ee946e"
     },
     {
       "id": "simulation.teamcenter.visualization.insert.request",
@@ -437641,7 +437641,7 @@
       "description": "Insert one exact Teamcenter online source into the active VisMockup document.",
       "use_when": "The signed-in user requests one direct action on the bound workstation Connector.",
       "do_not_use_when": "No current user-scoped Connector binding exists.",
-      "business_effect": "Queue one exact read-only Teamcenter observation or official Visualization launch through the caller-bound App runtime.",
+      "business_effect": "Queue an official Teamcenter Visualization launch that inserts one exact online source into the active VisMockup document.",
       "business_acceptance_criteria": [
         "The operation is scoped to the caller's single bound Simulation Connector.",
         "The closed request and response contracts preserve exact Connector and Adapter identity.",
@@ -437654,10 +437654,10 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -438834,7 +438834,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:a082f8f89a4598bec2a590e2af9d34e5fd9e6568e13cb5545990020485f8d676"
+      "business_definition_hash": "sha256:d9534083aa7453302e4e88f79b66660a9996e8bcc91d7244d05792ebdf0bcbbe"
     },
     {
       "id": "simulation.teamcenter.visualization.launch",
@@ -438846,7 +438846,7 @@
       "description": "Use Teamcenter launch information to open one online source in VisMockup.",
       "use_when": "A signed Simulation Connector plan invokes this exact VisMockup atom.",
       "do_not_use_when": "The caller is outside the trusted local Connector runtime.",
-      "business_effect": "Expose one exact Teamcenter read-only adapter atom exclusively to a signed Simulation Connector execution plan.",
+      "business_effect": "Open one exact Teamcenter online source as a new VisMockup document using official launch information.",
       "business_acceptance_criteria": [
         "The operation is scoped to the caller's single bound Simulation Connector.",
         "The closed request and response contracts preserve exact Connector and Adapter identity.",
@@ -440037,7 +440037,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:dabf97b2af9f25354489b625606797ba86ab84b84f511ac717ee912b1e341aef"
+      "business_definition_hash": "sha256:f9a77bda93abea75e4ccd4429b17bb67b62ed979f6331d71f0b37be8f874f154"
     },
     {
       "id": "simulation.teamcenter.visualization.launch.request",
@@ -440049,7 +440049,7 @@
       "description": "Queue an official Teamcenter Visualization launch for one exact online source.",
       "use_when": "The signed-in user requests one direct action on the bound workstation Connector.",
       "do_not_use_when": "No current user-scoped Connector binding exists.",
-      "business_effect": "Queue one exact read-only Teamcenter observation or official Visualization launch through the caller-bound App runtime.",
+      "business_effect": "Queue an official Teamcenter Visualization launch that opens one exact online source as a new VisMockup document.",
       "business_acceptance_criteria": [
         "The operation is scoped to the caller's single bound Simulation Connector.",
         "The closed request and response contracts preserve exact Connector and Adapter identity.",
@@ -440062,10 +440062,10 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
         "worker": false,
         "local_runtime": false
       },
@@ -441242,7 +441242,7 @@
           "path": "backend/tests/acceptance/test_mandatory_cases.py"
         }
       ],
-      "business_definition_hash": "sha256:edd9f6293aca03e25596a0e0d02a915c0fab4f3dedacf566c928bf256e475090"
+      "business_definition_hash": "sha256:7e1697ed776704ee6b70e94940d46b3bd140ea508885eb61b56fc57cce464dc6"
     },
     {
       "id": "simulation.vismockup.application.attach.request",
@@ -471575,8 +471575,8 @@
       "plugin_id": "official.simulation",
       "module": "simulation_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:2e6342af495320ab1fdd423f4601b852b69d1b3a76b4c9f88e4534e8a09c4e6e"
+      "artifact_hash": "sha256:46a4b8db99810a81635d8be692f2750c3592f3afd584079d9cdf6aee285fff3a"
     }
   ],
-  "created_at": "2026-09-16T02:58:09.592580Z"
+  "created_at": "2026-09-16T03:23:03.967704Z"
 }

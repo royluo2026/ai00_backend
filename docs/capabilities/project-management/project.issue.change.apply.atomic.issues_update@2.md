@@ -377,7 +377,7 @@ Execute Project Management operation issues.update.
     "arguments": {
       "gid": "example",
       "updates": {
-        "attachments": []
+        "bop_entry_gid": null
       }
     }
   }
