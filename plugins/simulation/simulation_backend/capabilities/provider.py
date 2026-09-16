@@ -25,9 +25,11 @@ _TWO_PHASE_ENTRYPOINTS = {
 
 _VISMOCKUP_WEB_WORKFLOWS = {
     "simulation.teamcenter.product.search.request",
+    "simulation.teamcenter.revision_rule.search.request",
     "simulation.teamcenter.product_structure.observe.request",
     "simulation.teamcenter.product_structure.page.read.request",
     "simulation.teamcenter.visualization.launch.request",
+    "simulation.teamcenter.visualization.insert.request",
     "simulation.vismockup.document.identity.read.request",
     "simulation.vismockup.document.hierarchy_inventory.read.request",
     "simulation.vismockup.application.attach.request",

@@ -699,9 +699,11 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
     by_id = {(spec.id, spec.version): (spec, descriptor) for spec, descriptor in registry.items}
     assert set(by_id) == {
         ("simulation.teamcenter.product.search.request", 1),
+        ("simulation.teamcenter.revision_rule.search.request", 1),
         ("simulation.teamcenter.product_structure.observe.request", 1),
         ("simulation.teamcenter.product_structure.page.read.request", 1),
         ("simulation.teamcenter.visualization.launch.request", 1),
+        ("simulation.teamcenter.visualization.insert.request", 1),
         ("simulation.vismockup.document.identity.read.request", 1),
         ("simulation.vismockup.document.hierarchy_inventory.read.request", 1),
         ("simulation.environment.live_document.adopt", 1),
@@ -738,8 +740,10 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
         ("simulation.vismockup.capture.create", 1),
         ("simulation.teamcenter.product_structure.observe", 1),
         ("simulation.teamcenter.product.search", 1),
+        ("simulation.teamcenter.revision_rule.search", 1),
         ("simulation.teamcenter.product_structure.page.read", 1),
         ("simulation.teamcenter.visualization.launch", 1),
+        ("simulation.teamcenter.visualization.insert", 1),
     }
     for spec, descriptor in by_id.values():
         assert spec.input_schema["additionalProperties"] is False
@@ -789,15 +793,19 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
         "source_selector", "max_nodes", "max_depth", "property_projection",
     }
     assert set(by_id[("simulation.teamcenter.product.search.request", 1)][0].input_schema["properties"]) == {
-        "endpoint_id", "item_id", "revision_id", "revision_rule", "configuration_date",
+        "endpoint_id", "query", "revision_id", "revision_rule", "configuration_date", "limit",
     }
     assert by_id[("simulation.teamcenter.product.search.request", 1)][0].risk.value == "read"
+    assert set(by_id[("simulation.teamcenter.revision_rule.search.request", 1)][0].input_schema["properties"]) == {"endpoint_id"}
+    assert by_id[("simulation.teamcenter.revision_rule.search.request", 1)][0].risk.value == "read"
     assert set(by_id[("simulation.teamcenter.product_structure.page.read.request", 1)][0].input_schema["properties"]) == {
         "observation_id", "cursor", "page_size",
     }
     assert by_id[("simulation.teamcenter.product_structure.observe.request", 1)][0].risk.value == "read"
     assert by_id[("simulation.teamcenter.product_structure.page.read.request", 1)][0].risk.value == "read"
     assert by_id[("simulation.teamcenter.visualization.launch.request", 1)][0].risk.value == "write"
+    assert by_id[("simulation.teamcenter.visualization.insert.request", 1)][0].risk.value == "write"
+    assert by_id[("simulation.teamcenter.visualization.insert.request", 1)][0].confirmation == "user"
     for capability_id, (_spec, descriptor) in by_id.items():
         if capability_id[0].startswith("simulation.vismockup.") and not capability_id[0].endswith(".request") and capability_id[0] != "simulation.vismockup.command.get":
             assert descriptor.exposure.local_runtime
