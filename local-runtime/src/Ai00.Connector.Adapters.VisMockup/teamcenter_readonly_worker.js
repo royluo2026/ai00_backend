@@ -7,6 +7,8 @@ var SoaConstants = Java.type('com.teamcenter.soa.SoaConstants');
 var SessionService = Java.type('com.teamcenter.services.strong.core.SessionService');
 var DataManagementService = Java.type('com.teamcenter.services.strong.core.DataManagementService');
 var StructureManagementService = Java.type('com.teamcenter.services.strong.cad.StructureManagementService');
+var SavedQueryService = Java.type('com.teamcenter.services.strong.query.SavedQueryService');
+var SavedQueryInput = Java.type('com.teamcenter.services.strong.query._2007_06.SavedQuery$SavedQueryInput');
 var CreateBOMWindowsInfo = Java.type('com.teamcenter.services.strong.cad._2007_01.StructureManagement$CreateBOMWindowsInfo');
 var RevisionRuleConfigInfo = Java.type('com.teamcenter.services.strong.cad._2007_01.StructureManagement$RevisionRuleConfigInfo');
 var ExpandPSAllLevelsInfo = Java.type('com.teamcenter.services.strong.cad._2008_06.StructureManagement$ExpandPSAllLevelsInfo');
@@ -69,8 +71,8 @@ function closed(value, fields) {
   return JSON.stringify(actual) === JSON.stringify(fields);
 }
 
-if (!closed(request, ['command', 'payload']) || ['status', 'search', 'observe'].indexOf(request.command) < 0) fail('teamcenter_worker_command_forbidden');
-var endpointId = (request.command === 'status' || request.command === 'search') ? request.payload.endpoint_id : request.payload.source_selector.endpoint_id;
+if (!closed(request, ['command', 'payload']) || ['status', 'revision_rules', 'search', 'observe'].indexOf(request.command) < 0) fail('teamcenter_worker_command_forbidden');
+var endpointId = (request.command === 'status' || request.command === 'revision_rules' || request.command === 'search') ? request.payload.endpoint_id : request.payload.source_selector.endpoint_id;
 if (endpointId !== 'tc-production') fail('teamcenter_endpoint_forbidden');
 
 var connection = null;
@@ -86,16 +88,42 @@ try {
   if (request.command === 'status') {
     print(JSON.stringify({ ok: true, result: { state: 'ready', endpoint_id: endpointId } }));
     exitCode = 0;
+  } else if (request.command === 'revision_rules') {
+    if (!closed(request.payload, ['endpoint_id'])) fail('teamcenter_revision_rules_input_invalid');
+    var ruleDm=DataManagementService.getService(connection),ruleStructure=StructureManagementService.getService(connection);
+    var ruleResponse=ruleStructure.getRevisionRules();
+    var revisionRules=Java.from(ruleResponse.output||[]).map(function(entry){return entry.revRule;}).filter(function(rule){return rule!==null;});
+    if(revisionRules.length)ruleDm.getProperties(Java.to(revisionRules,'com.teamcenter.soa.client.model.ModelObject[]'),Java.to(['object_name'],'java.lang.String[]'));
+    var ruleNames=revisionRules.map(function(rule){return display(rule,'object_name');}).filter(function(name){return !!name;});
+    print(JSON.stringify({ok:true,result:{rules:ruleNames}}));exitCode=0;
   } else if (request.command === 'search') {
     var search=request.payload;
-    if(!closed(search,['endpoint_id','item_id','revision_id','revision_rule','configuration_date'])||!search.item_id||!search.revision_id)fail('teamcenter_search_input_invalid');
-    var dmSearch=DataManagementService.getService(connection),info=new GetItemFromIdInfo();info.itemId=String(search.item_id);info.revIds=Java.to([String(search.revision_id)],'java.lang.String[]');
-    var found=dmSearch.getItemFromId(Java.to([info],'com.teamcenter.services.strong.core._2007_01.DataManagement$GetItemFromIdInfo[]'),1,null),items=[];
-    Java.from(found.output||[]).forEach(function(out){
-      var item=out.item;Java.from(out.itemRevOutput||[]).forEach(function(revOut){var revision=revOut.itemRevision;if(!item||!revision)return;
-        dmSearch.getProperties(Java.to([item,revision],'com.teamcenter.soa.client.model.ModelObject[]'),Java.to(['object_name','object_string','item_id','item_revision_id','owning_user','owning_group'],'java.lang.String[]'));
-        items.push({display_name:display(revision,'object_string')||display(revision,'object_name'),item_id:display(revision,'item_id')||String(search.item_id),revision_id:display(revision,'item_revision_id')||String(search.revision_id),component_type:String(revision.getTypeObject().getName()),owning_user:display(revision,'owning_user'),owning_group:display(revision,'owning_group'),source_selector:{endpoint_id:'tc-production',object_uid:String(item.getUid()),item_revision_uid:String(revision.getUid()),bom_view_uid:'',revision_rule:String(search.revision_rule),configuration_date:String(search.configuration_date)}});
-      });
+    if(!closed(search,['endpoint_id','item_id','revision_id','revision_rule','configuration_date'])||!search.item_id)fail('teamcenter_search_input_invalid');
+    var dmSearch=DataManagementService.getService(connection),queryService=SavedQueryService.getService(connection),queryName='__Item_Revision_name_ID_and_rev';
+    var definitions=queryService.getSavedQueries(),queryDefinition=null;
+    Java.from(definitions.queries||[]).some(function(definition){if(String(definition.name)===queryName){queryDefinition=definition.query;return true;}return false;});
+    if(!queryDefinition)fail('teamcenter_saved_query_not_found');
+    var query=String(search.item_id),revisionId=String(search.revision_id||''),matches={},ordered=[];
+    function execute(entry,value){
+      var saved=new SavedQueryInput(),entries=[entry],values=[value];
+      if(revisionId){entries.push('item_revision_id');values.push(revisionId);}
+      saved.query=queryDefinition;saved.entries=Java.to(entries,'java.lang.String[]');saved.values=Java.to(values,'java.lang.String[]');
+      saved.limitList=Java.to([],'com.teamcenter.soa.client.model.ModelObject[]');saved.limitListCount=0;saved.maxNumToReturn=5001;saved.maxNumToInflate=5001;saved.resultsType=0;
+      var response=queryService.executeSavedQueries(Java.to([saved],'com.teamcenter.services.strong.query._2007_06.SavedQuery$SavedQueryInput[]'));
+      Java.from(response.arrayOfResults||[]).forEach(function(result){var objects=Java.from(result.objects||[]);if(objects.length>5000)fail('teamcenter_search_too_broad');objects.forEach(function(object){var uid=String(object.getUid());if(!matches[uid]){matches[uid]=object;ordered.push(object);}});});
+    }
+    execute('items_tag.item_id',query);
+    execute('items_tag.item_id',query+'*');
+    execute('items_tag.item_id','*'+query+'*');
+    execute('object_name',query);
+    execute('object_name',query+'*');
+    execute('object_name','*'+query+'*');
+    var revisions=ordered,items=[];
+    if(revisions.length)dmSearch.getProperties(Java.to(revisions,'com.teamcenter.soa.client.model.ModelObject[]'),Java.to(['object_name','object_string','item_id','item_revision_id','owning_user','owning_group','items_tag'],'java.lang.String[]'));
+    revisions.forEach(function(revision){
+      var item=modelObject(revision,'items_tag');if(!item)return;
+      dmSearch.getProperties(Java.to([item],'com.teamcenter.soa.client.model.ModelObject[]'),Java.to(['item_id'],'java.lang.String[]'));
+      items.push({display_name:display(revision,'object_string')||display(revision,'object_name'),item_id:display(item,'item_id')||display(revision,'item_id'),revision_id:display(revision,'item_revision_id'),component_type:String(revision.getTypeObject().getName()),owning_user:display(revision,'owning_user'),owning_group:display(revision,'owning_group'),source_selector:{endpoint_id:'tc-production',object_uid:String(item.getUid()),item_revision_uid:String(revision.getUid()),bom_view_uid:'',revision_rule:String(search.revision_rule),configuration_date:String(search.configuration_date)}});
     });
     print(JSON.stringify({ok:true,result:{items:items}}));exitCode=0;
   } else {
@@ -255,7 +283,10 @@ try {
 } catch (error) {
   var message = String(error && error.message ? error.message : error);
   var marker = message.indexOf('AI00_CODE:');
-  var code = marker >= 0 ? message.substring(marker + 10).replace(/\s.*$/, '') : 'teamcenter_worker_failed';
+  var code = marker >= 0 ? message.substring(marker + 10).replace(/\s.*$/, '')
+    : /authentication_failed|invalid credentials|login failed/i.test(message) ? 'teamcenter_authentication_failed'
+    : /session.*(?:expired|invalid)|not logged/i.test(message) ? 'teamcenter_session_expired'
+    : 'teamcenter_worker_failed';
   java.lang.System.err.println(code);
   print(JSON.stringify({ ok: false, code: code }));
 } finally {

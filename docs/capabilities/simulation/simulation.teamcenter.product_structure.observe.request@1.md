@@ -17,10 +17,10 @@ Queue one bounded read-only Teamcenter product-structure observation on the App 
 | 消费者 | 状态 |
 |---|---|
 | web | 可用 |
-| plugin | 可用 |
-| agent | 可用 |
-| api | 可用 |
-| mcp | 可用 |
+| plugin | 不可用 |
+| agent | 不可用 |
+| api | 不可用 |
+| mcp | 不可用 |
 | worker | 不可用 |
 | local_runtime | 不可用 |
 
@@ -35,7 +35,8 @@ Queue one bounded read-only Teamcenter product-structure observation on the App 
 - 认证新鲜度：0 秒
 
 资源选择器：
-- 无资源选择器；仍受租户、身份与权限策略约束。
+- `teamcenter-endpoint` ← `source_selector.endpoint_id`（必填）
+- `teamcenter-online-source` ← `source_selector.object_uid`（必填）
 
 ## 执行与可靠性
 

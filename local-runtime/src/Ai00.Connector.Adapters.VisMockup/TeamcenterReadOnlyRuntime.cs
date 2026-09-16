@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Security.Cryptography;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -11,9 +13,9 @@ namespace Ai00.Connector.Adapters.VisMockup;
 
 public static class TeamcenterReadOnlyPolicy
 {
-    public static readonly string[] WorkerCommands = ["status", "search", "observe", "launch"];
+    public static readonly string[] WorkerCommands = ["status", "revision_rules", "search", "observe", "launch"];
     public static readonly string[] AllowedServiceTokens =
-        ["login", "logout", "loadObjects", "getItemFromId", "getProperties", "getRevisionRules", "createBOMWindows", "expandPSAllLevels", "closeBOMWindows", "expandGRMRelationsForPrimary", "createLaunchInfo"];
+        ["login", "logout", "loadObjects", "getItemFromId", "getProperties", "getRevisionRules", "getSavedQueries", "executeSavedQueries", "createBOMWindows", "expandPSAllLevels", "closeBOMWindows", "expandGRMRelationsForPrimary", "createLaunchInfo"];
     public static readonly string[] ForbiddenServiceTokens =
         ["setProperties", "saveBOMWindows", "createObjects", "deleteObjects", "setDatasetFile", "getFileWriteTickets", "commitDatasetFiles"];
 }
@@ -102,16 +104,22 @@ public sealed record TeamcenterProductSearchItem(
     [property: JsonPropertyName("source_selector")] TeamcenterSourceSelector SourceSelector);
 public sealed record TeamcenterProductSearchResult(
     [property: JsonPropertyName("items")] IReadOnlyList<TeamcenterProductSearchItem> Items);
+public sealed record TeamcenterRevisionRulesResult(
+    [property: JsonPropertyName("rules")] IReadOnlyList<string> Rules);
+public sealed record TeamcenterSessionStatus(string State, string MaskedUsername);
 
 public interface ITeamcenterWorker
 {
     Task ValidateCredentialsAsync(string endpointId, string username, string password, CancellationToken ct);
+    Task<IReadOnlyList<string>> GetRevisionRulesAsync(string username, string password, CancellationToken ct);
     Task<TeamcenterProductSearchResult> SearchAsync(string itemId, string revisionId,
         string revisionRule, string configurationDate, string username, string password, CancellationToken ct);
     Task<IReadOnlyList<TeamcenterOccurrence>> ObserveAsync(TeamcenterSourceSelector selector,
         int maxNodes, int maxDepth, string propertyProjection, string username, string password, CancellationToken ct);
     Task<TeamcenterLaunchResult> LaunchAsync(TeamcenterSourceSelector selector, string expectedVisdocUid,
         string username, string password, CancellationToken ct);
+    Task<TeamcenterLaunchResult> ConsumeVisualizationAsync(TeamcenterSourceSelector selector, string expectedVisdocUid,
+        Func<string, CancellationToken, Task> consumer, string username, string password, CancellationToken ct);
 }
 
 public sealed class TeamcenterReadOnlyRuntime : IDisposable
@@ -119,6 +127,7 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
     private readonly ITeamcenterWorker worker;
     private readonly string connectionString;
     private readonly SemaphoreSlim gate = new(1, 1);
+    private readonly object credentialState = new();
     private char[] username = [];
     private char[] password = [];
     private string endpointId = "";
@@ -149,7 +158,9 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
             var compatibilityRoot = PrepareVisualizationCompatibility(compatibilityAsset, stateRoot);
             var jars = new[] { compatibilityRoot }.Concat(Directory.EnumerateFiles(lib, "*.jar")
                 .Order(StringComparer.OrdinalIgnoreCase)).ToArray();
-            return new TeamcenterReadOnlyRuntime(new TeamcenterProcessWorker(java, script, launcher, jars),
+            var materialRoot = Path.Combine(stateRoot, "teamcenter-visualization");
+            TeamcenterProcessWorker.SecureVisualizationMaterialRoot(materialRoot);
+            return new TeamcenterReadOnlyRuntime(new TeamcenterProcessWorker(java, script, launcher, jars, materialRoot),
                 Path.Combine(stateRoot, "teamcenter-structure-cache.db"));
         }
         catch
@@ -197,9 +208,36 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
         try
         {
             await worker.ValidateCredentialsAsync(endpoint, user, secret, ct);
-            ClearCredentials();
-            endpointId = endpoint; username = user.ToCharArray(); password = secret.ToCharArray();
+            lock (credentialState)
+            {
+                ClearCredentialsUnsafe();
+                endpointId = endpoint; username = user.ToCharArray(); password = secret.ToCharArray();
+            }
         }
+        catch (ConnectorException error) when (InvalidatesSession(error))
+        {
+            ClearCredentials();
+            throw;
+        }
+        finally { gate.Release(); }
+    }
+
+    public TeamcenterSessionStatus GetSessionStatus()
+    {
+        lock (credentialState)
+        {
+            if (username.Length == 0 || password.Length == 0) return new("logged_out", "");
+            var user = new string(username);
+            var masked = user.Length == 1 ? user + "***"
+                : user.Length == 2 ? user[0] + "***" : user[0] + "***" + user[^1];
+            return new("ready", masked);
+        }
+    }
+
+    public async Task LogoutAsync(CancellationToken ct)
+    {
+        await gate.WaitAsync(ct);
+        try { ClearCredentials(); }
         finally { gate.Release(); }
     }
 
@@ -211,13 +249,18 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
         var maxDepth = payload.GetProperty("max_depth").GetInt32();
         var projection = payload.GetProperty("property_projection").GetString() ?? "";
         if (maxNodes is < 1 or > 250_000 || maxDepth is < 1 or > 128
-            || projection.Length is < 1 or > 64 || selector.EndpointId != endpointId)
+            || projection.Length is < 1 or > 64)
             throw new ConnectorException("teamcenter_observe_input_invalid");
-        var credentials = RequireCredentials();
         IReadOnlyList<TeamcenterOccurrence> nodes;
         await gate.WaitAsync(ct);
-        try { nodes = await worker.ObserveAsync(selector, maxNodes, maxDepth, projection,
-                credentials.User, credentials.Password, ct); }
+        try
+        {
+            var credentials = RequireCredentials();
+            if (selector.EndpointId != endpointId) throw new ConnectorException("teamcenter_observe_input_invalid");
+            nodes = await worker.ObserveAsync(selector, maxNodes, maxDepth, projection,
+                credentials.User, credentials.Password, ct);
+        }
+        catch (ConnectorException error) when (InvalidatesSession(error)) { ClearCredentials(); throw; }
         finally { gate.Release(); }
         ValidateNodes(nodes, maxNodes, maxDepth);
         var captured = DateTimeOffset.UtcNow;
@@ -236,14 +279,88 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
         var revisionId = payload.GetProperty("revision_id").GetString() ?? "";
         var revisionRule = payload.GetProperty("revision_rule").GetString() ?? "";
         var configurationDate = payload.GetProperty("configuration_date").GetString() ?? "";
-        if (endpoint != endpointId || itemId.Length is < 1 or > 128 || revisionId.Length is < 1 or > 64
+        if (endpoint != "tc-production" || itemId.Length is < 1 or > 128 || revisionId.Length is < 1 or > 64
             || revisionRule.Length is < 1 or > 128 || !DateTimeOffset.TryParse(configurationDate, out _))
             throw new ConnectorException("teamcenter_search_input_invalid");
-        var credentials = RequireCredentials();
+        TeamcenterProductSearchResult found;
         await gate.WaitAsync(ct);
-        try { return await worker.SearchAsync(itemId, revisionId, revisionRule, configurationDate,
-                credentials.User, credentials.Password, ct); }
+        try
+        {
+            var credentials = RequireCredentials();
+            found = await worker.SearchAsync(itemId, revisionId, revisionRule, configurationDate,
+                credentials.User, credentials.Password, ct);
+        }
+        catch (ConnectorException error) when (InvalidatesSession(error)) { ClearCredentials(); throw; }
         finally { gate.Release(); }
+        return new TeamcenterProductSearchResult(found.Items.Where(item =>
+                string.Equals(item.ItemId, itemId, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(item.RevisionId, revisionId, StringComparison.Ordinal))
+            .Take(20).ToArray());
+    }
+
+    public async Task<object> GetRevisionRulesAsync(JsonElement payload, CancellationToken ct)
+    {
+        Closed(payload, "endpoint_id");
+        if ((payload.GetProperty("endpoint_id").GetString() ?? "") != "tc-production")
+            throw new ConnectorException("teamcenter_revision_rules_input_invalid");
+        IReadOnlyList<string> raw;
+        await gate.WaitAsync(ct);
+        try
+        {
+            var credentials = RequireCredentials();
+            raw = await worker.GetRevisionRulesAsync(credentials.User, credentials.Password, ct);
+        }
+        catch (ConnectorException error) when (InvalidatesSession(error)) { ClearCredentials(); throw; }
+        finally { gate.Release(); }
+        var rules = raw.Where(rule => !string.IsNullOrWhiteSpace(rule) && rule.Length <= 128)
+            .Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(rule => string.Equals(rule, "Latest Working", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+            .ThenBy(rule => rule, StringComparer.Ordinal).ToArray();
+        if (rules.Length == 0) throw new ConnectorException("teamcenter_revision_rules_unavailable");
+        return new TeamcenterRevisionRulesResult(rules);
+    }
+
+    public async Task<object> SearchV2Async(JsonElement payload, CancellationToken ct)
+    {
+        Closed(payload, "endpoint_id", "query", "revision_id", "revision_rule", "configuration_date", "limit");
+        var endpoint = payload.GetProperty("endpoint_id").GetString() ?? "";
+        var query = (payload.GetProperty("query").GetString() ?? "").Trim();
+        var revisionId = payload.GetProperty("revision_id").GetString() ?? "";
+        var revisionRule = payload.GetProperty("revision_rule").GetString() ?? "";
+        var configurationDate = payload.GetProperty("configuration_date").GetString() ?? "";
+        var limit = payload.GetProperty("limit").GetInt32();
+        if (endpoint != "tc-production" || query.Length is < 1 or > 128 || query.Any(char.IsControl)
+            || revisionId.Length > 64 || revisionId.Any(char.IsControl) || revisionRule.Length is < 1 or > 128
+            || !DateTimeOffset.TryParse(configurationDate, out _) || limit is < 1 or > 20)
+            throw new ConnectorException("teamcenter_search_input_invalid");
+        TeamcenterProductSearchResult found;
+        await gate.WaitAsync(ct);
+        try
+        {
+            var credentials = RequireCredentials();
+            found = await worker.SearchAsync(query, revisionId, revisionRule, configurationDate,
+                credentials.User, credentials.Password, ct);
+        }
+        catch (ConnectorException error) when (InvalidatesSession(error)) { ClearCredentials(); throw; }
+        finally { gate.Release(); }
+        return new TeamcenterProductSearchResult(RankSearchItems(found.Items, query, revisionId, limit));
+    }
+
+    public static IReadOnlyList<TeamcenterProductSearchItem> RankSearchItems(
+        IEnumerable<TeamcenterProductSearchItem> items, string query, string revisionId, int limit)
+    {
+        static int Rank(TeamcenterProductSearchItem item, string value)
+        {
+            if (string.Equals(item.ItemId, value, StringComparison.OrdinalIgnoreCase)) return 0;
+            if (item.ItemId.StartsWith(value, StringComparison.OrdinalIgnoreCase)) return 1;
+            if (item.ItemId.Contains(value, StringComparison.OrdinalIgnoreCase)) return 2;
+            return item.DisplayName.Contains(value, StringComparison.OrdinalIgnoreCase) ? 3 : int.MaxValue;
+        }
+        return items.Where(item => !string.IsNullOrWhiteSpace(item.SourceSelector.ItemRevisionUid)
+                && (revisionId.Length == 0 || string.Equals(item.RevisionId, revisionId, StringComparison.Ordinal))
+                && Rank(item, query) != int.MaxValue)
+            .GroupBy(item => item.SourceSelector.ItemRevisionUid, StringComparer.Ordinal).Select(group => group.First())
+            .OrderBy(item => Rank(item, query)).ThenBy(item => item.ItemId, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(item => item.RevisionId, StringComparer.Ordinal).Take(limit).ToArray();
     }
 
     public Task<TeamcenterObservationPage> ReadPageAsync(string observationId, int cursor, int pageSize, CancellationToken ct)
@@ -275,23 +392,33 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
             next < total ? next : null, nodes, hash));
     }
 
-    public async Task<object> LaunchAsync(JsonElement payload, CancellationToken ct)
+    public async Task<object> ConsumeVisualizationAsync(JsonElement payload,
+        Func<string, CancellationToken, Task> consumer, CancellationToken ct)
     {
         Closed(payload, "source_selector", "expected_visdoc_uid");
         var selector = ReadSelector(payload.GetProperty("source_selector"));
         var expected = payload.GetProperty("expected_visdoc_uid").GetString() ?? "";
-        if (expected.Length > 128 || selector.EndpointId != endpointId)
+        if (expected.Length > 128)
             throw new ConnectorException("teamcenter_launch_input_invalid");
-        var credentials = RequireCredentials();
         await gate.WaitAsync(ct);
-        try { return await worker.LaunchAsync(selector, expected, credentials.User, credentials.Password, ct); }
+        try
+        {
+            var credentials = RequireCredentials();
+            if (selector.EndpointId != endpointId) throw new ConnectorException("teamcenter_launch_input_invalid");
+            return await worker.ConsumeVisualizationAsync(selector, expected, consumer,
+                credentials.User, credentials.Password, ct);
+        }
+        catch (ConnectorException error) when (InvalidatesSession(error)) { ClearCredentials(); throw; }
         finally { gate.Release(); }
     }
 
     private (string User, string Password) RequireCredentials()
     {
-        if (username.Length == 0 || password.Length == 0) throw new ConnectorException("teamcenter_login_required");
-        return (new string(username), new string(password));
+        lock (credentialState)
+        {
+            if (username.Length == 0 || password.Length == 0) throw new ConnectorException("teamcenter_login_required");
+            return (new string(username), new string(password));
+        }
     }
 
     private static TeamcenterSourceSelector ReadSelector(JsonElement value)
@@ -371,6 +498,14 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
     }
 
     private void ClearCredentials()
+    {
+        lock (credentialState) ClearCredentialsUnsafe();
+    }
+
+    private static bool InvalidatesSession(ConnectorException error) =>
+        error.Message is "teamcenter_authentication_failed" or "teamcenter_session_expired";
+
+    private void ClearCredentialsUnsafe()
     { Array.Clear(username); Array.Clear(password); username = []; password = []; endpointId = ""; }
 
     public void Dispose() { ClearCredentials(); gate.Dispose(); }
@@ -380,15 +515,36 @@ internal sealed class UnavailableTeamcenterWorker : ITeamcenterWorker
 {
     private static ConnectorException Error() => new("teamcenter_runtime_unavailable");
     public Task ValidateCredentialsAsync(string endpointId, string username, string password, CancellationToken ct) => Task.FromException(Error());
+    public Task<IReadOnlyList<string>> GetRevisionRulesAsync(string username, string password, CancellationToken ct) => Task.FromException<IReadOnlyList<string>>(Error());
     public Task<TeamcenterProductSearchResult> SearchAsync(string itemId, string revisionId, string revisionRule, string configurationDate, string username, string password, CancellationToken ct) => Task.FromException<TeamcenterProductSearchResult>(Error());
     public Task<IReadOnlyList<TeamcenterOccurrence>> ObserveAsync(TeamcenterSourceSelector selector, int maxNodes, int maxDepth, string propertyProjection, string username, string password, CancellationToken ct) => Task.FromException<IReadOnlyList<TeamcenterOccurrence>>(Error());
     public Task<TeamcenterLaunchResult> LaunchAsync(TeamcenterSourceSelector selector, string expectedVisdocUid, string username, string password, CancellationToken ct) => Task.FromException<TeamcenterLaunchResult>(Error());
+    public Task<TeamcenterLaunchResult> ConsumeVisualizationAsync(TeamcenterSourceSelector selector, string expectedVisdocUid, Func<string, CancellationToken, Task> consumer, string username, string password, CancellationToken ct) => Task.FromException<TeamcenterLaunchResult>(Error());
 }
 
 public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, string launcherPath,
-    IReadOnlyList<string> classpath) : ITeamcenterWorker
+    IReadOnlyList<string> classpath, string visualizationMaterialRoot) : ITeamcenterWorker
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = false };
+
+    internal static void SecureVisualizationMaterialRoot(string path)
+    {
+        if (!OperatingSystem.IsWindows()) throw new PlatformNotSupportedException("windows_required");
+        var full = Path.GetFullPath(path);
+        Directory.CreateDirectory(full);
+        var directory = new DirectoryInfo(full);
+        if ((directory.Attributes & FileAttributes.ReparsePoint) != 0)
+            throw new IOException("teamcenter_visualization_material_root_invalid");
+        using var identity = WindowsIdentity.GetCurrent();
+        var sid = identity.User ?? throw new IOException("windows_user_required");
+        var security = new DirectorySecurity();
+        security.SetAccessRuleProtection(true, false);
+        security.SetOwner(sid);
+        security.AddAccessRule(new FileSystemAccessRule(sid, FileSystemRights.FullControl,
+            InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+            PropagationFlags.None, AccessControlType.Allow));
+        directory.SetAccessControl(security);
+    }
 
     public static ProcessStartInfo CreateStartInfo(string javaPath, string scriptPath, IReadOnlyList<string> classpath)
     {
@@ -410,6 +566,13 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
 
     public async Task ValidateCredentialsAsync(string endpointId, string username, string password, CancellationToken ct)
         => _ = await RunAsync("status", new { endpoint_id = endpointId }, username, password, ct);
+
+    public async Task<IReadOnlyList<string>> GetRevisionRulesAsync(string username, string password, CancellationToken ct)
+    {
+        var result = await RunAsync("revision_rules", new { endpoint_id = "tc-production" }, username, password, ct);
+        return result.GetProperty("rules").Deserialize<string[]>(JsonOptions)
+            ?? throw new ConnectorException("teamcenter_worker_response_invalid");
+    }
 
     public async Task<TeamcenterProductSearchResult> SearchAsync(string itemId, string revisionId,
         string revisionRule, string configurationDate, string username, string password, CancellationToken ct)
@@ -437,6 +600,91 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
             expected_visdoc_uid = expectedVisdocUid, source_identity_hash = selector.IdentityHash }, username, password, ct);
         return result.Deserialize<TeamcenterLaunchResult>(JsonOptions)
             ?? throw new ConnectorException("teamcenter_worker_response_invalid");
+    }
+
+    public async Task<TeamcenterLaunchResult> ConsumeVisualizationAsync(TeamcenterSourceSelector selector,
+        string expectedVisdocUid, Func<string, CancellationToken, Task> consumer,
+        string username, string password, CancellationToken ct)
+    {
+        var materialRoot = Path.GetFullPath(visualizationMaterialRoot);
+        SecureVisualizationMaterialRoot(materialRoot);
+        var operationRoot = Path.Combine(materialRoot, Guid.NewGuid().ToString("N"));
+        SecureVisualizationMaterialRoot(operationRoot);
+        using var process = new Process { StartInfo = CreateStartInfo(javaPath, launcherPath, classpath) };
+        try
+        {
+            if (!process.Start()) throw new ConnectorException("teamcenter_worker_start_failed");
+        }
+        catch
+        {
+            try { Directory.Delete(operationRoot, true); } catch { }
+            throw;
+        }
+        var diagnosticTask = ReadBoundedAsync(process.StandardError, 8192, ct);
+        Exception? consumerError = null;
+        string? materialPath = null;
+        try
+        {
+            await process.StandardInput.WriteLineAsync(username.AsMemory(), ct);
+            await process.StandardInput.WriteLineAsync(password.AsMemory(), ct);
+            await process.StandardInput.WriteLineAsync(JsonSerializer.Serialize(new
+            {
+                command = "consume",
+                payload = new { source_selector = selector, expected_visdoc_uid = expectedVisdocUid,
+                    source_identity_hash = selector.IdentityHash, material_root = operationRoot }
+            }).AsMemory(), ct);
+            await process.StandardInput.FlushAsync(ct);
+
+            var readyLine = await ReadLineBoundedAsync(process.StandardOutput, 16 * 1024, ct);
+            using var readyDocument = JsonDocument.Parse(readyLine);
+            var ready = readyDocument.RootElement;
+            if (ready.ValueKind != JsonValueKind.Object
+                || ready.EnumerateObject().Select(item => item.Name).Order().SequenceEqual(
+                    new[] { "expected_visdoc_uid", "material_path", "source_identity_hash", "type" }.Order()) is false
+                || ready.GetProperty("type").GetString() != "material_ready"
+                || ready.GetProperty("expected_visdoc_uid").GetString() != expectedVisdocUid
+                || ready.GetProperty("source_identity_hash").GetString() != selector.IdentityHash)
+                throw new ConnectorException("teamcenter_worker_response_invalid");
+            materialPath = ValidateMaterialPath(operationRoot,
+                ready.GetProperty("material_path").GetString() ?? "");
+            try { await consumer(materialPath, ct); }
+            catch (Exception error) { consumerError = error; }
+
+            await process.StandardInput.WriteLineAsync(JsonSerializer.Serialize(new
+                { type = consumerError is null ? "material_consumed" : "material_failed" }));
+            await process.StandardInput.FlushAsync();
+            process.StandardInput.Close();
+            using var cleanupTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            var finalLine = await ReadLineBoundedAsync(process.StandardOutput, 64 * 1024, cleanupTimeout.Token);
+            await process.WaitForExitAsync(cleanupTimeout.Token);
+            var diagnostic = await diagnosticTask;
+            if (consumerError is not null)
+                System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(consumerError).Throw();
+            using var finalDocument = JsonDocument.Parse(finalLine);
+            var root = finalDocument.RootElement;
+            if (process.ExitCode != 0 || !root.TryGetProperty("ok", out var ok) || !ok.GetBoolean())
+                throw new ConnectorException(root.TryGetProperty("code", out var code)
+                    ? code.GetString()! : SanitizeDiagnostic(diagnostic));
+            return root.GetProperty("result").Deserialize<TeamcenterLaunchResult>(JsonOptions)
+                ?? throw new ConnectorException("teamcenter_worker_response_invalid");
+        }
+        catch
+        {
+            try { if (!process.HasExited) process.Kill(true); } catch { }
+            if (consumerError is not null)
+                System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(consumerError).Throw();
+            throw;
+        }
+        finally
+        {
+            if (materialPath is not null)
+            {
+                try { File.Delete(materialPath); }
+                catch { /* Java also cleans up; a later state-root sweep handles a locked file. */ }
+            }
+            try { if (Directory.Exists(operationRoot)) Directory.Delete(operationRoot, true); }
+            catch { /* Never replace the consumer result with best-effort material cleanup. */ }
+        }
     }
 
     private async Task<JsonElement> RunAsync(string command, object payload, string username, string password, CancellationToken ct)
@@ -485,6 +733,30 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
             if (result.Length + count > maximum) throw new ConnectorException("teamcenter_worker_response_too_large");
             result.Append(buffer, 0, count); }
         return result.ToString();
+    }
+
+    private static async Task<string> ReadLineBoundedAsync(StreamReader reader, int maximum, CancellationToken ct)
+    {
+        var line = await reader.ReadLineAsync(ct);
+        if (line is null || line.Length == 0 || line.Length > maximum)
+            throw new ConnectorException("teamcenter_worker_response_invalid");
+        return line;
+    }
+
+    private static string ValidateMaterialPath(string materialRoot, string candidate)
+    {
+        if (string.IsNullOrWhiteSpace(candidate) || !Path.IsPathFullyQualified(candidate))
+            throw new ConnectorException("teamcenter_visualization_material_invalid");
+        var full = Path.GetFullPath(candidate);
+        var rootPrefix = Path.TrimEndingDirectorySeparator(materialRoot) + Path.DirectorySeparatorChar;
+        if (!full.StartsWith(rootPrefix, StringComparison.OrdinalIgnoreCase)
+            || !string.Equals(Path.GetExtension(full), ".vvi", StringComparison.OrdinalIgnoreCase)
+            || !File.Exists(full))
+            throw new ConnectorException("teamcenter_visualization_material_invalid");
+        var length = new FileInfo(full).Length;
+        if (length is < 1 or > 64 * 1024 * 1024)
+            throw new ConnectorException("teamcenter_visualization_material_invalid");
+        return full;
     }
 
     private static string SanitizeDiagnostic(string value)

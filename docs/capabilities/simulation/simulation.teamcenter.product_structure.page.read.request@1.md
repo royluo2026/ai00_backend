@@ -17,10 +17,10 @@ Queue one bounded page read from an existing local Teamcenter structure observat
 | 消费者 | 状态 |
 |---|---|
 | web | 可用 |
-| plugin | 可用 |
-| agent | 可用 |
-| api | 可用 |
-| mcp | 可用 |
+| plugin | 不可用 |
+| agent | 不可用 |
+| api | 不可用 |
+| mcp | 不可用 |
 | worker | 不可用 |
 | local_runtime | 不可用 |
 
@@ -35,7 +35,7 @@ Queue one bounded page read from an existing local Teamcenter structure observat
 - 认证新鲜度：0 秒
 
 资源选择器：
-- 无资源选择器；仍受租户、身份与权限策略约束。
+- `teamcenter-observation` ← `observation_id`（必填）
 
 ## 执行与可靠性
 
@@ -103,7 +103,7 @@ Queue one bounded page read from an existing local Teamcenter structure observat
   "major_version": 1,
   "payload": {
     "cursor": 0,
-    "observation_id": "example",
+    "observation_id": "tcobs:0000000000000000000000000000000000000000000000000000000000000000",
     "page_size": 1
   }
 }

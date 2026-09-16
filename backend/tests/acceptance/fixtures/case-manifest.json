@@ -4915,7 +4915,7 @@
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[system.search@1]"
     }
   },
-  "catalog_release": "rel_571dc0fd2eb458c532ec806ff51db7e6",
+  "catalog_release": "rel_721bb5964de8b31eeafdbbf5e3a05987",
   "mandatory_cases": [
     "success",
     "invalid_input",

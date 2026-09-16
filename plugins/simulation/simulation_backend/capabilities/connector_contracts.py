@@ -114,11 +114,15 @@ EXACT_SOURCE_SELECTOR = obj({
 }, ("endpoint_id", "object_uid", "item_revision_uid", "bom_view_uid", "revision_rule", "configuration_date"))
 TC_SEARCH_INPUT = obj({
     "endpoint_id": {"type": "string", "const": "tc-production"},
-    "item_id": {"type": "string", "minLength": 1, "maxLength": 128},
-    "revision_id": {"type": "string", "minLength": 1, "maxLength": 64},
+    "query": {"type": "string", "minLength": 1, "maxLength": 128},
+    "revision_id": {"type": "string", "maxLength": 64},
     "revision_rule": {"type": "string", "minLength": 1, "maxLength": 128},
     "configuration_date": {"type": "string", "format": "date-time"},
-}, ("endpoint_id", "item_id", "revision_id", "revision_rule", "configuration_date"))
+    "limit": {"type": "integer", "minimum": 1, "maximum": 20},
+}, ("endpoint_id", "query", "revision_id", "revision_rule", "configuration_date", "limit"))
+TC_REVISION_RULE_INPUT = obj({
+    "endpoint_id": {"type": "string", "const": "tc-production"},
+}, ("endpoint_id",))
 TC_OBSERVE_INPUT = obj({"source_selector":SOURCE_SELECTOR,
     "max_nodes":{"type":"integer","minimum":1,"maximum":250000},
     "max_depth":{"type":"integer","minimum":1,"maximum":128},
@@ -128,7 +132,15 @@ TC_PAGE_INPUT = obj({"observation_id":{"type":"string","pattern":"^tcobs:[a-f0-9
     "cursor":{"type":"integer","minimum":0,"maximum":250000},
     "page_size":{"type":"integer","minimum":1,"maximum":1000}},
     ("observation_id","cursor","page_size"))
-TC_LAUNCH_INPUT = obj({"source_selector":SOURCE_SELECTOR,
+TC_VISUALIZATION_SOURCE_SELECTOR = obj({
+    "endpoint_id": {"type":"string", "const":"tc-production"},
+    "object_uid": {"type":"string","minLength":1,"maxLength":128},
+    "item_revision_uid": {"type":"string","maxLength":128},
+    "bom_view_uid": {"type":"string","maxLength":128},
+    "revision_rule": {"type":"string","minLength":1,"maxLength":128},
+    "configuration_date": {"type":"string","format":"date-time"},
+}, ("endpoint_id", "object_uid", "item_revision_uid", "bom_view_uid", "revision_rule", "configuration_date"))
+TC_LAUNCH_INPUT = obj({"source_selector":TC_VISUALIZATION_SOURCE_SELECTOR,
     "expected_visdoc_uid":{"type":"string","maxLength":128}},
     ("source_selector","expected_visdoc_uid"))
 AH_APPLY_INPUT = obj({"document_session":HASH,"hierarchy_gid":{"type":"string","pattern":"^[1-9][0-9]*$"},
@@ -179,13 +191,17 @@ class ConnectorHealth(FrozenModel):
 
 INPUT_SCHEMAS = {
     "simulation.teamcenter.product.search.request": TC_SEARCH_INPUT,
+    "simulation.teamcenter.revision_rule.search.request": TC_REVISION_RULE_INPUT,
     "simulation.teamcenter.product_structure.observe.request": TC_OBSERVE_INPUT,
     "simulation.teamcenter.product_structure.page.read.request": TC_PAGE_INPUT,
     "simulation.teamcenter.visualization.launch.request": TC_LAUNCH_INPUT,
+    "simulation.teamcenter.visualization.insert.request": TC_LAUNCH_INPUT,
     "simulation.teamcenter.product_structure.observe": TC_OBSERVE_INPUT,
     "simulation.teamcenter.product.search": TC_SEARCH_INPUT,
+    "simulation.teamcenter.revision_rule.search": TC_REVISION_RULE_INPUT,
     "simulation.teamcenter.product_structure.page.read": TC_PAGE_INPUT,
     "simulation.teamcenter.visualization.launch": TC_LAUNCH_INPUT,
+    "simulation.teamcenter.visualization.insert": TC_LAUNCH_INPUT,
     "simulation.vismockup.document.identity.read.request": obj({}, ()),
     "simulation.vismockup.document.hierarchy_inventory.read.request": obj({
         "document_session": HASH,
@@ -356,6 +372,10 @@ TC_SEARCH_ITEM = obj({
 TC_SEARCH_RESULT = obj({
     "items": {"type": "array", "items": TC_SEARCH_ITEM, "maxItems": 20},
 }, ("items",))
+TC_REVISION_RULE_RESULT = obj({
+    "rules": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 128},
+              "minItems": 1, "maxItems": 256},
+}, ("rules",))
 AH_APPLY_RESULT = obj({"document_session":HASH,"hierarchy_gid":{"type":"string","pattern":"^[1-9][0-9]*$"},
     "applied":{"type":"integer","minimum":0,"maximum":256},"skipped":{"type":"integer","minimum":0,"maximum":256},
     "conflicts":{"type":"array","maxItems":256,"items":{"type":"string","maxLength":256}},
@@ -370,13 +390,17 @@ PAIRING_SUMMARY = obj({
 
 OUTPUT_SCHEMAS = {
     "simulation.teamcenter.product.search.request": OPERATION_REF,
+    "simulation.teamcenter.revision_rule.search.request": OPERATION_REF,
     "simulation.teamcenter.product_structure.observe.request": OPERATION_REF,
     "simulation.teamcenter.product_structure.page.read.request": OPERATION_REF,
     "simulation.teamcenter.visualization.launch.request": OPERATION_REF,
+    "simulation.teamcenter.visualization.insert.request": OPERATION_REF,
     "simulation.teamcenter.product_structure.observe": TC_OBSERVE_RESULT,
     "simulation.teamcenter.product.search": TC_SEARCH_RESULT,
+    "simulation.teamcenter.revision_rule.search": TC_REVISION_RULE_RESULT,
     "simulation.teamcenter.product_structure.page.read": TC_PAGE_RESULT,
     "simulation.teamcenter.visualization.launch": TC_LAUNCH_RESULT,
+    "simulation.teamcenter.visualization.insert": TC_LAUNCH_RESULT,
     "simulation.vismockup.document.identity.read.request": OPERATION_REF,
     "simulation.vismockup.document.hierarchy_inventory.read.request": OPERATION_REF,
     "simulation.connector.health.get": CONNECTOR_HEALTH,

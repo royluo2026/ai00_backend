@@ -35,7 +35,8 @@ Use Teamcenter launch information to open one online source in VisMockup.
 - 认证新鲜度：0 秒
 
 资源选择器：
-- 无资源选择器；仍受租户、身份与权限策略约束。
+- `teamcenter-endpoint` ← `source_selector.endpoint_id`（必填）
+- `teamcenter-online-source` ← `source_selector.object_uid`（必填）
 
 ## 执行与可靠性
 
@@ -86,8 +87,7 @@ Use Teamcenter launch information to open one online source in VisMockup.
           "type": "string"
         },
         "endpoint_id": {
-          "maxLength": 128,
-          "minLength": 1,
+          "const": "tc-production",
           "type": "string"
         },
         "item_revision_uid": {
@@ -108,6 +108,8 @@ Use Teamcenter launch information to open one online source in VisMockup.
       "required": [
         "endpoint_id",
         "object_uid",
+        "item_revision_uid",
+        "bom_view_uid",
         "revision_rule",
         "configuration_date"
       ],
@@ -132,8 +134,10 @@ Use Teamcenter launch information to open one online source in VisMockup.
   "payload": {
     "expected_visdoc_uid": "example",
     "source_selector": {
+      "bom_view_uid": "example",
       "configuration_date": "example",
-      "endpoint_id": "example",
+      "endpoint_id": "tc-production",
+      "item_revision_uid": "example",
       "object_uid": "example",
       "revision_rule": "example"
     }

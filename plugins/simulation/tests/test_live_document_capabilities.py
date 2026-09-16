@@ -142,6 +142,24 @@ def test_identity_read_is_empty_read_only_app_plan_and_candidate_web_only():
     assert len(queued) == 1
 
 
+def test_teamcenter_requests_are_web_only_with_action_specific_effects():
+    registry = Registry()
+    register_connector_runtime_capabilities(registry, ConnectorControlPlane(Connectors(), clock=lambda: NOW))
+    expectations = {
+        'simulation.teamcenter.product.search.request': 'exact, prefix, and contains search',
+        'simulation.teamcenter.revision_rule.search.request': 'revision rules',
+        'simulation.teamcenter.product_structure.observe.request': 'product structure',
+        'simulation.teamcenter.product_structure.page.read.request': 'occurrence rows',
+        'simulation.teamcenter.visualization.launch.request': 'new VisMockup document',
+        'simulation.teamcenter.visualization.insert.request': 'active VisMockup document',
+    }
+    for capability_id, phrase in expectations.items():
+        descriptor = registry.items[capability_id][2]
+        assert {key for key, value in descriptor.exposure.model_dump().items() if value} == {'web'}
+        assert descriptor.resource_selectors
+        assert phrase in descriptor.business_effect
+
+
 def test_hierarchy_inventory_request_has_bounded_input_and_operation_receipt():
     connectors = Connectors(); control = ConnectorControlPlane(connectors, clock=lambda: NOW)
     registry = Registry(); register_connector_runtime_capabilities(registry, control)

@@ -119,7 +119,7 @@ Start an append-only product-structure observation manifest.
   "payload": {
     "captured_at": "example",
     "node_count": 1,
-    "observation_id": "example",
+    "observation_id": "tcobs:0000000000000000000000000000000000000000000000000000000000000000",
     "page_count": 1,
     "source_gid": "1",
     "workspace_gid": "1"

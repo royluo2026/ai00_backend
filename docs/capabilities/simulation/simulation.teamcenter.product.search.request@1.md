@@ -1,6 +1,6 @@
 # simulation.teamcenter.product.search.request@1
 
-Resolve one exact Teamcenter item and revision without mutating Teamcenter.
+Search Teamcenter item IDs and names by exact, prefix, or contains matching without mutating Teamcenter.
 
 ## 使用判断
 
@@ -17,10 +17,10 @@ Resolve one exact Teamcenter item and revision without mutating Teamcenter.
 | 消费者 | 状态 |
 |---|---|
 | web | 可用 |
-| plugin | 可用 |
-| agent | 可用 |
-| api | 可用 |
-| mcp | 可用 |
+| plugin | 不可用 |
+| agent | 不可用 |
+| api | 不可用 |
+| mcp | 不可用 |
 | worker | 不可用 |
 | local_runtime | 不可用 |
 
@@ -35,7 +35,7 @@ Resolve one exact Teamcenter item and revision without mutating Teamcenter.
 - 认证新鲜度：0 秒
 
 资源选择器：
-- 无资源选择器；仍受租户、身份与权限策略约束。
+- `teamcenter-endpoint` ← `endpoint_id`（必填）
 
 ## 执行与可靠性
 
@@ -78,14 +78,18 @@ Resolve one exact Teamcenter item and revision without mutating Teamcenter.
       "const": "tc-production",
       "type": "string"
     },
-    "item_id": {
+    "limit": {
+      "maximum": 20,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "query": {
       "maxLength": 128,
       "minLength": 1,
       "type": "string"
     },
     "revision_id": {
       "maxLength": 64,
-      "minLength": 1,
       "type": "string"
     },
     "revision_rule": {
@@ -96,10 +100,11 @@ Resolve one exact Teamcenter item and revision without mutating Teamcenter.
   },
   "required": [
     "endpoint_id",
-    "item_id",
+    "query",
     "revision_id",
     "revision_rule",
-    "configuration_date"
+    "configuration_date",
+    "limit"
   ],
   "type": "object"
 }
@@ -115,7 +120,8 @@ Resolve one exact Teamcenter item and revision without mutating Teamcenter.
   "payload": {
     "configuration_date": "example",
     "endpoint_id": "tc-production",
-    "item_id": "example",
+    "limit": 1,
+    "query": "example",
     "revision_id": "example",
     "revision_rule": "example"
   }

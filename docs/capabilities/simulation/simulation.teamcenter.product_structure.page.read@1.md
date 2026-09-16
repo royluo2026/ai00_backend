@@ -35,7 +35,7 @@ Read one bounded page from a local Teamcenter product-structure observation.
 - 认证新鲜度：0 秒
 
 资源选择器：
-- 无资源选择器；仍受租户、身份与权限策略约束。
+- `teamcenter-observation` ← `observation_id`（必填）
 
 ## 执行与可靠性
 
@@ -103,7 +103,7 @@ Read one bounded page from a local Teamcenter product-structure observation.
   "major_version": 1,
   "payload": {
     "cursor": 0,
-    "observation_id": "example",
+    "observation_id": "tcobs:0000000000000000000000000000000000000000000000000000000000000000",
     "page_size": 1
   }
 }

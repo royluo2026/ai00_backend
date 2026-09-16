@@ -10,6 +10,75 @@ public sealed class VisMockupDocumentLifecycleTests : IDisposable
     private readonly string _directory = Path.Combine(Path.GetTempPath(), "ai00-vismockup-lifecycle", Guid.NewGuid().ToString("N"));
 
     [Fact]
+    public async Task Teamcenter_online_launch_opens_a_new_document_and_deletes_material()
+    {
+        Directory.CreateDirectory(_directory);
+        var worker = new OnlineMaterialTeamcenterWorker(Path.Combine(_directory, "online.vvi"));
+        using var runtime = new TeamcenterReadOnlyRuntime(worker, Path.Combine(_directory, "tc.db"));
+        await runtime.LoginAsync("tc-production", "user", "secret", default);
+        var application = new FakeApplication("14.2.0", new FakeDocument("existing", "user", FakeNode.FlatTree(1)));
+        using var sta = new StaDispatcher();
+        var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([_directory]),
+            new FakeVisMockupCom { ExistingApplication = application }, _directory, Path.Combine(_directory, "tree.db"), runtime);
+
+        var result = await adapter.ExecuteAsync(new AdapterOperation(
+            "teamcenter.visualization.launch@1", OnlineSelectorPayload()), default);
+
+        Assert.True(result.Ok);
+        Assert.NotNull(application.LastOpenedDocument);
+        Assert.False(File.Exists(worker.MaterialPath));
+    }
+
+    [Fact]
+    public async Task Teamcenter_online_insert_uses_the_current_document_and_deletes_material()
+    {
+        Directory.CreateDirectory(_directory);
+        var worker = new OnlineMaterialTeamcenterWorker(Path.Combine(_directory, "insert.vvi"));
+        using var runtime = new TeamcenterReadOnlyRuntime(worker, Path.Combine(_directory, "tc.db"));
+        await runtime.LoginAsync("tc-production", "user", "secret", default);
+        var active = new FakeDocument("active", "user", FakeNode.FlatTree(1));
+        var application = new FakeApplication("14.2.0", active);
+        using var sta = new StaDispatcher();
+        var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([_directory]),
+            new FakeVisMockupCom { ExistingApplication = application }, _directory, Path.Combine(_directory, "tree.db"), runtime);
+
+        var result = await adapter.ExecuteAsync(new AdapterOperation(
+            "teamcenter.visualization.insert@1", OnlineSelectorPayload()), default);
+
+        Assert.True(result.Ok);
+        Assert.Same(active, application.ActiveDocument);
+        Assert.Equal(1, active.InsertDocumentCalls);
+        Assert.False(File.Exists(worker.MaterialPath));
+        Assert.Contains(adapter.Manifest.Operations, item => item.OperationId == "teamcenter.visualization.insert@1");
+    }
+
+    [Fact]
+    public async Task Teamcenter_online_insert_fails_closed_without_an_active_document_and_cleans_material()
+    {
+        Directory.CreateDirectory(_directory);
+        var worker = new OnlineMaterialTeamcenterWorker(Path.Combine(_directory, "orphan.vvi"));
+        using var runtime = new TeamcenterReadOnlyRuntime(worker, Path.Combine(_directory, "tc.db"));
+        await runtime.LoginAsync("tc-production", "user", "secret", default);
+        using var sta = new StaDispatcher();
+        var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([_directory]),
+            new FakeVisMockupCom { ExistingApplication = new FakeApplication("14.2.0", null) },
+            _directory, Path.Combine(_directory, "tree.db"), runtime);
+
+        var error = await Assert.ThrowsAsync<ConnectorException>(() => adapter.ExecuteAsync(new AdapterOperation(
+            "teamcenter.visualization.insert@1", OnlineSelectorPayload()), default));
+
+        Assert.Equal("vismockup_active_document_required", error.Message);
+        Assert.False(File.Exists(worker.MaterialPath));
+    }
+
+    private static JsonElement OnlineSelectorPayload() => JsonSerializer.SerializeToElement(new
+    {
+        source_selector = new { endpoint_id = "tc-production", object_uid = "item", item_revision_uid = "revision",
+            bom_view_uid = "", revision_rule = "Latest Working", configuration_date = "2026-09-16T00:00:00Z" },
+        expected_visdoc_uid = "",
+    });
+
+    [Fact]
     public async Task OpensAndClosesAllDocumentsInTheConnectedApplication()
     {
         Directory.CreateDirectory(_directory);
@@ -325,5 +394,24 @@ public sealed class VisMockupDocumentLifecycleTests : IDisposable
     public void Dispose()
     {
         if (Directory.Exists(_directory)) Directory.Delete(_directory, true);
+    }
+
+    private sealed class OnlineMaterialTeamcenterWorker(string materialPath) : ITeamcenterWorker
+    {
+        public string MaterialPath { get; } = materialPath;
+        public Task ValidateCredentialsAsync(string endpointId, string username, string password, CancellationToken ct) => Task.CompletedTask;
+        public Task<IReadOnlyList<string>> GetRevisionRulesAsync(string username, string password, CancellationToken ct) => Task.FromResult<IReadOnlyList<string>>(["Latest Working"]);
+        public Task<TeamcenterProductSearchResult> SearchAsync(string itemId, string revisionId, string revisionRule, string configurationDate, string username, string password, CancellationToken ct) => Task.FromResult(new TeamcenterProductSearchResult([]));
+        public Task<IReadOnlyList<TeamcenterOccurrence>> ObserveAsync(TeamcenterSourceSelector selector, int maxNodes, int maxDepth, string propertyProjection, string username, string password, CancellationToken ct) => Task.FromResult<IReadOnlyList<TeamcenterOccurrence>>([]);
+        public Task<TeamcenterLaunchResult> LaunchAsync(TeamcenterSourceSelector selector, string expectedVisdocUid, string username, string password, CancellationToken ct) => throw new NotSupportedException();
+        public async Task<TeamcenterLaunchResult> ConsumeVisualizationAsync(TeamcenterSourceSelector selector,
+            string expectedVisdocUid, Func<string, CancellationToken, Task> consumer,
+            string username, string password, CancellationToken ct)
+        {
+            await File.WriteAllTextAsync(MaterialPath, "[VVI]", ct);
+            try { await consumer(MaterialPath, ct); }
+            finally { File.Delete(MaterialPath); }
+            return new("tclaunch:" + new string('a', 64), true, expectedVisdocUid, selector.IdentityHash);
+        }
     }
 }

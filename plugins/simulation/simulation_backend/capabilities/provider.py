@@ -25,9 +25,11 @@ _TWO_PHASE_ENTRYPOINTS = {
 
 _VISMOCKUP_WEB_WORKFLOWS = {
     "simulation.teamcenter.product.search.request",
+    "simulation.teamcenter.revision_rule.search.request",
     "simulation.teamcenter.product_structure.observe.request",
     "simulation.teamcenter.product_structure.page.read.request",
     "simulation.teamcenter.visualization.launch.request",
+    "simulation.teamcenter.visualization.insert.request",
     "simulation.vismockup.document.identity.read.request",
     "simulation.vismockup.document.hierarchy_inventory.read.request",
     "simulation.vismockup.application.attach.request",
@@ -43,9 +45,36 @@ _VISMOCKUP_WEB_WORKFLOWS = {
     "simulation.vismockup.command.get",
 }
 
+_TEAMCENTER_BUSINESS_EFFECTS = {
+    "simulation.teamcenter.product.search.request": "Queue a deterministic exact, prefix, and contains search of Teamcenter item IDs and names without mutating Teamcenter.",
+    "simulation.teamcenter.revision_rule.search.request": "Queue a read of the revision rules available to the current in-memory Teamcenter session.",
+    "simulation.teamcenter.product_structure.observe.request": "Queue one bounded read-only observation of the selected Teamcenter product structure.",
+    "simulation.teamcenter.product_structure.page.read.request": "Return a signed operation receipt for retrieving occurrence rows from an existing local Teamcenter observation.",
+    "simulation.teamcenter.visualization.launch.request": "Queue an official Teamcenter Visualization launch that opens one exact online source as a new VisMockup document.",
+    "simulation.teamcenter.visualization.insert.request": "Queue an official Teamcenter Visualization launch that inserts one exact online source into the active VisMockup document.",
+    "simulation.teamcenter.product.search": "Search Teamcenter item IDs and names using deterministic exact, prefix, and contains matching.",
+    "simulation.teamcenter.revision_rule.search": "Read the revision rules available to the current in-memory Teamcenter session.",
+    "simulation.teamcenter.product_structure.observe": "Materialize a temporary local observation identity and node-count evidence for an exact Teamcenter product structure.",
+    "simulation.teamcenter.product_structure.page.read": "Return cached occurrence rows, continuation position, and an integrity hash from a local Teamcenter observation.",
+    "simulation.teamcenter.visualization.launch": "Open one exact Teamcenter online source as a new VisMockup document using official launch information.",
+    "simulation.teamcenter.visualization.insert": "Insert one exact Teamcenter online source into the active VisMockup document using official launch information.",
+}
+
 _RESOURCES = {
     "simulation.connector.health.get": (("simulation-connector", "connector_id"),),
     "simulation.connector.plan.queue": (("simulation-connector", "plan.device_id"),),
+    "simulation.teamcenter.product.search.request": (("teamcenter-endpoint", "endpoint_id"),),
+    "simulation.teamcenter.revision_rule.search.request": (("teamcenter-endpoint", "endpoint_id"),),
+    "simulation.teamcenter.product_structure.observe.request": (("teamcenter-endpoint", "source_selector.endpoint_id"), ("teamcenter-online-source", "source_selector.object_uid")),
+    "simulation.teamcenter.product_structure.page.read.request": (("teamcenter-observation", "observation_id"),),
+    "simulation.teamcenter.visualization.launch.request": (("teamcenter-endpoint", "source_selector.endpoint_id"), ("teamcenter-online-source", "source_selector.object_uid")),
+    "simulation.teamcenter.visualization.insert.request": (("teamcenter-endpoint", "source_selector.endpoint_id"), ("teamcenter-online-source", "source_selector.object_uid")),
+    "simulation.teamcenter.product.search": (("teamcenter-endpoint", "endpoint_id"),),
+    "simulation.teamcenter.revision_rule.search": (("teamcenter-endpoint", "endpoint_id"),),
+    "simulation.teamcenter.product_structure.observe": (("teamcenter-endpoint", "source_selector.endpoint_id"), ("teamcenter-online-source", "source_selector.object_uid")),
+    "simulation.teamcenter.product_structure.page.read": (("teamcenter-observation", "observation_id"),),
+    "simulation.teamcenter.visualization.launch": (("teamcenter-endpoint", "source_selector.endpoint_id"), ("teamcenter-online-source", "source_selector.object_uid")),
+    "simulation.teamcenter.visualization.insert": (("teamcenter-endpoint", "source_selector.endpoint_id"), ("teamcenter-online-source", "source_selector.object_uid")),
     "simulation.vismockup.application.attach.request": (),
     "simulation.vismockup.application.launch.request": (),
     "simulation.vismockup.model.open.request": (("artifact", "artifact_ref.artifact_id"),),
@@ -501,7 +530,9 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             else LifecycleStatus.STABLE
         ),
         "exposure": (
-            ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True)
+            ExposurePolicy(web=True)
+            if governed.id.startswith("simulation.teamcenter.") and governed.id in _VISMOCKUP_WEB_WORKFLOWS
+            else ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True)
             if governed.id in _VISMOCKUP_WEB_WORKFLOWS
             else ExposurePolicy(local_runtime=True)
             if governed.id.startswith("simulation.vismockup.") or governed.id.startswith("simulation.teamcenter.")
@@ -728,9 +759,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             "business_effect": (
                 "Validate and persist one exact Connector control-plane operation for the caller-bound Simulation runtime."
                 if governed.id.startswith("simulation.connector.")
-                else "Queue one exact read-only Teamcenter observation or official Visualization launch through the caller-bound App runtime."
-                if is_teamcenter and governed.id in _VISMOCKUP_WEB_WORKFLOWS
-                else "Expose one exact Teamcenter read-only adapter atom exclusively to a signed Simulation Connector execution plan."
+                else _TEAMCENTER_BUSINESS_EFFECTS[governed.id]
                 if is_teamcenter
                 else "Queue or read one user-scoped signed VisMockup command through the bound Simulation Connector."
                 if governed.id in _VISMOCKUP_WEB_WORKFLOWS

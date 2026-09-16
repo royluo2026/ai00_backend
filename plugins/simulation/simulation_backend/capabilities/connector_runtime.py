@@ -66,8 +66,10 @@ DESKTOP_CAPABILITY_BINDINGS = (
     ("simulation.vismockup.document.hierarchy_inventory.read.request", 1),
     ("simulation.teamcenter.product_structure.observe.request", 1),
     ("simulation.teamcenter.product.search.request", 1),
+    ("simulation.teamcenter.revision_rule.search.request", 1),
     ("simulation.teamcenter.product_structure.page.read.request", 1),
     ("simulation.teamcenter.visualization.launch.request", 1),
+    ("simulation.teamcenter.visualization.insert.request", 1),
     ("simulation.environment.live_document.adopt", 1),
     ("simulation.environment.live_document.adopt", 2),
     ("simulation.environment.live_document.binding.get", 1),
@@ -113,9 +115,11 @@ DIRECT_VISMOCKUP_OPERATIONS = {
     "node_selection": ("vismockup.node.selection.change@1", "sha256:4ca8699ef27b5de3691dc8e2b6252350e001263e23e805489d16b435b575a539"),
     "tree": ("vismockup.tree.read@2", "sha256:5d69cc98e38bd721fb55623b62df5162e68cbfb9bcb51c1b6c25d351c486de7c"),
     "tc_observe": ("teamcenter.product_structure.observe@1", "sha256:704e6c398c551cc7a667d1ccf4d00c1b7f6330649676dbdd8b4fa9d92857a32b"),
-    "tc_search": ("teamcenter.product.search@1", "sha256:212e3c2396bf642456efa5e12674878fdbc201fc60250bcb3f150e19353d0acc"),
+    "tc_search": ("teamcenter.product.search@2", "sha256:6ef619b8abeb6705574ffa7e0902708b3c998773c80da4649a0f3f38b01c3310"),
+    "tc_rules": ("teamcenter.revision_rule.search@1", "sha256:1b6c1a36b0fa4a4654efa3ce4a67111403f2c862aeb20283206786c5ba86d9c0"),
     "tc_page": ("teamcenter.product_structure.page.read@1", "sha256:0ef57b5769664cebca42562cbb711228994e6257901786f84f5dfb82a8a6c6ad"),
     "tc_launch": ("teamcenter.visualization.launch@1", "sha256:d74338b54d5abd84dad3435768aa56756ef4fbb560f1d605b2b1bb9cc18519a8"),
+    "tc_insert": ("teamcenter.visualization.insert@1", "sha256:d3bd3656f14f8bfb9e3e2090c2462317aac1f4f1ca983fb92a7f8553fae84d1d"),
 }
 DIRECT_VISMOCKUP_OPERATION_IDS = frozenset(value[0] for value in DIRECT_VISMOCKUP_OPERATIONS.values())
 DIRECT_VISMOCKUP_CAPABILITIES = {
@@ -132,8 +136,10 @@ DIRECT_VISMOCKUP_CAPABILITIES = {
     "tree": "simulation.vismockup.tree.read.request",
     "tc_observe": "simulation.teamcenter.product_structure.observe.request",
     "tc_search": "simulation.teamcenter.product.search.request",
+    "tc_rules": "simulation.teamcenter.revision_rule.search.request",
     "tc_page": "simulation.teamcenter.product_structure.page.read.request",
     "tc_launch": "simulation.teamcenter.visualization.launch.request",
+    "tc_insert": "simulation.teamcenter.visualization.insert.request",
 }
 
 
@@ -396,7 +402,7 @@ def _direct_vismockup_plan(
     *, action: str, connector_id: str, payload: dict, context: CapabilityContext,
     now: datetime,
 ) -> ConnectorExecutionPlanV1:
-    if action in {'identity', 'tc_search', 'tc_observe', 'tc_page', 'tc_launch'}:
+    if action in {'identity', 'tc_search', 'tc_rules', 'tc_observe', 'tc_page', 'tc_launch', 'tc_insert'}:
         raise ConnectorError('runtime_v2_required')
     # execution-plan.v1 canonicalizes timestamps to whole UTC seconds in the
     # Windows runtime.  Match that wire contract before computing the hash.
@@ -449,7 +455,7 @@ def _direct_vismockup_plan_v2(
         raise ConnectorError("capability_provenance_required")
     operation_id, contract_hash = DIRECT_VISMOCKUP_OPERATIONS[action]
     step_payload = {"allow_launch": action == "launch"} if action in {"attach", "launch"} else payload
-    classification = "read" if action in {"attach", "tree", "identity", "hierarchy_inventory", "tc_search", "tc_observe", "tc_page"} else "write"
+    classification = "read" if action in {"attach", "tree", "identity", "hierarchy_inventory", "tc_search", "tc_rules", "tc_observe", "tc_page"} else "write"
     probe_id = None if classification == "read" else (
         "vismockup.application.probe@1" if action in {"launch", "close", "tc_launch"}
         else "vismockup.document.snapshot@1"
@@ -470,7 +476,7 @@ def _direct_vismockup_plan_v2(
         "depends_on": [],
         "payload": step_payload,
         "payload_hash": digest(step_payload),
-        "timeout_seconds": 600 if action in {"tree", "hierarchy_inventory", "tc_observe", "tc_launch"} else 120,
+        "timeout_seconds": 600 if action in {"tree", "hierarchy_inventory", "tc_observe", "tc_launch", "tc_insert"} else 120,
         "side_effect_classification": classification,
         "post_condition_probe_id": probe_id,
     }]
@@ -554,9 +560,11 @@ _VISMOCKUP_ATOMS = (
     ("simulation.vismockup.node.selection.change.apply", "Change one VisMockup node's selection highlight.", CapabilityRisk.WRITE),
     ("simulation.vismockup.capture.create", "Create a VisMockup-internal screenshot artifact.", CapabilityRisk.WRITE),
     ("simulation.teamcenter.product_structure.observe", "Create one bounded local read-only Teamcenter product-structure observation.", CapabilityRisk.READ),
-    ("simulation.teamcenter.product.search", "Resolve one exact Teamcenter item and revision into an immutable online-source selector.", CapabilityRisk.READ),
+    ("simulation.teamcenter.product.search", "Search Teamcenter item IDs and names with deterministic exact, prefix, and contains matching.", CapabilityRisk.READ),
+    ("simulation.teamcenter.revision_rule.search", "Read the available Teamcenter revision rules.", CapabilityRisk.READ),
     ("simulation.teamcenter.product_structure.page.read", "Read one bounded page from a local Teamcenter product-structure observation.", CapabilityRisk.READ),
     ("simulation.teamcenter.visualization.launch", "Use Teamcenter launch information to open one online source in VisMockup.", CapabilityRisk.WRITE),
+    ("simulation.teamcenter.visualization.insert", "Insert one Teamcenter online source into the active VisMockup document.", CapabilityRisk.WRITE),
 )
 
 
@@ -625,7 +633,7 @@ def register_connector_runtime_capabilities(
             runtime = control_plane.repository.bound_runtime_for_user(
                 context.user_gid, context.team_gid,
             )
-            app_v2_only = {"identity", "hierarchy_inventory", "tc_search", "tc_observe", "tc_page", "tc_launch"}
+            app_v2_only = {"identity", "hierarchy_inventory", "tc_search", "tc_rules", "tc_observe", "tc_page", "tc_launch", "tc_insert"}
             if action in app_v2_only and (context.source != 'web' or not runtime or runtime.get('runtime_type') != 'electron'):
                 raise CapabilityBusinessError('runtime_v2_required', 'A current user-bound App runtime is required.')
             binding = None
@@ -652,7 +660,7 @@ def register_connector_runtime_capabilities(
                 else {"document_session": payload["document_session"], "start_index": payload["start_index"],
                       "page_size": payload["page_size"], "max_nodes": payload["max_nodes"]}
                 if action == "hierarchy_inventory"
-                else payload if action in {"tc_search", "tc_observe", "tc_page", "tc_launch"}
+                else payload if action in {"tc_search", "tc_rules", "tc_observe", "tc_page", "tc_launch", "tc_insert"}
                 else {}
             )
             try:
@@ -766,19 +774,22 @@ def register_connector_runtime_capabilities(
         risk=CapabilityRisk.WRITE, confirmation="user", permissions=("simulation.use",),
         input_schema={}, output_schema={}, tags=("simulation", "connector", "plan"),
     ), queue_plan)
-    source_selector_schema = {"type":"object","required":["endpoint_id","object_uid","revision_rule","configuration_date"],
-        "properties":{"endpoint_id":{"type":"string","minLength":1,"maxLength":128},
+    source_selector_schema = {"type":"object","required":["endpoint_id","object_uid","item_revision_uid","bom_view_uid","revision_rule","configuration_date"],
+        "properties":{"endpoint_id":{"type":"string","const":"tc-production"},
             "object_uid":{"type":"string","minLength":1,"maxLength":128},
             "item_revision_uid":{"type":"string","maxLength":128},"bom_view_uid":{"type":"string","maxLength":128},
             "revision_rule":{"type":"string","minLength":1,"maxLength":128},
             "configuration_date":{"type":"string","format":"date-time"}},"additionalProperties":False}
     direct_schemas = {
-        "tc_search":{"type":"object","required":["endpoint_id","item_id","revision_id","revision_rule","configuration_date"],
+        "tc_search":{"type":"object","required":["endpoint_id","query","revision_id","revision_rule","configuration_date","limit"],
             "properties":{"endpoint_id":{"type":"string","const":"tc-production"},
-                "item_id":{"type":"string","minLength":1,"maxLength":128},
-                "revision_id":{"type":"string","minLength":1,"maxLength":64},
+                "query":{"type":"string","minLength":1,"maxLength":128},
+                "revision_id":{"type":"string","maxLength":64},
                 "revision_rule":{"type":"string","minLength":1,"maxLength":128},
-                "configuration_date":{"type":"string","format":"date-time"}},"additionalProperties":False},
+                "configuration_date":{"type":"string","format":"date-time"},
+                "limit":{"type":"integer","minimum":1,"maximum":20}},"additionalProperties":False},
+        "tc_rules":{"type":"object","required":["endpoint_id"],
+            "properties":{"endpoint_id":{"type":"string","const":"tc-production"}},"additionalProperties":False},
         "tc_observe":{"type":"object","required":["source_selector","max_nodes","max_depth","property_projection"],
             "properties":{"source_selector":source_selector_schema,"max_nodes":{"type":"integer","minimum":1,"maximum":250000},
                 "max_depth":{"type":"integer","minimum":1,"maximum":128},
@@ -788,6 +799,9 @@ def register_connector_runtime_capabilities(
                 "cursor":{"type":"integer","minimum":0,"maximum":250000},
                 "page_size":{"type":"integer","minimum":1,"maximum":1000}},"additionalProperties":False},
         "tc_launch":{"type":"object","required":["source_selector","expected_visdoc_uid"],
+            "properties":{"source_selector":source_selector_schema,"expected_visdoc_uid":{"type":"string","maxLength":128}},
+            "additionalProperties":False},
+        "tc_insert":{"type":"object","required":["source_selector","expected_visdoc_uid"],
             "properties":{"source_selector":source_selector_schema,"expected_visdoc_uid":{"type":"string","maxLength":128}},
             "additionalProperties":False},
     }
@@ -804,22 +818,24 @@ def register_connector_runtime_capabilities(
         ("simulation.vismockup.document.identity.read.request", "identity", "Queue a read of the current native document identity without launching VisMockup."),
         ("simulation.vismockup.document.hierarchy_inventory.read.request", "hierarchy_inventory", "Queue one bounded page read of the current document's alternate hierarchies."),
         ("simulation.teamcenter.product_structure.observe.request", "tc_observe", "Queue one bounded read-only Teamcenter product-structure observation on the App workstation."),
-        ("simulation.teamcenter.product.search.request", "tc_search", "Resolve one exact Teamcenter item and revision without mutating Teamcenter."),
+        ("simulation.teamcenter.product.search.request", "tc_search", "Search Teamcenter item IDs and names by exact, prefix, or contains matching without mutating Teamcenter."),
+        ("simulation.teamcenter.revision_rule.search.request", "tc_rules", "Read the available revision rules from the signed-in Teamcenter session."),
         ("simulation.teamcenter.product_structure.page.read.request", "tc_page", "Queue one bounded page read from an existing local Teamcenter structure observation."),
         ("simulation.teamcenter.visualization.launch.request", "tc_launch", "Queue an official Teamcenter Visualization launch for one exact online source."),
+        ("simulation.teamcenter.visualization.insert.request", "tc_insert", "Insert one exact Teamcenter online source into the active VisMockup document."),
     ):
         request_schema = ({"type":"object","required":["document_session","start_index","page_size","max_nodes"],
             "properties":{"document_session":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},
                 "start_index":{"type":"integer","minimum":0},"page_size":{"type":"integer","minimum":1,"maximum":16},
                 "max_nodes":{"type":"integer","minimum":1,"maximum":100000}},"additionalProperties":False}
             if action == "hierarchy_inventory" else direct_schemas.get(action, {}))
-        risk = CapabilityRisk.READ if action in {"identity", "hierarchy_inventory", "tree", "tc_search", "tc_observe", "tc_page"} else CapabilityRisk.WRITE
+        risk = CapabilityRisk.READ if action in {"identity", "hierarchy_inventory", "tree", "tc_search", "tc_rules", "tc_observe", "tc_page"} else CapabilityRisk.WRITE
         register(registry, CapabilitySpec(
             id=capability_id, owner="simulation", version=1, description=description,
             use_when="The signed-in user requests one direct action on the bound workstation Connector.",
             do_not_use_when="No current user-scoped Connector binding exists.",
             risk=risk,
-            confirmation="none" if action in {"attach", "visibility", "node_visibility", "node_selection", "tree", "identity", "hierarchy_inventory", "tc_search", "tc_observe", "tc_page"} else "user",
+            confirmation="none" if action in {"attach", "visibility", "node_visibility", "node_selection", "tree", "identity", "hierarchy_inventory", "tc_search", "tc_rules", "tc_observe", "tc_page"} else "user",
             permissions=("simulation.use",),
             input_schema=request_schema, output_schema={}, tags=("simulation", "connector", "vismockup", "workflow"),
         ), request_direct(action))
