@@ -102,6 +102,7 @@ public sealed record TeamcenterProductSearchItem(
     [property: JsonPropertyName("source_selector")] TeamcenterSourceSelector SourceSelector);
 public sealed record TeamcenterProductSearchResult(
     [property: JsonPropertyName("items")] IReadOnlyList<TeamcenterProductSearchItem> Items);
+public sealed record TeamcenterSessionStatus(string State, string MaskedUsername);
 
 public interface ITeamcenterWorker
 {
@@ -119,6 +120,7 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
     private readonly ITeamcenterWorker worker;
     private readonly string connectionString;
     private readonly SemaphoreSlim gate = new(1, 1);
+    private readonly object credentialState = new();
     private char[] username = [];
     private char[] password = [];
     private string endpointId = "";
@@ -197,9 +199,31 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
         try
         {
             await worker.ValidateCredentialsAsync(endpoint, user, secret, ct);
-            ClearCredentials();
-            endpointId = endpoint; username = user.ToCharArray(); password = secret.ToCharArray();
+            lock (credentialState)
+            {
+                ClearCredentialsUnsafe();
+                endpointId = endpoint; username = user.ToCharArray(); password = secret.ToCharArray();
+            }
         }
+        finally { gate.Release(); }
+    }
+
+    public TeamcenterSessionStatus GetSessionStatus()
+    {
+        lock (credentialState)
+        {
+            if (username.Length == 0 || password.Length == 0) return new("logged_out", "");
+            var user = new string(username);
+            var masked = user.Length == 1 ? user + "***"
+                : user.Length == 2 ? user[0] + "***" : user[0] + "***" + user[^1];
+            return new("ready", masked);
+        }
+    }
+
+    public async Task LogoutAsync(CancellationToken ct)
+    {
+        await gate.WaitAsync(ct);
+        try { ClearCredentials(); }
         finally { gate.Release(); }
     }
 
@@ -236,7 +260,7 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
         var revisionId = payload.GetProperty("revision_id").GetString() ?? "";
         var revisionRule = payload.GetProperty("revision_rule").GetString() ?? "";
         var configurationDate = payload.GetProperty("configuration_date").GetString() ?? "";
-        if (endpoint != endpointId || itemId.Length is < 1 or > 128 || revisionId.Length is < 1 or > 64
+        if (endpoint != "tc-production" || itemId.Length is < 1 or > 128 || revisionId.Length is < 1 or > 64
             || revisionRule.Length is < 1 or > 128 || !DateTimeOffset.TryParse(configurationDate, out _))
             throw new ConnectorException("teamcenter_search_input_invalid");
         var credentials = RequireCredentials();
@@ -290,8 +314,11 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
 
     private (string User, string Password) RequireCredentials()
     {
-        if (username.Length == 0 || password.Length == 0) throw new ConnectorException("teamcenter_login_required");
-        return (new string(username), new string(password));
+        lock (credentialState)
+        {
+            if (username.Length == 0 || password.Length == 0) throw new ConnectorException("teamcenter_login_required");
+            return (new string(username), new string(password));
+        }
     }
 
     private static TeamcenterSourceSelector ReadSelector(JsonElement value)
@@ -371,6 +398,11 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
     }
 
     private void ClearCredentials()
+    {
+        lock (credentialState) ClearCredentialsUnsafe();
+    }
+
+    private void ClearCredentialsUnsafe()
     { Array.Clear(username); Array.Clear(password); username = []; password = []; endpointId = ""; }
 
     public void Dispose() { ClearCredentials(); gate.Dispose(); }

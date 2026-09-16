@@ -8,20 +8,38 @@ using Microsoft.Extensions.Hosting;
 
 namespace Ai00.Connector.AppHost;
 
-public sealed record TeamcenterLoginCommand(string RequestId, string EndpointId, string Username, string Password);
+public abstract record TeamcenterControlCommand(string RequestId);
+public sealed record TeamcenterLoginCommand(string RequestId, string EndpointId, string Username, string Password)
+    : TeamcenterControlCommand(RequestId);
+public sealed record TeamcenterStatusCommand(string RequestId) : TeamcenterControlCommand(RequestId);
+public sealed record TeamcenterLogoutCommand(string RequestId) : TeamcenterControlCommand(RequestId);
 
 public static class TeamcenterControlProtocol
 {
     public const int MaximumBytes = 4096;
-    public static TeamcenterLoginCommand ParseRequest(string json)
+    public static TeamcenterControlCommand ParseRequest(string json)
     {
         if (Encoding.UTF8.GetByteCount(json) > MaximumBytes) throw new InvalidDataException("teamcenter_control_size_invalid");
         using var document = JsonDocument.Parse(json, new JsonDocumentOptions { MaxDepth = 2 });
         var value = document.RootElement;
         var fields = value.EnumerateObject().Select(item => item.Name).ToArray();
+        var type = value.TryGetProperty("type", out var typeValue) ? typeValue.GetString() : null;
+        if (type is "teamcenter_status" or "teamcenter_logout")
+        {
+            var expectedControl = new[] { "type", "request_id" };
+            if (fields.Length != expectedControl.Length || fields.Distinct().Count() != fields.Length
+                || fields.Except(expectedControl).Any())
+                throw new InvalidDataException("teamcenter_control_message_forbidden");
+            var controlRequestId = value.GetProperty("request_id").GetString() ?? "";
+            if (!Regex.IsMatch(controlRequestId, "\\Atc-[a-f0-9]{32}\\z"))
+                throw new InvalidDataException("teamcenter_control_message_invalid");
+            return type == "teamcenter_status"
+                ? new TeamcenterStatusCommand(controlRequestId)
+                : new TeamcenterLogoutCommand(controlRequestId);
+        }
         var expected = new[] { "type", "request_id", "endpoint_id", "username", "password" };
         if (fields.Length != expected.Length || fields.Distinct().Count() != fields.Length || fields.Except(expected).Any()
-            || value.GetProperty("type").GetString() != "teamcenter_login")
+            || type != "teamcenter_login")
             throw new InvalidDataException("teamcenter_control_message_forbidden");
         var requestId = value.GetProperty("request_id").GetString() ?? "";
         var endpoint = value.GetProperty("endpoint_id").GetString() ?? "";
@@ -31,7 +49,7 @@ public static class TeamcenterControlProtocol
             || username.Length is < 1 or > 191 || password.Length is < 1 or > 1024
             || username.IndexOfAny(['\r','\n']) >= 0 || password.IndexOfAny(['\r','\n']) >= 0)
             throw new InvalidDataException("teamcenter_control_message_invalid");
-        return new(requestId, endpoint, username, password);
+        return new TeamcenterLoginCommand(requestId, endpoint, username, password);
     }
 
     public static string Result(string requestId, bool success, string code)
@@ -41,6 +59,17 @@ public static class TeamcenterControlProtocol
             throw new InvalidDataException("teamcenter_control_result_invalid");
         return JsonSerializer.Serialize(new { type = "teamcenter_login_result", request_id = requestId,
             state = success ? "ready" : "failed", code });
+    }
+
+    public static string SessionResult(string requestId, string state, string code, string maskedUsername)
+    {
+        if (!Regex.IsMatch(requestId, "\\Atc-[a-f0-9]{32}\\z")
+            || state is not ("ready" or "logged_out" or "failed")
+            || !Regex.IsMatch(code, "\\A[a-z][a-z0-9_]{1,63}\\z")
+            || maskedUsername.Length > 191 || maskedUsername.IndexOfAny(['\r', '\n']) >= 0)
+            throw new InvalidDataException("teamcenter_control_result_invalid");
+        return JsonSerializer.Serialize(new { type = "teamcenter_session_result", request_id = requestId,
+            state, code, masked_username = maskedUsername });
     }
 }
 
@@ -89,20 +118,35 @@ public sealed class TeamcenterControlPipeHost(AppHostOptions options, Teamcenter
                 while (pipe.IsConnected && !ct.IsCancellationRequested)
                 {
                     var command = TeamcenterControlProtocol.ParseRequest(await ReadAsync(pipe, ct));
+                    if (command is TeamcenterStatusCommand statusCommand)
+                    {
+                        var status = runtime.GetSessionStatus();
+                        await WriteAsync(pipe, TeamcenterControlProtocol.SessionResult(statusCommand.RequestId,
+                            status.State, status.State, status.MaskedUsername), ct);
+                        continue;
+                    }
+                    if (command is TeamcenterLogoutCommand logoutCommand)
+                    {
+                        await runtime.LogoutAsync(ct);
+                        await WriteAsync(pipe, TeamcenterControlProtocol.SessionResult(logoutCommand.RequestId,
+                            "logged_out", "logged_out", ""), ct);
+                        continue;
+                    }
+                    var loginCommand = (TeamcenterLoginCommand)command;
                     var now = DateTimeOffset.UtcNow;
                     while (attempts.Count > 0 && now - attempts.Peek() > TimeSpan.FromMinutes(1)) attempts.Dequeue();
-                    if (attempts.Count >= 5) { await WriteAsync(pipe, TeamcenterControlProtocol.Result(command.RequestId, false, "rate_limited"), ct); continue; }
+                    if (attempts.Count >= 5) { await WriteAsync(pipe, TeamcenterControlProtocol.Result(loginCommand.RequestId, false, "rate_limited"), ct); continue; }
                     attempts.Enqueue(now);
                     try
                     {
-                        await runtime.LoginAsync(command.EndpointId, command.Username, command.Password, ct);
-                        await WriteAsync(pipe, TeamcenterControlProtocol.Result(command.RequestId, true, "ready"), ct);
+                        await runtime.LoginAsync(loginCommand.EndpointId, loginCommand.Username, loginCommand.Password, ct);
+                        await WriteAsync(pipe, TeamcenterControlProtocol.Result(loginCommand.RequestId, true, "ready"), ct);
                     }
                     catch (Exception error)
                     {
                         var code = error.Message is "teamcenter_authentication_failed" or "teamcenter_runtime_unavailable"
                             ? error.Message : "teamcenter_login_failed";
-                        await WriteAsync(pipe, TeamcenterControlProtocol.Result(command.RequestId, false, code), ct);
+                        await WriteAsync(pipe, TeamcenterControlProtocol.Result(loginCommand.RequestId, false, code), ct);
                     }
                 }
             }

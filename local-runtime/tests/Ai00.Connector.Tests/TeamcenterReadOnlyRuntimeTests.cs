@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Ai00.Connector.Adapters.VisMockup;
+using Ai00.Connector.Contracts;
 using Xunit;
 
 namespace Ai00.Connector.Tests;
@@ -48,6 +49,24 @@ public sealed class TeamcenterReadOnlyRuntimeTests
         Assert.DoesNotContain(start.Environment, item => item.Value?.Contains("secret", StringComparison.Ordinal) == true);
         Assert.True(start.RedirectStandardInput);
         Assert.False(start.UseShellExecute);
+    }
+
+    [Fact]
+    public async Task Login_status_is_retained_in_memory_until_logout()
+    {
+        using var runtime = new TeamcenterReadOnlyRuntime(new RecordingTeamcenterWorker(), Path.GetTempFileName());
+
+        Assert.Equal(new TeamcenterSessionStatus("logged_out", ""), runtime.GetSessionStatus());
+        await runtime.LoginAsync("tc-production", "user", "secret", CancellationToken.None);
+        Assert.Equal(new TeamcenterSessionStatus("ready", "u***r"), runtime.GetSessionStatus());
+
+        await runtime.LogoutAsync(CancellationToken.None);
+
+        Assert.Equal(new TeamcenterSessionStatus("logged_out", ""), runtime.GetSessionStatus());
+        using var payload = JsonDocument.Parse("""{"endpoint_id":"tc-production","item_id":"A","revision_id":"01","revision_rule":"Latest Working","configuration_date":"2026-09-16T00:00:00Z"}""");
+        var error = await Assert.ThrowsAsync<ConnectorException>(
+            () => runtime.SearchAsync(payload.RootElement, CancellationToken.None));
+        Assert.Equal("teamcenter_login_required", error.Message);
     }
 
     [Fact]
