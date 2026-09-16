@@ -68,6 +68,8 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
     public bool Closed { get; private set; }
     public List<bool> VisibilityChanges { get; } = [];
     public int SetNodeVisibleCalls { get; private set; }
+    public Dictionary<string, IVisMockupNode> CadNodes { get; } = new(StringComparer.Ordinal);
+    public IVisMockupNode FindNodeByCadId(string cadId) => CadNodes[cadId];
     public Exception? SetNodeVisibleError { get; set; }
     public bool ApplyVisibilityBeforeThrow { get; set; }
     public IReadOnlyList<string> InsertedDocumentPaths => _insertedDocumentPaths;
@@ -144,6 +146,7 @@ public sealed record FakeNode(
     string ModelId,
     IReadOnlyList<IVisMockupNode> Children) : IVisMockupNode
 {
+    public string CadId { get; init; } = "";
     public bool IsVisible { get; set; }
     public static IVisMockupNode FlatTree(int count)
     {

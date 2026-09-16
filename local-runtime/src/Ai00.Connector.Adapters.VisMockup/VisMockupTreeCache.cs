@@ -1,12 +1,13 @@
 using System.Security.Cryptography;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
+using Ai00.Connector.Contracts;
 
 namespace Ai00.Connector.Adapters.VisMockup;
 
 internal sealed record CachedTreeNode(
     string NodeKey, string? ParentNodeKey, int ChildOrder, int Depth,
-    string Name, string CatiaOccurrenceName, bool HasMore);
+    string Name, string CatiaOccurrenceName, bool HasMore, string CadId = "");
 
 internal sealed record CachedTree(IReadOnlyList<CachedTreeNode> Nodes, int MaxDepth, string CacheState);
 
@@ -77,7 +78,7 @@ internal sealed class VisMockupTreeCache
         using var command = connection.CreateCommand();
         command.CommandText = """
             SELECT external_node_key,parent_external_node_key,child_order,depth,
-                   printable_name,occurrence_id,has_more
+                   printable_name,occurrence_id,has_more,cad_id
             FROM vm_cache_nodes
             WHERE document_local_id=$document_local_id AND generation=$generation AND depth<=$max_depth
             ORDER BY depth,child_order,external_node_key
@@ -90,7 +91,7 @@ internal sealed class VisMockupTreeCache
         while (reader.Read()) nodes.Add(new(
             reader.GetString(0), reader.IsDBNull(1) ? null : reader.GetString(1),
             reader.GetInt32(2), reader.GetInt32(3), reader.GetString(4),
-            reader.GetString(5), reader.GetBoolean(6)));
+            reader.GetString(5), reader.GetBoolean(6), reader.GetString(7)));
         reader.Close();
         if (nodes.Count == 0) return null;
         var crossSessionStableProjection = currentExternalRevision is null &&
@@ -185,9 +186,9 @@ internal sealed class VisMockupTreeCache
             insertNode.CommandText = """
                 INSERT INTO vm_cache_nodes(
                     document_local_id,generation,external_node_key,parent_external_node_key,
-                    child_order,depth,printable_name,occurrence_id,has_more)
+                    child_order,depth,printable_name,occurrence_id,has_more,cad_id,control_key)
                 VALUES($document_local_id,$generation,$node_key,$parent_key,
-                    $child_order,$depth,$name,$occurrence_id,$has_more)
+                    $child_order,$depth,$name,$occurrence_id,$has_more,$cad_id,$control_key)
                 """;
             insertNode.Parameters.AddWithValue("$document_local_id", localId);
             insertNode.Parameters.AddWithValue("$generation", generation);
@@ -198,6 +199,8 @@ internal sealed class VisMockupTreeCache
             insertNode.Parameters.AddWithValue("$name", node.Name);
             insertNode.Parameters.AddWithValue("$occurrence_id", node.CatiaOccurrenceName);
             insertNode.Parameters.AddWithValue("$has_more", node.HasMore);
+            insertNode.Parameters.AddWithValue("$cad_id", node.CadId);
+            insertNode.Parameters.AddWithValue("$control_key", ControlKey(identity,node.CadId));
             insertNode.ExecuteNonQuery();
         }
 
@@ -230,6 +233,41 @@ internal sealed class VisMockupTreeCache
             node.PrintableName,
             node.CatiaOccurrenceName,
             parents.Contains(node.StableOccurrenceKey))).ToArray());
+    }
+
+    internal static string ControlKey(string sourceHash, string cadId) =>
+        string.IsNullOrEmpty(cadId) ? "" : "cad:" + Convert.ToHexString(SHA256.HashData(
+            System.Text.Encoding.UTF8.GetBytes(sourceHash + "\0" + cadId))).ToLowerInvariant();
+
+    public string ResolveCadNodeKey(IVisMockupDocument document, string controlKey)
+    {
+        using var connection = Open();
+        using var command = connection.CreateCommand();
+        command.CommandText = """
+            SELECT n.cad_id,n.printable_name FROM vm_cache_nodes n
+            JOIN vm_cache_documents d ON d.local_id=n.document_local_id
+            WHERE d.document_identity_hash=$identity AND n.control_key=$key
+              AND n.generation=(SELECT MAX(saved.generation) FROM vm_cache_nodes saved
+                WHERE saved.document_local_id=d.local_id AND saved.control_key=$key)
+            LIMIT 2
+            """;
+        command.Parameters.AddWithValue("$identity",Identity(document));
+        command.Parameters.AddWithValue("$key",controlKey);
+        using var reader = command.ExecuteReader();
+        if (!reader.Read()) throw new ConnectorNoEffectException("vismockup_cad_locator_missing");
+        var cadId = reader.GetString(0);
+        var name = reader.GetString(1);
+        if (string.IsNullOrEmpty(cadId) || reader.Read())
+            throw new ConnectorNoEffectException("vismockup_cad_instance_ambiguous");
+        reader.Close();
+        // Use native indexed lookup on every operation. Do not retain raw handles
+        // across insert/delete operations in an otherwise unchanged document session.
+        IVisMockupNode node;
+        try { node = document.FindNodeByCadId(cadId); }
+        catch { throw new ConnectorNoEffectException("vismockup_cad_instance_unmapped"); }
+        if (node.CadId != cadId || node.PrintableName != name)
+            throw new ConnectorNoEffectException("vismockup_cad_instance_changed");
+        return node.NodeKey;
     }
 
     public string ResolveSessionNodeKey(IVisMockupDocument document, string stableOccurrenceKey, bool verifyPrintableName = true)
@@ -451,6 +489,18 @@ internal sealed class VisMockupTreeCache
             command.ExecuteNonQuery();
         }
         transaction.Commit();
+        foreach (var column in new[] {"cad_id", "control_key"})
+        {
+            if (ColumnExists(connection,"vm_cache_nodes",column)) continue;
+            using var addColumn = connection.CreateCommand();
+            addColumn.CommandText = $"ALTER TABLE vm_cache_nodes ADD COLUMN {column} TEXT NOT NULL DEFAULT ''";
+            addColumn.ExecuteNonQuery();
+        }
+        using (var locatorIndex = connection.CreateCommand())
+        {
+            locatorIndex.CommandText = "CREATE INDEX IF NOT EXISTS ix_vm_cache_nodes_control ON vm_cache_nodes(control_key,document_local_id,generation)";
+            locatorIndex.ExecuteNonQuery();
+        }
         if (!ColumnExists(connection, "vm_cache_generations", "byte_size"))
         {
             using var addByteSize = connection.CreateCommand();

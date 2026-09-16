@@ -402,6 +402,11 @@ public sealed class VisMockupAdapter : IConnectorAdapter
 
     public Task<bool> ObserveNodeVisibilityAsync(string nodeKey) => _sta.InvokeAsync(() =>
     {
+        if (nodeKey.StartsWith("cad:", StringComparison.Ordinal))
+        {
+            var active = _connection.RequireActiveDocument();
+            return active.IsNodeVisible(ResolveSessionNodeKey(active,nodeKey));
+        }
         if (!nodeKey.StartsWith("pdm:", StringComparison.Ordinal))
             return _connection.RequireActiveDocument().IsNodeVisible(nodeKey);
         var application = _connection.RequireActiveApplication(false);
@@ -434,6 +439,9 @@ public sealed class VisMockupAdapter : IConnectorAdapter
 
     private string ResolveSessionNodeKey(IVisMockupDocument document, string key)
     {
+        if (key.StartsWith("cad:", StringComparison.Ordinal))
+            return _treeCache?.ResolveCadNodeKey(document,key)
+                ?? throw new ConnectorNoEffectException("vismockup_cad_locator_missing");
         var process = _com.InspectProcess();
         (int, long, string, string, string, string?)? session =
             process.ProcessId is int id && process.ProcessStartUtcTicks is long started
@@ -565,7 +573,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         var document = _connection.RequireActiveDocument();
         if (forceRefresh) { _sessionNodeKeys.Clear(); _mappedSession = null; }
         var cached = forceRefresh ? null : _treeCache?.TryRead(document, maxDepth);
-        if (cached is not null) return TreeResult(cached.Nodes, maxDepth, cached.CacheState,
+        if (cached is not null) return TreeResult(document, cached.Nodes, maxDepth, cached.CacheState,
             includeVisibility ? ReadLiveVisibility(document, cached.Nodes, maxDepth, cached.CacheState) : null);
         // The interactive tree must not wait on VisMockup's non-cancellable
         // ExportEx call. The governed document-snapshot workflow owns PLMXML
@@ -573,7 +581,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         var visibility = includeVisibility ? new Dictionary<string, bool?>(StringComparer.Ordinal) : null;
         var complete = ReadCompleteComTree(document, maxDepth, visibility);
         _treeCache?.Replace(document, maxDepth, complete);
-        return TreeResult(complete, maxDepth, "verified", visibility);
+        return TreeResult(document, complete, maxDepth, "verified", visibility);
     });
 
     private VisMockupDocumentSnapshot ReadPlmxmlSnapshot(IVisMockupDocument document, int maxNodes, int maxDepth)
@@ -640,9 +648,11 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             // Keep the interactive tree on VisMockup's lightweight product-
             // structure path. Occurrence metadata can open JT payloads and turn
             // a shallow tree read into a multi-minute geometry scan.
+            string cadId;
+            try { cadId = item.Node.CadId; } catch { cadId = ""; }
             nodes.Add(new(nodeKey, item.Parent, item.ChildOrder, item.Depth,
                 item.Node.PrintableName, "",
-                children.Count > 0));
+                children.Count > 0, cadId));
             if (item.Depth == maxDepth) continue;
             for (var index = 0; index < children.Count; index++)
                 queue.Enqueue((children[index], nodeKey, index, item.Depth + 1));
@@ -691,14 +701,16 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         return visible;
     }
 
-    private static object TreeResult(IReadOnlyList<CachedTreeNode> nodes, int maxDepth, string cacheState,
+    private static object TreeResult(IVisMockupDocument document, IReadOnlyList<CachedTreeNode> nodes, int maxDepth, string cacheState,
         IReadOnlyDictionary<string, bool?>? visibility)
     {
+        var sourceHash = VisMockupTreeCache.Identity(document);
         if (visibility is null) return new
         {
             nodes = nodes.Select(node => new {
                 node_key = node.NodeKey, parent_node_key = node.ParentNodeKey,
                 name = node.Name, catia_occurrence_name = node.CatiaOccurrenceName,
+                control_key = VisMockupTreeCache.ControlKey(sourceHash,node.CadId),
                 has_more = node.HasMore,
             }).ToArray(),
             max_depth = maxDepth, cache_state = cacheState,
@@ -707,6 +719,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             nodes = nodes.Select(node => new {
                 node_key = node.NodeKey, parent_node_key = node.ParentNodeKey,
                 name = node.Name, catia_occurrence_name = node.CatiaOccurrenceName,
+                control_key = VisMockupTreeCache.ControlKey(sourceHash,node.CadId),
                 has_more = node.HasMore,
                 visible = visibility.TryGetValue(node.NodeKey, out var live) ? live : null,
             }).ToArray(),

@@ -27,6 +27,7 @@ public interface IVisMockupDocument
     string SourceIdentity { get; }
     int HierarchyCount { get; }
     IVisMockupNode RootNode { get; }
+    IVisMockupNode FindNodeByCadId(string cadId) => throw new ConnectorException("vismockup_cad_lookup_unavailable");
     IReadOnlyCollection<string> AllNodeKeys { get; }
     IReadOnlyCollection<string> VisibleNodeKeys { get; }
     bool IsNodeVisible(string nodeKey);
@@ -48,6 +49,7 @@ public interface IVisMockupNode
     bool IsVisible { get; }
     string PrintableName { get; }
     string OccurrenceId { get; }
+    string CadId => "";
     string ModelId { get; }
     IReadOnlyList<IVisMockupNode> Children { get; }
 }
@@ -140,6 +142,9 @@ internal static class VisMockupDispatch
 
     public static object InvokeMethod(object value, int dispatchId, params object?[]? args)
         => Invoke(value, dispatchId, 1, allowEmptyResult: true, args: args);
+
+    public static object InvokeMethodWithResult(object value, int dispatchId, params object?[]? args)
+        => Invoke(value, dispatchId, 1, allowEmptyResult: false, args: args);
 
     public static void SetProperty(object value, int dispatchId, object? propertyValue)
     {
@@ -506,6 +511,14 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         public string SourceIdentity => Convert.ToString(VisMockupDispatch.GetProperty(value, 11)) ?? "";
         public int HierarchyCount => Convert.ToInt32(VisMockupDispatch.GetProperty(value, 14));
         public IVisMockupNode RootNode => new DynamicNode(VisMockupDispatch.GetProperty(ActiveView, 11));
+        public IVisMockupNode FindNodeByCadId(string cadId)
+        {
+            dynamic view = ActiveView;
+            object found = null!;
+            view.GetNodeFromCADID(cadId, ref found);
+            if (found is null) throw new ConnectorNoEffectException("vismockup_cad_instance_unmapped");
+            return new DynamicNode(found);
+        }
         public IReadOnlyCollection<string> AllNodeKeys => Traverse().Select(NodeKey).ToArray();
         public IReadOnlyCollection<string> VisibleNodeKeys => Traverse().Where(IsVisible).Select(NodeKey).ToArray();
         public bool IsNodeVisible(string nodeKey) => IsVisible(FindNode(nodeKey));
@@ -514,7 +527,7 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
             var node = FindNode(nodeKey);
             // visible PUT changes a flag even for unloaded parts. The view
             // command performs the display/load operation for the selected branch.
-            var nodes = VisMockupDispatch.InvokeMethod(ActiveView, 35);
+            var nodes = VisMockupDispatch.InvokeMethodWithResult(ActiveView, 35);
             VisMockupDispatch.InvokeMethod(nodes, 4, node);
             VisMockupDispatch.InvokeMethod(ActiveView, visible ? 19 : 20, nodes);
             VisMockupDispatch.InvokeMethod(ActiveView, 31);
@@ -664,6 +677,9 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         public string NodeKey => VisMockupDispatch.InvokeUInt32OutParameter(value, 21).ToString();
         public bool IsVisible => Convert.ToBoolean(VisMockupDispatch.GetProperty(value, 9));
         public string PrintableName => Convert.ToString(VisMockupDispatch.GetProperty(value, 7)) ?? "";
+        // CADID is the viewer's occurrence path, not a display label or a runtime node key.
+        // Unlike MetaDataProperties this does not open the JT payload.
+        public string CadId => (Convert.ToString(VisMockupDispatch.GetProperty(value, 19)) ?? "").TrimEnd('\0');
         public string OccurrenceId
         {
             get
