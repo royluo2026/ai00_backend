@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Xml;
 using Ai00.Connector.Contracts;
 
@@ -98,6 +99,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             new("teamcenter.product_structure.observe@1", "sha256:704e6c398c551cc7a667d1ccf4d00c1b7f6330649676dbdd8b4fa9d92857a32b"),
             new("teamcenter.product_structure.page.read@1", "sha256:0ef57b5769664cebca42562cbb711228994e6257901786f84f5dfb82a8a6c6ad"),
             new("teamcenter.visualization.launch@1", "sha256:d74338b54d5abd84dad3435768aa56756ef4fbb560f1d605b2b1bb9cc18519a8"),
+            new("teamcenter.visualization.insert@1", "sha256:d3bd3656f14f8bfb9e3e2090c2462317aac1f4f1ca983fb92a7f8553fae84d1d"),
         ]);
 
     public async Task<AdapterHealth> ProbeAsync(CancellationToken cancellationToken)
@@ -291,7 +293,8 @@ public sealed class VisMockupAdapter : IConnectorAdapter
                 operation.Payload.GetProperty("observation_id").GetString() ?? "",
                 operation.Payload.GetProperty("cursor").GetInt32(),
                 operation.Payload.GetProperty("page_size").GetInt32(), cancellationToken),
-            "teamcenter.visualization.launch@1" => await _teamcenter.LaunchAsync(operation.Payload, cancellationToken),
+            "teamcenter.visualization.launch@1" => await OpenTeamcenterVisualizationAsync(operation.Payload, cancellationToken),
+            "teamcenter.visualization.insert@1" => await InsertTeamcenterVisualizationAsync(operation.Payload, cancellationToken),
             "vismockup.status" => await StatusAsync(),
             "vismockup.launch" => await LaunchAsync(),
             "vismockup.model.open" => await OpenFileAsync(operation.Payload.GetProperty("file_path").GetString() ?? ""),
@@ -330,6 +333,34 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             already_present = existing is not null,
         };
     });
+
+    public Task<object> OpenTeamcenterVisualizationAsync(JsonElement payload, CancellationToken ct) =>
+        _teamcenter.ConsumeVisualizationAsync(payload, async (path, token) =>
+        {
+            token.ThrowIfCancellationRequested();
+            await _sta.InvokeAsync<object>(() =>
+            {
+                var application = _connection.RequireActiveApplication(true);
+                var document = application.OpenDocument(path);
+                _ownedDocumentId = document.DocumentId;
+                return new { opened = true, document_id = document.DocumentId };
+            });
+        }, ct);
+
+    public Task<object> InsertTeamcenterVisualizationAsync(JsonElement payload, CancellationToken ct) =>
+        _teamcenter.ConsumeVisualizationAsync(payload, async (path, token) =>
+        {
+            token.ThrowIfCancellationRequested();
+            await _sta.InvokeAsync<object>(() =>
+            {
+                IVisMockupDocument document;
+                try { document = _connection.RequireActiveDocument(); }
+                catch (ConnectorException error) when (error.Message == "active_document_unavailable")
+                { throw new ConnectorException("vismockup_active_document_required"); }
+                _ = document.InsertDocument(path);
+                return new { inserted = true, document_id = document.DocumentId };
+            });
+        }, ct);
 
     public Task<object> CloseManagedFileAsync() => _sta.InvokeAsync<object>(() =>
     {

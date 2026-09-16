@@ -3,7 +3,7 @@ var Connection=Java.type('com.teamcenter.soa.client.Connection'),CredentialManag
 var SessionService=Java.type('com.teamcenter.services.strong.core.SessionService'),CoreDM=Java.type('com.teamcenter.services.strong.core.DataManagementService');
 var VisDM=Java.type('com.teamcenter.services.rac.visualization._2013_05.DataManagement');
 var ServerInfo=Java.type('com.teamcenter.services.rac.visualization._2011_02.DataManagement$ServerInfo'),UserAgent=Java.type('com.teamcenter.services.rac.visualization._2011_02.DataManagement$UserAgentDataInfo');
-var Files=Java.type('java.nio.file.Files'),StandardCharsets=Java.type('java.nio.charset.StandardCharsets'),TimeUnit=Java.type('java.util.concurrent.TimeUnit'),UUID=Java.type('java.util.UUID');
+var Files=Java.type('java.nio.file.Files'),Paths=Java.type('java.nio.file.Paths'),StandardCharsets=Java.type('java.nio.charset.StandardCharsets'),UUID=Java.type('java.util.UUID');
 function fail(code){throw new Error('AI00_CODE:'+code);}
 function hex(bytes){var out='';Java.from(bytes).forEach(function(b){var n=Number(b)&255;out+=(n<16?'0':'')+n.toString(16);});return out.toUpperCase();}
 var input=new BufferedReader(new InputStreamReader(java.lang.System['in'],'UTF-8'));
@@ -12,7 +12,7 @@ var request=JSON.parse(String(input.readLine()||'{}')),payload=request.payload||
 var CredentialImpl=Java.extend(CredentialManager,{getCredentialType:function(){return CredentialManager.CLIENT_CREDENTIAL_TYPE_STD;},getCredentials:function(){return Java.to([state.user,state.password,state.group,state.role],'java.lang.String[]');},setUserPassword:function(u,p){state.user=String(u||'');state.password=String(p||'');},setGroupRole:function(g,r){state.group=String(g||'');state.role=String(r||'');}});
 var connection=null,session=null,vviFile=null,exitCode=1;
 try{
-  if(request.command!=='launch'||selector.endpoint_id!=='tc-production'||!selector.object_uid)fail('teamcenter_source_selector_invalid');
+  if(request.command!=='consume'||selector.endpoint_id!=='tc-production'||!selector.object_uid||!payload.material_root)fail('teamcenter_source_selector_invalid');
   connection=new Connection('http://192.168.44.150:7001/tc',new CredentialImpl(),SoaConstants.REST,SoaConstants.HTTP);connection.setApplicationName('AI00 Read-only VisMockup Launch');
   session=SessionService.getService(connection);var login=session.login(state.user,state.password,'','','zh_CN','AI00ReadOnlyVisualization');if(!login||!login.user)fail('teamcenter_authentication_failed');
   var loaded=CoreDM.getService(connection).loadObjects(Java.to([String(selector.object_uid)],'java.lang.String[]'));var target=loaded.sizeOfPlainObjects()>0?loaded.getPlainObject(0):loaded.sizeOfUpdatedObjects()>0?loaded.getUpdatedObject(0):null;if(!target||loaded.sizeOfPartialErrors()>0)fail('teamcenter_object_not_found');
@@ -23,9 +23,13 @@ try{
   var response=connection.getSender().invoke3('Visualization-2013-05-DataManagement','createLaunchInfo',Java.to([[id],server,agent,sessionInfo],'java.lang.Object[]'),VisDM.class);
   if(!response||response.serviceData.sizeOfPartialErrors()>0||!response.vviStrBuffersOutputMap||response.vviStrBuffersOutputMap.isEmpty())fail('teamcenter_visualization_launch_info_failed');
   var vvi=String(response.vviStrBuffersOutputMap.values().iterator().next()).replace('OperationStructure=Ask','OperationStructure=None');
-  vviFile=Files.createTempFile('ai00-tc-vis-','.vvi');Files.write(vviFile,new java.lang.String(vvi).getBytes(StandardCharsets.UTF_8));vvi='';
-  var runner=new java.lang.ProcessBuilder('D:\\Siemens\\Teamcenter14\\portal\\runner.exe','-mime=application/x-visnetwork','-encodedArgs='+hex(new java.lang.String(String(vviFile.toAbsolutePath())).getBytes(StandardCharsets.UTF_16BE))).redirectOutput(java.lang.ProcessBuilder.Redirect.DISCARD).redirectError(java.lang.ProcessBuilder.Redirect.DISCARD).start();
-  runner.waitFor(90,TimeUnit.SECONDS);
+  var materialRoot=Paths.get(String(payload.material_root));Files.createDirectories(materialRoot);
+  vviFile=Files.createTempFile(materialRoot,'ai00-tc-vis-','.vvi');Files.write(vviFile,new java.lang.String(vvi).getBytes(StandardCharsets.UTF_8));vvi='';
+  print(JSON.stringify({type:'material_ready',material_path:String(vviFile.toAbsolutePath()),expected_visdoc_uid:String(payload.expected_visdoc_uid||''),source_identity_hash:String(payload.source_identity_hash||'')}));java.lang.System.out.flush();
+  var acknowledgement=JSON.parse(String(input.readLine()||'{}'));
+  var acknowledgementKeys=Object.keys(acknowledgement);
+  if(acknowledgementKeys.length!==1||(acknowledgement.type!=='material_consumed'&&acknowledgement.type!=='material_failed'))fail('teamcenter_visualization_ack_invalid');
+  if(acknowledgement.type==='material_failed')fail('teamcenter_visualization_consumer_failed');
   var launchId='tclaunch:'+String(UUID.randomUUID()).replace(/-/g,'')+String(UUID.randomUUID()).replace(/-/g,'');
   print(JSON.stringify({ok:true,result:{launch_id:launchId,runner_started:true,expected_visdoc_uid:String(payload.expected_visdoc_uid||''),source_identity_hash:String(payload.source_identity_hash||'')}}));exitCode=0;
 }catch(error){var message=String(error&&error.message?error.message:error),marker=message.indexOf('AI00_CODE:');var code=marker>=0?message.substring(marker+10).replace(/\s.*$/,''):'teamcenter_visualization_launch_failed';print(JSON.stringify({ok:false,code:code}));}

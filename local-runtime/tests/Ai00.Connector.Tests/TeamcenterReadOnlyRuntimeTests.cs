@@ -169,5 +169,7 @@ public sealed class TeamcenterReadOnlyRuntimeTests
         { PasswordSeen = password; return Task.FromResult(Nodes); }
         public Task<TeamcenterLaunchResult> LaunchAsync(TeamcenterSourceSelector selector, string expectedVisdocUid, string username, string password, CancellationToken ct)
         { PasswordSeen = password; return Task.FromResult(new TeamcenterLaunchResult("tclaunch:" + new string('a', 64), true, expectedVisdocUid, selector.IdentityHash)); }
+        public Task<TeamcenterLaunchResult> ConsumeVisualizationAsync(TeamcenterSourceSelector selector, string expectedVisdocUid, Func<string, CancellationToken, Task> consumer, string username, string password, CancellationToken ct)
+        { PasswordSeen = password; return Task.FromResult(new TeamcenterLaunchResult("tclaunch:" + new string('a', 64), true, expectedVisdocUid, selector.IdentityHash)); }
     }
 }
