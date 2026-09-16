@@ -62,6 +62,19 @@ public sealed class VisMockupDocumentIdentityTests
     }
 
     [Fact]
+    public void ProcessIdentityKeepsThePreviouslyAttachedIncarnationAfterEmbeddingRemovesItsMainWindow()
+    {
+        Assert.Equal((20, 200L), WindowsVisMockupCom.SelectProcessIdentity([
+            (10, 100L, false),
+            (20, 200L, false),
+        ], (20, 200L)));
+        Assert.Null(WindowsVisMockupCom.SelectProcessIdentity([
+            (10, 100L, false),
+            (20, 201L, false),
+        ], (20, 200L)));
+    }
+
+    [Fact]
     public async Task IdentityIsStableAndChangesOnRestartAndDocumentSwitchWithSameSourceAndTitle()
     {
         using var sta = new StaDispatcher();

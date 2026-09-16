@@ -310,15 +310,19 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         var version = File.Exists(path)
             ? System.Diagnostics.FileVersionInfo.GetVersionInfo(path).ProductVersion ?? "unknown"
             : "unknown";
-        var identity = SelectProcessIdentity(matches);
+        var identity = SelectProcessIdentity(matches, _attachedProcess);
         return identity is { } selected
             ? new(true, version, selected.Id, selected.Started)
             : new(running, version);
     }
 
     internal static (int Id, long Started)? SelectProcessIdentity(
-        IReadOnlyList<(int Id, long Started, bool HasMainWindow)> processes)
+        IReadOnlyList<(int Id, long Started, bool HasMainWindow)> processes,
+        (int ProcessId, long Started)? attachedProcess = null)
     {
+        if (attachedProcess is { } attached
+            && processes.Any(process => process.Id == attached.ProcessId && process.Started == attached.Started))
+            return (attached.ProcessId, attached.Started);
         var windowed = processes.Where(process => process.HasMainWindow).ToArray();
         if (windowed.Length == 1) return (windowed[0].Id, windowed[0].Started);
         if (windowed.Length > 1 || processes.Count != 1) return null;
