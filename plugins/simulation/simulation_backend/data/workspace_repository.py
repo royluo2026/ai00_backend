@@ -273,7 +273,9 @@ class WorkspaceRepository:
                 if row.get(key) is not None:
                     row[key] = str(row[key])
             artifact = row.pop("artifact_ref_json", None)
-            row["artifact_ref"] = json.loads(artifact) if isinstance(artifact, str) else artifact
+            # Online registrations store a source envelope here, not a downloadable artifact.
+            row["artifact_ref"] = None if row["source_kind"] == "teamcenter_online" else (
+                json.loads(artifact) if isinstance(artifact, str) else artifact)
             metadata = online_by_document.get(str(row["document_gid"]), {})
             row.update({key: metadata.get(key) for key in ("online_source_gid", "source_selector_json",
                 "observation_id", "observation_captured_at", "observation_node_count")})
@@ -1301,6 +1303,120 @@ class WorkspaceRepository:
             if binding["state"] == "superseded":
                 return None
             return self._live_document_bound_result(cursor, binding, tenant_gid=scope[0], actor_gid=scope[1])
+
+    def bind_online_live_document(self, *, workspace_gid: str, document_gid: str,
+                                  tenant_gid: str, actor_gid: str,
+                                  connector_device_id: str, document_session: str,
+                                  source_identity_hash: str,
+                                  expected_workspace_row_version: int,
+                                  idempotency_key: str) -> dict[str, Any]:
+        """Bind one attested native session to its immutable Teamcenter source document.
+
+        This is deliberately not an import or a source conversion.  The online document
+        keeps its Teamcenter selector and source identity; only its current runtime device
+        and the workspace's live-session binding are advanced atomically.
+        """
+        workspace_gid, document_gid = _gid(workspace_gid, "workspace_gid"), _gid(document_gid, "document_gid")
+        tenant_gid, actor_gid = _gid(tenant_gid, "tenant_gid"), _gid(actor_gid, "actor_gid")
+        source_hash = _sha256_body(source_identity_hash, "source_identity_hash")
+        if not isinstance(idempotency_key, str) or not idempotency_key.strip():
+            raise WorkspaceRepositoryError("idempotency_key_invalid")
+        scope = self._live_document_identity(tenant_gid, actor_gid, connector_device_id, document_session)
+        request = {
+            "op": "bind_online_live_document", "document_gid": document_gid,
+            "connector_device_id": connector_device_id, "document_session": document_session,
+            "source_identity_hash": source_hash,
+        }
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT row_version,cache_revision_hash,status FROM workmanship_sim_workspaces "
+                "WHERE gid=%s AND tenant_gid=%s AND owner_gid=%s AND removed_at IS NULL FOR UPDATE",
+                (workspace_gid, tenant_gid, actor_gid),
+            )
+            workspace = cursor.fetchone()
+            if not workspace:
+                raise WorkspaceRepositoryError("workspace_not_found")
+            if str(workspace.get("status") or "") == "frozen":
+                raise WorkspaceRepositoryError("workspace_frozen")
+            request_hash, replay = self._idempotency_begin(
+                cursor, workspace_gid=workspace_gid, idempotency_key=idempotency_key, request=request,
+            )
+            if replay is not None:
+                return replay
+            if int(workspace["row_version"]) != int(expected_workspace_row_version):
+                raise WorkspaceRepositoryError("version_conflict")
+            cursor.execute(
+                "SELECT source_kind,content_sha256,connector_device_id,row_version FROM "
+                "workmanship_sim_vm_documents WHERE gid=%s AND workspace_gid=%s AND tenant_gid=%s "
+                "AND owner_gid=%s AND document_role='primary' AND removed_at IS NULL FOR UPDATE",
+                (document_gid, workspace_gid, tenant_gid, actor_gid),
+            )
+            document = cursor.fetchone()
+            if not document or str(document.get("source_kind") or "") != "teamcenter_online":
+                raise WorkspaceRepositoryError("online_model_document_not_found")
+            if _sha256_body(document.get("content_sha256"), "content_sha256") != source_hash:
+                raise WorkspaceRepositoryError("online_source_identity_mismatch")
+            cursor.execute(
+                "SELECT session_identity_hash,workspace_gid,connector_device_id,document_session,state FROM "
+                "workmanship_sim_live_document_bindings WHERE tenant_gid=%s AND actor_gid=%s "
+                "AND session_identity_hash=%s FOR UPDATE", scope,
+            )
+            observed = cursor.fetchone()
+            if observed and str(observed.get("workspace_gid") or "") != workspace_gid:
+                raise WorkspaceRepositoryError("live_document_already_bound")
+            cursor.execute(
+                "SELECT session_identity_hash,connector_device_id,document_session,state FROM "
+                "workmanship_sim_live_document_bindings WHERE workspace_gid=%s AND tenant_gid=%s "
+                "AND actor_gid=%s AND state IN ('importing','bound') FOR UPDATE",
+                (workspace_gid, tenant_gid, actor_gid),
+            )
+            active = cursor.fetchall()
+            if any(row["session_identity_hash"] != scope[2] for row in active):
+                raise WorkspaceRepositoryError("live_document_binding_conflict")
+
+            already_bound = bool(observed and str(observed.get("state") or "") == "bound"
+                                 and str(document.get("connector_device_id") or "") == connector_device_id)
+            if not observed:
+                cursor.execute(
+                    "INSERT INTO workmanship_sim_live_document_bindings "
+                    "(tenant_gid,actor_gid,session_identity_hash,connector_device_id,document_session,workspace_gid,state) "
+                    "VALUES (%s,%s,%s,%s,%s,%s,'bound')",
+                    (*scope, connector_device_id, document_session, workspace_gid),
+                )
+            elif not already_bound:
+                cursor.execute(
+                    "UPDATE workmanship_sim_live_document_bindings SET connector_device_id=%s,"
+                    "document_session=%s,state='bound',updated_at=NOW(6) WHERE tenant_gid=%s "
+                    "AND actor_gid=%s AND session_identity_hash=%s",
+                    (connector_device_id, document_session, *scope),
+                )
+
+            if already_bound:
+                next_version = int(workspace["row_version"])
+                cache_hash = str(workspace.get("cache_revision_hash") or _EMPTY_CACHE_REVISION_HASH)
+            else:
+                cursor.execute(
+                    "UPDATE workmanship_sim_vm_documents SET connector_device_id=%s,row_version=row_version+1 "
+                    "WHERE gid=%s AND row_version=%s",
+                    (connector_device_id, document_gid, int(document["row_version"])),
+                )
+                if cursor.rowcount != 1:
+                    raise WorkspaceRepositoryError("version_conflict")
+                next_version, cache_hash = self._advance_workspace_revision(
+                    cursor, workspace_gid=workspace_gid, current=workspace,
+                    patch={"op": "bind_online_live_document", "document_gid": document_gid,
+                           "session_identity_hash": scope[2], "source_identity_hash": source_hash},
+                )
+            result = {
+                "workspace_gid": workspace_gid, "document_gid": document_gid, "state": "bound",
+                "connector_device_id": connector_device_id, "document_session": document_session,
+                "workspace_row_version": next_version, "cache_revision_hash": cache_hash,
+            }
+            self._idempotency_finish(
+                cursor, workspace_gid=workspace_gid, idempotency_key=idempotency_key,
+                request_hash=request_hash, response=result,
+            )
+            return result
 
     def rebind_live_document(self, *, workspace_gid: str, tenant_gid: str, actor_gid: str,
                              connector_device_id: str, document_session: str,

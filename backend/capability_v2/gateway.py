@@ -7,6 +7,7 @@ import hashlib
 import json
 import logging
 import os
+import threading
 import time
 import uuid
 from dataclasses import dataclass, field
@@ -399,9 +400,8 @@ class CapabilityGatewayService:
                     if inspect.iscoroutinefunction(provider.handler):
                         value = provider.handler(dict(envelope.payload), context)
                     else:
-                        value = await asyncio.wait_for(
-                            asyncio.to_thread(provider.handler, dict(envelope.payload), context),
-                            timeout=timeout_seconds,
+                        value = await self._invoke_sync_provider(
+                            provider.handler, dict(envelope.payload), context, timeout_seconds,
                         )
                     if inspect.isawaitable(value):
                         value = await asyncio.wait_for(value, timeout=timeout_seconds)
@@ -1048,6 +1048,38 @@ class CapabilityGatewayService:
         if isinstance(current, (dict, list, tuple, set, bool)) or str(current) != expected:
             return "expected_resource_version_mismatch"
         return None
+
+    async def _invoke_sync_provider(self, handler, payload, context, timeout_seconds):
+        # Cancelling to_thread cannot stop its worker. Transfer ownership under a
+        # lock so either Gateway receives the output or its transaction is closed.
+        lock = threading.Lock()
+        abandoned = False
+        completed = None
+
+        def run():
+            nonlocal completed
+            value = handler(payload, context)
+            with lock:
+                if not abandoned:
+                    completed = value
+                    return value
+            if isinstance(value, TransactionalCapabilityOutput):
+                self._rollback_and_close(value.transaction)
+            return None
+
+        try:
+            return await asyncio.wait_for(asyncio.to_thread(run), timeout=timeout_seconds)
+        except BaseException:
+            with lock:
+                abandoned = True
+                discarded = completed
+            if isinstance(discarded, TransactionalCapabilityOutput):
+                # The worker finished just before cancellation but delivery lost
+                # the race. Submit cleanup immediately, off the event-loop thread.
+                asyncio.get_running_loop().run_in_executor(
+                    None, self._rollback_and_close, discarded.transaction,
+                )
+            raise
 
     @staticmethod
     def _rollback_and_close(transaction) -> None:

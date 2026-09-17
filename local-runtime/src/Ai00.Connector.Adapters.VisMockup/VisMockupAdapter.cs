@@ -22,6 +22,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     private readonly string _plmxmlRoot;
     private readonly ILiveHierarchyInventoryReader _liveHierarchyReader;
     private readonly TeamcenterReadOnlyRuntime _teamcenter;
+    private readonly ITeamcenterVisualizationLauncher _teamcenterVisualizationLauncher = new TeamcenterVisualizationRunner();
     private object? _application;
     private string? _ownedDocumentId;
     private (int ProcessId, long Started, string DocumentId, string Source, string RootKey, string? SourceRevision)? _mappedSession;
@@ -50,6 +51,11 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     public VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string captureRoot,
         string treeCachePath, TeamcenterReadOnlyRuntime teamcenter)
         : this(sta, paths, com, "", captureRoot, new VisMockupTreeCache(treeCachePath), null, teamcenter) { }
+
+    internal VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com, string captureRoot,
+        string treeCachePath, TeamcenterReadOnlyRuntime teamcenter, ITeamcenterVisualizationLauncher launcher)
+        : this(sta, paths, com, captureRoot, treeCachePath, teamcenter)
+    { _teamcenterVisualizationLauncher = launcher; }
 
     internal VisMockupAdapter(StaDispatcher sta, AllowedPathPolicy paths, IVisMockupCom com,
         string captureRoot, ILiveHierarchyInventoryReader liveHierarchyReader)
@@ -98,6 +104,8 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             new("teamcenter.revision_rule.search@1", "sha256:1b6c1a36b0fa4a4654efa3ce4a67111403f2c862aeb20283206786c5ba86d9c0"),
             new("teamcenter.product_structure.observe@1", "sha256:704e6c398c551cc7a667d1ccf4d00c1b7f6330649676dbdd8b4fa9d92857a32b"),
             new("teamcenter.product_structure.page.read@1", "sha256:0ef57b5769664cebca42562cbb711228994e6257901786f84f5dfb82a8a6c6ad"),
+            new("teamcenter.product_structure.children.read@1", "sha256:a76cbb3fba1abefdef619baad7a718a641dc6a4ab51ceb1e2e6575851837196f"),
+            new("teamcenter.node_properties.read@1", "sha256:aab317614eb33e600e66660b0879fe59fdda138b7c37fe373af1c12d75eff6b5"),
             new("teamcenter.visualization.launch@1", "sha256:d74338b54d5abd84dad3435768aa56756ef4fbb560f1d605b2b1bb9cc18519a8"),
             new("teamcenter.visualization.insert@1", "sha256:d3bd3656f14f8bfb9e3e2090c2462317aac1f4f1ca983fb92a7f8553fae84d1d"),
         ]);
@@ -286,6 +294,8 @@ public sealed class VisMockupAdapter : IConnectorAdapter
                 operation.Payload.GetProperty("expected_scene_hash").GetString() ?? ""),
             "vismockup.view.capture@1" => await CaptureAsync(ReadCaptureRequest(operation.Payload, operation.StepId)),
             "teamcenter.product_structure.observe@1" => await _teamcenter.ObserveAsync(operation.Payload, cancellationToken),
+            "teamcenter.product_structure.children.read@1" => await _teamcenter.ReadChildrenAsync(operation.Payload, cancellationToken),
+            "teamcenter.node_properties.read@1" => await _teamcenter.ReadNodePropertiesAsync(operation.Payload, cancellationToken),
             "teamcenter.product.search@1" => await _teamcenter.SearchAsync(operation.Payload, cancellationToken),
             "teamcenter.product.search@2" => await _teamcenter.SearchV2Async(operation.Payload, cancellationToken),
             "teamcenter.revision_rule.search@1" => await _teamcenter.GetRevisionRulesAsync(operation.Payload, cancellationToken),
@@ -335,20 +345,11 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     });
 
     public Task<object> OpenTeamcenterVisualizationAsync(JsonElement payload, CancellationToken ct) =>
-        _teamcenter.ConsumeVisualizationAsync(payload, async (path, token) =>
-        {
-            token.ThrowIfCancellationRequested();
-            await _sta.InvokeAsync<object>(() =>
-            {
-                var application = _connection.RequireActiveApplication(true);
-                var document = application.OpenDocument(path);
-                _ownedDocumentId = document.DocumentId;
-                return new { opened = true, document_id = document.DocumentId };
-            });
-        }, ct);
+        _teamcenter.ConsumeVisualizationAsync(payload, "Open",
+            (path, token) => _teamcenterVisualizationLauncher.LaunchAsync(path, token), ct);
 
     public Task<object> InsertTeamcenterVisualizationAsync(JsonElement payload, CancellationToken ct) =>
-        _teamcenter.ConsumeVisualizationAsync(payload, async (path, token) =>
+        _teamcenter.ConsumeVisualizationAsync(payload, "Insert", async (path, token) =>
         {
             token.ThrowIfCancellationRequested();
             await _sta.InvokeAsync<object>(() =>

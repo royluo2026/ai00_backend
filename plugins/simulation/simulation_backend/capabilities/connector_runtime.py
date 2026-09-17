@@ -37,7 +37,10 @@ from ..data.connector_repository import (
     ConnectorRepositoryError,
     SimulationConnectorRepository,
 )
-from .connector_contracts import AdapterAdvertisement, AdapterOperation, ConnectorHealth
+from .connector_contracts import (
+    AdapterAdvertisement, AdapterOperation, ConnectorHealth,
+    TC_CHILDREN_INPUT, TC_NODE_PROPERTIES_INPUT,
+)
 
 
 class ConnectorError(RuntimeError):
@@ -46,6 +49,8 @@ class ConnectorError(RuntimeError):
 
 # Consumer declarations do not add authorization or change existing versions.
 DESKTOP_CAPABILITY_BINDINGS = (
+    ('simulation.connector.recovery.search', 1),
+    ('simulation.connector.recovery.resolve', 1),
     ("simulation.connector.runtime.takeover", 1),
     ("simulation.connector.health.get", 1),
     ("simulation.connector.health.get", 2),
@@ -68,12 +73,15 @@ DESKTOP_CAPABILITY_BINDINGS = (
     ("simulation.teamcenter.product.search.request", 1),
     ("simulation.teamcenter.revision_rule.search.request", 1),
     ("simulation.teamcenter.product_structure.page.read.request", 1),
+    ("simulation.teamcenter.product_structure.children.read.request", 1),
+    ("simulation.teamcenter.node_properties.read.request", 1),
     ("simulation.teamcenter.visualization.launch.request", 1),
     ("simulation.teamcenter.visualization.insert.request", 1),
     ("simulation.environment.live_document.adopt", 1),
     ("simulation.environment.live_document.adopt", 2),
     ("simulation.environment.live_document.binding.get", 1),
     ("simulation.environment.live_document.rebind", 1),
+    ("simulation.environment.online_source.live_document.bind", 1),
     ("simulation.environment.live_document.inventory.apply", 1),
     ("simulation.vismockup.command.get", 1),
 )
@@ -118,6 +126,8 @@ DIRECT_VISMOCKUP_OPERATIONS = {
     "tc_search": ("teamcenter.product.search@2", "sha256:6ef619b8abeb6705574ffa7e0902708b3c998773c80da4649a0f3f38b01c3310"),
     "tc_rules": ("teamcenter.revision_rule.search@1", "sha256:1b6c1a36b0fa4a4654efa3ce4a67111403f2c862aeb20283206786c5ba86d9c0"),
     "tc_page": ("teamcenter.product_structure.page.read@1", "sha256:0ef57b5769664cebca42562cbb711228994e6257901786f84f5dfb82a8a6c6ad"),
+    "tc_children": ("teamcenter.product_structure.children.read@1", "sha256:a76cbb3fba1abefdef619baad7a718a641dc6a4ab51ceb1e2e6575851837196f"),
+    "tc_node_properties": ("teamcenter.node_properties.read@1", "sha256:aab317614eb33e600e66660b0879fe59fdda138b7c37fe373af1c12d75eff6b5"),
     "tc_launch": ("teamcenter.visualization.launch@1", "sha256:d74338b54d5abd84dad3435768aa56756ef4fbb560f1d605b2b1bb9cc18519a8"),
     "tc_insert": ("teamcenter.visualization.insert@1", "sha256:d3bd3656f14f8bfb9e3e2090c2462317aac1f4f1ca983fb92a7f8553fae84d1d"),
 }
@@ -138,6 +148,8 @@ DIRECT_VISMOCKUP_CAPABILITIES = {
     "tc_search": "simulation.teamcenter.product.search.request",
     "tc_rules": "simulation.teamcenter.revision_rule.search.request",
     "tc_page": "simulation.teamcenter.product_structure.page.read.request",
+    "tc_children": "simulation.teamcenter.product_structure.children.read.request",
+    "tc_node_properties": "simulation.teamcenter.node_properties.read.request",
     "tc_launch": "simulation.teamcenter.visualization.launch.request",
     "tc_insert": "simulation.teamcenter.visualization.insert.request",
 }
@@ -402,7 +414,7 @@ def _direct_vismockup_plan(
     *, action: str, connector_id: str, payload: dict, context: CapabilityContext,
     now: datetime,
 ) -> ConnectorExecutionPlanV1:
-    if action in {'identity', 'tc_search', 'tc_rules', 'tc_observe', 'tc_page', 'tc_launch', 'tc_insert'}:
+    if action in {'identity', 'tc_search', 'tc_rules', 'tc_observe', 'tc_page', 'tc_children', 'tc_launch', 'tc_insert'}:
         raise ConnectorError('runtime_v2_required')
     # execution-plan.v1 canonicalizes timestamps to whole UTC seconds in the
     # Windows runtime.  Match that wire contract before computing the hash.
@@ -455,7 +467,7 @@ def _direct_vismockup_plan_v2(
         raise ConnectorError("capability_provenance_required")
     operation_id, contract_hash = DIRECT_VISMOCKUP_OPERATIONS[action]
     step_payload = {"allow_launch": action == "launch"} if action in {"attach", "launch"} else payload
-    classification = "read" if action in {"attach", "tree", "identity", "hierarchy_inventory", "tc_search", "tc_rules", "tc_observe", "tc_page"} else "write"
+    classification = "read" if action in {"attach", "tree", "identity", "hierarchy_inventory", "tc_search", "tc_rules", "tc_observe", "tc_page", "tc_children"} else "write"
     probe_id = None if classification == "read" else (
         "vismockup.application.probe@1" if action in {"launch", "close", "tc_launch"}
         else "vismockup.document.snapshot@1"
@@ -476,7 +488,7 @@ def _direct_vismockup_plan_v2(
         "depends_on": [],
         "payload": step_payload,
         "payload_hash": digest(step_payload),
-        "timeout_seconds": 600 if action in {"tree", "hierarchy_inventory", "tc_observe", "tc_launch", "tc_insert"} else 120,
+        "timeout_seconds": 600 if action in {"tree", "hierarchy_inventory", "tc_observe", "tc_children", "tc_launch", "tc_insert"} else 120,
         "side_effect_classification": classification,
         "post_condition_probe_id": probe_id,
     }]
@@ -563,6 +575,8 @@ _VISMOCKUP_ATOMS = (
     ("simulation.teamcenter.product.search", "Search Teamcenter item IDs and names with deterministic exact, prefix, and contains matching.", CapabilityRisk.READ),
     ("simulation.teamcenter.revision_rule.search", "Read the available Teamcenter revision rules.", CapabilityRisk.READ),
     ("simulation.teamcenter.product_structure.page.read", "Read one bounded page from a local Teamcenter product-structure observation.", CapabilityRisk.READ),
+    ("simulation.teamcenter.product_structure.children.read", "Read one generation-pinned page of direct children for an exact Teamcenter source and occurrence path.", CapabilityRisk.READ),
+    ("simulation.teamcenter.node_properties.read", "Read the fixed display-property projection for one exact Teamcenter occurrence, using the principal-scoped local cache first.", CapabilityRisk.READ),
     ("simulation.teamcenter.visualization.launch", "Use Teamcenter launch information to open one online source in VisMockup.", CapabilityRisk.WRITE),
     ("simulation.teamcenter.visualization.insert", "Insert one Teamcenter online source into the active VisMockup document.", CapabilityRisk.WRITE),
 )
@@ -572,6 +586,53 @@ def register_connector_runtime_capabilities(
     registry, control_plane: ConnectorControlPlane,
 ) -> None:
     from .provider import register
+
+    def manual_recovery(action):
+        from backend.capability_v2.reliability import TransactionalCapabilityOutput, transactional_provider
+        from ..data.connection import open_simulation_transaction
+
+        def handler(payload, context):
+            if context.source != 'web' or not context.user_gid or not context.team_gid:
+                raise CapabilityBusinessError('runtime_owner_mismatch', 'Recovery requires an authenticated device owner and tenant.')
+            if action == 'resolve' and not context.confirmation_token:
+                raise CapabilityBusinessError('recovery_confirmation_required', 'Confirm the exact reviewed operation before recording a decision.')
+            transaction = None
+            try:
+                if action == 'search':
+                    data = control_plane.repository.search_manual_recovery(
+                        actor_id=context.user_gid, tenant_id=context.team_gid, **payload)
+                else:
+                    transaction = open_simulation_transaction()
+                    data = control_plane.repository.resolve_manual_recovery(**payload,
+                        actor_id=context.user_gid, tenant_id=context.team_gid, now=control_plane.clock(),
+                        transaction=transaction)
+                evidence = (EvidenceRef(kind='simulation.connector.recovery.' + action,
+                    reference=data.get('audit_ref', 'connector-recovery-search'), digest=canonical_hash(data)),)
+                if transaction is not None:
+                    return TransactionalCapabilityOutput(data=data, transaction=transaction, evidence=evidence)
+                return CapabilityOutput(data=data, evidence=evidence)
+            except BaseException as exc:
+                if transaction is not None:
+                    try:
+                        transaction.rollback()
+                    finally:
+                        transaction.close()
+                if isinstance(exc, ConnectorRepositoryError):
+                    raise CapabilityBusinessError(str(exc), str(exc)) from exc
+                raise
+        return transactional_provider(handler) if action == 'resolve' else handler
+
+    for action in ('search', 'resolve'):
+        register(registry, CapabilitySpec(
+            id='simulation.connector.recovery.' + action, owner='simulation', version=1,
+            description=('List up to twenty unresolved operations owned by the authenticated device owner.'
+                         if action == 'search' else 'Record a human disposition or abandonment and close one exact uncertain Connector plan without replay.'),
+            use_when='The device owner reviews an allowlisted uncertain operation or abandons and archives an unfinished plan without claiming its execution outcome.',
+            do_not_use_when='The caller is automated or the operation is outside the caller device and tenant scope.',
+            risk=CapabilityRisk.READ if action == 'search' else CapabilityRisk.WRITE,
+            confirmation='none' if action == 'search' else 'user', permissions=('simulation.use',),
+            input_schema={}, output_schema={}, tags=('simulation', 'connector', 'recovery'),
+        ), manual_recovery(action))
 
     def takeover(payload, context):
         from ..application.connector_runtime_sessions import RuntimeSessionService
@@ -633,7 +694,7 @@ def register_connector_runtime_capabilities(
             runtime = control_plane.repository.bound_runtime_for_user(
                 context.user_gid, context.team_gid,
             )
-            app_v2_only = {"identity", "hierarchy_inventory", "tc_search", "tc_rules", "tc_observe", "tc_page", "tc_launch", "tc_insert"}
+            app_v2_only = {"identity", "hierarchy_inventory", "tc_search", "tc_rules", "tc_observe", "tc_page", "tc_children", "tc_node_properties", "tc_launch", "tc_insert"}
             if action in app_v2_only and (context.source != 'web' or not runtime or runtime.get('runtime_type') != 'electron'):
                 raise CapabilityBusinessError('runtime_v2_required', 'A current user-bound App runtime is required.')
             binding = None
@@ -660,7 +721,7 @@ def register_connector_runtime_capabilities(
                 else {"document_session": payload["document_session"], "start_index": payload["start_index"],
                       "page_size": payload["page_size"], "max_nodes": payload["max_nodes"]}
                 if action == "hierarchy_inventory"
-                else payload if action in {"tc_search", "tc_rules", "tc_observe", "tc_page", "tc_launch", "tc_insert"}
+                else payload if action in {"tc_search", "tc_rules", "tc_observe", "tc_page", "tc_children", "tc_node_properties", "tc_launch", "tc_insert"}
                 else {}
             )
             try:
@@ -781,6 +842,8 @@ def register_connector_runtime_capabilities(
             "revision_rule":{"type":"string","minLength":1,"maxLength":128},
             "configuration_date":{"type":"string","format":"date-time"}},"additionalProperties":False}
     direct_schemas = {
+        "tc_children": TC_CHILDREN_INPUT,
+        "tc_node_properties": TC_NODE_PROPERTIES_INPUT,
         "tc_search":{"type":"object","required":["endpoint_id","query","revision_id","revision_rule","configuration_date","limit"],
             "properties":{"endpoint_id":{"type":"string","const":"tc-production"},
                 "query":{"type":"string","minLength":1,"maxLength":128},
@@ -821,6 +884,8 @@ def register_connector_runtime_capabilities(
         ("simulation.teamcenter.product.search.request", "tc_search", "Search Teamcenter item IDs and names by exact, prefix, or contains matching without mutating Teamcenter."),
         ("simulation.teamcenter.revision_rule.search.request", "tc_rules", "Read the available revision rules from the signed-in Teamcenter session."),
         ("simulation.teamcenter.product_structure.page.read.request", "tc_page", "Queue one bounded page read from an existing local Teamcenter structure observation."),
+        ("simulation.teamcenter.product_structure.children.read.request", "tc_children", "Queue one read-only generation-pinned page of direct children for an exact Teamcenter source and occurrence path."),
+        ("simulation.teamcenter.node_properties.read.request", "tc_node_properties", "Read the fixed display properties for one exact Teamcenter occurrence, preferring the current principal's local Connector cache."),
         ("simulation.teamcenter.visualization.launch.request", "tc_launch", "Queue an official Teamcenter Visualization launch for one exact online source."),
         ("simulation.teamcenter.visualization.insert.request", "tc_insert", "Insert one exact Teamcenter online source into the active VisMockup document."),
     ):
@@ -829,13 +894,13 @@ def register_connector_runtime_capabilities(
                 "start_index":{"type":"integer","minimum":0},"page_size":{"type":"integer","minimum":1,"maximum":16},
                 "max_nodes":{"type":"integer","minimum":1,"maximum":100000}},"additionalProperties":False}
             if action == "hierarchy_inventory" else direct_schemas.get(action, {}))
-        risk = CapabilityRisk.READ if action in {"identity", "hierarchy_inventory", "tree", "tc_search", "tc_rules", "tc_observe", "tc_page"} else CapabilityRisk.WRITE
+        risk = CapabilityRisk.READ if action in {"identity", "hierarchy_inventory", "tree", "tc_search", "tc_rules", "tc_observe", "tc_page", "tc_children", "tc_node_properties"} else CapabilityRisk.WRITE
         register(registry, CapabilitySpec(
             id=capability_id, owner="simulation", version=1, description=description,
             use_when="The signed-in user requests one direct action on the bound workstation Connector.",
             do_not_use_when="No current user-scoped Connector binding exists.",
             risk=risk,
-            confirmation="none" if action in {"attach", "visibility", "node_visibility", "node_selection", "tree", "identity", "hierarchy_inventory", "tc_search", "tc_rules", "tc_observe", "tc_page"} else "user",
+            confirmation="none" if action in {"attach", "visibility", "node_visibility", "node_selection", "tree", "identity", "hierarchy_inventory", "tc_search", "tc_rules", "tc_observe", "tc_page", "tc_children", "tc_node_properties"} else "user",
             permissions=("simulation.use",),
             input_schema=request_schema, output_schema={}, tags=("simulation", "connector", "vismockup", "workflow"),
         ), request_direct(action))

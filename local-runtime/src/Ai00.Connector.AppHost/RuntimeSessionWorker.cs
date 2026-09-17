@@ -253,15 +253,7 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
                     continue;
                 }
                 await diagnostics.SendAsync(new{type="diagnostic",code="recovery_required"},ct);
-                try{await ReconcileAsync(outcome,deviceId,tenantId,generation,secret,keyId,ct);}
-                catch(RuntimeTransportException error) when(IsObsoleteRecovery(error.Message))
-                {
-                    // Retain the signed local record, but do not let a plan the
-                    // server no longer owns block newer recovery work.
-                    journal.Append("reconciliation_retry_v3",outcome.PlanId,"{\"result\":\"server_plan_unavailable\"}");
-                    journal.Append("acknowledged",outcome.PlanId,"{}");
-                    continue;
-                }
+                await RecoverOneAsync(outcome,journal,token=>ReconcileAsync(outcome,deviceId,tenantId,generation,secret,keyId,token),ct);
             }
             lifetime.StopApplication();return;
         }
@@ -424,6 +416,18 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
         // attempt to reconcile an already-closed plan and permanently starve the host.
         if(hasInconclusive)journal.Append("manual_review_required",outcome.PlanId,"{}");
         else journal.Append("acknowledged",outcome.PlanId,"{}");
+    }
+    internal static async Task<bool> RecoverOneAsync(OutcomeV2 outcome,AppPlanJournal journal,Func<CancellationToken,Task> reconcile,CancellationToken ct)
+    {
+        try{await reconcile(ct);return false;}
+        catch(RuntimeTransportException error) when(IsObsoleteRecovery(error.Message))
+        {
+            // Retain the signed local record, but do not let a plan the
+            // authenticated server no longer owns block newer recovery work.
+            journal.Append("reconciliation_retry_v3",outcome.PlanId,"{\"result\":\"server_plan_unavailable\"}");
+            journal.Append("acknowledged",outcome.PlanId,"{}");
+            return true;
+        }
     }
     internal static bool IsObsoleteRecovery(string code)=>code=="plan_reconciliation_invalid";
     private static byte[] Decode(string text)=>Convert.FromBase64String(text.Replace('-','+').Replace('_','/')+new string('=',(4-text.Length%4)%4));

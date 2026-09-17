@@ -8,6 +8,7 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 import re
+from contextlib import nullcontext
 from typing import TYPE_CHECKING
 
 from pymysql.err import IntegrityError
@@ -67,19 +68,21 @@ class ProjectionLease:
 
 
 class SimulationConnectorRepository:
+    _INTRINSICALLY_SAFE_ACTIONS = {
+        "vismockup.application.probe@1": {True},
+        "vismockup.visibility.change@1": {"all_on", "all_off"},
+        "vismockup.node.visibility.change@1": {"show", "hide", "isolate"},
+        "vismockup.node.selection.change@1": {"highlight", "select", "unhighlight", "deselect"},
+    }
+
     def __init__(self, *, projection_protocol=None):
         self.projection_v2 = projection_protocol == PROTOCOL_V2
         self.projection_table = ('workmanship_sim_connector_runtime_projection_outbox' if self.projection_v2
                                  else 'workmanship_sim_connector_projection_outbox')
 
-    @staticmethod
-    def _repeat_is_intrinsically_safe(plan: ConnectorExecutionPlanV2) -> bool:
-        allowed = {
-            "vismockup.application.probe@1": {True},
-            "vismockup.visibility.change@1": {"all_on", "all_off"},
-            "vismockup.node.visibility.change@1": {"show", "hide", "isolate"},
-            "vismockup.node.selection.change@1": {"highlight", "select", "unhighlight", "deselect"},
-        }
+    @classmethod
+    def _repeat_is_intrinsically_safe(cls, plan: ConnectorExecutionPlanV2) -> bool:
+        allowed = cls._INTRINSICALLY_SAFE_ACTIONS
         steps = plan.steps if hasattr(plan, "steps") else plan.get("steps", ())
         def safe(step):
             operation_id = step.operation_id if hasattr(step, "operation_id") else step.get("operation_id")
@@ -87,6 +90,19 @@ class SimulationConnectorRepository:
             value = payload.get("allow_launch") if operation_id == "vismockup.application.probe@1" else str(payload.get("action") or "")
             return operation_id in allowed and value in allowed[operation_id]
         return bool(steps) and all(safe(step) for step in steps)
+
+    @staticmethod
+    def _repeat_is_freshly_confirmed_document_launch(plan: ConnectorExecutionPlanV2, prior: dict) -> bool:
+        confirmation = plan.confirmation_receipt_id
+        prior_steps = prior.get('steps') if isinstance(prior, dict) else None
+        return (
+            plan.capability_id == 'simulation.teamcenter.visualization.launch.request'
+            and isinstance(confirmation, str) and bool(confirmation)
+            and confirmation != prior.get('confirmation_receipt_id')
+            and len(plan.steps) == 1 and plan.steps[0].operation_id == 'teamcenter.visualization.launch@1'
+            and isinstance(prior_steps, list) and len(prior_steps) == 1
+            and prior_steps[0].get('operation_id') == 'teamcenter.visualization.launch@1'
+        )
 
     def runtime_device(self, device_id):
         with get_simulation_conn() as conn, conn.cursor() as cursor:
@@ -104,6 +120,21 @@ class SimulationConnectorRepository:
             return verify_identity_evidence(row, runtime, actor_id=actor_id, tenant_id=tenant_id, now=now)
         except ValueError as exc:
             code = 'live_document_identity_stale' if str(exc) == 'live_document_identity_stale' else 'live_document_identity_unavailable'
+            raise ConnectorRepositoryError(code) from exc
+
+    def verified_teamcenter_launch(self, operation_id, *, actor_id, tenant_id, now):
+        from ..application.teamcenter_launch_evidence import verify_teamcenter_launch_evidence
+        runtime = self.bound_runtime_for_user(actor_id, tenant_id)
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM workmanship_sim_connector_runtime_plans "
+                "WHERE plan_id=%s AND actor_gid=%s AND tenant_gid=%s AND protocol=%s",
+                (operation_id, actor_id, tenant_id, PROTOCOL_V2))
+            row = cursor.fetchone()
+        try:
+            return verify_teamcenter_launch_evidence(
+                row, runtime, actor_id=actor_id, tenant_id=tenant_id, now=now)
+        except ValueError as exc:
+            code = "launch_evidence_stale" if str(exc) == "launch_evidence_stale" else "launch_evidence_unavailable"
             raise ConnectorRepositoryError(code) from exc
 
     def verified_hierarchy_inventory(self, operation_id, *, actor_id, tenant_id, now):
@@ -216,6 +247,156 @@ class SimulationConnectorRepository:
     # Device rows serialize all v2 writers. Never acquire a plan lock before
     # its device lock, including queueing, recovery, and takeover.
     @staticmethod
+    def _recovery_fingerprint(plan):
+        fields = ('device_id', 'plan_id', 'runtime_generation', 'status', 'plan_json',
+                  'plan_hash', 'outcome_hash', 'outcome_json', 'protocol', 'actor_gid', 'tenant_gid')
+        # Preserve stored strings exactly, including damaged JSON and whitespace.
+        snapshot = json.dumps({key: plan.get(key) for key in fields}, sort_keys=True,
+                              separators=(',', ':'), ensure_ascii=False)
+        return 'sha256:' + hashlib.sha256(snapshot.encode('utf-8')).hexdigest()
+
+    @classmethod
+    def _manual_recovery_item(cls, plan):
+        document_operations = {'teamcenter.visualization.launch@1', 'teamcenter.visualization.insert@1',
+                               'vismockup.model.open@1', 'vismockup.model.insert@1'}
+        raw = plan['plan_json']
+        try:
+            parsed = json.loads(raw) if isinstance(raw, str) else raw
+        except (ValueError, TypeError):
+            parsed = None
+        steps = parsed.get('steps', []) if isinstance(parsed, dict) else []
+        steps = steps if isinstance(steps, list) else []
+        step = steps[0] if len(steps) == 1 and isinstance(steps[0], dict) else {}
+        operation = step.get('operation_id', '') if len(steps) <= 1 else 'multiple_operations'
+        operation = operation if isinstance(operation, str) else ''
+        digest = plan.get('outcome_hash')
+        if not isinstance(digest, str) or not re.fullmatch(r'[0-9a-f]{64}', digest):
+            digest = None
+        plan_digest = plan.get('plan_hash')
+        if not isinstance(plan_digest, str) or not re.fullmatch(r'[0-9a-f]{64}', plan_digest):
+            plan_digest = None
+        reason = None
+        if not digest:
+            reason = 'missing_outcome_hash'
+        elif len(steps) != 1:
+            reason = 'multiple_operations'
+        elif operation not in document_operations:
+            allowed = cls._INTRINSICALLY_SAFE_ACTIONS.get(operation)
+            payload = step.get('payload')
+            payload = payload if isinstance(payload, dict) else {}
+            value = payload.get('action')
+            if allowed is None:
+                reason = 'unsupported_operation'
+            elif operation == 'vismockup.application.probe@1':
+                if payload.get('allow_launch') is not True:
+                    reason = 'unsupported_action'
+            elif not isinstance(value, str) or value not in allowed:
+                reason = 'unsupported_action'
+        # Abandonment archives the exact plan without claiming any step outcome.
+        # Unsupported and multi-step plans therefore need not remain blockers.
+        decisions = ['executed', 'not_executed', 'abandoned'] if reason is None else ['abandoned']
+        return dict(plan_id=plan['plan_id'], device_id=plan['device_id'],
+            runtime_generation=plan['runtime_generation'], outcome_hash='sha256:' + digest if digest else None,
+            plan_hash='sha256:' + plan_digest if plan_digest else None,
+            recovery_fingerprint=cls._recovery_fingerprint(plan),
+            operation_id=operation or 'unknown_operation', status=plan['status'],
+            eligible=bool(decisions), allowed_decisions=decisions,
+            ineligible_reason=None,
+            # Stored exception text may contain local paths or credentials. Never return it.
+            error_code='manual_review_required' if plan['status'] == 'manual_review_required' else 'execution_uncertain')
+
+    def search_manual_recovery(self, *, actor_id, tenant_id, page=1, page_size=5):
+        if not actor_id or not tenant_id:
+            raise ConnectorRepositoryError('runtime_owner_mismatch')
+        if type(page) is not int or page < 1 or type(page_size) is not int or not 1 <= page_size <= 20:
+            raise ConnectorRepositoryError('recovery_input_invalid')
+        scope = (
+            "FROM workmanship_sim_connector_runtime_plans p "
+            "JOIN workmanship_sim_connector_runtime_devices d ON d.device_id=p.device_id "
+            "WHERE d.owner_user_gid=%s AND d.tenant_gid=%s AND d.status='active' "
+            "AND p.actor_gid=%s AND p.tenant_gid=%s AND p.protocol=%s "
+            "AND p.runtime_generation=d.runtime_generation "
+            "AND p.status IN ('outcome_unknown','manual_review_required') ")
+        parameters = (actor_id, tenant_id, actor_id, tenant_id, PROTOCOL_V2)
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            # One statement is one snapshot even at READ COMMITTED. The aggregate
+            # side retains metadata when the page is empty or out of range.
+            # Cap only the SQL offset to the signed database integer range;
+            # arbitrarily large valid page requests still represent empty pages.
+            offset = min((page - 1) * page_size, 2**63 - 1)
+            cursor.execute('SELECT totals.total,paged.* FROM (SELECT COUNT(*) AS total ' + scope +
+                ') totals LEFT JOIN (SELECT p.* ' + scope +
+                'ORDER BY p.created_at,p.plan_id LIMIT %s OFFSET %s) paged ON 1=1 '
+                'ORDER BY paged.created_at,paged.plan_id', (*parameters, *parameters, page_size, offset))
+            rows = cursor.fetchall()
+            total = int(rows[0]['total'])
+            items = [self._manual_recovery_item(plan) for plan in rows if plan['plan_id'] is not None]
+            return dict(items=items, page=page, page_size=page_size, total=total,
+                        page_count=(total + page_size - 1) // page_size)
+
+    def resolve_manual_recovery(self, *, device_id, plan_id, expected_generation,
+                                expected_outcome_hash=None, expected_plan_hash=None, expected_recovery_fingerprint=None, decision, reason,
+                                actor_id, tenant_id, now, transaction=None):
+        if (not isinstance(reason, str) or not reason.strip() or len(reason) > 1024
+                or decision not in {'executed', 'not_executed', 'abandoned'}
+                or any(value is not None and (not isinstance(value, str)
+                    or not re.fullmatch(r'sha256:[0-9a-f]{64}', value))
+                    for value in (expected_outcome_hash, expected_plan_hash, expected_recovery_fingerprint))):
+            raise ConnectorRepositoryError('recovery_input_invalid')
+        with (nullcontext(transaction) if transaction is not None else get_simulation_conn()) as conn, conn.cursor() as cursor:
+            row = self._locked_runtime(cursor, device_id)
+            if not actor_id or not tenant_id or row['owner_user_gid'] != actor_id or row['tenant_gid'] != tenant_id:
+                raise ConnectorRepositoryError('runtime_owner_mismatch')
+            cursor.execute("SELECT * FROM workmanship_sim_connector_runtime_plans WHERE plan_id=%s AND device_id=%s FOR UPDATE",
+                           (plan_id, device_id))
+            plan = cursor.fetchone()
+            if not plan or plan['actor_gid'] != actor_id or plan['tenant_gid'] != tenant_id:
+                raise ConnectorRepositoryError('runtime_owner_mismatch')
+            if (row['runtime_generation'] != expected_generation or plan['runtime_generation'] != expected_generation
+                    or plan['protocol'] != PROTOCOL_V2):
+                raise ConnectorRepositoryError('recovery_state_changed')
+            item = self._manual_recovery_item(plan)
+            if item['outcome_hash']:
+                if expected_outcome_hash != 'sha256:' + plan['outcome_hash']:
+                    raise ConnectorRepositoryError('recovery_state_changed')
+            elif expected_outcome_hash is not None or (expected_plan_hash is None and expected_recovery_fingerprint is None):
+                raise ConnectorRepositoryError('recovery_state_changed')
+            if expected_plan_hash is not None and expected_plan_hash != 'sha256:' + (plan.get('plan_hash') or ''):
+                raise ConnectorRepositoryError('recovery_state_changed')
+            disposition = dict(plan_id=plan_id, device_id=device_id, expected_generation=expected_generation,
+                expected_outcome_hash=expected_outcome_hash, expected_plan_hash=expected_plan_hash,
+                expected_recovery_fingerprint=expected_recovery_fingerprint,
+                decision=decision, reason=reason)
+            cursor.execute("SELECT audit_id,outcome_json FROM workmanship_sim_connector_runtime_audit "
+                           "WHERE device_id=%s AND plan_id=%s AND event_type='human_recovery_disposition'",
+                           (device_id, plan_id))
+            prior = cursor.fetchone()
+            if prior:
+                stored = prior['outcome_json']
+                stored = dict(json.loads(stored) if isinstance(stored, str) else stored)
+                # Historical result-bound reviews did not carry a plan-hash field.
+                stored.setdefault('expected_plan_hash', None)
+                stored.setdefault('expected_recovery_fingerprint', None)
+                if stored != disposition:
+                    raise ConnectorRepositoryError('recovery_decision_conflict')
+                return dict(plan_id=plan_id, device_id=device_id, decision=decision,
+                            audit_ref=prior['audit_id'], retry_started=False)
+            if plan['status'] not in {'outcome_unknown', 'manual_review_required'}:
+                raise ConnectorRepositoryError('recovery_state_changed')
+            if expected_recovery_fingerprint is not None and expected_recovery_fingerprint != item['recovery_fingerprint']:
+                raise ConnectorRepositoryError('recovery_state_changed')
+            if decision not in item['allowed_decisions']:
+                raise ConnectorRepositoryError('recovery_operation_unsupported')
+            cursor.execute("UPDATE workmanship_sim_connector_runtime_plans SET status='cancelled',"
+                           "reconciliation_state='not_required',reconciled_at=%s,updated_at=%s WHERE plan_id=%s AND device_id=%s",
+                           (_utc(now), _utc(now), plan_id, device_id))
+            audit_ref = self._runtime_audit(cursor, row, 'human_recovery_disposition', _utc(now),
+                actor_id=actor_id, reason=reason, plan_id=plan_id, outcome_hash=plan['outcome_hash'],
+                outcome_json=json.dumps(disposition, sort_keys=True))
+            return dict(plan_id=plan_id, device_id=device_id, decision=decision,
+                        audit_ref=audit_ref, retry_started=False)
+
+    @staticmethod
     def _locked_runtime(cursor, device_id: str) -> dict:
         cursor.execute(
             "SELECT * FROM workmanship_sim_connector_runtime_devices WHERE device_id=%s FOR UPDATE",
@@ -307,15 +488,17 @@ class SimulationConnectorRepository:
     @staticmethod
     def _runtime_audit(cursor, row, event, now, *, actor_id=None, reason=None, plan_id=None, outcome_hash=None,
                        recovery_instance_id=None, recovery_session_token_hash=None, outcome_json=None):
+        audit_id = uuid.uuid4().hex
         cursor.execute(
             "INSERT INTO workmanship_sim_connector_runtime_audit "
             "(audit_id,protocol,device_id,runtime_generation,runtime_instance_id,session_token_hash,"
             "event_type,actor_id,reason,plan_id,outcome_hash,created_at,recovery_instance_id,recovery_session_token_hash,outcome_json) "
             "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-            (uuid.uuid4().hex, PROTOCOL_V2, row["device_id"], row["runtime_generation"],
+            (audit_id, PROTOCOL_V2, row["device_id"], row["runtime_generation"],
              row["current_runtime_instance_id"], row["session_token_hash"], event,
              actor_id, reason, plan_id, outcome_hash, now, recovery_instance_id, recovery_session_token_hash, outcome_json),
         )
+        return audit_id
 
     @classmethod
     def _retire_queued_plans(cls, cursor, row, now):
@@ -548,7 +731,9 @@ class SimulationConnectorRepository:
                         same_runtime_session = (
                             prior.get('runtime_generation'), prior.get('runtime_instance_id')
                         ) == (plan.runtime_generation, plan.runtime_instance_id)
-                        if write_plan and not same_runtime_session and not self._repeat_is_intrinsically_safe(plan):
+                        safe_repeat = (self._repeat_is_intrinsically_safe(plan)
+                            or self._repeat_is_freshly_confirmed_document_launch(plan, prior))
+                        if write_plan and not same_runtime_session and not safe_repeat:
                             raise ConnectorRepositoryError('reconciliation_required')
                         continue
                     # A read-only plan cannot leave an external side effect. If

@@ -24,6 +24,8 @@ _TWO_PHASE_ENTRYPOINTS = {
 }
 
 _VISMOCKUP_WEB_WORKFLOWS = {
+    "simulation.teamcenter.node_properties.read.request",
+    "simulation.teamcenter.product_structure.children.read.request",
     "simulation.teamcenter.product.search.request",
     "simulation.teamcenter.revision_rule.search.request",
     "simulation.teamcenter.product_structure.observe.request",
@@ -46,6 +48,10 @@ _VISMOCKUP_WEB_WORKFLOWS = {
 }
 
 _TEAMCENTER_BUSINESS_EFFECTS = {
+    "simulation.teamcenter.node_properties.read.request": "Queue a read of the fixed display-property projection for one exact Teamcenter occurrence, preferring the current principal's local Connector cache.",
+    "simulation.teamcenter.node_properties.read": "Return the fixed display-property projection for one exact Teamcenter occurrence with source identity, capture time and authoritative cache-hit evidence.",
+    "simulation.teamcenter.product_structure.children.read.request": "Queue a read-only generation-pinned page of direct children for one exact Teamcenter source and occurrence path.",
+    "simulation.teamcenter.product_structure.children.read": "Return the requested parent and a bounded page of direct children with source identity, cache age, generation and explicit incomplete-tree semantics.",
     "simulation.teamcenter.product.search.request": "Queue a deterministic exact, prefix, and contains search of Teamcenter item IDs and names without mutating Teamcenter.",
     "simulation.teamcenter.revision_rule.search.request": "Queue a read of the revision rules available to the current in-memory Teamcenter session.",
     "simulation.teamcenter.product_structure.observe.request": "Queue one bounded read-only observation of the selected Teamcenter product structure.",
@@ -61,6 +67,12 @@ _TEAMCENTER_BUSINESS_EFFECTS = {
 }
 
 _RESOURCES = {
+    "simulation.teamcenter.node_properties.read.request": (("teamcenter-endpoint", "source_selector.endpoint_id"), ("teamcenter-online-source", "source_selector.object_uid")),
+    "simulation.teamcenter.node_properties.read": (("teamcenter-endpoint", "source_selector.endpoint_id"), ("teamcenter-online-source", "source_selector.object_uid")),
+    'simulation.connector.recovery.search': (),
+    'simulation.connector.recovery.resolve': (('simulation-connector', 'device_id'), ('simulation-connector-command', 'plan_id')),
+    "simulation.teamcenter.product_structure.children.read.request": (("teamcenter-endpoint", "source_selector.endpoint_id"), ("teamcenter-online-source", "source_selector.object_uid")),
+    "simulation.teamcenter.product_structure.children.read": (("teamcenter-endpoint", "source_selector.endpoint_id"), ("teamcenter-online-source", "source_selector.object_uid")),
     "simulation.connector.health.get": (("simulation-connector", "connector_id"),),
     "simulation.connector.plan.queue": (("simulation-connector", "plan.device_id"),),
     "simulation.teamcenter.product.search.request": (("teamcenter-endpoint", "endpoint_id"),),
@@ -190,6 +202,7 @@ _RESOURCES = {
     "simulation.environment.binding.create": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.binding.remove": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.live_document.rebind": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.online_source.live_document.bind": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.version.freeze": (("simulation-workspace", "workspace_gid"),),
     "simulation.vm_checkpoint.create": (("simulation-workspace", "workspace_gid"), ("simulation-document-snapshot", "snapshot_request_id")),
     "simulation.vm_checkpoint.search": (("simulation-workspace", "workspace_gid"),),
@@ -288,6 +301,50 @@ _RETRYABLE_ERROR_CODES = frozenset({
     "execution_plan_unavailable", "active_document_unavailable",
     "connector_offline", "interactive_session_missing", "vismockup_unavailable",
     "capture_failed", "artifact_upload_unconfirmed", "craft_screenshot_attach_failed",
+})
+
+_TEAMCENTER_NODE_PROPERTY_CAPABILITIES = frozenset({
+    "simulation.teamcenter.node_properties.read.request",
+    "simulation.teamcenter.node_properties.read",
+})
+_TEAMCENTER_NODE_PROPERTY_ERROR_PAIRS = (
+    ("teamcenter_login_required", "The current Connector process has no authenticated in-memory Teamcenter session."),
+    ("teamcenter_input_invalid", "The Teamcenter request envelope is malformed."),
+    ("teamcenter_source_selector_invalid", "The Teamcenter source selector is incomplete or invalid."),
+    ("teamcenter_node_properties_input_invalid", "The occurrence path or fixed node-property request is invalid."),
+    ("teamcenter_node_properties_cache_invalid", "The local node-property cache entry is corrupt, open-ended, or belongs to another occurrence."),
+    ("teamcenter_worker_response_invalid", "The Teamcenter worker returned an invalid or open-ended response."),
+    ("teamcenter_authentication_failed", "Teamcenter rejected the current authentication attempt."),
+    ("teamcenter_session_expired", "The in-memory Teamcenter session expired and must be authenticated again."),
+    ("teamcenter_runtime_unavailable", "The supported Teamcenter runtime is unavailable on the Connector host."),
+    ("teamcenter_worker_start_failed", "The bounded Teamcenter worker process could not be started."),
+    ("teamcenter_timeout", "The bounded Teamcenter read exceeded its execution deadline."),
+    ("teamcenter_worker_response_too_large", "The Teamcenter worker response exceeded the governed size limit."),
+    ("teamcenter_worker_command_forbidden", "The worker rejected an operation outside its fixed read-only allowlist."),
+    ("teamcenter_worker_failed", "The Teamcenter worker failed before producing a valid result."),
+    ("teamcenter_source_not_found", "The exact Teamcenter source object is unavailable."),
+    ("teamcenter_bom_window_failed", "Teamcenter could not create the read-only BOM window for the selected source."),
+    ("teamcenter_parent_path_not_found", "The exact parent occurrence path no longer resolves in Teamcenter."),
+    ("teamcenter_occurrence_identity_invalid", "Teamcenter returned an invalid occurrence identity while walking the path."),
+    ("teamcenter_structure_expand_failed", "Teamcenter could not expand the requested occurrence."),
+    ("teamcenter_structure_properties_failed", "Teamcenter could not read the fixed property projection."),
+    ("teamcenter_structure_response_invalid", "Teamcenter returned an invalid structure response."),
+)
+_TEAMCENTER_NODE_PROPERTY_RETRYABLE_ERRORS = frozenset({
+    "teamcenter_login_required",
+    "teamcenter_session_expired",
+    "teamcenter_runtime_unavailable",
+    "teamcenter_worker_start_failed",
+    "teamcenter_timeout",
+    "teamcenter_worker_failed",
+    "teamcenter_bom_window_failed",
+    "teamcenter_structure_expand_failed",
+    "teamcenter_structure_properties_failed",
+})
+_TEAMCENTER_NODE_PROPERTY_CALLER_ERRORS = frozenset({
+    "teamcenter_input_invalid",
+    "teamcenter_source_selector_invalid",
+    "teamcenter_node_properties_input_invalid",
 })
 
 _PLMXML_ERROR_PAIRS = (
@@ -598,12 +655,95 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         )),
         "domain_errors_complete": "experimental" not in governed.tags,
     }
+    if governed.id in _TEAMCENTER_NODE_PROPERTY_CAPABILITIES:
+        updates.update({
+            "domain_errors": tuple(updates["domain_errors"]) + tuple(
+                DomainErrorContract(
+                    code=code,
+                    meaning=meaning,
+                    retryable=code in _TEAMCENTER_NODE_PROPERTY_RETRYABLE_ERRORS,
+                    is_caller_error=code in _TEAMCENTER_NODE_PROPERTY_CALLER_ERRORS,
+                )
+                for code, meaning in _TEAMCENTER_NODE_PROPERTY_ERROR_PAIRS
+            ),
+            # Worker/runtime diagnostics can evolve independently; this list is
+            # intentionally useful and stable without claiming exhaustiveness.
+            "domain_errors_complete": False,
+        })
     if governed.id in _TWO_PHASE_ENTRYPOINTS and governed.version == 1:
         updates.update({
             "exposure": ExposurePolicy(),
             "agent_output_schema": None,
             "deprecation_message": f"Immediate dispatch is closed; migrate to {governed.id}@2 and its action/dispatch workflow.",
             "no_consumer_reason": "The unsafe immediate-dispatch contract is frozen with no verified runtime consumer and accepts no new traffic.",
+        })
+    if governed.id.startswith('simulation.connector.recovery.'):
+        from backend.capability_v2.identity import DESKTOP_CONSUMER_ID
+        updates.update({
+            'exposure': ExposurePolicy(web=True),
+            'delegation_policy': 'none',
+            'consistency_policy': 'strong',
+            'replay_data_policy': 'projected' if governed.id.endswith('.resolve') else 'metadata_only',
+            'execution_mode': ExecutionMode.CLOUD_SYNC,
+            'consumer_refs': ({'consumer_id': DESKTOP_CONSUMER_ID, 'consumer_type': 'web', 'version_constraint': '==1'},),
+            'test_refs': ({'path': 'backend/tests/test_simulation_connector_runtime_v2_sql.py'},),
+            'transaction_policy': {
+                'owner': 'simulation',
+                'atomicity': ('One bounded owner-scoped read with no writes.' if governed.id.endswith('.search') else
+                    'Device lock then exact plan lock; status and append-only human disposition audit commit together.'),
+                'tables': ['workmanship_sim_connector_runtime_devices', 'workmanship_sim_connector_runtime_plans',
+                           'workmanship_sim_connector_runtime_audit'],
+                'migration_refs': ['backend/db/migrations/domains/simulation/0027_connector_manual_recovery_status.sql'],
+                'idempotency': 'Exact device/plan/generation/expected outcome hash/expected plan hash/expected recovery fingerprint/decision/reason replays one audit reference; differing dispositions refuse. Missing new fields in historical audits normalize to null.',
+                'native_atomicity': 'A human disposition does not assert a native result or mutate native documents.',
+            },
+            'business_effect': ('Return a stable, counted page of owner-visible unresolved Connector operations for human review.'
+                if governed.id.endswith('.search') else
+                'Close one exact uncertain Connector plan with an audited human disposition or abandonment while preserving any recorded runtime outcome.'),
+            'business_acceptance_criteria': (
+                'Only the authenticated web device owner in the same tenant may review the operation.',
+                'The signed outcome remains immutable; review never retries execution or proves successful document association.',
+                'Executed/not_executed decisions require one operation with an outcome hash: document open/insert; probe allow_launch=true; visibility all_on/all_off; node visibility show/hide/isolate; node selection highlight/select/unhighlight/deselect.',
+                'Abandoned archives an exact plan, including unsupported operations/actions, multiple steps, missing hashes or malformed stored JSON, without asserting execution, retrying, or reversing external side effects.',
+                'Every unresolved item has a durable recovery_fingerprint and at least abandoned; only a parseable known bounded operation with a stored outcome hash also allows executed/not_executed. Malformed plan JSON is exposed safely as unknown_operation rather than breaking the page.',
+                'The recovery fingerprint hashes stored device/plan identity, generation, status, raw plan JSON, both hashes, raw outcome, protocol, actor and tenant. Any supplied fingerprint is checked under the device and plan locks; hashless abandonment requires it. Exact historical replay uses the recorded disposition before rechecking the now-cancelled status fingerprint.',
+                'An existing valid outcome hash still requires the exact expected_outcome_hash for legacy clients. Supplied plan hashes must match. Without an outcome, only abandonment with exact plan hash or fingerprint is allowed. Missing optional hashes/fingerprint are omitted in requests, never JSON null; audits record all three expected values including nulls.',
+                'Search defaults to page 1 with five items, allows 1..20 items per page, and counts and pages the same owner/tenant/current-generation unresolved scope within one SQL statement snapshot ordered by created_at and plan_id. Out-of-range pages are empty with truthful totals.',
+            ),
+            'business_invariants': (BusinessInvariantContract(
+                rule_id='simulation.connector.recovery.owner_exact_outcome', version=1,
+                statement=('Search exposes at most the requested page size (maximum twenty) with an exact scoped total, stable created_at/plan_id ordering, and matching owner, tenant and current generation.'
+                    if governed.id.endswith('.search') else
+                    'Human review is owner and tenant scoped and binds exact generation plus stored outcome identity or a locked recovery fingerprint for hashless abandonment; executed/not_executed require one bounded operation and outcome hash; conflicting decisions refuse without side effects.'),
+                applies_when='an unresolved Connector operation is reviewed',
+                enforcement_ref='plugins/simulation/simulation_backend/data/connector_repository.py:SimulationConnectorRepository.' +
+                    ('search_manual_recovery' if governed.id.endswith('.search') else 'resolve_manual_recovery'),
+                error_code='runtime_owner_mismatch' if governed.id.endswith('.search') else 'recovery_state_changed',
+                test_refs=('backend/tests/test_simulation_connector_runtime_v2_sql.py::test_manual_recovery_preserves_signed_outcome_and_replays',
+                           'backend/tests/test_simulation_connector_runtime_v2_sql.py::test_manual_recovery_refuses_wrong_owner_or_stale_state',
+                           'backend/tests/test_simulation_connector_runtime_v2_sql.py::test_manual_recovery_bounded_actions_release_unresolved_blocker',
+                           'backend/tests/test_simulation_connector_runtime_v2_sql.py::test_manual_recovery_ineligible_reasons_refuse_without_mutation',
+                           'backend/tests/test_simulation_connector_runtime_v2_sql.py::test_manual_recovery_abandoned_archives_exact_plan_without_claiming_execution',
+                           'backend/tests/test_simulation_connector_runtime_v2_sql.py::test_manual_recovery_search_paginates_scoped_stable_results',
+                           'backend/tests/test_simulation_connector_runtime_v2_sql.py::test_manual_recovery_search_count_and_page_share_one_statement',
+                           'backend/tests/test_simulation_connector_runtime_v2_sql.py::test_manual_recovery_missing_outcome_requires_exact_plan_identity',
+                           'backend/tests/test_simulation_connector_runtime_v2_sql.py::test_manual_recovery_result_hash_still_required_and_old_audit_replays',
+                           'backend/tests/test_simulation_connector_runtime_v2_sql.py::test_manual_recovery_fingerprint_archives_damaged_plan_and_refuses_stale_snapshot',
+                           'backend/tests/test_simulation_connector_runtime_v2_sql.py::test_manual_recovery_fingerprint_binds_each_storage_identity_field',
+                           'backend/tests/test_connector_recovery_gateway_transaction.py::test_recovery_gateway_plan_hash_only_abandonment_binds_confirmation'),
+            ),),
+            'no_business_invariant_reason': None,
+            'domain_errors': tuple(DomainErrorContract(code=code, meaning=meaning, is_caller_error=True)
+                for code, meaning in (
+                    ('runtime_owner_mismatch', 'The device and plan must belong to the authenticated user and tenant.'),
+                    ('runtime_session_invalid', 'The device must be active and use runtime protocol v2.'),
+                    ('recovery_confirmation_required', 'An exact user confirmation is required.'),
+                    ('recovery_input_invalid', 'Search requires integer page >= 1 and page_size 1..20; resolve requires a valid decision, correctly formatted expected hashes and nonempty bounded reason.'),
+                    ('recovery_state_changed', 'The generation, required outcome/plan identity, recovery fingerprint or unresolved plan state is missing or changed; read it again.'),
+                    ('recovery_decision_conflict', 'A different human disposition has already been recorded.'),
+                    ('recovery_operation_unsupported', 'The selected decision is not allowed for this exact plan; unsupported, multi-step, malformed or outcome-less plans may only be abandoned using their exact recovery identity.'),
+                )),
+            'domain_errors_complete': True,
         })
     if governed.id == "simulation.environment.workspace.cache_lease.get":
         updates.update({
@@ -749,7 +889,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             "business_invariants": invariants,
             "no_business_invariant_reason": None if invariants else _CONNECTOR_READ_REASON,
         })
-    if (
+    if not governed.id.startswith('simulation.connector.recovery.') and (
         governed.id.startswith("simulation.connector.")
         or governed.id.startswith("simulation.vismockup.")
         or governed.id.startswith("simulation.teamcenter.")
@@ -784,8 +924,9 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             "simulation.environment.live_document.adopt": ("Bind the owner's already-open native document and register it as the environment's primary live model."
                 if governed.version >= 2 else "Bind the owner's already-open native document to one durable private importing environment."),
             "simulation.environment.live_document.binding.get": "Resolve the owner's saved document-to-environment association for document and environment selection.",
-            "simulation.environment.live_document.rebind": "Explicitly rotate one owned environment to the freshly attested current native document session while retaining the prior session as history.",
-            "simulation.environment.live_document.inventory.apply": "Persist one signed complete page of alternate hierarchies into the bound environment without mutating VisMockup.",
+                "simulation.environment.live_document.rebind": "Explicitly rotate one owned environment to the freshly attested current native document session while retaining the prior session as history.",
+                "simulation.environment.online_source.live_document.bind": "Bind one user-confirmed Teamcenter online-source launch to the exact freshly attested VisMockup document without replacing its Teamcenter source identity.",
+                "simulation.environment.live_document.inventory.apply": "Persist one signed complete page of alternate hierarchies into the bound environment without mutating VisMockup.",
         }
         updates.update(exposure=ExposurePolicy(web=True), execution_mode=ExecutionMode.CLOUD_SYNC,
             lifecycle_status=LifecycleStatus.EXPERIMENTAL,
@@ -812,8 +953,10 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                 'owner':'simulation', 'atomicity':(
                     'signed AH page/hierarchies/nodes/workspace revision/idempotency in one repository transaction'
                     if governed.id.endswith('.inventory.apply') else
-                    'active binding rotation/primary live model/workspace revision/idempotency in one repository transaction'
-                    if governed.id.endswith('.rebind') else
+                        'active binding rotation/primary live model/workspace revision/idempotency in one repository transaction'
+                        if governed.id.endswith('.rebind') else
+                        'signed Teamcenter launch/current document identity/live binding/online model runtime device/workspace revision/idempotency in one repository transaction'
+                        if governed.id.endswith('online_source.live_document.bind') else
                     'workspace create/version/head/binding/primary live model/idempotency reservation in one repository transaction'
                     if governed.id.endswith('.adopt') and governed.version >= 2 else
                     'workspace create/version/head/binding/idempotency reservation in one repository transaction'
@@ -823,20 +966,21 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                 'tables': (['workmanship_sim_connector_runtime_plans','workmanship_sim_connector_runtime_devices',
                     'workmanship_sim_live_document_bindings','workmanship_sim_workspaces',
                     'workmanship_sim_vm_documents','workmanship_sim_materialization_verifications',
-                    'workmanship_sim_workspace_idempotency'] if governed.id.endswith('.rebind') else
+                        'workmanship_sim_workspace_idempotency'] if (governed.id.endswith('.rebind') or governed.id.endswith('online_source.live_document.bind')) else
                     ['workmanship_sim_connector_runtime_plans','workmanship_sim_connector_runtime_devices',
                     'workmanship_sim_live_document_bindings','workmanship_sim_live_document_adoptions',
                     'workmanship_sim_workspaces','workmanship_sim_workspace_versions','workmanship_sim_workspace_heads',
-                    *(['workmanship_sim_vm_documents'] if ((governed.id.endswith('.adopt') and governed.version >= 2) or governed.id.endswith('.rebind')) else []),
+                        *(['workmanship_sim_vm_documents'] if ((governed.id.endswith('.adopt') and governed.version >= 2) or governed.id.endswith('.rebind') or governed.id.endswith('online_source.live_document.bind')) else []),
                     *(['workmanship_sim_workspace_hierarchies','workmanship_sim_workspace_nodes']
                       if governed.id.endswith('.inventory.apply') else []),
                     *(['workmanship_sim_workspace_idempotency']
-                      if governed.id.endswith('.inventory.apply') or governed.id.endswith('.rebind') else [])]),
+                          if governed.id.endswith('.inventory.apply') or governed.id.endswith('.rebind') or governed.id.endswith('online_source.live_document.bind') else [])]),
                 'migration_refs':['backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql',
                     'backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql'],
-                'dependencies':['vismockup.document.identity.read@1','vismockup.document.hierarchy_inventory.read@1','simulation.vismockup.command.get@1'],
-                'idempotency':('workspace/key plus exact prior and newly attested session' if governed.id.endswith('.rebind') else
-                    'owner/tenant/key plus exact device/session/name' + ('/document display name' if governed.version >= 2 else ''))
+                    'dependencies':['vismockup.document.identity.read@1','vismockup.document.hierarchy_inventory.read@1','teamcenter.visualization.launch@1','simulation.vismockup.command.get@1'],
+                    'idempotency':('workspace/key plus exact signed launch source and freshly attested document session' if governed.id.endswith('online_source.live_document.bind') else
+                        'workspace/key plus exact prior and newly attested session' if governed.id.endswith('.rebind') else
+                        'owner/tenant/key plus exact device/session/name' + ('/document display name' if governed.version >= 2 else ''))
                     + '; retained responses forbid recreation'},
             domain_errors=tuple(DomainErrorContract(code=code, meaning=meaning) for code, meaning in (
                 ('live_document_identity_unavailable','The authenticated native identity cannot be established.'),
@@ -845,7 +989,13 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                 ('live_document_input_invalid','The closed live document request is invalid.'),
                 ('live_document_binding_stale','The prior binding cannot be reused safely.'),
                 ('document_session_changed','The saved binding changed before the explicit rebind committed.'),
-                ('live_document_already_bound','The newly attested native session belongs to another environment.'),
+                    ('live_document_already_bound','The newly attested native session belongs to another environment.'),
+                    ('live_document_binding_conflict','The selected environment already has another active native session.'),
+                    ('launch_evidence_unavailable','The signed Teamcenter launch result is unavailable or invalid.'),
+                    ('launch_evidence_stale','The signed Teamcenter launch result is stale.'),
+                    ('launch_document_device_mismatch','The launch and current native document were attested by different Connector devices.'),
+                    ('online_model_document_not_found','The selected primary Teamcenter online-source document is unavailable.'),
+                    ('online_source_identity_mismatch','The signed launch source does not match the selected online-source document.'),
                 ('primary_live_document_unavailable','The selected environment has no unique primary live document to rebind.'),
                 ('idempotency_conflict','The request key was already used for different adoption input.'),
                 ('runtime_v2_required','A current App v2 runtime is required.'))), domain_errors_complete=False)

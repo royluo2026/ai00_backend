@@ -81,6 +81,60 @@ public sealed class OutcomeUnknownRecoveryTests : IDisposable
         Assert.False(worker.ExecutionQuarantined);
         Assert.True(worker.RequiresProcessRestart);
     }
+    [Fact] public async Task ChildrenTimeoutCompletesCleanupWithoutRestartAndAllowsNextPlan()
+    {
+        using var key = new DeviceSigningKeyStore(root).GetOrCreate();
+        var plan=ProtocolV2VectorTests.Vector["plan"]!.DeepClone().AsObject();
+        plan["steps"]![0]!["timeout_seconds"]=1;
+        plan["steps"]![0]!["operation_id"]="teamcenter.product_structure.children.read@1";
+        plan["steps"]![0]!["side_effect_classification"]="read";
+        plan["steps"]![0]!["post_condition_probe_id"]=null;
+        using var cloud=ProtocolV2VectorTests.TestKey("plan");
+        ProtocolV2VectorTests.SignPlan(plan,cloud);
+        var cleaned=false;
+        var adapter=new FakeAdapter(()=>Task.FromResult(new AdapterResult(true)),
+            "teamcenter.product_structure.children.read@1", async ct=>{
+                if(cleaned)return new AdapterResult(true);
+                try { await Task.Delay(Timeout.Infinite,ct); }
+                finally { await Task.Delay(50); cleaned=true; }
+                return new AdapterResult(true);
+            });
+        var worker=Worker(new AppPlanJournal(Path.Combine(root,"journal")),adapter,key);
+        var outcome=await worker.ExecuteAsync(Lease() with{PlanJson=plan.ToJsonString()},Session(),CancellationToken.None);
+        Assert.Equal("failed_without_effect",outcome.OverallStatus);
+        Assert.False(worker.ExecutionQuarantined);
+        Assert.False(worker.RequiresProcessRestart);
+        Assert.True(cleaned);
+        plan["plan_id"]="children-next";
+        ProtocolV2VectorTests.SignPlan(plan,cloud);
+        var next=await worker.ExecuteAsync(Lease() with{PlanJson=plan.ToJsonString()},Session(),CancellationToken.None);
+        Assert.Equal("succeeded",next.OverallStatus);
+    }
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ChildrenTimeoutWithoutConfirmedCleanupRequiresRestart(bool cleanupFails)
+    {
+        using var key=new DeviceSigningKeyStore(root).GetOrCreate();
+        var plan=ProtocolV2VectorTests.Vector["plan"]!.DeepClone().AsObject();
+        plan["steps"]![0]!["timeout_seconds"]=1;
+        plan["steps"]![0]!["operation_id"]="teamcenter.product_structure.children.read@1";
+        plan["steps"]![0]!["side_effect_classification"]="read";
+        plan["steps"]![0]!["post_condition_probe_id"]=null;
+        using var cloud=ProtocolV2VectorTests.TestKey("plan"); ProtocolV2VectorTests.SignPlan(plan,cloud);
+        var adapter=new FakeAdapter(()=>new TaskCompletionSource<AdapterResult>().Task,
+            "teamcenter.product_structure.children.read@1",
+            cleanupFails ? async ct=>{
+                try { await Task.Delay(Timeout.Infinite,ct); }
+                catch(OperationCanceledException) { throw new ConnectorException("teamcenter_worker_cleanup_failed"); }
+                return new AdapterResult(true);
+            } : null);
+        var worker=Worker(new AppPlanJournal(Path.Combine(root,"journal")),adapter,key);
+        var outcome=await worker.ExecuteAsync(Lease() with{PlanJson=plan.ToJsonString()},Session(),CancellationToken.None);
+        Assert.Equal("failed_without_effect",outcome.OverallStatus);
+        Assert.False(worker.ExecutionQuarantined);
+        Assert.True(worker.RequiresProcessRestart);
+    }
     [Fact] public async Task AdapterRejectionBeforeComIsFailedWithoutEffectForWritePlan()
     {
         using var key = new DeviceSigningKeyStore(root).GetOrCreate();
@@ -206,6 +260,79 @@ public sealed class OutcomeUnknownRecoveryTests : IDisposable
     {
         Assert.Equal(expected, RuntimeSessionWorker.IsObsoleteRecovery(code));
     }
+    [Fact] public async Task AuthenticatedClosedPlanAcknowledgementSkipsOnlyThatExactOutcomeAfterRestart()
+    {
+        using var key=new DeviceSigningKeyStore(root).GetOrCreate();
+        var journal=new AppPlanJournal(Path.Combine(root,"journal"));
+        var adapter=new FakeAdapter(()=>throw new Exception("recovery must never replay the operation"));
+        AppendInterruptedPlan(journal,"plan-002",Lease());
+        var otherPlan=ProtocolV2VectorTests.Vector["plan"]!.DeepClone().AsObject();
+        otherPlan["plan_id"]="plan-other";
+        using(var cloud=ProtocolV2VectorTests.TestKey("plan"))ProtocolV2VectorTests.SignPlan(otherPlan,cloud);
+        AppendInterruptedPlan(journal,"plan-other",Lease() with{PlanJson=otherPlan.ToJsonString()});
+        var recovered=Worker(journal,adapter,key).Recover();
+        var closed=Assert.Single(recovered,outcome=>outcome.PlanId=="plan-002");
+        var other=Assert.Single(recovered,outcome=>outcome.PlanId=="plan-other");
+        var signedOutcome=journal.Events.Single(e=>e.Kind=="outcome"&&e.PlanId==closed.PlanId).Data;
+        using var http=new HttpClient(new InspectRequest(async request=>
+        {
+            Assert.Equal("/api/v1/simulation/connectors/v2/runtime/reconciliation/register",request.RequestUri!.AbsolutePath);
+            Assert.Equal("device-credential",request.Headers.GetValues("X-AI00-Device-Credential").Single());
+            Assert.False(request.Headers.Contains("X-AI00-Runtime-Session"));
+            using var body=JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
+            Assert.Equal(closed.PlanId,body.RootElement.GetProperty("plan_id").GetString());
+            return new HttpResponseMessage(System.Net.HttpStatusCode.Conflict){Content=new StringContent("{\"detail\":{\"code\":\"plan_reconciliation_invalid\"}}")};
+        }));
+        Assert.True(await RuntimeSessionWorker.RecoverOneAsync(closed,journal,async ct=>{await new RuntimeTransport(http,new Uri("https://gateway.example.com")).SendAsync(
+            HttpMethod.Post,"runtime/reconciliation/register",new{plan_id=closed.PlanId},ct,credential:"device-credential");},CancellationToken.None));
+
+        var afterRestart=Worker(new AppPlanJournal(journal.Path),adapter,key).Recover();
+
+        Assert.Equal(signedOutcome,new AppPlanJournal(journal.Path).Events.Single(e=>e.Kind=="outcome"&&e.PlanId==closed.PlanId).Data);
+        Assert.Equal(other.ToJson(),Assert.Single(afterRestart).ToJson());
+        Assert.Equal(0,adapter.Calls);
+        Assert.Contains(journal.Events,e=>e.Kind=="reconciliation_retry_v3"&&e.PlanId==closed.PlanId);
+        Assert.Contains(journal.Events,e=>e.Kind=="acknowledged"&&e.PlanId==closed.PlanId);
+    }
+    [Fact] public async Task AcknowledgedUnknownAllowsANewExplicitPlanButAnotherPendingUnknownStillBlocks()
+    {
+        using var key=new DeviceSigningKeyStore(root).GetOrCreate();
+        var journal=new AppPlanJournal(Path.Combine(root,"journal"));
+        AppendInterruptedPlan(journal,"plan-002",Lease());
+        var recoveryWorker=Worker(journal,new FakeAdapter(()=>throw new Exception("recovery must not replay")),key);
+        var closed=Assert.Single(recoveryWorker.Recover());
+        Assert.True(await RuntimeSessionWorker.RecoverOneAsync(closed,journal,_=>throw new RuntimeTransportException("plan_reconciliation_invalid"),CancellationToken.None));
+        var nextPlan=ProtocolV2VectorTests.Vector["plan"]!.DeepClone().AsObject();
+        nextPlan["plan_id"]="plan-next";
+        using(var cloud=ProtocolV2VectorTests.TestKey("plan"))ProtocolV2VectorTests.SignPlan(nextPlan,cloud);
+        var adapter=new FakeAdapter(()=>Task.FromResult(new AdapterResult(true,new{connected=true})));
+        var restarted=Worker(new AppPlanJournal(journal.Path),adapter,key);
+
+        var next=await restarted.ExecuteAsync(Lease() with{PlanJson=nextPlan.ToJsonString()},Session(),CancellationToken.None);
+
+        Assert.Equal("succeeded",next.OverallStatus);
+        Assert.Equal(1,adapter.Calls);
+        var pendingPlan=ProtocolV2VectorTests.Vector["plan"]!.DeepClone().AsObject();
+        pendingPlan["plan_id"]="plan-pending";
+        using(var cloud=ProtocolV2VectorTests.TestKey("plan"))ProtocolV2VectorTests.SignPlan(pendingPlan,cloud);
+        AppendInterruptedPlan(journal,"plan-pending",Lease() with{PlanJson=pendingPlan.ToJsonString()});
+        Assert.Single(Worker(journal,new FakeAdapter(()=>throw new Exception("recovery must not replay")),key).Recover(),item=>item.PlanId=="plan-pending");
+        var blockedPlan=ProtocolV2VectorTests.Vector["plan"]!.DeepClone().AsObject();
+        blockedPlan["plan_id"]="plan-blocked";
+        using(var cloud=ProtocolV2VectorTests.TestKey("plan"))ProtocolV2VectorTests.SignPlan(blockedPlan,cloud);
+
+        var error=await Assert.ThrowsAsync<InvalidDataException>(()=>Worker(new AppPlanJournal(journal.Path),adapter,key).ExecuteAsync(
+            Lease() with{PlanJson=blockedPlan.ToJsonString()},Session(),CancellationToken.None));
+
+        Assert.Equal("runtime_quarantined",error.Message);
+        Assert.Equal(1,adapter.Calls);
+    }
+    private static void AppendInterruptedPlan(AppPlanJournal journal,string planId,LeasedPlan lease)
+    {
+        journal.Append("plan_received",planId,lease.PlanJson);
+        journal.Append("lease_acquired",planId,JsonSerializer.Serialize(lease));
+        journal.Append("invocation_started",planId,JsonSerializer.Serialize(new{step_id="step-00001",started_at=Now.ToString("O")}));
+    }
     [Theory] [InlineData("device")] [InlineData("generation")] [InlineData("instance")] [InlineData("expiry")] [InlineData("key")] [InlineData("lease")]
     public async Task InvalidBindingsNeverReachAdapter(string field)
     {
@@ -225,12 +352,16 @@ public sealed class OutcomeUnknownRecoveryTests : IDisposable
     internal static RuntimeSession Session()=>new("device-001","tenant-001",7,"runtime-instance-001","session-secret",Now.AddMinutes(3));
     internal static LeasedPlan Lease()=>new("lease-002",Now.AddMinutes(2),ProtocolV2VectorTests.Vector["plan"]!.ToJsonString());
     private static PlanExecutionWorker Worker(AppPlanJournal journal,FakeAdapter adapter,DeviceSigningKey key)=>new(journal,adapter,key,"device-key-001",new Dictionary<string,TrustedPlanKey>{{"cloud-plan-key-2026-09",new(ProtocolV2VectorTests.Vector["plan_public_jwk"]!.ToJsonString(),Now.AddDays(-1),Now.AddDays(1),false)}},()=>Now);
-    internal sealed class FakeAdapter(Func<Task<AdapterResult>> invoke,string operation="vismockup.application.probe@1"):IConnectorAdapter
+    internal sealed class FakeAdapter(Func<Task<AdapterResult>> invoke,string operation="vismockup.application.probe@1",Func<CancellationToken,Task<AdapterResult>>? cancellable=null):IConnectorAdapter
     {
         public int Calls {get;private set;}
         public AdapterManifest Manifest {get;}=new("ai00.vismockup",1,"siemens.vismockup","14.2.0",[new(operation,"sha256:"+new string('4',64))]);
         public Task<AdapterHealth> ProbeAsync(CancellationToken ct)=>Task.FromResult(new AdapterHealth(true,"ready",true,true,"14.2.0"));
-        public Task<AdapterResult> ExecuteAsync(AdapterOperation operation,CancellationToken ct){Calls++;return invoke();}
+        public Task<AdapterResult> ExecuteAsync(AdapterOperation operation,CancellationToken ct){Calls++;return cancellable is null?invoke():cancellable(ct);}
+    }
+    private sealed class InspectRequest(Func<HttpRequestMessage,Task<HttpResponseMessage>> handle):HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,CancellationToken ct)=>handle(request);
     }
     public void Dispose(){if(Directory.Exists(root))Directory.Delete(root,true);}
 }

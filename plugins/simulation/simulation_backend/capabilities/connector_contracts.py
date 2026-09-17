@@ -149,6 +149,74 @@ AH_APPLY_INPUT = obj({"document_session":HASH,"hierarchy_gid":{"type":"string","
     ("document_session","hierarchy_gid","base_hash","desired_hash","cursor","max_operations"))
 
 
+TC_OCCURRENCE_EDGE = obj({
+    "occurrence_uid": {"type": "string", "minLength": 1, "maxLength": 128},
+    "item_revision_uid": {"type": "string", "minLength": 1, "maxLength": 128},
+}, ("occurrence_uid", "item_revision_uid"))
+TC_CHILDREN_INPUT = obj({
+    "source_selector": TC_VISUALIZATION_SOURCE_SELECTOR,
+    "parent_path": {"type": "array", "maxItems": 128, "items": TC_OCCURRENCE_EDGE},
+    "cursor": {"type": "integer", "minimum": 0},
+    "page_size": {"type": "integer", "minimum": 1, "maximum": 500},
+    "refresh": {"type": "boolean"},
+    "generation": {"type": ["string", "null"], "minLength": 1, "maxLength": 128},
+}, ("source_selector", "parent_path", "cursor", "page_size", "refresh", "generation"))
+TC_CHILDREN_INPUT["oneOf"] = [
+    {"properties": {"cursor": {"const": 0}, "generation": {"type": "null"}}},
+    {"properties": {"cursor": {"minimum": 1}, "generation": {"type": "string"}, "refresh": {"const": False}}},
+]
+TC_CHILD_NODE = obj({
+    "occurrence_id": HASH,
+    "parent_occurrence_id": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+    "occurrence_path": {"type": "array", "maxItems": 129, "items": TC_OCCURRENCE_EDGE},
+    "depth": {"type": "integer", "minimum": 0, "maximum": 129},
+    "child_order": {"type": "integer", "minimum": 0},
+    "name": {"type": "string"},
+    "item_revision_uid": {"type": "string"},
+    "revision_id": {"type": "string"},
+    "component_type": {"type": "string"},
+    "has_children": {"type": ["boolean", "null"]},
+}, ("occurrence_id", "parent_occurrence_id", "occurrence_path", "depth", "child_order",
+    "name", "item_revision_uid", "revision_id", "component_type", "has_children"))
+TC_CHILDREN_RESULT = obj({
+    "source_identity_hash": HASH,
+    "captured_at": {"type": "string", "format": "date-time"},
+    "cache_hit": {"type": "boolean"},
+    "generation": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+    "parent": TC_CHILD_NODE,
+    "nodes": {"type": "array", "maxItems": 500, "items": TC_CHILD_NODE},
+    "cursor": {"type": "integer", "minimum": 0},
+    "next_cursor": {"type": ["integer", "null"], "minimum": 0},
+    "child_count": {"type": "integer", "minimum": 0},
+    "complete": {"type": "boolean", "const": False},
+}, ("source_identity_hash", "captured_at", "cache_hit", "generation", "parent", "nodes",
+    "cursor", "next_cursor", "child_count", "complete"))
+TC_NODE_PROPERTIES_INPUT = obj({
+    "source_selector": TC_VISUALIZATION_SOURCE_SELECTOR,
+    "occurrence_path": {"type": "array", "maxItems": 128, "items": TC_OCCURRENCE_EDGE},
+}, ("source_selector", "occurrence_path"))
+TC_NODE_PROPERTY_VALUES = obj({
+    "name": {"type": ["string", "null"], "maxLength": 4096},
+    "item_id": {"type": ["string", "null"], "maxLength": 4096},
+    "revision_id": {"type": ["string", "null"], "maxLength": 4096},
+    "component_type": {"type": ["string", "null"], "maxLength": 4096},
+    "owning_user": {"type": ["string", "null"], "maxLength": 4096},
+    "owning_group": {"type": ["string", "null"], "maxLength": 4096},
+    "weight_raw": {"type": ["string", "null"], "maxLength": 4096},
+    "unit_weight_raw": {"type": ["string", "null"], "maxLength": 4096},
+    "torque_raw": {"type": ["string", "null"], "maxLength": 4096},
+    "torque_importance": {"type": ["string", "null"], "maxLength": 4096},
+    "occurrence_uid": {"type": ["string", "null"], "minLength": 1, "maxLength": 128},
+}, ("name", "item_id", "revision_id", "component_type", "owning_user", "owning_group",
+    "weight_raw", "unit_weight_raw", "torque_raw", "torque_importance", "occurrence_uid"))
+TC_NODE_PROPERTIES_RESULT = obj({
+    "source_identity_hash": HASH,
+    "captured_at": {"type": "string", "format": "date-time"},
+    "cache_hit": {"type": "boolean"},
+    "properties": TC_NODE_PROPERTY_VALUES,
+}, ("source_identity_hash", "captured_at", "cache_hit", "properties"))
+
+
 class AdapterOperation(FrozenModel):
     operation_id: str = Field(pattern=r"^[a-z][a-z0-9_.-]{2,127}@[1-9][0-9]*$")
     contract_hash: str = Field(pattern=HASH_PATTERN)
@@ -190,6 +258,10 @@ class ConnectorHealth(FrozenModel):
 
 
 INPUT_SCHEMAS = {
+    "simulation.teamcenter.node_properties.read.request": TC_NODE_PROPERTIES_INPUT,
+    "simulation.teamcenter.node_properties.read": TC_NODE_PROPERTIES_INPUT,
+    "simulation.teamcenter.product_structure.children.read.request": TC_CHILDREN_INPUT,
+    "simulation.teamcenter.product_structure.children.read": TC_CHILDREN_INPUT,
     "simulation.teamcenter.product.search.request": TC_SEARCH_INPUT,
     "simulation.teamcenter.revision_rule.search.request": TC_REVISION_RULE_INPUT,
     "simulation.teamcenter.product_structure.observe.request": TC_OBSERVE_INPUT,
@@ -389,6 +461,10 @@ PAIRING_SUMMARY = obj({
 }, ("pairing_id", "user_code", "device_name", "runtime_version", "masked_windows_user", "status", "expires_at", "resource_version"))
 
 OUTPUT_SCHEMAS = {
+    "simulation.teamcenter.node_properties.read.request": OPERATION_REF,
+    "simulation.teamcenter.node_properties.read": TC_NODE_PROPERTIES_RESULT,
+    "simulation.teamcenter.product_structure.children.read.request": OPERATION_REF,
+    "simulation.teamcenter.product_structure.children.read": TC_CHILDREN_RESULT,
     "simulation.teamcenter.product.search.request": OPERATION_REF,
     "simulation.teamcenter.revision_rule.search.request": OPERATION_REF,
     "simulation.teamcenter.product_structure.observe.request": OPERATION_REF,
@@ -472,6 +548,47 @@ __all__ = [
 ]
 
 # App v2 user actions remain governed; device transport is not a business Capability.
+INPUT_SCHEMAS['simulation.connector.recovery.search'] = obj({
+    'page': {'type': 'integer', 'minimum': 1, 'default': 1},
+    'page_size': {'type': 'integer', 'minimum': 1, 'maximum': 20, 'default': 5},
+})
+RECOVERY_ITEM = obj({
+    'plan_id': STRING, 'device_id': STRING,
+    'runtime_generation': {'type': 'integer', 'minimum': 1},
+    'outcome_hash': {'type': ['string', 'null'], 'pattern': '^sha256:[0-9a-f]{64}$'},
+    'plan_hash': {'type': ['string', 'null'], 'pattern': '^sha256:[0-9a-f]{64}$'},
+    'recovery_fingerprint': HASH,
+    'operation_id': STRING,
+    'status': {'type': 'string', 'enum': ['outcome_unknown', 'manual_review_required']},
+    'eligible': {'type': 'boolean'}, 'error_code': STRING,
+    'ineligible_reason': {'type': ['string', 'null'], 'enum': [None, 'missing_outcome_hash',
+        'multiple_operations', 'unsupported_operation', 'unsupported_action', 'missing_plan_hash']},
+    'allowed_decisions': {'type': 'array', 'maxItems': 3, 'uniqueItems': True,
+        'items': {'type': 'string', 'enum': ['executed', 'not_executed', 'abandoned']}},
+}, ('plan_id', 'device_id', 'runtime_generation', 'outcome_hash', 'operation_id', 'status', 'eligible', 'error_code'))
+OUTPUT_SCHEMAS['simulation.connector.recovery.search'] = obj({
+    'items': {'type': 'array', 'maxItems': 20, 'items': RECOVERY_ITEM},
+    'page': {'type': 'integer', 'minimum': 1},
+    'page_size': {'type': 'integer', 'minimum': 1, 'maximum': 20},
+    'total': {'type': 'integer', 'minimum': 0},
+    'page_count': {'type': 'integer', 'minimum': 0},
+}, ('items', 'page', 'page_size', 'total', 'page_count'))
+INPUT_SCHEMAS['simulation.connector.recovery.resolve'] = obj({
+    'plan_id': {'type': 'string', 'minLength': 1, 'maxLength': 256},
+    'device_id': {'type': 'string', 'minLength': 1, 'maxLength': 256},
+    'expected_generation': {'type': 'integer', 'minimum': 1},
+    'expected_outcome_hash': HASH,
+    'expected_plan_hash': HASH,
+    'expected_recovery_fingerprint': HASH,
+    'decision': {'type': 'string', 'enum': ['not_executed', 'executed', 'abandoned']},
+    'reason': {'type': 'string', 'minLength': 1, 'maxLength': 1024},
+}, ('plan_id', 'device_id', 'expected_generation', 'decision', 'reason'))
+OUTPUT_SCHEMAS['simulation.connector.recovery.resolve'] = obj({
+    'plan_id': STRING, 'device_id': STRING,
+    'decision': {'type': 'string', 'enum': ['not_executed', 'executed', 'abandoned']},
+    'audit_ref': STRING, 'retry_started': {'type': 'boolean', 'const': False},
+}, ('plan_id', 'device_id', 'decision', 'audit_ref', 'retry_started'))
+
 INPUT_SCHEMAS['simulation.connector.runtime.takeover'] = obj({
     'device_id': {'type': 'string', 'minLength': 1, 'maxLength': 256},
     'expected_generation': {'type': 'integer', 'minimum': 1},

@@ -111,7 +111,7 @@ public sealed class TeamcenterReadOnlyRuntimeTests
     [Fact]
     public void Policy_has_no_generic_or_persistent_write_operation()
     {
-        Assert.Equal(new[] { "status", "revision_rules", "search", "observe", "launch" }, TeamcenterReadOnlyPolicy.WorkerCommands);
+        Assert.Equal(new[] { "status", "revision_rules", "search", "observe", "launch", "children", "node_properties" }, TeamcenterReadOnlyPolicy.WorkerCommands);
         Assert.Contains("executeSavedQueries", TeamcenterReadOnlyPolicy.AllowedServiceTokens);
         Assert.DoesNotContain(TeamcenterReadOnlyPolicy.ForbiddenServiceTokens,
             token => TeamcenterReadOnlyPolicy.AllowedServiceTokens.Contains(token));
@@ -191,6 +191,52 @@ public sealed class TeamcenterReadOnlyRuntimeTests
         Assert.DoesNotContain("semantic", script, StringComparison.OrdinalIgnoreCase);
     }
 
+    [Fact]
+    public async Task Visualization_protocol_ignores_bounded_sdk_stdout_noise()
+    {
+        using var reader = new StringReader("SDK diagnostic 2.0: ready\nAI00_TC_VIS_V1:{\"type\":\"material_ready\"}\n");
+
+        var json = await TeamcenterProcessWorker.ReadVisualizationProtocolLineAsync(reader, 1024, CancellationToken.None);
+
+        Assert.Equal("{\"type\":\"material_ready\"}", json);
+        var script = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "teamcenter_visualization_launch.js"));
+        Assert.Equal(3, script.Split("AI00_TC_VIS_V1:").Length - 1);
+    }
+
+    [Fact]
+    public void Visualization_protocol_preserves_worker_failure_code_before_material_ready()
+    {
+        var error = Assert.Throws<ConnectorException>(() =>
+            TeamcenterProcessWorker.ParseVisualizationMaterialReady(
+                "{\"ok\":false,\"code\":\"teamcenter_visualization_launch_info_failed\"}",
+                "expected-document", "expected-source"));
+
+        Assert.Equal("teamcenter_visualization_launch_info_failed", error.Message);
+    }
+
+    [Fact]
+    public void Visualization_launch_passes_the_typed_id_info_array_required_by_the_service_contract()
+    {
+        var script = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "teamcenter_visualization_launch.js"));
+
+        Assert.Contains("Java.to([id],'com.teamcenter.services.rac.visualization._2013_05.DataManagement$IdInfo2[]')", script.Replace(" ", ""));
+        Assert.Contains("Java.to([ids,server,agent,sessionInfo],'java.lang.Object[]')", script.Replace(" ", ""));
+        Assert.DoesNotContain("Java.to([[id],server,agent,sessionInfo]", script.Replace(" ", ""));
+    }
+
+    [Fact]
+    public void Visualization_preparation_failure_is_no_effect_and_preserves_safe_diagnostic()
+    {
+        var serverError = TeamcenterProcessWorker.NoEffectBeforeVisualizationConsumer(
+            new ConnectorException("teamcenter_worker_response_invalid"),
+            "服务器返回内部服务器错误。 解析 DOM 时发生错误：。 应用程序将终止。");
+        var launchError = TeamcenterProcessWorker.NoEffectBeforeVisualizationConsumer(
+            new ConnectorException("teamcenter_visualization_launch_info_failed"), "");
+
+        Assert.Equal("teamcenter_visualization_server_error", serverError.Code);
+        Assert.Equal("teamcenter_visualization_launch_info_failed", launchError.Code);
+    }
+
     private sealed class RecordingTeamcenterWorker : ITeamcenterWorker
     {
         public string PasswordSeen { get; private set; } = "";
@@ -219,7 +265,7 @@ public sealed class TeamcenterReadOnlyRuntimeTests
         { await release.WaitAsync(ct); return Nodes; }
         public Task<TeamcenterLaunchResult> LaunchAsync(TeamcenterSourceSelector selector, string expectedVisdocUid, string username, string password, CancellationToken ct)
         { PasswordSeen = password; return Task.FromResult(new TeamcenterLaunchResult("tclaunch:" + new string('a', 64), true, expectedVisdocUid, selector.IdentityHash)); }
-        public Task<TeamcenterLaunchResult> ConsumeVisualizationAsync(TeamcenterSourceSelector selector, string expectedVisdocUid, Func<string, CancellationToken, Task> consumer, string username, string password, CancellationToken ct)
+        public Task<TeamcenterLaunchResult> ConsumeVisualizationAsync(TeamcenterSourceSelector selector, string expectedVisdocUid, string visualizationOperation, Func<string, CancellationToken, Task> consumer, string username, string password, CancellationToken ct)
         { PasswordSeen = password; return Task.FromResult(new TeamcenterLaunchResult("tclaunch:" + new string('a', 64), true, expectedVisdocUid, selector.IdentityHash)); }
     }
 }

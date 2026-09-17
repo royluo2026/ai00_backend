@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="..\..\..\docs\contracts\teamcenter.node_properties.read@1.json" Link="teamcenter.node_properties.read@1.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\..\docs\contracts\teamcenter.product_structure.children.read@1.json" Link="teamcenter.product_structure.children.read@1.json" CopyToOutputDirectory="PreserveNewest" />
     <ProjectReference Include="..\..\src\Ai00.Connector.AppHost\Ai00.Connector.AppHost.csproj" />
     <ProjectReference Include="..\..\src\Ai00.Connector.Contracts.V2\Ai00.Connector.Contracts.V2.csproj" />
     <None Include="..\..\..\backend\tests\fixtures\connector_execution_plan_v2.json" Link="connector_execution_plan_v2.json" CopyToOutputDirectory="PreserveNewest" />

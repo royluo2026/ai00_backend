@@ -19,6 +19,8 @@ from plugins.simulation.simulation_backend.capabilities.connector_runtime import
     ConnectorControlPlane,
     ConnectorError,
     ConnectorHealth,
+    DIRECT_VISMOCKUP_CAPABILITIES,
+    DIRECT_VISMOCKUP_OPERATIONS,
     _direct_vismockup_plan,
     _direct_vismockup_plan_v2,
     require_compatible,
@@ -698,10 +700,14 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
 
     by_id = {(spec.id, spec.version): (spec, descriptor) for spec, descriptor in registry.items}
     assert set(by_id) == {
+        ("simulation.connector.recovery.search", 1),
+        ("simulation.connector.recovery.resolve", 1),
         ("simulation.teamcenter.product.search.request", 1),
         ("simulation.teamcenter.revision_rule.search.request", 1),
         ("simulation.teamcenter.product_structure.observe.request", 1),
         ("simulation.teamcenter.product_structure.page.read.request", 1),
+        ("simulation.teamcenter.product_structure.children.read.request", 1),
+        ("simulation.teamcenter.node_properties.read.request", 1),
         ("simulation.teamcenter.visualization.launch.request", 1),
         ("simulation.teamcenter.visualization.insert.request", 1),
         ("simulation.vismockup.document.identity.read.request", 1),
@@ -710,6 +716,7 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
         ("simulation.environment.live_document.adopt", 2),
         ("simulation.environment.live_document.binding.get", 1),
         ("simulation.environment.live_document.rebind", 1),
+        ("simulation.environment.online_source.live_document.bind", 1),
         ("simulation.environment.live_document.inventory.apply", 1),
         ("simulation.connector.runtime.takeover", 1),
         ("simulation.connector.health.get", 1),
@@ -742,6 +749,8 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
         ("simulation.teamcenter.product.search", 1),
         ("simulation.teamcenter.revision_rule.search", 1),
         ("simulation.teamcenter.product_structure.page.read", 1),
+        ("simulation.teamcenter.product_structure.children.read", 1),
+        ("simulation.teamcenter.node_properties.read", 1),
         ("simulation.teamcenter.visualization.launch", 1),
         ("simulation.teamcenter.visualization.insert", 1),
     }
@@ -803,6 +812,32 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
     }
     assert by_id[("simulation.teamcenter.product_structure.observe.request", 1)][0].risk.value == "read"
     assert by_id[("simulation.teamcenter.product_structure.page.read.request", 1)][0].risk.value == "read"
+    node_properties = by_id[("simulation.teamcenter.node_properties.read.request", 1)][0]
+    assert set(node_properties.input_schema["properties"]) == {"source_selector", "occurrence_path"}
+    assert node_properties.risk.value == "read"
+    assert node_properties.confirmation == "none"
+    expected_node_property_errors = {
+        "teamcenter_login_required",
+        "teamcenter_node_properties_input_invalid",
+        "teamcenter_node_properties_cache_invalid",
+        "teamcenter_worker_response_invalid",
+        "teamcenter_parent_path_not_found",
+        "teamcenter_session_expired",
+    }
+    for capability_id in (
+        "simulation.teamcenter.node_properties.read.request",
+        "simulation.teamcenter.node_properties.read",
+    ):
+        descriptor = by_id[(capability_id, 1)][1]
+        assert expected_node_property_errors <= {error.code for error in descriptor.domain_errors}
+        assert descriptor.domain_errors_complete is False
+    assert DIRECT_VISMOCKUP_OPERATIONS["tc_node_properties"] == (
+        "teamcenter.node_properties.read@1",
+        "sha256:aab317614eb33e600e66660b0879fe59fdda138b7c37fe373af1c12d75eff6b5",
+    )
+    assert DIRECT_VISMOCKUP_CAPABILITIES["tc_node_properties"] == (
+        "simulation.teamcenter.node_properties.read.request"
+    )
     assert by_id[("simulation.teamcenter.visualization.launch.request", 1)][0].risk.value == "write"
     assert by_id[("simulation.teamcenter.visualization.insert.request", 1)][0].risk.value == "write"
     assert by_id[("simulation.teamcenter.visualization.insert.request", 1)][0].confirmation == "user"

@@ -262,6 +262,8 @@ def is_resumable_ddl(statement: str) -> bool:
     marked_foreign_key_drop = "AI00: RESUMABLE DROP FOREIGN KEY" in statement.upper()
     marked_create_trigger = "AI00: RESUMABLE CREATE TRIGGER" in statement.upper()
     return bool(
+        _status_check_replacement(statement)
+        or
         re.match(r"^CREATE TABLE IF NOT EXISTS\b", normalized)
         or re.match(r"^CREATE (?:UNIQUE )?INDEX IF NOT EXISTS\b", normalized)
         or re.match(
@@ -292,8 +294,78 @@ def is_resumable_ddl(statement: str) -> bool:
     )
 
 
+def _status_check_replacement(statement: str):
+    if 'AI00: RESUMABLE ADD EXPANDED STATUS CHECK' in statement.upper():
+        match = re.fullmatch(
+            r"ALTER\s+TABLE\s+`?(workmanship_sim_connector_runtime_plans)`?\s+"
+            r"ADD\s+CONSTRAINT\s+`?([A-Za-z0-9_]+)`?\s+CHECK\s*"
+            r"\(status\s+IN\s*\(([^)]+)\)\)", strip_sql_comments(statement), re.I | re.S)
+        if match:
+            return ('add', *match.groups())
+    elif 'AI00: RESUMABLE RETIRE OLD STATUS CHECK' in statement.upper():
+        match = re.fullmatch(
+            r"ALTER\s+TABLE\s+`?(workmanship_sim_connector_runtime_plans)`?\s+"
+            r"DROP\s+CHECK\s+sim_runtime_plan_status_pre_recovery", strip_sql_comments(statement), re.I)
+        if match:
+            return ('retire', match.group(1), None, None)
+    return None
+
+
 def prepare_resumable_statement(conn, statement: str) -> str | None:
     """Translate declarative IF NOT EXISTS DDL for OceanBase 4.3.5."""
+    replacement = _status_check_replacement(statement)
+    if replacement:
+        phase, table, constraint, values = replacement
+        old_values = {'queued', 'leased', 'executing', 'succeeded', 'failed_without_effect',
+                      'outcome_unknown', 'manual_review_required', 'expired'}
+        desired = old_values | {'cancelled'}
+        if phase == 'add' and (set(re.findall(r"'([a-z_]+)'", values)) != desired
+                or re.sub(r"'[a-z_]+'|[,\s]", '', values)):
+            raise MigrationError('unexpected runtime plan status replacement')
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT tc.CONSTRAINT_NAME, cc.CHECK_CLAUSE FROM information_schema.TABLE_CONSTRAINTS tc "
+                "JOIN information_schema.CHECK_CONSTRAINTS cc ON cc.CONSTRAINT_SCHEMA=tc.CONSTRAINT_SCHEMA "
+                "AND cc.CONSTRAINT_NAME=tc.CONSTRAINT_NAME WHERE tc.CONSTRAINT_SCHEMA=DATABASE() "
+                "AND tc.TABLE_NAME=%s AND tc.CONSTRAINT_TYPE='CHECK'", (rewrite_sql(table),))
+            rows = cur.fetchall()
+        matches = []
+        for row in rows:
+            name, clause = (row['CONSTRAINT_NAME'], row['CHECK_CLAUSE']) if isinstance(row, dict) else row
+            clause = re.sub(r'_(?:utf8mb4|utf8|ascii|binary)(?=\s*\x27)', '', str(clause), flags=re.I)
+            clause = clause.replace('`', '').strip().strip('()').strip()
+            match = re.fullmatch(r"status\s+in\s*\((.*)", clause, re.I | re.S)
+            if match:
+                raw = match.group(1)
+                current = set(re.findall(r"'([a-z_]+)'", raw))
+                if re.sub(r"'[a-z_]+'|[,\s]", '', raw):
+                    raise MigrationError('unrecognized runtime plan status constraint')
+                matches.append((name, current))
+            elif re.search(r'\bstatus\b', clause, re.I):
+                raise MigrationError('unrecognized runtime plan status constraint')
+        old = [name for name, current in matches if current == old_values]
+        expanded = [name for name, current in matches if current == desired]
+        if (not matches or len(old) > 1 or len(expanded) > 1
+                or len(old) + len(expanded) != len(matches)):
+            raise MigrationError('missing, ambiguous or changed runtime plan status constraint')
+        if phase == 'retire':
+            if not expanded:
+                raise MigrationError('expanded runtime plan status constraint must exist before retiring old check')
+            if not old:
+                return None
+            if not re.fullmatch(r'[A-Za-z0-9_]+', old[0]):
+                raise MigrationError('invalid runtime plan constraint identifier')
+            return f"ALTER TABLE `{table}` DROP CHECK `{old[0]}`"
+        if expanded:
+            return None
+        # Constraint names share the database namespace, unlike table-local indexes.
+        # Bind the seed to the effective table, keeping MySQL's 64-character limit.
+        suffix = hashlib.sha256((rewrite_sql(table) + '\0' + constraint).encode('utf-8')).hexdigest()[:16]
+        constraint = constraint[:47] + '_' + suffix
+        # OceanBase 3.2 rejects combined constraint DDL. Retain the old check until
+        # the second phase re-reads and verifies the expanded check has committed.
+        return (f"ALTER TABLE `{table}` ADD CONSTRAINT `{constraint}` "
+                f"CHECK (status IN ({values}))")
     create_trigger = re.search(
         r"\bCREATE\s+TRIGGER\s+`?([A-Za-z0-9_]+)`?\s+BEFORE\s+(?:UPDATE|DELETE)\b",
         strip_sql_comments(statement),

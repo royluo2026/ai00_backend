@@ -8,16 +8,13 @@ namespace Ai00.Connector.Tests;
 public sealed class TeamcenterWorkerContractTests
 {
     [Fact]
-    public void Search_queries_exact_prefix_and_contains_before_name_fallbacks()
+    public void Search_uses_exact_id_then_batched_contains_fallback()
     {
         var script = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "teamcenter_readonly_worker.js"));
         var stages = new[] {
-            "execute('items_tag.item_id',query);",
-            "execute('items_tag.item_id',query+'*');",
-            "execute('items_tag.item_id','*'+query+'*');",
-            "execute('object_name',query);",
-            "execute('object_name',query+'*');",
-            "execute('object_name','*'+query+'*');",
+            "executeBatch([['items_tag.item_id',query]]);",
+            "['items_tag.item_id','*'+query+'*']",
+            "['object_name','*'+query+'*']",
         };
         var previous = -1;
         foreach (var stage in stages)
@@ -26,6 +23,11 @@ public sealed class TeamcenterWorkerContractTests
             Assert.True(current > previous, $"missing or unordered query stage: {stage}");
             previous = current;
         }
+        Assert.Contains("if(!ordered.length)executeBatch", script);
+        Assert.Contains("executeSavedQueries(Java.to(inputs", script);
+        Assert.DoesNotContain("entries.push(queryEntry('item_revision_id'))", script);
+        Assert.Contains("display(revision,'item_revision_id')===revisionId", script);
+        Assert.Contains("dmSearch.getProperties(Java.to(itemValues", script);
         Assert.Contains("teamcenter_session_expired", script);
         Assert.Contains("teamcenter_authentication_failed", script);
         Assert.Contains("maxNumToReturn=5001", script.Replace(" ", ""));

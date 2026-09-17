@@ -186,6 +186,12 @@ Queue one bounded page read of the current document's alternate hierarchies.
 - `live_document_binding_stale`：The prior binding cannot be reused safely.（retryable=false）
 - `document_session_changed`：The saved binding changed before the explicit rebind committed.（retryable=false）
 - `live_document_already_bound`：The newly attested native session belongs to another environment.（retryable=false）
+- `live_document_binding_conflict`：The selected environment already has another active native session.（retryable=false）
+- `launch_evidence_unavailable`：The signed Teamcenter launch result is unavailable or invalid.（retryable=false）
+- `launch_evidence_stale`：The signed Teamcenter launch result is stale.（retryable=false）
+- `launch_document_device_mismatch`：The launch and current native document were attested by different Connector devices.（retryable=false）
+- `online_model_document_not_found`：The selected primary Teamcenter online-source document is unavailable.（retryable=false）
+- `online_source_identity_mismatch`：The signed launch source does not match the selected online-source document.（retryable=false）
 - `primary_live_document_unavailable`：The selected environment has no unique primary live document to rebind.（retryable=false）
 - `idempotency_conflict`：The request key was already used for different adoption input.（retryable=false）
 - `runtime_v2_required`：A current App v2 runtime is required.（retryable=false）

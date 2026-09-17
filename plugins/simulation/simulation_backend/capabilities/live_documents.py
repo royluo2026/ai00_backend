@@ -22,6 +22,9 @@ BINDING_INPUT = {**obj(dict(identity_operation_id=KEY, workspace_gid=GID), []),
 REBIND_INPUT = obj(dict(workspace_gid=GID, identity_operation_id=KEY,
     expected_document_session=HASH, expected_workspace_row_version={'type':'integer','minimum':1},
     idempotency_key=KEY))
+ONLINE_BIND_INPUT = obj(dict(workspace_gid=GID, document_gid=GID,
+    launch_operation_id=KEY, identity_operation_id=KEY,
+    expected_workspace_row_version={'type':'integer','minimum':1}, idempotency_key=KEY))
 ADOPT_OUTPUT_V1 = obj(dict(workspace_gid=GID, version_gid=GID,
     state={'type':'string','enum':['importing']}, created={'type':'boolean'}))
 ADOPT_OUTPUT = obj(dict(workspace_gid=GID, version_gid=GID, model_document_gid=GID,
@@ -33,6 +36,7 @@ REBIND_OUTPUT = obj(dict(workspace_gid=GID, document_gid=GID,
     state={'type':'string','enum':['importing','bound']}, connector_device_id=KEY,
     document_session=HASH, workspace_row_version={'type':'integer','minimum':1},
     cache_revision_hash=HASH))
+ONLINE_BIND_OUTPUT = REBIND_OUTPUT
 INVENTORY_APPLY_INPUT = obj(dict(workspace_gid=GID, inventory_operation_id=KEY, idempotency_key=KEY))
 INVENTORY_APPLY_OUTPUT = obj(dict(workspace_gid=GID,
     imported_hierarchy_count={'type':'integer','minimum':0}, next_index={'type':['integer','null'],'minimum':0},
@@ -120,6 +124,27 @@ class LiveDocumentProvider:
             raise CapabilityBusinessError(str(exc), str(exc)) from exc
         return self._output(result)
 
+    def bind_online(self, payload, context):
+        scope = self._scope(payload, context, ONLINE_BIND_INPUT)
+        try:
+            launch = self.connectors.verified_teamcenter_launch(
+                payload['launch_operation_id'], actor_id=context.user_gid,
+                tenant_id=context.team_gid, now=self.clock())
+            identity = self.connectors.verified_document_identity(
+                payload['identity_operation_id'], actor_id=context.user_gid,
+                tenant_id=context.team_gid, now=self.clock())
+            if launch['connector_device_id'] != identity['connector_device_id']:
+                raise WorkspaceRepositoryError('launch_document_device_mismatch')
+            result = self.workspaces.bind_online_live_document(
+                **scope, **identity, workspace_gid=payload['workspace_gid'],
+                document_gid=payload['document_gid'],
+                source_identity_hash=launch['source_identity_hash'],
+                expected_workspace_row_version=payload['expected_workspace_row_version'],
+                idempotency_key=payload['idempotency_key'])
+        except (ConnectorRepositoryError, WorkspaceRepositoryError, KeyError) as exc:
+            raise CapabilityBusinessError(str(exc), str(exc)) from exc
+        return self._output(result)
+
     def apply_inventory(self, payload, context):
         scope = self._scope(payload, context, INVENTORY_APPLY_INPUT)
         try:
@@ -151,3 +176,12 @@ def register_live_document_capabilities(registry, control_plane):
             do_not_use_when='Native identity is unavailable or another user owns the binding.', risk=risk,
             confirmation='user' if name == 'rebind' else 'none', permissions=('simulation.use',), input_schema=input_schema, output_schema=output_schema,
             tags=('simulation','live_document','experimental')), handler)
+    register(registry, CapabilitySpec(
+        id='simulation.environment.online_source.live_document.bind', owner='simulation', version=1,
+        description='Bind a freshly launched Teamcenter online source document to its attested VisMockup session.',
+        use_when='A user-confirmed Teamcenter launch has opened a new VisMockup document for an owned online-source model.',
+        do_not_use_when='Either signed launch evidence or current native document identity is unavailable or mismatched.',
+        risk=CapabilityRisk.WRITE, confirmation='user', permissions=('simulation.use',),
+        input_schema=ONLINE_BIND_INPUT, output_schema=ONLINE_BIND_OUTPUT,
+        tags=('simulation','teamcenter_online','live_document','experimental')),
+        provider.bind_online)

@@ -60,7 +60,7 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
                 if(retained!=null){var result=OutcomeV2.ParseAndVerify(retained.Data,signingKey.PublicJwk.GetRawText());if(result.LeaseId!=lease.LeaseId)throw new InvalidDataException("lease_replay_conflict");return result;}
                 throw new InvalidDataException("plan_recovery_required");
             }
-            if(ExecutionQuarantined||journal.Events.Any(e=>e.Kind=="outcome"&&OutcomeV2.ParseAndVerify(e.Data,signingKey.PublicJwk.GetRawText()).OverallStatus=="outcome_unknown"&&!journal.Events.Any(a=>a.PlanId==e.PlanId&&a.Kind=="reconciled")))throw new InvalidDataException("runtime_quarantined");
+            if(ExecutionQuarantined||journal.Events.Any(e=>e.Kind=="outcome"&&OutcomeV2.ParseAndVerify(e.Data,signingKey.PublicJwk.GetRawText()).OverallStatus=="outcome_unknown"&&!journal.Events.Any(a=>a.PlanId==e.PlanId&&a.Kind is "reconciled" or "acknowledged")))throw new InvalidDataException("runtime_quarantined");
             var manifest=adapter.Manifest;
             if(plan.AdapterId!=manifest.AdapterId||plan.AdapterMajor!=manifest.AdapterMajor||plan.TargetProduct.GetProperty("product_id").GetString()!=manifest.ProductId||Version.Parse(manifest.ProductVersion)<Version.Parse(plan.TargetProduct.GetProperty("minimum_version").GetString()!)||Version.Parse(manifest.ProductVersion)>=Version.Parse(plan.TargetProduct.GetProperty("maximum_version_exclusive").GetString()!)||plan.Steps.Any(s=>!manifest.Supports(s.OperationId,s.ContractHash)))throw new InvalidDataException("adapter_contract_mismatch");
             ct.ThrowIfCancellationRequested();
@@ -89,9 +89,11 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
                 }
                 journal.Append("invocation_started",plan.PlanId,JsonSerializer.Serialize(new{step_id=step.StepId,started_at=Timestamp(started)}));
                 string status="succeeded";object? data=null;string? error=null;
+                Task<AdapterResult>? invocation=null;
                 try
                 {
-                    var result=await adapter.ExecuteAsync(new(step.OperationId,payload,step.StepId,step.ContractHash),timeout.Token).WaitAsync(timeout.Token);
+                    invocation=adapter.ExecuteAsync(new(step.OperationId,payload,step.StepId,step.ContractHash),timeout.Token);
+                    var result=await invocation.WaitAsync(timeout.Token);
                     timeout.Token.ThrowIfCancellationRequested();
                     if(!result.Ok)throw new ConnectorException("adapter_effect_unknown");
                     if(step.OperationId=="vismockup.view.capture@1")
@@ -117,6 +119,20 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
                         ? connectorError.Code
                         : noEffect?"read_invocation_failed":"invocation_outcome_unknown";
                     if(exception is OperationCanceledException&&timeout.IsCancellationRequested&&!ct.IsCancellationRequested)
+                    {
+                        // Only this subprocess-backed read can prove cancellation cleanup;
+                        // a timed-out COM call still requires a fresh host.
+                        var cleaned=false;
+                        if(step.OperationId=="teamcenter.product_structure.children.read@1"&&invocation is not null)
+                        {
+                            try { await invocation.WaitAsync(TimeSpan.FromSeconds(5)); cleaned=true; }
+                            catch(OperationCanceledException) { cleaned=invocation.IsCompleted; }
+                            catch(ConnectorException cleanupError) { cleaned=cleanupError.Code!="teamcenter_worker_cleanup_failed"; }
+                            catch { }
+                        }
+                        RequiresProcessRestart|=!cleaned;
+                    }
+                    if(exception is ConnectorException {Code:"teamcenter_worker_cleanup_failed"})
                         RequiresProcessRestart=true;
                     if(!noEffect)ExecutionQuarantined=true;
                 }

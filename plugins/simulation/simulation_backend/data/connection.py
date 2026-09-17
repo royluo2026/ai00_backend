@@ -62,3 +62,8 @@ def get_simulation_conn():
         raise
     finally:
         conn.close()
+
+
+def open_simulation_transaction():
+    """Return an uncommitted connection whose lifecycle belongs to the Gateway."""
+    return wrap_connection(_get_pool().connection())

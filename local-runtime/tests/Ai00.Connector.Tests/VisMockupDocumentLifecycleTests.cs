@@ -17,16 +17,38 @@ public sealed class VisMockupDocumentLifecycleTests : IDisposable
         using var runtime = new TeamcenterReadOnlyRuntime(worker, Path.Combine(_directory, "tc.db"));
         await runtime.LoginAsync("tc-production", "user", "secret", default);
         var application = new FakeApplication("14.2.0", new FakeDocument("existing", "user", FakeNode.FlatTree(1)));
+        var launcher = new RecordingTeamcenterVisualizationLauncher();
         using var sta = new StaDispatcher();
         var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([_directory]),
-            new FakeVisMockupCom { ExistingApplication = application }, _directory, Path.Combine(_directory, "tree.db"), runtime);
+            new FakeVisMockupCom { ExistingApplication = application }, _directory,
+            Path.Combine(_directory, "tree.db"), runtime, launcher);
 
         var result = await adapter.ExecuteAsync(new AdapterOperation(
             "teamcenter.visualization.launch@1", OnlineSelectorPayload()), default);
 
         Assert.True(result.Ok);
-        Assert.NotNull(application.LastOpenedDocument);
+        Assert.Equal(Path.GetFullPath(worker.MaterialPath), launcher.MaterialPath);
+        Assert.Equal("Open", worker.VisualizationOperation);
+        Assert.Null(application.LastOpenedDocument);
         Assert.False(File.Exists(worker.MaterialPath));
+    }
+
+    [Fact]
+    public void Teamcenter_online_launcher_uses_the_official_runner_contract_and_utf16be_path()
+    {
+        Directory.CreateDirectory(_directory);
+        var runnerPath = Path.Combine(_directory, "runner.exe");
+        var materialPath = Path.Combine(_directory, "online.vvi");
+        File.WriteAllBytes(runnerPath, [1]);
+        File.WriteAllText(materialPath, "[VVI]");
+        var launcher = new TeamcenterVisualizationRunner(runnerPath);
+
+        var start = launcher.CreateStartInfo(materialPath);
+
+        Assert.Equal(Path.GetFullPath(runnerPath), start.FileName);
+        Assert.Equal("-mime=application/x-visnetwork", start.ArgumentList[0]);
+        Assert.Equal("-encodedArgs=" + Convert.ToHexString(System.Text.Encoding.BigEndianUnicode.GetBytes(Path.GetFullPath(materialPath))), start.ArgumentList[1]);
+        Assert.False(start.UseShellExecute);
     }
 
     [Fact]
@@ -46,6 +68,7 @@ public sealed class VisMockupDocumentLifecycleTests : IDisposable
             "teamcenter.visualization.insert@1", OnlineSelectorPayload()), default);
 
         Assert.True(result.Ok);
+        Assert.Equal("Insert", worker.VisualizationOperation);
         Assert.Same(active, application.ActiveDocument);
         Assert.Equal(1, active.InsertDocumentCalls);
         Assert.False(File.Exists(worker.MaterialPath));
@@ -399,19 +422,31 @@ public sealed class VisMockupDocumentLifecycleTests : IDisposable
     private sealed class OnlineMaterialTeamcenterWorker(string materialPath) : ITeamcenterWorker
     {
         public string MaterialPath { get; } = materialPath;
+        public string? VisualizationOperation { get; private set; }
         public Task ValidateCredentialsAsync(string endpointId, string username, string password, CancellationToken ct) => Task.CompletedTask;
         public Task<IReadOnlyList<string>> GetRevisionRulesAsync(string username, string password, CancellationToken ct) => Task.FromResult<IReadOnlyList<string>>(["Latest Working"]);
         public Task<TeamcenterProductSearchResult> SearchAsync(string itemId, string revisionId, string revisionRule, string configurationDate, string username, string password, CancellationToken ct) => Task.FromResult(new TeamcenterProductSearchResult([]));
         public Task<IReadOnlyList<TeamcenterOccurrence>> ObserveAsync(TeamcenterSourceSelector selector, int maxNodes, int maxDepth, string propertyProjection, string username, string password, CancellationToken ct) => Task.FromResult<IReadOnlyList<TeamcenterOccurrence>>([]);
         public Task<TeamcenterLaunchResult> LaunchAsync(TeamcenterSourceSelector selector, string expectedVisdocUid, string username, string password, CancellationToken ct) => throw new NotSupportedException();
         public async Task<TeamcenterLaunchResult> ConsumeVisualizationAsync(TeamcenterSourceSelector selector,
-            string expectedVisdocUid, Func<string, CancellationToken, Task> consumer,
+            string expectedVisdocUid, string visualizationOperation, Func<string, CancellationToken, Task> consumer,
             string username, string password, CancellationToken ct)
         {
+            VisualizationOperation = visualizationOperation;
             await File.WriteAllTextAsync(MaterialPath, "[VVI]", ct);
             try { await consumer(MaterialPath, ct); }
             finally { File.Delete(MaterialPath); }
             return new("tclaunch:" + new string('a', 64), true, expectedVisdocUid, selector.IdentityHash);
+        }
+    }
+
+    private sealed class RecordingTeamcenterVisualizationLauncher : ITeamcenterVisualizationLauncher
+    {
+        public string? MaterialPath { get; private set; }
+        public Task LaunchAsync(string materialPath, CancellationToken ct)
+        {
+            MaterialPath = Path.GetFullPath(materialPath);
+            return Task.CompletedTask;
         }
     }
 }

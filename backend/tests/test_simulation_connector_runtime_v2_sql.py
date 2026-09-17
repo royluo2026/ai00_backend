@@ -18,7 +18,7 @@ import uuid
 import pytest
 
 from backend.contracts.connector_execution_plan_v2 import (
-    ConnectorExecutionPlanV2, ConnectorPlanOutcomeV2, compute_plan_hash,
+    ConnectorExecutionPlanV2, ConnectorPlanOutcomeV2, compute_plan_hash, canonicalize_v2,
 )
 from plugins.simulation.simulation_backend.data import connector_repository
 from plugins.simulation.simulation_backend.data.connector_repository import (
@@ -110,6 +110,11 @@ def database(request, tmp_path, monkeypatch):
 
     ddl = '\n'.join((MIGRATION.parent / name).read_text(encoding='utf-8') for name in
         ('0008_connector_app_runtime_v2.sql', '0009_connector_app_auth.sql', '0010_connector_v2_projection.sql'))
+    recovery_ddl = (MIGRATION.parent / '0027_connector_manual_recovery_status.sql').read_text(encoding='utf-8')
+    if dialect == 'sqlite':
+        # SQLite cannot ALTER CHECK; build the equivalent final schema in this empty fixture.
+        new_check = re.search(r'CHECK \(status IN \([^;]+\)\)', recovery_ddl).group(0)
+        ddl = ddl.replace("CHECK (`status` IN ('queued','leased','executing','succeeded','failed_without_effect','outcome_unknown','manual_review_required','expired'))", new_check)
     with transaction() as conn:
         if dialect == "mysql":
             from backend.db.versioned_migrations import prepare_resumable_statement
@@ -148,6 +153,13 @@ def database(request, tmp_path, monkeypatch):
             if statement:
                 with conn.cursor() as cur:
                     cur.execute(statement)
+        if dialect == 'mysql':
+            from backend.db.versioned_migrations import prepare_resumable_statement, split_sql
+            for phase in split_sql(recovery_ddl):
+                statement = prepare_resumable_statement(conn, phase)
+                if statement:
+                    with conn.cursor() as cur:
+                        cur.execute(statement)
     monkeypatch.setattr(connector_repository, "get_simulation_conn", transaction)
     device = "test-runtime-" + uuid.uuid4().hex
     with transaction() as conn, conn.cursor() as cur:
@@ -177,7 +189,7 @@ def session(database, *, now=NOW, instance="runtime-instance-001"):
 
 
 def queue(database, registered, *, now=NOW, idempotency_key=None, normalized_input_hash=None,
-          side_effect_classification=None, operation_id=None, expires_at="2026-09-07T12:10:00Z"):
+          side_effect_classification=None, operation_id=None, payload=None, expires_at="2026-09-07T12:10:00Z"):
     source = json.loads((ROOT / "backend/tests/fixtures/connector_execution_plan_v2.json").read_text())["plan"]
     source.update(device_id=database[1], plan_id="plan-" + uuid.uuid4().hex,
                   runtime_generation=registered.runtime_generation,
@@ -192,6 +204,9 @@ def queue(database, registered, *, now=NOW, idempotency_key=None, normalized_inp
         source['steps'][0]['side_effect_classification'] = side_effect_classification
     if operation_id is not None:
         source['steps'][0]['operation_id'] = operation_id
+    if payload is not None:
+        source['steps'][0]['payload'] = payload
+        source['steps'][0]['payload_hash'] = 'sha256:' + hashlib.sha256(canonicalize_v2(payload)).hexdigest()
     source['steps'][0]['post_condition_probe_id'] = 'vismockup.application.postcondition@1'
     source["plan_hash"] = compute_plan_hash(source)
     plan = ConnectorExecutionPlanV2.model_validate(source)
@@ -289,6 +304,559 @@ def complete(database, registered, outcome, *, reconciled=False, now=NOW):
     method = SimulationConnectorRepository().mark_reconciled if reconciled else SimulationConnectorRepository().complete_v2_plan
     return method(database[1], registered.runtime_generation, registered.runtime_instance_id,
                   registered.session_token, outcome, now)
+
+
+def recovery_case(database, operation_id='teamcenter.visualization.launch@1', *, payload=None, side_effect_classification=None):
+    registered = session(database)
+    plan = queue(database, registered, operation_id=operation_id, payload=payload,
+                 side_effect_classification=side_effect_classification)
+    complete(database, registered, outcome_for(plan, lease(database, registered), 'outcome_unknown'))
+    row = read(database, 'runtime_plans')
+    return dict(device_id=database[1], plan_id=plan.plan_id, expected_generation=7,
+        expected_outcome_hash='sha256:' + row['outcome_hash'], decision='not_executed',
+        reason='Verified the document was not opened', actor_id='user-001', tenant_id='tenant-001', now=NOW)
+
+
+def test_manual_recovery_preserves_signed_outcome_and_replays(database):
+    args = recovery_case(database)
+    repo = SimulationConnectorRepository()
+    before = read(database, 'runtime_plans')
+    items = repo.search_manual_recovery(actor_id='user-001', tenant_id='tenant-001')['items']
+    assert len(items) == 1 and items[0]['eligible'] is True
+    assert items[0]['outcome_hash'] == args['expected_outcome_hash']
+    result = repo.resolve_manual_recovery(**args)
+    assert result['retry_started'] is False and result['audit_ref']
+    assert repo.resolve_manual_recovery(**args) == result
+    after = read(database, 'runtime_plans')
+    assert after['status'] == 'cancelled'
+    assert after['outcome_json'] == before['outcome_json']
+    assert after['outcome_hash'] == before['outcome_hash']
+    assert repo.search_manual_recovery(actor_id='user-001', tenant_id='tenant-001')['items'] == []
+    # The authenticated transport maps this closed-plan response to the existing
+    # obsolete-journal acknowledgement; it must not issue a new recovery lease.
+    with pytest.raises(ConnectorRepositoryError, match='plan_reconciliation_invalid'):
+        repo.register_reconciliation_session(args['device_id'], 7, 'recovery-after-review', args['plan_id'],
+            'a' * 64, NOW + timedelta(seconds=180), now=NOW + timedelta(seconds=90))
+    assert read(database, 'runtime_recovery_sessions') is None
+    with pytest.raises(ConnectorRepositoryError, match='recovery_decision_conflict'):
+        repo.resolve_manual_recovery(**dict(args, decision='executed'))
+
+
+@pytest.mark.parametrize('change,error', [
+    ({'actor_id':'other'}, 'runtime_owner_mismatch'),
+    ({'tenant_id':'other'}, 'runtime_owner_mismatch'),
+    ({'expected_generation':8}, 'recovery_state_changed'),
+    ({'expected_outcome_hash':'sha256:'+'0'*64}, 'recovery_state_changed'),
+    ({'reason':' '}, 'recovery_input_invalid'),
+])
+@pytest.mark.parametrize('decision', ['not_executed', 'abandoned'])
+def test_manual_recovery_refuses_wrong_owner_or_stale_state(database, change, error, decision):
+    args = dict(recovery_case(database), decision=decision)
+    repo = SimulationConnectorRepository()
+    assert repo.search_manual_recovery(actor_id='other', tenant_id='tenant-001')['items'] == []
+    assert repo.search_manual_recovery(actor_id='user-001', tenant_id='other')['items'] == []
+    before = read(database, 'runtime_plans')
+    with pytest.raises(ConnectorRepositoryError, match=error):
+        repo.resolve_manual_recovery(**dict(args, **change))
+    assert read(database, 'runtime_plans') == before
+
+
+def test_manual_recovery_lists_but_refuses_unsupported_operation(database):
+    args = recovery_case(database, 'vismockup.model.close@1')
+    repo = SimulationConnectorRepository()
+    item = repo.search_manual_recovery(actor_id='user-001', tenant_id='tenant-001')['items'][0]
+    assert item['eligible'] is True and item['allowed_decisions'] == ['abandoned']
+    with pytest.raises(ConnectorRepositoryError, match='recovery_operation_unsupported'):
+        repo.resolve_manual_recovery(**args)
+
+
+@pytest.mark.parametrize('operation,payload', [
+    ('vismockup.application.probe@1', {'allow_launch': True}),
+    *[('vismockup.visibility.change@1', {'action': action}) for action in ('all_on', 'all_off')],
+    *[('vismockup.node.visibility.change@1', {'action': action}) for action in ('show', 'hide', 'isolate')],
+    *[('vismockup.node.selection.change@1', {'action': action}) for action in ('highlight', 'select', 'unhighlight', 'deselect')],
+    *[(operation, {}) for operation in ('teamcenter.visualization.launch@1',
+        'teamcenter.visualization.insert@1', 'vismockup.model.open@1', 'vismockup.model.insert@1')],
+])
+def test_manual_recovery_bounded_actions_release_unresolved_blocker(database, operation, payload):
+    args = recovery_case(database, operation, payload=payload,
+                         side_effect_classification='read' if operation == 'vismockup.application.probe@1' else 'write')
+    repo = SimulationConnectorRepository()
+    with database[0]() as conn, conn.cursor() as cur:
+        assert repo._has_unresolved_plans(cur, database[1])
+    before = read(database, 'runtime_plans')
+    item = repo.search_manual_recovery(actor_id='user-001', tenant_id='tenant-001')['items'][0]
+    assert item['eligible'] is True
+    assert item['ineligible_reason'] is None
+    assert item['allowed_decisions'] == ['executed', 'not_executed', 'abandoned']
+    from plugins.simulation.simulation_backend.capabilities.connector_contracts import RECOVERY_ITEM
+    import jsonschema
+    jsonschema.validate(item, RECOVERY_ITEM)
+    result = repo.resolve_manual_recovery(**args)
+    assert repo.resolve_manual_recovery(**args) == result
+    with pytest.raises(ConnectorRepositoryError, match='recovery_decision_conflict'):
+        repo.resolve_manual_recovery(**dict(args, decision='executed'))
+    after = read(database, 'runtime_plans')
+    assert after['status'] == 'cancelled'
+    assert (after['outcome_json'], after['outcome_hash']) == (before['outcome_json'], before['outcome_hash'])
+    with database[0]() as conn, conn.cursor() as cur:
+        assert not repo._has_unresolved_plans(cur, database[1])
+        cur.execute("SELECT audit_id FROM workmanship_sim_connector_runtime_audit WHERE plan_id=%s "
+                    "AND event_type='human_recovery_disposition'", (args['plan_id'],))
+        assert [row['audit_id'] for row in cur.fetchall()] == [result['audit_ref']]
+
+
+@pytest.mark.parametrize('operation,payload,mutation,reason', [
+    ('vismockup.application.probe@1', {'allow_launch': False}, None, 'unsupported_action'),
+    ('vismockup.application.probe@1', {'allow_launch': 1}, None, 'unsupported_action'),
+    ('vismockup.application.probe@1', {}, None, 'unsupported_action'),
+    ('vismockup.visibility.change@1', {'action': 'toggle'}, None, 'unsupported_action'),
+    ('vismockup.node.visibility.change@1', {'action': 'all_on'}, None, 'unsupported_action'),
+    ('vismockup.node.selection.change@1', {'action': 'toggle'}, None, 'unsupported_action'),
+    ('vismockup.node.selection.change@1', {'action': []}, None, 'unsupported_action'),
+    ('unknown.operation@1', {'action': 'show'}, None, 'unsupported_operation'),
+    ('vismockup.node.visibility.change@2', {'action': 'show'}, None, 'unsupported_operation'),
+    ('vismockup.node.visibility.change@1', {'action': 'show'}, 'multiple', 'multiple_operations'),
+    ('vismockup.node.visibility.change@1', {'action': 'show'}, 'missing_hash', 'missing_outcome_hash'),
+])
+def test_manual_recovery_ineligible_reasons_refuse_without_mutation(database, operation, payload, mutation, reason):
+    args = recovery_case(database)
+    plan = json.loads(read(database, 'runtime_plans')['plan_json'])
+    plan['steps'][0].update(operation_id=operation, payload=payload)
+    if mutation == 'multiple':
+        plan['steps'].append(dict(plan['steps'][0]))
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute('UPDATE workmanship_sim_connector_runtime_plans SET plan_json=%s WHERE plan_id=%s',
+                    (json.dumps(plan), args['plan_id']))
+        if mutation == 'missing_hash':
+            cur.execute('UPDATE workmanship_sim_connector_runtime_plans SET outcome_hash=NULL WHERE plan_id=%s', (args['plan_id'],))
+    before = read(database, 'runtime_plans')
+    repo = SimulationConnectorRepository()
+    item = repo.search_manual_recovery(actor_id='user-001', tenant_id='tenant-001')['items'][0]
+    assert item['eligible'] is True
+    assert item['ineligible_reason'] is None
+    assert item['allowed_decisions'] == ['abandoned']
+    from plugins.simulation.simulation_backend.capabilities.connector_contracts import RECOVERY_ITEM
+    import jsonschema
+    jsonschema.validate(item, RECOVERY_ITEM)
+    error = 'recovery_state_changed' if mutation == 'missing_hash' else 'recovery_operation_unsupported'
+    for decision in ('executed', 'not_executed'):
+        with pytest.raises(ConnectorRepositoryError, match=error):
+            repo.resolve_manual_recovery(**dict(args, decision=decision))
+    assert read(database, 'runtime_plans') == before
+    with database[0]() as conn, conn.cursor() as cur:
+        assert repo._has_unresolved_plans(cur, database[1])
+        cur.execute("SELECT audit_id FROM workmanship_sim_connector_runtime_audit WHERE plan_id=%s "
+                    "AND event_type='human_recovery_disposition'", (args['plan_id'],))
+        assert cur.fetchall() == []
+
+
+def test_manual_recovery_capability_is_confirmed_web_only_with_closed_contracts(database):
+    from backend.capabilities.models_next import CapabilityContext, CapabilityBusinessError
+    from backend.capabilities.registry_next import CapabilityRegistry
+    from plugins.simulation.simulation_backend.capabilities.connector_runtime import (
+        ConnectorControlPlane, register_connector_runtime_capabilities,
+    )
+    import jsonschema
+    args = recovery_case(database)
+    registry = CapabilityRegistry()
+    register_connector_runtime_capabilities(registry, ConnectorControlPlane(SimulationConnectorRepository(), clock=lambda: NOW))
+    search = registry.get('simulation.connector.recovery.search', 1)
+    resolve = registry.get('simulation.connector.recovery.resolve', 1)
+    for registration in (search, resolve):
+        descriptor = registration.descriptor
+        assert descriptor.exposure.web and not any(value for key, value in descriptor.exposure.model_dump().items() if key != 'web')
+        assert descriptor.business_invariants
+        assert registration.spec.permissions == ('simulation.use',)
+        assert registration.spec.input_schema['additionalProperties'] is False
+    assert resolve.spec.confirmation == 'user'
+    assert resolve.descriptor.replay_data_policy == 'projected'
+    payload = {key: value for key, value in args.items() if key not in {'actor_id','tenant_id','now'}}
+    context = CapabilityContext(user_gid='user-001', team_gid='tenant-001', source='web')
+    output = search.handler({}, context).data
+    jsonschema.validate(output, search.spec.output_schema)
+    for source in ('agent', 'api', 'plugin', 'mcp', 'local_runtime'):
+        with pytest.raises(CapabilityBusinessError, match='authenticated device owner'):
+            resolve.handler(payload, context.model_copy(update={'source':source, 'confirmation_token':'receipt'}))
+    with pytest.raises(CapabilityBusinessError, match='Confirm the exact'):
+        resolve.handler(payload, context)
+    jsonschema.validate(payload, resolve.spec.input_schema)
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(dict(payload, unexpected=True), resolve.spec.input_schema)
+    # Successful writes are exercised through the Gateway transaction boundary
+    # in test_connector_recovery_gateway_transaction.py, including output validation.
+
+
+@pytest.mark.parametrize('kind', ['unknown', 'unsupported_action', 'multiple', 'known', 'missing_hash'])
+def test_manual_recovery_abandoned_archives_exact_plan_without_claiming_execution(database, kind):
+    args = dict(recovery_case(database), decision='abandoned', reason='Abandon and archive this unfinished operation')
+    plan = json.loads(read(database, 'runtime_plans')['plan_json'])
+    if kind == 'unknown':
+        plan['steps'][0]['operation_id'] = 'unknown.operation@1'
+    elif kind == 'unsupported_action':
+        plan['steps'][0].update(operation_id='vismockup.node.visibility.change@1', payload={'action': 'toggle'})
+    elif kind == 'multiple':
+        plan['steps'].append(dict(plan['steps'][0]))
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute('UPDATE workmanship_sim_connector_runtime_plans SET plan_json=%s WHERE plan_id=%s',
+                    (json.dumps(plan), args['plan_id']))
+        if kind == 'missing_hash':
+            cur.execute('UPDATE workmanship_sim_connector_runtime_plans SET outcome_hash=NULL WHERE plan_id=%s', (args['plan_id'],))
+    before = read(database, 'runtime_plans')
+    repo = SimulationConnectorRepository()
+    if kind == 'missing_hash':
+        with pytest.raises(ConnectorRepositoryError, match='recovery_state_changed'):
+            repo.resolve_manual_recovery(**args)
+        assert read(database, 'runtime_plans') == before
+        with database[0]() as conn, conn.cursor() as cur:
+            assert repo._has_unresolved_plans(cur, database[1])
+        return
+    result = repo.resolve_manual_recovery(**args)
+    assert result['decision'] == 'abandoned' and result['retry_started'] is False
+    assert repo.resolve_manual_recovery(**args) == result
+    for decision in ('executed', 'not_executed'):
+        with pytest.raises(ConnectorRepositoryError, match='recovery_decision_conflict'):
+            repo.resolve_manual_recovery(**dict(args, decision=decision))
+    with pytest.raises(ConnectorRepositoryError, match='recovery_decision_conflict'):
+        repo.resolve_manual_recovery(**dict(args, reason='Different reason'))
+    after = read(database, 'runtime_plans')
+    assert after['status'] == 'cancelled' and after['reconciliation_state'] == 'not_required'
+    assert (after['outcome_json'], after['outcome_hash']) == (before['outcome_json'], before['outcome_hash'])
+    with database[0]() as conn, conn.cursor() as cur:
+        assert not repo._has_unresolved_plans(cur, database[1])
+        cur.execute("SELECT audit_id,outcome_json FROM workmanship_sim_connector_runtime_audit WHERE plan_id=%s "
+                    "AND event_type='human_recovery_disposition'", (args['plan_id'],))
+        audits = cur.fetchall()
+        assert len(audits) == 1 and audits[0]['audit_id'] == result['audit_ref']
+        assert json.loads(audits[0]['outcome_json'])['decision'] == 'abandoned'
+        cur.execute('SELECT plan_id FROM workmanship_sim_connector_runtime_plans WHERE device_id=%s', (database[1],))
+        assert [row['plan_id'] for row in cur.fetchall()] == [args['plan_id']]
+    from plugins.simulation.simulation_backend.capabilities.connector_contracts import INPUT_SCHEMAS, OUTPUT_SCHEMAS
+    import jsonschema
+    jsonschema.validate({key: value for key, value in args.items() if key not in {'actor_id', 'tenant_id', 'now'}},
+                        INPUT_SCHEMAS['simulation.connector.recovery.resolve'])
+    jsonschema.validate(result, OUTPUT_SCHEMAS['simulation.connector.recovery.resolve'])
+
+
+def test_manual_recovery_bounds_results_and_hides_other_plan_owner(database):
+    args = recovery_case(database)
+    transaction, device = database
+    with transaction() as conn, conn.cursor() as cur:
+        for index in range(23):
+            cur.execute("INSERT INTO workmanship_sim_connector_runtime_plans "
+                "(plan_id,protocol,device_id,runtime_generation,runtime_instance_id,session_token_hash,tenant_gid,actor_gid,"
+                "idempotency_key,plan_hash,plan_json,status,expires_at) "
+                "SELECT %s,protocol,device_id,runtime_generation,runtime_instance_id,session_token_hash,tenant_gid,actor_gid,"
+                "%s,plan_hash,plan_json,status,expires_at FROM workmanship_sim_connector_runtime_plans WHERE plan_id=%s",
+                ('copy-' + str(index), 'copy-' + str(index), args['plan_id']))
+        cur.execute("UPDATE workmanship_sim_connector_runtime_plans SET actor_gid='other' WHERE plan_id=%s", (args['plan_id'],))
+    repo = SimulationConnectorRepository()
+    items = repo.search_manual_recovery(actor_id='user-001', tenant_id='tenant-001', page_size=20)['items']
+    assert len(items) == 20
+    assert all(item['plan_id'] != args['plan_id'] for item in items)
+    assert all(item['outcome_hash'] is None and item['eligible'] and item['allowed_decisions'] == ['abandoned'] for item in items)
+    with pytest.raises(ConnectorRepositoryError, match='runtime_owner_mismatch'):
+        repo.resolve_manual_recovery(**args)
+
+
+@pytest.mark.parametrize('change,error', [
+    ({}, None), ({'expected_plan_hash': None}, 'recovery_state_changed'),
+    ({'expected_plan_hash': 'sha256:' + '0'*64}, 'recovery_state_changed'),
+    ({'expected_generation': 8}, 'recovery_state_changed'),
+    ({'actor_id': 'other'}, 'runtime_owner_mismatch'),
+    ({'tenant_id': 'other'}, 'runtime_owner_mismatch'),
+    ({'decision': 'executed'}, 'recovery_operation_unsupported'),
+    ({'decision': 'not_executed'}, 'recovery_operation_unsupported'),
+    ({'stale_plan': True}, 'recovery_state_changed'),
+    ({'missing_plan': True}, 'recovery_state_changed'),
+])
+def test_manual_recovery_missing_outcome_requires_exact_plan_identity(database, change, error):
+    args = recovery_case(database, 'vismockup.application.probe@1', payload={'allow_launch': True})
+    row = read(database, 'runtime_plans')
+    args.pop('expected_outcome_hash')
+    args.update(decision='abandoned', expected_plan_hash='sha256:' + row['plan_hash'])
+    change = dict(change)
+    stale = change.pop('stale_plan', False)
+    missing = change.pop('missing_plan', False)
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute('UPDATE workmanship_sim_connector_runtime_plans SET outcome_hash=NULL WHERE plan_id=%s', (args['plan_id'],))
+        if stale or missing:
+            cur.execute('UPDATE workmanship_sim_connector_runtime_plans SET plan_hash=%s WHERE plan_id=%s',
+                        ('' if missing else 'f'*64, args['plan_id']))
+    before = read(database, 'runtime_plans')
+    repo = SimulationConnectorRepository()
+    item = repo.search_manual_recovery(actor_id='user-001', tenant_id='tenant-001')['items'][0]
+    assert item['plan_hash'] == (None if missing else 'sha256:' + before['plan_hash'])
+    assert item['allowed_decisions'] == ['abandoned']
+    assert item['eligible'] is True
+    assert item['ineligible_reason'] is None
+    args.update(change)
+    if error:
+        with pytest.raises(ConnectorRepositoryError, match=error):
+            repo.resolve_manual_recovery(**args)
+        assert read(database, 'runtime_plans') == before
+        return
+    result = repo.resolve_manual_recovery(**args)
+    assert repo.resolve_manual_recovery(**args) == result
+    with pytest.raises(ConnectorRepositoryError, match='recovery_decision_conflict'):
+        repo.resolve_manual_recovery(**dict(args, reason='Different review'))
+    after = read(database, 'runtime_plans')
+    assert after['status'] == 'cancelled' and after['outcome_hash'] is None
+    assert after['outcome_json'] == before['outcome_json'] and after['plan_hash'] == before['plan_hash']
+    with database[0]() as conn, conn.cursor() as cur:
+        assert not repo._has_unresolved_plans(cur, database[1])
+        cur.execute("SELECT outcome_json FROM workmanship_sim_connector_runtime_audit WHERE plan_id=%s AND event_type='human_recovery_disposition'", (args['plan_id'],))
+        audit = json.loads(cur.fetchone()['outcome_json'])
+        assert audit['expected_plan_hash'] == args['expected_plan_hash']
+        assert audit['expected_outcome_hash'] is None and audit['decision'] == 'abandoned'
+
+
+def test_manual_recovery_result_hash_still_required_and_old_audit_replays(database):
+    args = recovery_case(database)
+    before = read(database, 'runtime_plans')
+    plan_only = dict(args, decision='abandoned', expected_plan_hash='sha256:' + before['plan_hash'])
+    plan_only.pop('expected_outcome_hash')
+    repo = SimulationConnectorRepository()
+    with pytest.raises(ConnectorRepositoryError, match='recovery_state_changed'):
+        repo.resolve_manual_recovery(**plan_only)
+    with pytest.raises(ConnectorRepositoryError, match='recovery_state_changed'):
+        repo.resolve_manual_recovery(**dict(args, expected_plan_hash='sha256:'+'0'*64))
+    assert read(database, 'runtime_plans') == before
+    result = repo.resolve_manual_recovery(**args)
+    legacy = {key: value for key, value in args.items() if key not in {'actor_id', 'tenant_id', 'now'}}
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute('UPDATE workmanship_sim_connector_runtime_audit SET outcome_json=%s WHERE audit_id=%s',
+                    (json.dumps(legacy), result['audit_ref']))
+    assert repo.resolve_manual_recovery(**args) == result
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute('SELECT outcome_json FROM workmanship_sim_connector_runtime_audit WHERE audit_id=%s', (result['audit_ref'],))
+        assert json.loads(cur.fetchone()['outcome_json']) == legacy
+
+
+@pytest.mark.parametrize('raw_plan', ['{invalid json', '{}', 'null', '{"steps":[null]}'])
+@pytest.mark.parametrize('mutation', [None, 'plan_json', 'plan_hash', 'outcome_hash', 'status', 'runtime_generation'])
+def test_manual_recovery_fingerprint_archives_damaged_plan_and_refuses_stale_snapshot(database, raw_plan, mutation):
+    try:
+        json.loads(raw_plan)
+    except json.JSONDecodeError:
+        with database[0]() as conn:
+            if not isinstance(conn, SQLiteConnection):
+                pytest.skip('Native JSON columns cannot store syntactically invalid JSON; SQLite covers raw corruption')
+    args = recovery_case(database)
+    args.pop('expected_outcome_hash')
+    args['decision'] = 'abandoned'
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute('UPDATE workmanship_sim_connector_runtime_plans SET outcome_hash=NULL,plan_hash=%s,plan_json=%s WHERE plan_id=%s',
+                    ('', raw_plan, args['plan_id']))
+    repo = SimulationConnectorRepository()
+    item = repo.search_manual_recovery(actor_id='user-001', tenant_id='tenant-001')['items'][0]
+    assert item['eligible'] and item['allowed_decisions'] == ['abandoned']
+    assert item['operation_id'] == 'unknown_operation' and item['ineligible_reason'] is None
+    assert re.fullmatch(r'sha256:[0-9a-f]{64}', item['recovery_fingerprint'])
+    args['expected_recovery_fingerprint'] = item['recovery_fingerprint']
+    if mutation:
+        # Change the JSON value, not whitespace that native JSON may normalize.
+        values = {'plan_json': json.dumps({'steps': [], 'recovery_test_revision': 1}),
+                  'plan_hash': 'a'*64, 'outcome_hash': 'b'*64,
+                  'status': 'manual_review_required', 'runtime_generation': 8}
+        with database[0]() as conn, conn.cursor() as cur:
+            cur.execute(f'UPDATE workmanship_sim_connector_runtime_plans SET {mutation}=%s WHERE plan_id=%s',
+                        (values[mutation], args['plan_id']))
+        before = read(database, 'runtime_plans')
+        with pytest.raises(ConnectorRepositoryError, match='recovery_state_changed'):
+            repo.resolve_manual_recovery(**args)
+        assert read(database, 'runtime_plans') == before
+        return
+    before = read(database, 'runtime_plans')
+    with pytest.raises(ConnectorRepositoryError, match='recovery_state_changed'):
+        repo.resolve_manual_recovery(**dict(args, expected_recovery_fingerprint=None))
+    result = repo.resolve_manual_recovery(**args)
+    assert result['decision'] == 'abandoned' and result['retry_started'] is False
+    assert repo.resolve_manual_recovery(**args) == result
+    with pytest.raises(ConnectorRepositoryError, match='recovery_decision_conflict'):
+        repo.resolve_manual_recovery(**dict(args, reason='Changed reason'))
+    after = read(database, 'runtime_plans')
+    assert after['status'] == 'cancelled'
+    assert after['plan_json'] == before['plan_json'] and after['outcome_json'] == before['outcome_json']
+    with database[0]() as conn, conn.cursor() as cur:
+        assert not repo._has_unresolved_plans(cur, database[1])
+        cur.execute("SELECT outcome_json FROM workmanship_sim_connector_runtime_audit WHERE plan_id=%s AND event_type='human_recovery_disposition'", (args['plan_id'],))
+        audit = json.loads(cur.fetchone()['outcome_json'])
+        assert audit['expected_recovery_fingerprint'] == args['expected_recovery_fingerprint']
+
+
+def test_manual_recovery_fingerprint_binds_each_storage_identity_field(database):
+    recovery_case(database)
+    row = read(database, 'runtime_plans')
+    fingerprint = SimulationConnectorRepository._recovery_fingerprint
+    original = fingerprint(row)
+    for field in ('device_id', 'plan_id', 'runtime_generation', 'status', 'plan_json',
+                  'plan_hash', 'outcome_hash', 'outcome_json', 'protocol', 'actor_gid', 'tenant_gid'):
+        assert fingerprint(dict(row, **{field: str(row[field]) + 'changed'})) != original
+    assert fingerprint(dict(reversed(list(row.items())))) == original
+    # Pure row test: raw-string sensitivity must not depend on a database keeping
+    # insignificant whitespace when it stores a native JSON value.
+    if isinstance(row['plan_json'], str):
+        assert fingerprint(dict(row, plan_json=row['plan_json'] + ' ')) != original
+
+
+def test_manual_recovery_search_count_and_page_share_one_statement(database, monkeypatch):
+    recovery_case(database)
+    with database[0]() as conn, conn.cursor() as cur:
+        cursor_type = type(cur)
+    execute = cursor_type.execute
+    statements = []
+    def observe(self, sql, *args, **kwargs):
+        if sql.lstrip().upper().startswith('SELECT') and 'workmanship_sim_connector_runtime_plans' in sql:
+            statements.append(sql)
+        return execute(self, sql, *args, **kwargs)
+    monkeypatch.setattr(cursor_type, 'execute', observe)
+    repo = SimulationConnectorRepository()
+    page = repo.search_manual_recovery(actor_id='user-001', tenant_id='tenant-001')
+    assert page['total'] == 1 and len(page['items']) == 1
+    # At READ COMMITTED two reads can disagree if a disposition commits between
+    # them. One statement guarantees the count and items use one SQL snapshot.
+    assert len(statements) == 1
+    statements.clear()
+    assert repo.search_manual_recovery(actor_id='user-001', tenant_id='tenant-001', page=2) == dict(
+        items=[], page=2, page_size=5, total=1, page_count=1)
+    assert len(statements) == 1
+    statements.clear()
+    assert repo.search_manual_recovery(actor_id='other', tenant_id='tenant-001') == dict(
+        items=[], page=1, page_size=5, total=0, page_count=0)
+    assert len(statements) == 1
+
+
+def test_manual_recovery_search_paginates_scoped_stable_results(database):
+    from backend.capabilities.models_next import CapabilityContext
+    from backend.capabilities.registry_next import CapabilityRegistry
+    from plugins.simulation.simulation_backend.capabilities.connector_runtime import ConnectorControlPlane, register_connector_runtime_capabilities
+    import jsonschema
+    args = recovery_case(database)
+    with database[0]() as conn, conn.cursor() as cur:
+        for index in range(27):
+            identity = f'page-copy-{index:02d}'
+            cur.execute("INSERT INTO workmanship_sim_connector_runtime_plans "
+                "(plan_id,protocol,device_id,runtime_generation,runtime_instance_id,session_token_hash,tenant_gid,actor_gid,"
+                "idempotency_key,plan_hash,plan_json,status,expires_at,created_at) "
+                "SELECT %s,protocol,device_id,runtime_generation,runtime_instance_id,session_token_hash,tenant_gid,actor_gid,"
+                "%s,plan_hash,plan_json,status,expires_at,%s FROM workmanship_sim_connector_runtime_plans WHERE plan_id=%s",
+                (identity, identity, NOW, args['plan_id']))
+        cur.execute("UPDATE workmanship_sim_connector_runtime_plans SET actor_gid='other' WHERE plan_id IN (%s,%s)",
+                    (args['plan_id'], 'page-copy-00'))
+        cur.execute("UPDATE workmanship_sim_connector_runtime_plans SET tenant_gid='other' WHERE plan_id='page-copy-01'")
+        cur.execute("UPDATE workmanship_sim_connector_runtime_plans SET runtime_generation=6 WHERE plan_id='page-copy-02'")
+        cur.execute("UPDATE workmanship_sim_connector_runtime_plans SET status='cancelled' WHERE plan_id='page-copy-03'")
+    registry = CapabilityRegistry()
+    register_connector_runtime_capabilities(registry, ConnectorControlPlane(SimulationConnectorRepository(), clock=lambda: NOW))
+    search = registry.get('simulation.connector.recovery.search', 1)
+    context = CapabilityContext(user_gid='user-001', team_gid='tenant-001', source='web')
+    def fetch(payload):
+        jsonschema.validate(payload, search.spec.input_schema)
+        result = search.handler(payload, context).data
+        jsonschema.validate(result, search.spec.output_schema)
+        assert len(result['items']) <= result['page_size']
+        return result
+    first = fetch({})
+    assert {k:v for k,v in first.items() if k != 'items'} == dict(page=1, page_size=5, total=23, page_count=5)
+    assert [item['plan_id'] for item in first['items']] == [f'page-copy-{i:02d}' for i in range(4, 9)]
+    last = fetch({'page': 5, 'page_size': 5})
+    assert [item['plan_id'] for item in last['items']] == ['page-copy-24', 'page-copy-25', 'page-copy-26']
+    assert last == fetch({'page': 5, 'page_size': 5})
+    wide = fetch({'page': 2, 'page_size': 20})
+    assert wide['items'] == last['items'] and wide['page_count'] == 2 and wide['total'] == 23
+    assert fetch({'page': 6}) == dict(items=[], page=6, page_size=5, total=23, page_count=5)
+    assert fetch({'page': 10**30}) == dict(items=[], page=10**30, page_size=5, total=23, page_count=5)
+    other = search.handler({}, context.model_copy(update={'user_gid': 'other'})).data
+    assert other == dict(items=[], page=1, page_size=5, total=0, page_count=0)
+    other_tenant = search.handler({}, context.model_copy(update={'team_gid': 'other'})).data
+    assert other_tenant == dict(items=[], page=1, page_size=5, total=0, page_count=0)
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute('UPDATE workmanship_sim_connector_runtime_plans SET created_at=%s WHERE plan_id=%s',
+                    (NOW - timedelta(days=1), 'page-copy-26'))
+    assert [item['plan_id'] for item in fetch({})['items']] == ['page-copy-26', 'page-copy-04', 'page-copy-05', 'page-copy-06', 'page-copy-07']
+    for invalid in ({'page': 0}, {'page': True}, {'page': 1.5}, {'page_size': 0}, {'page_size': 21}, {'page_size': False}, {'unknown': 1}):
+        with pytest.raises(jsonschema.ValidationError):
+            jsonschema.validate(invalid, search.spec.input_schema)
+        if 'unknown' not in invalid:
+            with pytest.raises(ConnectorRepositoryError, match='recovery_input_invalid'):
+                SimulationConnectorRepository().search_manual_recovery(actor_id='user-001', tenant_id='tenant-001', **invalid)
+
+
+def test_manual_recovery_closes_only_reviewed_plan_and_preserves_audit(database):
+    args = recovery_case(database)
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute("INSERT INTO workmanship_sim_connector_runtime_plans "
+            "(plan_id,protocol,device_id,runtime_generation,runtime_instance_id,session_token_hash,tenant_gid,actor_gid,"
+            "idempotency_key,plan_hash,plan_json,status,expires_at) "
+            "SELECT %s,protocol,device_id,runtime_generation,runtime_instance_id,session_token_hash,tenant_gid,actor_gid,"
+            "%s,plan_hash,plan_json,status,expires_at FROM workmanship_sim_connector_runtime_plans WHERE plan_id=%s",
+            ('unrelated-' + args['plan_id'], 'unrelated', args['plan_id']))
+        cur.execute("SELECT * FROM workmanship_sim_connector_runtime_audit WHERE device_id=%s ORDER BY audit_id", (args['device_id'],))
+        before = cur.fetchall()
+    repo = SimulationConnectorRepository()
+    result = repo.resolve_manual_recovery(**dict(args, decision='executed'))
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute("SELECT * FROM workmanship_sim_connector_runtime_audit WHERE device_id=%s ORDER BY audit_id", (args['device_id'],))
+        after = cur.fetchall()
+        assert [row for row in after if row['audit_id'] != result['audit_ref']] == before
+        audit = next(row for row in after if row['audit_id'] == result['audit_ref'])
+        assert audit['actor_id'] == 'user-001' and audit['reason'] == args['reason']
+        assert json.loads(audit['outcome_json'])['decision'] == 'executed'
+        cur.execute("SELECT status FROM workmanship_sim_connector_runtime_plans WHERE plan_id=%s", ('unrelated-' + args['plan_id'],))
+        assert cur.fetchone()['status'] == 'outcome_unknown'
+        cur.execute("SELECT COUNT(*) AS count FROM workmanship_sim_connector_runtime_plans WHERE device_id=%s", (args['device_id'],))
+        assert cur.fetchone()['count'] == 2
+    assert len(repo.search_manual_recovery(actor_id='user-001', tenant_id='tenant-001')['items']) == 1
+
+
+def test_manual_recovery_concurrent_decisions_have_one_winner(database):
+    args = recovery_case(database)
+    def resolve(decision):
+        try:
+            return SimulationConnectorRepository().resolve_manual_recovery(**dict(args, decision=decision))
+        except ConnectorRepositoryError as exc:
+            return str(exc)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(resolve, ['executed', 'not_executed']))
+    assert len([result for result in results if isinstance(result, dict)]) == 1
+    assert 'recovery_decision_conflict' in results
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute("SELECT COUNT(*) AS count FROM workmanship_sim_connector_runtime_audit "
+                    "WHERE device_id=%s AND event_type='human_recovery_disposition'", (args['device_id'],))
+        assert cur.fetchone()['count'] == 1
+
+
+@pytest.mark.parametrize('column,value', [('actor_gid','other'), ('tenant_gid','other'), ('runtime_generation',8)])
+def test_manual_recovery_requires_plan_identity_as_well_as_device_identity(database, column, value):
+    args = recovery_case(database)
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute(f"UPDATE workmanship_sim_connector_runtime_plans SET {column}=%s WHERE plan_id=%s", (value,args['plan_id']))
+    repo = SimulationConnectorRepository()
+    assert repo.search_manual_recovery(actor_id='user-001', tenant_id='tenant-001')['items'] == []
+    with pytest.raises(ConnectorRepositoryError, match='recovery_state_changed|runtime_owner_mismatch'):
+        repo.resolve_manual_recovery(**args)
+
+
+def test_manual_recovery_rejects_same_decision_with_different_reason(database):
+    args = recovery_case(database)
+    repo = SimulationConnectorRepository()
+    repo.resolve_manual_recovery(**args)
+    with pytest.raises(ConnectorRepositoryError, match='recovery_decision_conflict'):
+        repo.resolve_manual_recovery(**dict(args, reason='A different review'))
+
+
+def test_manual_recovery_audit_failure_rolls_back_plan_close(database):
+    args = recovery_case(database)
+    before = read(database, 'runtime_plans')
+    with database[0]() as conn, conn.cursor() as cur:
+        if not isinstance(conn, SQLiteConnection):
+            pytest.skip('SQLite trigger fault injection; native lock coverage uses the concurrent decision test')
+        cur.execute("CREATE TRIGGER reject_human_audit BEFORE INSERT ON workmanship_sim_connector_runtime_audit "
+                    "WHEN NEW.event_type='human_recovery_disposition' BEGIN SELECT RAISE(ABORT,'test audit unavailable'); END")
+    with pytest.raises(sqlite3.IntegrityError, match='test audit unavailable'):
+        SimulationConnectorRepository().resolve_manual_recovery(**args)
+    assert read(database, 'runtime_plans') == before
 
 
 def test_registration_race_has_one_winner_and_never_stores_plaintext(database):

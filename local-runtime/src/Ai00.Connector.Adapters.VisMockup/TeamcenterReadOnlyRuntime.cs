@@ -13,9 +13,9 @@ namespace Ai00.Connector.Adapters.VisMockup;
 
 public static class TeamcenterReadOnlyPolicy
 {
-    public static readonly string[] WorkerCommands = ["status", "revision_rules", "search", "observe", "launch"];
+    public static readonly string[] WorkerCommands = ["status", "revision_rules", "search", "observe", "launch", "children", "node_properties"];
     public static readonly string[] AllowedServiceTokens =
-        ["login", "logout", "loadObjects", "getItemFromId", "getProperties", "getRevisionRules", "getSavedQueries", "executeSavedQueries", "createBOMWindows", "expandPSAllLevels", "closeBOMWindows", "expandGRMRelationsForPrimary", "createLaunchInfo"];
+        ["login", "logout", "loadObjects", "getItemFromId", "getProperties", "getRevisionRules", "getSavedQueries", "executeSavedQueries", "createBOMWindows", "expandPSAllLevels", "expandPSOneLevel", "closeBOMWindows", "expandGRMRelationsForPrimary", "createLaunchInfo"];
     public static readonly string[] ForbiddenServiceTokens =
         ["setProperties", "saveBOMWindows", "createObjects", "deleteObjects", "setDatasetFile", "getFileWriteTickets", "commitDatasetFiles"];
 }
@@ -110,6 +110,11 @@ public sealed record TeamcenterSessionStatus(string State, string MaskedUsername
 
 public interface ITeamcenterWorker
 {
+    Task<TeamcenterNodePropertiesResult> ReadNodePropertiesAsync(TeamcenterSourceSelector selector,
+        TeamcenterOccurrenceEdge[] path, string username, string password, CancellationToken ct) =>
+        Task.FromException<TeamcenterNodePropertiesResult>(new ConnectorException("teamcenter_runtime_unavailable"));
+    Task<TeamcenterChildrenBatch> ReadChildrenAsync(TeamcenterSourceSelector selector, TeamcenterOccurrenceEdge[] path,
+        string username, string password, CancellationToken ct) => Task.FromException<TeamcenterChildrenBatch>(new ConnectorException("teamcenter_runtime_unavailable"));
     Task ValidateCredentialsAsync(string endpointId, string username, string password, CancellationToken ct);
     Task<IReadOnlyList<string>> GetRevisionRulesAsync(string username, string password, CancellationToken ct);
     Task<TeamcenterProductSearchResult> SearchAsync(string itemId, string revisionId,
@@ -119,10 +124,11 @@ public interface ITeamcenterWorker
     Task<TeamcenterLaunchResult> LaunchAsync(TeamcenterSourceSelector selector, string expectedVisdocUid,
         string username, string password, CancellationToken ct);
     Task<TeamcenterLaunchResult> ConsumeVisualizationAsync(TeamcenterSourceSelector selector, string expectedVisdocUid,
-        Func<string, CancellationToken, Task> consumer, string username, string password, CancellationToken ct);
+        string visualizationOperation, Func<string, CancellationToken, Task> consumer,
+        string username, string password, CancellationToken ct);
 }
 
-public sealed class TeamcenterReadOnlyRuntime : IDisposable
+public sealed partial class TeamcenterReadOnlyRuntime : IDisposable
 {
     private readonly ITeamcenterWorker worker;
     private readonly string connectionString;
@@ -156,7 +162,9 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
         try
         {
             var compatibilityRoot = PrepareVisualizationCompatibility(compatibilityAsset, stateRoot);
-            var jars = new[] { compatibilityRoot }.Concat(Directory.EnumerateFiles(lib, "*.jar")
+            // Keep the Java 11 compatibility classes first; the official RAC jar
+            // supplies the 2011-02 ServerInfo/UserAgent types used by launch.
+            var jars = new[] { compatibilityRoot, @"D:\Siemens\Teamcenter14\portal\plugins\TcSoaVisualizationRac_14000.2.0.jar" }.Concat(Directory.EnumerateFiles(lib, "*.jar")
                 .Order(StringComparer.OrdinalIgnoreCase)).ToArray();
             var materialRoot = Path.Combine(stateRoot, "teamcenter-visualization");
             TeamcenterProcessWorker.SecureVisualizationMaterialRoot(materialRoot);
@@ -392,9 +400,11 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
             next < total ? next : null, nodes, hash));
     }
 
-    public async Task<object> ConsumeVisualizationAsync(JsonElement payload,
+    public async Task<object> ConsumeVisualizationAsync(JsonElement payload, string visualizationOperation,
         Func<string, CancellationToken, Task> consumer, CancellationToken ct)
     {
+        if (visualizationOperation is not ("Open" or "Insert"))
+            throw new ConnectorException("teamcenter_visualization_operation_invalid");
         Closed(payload, "source_selector", "expected_visdoc_uid");
         var selector = ReadSelector(payload.GetProperty("source_selector"));
         var expected = payload.GetProperty("expected_visdoc_uid").GetString() ?? "";
@@ -405,7 +415,7 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
         {
             var credentials = RequireCredentials();
             if (selector.EndpointId != endpointId) throw new ConnectorException("teamcenter_launch_input_invalid");
-            return await worker.ConsumeVisualizationAsync(selector, expected, consumer,
+            return await worker.ConsumeVisualizationAsync(selector, expected, visualizationOperation, consumer,
                 credentials.User, credentials.Password, ct);
         }
         catch (ConnectorException error) when (InvalidatesSession(error)) { ClearCredentials(); throw; }
@@ -418,6 +428,15 @@ public sealed class TeamcenterReadOnlyRuntime : IDisposable
         {
             if (username.Length == 0 || password.Length == 0) throw new ConnectorException("teamcenter_login_required");
             return (new string(username), new string(password));
+        }
+    }
+
+    private string RequirePrincipal()
+    {
+        lock (credentialState)
+        {
+            if (username.Length == 0) throw new ConnectorException("teamcenter_login_required");
+            return new string(username);
         }
     }
 
@@ -519,12 +538,32 @@ internal sealed class UnavailableTeamcenterWorker : ITeamcenterWorker
     public Task<TeamcenterProductSearchResult> SearchAsync(string itemId, string revisionId, string revisionRule, string configurationDate, string username, string password, CancellationToken ct) => Task.FromException<TeamcenterProductSearchResult>(Error());
     public Task<IReadOnlyList<TeamcenterOccurrence>> ObserveAsync(TeamcenterSourceSelector selector, int maxNodes, int maxDepth, string propertyProjection, string username, string password, CancellationToken ct) => Task.FromException<IReadOnlyList<TeamcenterOccurrence>>(Error());
     public Task<TeamcenterLaunchResult> LaunchAsync(TeamcenterSourceSelector selector, string expectedVisdocUid, string username, string password, CancellationToken ct) => Task.FromException<TeamcenterLaunchResult>(Error());
-    public Task<TeamcenterLaunchResult> ConsumeVisualizationAsync(TeamcenterSourceSelector selector, string expectedVisdocUid, Func<string, CancellationToken, Task> consumer, string username, string password, CancellationToken ct) => Task.FromException<TeamcenterLaunchResult>(Error());
+    public Task<TeamcenterLaunchResult> ConsumeVisualizationAsync(TeamcenterSourceSelector selector, string expectedVisdocUid, string visualizationOperation, Func<string, CancellationToken, Task> consumer, string username, string password, CancellationToken ct) => Task.FromException<TeamcenterLaunchResult>(Error());
 }
 
 public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, string launcherPath,
     IReadOnlyList<string> classpath, string visualizationMaterialRoot) : ITeamcenterWorker
 {
+    private const string VisualizationProtocolPrefix = "AI00_TC_VIS_V1:";
+    public async Task<TeamcenterNodePropertiesResult> ReadNodePropertiesAsync(
+        TeamcenterSourceSelector selector, TeamcenterOccurrenceEdge[] path,
+        string username, string password, CancellationToken ct)
+    {
+        var result = await RunAsync("node_properties",
+            new { source_selector = selector, occurrence_path = path }, username, password, ct);
+        var properties = result.Deserialize<TeamcenterNodeProperties>()
+            ?? throw new ConnectorException("teamcenter_worker_response_invalid");
+        return new TeamcenterNodePropertiesResult(
+            selector.IdentityHash, DateTimeOffset.UtcNow, false, properties);
+    }
+
+    public async Task<TeamcenterChildrenBatch> ReadChildrenAsync(TeamcenterSourceSelector selector, TeamcenterOccurrenceEdge[] path,
+        string username, string password, CancellationToken ct)
+    {
+        var result = await RunAsync("children", new { source_selector = selector, parent_path = path }, username, password, ct);
+        return result.Deserialize<TeamcenterChildrenBatch>() ?? throw new ConnectorException("teamcenter_worker_response_invalid");
+    }
+
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = false };
 
     internal static void SecureVisualizationMaterialRoot(string path)
@@ -603,7 +642,7 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
     }
 
     public async Task<TeamcenterLaunchResult> ConsumeVisualizationAsync(TeamcenterSourceSelector selector,
-        string expectedVisdocUid, Func<string, CancellationToken, Task> consumer,
+        string expectedVisdocUid, string visualizationOperation, Func<string, CancellationToken, Task> consumer,
         string username, string password, CancellationToken ct)
     {
         var materialRoot = Path.GetFullPath(visualizationMaterialRoot);
@@ -631,22 +670,30 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
             {
                 command = "consume",
                 payload = new { source_selector = selector, expected_visdoc_uid = expectedVisdocUid,
-                    source_identity_hash = selector.IdentityHash, material_root = operationRoot }
+                    source_identity_hash = selector.IdentityHash, material_root = operationRoot,
+                    visualization_operation = visualizationOperation }
             }).AsMemory(), ct);
             await process.StandardInput.FlushAsync(ct);
 
-            var readyLine = await ReadLineBoundedAsync(process.StandardOutput, 16 * 1024, ct);
-            using var readyDocument = JsonDocument.Parse(readyLine);
-            var ready = readyDocument.RootElement;
-            if (ready.ValueKind != JsonValueKind.Object
-                || ready.EnumerateObject().Select(item => item.Name).Order().SequenceEqual(
-                    new[] { "expected_visdoc_uid", "material_path", "source_identity_hash", "type" }.Order()) is false
-                || ready.GetProperty("type").GetString() != "material_ready"
-                || ready.GetProperty("expected_visdoc_uid").GetString() != expectedVisdocUid
-                || ready.GetProperty("source_identity_hash").GetString() != selector.IdentityHash)
-                throw new ConnectorException("teamcenter_worker_response_invalid");
-            materialPath = ValidateMaterialPath(operationRoot,
-                ready.GetProperty("material_path").GetString() ?? "");
+            try
+            {
+                var readyLine = await ReadVisualizationProtocolLineAsync(process.StandardOutput, 16 * 1024, ct);
+                materialPath = ValidateMaterialPath(operationRoot,
+                    ParseVisualizationMaterialReady(readyLine, expectedVisdocUid, selector.IdentityHash));
+            }
+            catch (ConnectorException error)
+            {
+                try { if (!process.HasExited) process.Kill(true); } catch { }
+                string preparationDiagnostic = "";
+                try
+                {
+                    using var cleanup = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                    await process.WaitForExitAsync(cleanup.Token);
+                    preparationDiagnostic = await diagnosticTask.WaitAsync(cleanup.Token);
+                }
+                catch { }
+                throw NoEffectBeforeVisualizationConsumer(error, preparationDiagnostic);
+            }
             try { await consumer(materialPath, ct); }
             catch (Exception error) { consumerError = error; }
 
@@ -655,7 +702,7 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
             await process.StandardInput.FlushAsync();
             process.StandardInput.Close();
             using var cleanupTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-            var finalLine = await ReadLineBoundedAsync(process.StandardOutput, 64 * 1024, cleanupTimeout.Token);
+            var finalLine = await ReadVisualizationProtocolLineAsync(process.StandardOutput, 64 * 1024, cleanupTimeout.Token);
             await process.WaitForExitAsync(cleanupTimeout.Token);
             var diagnostic = await diagnosticTask;
             if (consumerError is not null)
@@ -723,7 +770,17 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
             if (process.ExitCode != 0) throw new ConnectorException(SanitizeDiagnostic(diagnostic));
             return root.GetProperty("result").Clone();
         }
-        catch { try { if (!process.HasExited) process.Kill(true); } catch { } throw; }
+        catch
+        {
+            try
+            {
+                if (!process.HasExited) process.Kill(true);
+                using var cleanup = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                await process.WaitForExitAsync(cleanup.Token);
+            }
+            catch { throw new ConnectorException("teamcenter_worker_cleanup_failed"); }
+            throw;
+        }
     }
 
     private static async Task<string> ReadBoundedAsync(StreamReader reader, int maximum, CancellationToken ct)
@@ -741,6 +798,80 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
         if (line is null || line.Length == 0 || line.Length > maximum)
             throw new ConnectorException("teamcenter_worker_response_invalid");
         return line;
+    }
+
+    internal static async Task<string> ReadVisualizationProtocolLineAsync(
+        TextReader reader, int maximum, CancellationToken ct)
+    {
+        var consumed = 0;
+        while (true)
+        {
+            var line = await reader.ReadLineAsync(ct);
+            if (line is null) throw new ConnectorException("teamcenter_worker_response_invalid");
+            consumed += line.Length + 1;
+            if (consumed > maximum) throw new ConnectorException("teamcenter_worker_response_too_large");
+            if (line.StartsWith(VisualizationProtocolPrefix, StringComparison.Ordinal))
+            {
+                var payload = line[VisualizationProtocolPrefix.Length..];
+                if (payload.Length == 0) throw new ConnectorException("teamcenter_worker_response_invalid");
+                return payload;
+            }
+        }
+    }
+
+    internal static string ParseVisualizationMaterialReady(
+        string payload, string expectedVisdocUid, string expectedSourceIdentityHash)
+    {
+        try
+        {
+            using var document = JsonDocument.Parse(payload);
+            var root = document.RootElement;
+            if (root.ValueKind != JsonValueKind.Object)
+                throw new ConnectorException("teamcenter_worker_response_invalid");
+
+            var names = root.EnumerateObject().Select(item => item.Name).Order().ToArray();
+            if (names.SequenceEqual(new[] { "code", "ok" }.Order())
+                && root.TryGetProperty("ok", out var ok)
+                && ok.ValueKind == JsonValueKind.False
+                && root.TryGetProperty("code", out var codeElement))
+            {
+                var code = codeElement.GetString();
+                if (code is not null && code.Length is >= 1 and <= 128
+                    && code.All(character => char.IsAsciiLetterOrDigit(character) || character == '_'))
+                    throw new ConnectorException(code);
+                throw new ConnectorException("teamcenter_worker_failed");
+            }
+
+            if (!names.SequenceEqual(
+                    new[] { "expected_visdoc_uid", "material_path", "source_identity_hash", "type" }.Order())
+                || root.GetProperty("type").GetString() != "material_ready"
+                || root.GetProperty("expected_visdoc_uid").GetString() != expectedVisdocUid
+                || root.GetProperty("source_identity_hash").GetString() != expectedSourceIdentityHash)
+                throw new ConnectorException("teamcenter_worker_response_invalid");
+            return root.GetProperty("material_path").GetString()
+                ?? throw new ConnectorException("teamcenter_worker_response_invalid");
+        }
+        catch (JsonException)
+        {
+            throw new ConnectorException("teamcenter_worker_response_invalid");
+        }
+    }
+
+    internal static ConnectorNoEffectException NoEffectBeforeVisualizationConsumer(
+        Exception error, string diagnostic)
+    {
+        if (error is ConnectorException connector
+            && connector.Code != "teamcenter_worker_response_invalid")
+            return new ConnectorNoEffectException(connector.Code);
+        if (diagnostic.Contains("服务器返回内部服务器错误", StringComparison.OrdinalIgnoreCase)
+            || diagnostic.Contains("internal server error", StringComparison.OrdinalIgnoreCase)
+            || diagnostic.Contains("解析 DOM", StringComparison.OrdinalIgnoreCase))
+            return new ConnectorNoEffectException("teamcenter_visualization_server_error");
+        if (diagnostic.Contains("ClassNotFound", StringComparison.OrdinalIgnoreCase)
+            || diagnostic.Contains("NoClassDefFound", StringComparison.OrdinalIgnoreCase)
+            || diagnostic.Contains("NoSuchMethod", StringComparison.OrdinalIgnoreCase))
+            return new ConnectorNoEffectException("teamcenter_visualization_sdk_incompatible");
+        return new ConnectorNoEffectException("teamcenter_visualization_worker_failed");
     }
 
     private static string ValidateMaterialPath(string materialRoot, string candidate)

@@ -145,12 +145,24 @@ class RecordingCursor:
             self._all = list(self.connection.ledger_rows)
         elif "information_schema.TABLE_CONSTRAINTS" in normalized:
             self._one = (0,)
+            if 'CHECK_CLAUSE' in normalized:
+                self._all = list(self.connection.runtime_constraints)
         elif "information_schema.STATISTICS" in normalized:
             self._one = (0,)
         elif "information_schema.COLUMNS" in normalized:
             self._one = (0,)
         elif normalized == "SELECT VERSION()":
             self._one = ("OceanBase_CE 4.3.5.1",)
+        elif "ADD CONSTRAINT" in normalized and "'cancelled'" in normalized:
+            self.connection.runtime_constraints = [
+                ('runtime_status', "status in ('queued','leased','executing','succeeded','failed_without_effect','outcome_unknown','manual_review_required','expired')"),
+                ('sim_runtime_plan_status_recovery', "status in ('queued','leased','executing','succeeded','failed_without_effect','outcome_unknown','manual_review_required','expired','cancelled')"),
+            ]
+        elif "DROP CHECK sim_runtime_plan_status_pre_recovery" in normalized:
+            self.connection.runtime_constraints = [
+                item for item in self.connection.runtime_constraints
+                if item[0] != 'runtime_status'
+            ]
 
     def fetchone(self):
         return self._one
@@ -165,6 +177,9 @@ class RecordingConnection:
         self.statements = []
         self.commits = 0
         self.rollbacks = 0
+        self.runtime_constraints = [
+            ('runtime_status', "status in ('queued','leased','executing','succeeded','failed_without_effect','outcome_unknown','manual_review_required','expired')"),
+        ]
 
     def cursor(self):
         return RecordingCursor(self)

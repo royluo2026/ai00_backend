@@ -120,6 +120,131 @@ def count(database, table):
         return db.execute("SELECT COUNT(*) FROM workmanship_sim_" + table).fetchone()[0]
 
 
+def seed_teamcenter_online_workspace(database, *, workspace_gid="10", document_gid="11",
+                                     content_sha256="a" * 64):
+    artifact = json.dumps({"source_selector": {"item_id": "W10-ENG0001", "revision": "00;1"}},
+                          ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    with sqlite3.connect(database) as db:
+        db.execute(
+            "INSERT INTO workmanship_sim_workspaces "
+            "(gid,tenant_gid,owner_gid,name,review_type,version_label,status,visibility,"
+            "cache_revision_hash,row_version) VALUES (?,?,?,?,?,?,?,?,?,?)",
+            (workspace_gid, "20", "30", "TC workspace", "node_review", "V1", "draft", "private",
+             "sha256:" + "b" * 64, 1),
+        )
+        db.execute(
+            "INSERT INTO workmanship_sim_workspace_versions "
+            "(gid,workspace_gid,tenant_gid,owner_gid,sequence,status,row_version) VALUES (?,?,?,?,?,?,?)",
+            ("12", workspace_gid, "20", "30", 1, "draft", 1),
+        )
+        db.execute("INSERT INTO workmanship_sim_workspace_heads VALUES (?,?,?)", (workspace_gid, "12", 1))
+        db.execute(
+            "INSERT INTO workmanship_sim_vm_documents "
+            "(gid,workspace_gid,tenant_gid,owner_gid,document_role,primary_slot,display_name,media_type,"
+            "artifact_ref_json,content_sha256,portability,connector_device_id,sort_order,source_kind,"
+            "source_identity_hash,status,row_version) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (document_gid, workspace_gid, "20", "30", "primary", 1, "W10 online",
+             "application/vnd.siemens.teamcenter.visualization-document", artifact, content_sha256,
+             "online", None, 0, "teamcenter_online", "c" * 64, "active", 1),
+        )
+    return {"workspace_gid": workspace_gid, "document_gid": document_gid,
+            "content_sha256": content_sha256, "artifact_ref_json": artifact}
+
+
+def bind_online(database, **overrides):
+    seeded = seed_teamcenter_online_workspace(database) if count(database, "workspaces") == 0 else {
+        "workspace_gid": "10", "document_gid": "11", "content_sha256": "a" * 64,
+    }
+    request = dict(
+        workspace_gid=seeded["workspace_gid"], document_gid=seeded["document_gid"],
+        tenant_gid="20", actor_gid="30", connector_device_id="device-A",
+        document_session="process-incarnation/document-A",
+        source_identity_hash="sha256:" + seeded["content_sha256"],
+        expected_workspace_row_version=1, idempotency_key="bind-A",
+    )
+    request.update(overrides)
+    return module.WorkspaceRepository().bind_online_live_document(**request)
+
+
+def test_bind_online_live_document_preserves_teamcenter_source_and_advances_once(database):
+    seeded = seed_teamcenter_online_workspace(database)
+
+    result = bind_online(database)
+
+    assert result["workspace_gid"] == seeded["workspace_gid"]
+    assert result["document_gid"] == seeded["document_gid"]
+    assert result["state"] == "bound"
+    assert result["workspace_row_version"] == 2
+    assert result["document_session"] == "process-incarnation/document-A"
+    with sqlite3.connect(database) as db:
+        document = db.execute(
+            "SELECT source_kind,source_identity_hash,content_sha256,artifact_ref_json,"
+            "connector_device_id,row_version FROM workmanship_sim_vm_documents WHERE gid='11'"
+        ).fetchone()
+        binding = db.execute(
+            "SELECT connector_device_id,document_session,workspace_gid,state "
+            "FROM workmanship_sim_live_document_bindings"
+        ).fetchone()
+    assert document == ("teamcenter_online", "c" * 64, "a" * 64, seeded["artifact_ref_json"],
+                        "device-A", 2)
+    assert binding == ("device-A", "process-incarnation/document-A", "10", "bound")
+
+
+def test_bind_online_live_document_idempotent_replay_does_not_advance(database):
+    seed_teamcenter_online_workspace(database)
+    first = bind_online(database)
+    assert bind_online(database) == first
+    with sqlite3.connect(database) as db:
+        assert db.execute("SELECT row_version FROM workmanship_sim_workspaces").fetchone()[0] == 2
+        assert db.execute("SELECT row_version FROM workmanship_sim_vm_documents").fetchone()[0] == 2
+    assert count(database, "live_document_bindings") == 1
+
+
+@pytest.mark.parametrize(("overrides", "error"), [
+    ({"source_identity_hash": "sha256:" + "d" * 64}, "online_source_identity_mismatch"),
+    ({"tenant_gid": "21"}, "workspace_not_found"),
+    ({"actor_gid": "31"}, "workspace_not_found"),
+    ({"document_gid": "99"}, "online_model_document_not_found"),
+    ({"expected_workspace_row_version": 2}, "version_conflict"),
+])
+def test_bind_online_live_document_rejects_invalid_scope_or_evidence_without_mutation(
+        database, overrides, error):
+    seed_teamcenter_online_workspace(database)
+    with pytest.raises(module.WorkspaceRepositoryError, match=error):
+        bind_online(database, **overrides)
+    assert count(database, "live_document_bindings") == 0
+    with sqlite3.connect(database) as db:
+        assert db.execute("SELECT row_version FROM workmanship_sim_workspaces").fetchone()[0] == 1
+        assert db.execute("SELECT connector_device_id,row_version FROM workmanship_sim_vm_documents").fetchone() == (None, 1)
+
+
+def test_bind_online_live_document_rejects_session_owned_by_another_workspace(database):
+    seed_teamcenter_online_workspace(database)
+    scope = module.WorkspaceRepository._live_document_identity(
+        "20", "30", "device-A", "process-incarnation/document-A")
+    with sqlite3.connect(database) as db:
+        db.execute(
+            "INSERT INTO workmanship_sim_live_document_bindings "
+            "(tenant_gid,actor_gid,session_identity_hash,connector_device_id,document_session,workspace_gid,state) "
+            "VALUES (?,?,?,?,?,?,?)", (*scope, "device-A", "process-incarnation/document-A", "999", "bound"),
+        )
+    with pytest.raises(module.WorkspaceRepositoryError, match="live_document_already_bound"):
+        bind_online(database)
+
+
+def test_bind_online_live_document_rejects_another_active_session_in_workspace(database):
+    seed_teamcenter_online_workspace(database)
+    scope = module.WorkspaceRepository._live_document_identity("20", "30", "device-A", "old-session")
+    with sqlite3.connect(database) as db:
+        db.execute(
+            "INSERT INTO workmanship_sim_live_document_bindings "
+            "(tenant_gid,actor_gid,session_identity_hash,connector_device_id,document_session,workspace_gid,state) "
+            "VALUES (?,?,?,?,?,?,?)", (*scope, "device-A", "old-session", "10", "bound"),
+        )
+    with pytest.raises(module.WorkspaceRepositoryError, match="live_document_binding_conflict"):
+        bind_online(database)
+
+
 def test_adopt_reuse_and_durable_replay(database):
     first = adopt()
     assert first["state"] == "importing"

@@ -6,7 +6,7 @@ from backend.capability_v2.provider_contracts import CapabilityBusinessError, Ca
 from plugins.simulation.simulation_backend.capabilities.live_documents import LiveDocumentProvider, BINDING_INPUT
 from plugins.simulation.simulation_backend.capabilities.connector_runtime import ConnectorControlPlane, register_connector_runtime_capabilities
 from plugins.simulation.simulation_backend.data.connector_repository import ConnectorRepositoryError
-from plugins.simulation.tests.test_live_document_binding_repository import database, count
+from plugins.simulation.tests.test_live_document_binding_repository import database, count, seed_teamcenter_online_workspace
 from plugins.simulation.tests.test_live_document_identity_evidence import NOW
 
 
@@ -25,6 +25,11 @@ class Connectors:
         self.calls.append((operation_id, scope))
         return dict(connector_device_id='device-A', document_session='sha256:'+'a'*64,
             start_index=0, next_index=None, total_hierarchies=0, hierarchies=[])
+    def verified_teamcenter_launch(self, operation_id, **scope):
+        self.calls.append((operation_id, scope))
+        if self.fail: raise ConnectorRepositoryError('launch_evidence_unavailable')
+        return dict(connector_device_id='device-A', source_identity_hash='sha256:'+'d'*64,
+            launch_id='tclaunch:'+'e'*64)
 
 
 def context(): return CapabilityContext(user_gid='30',team_gid='20',source='web')
@@ -77,6 +82,41 @@ def test_rebind_never_accepts_a_raw_or_other_owner_identity(database):
         provider.rebind({**payload, 'document_session':'raw'}, context())
     with pytest.raises(CapabilityBusinessError, match='workspace_not_found'):
         provider.rebind(payload, context().model_copy(update={'user_gid':'31'}))
+
+
+def test_online_source_bind_requires_matching_signed_launch_and_current_identity(database):
+    seeded = seed_teamcenter_online_workspace(database, content_sha256='d'*64)
+    connectors = Connectors()
+    provider = LiveDocumentProvider(connectors, clock=lambda: NOW)
+
+    result = provider.bind_online({
+        'workspace_gid': seeded['workspace_gid'], 'document_gid': seeded['document_gid'],
+        'launch_operation_id': 'launch-op', 'identity_operation_id': 'identity-op',
+        'expected_workspace_row_version': 1, 'idempotency_key': 'online-bind-key',
+    }, context()).data
+
+    assert result['state'] == 'bound'
+    assert result['document_session'] == 'sha256:'+'a'*64
+    assert result['workspace_row_version'] == 2
+    assert connectors.calls == [
+        ('launch-op', dict(actor_id='30', tenant_id='20', now=NOW)),
+        ('identity-op', dict(actor_id='30', tenant_id='20', now=NOW)),
+    ]
+
+
+def test_online_source_bind_rejects_cross_device_evidence_without_mutation(database):
+    seeded = seed_teamcenter_online_workspace(database, content_sha256='d'*64)
+    connectors = Connectors()
+    connectors.verified_document_identity = lambda operation_id, **scope: dict(
+        connector_device_id='device-B', document_session='sha256:'+'a'*64)
+    provider = LiveDocumentProvider(connectors, clock=lambda: NOW)
+    with pytest.raises(CapabilityBusinessError, match='launch_document_device_mismatch'):
+        provider.bind_online({
+            'workspace_gid': seeded['workspace_gid'], 'document_gid': seeded['document_gid'],
+            'launch_operation_id': 'launch-op', 'identity_operation_id': 'identity-op',
+            'expected_workspace_row_version': 1, 'idempotency_key': 'online-bind-key',
+        }, context())
+    assert count(database, 'live_document_bindings') == 0
 
 
 def test_refused_evidence_and_raw_ui_session_never_create(database):
@@ -133,10 +173,13 @@ def test_identity_read_is_empty_read_only_app_plan_and_candidate_web_only():
     assert step['operation_id'] == 'vismockup.document.identity.read@1'
     for name in ('simulation.vismockup.document.identity.read.request','simulation.vismockup.document.hierarchy_inventory.read.request',
                  'simulation.environment.live_document.adopt','simulation.environment.live_document.binding.get',
-                 'simulation.environment.live_document.rebind','simulation.environment.live_document.inventory.apply'):
+                 'simulation.environment.live_document.rebind','simulation.environment.live_document.inventory.apply',
+                 'simulation.environment.online_source.live_document.bind'):
         d = registry.items[name][2]
         assert d.lifecycle_status.value == 'experimental'
         assert {key for key,value in d.exposure.model_dump().items() if value} == {'web'}
+    spec = registry.items['simulation.environment.online_source.live_document.bind'][0]
+    assert spec.confirmation == 'user'
     connectors.bound_runtime_for_user = lambda *_: None
     with pytest.raises(CapabilityBusinessError): handler({},ctx)
     assert len(queued) == 1

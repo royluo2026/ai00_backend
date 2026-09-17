@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from types import SimpleNamespace
+import json
 
 import pytest
 
@@ -46,6 +47,32 @@ def _install(monkeypatch, rows):
     monkeypatch.setattr(module, "get_simulation_conn", lambda: _Connection(cursor))
     monkeypatch.setattr(module, "next_gid", lambda: 9001)
     return cursor
+
+
+@pytest.mark.parametrize("source_kind", ["teamcenter_online", "artifact", "live_document"])
+def test_search_model_documents_returns_valid_source_specific_reference(monkeypatch, source_kind):
+    from backend.capabilities.validation_next import validate_payload
+    from plugins.simulation.simulation_backend.capabilities.environment_documents import specs
+
+    selector = {"endpoint_id": "tc-production", "object_uid": "root-uid",
+                "item_revision_uid": "revision-uid", "bom_view_uid": "",
+                "revision_rule": "Latest Working", "configuration_date": "2026-09-16T01:00:00Z"}
+    file_ref = {"artifact_id": "model-file", "media_type": "application/plmxml+xml",
+                "sha256": "b" * 64, "byte_size": 42, "version": 1}
+    stored_ref = ({"source_selector": selector, "insertion_instance_id": "insert-one"}
+                  if source_kind == "teamcenter_online" else file_ref if source_kind == "artifact" else None)
+    row = {"document_gid": 40, "workspace_gid": 10, "role": "primary", "display_name": "W10",
+           "media_type": "application/plmxml+xml" if source_kind == "artifact" else "application/vnd.siemens.teamcenter.visualization-document",
+           "artifact_ref_json": json.dumps(stored_ref) if stored_ref else None,
+           "source_kind": source_kind, "source_identity_hash": "a" * 64, "content_sha256": "b" * 64,
+           "portability": "portable" if source_kind == "artifact" else "device_bound",
+           "connector_device_id": None, "sort_order": 0, "row_version": 1}
+    metadata = [{"document_gid": 40, "online_source_gid": 50, "source_selector_json": json.dumps(selector)}] if source_kind == "teamcenter_online" else []
+    _install(monkeypatch, [[row], metadata])
+    result = WorkspaceRepository().search_model_documents(workspace_gid="10", tenant_gid="20", actor_gid="30")
+    validate_payload(specs()[0][0].output_schema, result, label="output")
+    assert result["items"][0]["artifact_ref"] == (file_ref if source_kind == "artifact" else None)
+    assert result["items"][0]["source_selector"] == (selector if source_kind == "teamcenter_online" else None)
 
 
 def test_add_primary_model_document_is_atomic_and_invalidates_materialization(monkeypatch):

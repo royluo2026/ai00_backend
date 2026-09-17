@@ -452,6 +452,50 @@ def test_signed_probe_controls_reconciliation_and_replacement(database, classifi
                 service.repository.insert_v2_plan(replacement, fresh.session_token, service.clock())
 
 
+def test_fresh_confirmation_allows_a_new_document_launch_after_connector_restart(database):
+    service, key = setup_service(database)
+    session = register(service, key, database[1])
+    cloud, _ = signer()
+    raw = deepcopy(VECTOR['plan'])
+    raw.update(
+        plan_id='original-launch', capability_id='simulation.teamcenter.visualization.launch.request',
+        device_id=database[1], runtime_instance_id='winner',
+        confirmation_receipt_id='apr_original',
+        issued_at='2026-09-07T12:00:00Z', expires_at='2026-09-07T12:10:00Z',
+    )
+    raw['steps'][0].update(
+        operation_id='teamcenter.visualization.launch@1', side_effect_classification='write',
+        post_condition_probe_id='vismockup.application.probe@1',
+    )
+    original = cloud.sign(raw)
+    service.repository.insert_v2_plan(original, session.session_token, NOW)
+    pins = dict(device_id=database[1], generation=7, runtime_instance_id='winner', runtime_type='electron')
+    leased = service.lease(session.session_token, **pins)
+    service.outcome(session.session_token, outcome(original, leased, key), **pins)
+
+    service.clock = lambda: NOW + timedelta(minutes=6)
+    replacement_session = register(service, key, database[1], instance='replacement')
+    replay = cloud.sign({
+        **original.model_dump(mode='json'),
+        'plan_id': 'replayed-launch', 'idempotency_key': 'replayed-launch',
+        'runtime_instance_id': 'replacement',
+    })
+    with pytest.raises(RuntimeError, match='reconciliation_required'):
+        service.repository.insert_v2_plan(replay, replacement_session.session_token, service.clock())
+    replacement = cloud.sign({
+        **original.model_dump(mode='json'),
+        'plan_id': 'replacement-launch', 'idempotency_key': 'replacement-launch',
+        'runtime_instance_id': 'replacement', 'confirmation_receipt_id': 'apr_replacement',
+    })
+
+    service.repository.insert_v2_plan(replacement, replacement_session.session_token, service.clock())
+
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute('SELECT status FROM workmanship_sim_connector_runtime_plans WHERE plan_id=%s',
+                    (replacement.plan_id,))
+        assert cur.fetchone()['status'] == 'queued'
+
+
 def test_absent_probe_classifies_manual_review():
     from plugins.simulation.simulation_backend.application.connector_protocol_v2 import ReconciliationService
     assert ReconciliationService().reconcile('plan-1', None) == 'manual_review_required'
