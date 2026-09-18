@@ -42,7 +42,7 @@
 
 ## 文件
 
-- `catalog.v2.json`：完整机器目录和最小合法示例。
+- `catalog.v2.json`：Capability 主目录和最小合法示例；不重复内嵌消费者投影。
 - `agent-tools.v2.json`：仅包含 `exposure.agent=true` 的工具。
 - `mcp-tools.v2.json`：仅包含 `exposure.mcp=true` 的工具。
 - `openapi-fragment.v2.json`：固定 release 的 API Schema 片段。

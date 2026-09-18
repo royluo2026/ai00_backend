@@ -154,6 +154,25 @@ def test_machine_catalog_contains_release_bound_agent_mcp_and_openapi_views():
     }
 
 
+def test_catalog_file_excludes_duplicate_consumer_projections():
+    document = build_documentation(_catalog())
+    catalog = json.loads(document.files["catalog.v2.json"])
+
+    assert set(catalog) == {
+        "schema_version", "release_id", "catalog_hash", "provider_artifacts", "capabilities",
+    }
+    assert catalog["release_id"] == document.machine_catalog["release_id"]
+    assert catalog["catalog_hash"] == document.machine_catalog["catalog_hash"]
+    assert catalog["capabilities"] == document.machine_catalog["capabilities"]
+
+    agent_view = json.loads(document.files["agent-tools.v2.json"])
+    mcp_view = json.loads(document.files["mcp-tools.v2.json"])
+    openapi_view = json.loads(document.files["openapi-fragment.v2.json"])
+    assert agent_view["tools"] == document.machine_catalog["agent_tools"]
+    assert mcp_view["tools"] == document.machine_catalog["mcp_tools"]
+    assert openapi_view == document.machine_catalog["openapi_fragment"]
+
+
 def test_capability_page_documents_every_execution_budget_field():
     catalog = _catalog()
     descriptor = catalog.descriptors[0]

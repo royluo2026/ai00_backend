@@ -250,7 +250,9 @@ def catalog_integrity_errors(catalog: dict) -> list[str]:
     errors = []
     if (catalog.get("release_id"), catalog.get("catalog_hash")) != (release.release_id, release.catalog_hash):
         errors.append("developer catalog release/hash differs from immutable release")
-    expected_catalog = build_documentation(release).machine_catalog
+    expected_catalog = json.loads(
+        build_documentation(release).files["catalog.v2.json"]
+    )
     if catalog != expected_catalog:
         errors.append("developer catalog projection differs from immutable release")
     return errors

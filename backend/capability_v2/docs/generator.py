@@ -268,6 +268,17 @@ def generated_files(release: CatalogRelease) -> dict[str, str]:
     return build_documentation(release).files
 
 
+def _catalog_projection(machine: Mapping[str, Any]) -> dict[str, Any]:
+    """Return the core developer Catalog without duplicated consumer views."""
+    return {
+        "schema_version": machine["schema_version"],
+        "release_id": machine["release_id"],
+        "catalog_hash": machine["catalog_hash"],
+        "provider_artifacts": machine["provider_artifacts"],
+        "capabilities": machine["capabilities"],
+    }
+
+
 def _render_files(machine: dict[str, Any]) -> dict[str, str]:
     capabilities = machine["capabilities"]
     by_domain: dict[str, list[dict[str, Any]]] = {domain: [] for domain in CANONICAL_DOMAINS}
@@ -282,7 +293,7 @@ def _render_files(machine: dict[str, Any]) -> dict[str, str]:
         "INTEGRATION.md": _integration_guide(machine),
         "SECURITY.md": _security_guide(machine),
         "ERRORS.md": _error_guide(),
-        "catalog.v2.json": _json(machine),
+        "catalog.v2.json": _json(_catalog_projection(machine)),
         "agent-tools.v2.json": _json({
             "catalog_release": machine["release_id"], "tools": machine["agent_tools"],
         }),
@@ -335,7 +346,7 @@ def _readme(machine, by_domain, counts) -> str:
 
 ## 文件
 
-- `catalog.v2.json`：完整机器目录和最小合法示例。
+- `catalog.v2.json`：Capability 主目录和最小合法示例；不重复内嵌消费者投影。
 - `agent-tools.v2.json`：仅包含 `exposure.agent=true` 的工具。
 - `mcp-tools.v2.json`：仅包含 `exposure.mcp=true` 的工具。
 - `openapi-fragment.v2.json`：固定 release 的 API Schema 片段。
