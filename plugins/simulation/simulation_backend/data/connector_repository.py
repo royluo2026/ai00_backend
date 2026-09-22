@@ -99,9 +99,9 @@ class SimulationConnectorRepository:
             plan.capability_id == 'simulation.teamcenter.visualization.launch.request'
             and isinstance(confirmation, str) and bool(confirmation)
             and confirmation != prior.get('confirmation_receipt_id')
-            and len(plan.steps) == 1 and plan.steps[0].operation_id == 'teamcenter.visualization.launch@1'
+            and len(plan.steps) == 1 and plan.steps[0].operation_id in {'teamcenter.visualization.launch@1', 'teamcenter.visualization.launch@2'}
             and isinstance(prior_steps, list) and len(prior_steps) == 1
-            and prior_steps[0].get('operation_id') == 'teamcenter.visualization.launch@1'
+            and prior_steps[0].get('operation_id') == plan.steps[0].operation_id
         )
 
     def runtime_device(self, device_id):
@@ -136,6 +136,26 @@ class SimulationConnectorRepository:
         except ValueError as exc:
             code = "launch_evidence_stale" if str(exc) == "launch_evidence_stale" else "launch_evidence_unavailable"
             raise ConnectorRepositoryError(code) from exc
+
+    @staticmethod
+    def verified_teamcenter_opened_source_evidence(cursor, operation_id, *, actor_id, tenant_id, now):
+        """Verify the current-open receipt inside the caller's binding transaction."""
+        from ..application.teamcenter_launch_evidence import verify_teamcenter_opened_source_evidence
+        cursor.execute('SELECT * FROM workmanship_sim_connector_runtime_plans '
+            'WHERE plan_id=%s AND actor_gid=%s AND tenant_gid=%s AND protocol=%s',
+            (operation_id, actor_id, tenant_id, PROTOCOL_V2))
+        row = cursor.fetchone()
+        if not row:
+            raise ConnectorRepositoryError('launch_evidence_unavailable')
+        runtime = SimulationConnectorRepository._locked_runtime(cursor, row['device_id'])
+        # Device lock serializes runtime changes and outcome writers; re-read the
+        # receipt with a current locking read, not the initial MVCC snapshot.
+        cursor.execute('SELECT * FROM workmanship_sim_connector_runtime_plans WHERE plan_id=%s FOR UPDATE', (operation_id,))
+        row = cursor.fetchone()
+        try:
+            return verify_teamcenter_opened_source_evidence(row, runtime, actor_id=actor_id, tenant_id=tenant_id, now=now)
+        except ValueError as exc:
+            raise ConnectorRepositoryError('launch_evidence_unavailable') from exc
 
     def verified_hierarchy_inventory(self, operation_id, *, actor_id, tenant_id, now):
         from ..application.live_document_inventory import verify_hierarchy_inventory_evidence

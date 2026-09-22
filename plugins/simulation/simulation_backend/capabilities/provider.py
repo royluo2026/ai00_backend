@@ -599,7 +599,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                 "simulation.connector.pairing.activate",
             }
             else ExposurePolicy(web=True)
-            if governed.id in {
+            if governed.id.startswith('simulation.viewer.interaction.') or governed.id in {
                 "simulation.connector.pairing.bootstrap.create",
                 "simulation.connector.pairing.bootstrap.get",
                 "simulation.connector.pairing.summary.get",
@@ -999,6 +999,60 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                 ('primary_live_document_unavailable','The selected environment has no unique primary live document to rebind.'),
                 ('idempotency_conflict','The request key was already used for different adoption input.'),
                 ('runtime_v2_required','A current App v2 runtime is required.'))), domain_errors_complete=False)
+    if governed.id.startswith('simulation.viewer.interaction.'):
+        from backend.capability_v2.identity import DESKTOP_CONSUMER_ID
+        updates.update(
+            exposure=ExposurePolicy(web=True), execution_mode=ExecutionMode.CLOUD_SYNC,
+            lifecycle_status=LifecycleStatus.EXPERIMENTAL,
+            business_effect=('Resolve the current verified source association for one owner workspace document.'
+                if governed.id.endswith('scope.get') else
+                'Issue a 60-second signed local interaction grant scoped to the current owner, device, source and opened document.'),
+            business_acceptance_criteria=(
+                'The workspace, primary online-source document, active binding and current runtime belong to the authenticated owner and tenant.',
+                'Caller input cannot select device, runtime, operations, actor, tenant or authorization lifetime.',
+                'Renewal retains the same session nonce and allocates a strictly increasing generation only after current-scope revalidation.'),
+            business_invariants=(BusinessInvariantContract(rule_id='simulation.viewer.interaction.current_source', version=1,
+                statement='Local interaction authority exists only for one active verified source association and authenticated runtime.',
+                applies_when='an owner resolves or authorizes a local viewer interaction',
+                enforcement_ref='plugins/simulation/simulation_backend/data/viewer_interaction_repository.py:authorize_scope',
+                error_code='interaction_binding_stale', test_refs=('backend/tests/test_viewer_interaction_repository.py::test_current_association_fails_closed_after_scope_changes',)),),
+            no_business_invariant_reason=None,
+            consumer_refs=({'consumer_id':DESKTOP_CONSUMER_ID, 'consumer_type':'web', 'version_constraint':'==1'},),
+            test_refs=({'path':'plugins/simulation/tests/test_viewer_interaction_provider.py'},
+                {'path':'backend/tests/test_viewer_interaction_repository.py'}, {'path':'backend/tests/test_viewer_interaction_audit.py'}),
+            transaction_policy=dict(owner='simulation', atomicity='workspace/source/runtime/binding checks and generation allocation through signing in one transaction',
+                tables=['workmanship_sim_viewer_source_associations', 'workmanship_sim_viewer_interaction_grants', 'workmanship_sim_viewer_grant_evidence'],
+                migration_refs=['backend/db/migrations/domains/simulation/0028_viewer_interaction.sql', 'backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql'],
+                dependencies=['simulation.environment.online_source.live_document.bind@2'],
+                idempotency='source association/session nonce/prior grant; stale renewals rejected'),
+            domain_errors=tuple(DomainErrorContract(code=code, meaning=meaning) for code, meaning in (
+                ('interaction_scope_denied', 'The caller does not own a current permitted source scope.'),
+                ('interaction_binding_stale', 'The source, document binding or current runtime changed.'),
+                ('interaction_renewal_stale', 'The prior grant is not the latest grant for this session.'),
+                ('interaction_signer_unavailable', 'Trusted grant signing material is unavailable.'),
+                ('interaction_catalog_binding_unavailable', 'Exact trusted authorization or operation Catalog binding is unavailable.'),
+                ('interaction_authorization_rejected', 'The closed request or trusted signer rejected the grant.'))),
+            domain_errors_complete=False)
+    if governed.id == 'simulation.environment.online_source.live_document.bind' and governed.version == 2:
+        updates.update(
+            business_effect='Atomically bind one verified launch major 2 source/document receipt and persist its local interaction source association.',
+            business_acceptance_criteria=(
+                'The signed current-open receipt binds source selector and document identity to the same fresh owner runtime.',
+                'Source association, live binding, document device, workspace revision and idempotency result commit or roll back together.',
+                'No independent identity read or saved environment document identity is required.'),
+            business_invariants=(BusinessInvariantContract(rule_id='simulation.viewer.current_open_receipt', version=1,
+                statement='A source association is established only from a verified signed current-open launch receipt.',
+                applies_when='an online source is bound for local interaction',
+                enforcement_ref='plugins/simulation/simulation_backend/data/connector_repository.py:verified_teamcenter_opened_source_evidence',
+                error_code='launch_evidence_unavailable', test_refs=('plugins/simulation/tests/test_viewer_opened_source_binding.py::test_current_open_receipt_atomically_binds_source_and_idempotent_association',)),),
+            consumer_refs=tuple({**ref, 'version_constraint':'==2'} for ref in updates['consumer_refs']),
+            test_refs=({'path':'plugins/simulation/tests/test_viewer_opened_source_binding.py'},),
+            transaction_policy={**updates['transaction_policy'],
+                'atomicity':'verified opened-source evidence/source association/live binding/document/workspace revision/idempotency in one transaction',
+                'tables':[*updates['transaction_policy']['tables'], 'workmanship_sim_viewer_source_associations'],
+                'migration_refs':[*updates['transaction_policy']['migration_refs'], 'backend/db/migrations/domains/simulation/0028_viewer_interaction.sql'],
+                'dependencies':['teamcenter.visualization.launch@2'],
+                'idempotency':'workspace/key plus launch receipt/runtime/document/source and expected workspace revision'})
     return CapabilityDescriptorV2.model_validate({**descriptor.model_dump(), **updates})
 
 

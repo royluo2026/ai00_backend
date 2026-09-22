@@ -7,6 +7,52 @@ using Xunit;
 namespace Ai00.Connector.Tests;
 public sealed class OutcomeUnknownRecoveryTests : IDisposable
 {
+    [Theory] [InlineData("acknowledged")] [InlineData("reconciled")]
+    public async Task FinalizedHistoricalOutcomesDoNotReenterExecutionValidation(string terminal)
+    {
+        using var key=new DeviceSigningKeyStore(root).GetOrCreate();
+        var journal=new AppPlanJournal(Path.Combine(root,"journal"));
+        // Recovery already excludes finalized plans. Execution must do the same:
+        // archived payloads are not inputs to the next command's quarantine check.
+        journal.Append("outcome","archived-plan","legacy archived outcome");
+        journal.Append(terminal,"archived-plan","{}");
+        var adapter=new FakeAdapter(()=>Task.FromResult(new AdapterResult(true,new{connected=true})));
+        var outcome=await Worker(journal,adapter,key).ExecuteAsync(Lease(),Session(),CancellationToken.None);
+        Assert.Equal("succeeded",outcome.OverallStatus);
+        Assert.Equal(1,adapter.Calls);
+    }
+    [Fact] public async Task UnresolvedHistoricalOutcomeStillRequiresSignatureValidation()
+    {
+        using var key=new DeviceSigningKeyStore(root).GetOrCreate();
+        var journal=new AppPlanJournal(Path.Combine(root,"journal"));
+        journal.Append("outcome","unresolved-plan","invalid unsigned outcome");
+        var adapter=new FakeAdapter(()=>Task.FromResult(new AdapterResult(true)));
+        await Assert.ThrowsAnyAsync<Exception>(()=>Worker(journal,adapter,key).ExecuteAsync(Lease(),Session(),CancellationToken.None));
+        Assert.Equal(0,adapter.Calls);
+    }
+    [Fact] public async Task InvalidAdapterErrorCodeDoesNotCrashOutcomeSigning()
+    {
+        using var key=new DeviceSigningKeyStore(root).GetOrCreate();
+        var journal=new AppPlanJournal(Path.Combine(root,"journal"));
+        var adapter=new FakeAdapter(()=>throw new ConnectorNoEffectException("type_DirectModel"));
+        var outcome=await Worker(journal,adapter,key).ExecuteAsync(Lease(),Session(),CancellationToken.None);
+        Assert.Equal("failed_without_effect",outcome.OverallStatus);
+        Assert.Equal("adapter_error_code_invalid",outcome.Steps[0].GetProperty("error_code").GetString());
+    }
+    [Fact] public void LegacyInvalidErrorCodeIsRecoveredWithoutReinvokingAdapter()
+    {
+        using var key=new DeviceSigningKeyStore(root).GetOrCreate();
+        var journal=new AppPlanJournal(Path.Combine(root,"journal"));
+        journal.Append("lease_acquired","plan-002",JsonSerializer.Serialize(Lease()));
+        journal.Append("step_terminal","plan-002",JsonSerializer.Serialize(new {
+            step_id="step-00001",started_at=PlanExecutionWorker.Timestamp(Now),completed_at=PlanExecutionWorker.Timestamp(Now),
+            status="failed_without_effect",result=(object?)null,result_hash=(string?)null,error_code="type_DirectModel",reconciliation_state="not_required"}));
+        var adapter=new FakeAdapter(()=>throw new InvalidOperationException("must not invoke"));
+        var outcome=Assert.Single(Worker(journal,adapter,key).Recover());
+        Assert.Equal("failed_without_effect",outcome.OverallStatus);
+        Assert.Equal("adapter_error_code_invalid",outcome.Steps[0].GetProperty("error_code").GetString());
+        Assert.Equal(0,adapter.Calls);
+    }
     private readonly string root = Path.Combine(Path.GetTempPath(), "ai00-app-test-" + Guid.NewGuid().ToString("N"));
     private static readonly DateTimeOffset Now = DateTimeOffset.Parse("2026-09-07T01:03:00Z");
     [Theory] [InlineData(false)] [InlineData(true)]
@@ -81,19 +127,21 @@ public sealed class OutcomeUnknownRecoveryTests : IDisposable
         Assert.False(worker.ExecutionQuarantined);
         Assert.True(worker.RequiresProcessRestart);
     }
-    [Fact] public async Task ChildrenTimeoutCompletesCleanupWithoutRestartAndAllowsNextPlan()
+    [Theory]
+    [InlineData("teamcenter.product_structure.children.read@1")]
+    [InlineData("teamcenter.node_properties.read@1")]
+    public async Task TeamcenterReadTimeoutCompletesCleanupWithoutRestartAndAllowsNextPlan(string operationId)
     {
         using var key = new DeviceSigningKeyStore(root).GetOrCreate();
         var plan=ProtocolV2VectorTests.Vector["plan"]!.DeepClone().AsObject();
         plan["steps"]![0]!["timeout_seconds"]=1;
-        plan["steps"]![0]!["operation_id"]="teamcenter.product_structure.children.read@1";
+        plan["steps"]![0]!["operation_id"]=operationId;
         plan["steps"]![0]!["side_effect_classification"]="read";
         plan["steps"]![0]!["post_condition_probe_id"]=null;
         using var cloud=ProtocolV2VectorTests.TestKey("plan");
         ProtocolV2VectorTests.SignPlan(plan,cloud);
         var cleaned=false;
-        var adapter=new FakeAdapter(()=>Task.FromResult(new AdapterResult(true)),
-            "teamcenter.product_structure.children.read@1", async ct=>{
+        var adapter=new FakeAdapter(()=>Task.FromResult(new AdapterResult(true)), operationId, async ct=>{
                 if(cleaned)return new AdapterResult(true);
                 try { await Task.Delay(Timeout.Infinite,ct); }
                 finally { await Task.Delay(50); cleaned=true; }

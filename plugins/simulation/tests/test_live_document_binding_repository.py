@@ -29,7 +29,6 @@ def database(tmp_path, monkeypatch):
         CREATE TABLE workmanship_sim_live_document_bindings (
           tenant_gid TEXT, actor_gid TEXT, session_identity_hash TEXT, connector_device_id TEXT,
           document_session TEXT, workspace_gid TEXT, state TEXT DEFAULT 'importing',
-          updated_at TEXT,
           PRIMARY KEY(tenant_gid,actor_gid,session_identity_hash));
         CREATE TABLE workmanship_sim_live_document_adoptions (
           tenant_gid TEXT, actor_gid TEXT, idempotency_key TEXT, request_hash TEXT, response_json TEXT,
@@ -232,7 +231,7 @@ def test_bind_online_live_document_rejects_session_owned_by_another_workspace(da
         bind_online(database)
 
 
-def test_bind_online_live_document_rejects_another_active_session_in_workspace(database):
+def test_bind_online_live_document_rotates_another_active_session_in_workspace(database):
     seed_teamcenter_online_workspace(database)
     scope = module.WorkspaceRepository._live_document_identity("20", "30", "device-A", "old-session")
     with sqlite3.connect(database) as db:
@@ -241,8 +240,18 @@ def test_bind_online_live_document_rejects_another_active_session_in_workspace(d
             "(tenant_gid,actor_gid,session_identity_hash,connector_device_id,document_session,workspace_gid,state) "
             "VALUES (?,?,?,?,?,?,?)", (*scope, "device-A", "old-session", "10", "bound"),
         )
-    with pytest.raises(module.WorkspaceRepositoryError, match="live_document_binding_conflict"):
-        bind_online(database)
+    result = bind_online(database)
+
+    assert result["document_session"] == "process-incarnation/document-A"
+    assert result["workspace_row_version"] == 2
+    with sqlite3.connect(database) as db:
+        bindings = db.execute(
+            "SELECT document_session,state FROM workmanship_sim_live_document_bindings ORDER BY document_session"
+        ).fetchall()
+    assert bindings == [
+        ("old-session", "superseded"),
+        ("process-incarnation/document-A", "bound"),
+    ]
 
 
 def test_adopt_reuse_and_durable_replay(database):

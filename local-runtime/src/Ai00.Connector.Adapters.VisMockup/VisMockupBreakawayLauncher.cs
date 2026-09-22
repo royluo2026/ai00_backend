@@ -35,13 +35,23 @@ public sealed class VisMockupBreakawayLauncher(string executable,string publishe
     [DllImport("kernel32.dll",CharSet=CharSet.Unicode,SetLastError=true)]private static extern bool CreateProcessW(string application,StringBuilder command,IntPtr processAttributes,IntPtr threadAttributes,bool inherit,uint flags,IntPtr environment,string directory,ref StartupInfo startup,out ProcessInfo process);
     [DllImport("kernel32.dll",SetLastError=true)]private static extern bool IsProcessInJob(IntPtr process,IntPtr job,out bool inJob);
     [DllImport("kernel32.dll")]private static extern bool CloseHandle(IntPtr handle);
-    public void Launch()
+    public string Verify()
     {
         var path=Path.GetFullPath(executable);
-        var programFiles=Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)+Path.DirectorySeparatorChar;
-        if(!path.StartsWith(programFiles,StringComparison.OrdinalIgnoreCase))throw new ConnectorException("vismockup_install_path_forbidden");
+        if(!File.Exists(path))throw new FileNotFoundException("VisMockup executable not found",path);
+        if(!RequiresSignedExecutable(publisher))return path;
         using var cert=ExecutableTrust.RequireSigned(path);
-        if(cert.Thumbprint!=publisher)throw new ConnectorException("vismockup_signer_mismatch");
+        if(!PublisherMatches(publisher,cert.Thumbprint))throw new ConnectorException("vismockup_signer_mismatch");
+        return path;
+    }
+    internal static bool RequiresSignedExecutable(string expected)=>
+        !string.Equals(expected,"development-local-only",StringComparison.Ordinal);
+    internal static bool PublisherMatches(string expected,string actual)=>
+        string.Equals(expected,"development-local-only",StringComparison.Ordinal)||
+        string.Equals(expected,actual,StringComparison.OrdinalIgnoreCase);
+    public void Launch()
+    {
+        var path=Verify();
         var startup=new StartupInfo{Size=Marshal.SizeOf<StartupInfo>()};
         if(!CreateProcessW(path,new StringBuilder("\""+path+"\""),IntPtr.Zero,IntPtr.Zero,false,CreateBreakawayFromJob,IntPtr.Zero,Path.GetDirectoryName(path)!,ref startup,out var process))throw new Win32Exception(Marshal.GetLastWin32Error());
         try{if(!IsProcessInJob(process.Process,IntPtr.Zero,out var inJob)||inJob)throw new ConnectorException("vismockup_breakaway_unverified");}

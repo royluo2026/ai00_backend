@@ -1,0 +1,18 @@
+{
+  "public_jwk": {"kty":"EC","crv":"P-256","x":"axfR8uEsQkf4vOblY6RA8ncDfYEt6zOg9KE5RdiYwpY","y":"T-NC4v4af5uO5-tKfA-eFivOM1drMV7Oy7ZAaDe_UfU"},
+  "grant": {
+    "protocol": "ai00.viewer.interaction.grant.v1",
+    "grant_id": "grant-1",
+    "grant_generation": 1,
+    "session_nonce": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "actor_id": "11", "tenant_id": "12", "device_id": "device-1",
+    "runtime_instance_id": "runtime-1", "workspace_gid": "10", "document_gid": "20",
+    "source_association_id": "association-1",
+    "document_session": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "operations": [{"id":"vismockup.node.visibility.change@1","contract_hash":"sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"}],
+    "policy_version": "viewer-interaction-v1",
+    "issued_at": "2026-09-22T04:00:00Z", "expires_at": "2026-09-22T04:01:00Z",
+    "audience": "ai00.connector.viewer-interaction", "key_id": "fixture-only",
+    "signature": "4OMv6H1OWL2voSfWbzOlP1Jd-tUgbas9mMPo69bbuQRbvAzVKwuR0PlC069wc4v0Kk0yWSCE_KmGgZe9IjPG8g"
+  }
+}

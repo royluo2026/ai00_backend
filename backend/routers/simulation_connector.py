@@ -16,6 +16,7 @@ import tempfile
 import uuid
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, WebSocket, WebSocketDisconnect
+from starlette.concurrency import run_in_threadpool
 from pydantic import BaseModel, ConfigDict, Field
 
 from backend.platform_sdk.auth import get_authenticated_principal, get_current_user
@@ -539,7 +540,9 @@ def runtime_restart(body: RuntimeRestartBody, pins: dict = Depends(_runtime_auth
 
 
 @router.post('/v2/plans/lease')
-def runtime_lease(body: ConnectorLeaseBody, pins: dict = Depends(_runtime_auth)):
+def runtime_lease(body: ConnectorLeaseBody, pins: dict = Depends(_runtime_pins)):
+    # lease_v2_plan authenticates under the same device lock as the lease write.
+    # A separate authentication transaction only repeats the lock/DB round trip.
     return _transport(lambda: runtime_session_service.lease(**pins, lease_seconds=body.lease_seconds))
 
 
@@ -651,17 +654,17 @@ async def runtime_capture_artifact(
 @router.websocket('/v2/plans/wake')
 async def runtime_wake(websocket: WebSocket, pins: dict = Depends(_runtime_pins)):
     try:
-        runtime_session_service.authenticate(**pins)
+        await run_in_threadpool(runtime_session_service.authenticate, **pins)
         await websocket.accept()
         async with connector_wake_broker.subscribe(pins['device_id']) as subscription:
             await websocket.send_json({'type': 'ready'})
             # Close the lease/subscribe race: a plan committed between the
             # previous empty lease and this subscription cannot miss its wake.
-            if runtime_session_service.has_queued_plan(**pins):
+            if await run_in_threadpool(runtime_session_service.has_queued_plan, **pins):
                 await websocket.send_json({'type': 'plan_available'})
             while True:
                 signaled = await subscription.wait(25)
-                runtime_session_service.authenticate(**pins)
+                await run_in_threadpool(runtime_session_service.authenticate, **pins)
                 await websocket.send_json({'type': 'plan_available' if signaled else 'keepalive'})
     except ConnectorRepositoryError:
         await websocket.close(code=4401)
@@ -693,6 +696,32 @@ def runtime_reconcile(plan_id: str, body: ConnectorReconciliationEvidenceV2, pin
     if plan_id != body.plan_id:
         raise HTTPException(status_code=409, detail={'code': 'plan_identity_mismatch'})
     return _transport(lambda: runtime_session_service.outcome(outcome=body, reconcile=True, **pins))
+
+
+@router.post('/v2/viewer-interaction/events')
+async def viewer_interaction_events(request: Request, pins: dict = Depends(_runtime_pins)):
+    from backend.contracts.viewer_interaction_v1 import MAX_AUDIT_BYTES
+    from plugins.simulation.simulation_backend.data.viewer_interaction_repository import ViewerInteractionRepository
+    from pydantic import ValidationError
+    import json
+    body = bytearray()
+    async for chunk in request.stream():
+        if len(body) + len(chunk) > MAX_AUDIT_BYTES:
+            raise HTTPException(status_code=413, detail={'code': 'interaction_audit_too_large'})
+        body.extend(chunk)
+    try:
+        batch = json.loads(body)
+        # Authentication, signature, ownership, dedupe and insert share one transaction.
+        data = await run_in_threadpool(ViewerInteractionRepository().append_events,
+            batch, pins=pins, now=datetime.now(timezone.utc))
+        return {'success': True, 'data': data}
+    except ConnectorRepositoryError as exc:
+        raise HTTPException(status_code=401, detail={'code': str(exc)}) from exc
+    except (ValidationError, json.JSONDecodeError, UnicodeDecodeError, RecursionError) as exc:
+        raise HTTPException(status_code=422, detail={'code': 'interaction_audit_invalid'}) from exc
+    except ValueError as exc:
+        code = str(exc) if str(exc).startswith('interaction_') else 'interaction_audit_invalid'
+        raise HTTPException(status_code=409, detail={'code': code}) from exc
 
 
 __all__ = ["router"]

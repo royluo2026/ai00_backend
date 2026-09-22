@@ -8,6 +8,32 @@ namespace Ai00.Connector.Tests;
 public sealed class TeamcenterWorkerContractTests
 {
     [Fact]
+    public void JT_bytes_survive_launch_cleanup_and_identical_downloads_share_one_file()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "ai00-render-material-" + Guid.NewGuid().ToString("N"));
+        var operation = Path.Combine(root, "operation");
+        Directory.CreateDirectory(operation);
+        try
+        {
+            var original = Path.Combine(operation, "part.jt");
+            File.WriteAllText(original, "sample JT bytes");
+            Assert.Equal(original, TeamcenterProcessWorker.ValidateMaterialPath(operation, original));
+            var retained = TeamcenterProcessWorker.RetainRendererMaterial(root, original);
+            File.WriteAllText(original, "sample JT bytes");
+            Assert.Equal(retained, TeamcenterProcessWorker.RetainRendererMaterial(root, original));
+            var vvi = Path.Combine(operation, "launch.vvi");
+            File.WriteAllText(vvi, "short-lived launch material");
+            Assert.Equal(vvi, TeamcenterProcessWorker.RetainRendererMaterial(root, vvi));
+            Directory.Delete(operation, true);
+            Assert.Equal("sample JT bytes", File.ReadAllText(retained));
+            Assert.Single(Directory.GetFiles(Path.GetDirectoryName(retained)!));
+            Assert.Throws<Ai00.Connector.Contracts.ConnectorException>(() =>
+                TeamcenterProcessWorker.ValidateMaterialPath(operation, retained));
+        }
+        finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
+    }
+
+    [Fact]
     public void Search_uses_exact_id_then_batched_contains_fallback()
     {
         var script = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "teamcenter_readonly_worker.js"));

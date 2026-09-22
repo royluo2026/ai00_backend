@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="..\..\..\backend\tests\fixtures\viewer_interaction_v1.json" Link="viewer_interaction_v1.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\..\docs\contracts\teamcenter.node_properties.read@1.json" Link="teamcenter.node_properties.read@1.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\..\docs\contracts\teamcenter.product_structure.children.read@1.json" Link="teamcenter.product_structure.children.read@1.json" CopyToOutputDirectory="PreserveNewest" />
     <ProjectReference Include="..\..\src\Ai00.Connector.AppHost\Ai00.Connector.AppHost.csproj" />

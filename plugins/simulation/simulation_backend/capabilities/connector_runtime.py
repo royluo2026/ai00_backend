@@ -76,12 +76,16 @@ DESKTOP_CAPABILITY_BINDINGS = (
     ("simulation.teamcenter.product_structure.children.read.request", 1),
     ("simulation.teamcenter.node_properties.read.request", 1),
     ("simulation.teamcenter.visualization.launch.request", 1),
+    ("simulation.teamcenter.visualization.launch.request", 2),
+    ("simulation.viewer.interaction.scope.get", 1),
+    ("simulation.viewer.interaction.authorize", 1),
     ("simulation.teamcenter.visualization.insert.request", 1),
     ("simulation.environment.live_document.adopt", 1),
     ("simulation.environment.live_document.adopt", 2),
     ("simulation.environment.live_document.binding.get", 1),
     ("simulation.environment.live_document.rebind", 1),
     ("simulation.environment.online_source.live_document.bind", 1),
+    ("simulation.environment.online_source.live_document.bind", 2),
     ("simulation.environment.live_document.inventory.apply", 1),
     ("simulation.vismockup.command.get", 1),
 )
@@ -98,6 +102,7 @@ DESKTOP_TRANSPORT_BINDINGS = tuple(dict(method=method,
     ("POST", "runtime/register", "runtime_register", "device_credential_and_signature"),
     ("POST", "runtime/reconciliation/register", "runtime_reconciliation_register", "device_credential_and_signature"),
     ("POST", "heartbeat", "runtime_heartbeat", "runtime_session"),
+    ("POST", "viewer-interaction/events", "viewer_interaction_events", "runtime_session_and_signed_events"),
     ("POST", "runtime/renew", "runtime_renew", "runtime_session"),
     ("POST", "plans/lease", "runtime_lease", "runtime_session"),
     ("GET", "plans/{plan_id}/artifacts/{artifact_id}", "runtime_artifact_grant", "runtime_session_and_plan_lease"),
@@ -449,7 +454,7 @@ def _direct_vismockup_plan(
 
 def _direct_vismockup_plan_v2(
     *, action: str, connector_id: str, payload: dict, context: CapabilityContext,
-    now: datetime, capability_id: str | None = None, readback: bool = False,
+    now: datetime, capability_id: str | None = None, readback: bool = False, major_version: int = 1,
 ) -> dict:
     """Build the unsigned App-runtime plan; queue_v2 pins the live runtime then signs it."""
     now = now.astimezone(UTC).replace(microsecond=0)
@@ -466,6 +471,11 @@ def _direct_vismockup_plan_v2(
     ):
         raise ConnectorError("capability_provenance_required")
     operation_id, contract_hash = DIRECT_VISMOCKUP_OPERATIONS[action]
+    if major_version != 1:
+        if action != 'tc_launch' or major_version != 2:
+            raise ConnectorError('operation_version_invalid')
+        from ..application.teamcenter_launch_evidence import OPENED_SOURCE_CONTRACT_HASH
+        operation_id, contract_hash = 'teamcenter.visualization.launch@2', OPENED_SOURCE_CONTRACT_HASH
     step_payload = {"allow_launch": action == "launch"} if action in {"attach", "launch"} else payload
     classification = "read" if action in {"attach", "tree", "identity", "hierarchy_inventory", "tc_search", "tc_rules", "tc_observe", "tc_page", "tc_children"} else "write"
     probe_id = None if classification == "read" else (
@@ -480,6 +490,7 @@ def _direct_vismockup_plan_v2(
         "device_id": connector_id,
         "idempotency_key": idempotency_key,
         "normalized_input_hash": normalized_input_hash,
+        **({'major_version': major_version} if major_version != 1 else {}),
     })).hexdigest()
     steps = [{
         "step_id": "step-00001",
@@ -510,7 +521,7 @@ def _direct_vismockup_plan_v2(
         "protocol": "ai00.connector.execution-plan.v2",
         "plan_id": "vismockup-command-" + plan_identity,
         "capability_id": capability_id or DIRECT_VISMOCKUP_CAPABILITIES[action],
-        "major_version": 1,
+        "major_version": major_version,
         "capability_version_gid": capability_version_gid,
         "business_definition_hash": definition_hash,
         "catalog_release": catalog_release,
@@ -687,7 +698,7 @@ def register_connector_runtime_capabilities(
             digest=plan.plan_hash,
         ),))
 
-    def request_direct(action):
+    def request_direct(action, major_version=1):
         def handler(payload, context):
             if action == 'identity' and (payload != {} or not context.user_gid or not context.team_gid):
                 raise CapabilityBusinessError('live_document_input_invalid', 'Identity read takes an empty payload.')
@@ -728,7 +739,7 @@ def register_connector_runtime_capabilities(
                 if runtime and runtime.get("runtime_type") == "electron":
                     plan = _direct_vismockup_plan_v2(
                         action=action, connector_id=connector_id, payload=plan_payload,
-                        context=context, now=control_plane.clock(),
+                        context=context, now=control_plane.clock(), major_version=major_version,
                     )
                     operation = control_plane.queue_v2(plan, context, runtime_row=runtime)
                     evidence_digest = canonical_hash(plan)
@@ -905,7 +916,17 @@ def register_connector_runtime_capabilities(
             input_schema=request_schema, output_schema={}, tags=("simulation", "connector", "vismockup", "workflow"),
         ), request_direct(action))
     from .live_documents import register_live_document_capabilities
+    register(registry, CapabilitySpec(
+        id='simulation.teamcenter.visualization.launch.request', owner='simulation', version=2,
+        description='Queue a Teamcenter launch that attests the source and opened document in one signed receipt.',
+        use_when='The owner opens an online source for a local viewer session.',
+        do_not_use_when='No current owner-scoped App runtime exists.', risk=CapabilityRisk.WRITE,
+        confirmation='user', permissions=('simulation.use',), input_schema=direct_schemas['tc_launch'],
+        output_schema={}, tags=('simulation', 'connector', 'teamcenter', 'workflow', 'experimental')),
+        request_direct('tc_launch', major_version=2))
     register_live_document_capabilities(registry, control_plane)
+    from .viewer_interaction import register_viewer_interaction_capabilities
+    register_viewer_interaction_capabilities(registry, control_plane)
     register(registry, CapabilitySpec(
         id="simulation.environment.runtime_package.open.request", owner="simulation", version=1,
         description="Prepare and queue one frozen environment package, opening only its generated top-level PLMXML.",
@@ -932,6 +953,16 @@ def register_connector_runtime_capabilities(
             input_schema={}, output_schema={}, execution="local",
             tags=("simulation", "connector", "vismockup", "atomic"),
         ), local_atom_only)
+    from ..application.teamcenter_launch_evidence import TeamcenterOpenedSourceResult
+    from .connector_contracts import TC_LAUNCH_INPUT
+    register(registry, CapabilitySpec(
+        id='simulation.teamcenter.visualization.launch', owner='simulation', version=2,
+        description='Open an exact Teamcenter source and attest the resulting native document.',
+        use_when='A signed launch major 2 plan invokes the current-open adapter.',
+        do_not_use_when='The caller is outside the trusted local runtime.', risk=CapabilityRisk.WRITE,
+        confirmation='none', permissions=('agent.run',), input_schema=TC_LAUNCH_INPUT,
+        output_schema=TeamcenterOpenedSourceResult.model_json_schema(), execution='local',
+        tags=('simulation', 'connector', 'teamcenter', 'atomic', 'experimental')), local_atom_only)
 
 
 __all__ = [

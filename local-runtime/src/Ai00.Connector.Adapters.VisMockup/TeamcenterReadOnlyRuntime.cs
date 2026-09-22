@@ -587,19 +587,24 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
 
     public static ProcessStartInfo CreateStartInfo(string javaPath, string scriptPath, IReadOnlyList<string> classpath)
     {
+        var fmsRoot = Environment.GetEnvironmentVariable("FMS_HOME") is { Length: > 0 } configuredFms
+            ? configuredFms : @"D:\Siemens\Teamcenter14\tccs";
         var info = new ProcessStartInfo(javaPath) { UseShellExecute = false, CreateNoWindow = true,
             RedirectStandardInput = true, RedirectStandardOutput = true, RedirectStandardError = true,
             StandardInputEncoding = Encoding.UTF8, StandardOutputEncoding = Encoding.UTF8,
             StandardErrorEncoding = Encoding.UTF8 };
         info.ArgumentList.Add("--add-modules"); info.ArgumentList.Add("jdk.unsupported");
         info.ArgumentList.Add("-Dfile.encoding=UTF-8");
-        info.ArgumentList.Add("-Djava.library.path=D:/Siemens/Teamcenter14/tccs/lib");
+        info.ArgumentList.Add("-Djava.library.path=" + Path.Combine(fmsRoot, "lib"));
         info.ArgumentList.Add("-cp"); info.ArgumentList.Add(string.Join(';', classpath));
         info.ArgumentList.Add("--module"); info.ArgumentList.Add("jdk.scripting.nashorn.shell/jdk.nashorn.tools.jjs.Main");
         info.ArgumentList.Add(scriptPath);
         info.Environment.Clear();
         foreach (var key in new[] { "SystemRoot", "WINDIR", "TEMP", "TMP", "LOCALAPPDATA", "USERPROFILE", "FMS_HOME" })
             if (Environment.GetEnvironmentVariable(key) is { Length: > 0 } value) info.Environment[key] = value;
+        info.Environment["FMS_HOME"] = fmsRoot;
+        info.Environment["PATH"] = Path.Combine(fmsRoot, "lib") + Path.PathSeparator
+            + (Environment.GetEnvironmentVariable("PATH") ?? "");
         return info;
     }
 
@@ -694,7 +699,11 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
                 catch { }
                 throw NoEffectBeforeVisualizationConsumer(error, preparationDiagnostic);
             }
-            try { await consumer(materialPath, ct); }
+            string rendererPath;
+            try { rendererPath = RetainRendererMaterial(materialRoot, materialPath); }
+            catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+            { throw new ConnectorNoEffectException("teamcenter_render_material_unavailable"); }
+            try { await consumer(rendererPath, ct); }
             catch (Exception error) { consumerError = error; }
 
             await process.StandardInput.WriteLineAsync(JsonSerializer.Serialize(new
@@ -874,18 +883,37 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
         return new ConnectorNoEffectException("teamcenter_visualization_worker_failed");
     }
 
-    private static string ValidateMaterialPath(string materialRoot, string candidate)
+    internal static string RetainRendererMaterial(string materialRoot, string materialPath)
+    {
+        if (!string.Equals(Path.GetExtension(materialPath), ".jt", StringComparison.OrdinalIgnoreCase))
+            return materialPath;
+        // JT can be read lazily after Open returns. Keep immutable bytes independently
+        // of the temporary TC launch/session files; repeated downloads share the file.
+        var cacheRoot = Path.Combine(materialRoot, "render-cache");
+        SecureVisualizationMaterialRoot(cacheRoot);
+        string digest;
+        using (var stream = File.OpenRead(materialPath))
+            digest = Convert.ToHexString(SHA256.HashData(stream)).ToLowerInvariant();
+        var retained = Path.Combine(cacheRoot, digest + ".jt");
+        try { File.Move(materialPath, retained, overwrite: false); }
+        catch (IOException) when (File.Exists(retained)) { }
+        return retained;
+    }
+
+    internal static string ValidateMaterialPath(string materialRoot, string candidate)
     {
         if (string.IsNullOrWhiteSpace(candidate) || !Path.IsPathFullyQualified(candidate))
             throw new ConnectorException("teamcenter_visualization_material_invalid");
         var full = Path.GetFullPath(candidate);
         var rootPrefix = Path.TrimEndingDirectorySeparator(materialRoot) + Path.DirectorySeparatorChar;
         if (!full.StartsWith(rootPrefix, StringComparison.OrdinalIgnoreCase)
-            || !string.Equals(Path.GetExtension(full), ".vvi", StringComparison.OrdinalIgnoreCase)
+            || !(string.Equals(Path.GetExtension(full), ".vvi", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(Path.GetExtension(full), ".jt", StringComparison.OrdinalIgnoreCase))
             || !File.Exists(full))
             throw new ConnectorException("teamcenter_visualization_material_invalid");
         var length = new FileInfo(full).Length;
-        if (length is < 1 or > 64 * 1024 * 1024)
+        if (length < 1 || (Path.GetExtension(full).Equals(".vvi", StringComparison.OrdinalIgnoreCase)
+                && length > 64 * 1024 * 1024))
             throw new ConnectorException("teamcenter_visualization_material_invalid");
         return full;
     }

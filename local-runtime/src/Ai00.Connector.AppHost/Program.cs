@@ -50,6 +50,21 @@ public static class Program
             builder.Services.AddSingleton(key);builder.Services.AddSingleton(new AppCredentialStore(root,options.GatewayOrigin));
             builder.Services.AddSingleton(new AppPlanJournal(Path.Combine(root,$"execution{stateSuffix}.v2.journal")));
             builder.Services.AddSingleton(adapter);builder.Services.AddSingleton(new PostConditionProbes(sta,com,adapter));
+            var viewerGate=new ViewerExecutionGate();
+            var viewerSession=new ViewerInteractionSession();
+            var viewerContext=new ViewerInteractionRuntimeContext();
+            var viewerJournal=new ViewerInteractionJournal(Path.Combine(root,$"viewer-interaction{stateSuffix}.v1.journal"));
+            if(viewerJournal.HasUnknown)viewerGate.Quarantine("viewer_recovery_required");
+            adapter.ViewerInteractionAdmissionAllowed=()=>!viewerGate.IsQuarantined&&viewerSession.IsDispatchAuthorized(
+                viewerContext.Current,DateTimeOffset.UtcNow,ViewerInteractionPipeHost.MonotonicNow());
+            builder.Services.AddSingleton(viewerGate);builder.Services.AddSingleton(viewerSession);
+            builder.Services.AddSingleton(viewerContext);builder.Services.AddSingleton(viewerJournal);
+            builder.Services.AddSingleton(new ViewerInteractionExecutor(viewerSession,viewerContext,viewerGate,viewerJournal,
+                (operation,hash)=>adapter.Manifest.Supports(operation,hash),adapter.ExecuteViewerNodeAsync));
+            // Main owns the default-off UI feature flag. This channel cannot dispatch
+            // until a server-signed grant is installed for the authenticated runtime.
+            builder.Services.AddHostedService<ViewerInteractionPipeHost>();
+            builder.Services.AddHostedService<ViewerInteractionAuditWorker>();
             builder.Services.AddHostedService<RuntimeSessionWorker>();
             using var host=builder.Build();
             using var monitorCancellation=new CancellationTokenSource();

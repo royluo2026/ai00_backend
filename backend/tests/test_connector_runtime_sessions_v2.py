@@ -93,6 +93,31 @@ def test_pairing_rejects_wrong_key_owner_nonce_and_expiry(database):
         service.activate_v2(pending['pairing_id'], pending['signing_challenge'], sign(key, pending['signing_challenge']), 'wrong')
 
 
+def test_http_lease_authenticates_once_inside_transaction_and_rejects_wrong_token(database, monkeypatch):
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+    from backend.routers import simulation_connector as routes
+    service, key = setup_service(database)
+    current = register(service, key, database[1])
+    monkeypatch.setattr(routes, 'runtime_session_service', service)
+    checks = []
+    original = SimulationConnectorRepository._authenticated_runtime.__func__
+    def counted(cls, *args):
+        checks.append(True)
+        return original(cls, *args)
+    monkeypatch.setattr(SimulationConnectorRepository, '_authenticated_runtime', classmethod(counted))
+    app = FastAPI()
+    app.include_router(routes.router)
+    headers = {'X-AI00-Device-ID': database[1], 'X-AI00-Runtime-Generation': '7',
+        'X-AI00-Runtime-Instance-ID': current.runtime_instance_id, 'X-AI00-Runtime-Type': 'electron',
+        'X-AI00-Runtime-Session': current.session_token}
+    with TestClient(app) as client:
+        assert client.post('/api/v1/simulation/connectors/v2/plans/lease', headers=headers, json={}).status_code == 200
+        assert len(checks) == 1
+        headers['X-AI00-Runtime-Session'] = 'incorrect'
+        assert client.post('/api/v1/simulation/connectors/v2/plans/lease', headers=headers, json={}).status_code == 401
+
+
 def test_losing_instance_cannot_evict_winner(database):
     service, key = setup_service(database)
     def attempt(instance):

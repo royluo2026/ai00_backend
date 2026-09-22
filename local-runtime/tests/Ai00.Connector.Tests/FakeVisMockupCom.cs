@@ -10,7 +10,9 @@ public sealed class FakeVisMockupCom : IVisMockupCom
     public VisMockupProcessState InspectProcess() => new(ProcessRunning || ExistingApplication is not null,
         "14.2.0", ProcessId, ProcessStartUtcTicks);
     public IVisMockupApplication? ExistingApplication { get; set; }
+    public IVisMockupApplication? LaunchedApplication { get; set; }
     public int LaunchCalls { get; private set; }
+    public int HideOwnedWindowsCalls { get; private set; }
     public HashSet<int> ThreadIds { get; } = [];
     public HashSet<ApartmentState> ApartmentStates { get; } = [];
 
@@ -22,7 +24,12 @@ public sealed class FakeVisMockupCom : IVisMockupCom
         return application is not null;
     }
 
-    public void Launch() => LaunchCalls++;
+    public void Launch()
+    {
+        LaunchCalls++;
+        ExistingApplication = LaunchedApplication;
+    }
+    public void HideOwnedWindows() => HideOwnedWindowsCalls++;
     public IVisMockupApplication WaitForActiveApplication(TimeSpan timeout) =>
         ExistingApplication ?? throw new InvalidOperationException("not active");
 
@@ -68,10 +75,26 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
     public bool Closed { get; private set; }
     public List<bool> VisibilityChanges { get; } = [];
     public int SetNodeVisibleCalls { get; private set; }
+    public int SetNodeSelectedCalls { get; private set; }
+    public int FindNodeByKeyCalls { get; private set; }
+    public Action? AfterNodeLookup { get; set; }
+    public Action? AfterNodeWrite { get; set; }
     public Dictionary<string, IVisMockupNode> CadNodes { get; } = new(StringComparer.Ordinal);
+    private Dictionary<string, IVisMockupNode>? _runtimeNodes;
+    // Native-key users opt into an index. Legacy tests retain their traversal
+    // behavior and can construct identity-only documents without a root node.
+    public Dictionary<string, IVisMockupNode> RuntimeNodes => _runtimeNodes ??= IndexNodes(RootNode);
+    public IVisMockupNode FindNodeByKey(string key)
+    {
+        FindNodeByKeyCalls++;
+        var node = RuntimeNodes[key];
+        AfterNodeLookup?.Invoke();
+        return node;
+    }
     public IVisMockupNode FindNodeByCadId(string cadId) => CadNodes[cadId];
     public Exception? SetNodeVisibleError { get; set; }
     public bool ApplyVisibilityBeforeThrow { get; set; }
+    public Exception? SetNodeSelectedError { get; set; }
     public IReadOnlyList<string> InsertedDocumentPaths => _insertedDocumentPaths;
     public int InsertDocumentCalls { get; private set; }
     public CaptureProfile Profile { get; private set; } = new("png", 1, 1, "current");
@@ -82,10 +105,14 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
     public void SetNodeVisible(string nodeKey, bool visible)
     {
         SetNodeVisibleCalls++;
-        if (!AllNodeKeys.Contains(nodeKey, StringComparer.Ordinal)) throw new InvalidOperationException("node not found");
+        if (_runtimeNodes is null ? !AllNodeKeys.Contains(nodeKey, StringComparer.Ordinal) : !_runtimeNodes.ContainsKey(nodeKey))
+            throw new InvalidOperationException("node not found");
         if (visible) _visible.Add(nodeKey); else _visible.Remove(nodeKey);
-        var fakeNode = Traverse().OfType<FakeNode>().FirstOrDefault(node => node.NodeKey == nodeKey);
+        var fakeNode = _runtimeNodes is null
+            ? Traverse().OfType<FakeNode>().FirstOrDefault(node => node.NodeKey == nodeKey)
+            : _runtimeNodes[nodeKey] as FakeNode;
         if (fakeNode is not null) fakeNode.IsVisible = visible;
+        AfterNodeWrite?.Invoke();
         if (SetNodeVisibleError is not null)
         {
             if (!ApplyVisibilityBeforeThrow)
@@ -98,8 +125,12 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
     }
     public void SetNodeSelected(string nodeKey, bool selected)
     {
-        if (!AllNodeKeys.Contains(nodeKey, StringComparer.Ordinal)) throw new InvalidOperationException("node not found");
+        SetNodeSelectedCalls++;
+        if (_runtimeNodes is null ? !AllNodeKeys.Contains(nodeKey, StringComparer.Ordinal) : !_runtimeNodes.ContainsKey(nodeKey))
+            throw new InvalidOperationException("node not found");
         if (selected) _selected.Add(nodeKey); else _selected.Remove(nodeKey);
+        AfterNodeWrite?.Invoke();
+        if (SetNodeSelectedError is not null) throw SetNodeSelectedError;
     }
     public void ApplyCaptureProfile(CaptureProfile profile) => Profile = profile;
     public string AttachModel(string path) => "attached-" + Path.GetFileNameWithoutExtension(path);
@@ -128,6 +159,18 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
     }
     public void SetAllNodesVisible(bool visible) => VisibilityChanges.Add(visible);
     public void Close() => Closed = true;
+    private static Dictionary<string, IVisMockupNode> IndexNodes(IVisMockupNode root)
+    {
+        var result = new Dictionary<string, IVisMockupNode>(StringComparer.Ordinal);
+        var pending = new Queue<IVisMockupNode>();
+        pending.Enqueue(root);
+        while (pending.TryDequeue(out var node))
+        {
+            result.TryAdd(node.NodeKey, node);
+            foreach (var child in node.Children) pending.Enqueue(child);
+        }
+        return result;
+    }
     private IEnumerable<IVisMockupNode> Traverse()
     {
         var queue = new Queue<IVisMockupNode>();

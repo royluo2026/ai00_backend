@@ -144,7 +144,7 @@ class PlanSigner:
                       not_after=parse(not_after_raw), revoked=False)
         return cls(lambda requested: record if requested == key_id else None, key_id=key_id, clock=clock)
 
-    def sign(self, plan) -> ConnectorExecutionPlanV2:
+    def _active_key_record(self):
         record = self._secret_provider(self.key_id)
         now = self.clock()
         if not record or record['revoked'] or not record['not_before'] <= now < record['not_after']:
@@ -152,6 +152,26 @@ class PlanSigner:
         key = record['private_key']
         if not isinstance(key, ec.EllipticCurvePrivateKey) or not isinstance(key.curve, ec.SECP256R1):
             raise ValueError('private_key_required')
+        return record, now
+
+    def sign_interaction_grant(self, claims):
+        from backend.contracts.viewer_interaction_v1 import SignedGrant, grant_signature_bytes
+
+        record, now = self._active_key_record()
+        raw = claims.model_dump(mode='json') if isinstance(claims, SignedGrant) else dict(claims)
+        raw.update(key_id=self.key_id,
+                   signature=base64.urlsafe_b64encode((1).to_bytes(32, 'big') * 2).rstrip(b'=').decode())
+        parsed = SignedGrant.model_validate(raw)
+        issued, expires = datetime.fromisoformat(parsed.issued_at), datetime.fromisoformat(parsed.expires_at)
+        if not record['not_before'] <= issued <= now < expires <= record['not_after']:
+            raise ValueError('grant_signing_interval_invalid')
+        r, s = decode_dss_signature(record['private_key'].sign(grant_signature_bytes(parsed), ec.ECDSA(hashes.SHA256())))
+        raw['signature'] = base64.urlsafe_b64encode(r.to_bytes(32, 'big') + min(s, P256_ORDER-s).to_bytes(32, 'big')).rstrip(b'=').decode()
+        return SignedGrant.model_validate(raw)
+
+    def sign(self, plan) -> ConnectorExecutionPlanV2:
+        record, now = self._active_key_record()
+        key = record['private_key']
         raw = plan.model_dump(mode='json') if isinstance(plan, ConnectorExecutionPlanV2) else dict(plan)
         raw.update(key_id=self.key_id, signature_algorithm='ecdsa-p256-sha256')
         raw['plan_hash'] = compute_plan_hash(raw)
@@ -219,6 +239,8 @@ def probe_context(plan_row, recovery, *, last_journal_sequence):
                 and payload.get('action') in {'show', 'hide'}):
             probe['probe_input'] = dict(node_key=payload['node_key'],
                 expected_visible=payload['action'] == 'show')
+            if payload.get('occurrence_path'):
+                probe['probe_input']['occurrence_path'] = payload['occurrence_path']
         if (step['operation_id'] == 'vismockup.visibility.change@1'
                 and payload.get('action') in {'all_on', 'all_off'}):
             probe['probe_input'] = dict(expected_all_visible=payload['action'] == 'all_on')

@@ -14,7 +14,8 @@ public sealed class PostConditionProbes(StaDispatcher sta,IVisMockupCom com,VisM
         {
             try
             {
-                var visible=await adapter.ObserveNodeVisibilityAsync(nodeKey.GetString()!).WaitAsync(TimeSpan.FromSeconds(10),ct);
+                var occurrencePath=input.TryGetProperty("occurrence_path",out var path) ? path : (JsonElement?)null;
+                var visible=await adapter.ObserveNodeVisibilityAsync(nodeKey.GetString()!, occurrencePath).WaitAsync(TimeSpan.FromSeconds(10),ct);
                 return new{classification=visible==expected.GetBoolean()?"succeeded":"failed_without_effect",
                     observed_result=(object)new{node_key=nodeKey.GetString(),visible}};
             }

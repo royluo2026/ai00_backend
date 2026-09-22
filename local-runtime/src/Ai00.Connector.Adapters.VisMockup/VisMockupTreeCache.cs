@@ -48,6 +48,28 @@ internal sealed class VisMockupTreeCache
     internal static string Identity(IVisMockupDocument document) =>
         VisMockupTreeFingerprint.DocumentIdentityHash(document);
 
+    internal bool HasVerifiedOpen(string session, string sourceKey, string liveSource)
+    {
+        using var connection=Open();
+        using var command=connection.CreateCommand();
+        command.CommandText="SELECT 1 FROM vm_verified_opens WHERE document_session=$session AND source_key=$source AND live_source_hash=$live";
+        command.Parameters.AddWithValue("$session",session);
+        command.Parameters.AddWithValue("$source",sourceKey);
+        command.Parameters.AddWithValue("$live",CanonicalJson.Hash(new { source=liveSource }));
+        return command.ExecuteScalar() is not null;
+    }
+
+    internal void RememberVerifiedOpen(string session, string sourceKey, string liveSource)
+    {
+        using var connection=Open();
+        using var command=connection.CreateCommand();
+        command.CommandText="INSERT INTO vm_verified_opens(document_session,source_key,live_source_hash) VALUES($session,$source,$live) ON CONFLICT(document_session) DO UPDATE SET source_key=excluded.source_key,live_source_hash=excluded.live_source_hash";
+        command.Parameters.AddWithValue("$session",session);
+        command.Parameters.AddWithValue("$source",sourceKey);
+        command.Parameters.AddWithValue("$live",CanonicalJson.Hash(new { source=liveSource }));
+        command.ExecuteNonQuery();
+    }
+
     public CachedTree? TryRead(IVisMockupDocument document, int maxDepth)
     {
         using var connection = Open();
@@ -450,6 +472,10 @@ internal sealed class VisMockupTreeCache
         {
             command.Transaction = transaction;
             command.CommandText = """
+                CREATE TABLE IF NOT EXISTS vm_verified_opens(
+                  document_session TEXT PRIMARY KEY,
+                  source_key TEXT NOT NULL,
+                  live_source_hash TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS vm_cache_documents(
                   local_id INTEGER PRIMARY KEY,
                   document_identity_hash TEXT NOT NULL UNIQUE,

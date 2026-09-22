@@ -56,6 +56,38 @@ public sealed class VisMockupCadLocatorTests
     }
 
     [Fact]
+    public async Task TeamcenterOccurrencePathControlsDeepNodeWithoutFullTreeScan()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "ai00-tc-path-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        try
+        {
+            var leaf = new FakeNode("leaf-native", "Leaf", "leaf-occ", "leaf-model", []);
+            var branch = new FakeNode("branch-native", "Branch", "branch-occ", "branch-model", [leaf]);
+            var root = new FakeNode("root-native", "Root", "root-occ", "root-model", [branch]);
+            var document = new FakeDocument("session", "tc://assembly/A", root);
+            var app = FakeVisMockupCom.WithDocument("unused");
+            app.ActiveDocument = document;
+            app.OpenDocuments = [document];
+            var com = new FakeVisMockupCom { ExistingApplication = app };
+            using var sta = new StaDispatcher();
+            var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([directory]), com, directory,
+                Path.Combine(directory, "tree.db"));
+            var path = JsonSerializer.SerializeToElement(new[]
+            {
+                new { occurrence_uid = "branch-occ", item_revision_uid = "branch-rev" },
+                new { occurrence_uid = "leaf-occ", item_revision_uid = "leaf-rev" },
+            });
+
+            await adapter.ChangeNodeVisibilityAsync("tc:leaf-occ", "show", path);
+
+            Assert.Contains("leaf-native", document.VisibleNodeKeys);
+            Assert.True(await adapter.ObserveNodeVisibilityAsync("tc:leaf-occ", path));
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
     public void CollidingInstancePathsInCacheAreRejectedRatherThanMerged()
     {
         var directory=Path.Combine(Path.GetTempPath(),"ai00-cad-duplicates-"+Guid.NewGuid().ToString("N"));

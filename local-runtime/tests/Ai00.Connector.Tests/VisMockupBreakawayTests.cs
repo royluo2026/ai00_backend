@@ -1,8 +1,27 @@
 using Ai00.Connector.Adapters.VisMockup;
+using Ai00.Connector.Contracts;
 using Xunit;
 namespace Ai00.Connector.Tests;
 public sealed class VisMockupBreakawayTests
 {
+    [Theory]
+    [InlineData("development-local-only", "ANY-SIGNED-THUMBPRINT", true)]
+    [InlineData("EXPECTED", "expected", true)]
+    [InlineData("EXPECTED", "OTHER", false)]
+    public void PublisherVerificationKeepsProductionPinnedAndAllowsSignedLocalDevelopment(
+        string expected, string actual, bool allowed)
+    {
+        Assert.Equal(allowed, VisMockupBreakawayLauncher.PublisherMatches(expected, actual));
+    }
+
+    [Theory]
+    [InlineData("development-local-only", false)]
+    [InlineData("EXPECTED-PRODUCTION-THUMBPRINT", true)]
+    public void OnlyLocalDevelopmentMayUseAnUnsignedConfiguredExecutable(string publisher, bool requiresSignature)
+    {
+        Assert.Equal(requiresSignature, VisMockupBreakawayLauncher.RequiresSignedExecutable(publisher));
+    }
+
     [Fact] public void UnsignedOrNonAllowlistedExecutableIsRejectedBeforeLaunch()
     {
         Assert.ThrowsAny<Exception>(()=>new VisMockupBreakawayLauncher(@"C:\untrusted\vis.exe","publisher").Launch());
@@ -13,6 +32,14 @@ public sealed class VisMockupBreakawayTests
         var connection=new VisMockupConnection(com);
         Assert.Same(com.ExistingApplication,connection.RequireActiveApplication(true));
         Assert.Equal(0,com.LaunchCalls);
+    }
+    [Fact] public void RunningUnrelatedVisMockupDoesNotBlockOwnedSessionLaunch()
+    {
+        var owned=FakeVisMockupCom.WithDocument("owned");
+        var com=new FakeVisMockupCom{ProcessRunning=true,LaunchedApplication=owned};
+        var connection=new VisMockupConnection(com);
+        Assert.Same(owned,connection.RequireActiveApplication(true));
+        Assert.Equal(1,com.LaunchCalls);
     }
     [Fact] public async Task ReconciliationRejectsUndeclaredProbeWithoutCom()
     {

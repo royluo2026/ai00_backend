@@ -1,0 +1,19 @@
+{
+  "files": [
+    ".generated-manifest.json",
+    "ERRORS.md",
+    "INTEGRATION.md",
+    "README.md",
+    "SECURITY.md",
+    "agent-tools.v2.json",
+    "catalog.v2.json",
+    "mcp-tools.v2.json",
+    "openapi-fragment.v2.json",
+    "simulation/simulation.environment.online_source.live_document.bind@2.md",
+    "simulation/simulation.teamcenter.visualization.launch.request@2.md",
+    "simulation/simulation.teamcenter.visualization.launch@2.md",
+    "simulation/simulation.viewer.interaction.authorize@1.md",
+    "simulation/simulation.viewer.interaction.scope.get@1.md"
+  ],
+  "schema_version": 1
+}

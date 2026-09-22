@@ -280,6 +280,7 @@ def test_direct_app_request_queues_v2_instead_of_fenced_legacy_plan():
             return {"device_id": "device-001", "runtime_type": "electron"}
 
     class Control:
+        plan_signer = None
         def __init__(self):
             self.repository = Repository()
             self.queued = None
@@ -321,6 +322,7 @@ def test_prepared_workflow_queue_uses_v2_for_bound_electron_runtime():
             return {"device_id": source.device_id, "runtime_type": "electron"}
 
     class Control:
+        plan_signer = None
         repository = Repository()
         clock = staticmethod(lambda: NOW)
         queued = None
@@ -356,6 +358,7 @@ def test_direct_app_request_preserves_actionable_connector_error_code():
             return {"device_id": "device-001", "runtime_type": "electron"}
 
     class Control:
+        plan_signer = None
         repository = Repository()
         clock = staticmethod(lambda: NOW)
 
@@ -700,6 +703,11 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
 
     by_id = {(spec.id, spec.version): (spec, descriptor) for spec, descriptor in registry.items}
     assert set(by_id) == {
+        ('simulation.viewer.interaction.scope.get', 1),
+        ('simulation.viewer.interaction.authorize', 1),
+        ('simulation.environment.online_source.live_document.bind', 2),
+        ('simulation.teamcenter.visualization.launch.request', 2),
+        ('simulation.teamcenter.visualization.launch', 2),
         ("simulation.connector.recovery.search", 1),
         ("simulation.connector.recovery.resolve", 1),
         ("simulation.teamcenter.product.search.request", 1),
@@ -796,7 +804,7 @@ def test_connector_capabilities_are_registered_with_closed_contracts():
     assert by_id[("simulation.vismockup.tree.read.request", 1)][0].confirmation == "none"
     assert by_id[("simulation.environment.live_document.rebind", 1)][0].confirmation == "user"
     assert set(by_id[("simulation.vismockup.tree.read.request", 1)][0].input_schema["properties"]) == {
-        "max_depth", "force_refresh",
+        "max_depth", "force_refresh", "expected_document_session",
     }
     assert set(by_id[("simulation.teamcenter.product_structure.observe.request", 1)][0].input_schema["properties"]) == {
         "source_selector", "max_nodes", "max_depth", "property_projection",

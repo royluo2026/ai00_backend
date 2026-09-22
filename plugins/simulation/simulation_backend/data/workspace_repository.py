@@ -1306,10 +1306,11 @@ class WorkspaceRepository:
 
     def bind_online_live_document(self, *, workspace_gid: str, document_gid: str,
                                   tenant_gid: str, actor_gid: str,
-                                  connector_device_id: str, document_session: str,
-                                  source_identity_hash: str,
+                                  connector_device_id: str | None = None, document_session: str | None = None,
+                                  source_identity_hash: str | None = None,
                                   expected_workspace_row_version: int,
-                                  idempotency_key: str) -> dict[str, Any]:
+                                  idempotency_key: str, launch_operation_id: str | None = None,
+                                  now=None) -> dict[str, Any]:
         """Bind one attested native session to its immutable Teamcenter source document.
 
         This is deliberately not an import or a source conversion.  The online document
@@ -1318,15 +1319,8 @@ class WorkspaceRepository:
         """
         workspace_gid, document_gid = _gid(workspace_gid, "workspace_gid"), _gid(document_gid, "document_gid")
         tenant_gid, actor_gid = _gid(tenant_gid, "tenant_gid"), _gid(actor_gid, "actor_gid")
-        source_hash = _sha256_body(source_identity_hash, "source_identity_hash")
         if not isinstance(idempotency_key, str) or not idempotency_key.strip():
             raise WorkspaceRepositoryError("idempotency_key_invalid")
-        scope = self._live_document_identity(tenant_gid, actor_gid, connector_device_id, document_session)
-        request = {
-            "op": "bind_online_live_document", "document_gid": document_gid,
-            "connector_device_id": connector_device_id, "document_session": document_session,
-            "source_identity_hash": source_hash,
-        }
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
                 "SELECT row_version,cache_revision_hash,status FROM workmanship_sim_workspaces "
@@ -1338,6 +1332,21 @@ class WorkspaceRepository:
                 raise WorkspaceRepositoryError("workspace_not_found")
             if str(workspace.get("status") or "") == "frozen":
                 raise WorkspaceRepositoryError("workspace_frozen")
+            opened = None
+            if launch_operation_id is not None:
+                from .connector_repository import SimulationConnectorRepository
+                opened = SimulationConnectorRepository.verified_teamcenter_opened_source_evidence(
+                    cursor, launch_operation_id, actor_id=actor_gid, tenant_id=tenant_gid, now=now)
+                connector_device_id, document_session = opened['connector_device_id'], opened['document_session']
+                source_identity_hash = opened['source_identity_hash']
+            source_hash = _sha256_body(source_identity_hash, 'source_identity_hash')
+            scope = self._live_document_identity(tenant_gid, actor_gid, connector_device_id, document_session)
+            request = dict(op='bind_online_live_document', document_gid=document_gid,
+                connector_device_id=connector_device_id, document_session=document_session, source_identity_hash=source_hash)
+            if opened:
+                request.update(op='bind_online_live_document_v2', launch_operation_id=launch_operation_id,
+                    runtime_instance_id=opened['runtime_instance_id'], runtime_generation=opened['runtime_generation'],
+                    expected_workspace_row_version=expected_workspace_row_version)
             request_hash, replay = self._idempotency_begin(
                 cursor, workspace_gid=workspace_gid, idempotency_key=idempotency_key, request=request,
             )
@@ -1371,10 +1380,16 @@ class WorkspaceRepository:
                 (workspace_gid, tenant_gid, actor_gid),
             )
             active = cursor.fetchall()
-            if any(row["session_identity_hash"] != scope[2] for row in active):
-                raise WorkspaceRepositoryError("live_document_binding_conflict")
+            previous = [row for row in active if row["session_identity_hash"] != scope[2]]
+            if previous:
+                cursor.execute(
+                    "UPDATE workmanship_sim_live_document_bindings SET state='superseded' "
+                    "WHERE workspace_gid=%s AND tenant_gid=%s AND actor_gid=%s "
+                    "AND state IN ('importing','bound') AND session_identity_hash<>%s",
+                    (workspace_gid, tenant_gid, actor_gid, scope[2]),
+                )
 
-            already_bound = bool(observed and str(observed.get("state") or "") == "bound"
+            already_bound = bool(not previous and observed and str(observed.get("state") or "") == "bound"
                                  and str(document.get("connector_device_id") or "") == connector_device_id)
             if not observed:
                 cursor.execute(
@@ -1386,7 +1401,7 @@ class WorkspaceRepository:
             elif not already_bound:
                 cursor.execute(
                     "UPDATE workmanship_sim_live_document_bindings SET connector_device_id=%s,"
-                    "document_session=%s,state='bound',updated_at=NOW(6) WHERE tenant_gid=%s "
+                    "document_session=%s,state='bound' WHERE tenant_gid=%s "
                     "AND actor_gid=%s AND session_identity_hash=%s",
                     (connector_device_id, document_session, *scope),
                 )
@@ -1412,6 +1427,13 @@ class WorkspaceRepository:
                 "connector_device_id": connector_device_id, "document_session": document_session,
                 "workspace_row_version": next_version, "cache_revision_hash": cache_hash,
             }
+            if opened:
+                from .viewer_interaction_repository import ViewerInteractionRepository
+                result['source_association_id'] = ViewerInteractionRepository.record_source_association(
+                    cursor, tenant_gid=tenant_gid, actor_gid=actor_gid, workspace_gid=workspace_gid,
+                    document_gid=document_gid, device_id=connector_device_id, document_session=document_session,
+                    runtime_instance_id=opened['runtime_instance_id'], runtime_generation=opened['runtime_generation'],
+                    source_revision=source_hash, now=now)
             self._idempotency_finish(
                 cursor, workspace_gid=workspace_gid, idempotency_key=idempotency_key,
                 request_hash=request_hash, response=result,
@@ -1736,7 +1758,7 @@ class WorkspaceRepository:
                 cache_hash = str(workspace.get("cache_revision_hash") or _EMPTY_CACHE_REVISION_HASH)
             complete = page.get("next_index") is None
             if complete:
-                cursor.execute("UPDATE workmanship_sim_live_document_bindings SET state='bound',updated_at=NOW(6) "
+                cursor.execute("UPDATE workmanship_sim_live_document_bindings SET state='bound' "
                     "WHERE workspace_gid=%s AND tenant_gid=%s AND actor_gid=%s AND session_identity_hash=%s",
                     (workspace_gid, tenant_gid, actor_gid, identity_hash))
             result = {"workspace_gid": workspace_gid, "imported_hierarchy_count": imported,

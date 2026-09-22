@@ -8,6 +8,7 @@ from pydantic import Field, model_validator
 
 from backend.capability_v2.contracts import FrozenModel
 from backend.domain_ports.local_integration import HASH_PATTERN
+from ..application.teamcenter_launch_evidence import TeamcenterOpenedSourceResult
 
 
 def obj(properties: dict, required: tuple[str, ...] = ()) -> dict:
@@ -143,6 +144,11 @@ TC_VISUALIZATION_SOURCE_SELECTOR = obj({
 TC_LAUNCH_INPUT = obj({"source_selector":TC_VISUALIZATION_SOURCE_SELECTOR,
     "expected_visdoc_uid":{"type":"string","maxLength":128}},
     ("source_selector","expected_visdoc_uid"))
+TC_OCCURRENCE_EDGE = obj({
+    "occurrence_uid": {"type": "string", "minLength": 1, "maxLength": 128},
+    "item_revision_uid": {"type": "string", "minLength": 1, "maxLength": 128},
+}, ("occurrence_uid", "item_revision_uid"))
+TC_OCCURRENCE_PATH = {"type": "array", "minItems": 1, "maxItems": 128, "items": TC_OCCURRENCE_EDGE}
 AH_APPLY_INPUT = obj({"document_session":HASH,"hierarchy_gid":{"type":"string","pattern":"^[1-9][0-9]*$"},
     "base_hash":HASH,"desired_hash":HASH,"cursor":{"type":"integer","minimum":0},
     "max_operations":{"type":"integer","minimum":1,"maximum":256}},
@@ -299,14 +305,19 @@ INPUT_SCHEMAS = {
     "simulation.vismockup.node.visibility.change.request": obj({
         "node_key": STRING,
         "action": {"type": "string", "enum": ["show", "hide", "toggle_visible", "isolate"]},
+        "occurrence_path": TC_OCCURRENCE_PATH,
+        "expected_document_session": HASH,
     }, ("node_key", "action")),
     "simulation.vismockup.node.selection.change.request": obj({
         "node_key": STRING,
         "action": {"type": "string", "enum": ["highlight", "unhighlight", "select", "deselect"]},
+        "occurrence_path": TC_OCCURRENCE_PATH,
+        "expected_document_session": HASH,
     }, ("node_key", "action")),
     "simulation.vismockup.tree.read.request": obj({
         "max_depth": {"type": "integer", "minimum": 1, "maximum": 8},
         "force_refresh": {"type": "boolean"},
+        "expected_document_session": HASH,
     }, ("max_depth",)),
     "simulation.vismockup.command.get": obj({"operation_id": STRING}, ("operation_id",)),
     "simulation.vismockup.status.get": obj(CONNECTOR, ("connector_id",)),
@@ -461,6 +472,7 @@ PAIRING_SUMMARY = obj({
 }, ("pairing_id", "user_code", "device_name", "runtime_version", "masked_windows_user", "status", "expires_at", "resource_version"))
 
 OUTPUT_SCHEMAS = {
+    ('simulation.teamcenter.visualization.launch', 2): TeamcenterOpenedSourceResult.model_json_schema(),
     "simulation.teamcenter.node_properties.read.request": OPERATION_REF,
     "simulation.teamcenter.node_properties.read": TC_NODE_PROPERTIES_RESULT,
     "simulation.teamcenter.product_structure.children.read.request": OPERATION_REF,

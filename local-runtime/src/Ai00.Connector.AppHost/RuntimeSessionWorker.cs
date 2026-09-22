@@ -226,7 +226,8 @@ public sealed class AppCredentialStore(string root,Uri origin)
 
 public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeTransport transport,DeviceSigningKey key,
     AppCredentialStore credentials,AppPlanJournal journal,VisMockupAdapter adapter,PostConditionProbes probes,
-    HostManifest manifest,IAppArtifactMaterializer artifactMaterializer,IAppCaptureUploader captureUploader,IHostApplicationLifetime lifetime):BackgroundService
+    HostManifest manifest,IAppArtifactMaterializer artifactMaterializer,IAppCaptureUploader captureUploader,IHostApplicationLifetime lifetime,
+    ViewerExecutionGate viewerGate,ViewerInteractionRuntimeContext viewerContext):BackgroundService
 {
     internal const int PlanLeaseSeconds=300;
     internal static bool HeartbeatDue(DateTimeOffset now,DateTimeOffset lastHeartbeat) =>
@@ -240,7 +241,7 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
         var deviceId=credential.GetProperty("device_id").GetString()!;var tenantId=credential.GetProperty("tenant_gid").GetString()!;
         var generation=credential.GetProperty("runtime_generation").GetInt64();var secret=credential.GetProperty("device_credential").GetString()!;
         var keyId=credential.GetProperty("device_key_id").GetString()!;
-        var executor=new PlanExecutionWorker(journal,adapter,key,keyId,manifest.PlanKeys,null,artifactMaterializer,captureUploader);
+        var executor=new PlanExecutionWorker(journal,adapter,key,keyId,manifest.PlanKeys,null,artifactMaterializer,captureUploader,viewerGate);
         var savedSession=credentials.LoadSession();
         var recovered=executor.Recover();
         if(recovered.Count>0)
@@ -266,6 +267,8 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
         }
         else session=await RegisterAsync(deviceId,tenantId,generation,secret,null,ct);
         credentials.SaveSession(session);
+        viewerContext.Update(session,keyId);
+        using var clearViewerContext=ct.Register(viewerContext.Clear);
         var lastHeartbeat=DateTimeOffset.MinValue;
         while(!ct.IsCancellationRequested)
         {
@@ -277,6 +280,7 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
                     var renewed=await transport.SendAsync(HttpMethod.Post,"runtime/renew",null,ct,session);
                     session=session with{ExpiresAt=renewed.GetProperty("expires_at").GetDateTimeOffset()};
                     credentials.SaveSession(session);
+                    viewerContext.Update(session,keyId);
                 }
                 var now=DateTimeOffset.UtcNow;
                 if(HeartbeatDue(now,lastHeartbeat))

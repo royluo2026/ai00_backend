@@ -75,7 +75,7 @@ public static class TeamcenterControlProtocol
 
 // Separate from the diagnostic pipe: business credentials can never enter diagnostics.
 // The current-user ACL and peer PID check bind this control channel to the Electron parent.
-public sealed class TeamcenterControlPipeHost(AppHostOptions options, TeamcenterReadOnlyRuntime runtime) : BackgroundService
+public sealed class TeamcenterControlPipeHost(AppHostOptions options, TeamcenterReadOnlyRuntime runtime,ViewerInteractionSession? viewerSession=null) : BackgroundService
 {
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern bool GetNamedPipeClientProcessId(Microsoft.Win32.SafeHandles.SafePipeHandle pipe, out uint pid);
@@ -127,6 +127,7 @@ public sealed class TeamcenterControlPipeHost(AppHostOptions options, Teamcenter
                     }
                     if (command is TeamcenterLogoutCommand logoutCommand)
                     {
+                        viewerSession?.Invalidate("logged_out");
                         await runtime.LogoutAsync(ct);
                         await WriteAsync(pipe, TeamcenterControlProtocol.SessionResult(logoutCommand.RequestId,
                             "logged_out", "logged_out", ""), ct);

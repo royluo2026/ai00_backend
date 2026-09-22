@@ -9,6 +9,8 @@ public sealed class AppPlanJournal
 {
     private readonly object gate=new();
     private List<AppJournalEvent> events;
+    private long appendTailSequence;
+    private string AppendPath => Path + ".events";
     public string Path {get;}
     public IReadOnlyList<AppJournalEvent> Events{get{lock(gate)return events.ToArray();}}
     public AppPlanJournal(string path)
@@ -16,14 +18,48 @@ public sealed class AppPlanJournal
         Path=System.IO.Path.GetFullPath(path);
         events=File.Exists(Path)?JsonSerializer.Deserialize<List<AppJournalEvent>>(File.ReadAllBytes(Path))??throw new InvalidDataException("journal_invalid"):[];
         if(events.Where((e,i)=>e.Sequence!=i+1).Any())throw new InvalidDataException("journal_sequence_invalid");
+        appendTailSequence=events.Count;
+        ReadAppendEventsLocked();
     }
     public void Append(string kind,string planId,string data)
     {
         lock(gate)
         {
-            var next=events.Append(new AppJournalEvent(events.Count+1,kind,planId,data)).ToList();
-            DurableJsonFile.Write(Path,next);
-            events=next;
+            // Another recovery worker may have opened the same journal before
+            // this instance. Refresh the append-only tail before allocating a
+            // sequence so a stale in-memory view cannot write a duplicate.
+            ReadAppendEventsLocked();
+            var item=new AppJournalEvent(events.Count+1,kind,planId,data);
+            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(AppendPath)??throw new InvalidDataException("journal_path_invalid"));
+            var bytes=JsonSerializer.SerializeToUtf8Bytes(item);
+            using(var stream=new FileStream(AppendPath,FileMode.Append,FileAccess.Write,FileShare.Read,4096,FileOptions.WriteThrough))
+            {
+                stream.Write(bytes);
+                stream.WriteByte((byte)'\n');
+                stream.Flush(true);
+            }
+            events.Add(item);
+            appendTailSequence=item.Sequence;
+        }
+    }
+    private void ReadAppendEventsLocked()
+    {
+        if(!File.Exists(AppendPath))return;
+        long previousSequence=0;
+        foreach(var line in File.ReadLines(AppendPath))
+        {
+            if(string.IsNullOrWhiteSpace(line))continue;
+            var item=JsonSerializer.Deserialize<AppJournalEvent>(line)??throw new InvalidDataException("journal_invalid");
+            if(item.Sequence<=previousSequence)throw new InvalidDataException("journal_sequence_invalid");
+            previousSequence=item.Sequence;
+            if(item.Sequence<=appendTailSequence)
+            {
+                if(item.Sequence>events.Count||!events[(int)item.Sequence-1].Equals(item))throw new InvalidDataException("journal_sequence_invalid");
+                continue;
+            }
+            if(item.Sequence!=events.Count+1)throw new InvalidDataException("journal_sequence_invalid");
+            events.Add(item);
+            appendTailSequence=item.Sequence;
         }
     }
 }
@@ -31,9 +67,10 @@ public sealed class AppPlanJournal
 public sealed record RuntimeSession(string DeviceId,string TenantId,long Generation,string InstanceId,string Token,DateTimeOffset ExpiresAt);
 public sealed record LeasedPlan(string LeaseId,DateTimeOffset LeaseUntil,string PlanJson);
 public sealed record TrustedPlanKey(string PublicJwk,DateTimeOffset NotBefore,DateTimeOffset NotAfter,bool Revoked);
-public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter adapter,DeviceSigningKey signingKey,string deviceKeyId,IReadOnlyDictionary<string,TrustedPlanKey> keys,Func<DateTimeOffset>? clock=null,IAppArtifactMaterializer? artifactMaterializer=null,IAppCaptureUploader? captureUploader=null)
+public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter adapter,DeviceSigningKey signingKey,string deviceKeyId,IReadOnlyDictionary<string,TrustedPlanKey> keys,Func<DateTimeOffset>? clock=null,IAppArtifactMaterializer? artifactMaterializer=null,IAppCaptureUploader? captureUploader=null,ViewerExecutionGate? viewerGate=null)
 {
     private readonly SemaphoreSlim serial=new(1,1);
+    private readonly ViewerExecutionGate executionGate=viewerGate??new();
     private DateTimeOffset Now=>(clock??(()=>DateTimeOffset.UtcNow))();
     public bool ExecutionQuarantined {get;private set;}
     public bool RequiresProcessRestart {get;private set;}
@@ -48,8 +85,11 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
     public async Task<OutcomeV2> ExecuteAsync(LeasedPlan lease,RuntimeSession session,CancellationToken ct)
     {
         await serial.WaitAsync(ct);
+        IDisposable? viewerLease=null;
+        var invocationStarted=false;
         try
         {
+            viewerLease=await executionGate.EnterPlanAsync(ct);
             var plan=Verify(lease.PlanJson);
             if(plan.DeviceId!=session.DeviceId||plan.TenantId!=session.TenantId||plan.RuntimeGeneration!=session.Generation||plan.RuntimeInstanceId!=session.InstanceId||session.ExpiresAt<=Now||lease.LeaseUntil<=Now||lease.LeaseUntil>session.ExpiresAt||lease.LeaseUntil>plan.ExpiresAt||string.IsNullOrWhiteSpace(lease.LeaseId)||plan.IssuedAt>Now||plan.ExpiresAt<=Now)throw new InvalidDataException("plan_session_lease_binding_invalid");
             var previous=journal.Events.Where(e=>e.PlanId==plan.PlanId).ToArray();
@@ -60,7 +100,14 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
                 if(retained!=null){var result=OutcomeV2.ParseAndVerify(retained.Data,signingKey.PublicJwk.GetRawText());if(result.LeaseId!=lease.LeaseId)throw new InvalidDataException("lease_replay_conflict");return result;}
                 throw new InvalidDataException("plan_recovery_required");
             }
-            if(ExecutionQuarantined||journal.Events.Any(e=>e.Kind=="outcome"&&OutcomeV2.ParseAndVerify(e.Data,signingKey.PublicJwk.GetRawText()).OverallStatus=="outcome_unknown"&&!journal.Events.Any(a=>a.PlanId==e.PlanId&&a.Kind is "reconciled" or "acknowledged")))throw new InvalidDataException("runtime_quarantined");
+            // Only unresolved outcomes can quarantine a new command. Do not
+            // re-parse and re-verify the entire finalized archive on every click.
+            var history=journal.Events;
+            var finalized=history.Where(e=>e.Kind is "reconciled" or "acknowledged")
+                .Select(e=>e.PlanId).ToHashSet(StringComparer.Ordinal);
+            if(ExecutionQuarantined||history.Any(e=>e.Kind=="outcome"&&!finalized.Contains(e.PlanId)&&
+                OutcomeV2.ParseAndVerify(e.Data,signingKey.PublicJwk.GetRawText()).OverallStatus=="outcome_unknown"))
+                throw new InvalidDataException("runtime_quarantined");
             var manifest=adapter.Manifest;
             if(plan.AdapterId!=manifest.AdapterId||plan.AdapterMajor!=manifest.AdapterMajor||plan.TargetProduct.GetProperty("product_id").GetString()!=manifest.ProductId||Version.Parse(manifest.ProductVersion)<Version.Parse(plan.TargetProduct.GetProperty("minimum_version").GetString()!)||Version.Parse(manifest.ProductVersion)>=Version.Parse(plan.TargetProduct.GetProperty("maximum_version_exclusive").GetString()!)||plan.Steps.Any(s=>!manifest.Supports(s.OperationId,s.ContractHash)))throw new InvalidDataException("adapter_contract_mismatch");
             ct.ThrowIfCancellationRequested();
@@ -92,6 +139,7 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
                 Task<AdapterResult>? invocation=null;
                 try
                 {
+                    invocationStarted=true;
                     invocation=adapter.ExecuteAsync(new(step.OperationId,payload,step.StepId,step.ContractHash),timeout.Token);
                     var result=await invocation.WaitAsync(timeout.Token);
                     timeout.Token.ThrowIfCancellationRequested();
@@ -120,10 +168,12 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
                         : noEffect?"read_invocation_failed":"invocation_outcome_unknown";
                     if(exception is OperationCanceledException&&timeout.IsCancellationRequested&&!ct.IsCancellationRequested)
                     {
-                        // Only this subprocess-backed read can prove cancellation cleanup;
+                        // Teamcenter structure and property reads share the same
+                        // cancellable subprocess worker. Both can prove cleanup;
                         // a timed-out COM call still requires a fresh host.
                         var cleaned=false;
-                        if(step.OperationId=="teamcenter.product_structure.children.read@1"&&invocation is not null)
+                        if((step.OperationId is "teamcenter.product_structure.children.read@1" or
+                            "teamcenter.node_properties.read@1") && invocation is not null)
                         {
                             try { await invocation.WaitAsync(TimeSpan.FromSeconds(5)); cleaned=true; }
                             catch(OperationCanceledException) { cleaned=invocation.IsCompleted; }
@@ -142,7 +192,16 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
             }
             return PersistOutcome(plan,lease,results);
         }
-        finally{serial.Release();}
+        catch
+        {
+            if(invocationStarted)executionGate.Quarantine("plan_outcome_unpersisted");
+            throw;
+        }
+        finally
+        {
+            if(ExecutionQuarantined||RequiresProcessRestart)executionGate.Quarantine("plan_recovery_required");
+            viewerLease?.Dispose();serial.Release();
+        }
     }
     public IReadOnlyList<OutcomeV2> Recover()
     {
@@ -183,6 +242,15 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
     private JsonElement StepResult(string id,DateTimeOffset started,string status,object? data,string? error)=>JsonSerializer.SerializeToElement(new{step_id=id,started_at=Timestamp(started),completed_at=Timestamp(Now<started?started:Now),status,result=data,result_hash=status=="succeeded"?CanonicalJsonV2.Hash(JsonSerializer.SerializeToElement(data)):null,error_code=error,reconciliation_state=status=="outcome_unknown"?"pending":"not_required"});
     private OutcomeV2 PersistOutcome(ExecutionPlanV2 plan,LeasedPlan lease,List<JsonElement> results)
     {
+        // External adapter codes (including legacy journal entries) must not
+        // prevent signing a known terminal outcome or replay journaled work.
+        results=results.Select(result=>{
+            if(result.GetProperty("error_code").GetString() is not { } code ||
+                (code.Length is > 0 and <= 128 && code.All(c=>c is >= 'a' and <= 'z' or >= '0' and <= '9' or '_' or '.' or '-')))return result;
+            var normalized=System.Text.Json.Nodes.JsonNode.Parse(result.GetRawText())!;
+            normalized["error_code"]="adapter_error_code_invalid";
+            return JsonSerializer.SerializeToElement(normalized);
+        }).ToList();
         var status=results.Any(r=>r.GetProperty("status").GetString()=="outcome_unknown")?"outcome_unknown":results.Any(r=>r.GetProperty("status").GetString()=="failed_without_effect")?"failed_without_effect":"succeeded";
         var unsigned=JsonSerializer.Serialize(new{protocol=plan.Protocol,plan_id=plan.PlanId,plan_hash=plan.PlanHash,lease_id=lease.LeaseId,tenant_id=plan.TenantId,device_id=plan.DeviceId,runtime_generation=(long)plan.RuntimeGeneration,runtime_instance_id=plan.RuntimeInstanceId,overall_status=status,steps=results,journal_sequence=journal.Events.Count+1,reported_at=Timestamp(Now),signature_algorithm="ecdsa-p256-sha256",device_key_id=deviceKeyId});
         var signed=OutcomeV2Signer.Sign(unsigned,signingKey);journal.Append("outcome",plan.PlanId,signed);

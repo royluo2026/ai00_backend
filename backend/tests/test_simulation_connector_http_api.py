@@ -31,6 +31,7 @@ def test_pairing_http_surface_is_canonical_simulation_owned():
         "/api/v1/simulation/connectors/v2/runtime/register",
         "/api/v1/simulation/connectors/v2/runtime/reconciliation/register",
         "/api/v1/simulation/connectors/v2/heartbeat",
+        "/api/v1/simulation/connectors/v2/viewer-interaction/events",
         "/api/v1/simulation/connectors/v2/runtime/renew",
         "/api/v1/simulation/connectors/v2/runtime/restart",
         "/api/v1/simulation/connectors/v2/plans/lease",
@@ -66,6 +67,29 @@ def test_pairing_approval_requires_existing_feishu_identity():
 
     user = {"gid": "user-1", "feishu_open_id": "ou_123"}
     assert simulation_connector._feishu_user(user) is user
+
+
+def test_runtime_wake_does_not_run_blocking_database_calls_on_event_loop(monkeypatch):
+    import threading
+    from starlette.websockets import WebSocketDisconnect
+    loop_thread = threading.get_ident()
+    calls = []
+    class Sessions:
+        def authenticate(self, **pins):
+            assert threading.get_ident() != loop_thread
+            calls.append('authenticate')
+        def has_queued_plan(self, **pins):
+            assert threading.get_ident() != loop_thread
+            calls.append('queued')
+            return True
+    class Socket:
+        async def accept(self): pass
+        async def send_json(self, value):
+            if value['type'] == 'plan_available':
+                raise WebSocketDisconnect()
+    monkeypatch.setattr(simulation_connector, 'runtime_session_service', Sessions())
+    asyncio.run(simulation_connector.runtime_wake(Socket(), {'device_id':'test-device'}))
+    assert calls == ['authenticate', 'queued']
 
 
 def test_v2_rejects_browser_identity_without_device_session():

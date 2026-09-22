@@ -6,7 +6,7 @@ using Ai00.Connector.Contracts;
 
 namespace Ai00.Connector.Adapters.VisMockup;
 
-public sealed class VisMockupAdapter : IConnectorAdapter
+public sealed partial class VisMockupAdapter : IConnectorAdapter
 {
     private const string ProgId = "VFFrame.Application";
     private readonly StaDispatcher _sta;
@@ -107,6 +107,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             new("teamcenter.product_structure.children.read@1", "sha256:a76cbb3fba1abefdef619baad7a718a641dc6a4ab51ceb1e2e6575851837196f"),
             new("teamcenter.node_properties.read@1", "sha256:aab317614eb33e600e66660b0879fe59fdda138b7c37fe373af1c12d75eff6b5"),
             new("teamcenter.visualization.launch@1", "sha256:d74338b54d5abd84dad3435768aa56756ef4fbb560f1d605b2b1bb9cc18519a8"),
+            new("teamcenter.visualization.launch@2", "sha256:807ebf90b7f92d994a1da3963c459191750fb21ca8890a096e3bb04d398e407a"),
             new("teamcenter.visualization.insert@1", "sha256:d3bd3656f14f8bfb9e3e2090c2462317aac1f4f1ca983fb92a7f8553fae84d1d"),
         ]);
 
@@ -213,6 +214,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     public Task<VisMockupDocumentSnapshot> SnapshotAsync(int maxNodes, int maxDepth) =>
         _sta.InvokeAsync(() =>
         {
+            InvalidateViewerStructure();
             var document = _connection.RequireActiveDocument();
             _sessionNodeKeys.Clear();
             _mappedSession = null;
@@ -226,7 +228,11 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         });
 
     public Task<NodeBinding> AttachModelAsync(string documentId, string baselineSnapshotHash, System.Text.Json.JsonElement binding) =>
-        _sta.InvokeAsync(() => _attacher.Attach(_connection.RequireActiveDocument(), documentId, baselineSnapshotHash, binding));
+        _sta.InvokeAsync(() =>
+        {
+            InvalidateViewerStructure();
+            return _attacher.Attach(_connection.RequireActiveDocument(), documentId, baselineSnapshotHash, binding);
+        });
 
     public Task<string> ApplySceneAsync(string documentId, SceneState scene, string? baselineSnapshotHash = null) =>
         _sta.InvokeAsync(() =>
@@ -269,17 +275,24 @@ public sealed class VisMockupAdapter : IConnectorAdapter
                 operation.Payload.GetProperty("action").GetString() ?? ""),
             "vismockup.node.visibility.change@1" => await ChangeNodeVisibilityAsync(
                 operation.Payload.GetProperty("node_key").GetString() ?? "",
-                operation.Payload.GetProperty("action").GetString() ?? ""),
+                operation.Payload.GetProperty("action").GetString() ?? "",
+                operation.Payload.TryGetProperty("occurrence_path", out var visibilityPath) ? visibilityPath : null,
+                operation.Payload.TryGetProperty("expected_document_session", out var visibilitySession) ? visibilitySession.GetString() : null),
             "vismockup.node.selection.change@1" => await ChangeNodeSelectionAsync(
                 operation.Payload.GetProperty("node_key").GetString() ?? "",
-                operation.Payload.GetProperty("action").GetString() ?? ""),
+                operation.Payload.GetProperty("action").GetString() ?? "",
+                operation.Payload.TryGetProperty("occurrence_path", out var selectionPath) ? selectionPath : null,
+                operation.Payload.TryGetProperty("expected_document_session", out var selectionSession) ? selectionSession.GetString() : null),
             "vismockup.tree.read@1" => await TreeAsync(
                 operation.Payload.GetProperty("max_depth").GetInt32(),
-                operation.Payload.TryGetProperty("force_refresh", out var forceRefresh) && forceRefresh.GetBoolean()),
+                operation.Payload.TryGetProperty("force_refresh", out var forceRefresh) && forceRefresh.GetBoolean(),
+                false,
+                operation.Payload.TryGetProperty("expected_document_session", out var treeSession) ? treeSession.GetString() : null),
             "vismockup.tree.read@2" => await TreeAsync(
                 operation.Payload.GetProperty("max_depth").GetInt32(),
                 operation.Payload.TryGetProperty("force_refresh", out var liveForceRefresh) && liveForceRefresh.GetBoolean(),
-                includeVisibility: true),
+                includeVisibility: true,
+                expectedSession: operation.Payload.TryGetProperty("expected_document_session", out var liveTreeSession) ? liveTreeSession.GetString() : null),
             "vismockup.model.attach@1" => await AttachModelAsync(
                 operation.Payload.GetProperty("document_id").GetString() ?? "",
                 operation.Payload.GetProperty("baseline_snapshot_hash").GetString() ?? "",
@@ -304,6 +317,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
                 operation.Payload.GetProperty("cursor").GetInt32(),
                 operation.Payload.GetProperty("page_size").GetInt32(), cancellationToken),
             "teamcenter.visualization.launch@1" => await OpenTeamcenterVisualizationAsync(operation.Payload, cancellationToken),
+            "teamcenter.visualization.launch@2" => await OpenTeamcenterVisualizationWithIdentityAsync(operation.Payload, cancellationToken),
             "teamcenter.visualization.insert@1" => await InsertTeamcenterVisualizationAsync(operation.Payload, cancellationToken),
             "vismockup.status" => await StatusAsync(),
             "vismockup.launch" => await LaunchAsync(),
@@ -319,6 +333,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
 
     public Task<object> OpenManagedFileAsync(string filePath) => _sta.InvokeAsync<object>(() =>
     {
+        InvalidateViewerStructure();
         var safePath = _paths.ValidateModelPath(filePath);
         var application = _connection.RequireActiveApplication(true);
         var document = application.OpenDocument(safePath);
@@ -328,6 +343,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
 
     public Task<object> InsertManagedFileAsync(string filePath) => _sta.InvokeAsync<object>(() =>
     {
+        InvalidateViewerStructure();
         var safePath = _paths.ValidateModelPath(filePath);
         var document = _connection.RequireActiveDocument();
         var expected = Path.GetFullPath(safePath);
@@ -345,8 +361,56 @@ public sealed class VisMockupAdapter : IConnectorAdapter
     });
 
     public Task<object> OpenTeamcenterVisualizationAsync(JsonElement payload, CancellationToken ct) =>
-        _teamcenter.ConsumeVisualizationAsync(payload, "Open",
-            (path, token) => _teamcenterVisualizationLauncher.LaunchAsync(path, token), ct);
+        OpenTeamcenterVisualizationCoreAsync(payload, captureIdentity: false, ct);
+
+    // Separate result contract: do not silently extend launch@1's closed wire schema.
+    // The governed opened-source operation will serialize this complete receipt.
+    public Task<object> OpenTeamcenterVisualizationWithIdentityAsync(JsonElement payload, CancellationToken ct) =>
+        OpenTeamcenterVisualizationCoreAsync(payload, captureIdentity: true, ct);
+
+    private async Task<object> OpenTeamcenterVisualizationCoreAsync(JsonElement payload, bool captureIdentity, CancellationToken ct)
+    {
+        object? openedIdentity = null;
+        var launch = await _teamcenter.ConsumeVisualizationAsync(payload, "Open", async (path, token) =>
+        {
+            token.ThrowIfCancellationRequested();
+            // Teamcenter resolved the requested source before handing us its material.
+            // Open it on the retained renderer; its returned document is the runtime
+            // target. Historical source receipts cannot establish this open's target.
+            if (!string.Equals(Path.GetExtension(path), ".jt", StringComparison.OrdinalIgnoreCase))
+                _ = TeamcenterVisualizationSource.ReadMaterial(path);
+            await _sta.InvokeAsync(() =>
+            {
+                token.ThrowIfCancellationRequested();
+                var application = _connection.RequireActiveApplication(true);
+                var process = captureIdentity ? RequireProcessIdentity() : null;
+                InvalidateViewerStructure();
+                _com.HideOwnedWindows();
+                var document = application.OpenDocument(path);
+                _ownedDocumentId = document.DocumentId;
+                if (process is not null)
+                {
+                    var after = RequireProcessIdentity();
+                    if (process.ProcessId != after.ProcessId || process.ProcessStartUtcTicks != after.ProcessStartUtcTicks)
+                        throw new ConnectorException("vismockup_document_identity_changed");
+                    var handle = document.DocumentId;
+                    if (string.IsNullOrWhiteSpace(handle))
+                        throw new ConnectorException("vismockup_document_handle_unavailable");
+                    var ticks = process.ProcessStartUtcTicks!.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    // Capture the returned document in the same STA turn as OpenDocument.
+                    // Never substitute a later ActiveDocument read for this provenance.
+                    openedIdentity = new { document_session = CanonicalJson.Hash(new {
+                        process_id = process.ProcessId!.Value, process_started_utc_ticks = ticks, document_handle = handle }),
+                        process_id = process.ProcessId!.Value, process_started_utc_ticks = ticks, document_handle = handle };
+                }
+                _com.HideOwnedWindows();
+                return document.DocumentId;
+            });
+        }, ct);
+        if (!captureIdentity) return launch;
+        if (openedIdentity is null) throw new ConnectorException("vismockup_opened_document_identity_unavailable");
+        return new { protocol = "ai00.viewer.opened-source.v1", launch, document_identity = openedIdentity };
+    }
 
     public Task<object> InsertTeamcenterVisualizationAsync(JsonElement payload, CancellationToken ct) =>
         _teamcenter.ConsumeVisualizationAsync(payload, "Insert", async (path, token) =>
@@ -354,6 +418,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             token.ThrowIfCancellationRequested();
             await _sta.InvokeAsync<object>(() =>
             {
+                InvalidateViewerStructure();
                 IVisMockupDocument document;
                 try { document = _connection.RequireActiveDocument(); }
                 catch (ConnectorException error) when (error.Message == "active_document_unavailable")
@@ -365,6 +430,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
 
     public Task<object> CloseManagedFileAsync() => _sta.InvokeAsync<object>(() =>
     {
+        InvalidateViewerStructure();
         var application = _connection.RequireActiveApplication(false);
         application.CloseAllDocuments();
         var closed = _ownedDocumentId;
@@ -384,10 +450,11 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         return new { action };
     });
 
-    public Task<object> ChangeNodeVisibilityAsync(string nodeKey, string action) => _sta.InvokeAsync<object>(() =>
+    public Task<object> ChangeNodeVisibilityAsync(string nodeKey, string action, JsonElement? occurrencePath = null, string? expectedSession = null) => _sta.InvokeAsync<object>(() =>
     {
         var document = _connection.RequireActiveDocument();
-        var sessionNodeKey = ResolveSessionNodeKey(document, nodeKey);
+        RequireExpectedDocumentSession(document, expectedSession);
+        var sessionNodeKey = ResolveSessionNodeKey(document, nodeKey, occurrencePath);
         if (action == "isolate")
         {
             document.SetAllNodesVisible(false);
@@ -418,12 +485,13 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             throw new ConnectorNoEffectException("vismockup_node_visibility_write_rejected");
         }
 
+        RequireExpectedDocumentSession(document, expectedSession);
         if (document.IsNodeVisible(sessionNodeKey) != visible)
             throw new ConnectorNoEffectException("vismockup_node_visibility_write_rejected");
         return new { node_key = nodeKey, visible };
     });
 
-    public Task<object> ChangeNodeSelectionAsync(string nodeKey, string action) => _sta.InvokeAsync<object>(() =>
+    public Task<object> ChangeNodeSelectionAsync(string nodeKey, string action, JsonElement? occurrencePath = null, string? expectedSession = null) => _sta.InvokeAsync<object>(() =>
     {
         var selected = action switch
         {
@@ -432,16 +500,31 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             _ => throw new ConnectorException("node_selection_action_unsupported"),
         };
         var document = _connection.RequireActiveDocument();
-        document.SetNodeSelected(ResolveSessionNodeKey(document, nodeKey), selected);
+        RequireExpectedDocumentSession(document, expectedSession);
+        document.SetNodeSelected(ResolveSessionNodeKey(document, nodeKey, occurrencePath), selected);
+        RequireExpectedDocumentSession(document, expectedSession);
         return new { node_key = nodeKey, selected };
     });
 
-    public Task<bool> ObserveNodeVisibilityAsync(string nodeKey) => _sta.InvokeAsync(() =>
+    private void RequireExpectedDocumentSession(IVisMockupDocument document, string? expectedSession)
+    {
+        if (string.IsNullOrWhiteSpace(expectedSession)) return;
+        var process = RequireProcessIdentity();
+        if (!string.Equals(DocumentSession(process, document.DocumentId), expectedSession, StringComparison.Ordinal))
+            throw new ConnectorException("vismockup_document_changed");
+    }
+
+    public Task<bool> ObserveNodeVisibilityAsync(string nodeKey, JsonElement? occurrencePath = null) => _sta.InvokeAsync(() =>
     {
         if (nodeKey.StartsWith("cad:", StringComparison.Ordinal))
         {
             var active = _connection.RequireActiveDocument();
             return active.IsNodeVisible(ResolveSessionNodeKey(active,nodeKey));
+        }
+        if (nodeKey.StartsWith("tc:", StringComparison.Ordinal))
+        {
+            var active = _connection.RequireActiveDocument();
+            return active.IsNodeVisible(ResolveSessionNodeKey(active, nodeKey, occurrencePath));
         }
         if (!nodeKey.StartsWith("pdm:", StringComparison.Ordinal))
             return _connection.RequireActiveDocument().IsNodeVisible(nodeKey);
@@ -473,7 +556,7 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         throw new ConnectorException("vismockup_recovery_node_unavailable");
     });
 
-    private string ResolveSessionNodeKey(IVisMockupDocument document, string key)
+    private string ResolveSessionNodeKey(IVisMockupDocument document, string key, JsonElement? occurrencePath = null)
     {
         if (key.StartsWith("cad:", StringComparison.Ordinal))
             return _treeCache?.ResolveCadNodeKey(document,key)
@@ -494,7 +577,19 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             var occurrence = key[3..];
             if (string.IsNullOrWhiteSpace(occurrence))
                 throw new ConnectorNoEffectException("vismockup_session_node_mapping_stale");
+            // Teamcenter tree node IDs may be hashes of the full occurrence path.
+            // They are cache identities, not values exposed by VisMockup node
+            // metadata, and scanning the complete COM tree can never resolve them.
+            if (occurrence.StartsWith("sha256:", StringComparison.Ordinal))
+                throw new ConnectorNoEffectException("vismockup_online_occurrence_locator_invalid");
             if (_sessionNodeKeys.TryGetValue(key, out var onlineKnown)) return onlineKnown;
+            if (occurrencePath is { ValueKind: JsonValueKind.Array })
+            {
+                var resolvedOnline = ResolveTeamcenterOccurrencePath(document, key, occurrencePath.Value);
+                if (_sessionNodeKeys.Count >= 4096) _sessionNodeKeys.Clear();
+                _sessionNodeKeys[key] = resolvedOnline;
+                return resolvedOnline;
+            }
             var matches = new List<string>();
             var pending = new Queue<IVisMockupNode>(); pending.Enqueue(document.RootNode);
             while (pending.Count > 0 && matches.Count < 2)
@@ -526,6 +621,34 @@ public sealed class VisMockupAdapter : IConnectorAdapter
             _sessionNodeKeys[key] = resolved;
         }
         return resolved;
+    }
+
+    private static string ResolveTeamcenterOccurrencePath(IVisMockupDocument document, string key, JsonElement pathValue)
+    {
+        TeamcenterOccurrenceEdge[] path;
+        try { path = pathValue.Deserialize<TeamcenterOccurrenceEdge[]>() ?? []; }
+        catch (JsonException) { throw new ConnectorNoEffectException("vismockup_online_occurrence_path_invalid"); }
+        if (path.Length is < 1 or > 128 || path.Any(edge =>
+                string.IsNullOrWhiteSpace(edge.OccurrenceUid) || edge.OccurrenceUid.Length > 128 ||
+                string.IsNullOrWhiteSpace(edge.ItemRevisionUid) || edge.ItemRevisionUid.Length > 128))
+            throw new ConnectorNoEffectException("vismockup_online_occurrence_path_invalid");
+
+        var current = document.RootNode;
+        var start = 0;
+        if (string.Equals(current.OccurrenceId, path[0].OccurrenceUid, StringComparison.Ordinal)) start = 1;
+        for (var index = start; index < path.Length; index++)
+        {
+            var matches = current.Children
+                .Where(child => string.Equals(child.OccurrenceId, path[index].OccurrenceUid, StringComparison.Ordinal))
+                .ToArray();
+            if (matches.Length != 1)
+                throw new ConnectorNoEffectException(matches.Length == 0
+                    ? "vismockup_online_occurrence_unmapped" : "vismockup_online_occurrence_ambiguous");
+            current = matches[0];
+        }
+        if (!string.Equals(current.OccurrenceId, key[3..], StringComparison.Ordinal))
+            throw new ConnectorNoEffectException("vismockup_online_occurrence_path_mismatch");
+        return current.NodeKey;
     }
 
     private bool TryHydrateTreeCacheFromActivePlmxml(IVisMockupDocument document)
@@ -603,21 +726,29 @@ public sealed class VisMockupAdapter : IConnectorAdapter
         switch (action) { case "all_on": view.AllNodesOn(); break; case "all_off": view.AllNodesOff(); break; case "deselect": view.DeSelectAllNodes(); break; default: throw new InvalidOperationException("Unsupported visibility action"); }
         return new { action };
     });
-    public Task<object> TreeAsync(int maxDepth, bool forceRefresh = false, bool includeVisibility = false) => _sta.InvokeAsync<object>(() =>
+    public Task<object> TreeAsync(int maxDepth, bool forceRefresh = false, bool includeVisibility = false, string? expectedSession = null) => _sta.InvokeAsync<object>(() =>
     {
         if (maxDepth is < 1 or > 8) throw new ConnectorException("vismockup_tree_depth_invalid");
         var document = _connection.RequireActiveDocument();
-        if (forceRefresh) { _sessionNodeKeys.Clear(); _mappedSession = null; }
+        RequireExpectedDocumentSession(document, expectedSession);
+        if (forceRefresh) { InvalidateViewerStructure(); _sessionNodeKeys.Clear(); _mappedSession = null; }
         var cached = forceRefresh ? null : _treeCache?.TryRead(document, maxDepth);
-        if (cached is not null) return TreeResult(document, cached.Nodes, maxDepth, cached.CacheState,
-            includeVisibility ? ReadLiveVisibility(document, cached.Nodes, maxDepth, cached.CacheState) : null);
+        if (cached is not null)
+        {
+            var cachedResult=TreeResult(document, cached.Nodes, maxDepth, cached.CacheState,
+                includeVisibility ? ReadLiveVisibility(document, cached.Nodes, maxDepth, cached.CacheState) : null);
+            RequireExpectedDocumentSession(document, expectedSession);
+            return cachedResult;
+        }
         // The interactive tree must not wait on VisMockup's non-cancellable
         // ExportEx call. The governed document-snapshot workflow owns PLMXML
         // acquisition; this read path mirrors the proven direct COM traversal.
         var visibility = includeVisibility ? new Dictionary<string, bool?>(StringComparer.Ordinal) : null;
         var complete = ReadCompleteComTree(document, maxDepth, visibility);
         _treeCache?.Replace(document, maxDepth, complete);
-        return TreeResult(document, complete, maxDepth, "verified", visibility);
+        var result=TreeResult(document, complete, maxDepth, "verified", visibility);
+        RequireExpectedDocumentSession(document, expectedSession);
+        return result;
     });
 
     private VisMockupDocumentSnapshot ReadPlmxmlSnapshot(IVisMockupDocument document, int maxNodes, int maxDepth)
