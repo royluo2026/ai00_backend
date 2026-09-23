@@ -13,7 +13,7 @@ Both versions require a reverse-DNS `plugin_id` below `publisher_id`, SemVer, co
 
 Each `provides` item requires:
 
-- `capability_id`: the supplied Capability ID;
+- `id`: the supplied Capability ID;
 - `major`: positive supported major;
 - `owner_domain`: below the publisher namespace; the Capability ID must be below this owner namespace;
 - `module`: canonical package-relative `.mjs` path without traversal;
