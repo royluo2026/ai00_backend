@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI00 Plugin Development"
+  short_description: "Build and prepare governed AI00 third-party plugins"
+  default_prompt: "Use $ai00-plugin-development to prepare this AI00 plugin for development or release."
