@@ -157,6 +157,25 @@ class SimulationConnectorRepository:
         except ValueError as exc:
             raise ConnectorRepositoryError('launch_evidence_unavailable') from exc
 
+    @staticmethod
+    def verified_existing_document_identity_evidence(cursor, operation_id, *, actor_id, tenant_id, now):
+        """Verify a signed identity of an already-open document in the current runtime transaction."""
+        from ..application.live_document_identity import verify_existing_identity_evidence
+        cursor.execute('SELECT * FROM workmanship_sim_connector_runtime_plans '
+            'WHERE plan_id=%s AND actor_gid=%s AND tenant_gid=%s AND protocol=%s',
+            (operation_id, actor_id, tenant_id, PROTOCOL_V2))
+        row = cursor.fetchone()
+        if not row:
+            raise ConnectorRepositoryError('live_document_identity_unavailable')
+        runtime = SimulationConnectorRepository._locked_runtime(cursor, row['device_id'])
+        cursor.execute('SELECT * FROM workmanship_sim_connector_runtime_plans WHERE plan_id=%s FOR UPDATE', (operation_id,))
+        row = cursor.fetchone()
+        try:
+            return verify_existing_identity_evidence(row, runtime, actor_id=actor_id, tenant_id=tenant_id, now=now)
+        except ValueError as exc:
+            raise ConnectorRepositoryError(str(exc) if str(exc) == 'live_document_identity_stale'
+                else 'live_document_identity_unavailable') from exc
+
     def verified_hierarchy_inventory(self, operation_id, *, actor_id, tenant_id, now):
         from ..application.live_document_inventory import verify_hierarchy_inventory_evidence
         runtime = self.bound_runtime_for_user(actor_id, tenant_id)
@@ -296,7 +315,9 @@ class SimulationConnectorRepository:
         if not isinstance(plan_digest, str) or not re.fullmatch(r'[0-9a-f]{64}', plan_digest):
             plan_digest = None
         reason = None
-        if not digest:
+        if plan['status'] in {'leased', 'executing'}:
+            reason = 'unreported_expired_lease'
+        elif not digest:
             reason = 'missing_outcome_hash'
         elif len(steps) != 1:
             reason = 'multiple_operations'
@@ -319,7 +340,9 @@ class SimulationConnectorRepository:
             runtime_generation=plan['runtime_generation'], outcome_hash='sha256:' + digest if digest else None,
             plan_hash='sha256:' + plan_digest if plan_digest else None,
             recovery_fingerprint=cls._recovery_fingerprint(plan),
-            operation_id=operation or 'unknown_operation', status=plan['status'],
+            operation_id=operation or 'unknown_operation',
+            # Read-only projection; keep stored state/fingerprint for locked resolution.
+            status='outcome_unknown' if plan['status'] in {'leased', 'executing'} else plan['status'],
             eligible=bool(decisions), allowed_decisions=decisions,
             ineligible_reason=None,
             # Stored exception text may contain local paths or credentials. Never return it.
@@ -336,8 +359,9 @@ class SimulationConnectorRepository:
             "WHERE d.owner_user_gid=%s AND d.tenant_gid=%s AND d.status='active' "
             "AND p.actor_gid=%s AND p.tenant_gid=%s AND p.protocol=%s "
             "AND p.runtime_generation=d.runtime_generation "
-            "AND p.status IN ('outcome_unknown','manual_review_required') ")
-        parameters = (actor_id, tenant_id, actor_id, tenant_id, PROTOCOL_V2)
+            "AND (p.status IN ('outcome_unknown','manual_review_required') "
+            "OR (p.status IN ('leased','executing') AND p.lease_until<=%s)) ")
+        parameters = (actor_id, tenant_id, actor_id, tenant_id, PROTOCOL_V2, datetime.now(UTC))
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             # One statement is one snapshot even at READ COMMITTED. The aggregate
             # side retains metadata when the page is empty or out of range.
@@ -401,7 +425,10 @@ class SimulationConnectorRepository:
                     raise ConnectorRepositoryError('recovery_decision_conflict')
                 return dict(plan_id=plan_id, device_id=device_id, decision=decision,
                             audit_ref=prior['audit_id'], retry_started=False)
-            if plan['status'] not in {'outcome_unknown', 'manual_review_required'}:
+            expired_lease = (plan['status'] in {'leased', 'executing'}
+                             and plan.get('lease_until') is not None
+                             and _utc(plan['lease_until']) <= _utc(now))
+            if plan['status'] not in {'outcome_unknown', 'manual_review_required'} and not expired_lease:
                 raise ConnectorRepositoryError('recovery_state_changed')
             if expected_recovery_fingerprint is not None and expected_recovery_fingerprint != item['recovery_fingerprint']:
                 raise ConnectorRepositoryError('recovery_state_changed')

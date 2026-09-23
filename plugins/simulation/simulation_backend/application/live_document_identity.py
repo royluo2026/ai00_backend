@@ -10,6 +10,9 @@ from .connector_protocol_v2 import OutcomeVerifier
 IDENTITY_CAPABILITY = 'simulation.vismockup.document.identity.read.request'
 IDENTITY_OPERATION = 'vismockup.document.identity.read@1'
 IDENTITY_CONTRACT_HASH = 'sha256:2a8b6e89d3a13cf35b0584a989ed79977700d3cd3fe9fcc918c3b871d1c8c4d7'
+EXISTING_IDENTITY_CAPABILITY = 'simulation.vismockup.document.existing_identity.read.request'
+EXISTING_IDENTITY_OPERATION = 'vismockup.document.existing_identity.read@1'
+EXISTING_IDENTITY_CONTRACT_HASH = 'sha256:9aa9528fff83c565d3d005daa1167b41cef2f6d413d485790c6c98c139fc1471'
 HIERARCHY_INVENTORY_CAPABILITY = 'simulation.vismockup.document.hierarchy_inventory.read.request'
 HIERARCHY_INVENTORY_OPERATION = 'vismockup.document.hierarchy_inventory.read@1'
 HIERARCHY_INVENTORY_CONTRACT_HASH = 'sha256:a89bdc3fbb04ee643f1434dee83c653df8a04fc406ac7fff1e61ce39ee99685a'
@@ -32,6 +35,20 @@ def identity_only_plan(plan):
         and plan.steps[0].contract_hash == IDENTITY_CONTRACT_HASH
         and plan.steps[0].payload == {} and plan.steps[0].side_effect_classification == 'read'
         and plan.steps[0].post_condition_probe_id is None)
+
+
+def existing_identity_only_plan(plan):
+    if not (plan.capability_id == EXISTING_IDENTITY_CAPABILITY and plan.major_version == 1
+        and len(plan.steps) == 1 and plan.adapter_id == 'ai00.vismockup' and plan.adapter_major == 1
+        and plan.target_product.product_id == 'siemens.vismockup'):
+        return False
+    step = plan.steps[0]
+    expected = step.payload.get('expected_document_session') if isinstance(step.payload, dict) else None
+    return (step.operation_id == EXISTING_IDENTITY_OPERATION and step.contract_hash == EXISTING_IDENTITY_CONTRACT_HASH
+        and step.side_effect_classification == 'read' and step.post_condition_probe_id is None
+        and set(step.payload) == {'expected_document_session'} and isinstance(expected, str)
+        and len(expected) == 71 and expected.startswith('sha256:')
+        and all(char in '0123456789abcdef' for char in expected[7:]))
 
 
 def hierarchy_inventory_only_plan(plan):
@@ -65,6 +82,16 @@ def _json(value):
 
 
 def verify_identity_evidence(row, runtime, *, actor_id, tenant_id, now):
+    return _verify_identity_evidence(row, runtime, actor_id=actor_id, tenant_id=tenant_id, now=now,
+        existing=False)
+
+
+def verify_existing_identity_evidence(row, runtime, *, actor_id, tenant_id, now):
+    return _verify_identity_evidence(row, runtime, actor_id=actor_id, tenant_id=tenant_id, now=now,
+        existing=True)
+
+
+def _verify_identity_evidence(row, runtime, *, actor_id, tenant_id, now, existing):
     """Bounded, fail-closed verification of server-owned plan/outcome/runtime rows."""
     try:
         if not row or not runtime or not actor_id or not tenant_id:
@@ -72,7 +99,7 @@ def verify_identity_evidence(row, runtime, *, actor_id, tenant_id, now):
         plan = ConnectorExecutionPlanV2.model_validate(_json(row['plan_json']))
         outcome = OutcomeVerifier.verify(_json(row['outcome_json']), _json(runtime['device_signing_jwk']))
         OutcomeVerifier.verify_steps(plan, outcome)
-        if not identity_only_plan(plan) or row['status'] != 'succeeded' or outcome.overall_status != 'succeeded':
+        if not (existing_identity_only_plan(plan) if existing else identity_only_plan(plan)) or row['status'] != 'succeeded' or outcome.overall_status != 'succeeded':
             raise ValueError('live_document_identity_unavailable')
         if (plan.actor_id, row['actor_gid'], runtime['owner_user_gid']) != (actor_id,) * 3:
             raise ValueError('live_document_identity_unavailable')
@@ -106,6 +133,11 @@ def verify_identity_evidence(row, runtime, *, actor_id, tenant_id, now):
         expected = 'sha256:' + hashlib.sha256(canonicalize_v2(source)).hexdigest()
         if identity.document_session != expected or not identity.document_handle.strip():
             raise ValueError('live_document_identity_unavailable')
-        return dict(connector_device_id=plan.device_id, document_session=identity.document_session)
+        if existing and identity.document_session != plan.steps[0].payload['expected_document_session']:
+            raise ValueError('live_document_identity_unavailable')
+        result = dict(connector_device_id=plan.device_id, document_session=identity.document_session)
+        if existing:
+            result.update(runtime_instance_id=plan.runtime_instance_id, runtime_generation=plan.runtime_generation)
+        return result
     except (KeyError, TypeError, AttributeError) as exc:
         raise ValueError('live_document_identity_unavailable') from exc

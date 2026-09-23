@@ -41,7 +41,7 @@ const TabManager = (() => {
     },
     cad_sim:          {
       title: '数模仿真',
-      src: '../packages/sim-plugin/web/cad_sim/index.html',
+      src: '../packages/sim-plugin/web/cad_sim/index.html?rev=20260918-teamcenter-node-detail-recovery-2',
       minPerm: null,
     },
     // 模块 Hub — 二级横排页签入口

@@ -190,7 +190,11 @@
         item_gid: itemGid, expected_revision: expectedRevision, status, schedule, note, attachments,
       }),
     ),
-    'base.identity.session.profile.get': exactOutcome(operationTargets['base.identity.session.profile.get'], () => ({})),
+    'base.identity.session.profile.get': {
+      capabilityId: operationTargets['base.identity.session.profile.get'],
+      payload: () => ({}),
+      legacy: value => value?.profile || value,
+    },
     'base.users.list': exactOutcome(operationTargets['base.users.list'], () => ({})),
     'base.users.assignRole': {
       capabilityId: operationTargets['base.users.assignRole'],
@@ -256,15 +260,9 @@
     };
   }
 
-  function defaultTransport(path, options) {
-    const transport = rootTransport();
-    if (typeof transport !== 'function') throw new TypeError('_cloudFetch 未就绪');
-    return transport(path, options);
-  }
-
-  function rootTransport() {
-    if (typeof window === 'undefined') return null;
-    return window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
+  function defaultTransport(capabilityId, envelope, confirmed) {
+    if (typeof window === 'undefined' || !window.AI00Business) throw new TypeError('Capability 客户端未就绪');
+    return window.AI00Business.request(capabilityId, envelope, confirmed === true ? () => true : undefined);
   }
 
   function defaultIdempotencyKey(capabilityId) {
@@ -286,6 +284,7 @@
     if (response?.success !== true || envelope?.ok !== true) {
       throw invocationError(response, capabilityId);
     }
+    if (envelope.status === 'accepted' && envelope.operation_ref) return envelope.operation_ref;
     const value = envelope.data;
     return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
   }
@@ -308,19 +307,11 @@
     return error;
   }
 
-  function createExistingCapabilityClient(_cloudFetch = defaultTransport, options = {}) {
+  function createExistingCapabilityClient(transport = defaultTransport, options = {}) {
     const idempotencyKeyFactory = options.idempotencyKeyFactory || defaultIdempotencyKey;
 
-    async function request(capabilityId, action, body) {
-      return _cloudFetch(`/api/v1/capabilities/${capabilityId}:${action}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-    }
-
     async function invoke(capabilityId, payload, invokeOptions = {}) {
-      const requestBody = { version: 1, payload };
+      const requestBody = { version: invokeOptions.version ?? 1, payload };
       if (invokeOptions.expectedResourceVersion !== undefined) {
         requestBody.expected_resource_version = String(invokeOptions.expectedResourceVersion);
       }
@@ -328,17 +319,12 @@
         requestBody.idempotency_key = invokeOptions.idempotencyKey
           || idempotencyKeyFactory(capabilityId, payload);
       }
-      let response = await request(capabilityId, 'invoke', requestBody);
-      if (response?.data?.error?.code === 'confirmation_required') {
+      let response = await transport(capabilityId, requestBody, invokeOptions.confirmed);
+      const challenge = response?.error?.confirmation_challenge;
+      if (challenge && response.error.code === 'confirmation_required') {
         if (invokeOptions.confirmed !== true) throw invocationError(response, capabilityId);
-        const confirmation = await request(capabilityId, 'confirm', requestBody);
-        const token = confirmation?.success === true
-          ? confirmation?.data?.confirmation_token
-          : null;
-        if (!token) throw invocationError(confirmation, capabilityId);
-        response = await request(capabilityId, 'invoke', {
-          ...requestBody,
-          confirmation_token: token,
+        response = await transport(capabilityId, {
+          ...requestBody, confirmation: { challenge_id: challenge, approved: true },
         });
       }
       return invocationValue(response, capabilityId);

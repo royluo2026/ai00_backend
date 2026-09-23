@@ -63,6 +63,7 @@ const AuthStateManager = (() => {
     window._authUser    = state.user    || null;
     window._authToken   = state.token   || '';
     window._authOrgInfo = state.orgInfo || null;
+    if (window._authMode === 'feishu') document.getElementById('_auth_gate')?.remove();
 
     _subscribers.forEach(fn => { try { fn(state); } catch(e) {} });
   }
@@ -75,8 +76,9 @@ const AuthStateManager = (() => {
         window._authUser  = state?.user  || null;
         window._authToken = state?.token || null;
         // feishu 模式：从 /users/me 补充 grants + org_role
-        if (state?.mode === 'feishu' && state?.token && window._authUser) {
-          _refreshUserProfile(state.token).catch(() => {});
+        if (state?.mode === 'feishu' && window._authUser) {
+          document.getElementById('_auth_gate')?.remove();
+          _refreshUserProfile().catch(() => {});
         }
       } else {
         // 非 Electron 环境（开发调试）：默认完全开放
@@ -87,25 +89,11 @@ const AuthStateManager = (() => {
     }
   }
 
-  async function _refreshUserProfile(token) {
+  async function _refreshUserProfile() {
     try {
-      const config = await window.electronAPI?.getConfig?.().catch(() => null);
-      const runtimeBase = window.AI00RuntimeConfig?.getRuntimeBackendBase;
-      const explicitBackendUrl = config?.backendUrl || '';
-      const backendUrl = runtimeBase
-        ? (await runtimeBase(explicitBackendUrl))
-        : (
-            explicitBackendUrl ||
-            window._AI00_BASE ||
-            localStorage.getItem('ai00_backend_url') ||
-            window.AI00RuntimeConfig?.defaultLocalBackend ||
-            ''
-          ).replace(/\/$/, '');
-      const res = await fetch(`${backendUrl}/users/me`, {
-        headers: { 'X-AI00-Token': token },
-      });
-      if (!res.ok) return;
-      const data = await res.json();
+      const response = await window.AI00Business.request('base.identity.session.profile.get', { version: 1, payload: {} });
+      if (response?.success !== true || response.data?.ok !== true) return;
+      const data = response.data.data?.profile || response.data.data;
       if (data && window._authUser) {
         window._authUser = _mergeUserProfile(window._authUser, data);
         // 已打开的 iframe 可能早于异步 profile 刷新；通知同源页面重新读取。

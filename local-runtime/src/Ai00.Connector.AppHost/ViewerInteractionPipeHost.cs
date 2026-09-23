@@ -16,6 +16,14 @@ public sealed class ViewerInteractionPipeHost(AppHostOptions options,HostManifes
     ViewerExecutionGate gate,VisMockupAdapter adapter):BackgroundService
 {
     internal static TimeSpan MonotonicNow()=>TimeSpan.FromSeconds((double)Stopwatch.GetTimestamp()/Stopwatch.Frequency);
+    internal static TimeSpan InteractionTimeout(string type)=>TimeSpan.FromSeconds(
+        type=="resolve_nodes"?25:type is "prepare_document" or "activate_document"?15:5);
+    internal static Task ReleaseAfterRead(Task read,IDisposable dispatch,IDisposable lease)
+        =>read.ContinueWith(completed=>
+        {
+            _=completed.Exception; // Observe a late read failure without reporting an unknown write.
+            try{dispatch.Dispose();}finally{lease.Dispose();}
+        },CancellationToken.None,TaskContinuationOptions.ExecuteSynchronously,TaskScheduler.Default);
     [DllImport("kernel32.dll",SetLastError=true)]
     private static extern bool GetNamedPipeClientProcessId(Microsoft.Win32.SafeHandles.SafePipeHandle pipe,out uint pid);
     [StructLayout(LayoutKind.Sequential)]
@@ -123,15 +131,34 @@ public sealed class ViewerInteractionPipeHost(AppHostOptions options,HostManifes
             }
             var error=session.Validate(request.InteractionId,runtime.Current,DateTimeOffset.UtcNow,MonotonicNow());
             if(error is not null)return Reject(error);
-            using var lease=gate.TryEnterInteractive();if(lease is null)return new(request.RequestId,"busy",error_code:"viewer_busy");
+            var lease=gate.TryEnterInteractive();if(lease is null)return new(request.RequestId,"busy",error_code:"viewer_busy");
             var current=session.Current;
-            if(current is null||current.SessionNonce!=request.InteractionId)return Reject("interaction_closed");
-            using var dispatch=session.BeginDispatch(current);
+            if(current is null||current.SessionNonce!=request.InteractionId){lease.Dispose();return Reject("interaction_closed");}
+            var dispatch=session.BeginDispatch(current);
+            Task<object>? mapping=null;
+            var handedOff=false;
             try
             {
-                var result=await adapter.ResolveViewerNodesAsync(current.SourceAssociationId,current.DocumentSession,request.Document.GetProperty("source_nodes")).WaitAsync(TimeSpan.FromSeconds(5),ct);
+                if(request.Type is "prepare_document" or "activate_document")
+                {
+                    var target=await (request.Type=="prepare_document"
+                        ?adapter.PrepareViewerDocumentAsync(current.DocumentSession,ct)
+                        :adapter.ActivateViewerDocumentAsync(current.DocumentSession,ct)).WaitAsync(InteractionTimeout(request.Type),ct);
+                    var changed=session.Validate(request.InteractionId,runtime.Current,DateTimeOffset.UtcNow,MonotonicNow());
+                    if(changed is not null)return Reject(changed);
+                    return new(request.RequestId,"completed",new{process_id=target.ProcessId,document_session=target.DocumentSession,document_id=target.DocumentId,document_window=target.DocumentWindow,window_token=target.WindowToken});
+                }
+                mapping=adapter.ResolveViewerNodesAsync(current.SourceAssociationId,current.DocumentSession,request.Document.GetProperty("source_nodes"));
+                var result=await mapping.WaitAsync(InteractionTimeout(request.Type),ct);
                 var response=new ViewerInteractionResponse(request.RequestId,"completed",result);
                 return JsonSerializer.SerializeToUtf8Bytes(response).Length<=ViewerInteractionProtocol.MaximumBytes?response:Reject("mapping_result_too_large");
+            }
+            catch(TimeoutException) when(request.Type=="resolve_nodes" && mapping is not null)
+            {
+                // Keep both the serial gate and authorization dispatch until the
+                // read-only STA work settles. A timed-out mapping is not an unknown write.
+                handedOff=true;_ = ReleaseAfterRead(mapping,dispatch,lease);
+                return Reject("viewer_mapping_pending");
             }
             catch(Exception timeoutError) when(timeoutError is TimeoutException or OperationCanceledException)
             {
@@ -139,6 +166,7 @@ public sealed class ViewerInteractionPipeHost(AppHostOptions options,HostManifes
                 // can still occupy the STA and must not admit a waiting plan.
                 gate.Quarantine("viewer_sta_unavailable");return Reject("viewer_sta_unavailable");
             }
+            finally{if(!handedOff){dispatch.Dispose();lease.Dispose();}}
         }
         catch(ConnectorNoEffectException error){return Reject(error.Code);}
         catch(Exception error) when(error is InvalidDataException or ProtocolV2Exception or JsonException or KeyNotFoundException or InvalidOperationException or System.Security.Cryptography.CryptographicException)

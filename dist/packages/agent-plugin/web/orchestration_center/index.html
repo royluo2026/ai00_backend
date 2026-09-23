@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <script src="/web/core/business_facade.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>编排中心 — AI00</title>
+  
+  <link rel="stylesheet" href="/assets/index-2ee087b1.css">
+</head>
+<body>
+  <main id="orchestrationApp" aria-label="编排中心"></main>
+  <script src="api.js"></script>
+  <script>
+    // Production entry: the page is governed by the universal Capability
+    // Gateway and the host's authenticated _cloudFetch transport. It fails
+    // closed when the host has not supplied a trusted project scope.
+    window.loadGovernedOrchestrationState = async function () {
+      const scope = window.__AI00_ORCHESTRATION_SCOPE__ || window.parent?.__AI00_ORCHESTRATION_SCOPE__;
+      if (!scope?.tenant_gid || !scope?.project_gid) throw new Error('编排中心缺少受治理的项目作用域');
+
+      if (!window.AI00Business?.available()) throw new Error('统一认证客户端不可用');
+      const api = window.OrchestrationApi.createOrchestrationApi(window.AI00Business.request, {
+        panoramaRead: { id: 'agent.orchestration.panorama.read', version: 1 },
+        graphRead: { id: 'agent.orchestration.graph.read', version: 1 },
+        metricRead: { id: 'agent.orchestration.metric.read', version: 1 },
+      });
+      const panorama = await api.invokeRead('panoramaRead', { ...scope, limit: 100 });
+      const panoramas = panorama?.items || [];
+      const selected = panoramas.find(item => item.current_version_gid) || panoramas[0];
+      let graph = null;
+      if (selected?.current_version_gid) {
+        const result = await api.invokeRead('graphRead', { ...scope, version_gid: selected.current_version_gid });
+        graph = result?.graph || result || null;
+      }
+      let metric = null;
+      if (selected?.gid) {
+        try {
+          metric = await api.invokeRead('metricRead', {
+            ...scope, panorama_gid: selected.gid,
+            period_key: String(new Date().getUTCFullYear()),
+          });
+        } catch (error) {
+          // Evidence is optional for the initial canvas render; the metrics
+          // panel shows an explicit unavailable state rather than a demo value.
+          metric = null;
+        }
+      }
+      const x = ['TG0前','TG0','TG1','TG2','EP','PPV','PP','P','SOP'];
+      const y = ['项目管理','同步工程','工艺规划','设备规划'];
+      const source = graph || {};
+      return {
+        mode: source.mode || 'fixed',
+        axis: source.axis || { x_items: x, y_items: y },
+        nodes: source.nodes || [], edges: source.edges || [],
+        items: source.items || [], itemEdges: source.item_edges || source.itemEdges || [],
+        capabilityBindings: source.capability_bindings || source.capabilityBindings || [],
+        contextBindings: source.context_bindings || source.contextBindings || [],
+        panoramas,
+        effectiveRate: metric ? {
+          total_workload_hours: metric.total_workload_hours,
+          effective_agent_workload_hours: metric.effective_agent_workload_hours,
+          rate: metric.effective_intelligent_work_rate,
+          // Task-level evidence is intentionally not fabricated by the
+          // aggregate endpoint; the panel renders an explicit empty detail.
+          tasks: [],
+        } : null,
+        automationRatio: metric ? { rate: metric.automation_ratio } : null,
+        metric,
+      };
+    };
+  </script>
+  <script src="store.js"></script>
+  <script src="axis_editor.js"></script>
+  <script src="orthogonal_router.js"></script>
+  <script src="panorama_canvas.js"></script>
+  <script src="decomposition_view.js"></script>
+  <script src="inspector.js"></script>
+  <script src="metrics.js"></script>
+  <script src="app.js"></script>
+  <script src="bootstrap.js"></script>
+</body>
+</html>

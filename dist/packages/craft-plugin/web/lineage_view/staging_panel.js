@@ -42,12 +42,8 @@ class StagingPanel {
   setLayoutMode(lm) { this._layoutMode = lm; }
 
   async _invokeCapability(id, payload) {
-    const _cloudFetch = this._cf;
-    const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ version: 1, payload }),
-    });
+
+    const response = await window.AI00Business.request(id, { version: 1, payload });
     const result = response?.data;
     if (response?.success !== true || result?.ok !== true) {
       const detail = result?.error || response?.error || {};
@@ -71,8 +67,8 @@ class StagingPanel {
       console.warn('[StagingPanel] load failed:', e);
     }
     try {
-      const _cloudFetch = this._cf;
-      const response = await _cloudFetch(`/api/craft/tc-resource-staging?version_gid=${encodeURIComponent(this._versionGid)}`, { method: 'GET' });
+
+      const response = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.resource_requirement.staging.search", {version:1,payload:Object.fromEntries(Object.entries({...{...{"page_size":(query.has("page_size")?Number(query.get("page_size")):100),"version_gid":(query.has("version_gid")?query.get("version_gid"):null)},...((query.has("match_status")?query.get("match_status"):null)?{"match_status":(query.has("match_status")?query.get("match_status"):null)}:{})},...((query.has("cursor")?query.get("cursor"):null)?{"cursor":(query.has("cursor")?query.get("cursor"):null)}:{})}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result["items"]??[]),"next_cursor":(result["next_cursor"]??null)}; })({},{},new URLSearchParams((`/api/craft/tc-resource-staging?version_gid=${encodeURIComponent(this._versionGid)}`).split("?")[1]||""));
       this._resourceItems = response?.data || response?.items || [];
     } catch (e) {
       this._resourceItems = [];
@@ -188,8 +184,8 @@ class StagingPanel {
 
   async resolveResourceItem(item) {
     try {
-      const _cloudFetch = this._cf;
-      const response = await _cloudFetch(`/api/craft/resource-requirements?resource_type=${encodeURIComponent(item.resource_type)}`, { method: 'GET' });
+
+      const response = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.resource_requirement.search", {version:1,payload:Object.fromEntries(Object.entries({...{...{...{"status":(query.has("status")?query.get("status"):"active"),"page_size":(query.has("page_size")?Number(query.get("page_size")):100)},...((query.has("resource_type")?query.get("resource_type"):null)?{"resource_type":(query.has("resource_type")?query.get("resource_type"):null)}:{})},...((query.has("q")?query.get("q"):null)?{"q":(query.has("q")?query.get("q"):null)}:{})},...((query.has("cursor")?query.get("cursor"):null)?{"cursor":(query.has("cursor")?query.get("cursor"):null)}:{})}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result["items"]??[]),"next_cursor":(result["next_cursor"]??null)}; })({},{},new URLSearchParams((`/api/craft/resource-requirements?resource_type=${encodeURIComponent(item.resource_type)}`).split("?")[1]||""));
       const candidates = response?.data || response?.items || [];
       if (!candidates.length) return this._toast('没有可用的同类型资源标准', 'error');
       const choice = window.prompt(
@@ -199,10 +195,7 @@ class StagingPanel {
       if (!choice) return;
       const selected = candidates.find(value => value.gid === choice.trim() || value.code === choice.trim());
       if (!selected) return this._toast('未找到所选资源标准', 'error');
-      await _cloudFetch(`/api/craft/tc-resource-staging/${item.gid}/resolve`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(_resourceResolvePayload(item, selected.gid)),
-      });
+      await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.resource_requirement.staging.resolve", {version:1,payload:Object.fromEntries(Object.entries({"staging_gid":path.staging_gid,...Object.fromEntries(Object.entries({...{},...body}).filter(([,v])=>v!=null))}).filter(([,v])=>v!=null))}); return {"success":true,"data":result}; })(_resourceResolvePayload(item, selected.gid),{"staging_gid":decodeURIComponent(String(item.gid))},new URLSearchParams());
       await this.load();
     } catch (error) {
       this._toast('资源匹配失败: ' + error.message, 'error');
@@ -211,11 +204,8 @@ class StagingPanel {
 
   async ignoreResourceItem(item) {
     try {
-      const _cloudFetch = this._cf;
-      await _cloudFetch(`/api/craft/tc-resource-staging/${item.gid}/ignore`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(_resourceIgnorePayload(item)),
-      });
+
+      await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.resource_requirement.staging.ignore", {version:1,payload:Object.fromEntries(Object.entries({"staging_gid":path.staging_gid,...Object.fromEntries(Object.entries({...{},...body}).filter(([,v])=>v!=null))}).filter(([,v])=>v!=null))}); return {"success":true,"data":result}; })(_resourceIgnorePayload(item),{"staging_gid":decodeURIComponent(String(item.gid))},new URLSearchParams());
       await this.load();
     } catch (error) {
       this._toast('忽略失败: ' + error.message, 'error');

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script src="/web/core/business_facade.js"></script>
   <meta charset="UTF-8">
   <title>系统能力</title>
   <script src="/web/icons.js"></script>
@@ -179,14 +180,14 @@
 
     // ── Cloud fetch ───────────────────────────────────────────────────────────
     function cf(path, opts) {
-      const fn = window.parent?._cloudFetch || window._cloudFetch || window.parent?.parent?._cloudFetch;
+      const fn = window.AI00Business?.available() || window.AI00Business?.available() || window.AI00Business?.available();
       if (!fn) return Promise.reject(new Error('no _cloudFetch'));
       return fn(path, opts);
     }
 
     async function loadNotes() {
       try {
-        const res = await cf('/admin/config');
+        const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.runtime.annotation.search", {version:1,payload:({collection:query.get("prefix")==="lists."?"lists":"capabilities"})}); return ({...result,items:result.data}); })({},{},new URLSearchParams());
         if (res?.data) {
           res.data.forEach(row => {
             const mn = row.key?.match(/^capabilities\.(.+)\.note$/);
@@ -209,10 +210,7 @@
       clearTimeout(_saveTimer);
       _saveTimer = setTimeout(async () => {
         try {
-          await cf(`/admin/config/capabilities.${id}.note`, {
-            method: 'PUT',
-            body: JSON.stringify({ value: value || ' ', description: `capability ${id} note` }),
-          });
+          await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.runtime.capability_note.set", {version:1,payload:({id:path.id,value:body.value})}); return result; })({ value: value || ' ', description: `capability ${id} note` },{"id":decodeURIComponent(String(id))},new URLSearchParams());
         } catch (e) { console.warn('[capabilities] save note failed:', e.message); }
         finally { _hideSaving(); }
       }, 600);
@@ -222,10 +220,7 @@
       const cap = CAPABILITIES.find(c => c.id === id);
       if (cap) cap.status = value;
       try {
-        await cf(`/admin/config/capabilities.${id}.status`, {
-          method: 'PUT',
-          body: JSON.stringify({ value, description: `capability ${id} status` }),
-        });
+        await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.runtime.capability_status.set", {version:1,payload:({id:path.id,value:body.value})}); return result; })({ value, description: `capability ${id} status` },{"id":decodeURIComponent(String(id))},new URLSearchParams());
       } catch (_) {}
     }
 

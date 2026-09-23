@@ -8,6 +8,28 @@ using Xunit;
 namespace Ai00.Connector.Tests;
 public class ViewerInteractionPipeTests
 {
+    [Fact] public void NodeMappingHasItsOwnLargeModelBudgetWithoutExtendingWriteTimeout()
+    {
+        Assert.Equal(TimeSpan.FromSeconds(25),ViewerInteractionPipeHost.InteractionTimeout("resolve_nodes"));
+        Assert.Equal(TimeSpan.FromSeconds(5),ViewerInteractionPipeHost.InteractionTimeout("execute"));
+    }
+    [Fact] public async Task TimedOutReadKeepsTheGateUntilItsStaWorkSettles()
+    {
+        var gate=new ViewerExecutionGate();
+        var lease=gate.TryEnterInteractive();Assert.NotNull(lease);
+        var dispatch=new TestLease();
+        var read=new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var released=ViewerInteractionPipeHost.ReleaseAfterRead(read.Task,dispatch,lease!);
+        Assert.Null(gate.TryEnterInteractive());
+        read.SetResult(new object());await released.WaitAsync(TimeSpan.FromSeconds(2));
+        Assert.True(dispatch.Disposed);
+        using var next=gate.TryEnterInteractive();Assert.NotNull(next);
+    }
+    private sealed class TestLease:IDisposable
+    {
+        public bool Disposed {get;private set;}
+        public void Dispose()=>Disposed=true;
+    }
     [Fact] public async Task RealPipeInstallsGrantResolvesExecutesDeduplicatesQueriesAndCloses()
     {
         using var rig=new ViewerInteractionExecutionTests.Rig();
@@ -45,6 +67,18 @@ public class ViewerInteractionPipeTests
             var installed=await Send(new{type="install_grant",request_id="install",grant=fixture.Grant.Document});
             Assert.Equal("completed",installed.GetProperty("status").GetString());
             var interaction=installed.GetProperty("result").GetProperty("interaction_id").GetString()!;
+            var prepared=await Send(new{type="prepare_document",request_id="prepare",interaction_id=interaction});
+            Assert.Equal("completed",prepared.GetProperty("status").GetString());
+            Assert.Equal(123,prepared.GetProperty("result").GetProperty("process_id").GetInt32());
+            Assert.Equal("doc",prepared.GetProperty("result").GetProperty("document_id").GetString());
+            var activated=await Send(new{type="activate_document",request_id="activate",interaction_id=interaction});
+            Assert.Equal("completed",activated.GetProperty("status").GetString());
+            Assert.Equal("doc",activated.GetProperty("result").GetProperty("document_id").GetString());
+            using(var held=gate.TryEnterInteractive())
+            {
+                Assert.Equal("busy",(await Send(new{type="prepare_document",request_id="busy-prepare",interaction_id=interaction})).GetProperty("status").GetString());
+                Assert.Equal("busy",(await Send(new{type="activate_document",request_id="busy-activate",interaction_id=interaction})).GetProperty("status").GetString());
+            }
             var mapping=await Send(new{type="resolve_nodes",request_id="resolve",interaction_id=interaction,source_nodes=new[]{new{source_node_id="root",kind="single_part_root"}}});
             Assert.Equal("completed",mapping.GetProperty("status").GetString());
             var result=mapping.GetProperty("result");var reference=result.GetProperty("nodes")[0].GetProperty("node_ref").GetString();
@@ -55,8 +89,14 @@ public class ViewerInteractionPipeTests
             Assert.Equal(1,document.SetNodeVisibleCalls);
             var query=await Send(new{type="query_request",request_id="query",interaction_id=interaction,queried_request_id="show"});
             Assert.Equal("query",query.GetProperty("request_id").GetString());Assert.Equal("completed",query.GetProperty("status").GetString());
+            runtime.Update(ViewerInteractionSessionTests.Runtime() with{InstanceId="changed",ExpiresAt=now.AddHours(1)},"key");
+            Assert.Equal("rejected",(await Send(new{type="prepare_document",request_id="stale-prepare",interaction_id=interaction})).GetProperty("status").GetString());
+            Assert.Equal("rejected",(await Send(new{type="activate_document",request_id="stale-activate",interaction_id=interaction})).GetProperty("status").GetString());
             Assert.Equal("completed",(await Send(new{type="close",request_id="close",interaction_id=interaction})).GetProperty("status").GetString());
             Assert.Null(session.Current);Assert.Single(rig.Journal.ReadPendingUpload());
+            Assert.Equal("rejected",(await Send(new{type="prepare_document",request_id="closed-prepare",interaction_id=interaction})).GetProperty("status").GetString());
+            gate.Quarantine("test");
+            Assert.Equal("runtime_quarantined",(await Send(new{type="prepare_document",request_id="quarantined-prepare",interaction_id=interaction})).GetProperty("error_code").GetString());
         }
         finally{client.Dispose();await host.StopAsync(default);}
     }

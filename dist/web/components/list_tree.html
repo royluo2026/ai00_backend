@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script src="/web/core/business_facade.js"></script>
   <meta charset="UTF-8">
   <title>清单树</title>
   <style>
@@ -270,15 +271,11 @@ async function _load() {
   _loading = true;
   _render();  // 显示加载中
 
-  const _cloudFetch  = window._cloudFetch || window.parent?._cloudFetch || window.top?._cloudFetch;
+  const _cloudFetch  = window.AI00Business?.available() || window.AI00Business?.available() || window.AI00Business?.available();
 
   async function invokeCapability(id, payload = {}) {
-    if (!_cloudFetch) throw new Error('云端服务未连接');
-    const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ version: 1, payload }),
-    });
+    if (!window.AI00Business?.available()) throw new Error('云端服务未连接');
+    const response = await window.AI00Business.request(id, { version: 1, payload });
     const envelope = response?.data;
     if (response?.success !== true || envelope?.ok !== true) {
       const detail = envelope?.error || response?.error || {};
@@ -328,7 +325,7 @@ async function _load() {
   _pbomSnaps = [];
   try {
     if (_cloudFetch) {
-      const res = await _cloudFetch('/api/ebom/snapshots', { method: 'GET' });
+      const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.pbom.version.search", {version:1,payload:Object.fromEntries(Object.entries({"project_ref":(query.has("project_gid")?query.get("project_gid"):null),"limit":200}).filter(([,v])=>v!=null))}); return {"success":true,"data":((result["items"]??[])).map(row=>({"gid":(row["gid"]??""),"project_gid":((row["project_gid"]??null)||(row["project_ref"]??null)),"version_tag":((row["version_tag"]??null)||""),"name":((row["name"]??null)||((row["version_tag"]??null)||"")),"source_type":((row["source_type"]??null)||"native"),"status":(row["status"]??"draft"),"created_at":((row["created_at"]??null)||"")}))}; })({},{},new URLSearchParams());
       _pbomSnaps = (res?.data || []).map(s => ({
         gid:         s.gid,
         name:        s.name || s.version_tag || s.gid,
@@ -625,7 +622,7 @@ function _showCtxMenu(e, list) {
 
 // ── 关联项目（PATCH /api/lists/{gid}）────────────────────────
 async function _assignProject(list, projectGid) {
-  const _cloudFetch = window._cloudFetch || window.parent?._cloudFetch || window.top?._cloudFetch;
+  const _cloudFetch = window.AI00Business?.available() || window.AI00Business?.available() || window.AI00Business?.available();
   try {
     if (_cloudFetch) {
       await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)

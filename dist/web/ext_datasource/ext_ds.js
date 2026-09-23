@@ -4,21 +4,14 @@
  */
 'use strict';
 
-const _cf = (method, path, opts = {}) => {
-  const fn = window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
-  if (!fn) throw new TypeError('_cloudFetch 未就绪');
-  return fn(path, { ...opts, method });
-};
+
 async function _invokeCapability(id, payload = {}) {
-  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ version: 1, payload }),
-  });
+  const version = ['ontology.concept.get', 'ontology.concept.resolve', 'ontology.object.list'].includes(id) ? 2 : 1;
+  const response = await window.AI00Business.request(id, { version, payload });
   const envelope = response?.data;
   if (response?.success !== true || envelope?.ok !== true) {
     const detail = envelope?.error || response?.error || {};
-    throw new Error(detail.message || `能力调用失败：${id}@1`);
+    throw new Error(detail.message || `能力调用失败：${id}@${version}`);
   }
   const value = envelope.data;
   return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;

@@ -83,17 +83,9 @@ function _toggleFavorite(file) {
 }
 
 /* ── cloudFetch helper ───────────────────────────────── */
-function _cf(method, path, opts = {}) {
-  const fn = window.parent?._cloudFetch || window._cloudFetch;
-  if (!fn) return Promise.reject(new Error('_cloudFetch not available'));
-  return fn(path, { ...opts, method });
-}
+
 async function _invokeCapability(id, payload) {
-  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ version: 1, payload }),
-  });
+  const response = await window.AI00Business.request(id, { version: 1, payload });
   const envelope = response?.data;
   if (response?.success !== true || envelope?.ok !== true) {
     const detail = envelope?.error || response?.error || {};

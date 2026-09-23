@@ -9,16 +9,10 @@ let _factories = [];          // 工厂列表缓存
 
 // ── Capability Gateway 封装 ───────────────────────────────
 function _cloudFetchFn() {
-  return window.parent?._cloudFetch || window._cloudFetch;
+  return window.AI00Business?.available() || window.AI00Business?.available();
 }
 async function invokeCapability(id, payload = {}) {
-  const _cloudFetch = _cloudFetchFn();
-  if (!_cloudFetch) throw new Error('云端服务未连接');
-  const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ version: 1, payload }),
-  });
+  const response = await window.AI00Business.request(id, { version: 1, payload });
   const envelope = response?.data;
   if (response?.success !== true || envelope?.ok !== true) {
     const detail = envelope?.error || response?.error || {};
@@ -326,11 +320,11 @@ async function loadProjectMembers(projectGid) {
   const isCloud = (window.parent?._authMode || window._authMode || 'local') === 'feishu';
   if (!isCloud) { section.style.display = 'none'; return; }
   section.style.display = '';
-  const _cloudFetch = cloudFetch;
+
 
   let isOwner = false;
   try {
-    const me = await _cloudFetch('/users/me', { method: 'GET' }).then(r => r.json());
+    const me = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.identity.current.get", {version:1,payload:({})}); return result; })({},{},new URLSearchParams()).then(r => r.json());
     const grants = me.grants || [];
     const orgRole = me.org_role || me.system_role || '';
     isOwner = orgRole === 'super_admin' ||

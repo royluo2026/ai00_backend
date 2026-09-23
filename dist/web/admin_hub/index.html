@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
+  <script src="/web/core/business_facade.js"></script>
 <meta charset="UTF-8">
 <title>管理中心</title>
 <style>
@@ -41,6 +42,7 @@
     height: 100%; color: var(--text-muted); gap: 12px;
   }
   .placeholder svg { opacity: .4; }
+  .project-scope { margin: 0 10px 8px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg2); color: var(--text); font-size: 12px; width: calc(100% - 20px); }
   .placeholder p { font-size: 14px; }
 </style>
 </head>
@@ -48,6 +50,7 @@
 <div class="layout">
   <div class="sidebar">
     <div class="sidebar-title">管理中心</div>
+    <select id="projectScope" class="project-scope" aria-label="当前项目作用域" disabled><option value="">正在读取项目…</option></select>
     <div id="sidebarNav"></div>
   </div>
   <div class="content" id="content">
@@ -60,9 +63,41 @@
     <iframe id="frame" style="display:none"></iframe>
   </div>
 </div>
+<script src="../core/web_compat.js"></script>
+<script src="../core/auth_state.js"></script>
+<script src="scope.js"></script>
 <script>
   const frame       = document.getElementById('frame');
   const placeholder = document.getElementById('placeholder');
+  const projectScope = document.getElementById('projectScope');
+  let _authorizedProject = null;
+
+  async function loadAuthorizedProjectScope() {
+    const cloudFetch = window.AI00Business?.available() || window.AI00Business?.available();
+    if (typeof cloudFetch !== 'function') return;
+    try {
+      const response = await window.AI00Business.request("project.project.read.atomic.projects_search", { version: 1, payload: { arguments: {} } });
+      const projects = window.AdminHubScope.unwrapCapabilityProjects(response);
+      projectScope.innerHTML = '<option value="">选择项目（必选）</option>';
+      projects.filter(p => p && p.gid).forEach(p => {
+        const option = document.createElement('option'); option.value = p.gid; option.textContent = p.name || p.gid;
+        projectScope.appendChild(option);
+      });
+      const preferred = window.parent?._currentProjectGid || window.parent?._selectedProject?.gid || '';
+      if (preferred && [...projectScope.options].some(o => o.value === preferred)) projectScope.value = preferred;
+      projectScope.disabled = projectScope.options.length <= 1;
+      _authorizedProject = projects.find(p => p.gid === projectScope.value) || null;
+      projectScope.onchange = () => {
+        _authorizedProject = projects.find(p => p.gid === projectScope.value) || null;
+        postOrchestrationScope();
+      };
+      postOrchestrationScope();
+    } catch (error) {
+      projectScope.innerHTML = '<option value="">项目作用域不可用</option>';
+      projectScope.disabled = true;
+      console.warn('[AdminHub] project scope unavailable', error);
+    }
+  }
 
   const NAV_DEFS = [
     { id:'admin_bug_tracker',   label:'开发看板',  src:'../admin/bug_tracker.html',
@@ -75,6 +110,8 @@
       icon:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>' },
     { id:'admin_capability_governance', label:'能力治理中心', src:'../admin/capability_governance/index.html',
       icon:'<path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M8 12l2.5 2.5L16 9"/>' },
+    { id:'admin_orchestration', label:'编排中心',  src:'../../packages/agent-plugin/web/orchestration_center/index.html?source=governed',
+      icon:'<circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M6.5 7.5l4.2 8.6M17.5 7.5l-4.2 8.6"/>' },
     { id:'admin_lists',         label:'清单注册',  src:'../admin/lists_registry.html',
       icon:'<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>' },
     { id:'admin_feature_flags', label:'功能开关',  src:'../admin/feature_flags.html',
@@ -95,11 +132,30 @@
     return true;
   }
 
-  // iframe 加载完成后同步主题（解决时序竞争）
+  function postOrchestrationScope() {
+    if (!frame.contentWindow || !frame.src.includes('/orchestration_center/')) return false;
+    const user = window.parent?._authUser || window._authUser || {};
+    const scope = window.AdminHubScope.buildOrchestrationScope(user, _authorizedProject);
+    // Scope is produced only from the capability-backed project list; never
+    // fall back to an ambient host project or synthesize an id.
+    if (!scope) return false;
+    frame.contentWindow.postMessage({ type:'orchestration-scope', scope }, location.origin);
+    return true;
+  }
+
+  // iframe 加载完成后同步主题与作用域（解决 child DOMContentLoaded 先于 parent load 的竞争）
   frame.addEventListener('load', () => {
     const theme = document.documentElement.dataset.theme || 'dark';
     try { frame.contentWindow?.postMessage({ type: 'theme', theme }, '*'); } catch(_) {}
+    postOrchestrationScope();
+    // Auth/project state can settle after iframe load; retry briefly and also
+    // react to the host's standard change events.
+    let attempts = 0;
+    const retry = setInterval(() => { if (postOrchestrationScope() || ++attempts >= 20) clearInterval(retry); }, 250);
   });
+  window.addEventListener('auth-ready', postOrchestrationScope);
+  window.addEventListener('project-changed', postOrchestrationScope);
+  window.addEventListener('ai00-auth-user-updated', loadAuthorizedProjectScope);
 
   function navigate(el) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -131,6 +187,10 @@
 
     NAV_DEFS.forEach(def => {
       const ff = flags[def.id];
+      if (def.id === 'admin_orchestration' && ff?.enabled !== true) {
+        console.log('[AdminHub] orchestration is disabled by default');
+        return;
+      }
       if (ff?.visibility && !_meetsVisibility(ff.visibility)) {
         console.log('[AdminHub] hidden by flag:', def.id);
         return;
@@ -174,6 +234,8 @@
   // 先设主题再渲染导航，确保iframe加载时admin_hub自身已有data-theme
   try { applyTheme(window.parent?.document?.documentElement?.dataset?.theme); } catch(_) {}
   renderNav();
+  if (window.AuthStateManager?.init) window.AuthStateManager.init().finally(loadAuthorizedProjectScope);
+  else loadAuthorizedProjectScope();
 </script>
 </body>
 </html>

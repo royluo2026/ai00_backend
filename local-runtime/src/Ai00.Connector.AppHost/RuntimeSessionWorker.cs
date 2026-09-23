@@ -230,6 +230,19 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
     ViewerExecutionGate viewerGate,ViewerInteractionRuntimeContext viewerContext):BackgroundService
 {
     internal const int PlanLeaseSeconds=300;
+    internal static async Task<RuntimeSession> RegisterAfterRecoveryAsync(
+        Func<CancellationToken,Task<RuntimeSession>> register,
+        Func<CancellationToken,Task> waitForRecovery,CancellationToken ct)
+    {
+        while(true)
+        {
+            ct.ThrowIfCancellationRequested();
+            try{return await register(ct);}
+            catch(RuntimeTransportException error)when(error.Message=="runtime_plans_unresolved"||error.Transient)
+            {await waitForRecovery(ct);}
+            catch(HttpRequestException){await waitForRecovery(ct);}
+        }
+    }
     internal static bool HeartbeatDue(DateTimeOffset now,DateTimeOffset lastHeartbeat) =>
         now-lastHeartbeat>=TimeSpan.FromSeconds(30);
 
@@ -258,14 +271,19 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
             }
             lifetime.StopApplication();return;
         }
-        RuntimeSession session;
-        if(savedSession is not null&&savedSession.ExpiresAt>DateTimeOffset.UtcNow)
+        RuntimeSession session=await RegisterAfterRecoveryAsync(async token=>
         {
-            try{session=await RestartAsync(savedSession,ct);}
-            catch(RuntimeTransportException e)when(e.Message=="runtime_session_invalid")
-            {session=await RegisterAsync(deviceId,tenantId,generation,secret,null,ct);}
-        }
-        else session=await RegisterAsync(deviceId,tenantId,generation,secret,null,ct);
+            if(savedSession is not null&&savedSession.ExpiresAt>DateTimeOffset.UtcNow)
+            {
+                try{return await RestartAsync(savedSession,token);}
+                catch(RuntimeTransportException e)when(e.Message=="runtime_session_invalid"){}
+            }
+            return await RegisterAsync(deviceId,tenantId,generation,secret,null,token);
+        },async token=>
+        {
+            await diagnostics.SendAsync(new{type="diagnostic",code="recovery_required"},token);
+            await Task.Delay(TimeSpan.FromSeconds(5),token);
+        },ct);
         credentials.SaveSession(session);
         viewerContext.Update(session,keyId);
         using var clearViewerContext=ct.Register(viewerContext.Clear);

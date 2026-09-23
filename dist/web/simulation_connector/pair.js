@@ -6,47 +6,12 @@ const approveButton = document.getElementById('approve');
 let resourceVersion = 0;
 
 function message(value) { statusNode.textContent = value; }
-async function request(path, options = {}) {
-  const response = await fetch(path, {
-    ...options,
-    headers: { 'Content-Type': 'application/json', 'X-AI00-Token': token, ...(options.headers || {}) },
-  });
-  const body = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(body?.detail?.code || `HTTP ${response.status}`);
-  return body.data;
-}
 
-async function invokeCapability(capabilityId, payload, { confirm = false } = {}) {
-  const version = 1;
-  const idempotencyKey = confirm ? `connector-pairing:${crypto.randomUUID()}` : undefined;
-  let confirmationToken;
-  if (confirm) {
-    const approval = await request(
-      `/api/v1/capabilities/${encodeURIComponent(capabilityId)}:confirm`,
-      {
-        method: 'POST',
-        body: JSON.stringify({ version, payload, idempotency_key: idempotencyKey }),
-      },
-    );
-    confirmationToken = approval?.confirmation_token;
-    if (!confirmationToken) throw new Error('confirmation_token_missing');
-  }
-  const result = await request(
-    `/api/v1/capabilities/${encodeURIComponent(capabilityId)}:invoke`,
-    {
-      method: 'POST',
-      body: JSON.stringify({
-        version, payload, idempotency_key: idempotencyKey,
-        confirmation_token: confirmationToken,
-      }),
-    },
-  );
-  if (result?.ok !== true) throw new Error(result?.error?.code || 'capability_invocation_failed');
-  return result.data;
-}
+
+async function invokeCapability(capabilityId,payload,{confirm=false}={}) { return window.AI00Business.invoke(capabilityId,{version:1,payload}); }
 
 async function load() {
-  if (!token) { message('请先在 AI00 中使用飞书登录，再重新打开此页面。'); return; }
+
   if (!code) { message('缺少配对码，请从 Connector 重新发起绑定。'); return; }
   try {
     const data = await invokeCapability('simulation.connector.pairing.summary.get', { user_code: code });

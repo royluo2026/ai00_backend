@@ -85,6 +85,7 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
         [
             new("vismockup.application.probe@1", "sha256:197cfad8bc3453030fdc288ea78c3abc21699274dd48d4482444af4f62380a37"),
             new("vismockup.document.identity.read@1", "sha256:2a8b6e89d3a13cf35b0584a989ed79977700d3cd3fe9fcc918c3b871d1c8c4d7"),
+            new("vismockup.document.existing_identity.read@1", "sha256:9aa9528fff83c565d3d005daa1167b41cef2f6d413d485790c6c98c139fc1471"),
             new("vismockup.document.hierarchy_inventory.read@1", "sha256:a89bdc3fbb04ee643f1434dee83c653df8a04fc406ac7fff1e61ce39ee99685a"),
             new("vismockup.document.snapshot@1", "sha256:aa7c11c2501026c470a9cc7bfcbbecc7339879c18bf2b6b86f68ed7fc2e1861b"),
             new("vismockup.model.open@1", "sha256:aabd43bb066794c250f7eeed41def7c147a4da7263e813f192efa59a0cb40e34"),
@@ -161,6 +162,110 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
         });
         cancellationToken.ThrowIfCancellationRequested();
         return result;
+    }
+
+    private async Task<object> ReadExistingDocumentIdentityAsync(System.Text.Json.JsonElement payload, CancellationToken cancellationToken)
+    {
+        if(payload.ValueKind!=System.Text.Json.JsonValueKind.Object||payload.EnumerateObject().Count()!=1
+            ||!payload.TryGetProperty("expected_document_session",out var expectedElement)
+            ||expectedElement.ValueKind!=System.Text.Json.JsonValueKind.String)
+            throw new ConnectorException("vismockup_document_identity_input_invalid");
+        var expected=expectedElement.GetString()??"";
+        if(expected.Length!=71||!expected.StartsWith("sha256:",StringComparison.Ordinal)
+            ||expected[7..].Any(value=>!Uri.IsHexDigit(value)))
+            throw new ConnectorException("vismockup_document_identity_input_invalid");
+        cancellationToken.ThrowIfCancellationRequested();
+        var result=await _sta.InvokeAsync<object>(()=>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var app=_connection.RequireExistingApplication();
+            var before=RequireProcessIdentity();
+            var matches=app.OpenDocuments.Where(document=>DocumentSession(before,document.DocumentId)==expected).Take(2).ToArray();
+            if(matches.Length!=1)throw new ConnectorNoEffectException("document_session_changed");
+            var document=matches[0];
+            document.SelectExistingNativeWindow(before.ProcessId!.Value);
+            var active=app.ActiveDocument;
+            var after=RequireProcessIdentity();
+            if(active is null||active.DocumentId!=document.DocumentId||DocumentSession(after,active.DocumentId)!=expected)
+                throw new ConnectorNoEffectException("document_session_changed");
+            return new{document_session=expected,process_id=after.ProcessId!.Value,
+                process_started_utc_ticks=after.ProcessStartUtcTicks!.Value.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                document_handle=active.DocumentId};
+        });
+        cancellationToken.ThrowIfCancellationRequested();
+        return result;
+    }
+
+    private sealed record PreparedTarget(long ProcessStartTicks,ViewerDocumentTarget Target);
+    private readonly Dictionary<string,PreparedTarget> _preparedTargets=new(StringComparer.Ordinal);
+    public sealed record ViewerDocumentTarget(int ProcessId, string DocumentSession, string DocumentId,string DocumentWindow,string WindowToken);
+
+    public async Task<ViewerDocumentTarget> PrepareViewerDocumentAsync(string expectedDocumentSession, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        return await _sta.InvokeAsync(()=>
+        {
+            var trace=System.Diagnostics.Stopwatch.StartNew();
+            void Stage(string name)=>Console.Error.WriteLine($"AI00_VIEWER_PREPARE_V1:{name}:{trace.ElapsedMilliseconds}");
+            Stage("sta_enter");
+            ct.ThrowIfCancellationRequested();
+            var before=RequireProcessIdentity();
+            Stage("process_before");
+            var application=_connection.RequireActiveApplication(allowLaunch:false);
+            Stage("application");
+            var document=application.ActiveDocument??throw new ConnectorException("active_document_unavailable");
+            Stage("active_document");
+            var documentId=document.DocumentId;
+            Stage("document_id");
+            if(DocumentSession(before,documentId)!=expectedDocumentSession)
+                throw new ConnectorNoEffectException("document_session_changed");
+            var pid=before.ProcessId!.Value;
+            var started=before.ProcessStartUtcTicks!.Value;
+            if(_preparedTargets.Values.Any(item=>item.ProcessStartTicks!=started))_preparedTargets.Clear();
+            var previous=_preparedTargets.GetValueOrDefault(expectedDocumentSession)?.Target;
+            var window=document.LocateNativeWindow(pid,previous is null?null:new(previous.DocumentWindow,previous.WindowToken));
+            Stage("native_window");
+            var prepared=new ViewerDocumentTarget(pid,expectedDocumentSession,documentId,window.DocumentWindow,window.WindowToken);
+            var after=RequireProcessIdentity();
+            Stage("process_after");
+            var activeAfter=application.ActiveDocument;
+            Stage("active_after");
+            if(activeAfter is null||DocumentSession(after,activeAfter.DocumentId)!=expectedDocumentSession)
+                throw new ConnectorNoEffectException("document_session_changed");
+            Stage("verified");
+            _preparedTargets[expectedDocumentSession]=new(started,prepared);
+            while(_preparedTargets.Count>32)_preparedTargets.Remove(_preparedTargets.Keys.First());
+            return prepared;
+        });
+    }
+
+    public async Task<ViewerDocumentTarget> ActivateViewerDocumentAsync(string expectedDocumentSession,CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        return await _sta.InvokeAsync(()=>
+        {
+            ct.ThrowIfCancellationRequested();
+            var process=RequireProcessIdentity();
+            if(!_preparedTargets.TryGetValue(expectedDocumentSession,out var prepared)
+                ||prepared.ProcessStartTicks!=process.ProcessStartUtcTicks||prepared.Target.ProcessId!=process.ProcessId)
+            {
+                _preparedTargets.Clear();
+                throw new ConnectorNoEffectException("document_session_changed");
+            }
+            var application=_connection.RequireActiveApplication(allowLaunch:false);
+            var document=application.OpenDocuments.SingleOrDefault(item=>item.DocumentId==prepared.Target.DocumentId);
+            if(document is null)
+            {
+                _preparedTargets.Remove(expectedDocumentSession);
+                throw new ConnectorNoEffectException("document_session_changed");
+            }
+            var window=document.ActivateNativeWindow(process.ProcessId!.Value,
+                new(prepared.Target.DocumentWindow,prepared.Target.WindowToken));
+            var active=application.ActiveDocument;
+            if(active is null||DocumentSession(process,active.DocumentId)!=expectedDocumentSession)
+                throw new ConnectorNoEffectException("document_session_changed");
+            return prepared.Target with{DocumentWindow=window.DocumentWindow,WindowToken=window.WindowToken};
+        });
     }
 
     private async Task<object> ReadHierarchyInventoryAsync(System.Text.Json.JsonElement payload, CancellationToken cancellationToken)
@@ -260,6 +365,7 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
         object result = operation.OperationId switch
         {
             "vismockup.document.identity.read@1" => await ReadDocumentIdentityAsync(operation.Payload, cancellationToken),
+            "vismockup.document.existing_identity.read@1" => await ReadExistingDocumentIdentityAsync(operation.Payload, cancellationToken),
             "vismockup.document.hierarchy_inventory.read@1" => await ReadHierarchyInventoryAsync(operation.Payload, cancellationToken),
             "vismockup.application.probe@1" => await ProbeAsync(
                 operation.Payload.TryGetProperty("allow_launch", out var allowLaunch) && allowLaunch.GetBoolean(), cancellationToken),

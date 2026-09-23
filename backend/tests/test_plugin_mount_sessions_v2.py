@@ -21,6 +21,14 @@ from backend.capability_v2.identity import AuthenticatedPrincipal
 NOW = datetime(2026, 8, 10, 12, 0, tzinfo=UTC)
 
 
+def test_mount_uses_running_gateway_catalog_including_test_overlay(monkeypatch):
+    from types import SimpleNamespace
+    from backend.routers import plugin_marketplace as router
+    release = SimpleNamespace(release_id='rel_' + 'f' * 32)
+    monkeypatch.setattr(router, 'get_default_gateway', lambda: SimpleNamespace(catalog=lambda: release))
+    assert router._catalog_release() is release
+
+
 def _manifest():
     return {
         "schema_version": "2.0",
@@ -243,6 +251,7 @@ def test_plugin_mount_invoke_constructs_trusted_identity_and_returns_full_result
     captured = []
 
     class Gateway:
+        catalog_release = "rel_" + "b" * 32
         async def invoke(self, envelope):
             captured.append(envelope)
             return CapabilityResultV2(
@@ -336,6 +345,7 @@ def test_mount_invocation_audits_permitted_and_ungranted_results(monkeypatch):
     events = []
 
     class Gateway:
+        catalog_release = "rel_" + "b" * 32
         async def invoke(self, envelope):
             return CapabilityResultV2(
                 ok=True, status=CapabilityStatus.COMPLETED,

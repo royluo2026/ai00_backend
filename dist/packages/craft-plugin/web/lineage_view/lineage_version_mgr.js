@@ -126,12 +126,8 @@ class LineageVersionManager {
   }
 
   async _invokeCapability(id, payload = {}) {
-    const _cloudFetch = this._cf;
-    const response = await _cloudFetch('POST', `/api/v1/capabilities/${id}:invoke`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ version: 1, payload }),
-    });
+
+    const response = await window.AI00Business.request(id, { version: 1, payload });
     const envelope = response?.data;
     if (response?.success !== true || envelope?.ok !== true) {
       // 保留独立测试/旧嵌入页传入 {data: value} 的轻量适配。

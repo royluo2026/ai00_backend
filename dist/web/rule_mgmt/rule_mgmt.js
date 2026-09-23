@@ -5,9 +5,7 @@
  */
 'use strict';
 
-function _cf(method, path, opts = {}) {
-  return ListShell._cf(path, { ...opts, method });
-}
+
 
 // ── 列定义 ────────────────────────────────────────────────────────────────────
 const RULE_COLS = [
@@ -52,10 +50,7 @@ async function _listOntologyObjects(kinds) {
   let offset = 0;
   let total = 0;
   do {
-    const page = await _cf('POST', `/api/v1/capabilities/ontology.object.list:invoke`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ version: 1, payload: { kinds, limit: 100, offset } }),
-    });
+    const page = await window.AI00Business.request("ontology.object.list", { version: 2, payload: { kinds, limit: 100, offset } });
     const envelope = page?.data;
     if (page?.success !== true || envelope?.ok !== true) throw new Error('ontology.object.list failed');
     const value = envelope.data;
@@ -127,7 +122,7 @@ const CELL_RENDERER = {
 const load = ListShell.buildLoadHandler({
   bridgeNs:         'rule',
   bridgeListMethod: 'list_rules',
-  cloudRequest:     (query) => _cf('GET', `/api/rules?${query}`),
+  cloudRequest:     (query) => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.library.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"list",status:(query.has("status")?query.get("status"):null),list_gid:(query.has("list_gid")?query.get("list_gid"):null),q:(query.has("q")?query.get("q"):null),limit:(query.has("limit")?Number(query.get("limit")):null)}).filter(([,v])=>v!=null))}); return result; })({},{},new URLSearchParams((`/api/rules?${query}`).split("?")[1]||"")),
   getCurrentList:   () => _currentList,
   getAllLists:       () => _allLists,
   getShell:         () => _shell,
@@ -138,8 +133,8 @@ const load = ListShell.buildLoadHandler({
 const _onRowsChange = ListShell.buildRowsChangeHandler({
   editableKeys:       ['code', 'name', 'rule_type', 'enforcement_level', 'expression', 'context_class_gid'],
   primaryKey:         'name',
-  cloudUpdate:        (gid, body) => _cf('PATCH', `/api/rules/${gid}`, { body: JSON.stringify(body) }),
-  cloudCreate:        (body) => _cf('POST', '/api/rules', { body: JSON.stringify(body) }),
+  cloudUpdate:        (gid, body) => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); return result; })(body,{"gid":decodeURIComponent(String(gid))},new URLSearchParams()),
+  cloudCreate:        (body) => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"create",record:{...{"code":"","rule_type":"process","enforcement_level":"advisory","status":"draft","share_scope":"team","list_gid":null,"context_class_gid":null,"rule_definition":{}},...body}}).filter(([,v])=>v!=null))}); return result; })(body,{},new URLSearchParams()),
   bridgeNs:           'rule',
   bridgeUpdateMethod: 'update_rule',
   bridgeCreateMethod: 'create_rule',
@@ -164,10 +159,7 @@ async function _runRuleCheck(row) {
   let context;
   try { context = JSON.parse(contextStr); } catch { alert('JSON 格式错误，请检查输入'); return; }
   try {
-    const resp = await _cf('POST', '/api/rule-engine/check', {
-      method: 'POST',
-      body: JSON.stringify({ rule_gid: row.gid, context }),
-    });
+    const resp = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.engine.evaluate", {version:1,payload:Object.fromEntries(Object.entries({operation:"check",dry_run:true,rule_gid:body.rule_gid,context:body.context}).filter(([,v])=>v!=null))}); return result; })({ rule_gid: row.gid, context },{},new URLSearchParams());
     alert(`规则：${row.name}\n结果：${(resp.result || '').toUpperCase()}${resp.message ? '\n详情：' + resp.message : ''}`);
   } catch (e) {
     alert('检验请求失败：' + e);
@@ -204,16 +196,12 @@ async function init() {
     rowClass: (row) => row._source === 'cloud' ? 'ge-row-cloud' : 'ge-row-local',
     onListsChange: (lists) => { _allLists = lists; },
     onSelect:   (gid) => { _currentList = gid; load(); },
-    rdpSaveOpts: { bridgeNs: 'rule', bridgeMethod: 'update_rule', savePatch: (row, patch) => _cf('PATCH', `/api/rules/${row.gid}`, { body: JSON.stringify(patch) }) },
+    rdpSaveOpts: { bridgeNs: 'rule', bridgeMethod: 'update_rule', savePatch: (row, patch) => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); return result; })(patch,{"gid":decodeURIComponent(String(row.gid))},new URLSearchParams()) },
     importExport: ListShell.makeImportExport('rule_mgmt', _getViewRows, async (rows, _fm, _c, signal) => {
         for (const r of rows) {
           if (signal?.aborted) break;
           if (!r.name) continue;
-          await _cf('POST', '/api/rules', {
-            method: 'POST',
-            body: JSON.stringify({ name: r.name, code: r.code || '', rule_type: r.rule_type || 'other', enforcement_level: r.enforcement_level || 'advisory', list_gid: _currentList || null }),
-            signal,
-          }).catch(e => console.error('[import rule]', e));
+          await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"create",record:{...{"code":"","rule_type":"process","enforcement_level":"advisory","status":"draft","share_scope":"team","list_gid":null,"context_class_gid":null,"rule_definition":{}},...body}}).filter(([,v])=>v!=null))}); return result; })({ name: r.name, code: r.code || '', rule_type: r.rule_type || 'other', enforcement_level: r.enforcement_level || 'advisory', list_gid: _currentList || null },{},new URLSearchParams()).catch(e => console.error('[import rule]', e));
         }
         if (!signal?.aborted) await load();
       }),
@@ -265,10 +253,7 @@ function _showBindClassModal(row) {
   overlay.querySelector('#_bindClassSave').addEventListener('click', async () => {
     const val = overlay.querySelector('#_bindClassSel').value || null;
     try {
-      await _cf('PATCH', `/api/rules/${row.gid}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ context_class_gid: val }),
-      });
+      await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); return result; })({ context_class_gid: val },{"gid":decodeURIComponent(String(row.gid))},new URLSearchParams());
       row.context_class_gid = val;
       _shell.setRows(_rules);
       overlay.remove();

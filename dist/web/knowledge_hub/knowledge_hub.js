@@ -6,7 +6,7 @@
 
 // ── 工具 ──────────────────────────────────────────────────────────────────────
 function _cf() {
-  return window._cloudFetch || window.parent?._cloudFetch || null;
+  return window.AI00Business?.available() || window.AI00Business?.available() || null;
 }
 // localStorage 账号隔离
 function _lsk(base) {
@@ -36,41 +36,41 @@ function _fmt(ts) {
 
 // 调用云端 API（替代本地 bridge）
 async function _bridge(method, ...args) {
-  const _cloudFetch = _cf();
-  if (!_cloudFetch) throw new Error('cloudFetch not available');
+
+  if (!window.AI00Business?.available()) throw new Error('cloudFetch not available');
   switch (method) {
     case 'list_folders': {
       const scopeType = args[0] || 'personal';
-      return { data: await _cloudFetch(`/api/knowledge_hub/folders?scope_type=${scopeType}`, { method: 'GET' }) };
+      return { data: await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.read.atomic.folders_list", {version:1,payload:Object.fromEntries(Object.entries({"scope_type":(query.has("scope_type")?query.get("scope_type"):null),"team_gid":(query.has("team_gid")?query.get("team_gid"):null)}).filter(([,v])=>v!=null))}); return (result["items"]??[]); })({},{},new URLSearchParams((`/api/knowledge_hub/folders?scope_type=${scopeType}`).split("?")[1]||"")) };
     }
     case 'list_favorites':
-      return { data: await _cloudFetch('/api/knowledge_hub/favorites', { method: 'GET' }) };
+      return { data: await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.personalization.read.atomic.favorites_list", {version:1,payload:Object.fromEntries(Object.entries({}).filter(([,v])=>v!=null))}); return (result["items"]??[]); })({},{},new URLSearchParams()) };
     case 'list_recent':
-      return { data: await _cloudFetch(`/api/knowledge_hub/recent?limit=${args[0] || 20}`, { method: 'GET' }) };
+      return { data: await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.personalization.read.atomic.recent_list", {version:1,payload:Object.fromEntries(Object.entries({"limit":(query.has("limit")?Number(query.get("limit")):20)}).filter(([,v])=>v!=null))}); return (result["items"]??[]); })({},{},new URLSearchParams((`/api/knowledge_hub/recent?limit=${args[0] || 20}`).split("?")[1]||"")) };
     case 'list_items': {
       const folderGid = args[0];
-      return { data: await _cloudFetch(folderGid ? `/api/knowledge_hub/items?folder_gid=${folderGid}` : '/api/knowledge_hub/items', { method: 'GET' }) };
+      return { data: await (folderGid ? (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.read.atomic.items_list", {version:1,payload:Object.fromEntries(Object.entries({"folder_gid":(query.has("folder_gid")?query.get("folder_gid"):null),"scope_type":(query.has("scope_type")?query.get("scope_type"):null),"team_gid":(query.has("team_gid")?query.get("team_gid"):null),"show_hidden":(query.has("show_hidden")?['true','1','yes','on'].includes(query.get("show_hidden").toLowerCase()):false),"q":(query.has("q")?query.get("q"):null)}).filter(([,v])=>v!=null))}); return (result["items"]??[]); })({},{},new URLSearchParams((`/api/knowledge_hub/items?folder_gid=${folderGid}`).split("?")[1]||"")) : (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.read.atomic.items_list", {version:1,payload:Object.fromEntries(Object.entries({"folder_gid":(query.has("folder_gid")?query.get("folder_gid"):null),"scope_type":(query.has("scope_type")?query.get("scope_type"):null),"team_gid":(query.has("team_gid")?query.get("team_gid"):null),"show_hidden":(query.has("show_hidden")?['true','1','yes','on'].includes(query.get("show_hidden").toLowerCase()):false),"q":(query.has("q")?query.get("q"):null)}).filter(([,v])=>v!=null))}); return (result["items"]??[]); })({},{},new URLSearchParams())) };
     }
     case 'update_item': {
       const { gid, ...fields } = args[0] || {};
-      return _cloudFetch(`/api/knowledge_hub/items/${gid}`, { method: 'PATCH', body: JSON.stringify(fields) });
+      return (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.items_update", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,"updates":body}).filter(([,v])=>v!=null))}); return {"success":Boolean((result["changed"]??true))}; })(fields,{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
     }
     case 'delete_item':
-      return _cloudFetch(`/api/knowledge_hub/items/${args[0]}`, { method: 'DELETE' });
+      return (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.items_delete", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid}).filter(([,v])=>v!=null))}); return {"success":true,...result}; })({},{"gid":decodeURIComponent(String(args[0]))},new URLSearchParams());
     case 'create_folder':
-      return { data: await _cloudFetch('/api/knowledge_hub/folders', { method: 'POST', body: JSON.stringify({ parent_gid: args[0] || null, name: args[1] || '新建文件夹', scope_type: 'personal' }) }) };
+      return { data: await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.folders_create", {version:1,payload:Object.fromEntries(Object.entries({...{"parent_gid":null,"scope_type":"personal","team_gid":null,"name":"新建文件夹","sort_order":0},...body}).filter(([,v])=>v!=null))}); return result; })({ parent_gid: args[0] || null, name: args[1] || '新建文件夹', scope_type: 'personal' },{},new URLSearchParams()) };
     case 'rename_folder':
-      return _cloudFetch(`/api/knowledge_hub/folders/${args[0]}`, { method: 'PATCH', body: JSON.stringify({ name: args[1] }) });
+      return (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.folders_update", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,"updates":body}).filter(([,v])=>v!=null))}); return {"success":Boolean((result["changed"]??true))}; })({ name: args[1] },{"gid":decodeURIComponent(String(args[0]))},new URLSearchParams());
     case 'delete_folder':
-      return _cloudFetch(`/api/knowledge_hub/folders/${args[0]}`, { method: 'DELETE' });
+      return (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.folders_delete", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid}).filter(([,v])=>v!=null))}); return {"success":true,...result}; })({},{"gid":decodeURIComponent(String(args[0]))},new URLSearchParams());
     case 'move_folder':
-      return _cloudFetch(`/api/knowledge_hub/folders/${args[0]}`, { method: 'PATCH', body: JSON.stringify({ parent_gid: args[1] || null }) });
+      return (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.folders_update", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,"updates":body}).filter(([,v])=>v!=null))}); return {"success":Boolean((result["changed"]??true))}; })({ parent_gid: args[1] || null },{"gid":decodeURIComponent(String(args[0]))},new URLSearchParams());
     case 'create_item': {
       const [folderGid, itemType, title, contentBody, contentMd, filePath, url, siteRef, tags] = args;
-      return { data: await _cloudFetch('/api/knowledge_hub/items', { method: 'POST', body: JSON.stringify({ folder_gid: folderGid, item_type: itemType, title, content_body: contentBody, content_md: contentMd, file_path: filePath, url, site_ref: siteRef, tags, scope_type: 'personal' }) }) };
+      return { data: await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.items_create", {version:1,payload:Object.fromEntries(Object.entries({...{"folder_gid":null,"scope_type":"personal","team_gid":null,"item_type":"richtext","title":"未命名文档","status":"draft","content_body":null,"content_md":"","file_path":"","url":"","site_ref":null,"tags":[]},...body}).filter(([,v])=>v!=null))}); return result; })({ folder_gid: folderGid, item_type: itemType, title, content_body: contentBody, content_md: contentMd, file_path: filePath, url, site_ref: siteRef, tags, scope_type: 'personal' },{},new URLSearchParams()) };
     }
     case 'record_recent':
-      return _cloudFetch(`/api/knowledge_hub/items/${args[0]}/recent`, { method: 'POST' });
+      return (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.personalization.change.apply.atomic.recent_record", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid}).filter(([,v])=>v!=null))}); return {"success":true}; })({},{"gid":decodeURIComponent(String(args[0]))},new URLSearchParams());
     default:
       throw new Error(`Unknown bridge method: ${method}`);
   }
@@ -178,7 +178,7 @@ async function init() {
     try {
       const _cloudFetch = _cf();
       if (_cloudFetch) {
-        const item = await _cloudFetch(`/api/knowledge_hub/items/${_urlItemGid}`, { method: 'GET' });
+        const item = await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.read.atomic.items_get", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid}).filter(([,v])=>v!=null))}); return result; })({},{"gid":decodeURIComponent(String(_urlItemGid))},new URLSearchParams());
         if (item?.gid) _openItem(item);
       }
     } catch (_) { /* 静默失败，保持默认视图 */ }
@@ -355,11 +355,11 @@ async function _loadCloudFolders(scopeType, teamGid) {
   const key = scopeType === 'team' ? `team:${teamGid}` : 'public';
   if (!_isCloud()) { _cloudFolders[key] = []; return; }
   try {
-    const _cloudFetch = _cf();
-    if (!_cloudFetch) return;
+
+    if (!window.AI00Business?.available()) return;
     const query = new URLSearchParams({ scope_type: scopeType });
     if (teamGid) query.set('team_gid', teamGid);
-    const data = await _cloudFetch(`/api/knowledge_hub/folders?${query}`, { method: 'GET' });
+    const data = await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.read.atomic.folders_list", {version:1,payload:Object.fromEntries(Object.entries({"scope_type":(query.has("scope_type")?query.get("scope_type"):null),"team_gid":(query.has("team_gid")?query.get("team_gid"):null)}).filter(([,v])=>v!=null))}); return (result["items"]??[]); })({},{},new URLSearchParams((`/api/knowledge_hub/folders?${query}`).split("?")[1]||""));
     _cloudFolders[key] = Array.isArray(data) ? data : [];
   } catch (_) { _cloudFolders[key] = []; }
 }
@@ -513,7 +513,7 @@ async function _loadItems() {
     if (_currentScope === 'favorites') {
       if (_isCloud()) {
         const _cloudFetch = _cf();
-        if (_cloudFetch) _items = (await _cloudFetch('/api/knowledge_hub/favorites', { method: 'GET' })) || [];
+        if (_cloudFetch) _items = (await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.personalization.read.atomic.favorites_list", {version:1,payload:Object.fromEntries(Object.entries({}).filter(([,v])=>v!=null))}); return (result["items"]??[]); })({},{},new URLSearchParams())) || [];
       } else {
         const res = await _bridge('list_favorites');
         _items = res?.data || [];
@@ -523,7 +523,7 @@ async function _loadItems() {
     if (_currentScope === 'recent') {
       if (_isCloud()) {
         const _cloudFetch = _cf();
-        if (_cloudFetch) _items = (await _cloudFetch('/api/knowledge_hub/recent', { method: 'GET' })) || [];
+        if (_cloudFetch) _items = (await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.personalization.read.atomic.recent_list", {version:1,payload:Object.fromEntries(Object.entries({"limit":(query.has("limit")?Number(query.get("limit")):20)}).filter(([,v])=>v!=null))}); return (result["items"]??[]); })({},{},new URLSearchParams())) || [];
       } else {
         const res = await _bridge('list_recent', 20);
         _items = res?.data || [];
@@ -536,13 +536,13 @@ async function _loadItems() {
     } else {
       // cloud (public / team)
       if (!_isCloud()) { _items = []; return; }
-      const _cloudFetch = _cf();
-      if (!_cloudFetch) return;
+
+      if (!window.AI00Business?.available()) return;
       const query = new URLSearchParams({ scope_type: _currentScope });
       if (_currentFolderGid) query.set('folder_gid', _currentFolderGid);
       if (_currentTeamGid) query.set('team_gid', _currentTeamGid);
       if (_getAuthRole() === 'super_admin') query.set('show_hidden', 'true');
-      _items = (await _cloudFetch(`/api/knowledge_hub/items?${query}`, { method: 'GET' })) || [];
+      _items = (await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.read.atomic.items_list", {version:1,payload:Object.fromEntries(Object.entries({"folder_gid":(query.has("folder_gid")?query.get("folder_gid"):null),"scope_type":(query.has("scope_type")?query.get("scope_type"):null),"team_gid":(query.has("team_gid")?query.get("team_gid"):null),"show_hidden":(query.has("show_hidden")?['true','1','yes','on'].includes(query.get("show_hidden").toLowerCase()):false),"q":(query.has("q")?query.get("q"):null)}).filter(([,v])=>v!=null))}); return (result["items"]??[]); })({},{},new URLSearchParams((`/api/knowledge_hub/items?${query}`).split("?")[1]||""))) || [];
     }
   } catch (e) {
     _loadError = e;
@@ -735,7 +735,7 @@ async function _renameItem(item) {
       await _bridge('update_item', { gid: item.gid, title: newTitle });
     } else if (_isCloud()) {
       const _cloudFetch = _cf();
-      if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/items/${item.gid}`, { method: 'PATCH', body: JSON.stringify({ title: newTitle }) });
+      if (_cloudFetch) await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.items_update", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,"updates":body}).filter(([,v])=>v!=null))}); return {"success":Boolean((result["changed"]??true))}; })({ title: newTitle },{"gid":decodeURIComponent(String(item.gid))},new URLSearchParams());
     }
     item.title = newTitle;
     if (_currentItem?.gid === item.gid) _centerTitle.textContent = newTitle;
@@ -771,7 +771,7 @@ async function _moveItem(item) {
       await _bridge('update_item', { gid: item.gid, folder_gid: targetGid });
     } else if (_isCloud()) {
       const _cloudFetch = _cf();
-      if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/items/${item.gid}`, { method: 'PATCH', body: JSON.stringify({ folder_gid: targetGid }) });
+      if (_cloudFetch) await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.items_update", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,"updates":body}).filter(([,v])=>v!=null))}); return {"success":Boolean((result["changed"]??true))}; })({ folder_gid: targetGid },{"gid":decodeURIComponent(String(item.gid))},new URLSearchParams());
     }
     item.folder_gid = targetGid;
     // 如果移出了当前文件夹，从列表移除
@@ -799,16 +799,13 @@ async function _setItemVisibility(item) {
     shared_project_gid: item.shared_project_gid  || null,
   };
   await VisibilitySelector.showDialog(itemForDialog, async (val) => {
-    const _cloudFetch = _cf();
-    if (!_cloudFetch) return;
-    await _cloudFetch(`/api/knowledge_hub/items/${item.gid}`, {
-      method: 'PATCH',
-      body: JSON.stringify({
+
+    if (!window.AI00Business?.available()) return;
+    await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.items_update", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,"updates":body}).filter(([,v])=>v!=null))}); return {"success":Boolean((result["changed"]??true))}; })({
         scope_type:         visToScope[val.visibility] || 'public',
         team_gid:           val.shared_team_gid    || null,
         shared_project_gid: val.shared_project_gid || null,
-      }),
-    });
+      },{"gid":decodeURIComponent(String(item.gid))},new URLSearchParams());
     item.scope_type         = visToScope[val.visibility] || 'public';
     item.team_gid           = val.shared_team_gid    || null;
     item.shared_project_gid = val.shared_project_gid || null;
@@ -825,7 +822,7 @@ async function _togglePinItem(item) {
       await _bridge('update_item', { gid: item.gid, is_pinned: newVal });
     } else if (_isCloud()) {
       const _cloudFetch = _cf();
-      if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/items/${item.gid}`, { method: 'PATCH', body: JSON.stringify({ is_pinned: newVal }) });
+      if (_cloudFetch) await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.items_update", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,"updates":body}).filter(([,v])=>v!=null))}); return {"success":Boolean((result["changed"]??true))}; })({ is_pinned: newVal },{"gid":decodeURIComponent(String(item.gid))},new URLSearchParams());
     }
     item.is_pinned = newVal;
     _renderLeft2();
@@ -845,7 +842,7 @@ async function _toggleHideItem(item) {
       await _bridge('update_item', { gid: item.gid, is_hidden: newVal });
     } else if (_isCloud()) {
       const _cloudFetch = _cf();
-      if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/items/${item.gid}`, { method: 'PATCH', body: JSON.stringify({ is_hidden: newVal }) });
+      if (_cloudFetch) await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.items_update", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,"updates":body}).filter(([,v])=>v!=null))}); return {"success":Boolean((result["changed"]??true))}; })({ is_hidden: newVal },{"gid":decodeURIComponent(String(item.gid))},new URLSearchParams());
     }
     item.is_hidden = newVal;
     _renderLeft2();
@@ -864,7 +861,7 @@ async function _deleteItem(item) {
       await _bridge('delete_item', item.gid);
     } else if (_isCloud()) {
       const _cloudFetch = _cf();
-      if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/items/${item.gid}`, { method: 'DELETE' });
+      if (_cloudFetch) await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.items_delete", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid}).filter(([,v])=>v!=null))}); return {"success":true,...result}; })({},{"gid":decodeURIComponent(String(item.gid))},new URLSearchParams());
     }
     _items = _items.filter(i => i.gid !== item.gid);
     if (_currentItem?.gid === item.gid) {
@@ -1011,9 +1008,7 @@ function _renderMarkdownCenter(item, scope) {
         await _bridge('update_item', { gid: item.gid, content_md: val });
       } else {
         const _cloudFetch = _cf();
-        if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/items/${item.gid}`, {
-          method: 'PATCH', body: JSON.stringify({ content_md: val }),
-        });
+        if (_cloudFetch) await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.items_update", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,"updates":body}).filter(([,v])=>v!=null))}); return {"success":Boolean((result["changed"]??true))}; })({ content_md: val },{"gid":decodeURIComponent(String(item.gid))},new URLSearchParams());
       }
       item.content_md = val;
       statusEl.textContent = '已保存';
@@ -1046,7 +1041,7 @@ function _recordRecent(item) {
       _bridge('record_recent', item.gid);
     } else if (_isCloud()) {
       const _cloudFetch = _cf();
-      if (_cloudFetch) _cloudFetch(`/api/knowledge_hub/items/${item.gid}/recent`, { method: 'POST' });
+      if (_cloudFetch) (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.personalization.change.apply.atomic.recent_record", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid}).filter(([,v])=>v!=null))}); return {"success":true}; })({},{"gid":decodeURIComponent(String(item.gid))},new URLSearchParams());
     }
   } catch (_) {}
 }
@@ -1132,11 +1127,11 @@ async function _fetchEntries(item) {
   if (!_thread) return;
   try {
     if (_isCloud()) {
-      const _cloudFetch = _cf();
-      if (!_cloudFetch) return;
+
+      if (!window.AI00Business?.available()) return;
 
       // 加载变更历史（section=history）
-      const histRes = await _cloudFetch(`/api/knowledge_hub/items/${item.gid}/history`, { method: 'GET' }).catch(() => null);
+      const histRes = await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.read.atomic.items_history_get", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid}).filter(([,v])=>v!=null))}); return {"success":true,"data":((result["items"]??[])).map(row=>({"gid":row["gid"],"id":row["id"],"author_name":row["author_name"],"content":row["content"],"created_at":String(row["created_at"])}))}; })({},{"gid":decodeURIComponent(String(item.gid))},new URLSearchParams()).catch(() => null);
       const histEntries = histRes?.data || [];
 
       // 渲染历史区域（header + 折叠列表）
@@ -1159,7 +1154,7 @@ async function _fetchEntries(item) {
       histEl.querySelector('.kh-history-body').innerHTML = _renderHistory(histEntries);
 
       // 加载评论（section != history）
-      const data = await _cloudFetch(`/api/item-entries/knowledge_item/${item.gid}`, { method: 'GET' });
+      const data = await window.AI00Business.invoke('project.knowledge_comment.list',{version:1,payload:{item_gid:item.gid}});
       const allEntries = Array.isArray(data) ? data : (data?.entries || []);
       const comments = allEntries.filter(e => e.section !== 'history');
       _thread.setEntries(comments, item.gid);
@@ -1181,10 +1176,7 @@ async function _newFolder(parentGid, scopeKey, teamGid) {
     } else if (_isCloud()) {
       const _cloudFetch = _cf();
       if (_cloudFetch) {
-        newFolder = await _cloudFetch('/api/knowledge_hub/folders', {
-          method: 'POST',
-          body: JSON.stringify({ parent_gid: parentGid, scope_type: scopeKey, team_gid: teamGid, name: '新建文件夹' }),
-        });
+        newFolder = await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.folders_create", {version:1,payload:Object.fromEntries(Object.entries({...{"parent_gid":null,"scope_type":"personal","team_gid":null,"name":"新建文件夹","sort_order":0},...body}).filter(([,v])=>v!=null))}); return result; })({ parent_gid: parentGid, scope_type: scopeKey, team_gid: teamGid, name: '新建文件夹' },{},new URLSearchParams());
         await _loadCloudFolders(scopeKey, teamGid);
       }
     }
@@ -1212,9 +1204,7 @@ async function _renameFolder(folder, scopeKey, teamGid) {
       await _loadPersonalFolders();
     } else if (_isCloud()) {
       const _cloudFetch = _cf();
-      if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/folders/${folder.gid}`, {
-        method: 'PATCH', body: JSON.stringify({ name }),
-      });
+      if (_cloudFetch) await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.folders_update", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,"updates":body}).filter(([,v])=>v!=null))}); return {"success":Boolean((result["changed"]??true))}; })({ name },{"gid":decodeURIComponent(String(folder.gid))},new URLSearchParams());
       await _loadCloudFolders(scopeKey, teamGid);
     }
     _renderLeft1();
@@ -1251,9 +1241,7 @@ function _startInlineRename(node, folder, scopeKey, teamGid, isNew) {
         await _loadPersonalFolders();
       } else if (_isCloud()) {
         const _cloudFetch = _cf();
-        if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/folders/${folder.gid}`, {
-          method: 'PATCH', body: JSON.stringify({ name: newName }),
-        });
+        if (_cloudFetch) await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.folders_update", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,"updates":body}).filter(([,v])=>v!=null))}); return {"success":Boolean((result["changed"]??true))}; })({ name: newName },{"gid":decodeURIComponent(String(folder.gid))},new URLSearchParams());
         await _loadCloudFolders(scopeKey, teamGid);
       }
     } catch (_) {}
@@ -1281,7 +1269,7 @@ async function _doDeleteFolder(folder, scopeKey, teamGid) {
       await _loadPersonalFolders();
     } else if (_isCloud()) {
       const _cloudFetch = _cf();
-      if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/folders/${folder.gid}`, { method: 'DELETE' });
+      if (_cloudFetch) await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.folders_delete", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid}).filter(([,v])=>v!=null))}); return {"success":true,...result}; })({},{"gid":decodeURIComponent(String(folder.gid))},new URLSearchParams());
       await _loadCloudFolders(scopeKey, teamGid);
     }
   } catch (_) {}
@@ -1424,10 +1412,7 @@ async function _handleDrop(dragData, targetFolderGid, targetScopeKey, targetTeam
         await _loadPersonalFolders();
       } else if (_isCloud()) {
         const _cloudFetch = _cf();
-        if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/folders/${dragData.gid}`, {
-          method: 'PATCH',
-          body: JSON.stringify({ parent_gid: targetFolderGid || null }),
-        });
+        if (_cloudFetch) await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.folders_update", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,"updates":body}).filter(([,v])=>v!=null))}); return {"success":Boolean((result["changed"]??true))}; })({ parent_gid: targetFolderGid || null },{"gid":decodeURIComponent(String(dragData.gid))},new URLSearchParams());
         await _loadCloudFolders(targetScopeKey, targetTeamGid);
       }
       _renderLeft1();
@@ -1442,10 +1427,7 @@ async function _handleDrop(dragData, targetFolderGid, targetScopeKey, targetTeam
         await _bridge('update_item', { gid: dragData.gid, folder_gid: targetFolderGid || null });
       } else if (_isCloud()) {
         const _cloudFetch = _cf();
-        if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/items/${dragData.gid}`, {
-          method: 'PATCH',
-          body: JSON.stringify({ folder_gid: targetFolderGid || null }),
-        });
+        if (_cloudFetch) await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.items_update", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,"updates":body}).filter(([,v])=>v!=null))}); return {"success":Boolean((result["changed"]??true))}; })({ folder_gid: targetFolderGid || null },{"gid":decodeURIComponent(String(dragData.gid))},new URLSearchParams());
       }
       // 移走后从 Left2 移除（如当前不是目标文件夹视图）
       if (_currentFolderGid !== targetFolderGid) {
@@ -1540,7 +1522,7 @@ async function _createSitePage() {
     { path: 'rule_mgmt/rule_mgmt.html', title: '规则管理' },
     { path: 'craft_table/index.html', title: '工艺表格' },
     { path: 'lineage_view/index.html', title: 'BOP Lineage 视图' },
-    { path: 'gbop/index.html', title: 'GBOP 标准工序' },
+    { path: 'gbop/index.html', title: 'GBOP 版本结构管理' },
     { path: 'gbop_lineage/index.html', title: 'GBOP 树形视图' },
     { path: 'canvas/canvas_shell.html', title: '工艺规划画布' },
     { path: 'flow_canvas/index.html', title: '流程画布' },
@@ -1573,7 +1555,7 @@ async function _createSitePage() {
     if (_isCloud()) {
       const _cloudFetch = _cf();
       if (_cloudFetch) {
-        const all = await _cloudFetch('/api/knowledge_hub/items?scope_type=public&show_hidden=true', { method: 'GET' }) || [];
+        const all = await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.read.atomic.items_list", {version:1,payload:Object.fromEntries(Object.entries({"folder_gid":(query.has("folder_gid")?query.get("folder_gid"):null),"scope_type":(query.has("scope_type")?query.get("scope_type"):null),"team_gid":(query.has("team_gid")?query.get("team_gid"):null),"show_hidden":(query.has("show_hidden")?['true','1','yes','on'].includes(query.get("show_hidden").toLowerCase()):false),"q":(query.has("q")?query.get("q"):null)}).filter(([,v])=>v!=null))}); return (result["items"]??[]); })({},{},new URLSearchParams(('/api/knowledge_hub/items?scope_type=public&show_hidden=true').split("?")[1]||"")) || [];
         all.forEach(it => {
           if (it.item_type === 'site_page') {
             const ref = typeof it.site_ref === 'string' ? JSON.parse(it.site_ref || '{}') : (it.site_ref || {});
@@ -1703,7 +1685,7 @@ async function _doCreateItem(fields) {
       item = res?.data;
     } else if (_isCloud()) {
       const cf = _cf();
-      if (!cf) throw new Error('知识库服务不可用，请重新登录后重试');
+      if (!window.AI00Business?.available()) throw new Error('知识库服务不可用，请重新登录后重试');
       const body = {
         ...extra,
         scope_type: visOverride?.scope_type || scope,
@@ -1711,7 +1693,7 @@ async function _doCreateItem(fields) {
         ...cleanFields,
       };
       if (visOverride?.shared_project_gid) body.shared_project_gid = visOverride.shared_project_gid;
-      item = await cf('/api/knowledge_hub/items', { method: 'POST', body: JSON.stringify(body) });
+      item = await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.items_create", {version:1,payload:Object.fromEntries(Object.entries({...{"folder_gid":null,"scope_type":"personal","team_gid":null,"item_type":"richtext","title":"未命名文档","status":"draft","content_body":null,"content_md":"","file_path":"","url":"","site_ref":null,"tags":[]},...body}).filter(([,v])=>v!=null))}); return result; })(body,{},new URLSearchParams());
     }
     if (!item?.gid) throw new Error('未收到已保存的条目，请刷新列表后重试');
     _items.unshift(item);

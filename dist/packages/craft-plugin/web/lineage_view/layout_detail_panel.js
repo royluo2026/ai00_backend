@@ -10,6 +10,20 @@ function _ldpLsk(base) {
   try { const u = window.parent?._authUser || window.top?._authUser || window._authUser; const g = u?.gid || u?.user_gid || ''; return g ? `${g}:${base}` : base; } catch { return base; }
 }
 
+const _ONTOLOGY_DETAIL_VISIBILITY_KEY = 'ai00:ontology-detail-visibility';
+function _ontologyDetailVisibility() {
+  try { return JSON.parse(localStorage.getItem(_ONTOLOGY_DETAIL_VISIBILITY_KEY) || '{}') || {}; }
+  catch { return {}; }
+}
+function _applyOntologyDetailVisibility(item) {
+  const gid = item?.gid || item?.stable_gid;
+  const values = _ontologyDetailVisibility();
+  const visible = gid && Object.prototype.hasOwnProperty.call(values, gid)
+    ? values[gid]
+    : item?.show_in_detail;
+  return { ...item, show_in_detail: !(visible === false || visible === 0 || visible === '0') };
+}
+
 // ── 节点类型颜色——与 lineage.css .lv-nt-* 保持完全一致 ─────────────────────────
 // 注意：节点树的圆点优先使用 class="lv-nt-dot lv-nt-{type}" 获取颜色，
 // 此表仅作为无法用 CSS 类时的内联颜色兜底（如 SVG、canvas 等场景）。
@@ -256,11 +270,12 @@ class LayoutDetailPanel {
    * @param {Function}    opts.getLineageData - () => { rowByGid, childMap, statsMap, versionGid }
    * @param {Function}    opts.onNodeActivate - (gid) => void  节点树点击时通知主视图高亮定位
    */
-  constructor({ containerEl, cf, toast, patchEntry, reloadData, preserveLayoutView, getLineageData, onNodeActivate, onPropertyChange, getVersionInfo, onVersionChange, loadEntryDetail, loadVersionProjection }) {
+  constructor({ containerEl, cf, toast, patchEntry, createEntry, reloadData, preserveLayoutView, getLineageData, onNodeActivate, onPropertyChange, getVersionInfo, onVersionChange, loadEntryDetail, loadVersionProjection }) {
     this._el = containerEl;
     this._cf = cf;
     this._toast = toast;
     this._patchEntry = patchEntry;
+    this._createEntry = createEntry || null;
     this._reloadData = reloadData;
     this._preserveLayoutView = preserveLayoutView || (() => {});
     this._getLineageData = getLineageData || (() => null);
@@ -272,37 +287,21 @@ class LayoutDetailPanel {
     this._loadVersionProjection = loadVersionProjection || null;
     this._detailGeneration = 0;
 
-    this._invokeCapability = async (id, payload = {}) => {
-      const _cloudFetch = this._cf;
-      const requestBody = {
-        version: 1,
-        payload,
-        idempotency_key: `${id}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-      };
-      const request = (suffix, body) => _cloudFetch(`/api/v1/capabilities/${id}:${suffix}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      let response = await request('invoke', requestBody);
-      if (response?.data?.error?.code === 'confirmation_required') {
-        const confirmation = await request('confirm', requestBody);
-        const token = confirmation?.data?.confirmation_token;
-        if (!token) throw new Error(`能力确认失败：${id}@1`);
-        response = await request('invoke', { ...requestBody, confirmation_token: token });
-      }
-      const envelope = response?.data;
-      if (response?.success !== true || envelope?.ok !== true) {
-        const detail = envelope?.error || response?.error || {};
-        throw new Error(detail.message || `能力调用失败：${id}@1`);
-      }
-      const value = envelope.data;
-      return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
-    };
+    this._invokeCapability = async (id, payload = {}) => window.AI00Business.invoke(
+      id,
+      { version: ['ontology.concept.get','ontology.concept.resolve','ontology.object.list'].includes(id) ? 2 : 1, payload },
+      async () => true,
+    );
     this._ontologySchemaCache = new Map();
     this._ontologySchemaVersionKey = 'ai00:ontology-schema-version';
     this._onOntologySchemaVersion = event => {
-      if (event.key === this._ontologySchemaVersionKey) this._ontologySchemaCache.clear();
+      if (event.key === this._ontologySchemaVersionKey || event.key === _ONTOLOGY_DETAIL_VISIBILITY_KEY) {
+        this._ontologySchemaCache.clear();
+        if (event.key === _ONTOLOGY_DETAIL_VISIBILITY_KEY && this._currentGid) {
+          this._loadOntoProps(this._currentGid, this._currentRow);
+          this._renderRels(this._currentGid);
+        }
+      }
     };
     window.addEventListener('storage', this._onOntologySchemaVersion);
     this._loadOntologySchema = async (nodeType) => {
@@ -319,8 +318,8 @@ class LayoutDetailPanel {
       const schema = detail?.concept || detail || {};
       const normalized = {
         ...schema,
-        properties: Array.isArray(schema.properties) ? schema.properties : [],
-        relations: Array.isArray(schema.relations) ? schema.relations : [],
+        properties: Array.isArray(schema.properties) ? schema.properties.map(_applyOntologyDetailVisibility) : [],
+        relations: Array.isArray(schema.relations) ? schema.relations.map(_applyOntologyDetailVisibility) : [],
         rules: Array.isArray(schema.rules) ? schema.rules : [],
       };
       this._ontologySchemaCache.set(key, normalized);
@@ -909,11 +908,10 @@ class LayoutDetailPanel {
       sort_order:  maxSort + 1,
     };
     try {
-      await this._invokeCapability('craft.bop.entry.bulk.change.apply', {
-        operation: 'create', ...body,
-      });
+      if (this._createEntry) await this._createEntry(body);
+      else await this._invokeCapability('craft.bop.entry.bulk.change.apply', { operation: 'create', ...body });
       this._toast?.('节点已创建', 'ok');
-      await this._reloadData();
+      this.refresh();
     } catch (e) {
       this._toast?.('创建失败: ' + e.message, 'error');
       this._renderTree(this._currentGid);
@@ -1143,9 +1141,11 @@ class LayoutDetailPanel {
         const patches = siblings
           .map((r, i) => ({ gid: r.gid, newSeq: i + 1, oldSeq: r.sort_order }))
           .filter(p => p.newSeq !== p.oldSeq || p.gid === dragGid);
-        await Promise.all(patches.map(p => this._invokeCapability('craft.bop.entry.change.apply', {
-          operation: 'update', entry_gid: p.gid, updates: { sort_order: p.newSeq },
-        })));
+        for (const patch of patches) {
+          await this._invokeCapability('craft.bop.entry.change.apply', {
+            operation: 'update', entry_gid: patch.gid, updates: { sort_order: patch.newSeq },
+          });
+        }
       }
       await this._reloadData();
     } catch (err) {
@@ -1415,7 +1415,7 @@ class LayoutDetailPanel {
       const nodeType = row.node_type;
       const schemaResp = await this._loadOntologySchema(nodeType);
       const props = (schemaResp?.properties || [])
-        .filter(p => p.prop_kind === 'data' && Boolean(p.show_in_detail) !== false)
+        .filter(p => p.prop_kind === 'data' && p.show_in_detail)
         .sort((a, b) => (a.sort_order ?? 99) - (b.sort_order ?? 99));
 
       // 收集 show_in_detail=false 的关系 link_type，_renderRels 据此隐藏对应分组
@@ -1514,20 +1514,30 @@ class LayoutDetailPanel {
           else if (dtype === 'boolean') { val = val === 'true' ? true : val === 'false' ? false : null; }
 
           saving = true;
+          const previousRaw = committedRaw;
+          const previousVal = src === 'entity'
+            ? (Object.prototype.hasOwnProperty.call(entityVals, propName) ? entityVals[propName] : entityVals.ext?.[propName])
+            : metaVals[propName];
+          if (src === 'entity') {
+            if (Object.prototype.hasOwnProperty.call(entityVals, propName)) entityVals[propName] = val;
+            else {
+              if (!entityVals.ext || typeof entityVals.ext !== 'object') entityVals.ext = {};
+              entityVals.ext[propName] = val;
+            }
+          } else metaVals[propName] = val;
+          this._onPropertyChange?.(gid, propName, val);
           try {
             await this._invokeCapability('craft.bop.entry.change.apply', {
               operation: 'update', entry_gid: gid, properties: [{ name: propName, value: val }],
             });
             committedRaw = inp.value;
-            if (src === 'entity') {
-              if (Object.prototype.hasOwnProperty.call(entityVals, propName)) entityVals[propName] = val;
-              else {
-                if (!entityVals.ext || typeof entityVals.ext !== 'object') entityVals.ext = {};
-                entityVals.ext[propName] = val;
-              }
-            } else metaVals[propName] = val;
-            this._onPropertyChange?.(gid, propName, val);
           } catch (e) {
+            inp.value = previousRaw;
+            if (src === 'entity') {
+              if (Object.prototype.hasOwnProperty.call(entityVals, propName)) entityVals[propName] = previousVal;
+              else entityVals.ext[propName] = previousVal;
+            } else metaVals[propName] = previousVal;
+            this._onPropertyChange?.(gid, propName, previousVal);
             this._toast?.('保存失败: ' + (e?.message || e), 'error');
           } finally {
             saving = false;
@@ -2778,7 +2788,7 @@ class LayoutDetailPanel {
       const nodeType = row.node_type;
       const schemaResp = await this._loadOntologySchema(nodeType);
       const props = (schemaResp?.properties || [])
-        .filter(p => p.prop_kind === 'data' && Boolean(p.show_in_detail) !== false)
+        .filter(p => p.prop_kind === 'data' && p.show_in_detail)
         .sort((a, b) => (a.sort_order ?? 99) - (b.sort_order ?? 99));
 
       // 收集 show_in_detail=false 的关系 link_type，_renderRels 据此隐藏对应分组
@@ -2876,20 +2886,30 @@ class LayoutDetailPanel {
           else if (dtype === 'boolean') { val = val === 'true' ? true : val === 'false' ? false : null; }
 
           saving = true;
+          const previousRaw = committedRaw;
+          const previousVal = src === 'entity'
+            ? (Object.prototype.hasOwnProperty.call(entityVals, propName) ? entityVals[propName] : entityVals.ext?.[propName])
+            : metaVals[propName];
+          if (src === 'entity') {
+            if (Object.prototype.hasOwnProperty.call(entityVals, propName)) entityVals[propName] = val;
+            else {
+              if (!entityVals.ext || typeof entityVals.ext !== 'object') entityVals.ext = {};
+              entityVals.ext[propName] = val;
+            }
+          } else metaVals[propName] = val;
+          this._onPropertyChange?.(gid, propName, val);
           try {
             await this._invokeCapability('craft.bop.entry.change.apply', {
               operation: 'update', entry_gid: gid, properties: [{ name: propName, value: val }],
             });
             committedRaw = inp.value;
-            if (src === 'entity') {
-              if (Object.prototype.hasOwnProperty.call(entityVals, propName)) entityVals[propName] = val;
-              else {
-                if (!entityVals.ext || typeof entityVals.ext !== 'object') entityVals.ext = {};
-                entityVals.ext[propName] = val;
-              }
-            } else metaVals[propName] = val;
-            this._onPropertyChange?.(gid, propName, val);
           } catch (e) {
+            inp.value = previousRaw;
+            if (src === 'entity') {
+              if (Object.prototype.hasOwnProperty.call(entityVals, propName)) entityVals[propName] = previousVal;
+              else entityVals.ext[propName] = previousVal;
+            } else metaVals[propName] = previousVal;
+            this._onPropertyChange?.(gid, propName, previousVal);
             this._toast?.('保存失败: ' + (e?.message || e), 'error');
           } finally {
             saving = false;
@@ -4203,11 +4223,12 @@ class LayoutDetailPanel {
 
     // 每次切换节点都重新加载本体 schema（不同 node_type 有不同关系定义）
     if (row?.node_type) {
+      this._relationConfigByLinkType = new Map();
       try {
         const schemaResp = await this._loadOntologySchema(row.node_type);
         this._hiddenLinkTypes = new Set(
           (schemaResp?.relations || [])
-            .filter(r => r.show_in_detail === false)
+            .filter(r => !r.show_in_detail)
             .map(r => r.link_type_binding)
         );
         this._relationConfigByLinkType = new Map(
@@ -4218,11 +4239,13 @@ class LayoutDetailPanel {
       } catch {}
     }
 
-    const relationConfigs = Array.from(this._relationConfigByLinkType?.values() || [])
-      .filter(r => r.link_type_binding && r.show_in_detail !== false)
+    const configuredRelations = Array.from(this._relationConfigByLinkType?.values() || [])
+      .filter(r => r.link_type_binding);
+    const relationConfigs = configuredRelations
+      .filter(r => r.show_in_detail)
       .sort((a, b) => (a.sort_order ?? 99) - (b.sort_order ?? 99) || String(a.label_zh || a.name || '').localeCompare(String(b.label_zh || b.name || '')));
 
-    const groups = relationConfigs.length
+    const groups = configuredRelations.length
       ? _buildRuntimeRelationGroups(relationConfigs)
       : [
         ...REL_GROUPS.map(group => ({ ...group, linkType: group.linkTypes[0] })),

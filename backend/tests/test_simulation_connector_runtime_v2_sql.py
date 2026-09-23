@@ -317,6 +317,37 @@ def recovery_case(database, operation_id='teamcenter.visualization.launch@1', *,
         reason='Verified the document was not opened', actor_id='user-001', tenant_id='tenant-001', now=NOW)
 
 
+@pytest.mark.parametrize('status', ['leased', 'executing'])
+def test_manual_recovery_lists_expired_unreported_lease_without_replaying(database, status):
+    registered = session(database)
+    plan = queue(database, registered)
+    lease(database, registered)
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute('UPDATE workmanship_sim_connector_runtime_plans SET status=%s WHERE plan_id=%s', (status, plan.plan_id))
+    repo = SimulationConnectorRepository()
+    item = repo.search_manual_recovery(actor_id='user-001', tenant_id='tenant-001')['items'][0]
+    assert item['allowed_decisions'] == ['abandoned']
+    assert item['status'] == 'outcome_unknown'
+    assert read(database, 'runtime_plans')['status'] == status
+    assert repo.search_manual_recovery(actor_id='other', tenant_id='tenant-001')['items'] == []
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute('UPDATE workmanship_sim_connector_runtime_plans SET lease_until=%s WHERE plan_id=%s',
+                    (datetime.now(UTC) + timedelta(hours=1), plan.plan_id))
+    assert repo.search_manual_recovery(actor_id='user-001', tenant_id='tenant-001')['items'] == []
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute('UPDATE workmanship_sim_connector_runtime_plans SET lease_until=%s WHERE plan_id=%s',
+                    (NOW + timedelta(seconds=15), plan.plan_id))
+    args = dict(device_id=database[1], plan_id=plan.plan_id, expected_generation=7,
+        expected_recovery_fingerprint=item['recovery_fingerprint'], decision='abandoned',
+        reason='Archive lost lease without claiming execution', actor_id='user-001', tenant_id='tenant-001')
+    with pytest.raises(ConnectorRepositoryError, match='recovery_state_changed'):
+        repo.resolve_manual_recovery(**args, now=NOW)
+    result = repo.resolve_manual_recovery(**args, now=NOW + timedelta(seconds=16))
+    assert result['retry_started'] is False
+    assert read(database, 'runtime_plans')['status'] == 'cancelled'
+    assert read(database, 'runtime_plans')['outcome_json'] is None
+
+
 def test_manual_recovery_preserves_signed_outcome_and_replays(database):
     args = recovery_case(database)
     repo = SimulationConnectorRepository()

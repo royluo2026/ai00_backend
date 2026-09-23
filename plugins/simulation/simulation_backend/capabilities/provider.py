@@ -33,6 +33,7 @@ _VISMOCKUP_WEB_WORKFLOWS = {
     "simulation.teamcenter.visualization.launch.request",
     "simulation.teamcenter.visualization.insert.request",
     "simulation.vismockup.document.identity.read.request",
+    "simulation.vismockup.document.existing_identity.read.request",
     "simulation.vismockup.document.hierarchy_inventory.read.request",
     "simulation.vismockup.application.attach.request",
     "simulation.vismockup.application.launch.request",
@@ -202,6 +203,7 @@ _RESOURCES = {
     "simulation.environment.binding.create": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.binding.remove": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.live_document.rebind": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.live_document.resume_online": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.online_source.live_document.bind": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.version.freeze": (("simulation-workspace", "workspace_gid"),),
     "simulation.vm_checkpoint.create": (("simulation-workspace", "workspace_gid"), ("simulation-document-snapshot", "snapshot_request_id")),
@@ -916,15 +918,18 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             ),
         })
     if governed.id in {"simulation.vismockup.document.identity.read.request",
+                       "simulation.vismockup.document.existing_identity.read.request",
                        "simulation.vismockup.document.hierarchy_inventory.read.request"} or "live_document" in governed.tags:
         from backend.capability_v2.identity import DESKTOP_CONSUMER_ID
         effects = {
             "simulation.vismockup.document.identity.read.request": "Queue one signed read identifying the active native document on the owner's current App workstation.",
+            "simulation.vismockup.document.existing_identity.read.request": "Select an already-open VisMockup document by exact native session and persist its signed identity in the current App runtime.",
             "simulation.vismockup.document.hierarchy_inventory.read.request": "Queue one signed bounded read of alternate hierarchies from an exact active document session.",
             "simulation.environment.live_document.adopt": ("Bind the owner's already-open native document and register it as the environment's primary live model."
                 if governed.version >= 2 else "Bind the owner's already-open native document to one durable private importing environment."),
             "simulation.environment.live_document.binding.get": "Resolve the owner's saved document-to-environment association for document and environment selection.",
                 "simulation.environment.live_document.rebind": "Explicitly rotate one owned environment to the freshly attested current native document session while retaining the prior session as history.",
+                "simulation.environment.live_document.resume_online": "Renew the current runtime source association for the exact already-bound Teamcenter online document without opening a model.",
                 "simulation.environment.online_source.live_document.bind": "Bind one user-confirmed Teamcenter online-source launch to the exact freshly attested VisMockup document without replacing its Teamcenter source identity.",
                 "simulation.environment.live_document.inventory.apply": "Persist one signed complete page of alternate hierarchies into the bound environment without mutating VisMockup.",
         }
@@ -999,6 +1004,44 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                 ('primary_live_document_unavailable','The selected environment has no unique primary live document to rebind.'),
                 ('idempotency_conflict','The request key was already used for different adoption input.'),
                 ('runtime_v2_required','A current App v2 runtime is required.'))), domain_errors_complete=False)
+    if governed.id == 'simulation.vismockup.document.existing_identity.read.request':
+        updates.update(
+            business_acceptance_criteria=(
+                'The Connector selects only an already-open document whose native session equals the requested saved session.',
+                'The signed identity result is scoped to the current owner runtime; mismatched or missing documents fail closed.',
+                'No Teamcenter launch or model opening occurs.'),
+            business_invariants=(BusinessInvariantContract(rule_id='simulation.viewer.existing_identity', version=1,
+                statement='An existing native document identity is accepted only from a fresh signed current-runtime outcome for the exact requested session.',
+                applies_when='the owner reads an already-open document identity for runtime resumption',
+                enforcement_ref='plugins/simulation/simulation_backend/application/live_document_identity.py:verify_existing_identity_evidence',
+                error_code='live_document_identity_unavailable',
+                test_refs=('plugins/simulation/tests/test_live_document_identity_evidence.py::test_existing_document_identity_is_pinned_to_requested_session_and_current_runtime',)),),
+            test_refs=({'path':'plugins/simulation/tests/test_live_document_identity_evidence.py'},),
+            transaction_policy={**updates['transaction_policy'],
+                'dependencies':['vismockup.document.existing_identity.read@1'],
+                'idempotency':'owner/runtime/request key and exact expected native document session'})
+    if governed.id == 'simulation.environment.live_document.resume_online':
+        updates.update(
+            business_acceptance_criteria=(
+                'The signed existing-document identity is fresh and belongs to the current owner App runtime.',
+                'The saved binding, active prior source association, source revision and primary Teamcenter document match exactly.',
+                'Only the runtime source association changes; no model is opened and no workspace content revision changes.'),
+            business_invariants=(BusinessInvariantContract(rule_id='simulation.viewer.existing_document_resume', version=1,
+                statement='Only an exact already-bound Teamcenter document with a fresh signed current-runtime native identity can renew its source association.',
+                applies_when='an owner resumes local control of an already-open online-source document',
+                enforcement_ref='plugins/simulation/simulation_backend/data/workspace_repository.py:resume_online_live_document',
+                error_code='live_document_identity_mismatch',
+                test_refs=('plugins/simulation/tests/test_live_document_resume.py::test_resume_rejects_wrong_source_or_session',)),),
+            test_refs=({'path':'plugins/simulation/tests/test_live_document_resume.py'},),
+            transaction_policy={**updates['transaction_policy'],
+                'atomicity':'signed current-runtime identity/owned binding/prior source revision check and association/idempotency renewal in one transaction',
+                'tables':['workmanship_sim_connector_runtime_plans','workmanship_sim_connector_runtime_devices',
+                    'workmanship_sim_workspaces','workmanship_sim_vm_documents',
+                    'workmanship_sim_live_document_bindings','workmanship_sim_viewer_source_associations',
+                    'workmanship_sim_workspace_idempotency'],
+                'migration_refs':['backend/db/migrations/domains/simulation/0028_viewer_interaction.sql'],
+                'dependencies':['vismockup.document.existing_identity.read@1','simulation.environment.online_source.live_document.bind@3'],
+                'idempotency':'workspace/key plus exact signed identity operation, document session and expected workspace revision'})
     if governed.id.startswith('simulation.viewer.interaction.'):
         from backend.capability_v2.identity import DESKTOP_CONSUMER_ID
         updates.update(
@@ -1033,7 +1076,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                 ('interaction_catalog_binding_unavailable', 'Exact trusted authorization or operation Catalog binding is unavailable.'),
                 ('interaction_authorization_rejected', 'The closed request or trusted signer rejected the grant.'))),
             domain_errors_complete=False)
-    if governed.id == 'simulation.environment.online_source.live_document.bind' and governed.version == 2:
+    if governed.id == 'simulation.environment.online_source.live_document.bind' and governed.version in (2, 3):
         updates.update(
             business_effect='Atomically bind one verified launch major 2 source/document receipt and persist its local interaction source association.',
             business_acceptance_criteria=(
@@ -1045,7 +1088,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                 applies_when='an online source is bound for local interaction',
                 enforcement_ref='plugins/simulation/simulation_backend/data/connector_repository.py:verified_teamcenter_opened_source_evidence',
                 error_code='launch_evidence_unavailable', test_refs=('plugins/simulation/tests/test_viewer_opened_source_binding.py::test_current_open_receipt_atomically_binds_source_and_idempotent_association',)),),
-            consumer_refs=tuple({**ref, 'version_constraint':'==2'} for ref in updates['consumer_refs']),
+            consumer_refs=tuple({**ref, 'version_constraint':f'=={governed.version}'} for ref in updates['consumer_refs']),
             test_refs=({'path':'plugins/simulation/tests/test_viewer_opened_source_binding.py'},),
             transaction_policy={**updates['transaction_policy'],
                 'atomicity':'verified opened-source evidence/source association/live binding/document/workspace revision/idempotency in one transaction',
@@ -1053,6 +1096,18 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                 'migration_refs':[*updates['transaction_policy']['migration_refs'], 'backend/db/migrations/domains/simulation/0028_viewer_interaction.sql'],
                 'dependencies':['teamcenter.visualization.launch@2'],
                 'idempotency':'workspace/key plus launch receipt/runtime/document/source and expected workspace revision'})
+        if governed.version == 3:
+            updates.update(
+                business_effect='Atomically complete a verified current open, bind its source and issue a signed local interaction grant.',
+                business_acceptance_criteria=(*updates['business_acceptance_criteria'],
+                    'Binding, grant signature, exact issuer proof and immutable completion result commit or roll back together.',
+                    'A repeated completion key and nonce returns the same result without another open or grant allocation.'),
+                test_refs=({'path':'plugins/simulation/tests/test_viewer_open_completion.py'},),
+                transaction_policy={**updates['transaction_policy'],
+                    'atomicity':'source binding/revision/association/grant/signature/proof/idempotent completion in one transaction',
+                    'tables':[*updates['transaction_policy']['tables'], 'workmanship_sim_viewer_interaction_grants', 'workmanship_sim_viewer_grant_evidence'],
+                    'migration_refs':[*updates['transaction_policy']['migration_refs'], 'backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql'],
+                    'idempotency':'workspace/key plus launch operation/document/expected revision/Main nonce; immutable replay, nonce conflict rejected'})
     return CapabilityDescriptorV2.model_validate({**descriptor.model_dump(), **updates})
 
 

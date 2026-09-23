@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script src="/web/core/business_facade.js"></script>
 <meta charset="UTF-8">
 <title>现场信息</title>
 <style>
@@ -311,7 +312,7 @@ function _cf() {
   try {
     let w = window;
     for (let i = 0; i < 6; i++) {
-      if (w._cloudFetch) return w._cloudFetch;
+      if (window.AI00Business?.available()) return window.AI00Business?.available();
       if (w.parent === w) break;
       w = w.parent;
     }
@@ -319,13 +320,7 @@ function _cf() {
   return null;
 }
 async function _invokeCapability(id, payload) {
-  const _cloudFetch = _cf();
-  if (!_cloudFetch) throw new Error('云端服务未连接');
-  const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ version: 1, payload }),
-  });
+  const response = await window.AI00Business.request(id, { version: 1, payload });
   const envelope = response?.data;
   if (response?.success !== true || envelope?.ok !== true) {
     const detail = envelope?.error || response?.error || {};
@@ -1064,12 +1059,7 @@ function _openImportModal() {
 function _closeImportModal() { document.getElementById('importModal').style.display = 'none'; }
 
 async function _handleFileSelect(e) {
-  const file = e.target.files?.[0];
-  if (!file) return;
-  const ext = file.name.split('.').pop().toLowerCase();
-  if (ext === 'csv') { await _parseCSV(file); }
-  else if (ext === 'xlsx') { await _parseXLSX(file); }
-  else { _toast('仅支持 .xlsx 和 .csv 文件'); }
+e.preventDefault();return _parseXLSX();
 }
 
 async function _parseCSV(file) {
@@ -1107,27 +1097,7 @@ function _splitCSVLine(line) {
 }
 
 async function _parseXLSX(file) {
-  const _cloudFetch = _cf();
-  if (!_cloudFetch) { _toast('未连接云端，无法解析 Excel'); return; }
-  const buf = await file.arrayBuffer();
-  const b64 = _arrayBufferToBase64(buf);
-  try {
-    const res = await _cloudFetch('/api/import-export/import/parse-excel', {
-      method: 'POST',
-      body: JSON.stringify({ file_b64: b64, filename: file.name }),
-    });
-    if (!res?.data?.headers?.length) { _toast('Excel 解析无数据'); return; }
-    const headers = res.data.headers;
-    const rows = (res.data.rows || []).map(arr => {
-      const obj = {};
-      headers.forEach((h, i) => { obj[h] = arr[i] ?? ''; });
-      return obj;
-    });
-    if (!rows.length) { _toast('Excel 解析无有效数据行'); return; }
-    _showImportPreview(headers, rows);
-  } catch (e) {
-    _toast('解析失败：' + (e.message || e));
-  }
+try{const data=await (await window.AI00Business.invoke('craft.data_exchange.excel.parse',{version:1,payload:{},native_io:{select:'spreadsheet'}})).data;if(!data.headers.length){_toast('Excel 解析无数据');return;}const rows=data.rows.map(row=>Object.fromEntries(data.headers.map((header,index)=>[header,row[index]??''])));if(!rows.length){_toast('Excel 解析无有效数据行');return;}_showImportPreview(data.headers,rows);}catch(error){if(error.code!=='native_selection_cancelled')_toast('解析失败：'+error.message);}
 }
 
 function _arrayBufferToBase64(buffer) {
@@ -1264,7 +1234,7 @@ document.getElementById('importModal').addEventListener('click', e => {
   if (e.target === e.currentTarget) _closeImportModal();
 });
 document.getElementById('importConfirm').addEventListener('click', _doImport);
-document.getElementById('importFileInput').addEventListener('change', _handleFileSelect);
+document.getElementById('importFileInput').addEventListener('click', _handleFileSelect);
 
 // 分页事件
 document.getElementById('pgFirst').addEventListener('click', () => { _page = 1; _render(); });

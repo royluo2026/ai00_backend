@@ -689,76 +689,15 @@
 
   function _getUserGid()   { return _cachedAuth?.user?.gid || ''; }
   function _getAuthMode()  { return _cachedAuth?.mode || 'none'; }
-  function _getAuthToken() { return _cachedAuth?.token || null; }
 
   /* ── SSE 流式 AI 对话 helpers ────────────────────────────────────────── */
 
-  async function _cf(method, endpoint, body, signal, callbacks) {
-    const eAPI = window.electronAPI;
-    if (!eAPI) { callbacks.onError?.('electronAPI 未就绪'); return; }
-    const config  = await eAPI.getConfig?.().catch?.(() => ({})) || {};
-    const state   = await eAPI.authGetState?.().catch?.(() => ({})) || {};
-    const runtimeBase = await window.AI00RuntimeConfig?.getRuntimeBackendBase?.(config.backendUrl || '')
-    const baseUrl = (runtimeBase || config.backendUrl || '').replace(/\/$/, '');
-    const token   = state.token || '';
-
-    let res;
-    try {
-      res = await fetch(`${baseUrl}${endpoint}`, {
-        method,
-        headers: {
-          'Content-Type':  'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}`, 'X-AI00-Token': token } : {}),
-        },
-        body:   JSON.stringify(body),
-        signal: signal || undefined,
-      });
-    } catch (e) {
-      if (e.name === 'AbortError') return;
-      callbacks.onError?.(e.message || '网络错误');
-      return;
-    }
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      callbacks.onError?.(err.detail || `HTTP ${res.status}`);
-      return;
-    }
-
-    const reader  = res.body.getReader();
-    const decoder = new TextDecoder();
-    let   buf     = '';
-
-    while (true) {
-      let done, value;
-      try { ({ done, value } = await reader.read()); } catch (_) { break; }
-      if (done) break;
-      buf += decoder.decode(value, { stream: true });
-      const lines = buf.split('\n');
-      buf = lines.pop() ?? '';
-      for (const line of lines) {
-        if (!line.startsWith('data: ')) continue;
-        let evt;
-        try { evt = JSON.parse(line.slice(6)); } catch (_) { continue; }
-        const t = evt.type;
-        if      (t === 'token')            callbacks.onToken?.(evt.content || '');
-        else if (t === 'tool_start')       callbacks.onToolStart?.(evt.name);
-        else if (t === 'tool_end')         callbacks.onToolEnd?.(evt.name, evt.ok, evt.result);
-        else if (t === 'done')             callbacks.onDone?.(evt.session_id);
-        else if (t === 'confirm_required') callbacks.onConfirmRequired?.(evt);
-        else if (t === 'error')            callbacks.onError?.(evt.message || '未知错误');
-      }
-    }
-  }
-
   async function _fetchAiChatStream(text, sessionGid, ctxObj, signal, callbacks) {
-    return _cf('POST', '/api/ai/chat/stream', {
-      message:    text,
-      session_id: sessionGid || '',
-      user_gid:   _getUserGid(),
-      auth_token: _getAuthToken() || '',
-      context:    ctxObj || {},
-    }, signal, callbacks);
+    return window.AI00Business.stream('agent.interaction.chat.change.apply', {
+      version: 3, payload: {operation: 'chat_stream', body: {
+        message: text, session_id: sessionGid || null, context: ctxObj || {},
+      }},
+    }, callbacks, signal);
   }
 
   /* ── 为底部容器 iframe 子页面暴露 _cloudFetch 和 _authMode ─────────────── */
@@ -812,7 +751,7 @@
 
   // 转 Skill（从当前执行流程另存为新 Skill）
   document.getElementById('wfcToSkillBtn')?.addEventListener('click', async () => {
-    const _cloudFetch = window._cloudFetch?.bind(window);
+
     const canvasData = _getFlowCanvasJSON();
     if (!canvasData || (canvasData.nodes || []).length === 0) {
       _showToast('执行流程为空，无法转 Skill');
@@ -823,15 +762,13 @@
     if (!title?.trim()) return;
     const name = title.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^\w\u4e00-\u9fa5]/g, '');
     const content = JSON.stringify({ canvas: canvasData });
-    const res = await _cloudFetch?.('/api/skills', {
-      method: 'POST',
-      body: JSON.stringify({
+    const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.skill.create", {version:1,payload:Object.fromEntries(Object.entries({...body,visibility:body.scope||"private",content:typeof body.content==="string"?JSON.parse(body.content):body.content,tags:typeof body.tags==="string"?JSON.parse(body.tags):body.tags}).filter(([key,value])=>["name","title","description","skill_type","visibility","content","icon","tags","sort_order"].includes(key)&&value!==undefined))}); return result; })({
       name, title: title.trim(),
       skill_type: 'prompt',
       scope: 'private',
       content,
       owner_gid: _getUserGid(),
-    })});
+    },{},new URLSearchParams());
     if (res?.error) { _showToast(`保存失败：${res.error}`); return; }
     _showToast(`已创建 Skill「${title.trim()}」`);
     // 刷新侧边栏 Skill 列表
@@ -840,7 +777,7 @@
 
   // 更新 Skill（将本次调整写回原 Skill，仅固定模式下可用）
   document.getElementById('wfcUpdateSkillBtn')?.addEventListener('click', async () => {
-    const _cloudFetch = window._cloudFetch?.bind(window);
+
     if (!_fixedSkill) { _showToast('未加载任何 Skill'); return; }
     const canvasData = _getFlowCanvasJSON();
     if (!canvasData) { _showToast('执行流程为空'); return; }
@@ -855,12 +792,10 @@
     } catch (_) {}
     contentObj.canvas = canvasData;
 
-    const res = await _cloudFetch?.(`/api/skills/${_fixedSkill.gid}`, {
-      method: 'PUT',
-      body: JSON.stringify({
+    const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.skill.update", {version:1,payload:({skill_gid:path.gid,changes:Object.fromEntries(Object.entries({...body,...(body.scope?{visibility:body.scope}:{}),...(body.content!==undefined?{content:typeof body.content==="string"?JSON.parse(body.content):body.content}:{}),...(body.tags!==undefined?{tags:typeof body.tags==="string"?JSON.parse(body.tags):body.tags}:{})}).filter(([key,value])=>["title","description","visibility","content","icon","tags","sort_order","status","is_pinned"].includes(key)&&value!==undefined))})}); return result; })({
       gid: _fixedSkill.gid,
       content: JSON.stringify(contentObj),
-    })});
+    },{"gid":decodeURIComponent(String(_fixedSkill.gid))},new URLSearchParams());
     if (res?.error) { _showToast(`更新失败：${res.error}`); return; }
     // 同步本地 _fixedSkill 引用
     _fixedSkill = { ..._fixedSkill, content: JSON.stringify(contentObj) };
@@ -1493,7 +1428,7 @@
           _finalizeMarkdown();
         },
         onConfirmRequired(evt) {
-          if (evt.session_id) _apSessionGid = evt.session_id;
+          if (evt.session_gid) _apSessionGid = evt.session_gid;
           const $live = $bub.querySelector('.wfc-stream-text-live');
           if ($live) $live.remove();
           _finalizeMarkdown();
@@ -1531,16 +1466,8 @@
     $bub.querySelector('.wfc-confirm-btn')?.addEventListener('click', async () => {
       $bub.innerHTML = '⏳ 执行中…';
       try {
-        const cf = window._cloudFetch;
-        if (!cf) { $bub.innerHTML = '❌ _cloudFetch 未就绪'; return; }
         await new Promise(resolveConfirm => {
-          _cf('POST', '/api/ai/confirm', {
-            session_gid:   _apSessionGid,
-            confirm_token: evt.confirm_token,
-            tool_name:     evt.tool_name,
-            tool_use_id:   evt.tool_use_id,
-            auth_token:    _getAuthToken() || '',
-          }, null, {
+          window.AI00Business.stream('agent.catalog_tool.confirm.apply', {version:1,payload:{},continuation:{handle:evt.confirmation_handle,session_gid:_apSessionGid,mode:'chat_stream'}}, {
             onToken(chunk)    { /* ignore tokens from confirm continuation */ },
             onToolStart()     {},
             onToolEnd()       {},
@@ -1846,21 +1773,17 @@
 
   /** 获取指定版本的所有 BOP 条目（去重：因 LEFT JOIN 可能产生重复行） */
   async function _fetchBopEntries(versionGid) {
-    const _cloudFetch = window._cloudFetch?.bind(window);
+
     try {
       const raw = [];
       const pageSize = 100;
       let offset = 0;
       let total = null;
       do {
-        const res = await _cloudFetch('/api/v1/capabilities/craft.bop.entry.legacy_read:invoke', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ version: 1, payload: {
+        const res = await window.AI00Business.request("craft.bop.entry.legacy_read", { version: 1, payload: {
             operation: 'version_entries', version_gid: versionGid,
             limit: pageSize, offset,
-          }}),
-        });
+          }});
         const envelope = res?.data;
         if (res?.success !== true || envelope?.ok !== true) {
           const detail = envelope?.error || res?.error || {};
@@ -2039,7 +1962,7 @@
   }
 
   function _initAiPanel() {
-    const _cloudFetch = window._cloudFetch?.bind(window);
+
     const panel  = document.getElementById('wfcwAiPanel');
     const hdr    = document.getElementById('wfcwApHdr');
     const toggle = document.getElementById('wfcwApToggle');
@@ -2096,10 +2019,7 @@
       if ($sb) $sb.style.display = 'none';
       // 同步通知服务端（工具调用轮次间的兜底）
       if (_apSessionGid) {
-        _cloudFetch?.('/api/ai/abort', {
-          method: 'POST',
-          body: JSON.stringify({ session_gid: _apSessionGid }),
-        }).catch(() => {});
+        (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.interaction.cancel", {version:2,payload:({session_gid:body.session_gid})}); return result; })({ session_gid: _apSessionGid },{},new URLSearchParams()).catch(() => {});
       }
     });
 
@@ -2109,7 +2029,7 @@
 
   /* ── 工具库面板 ───────────────────────────────────────────────────────── */
   function _initToolsPanel() {
-    const _cloudFetch = window._cloudFetch?.bind(window);
+
     const $sec  = document.getElementById('wfcwToolsSection');
     const $hdr  = document.getElementById('wfcwToolsHdr');
     const $body = document.getElementById('wfcwToolsBody');
@@ -2117,7 +2037,7 @@
 
     $hdr.addEventListener('click', () => $sec.classList.toggle('collapsed'));
 
-    _cloudFetch?.('/api/ai/tools', { method: 'GET' }).then(data => {
+    (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.tool_catalog.list", {version:1,payload:({})}); return result; })({},{},new URLSearchParams()).then(data => {
       if (!data || !$body) return;
       const all = [
         ...(data.read || []),
@@ -2154,11 +2074,11 @@
 
   /* ── Skill 库面板（悬浮聊天窗内） ───────────────────────────────────── */
   function _initSkillsPanel() {
-    const _cloudFetch = window._cloudFetch?.bind(window);
+
     const $body = document.getElementById('wfcwSkillsBody');
     if (!$body) return;
 
-    _cloudFetch?.('/api/skills?scope_filter=all', { method: 'GET' }).then(list => {
+    (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.skill.read", {version:1,payload:Object.fromEntries(Object.entries({"operation":"list","scope_filter":(query.has("scope_filter")?query.get("scope_filter"):"all")}).filter(([,v])=>v!=null))}); return result; })({},{},new URLSearchParams(('/api/skills?scope_filter=all').split("?")[1]||"")).then(list => {
       if (!$body) return;
       const skills = Array.isArray(list) ? list.filter(s => s.status === 'active') : [];
       _skillsList = skills;   // 缓存供 @ mention 使用
@@ -2304,7 +2224,7 @@
   let _canvasSnapshot = null;   // 临时保存原有画布内容（放入画布预览时）
 
   function _initFlowSidebar() {
-    const _cloudFetch = window._cloudFetch?.bind(window);
+
     const $sb  = document.getElementById('wfcwFlowSidebar');
     const $btn = document.getElementById('wfcwFsCollapseBtn');
     const $hdr = document.getElementById('wfcwFsHdr');
@@ -2369,9 +2289,7 @@
       let contentObj = {};
       try { contentObj = JSON.parse(_fixedSkill.content || '{}'); } catch (_) {}
       contentObj.canvas = canvasData;
-      const res = await _cloudFetch?.(`/api/skills/${_fixedSkill.gid}`, {
-        method: 'PUT', body: JSON.stringify({ gid: _fixedSkill.gid, content: JSON.stringify(contentObj) }),
-      });
+      const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.skill.update", {version:1,payload:({skill_gid:path.gid,changes:Object.fromEntries(Object.entries({...body,...(body.scope?{visibility:body.scope}:{}),...(body.content!==undefined?{content:typeof body.content==="string"?JSON.parse(body.content):body.content}:{}),...(body.tags!==undefined?{tags:typeof body.tags==="string"?JSON.parse(body.tags):body.tags}:{})}).filter(([key,value])=>["title","description","visibility","content","icon","tags","sort_order","status","is_pinned"].includes(key)&&value!==undefined))})}); return result; })({ gid: _fixedSkill.gid, content: JSON.stringify(contentObj) },{"gid":decodeURIComponent(String(_fixedSkill.gid))},new URLSearchParams());
       if (res?.error) { _showToast(`更新失败：${res.error}`); return; }
       _fixedSkill = { ..._fixedSkill, content: JSON.stringify(contentObj) };
       _showToast(`Skill「${_fixedSkill.title}」已更新`);
@@ -2654,7 +2572,7 @@
 
   /* ── 悬浮聊天窗 ───────────────────────────────────────────────────────── */
   function _initFloatChat() {
-    const _cloudFetch = window._cloudFetch?.bind(window);
+
     const $chat = document.getElementById('wfcwFloatChat');
     if (!$chat) return;
 
@@ -2736,10 +2654,7 @@
       if ($sb) $sb.style.display = 'none';
       // 同步通知服务端（工具调用轮次间的兜底）
       if (_apSessionGid) {
-        _cloudFetch?.('/api/ai/abort', {
-          method: 'POST',
-          body: JSON.stringify({ session_gid: _apSessionGid }),
-        }).catch(() => {});
+        (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.interaction.cancel", {version:2,payload:({session_gid:body.session_gid})}); return result; })({ session_gid: _apSessionGid },{},new URLSearchParams()).catch(() => {});
       }
     });
 

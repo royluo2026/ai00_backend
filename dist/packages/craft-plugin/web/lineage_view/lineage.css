@@ -1128,6 +1128,12 @@ body {
   pointer-events: none;
   transition: none;
 }
+
+.ll-persist-pending {
+  opacity: 0.68;
+  cursor: wait !important;
+  pointer-events: none;
+}
 @keyframes lv-demo-reveal {
   from { opacity: 0; transform: translateY(5px); }
   to   { opacity: 1; transform: none; }
@@ -2051,6 +2057,9 @@ body {
 }
 .lv-pic-thumb .lv-pic-del:hover { background: var(--red, #f38ba8); }
 .lv-pic-add {
+  appearance: none;
+  background: transparent;
+  font-family: inherit;
   width: 68px;
   height: 68px;
   border-radius: 5px;
@@ -2071,6 +2080,36 @@ body {
   color: var(--blue, #89b4fa);
 }
 .lv-pic-add svg { pointer-events: none; }
+.lv-pic-paste {
+  appearance: none;
+  align-self: center;
+  border: 1px solid var(--surface2, #585b70);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--subtext0, #a6adc8);
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+  padding: 5px 8px;
+}
+.lv-pic-paste:hover,
+.lv-pic-area:focus .lv-pic-paste {
+  border-color: var(--blue, #89b4fa);
+  color: var(--blue, #89b4fa);
+}
+.lv-pic-paste-hint {
+  width: 100%;
+  margin-top: 8px;
+  padding: 6px 8px;
+  border: 1px dashed var(--surface2, #585b70);
+  border-radius: 4px;
+  background: var(--base, #1e1e2e);
+  color: var(--overlay0, #6c7086);
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+}
+.lv-pic-paste-hint:hover { border-color: var(--blue, #89b4fa); color: var(--blue, #89b4fa); }
 .lv-pic-uploading {
   font-size: 10px;
   color: var(--subtext0, #a6adc8);

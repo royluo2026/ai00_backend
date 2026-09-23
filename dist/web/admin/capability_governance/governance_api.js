@@ -11,39 +11,11 @@
   const GRAPH_DEPTH_MAX = 4;
   const GRAPH_NODES_MAX = 500;
 
-  async function standaloneFetch(path, options = {}) {
-    const state = await hostWindow?.electronAPI?.authGetState?.() || {};
-    const config = await hostWindow?.electronAPI?.getConfig?.() || {};
-    const base = String(config.backendUrl || hostWindow?._AI00_BASE || hostWindow?.location?.origin || '').replace(/\/$/, '');
-    const fetcher = hostWindow && typeof hostWindow.fetch === 'function' ? hostWindow.fetch.bind(hostWindow) : null;
-    if (!fetcher) throw new Error('浏览器 Fetch 不可用');
-    const response = await fetcher(`${base}${path}`, Object.assign({}, options, {
-      headers: Object.assign({
-        'Content-Type': 'application/json',
-        ...(state.token ? { 'X-AI00-Token': state.token } : {}),
-      }, options.headers || {}),
-    }));
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      const detail = data && data.detail;
-      const message = typeof detail === 'string' ? detail : detail && detail.message || `HTTP ${response.status}`;
-      throw new Error(message);
-    }
-    return data;
-  }
 
-  function gateway() {
-    try {
-      const fetcher = hostWindow && hostWindow.parent && hostWindow.parent._cloudFetch;
-      if (typeof fetcher === 'function') return fetcher;
-    } catch (_) { /* cross-origin parent; use the local authenticated fallback */ }
-    if (typeof hostWindow?._cloudFetch === 'function') return hostWindow._cloudFetch;
-    return standaloneFetch;
-  }
 
-  function _cf(method, path, options = {}) {
-    return gateway()(path, Object.assign({}, options, { method }));
-  }
+
+
+
 
   function boundedInteger(value, fallback, maximum) {
     const requested = typeof value === 'number' && Number.isFinite(value) ? Math.floor(value) : fallback;
@@ -95,23 +67,7 @@
     return result;
   }
 
-  async function invoke(capabilityId, payload, options = {}) {
-    const result = await _cf('POST', `/api/v1/capabilities/${capabilityId}:invoke`, {
-      method: 'POST',
-      body: JSON.stringify({
-        version: 1,
-        payload,
-        idempotency_key: options.idempotencyKey,
-        expected_resource_version: options.expectedResourceVersion,
-        confirmation_token: options.confirmationToken,
-      }),
-    });
-    // The HTTP endpoint deliberately keeps business failures at HTTP 200 so
-    // callers can inspect the complete CapabilityResultV2 envelope.  Do not
-    // silently treat {success:false} as a successful scan/action: surface the
-    // stable error code and readable message to the controller.
-    return unwrapInvocation(result);
-  }
+  async function invoke(capabilityId, payload, options = {}) { return hostWindow.AI00Business.invoke(capabilityId, {version:1,payload,idempotency_key:options.idempotencyKey,expected_resource_version:options.expectedResourceVersion}); }
 
   function searchRegistry({ query = '', limit, offset = 0, domain = '' } = {}) {
     const payload = { query: String(query), limit: boundedInteger(limit, COLLECTION_LIMIT, COLLECTION_MAX) };
@@ -153,28 +109,9 @@
   }
   const getGraph = (targetGid, { maxDepth, maxNodes } = {}) => invoke('base.capability_graph.get', { target_gid: gid(targetGid), max_depth: boundedInteger(maxDepth, 2, GRAPH_DEPTH_MAX), max_nodes: boundedInteger(maxNodes, 100, GRAPH_NODES_MAX) });
 
-  async function requestConfirmation(capabilityId, payload, options) {
-    const confirmation = await _cf('POST', `/api/v1/capabilities/${capabilityId}:confirm`, {
-      method: 'POST',
-      body: JSON.stringify({
-        version: 1,
-        payload,
-        idempotency_key: options.idempotencyKey,
-        expected_resource_version: options.expectedResourceVersion,
-      }),
-    });
-    const confirmed = confirmation && confirmation.data ? confirmation.data : confirmation;
-    const confirmationToken = confirmed && confirmed.confirmation_token;
-    if (!confirmationToken) throw new Error('Gateway 未返回治理操作确认令牌');
-    return confirmationToken;
-  }
 
-  async function write(capabilityId, payload, options) {
-    const request = writeOptions(options, payload);
-    if (request.options.confirmationToken) return invoke(capabilityId, request.payload, request.options);
-    const confirmationToken = await requestConfirmation(capabilityId, request.payload, request.options);
-    return invoke(capabilityId, request.payload, Object.assign({}, request.options, { confirmationToken }));
-  }
+
+  async function write(capabilityId, payload, options) { const request = writeOptions(options,payload); return invoke(capabilityId,request.payload,request.options); }
 
   const runAnalysis = ({ targetGid, webRevision } = {}, options) => {
     const payload = { target_gid: gid(targetGid) };

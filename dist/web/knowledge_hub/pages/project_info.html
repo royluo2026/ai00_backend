@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script src="/web/core/business_facade.js"></script>
 <meta charset="UTF-8">
 <title>业务基础信息</title>
 <style>
@@ -220,7 +221,7 @@ function _cf() {
   try {
     let w = window;
     for (let i = 0; i < 6; i++) {
-      if (w._cloudFetch) return w._cloudFetch;
+      if (window.AI00Business?.available()) return window.AI00Business?.available();
       if (w.parent === w) break;
       w = w.parent;
     }
@@ -228,13 +229,7 @@ function _cf() {
   return null;
 }
 async function _invokeCapability(id, payload) {
-  const _cloudFetch = _cf();
-  if (!_cloudFetch) throw new Error('云端服务未连接');
-  const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ version: 1, payload }),
-  });
+  const response = await window.AI00Business.request(id, { version: 1, payload });
   const envelope = response?.data;
   if (response?.success !== true || envelope?.ok !== true) {
     const detail = envelope?.error || response?.error || {};
@@ -541,7 +536,7 @@ async function _loadShared() {
   try {
     const [vmRes, userRes, factoryRes] = await Promise.all([
       _invokeCapability('project.project.read.atomic.vehicle_models_list', { arguments: {} }).catch(() => null),
-      cf('/users/').catch(() => null),
+      (async (body,path,query) => { const result = await window.AI00Business.invoke("base.identity.admin_user.list", {version:1,payload:({})}); return result; })({},{},new URLSearchParams()).catch(() => null),
       _invokeCapability('factory.structure.search', { kind: 'factory' }).catch(() => null),
     ]);
     (vmRes?.data || []).forEach(v => { _vmMap[v.gid] = v.name; });

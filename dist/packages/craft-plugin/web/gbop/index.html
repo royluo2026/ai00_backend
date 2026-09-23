@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script src="/web/core/business_facade.js"></script>
   <meta charset="UTF-8" />
   <title>GBOP 标准工序</title>
   
@@ -81,8 +82,9 @@
   <div id="modal-import-tc-excel" class="modal-overlay hidden">
     <div class="modal">
       <div class="modal-title">从 TC Excel 导入工序/操作</div>
-      <p class="modal-hint">Sheet 1：总装工序/操作 → 写入 gbop_processes / gbop_operations，自动建立父子关系。<br>
-        Sheet 2：VPPS 绑定表 → 将工序/操作链接到已有零部件节点。</p>
+      <p class="modal-hint">请先执行“从 VPPS 零件导入”，再上传同一个 Excel 文件。<br>
+        Sheet 1 必需列：零组件类型、零组件名称、BOM 行、VPPS、父级。<br>
+        Sheet 2 必需列：VPPS、工序VPPS、操作VPPS、标记；标记为 part_feed 的操作可参与 PBOM 自动匹配。</p>
       <label>选择 Excel 文件 <span class="req">*</span>
         <input id="inp-tc-excel-file" type="file" accept=".xlsx,.xls" style="margin-top:4px" />
       </label>

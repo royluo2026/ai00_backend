@@ -6,21 +6,12 @@
  */
 
 // ── API 调用 ──────────────────────────────────────────────────────────────────
-const _cloudFetchFn = () => window.parent?._cloudFetch || window._cloudFetch || null;
+const _cloudFetchFn = () => window.AI00Business?.available() || window.AI00Business?.available() || null;
 
-async function _cf(method, path, opts = {}) {
-  const fn = _cloudFetchFn();
-  if (!fn) throw new Error('云端服务未连接');
-  return fn(path, { ...opts, method });
-}
+
 
 async function _invokeCapability(id, payload, options = {}) {
-  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ version: 1, payload }),
-    signal: options.signal,
-  });
+  const response = await window.AI00Business.request(id, { version: 1, payload });
   const envelope = response?.data;
   if (response?.success !== true || envelope?.ok !== true) {
     const detail = envelope?.error || response?.error || {};
@@ -99,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Load manifest
   try {
-    const res = await _cf('GET', '/api/flows/capability-manifest');
+    const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.flow.capability_manifest.get", {version:1,payload:({})}); return result; })({},{},new URLSearchParams());
     _manifest = res?.manifest || [];
   } catch (e) {
     console.warn('[FlowEditor] manifest 加载失败:', e);
@@ -838,10 +829,7 @@ async function _generateScript() {
   if (btn) { btn.disabled = true; btn.textContent = 'AI 生成中…'; }
 
   try {
-    const res = await _cf('POST', '/api/flows/gen-script', {
-      method: 'POST',
-      body: JSON.stringify({ description: desc, inputs_schema: {}, outputs_schema: {} }),
-    });
+    const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.flow.change.apply", {version:1,payload:Object.fromEntries(Object.entries({...{},...body}).filter(([,v])=>v!=null))}); return result; })({ description: desc, inputs_schema: {}, outputs_schema: {} },{},new URLSearchParams());
     const code = res?.code || '';
     const codeEl = document.getElementById('feGenCode');
     if (codeEl) codeEl.value = code;

@@ -606,9 +606,9 @@ class RowDetailPanel {
     if (!itemType || !gid) { console.warn('[RowDetailPanel._loadEntriesAsync] missing itemType or gid'); return; }
     try {
       let result;
-      const _cloudFetch = window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
+      const _cloudFetch = window.AI00Business?.available() || window.AI00Business?.available() || window.AI00Business?.available();
       if (_cloudFetch) {
-        const resp = await _cloudFetch(`/api/item-entries/${itemType}/${gid}`, { method: 'GET' });
+        const resp = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.list.read.atomic.item_entries_get", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"item_type":path.item_type,"item_gid":path.item_gid}}).arguments).filter(([k,v])=>v!=null||[].includes(k)))}}); return result; })({},{"item_type":decodeURIComponent(String(itemType)),"item_gid":decodeURIComponent(String(gid))},new URLSearchParams());
         result = resp?.entries || [];
       }
       // 防竞争：如果已切换到其他行，丢弃过期结果
@@ -648,9 +648,9 @@ class RowDetailPanel {
     const countEl = this._el.querySelector('#rdpChangeLogCount');
     if (!listEl) return;
     listEl.textContent = '加载中…';
-    const _cloudFetch = window._cloudFetch || window.parent?._cloudFetch || window.top?._cloudFetch;
+    const _cloudFetch = window.AI00Business?.available() || window.AI00Business?.available() || window.AI00Business?.available();
     if (!_cloudFetch) { listEl.textContent = '（无云端连接）'; return; }
-    _cloudFetch(`/api/change-logs?item_type=${encodeURIComponent(this._itemType)}&item_gid=${encodeURIComponent(itemGid)}&limit=50`, { method: 'GET' })
+    (async (body,path,query) => { const result = await window.AI00Business.invoke("project.change_log.search", {version:1,payload:({...Object.fromEntries(["item_type","item_gid","list_gid"].filter(key=>query.get(key)).map(key=>[key,query.get(key)])),limit:Number(query.get("limit")||100),offset:Number(query.get("offset")||0)})}); return result.logs; })({},{},new URLSearchParams((`/api/change-logs?item_type=${encodeURIComponent(this._itemType)}&item_gid=${encodeURIComponent(itemGid)}&limit=50`).split("?")[1]||""))
       .then(rows => {
         if (!Array.isArray(rows) || rows.length === 0) {
           listEl.innerHTML = '<div style="padding:6px 0">暂无变更记录</div>';

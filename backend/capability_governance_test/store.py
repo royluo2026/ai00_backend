@@ -10,6 +10,7 @@ from threading import RLock
 from typing import Any, Protocol
 
 from backend.utils.gid import next_gid
+from .runtime_fence import acquire_runtime_fence
 
 from .models import (
     BusinessPurposeRecord,
@@ -580,12 +581,16 @@ class SqlGovernanceStore(GovernanceStore):
     def import_snapshot(self, document: SnapshotDocument) -> SnapshotRecord:
         cursor = self._connection.cursor()
         try:
+            fenced = acquire_runtime_fence(cursor)
             from .fingerprint import snapshot_fingerprint
             if snapshot_fingerprint(document) != document.snapshot_hash:
                 raise ImmutableRecordError("snapshot_hash_mismatch")
             existing = self._select_snapshot(cursor, document.snapshot_hash)
             if existing is not None:
-                return self._load_existing_snapshot(cursor, existing, document)
+                record = self._load_existing_snapshot(cursor, existing, document)
+                if fenced:
+                    self._connection.commit()
+                return record
             created_at = _now()
             scan_run_gid = self._next_ids()
             snapshot_gid = self._next_ids()
@@ -974,6 +979,7 @@ class SqlGovernanceStore(GovernanceStore):
         _validate_business_review_references(review)
         cursor = self._connection.cursor()
         try:
+            acquire_runtime_fence(cursor)
             cursor.execute(
                 "SELECT request_fingerprint, proposal_gid FROM workmanship_base_capability_business_review_requests "
                 "WHERE idempotency_key = %s FOR UPDATE", (idempotency_key,),
@@ -1360,6 +1366,7 @@ class SqlGovernanceStore(GovernanceStore):
         _validate_business_review_references(review)
         cursor = self._connection.cursor()
         try:
+            acquire_runtime_fence(cursor)
             cursor.execute(
                 "INSERT INTO workmanship_base_capability_business_reviews "
                 "(business_review_gid, proposal_gid, capability_version_gid, definition_hash, decision, decision_reason, reviewer_gid, reviewer_role, evidence_snapshot_gid, decided_at) "

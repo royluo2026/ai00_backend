@@ -19,7 +19,76 @@ async function tick() {
 }
 
 async function runLineageProgressiveLoadingTests() {
-  const { LineageProgressiveLoader } = require('./lineage_progressive_loader.js');
+  const { LineageProgressiveLoader, preloadFirstLineScopes } = require('./lineage_progressive_loader.js');
+
+  {
+    assert.strictEqual(typeof preloadFirstLineScopes, 'function', 'initial line preloader must be available');
+    const first = deferred();
+    const second = deferred();
+    const started = [];
+    const completion = preloadFirstLineScopes(
+      [{ gid: 'line-1' }, { gid: 'line-2' }, { gid: 'line-3' }],
+      line => {
+        started.push(line.gid);
+        return line.gid === 'line-1' ? first.promise : second.promise;
+      },
+    );
+    await tick();
+    assert.deepStrictEqual(started, ['line-1', 'line-2'], 'the first two lines must start before either finishes');
+    first.resolve('first');
+    second.resolve('second');
+    assert.deepStrictEqual(
+      (await completion).map(result => result.status),
+      ['fulfilled', 'fulfilled'],
+    );
+  }
+
+  {
+    const started = [];
+    await preloadFirstLineScopes(
+      [
+        { gid: 'hidden-1' },
+        { gid: 'hidden-2' },
+        { gid: 'visible-1' },
+        { gid: 'visible-2' },
+        { gid: 'visible-3' },
+      ],
+      async line => { started.push(line.gid); },
+      new Set(['visible-1', 'visible-2', 'visible-3']),
+    );
+    assert.deepStrictEqual(
+      started,
+      ['visible-1', 'visible-2', 'visible-3'],
+      'initial preload must target every line currently visible in the saved filter',
+    );
+  }
+
+  {
+    let attempts = 0;
+    const results = await preloadFirstLineScopes(
+      [{ gid: 'line-transient' }],
+      async () => {
+        attempts += 1;
+        if (attempts < 3) throw new Error('invocation_unavailable');
+        return 'loaded';
+      },
+      null,
+      { retryDelays: [0, 0], sleep: async () => {} },
+    );
+    assert.strictEqual(attempts, 3, 'transient read failures must be retried twice');
+    assert.deepStrictEqual(results, [{ status: 'fulfilled', value: 'loaded' }]);
+  }
+
+  {
+    const results = await preloadFirstLineScopes(
+      [{ gid: 'line-broken' }],
+      async () => { throw new Error('provider_failed'); },
+      null,
+      { retryDelays: [0, 0], sleep: async () => {} },
+    );
+    assert.strictEqual(results[0].status, 'rejected', 'permanent failures must remain visible to the caller');
+    assert.strictEqual(results[0].reason.message, 'provider_failed');
+  }
 
   {
     const calls = [];
@@ -76,10 +145,17 @@ async function runLineageProgressiveLoadingTests() {
     assert.deepStrictEqual(commits[0].rows.map(row => row.gid), ['root', 'line-1']);
 
     const scopeRows = [];
+    const completedScopes = [];
     await loader.loadScope({ version_gid: 'version-1', revision: loaded.revision, scope_kind: 'line', scope_gid: 'line-1' }, {
       onPage: value => scopeRows.push(value.rows.map(row => row.gid)),
+      onComplete: value => completedScopes.push(value.rows.map(row => row.gid)),
     });
     assert.deepStrictEqual(scopeRows, [['line-1'], ['line-1', 'station-1']]);
+    assert.deepStrictEqual(
+      completedScopes,
+      [['line-1', 'station-1']],
+      'a paged line load must expose one stable completion instead of asking the view to redraw for every page',
+    );
     assert.strictEqual(calls.filter(call => call.id === 'craft.bop.work_package.get').length, 2);
 
     const detail = await loader.loadDetail(
@@ -141,6 +217,31 @@ async function runLineageProgressiveLoadingTests() {
     assert.throws(() => loader.loadVersion('after-dispose'), /disposed/);
   }
 
+  {
+    global.window ||= { parent: {}, top: {} };
+    const { LayoutMode } = require('./layout_mode.js');
+    const layoutEl = { dataset: {}, innerHTML: '', onclick: null,
+      removeAttribute(name) { if (name === 'data-rendered') delete this.dataset.rendered; } };
+    const lineEl = { querySelector: () => layoutEl };
+    let calls = 0;
+    const data = {
+      rowByGid: new Map([['line-3', { gid: 'line-3', node_type: 'line_process' }]]),
+      childMap: new Map(),
+      isLineScopeLoaded: () => false,
+      loadLineScope: async () => { calls += 1; throw new Error('scope failed'); },
+    };
+    const mode = { _data: data, _renderedLineGids: new Set(),
+      _world: { querySelector: selector => selector.includes(' .ll-line-layout') ? layoutEl : lineEl },
+      _renderLineCards: LayoutMode.prototype._renderLineCards };
+    mode._renderLineCards('line-3');
+    assert.match(layoutEl.innerHTML, /加载工位中/);
+    assert.strictEqual(calls, 1, 'an unpreloaded visible line must request its station scope');
+    await tick();
+    assert.match(layoutEl.innerHTML, /工位加载失败，点击重试/);
+    layoutEl.onclick();
+    assert.strictEqual(calls, 2, 'failed line scope must be retryable');
+  }
+
   const index = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
   const coordinatorAt = index.indexOf('lineage_load_coordinator.js');
   const storeAt = index.indexOf('lineage_projection_store.js');
@@ -151,11 +252,23 @@ async function runLineageProgressiveLoadingTests() {
   assert.ok(loaderAt >= 0 && loaderAt < lineageAt, 'progressive loader must load before lineage.js');
 
   const lineage = fs.readFileSync(path.join(__dirname, 'lineage.js'), 'utf8');
+  assert.match(lineage, /\blet _versionTag\s*=/, 'version switch must be able to update the current tag');
   assert.ok(
     !/\/api\/bop\/versions\/\$\{[^}]+\}\/entries/.test(lineage),
     'lineage must not use the unbounded legacy version entries route',
   );
   assert.ok(lineage.includes('LineageProgressiveLoader'), 'lineage must use the progressive loader');
+  assert.ok(
+    lineage.includes("preloadFailure?.status === 'rejected'"),
+    'lineage must surface a failed selected-line preload instead of rendering it as no stations',
+  );
+  const loadStart = lineage.indexOf('async function _load(');
+  const clearHeavyData = lineage.indexOf('_progressiveLoader.clearHeavyData()', loadStart);
+  const showLoadingOverlay = lineage.indexOf("classList.remove('hidden')", loadStart);
+  assert.ok(
+    showLoadingOverlay > loadStart && showLoadingOverlay < clearHeavyData,
+    'a reload must cover the cleared layout until selected line scopes finish loading',
+  );
   const detailPanel = fs.readFileSync(path.join(__dirname, 'layout_detail_panel.js'), 'utf8');
   assert.ok(
     !/\/api\/bop\/versions\/\$\{[^}]+\}\/entries/.test(detailPanel),

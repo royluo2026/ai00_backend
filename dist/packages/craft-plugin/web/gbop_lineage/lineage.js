@@ -37,21 +37,10 @@ const _OP_STATS_PRIORITY = ['part'];
 // ── 状态 ─────────────────────────────────────────────────────────────
 const _params   = Object.fromEntries(new URLSearchParams(location.search));
 // 向上遍历 frame 链找到 _cloudFetch（可能嵌套多层 iframe：main→knowledgeHub→lineage）
-function _cf(method, path, opts = {}) {
-  let w = window;
-  for (let i = 0; i < 5; i++) {
-    if (w._cloudFetch) return w._cloudFetch(path, { ...opts, method });
-    if (w.parent && w.parent !== w) w = w.parent; else break;
-  }
-  throw new Error('cloudFetch not available');
-}
+
 
 async function _invokeCapability(id, payload) {
-  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ version: 1, payload }),
-  });
+  const response = await window.AI00Business.request(id, { version: 1, payload });
   const result = response?.data;
   if (response?.success !== true || result?.ok !== true) {
     const detail = result?.error || response?.error || {};

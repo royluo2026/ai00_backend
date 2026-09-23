@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
+  <script src="/web/core/business_facade.js"></script>
 <meta charset="UTF-8">
 <title>数模仿真</title>
 
-  
-  <link rel="stylesheet" href="/assets/index-06e617e5.css">
+
+  <link rel="stylesheet" href="/assets/index-e3936a52.css">
 </head>
 <body>
 
@@ -17,8 +18,9 @@
   <span id="vmBannerText"></span>
 </div>
 
-<!-- 顶部工具栏 -->
-<div class="cs-toolbar">
+<div id="simulationShell" class="cs-sim-shell">
+<!-- AI00 单行操作栏（固定在工作区底部） -->
+<div id="ai00ActionBar" class="cs-toolbar cs-ai00-action-bar">
   <div class="cs-toolbar-title">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
       <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
@@ -29,38 +31,41 @@
   </div>
   <div class="cs-toolbar-sep"></div>
 
+  <button id="btnResourceMode" class="cs-btn cs-bottom-capsule" type="button" aria-pressed="true" title="折叠或展开产品与资源面板">产品资源</button>
+  <button id="btnToggleBopPanel" class="cs-btn" type="button" aria-pressed="true" title="显示或隐藏仿真环境">仿真环境</button>
+  <button id="btnFocus3d" class="cs-btn" type="button" aria-pressed="false" title="收起两侧结构，专注三维工作区">专注 3D</button>
+
+  <div class="cs-toolbar-sep"></div>
+  <button id="btnEnvironmentInsert" class="cs-btn" type="button" disabled>插入 ▾</button>
+  <button id="btnAdoptCurrentDocument" type="button" class="cs-btn cs-adoption-entry">从当前文档创建环境</button>
+  <button id="btnSwitchVmDocument" type="button" class="cs-btn" title="选择同一 VisMockup 中已打开的文档">切换 VisMockup 文档 ▾</button>
+  <span id="viewerInteractionRoute" role="status" aria-live="polite" data-route="pending">正在确认交互通道…</span>
+  <div id="environmentInsertMenu" class="cs-action-menu hidden" role="menu">
+    <button type="button" data-insert-source="bop">插入 BOP…</button>
+    <button type="button" data-insert-source="plmxml">插入 PLMXML…</button>
+    <button type="button" data-insert-source="jt">插入本地 JT…</button>
+    <button type="button" data-insert-source="environment_version" disabled title="待环境版本投影能力发布">插入已有环境版本（待发布）</button>
+    <button type="button" data-insert-source="vismockup_document" disabled title="第二阶段">插入 VisMockup 已打开文档（第二阶段）</button>
+  </div>
+  <button id="btnEnvironmentSave" class="cs-btn" type="button" disabled>保存仿真环境</button>
+  <button id="btnEnvironmentSync" class="cs-btn" type="button" disabled>同步到 VisMockup</button>
+  <button id="btnEnvironmentExport" class="cs-btn" type="button" disabled>导出 ▾</button>
+  <button id="btnEnvironmentWriteback" class="cs-btn" type="button" disabled>回传 BOP</button>
+
   <!-- VisMockup 启动 -->
-  <button id="btnLaunchVm" class="cs-btn hidden" title="旧本地控制入口已停用">
+  <button id="btnLaunchVm" class="cs-btn hidden" title="VisMockup 由模型打开操作按需启动" aria-hidden="true" tabindex="-1">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <polygon points="5 3 19 12 5 21 5 3"/>
     </svg>
-    启动 VisMockup
+    <span id="btnLaunchVmLabel">连接 VisMockup</span>
   </button>
 
-  <!-- 打开文件 -->
-  <button id="btnOpenFile" class="cs-btn hidden" title="旧本地控制入口已停用">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
-    </svg>
-    打开文件
-  </button>
   <div class="cs-toolbar-sep"></div>
-
-  <!-- VisMockup 状态指示 -->
-  <div id="vmStatusDot" class="cs-vm-dot hidden" title="请通过 AI00 Connector 连接"></div>
-  <span id="vmStatusLabel" class="cs-vm-label hidden">未连接</span>
-  <div class="cs-toolbar-sep hidden"></div>
-
-  <!-- 仿真任务 -->
-  <button id="btnNewTask" class="cs-btn primary">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-    </svg>
-    新建仿真任务
-  </button>
-  <button id="btnGovernedCapture" class="cs-btn primary" title="通过 AI00 Connector 搭建环境并按工艺倒序截图">
-    AI00 Connector 截图
-  </button>
+  <button id="btnVmCheckpoint" class="cs-btn" title="从当前 VisMockup 文档创建受治理手动快照">创建快照</button>
+  <button id="btnVmCompare" class="cs-btn" title="立即比较最近两个快照，不改变自动对比设置">立即对比</button>
+  <label class="cs-version-switch" title="新鲜快照完成后自动生成版本差异报告">
+    <input id="vmAutoCompare" type="checkbox"> 自动版本对比
+  </label>
   <div class="cs-toolbar-spacer"></div>
 
   <!-- 复位视角 -->
@@ -72,12 +77,49 @@
   </button>
 </div>
 
-<!-- 主体双栏：BOP 树 + 3D viewer -->
+<!-- 主体五栏：资源 + 备选层次结构 + 模型文件 + VM 工作区 + 预留区 -->
 <div class="cs-body">
 
-  <!-- 左侧：BOP 结构树面板 -->
-  <div class="cs-bop-panel" id="bopPanel">
-    <!-- BOP 版本选择 -->
+  <aside id="simulationObjectPanel" class="cs-object-panel" aria-label="产品与资源">
+    <button id="btnToggleVisPanel" class="cs-object-capsule" type="button" aria-expanded="true">
+      <span id="currentDocumentLabel">当前仿真文档 · 未选择环境</span>
+      <span id="bindingDraftStatus" class="cs-binding-draft-status" title="BOP 与当前 VM 的自动初版绑定"></span>
+      <span class="cs-capsule-icon">⌃</span>
+    </button>
+    <button id="btnToggleResourceSection" class="cs-object-capsule" type="button" aria-expanded="false">
+      <span>资源</span><span class="cs-capsule-icon">⌄</span>
+    </button>
+
+  <aside id="resourceLibraryPanel" class="cs-resource-library collapsed" aria-label="资源库">
+    <div class="cs-column-header"><span>资源库</span><span class="cs-resource-count">拖拽到 BOP</span></div>
+    <div class="cs-resource-search"><input type="search" placeholder="搜索设备、工装、工具、套筒"></div>
+    <div class="cs-resource-groups">
+      <details open><summary>设备</summary><div id="simulationResourceEquipment" class="cs-resource-items"><span class="cs-resource-empty">选择仿真环境后加载</span></div></details>
+      <details><summary>工装</summary><div id="simulationResourceFixture" class="cs-resource-items"><span class="cs-resource-empty">选择仿真环境后加载</span></div></details>
+      <details><summary>工具与套筒</summary><div id="simulationResourceTools" class="cs-resource-items"><span class="cs-resource-empty">选择仿真环境后加载</span></div></details>
+    </div>
+  </aside>
+  </aside>
+
+  <!-- 第二列：当前文档的备选层次结构。 -->
+  <aside id="simulationEnvironmentPanel" class="cs-environment-stack" aria-label="当前仿真文档">
+    <button id="btnToggleEnvironmentPanel" class="cs-object-capsule" type="button" aria-expanded="false" title="展开仿真环境库">
+      <span>仿真环境库</span><span class="cs-capsule-icon" data-toggle-icon>⌄</span>
+    </button>
+    <aside id="environmentRecordsPanel" class="cs-environment-records collapsed">
+      <div class="cs-environment-panel-content">
+        <div id="environmentSyncStatus" class="cs-environment-panel-status" role="status">尚未选择环境</div>
+        <div class="cs-environment-search">
+          <input id="environmentSearchInput" type="search" placeholder="搜索项目或环境">
+          <button id="btnNewEnvironment" class="cs-icon-btn" type="button" title="新建个人仿真环境">＋</button>
+        </div>
+        <div id="environmentRecordsBody" class="cs-environment-record-list">
+          <div class="cs-environment-empty">暂无仿真环境</div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="cs-bop-panel legacy-environment-tree hidden" id="environmentTreePanel" aria-hidden="true">
     <div class="cs-bop-hdr">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0">
         <rect x="3" y="3" width="7" height="7" rx="1"/>
@@ -85,68 +127,76 @@
         <rect x="3" y="14" width="7" height="7" rx="1"/>
         <path d="M17.5 14v6m-3-3h6"/>
       </svg>
-      BOP 结构树
+      <span id="environmentTreeTitle" class="cs-environment-tree-title">当前仿真环境树</span>
     </div>
-
-    <!-- 版本选择器 -->
-    <div class="cs-bop-ver-row">
-      <select id="bopVersionSel" class="cs-bop-ver-sel">
-        <option value="">-- 选择 BOP 版本 --</option>
+    <div class="cs-environment-tree-toolbar">
+      <label for="environmentTreeDepth">打开层级</label>
+      <select id="environmentTreeDepth" aria-label="打开层级">
+        <option value="1" selected>1 级</option><option value="2">2 级</option>
+        <option value="3">3 级</option><option value="4">4 级</option><option value="5">5 级</option>
       </select>
-      <button id="btnLoadBopVer" class="cs-btn cs-btn-xs" title="加载所选版本">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
-        </svg>
-      </button>
-      <button id="btnRefreshVers" class="cs-btn cs-btn-xs" title="刷新版本列表">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
-        </svg>
-      </button>
     </div>
-
-    <!-- GID 手动输入（折叠区，点击"更多"展开）-->
-    <div id="bopManualRow" class="cs-bop-manual-row hidden">
-      <input type="text" id="bopGidInput" class="cs-bop-gid-input" placeholder="或直接输入 BOP 版本 GID">
-      <button id="btnLoadBopGid" class="cs-btn cs-btn-xs">加载</button>
-    </div>
-    <button id="btnToggleManual" class="cs-bop-toggle-manual">手动输入 GID</button>
-
-    <!-- 版本状态徽标 -->
+    <!-- 保留给受治理截图流程的内部状态，不再作为树的选择入口。 -->
     <div id="bopVerStatus" class="cs-bop-ver-status hidden"></div>
-
-    <!-- 树体 -->
-    <div id="bopTreeLoading" class="cs-bop-loading hidden">
+    <div id="bopTreeLoading" class="cs-bop-loading hidden" role="status">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="cs-spin">
         <line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/>
         <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/>
         <line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/>
         <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>
       </svg>
-      加载中...
+      <span id="bopTreeLoadingText">加载中...</span>
     </div>
-    <div id="bopTreeEmpty" class="cs-bop-empty hidden">请选择 BOP 版本</div>
+    <div id="bopTreeEmpty" class="cs-bop-empty hidden">尚未选择仿真环境</div>
     <div id="bopTreeBody" class="cs-bop-tree-body"></div>
-  </div>
+    </div>
+  </aside>
 
-  <!-- 中间：VisMockup 结构树面板 -->
+  <div id="environmentWidthHandle" class="cs-panel-width-handle" role="separator" tabindex="0" aria-orientation="vertical" aria-label="调整备选层次结构区域宽度"></div>
+
+  <!-- 右列：模型文件独立滚动，便于拖拽到中间的备选层次结构。 -->
+  <aside id="modelDocumentsPanel" class="cs-model-documents-panel" aria-label="模型文件">
+    <section class="cs-model-documents">
+      <div class="cs-model-documents-header">
+        <span>模型文件</span>
+        <button id="btnTeamcenterSession" class="cs-btn cs-btn-xs cs-teamcenter-session-button" data-state="checking" type="button" title="正在检查 Teamcenter 登录状态" aria-label="Teamcenter 登录状态：检查中">
+          <span class="cs-teamcenter-session-dot" aria-hidden="true"></span><span data-label>Teamcenter 检查中</span>
+        </button>
+        <button id="btnAddTeamcenterSource" class="cs-btn cs-btn-xs" type="button">＋ Teamcenter</button>
+        <button id="btnAddModelDocument" class="cs-btn cs-btn-xs" type="button">＋ PLMXML / JT</button>
+      </div>
+      <div id="modelDocumentList" class="cs-model-document-list">
+        <span class="cs-model-document-empty">选择仿真环境后添加模型文件</span>
+      </div>
+    </section>
+  </aside>
+
+  <div id="modelWidthHandle" class="cs-panel-width-handle" role="separator" tabindex="0" aria-orientation="vertical" aria-label="调整模型文件区域宽度"></div>
+
+  <!-- 中列：VM 结构与可编辑备选层次结构。 -->
   <div class="cs-vis-panel" id="visPanel">
-    <div class="cs-vis-hdr">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0">
-        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
-      </svg>
-      VM 结构树
-      <button id="btnRefreshVisTree" class="cs-btn cs-btn-xs" title="从 VisMockup 重新加载结构树" style="margin-left:auto">
+    <div class="cs-vis-actions">
+      <label class="cs-tree-depth" title="只控制本地完整结构树的展开层级，不会重新同步 VisMockup">
+        VM 层级
+        <select id="vmTreeDepth" aria-label="VM 结构树打开层级">
+          <option value="1" selected>1</option><option value="2">2</option><option value="3">3</option>
+          <option value="4">4</option><option value="5">5</option>
+        </select>
+      </label>
+      <button id="btnRefreshVisTree" class="cs-btn cs-btn-xs" title="从 VisMockup 重新加载结构树">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
         </svg>
       </button>
+      <button id="btnOpenPlmxmlTree" class="cs-btn cs-btn-xs" title="选择工程师导出的 PLMXML，仅导入结构树，不打开模型">
+        PLMXML
+      </button>
+      <input id="vmPlmxmlFile" type="file" accept=".plmxml,.xml,application/xml,text/xml" class="hidden">
       <button id="btnScanCatiaMap" class="cs-btn cs-btn-xs" title="扫描全树 catiaOccurrenceName 映射（不触发几何加载）">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        扫描映射
+        映射
       </button>
       <button id="btnCaptureOps" class="cs-btn cs-btn-xs"
               title="对选中 BOP 节点下所有 operation 按 sort_order 倒序截图并存入工步">
@@ -156,28 +206,64 @@
           <circle cx="12" cy="12" r="4"/>
           <path d="M9 5V3h6v2"/>
         </svg>
-        按工序截图
+        工序截图
       </button>
     </div>
-    <div id="visTreeLoading" class="cs-bop-loading hidden">
+    <section class="cs-alternate-hierarchies" aria-label="备选层次结构">
+      <div class="cs-model-documents-header">
+        <span>备选层次结构</span>
+        <button id="btnAddAlternateHierarchy" class="cs-btn cs-btn-xs" type="button">＋ 新建</button>
+      </div>
+      <div id="alternateHierarchyList" class="cs-alternate-hierarchy-list">
+        <span class="cs-model-document-empty">选择仿真环境后加载</span>
+      </div>
+      <div class="cs-alternate-hierarchy-hint">展开层次后，可把模型文件或资源拖到目标节点。</div>
+    </section>
+    <div id="visTreeLoading" class="cs-bop-loading hidden" role="status">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="cs-spin">
         <line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/>
         <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/>
         <line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/>
         <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>
       </svg>
-      加载中...
+      <span id="visTreeLoadingText">加载中...</span>
     </div>
     <div id="visTreeEmpty" class="cs-bop-empty">连接后点击刷新加载结构树</div>
     <div id="visTreeBody" class="cs-vis-tree-body"></div>
-  </div>
-
-  <!-- 右侧：VisMockup 控制区 + 详情面板 -->
-  <div class="cs-viewer-panel">
-    <div class="cs-viewer-toolbar">
-      <span style="font-size:11px;color:var(--text-muted)" id="nodePathLabel">—</span>
-      <div style="flex:1"></div>
+    <div id="plmxmlSourceBanner" class="cs-plmxml-source-banner hidden" role="status">
+      <span class="cs-plmxml-source-label">项目号</span>
+      <strong id="plmxmlProjectCode">未识别</strong>
+      <span class="cs-plmxml-source-label">保存时间</span>
+      <time id="plmxmlStoredAt">未知时间</time>
     </div>
+    </div>
+  </aside>
+
+  <!-- 最右侧预留区，后续承载版本对比或仿真结果 -->
+  <div class="cs-viewer-panel cs-future-panel" id="simulationFuturePanel">
+    <nav class="cs-workspace-tabs" aria-label="仿真工作区">
+      <button class="active" type="button" data-workspace-tab="viewer">三维工作区</button>
+      <button type="button" data-workspace-tab="detail">节点详情</button>
+      <button type="button" data-workspace-tab="tasks">任务与结果</button>
+      <button type="button" data-workspace-tab="history">操作记录</button>
+      <button type="button" data-workspace-tab="issues">问题提报</button>
+      <button type="button" data-workspace-tab="files">工艺文件</button>
+    </nav>
+    <div class="cs-viewer-toolbar" id="ai00StatusBar" aria-label="仿真运行状态">
+      <span class="cs-viewer-node-path" id="nodePathLabel">—</span>
+      <div id="viewerContextInfo" class="cs-viewer-context">
+        <span id="viewerEnvironmentLabel" class="cs-viewer-environment">仿真环境：未选择</span>
+        <span class="cs-status-sep" aria-hidden="true"></span>
+        <span id="cmdResult" class="cs-cmd-result"></span>
+        <button id="vmDocumentLabel" type="button" class="cs-vm-document" title="点击切换 VisMockup 文档">—</button>
+      </div>
+      <div id="viewerEmbedStatus" class="cs-viewer-embed-status" aria-label="VisMockup 内嵌状态">
+        <span id="vmStatusDot" class="cs-vm-dot" title="打开模型时创建专用 VisMockup 会话"></span>
+        <span id="vmStatusLabel" class="cs-vm-label">打开模型时启动专用 VisMockup</span>
+        <button id="btnConnectorRecovery" class="cs-recovery-entry" type="button">处理未完成操作</button>
+      </div>
+    </div>
+    <div id="nativeViewportSlot" class="cs-native-viewport-slot">
     <div class="cs-viewer-body" id="viewerBody">
       <div id="vmPlaceholder" class="cs-vm-placeholder">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
@@ -185,10 +271,17 @@
           <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
           <line x1="12" y1="22.08" x2="12" y2="12"/>
         </svg>
-        <p>点击"启动 VisMockup"连接 3D 查看器</p>
-        <p style="font-size:11px;opacity:.6;margin-top:4px">VisMockup 已打开时将自动连接，无需重新启动</p>
+        <p>展开模型路径后点击“打开”</p>
+        <p style="font-size:11px;opacity:.6;margin-top:4px">AI00 将创建专用 VisMockup 窗口并加载所选模型</p>
       </div>
+      <section id="vmDiffPanel" class="cs-diff-panel hidden" aria-live="polite">
+        <header><strong>版本差异</strong><button id="btnCloseVmDiff" class="cs-icon-btn" type="button">×</button></header>
+        <div id="vmDiffSummary" class="cs-diff-summary">尚未生成报告</div>
+        <div id="vmDiffItems" class="cs-diff-items"></div>
+      </section>
     </div>
+    </div>
+    <div id="workspacePlaceholder" class="cs-workspace-placeholder hidden"></div>
 
     <!-- 底部详情面板（BOP 节点 / VM 节点详情，可折叠） -->
     <div id="csDetailPanel" class="cs-dp">
@@ -225,18 +318,18 @@
 </div><!-- /.cs-body -->
 
 <!-- VM 测试命令条 -->
-<div class="cs-cmd-bar hidden" aria-hidden="true">
+<div id="vmCommandRail" class="cs-cmd-bar" aria-label="VisMockup 命令">
   <span class="cs-cmd-bar-label">VM</span>
   <div class="cs-cmd-sep"></div>
 
   <!-- 视图显示 -->
-  <button id="cmdAllOn" class="cs-btn cs-btn-xs" title="AllNodesOn — 显示所有节点">
+  <button id="cmdAllOn" class="cs-btn cs-btn-xs cs-cmd-green" title="AllNodesOn — 显示所有节点">
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
     </svg>
     全显
   </button>
-  <button id="cmdAllOff" class="cs-btn cs-btn-xs" title="AllNodesOff — 隐藏所有节点">
+  <button id="cmdAllOff" class="cs-btn cs-btn-xs cs-cmd-green" title="AllNodesOff — 隐藏所有节点">
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>
     </svg>
@@ -245,13 +338,13 @@
   <div class="cs-cmd-sep"></div>
 
   <!-- 选择 -->
-  <button id="cmdSelVisible" class="cs-btn cs-btn-xs" title="SelectVisibleNodes — 选中所有可见节点">
+  <button id="cmdSelVisible" class="cs-btn cs-btn-xs cs-cmd-purple" title="SelectVisibleNodes — 选中所有可见节点">
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
     </svg>
     选可见
   </button>
-  <button id="cmdDesel" class="cs-btn cs-btn-xs" title="DeSelectAllNodes — 取消全部选中">
+  <button id="cmdDesel" class="cs-btn cs-btn-xs cs-cmd-purple" title="DeSelectAllNodes — 取消全部选中">
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/>
     </svg>
@@ -260,13 +353,13 @@
   <div class="cs-cmd-sep"></div>
 
   <!-- 动态高亮 -->
-  <button id="cmdDynHlOn" class="cs-btn cs-btn-xs" title="SetForceDynamicHighlight(True) — 开启动态高亮">
+  <button id="cmdDynHlOn" class="cs-btn cs-btn-xs cs-cmd-purple" title="SetForceDynamicHighlight(True) — 开启动态高亮">
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
     </svg>
     高亮↑
   </button>
-  <button id="cmdDynHlOff" class="cs-btn cs-btn-xs" title="SetForceDynamicHighlight(False) — 关闭动态高亮">
+  <button id="cmdDynHlOff" class="cs-btn cs-btn-xs cs-cmd-purple" title="SetForceDynamicHighlight(False) — 关闭动态高亮">
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <line x1="1" y1="1" x2="23" y2="23"/>
       <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" opacity=".4"/>
@@ -276,7 +369,7 @@
   <div class="cs-cmd-sep"></div>
 
   <!-- 信息 -->
-  <button id="cmdDocInfo" class="cs-btn cs-btn-xs" title="查询文档信息（路径、节点数等）">
+  <button id="cmdDocInfo" class="cs-btn cs-btn-xs cs-cmd-blue" title="查询文档信息（路径、节点数等）">
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
     </svg>
@@ -284,7 +377,7 @@
   </button>
 
   <!-- 截图 -->
-  <button id="cmdCapture" class="cs-btn cs-btn-xs" title="CaptureImage — 截图到 Temp 目录">
+  <button id="cmdCapture" class="cs-btn cs-btn-xs cs-cmd-blue" title="CaptureImage — 截图到 Temp 目录">
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/>
     </svg>
@@ -293,7 +386,7 @@
   <div class="cs-cmd-sep"></div>
 
   <!-- 加载全部几何 -->
-  <button id="cmdLoadAllGeo" class="cs-btn cs-btn-xs" title="遍历全树触发 JT 几何数据加载（大型文件耗时较长，谨慎使用）">
+  <button id="cmdLoadAllGeo" class="cs-btn cs-btn-xs cs-cmd-orange" title="遍历全树触发 JT 几何数据加载（大型文件耗时较长，谨慎使用）">
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
       <polyline points="12 2 12 12"/><polyline points="8 8 12 12 16 8"/>
@@ -303,7 +396,7 @@
 
   <div class="cs-cmd-sep"></div>
   <!-- 调试：原始树结构 -->
-  <button id="cmdDebugTree" class="cs-btn cs-btn-xs" title="调试：打印 VisMockup 原始节点树到 console（F12查看）">
+  <button id="cmdDebugTree" class="cs-btn cs-btn-xs cs-cmd-orange" title="调试：打印 VisMockup 原始节点树到 console（F12查看）">
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
     </svg>
@@ -311,15 +404,91 @@
   </button>
 
   <!-- 诊断 catia 匹配 -->
-  <button id="cmdDebugCatiaMatch" class="cs-btn cs-btn-xs" title="诊断 BOP catia_occ 与 VM catiaOccurrenceName 是否对得上（详见F12）">
+  <button id="cmdDebugCatiaMatch" class="cs-btn cs-btn-xs cs-cmd-orange" title="诊断 BOP catia_occ 与 VM catiaOccurrenceName 是否对得上（详见F12）">
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
     </svg>
     诊断匹配
   </button>
 
-  <div style="flex:1"></div>
-  <span class="cs-cmd-result" id="cmdResult"></span>
+</div>
+
+<aside id="xiaorouDock" class="cs-xiaorou-dock" aria-label="小柔 AI 助手侧栏">
+<button id="xiaorouBall" class="cs-xiaorou-ball" type="button" title="展开小柔 AI 助手（Alt+R）" aria-label="展开小柔 AI 助手" aria-expanded="false">柔</button>
+<section id="xiaorouChat" class="cs-xiaorou-chat hidden" aria-label="小柔 AI 助手">
+  <header class="cs-xiaorou-chat-header">
+    <span>AI 对话</span>
+    <button id="xiaorouChatClose" type="button" title="关闭" aria-label="关闭小柔">×</button>
+  </header>
+  <div class="cs-xiaorou-context">当前模块：数模仿真</div>
+  <div id="xiaorouChatMessages" class="cs-xiaorou-messages">
+    <div class="cs-xiaorou-empty">向小柔发送消息，获取 AI 辅助</div>
+  </div>
+  <div class="cs-xiaorou-input-row">
+    <textarea id="xiaorouChatInput" rows="2" placeholder="问小柔…"></textarea>
+    <button id="xiaorouChatSend" type="button" title="发送" aria-label="发送消息">➤</button>
+  </div>
+</section>
+</aside>
+</div><!-- /#simulationShell -->
+
+<!-- 新建 / 编辑仿真环境弹窗 -->
+<div id="environmentModalOverlay" class="cs-modal-overlay hidden">
+  <form id="environmentModalForm" class="cs-modal cs-environment-modal">
+    <div id="environmentModalTitle" class="cs-modal-title">新建个人仿真环境</div>
+    <div class="cs-field"><label>环境名称</label><input id="environmentModalName" required maxlength="255"></div>
+    <div class="cs-field"><label>主项目</label><select id="environmentModalPrimaryProject"><option value="">— 无 —</option></select></div>
+    <div class="cs-environment-form-grid">
+      <div class="cs-field"><label>评审类型</label><select id="environmentModalReviewType"><option value="node_review">节点评审</option><option value="scattered_review">零散评审</option><option value="other">其他</option></select></div>
+      <div class="cs-field"><label>仿真环境版本</label><input id="environmentModalVersion" required maxlength="128" value="V1"></div>
+      <div class="cs-field"><label>状态</label><select id="environmentModalStatus"><option value="active">活动</option><option value="baseline">基线</option><option value="frozen">冻结</option><option value="archived">归档</option></select></div>
+      <div class="cs-field"><label>可见范围</label><select id="environmentModalVisibility"><option value="private">私人</option><option value="shared">共享</option></select></div>
+    </div>
+    <div class="cs-field"><label>更新时间</label><input id="environmentModalUpdated" disabled value="保存后自动生成"></div>
+    <div id="environmentModalError" class="cs-form-error"></div>
+    <div class="cs-modal-actions"><button class="cs-btn" id="environmentModalCancel" type="button">取消</button><button class="cs-btn primary" id="environmentModalSave" type="submit">保存</button></div>
+  </form>
+</div>
+
+<div id="forkModalOverlay" class="cs-modal-overlay hidden">
+  <form id="forkModalForm" class="cs-modal cs-fork-modal">
+    <div class="cs-modal-title">Fork BOP</div>
+    <div class="cs-field"><label>来源不可变版本</label><select id="forkModalSourceVersion" required></select></div>
+    <div class="cs-field" id="forkModalTargetProjectField"><label>目标项目</label><select id="forkModalTargetProject" required></select></div>
+    <div class="cs-field hidden" id="forkModalTargetRepositoryField"><label>目标 BOP Repository</label><select id="forkModalTargetRepository"></select></div>
+    <div class="cs-field" id="forkModalDepthField"><label>复制深度</label><select id="forkModalDepth"><option value="all">全部复制</option><option value="operation">复制到操作</option><option value="process">复制到工序</option><option value="role">复制到岗位</option><option value="station">复制到工位</option></select></div>
+  <div id="forkModalPrivateFields" class="hidden"><div class="cs-field"><label id="forkModalTargetNameLabel">新环境名称</label><input id="forkModalTargetName" maxlength="255"></div><div class="cs-field" id="forkModalTargetVersionField"><label>新环境版本</label><input id="forkModalTargetVersion" maxlength="128" value="V1"></div></div>
+    <label id="forkModalIncludePersonalField"><input id="forkModalIncludePersonal" type="checkbox"> 同时迁移我的个人空间</label>
+    <div id="forkModalSummary" class="cs-fork-summary"></div>
+    <div id="forkModalError" class="cs-form-error"></div>
+    <div class="cs-modal-actions"><button class="cs-btn" id="forkModalCancel" type="button">取消</button><button class="cs-btn primary" type="submit">预览并 Fork</button></div>
+  </form>
+</div>
+
+<div id="plmxmlInsertOverlay" class="cs-modal-overlay hidden">
+  <form id="plmxmlInsertForm" class="cs-modal cs-plmxml-insert-modal">
+    <div class="cs-modal-title">插入 PLMXML</div>
+    <div id="plmxmlInsertSummary" class="cs-fork-summary"></div>
+    <label class="cs-choice-row"><input type="radio" name="plmxmlInsertMode" value="model_and_selected_hierarchies" checked> 插入模型文件及所选备选层次</label>
+    <label class="cs-choice-row"><input type="radio" name="plmxmlInsertMode" value="model_only"> 仅插入模型文件</label>
+    <fieldset id="plmxmlHierarchyChoices" class="cs-hierarchy-choices"><legend>备选层次结构</legend></fieldset>
+    <div id="plmxmlDependencyNotice" class="cs-fork-summary"></div>
+    <div id="plmxmlInsertError" class="cs-form-error"></div>
+    <div class="cs-modal-actions"><button id="plmxmlInsertCancel" class="cs-btn" type="button">取消</button><button class="cs-btn primary" type="submit">确认插入</button></div>
+  </form>
+</div>
+
+<div id="bopInsertOverlay" class="cs-modal-overlay hidden">
+  <form id="bopInsertForm" class="cs-modal cs-fork-modal">
+    <div class="cs-modal-title">插入 BOP 到当前仿真环境</div>
+    <div class="cs-field"><label>已发布 BOP 版本</label><select id="bopInsertVersion" required></select></div>
+    <div class="cs-field"><label>线体</label><select id="bopInsertLine"><option value="">全部线体</option></select></div>
+    <div class="cs-field"><label>复制深度</label><select id="bopInsertDepth"><option value="all">全部层级</option><option value="operation">到操作</option><option value="process">到工序</option><option value="role">到岗位</option><option value="station">到工位</option></select></div>
+    <div class="cs-field"><label>备选层次名称</label><input id="bopInsertName" required maxlength="255"></div>
+    <div id="bopInsertSummary" class="cs-fork-summary">先预览节点、模型引用和资源引用数量，再确认插入。</div>
+    <div id="bopInsertError" class="cs-form-error"></div>
+    <div class="cs-modal-actions"><button id="bopInsertCancel" class="cs-btn" type="button">取消</button><button id="bopInsertSubmit" class="cs-btn primary" type="submit">生成预览</button></div>
+  </form>
 </div>
 
 <!-- 新建仿真任务弹窗 -->
@@ -331,9 +500,16 @@
       <label>环境名称</label>
       <input id="connectorEnvironmentName" value="工艺倒序截图环境" maxlength="255">
     </div>
-    <div class="cs-field">
-      <label>Connector 设备 ID</label>
-      <input id="connectorDeviceId" placeholder="选择或输入已绑定设备 ID">
+    <div id="connectorBindingCard" class="cs-connector-binding">
+      <div>
+        <strong id="connectorBindingTitle">正在检查本机 Connector…</strong>
+        <div id="connectorBindingDetail">无需输入配对码或设备 ID。</div>
+      </div>
+      <div class="cs-connector-binding-actions">
+        <a class="cs-btn primary" id="connectorConnect" href="#">连接本机</a>
+        <button class="cs-btn primary hidden" id="connectorApprove">确认绑定</button>
+        <button class="cs-btn hidden" id="connectorPairCancel">取消</button>
+      </div>
     </div>
     <div class="cs-connector-source" id="connectorSource">请先选择已发布的 BOP 版本</div>
     <div id="connectorProblems" class="cs-connector-problems hidden"></div>
@@ -376,12 +552,71 @@
   </div>
 </div>
 
+<div id="liveDocumentAdoption" class="cs-modal-overlay hidden">
+  <section class="cs-modal cs-adoption-dialog" role="dialog" aria-modal="true" aria-labelledby="adoptionTitle" aria-describedby="adoptionError">
+    <div class="cs-adoption-heading"><h2 id="adoptionTitle">从当前文档创建环境</h2><button id="adoptionClose" type="button" class="cs-btn" aria-label="关闭">×</button></div>
+    <p>当前文档：<span id="adoptionDocument">—</span></p>
+    <div class="cs-field"><label for="adoptionName">环境名称</label><input id="adoptionName" type="text" maxlength="200" autocomplete="off"></div>
+    <dl class="cs-adoption-status" aria-live="polite"><dt>文档绑定</dt><dd id="adoptionBinding">未绑定</dd><dt>模型结构</dt><dd id="adoptionModel">未开始</dd><dt>备选层次结构（AH）</dt><dd id="adoptionAh">未开始</dd></dl>
+    <p id="adoptionError" role="alert"></p><p id="adoptionOperation"></p>
+    <div class="cs-modal-actions"><button id="adoptionCancel" type="button" class="cs-btn">取消</button><button id="adoptionConfirm" type="button" class="cs-btn primary" disabled>创建环境</button></div>
+  </section>
+</div>
+
+<div id="liveDocumentSwitcher" class="cs-modal-overlay hidden">
+  <section class="cs-modal cs-adoption-dialog" role="dialog" aria-modal="true" aria-labelledby="documentSwitcherTitle">
+    <div class="cs-adoption-heading"><h2 id="documentSwitcherTitle">切换 VisMockup 文档</h2><button id="documentSwitcherClose" type="button" class="cs-btn" aria-label="关闭">×</button></div>
+    <p>选择已打开的文档；有绑定的仿真环境将随文档一起切换。</p>
+    <div id="documentSwitcherItems" class="cs-document-choices" aria-label="已打开的文档"></div>
+    <p id="documentSwitcherStatus" role="status" aria-live="polite"></p>
+    <div class="cs-modal-actions"><button id="documentSwitcherRefresh" type="button" class="cs-btn">刷新列表</button></div>
+  </section>
+</div>
+
+<div id="connectorRecoveryOverlay" class="cs-modal-overlay hidden">
+  <section class="cs-modal cs-recovery-dialog" role="dialog" aria-modal="true" aria-labelledby="connectorRecoveryTitle" aria-describedby="connectorRecoveryStatus">
+    <div class="cs-modal-title" id="connectorRecoveryTitle">处理 Connector 未完成操作</div>
+    <p>请根据现场实际结果选择一项或多项操作并记录核对结论。该决定只记录恢复结果，不自动启动 VisMockup 或建立文档关联。</p>
+    <div class="cs-recovery-selection-actions"><button id="connectorRecoverySelectAll" type="button" class="cs-btn" disabled>请先选择结论</button><button id="connectorRecoveryDeselectAll" type="button" class="cs-btn">取消全选</button></div>
+    <div id="connectorRecoveryItems" class="cs-recovery-items" aria-label="待处理操作"></div>
+    <div id="connectorRecoveryPagination" class="cs-recovery-pagination"><button id="connectorRecoveryPrevPage" type="button" class="cs-btn">上一页</button><span id="connectorRecoveryPageInfo">第 0 / 0 页 · 共 0 项</span><button id="connectorRecoveryNextPage" type="button" class="cs-btn">下一页</button></div>
+    <p id="connectorRecoveryStatus" role="status" aria-live="polite"></p>
+    <p id="connectorRecoveryProgress" role="status" aria-live="polite"></p>
+    <div id="connectorRecoveryResults" class="cs-recovery-results" aria-label="批量处理结果"></div>
+    <fieldset class="cs-recovery-decisions"><legend>现场核对结果</legend><label><input type="radio" name="connectorRecoveryDecision" value="not_executed">未执行</label><label><input type="radio" name="connectorRecoveryDecision" value="executed">已执行</label><label><input type="radio" name="connectorRecoveryDecision" value="abandoned">放弃并归档该未完成操作</label><small>放弃：不重试、不宣称已执行/未执行、不撤销外部效果。</small></fieldset>
+    <div class="cs-field"><label for="connectorRecoveryReason">核对原因（必填）</label><textarea id="connectorRecoveryReason" maxlength="1024" rows="3" required></textarea></div>
+    <div class="cs-modal-actions"><button id="connectorRecoveryChooseDocument" type="button" class="cs-btn hidden">打开文档选择器</button><button id="connectorRecoveryCancel" type="button" class="cs-btn">稍后处理</button><button id="connectorRecoveryConfirm" type="button" class="cs-btn primary" disabled>确认处理</button></div>
+  </section>
+</div>
+
 <!-- online-3d-viewer：Three.js 降级预览 -->
-<script src="../assets/lib/occt/o3dv.min.js"></script>
+<script src="/web/assets/lib/occt/o3dv.min.js"></script>
 <script src="structure_tree.js"></script>
 <script src="viewer3d.js"></script>
 <script src="capture_workflow.js"></script>
-<script src="cad_sim.js"></script>
+<script src="connector_onboarding.js"></script>
+<script src="simulation_cache.js"></script>
+<script src="vm_versioning.js"></script>
+<script src="vm_snapshot_tree.js"></script>
+<script src="plmxml_tree_import.js"></script>
+<script src="bop_vm_binding_draft.js"></script>
+<script src="environment_store.js?v=20260916-capacity-backoff"></script>
+<script src="environment_records.js"></script>
+<script src="environment_tree.js"></script>
+<script src="model_binding_panel.js"></script>
+  <script src="model_document_collection.js"></script>
+  <script src="teamcenter_session.js?v=20260917-teamcenter-search-fix-v2"></script>
+<script src="teamcenter_online_source.js?v=20260917-teamcenter-runtime-controls-2"></script>
+<script src="tree_projection_cache.js?v=20260916-model-load-state-3"></script>
+<script src="environment_workspace.js"></script>
+<script src="viewer_interaction.js?rev=20260922-open-shortpath-2"></script>
+<script src="cad_sim.js?rev=20260922-local-interaction-1"></script>
+<!-- Vite treats ?v= as immutable dependency content; source fixes must revalidate. -->
+<script src="connector_recovery.js?rev=20260916-recovery-fingerprint-1"></script>
+<script src="live_document_adoption.js?v=20260922-local-interaction-1"></script>
+<script src="live_document_switcher.js?v=20260917-exact-session-recovery-1"></script>
+<script src="live_document_bootstrap.js?rev=20260922-open-shortpath-2"></script>
+<script>window.addEventListener('DOMContentLoaded', () => { AI00ConnectorRecovery.mount(); AI00LiveDocumentBootstrap(); });</script>
 <script>
   // 主题同步
   window.addEventListener('message', e => {

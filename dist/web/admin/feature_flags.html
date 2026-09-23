@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script src="/web/core/business_facade.js"></script>
   <meta charset="UTF-8">
   <title>功能开关</title>
   <script src="/web/icons.js"></script>
@@ -36,6 +37,7 @@
     colgroup col:nth-child(2) { width:auto; }
     colgroup col:nth-child(3) { width:180px; }
     colgroup col:nth-child(4) { width:180px; }
+    colgroup col:nth-child(5) { width:90px; }
     thead th { position:sticky; top:0; background:var(--bg-secondary); padding:8px 10px; text-align:left; font-size:12px; font-weight:600; color:var(--text-muted); border-bottom:1px solid var(--border-default); white-space:nowrap; z-index:2; }
     tbody tr { border-bottom:1px solid var(--border-default); }
     tbody tr:hover { background:var(--bg-surface); }
@@ -80,13 +82,14 @@
   </div>
   <div class="table-wrap">
     <table id="ffTable">
-      <colgroup><col/><col/><col/><col/></colgroup>
+      <colgroup><col/><col/><col/><col/><col/></colgroup>
       <thead>
         <tr>
           <th>分类</th>
           <th>功能名称</th>
           <th>可见性（谁能看到）</th>
           <th>可用性（谁能操作）</th>
+          <th>启用状态</th>
         </tr>
       </thead>
       <tbody id="ffBody"></tbody>
@@ -106,6 +109,7 @@
       { id:'admin_approval',      label:'审批中心',           cat:'admin',     navId:'admin_hub › approval'       },
       { id:'admin_org',           label:'组织管理',           cat:'admin',     navId:'admin_hub › org'            },
       { id:'admin_capabilities',  label:'系统能力',           cat:'admin',     navId:'admin_hub › capabilities'   },
+      { id:'admin_orchestration', label:'编排中心（MVP）',     cat:'admin',     navId:'admin_hub › orchestration'  },
       { id:'admin_lists',         label:'清单注册',           cat:'admin',     navId:'admin_hub › lists'          },
       { id:'admin_feature_flags', label:'功能开关',           cat:'admin',     navId:'admin_hub › feature_flags'  },
       { id:'admin_bug_tracker',   label:'开发看板',           cat:'admin',     navId:'admin_hub › bug_tracker'    },
@@ -165,6 +169,7 @@
       sb_schedule:      'member',
       admin_ai_audit:   'super_admin',
       admin_task_planning: 'super_admin',
+      admin_orchestration: 'team_admin',
       admin_bug_tracker:   'super_admin',
       // 系统设置面板默认可见性（与 settings.js _SETTINGS_VISIBILITY 保持一致）
       settings_panel_database:        'team_admin',
@@ -184,6 +189,7 @@
         d[f.id] = {
           visibility:   VISIBILITY_DEFAULTS[f.id] || 'all',
           availability: 'all',
+          ...(f.id === 'admin_orchestration' ? { enabled: false } : {}),
         };
       });
       return d;
@@ -191,7 +197,7 @@
 
     // ── Cloud fetch ───────────────────────────────────────────────────────────
     function cf(path, opts) {
-      const fn = window.parent?._cloudFetch || window._cloudFetch || window.parent?.parent?._cloudFetch;
+      const fn = window.AI00Business?.available() || window.AI00Business?.available() || window.AI00Business?.available();
       if (!fn) return Promise.reject(new Error('no _cloudFetch'));
       return fn(path, opts);
     }
@@ -199,7 +205,7 @@
     async function loadFlags() {
       _flags = _defaultFlags();
       try {
-        const res = await cf('/admin/config/feature_flags');
+        const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.runtime.feature_flags.get", {version:1,payload:({})}); return result; })({},{},new URLSearchParams());
         if (res?.data?.value) {
           const parsed = JSON.parse(res.data.value);
           // 深度合并：只覆盖存在的字段
@@ -219,10 +225,7 @@
 
     async function doSave() {
       try {
-        await cf('/admin/config/feature_flags', {
-          method: 'PUT',
-          body: JSON.stringify({ value: JSON.stringify(_flags), description: '功能开关配置' }),
-        });
+        await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.runtime.feature_flags.replace", {version:1,payload:({flags:Object.entries(JSON.parse(body.value)).map(([id,value])=>typeof value==="boolean"?{id,enabled:value}:{id,...value})})}); return result; })({ value: JSON.stringify(_flags), description: '功能开关配置' },{},new URLSearchParams());
         const badge = document.getElementById('savedBadge');
         badge.classList.add('visible');
         setTimeout(() => badge.classList.remove('visible'), 1500);
@@ -247,6 +250,11 @@
       return `<select class="${cls}" data-id="${_he(featId)}" data-field="${field}"${dis}>${opts}</select>`;
     }
 
+    function _enabledHtml(feat, enabled) {
+      if (feat.id !== 'admin_orchestration') return '<span class="feat-navid">—</span>';
+      return `<label title="编排中心入口开关"><input type="checkbox" class="feat-enabled" data-id="${_he(feat.id)}"${enabled ? ' checked' : ''} /> 启用</label>`;
+    }
+
     function render() {
       const body = document.getElementById('ffBody');
       body.innerHTML = '';
@@ -254,6 +262,7 @@
         const entry = _flags[feat.id] || { visibility: VISIBILITY_DEFAULTS[feat.id] || 'all', availability: 'all' };
         const vis   = entry.visibility   || 'all';
         const avail = entry.availability || 'all';
+        const enabled = entry.enabled === true;
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td><span class="cat-badge cat-${feat.cat}">${_he(CAT_LABELS[feat.cat] || feat.cat)}</span></td>
@@ -263,6 +272,7 @@
           </td>
           <td>${_selectHtml(feat.id, 'visibility',   vis,   !!feat.readonly, false)}</td>
           <td>${_selectHtml(feat.id, 'availability', avail, !!feat.readonly, true)}</td>
+          <td>${_enabledHtml(feat, enabled)}</td>
         `;
         body.appendChild(tr);
       });
@@ -281,6 +291,14 @@
           // 更新颜色 class
           sel.className = sel.className.replace(/\b(vis|ava)-\S+/, '');
           sel.classList.add(`${prefix}-${sel.value}`);
+          scheduleSave();
+        });
+      });
+      document.querySelectorAll('.feat-enabled').forEach(input => {
+        input.addEventListener('change', () => {
+          const id = input.dataset.id;
+          if (!_flags[id]) _flags[id] = { visibility: 'team_admin', availability: 'team_admin' };
+          _flags[id].enabled = input.checked;
           scheduleSave();
         });
       });

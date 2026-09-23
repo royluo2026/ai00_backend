@@ -39,12 +39,20 @@ public sealed class FakeVisMockupCom : IVisMockupCom
 
 public sealed class FakeApplication(string productVersion, IVisMockupDocument? activeDocument) : IVisMockupApplication
 {
+    private IVisMockupDocument? _activeDocument = activeDocument;
     public string ProductVersion { get; } = productVersion;
-    public IVisMockupDocument? ActiveDocument { get; set; } = activeDocument;
+    public int ActiveDocumentReads { get; private set; }
+    public IVisMockupDocument? ActiveDocument
+    {
+        get { ActiveDocumentReads++; return _activeDocument; }
+        set => _activeDocument = value;
+    }
     public IReadOnlyList<IVisMockupDocument> OpenDocuments { get; set; } = activeDocument is null ? [] : [activeDocument];
     public FakeDocument? LastOpenedDocument { get; private set; }
+    public int OpenCalls { get; private set; }
     public IVisMockupDocument OpenDocument(string path)
     {
+        OpenCalls++;
         LastOpenedDocument = new FakeDocument(Path.GetFullPath(path), Path.GetFullPath(path), FakeNode.FlatTree(1));
         ActiveDocument = LastOpenedDocument;
         OpenDocuments = [LastOpenedDocument];
@@ -61,6 +69,22 @@ public sealed class FakeApplication(string productVersion, IVisMockupDocument? a
 }
 public sealed class FakeDocument(string documentId, string sourceIdentity, IVisMockupNode rootNode) : IVisMockupDocument
 {
+    public NativeDocumentWindow NativeWindow { get; set; }=new("12345","67890");
+    public int ActivateNativeWindowCalls { get; private set; }
+    public Action? AfterNativeActivation { get; set; }
+    public NativeDocumentWindow LocateNativeWindow(int processId,NativeDocumentWindow? previous)=>NativeWindow;
+    public NativeDocumentWindow SelectExistingNativeWindow(int processId)
+    {
+        AfterNativeActivation?.Invoke();
+        return NativeWindow;
+    }
+    public NativeDocumentWindow ActivateNativeWindow(int processId,NativeDocumentWindow target)
+    {
+        ActivateNativeWindowCalls++;
+        if(target!=NativeWindow)throw new Ai00.Connector.Contracts.ConnectorException("vismockup_document_window_changed");
+        AfterNativeActivation?.Invoke();
+        return target;
+    }
     private readonly HashSet<string> _visible = [];
     private readonly HashSet<string> _selected = [];
     private readonly List<string> _insertedDocumentPaths = [];

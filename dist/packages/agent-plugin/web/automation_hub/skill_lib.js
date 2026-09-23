@@ -47,16 +47,10 @@
   }
 
   // ── 云端 API ───────────────────────────────────────────────────────────────
-  function _cf() { return window.parent?._cloudFetch || window._cloudFetch; }
+  function _cf() { return window.AI00Business?.available() || window.AI00Business?.available(); }
 
   async function _invokeCapability(id, payload = {}) {
-    const _cloudFetch = _cf();
-    if (!_cloudFetch) throw new Error('云端服务未连接');
-    const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ version: 1, payload }),
-    });
+    const response = await window.AI00Business.request(id, { version: 1, payload });
     const envelope = response?.data;
     if (response?.success !== true || envelope?.ok !== true) {
       const detail = envelope?.error || response?.error || {};
@@ -69,9 +63,9 @@
   // ── 加载数据 ──────────────────────────────────────────────────────────────
   async function loadSkills() {
     try {
-      const _cloudFetch = _cf();
-      if (!_cloudFetch) { _skills = []; renderGrid(); return; }
-      const list = await _cloudFetch(`/api/skills?scope_filter=all`, { method: 'GET' });
+
+      if (!window.AI00Business?.available()) { _skills = []; renderGrid(); return; }
+      const list = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.skill.read", {version:1,payload:Object.fromEntries(Object.entries({"operation":"list","scope_filter":(query.has("scope_filter")?query.get("scope_filter"):"all")}).filter(([,v])=>v!=null))}); return result; })({},{},new URLSearchParams((`/api/skills?scope_filter=all`).split("?")[1]||""));
       _skills = Array.isArray(list) ? list : [];
     } catch (e) {
       _skills = [];
@@ -136,7 +130,7 @@
         const newStatus = skill.status === 'active' ? 'archived' : 'active';
         const _cloudFetch = _cf();
         if (_cloudFetch) {
-          _cloudFetch(`/api/skills/${gid}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ status: newStatus }) }).then(() => loadSkills());
+          (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.skill.update", {version:1,payload:({skill_gid:path.gid,changes:Object.fromEntries(Object.entries({...body,...(body.scope?{visibility:body.scope}:{}),...(body.content!==undefined?{content:typeof body.content==="string"?JSON.parse(body.content):body.content}:{}),...(body.tags!==undefined?{tags:typeof body.tags==="string"?JSON.parse(body.tags):body.tags}:{})}).filter(([key,value])=>["title","description","visibility","content","icon","tags","sort_order","status","is_pinned"].includes(key)&&value!==undefined))})}); return result; })({ status: newStatus },{"gid":decodeURIComponent(String(gid))},new URLSearchParams()).then(() => loadSkills());
         }
       });
     });
@@ -376,15 +370,11 @@
     try {
       const _cloudFetch = _cf();
       if (!_cloudFetch) { alert('需要飞书登录才能保存'); return; }
-      const result = await _cloudFetch('/api/skills', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const result = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.skill.create", {version:1,payload:Object.fromEntries(Object.entries({...body,visibility:body.scope||"private",content:typeof body.content==="string"?JSON.parse(body.content):body.content,tags:typeof body.tags==="string"?JSON.parse(body.tags):body.tags}).filter(([key,value])=>["name","title","description","skill_type","visibility","content","icon","tags","sort_order"].includes(key)&&value!==undefined))}); return result; })({
           name, title, skill_type: _newType, scope, description: desc,
           owner_gid: _getUserGid(),
           content: JSON.stringify(content),
-        }),
-      });
+        },{},new URLSearchParams());
       if (result?.error) { alert(result.error); return; }
       closeNewModal();
       await loadSkills();
@@ -522,11 +512,7 @@
     try {
       const _cloudFetch = _cf();
       if (!_cloudFetch) { alert('需要飞书登录才能保存'); return; }
-      const result = await _cloudFetch(`/api/skills/${s.gid}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(fields),
-      });
+      const result = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.skill.update", {version:1,payload:({skill_gid:path.gid,changes:Object.fromEntries(Object.entries({...body,...(body.scope?{visibility:body.scope}:{}),...(body.content!==undefined?{content:typeof body.content==="string"?JSON.parse(body.content):body.content}:{}),...(body.tags!==undefined?{tags:typeof body.tags==="string"?JSON.parse(body.tags):body.tags}:{})}).filter(([key,value])=>["title","description","visibility","content","icon","tags","sort_order","status","is_pinned"].includes(key)&&value!==undefined))})}); return result; })(fields,{"gid":decodeURIComponent(String(s.gid))},new URLSearchParams());
       if (result?.error) { alert(result.error); return; }
       closeEditModal();
       await loadSkills();
@@ -538,7 +524,7 @@
     if (!confirm(`确认删除 Skill「${_editSkill.title}」？此操作不可恢复。`)) return;
     try {
       const _cloudFetch = _cf();
-      if (_cloudFetch) await _cloudFetch(`/api/skills/${_editSkill.gid}`, { method: 'DELETE' });
+      if (_cloudFetch) await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.skill.change.apply", {version:1,payload:Object.fromEntries(Object.entries({"operation":"delete","skill_gid":path.gid}).filter(([,v])=>v!=null))}); return result; })({},{"gid":decodeURIComponent(String(_editSkill.gid))},new URLSearchParams());
       closeEditModal();
       await loadSkills();
     } catch (e) { alert('删除失败: ' + e.message); }
@@ -549,11 +535,7 @@
     const newStatus = _editSkill.status === 'active' ? 'archived' : 'active';
     try {
       const _cloudFetch = _cf();
-      if (_cloudFetch) await _cloudFetch(`/api/skills/${_editSkill.gid}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus }),
-      });
+      if (_cloudFetch) await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.skill.update", {version:1,payload:({skill_gid:path.gid,changes:Object.fromEntries(Object.entries({...body,...(body.scope?{visibility:body.scope}:{}),...(body.content!==undefined?{content:typeof body.content==="string"?JSON.parse(body.content):body.content}:{}),...(body.tags!==undefined?{tags:typeof body.tags==="string"?JSON.parse(body.tags):body.tags}:{})}).filter(([key,value])=>["title","description","visibility","content","icon","tags","sort_order","status","is_pinned"].includes(key)&&value!==undefined))})}); return result; })({ status: newStatus },{"gid":decodeURIComponent(String(_editSkill.gid))},new URLSearchParams());
       closeEditModal();
       await loadSkills();
     } catch (e) { alert('操作失败: ' + e.message); }

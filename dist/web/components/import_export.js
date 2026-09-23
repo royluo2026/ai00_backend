@@ -223,7 +223,7 @@ class ImportExportManager {
       `;
       // 选完文件自动解析上传 → 跳过下一步按钮，直接在这个 handler 里完成
       const fileInput = wrap.querySelector('#ie-excel-file-input');
-      const _cf = this._cf.bind(this);
+
       fileInput.addEventListener('change', async () => {
         const file = fileInput.files?.[0];
         fileInput.value = '';
@@ -232,13 +232,7 @@ class ImportExportManager {
         this._importState._parsing = true;
         this._showBodyStatus('正在读取并解析文件…');
         try {
-          const b64 = await _readBrowserFile(file);
-          if (!b64) throw new Error('文件读取结果为空');
-          const data = await _cf('POST', '/api/import-export/import/parse-excel', {
-            file_b64: b64,
-            filename: file.name,
-          });
-          this._importState.parsed = data;
+          await this._parseExcelFile();
           this._renderImportStep(2);
         } catch (e) {
           this._showError(e.message || '读取失败');
@@ -300,65 +294,14 @@ class ImportExportManager {
   }
 
   async _parseExcelFile() {
-    const _cf = this._cf.bind(this);
-    const eAPI = _getElectronAPI();
-    let fileB64  = null;
-    let filename = 'unknown.xlsx';
-
-    if (eAPI?.openFileDialog) {
-      // Electron 环境：系统文件对话框
-      const filePath = await eAPI.openFileDialog([
-        { name: 'Excel / CSV 文件', extensions: ['xlsx', 'xls', 'xlsm', 'csv'] },
-        { name: '所有文件', extensions: ['*'] },
-      ]);
-      if (!filePath) throw new Error('未选择文件');
-      fileB64  = await _readFileAsBase64(filePath);
-      filename = filePath.split(/[\\/]/).pop();
-    } else {
-      // 浏览器环境：由「选择文件」按钮同步触发，数据存入了 _browserFilePicked
-      if (!this._importState._browserFilePicked) throw new Error('请先点击「选择 Excel / CSV 文件」按钮');
-      fileB64  = this._importState._browserFilePicked.b64;
-      filename = this._importState._browserFilePicked.name;
-    }
-
-    if (!fileB64) throw new Error('无法读取文件');
-
-    const data = await _cf('POST', '/api/import-export/import/parse-excel', {
-      file_b64: fileB64,
-      filename,
-    });
-    this._importState.parsed = data;
-  }
+this._importState.parsed=(await window.AI00Business.invoke('craft.data_exchange.excel.parse',{version:1,payload:{module:this._moduleId},native_io:{select:'spreadsheet'}})).data;
+}
 
   async _parseLarkSheet() {
-    const _cf = this._cf.bind(this);
-    const token = this._overlay.querySelector('#ie-lark-token')?.value.trim();
-    const range = this._overlay.querySelector('#ie-lark-range')?.value.trim() || 'Sheet1!A1:Z1000';
-    if (!token) throw new Error('请输入飞书电子表格 Token');
-    const userToken = _getLarkToken();
-    if (!userToken) throw new Error('请先飞书登录后再导入飞书表格');
-    const data = await _cf('POST', '/api/import-export/lark-sheets/read', {
-      user_access_token: userToken,
-      spreadsheet_token: token,
-      sheet_range: range,
-    });
-    this._importState.parsed = data;
-  }
+const token=this._overlay.querySelector('#ie-lark-token')?.value.trim(),range=this._overlay.querySelector('#ie-lark-range')?.value.trim()||'Sheet1!A1:Z1000';if(!token)throw Error('请输入飞书电子表格 Token');this._importState.parsed=await window.AI00Business.invoke('craft.data_exchange.feishu_sheet.read',{version:1,payload:{spreadsheet_token:token,sheet_range:range}});
+}
 
-  async _parseLarkBitable() {
-    const _cf = this._cf.bind(this);
-    const appToken   = this._overlay.querySelector('#ie-bitable-app')?.value.trim();
-    const tableId    = this._overlay.querySelector('#ie-bitable-table')?.value.trim();
-    if (!appToken || !tableId) throw new Error('请填写 App Token 和 Table ID');
-    const userToken = _getLarkToken();
-    if (!userToken) throw new Error('请先飞书登录后再导入飞书多维表');
-    const data = await _cf('POST', '/api/import-export/lark-bitable/read', {
-      user_access_token: userToken,
-      app_token: appToken,
-      table_id: tableId,
-    });
-    this._importState.parsed = data;
-  }
+  async _parseLarkBitable() {const app_token=this._overlay.querySelector('#ie-bitable-app')?.value.trim(),table_id=this._overlay.querySelector('#ie-bitable-table')?.value.trim();if(!app_token||!table_id)throw Error('请填写 App Token 和 Table ID');this._importState.parsed=await window.AI00Business.invoke('craft.data_exchange.feishu_bitable.read',{version:1,payload:{app_token,table_id,page_size:500}});}
 
   // Step 2：预览 + 字段映射
   _renderImportStep2() {
@@ -578,9 +521,9 @@ class ImportExportManager {
   // ────────────────────────────────────────────────────────────────────────────
 
   async _loadTemplates() {
-    const _cf = this._cf.bind(this);
+
     try {
-      const data = await _cf('GET', `/api/import-export/templates?module=${encodeURIComponent(this._moduleId)}`);
+      const data = (await window.AI00Business.invoke('base.export_template.list',{version:1,payload:{module:this._moduleId}})).items;
       this._exportState.templates = data || [];
     } catch {
       this._exportState.templates = [];
@@ -749,17 +692,15 @@ class ImportExportManager {
       this._setTitle('导出数据');
     });
     this._overlay.querySelector('#ie-tmpl-save').addEventListener('click', async () => {
-      const _cf = this._cf.bind(this);
+
       const config   = editor.getConfig();
       const name     = editor.getName() || '未命名模板';
       const isShared = editor.getIsShared();
       try {
         if (gid) {
-          await _cf('PATCH', `/api/import-export/templates/${gid}`, { name, config, is_shared: isShared });
+          await window.AI00Business.invoke('base.export_template.update',{version:1,payload:{gid,changes:{name,config,is_shared:isShared}}});
         } else {
-          const resp = await _cf('POST', '/api/import-export/templates', {
-            name, module: this._moduleId, config, is_shared: isShared,
-          });
+          const resp = await window.AI00Business.invoke('base.export_template.create',{version:1,payload:{name,module:this._moduleId,config,is_shared:isShared}});
           if (resp?.gid) this._exportState.templateGid = resp.gid;
         }
         await this._loadTemplates();
@@ -812,91 +753,23 @@ class ImportExportManager {
   }
 
   async _exportToExcel(tmplConfig, rows) {
-    const _cf = this._cf.bind(this);
-    const resp = await _cf('POST', '/api/import-export/export/excel', {
-      template_config: tmplConfig,
-      rows,
-    });
-    if (!resp?.file_b64) throw new Error('后端未返回文件数据');
-
-    const eAPI = _getElectronAPI();
-    const filename = resp.filename || 'export.xlsx';
-    let savePath = null;
-    if (eAPI?.saveFileDialog) {
-      savePath = await eAPI.saveFileDialog({
-        title: '保存 Excel 文件',
-        defaultPath: filename,
-        filters: [{ name: 'Excel 文件', extensions: ['xlsx'] }],
-      });
-    }
-    if (!savePath) return; // 用户取消
-
-    // base64 → 二进制写文件
-    // 通过 writeTextFile 不行（utf-8），需要 Electron IPC 写 binary
-    // 改用临时方案：base64 to blob → download link（适用于 Electron renderer）
-    _saveBase64AsFile(resp.file_b64, savePath, eAPI);
-  }
+const columns=(tmplConfig.columns||[]).filter(column=>column.include!==false).map(column=>({key:column.key,label:column.label||column.key,width:column.width||15}));
+ await window.AI00Business.invoke('craft.data_exchange.excel.export',{version:1,payload:{columns,styles:tmplConfig.styles||{},rows:rows.map(row=>columns.map(column=>{const value=row[column.key];return value&&typeof value==='object'?JSON.stringify(value):value??'';})),filename:'export.xlsx'},native_io:{save:true}});
+}
 
   async _exportToLarkSheet(tmplConfig, rows) {
-    const _cf = this._cf.bind(this);
-    const token   = this._overlay.querySelector('#ie-exp-lark-token')?.value.trim();
-    const sheetId = this._overlay.querySelector('#ie-exp-lark-sheet')?.value.trim() || 'Sheet1';
-    if (!token) throw new Error('请输入飞书电子表格 Token');
-    const userToken = _getLarkToken();
-    if (!userToken) throw new Error('请先飞书登录');
+const token=this._overlay.querySelector('#ie-exp-lark-token')?.value.trim(),sheetId=this._overlay.querySelector('#ie-exp-lark-sheet')?.value.trim()||'Sheet1';if(!token)throw Error('请输入飞书电子表格 Token');
+ const columns=(tmplConfig.columns||[]).filter(column=>column.include!==false);
+ await window.AI00Business.invoke('craft.data_exchange.feishu_sheet.write',{version:1,payload:{spreadsheet_token:token,sheet_id:sheetId,headers:columns.map(column=>column.label||column.key),rows:rows.map(row=>columns.map(column=>{const value=row[column.key];return value&&typeof value==='object'?JSON.stringify(value):value??'';}))}});
+}
 
-    const columns = (tmplConfig.columns || []).filter(c => c.include !== false);
-    const headers = columns.map(c => c.label || c.key);
-    const dataRows = rows.map(r => columns.map(c => {
-      const v = r[c.key];
-      return typeof v === 'object' ? JSON.stringify(v) : (v ?? '');
-    }));
-
-    await _cf('POST', '/api/import-export/lark-sheets/write', {
-      user_access_token: userToken,
-      spreadsheet_token: token,
-      sheet_id: sheetId,
-      headers,
-      rows: dataRows,
-    });
-  }
-
-  async _exportToLarkBitable(tmplConfig, rows) {
-    const _cf = this._cf.bind(this);
-    const appToken = this._overlay.querySelector('#ie-exp-bitable-app')?.value.trim();
-    const tableId  = this._overlay.querySelector('#ie-exp-bitable-table')?.value.trim();
-    if (!appToken || !tableId) throw new Error('请填写 App Token 和 Table ID');
-    const userToken = _getLarkToken();
-    if (!userToken) throw new Error('请先飞书登录');
-
-    const columns = (tmplConfig.columns || []).filter(c => c.include !== false);
-    const records = rows.map(r => {
-      const fields = {};
-      columns.forEach(c => { fields[c.label || c.key] = r[c.key] ?? ''; });
-      return fields;
-    });
-
-    await _cf('POST', '/api/import-export/lark-bitable/write', {
-      user_access_token: userToken,
-      app_token: appToken,
-      table_id: tableId,
-      records,
-    });
-  }
+  async _exportToLarkBitable(tmplConfig, rows) {const app_token=this._overlay.querySelector('#ie-exp-bitable-app')?.value.trim(),table_id=this._overlay.querySelector('#ie-exp-bitable-table')?.value.trim();if(!app_token||!table_id)throw Error('请填写 App Token 和 Table ID');const columns=(tmplConfig.columns||[]).filter(c=>c.include!==false);await window.AI00Business.invoke('craft.data_exchange.feishu_bitable.write',{version:1,payload:{app_token,table_id,headers:columns.map(c=>c.label||c.key),rows:rows.map(row=>columns.map(c=>{const v=row[c.key];return v&&typeof v==='object'?JSON.stringify(v):v??'';}))}});}
 
   // ────────────────────────────────────────────────────────────────────────────
   // 工具：云端 API 调用
   // ────────────────────────────────────────────────────────────────────────────
 
-  async _cf(method, path, body) {
-    const fn = window.parent?._cloudFetch || window._cloudFetch;
-    if (!fn) throw new Error('_cloudFetch 未就绪');
-    const opts = { method };
-    if (body !== undefined) opts.body = JSON.stringify(body);
-    const resp = await fn(path, opts);
-    if (!resp?.success) throw new Error(resp?.message || 'API 调用失败');
-    return resp.data;
-  }
+
 
   // ────────────────────────────────────────────────────────────────────────────
   // 错误提示
@@ -932,14 +805,7 @@ function _ieEsc(s) {
 }
 
 /** 浏览器环境：FileReader 读取 File 对象为 base64 字符串 */
-function _readBrowserFile(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload  = () => resolve((reader.result || '').split(',')[1]);
-    reader.onerror = () => reject(new Error('FileReader 读取失败'));
-    reader.readAsDataURL(file);
-  });
-}
+
 
 /** 沿 iframe 链查找 electronAPI（支持多层嵌套） */
 function _getElectronAPI() {
@@ -953,31 +819,10 @@ function _getElectronAPI() {
 }
 
 /** 获取已登录飞书用户的 access_token */
-function _getLarkToken() {
-  const authUser = window.parent?._authUser || window._authUser;
-  return authUser?.access_token || null;
-}
+
 
 /** 读取本地文件为 base64（通过 Electron IPC fs:read-binary，降级用 FileReader） */
-async function _readFileAsBase64(filePath) {
-  const eAPI = _getElectronAPI();
-  // 优先使用 Electron IPC（在 iframe 中 file:// fetch 不可用）
-  if (eAPI?.readFileBase64) {
-    const b64 = await eAPI.readFileBase64(filePath);
-    if (b64) return b64;
-  }
-  // 降级：fetch file:// 协议（仅主窗口中可用）
-  try {
-    const resp = await fetch('file://' + filePath.replace(/\\/g, '/'));
-    const buf  = await resp.arrayBuffer();
-    const bytes = new Uint8Array(buf);
-    let binary = '';
-    for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-    return btoa(binary);
-  } catch {
-    throw new Error('无法读取文件，请确认文件路径有效');
-  }
-}
+
 
 /** 将 base64 文件数据保存到指定路径（Electron 环境） */
 function _saveBase64AsFile(b64, filePath, eAPI) {

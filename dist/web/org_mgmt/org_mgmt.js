@@ -10,27 +10,14 @@ window.addEventListener('message', e => {
 });
 
 // ── cloudFetch 桥接 ────────────────────────────────────────────
-async function _cf(method, path, opts = {}) {
-  const cf = window.parent?._cloudFetch || window.top?._cloudFetch || window._cloudFetch;
-  if (typeof cf !== 'function') {
-    console.warn('[org_mgmt] _cloudFetch 不可用');
-    return null;
-  }
-  try {
-    return await cf(path, { ...opts, method });
-  } catch (e) {
-    console.warn('[org_mgmt] API 失败:', e.message);
-    return null;
-  }
-}
 
-async function invokeCapability(id, payload = {}) {
-  const _cloudFetch = window.parent?._cloudFetch || window.top?._cloudFetch || window._cloudFetch;
-  if (typeof _cloudFetch !== 'function') throw new Error('云端服务未连接');
-  const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ version: 1, payload }),
+
+async function invokeCapability(id, payload = {}, options = {}) {
+  if (!window.AI00Business?.available()) throw new Error('云端服务未连接');
+  const response = await window.AI00Business.request(id, {
+    version: 1, payload,
+    idempotency_key: options.idempotencyKey,
+    expected_resource_version: options.expectedResourceVersion,
   });
   const envelope = response?.data;
   if (response?.success !== true || envelope?.ok !== true) {
@@ -39,6 +26,16 @@ async function invokeCapability(id, payload = {}) {
   }
   const value = envelope.data;
   return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+}
+
+async function _runResponsibilityAction(action) {
+  try {
+    return await action();
+  } catch (error) {
+    console.error('[org_mgmt] responsibility action failed:', error);
+    _toast(error?.message || '操作失败，请重试', 'err');
+    return null;
+  }
 }
 
 async function _baseCall(operation, args = {}, options = {}) {
@@ -108,32 +105,6 @@ async function loadStruct() {
   _renderStructTree();
 }
 
-// ── 从飞书同步组织架构 ─────────────────────────────────────────
-document.getElementById('btn-sync-feishu').addEventListener('click', async () => {
-  const btn    = document.getElementById('btn-sync-feishu');
-  const banner = document.getElementById('sync-result-banner');
-  btn.disabled = true;
-  btn.innerHTML = '<svg class="icon" width="13" height="13"><use href="#icon-refresh"/></svg> 同步中…';
-  try {
-    const res = await _cf('POST', '/feishu/sync/org', { method: 'POST' });
-    if (res?.status === 'syncing' || res?.success) {
-      banner.textContent = '组织架构与成员同步已在后台启动，完成后请刷新页面查看';
-      banner.className = 'sync-banner sync-ok';
-      setTimeout(() => loadStruct(), 3000);
-    } else {
-      banner.textContent = res?.detail || '同步失败';
-      banner.className = 'sync-banner sync-err';
-    }
-  } catch (e) {
-    banner.textContent = `同步出错：${e.message}`;
-    banner.className = 'sync-banner sync-err';
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<svg class="icon" width="13" height="13"><use href="#icon-refresh"/></svg> 从飞书同步组织架构';
-    setTimeout(() => { banner.className = 'sync-banner hidden'; }, 8000);
-  }
-});
-
 // ── 展开状态（gid set） ────────────────────────────────────────
 let _expandedTeams = new Set();
 let _feishuFolded = true;  // 飞书组织默认折叠
@@ -141,19 +112,16 @@ let _feishuFolded = true;  // 飞书组织默认折叠
 function _renderStructTree() {
   const body = document.getElementById('struct-tree-body');
 
-  if (!_allTeams.length) {
-    body.innerHTML = '<div class="empty-hint" style="padding:24px 16px">暂无团队<br>请先点击"从飞书同步组织架构"</div>';
-    return;
-  }
-
-  // 拆分：手动团队 vs 飞书组织
-  const manualTeams = _allTeams.filter(t => !t.feishu_dept_id);
-  const feishuTeams = _allTeams.filter(t => !!t.feishu_dept_id);
+  // 所有已有节点统一进入一棵树；来源不再决定维护方式。
+  const knownTeamGids = new Set(_allTeams.map(team => team.gid));
+  let manualTeams = _allTeams.filter(team => !team.parent_team_gid || !knownTeamGids.has(team.parent_team_gid) || team.parent_team_gid === team.gid);
+  if (!manualTeams.length) manualTeams = [..._allTeams]; // cycle-safe fallback
+  const feishuTeams = _allTeams;
 
   // 飞书组织按层级构建
   const feishuChildMap = {};
   feishuTeams.forEach(t => {
-    const pid = t.parent_team_gid || '__root__';
+    const pid = t.parent_team_gid && t.parent_team_gid !== t.gid ? t.parent_team_gid : '__root__';
     if (!feishuChildMap[pid]) feishuChildMap[pid] = [];
     feishuChildMap[pid].push(t);
   });
@@ -166,13 +134,14 @@ function _renderStructTree() {
 
   // ── 手动团队区域 ──────────────────────────────────────────────
   html += `<div class="st-section-hdr">
-    <span>手动团队</span>
-    <span class="st-section-cnt">${manualTeams.length}</span>
+    <span>全部组织</span>
+    <span class="st-section-cnt">${_allTeams.length}</span>
     <button class="st-section-add-btn" id="stManualAddBtn" title="新建团队">＋</button>
   </div>`;
   // 内联添加输入框（默认隐藏）
   html += `<div class="st-inline-add" id="stManualAddRow" style="display:none">
     <input type="text" id="stManualAddInp" placeholder="输入团队名称…" autocomplete="off" />
+    <select id="stManualAddParent" title="上级组织">${_parentOptionsHtml()}</select>
     <button id="stManualAddOk">确定</button>
     <button id="stManualAddCancel">取消</button>
   </div>`;
@@ -182,22 +151,6 @@ function _renderStructTree() {
     manualTeams.forEach(t => {
       html += _renderNodeHtml(t, 0, feishuChildMap);
     });
-  }
-
-  // ── 飞书组织区域 ──────────────────────────────────────────────
-  html += `<div class="st-section-hdr st-section-fs" id="stFeishuHdr">
-    <span class="st-section-toggle">${_feishuFolded ? '▶' : '▼'}</span>
-    <span>飞书组织</span>
-    <span class="st-section-cnt">${feishuTeams.length}</span>
-  </div>`;
-  if (!_feishuFolded) {
-    if (feishuTeams.length === 0) {
-      html += '<div class="st-empty-sub">暂无飞书部门</div>';
-    } else {
-      (feishuChildMap['__root__'] || []).forEach(t => {
-        html += _renderNodeHtml(t, 0, feishuChildMap);
-      });
-    }
   }
 
   body.innerHTML = html;
@@ -214,13 +167,18 @@ function _renderStructTree() {
   document.getElementById('stManualAddOk')?.addEventListener('click', async () => {
     const name = addInp.value.trim();
     if (!name) return _toast('请输入团队名称', 'err');
-    const res = await _cf('POST', '/teams', { method: 'POST', body: JSON.stringify({ name }) });
-    if (res?.success) {
+    const parentTeamGid = document.getElementById('stManualAddParent').value || null;
+    try {
+      const res = await window.AI00Business.invoke('base.team.create', {
+        version: 1, payload: { name, parent_team_gid: parentTeamGid },
+      });
+      if (!res?.success) throw new Error(res?.detail || '创建失败');
       _toast('团队已创建');
       addRow.style.display = 'none'; addInp.value = '';
+      if (parentTeamGid) _expandedTeams.add(parentTeamGid);
       await loadStruct();
-    } else {
-      _toast(res?.detail || '创建失败', 'err');
+    } catch (error) {
+      _toast(error?.message || '创建失败，请重试', 'err');
     }
   });
   document.getElementById('stManualAddCancel')?.addEventListener('click', () => {
@@ -232,13 +190,7 @@ function _renderStructTree() {
   });
 
   // 飞书组织折叠 toggle
-  const fsHdr = document.getElementById('stFeishuHdr');
-  if (fsHdr) {
-    fsHdr.addEventListener('click', () => {
-      _feishuFolded = !_feishuFolded;
-      _renderStructTree();
-    });
-  }
+  // 飞书仅用于添加人员时搜索，不再提供整树同步入口。
 
   // 展开/折叠
   body.querySelectorAll('[data-toggle]').forEach(el => {
@@ -259,21 +211,43 @@ function _renderStructTree() {
       _renderStructTree();
       _loadTeamDetail(_selectedTeamGid);
     });
-    el.addEventListener('contextmenu', e => {
-      e.preventDefault();
-      const team = _allTeams.find(t => t.gid === el.dataset.gid);
-      if (team) _showTreeCtxMenu(e.clientX, e.clientY, team);
-    });
   });
 }
 
-function _renderNodeHtml(team, depth, childMap) {
-  const children = childMap[team.gid] || [];
+function _descendantTeamGids(gid) {
+  const excluded = new Set(gid ? [gid] : []);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    _allTeams.forEach(team => {
+      if (excluded.has(team.parent_team_gid) && !excluded.has(team.gid)) {
+        excluded.add(team.gid);
+        changed = true;
+      }
+    });
+  }
+  return excluded;
+}
+
+function _parentOptionsHtml(selectedGid = '', excludedGid = null) {
+  const excluded = _descendantTeamGids(excludedGid);
+  const options = _allTeams
+    .filter(team => !excluded.has(team.gid))
+    .sort((a, b) => a.name.localeCompare(b.name, 'zh'))
+    .map(team => `<option value="${_esc(team.gid)}"${team.gid === selectedGid ? ' selected' : ''}>${_esc(team.name)}</option>`)
+    .join('');
+  return `<option value=""${selectedGid ? '' : ' selected'}>无上级（一级组织）</option>${options}`;
+}
+
+function _renderNodeHtml(team, depth, childMap, ancestors = new Set()) {
+  if (ancestors.has(team.gid)) return '';
+  const branch = new Set(ancestors); branch.add(team.gid);
+  const children = (childMap[team.gid] || []).filter(child => !branch.has(child.gid));
   const hasChildren = children.length > 0;
   const isExpanded = _expandedTeams.has(team.gid);
   const isSelected = _selectedTeamGid === team.gid;
   const indent = depth * 16 + 10;
-  const isFeishu = !!team.feishu_dept_id;
+  const isFeishu = false;
 
   let html = `<div class="st-node${isSelected ? ' selected' : ''}" data-gid="${team.gid}" style="padding-left:${indent}px">
     <span class="st-toggle" data-toggle="${team.gid}">
@@ -294,74 +268,9 @@ function _renderNodeHtml(team, depth, childMap) {
   </div>`;
 
   if (isExpanded) {
-    children.forEach(child => { html += _renderNodeHtml(child, depth + 1, childMap); });
+    children.forEach(child => { html += _renderNodeHtml(child, depth + 1, childMap, branch); });
   }
   return html;
-}
-
-// ── 右键菜单 ──────────────────────────────────────────────────
-let _ctxMenu = null;
-
-function _showTreeCtxMenu(x, y, team) {
-  if (_ctxMenu) { _ctxMenu.remove(); _ctxMenu = null; }
-  if (!team.feishu_dept_id) return;
-
-  const menu = document.createElement('div');
-  menu.className = 'org-ctx-menu';
-  menu.style.cssText = `position:fixed;left:${x}px;top:${y}px;z-index:500`;
-  menu.innerHTML = `
-    <div class="org-ctx-item" id="ctx-sync-members">
-      <svg class="icon" width="13" height="13"><use href="#icon-refresh"/></svg>
-      <span>同步该组织成员</span>
-    </div>`;
-
-  document.body.appendChild(menu);
-  _ctxMenu = menu;
-
-  menu.querySelector('#ctx-sync-members').addEventListener('click', () => {
-    menu.remove(); _ctxMenu = null;
-    _syncTeamMembers(team);
-  });
-
-  const dismiss = e => {
-    if (!menu.contains(e.target)) {
-      menu.remove(); _ctxMenu = null;
-      document.removeEventListener('mousedown', dismiss);
-    }
-  };
-  setTimeout(() => document.addEventListener('mousedown', dismiss), 10);
-}
-
-// ── 同步该组织成员（不重载树，只刷新成员列表）────────────────────
-async function _syncTeamMembers(team) {
-  const banner = document.getElementById('sync-result-banner');
-  banner.textContent = `正在同步「${team.name}」的成员…`;
-  banner.className = 'sync-banner sync-ok';
-
-  try {
-    const res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('base.directory.feishu.sync', {
-      departmentId: team.feishu_dept_id,
-    });
-    if (res?.ok || res?.created != null) {
-      const { created = 0, updated = 0 } = res;
-      banner.textContent = `「${team.name}」同步完成：新建 ${created} 人，更新 ${updated} 人`;
-      banner.className = 'sync-banner sync-ok';
-      // 只刷新成员列表，不重载整棵树（避免展开状态丢失）
-      if (_selectedTeamGid === team.gid) {
-        // 先更新 _allUsers 缓存再刷新列表
-        const usersRes = await _baseCall('base.users.list');
-        if (usersRes?.data) _allUsers = usersRes.data;
-        _loadTeamMembers(team.gid);
-      }
-    } else {
-      banner.textContent = res?.detail || '同步失败';
-      banner.className = 'sync-banner sync-err';
-    }
-  } catch (e) {
-    banner.textContent = `同步出错：${e.message}`;
-    banner.className = 'sync-banner sync-err';
-  }
-  setTimeout(() => { banner.className = 'sync-banner hidden'; }, 6000);
 }
 
 async function _loadTeamDetail(gid) {
@@ -372,10 +281,11 @@ async function _loadTeamDetail(gid) {
   document.getElementById('struct-detail-form').classList.remove('hidden');
 
   document.getElementById('struct-name-input').value = team.name;
+  document.getElementById('struct-parent-select').innerHTML = _parentOptionsHtml(team.parent_team_gid || '', team.gid);
 
   const badge = document.getElementById('struct-type-badge');
-  badge.textContent = team.feishu_dept_id ? '飞书部门' : '手动创建';
-  badge.className = `struct-type-badge ${team.feishu_dept_id ? 'badge-big' : 'badge-small'}`;
+  badge.textContent = '人工维护';
+  badge.className = 'struct-type-badge badge-small';
 
   await _loadTeamMembers(gid);
 }
@@ -386,7 +296,7 @@ async function _loadTeamMembers(gid) {
     const usersRes = await _baseCall('base.users.list');
     if (usersRes?.data) _allUsers = usersRes.data;
   } catch {}
-  const res = await _cf('GET', `/teams/${gid}/members`);
+  const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.team.member.list", {version:1,payload:({team_gid:path.gid})}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
   const members = res?.data || [];
   document.getElementById('struct-members-count').textContent = `成员（${members.length} 人）`;
 
@@ -421,28 +331,33 @@ async function _loadTeamMembers(gid) {
 
 window.removeTeamMember = async function(teamGid, userGid) {
   if (!confirm('确定将该成员移出团队？')) return;
-  const res = await _cf('DELETE', `/teams/${teamGid}/members/${userGid}`, { method: 'DELETE' });
+  const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.team.member.remove", {version:1,payload:({team_gid:path.gid,user_gid:path.user_gid})}); return result; })({},{"gid":decodeURIComponent(String(teamGid)),"user_gid":decodeURIComponent(String(userGid))},new URLSearchParams());
   if (res?.success) _loadTeamMembers(teamGid);
 };
 
-// 保存团队名称
+// 保存团队名称和上级组织
 document.getElementById('struct-save-btn').addEventListener('click', async () => {
   if (!_selectedTeamGid) return;
   const team = _allTeams.find(t => t.gid === _selectedTeamGid);
   if (!team) return;
   const newName = document.getElementById('struct-name-input').value.trim();
   if (!newName) return _toast('团队名称不能为空', 'err');
-  if (newName === team.name) return _toast('未做任何修改');
-  const res = await _cf('PATCH', `/teams/${_selectedTeamGid}`, {
-    method: 'PATCH',
-    body: JSON.stringify({ name: newName }),
-  });
-  if (res?.success) {
-    team.name = newName;
+  const newParentTeamGid = document.getElementById('struct-parent-select').value || null;
+  const changes = {};
+  if (newName !== team.name) changes.name = newName;
+  if (newParentTeamGid !== (team.parent_team_gid || null)) changes.parent_team_gid = newParentTeamGid;
+  if (!Object.keys(changes).length) return _toast('未做任何修改');
+  try {
+    const res = await window.AI00Business.invoke('base.team.update', {
+      version: 1, payload: { team_gid: _selectedTeamGid, changes },
+    });
+    if (!res?.success) throw new Error(res?.detail || '保存失败');
+    Object.assign(team, changes);
+    if (newParentTeamGid) _expandedTeams.add(newParentTeamGid);
     _toast('保存成功');
     _renderStructTree();
-  } else {
-    _toast(res?.detail || '保存失败，请重试', 'err');
+  } catch (error) {
+    _toast(error?.message || '保存失败，请重试', 'err');
   }
 });
 
@@ -450,7 +365,7 @@ document.getElementById('struct-save-btn').addEventListener('click', async () =>
 document.getElementById('struct-delete-btn').addEventListener('click', async () => {
   if (!_selectedTeamGid) return;
   if (!confirm('确定删除该团队？此操作不可恢复。')) return;
-  const res = await _cf('DELETE', `/teams/${_selectedTeamGid}`, { method: 'DELETE' });
+  const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.team.archive", {version:1,payload:({team_gid:path.gid})}); return result; })({},{"gid":decodeURIComponent(String(_selectedTeamGid))},new URLSearchParams());
   if (res?.success) {
     _expandedTeams.delete(_selectedTeamGid);
     _selectedTeamGid = null;
@@ -544,7 +459,7 @@ function _makeUserSearchWidget({ inputId, resultsId, selectedId, onSelect }) {
   });
 
   async function _doSearch(q) {
-    const res = await _cf('GET', `/feishu/org/users/search?q=${encodeURIComponent(q)}`);
+    const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.feishu.organization_user.search", {version:1,payload:({query:query.get("q")||""})}); return result; })({},{},new URLSearchParams((`/feishu/org/users/search?q=${encodeURIComponent(q)}`).split("?")[1]||""));
     const users = res?.data || [];
     if (!users.length) {
       results.innerHTML = '<div class="user-search-empty">未找到用户</div>';
@@ -642,10 +557,7 @@ document.getElementById('btn-confirm-team-member').addEventListener('click', asy
   const body = d.gid
     ? { user_gid: d.gid }
     : { feishu_open_id: d.openId || '', name: d.name || '', email: d.email || '', avatar_url: d.avatar || '' };
-  const res = await _cf('POST', `/teams/${_selectedTeamGid}/members`, {
-    method: 'POST',
-    body: JSON.stringify(body),
-  });
+  const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.team.member.add", {version:1,payload:({team_gid:path.gid,member:body})}); return result; })(body,{"gid":decodeURIComponent(String(_selectedTeamGid))},new URLSearchParams());
   if (res?.success) {
     document.getElementById('modal-add-team-member').classList.add('hidden');
     _loadTeamMembers(_selectedTeamGid);
@@ -707,25 +619,7 @@ async function loadProjects() {
 
   const value = await invokeCapability('project.project.read.atomic.projects_search', { arguments: {} }).catch(() => []);
   _allProjects = Array.isArray(value) ? value : (value?.data || value?.projects || []);
-  const sel = document.getElementById('filter-project');
-  sel.innerHTML = '<option value="">— 选择项目 —</option>';
-  _allProjects.forEach(p => {
-    const opt = document.createElement('option');
-    opt.value = p.gid;
-    opt.textContent = p.name;
-    sel.appendChild(opt);
-  });
 }
-
-document.getElementById('filter-project').addEventListener('change', async function() {
-  const gid = this.value;
-  if (!gid) {
-    _selectedProjectGid = null;
-    document.getElementById('pm-config-body').innerHTML = '<div class="empty-hint">请在上方选择项目</div>';
-    return;
-  }
-  await _loadProjectConfig(gid);
-});
 
 // ── 项目配置视图 ───────────────────────────────────────────────
 
@@ -1023,6 +917,373 @@ async function _loadMatrix() {
   html += '</tbody></table>';
   wrap.innerHTML = html;
 }
+
+
+// ── 人工项目责任树（覆盖旧的自动 BOP 单人槽位实现）────────────
+let _responsibilityProjects = [];
+const _expandedResponsibilityProjects = new Set();
+
+async function _loadAllResponsibilityProjects() {
+  const projectValue = await invokeCapability('project.project.read.atomic.projects_search', { arguments: {} });
+  const projects = Array.isArray(projectValue)
+    ? projectValue
+    : (projectValue?.items || projectValue?.projects || projectValue?.data || []);
+  const configured = [];
+  let cursor = null;
+  do {
+    const page = await invokeCapability('project.org_management.read', {
+      operation: 'responsibility_tree.search',
+      arguments: { project_gid: null, cursor, page_size: 100, operation_gid: null },
+    });
+    configured.push(...(page?.items || []));
+    cursor = page?.next_cursor || null;
+  } while (cursor);
+  const configuredByGid = new Map(configured.map(item => [String(item.gid), item]));
+  return projects.map(project => {
+    const state = configuredByGid.get(String(project.gid));
+    return {
+      ...project,
+      revision: state?.revision || 0,
+      lines: state?.lines || [],
+      managerState: { project_gid: project.gid, revision: 0, managed: false, managers: [] },
+      members: [],
+      bopLines: [],
+      detailsLoaded: false,
+      detailsLoading: false,
+      detailsError: '',
+    };
+  });
+}
+
+async function _loadResponsibilityBopLines(projectGid) {
+  const values = [];
+  let cursor = null;
+  do {
+    const page = await invokeCapability('craft.bop.active_line.search', {
+      project_gid: projectGid, cursor, page_size: 100,
+    });
+    values.push(...(page?.items || []));
+    cursor = page?.next_cursor || null;
+  } while (cursor);
+  return values;
+}
+
+async function _loadResponsibilityProjectDetails(project) {
+  if (!project || project.detailsLoaded || project.detailsLoading) return;
+  project.detailsLoading = true;
+  project.detailsError = '';
+  _renderProjectConfig();
+  try {
+    const [managerState, memberData, bopLines, usersRes] = await Promise.all([
+      invokeCapability('base.project_manager.read', { project_gid: project.gid }),
+      invokeCapability('project.member.read', {
+        operation: 'members.list', arguments: { project_gid: project.gid },
+      }),
+      project.lines.length ? _loadResponsibilityBopLines(project.gid) : Promise.resolve([]),
+      _allUsers.length ? Promise.resolve(null) : _baseCall('base.users.list'),
+    ]);
+    if (usersRes?.data) _allUsers = usersRes.data;
+    project.managerState = managerState || project.managerState;
+    project.members = Array.isArray(memberData)
+      ? memberData
+      : (memberData?.data || memberData?.items || memberData?.members || []);
+    project.bopLines = bopLines;
+    project.detailsLoaded = true;
+  } catch (error) {
+    project.detailsError = error?.message || '详情加载失败';
+  } finally {
+    project.detailsLoading = false;
+    _renderProjectConfig();
+  }
+}
+
+async function _toggleResponsibilityProject(projectGid) {
+  const project = _responsibilityProjects.find(item => String(item.gid) === String(projectGid));
+  if (!project) return;
+  if (_expandedResponsibilityProjects.has(String(project.gid))) {
+    _expandedResponsibilityProjects.delete(String(project.gid));
+    _renderProjectConfig();
+    return;
+  }
+  _expandedResponsibilityProjects.clear();
+  _expandedResponsibilityProjects.add(String(project.gid));
+  _renderProjectConfig();
+  await _loadResponsibilityProjectDetails(project);
+}
+
+async function loadProjects() {
+  const body = document.getElementById('pm-config-body');
+  body.innerHTML = '<div class="empty-hint">加载全部项目责任树…</div>';
+  try {
+    _responsibilityProjects = await _loadAllResponsibilityProjects();
+  } catch (error) {
+    body.innerHTML = `<div class="empty-hint pm-load-error">项目加载失败：${_esc(error.message)}<br><button class="btn-ghost btn-sm" data-retry-projects>重试</button></div>`;
+    body.querySelector('[data-retry-projects]')?.addEventListener('click', loadProjects);
+    return;
+  }
+  const matrixFilter = document.getElementById('matrix-project-filter');
+  const selected = matrixFilter.value;
+  matrixFilter.innerHTML = '<option value="">全部项目</option>' + _responsibilityProjects
+    .map(project => `<option value="${_esc(project.gid)}">${_esc(project.name)}</option>`).join('');
+  matrixFilter.value = selected;
+  _renderProjectConfig();
+  const expandedProject = _responsibilityProjects.find(project => _expandedResponsibilityProjects.has(String(project.gid)));
+  if (expandedProject) await _loadResponsibilityProjectDetails(expandedProject);
+}
+
+function _person(gid) {
+  return _allUsers.find(user => user.gid === gid) || { gid, name: gid, avatar_url: '' };
+}
+
+function _personChips(gids) {
+  if (!gids?.length) return '<span class="pm-empty-value">未设置</span>';
+  return gids.map(gid => `<span class="pm-person-chip">${_esc(_person(gid).name || gid)}</span>`).join('');
+}
+
+function _removablePersonChips(gids, attributes) {
+  if (!gids?.length) return '<span class="pm-empty-value">未设置</span>';
+  return gids.map(gid => `<span class="pm-person-chip">${_esc(_person(gid).name || gid)}<button type="button" title="移除" ${attributes(gid)}>×</button></span>`).join('');
+}
+
+function _renderProjectConfig() {
+  const body = document.getElementById('pm-config-body');
+  if (!_responsibilityProjects.length) {
+    body.innerHTML = '<div class="empty-hint">暂无项目</div>';
+    return;
+  }
+  body.innerHTML = `<div class="pm-project-tree">${_responsibilityProjects.map(project => {
+    const managers = project.managerState?.managers || [];
+    const members = (project.members || []).filter(item => item.role === 'member');
+    const expanded = _expandedResponsibilityProjects.has(String(project.gid));
+    const summary = project.detailsLoaded
+      ? `<span class="pm-summary-chip">经理 ${managers.length}</span><span class="pm-summary-chip">成员 ${members.length}</span>`
+      : '<span class="pm-summary-chip pm-summary-pending">详情按需加载</span>';
+    return `<section class="pm-project-node" data-project="${_esc(project.gid)}">
+      <header class="pm-project-header">
+        <button type="button" class="pm-project-toggle" data-toggle-project="${_esc(project.gid)}" aria-expanded="${expanded}">
+          <span class="pm-tree-caret">${expanded ? '▼' : '▶'}</span><strong>${_esc(project.name)}</strong>
+          <span class="pm-project-summary">${summary}<span class="pm-summary-chip">人工线体 ${project.lines?.length || 0}</span></span>
+        </button><span class="pm-revision">r${project.revision || 0}</span>
+      </header>
+      ${!expanded ? '' : project.detailsLoading
+        ? '<div class="pm-project-detail-state">正在加载项目详情…</div>'
+        : project.detailsError
+          ? `<div class="pm-project-detail-state pm-load-error">详情加载失败：${_esc(project.detailsError)} <button class="btn-ghost btn-sm" data-retry-project-detail="${_esc(project.gid)}">重试</button></div>`
+          : `<div class="pm-project-detail-grid"><div class="pm-manager-node">
+        <div class="pm-node-title"><span>项目经理（${managers.length}）</span>
+          <button class="btn-ghost btn-sm" data-add-manager="${_esc(project.gid)}">＋ 添加经理</button></div>
+        <div class="pm-chip-list">${_removablePersonChips(managers.map(item => item.gid), gid => `data-project="${_esc(project.gid)}" data-remove-manager="${_esc(gid)}"`)}</div>
+      </div>
+      <div class="pm-manager-node pm-members-node">
+        <div class="pm-node-title"><span>项目成员（${members.length}）</span>
+          <button class="btn-ghost btn-sm" data-add-member="${_esc(project.gid)}">＋ 添加成员</button></div>
+        <div class="pm-chip-list">${members.map(item => `<span class="pm-person-chip">${_esc(item.name || item.email || item.user_gid)}<button type="button" title="移除" data-project="${_esc(project.gid)}" data-remove-member="${_esc(item.gid)}">×</button></span>`).join('') || '<span class="pm-empty-value">未设置</span>'}</div>
+      </div>
+      <div class="pm-lines-node">
+        <div class="pm-node-title"><span>人工线体（${project.lines?.length || 0}）</span>
+          <button class="btn-ghost btn-sm" data-add-line="${_esc(project.gid)}">＋ 新增线体</button></div>
+        ${(project.lines || []).map(line => _manualLineHtml(project, line)).join('') || '<div class="pm-no-lines">暂无人工线体</div>'}
+      </div></div>`}
+    </section>`;
+  }).join('')}</div>`;
+  body.querySelectorAll('[data-toggle-project]').forEach(button => button.addEventListener('click', () => _toggleResponsibilityProject(button.dataset.toggleProject)));
+  body.querySelectorAll('[data-retry-project-detail]').forEach(button => button.addEventListener('click', () => {
+    const project = _responsibilityProjects.find(item => String(item.gid) === String(button.dataset.retryProjectDetail));
+    _loadResponsibilityProjectDetails(project);
+  }));
+  body.querySelectorAll('[data-add-manager]').forEach(button => button.addEventListener('click', () => _openProjectPersonPicker({ type: 'manager', projectGid: button.dataset.addManager })));
+  body.querySelectorAll('[data-remove-manager]').forEach(button => button.addEventListener('click', () => _runResponsibilityAction(() => _removeManager(button.dataset.project, button.dataset.removeManager))));
+  body.querySelectorAll('[data-add-member]').forEach(button => button.addEventListener('click', () => _openProjectPersonPicker({ type: 'member', projectGid: button.dataset.addMember })));
+  body.querySelectorAll('[data-remove-member]').forEach(button => button.addEventListener('click', () => _runResponsibilityAction(() => _removeProjectMember(button.dataset.project, button.dataset.removeMember))));
+  body.querySelectorAll('[data-add-line]').forEach(button => button.addEventListener('click', () => _runResponsibilityAction(() => _createManualLine(button.dataset.addLine))));
+  body.querySelectorAll('[data-edit-line]').forEach(button => button.addEventListener('click', () => _runResponsibilityAction(() => _editManualLine(button.dataset.project, button.dataset.editLine))));
+  body.querySelectorAll('[data-add-line-leader]').forEach(button => button.addEventListener('click', () => _openProjectPersonPicker({ type: 'line', projectGid: button.dataset.project, lineGid: button.dataset.addLineLeader })));
+  body.querySelectorAll('[data-remove-line-leader]').forEach(button => button.addEventListener('click', () => _runResponsibilityAction(() => _removeLineLeader(button.dataset.project, button.dataset.line, button.dataset.removeLineLeader))));
+  body.querySelectorAll('[data-delete-line]').forEach(button => button.addEventListener('click', () => _runResponsibilityAction(() => _deleteManualLine(button.dataset.project, button.dataset.deleteLine))));
+  body.querySelectorAll('[data-map-line]').forEach(select => select.addEventListener('change', () => _runResponsibilityAction(() => _mapManualLine(select.dataset.project, select.dataset.mapLine, select.value || null))));
+}
+
+function _manualLineHtml(project, line) {
+  const options = (project.bopLines || []).map(item => `<option value="${_esc(item.gid)}" ${item.gid === line.bop_line_gid ? 'selected' : ''}>${_esc(item.path || item.title)}</option>`).join('');
+  return `<div class="pm-manual-line" data-line="${_esc(line.gid)}">
+    <div class="pm-line-main"><span class="pm-tree-branch">└</span><strong>${_esc(line.name)}</strong>
+      <span class="pm-chip-list">${_removablePersonChips(line.leader_user_gids, gid => `data-project="${_esc(project.gid)}" data-line="${_esc(line.gid)}" data-remove-line-leader="${_esc(gid)}"`)}</span></div>
+    <div class="pm-line-actions">
+      <select class="form-select pm-bop-select" data-project="${_esc(project.gid)}" data-map-line="${_esc(line.gid)}">
+        <option value="">未映射 BOP 节点</option>${options}</select>
+      <button class="btn-ghost btn-sm" data-project="${_esc(project.gid)}" data-add-line-leader="${_esc(line.gid)}">＋ 添加负责人</button>
+      <button class="btn-ghost btn-sm" data-project="${_esc(project.gid)}" data-edit-line="${_esc(line.gid)}">编辑名称</button>
+      <button class="btn-danger-sm" data-project="${_esc(project.gid)}" data-delete-line="${_esc(line.gid)}">删除</button>
+    </div>
+  </div>`;
+}
+
+function _promptPeople(currentGids) {
+  const current = (currentGids || []).map(gid => _person(gid).name || gid).join('、');
+  const value = prompt('输入负责人姓名或 GID，多个用逗号分隔；清空即移除全部负责人', current);
+  if (value === null) return null;
+  const tokens = value.split(/[，,、]/).map(item => item.trim()).filter(Boolean);
+  const gids = tokens.map(token => _allUsers.find(user => user.gid === token || user.name === token)?.gid || token);
+  return [...new Set(gids)].slice(0, 50);
+}
+
+async function _editManagers(projectGid) {
+  const project = _responsibilityProjects.find(item => item.gid === projectGid);
+  const gids = _promptPeople((project.managerState?.managers || []).map(item => item.gid));
+  if (gids === null) return;
+  const revision = project.managerState?.revision || 0;
+  const idempotencyKey = crypto.randomUUID();
+  await invokeCapability('base.project_manager.replace', { project_gid: projectGid, user_gids: gids,
+    expected_revision: revision, idempotency_key: idempotencyKey }, { idempotencyKey });
+  await loadProjects();
+}
+
+let _projectPersonTarget = null;
+let _selectedProjectPerson = null;
+const _projectPersonSearch = _makeUserSearchWidget({
+  inputId: 'search-project-person-input',
+  resultsId: 'search-project-person-results',
+  selectedId: 'search-project-person-selected',
+  onSelect: value => { _selectedProjectPerson = value; },
+});
+
+function _openProjectPersonPicker(target) {
+  _projectPersonTarget = target;
+  _selectedProjectPerson = null;
+  _projectPersonSearch.reset();
+  const labels = { manager: '添加项目经理', member: '添加项目成员', line: '添加线体负责人' };
+  document.getElementById('project-person-title').textContent = labels[target.type];
+  document.getElementById('modal-project-person').classList.remove('hidden');
+  setTimeout(() => document.getElementById('search-project-person-input').focus(), 50);
+}
+
+function _closeProjectPersonPicker() {
+  document.getElementById('modal-project-person').classList.add('hidden');
+}
+
+document.getElementById('btn-close-project-person').addEventListener('click', _closeProjectPersonPicker);
+document.getElementById('btn-cancel-project-person').addEventListener('click', _closeProjectPersonPicker);
+document.getElementById('btn-confirm-project-person').addEventListener('click', async () => {
+  const person = _selectedProjectPerson;
+  const target = _projectPersonTarget;
+  if (!person?.gid) return _toast('请选择已注册的飞书用户；新用户请先加入组织架构', 'err');
+  const project = _responsibilityProjects.find(item => item.gid === target.projectGid);
+  const button = document.getElementById('btn-confirm-project-person');
+  button.disabled = true;
+  const completed = await _runResponsibilityAction(async () => {
+    if (target.type === 'manager') {
+      const gids = [...new Set([...(project.managerState?.managers || []).map(item => item.gid), person.gid])];
+      await _replaceManagers(project, gids);
+    } else if (target.type === 'member') {
+      await invokeCapability('project.member.change.apply', {
+        operation: 'members.add', arguments: { project_gid: project.gid, user_gid: person.gid, project_role: 'member' },
+      });
+      await loadProjects();
+    } else {
+      const line = project.lines.find(item => item.gid === target.lineGid);
+      await _changeLine(project, 'managed_line.update', {
+        line_gid: line.gid, leader_user_gids: [...new Set([...line.leader_user_gids, person.gid])],
+      });
+    }
+    return true;
+  });
+  button.disabled = false;
+  if (completed) _closeProjectPersonPicker();
+});
+
+async function _replaceManagers(project, gids) {
+  const idempotencyKey = crypto.randomUUID();
+  await invokeCapability('base.project_manager.replace', {
+    project_gid: project.gid, user_gids: gids, expected_revision: project.managerState?.revision || 0,
+    idempotency_key: idempotencyKey,
+  }, { idempotencyKey });
+  await loadProjects();
+}
+
+async function _removeManager(projectGid, userGid) {
+  const project = _responsibilityProjects.find(item => item.gid === projectGid);
+  await _replaceManagers(project, (project.managerState?.managers || []).map(item => item.gid).filter(gid => gid !== userGid));
+}
+
+async function _removeProjectMember(projectGid, memberGid) {
+  await invokeCapability('project.member.change.apply', {
+    operation: 'members.remove', arguments: { project_gid: projectGid, member_gid: memberGid },
+  });
+  await loadProjects();
+}
+
+async function _removeLineLeader(projectGid, lineGid, userGid) {
+  const project = _responsibilityProjects.find(item => item.gid === projectGid);
+  const line = project.lines.find(item => item.gid === lineGid);
+  await _changeLine(project, 'managed_line.update', {
+    line_gid: line.gid, leader_user_gids: line.leader_user_gids.filter(gid => gid !== userGid),
+  });
+}
+
+async function _changeLine(project, operation, changeArguments) {
+  const idempotencyKey = crypto.randomUUID();
+  const result = await invokeCapability('project.org_management.change.apply', { operation,
+    arguments: { project_gid: project.gid, ...changeArguments }, expected_revision: project.revision || 0,
+    idempotency_key: idempotencyKey }, {
+      idempotencyKey, expectedResourceVersion: String(project.revision || 0),
+    });
+  _toast(result?.status === 'pending_projection' ? '已保存，BOP 权限正在同步' : '已保存');
+  await loadProjects();
+}
+
+async function _createManualLine(projectGid) {
+  const project = _responsibilityProjects.find(item => item.gid === projectGid);
+  const name = prompt('新线体名称');
+  if (!name?.trim()) return;
+  await _changeLine(project, 'managed_line.create', { name: name.trim(), leader_user_gids: [], bop_line_gid: null });
+}
+
+async function _editManualLine(projectGid, lineGid) {
+  const project = _responsibilityProjects.find(item => item.gid === projectGid);
+  const line = project.lines.find(item => item.gid === lineGid);
+  const name = prompt('线体名称', line.name);
+  if (name === null || !name.trim()) return;
+  await _changeLine(project, 'managed_line.update', { line_gid: lineGid, name: name.trim() });
+}
+
+async function _mapManualLine(projectGid, lineGid, bopLineGid) {
+  const project = _responsibilityProjects.find(item => item.gid === projectGid);
+  await _changeLine(project, 'managed_line.update', { line_gid: lineGid, bop_line_gid: bopLineGid });
+}
+
+async function _deleteManualLine(projectGid, lineGid) {
+  if (!confirm('确定删除这条人工线体及其责任映射？')) return;
+  const project = _responsibilityProjects.find(item => item.gid === projectGid);
+  await _changeLine(project, 'managed_line.delete', { line_gid: lineGid });
+}
+
+async function _loadMatrix() {
+  if (!_responsibilityProjects.length) _responsibilityProjects = await _loadAllResponsibilityProjects();
+  const selectedProject = document.getElementById('matrix-project-filter')?.value || '';
+  const visibleProjects = selectedProject
+    ? _responsibilityProjects.filter(project => project.gid === selectedProject)
+    : _responsibilityProjects;
+  const people = new Map();
+  visibleProjects.forEach(project => {
+    (project.managerState?.managers || []).forEach(person => people.set(person.gid, person));
+    (project.members || []).filter(item => item.role === 'member').forEach(item => people.set(item.user_gid, {
+      gid: item.user_gid, name: item.name || item.email || item.user_gid, avatar_url: item.avatar_url || '',
+    }));
+    (project.lines || []).forEach(line => line.leader_user_gids.forEach(gid => people.set(gid, _person(gid))));
+  });
+  const wrap = document.getElementById('pm-matrix-wrap');
+  if (!people.size) { wrap.innerHTML = '<div class="empty-hint">暂无责任人数据</div>'; return; }
+  wrap.innerHTML = `<table class="pm-matrix-table"><thead><tr><th class="pm-matrix-th-user">责任人</th>${visibleProjects.map(p => `<th>${_esc(p.name)}</th>`).join('')}</tr></thead><tbody>
+    ${[...people.values()].map(person => `<tr><td class="pm-matrix-td-user">${_esc(person.name || person.gid)}</td>${visibleProjects.map(project => {
+      const labels = [];
+      if ((project.managerState?.managers || []).some(item => item.gid === person.gid)) labels.push('项目经理');
+      if ((project.members || []).some(item => item.role === 'member' && item.user_gid === person.gid)) labels.push('项目成员');
+      (project.lines || []).filter(line => line.leader_user_gids.includes(person.gid)).forEach(line => labels.push(line.name));
+      return `<td>${labels.map(label => `<span class="pm-matrix-chip">${_esc(label)}</span>`).join('')}</td>`;
+    }).join('')}</tr>`).join('')}</tbody></table>`;
+  }
+
+document.getElementById('matrix-project-filter')?.addEventListener('change', _loadMatrix);
 
 
 // ── 工具函数 ──────────────────────────────────────────────────

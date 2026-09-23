@@ -56,7 +56,9 @@ def test_base_has_an_independent_migration_stream():
 def _registrations():
     capability_registry = CapabilityRegistry()
     register_capabilities(capability_registry)
-    return {item.spec.id: item for item in capability_registry.snapshot()}
+    # The frozen review governs v1; independently versioned candidates must not
+    # replace those contracts or silently inherit their stable status.
+    return {item.spec.id: item for item in capability_registry.snapshot() if item.spec.version == 1}
 
 
 def test_all_stable_base_capabilities_have_native_open_contracts():

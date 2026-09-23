@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script src="/web/core/business_facade.js"></script>
   <meta charset="UTF-8">
   <title>清单导航</title>
   <style>
@@ -125,7 +126,7 @@ async function _load() {
 
   // 云端清单（via cloudFetch）
   try {
-    const _cloudFetch = window._cloudFetch || window.parent?._cloudFetch;
+    const _cloudFetch = window.AI00Business?.available() || window.AI00Business?.available();
     if (_cloudFetch) {
       const res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
         .call('project.lists.search', { itemType: _itemType });

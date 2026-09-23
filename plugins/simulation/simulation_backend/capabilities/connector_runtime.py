@@ -68,6 +68,7 @@ DESKTOP_CAPABILITY_BINDINGS = (
     ("simulation.vismockup.node.selection.change.request", 1),
     ("simulation.vismockup.tree.read.request", 1),
     ("simulation.vismockup.document.identity.read.request", 1),
+    ("simulation.vismockup.document.existing_identity.read.request", 1),
     ("simulation.vismockup.document.hierarchy_inventory.read.request", 1),
     ("simulation.teamcenter.product_structure.observe.request", 1),
     ("simulation.teamcenter.product.search.request", 1),
@@ -84,8 +85,10 @@ DESKTOP_CAPABILITY_BINDINGS = (
     ("simulation.environment.live_document.adopt", 2),
     ("simulation.environment.live_document.binding.get", 1),
     ("simulation.environment.live_document.rebind", 1),
+    ("simulation.environment.live_document.resume_online", 1),
     ("simulation.environment.online_source.live_document.bind", 1),
     ("simulation.environment.online_source.live_document.bind", 2),
+    ("simulation.environment.online_source.live_document.bind", 3),
     ("simulation.environment.live_document.inventory.apply", 1),
     ("simulation.vismockup.command.get", 1),
 )
@@ -117,6 +120,7 @@ DESKTOP_TRANSPORT_BINDINGS = tuple(dict(method=method,
 
 DIRECT_VISMOCKUP_OPERATIONS = {
     "identity": ("vismockup.document.identity.read@1", "sha256:2a8b6e89d3a13cf35b0584a989ed79977700d3cd3fe9fcc918c3b871d1c8c4d7"),
+    "identity_existing": ("vismockup.document.existing_identity.read@1", "sha256:9aa9528fff83c565d3d005daa1167b41cef2f6d413d485790c6c98c139fc1471"),
     "hierarchy_inventory": ("vismockup.document.hierarchy_inventory.read@1", "sha256:a89bdc3fbb04ee643f1434dee83c653df8a04fc406ac7fff1e61ce39ee99685a"),
     "attach": ("vismockup.application.probe@1", "sha256:197cfad8bc3453030fdc288ea78c3abc21699274dd48d4482444af4f62380a37"),
     "launch": ("vismockup.application.probe@1", "sha256:197cfad8bc3453030fdc288ea78c3abc21699274dd48d4482444af4f62380a37"),
@@ -139,6 +143,7 @@ DIRECT_VISMOCKUP_OPERATIONS = {
 DIRECT_VISMOCKUP_OPERATION_IDS = frozenset(value[0] for value in DIRECT_VISMOCKUP_OPERATIONS.values())
 DIRECT_VISMOCKUP_CAPABILITIES = {
     "identity": "simulation.vismockup.document.identity.read.request",
+    "identity_existing": "simulation.vismockup.document.existing_identity.read.request",
     "hierarchy_inventory": "simulation.vismockup.document.hierarchy_inventory.read.request",
     "attach": "simulation.vismockup.application.attach.request",
     "launch": "simulation.vismockup.application.launch.request",
@@ -477,7 +482,7 @@ def _direct_vismockup_plan_v2(
         from ..application.teamcenter_launch_evidence import OPENED_SOURCE_CONTRACT_HASH
         operation_id, contract_hash = 'teamcenter.visualization.launch@2', OPENED_SOURCE_CONTRACT_HASH
     step_payload = {"allow_launch": action == "launch"} if action in {"attach", "launch"} else payload
-    classification = "read" if action in {"attach", "tree", "identity", "hierarchy_inventory", "tc_search", "tc_rules", "tc_observe", "tc_page", "tc_children"} else "write"
+    classification = "read" if action in {"attach", "tree", "identity", "identity_existing", "hierarchy_inventory", "tc_search", "tc_rules", "tc_observe", "tc_page", "tc_children"} else "write"
     probe_id = None if classification == "read" else (
         "vismockup.application.probe@1" if action in {"launch", "close", "tc_launch"}
         else "vismockup.document.snapshot@1"
@@ -705,7 +710,7 @@ def register_connector_runtime_capabilities(
             runtime = control_plane.repository.bound_runtime_for_user(
                 context.user_gid, context.team_gid,
             )
-            app_v2_only = {"identity", "hierarchy_inventory", "tc_search", "tc_rules", "tc_observe", "tc_page", "tc_children", "tc_node_properties", "tc_launch", "tc_insert"}
+            app_v2_only = {"identity", "identity_existing", "hierarchy_inventory", "tc_search", "tc_rules", "tc_observe", "tc_page", "tc_children", "tc_node_properties", "tc_launch", "tc_insert"}
             if action in app_v2_only and (context.source != 'web' or not runtime or runtime.get('runtime_type') != 'electron'):
                 raise CapabilityBusinessError('runtime_v2_required', 'A current user-bound App runtime is required.')
             binding = None
@@ -732,7 +737,7 @@ def register_connector_runtime_capabilities(
                 else {"document_session": payload["document_session"], "start_index": payload["start_index"],
                       "page_size": payload["page_size"], "max_nodes": payload["max_nodes"]}
                 if action == "hierarchy_inventory"
-                else payload if action in {"tc_search", "tc_rules", "tc_observe", "tc_page", "tc_children", "tc_node_properties", "tc_launch", "tc_insert"}
+                else payload if action in {"identity_existing", "tc_search", "tc_rules", "tc_observe", "tc_page", "tc_children", "tc_node_properties", "tc_launch", "tc_insert"}
                 else {}
             )
             try:
@@ -890,6 +895,7 @@ def register_connector_runtime_capabilities(
         ("simulation.vismockup.node.selection.change.request", "node_selection", "Queue a signed request to change one tree node's selection highlight in the active VisMockup document."),
         ("simulation.vismockup.tree.read.request", "tree", "Queue a signed bounded read of the active VisMockup product tree."),
         ("simulation.vismockup.document.identity.read.request", "identity", "Queue a read of the current native document identity without launching VisMockup."),
+        ("simulation.vismockup.document.existing_identity.read.request", "identity_existing", "Select an already open native document by its saved session and return signed identity evidence without launching VisMockup."),
         ("simulation.vismockup.document.hierarchy_inventory.read.request", "hierarchy_inventory", "Queue one bounded page read of the current document's alternate hierarchies."),
         ("simulation.teamcenter.product_structure.observe.request", "tc_observe", "Queue one bounded read-only Teamcenter product-structure observation on the App workstation."),
         ("simulation.teamcenter.product.search.request", "tc_search", "Search Teamcenter item IDs and names by exact, prefix, or contains matching without mutating Teamcenter."),
@@ -904,14 +910,16 @@ def register_connector_runtime_capabilities(
             "properties":{"document_session":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},
                 "start_index":{"type":"integer","minimum":0},"page_size":{"type":"integer","minimum":1,"maximum":16},
                 "max_nodes":{"type":"integer","minimum":1,"maximum":100000}},"additionalProperties":False}
-            if action == "hierarchy_inventory" else direct_schemas.get(action, {}))
-        risk = CapabilityRisk.READ if action in {"identity", "hierarchy_inventory", "tree", "tc_search", "tc_rules", "tc_observe", "tc_page", "tc_children", "tc_node_properties"} else CapabilityRisk.WRITE
+            if action == "hierarchy_inventory" else {"type":"object","required":["expected_document_session"],
+                "properties":{"expected_document_session":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}},
+                "additionalProperties":False} if action == "identity_existing" else direct_schemas.get(action, {}))
+        risk = CapabilityRisk.READ if action in {"identity", "identity_existing", "hierarchy_inventory", "tree", "tc_search", "tc_rules", "tc_observe", "tc_page", "tc_children", "tc_node_properties"} else CapabilityRisk.WRITE
         register(registry, CapabilitySpec(
             id=capability_id, owner="simulation", version=1, description=description,
             use_when="The signed-in user requests one direct action on the bound workstation Connector.",
             do_not_use_when="No current user-scoped Connector binding exists.",
             risk=risk,
-            confirmation="none" if action in {"attach", "visibility", "node_visibility", "node_selection", "tree", "identity", "hierarchy_inventory", "tc_search", "tc_rules", "tc_observe", "tc_page", "tc_children", "tc_node_properties"} else "user",
+            confirmation="none" if action in {"attach", "visibility", "node_visibility", "node_selection", "tree", "identity", "identity_existing", "hierarchy_inventory", "tc_search", "tc_rules", "tc_observe", "tc_page", "tc_children", "tc_node_properties"} else "user",
             permissions=("simulation.use",),
             input_schema=request_schema, output_schema={}, tags=("simulation", "connector", "vismockup", "workflow"),
         ), request_direct(action))

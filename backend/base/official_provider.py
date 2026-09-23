@@ -15,6 +15,8 @@ from backend.base.web_atomic import register_atomic_web_capabilities
 from backend.base.file_store_public_config import register_file_store_public_config_capability
 from backend.base.desktop_actions import register_desktop_capabilities
 from backend.base.org_management_capabilities import register_org_management_capabilities
+from backend.base.plugin_marketplace import register_marketplace_search
+from backend.base.plugin_marketplace_admin import register_marketplace_admin
 
 def register_capabilities(registry: Any) -> None:
     register_system_shared_capabilities(registry)
@@ -23,6 +25,8 @@ def register_capabilities(registry: Any) -> None:
     )
     register_plugin_storage_capabilities(registry)
     register_reviewed_base_capabilities(registry)
+    register_marketplace_search(registry)
+    register_marketplace_admin(registry)
     register_export_template_capability(registry)
     register_approval_capabilities(registry)
     register_collaboration_capabilities(registry)

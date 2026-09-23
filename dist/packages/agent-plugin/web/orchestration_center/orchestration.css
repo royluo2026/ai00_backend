@@ -1,0 +1,80 @@
+:root { color-scheme: light; font-family: Inter, "Microsoft YaHei", sans-serif; }
+* { box-sizing: border-box; }
+html, body, #orchestrationApp { width: 100%; height: 100%; margin: 0; }
+body { background: #f6f7f9; color: #1d2433; }
+.oc-app { position: relative; height: 100%; display: grid; grid-template-rows: auto auto minmax(0,1fr); }
+.oc-topbar { display: grid; grid-template-columns: minmax(220px,1fr) auto auto; align-items: center; gap: 22px; min-height: 64px; padding: 8px 16px; border-bottom: 1px solid #e2e7ef; background: #fff; }
+.oc-identity { display: flex; align-items: baseline; gap: 12px; }
+.oc-eyebrow { color: #7c8799; font-size: 11px; }
+.oc-identity h1 { margin: 0; font-size: 18px; letter-spacing: -.02em; }
+.oc-demo-badge { padding: 2px 7px; border-radius: 999px; background: #fff3cd; color: #8a5a00; font-size: 11px; font-weight: 700; }
+.oc-kpis { display: flex; gap: 8px; }
+.oc-kpi { display: flex; align-items: baseline; gap: 7px; padding: 5px 9px; border: 0; border-radius: 7px; background: #f5f7fa; color: #718096; font-size: 10px; cursor: pointer; }
+.oc-kpi strong { color: #22304a; font-size: 13px; }
+.oc-actions { display: flex; gap: 6px; }
+.oc-action, .oc-mode, .oc-view-nav button { border: 1px solid #d7dee9; border-radius: 7px; background: #fff; padding: 7px 10px; color: #536076; cursor: pointer; font-size: 11px; }
+.oc-mode.is-active, .oc-view-nav button.is-active { border-color: #315fce; background: #eef3ff; color: #244ca9; }
+.oc-view-nav { display: flex; gap: 7px; padding: 7px 14px; border-bottom: 1px solid #e2e7ef; background: #fafbfc; }
+.oc-workspace { min-height: 0; overflow: hidden; }
+.oc-panorama { position: relative; height: 100%; min-height: 0; display: grid; grid-template-rows: auto 1fr; }
+.oc-flow-toolbar { min-height: 42px; display: flex; align-items: center; gap: 8px; padding: 6px 14px; border-bottom: 1px solid #e3e7ee; background: rgba(255,255,255,.94); }
+.oc-flow-toggle { --flow-color: #64748b; border: 1px solid #d8dee8; border-radius: 999px; background: #fff; padding: 6px 10px; color: #4a5568; cursor: pointer; font-size: 12px; }
+.oc-flow-toggle::before { content: ''; display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--flow-color); }
+.oc-flow-toggle.is-off { opacity: .4; }
+.oc-canvas-viewport { min-height: 0; overflow: auto; padding: 0 0 24px; }
+.oc-canvas { position: relative; overflow: hidden; background-color: #fbfcfe; background-image: linear-gradient(#e8ebf1 1px, transparent 1px), linear-gradient(90deg, #e8ebf1 1px, transparent 1px); background-size: 190px 150px; background-position: 154px 70px; }
+.oc-stage { position: absolute; top: 0; width: 190px; height: 70px; padding: 30px 8px 0; border-left: 1px solid #dfe4ec; color: #566176; font-size: 12px; font-weight: 650; text-align: center; background: rgba(248,250,252,.92); }
+.oc-lane-label { position: absolute; left: 0; z-index: 3; width: 154px; height: 150px; padding: 18px 14px; border-top: 1px solid #dfe4ec; background: rgba(247,249,252,.96); color: #334155; font-size: 13px; font-weight: 700; }
+.oc-lane-row { position: absolute; left: 154px; height: 150px; border-top: 1px solid #dfe4ec; }
+.oc-flow-layer { position: absolute; inset: 0; z-index: 1; overflow: visible; pointer-events: none; }
+.oc-node { position: absolute; z-index: 2; width: 150px; min-height: 70px; padding: 11px 12px; border: 1px solid #cfd7e4; border-radius: 9px; background: #fff; box-shadow: 0 4px 14px rgba(15,23,42,.08); text-align: left; cursor: pointer; }
+.oc-node:hover, .oc-node:focus-visible { border-color: #6c8ee8; box-shadow: 0 8px 22px rgba(37,99,235,.14); outline: none; }
+.oc-node-title { display: block; color: #1e293b; font-size: 12px; }
+.oc-node-meta { display: block; margin-top: 8px; color: #7b8799; font-size: 10px; }
+.oc-inspector { position: absolute; z-index: 10; top: 52px; right: 12px; width: 320px; min-height: 170px; padding: 18px; border: 1px solid #d9e0eb; border-radius: 12px; background: #fff; box-shadow: 0 18px 50px rgba(15,23,42,.16); transition: transform .18s ease, opacity .18s ease; }
+.oc-inspector.is-collapsed { transform: translateX(calc(100% + 24px)); opacity: 0; pointer-events: none; }
+.oc-inspector h2 { margin: 0 0 18px; font-size: 16px; }
+.oc-inspector-kicker { margin: 0 0 7px; color: #7b8799; font-size: 11px; }
+.oc-status { display: inline-flex; align-items: center; gap: 7px; color: #334155; font-size: 12px; font-weight: 650; }
+.oc-status::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--status-color); box-shadow: 0 0 0 3px color-mix(in srgb, var(--status-color) 18%, transparent); }
+.oc-decomposition { display: grid; gap: 20px; padding: 22px; overflow: auto; }
+.oc-decomposition-level { position: relative; display: grid; grid-template-columns: 112px minmax(260px, 620px); gap: 14px; align-items: center; }
+.oc-decomposition-level + .oc-decomposition-level::before { content: ''; position: absolute; left: 126px; top: -20px; height: 20px; border-left: 2px solid #c7cfdd; }
+.oc-lineage-badge { justify-self: end; color: #7b8799; font-size: 11px; font-weight: 700; }
+.oc-lineage-card { display: grid; gap: 6px; min-height: 64px; padding: 13px 15px; border: 1px solid #d9e0eb; border-radius: 9px; background: #fff; box-shadow: 0 3px 10px rgba(15,23,42,.05); }
+.oc-lineage-card strong { font-size: 13px; }
+.oc-lineage-card small { color: #7b8799; }
+.oc-lineage-stack { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.level-capability .oc-lineage-card { border-left: 4px solid #8b5cf6; }
+.level-context .oc-lineage-card { border-left: 4px solid #0f9f73; }
+.oc-detail-panel { display: grid; align-content: start; gap: 12px; }
+.oc-detail-kicker { margin: 0; color: #8893a5; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+.oc-detail-panel h2 { margin: 0; font-size: 17px; }
+.oc-detail-tabs { padding-bottom: 10px; border-bottom: 1px solid #e5e9f0; color: #526075; font-size: 12px; }
+.oc-detail-status { color: #2563eb; font-size: 12px; font-weight: 700; }
+.oc-reference-list { display: grid; gap: 8px; }
+.oc-reference-card { display: grid; gap: 5px; padding: 10px; border: 1px solid #e0e5ed; border-radius: 8px; background: #fafbfc; }
+.oc-reference-card small { color: #7b8799; }
+.oc-reference-card a { color: #315fce; font-size: 11px; text-decoration: none; }
+.oc-suggestion { display: grid; gap: 9px; margin-top: 8px; padding: 12px; border: 1px solid #d8ccff; border-radius: 9px; background: #faf8ff; }
+.oc-advisory-badge { color: #7553c8; font-size: 10px; font-weight: 700; }
+.oc-suggestion-diff { margin: 0; padding-left: 18px; color: #596579; font-size: 11px; }
+.oc-button { width: max-content; border: 1px solid #cfd7e4; border-radius: 7px; background: #fff; padding: 7px 10px; cursor: pointer; }
+.oc-button-primary { border-color: #315fce; background: #315fce; color: #fff; }
+.oc-metrics-panel { position: absolute; z-index: 30; top: 70px; right: 16px; width: min(430px, calc(100% - 32px)); max-height: calc(100% - 86px); overflow: auto; padding: 20px; border: 1px solid #d9e0eb; border-radius: 12px; background: #fff; box-shadow: 0 18px 50px rgba(15,23,42,.18); }
+.oc-metrics-panel h2 { margin: 0 0 10px; font-size: 17px; }
+.oc-metrics-panel > p { margin: 8px 0 16px; color: #6b778b; font-size: 11px; }
+.oc-metric-formula { color: #244ca9; font-size: 22px; font-weight: 760; }
+.oc-metric-tasks { display: grid; gap: 8px; }
+.oc-metric-tasks article { display: grid; gap: 6px; padding: 11px; border: 1px solid #e0e5ed; border-radius: 8px; background: #fafbfc; }
+.oc-metric-tasks small { color: #667085; }
+.oc-safety-gate { color: #b45309; font-size: 10px; font-weight: 700; }
+.oc-panel-close { float: right; border: 0; background: transparent; color: #64748b; cursor: pointer; }
+.oc-axis-editor { position: absolute; z-index: 31; top: 70px; right: 16px; width: min(430px, calc(100% - 32px)); padding: 20px; border: 1px solid #d9e0eb; border-radius: 12px; background: #fff; box-shadow: 0 18px 50px rgba(15,23,42,.18); }
+.oc-axis-editor h2 { margin: 0 0 8px; font-size: 17px; }
+.oc-axis-editor > p { margin: 0 0 12px; color: #6b778b; font-size: 11px; line-height: 1.6; }
+.oc-axis-editor textarea { width: 100%; min-height: 78px; resize: vertical; padding: 10px; border: 1px solid #ccd5e2; border-radius: 8px; font: inherit; }
+.oc-axis-mappings { display: grid; gap: 8px; margin: 10px 0; }
+.oc-axis-mappings label { display: grid; grid-template-columns: 1fr 150px; gap: 10px; align-items: center; color: #536076; font-size: 11px; }
+.oc-axis-mappings select { padding: 7px; border: 1px solid #ccd5e2; border-radius: 7px; background: #fff; }
+.oc-axis-error { min-height: 28px; padding: 7px 0; color: #b45309; font-size: 11px; }

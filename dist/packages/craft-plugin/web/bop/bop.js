@@ -1,6 +1,4 @@
-function _cf(method, path, opts = {}) {
-  return ListShell._cf(path, { ...opts, method });
-}
+
 
 // ── 常量 ────────────────────────────────────────────────────────
 // 节点类型 AI_00 显示名：对照 docs/bop/db csv ui.xlsx "零组件类型AI_00" 列
@@ -94,11 +92,7 @@ let _bopVersions  = [];               // 所有版本（含归档）
 let _bopFamilyCollapsed = new Set();  // 折叠的版本族 family_gid
 
 async function _bopInvokeCapability(id, payload = {}) {
-  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ version: 1, payload }),
-  });
+  const response = await window.AI00Business.request(id, { version: 1, payload });
   const envelope = response?.data;
   if (response?.success !== true || envelope?.ok !== true) {
     const detail = envelope?.error || response?.error || {};
@@ -180,9 +174,9 @@ function _initShell() {
       { id: 'btn-auto-link',    label: '建立实体关联', btnStyle: 'ie',
         icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>',
         onClick: () => _openAutoLinkModal() },
-      { id: 'btn-import-bop',   label: 'BOP Fork', btnStyle: 'ie',
+      ...(_isSuperAdmin() ? [{ id: 'btn-import-bop',   label: '项目 Fork', btnStyle: 'ie',
         icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>',
-        onClick: () => _openForkModal() },
+        onClick: () => _openForkModal() }] : []),
       { id: 'btn-import-gbop',  label: '从GBOP导入', btnStyle: 'ie',
         icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="3" x2="12" y2="21"/></svg>',
         onClick: () => _openImportGbopModal() },
@@ -679,7 +673,8 @@ async function _saveEditVersion() {
 // ── 删除版本 ─────────────────────────────────────────────────────
 function _isSuperAdmin() {
   const user = window.parent?._authUser || window._authUser;
-  return (user?.role || user?.system_role) === 'super_admin';
+  return user?.org_role === 'super_admin' || user?.system_role === 'super_admin'
+    || user?.role === 'super_admin' || (user?.active_roles || []).includes('super_admin');
 }
 
 async function _purgeVersionEntries(ver, mode) {
@@ -1041,268 +1036,115 @@ async function _importTc() {
   } catch (e) { _toast('导入失败: ' + e.message, 'error'); }
 }
 
-// ── BOP Fork ─────────────────────────────────────────────────────
+// ── 项目 BOP Repository Fork ────────────────────────────────────
 
-// 系统预设（前端内置，不存 DB）
-const _FORK_SYSTEM_PRESETS = {
-  __new_model: {
-    name: '新车型衍生',
-    include_node_types: null,
-    field_rules: { title: 'inherit', vpps: 'inherit', bom_row_id: 'reset', bom_row_label: 'reset', bom_row_owner: 'reset', owner_gid: 'reset', gbop_source_gid: 'reset' },
-    meta_key_rules: {},
-  },
-  __iteration: {
-    name: '版本迭代',
-    include_node_types: null,
-    field_rules: {},   // 全部默认 inherit
-    meta_key_rules: {},
-  },
-  __structure: {
-    name: '结构复制',
-    include_node_types: null,
-    field_rules: { title: 'inherit', vpps: 'inherit', bom_row_id: 'reset', bom_row_label: 'reset', bom_row_owner: 'reset', owner_gid: 'reset', gbop_source_gid: 'reset', meta: 'reset' },
-    meta_key_rules: { '*': 'reset' },
-  },
-  __full_clone: {
-    name: '完整克隆',
-    include_node_types: null,
-    field_rules: {},
-    meta_key_rules: {},
-  },
-};
+let _repositoryForkSources = [];
 
-// 用户可控字段（标签映射）
-const _FORK_FIELD_LABELS = {
-  title:             '名称 (title)',
-  vpps:              'VPPS 壳',
-  bom_row_id:        'BOM行ID',
-  bom_row_label:     'BOM行标签',
-  bom_row_owner:     'BOM所有者',
-  parent_bop_label:  '父节点标签',
-  owner_gid:         '负责人',
-  gbop_source_gid:   'GBOP来源',
-  meta:              'Meta扩展字段',
-};
-
-// 常用 node_type 列表（勾选过滤用）
-const _FORK_NODE_TYPES = [
-  'factory_bop', 'line_process', 'station_process', 'operator_process',
-  'man', 'station_factory', 'process',
-  'equipment_factory', 'tool_factory', 'fixture_factory',
-  'equipment_need', 'tool_need', 'fixture_need',
-  'operation', 'issue', 'standard_task', 'non_standard_task',
-  'contral_plan', 'process_chart', 'knowledge', 'rule',
-  'floor_height_factory', 'jack_pos',
-  'part', 'non_standard_part', 'standard_part', 'support_material',
-];
-
-let _forkCustomPresets = [];   // DB 自定义预设缓存
-let _forkSelectedPresetGid = null;  // 当前选中的自定义预设 gid
-
-function _buildForkFieldRulesUI() {
-  const container = document.getElementById('fork-field-rules');
-  container.innerHTML = '';
-  Object.entries(_FORK_FIELD_LABELS).forEach(([field, label]) => {
-    const row = document.createElement('div');
-    row.className = 'fork-field-row';
-    row.innerHTML = `<span>${label}</span>
-      <select data-fork-field="${field}">
-        <option value="inherit">inherit</option>
-        <option value="reset">reset</option>
-      </select>`;
-    container.appendChild(row);
-  });
-}
-
-function _buildForkNodeTypesUI() {
-  const container = document.getElementById('fork-node-types');
-  container.innerHTML = '';
-  _FORK_NODE_TYPES.forEach(nt => {
-    const chip = document.createElement('span');
-    chip.className = 'fork-nt-chip';
-    chip.dataset.nt = nt;
-    chip.textContent = NODE_TYPE_LABELS[nt] || nt;
-    chip.addEventListener('click', () => chip.classList.toggle('active'));
-    container.appendChild(chip);
-  });
-}
-
-function _getForkConfig() {
-  // 节点类型过滤
-  const activeNts = [...document.querySelectorAll('.fork-nt-chip.active')].map(c => c.dataset.nt);
-  const includeNodeTypes = activeNts.length > 0 ? activeNts : null;
-
-  // 字段规则
-  const fieldRules = {};
-  document.querySelectorAll('[data-fork-field]').forEach(sel => {
-    if (sel.value === 'reset') fieldRules[sel.dataset.forkField] = 'reset';
-    // inherit 是默认，不需要显式写
-  });
-
-  return { includeNodeTypes, fieldRules };
-}
-
-function _applyForkPreset(preset) {
-  // 字段规则
-  document.querySelectorAll('[data-fork-field]').forEach(sel => {
-    const rule = (preset.field_rules || {})[sel.dataset.forkField];
-    sel.value = rule || 'inherit';
-  });
-  // 节点类型
-  document.querySelectorAll('.fork-nt-chip').forEach(chip => {
-    const nts = preset.include_node_types;
-    if (nts && nts.length > 0) {
-      chip.classList.toggle('active', nts.includes(chip.dataset.nt));
-    } else {
-      chip.classList.remove('active');
-    }
-  });
+function _forkOptionLabel(record, version) {
+  const project = record.project_name || record.project_gid || record.repository_gid;
+  const label = version.version_label || version.version_kind || version.version_gid;
+  return `${project} · ${label}`;
 }
 
 async function _openForkModal() {
-  if (!_currentVersion) { _toast('请先选择目标 BOP 版本', 'warn'); return; }
-
-  // 填充来源版本选择
-  const srcSel = document.getElementById('inp-fork-src-version');
-  srcSel.innerHTML = '<option value="">-- 选择来源 BOP 版本 --</option>';
-  // 填充版本族选择
-  const famSel = document.getElementById('inp-fork-family');
-  famSel.innerHTML = '<option value="">-- 自成新版本族 --</option>';
-  // 重置表单
-  document.getElementById('inp-fork-tag').value = '';
-  document.getElementById('inp-fork-bop-name').value = '';
-  document.getElementById('inp-fork-change-note').value = '';
-  document.getElementById('inp-fork-preset').value = '';
-  _forkSelectedPresetGid = null;
-  document.getElementById('btn-fork-delete-preset').style.display = 'none';
-
-  try {
-    const json = await _bopInvokeCapability('craft.bop.version.list', { page_size: 100 });
-    const vers = json.items || [];
-    vers.forEach(v => {
-      const opt = document.createElement('option');
-      opt.value = v.gid;
-      opt.textContent = `${v.bop_name || v.version_tag} · ${v.version_tag} (${MATURITY_LABELS[v.maturity] || v.maturity})`;
-      srcSel.appendChild(opt);
-    });
-    // 版本族（以 version_family_gid 为键，取第一个 bop_name）
-    const families = {};
-    vers.forEach(v => {
-      const fgid = v.version_family_gid || v.gid;
-      if (!families[fgid]) families[fgid] = v.bop_name || v.version_tag;
-    });
-    Object.entries(families).forEach(([fgid, fname]) => {
-      const opt = document.createElement('option');
-      opt.value = fgid;
-      opt.textContent = fname;
-      famSel.appendChild(opt);
-    });
-  } catch (_) {}
-
-  // 加载自定义预设
-  try {
-    const json = await _bopInvokeCapability('craft.bop.fork_preset.read', { operation: 'list' });
-    _forkCustomPresets = json || [];
-    _refreshForkPresetList();
-  } catch (_) { _forkCustomPresets = []; }
-
-  // 构建字段规则 UI
-  _buildForkFieldRulesUI();
-  _buildForkNodeTypesUI();
-
-  // 预设切换监听
-  const presetSel = document.getElementById('inp-fork-preset');
-  presetSel.onchange = () => {
-    const val = presetSel.value;
-    document.getElementById('btn-fork-delete-preset').style.display = 'none';
-    _forkSelectedPresetGid = null;
-    if (!val) return;
-    if (_FORK_SYSTEM_PRESETS[val]) {
-      _applyForkPreset(_FORK_SYSTEM_PRESETS[val]);
-    } else {
-      // 自定义预设
-      const preset = _forkCustomPresets.find(p => p.gid === val);
-      if (preset) {
-        _forkSelectedPresetGid = preset.gid;
-        document.getElementById('btn-fork-delete-preset').style.display = '';
-        _applyForkPreset(preset);
-      }
-    }
-  };
-
+  if (!_isSuperAdmin()) { _toast('只有超级管理员可以 Fork 主项目', 'warn'); return; }
+  const source = document.getElementById('inp-fork-src-version');
+  const target = document.getElementById('inp-fork-target-project');
+  const summary = document.getElementById('fork-plan-summary');
+  const submit = document.getElementById('btn-confirm-fork-bop');
+  source.replaceChildren(new Option('正在加载团队主 BOP 版本…', ''));
+  target.replaceChildren(new Option('正在加载目标项目…', ''));
+  summary.textContent = '正在读取不可变团队版本和可用目标项目…';
+  submit.disabled = true;
   openModal('modal-fork-bop');
-}
-
-function _refreshForkPresetList() {
-  const group = document.getElementById('fork-preset-custom-group');
-  group.innerHTML = '';
-  _forkCustomPresets.forEach(p => {
-    const opt = document.createElement('option');
-    opt.value = p.gid;
-    opt.textContent = p.name;
-    group.appendChild(opt);
-  });
-}
-
-async function _saveForkPreset() {
-  const { includeNodeTypes, fieldRules } = _getForkConfig();
-  const name = prompt('预设名称：');
-  if (!name) return;
   try {
-    const body = { name, include_node_types: includeNodeTypes, field_rules: fieldRules, meta_key_rules: {} };
-    const json = await _bopInvokeCapability('craft.bop.fork_preset.change.apply', { operation: 'create', ...body });
-    _forkCustomPresets.push(json);
-    _refreshForkPresetList();
-    // 选中新保存的预设
-    document.getElementById('inp-fork-preset').value = json.gid;
-    _forkSelectedPresetGid = json.data.gid;
-    document.getElementById('btn-fork-delete-preset').style.display = '';
-    _toast('预设已保存', 'success');
-  } catch (e) { _toast('保存失败: ' + e.message, 'error'); }
-}
-
-async function _deleteForkPreset() {
-  if (!_forkSelectedPresetGid) return;
-  if (!confirm('确认删除此预设？')) return;
-  try {
-    await _bopInvokeCapability('craft.bop.fork_preset.change.apply', {
-      operation: 'delete', gid: _forkSelectedPresetGid,
+    const [repositoryPage, projectResult] = await Promise.all([
+      _bopInvokeCapability('craft.bop.repository.search', { page_size: 100 }),
+      _bopInvokeCapability('project.project.read.atomic.projects_search', { arguments: {} }),
+    ]);
+    const repositories = repositoryPage?.items || [];
+    const projectItems = Array.isArray(projectResult) ? projectResult : (projectResult?.data || projectResult?.items || []);
+    const projectByGid = new Map(projectItems.map(item => [
+      String(item.gid || item.project_gid || ''),
+      item.name || item.project_name || '',
+    ]));
+    repositories.forEach(repository => {
+      repository.project_name = projectByGid.get(String(repository.project_gid)) || '';
     });
-    _forkCustomPresets = _forkCustomPresets.filter(p => p.gid !== _forkSelectedPresetGid);
-    _forkSelectedPresetGid = null;
-    _refreshForkPresetList();
-    document.getElementById('inp-fork-preset').value = '';
-    document.getElementById('btn-fork-delete-preset').style.display = 'none';
-    _toast('预设已删除', 'success');
-  } catch (e) { _toast('删除失败: ' + e.message, 'error'); }
+    const spacePages = await Promise.all(repositories.map(repository =>
+      _bopInvokeCapability('craft.bop.space.search', { repository_gid: String(repository.repository_gid), page_size: 100 })
+    ));
+    const teamSpaces = [];
+    spacePages.forEach((page, index) => {
+      (page?.items || []).filter(space => space.space_kind === 'team').forEach(space =>
+        teamSpaces.push({ ...space, repository: repositories[index] }));
+    });
+    const versionPages = await Promise.all(teamSpaces.map(item =>
+      _bopInvokeCapability('craft.bop.space_version.search', { space_gid: String(item.space_gid), page_size: 100 })
+    ));
+    _repositoryForkSources = [];
+    versionPages.forEach((page, index) => {
+      (page?.items || []).forEach(version =>
+        _repositoryForkSources.push({ ...version, repository: teamSpaces[index].repository, space: teamSpaces[index] }));
+    });
+    source.replaceChildren(new Option('-- 选择来源不可变版本 --', ''));
+    _repositoryForkSources.forEach(item =>
+      source.add(new Option(_forkOptionLabel(item.repository, item), String(item.version_gid))));
+    const occupied = new Set(repositories.map(item => String(item.project_gid)));
+    const candidates = projectItems.filter(item => {
+      const gid = String(item.gid || item.project_gid || '');
+      return gid && !occupied.has(gid);
+    });
+    target.replaceChildren(new Option('-- 选择尚未建立主 BOP 的项目 --', ''));
+    candidates.forEach(item => {
+      const gid = String(item.gid || item.project_gid);
+      target.add(new Option(item.name || item.project_name || gid, gid));
+    });
+    submit.disabled = !_repositoryForkSources.length || !candidates.length;
+    summary.textContent = !_repositoryForkSources.length ? '没有可 Fork 的团队不可变版本'
+      : !candidates.length ? '所有项目都已经有主 BOP Repository'
+        : 'Fork 只创建目标项目的团队主 BOP；来源保持不变。';
+  } catch (error) {
+    summary.textContent = `加载失败：${error.message || 'provider_failed'}`;
+    submit.disabled = true;
+  }
 }
 
 async function _executeFork() {
-  const srcGid  = document.getElementById('inp-fork-src-version').value;
-  const tag     = document.getElementById('inp-fork-tag').value.trim();
-  if (!srcGid)  { _toast('请选择来源版本', 'warn'); return; }
-  if (!tag)     { _toast('请填写版本标签', 'warn'); return; }
-
-  const { includeNodeTypes, fieldRules } = _getForkConfig();
-  const body = {
-    target_version_tag:       tag,
-    target_bop_name:          document.getElementById('inp-fork-bop-name').value.trim(),
-    target_version_family_gid: document.getElementById('inp-fork-family').value || null,
-    change_note:              document.getElementById('inp-fork-change-note').value.trim() || null,
-    include_node_types:       includeNodeTypes,
-    field_rules:              fieldRules,
-    meta_key_rules:           {},
-  };
+  if (!_isSuperAdmin()) { _toast('只有超级管理员可以 Fork 主项目', 'warn'); return; }
+  const sourceVersionGid = document.getElementById('inp-fork-src-version').value;
+  const targetProjectGid = document.getElementById('inp-fork-target-project').value;
+  const forkDepth = document.getElementById('inp-fork-depth').value;
+  if (!sourceVersionGid || !targetProjectGid) { _toast('请选择来源版本和目标项目', 'warn'); return; }
+  const submit = document.getElementById('btn-confirm-fork-bop');
+  const summary = document.getElementById('fork-plan-summary');
+  submit.disabled = true;
+  summary.textContent = '正在生成 Fork 预览…';
   try {
-    const json = await _bopInvokeCapability('craft.bop.fork.change.apply', {
-      operation: 'fork', source_version_gid: srcGid, ...body,
+    const previewKey = `bop-repository-fork-preview-${Date.now()}-${sourceVersionGid}`;
+    const preview = await _bopInvokeCapability('craft.bop.repository.fork.preview', {
+      source_version_gid: sourceVersionGid,
+      target_project_gid: targetProjectGid,
+      fork_depth: forkDepth,
+      include_personal_migration: false,
+      expected_target_slot: 0,
+      idempotency_key: previewKey,
+    });
+    summary.textContent = '预览已固定，正在创建目标项目主 BOP…';
+    const applyKey = `bop-repository-fork-apply-${Date.now()}-${preview.preview_gid}`;
+    const result = await _bopInvokeCapability('craft.bop.repository.fork.apply', {
+      preview_gid: String(preview.preview_gid),
+      plan_hash: preview.plan_hash,
+      allowed_decisions: preview.allowed_decisions || [],
+      expected_target_slot: 0,
+      idempotency_key: applyKey,
     });
     closeModal('modal-fork-bop');
-    await _refreshSidebar();
-    // 自动切换到新版本
-    if (json.data?.gid) { _currentVersion = json.data.gid; await load(); }
-    _toast(`Fork 成功，新版本 ${tag}，共 ${json.entries_count} 个节点`, 'success');
-  } catch (e) { _toast('Fork 失败: ' + e.message, 'error'); }
+    _toast(`项目 Fork 完成：复制 ${result.copied_node_count || 0} 个节点，保留 ${result.blueprint_node_count || 0} 个 VPPS 蓝图节点`, 'success');
+  } catch (error) {
+    summary.textContent = `Fork 失败：${error.message || 'provider_failed'}`;
+    submit.disabled = false;
+  }
 }
 
 async function _loadAlPreview() {
@@ -1450,8 +1292,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('btn-confirm-edit-entry').onclick    = _saveEditEntry;
   document.getElementById('btn-confirm-fork-bop').onclick      = _executeFork;
   document.getElementById('btn-confirm-import-gbop').onclick   = _importGbop;
-  document.getElementById('btn-fork-save-preset').addEventListener('click', _saveForkPreset);
-  document.getElementById('btn-fork-delete-preset').addEventListener('click', _deleteForkPreset);
   document.getElementById('btn-al-preview').addEventListener('click', _loadAlPreview);
   document.getElementById('btn-al-step-a').addEventListener('click', () => _runAlStep('A'));
   document.getElementById('btn-al-step-b').addEventListener('click', () => _runAlStep('B'));

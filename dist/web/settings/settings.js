@@ -41,32 +41,7 @@ async function _apiCall(_method, ..._args) {
   return null;
 }
 
-async function _invokeCapability(id, payload = {}) {
-  const requestBody = {
-    version: 1,
-    payload,
-    idempotency_key: `${id}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-  };
-  const request = (suffix, body) => _cf('POST', `/api/v1/capabilities/${id}:${suffix}`, {
-    method: 'POST',
-    body: JSON.stringify(body),
-  });
-  let response = await request('invoke', requestBody);
-  if (response?.data?.error?.code === 'confirmation_required') {
-    if (!window.confirm('确认保存服务端数据库连接配置？')) throw new Error('已取消保存');
-    const confirmation = await request('confirm', requestBody);
-    const token = confirmation?.data?.confirmation_token;
-    if (!token) throw new Error(`能力确认失败：${id}@1`);
-    response = await request('invoke', { ...requestBody, confirmation_token: token });
-  }
-  const envelope = response?.data;
-  if (response?.success !== true || envelope?.ok !== true) {
-    const detail = envelope?.error || response?.error || response || {};
-    throw new Error(detail.message || detail.msg || `能力调用失败：${id}@1`);
-  }
-  const value = envelope.data;
-  return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
-}
+async function _invokeCapability(id, payload = {}) { return window.AI00Business.invoke(id, {version:1,payload}, async () => true); }
 
 // ===================== 外观/主题面板 =====================
 function _initAppearance(config) {
@@ -326,10 +301,7 @@ async function _initFileStore() {
       secret_key: document.getElementById('minio-secret-key')?.value             || '',
       bucket:     document.getElementById('minio-public-bucket')?.value?.trim()  || 'ai00',
     };
-    const res = await _cf('POST', '/api/file-store/config', {
-      method: 'POST',
-      body:   JSON.stringify(payload),
-    });
+    const res = await _invokeCapability('base.file_store.minio_config.set', payload);
     btn.disabled = false; btn.textContent = '保存配置';
     if (fb) {
       fb.textContent = res?.msg || (res?.success ? '已保存' : '保存失败');
@@ -343,7 +315,7 @@ async function _initFileStore() {
     const btn = document.getElementById('btn-test-minio');
     const res = document.getElementById('minio-result');
     btn.disabled = true; btn.textContent = '测试中...';
-    const r = await _cf('POST', '/api/file-store/test', { method: 'POST', body: '{}' });
+    const r = await _invokeCapability('base.file_store.minio_connection.test');
     btn.disabled = false; btn.textContent = '测试连接';
     if (res) {
       res.textContent = r?.msg || (r?.success ? '连接成功 ✓' : '连接失败');
@@ -368,10 +340,7 @@ async function _initFileStore() {
       idaas_service_id:    document.getElementById('ois-service-id')?.value?.trim()     || '',
       public_base_url:     document.getElementById('ois-public-base-url')?.value?.trim() || '',
     };
-    const res = await _cf('POST', '/api/file-store/ois-config', {
-      method: 'POST',
-      body:   JSON.stringify(payload),
-    });
+    const res = await _invokeCapability('base.file_store.ois_config.set', payload);
     btn.disabled = false; btn.textContent = '保存 OIS 配置';
     if (fb) {
       fb.textContent = res?.msg || (res?.success ? '已保存' : '保存失败');
@@ -386,15 +355,12 @@ async function _initFileStore() {
     const res = document.getElementById('ois-result');
     const fb  = document.getElementById('ois-feedback');
     btn.disabled = true; btn.textContent = '测试中...';
-    if (fb) { fb.textContent = '测试中（最长12秒）...'; fb.style.color = 'var(--text-muted)'; }
+    if (fb) { fb.textContent = '正在通过 OIS SDK 验证读写连接...'; fb.style.color = 'var(--text-muted)'; }
     let r;
     try {
-      const ctrl = new AbortController();
-      const tid  = setTimeout(() => ctrl.abort(), 12000);
-      r = await _cf('POST', '/api/file-store/ois-test', { method: 'POST', body: '{}', signal: ctrl.signal });
-      clearTimeout(tid);
+      r = await _invokeCapability('base.file_store.ois_connection.test');
     } catch (e) {
-      r = { success: false, msg: e.name === 'AbortError' ? '请求超时（>12s），请检查网络' : (e.message || '请求异常') };
+      r = { success: false, msg: e.message || '请求异常' };
     }
     btn.disabled = false; btn.textContent = '测试连接';
     const msg = r?.msg || (r?.success ? '连接成功 ✓' : '连接失败');
@@ -1005,7 +971,7 @@ async function _buildPluginNavAndPanel(plugin, navEl, panelsEl, sourceType) {
 // ===================== 飞书集成面板 =====================
 async function _initFeishu() {
   // --- 读取当前 app_id（判断凭证是否已配置，同时填入输入框）---
-  const appIdRes = await _cf('GET', '/admin/config/FEISHU_APP_ID');
+  const appIdRes = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.runtime.feishu_app_id.get", {version:1,payload:({})}); return result; })({},{},new URLSearchParams());
   const appId    = appIdRes?.data?.value || '';
   const hasCreds = !!appId;
 
@@ -1025,12 +991,8 @@ async function _initFeishu() {
     btnSave.disabled = true;
     btnSave.textContent = '保存中...';
     // 分两次写入：App ID 和 App Secret
-    const r1 = await _cf('PUT', '/admin/config/FEISHU_APP_ID', {
-      method: 'PUT', body: JSON.stringify({ value: id, description: '飞书应用 ID' }),
-    });
-    const r2 = secret ? await _cf('PUT', '/admin/config/FEISHU_APP_SECRET', {
-      method: 'PUT', body: JSON.stringify({ value: secret, description: '飞书应用 Secret' }),
-    }) : { success: true };
+    const r1 = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.runtime.feishu_app_id.set", {version:1,payload:({value:body.value})}); return result; })({ value: id, description: '飞书应用 ID' },{},new URLSearchParams());
+    const r2 = secret ? await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.runtime.feishu_app_secret.set", {version:1,payload:({value:body.value})}); return result; })({ value: secret, description: '飞书应用 Secret' },{},new URLSearchParams()) : { success: true };
     btnSave.disabled = false;
     btnSave.textContent = '保存凭证';
 
@@ -1297,41 +1259,7 @@ const EXT_LABELS = {
 };
 
 // 直接调 backend FastAPI，带 JWT。比走 Python bridge 更可靠（用户数据在 PG）。
-async function _cf(method, path, opts = {}) {
-  const config = (await window.electronAPI?.getConfig?.()) || {};
-  const state  = (await window.electronAPI?.authGetState?.()) || {};
-  const runtimeBase = await window.AI00RuntimeConfig?.getRuntimeBackendBase?.(config?.backendUrl || '')
-  const baseUrl = (runtimeBase || config.backendUrl || '').replace(/\/$/, '');
 
-  const stateToken = typeof state.token === 'string' ? state.token.trim() : '';
-  const localToken = (localStorage.getItem('ai00_token') || '').trim();
-  const isJwtLike = (token) => typeof token === 'string' && token.split('.').length === 3;
-  const token = isJwtLike(stateToken) ? stateToken : (isJwtLike(localToken) ? localToken : stateToken || localToken || '');
-  const tokenSource = isJwtLike(stateToken) ? 'authGetState' : (isJwtLike(localToken) ? 'localStorage' : (stateToken ? 'authGetState-invalid' : (localToken ? 'localStorage-invalid' : 'none')));
-
-  console.log('[settings._backendFetch]', opts.method || 'GET', path, 'token:', token ? `有(${tokenSource})` : '无', 'baseUrl:', baseUrl);
-
-  if (!token) return { success: false, msg: '未登录或 token 为空' };
-
-  try {
-    const res = await fetch(`${baseUrl}${path}`, {
-      ...opts,
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-AI00-Token': token,
-        ...(opts.headers || {}),
-      },
-    });
-    const data = await res.json().catch(() => ({}));
-    console.log('[settings._backendFetch] 响应', res.status, data);
-    if (!res.ok) return { success: false, msg: data.detail || data.msg || `HTTP ${res.status}`, detail: data.detail || '', status: res.status };
-    return { success: true, ...data };
-  } catch (e) {
-    console.error('[settings._backendFetch] 异常', e);
-    return { success: false, msg: e.message };
-  }
-}
 
 async function _initUserManagement() {
   const container = document.getElementById('user-list-container');
@@ -1343,7 +1271,7 @@ async function _initUserManagement() {
 
   async function _loadUsers() {
     container.innerHTML = '<div class="empty-state">加载中...</div>';
-    const res = await _cf('GET', '/users/');
+    const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.identity.admin_user.list", {version:1,payload:({})}); return result; })({},{},new URLSearchParams());
     if (!res.success) {
       container.innerHTML = `<div class="empty-state">${res.msg || '权限不足'}</div>`;
       return;
@@ -1447,7 +1375,7 @@ function _initFollowsCleanup() {
       const kDays      = parseInt(kDaysInput?.value) || 0;
 
       // 拉取当前用户所有关注
-      const res     = await _cf('GET', '/api/follows');
+      const res     = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.follow.read.atomic.follows_list", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"item_type":(query.has("item_type")?query.get("item_type"):null)}}).arguments).filter(([k,v])=>v!=null||["item_type"].includes(k)))}}); return result; })({},{},new URLSearchParams());
       const follows = res?.data || [];
 
       const toDelete = [];
@@ -1456,12 +1384,12 @@ function _initFollowsCleanup() {
         const { gid: followGid, item_type, item_gid, created_at } = f;
 
         if (item_type === 'task' && cleanTask) {
-          const r      = await _cf('GET', `/api/tasks/${item_gid}`);
+          const r      = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.read.atomic.tasks_get", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"gid":path.gid}}).arguments).filter(([k,v])=>v!=null||[].includes(k)))}}); return result; })({},{"gid":decodeURIComponent(String(item_gid))},new URLSearchParams());
           const status = r?.data?.status || r?.status || '';
           if (['completed', 'closed'].includes(status)) toDelete.push(followGid);
 
         } else if (item_type === 'issue' && cleanIssue) {
-          const r      = await _cf('GET', `/api/issues/${item_gid}`);
+          const r      = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.read.atomic.issues_get", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"gid":path.gid}}).arguments).filter(([k,v])=>v!=null||[].includes(k)))}}); return result; })({},{"gid":decodeURIComponent(String(item_gid))},new URLSearchParams());
           const status = r?.data?.status || r?.status || '';
           if (['resolved', 'closed'].includes(status)) toDelete.push(followGid);
 
@@ -1473,7 +1401,7 @@ function _initFollowsCleanup() {
 
       // 批量删除
       for (const fGid of toDelete) {
-        await _cf('DELETE', `/api/follows/${fGid}`, { method: 'DELETE' });
+        await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.follow.change.apply.atomic.follows_delete", {version:1,payload:{arguments:{"gid":path.gid}}}); return result; })({},{"gid":decodeURIComponent(String(fGid))},new URLSearchParams());
       }
 
       if (resultEl) {
@@ -1607,7 +1535,7 @@ let _cachedFeatureFlags = null;
 async function _initFeatureFlags() {
   // 从后端读取功能开关（存储在 admin/config feature_flags 条目中）
   let flags = {};
-  const res = await _cf('GET', '/admin/config/feature_flags');
+  const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.runtime.feature_flags.get", {version:1,payload:({})}); return result; })({},{},new URLSearchParams());
   if (res?.success && res?.data?.value) {
     try { flags = JSON.parse(res.data.value); } catch (_) {}
   }
@@ -1620,10 +1548,7 @@ async function _initFeatureFlags() {
     checkbox.addEventListener('change', async () => {
       checkbox.disabled = true;
       const updated = { ...(_cachedFeatureFlags || {}), [key]: checkbox.checked };
-      const r = await _cf('PUT', '/admin/config/feature_flags', {
-        method: 'PUT',
-        body: JSON.stringify({ value: JSON.stringify(updated), description: '功能开关' }),
-      });
+      const r = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.runtime.feature_flags.replace", {version:1,payload:({flags:Object.entries(JSON.parse(body.value)).map(([id,value])=>typeof value==="boolean"?{id,enabled:value}:{id,...value})})}); return result; })({ value: JSON.stringify(updated), description: '功能开关' },{},new URLSearchParams());
       _cachedFeatureFlags = updated;
       checkbox.disabled = false;
       const fb = document.getElementById('ff-feedback');
@@ -1676,10 +1601,7 @@ async function _initFeatureFlags() {
     checkbox.addEventListener('change', async () => {
       checkbox.disabled = true;
       const updated = { ...(_cachedFeatureFlags || {}), [flagKey]: checkbox.checked };
-      const r = await _cf('PUT', '/admin/config/feature_flags', {
-        method: 'PUT',
-        body: JSON.stringify({ value: JSON.stringify(updated), description: '功能开关' }),
-      });
+      const r = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.runtime.feature_flags.replace", {version:1,payload:({flags:Object.entries(JSON.parse(body.value)).map(([id,value])=>typeof value==="boolean"?{id,enabled:value}:{id,...value})})}); return result; })({ value: JSON.stringify(updated), description: '功能开关' },{},new URLSearchParams());
       _cachedFeatureFlags = updated;
       checkbox.disabled = false;
       const fb = document.getElementById('ff-feedback');

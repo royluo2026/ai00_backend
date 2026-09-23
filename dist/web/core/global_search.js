@@ -30,16 +30,10 @@ const GlobalSearch = (() => {
   // ── DOM 引用（init 后赋值）────────────────────────────────────────────────
   let _overlay, _panel, _input, _badge, _tabs, _resultsEl, _footer;
 
-  function _cloudFetch(path, opts = {}) {
-    return window._cloudFetch(path, opts);
-  }
+
 
   async function _invokeCapability(id, payload = {}) {
-    const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ version: 1, payload }),
-    });
+    const response = await window.AI00Business.request(id, { version: 1, payload });
     const envelope = response?.data;
     if (response?.success !== true || envelope?.ok !== true) {
       const detail = envelope?.error || response?.error || {};
@@ -76,9 +70,9 @@ const GlobalSearch = (() => {
     if (authMode !== 'feishu') return [];
     try {
       const [usersRes, chatsRes, docsRes] = await Promise.allSettled([
-        _cloudFetch(`/feishu/search/users?q=${encodeURIComponent(q)}&limit=5`, { method: 'GET' }),
-        _cloudFetch(`/feishu/search/chats?q=${encodeURIComponent(q)}&limit=5`, { method: 'GET' }),
-        _cloudFetch(`/feishu/search/docs?q=${encodeURIComponent(q)}&limit=4`, { method: 'GET' }),
+        (async (body,path,query) => { const result = await window.AI00Business.invoke("base.feishu.user.search", {version:1,payload:({query:query.get("q")||"",limit:Number(query.get("limit")||10)})}); return result; })({},{},new URLSearchParams((`/feishu/search/users?q=${encodeURIComponent(q)}&limit=5`).split("?")[1]||"")),
+        (async (body,path,query) => { const result = await window.AI00Business.invoke("base.feishu.chat.search", {version:1,payload:({query:query.get("q")||"",limit:Number(query.get("limit")||10)})}); return result; })({},{},new URLSearchParams((`/feishu/search/chats?q=${encodeURIComponent(q)}&limit=5`).split("?")[1]||"")),
+        (async (body,path,query) => { const result = await window.AI00Business.invoke("base.feishu.document.search", {version:1,payload:({query:query.get("q")||"",limit:Number(query.get("limit")||10)})}); return result; })({},{},new URLSearchParams((`/feishu/search/docs?q=${encodeURIComponent(q)}&limit=4`).split("?")[1]||"")),
       ]);
       const items = [];
       if (usersRes.status === 'fulfilled' && usersRes.value?.data) {
@@ -115,8 +109,8 @@ const GlobalSearch = (() => {
   async function _searchTasks(q) {
     try {
       const [tasksRes, issuesRes] = await Promise.allSettled([
-        _cloudFetch(`/api/tasks?q=${encodeURIComponent(q)}&page_size=5`, { method: 'GET' }),
-        _cloudFetch(`/api/issues?q=${encodeURIComponent(q)}&page_size=5`, { method: 'GET' }),
+        (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.read.atomic.tasks_search", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"project_gid":(query.has("project_gid")?query.get("project_gid"):null),"status":(query.has("status")?query.get("status"):null),"list_gid":(query.has("list_gid")?query.get("list_gid"):null),"scheduled_date_from":(query.has("scheduled_date_from")?query.get("scheduled_date_from"):null),"q":(query.has("q")?query.get("q"):null),"page_size":(query.has("page_size")?Number(query.get("page_size")):null)}}).arguments).filter(([k,v])=>v!=null||["list_gid","project_gid","q","scheduled_date_from","status"].includes(k)))}}); return result; })({},{},new URLSearchParams((`/api/tasks?q=${encodeURIComponent(q)}&page_size=5`).split("?")[1]||"")),
+        (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.read.atomic.issues_search", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"project_gid":(query.has("project_gid")?query.get("project_gid"):null),"status":(query.has("status")?query.get("status"):null),"list_gid":(query.has("list_gid")?query.get("list_gid"):null),"q":(query.has("q")?query.get("q"):null),"page_size":(query.has("page_size")?Number(query.get("page_size")):null)}}).arguments).filter(([k,v])=>v!=null||["list_gid","project_gid","q","status"].includes(k)))}}); return result; })({},{},new URLSearchParams((`/api/issues?q=${encodeURIComponent(q)}&page_size=5`).split("?")[1]||"")),
       ]);
       const items = [];
       if (tasksRes.status === 'fulfilled' && tasksRes.value?.data) {
@@ -134,8 +128,8 @@ const GlobalSearch = (() => {
   async function _searchKnow(q) {
     try {
       const [knowRes, rulesRes] = await Promise.allSettled([
-        _cloudFetch(`/api/knowledge_hub/items?q=${encodeURIComponent(q)}&limit=5`, { method: 'GET' }),
-        _cloudFetch(`/api/rules?q=${encodeURIComponent(q)}&limit=5`, { method: 'GET' }),
+        (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.read.atomic.items_list", {version:1,payload:Object.fromEntries(Object.entries({"folder_gid":(query.has("folder_gid")?query.get("folder_gid"):null),"scope_type":(query.has("scope_type")?query.get("scope_type"):null),"team_gid":(query.has("team_gid")?query.get("team_gid"):null),"show_hidden":(query.has("show_hidden")?['true','1','yes','on'].includes(query.get("show_hidden").toLowerCase()):false),"q":(query.has("q")?query.get("q"):null)}).filter(([,v])=>v!=null))}); return (result["items"]??[]); })({},{},new URLSearchParams((`/api/knowledge_hub/items?q=${encodeURIComponent(q)}&limit=5`).split("?")[1]||"")),
+        (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.library.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"list",status:(query.has("status")?query.get("status"):null),list_gid:(query.has("list_gid")?query.get("list_gid"):null),q:(query.has("q")?query.get("q"):null),limit:(query.has("limit")?Number(query.get("limit")):null)}).filter(([,v])=>v!=null))}); return result; })({},{},new URLSearchParams((`/api/rules?q=${encodeURIComponent(q)}&limit=5`).split("?")[1]||"")),
       ]);
       const items = [];
       if (knowRes.status === 'fulfilled' && Array.isArray(knowRes.value)) {
@@ -155,8 +149,8 @@ const GlobalSearch = (() => {
     if (authMode !== 'feishu') return [];
     try {
       const [evRes, mtRes] = await Promise.allSettled([
-        _cloudFetch(`/feishu/search/events?q=${encodeURIComponent(q)}&limit=5`, { method: 'GET' }),
-        _cloudFetch(`/feishu/search/meetings?q=${encodeURIComponent(q)}&limit=4`, { method: 'GET' }),
+        (async (body,path,query) => { const result = await window.AI00Business.invoke("base.feishu.event.search", {version:1,payload:({query:query.get("q")||"",limit:Number(query.get("limit")||10)})}); return result; })({},{},new URLSearchParams((`/feishu/search/events?q=${encodeURIComponent(q)}&limit=5`).split("?")[1]||"")),
+        (async (body,path,query) => { const result = await window.AI00Business.invoke("base.feishu.meeting.search", {version:1,payload:({query:query.get("q")||"",limit:Number(query.get("limit")||10)})}); return result; })({},{},new URLSearchParams((`/feishu/search/meetings?q=${encodeURIComponent(q)}&limit=4`).split("?")[1]||"")),
       ]);
       const items = [];
       if (evRes.status === 'fulfilled' && evRes.value?.data) {
@@ -194,13 +188,13 @@ const GlobalSearch = (() => {
     if (cat === 'all' || cat === 'feishu') {
       if (authOk) {
         all.push(
-          _cloudFetch(`/feishu/search/users?q=${enc}&limit=5`, { method: 'GET' }).then(r =>
+          (async (body,path,query) => { const result = await window.AI00Business.invoke("base.feishu.user.search", {version:1,payload:({query:query.get("q")||"",limit:Number(query.get("limit")||10)})}); return result; })({},{},new URLSearchParams((`/feishu/search/users?q=${enc}&limit=5`).split("?")[1]||"")).then(r =>
             _addGroup('飞书联系人', (r?.data || []).map(u => ({ _cat:'feishu', _subtype:'user', ...u })))
           ).catch(() => {}),
-          _cloudFetch(`/feishu/search/chats?q=${enc}&limit=5`, { method: 'GET' }).then(r =>
+          (async (body,path,query) => { const result = await window.AI00Business.invoke("base.feishu.chat.search", {version:1,payload:({query:query.get("q")||"",limit:Number(query.get("limit")||10)})}); return result; })({},{},new URLSearchParams((`/feishu/search/chats?q=${enc}&limit=5`).split("?")[1]||"")).then(r =>
             _addGroup('飞书群聊', (r?.data || []).map(c => ({ _cat:'feishu', _subtype:'chat', ...c })))
           ).catch(() => {}),
-          _cloudFetch(`/feishu/search/docs?q=${enc}&limit=4`, { method: 'GET' }).then(r =>
+          (async (body,path,query) => { const result = await window.AI00Business.invoke("base.feishu.document.search", {version:1,payload:({query:query.get("q")||"",limit:Number(query.get("limit")||10)})}); return result; })({},{},new URLSearchParams((`/feishu/search/docs?q=${enc}&limit=4`).split("?")[1]||"")).then(r =>
             _addGroup('飞书文档', (r?.data || []).map(d => ({ _cat:'feishu', _subtype:'doc', ...d })))
           ).catch(() => {}),
         );
@@ -221,20 +215,20 @@ const GlobalSearch = (() => {
     }
     if (cat === 'all' || cat === 'tasks') {
       all.push(
-        _cloudFetch(`/api/tasks?q=${enc}&page_size=5`, { method: 'GET' }).then(r =>
+        (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.read.atomic.tasks_search", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"project_gid":(query.has("project_gid")?query.get("project_gid"):null),"status":(query.has("status")?query.get("status"):null),"list_gid":(query.has("list_gid")?query.get("list_gid"):null),"scheduled_date_from":(query.has("scheduled_date_from")?query.get("scheduled_date_from"):null),"q":(query.has("q")?query.get("q"):null),"page_size":(query.has("page_size")?Number(query.get("page_size")):null)}}).arguments).filter(([k,v])=>v!=null||["list_gid","project_gid","q","scheduled_date_from","status"].includes(k)))}}); return result; })({},{},new URLSearchParams((`/api/tasks?q=${enc}&page_size=5`).split("?")[1]||"")).then(r =>
           _addGroup('任务', (r?.data || []).map(t => ({ _cat:'tasks', _subtype:'task', ...t })))
         ).catch(() => {}),
-        _cloudFetch(`/api/issues?q=${enc}&page_size=5`, { method: 'GET' }).then(r =>
+        (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.read.atomic.issues_search", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"project_gid":(query.has("project_gid")?query.get("project_gid"):null),"status":(query.has("status")?query.get("status"):null),"list_gid":(query.has("list_gid")?query.get("list_gid"):null),"q":(query.has("q")?query.get("q"):null),"page_size":(query.has("page_size")?Number(query.get("page_size")):null)}}).arguments).filter(([k,v])=>v!=null||["list_gid","project_gid","q","status"].includes(k)))}}); return result; })({},{},new URLSearchParams((`/api/issues?q=${enc}&page_size=5`).split("?")[1]||"")).then(r =>
           _addGroup('问题', (r?.data || []).map(i => ({ _cat:'tasks', _subtype:'issue', ...i })))
         ).catch(() => {}),
       );
     }
     if (cat === 'all' || cat === 'know') {
       all.push(
-        _cloudFetch(`/api/knowledge_hub/items?q=${enc}&limit=5`, { method: 'GET' }).then(r =>
+        (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.read.atomic.items_list", {version:1,payload:Object.fromEntries(Object.entries({"folder_gid":(query.has("folder_gid")?query.get("folder_gid"):null),"scope_type":(query.has("scope_type")?query.get("scope_type"):null),"team_gid":(query.has("team_gid")?query.get("team_gid"):null),"show_hidden":(query.has("show_hidden")?['true','1','yes','on'].includes(query.get("show_hidden").toLowerCase()):false),"q":(query.has("q")?query.get("q"):null)}).filter(([,v])=>v!=null))}); return (result["items"]??[]); })({},{},new URLSearchParams((`/api/knowledge_hub/items?q=${enc}&limit=5`).split("?")[1]||"")).then(r =>
           _addGroup('知识库', (Array.isArray(r) ? r : []).map(k => ({ _cat:'know', _subtype:'knowledge', ...k })))
         ).catch(() => {}),
-        _cloudFetch(`/api/rules?q=${enc}&limit=5`, { method: 'GET' }).then(r =>
+        (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.library.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"list",status:(query.has("status")?query.get("status"):null),list_gid:(query.has("list_gid")?query.get("list_gid"):null),q:(query.has("q")?query.get("q"):null),limit:(query.has("limit")?Number(query.get("limit")):null)}).filter(([,v])=>v!=null))}); return result; })({},{},new URLSearchParams((`/api/rules?q=${enc}&limit=5`).split("?")[1]||"")).then(r =>
           _addGroup('规则', (r?.data || []).map(r => ({ _cat:'know', _subtype:'rule', ...r })))
         ).catch(() => {}),
       );
@@ -242,10 +236,10 @@ const GlobalSearch = (() => {
     if (cat === 'all' || cat === 'cal') {
       if (authOk) {
         all.push(
-          _cloudFetch(`/feishu/search/events?q=${enc}&limit=5`, { method: 'GET' }).then(r =>
+          (async (body,path,query) => { const result = await window.AI00Business.invoke("base.feishu.event.search", {version:1,payload:({query:query.get("q")||"",limit:Number(query.get("limit")||10)})}); return result; })({},{},new URLSearchParams((`/feishu/search/events?q=${enc}&limit=5`).split("?")[1]||"")).then(r =>
             _addGroup('日程', (r?.data || []).map(e => ({ _cat:'cal', _subtype:'event', ...e })))
           ).catch(() => {}),
-          _cloudFetch(`/feishu/search/meetings?q=${enc}&limit=4`, { method: 'GET' }).then(r =>
+          (async (body,path,query) => { const result = await window.AI00Business.invoke("base.feishu.meeting.search", {version:1,payload:({query:query.get("q")||"",limit:Number(query.get("limit")||10)})}); return result; })({},{},new URLSearchParams((`/feishu/search/meetings?q=${enc}&limit=4`).split("?")[1]||"")).then(r =>
             _addGroup('会议记录', (r?.data || []).map(m => ({ _cat:'cal', _subtype:'meeting', ...m })))
           ).catch(() => {}),
         );

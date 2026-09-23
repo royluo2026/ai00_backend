@@ -55,7 +55,8 @@ function _getProcessCardPresentation(row) {
   const criticalProcess = entity.critical_process ?? ext.critical_process ?? meta.critical_process;
   const savedColor = entity.sequence_color ?? ext.sequence_color ?? meta.sequence_color;
   let changeClass = '';
-  if (['工艺修改', '变更工序', '改变工序'].includes(modifiedType)) changeClass = 'll-process-change-operation';
+  if (['修改', '更改', '工艺修改', '变更工序', '改变工序'].includes(modifiedType)) changeClass = 'll-process-change-modified';
+  else if (['新增', '新加工序'].includes(modifiedType)) changeClass = 'll-process-change-added';
   else if (['仅零件修改', '仅改零件'].includes(modifiedType)) changeClass = 'll-process-change-parts';
   return {
     changeClass,
@@ -64,35 +65,7 @@ function _getProcessCardPresentation(row) {
   };
 }
 
-async function _invokeLayoutCapability(id, payload) {
-  const _cloudFetch = _cf;
-  const requestBody = {
-    version: 1,
-    payload,
-    idempotency_key: `${id}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-  };
-  const request = (suffix, body) => _cloudFetch(`/api/v1/capabilities/${id}:${suffix}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  let response = await request('invoke', requestBody);
-  if (response?.data?.error?.code === 'confirmation_required') {
-    if (!window.confirm('确认执行这次工艺数据变更？')) throw new Error('已取消变更');
-    const confirmation = await request('confirm', requestBody);
-    const token = confirmation?.data?.confirmation_token;
-    if (!token) throw new Error(`能力确认失败：${id}@1`);
-    response = await request('invoke', { ...requestBody, confirmation_token: token });
-  }
-  const result = response?.data;
-  if (response?.success !== true || result?.ok !== true) {
-    const detail = result?.error || response?.error || {};
-    const error = new Error(detail.message || `能力调用失败：${id}@1`);
-    error.code = detail.code || 'capability_invocation_failed';
-    throw error;
-  }
-  return result.data;
-}
+async function _invokeLayoutCapability(id, payload) { return window.AI00Business.invoke(id, {version:1,payload}, async () => true); }
 
 
 class LayoutMode {
@@ -243,6 +216,32 @@ class LayoutMode {
     this._renderLineNav();
   }
 
+  /** Refresh only the lines affected by an optimistic move. */
+  refreshMovedEntries(lineGids) {
+    if (!this._data) return;
+    const affected = new Set((lineGids || []).filter(Boolean));
+    const renderedBefore = new Set(this._renderedLineGids);
+    this._layoutAllStations();
+    for (const gid of affected) {
+      const lineEl = this._world.querySelector(`.ll-line-box[data-gid="${gid}"]`);
+      const layoutEl = lineEl?.querySelector('.ll-line-layout');
+      if (!layoutEl) continue;
+      layoutEl.removeAttribute('data-rendered');
+      layoutEl.innerHTML = '';
+      this._renderedLineGids.delete(gid);
+      if (renderedBefore.has(gid) || this._isLineVisible(gid, this._viewport.clientHeight)) {
+        this._renderLineCards(gid);
+      }
+    }
+    this._updateWorldSize();
+    this._renderMinimap();
+    this._renderLineNav();
+    this._setTransform();
+    this._syncMinimapViewport();
+    this.setEditMode(this._editMode);
+    if (this._activeGid) this.highlightNode(this._activeGid);
+  }
+
   /**
    * 公共 API：适应全局 —— 缩放和平移使所有线框在视口内完整可见
    */
@@ -296,13 +295,13 @@ class LayoutMode {
   setEditMode(enabled) {
     this._editMode = enabled;
     this._world.querySelectorAll('.ll-line-box').forEach(el => {
-      el.classList.toggle('ll-draggable', enabled);
+      el.classList.toggle('ll-draggable', enabled && !el.classList.contains('ll-persist-pending'));
       // 更新车流箭头可点击状态
       const gid = el.dataset.gid;
       if (gid) this._renderLineFlowArrows(gid, el);
     });
     this._world.querySelectorAll('.ll-ring-card, .ll-station-card').forEach(el => {
-      el.classList.toggle('ll-draggable', enabled);
+      el.classList.toggle('ll-draggable', enabled && !el.classList.contains('ll-persist-pending'));
     });
   }
 
@@ -483,7 +482,9 @@ class LayoutMode {
       }
 
       const box = document.createElement('div');
-      box.className = 'll-line-box' + (this._editMode ? ' ll-draggable' : '');
+      box.className = 'll-line-box'
+        + (this._editMode && !line.__pending_create ? ' ll-draggable' : '')
+        + (line.__pending_create ? ' ll-persist-pending' : '');
       box.dataset.gid = gid;
       box.style.left = pos.x + 'px';
       box.style.top = pos.y + 'px';
@@ -739,6 +740,29 @@ class LayoutMode {
     const layoutEl = lineEl.querySelector('.ll-line-layout');
     if (!layoutEl || layoutEl.dataset.rendered === '1') return;
 
+    const line = this._data?.rowByGid?.get(lineGid);
+    if (line?.node_type === 'line_process' && !(this._data.childMap.get(lineGid) || []).length
+        && this._data.isLineScopeLoaded && !this._data.isLineScopeLoaded(line)
+        && this._data.loadLineScope) {
+      const data = this._data;
+      layoutEl.dataset.rendered = '1';
+      layoutEl.innerHTML = '<div class="ll-line-empty">加载工位中…</div>';
+      this._renderedLineGids.add(lineGid);
+      Promise.resolve(data.loadLineScope(line)).catch(() => {
+        if (this._data !== data) return;
+        const current = this._world.querySelector(`.ll-line-box[data-gid="${lineGid}"] .ll-line-layout`);
+        if (!current) return;
+        current.innerHTML = '<div class="ll-line-empty">工位加载失败，点击重试</div>';
+        current.onclick = () => {
+          current.onclick = null;
+          current.removeAttribute('data-rendered');
+          this._renderedLineGids.delete(lineGid);
+          this._renderLineCards(lineGid);
+        };
+      });
+      return;
+    }
+
     layoutEl.dataset.rendered = '1';
 
     // 多项目模式：使用合并工位渲染
@@ -890,9 +914,10 @@ class LayoutMode {
     const card = document.createElement('div');
     const side = row._effectiveSide || this._parseLRMSuffix(row.title);
     const sideCls = side ? ' station-side-' + side : ' station-side-none';
-    const editable = this._editMode ? ' ll-draggable' : '';
+    const editable = this._editMode && !row.__pending_create ? ' ll-draggable' : '';
 
-    card.className = 'll-station-card' + sideCls + editable;
+    card.className = 'll-station-card' + sideCls + editable
+      + (row.__pending_create ? ' ll-persist-pending' : '');
     card.dataset.gid = row.gid;
     card.style.width = LL_STATION_W + 'px';
     card.style.height = LL_STATION_H + 'px';
@@ -1095,17 +1120,16 @@ class LayoutMode {
       const sortOrder  = (row.sort_order ?? 0) + 1;
       const versionGid = row.version_gid || this._data?.versionGid;
       try {
-        await _invokeLayoutCapability('craft.bop.entry.bulk.change.apply', {
-          operation: 'create',
+        const body = {
           version_gid: versionGid,
           parent_gid: parentGid,
           node_type: 'station_process',
           title: newTitle,
           sort_order: sortOrder,
-        });
+        };
+        if (this._data?.createEntry) await this._data.createEntry(body);
+        else await _invokeLayoutCapability('craft.bop.entry.bulk.change.apply', { operation: 'create', ...body });
         this._data?.toast?.('已创建工位「' + newTitle + '」', 'ok');
-        this._preserveView = true;
-        await this._data?.reloadData?.();
       } catch (err) {
         this._data?.toast?.('创建工位失败: ' + err.message, 'error');
       }
@@ -1130,8 +1154,7 @@ class LayoutMode {
     const targetVersionGid = target.version_gid || this._data.versionGid;
 
     try {
-      await _invokeLayoutCapability('craft.bop.entry.bulk.change.apply', {
-        operation: 'create',
+      const body = {
         version_gid: targetVersionGid,
         parent_gid: target.gid,
         node_type: srcRow.node_type,
@@ -1139,11 +1162,11 @@ class LayoutMode {
         vpps: srcRow.vpps || '',
         vpps_desc: srcRow.vpps_desc || '',
         sort_order: 0,
-      });
+      };
+      if (this._data?.createEntry) await this._data.createEntry(body);
+      else await _invokeLayoutCapability('craft.bop.entry.bulk.change.apply', { operation: 'create', ...body });
 
       this._data?.toast?.(`已粘贴「${srcRow.title || srcRow.node_type}」`, 'ok');
-      // 保留剪贴板，允许连续粘贴
-      this._data?.reloadData?.();
     } catch (e) {
       this._data?.toast?.('粘贴失败: ' + e.message, 'error');
     }
@@ -1580,7 +1603,9 @@ class LayoutMode {
 
   _createRingCard(row) {
     const el = document.createElement('div');
-    el.className = 'll-ring-card' + (this._editMode ? ' ll-draggable' : '');
+    el.className = 'll-ring-card'
+      + (this._editMode && !row.__pending_create ? ' ll-draggable' : '')
+      + (row.__pending_create ? ' ll-persist-pending' : '');
     el.dataset.gid = row.gid;
 
     const isProcess  = row.node_type === 'process';
@@ -1660,17 +1685,16 @@ class LayoutMode {
       const statsBox = document.createElement('div');
       statsBox.className = 'lv-stats-box';
       statsBox.dataset.statsGid = row.gid;
-      if (typeof _collectProcessPics === 'function') {
-        const pics = _collectProcessPics(row.gid);
+      if (this._data?.processPictureRecords && this._data?.bindPictureImage) {
+        const pics = this._data.processPictureRecords(row.gid);
         if (pics.length) {
           const fill = document.createElement('div');
           fill.className = 'lv-stats-thumb-fill';
           fill.title = '工艺流程图（点击灯箱）';
           const img = document.createElement('img');
           img.className = 'lv-thumb-fill';
-          img.src = pics[0];
           img.alt = 'process_flow_pic';
-          img.onerror = () => { fill.innerHTML = ''; };
+          this._data.bindPictureImage(img, pics[0].pic, pics[0].versionGid, () => { fill.innerHTML = ''; });
           fill.appendChild(img);
           statsBox.appendChild(fill);
         }
@@ -1791,17 +1815,21 @@ class LayoutMode {
       option.setAttribute('aria-label', labels[color]);
       option.addEventListener('click', async event => {
         event.stopPropagation();
+        const previous = _getProcessCardPresentation(row).seqColor;
+        if (!row.entity_data || typeof row.entity_data !== 'object') row.entity_data = {};
+        if (!row.entity_data.ext || typeof row.entity_data.ext !== 'object') row.entity_data.ext = {};
+        row.entity_data.ext.sequence_color = color;
+        badgeEl.classList.remove('ll-seq-red', 'll-seq-yellow', 'll-seq-green', 'll-seq-gray', 'll-seq-blue');
+        badgeEl.classList.add(`ll-seq-${color}`);
+        picker.remove();
         try {
           await _invokeLayoutCapability('craft.bop.entry.change.apply', {
             operation: 'update', entry_gid: row.gid, properties: [{ name: 'sequence_color', value: color }],
           });
-          if (!row.entity_data || typeof row.entity_data !== 'object') row.entity_data = {};
-          if (!row.entity_data.ext || typeof row.entity_data.ext !== 'object') row.entity_data.ext = {};
-          row.entity_data.ext.sequence_color = color;
-          badgeEl.classList.remove('ll-seq-red', 'll-seq-yellow', 'll-seq-green', 'll-seq-gray', 'll-seq-blue');
-          badgeEl.classList.add(`ll-seq-${color}`);
-          picker.remove();
         } catch (error) {
+          row.entity_data.ext.sequence_color = previous;
+          badgeEl.classList.remove('ll-seq-red', 'll-seq-yellow', 'll-seq-green', 'll-seq-gray', 'll-seq-blue');
+          badgeEl.classList.add(`ll-seq-${previous}`);
           this._data?.toast?.('序字颜色保存失败: ' + (error?.message || error), 'error');
         }
       });
@@ -1879,7 +1907,9 @@ class LayoutMode {
    */
   _createCompactCard(row) {
     const el = document.createElement('div');
-    el.className = 'll-ring-card' + (this._editMode ? ' ll-draggable' : '');
+    el.className = 'll-ring-card'
+      + (this._editMode && !row.__pending_create ? ' ll-draggable' : '')
+      + (row.__pending_create ? ' ll-persist-pending' : '');
     el.dataset.gid = row.gid;
 
     const row1 = document.createElement('div');
@@ -2023,7 +2053,7 @@ class LayoutMode {
   }
 
   /**
-   * 工序卡片统计区无图片时弹出图片上传/粘贴弹窗
+   * 工序卡片统计区无图片时弹出图片上传弹窗
    */
   async _openPicUploadDialog(gid, row) {
     const overlay = document.createElement('div');
@@ -2040,18 +2070,10 @@ class LayoutMode {
       </div>
       <div style="font-size:11px;font-weight:600;color:var(--subtext0,#a6adc8);margin-bottom:4px">工艺流程图</div>
       <div id="_picDlgAreaFlow"></div>
-      <div style="font-size:11px;color:var(--overlay0,#6c7086);margin-top:8px;padding:6px 8px;
-           background:var(--base,#1e1e2e);border-radius:4px;border:1px dashed var(--surface2,#585b70);
-           text-align:center;cursor:pointer" id="_picDlgPasteHintFlow">
-        📋 点击此处后按 Ctrl+V 粘贴到工艺流程图
-      </div>
+      <button type="button" class="lv-pic-paste-hint" id="_picDlgPasteHintFlow">📋 粘贴到工艺流程图</button>
       <div style="font-size:11px;font-weight:600;color:var(--subtext0,#a6adc8);margin:14px 0 4px">工艺卡图片</div>
       <div id="_picDlgAreaChart"></div>
-      <div style="font-size:11px;color:var(--overlay0,#6c7086);margin-top:8px;padding:6px 8px;
-           background:var(--base,#1e1e2e);border-radius:4px;border:1px dashed var(--surface2,#585b70);
-           text-align:center;cursor:pointer" id="_picDlgPasteHintChart">
-        📋 点击此处后按 Ctrl+V 粘贴到工艺卡图片
-      </div>
+      <button type="button" class="lv-pic-paste-hint" id="_picDlgPasteHintChart">📋 粘贴到工艺卡图片</button>
       <div class="lv-modal-actions">
         <button class="lv-modal-btn-ghost" id="_picDlgCancel">取消</button>
         <button class="lv-modal-btn-primary" id="_picDlgOk">保存</button>
@@ -2081,49 +2103,24 @@ class LayoutMode {
     };
     refresh();
 
-    // 粘贴图片支持
-    const onPaste = async (e) => {
-      const items = e.clipboardData?.items;
-      if (!items) return;
-      const activeTarget = dlg.dataset.pasteTarget === 'chart' ? 'chart' : 'flow';
-      for (const item of items) {
-        if (item.type.startsWith('image/')) {
-          const file = item.getAsFile();
-          const targetList = activeTarget === 'chart' ? pendingChartPics : pendingFlowPics;
-          const hintId = activeTarget === 'chart' ? '#_picDlgPasteHintChart' : '#_picDlgPasteHintFlow';
-          if (!file || targetList.length >= 15) continue;
-          const hint = dlg.querySelector(hintId);
-          if (hint) hint.textContent = '上传中…';
-          try {
-            const pic = await (typeof _uploadBopPic === 'function' ? _uploadBopPic(file) : null);
-            if (pic) {
-              targetList.push(pic);
-              if (activeTarget === 'chart') pendingChartPics = targetList;
-              else pendingFlowPics = targetList;
-              refresh();
-            }
-          } catch (err) { /* ignore */ }
-          if (hint) hint.textContent = activeTarget === 'chart'
-            ? '📋 点击此处后按 Ctrl+V 粘贴到工艺卡图片'
-            : '📋 点击此处后按 Ctrl+V 粘贴到工艺流程图';
-        }
-      }
+    let pasteTarget = 'flow';
+    const paste = target => {
+      pasteTarget = target;
+      const area = target === 'chart' ? chartAreaEl : flowAreaEl;
+      area.querySelector('.lv-pic-area')?.dispatchEvent(new CustomEvent('ai00:paste-image'));
     };
-    document.addEventListener('paste', onPaste);
-
-    // 粘贴区域聚焦提示
-    dlg.querySelector('#_picDlgPasteHintFlow').addEventListener('click', () => {
-      dlg.dataset.pasteTarget = 'flow';
-      dlg.querySelector('#_picDlgPasteHintFlow').focus?.();
-    });
-    dlg.querySelector('#_picDlgPasteHintChart').addEventListener('click', () => {
-      dlg.dataset.pasteTarget = 'chart';
-      dlg.querySelector('#_picDlgPasteHintChart').focus?.();
-    });
+    dlg.querySelector('#_picDlgPasteHintFlow').addEventListener('click', () => paste('flow'));
+    dlg.querySelector('#_picDlgPasteHintChart').addEventListener('click', () => paste('chart'));
+    const onPaste = event => {
+      if (!Array.from(event.clipboardData?.types || []).some(type => type.startsWith('image/'))) return;
+      event.preventDefault();
+      paste(pasteTarget);
+    };
+    dlg.addEventListener('paste', onPaste);
 
     // 关闭
     const close = () => {
-      document.removeEventListener('paste', onPaste);
+      dlg.removeEventListener('paste', onPaste);
       overlay.remove();
     };
 
@@ -2135,22 +2132,31 @@ class LayoutMode {
       const btn = dlg.querySelector('#_picDlgOk');
       btn.disabled = true;
       btn.textContent = '保存中…';
+      const currentRow = this._data?.rowByGid?.get(gid) || row;
+      const previousFlowPics = Array.isArray(currentRow.process_flow_pic)
+        ? [...currentRow.process_flow_pic]
+        : (currentRow.process_flow_pic ? [currentRow.process_flow_pic] : []);
+      const previousChartPics = Array.isArray(currentRow.process_chart_pic)
+        ? [...currentRow.process_chart_pic]
+        : (currentRow.process_chart_pic ? [currentRow.process_chart_pic] : []);
+      const nextFlowPics = [...pendingFlowPics];
+      const nextChartPics = [...pendingChartPics];
+
+      // 先在当前画面内更新并关闭弹窗；持久化仍在本次明确的保存操作中完成。
+      // 只替换当前工序卡片，避免重新加载整份 BOP 导致视点和选择状态跳变。
+      currentRow.process_flow_pic = nextFlowPics;
+      currentRow.process_chart_pic = nextChartPics;
+      this.refreshProcessCard(gid);
+      close();
       try {
         await this._data.patchEntry(gid, {
-          process_flow_pic: pendingFlowPics,
-          process_chart_pic: pendingChartPics,
+          process_flow_pic: nextFlowPics,
+          process_chart_pic: nextChartPics,
         });
-        // 更新内存中的 row 数据
-        if (this._data?.rowByGid?.get(gid)) {
-          this._data.rowByGid.get(gid).process_flow_pic = pendingFlowPics;
-          this._data.rowByGid.get(gid).process_chart_pic = pendingChartPics;
-        }
-        if (this._data?.preserveView) this._data.preserveView();
-        if (typeof _reload === 'function') _reload();
-        close();
       } catch (e) {
-        btn.disabled = false;
-        btn.textContent = '保存';
+        currentRow.process_flow_pic = previousFlowPics;
+        currentRow.process_chart_pic = previousChartPics;
+        this.refreshProcessCard(gid);
         if (this._data?.toast) this._data.toast('保存失败: ' + e.message, 'error');
       }
     });
@@ -2644,7 +2650,7 @@ class LayoutMode {
     });
 
     // ── 双击卡片主体区打开底部详情面板（排除统计区） ──
-    vp.addEventListener('dblclick', e => {
+    vp.addEventListener('dblclick', async e => {
       // stats box 双击处理
       const box = e.target.closest('.lv-stats-box');
       if (box) {
@@ -2654,19 +2660,19 @@ class LayoutMode {
         if (row?.node_type === 'process' && this._data?.renderPicArea && this._data?.patchEntry) {
           // 工序：有图→灯箱+底部「继续上传」；无图→直接上传弹窗
           if (box.querySelector('.lv-stats-thumb-fill')) {
-            const pics = [];
-            const _abs = s => window.AI00RuntimeConfig?.toAbsoluteBackendUrl?.(typeof s === 'string' ? s : '') || s;
+            const records = [];
             const _addPics = r => {
               for (const field of ['process_flow_pic', 'process_chart_pic']) {
                 const val = r?.[field];
-                if (Array.isArray(val)) val.forEach(p => { const s = _abs(typeof p === 'string' ? p : (p?.url || p?.src || '')); if (s) pics.push(s); });
-                else if (typeof val === 'string' && val) pics.push(_abs(val));
+                if (Array.isArray(val)) val.forEach(pic => records.push({ pic, versionGid: r?.version_gid }));
+                else if (val) records.push({ pic: val, versionGid: r?.version_gid });
               }
             };
             _addPics(row);
             for (const child of (this._data?.childMap?.get(gid) || [])) {
               if (child.node_type === 'operation') _addPics(child);
             }
+            const pics = await this._data?.resolvePictures?.(records) || [];
             if (pics.length && this._data?.openImageLightbox) {
               this._data.openImageLightbox(pics, 0, {
                 onAddMore: () => this._openPicUploadDialog(gid, row),
@@ -2679,19 +2685,19 @@ class LayoutMode {
         }
         // 其他节点 stats box 双击：有图→灯箱，无图→详情面板
         if (box.querySelector('.lv-stats-thumb-fill')) {
-          const pics = [];
-          const _abs = s => window.AI00RuntimeConfig?.toAbsoluteBackendUrl?.(typeof s === 'string' ? s : '') || s;
+          const records = [];
           const _addPics = r => {
             for (const field of ['process_flow_pic', 'process_chart_pic']) {
               const val = r?.[field];
-              if (Array.isArray(val)) val.forEach(p => { const s = _abs(typeof p === 'string' ? p : (p?.url || p?.src || '')); if (s) pics.push(s); });
-              else if (typeof val === 'string' && val) pics.push(_abs(val));
+              if (Array.isArray(val)) val.forEach(pic => records.push({ pic, versionGid: r?.version_gid }));
+              else if (val) records.push({ pic: val, versionGid: r?.version_gid });
             }
           };
           _addPics(row);
           for (const child of (this._data?.childMap?.get(gid) || [])) {
             if (child.node_type === 'operation') _addPics(child);
           }
+          const pics = await this._data?.resolvePictures?.(records) || [];
           if (pics.length && this._data?.openImageLightbox) this._data.openImageLightbox(pics);
         } else if (this._data?.layoutDetailPanel) {
           this._data.layoutDetailPanel.open(gid);
@@ -3753,13 +3759,17 @@ class LayoutMode {
           return;
         }
       }
-      await _invokeLayoutCapability('craft.bop.entry.change.apply', {
-        operation: 'update',
-        entry_gid: drag.row.gid,
-        updates: { parent_gid: drag.hoveredGid },
-      });
-      this._preserveView = true;
-      if (this._data?.reloadData) await this._data.reloadData();
+      if (this._data?.moveEntries) {
+        await this._data.moveEntries([{
+          gid: drag.row.gid,
+          updates: { parent_gid: drag.hoveredGid },
+        }]);
+      } else {
+        await _invokeLayoutCapability('craft.bop.entry.change.apply', {
+          operation: 'update', entry_gid: drag.row.gid,
+          updates: { parent_gid: drag.hoveredGid },
+        });
+      }
     } catch (err) {
       if (this._data?.toast) this._data.toast('移动失败: ' + err.message, 'error');
       else console.error('[LayoutMode] _commitParentChange error:', err);
@@ -3795,40 +3805,30 @@ class LayoutMode {
     const destParent = targetRow.parent_gid || null;
 
     try {
-      // Step 1：跨父时先换挂
-      if (dragParent !== destParent) {
-        await _invokeLayoutCapability('craft.bop.entry.change.apply', {
-          operation: 'update',
-          entry_gid: drag.row.gid,
-          updates: { parent_gid: targetRow.parent_gid },
-        });
-      }
-
-      // Step 2：在目标父级的同类子节点中计算新顺序
-      // childMap 尚未刷新，跨父时手动排除拖拽行，再追加到末尾
+      // Insert with a fractional key whenever there is a gap. This persists the
+      // move with one governed write instead of renumbering every sibling.
       const destSiblings = (this._data?.childMap.get(destParent) || [])
         .filter(r => r.node_type === nodeType && r.gid !== drag.row.gid)
         .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
-
-      // 插到目标后面
       const targetIdx = destSiblings.findIndex(r => r.gid === drag.hoveredGid);
-      destSiblings.splice(targetIdx + 1, 0, drag.row);
-
-      // 只 PATCH 序号变化的行（拖拽行强制包含，以便在跨父时也写入新 seq_no）
-      const patches = destSiblings
-        .map((r, i) => ({ gid: r.gid, newSeq: i + 1, oldSeq: r.sort_order }))
-        .filter(p => p.newSeq !== p.oldSeq || p.gid === drag.row.gid);
-
-      if (patches.length) {
-        await Promise.all(patches.map(p => _invokeLayoutCapability('craft.bop.entry.change.apply', {
-          operation: 'update',
-          entry_gid: p.gid,
-          updates: { sort_order: p.newSeq },
-        })));
+      if (targetIdx < 0) return;
+      const targetOrder = Number(targetRow.sort_order ?? targetIdx);
+      const nextRow = destSiblings[targetIdx + 1] || null;
+      const nextOrder = nextRow ? Number(nextRow.sort_order ?? targetOrder + 1) : targetOrder + 1;
+      const midpoint = targetOrder + (nextOrder - targetOrder) / 2;
+      const updates = {
+        ...(dragParent !== destParent ? { parent_gid: destParent } : {}),
+        sort_order: nextRow && midpoint > targetOrder && midpoint < nextOrder
+          ? midpoint
+          : targetOrder + 1,
+      };
+      if (this._data?.moveEntries) {
+        await this._data.moveEntries([{ gid: drag.row.gid, updates }]);
+      } else {
+        await _invokeLayoutCapability('craft.bop.entry.change.apply', {
+          operation: 'update', entry_gid: drag.row.gid, updates,
+        });
       }
-
-      this._preserveView = true;
-      if (this._data?.reloadData) await this._data.reloadData();
     } catch (err) {
       if (this._data?.toast) this._data.toast('操作失败: ' + err.message, 'error');
       else console.error('[LayoutMode] _commitPositionAfter error:', err);

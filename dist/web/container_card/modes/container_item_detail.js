@@ -70,39 +70,10 @@ window.ContainerModes['row_detail'] = (() => {
   //    若不可用则直接 fetch（从 electronAPI 获取 backendUrl + token）
 
   function _getCF() {
-    return window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch || null;
+    return window.AI00Business?.available() || window.AI00Business?.available() || window.AI00Business?.available() || null;
   }
 
-  async function _cf(method, path, opts = {}) {
-    const requestOptions = { ...opts, method };
-    // 优先用主窗口的 _cloudFetch 函数（与 ListShell._cf 完全一致）
-    const cf = _getCF();
-    if (cf) return cf(path, requestOptions);
 
-    // 降级：直接使用 electronAPI 构建 fetch
-    const eAPI = window.top?.electronAPI || window.parent?.electronAPI || window.electronAPI;
-    if (!eAPI) throw new Error('electronAPI 不可用');
-    const [config, state] = await Promise.all([
-      (eAPI.getConfig?.() || Promise.resolve({})).catch(() => ({})),
-      (eAPI.authGetState?.() || Promise.resolve({})).catch(() => ({})),
-    ]);
-    const runtimeBase = await window.AI00RuntimeConfig?.getRuntimeBackendBase?.(config?.backendUrl || '')
-    const baseUrl = (runtimeBase || config?.backendUrl || '').replace(/\/$/, '');
-    const token = state?.token || '';
-    const res = await fetch(`${baseUrl}${path}`, {
-      ...requestOptions,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { 'X-AI00-Token': token } : {}),
-        ...(requestOptions.headers || {}),
-      },
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.detail || `HTTP ${res.status}`);
-    }
-    return res.json();
-  }
 
   const _ruleChangeOperations = new Map();
   const _ruleChangeFields = new Set(['name', 'description', 'severity', 'enabled', 'condition', 'message', 'scope', 'tags', 'priority', 'category']);
@@ -150,10 +121,10 @@ window.ContainerModes['row_detail'] = (() => {
 
   async function _load(itemType, gid, source) {
     let res;
-    if (itemType === 'task') res = await _cf('GET', `/api/tasks/${gid}`);
-    else if (itemType === 'issue') res = await _cf('GET', `/api/issues/${gid}`);
+    if (itemType === 'task') res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.read.atomic.tasks_get", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"gid":path.gid}}).arguments).filter(([k,v])=>v!=null||[].includes(k)))}}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
+    else if (itemType === 'issue') res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.read.atomic.issues_get", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"gid":path.gid}}).arguments).filter(([k,v])=>v!=null||[].includes(k)))}}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
     else if (itemType === 'knowledge') res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('knowledge.get', { gid });
-    else if (itemType === 'rule') res = await _cf('GET', `/api/rules/${gid}`);
+    else if (itemType === 'rule') res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.library.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"get",gid:path.gid}).filter(([,v])=>v!=null))}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
     else throw new Error(`不支持的条目类型: ${itemType}`);
     return res?.data || res || null;
   }
@@ -163,20 +134,17 @@ window.ContainerModes['row_detail'] = (() => {
   // ── entries 持久化（调用 item_entries API，非 task/issue 字段）───
 
   async function _loadPopoutEntries(itemType, gid, source) {
-    const resp = await _cf('GET', `/api/item-entries/${itemType}/${gid}`);
+    const resp = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.list.read.atomic.item_entries_get", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"item_type":path.item_type,"item_gid":path.item_gid}}).arguments).filter(([k,v])=>v!=null||[].includes(k)))}}); return result; })({},{"item_type":decodeURIComponent(String(itemType)),"item_gid":decodeURIComponent(String(gid))},new URLSearchParams());
     return resp?.entries || [];
   }
 
   async function _savePopoutEntries(itemType, gid, source, entries) {
-    await _cf('PUT', `/api/item-entries/${itemType}/${gid}`, {
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ entries }),
-    });
+    await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.list.change.apply.atomic.item_entries_replace", {version:1,payload:{arguments:{"item_type":path.item_type,"item_gid":path.item_gid,"entries":(body.entries||[])}}}); return result; })({ entries },{"item_type":decodeURIComponent(String(itemType)),"item_gid":decodeURIComponent(String(gid))},new URLSearchParams());
   }
 
   async function _save(itemType, gid, source, changes, currentItem) {
-    if (itemType === 'task') await _cf('PUT', `/api/tasks/${gid}`, { body: JSON.stringify(changes) });
-    else if (itemType === 'issue') await _cf('PUT', `/api/issues/${gid}`, { body: JSON.stringify(changes) });
+    if (itemType === 'task') await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.tasks_update", {version:2,payload:{arguments:{"gid":path.gid,"updates":window.AI00Business.workItemChanges(body)}}}); return result; })(changes,{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
+    else if (itemType === 'issue') await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.change.apply.atomic.issues_update", {version:2,payload:{arguments:{"gid":path.gid,"updates":window.AI00Business.workItemChanges(body)}}}); return result; })(changes,{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
     else if (itemType === 'knowledge') await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('knowledge.update', { gid, updates: changes });
     else if (itemType === 'rule') return _saveRuleDefinition(currentItem, changes);
     else throw new Error(`不支持的条目类型: ${itemType}`);
@@ -195,10 +163,10 @@ window.ContainerModes['row_detail'] = (() => {
     }
     body.description = fields.description || '';
     let res;
-    if (itemType === 'task') res = await _cf('POST', '/api/tasks', { body: JSON.stringify(body) });
-    else if (itemType === 'issue') res = await _cf('POST', '/api/issues', { body: JSON.stringify(body) });
+    if (itemType === 'task') res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.tasks_create", {version:2,payload:{arguments:{...{"description":"","owner_gid":"","assignee_team_gid":null,"project_gid":null,"status":"pending","priority":"normal","source_ref":{},"review_date":null,"meeting_level":"none","meeting_doc_link":null,"progress_logs":[],"due_date":null,"plan_start":null,"plan_end":null,"actual_start":null,"actual_end":null,"share_scope":"project","list_gid":null,"local_gid":null,"local_created_at":null,"attachments":[],"scheduled_date":null,"scheduled_start_time":null,"time_estimate":null,"is_deleted":false,"parent_task_gid":null,"canvas_x":null,"canvas_y":null,"completion":0,"node_type":"normal","canvas_icon":"star","feishu_assignee_open_id":null,"feishu_assignee_name":null,"feishu_group_chat_id":null,"feishu_group_name":null,"feishu_groups":[],"feishu_docs":[]},...body}}}); return result; })(body,{},new URLSearchParams());
+    else if (itemType === 'issue') res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.change.apply.atomic.issues_create", {version:2,payload:{arguments:{...{"description":"","severity":"low","status":"open","owner_gid":"","assignee_team_gid":null,"project_gid":null,"tracking_refs":[],"occurrence_root_cause":null,"escape_root_cause":null,"interim_action":null,"permanent_action":null,"source_ref":{},"related_task_gid":null,"related_knowledge_gid":null,"approval_order_gid":null,"bop_entry_gid":null,"share_scope":"project","list_gid":null,"attachments":[],"feishu_assignee_open_id":null,"feishu_assignee_name":null,"feishu_group_chat_id":null,"feishu_group_name":null,"feishu_groups":[],"feishu_docs":[]},...body}}}); return result; })(body,{},new URLSearchParams());
     else if (itemType === 'knowledge') res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('knowledge.create', { record: body });
-    else if (itemType === 'rule') res = await _cf('POST', '/api/rules', { body: JSON.stringify(body) });
+    else if (itemType === 'rule') res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"create",record:{...{"code":"","rule_type":"process","enforcement_level":"advisory","status":"draft","share_scope":"team","list_gid":null,"context_class_gid":null,"rule_definition":{}},...body}}).filter(([,v])=>v!=null))}); return result; })(body,{},new URLSearchParams());
     else throw new Error(`不支持的条目类型: ${itemType}`);
     return res?.data || res || null;
   }

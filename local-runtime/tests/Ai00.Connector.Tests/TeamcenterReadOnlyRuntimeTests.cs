@@ -199,8 +199,8 @@ public sealed class TeamcenterReadOnlyRuntimeTests
         var json = await TeamcenterProcessWorker.ReadVisualizationProtocolLineAsync(reader, 1024, CancellationToken.None);
 
         Assert.Equal("{\"type\":\"material_ready\"}", json);
-        var script = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "teamcenter_visualization_launch.js"));
-        Assert.Equal(3, script.Split("AI00_TC_VIS_V1:").Length - 1);
+        // Legacy reader compatibility only. Persistent V2 transport is exercised with a real child
+        // by TeamcenterVisualizationSessionTests, rather than counting source-code literals.
     }
 
     [Fact]

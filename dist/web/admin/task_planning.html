@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
+  <script src="/web/core/business_facade.js"></script>
 <meta charset="UTF-8">
 <title>任务规划</title>
 <style>
@@ -977,11 +978,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);
 'use strict';
 
 // ── cloud infrastructure ──
-function _cf(path, opts = {}) {
-  const fn = window.parent?._cloudFetch || window._cloudFetch;
-  if (!fn) return Promise.resolve(null);
-  return fn(path, opts);
-}
+
 
 // Task status mapping: canvas uses 'done', DB uses 'completed'
 function _toDbStatus(s) { return s === 'done' ? 'completed' : s; }
@@ -1017,7 +1014,7 @@ async function _apiListLists() {
 
 async function _apiListTasks(listGid, placedOnly = false) {
   try {
-    const d = await _cf(`/api/tasks?list_gid=${listGid}`);
+    const d = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.read.atomic.tasks_search", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"project_gid":(query.has("project_gid")?query.get("project_gid"):null),"status":(query.has("status")?query.get("status"):null),"list_gid":(query.has("list_gid")?query.get("list_gid"):null),"scheduled_date_from":(query.has("scheduled_date_from")?query.get("scheduled_date_from"):null),"q":(query.has("q")?query.get("q"):null),"page_size":(query.has("page_size")?Number(query.get("page_size")):null)}}).arguments).filter(([k,v])=>v!=null||["list_gid","project_gid","q","scheduled_date_from","status"].includes(k)))}}); return result; })({},{},new URLSearchParams((`/api/tasks?list_gid=${listGid}`).split("?")[1]||""));
     let t = (d?.data ?? []).map(_remapTask);
     if (placedOnly) t = t.filter(n => n._placed);
     return t;
@@ -1025,43 +1022,42 @@ async function _apiListTasks(listGid, placedOnly = false) {
 }
 
 async function _apiListDeps(listGid) {
-  try { const d = await _cf(`/api/task-dependencies?list_gid=${listGid}`); return d?.data ?? []; }
+  try { const d = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.read.atomic.task_dependencies_list", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"list_gid":(query.has("list_gid")?query.get("list_gid"):null)}}).arguments).filter(([k,v])=>v!=null||[].includes(k)))}}); return result; })({},{},new URLSearchParams((`/api/task-dependencies?list_gid=${listGid}`).split("?")[1]||"")); return d?.data ?? []; }
   catch(e) { console.warn('[TaskCanvas] task-dependencies 加载失败（表可能未创建）:', e.message); return []; }
 }
 
 async function _apiCreateTask(listGid, title, nodeType, cx, cy, extraFields = {}) {
-  const d = await _cf('/api/tasks', { method: 'POST',
-    body: JSON.stringify({ title, node_type: nodeType, canvas_x: cx, canvas_y: cy, list_gid: listGid, status: 'pending', ...extraFields }) });
+  const d = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.tasks_create", {version:2,payload:{arguments:{...{"description":"","owner_gid":"","assignee_team_gid":null,"project_gid":null,"status":"pending","priority":"normal","source_ref":{},"review_date":null,"meeting_level":"none","meeting_doc_link":null,"progress_logs":[],"due_date":null,"plan_start":null,"plan_end":null,"actual_start":null,"actual_end":null,"share_scope":"project","list_gid":null,"local_gid":null,"local_created_at":null,"attachments":[],"scheduled_date":null,"scheduled_start_time":null,"time_estimate":null,"is_deleted":false,"parent_task_gid":null,"canvas_x":null,"canvas_y":null,"completion":0,"node_type":"normal","canvas_icon":"star","feishu_assignee_open_id":null,"feishu_assignee_name":null,"feishu_group_chat_id":null,"feishu_group_name":null,"feishu_groups":[],"feishu_docs":[]},...body}}}); return result; })({ title, node_type: nodeType, canvas_x: cx, canvas_y: cy, list_gid: listGid, status: 'pending', ...extraFields },{},new URLSearchParams());
   return d?.data?.gid ? { success: true, data: _remapTask(d.data) } : { success: false };
 }
 
 async function _apiUpdateTask(gid, fields) {
   const dbFields = Object.assign({}, fields);
   if ('status' in dbFields) dbFields.status = _toDbStatus(dbFields.status);
-  await _cf(`/api/tasks/${gid}`, { method: 'PUT', body: JSON.stringify(dbFields) });
+  await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.tasks_update", {version:1,payload:{arguments:{"gid":path.gid,"updates":body}}}); return result; })(dbFields,{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
 }
 
 async function _apiUpdateCanvas(gid, fields) {
-  await _cf(`/api/tasks/${gid}`, { method: 'PUT', body: JSON.stringify(fields) });
+  await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.tasks_update", {version:1,payload:{arguments:{"gid":path.gid,"updates":body}}}); return result; })(fields,{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
 }
 
 async function _apiDeleteTask(gid) {
-  await _cf(`/api/tasks/${gid}`, { method: 'DELETE' });
+  await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.tasks_delete", {version:1,payload:{arguments:{"gid":path.gid}}}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
 }
 
 async function _apiCreateDep(sourceGid, targetGid, edgeType, depCondition, depGroup, label) {
   const body = { source_gid: sourceGid, target_gid: targetGid, edge_type: edgeType,
     dep_condition: depCondition || 'done', dep_group: depGroup || null, label: label || '' };
-  const d = await _cf('/api/task-dependencies', { method: 'POST', body: JSON.stringify(body) });
+  const d = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.task_dependencies_create", {version:1,payload:{arguments:{...{"edge_type":"prerequisite","dep_condition":"done","dep_group":null,"label":""},...body}}}); return result; })(body,{},new URLSearchParams());
   return d?.data?.gid ? { success: true, data: d.data } : { success: false };
 }
 
 async function _apiUpdateDep(gid, fields) {
-  await _cf(`/api/task-dependencies/${gid}`, { method: 'PUT', body: JSON.stringify(fields) });
+  await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.task_dependencies_update", {version:1,payload:{arguments:{"gid":path.gid,"updates":body}}}); return result; })(fields,{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
 }
 
 async function _apiDeleteDep(gid) {
-  await _cf(`/api/task-dependencies/${gid}`, { method: 'DELETE' });
+  await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.task_dependencies_delete", {version:1,payload:{arguments:{"gid":path.gid}}}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
 }
 
 async function _apiListViews(listGid) {
@@ -2914,8 +2910,7 @@ document.getElementById('btnNewTree').addEventListener('click', async () => {
   const name = await _prompt('任务清单名称：', '新任务清单');
   if (!name) return;
   if (_isCloud()) {
-    const d = await _cf('/api/lists', { method: 'POST',
-      body: JSON.stringify({ name: name.trim(), item_type: 'task', storage_scope: 'cloud' }) });
+    const d = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.list.change.apply.atomic.lists_create", {version:1,payload:{arguments:{...{"color":"#5b8dee","storage_scope":"cloud","owner_type":"user","owner_gid":"","item_type":"task","sort_order":0,"visibility":"team","read_scope":null,"write_scope":null},...body}}}); return result; })({ name: name.trim(), item_type: 'task', storage_scope: 'cloud' },{},new URLSearchParams());
     if (d) { _lists.push(d); renderListSidebar(); selectList(d.gid); }
   } else {
     const r = await _lcb('create_list', { name: name.trim(), item_type: 'task', storage_scope: 'local' });
@@ -3000,33 +2995,8 @@ async function _initStandaloneCloud() {
     } catch(e) {}
   }
   // 设置 _cloudFetch（与 main.js 实现保持一致）
-  if (!window._cloudFetch) {
-    window._cloudFetch = async function(path, opts = {}) {
-      const config = (await window.electronAPI?.getConfig?.()) || {};
-      const state  = (await window.electronAPI?.authGetState?.()) || {};
-      const runtimeBase = await window.AI00RuntimeConfig?.getRuntimeBackendBase?.(config.backendUrl || '');
-      const baseUrl = (runtimeBase || config.backendUrl || '').replace(/\/$/, '');
-      const token = state.token || '';
-      const isFormData = typeof opts.body?.append === 'function';
-      const res = await fetch(`${baseUrl}${path}`, {
-        ...opts,
-        headers: {
-          ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-          ...(token ? { 'X-AI00-Token': token } : {}),
-          ...(opts.headers || {}),
-        },
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        const detail = err.detail;
-        const msg = typeof detail === 'string' ? detail
-          : Array.isArray(detail) ? detail.map(e => e.msg || JSON.stringify(e)).join('; ')
-          : detail ? JSON.stringify(detail) : `HTTP ${res.status}`;
-        throw new Error(msg);
-      }
-      if (res.status === 204 || res.headers.get('content-length') === '0') return null;
-      return res.json();
-    };
+  if (!window.AI00Business?.available()) {
+
   }
 }
 

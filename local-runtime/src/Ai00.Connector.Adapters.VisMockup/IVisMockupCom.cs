@@ -8,6 +8,8 @@ public interface IVisMockupCom
 {
     VisMockupProcessState InspectProcess();
     bool TryGetActiveApplication(out IVisMockupApplication? application);
+    bool TryAttachExistingApplication(out IVisMockupApplication? application)
+        => TryGetActiveApplication(out application);
     void Launch();
     void HideOwnedWindows() { }
     IVisMockupApplication WaitForActiveApplication(TimeSpan timeout);
@@ -24,6 +26,9 @@ public interface IVisMockupApplication
 
 public interface IVisMockupDocument
 {
+    NativeDocumentWindow LocateNativeWindow(int processId,NativeDocumentWindow? previous)=>throw new ConnectorException("vismockup_document_window_unavailable");
+    NativeDocumentWindow SelectExistingNativeWindow(int processId)=>throw new ConnectorException("vismockup_document_window_unavailable");
+    NativeDocumentWindow ActivateNativeWindow(int processId,NativeDocumentWindow target)=>throw new ConnectorException("vismockup_document_window_unavailable");
     string DocumentId { get; }
     string SourceIdentity { get; }
     int HierarchyCount { get; }
@@ -51,9 +56,18 @@ public interface IVisMockupNode
     bool IsVisible { get; }
     string PrintableName { get; }
     string OccurrenceId { get; }
+    IReadOnlyList<string> OccurrenceIds
+    {
+        get
+        {
+            var occurrence = OccurrenceId;
+            return string.IsNullOrWhiteSpace(occurrence) ? [] : [occurrence];
+        }
+    }
     string CadId => "";
     string ModelId { get; }
     IReadOnlyList<IVisMockupNode> Children { get; }
+    int ChildCount => Children.Count;
     IReadOnlyList<IVisMockupNode> GetChildren(int maximum)
     {
         var children=Children;
@@ -286,6 +300,9 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
     private const string ProgId = "VFFrame.Application";
     private IVisMockupApplication? _application;
     private (int ProcessId, long Started)? _attachedProcess;
+    [DllImport("oleaut32.dll", PreserveSig=true)]
+    private static extern int GetActiveObject(ref Guid clsid,nint reserved,
+        [MarshalAs(UnmanagedType.IUnknown)] out object value);
 
     private delegate bool EnumWindowsCallback(IntPtr window, IntPtr state);
 
@@ -365,6 +382,36 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         }
         application = null;
         return false;
+    }
+
+    public bool TryAttachExistingApplication(out IVisMockupApplication? application)
+    {
+        if(TryGetActiveApplication(out application))return true;
+        application=null;
+        try
+        {
+            var type=Type.GetTypeFromProgID(ProgId,throwOnError:true)!;
+            var clsid=type.GUID;
+            if(GetActiveObject(ref clsid,0,out var outer)!=0)return false;
+            var inner=VisMockupDispatch.GetProperty(outer,21);
+            var pid=Convert.ToInt32(VisMockupDispatch.GetProperty(inner,51));
+            using var process=System.Diagnostics.Process.GetProcessById(pid);
+            var actualPath=process.MainModule?.FileName??"";
+            var configured=Path.GetFullPath(executable);
+            if(!string.Equals(Path.GetDirectoryName(actualPath),Path.GetDirectoryName(configured),StringComparison.OrdinalIgnoreCase)
+                ||!MatchesProcessName(Path.GetFileNameWithoutExtension(configured),process.ProcessName))return false;
+            var started=process.StartTime.ToUniversalTime().Ticks;
+            var version=System.Diagnostics.FileVersionInfo.GetVersionInfo(configured).ProductVersion??"unknown";
+            _application=new DynamicApplication(outer,inner,version);
+            _attachedProcess=(pid,started);
+            application=_application;
+            return true;
+        }
+        catch(Exception error) when(error is COMException or ArgumentException or InvalidOperationException
+            or System.ComponentModel.Win32Exception or ConnectorException or UnauthorizedAccessException)
+        {
+            return false;
+        }
     }
 
     internal static bool CanReuseCachedApplication(VisMockupProcessState process, (int ProcessId, long Started)? attached) =>
@@ -456,7 +503,8 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
                 activeDocument,
                 VisMockupDispatch.GetProperty(activeApplication, 5),
                 new DynamicPlmxmlSaveOptions(
-                    VisMockupDispatch.GetProperty(activeApplication, 69)));
+                    VisMockupDispatch.GetProperty(activeApplication, 69)),
+                ReadActiveDocumentId);
         }
         public IReadOnlyList<IVisMockupDocument> OpenDocuments
         {
@@ -485,7 +533,7 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
                         var views = VisMockupDispatch.GetProperty(document, 3);
                         if (Convert.ToInt32(VisMockupDispatch.GetProperty(views, 1)) <= 0) continue;
                         var view = VisMockupDispatch.GetProperty(views, 2, 1);
-                        result.Add(new DynamicDocument(document, view, saveOptions));
+                        result.Add(new DynamicDocument(document, view, saveOptions, ReadActiveDocumentId));
                     }
                 }
                 catch (Exception error) when (error is not ConnectorException)
@@ -519,15 +567,27 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
             var documents = VisMockupDispatch.GetProperty(value, 4);
             _ = VisMockupDispatch.InvokeMethod(documents, 4);
         }
+        private string ReadActiveDocumentId()
+        {
+            var document=VisMockupDispatch.GetProperty(activeApplication,4);
+            return Convert.ToString(VisMockupDispatch.GetProperty(document,6))??"";
+        }
     }
 
     private sealed class DynamicDocument(
         object value,
         object activeView,
-        IVisMockupPlmxmlSaveOptions saveOptions) : IVisMockupDocument
+        IVisMockupPlmxmlSaveOptions saveOptions,
+        Func<string> activeDocumentId) : IVisMockupDocument
     {
         private dynamic Value => value;
         private object ActiveView => activeView;
+        public NativeDocumentWindow LocateNativeWindow(int processId,NativeDocumentWindow? previous)
+            =>NativeDocumentWindow.CaptureActive(processId,DocumentId,activeDocumentId,previous);
+        public NativeDocumentWindow SelectExistingNativeWindow(int processId)
+            =>NativeDocumentWindow.FindAndCapture(processId,DocumentId,activeDocumentId);
+        public NativeDocumentWindow ActivateNativeWindow(int processId,NativeDocumentWindow target)
+            =>NativeDocumentWindow.Activate(processId,DocumentId,activeDocumentId,target);
         public string DocumentId => Convert.ToString(VisMockupDispatch.GetProperty(value, 6)) ?? "";
         public string SourceIdentity => Convert.ToString(VisMockupDispatch.GetProperty(value, 11)) ?? "";
         public int HierarchyCount => Convert.ToInt32(VisMockupDispatch.GetProperty(value, 14));
@@ -695,6 +755,12 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
 
     private sealed class DynamicNode(object value) : IVisMockupNode
     {
+        private static readonly string[] OccurrenceMetadataNames =
+        [
+            "bl_occurrence_uid", "__PLM_INST_UID", "__PLM_CLONE_STABLE_INST_UID",
+            "__PLM_INST_TH_UID", "catiaOccurrenceName"
+        ];
+        private readonly Dictionary<string, string> _occurrenceMetadata = new(StringComparer.Ordinal);
         private dynamic Value => value;
         public string NodeKey => VisMockupDispatch.InvokeUInt32OutParameter(value, 21).ToString();
         public bool IsVisible => Convert.ToBoolean(VisMockupDispatch.GetProperty(value, 9));
@@ -706,25 +772,47 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         {
             get
             {
-                foreach (var name in new[] { "__PLM_INST_UID", "bl_occurrence_uid", "catiaOccurrenceName" })
+                foreach (var name in OccurrenceMetadataNames)
                 {
-                    try { var result = Convert.ToString(Value.MetaDataProperties.GetPropertyByName(name)) ?? "";
-                        if (!string.IsNullOrWhiteSpace(result)) return result; }
-                    catch { }
+                    var candidate = ReadOccurrenceMetadata(name);
+                    if (!string.IsNullOrWhiteSpace(candidate)) return candidate;
                 }
                 return "";
             }
         }
+        public IReadOnlyList<string> OccurrenceIds
+        {
+            get
+            {
+                var result = new List<string>();
+                foreach (var name in OccurrenceMetadataNames)
+                {
+                    var candidate = ReadOccurrenceMetadata(name);
+                    if (!string.IsNullOrWhiteSpace(candidate) && !result.Contains(candidate, StringComparer.Ordinal)) result.Add(candidate);
+                }
+                return result;
+            }
+        }
+        private string ReadOccurrenceMetadata(string name)
+        {
+            if (_occurrenceMetadata.TryGetValue(name, out var known)) return known;
+            try { known = (Convert.ToString(Value.MetaDataProperties.GetPropertyByName(name)) ?? "").Trim(); }
+            catch { known = ""; }
+            return _occurrenceMetadata[name] = known;
+        }
         public string ModelId { get { try { return Convert.ToString(Value.MetaDataProperties.GetPropertyByName("itemId")) ?? ""; } catch { return ""; } } }
         public IReadOnlyList<IVisMockupNode> Children => GetChildren(int.MaxValue);
+        public int ChildCount
+        {
+            get
+            {
+                try { return Convert.ToInt32(VisMockupDispatch.GetProperty(value, 3)); }
+                catch (ConnectorException error) when (error.Code == "vismockup_dispatch_d3_h80020009") { return 0; }
+            }
+        }
         public IReadOnlyList<IVisMockupNode> GetChildren(int maximum)
         {
-                int count;
-                try { count = Convert.ToInt32(VisMockupDispatch.GetProperty(value, 3)); }
-                catch (ConnectorException error) when (error.Code == "vismockup_dispatch_d3_h80020009")
-                {
-                    return [];
-                }
+                var count = ChildCount;
                 if (count <= 0) return [];
                 if(count>maximum)throw new ConnectorNoEffectException("viewer_mapping_budget_exceeded");
                 var children = VisMockupDispatch.GetProperty(value, 13);

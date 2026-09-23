@@ -1,8 +1,6 @@
 'use strict';
 
-function _cf(method, path, opts = {}) {
-  return ListShell._cf(path, { ...opts, method });
-}
+
 
 // ── 列定义 ──────────────────────────────────────────────────
 const ISSUE_COLS = [
@@ -47,11 +45,7 @@ let shell         = null;  // ListShell 实例
 const _bopCache   = {};
 
 async function _invokeBopCapability(id, payload = {}) {
-  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ version: 1, payload }),
-  });
+  const response = await window.AI00Business.request(id, { version: 1, payload });
   const envelope = response?.data;
   if (response?.success !== true || envelope?.ok !== true) {
     const detail = envelope?.error || response?.error || {};
@@ -157,10 +151,7 @@ function _closeBopPicker() {
 async function _linkBopEntry(issueRow) {
   _bopPickerCallback = async (entry) => {
     try {
-      await _cf('PUT', `/api/issues/${issueRow.gid}`, {
-        method: 'PUT',
-        body: JSON.stringify({ bop_entry_gid: entry.gid || null }),
-      });
+      await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.change.apply.atomic.issues_update", {version:2,payload:{arguments:{"gid":path.gid,"updates":window.AI00Business.workItemChanges(body)}}}); return result; })({ bop_entry_gid: entry.gid || null },{"gid":decodeURIComponent(String(issueRow.gid))},new URLSearchParams());
       const row = _all.find(r => r.gid === issueRow.gid);
       if (row) row.bop_entry_gid = entry.gid || null;
       shell?.setRows(_all);
@@ -171,7 +162,7 @@ async function _linkBopEntry(issueRow) {
 
 async function loadFollows() {
   try {
-    const res = await _cf('GET', '/api/follows?item_type=issue');
+    const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.follow.read.atomic.follows_list", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"item_type":(query.has("item_type")?query.get("item_type"):null)}}).arguments).filter(([k,v])=>v!=null||["item_type"].includes(k)))}}); return result; })({},{},new URLSearchParams(('/api/follows?item_type=issue').split("?")[1]||""));
     _followedMap.clear();
     for (const f of (res?.data || [])) {
       _followedMap.set(f.item_gid, { gid: f.gid, conditions: f.notify_on || [] });
@@ -191,16 +182,16 @@ async function _onRowsChange(newRows) {
       if (!changed) continue;
       const fields = {};
       for (const k of editableKeys) { if (row[k] !== undefined) fields[k] = row[k]; }
-      await _cf('PUT', `/api/issues/${row.gid}`, { method: 'PUT', body: JSON.stringify(fields) })
+      await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.change.apply.atomic.issues_update", {version:2,payload:{arguments:{"gid":path.gid,"updates":window.AI00Business.workItemChanges(body)}}}); return result; })(fields,{"gid":decodeURIComponent(String(row.gid))},new URLSearchParams())
         .catch(e => console.error('[update issue cloud]', e));
       didSave = true;
     } else if (row.title) {
       const _listGid = ListShell._canonListGid(_currentList);
-      await _cf('POST', '/api/issues', { method: 'POST', body: JSON.stringify({
+      await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.change.apply.atomic.issues_create", {version:2,payload:{arguments:{...{"description":"","severity":"low","status":"open","owner_gid":"","assignee_team_gid":null,"project_gid":null,"tracking_refs":[],"occurrence_root_cause":null,"escape_root_cause":null,"interim_action":null,"permanent_action":null,"source_ref":{},"related_task_gid":null,"related_knowledge_gid":null,"approval_order_gid":null,"bop_entry_gid":null,"share_scope":"project","list_gid":null,"attachments":[],"feishu_assignee_open_id":null,"feishu_assignee_name":null,"feishu_group_chat_id":null,"feishu_group_name":null,"feishu_groups":[],"feishu_docs":[]},...body}}}); return result; })({
         title: row.title, severity: row.severity || 'low',
         list_gid: _listGid,
         owner_gid: window.top?._authUser?.gid || window._authUser?.gid || '',
-      }) }).catch(e => console.error('[add-row issue]', e));
+      },{},new URLSearchParams()).catch(e => console.error('[add-row issue]', e));
       didSave = true;
     }
   }
@@ -225,7 +216,7 @@ async function load() {
   const isNoList = _currentList === ListShell.NO_LIST;
   try {
     const qs = (_currentList && !isNoList) ? `?list_gid=${_currentList}` : '';
-    const res = await _cf('GET', '/api/issues' + qs).catch(() => null);
+    const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.read.atomic.issues_search", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"project_gid":(query.has("project_gid")?query.get("project_gid"):null),"status":(query.has("status")?query.get("status"):null),"list_gid":(query.has("list_gid")?query.get("list_gid"):null),"q":(query.has("q")?query.get("q"):null),"page_size":(query.has("page_size")?Number(query.get("page_size")):null)}}).arguments).filter(([k,v])=>v!=null||["list_gid","project_gid","q","status"].includes(k)))}}); return result; })({},{},new URLSearchParams(('/api/issues' + qs).split("?")[1]||"")).catch(() => null);
     const _toTime = v => {
       if (!v) return 0;
       if (typeof v === 'number') return v;
@@ -290,12 +281,12 @@ async function init() {
       async (rows, _fm, _c, signal) => {
         for (const r of rows) {
           if (signal?.aborted) break;
-          await _cf('POST', '/api/issues', { method: 'POST', body: JSON.stringify({
+          await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.change.apply.atomic.issues_create", {version:2,payload:{arguments:{...{"description":"","severity":"low","status":"open","owner_gid":"","assignee_team_gid":null,"project_gid":null,"tracking_refs":[],"occurrence_root_cause":null,"escape_root_cause":null,"interim_action":null,"permanent_action":null,"source_ref":{},"related_task_gid":null,"related_knowledge_gid":null,"approval_order_gid":null,"bop_entry_gid":null,"share_scope":"project","list_gid":null,"attachments":[],"feishu_assignee_open_id":null,"feishu_assignee_name":null,"feishu_group_chat_id":null,"feishu_group_name":null,"feishu_groups":[],"feishu_docs":[]},...body}}}); return result; })({
             title: r.title || '导入问题',
             severity: r.severity || 'low',
             list_gid: shell?.currentListGid || null,
             owner_gid: window.top?._authUser?.gid || window._authUser?.gid || '',
-          }), signal }).catch(e => console.error('[import issue]', e));
+          },{},new URLSearchParams()).catch(e => console.error('[import issue]', e));
         }
         if (!signal?.aborted) await load();
       }),
@@ -331,7 +322,7 @@ async function init() {
         return `<span class="bop-entry-tag">${label}</span><button class="btn-bop-link btn-bop-edit" data-gid="${row.gid||''}" title="更换工序">…</button>`;
       },
       created_at:  (val) => val ? String(val).slice(0,10) : '-',
-      attachments: (val) => AttachmentsWidget?.renderCell(val) ?? '',
+      attachments: (val, row) => AttachmentsWidget?.renderCell(val, {itemType:'issue',itemGid:row.gid}) ?? '',
       feishu_assignee: (val, row) => {
         if (!window.FeishuMentionChip) return '';
         if (row.feishu_assignee_open_id) {
@@ -388,7 +379,7 @@ async function init() {
           const patch = result.type === 'user'
             ? { feishu_assignee_open_id: result.open_id, feishu_assignee_name: result.name }
             : { feishu_group_chat_id: result.chat_id, feishu_group_name: result.name };
-          await _cf('PUT', `/api/issues/${gid}`, { method: 'PUT', body: JSON.stringify(patch) })
+          await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.change.apply.atomic.issues_update", {version:2,payload:{arguments:{"gid":path.gid,"updates":window.AI00Business.workItemChanges(body)}}}); return result; })(patch,{"gid":decodeURIComponent(String(gid))},new URLSearchParams())
             .catch(e => console.error('[fm patch issue]', e));
           Object.assign(row, patch);
           shell.setRows(_all);
@@ -397,7 +388,7 @@ async function init() {
           const patch = field === 'feishu_assignee'
             ? { feishu_assignee_open_id: null, feishu_assignee_name: null }
             : { feishu_group_chat_id: null, feishu_group_name: null };
-          await _cf('PUT', `/api/issues/${gid}`, { method: 'PUT', body: JSON.stringify(patch) })
+          await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.change.apply.atomic.issues_update", {version:2,payload:{arguments:{"gid":path.gid,"updates":window.AI00Business.workItemChanges(body)}}}); return result; })(patch,{"gid":decodeURIComponent(String(gid))},new URLSearchParams())
             .catch(e => console.error('[fm clear issue]', e));
           Object.assign(row, patch);
           shell.setRows(_all);
@@ -556,7 +547,7 @@ async function _searchChats(q, overlay) {
   list.style.display = 'block';
   list.innerHTML = '<div style="padding:8px;color:var(--text-muted,#6c7086)">搜索中…</div>';
   try {
-    const res = await ListShell._cf(`/feishu/search/chats?q=${encodeURIComponent(q)}&limit=8`);
+    const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.feishu.chat.search", {version:1,payload:({query:query.get("q")||"",limit:Number(query.get("limit")||10)})}); return result; })({},{},new URLSearchParams((`/feishu/search/chats?q=${encodeURIComponent(q)}&limit=8`).split("?")[1]||""));
     const chats = res?.data || [];
     if (!chats.length) {
       list.innerHTML = '<div style="padding:8px;color:var(--text-muted,#6c7086)">无匹配群聊</div>';
@@ -593,10 +584,7 @@ async function _doShare(listName, shareUrl, overlay) {
   sendBtn.disabled = true;
   sendBtn.textContent = '发送中…';
   try {
-    await ListShell._cf('/feishu/chat-message/share-list', {
-      method: 'POST',
-      body: JSON.stringify({ chat_id: _selectedChat.chat_id, list_name: listName, share_url: shareUrl }),
-    });
+    await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.feishu.list_share.send", {version:1,payload:body}); return result; })({ chat_id: _selectedChat.chat_id, list_name: listName, share_url: shareUrl },{},new URLSearchParams());
     sendBtn.textContent = '已发送';
     setTimeout(_closeShareModal, 800);
   } catch (e) {

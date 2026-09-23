@@ -50,7 +50,7 @@ class HubShell {
         window._authUser  = e.data.user  || null;
         window._authToken = e.data.token || null;
         // 复制主窗口的 _cloudFetch（首次广播后主窗口应已设好）
-        if (!window._cloudFetch) this._bridgeAuthFromAncestors();
+        if (!window.AI00Business?.available()) this._bridgeAuthFromAncestors();
         // 转发给当前激活的子 iframe
         try { this._frameEl.contentWindow?.postMessage(e.data, '*'); } catch (_) {}
       }
@@ -72,8 +72,6 @@ class HubShell {
         w = w.parent;
         if (!window._authMode  && w._authMode)   window._authMode  = w._authMode;
         if (!window._authUser  && w._authUser)    window._authUser  = w._authUser;
-        if (!window._authToken && w._authToken)   window._authToken = w._authToken;
-        if (!window._cloudFetch && w._cloudFetch) window._cloudFetch = w._cloudFetch;
       }
     } catch (_) { /* cross-origin guard */ }
   }

@@ -111,20 +111,52 @@ def _installed_plugins(_payload: dict[str, Any], context: object) -> dict[str, A
     return PluginPlatformService().list_installed(actor=_actor(context))
 
 
-def _plugin_install(payload: dict[str, Any], context: object) -> dict[str, Any]:
-    from backend.plugin_platform.service import PluginLifecycleError, PluginPlatformService
-    try:
-        return {"installation": PluginPlatformService().request_install(actor=_actor(context), command=payload)}
-    except PluginLifecycleError as exc:
-        raise _structural_error(exc) from exc
+def _plugin_install(payload: dict[str, Any], context: object) -> Any:
+    return _plugin_transaction('request_install', payload, context)
 
 
-def _plugin_uninstall(payload: dict[str, Any], context: object) -> dict[str, Any]:
-    from backend.plugin_platform.service import PluginLifecycleError, PluginPlatformService
+def _plugin_transaction(operation, payload, context):
+    from backend.db.connection import get_conn
+    from backend.capability_v2.reliability import TransactionalCapabilityOutput
+    from backend.plugin_platform.service import PluginLifecycleError, PluginPlatformService, SqlPluginLifecycleRepository
+    manager = get_conn()
+    connection = manager.__enter__()
+
+    class Transaction:
+        """Keep the Base connection open through Gateway outcome persistence."""
+        closed = False
+        failed = False
+        def cursor(self): return connection.cursor()
+        def commit(self): connection.commit()
+        def rollback(self):
+            self.failed = True
+            connection.rollback()
+        def close(self):
+            if not self.closed:
+                self.closed = True
+                if self.failed:
+                    error = RuntimeError('Plugin transaction rolled back')
+                    manager.__exit__(type(error), error, None)
+                else:
+                    manager.__exit__(None, None, None)
+
+    transaction = Transaction()
     try:
-        return {"installation": PluginPlatformService().transition_uninstall(actor=_actor(context), command=payload)}
+        service = PluginPlatformService(repository=SqlPluginLifecycleRepository(connection=connection))
+        result = getattr(service, operation)(actor=_actor(context), command=payload)
+        return TransactionalCapabilityOutput(data={'installation': result}, transaction=transaction)
     except PluginLifecycleError as exc:
+        try: transaction.rollback()
+        finally: transaction.close()
         raise _structural_error(exc) from exc
+    except BaseException:
+        try: transaction.rollback()
+        finally: transaction.close()
+        raise
+
+
+def _plugin_uninstall(payload: dict[str, Any], context: object) -> Any:
+    return _plugin_transaction('transition_uninstall', payload, context)
 
 
 def _search_users(payload: dict[str, Any], _context: object) -> dict[str, Any]:

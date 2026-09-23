@@ -74,46 +74,11 @@ class ListSidebar {
     this._renderItems();
   }
 
-  _cf(method, path, opts = {}) {
-    // 优先用主窗口的 _cloudFetch（已验证 task/issue CRUD 可用），避免 iframe 内 fetch() 跨域问题
-    const cf = window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
-    if (cf) return cf(path, { ...opts, method });
 
-    // 降级：直接使用 electronAPI（本地模式或 _cloudFetch 未挂载时）
-    const eAPI = window.top?.electronAPI || window.parent?.electronAPI || window.electronAPI;
-    if (!eAPI) return Promise.reject(new Error('_cloudFetch 未就绪'));
-    return (async () => {
-      const [config, state] = await Promise.all([
-        (eAPI.getConfig?.() || Promise.resolve({})).catch(() => ({})),
-        (eAPI.authGetState?.() || Promise.resolve({})).catch(() => ({})),
-      ]);
-      const runtimeBase = await window.AI00RuntimeConfig?.getRuntimeBackendBase?.(config?.backendUrl || '')
-      const baseUrl = (runtimeBase || config?.backendUrl || '').replace(/\/$/, '');
-      const token = state?.token || '';
-      const res = await fetch(`${baseUrl}${path}`, {
-        ...opts,
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { 'X-AI00-Token': token } : {}),
-          ...(opts.headers || {}),
-        },
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail || `HTTP ${res.status}`);
-      }
-      return res.json();
-    })();
-  }
 
   async _invokeCapability(id, payload = {}) {
-    const _cf = this._cf.bind(this);
-    const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ version: 1, payload }),
-    });
+
+    const response = await window.AI00Business.request(id, { version: 1, payload });
     const envelope = response?.data;
     if (response?.success !== true || envelope?.ok !== true) {
       const detail = envelope?.error || response?.error || {};
@@ -124,7 +89,7 @@ class ListSidebar {
   }
 
   async _loadLists() {
-    const _cf = this._cf.bind(this);
+
     // 云端 PG 清单
     let cloudLists = [];
     try {
@@ -691,13 +656,13 @@ class ListSidebar {
   }
 
   async _doCreateList(name, color = '#5b8dee', visibility = 'team', projectGid = null, sharedTeamGid = null) {
-    const _cf = this._cf.bind(this);
+
     const uid = window.top?._authUser?.gid || window.parent?._authUser?.gid || '';
     const body = { name, color, storage_scope: 'cloud', owner_type: 'user',
                    item_type: this._itemType, visibility, owner_gid: uid };
     if (projectGid)    body.project_gid     = projectGid;
     if (sharedTeamGid) body.shared_team_gid = sharedTeamGid;
-    const res = await _cf('POST', '/api/lists', { body: JSON.stringify(body) });
+    const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.list.change.apply.atomic.lists_create", {version:1,payload:{arguments:{...{"color":"#5b8dee","storage_scope":"cloud","owner_type":"user","owner_gid":"","item_type":"task","sort_order":0,"visibility":"team","read_scope":null,"write_scope":null},...body}}}); return result; })(body,{},new URLSearchParams());
     const newGid = res?.data?.gid || null;
     await this._loadLists();
     this._renderItems();
@@ -950,7 +915,7 @@ class ListSidebar {
 
   /** 转让 Owner 弹层 */
   async _transferOwner(listObj) {
-    const _cf = this._cf.bind(this);
+
     document.querySelectorAll('.ls-owner-modal').forEach(m => m.remove());
     const overlay = document.createElement('div');
     overlay.className = 'ls-owner-modal';
@@ -1086,7 +1051,7 @@ class ListSidebar {
   }
 
   async _updateList(gid, fields) {
-    const _cf = this._cf.bind(this);
+
     try {
       await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
         .call('project.lists.patch', { gid, patch: fields });
@@ -1102,7 +1067,7 @@ class ListSidebar {
   }
 
   async _deleteList(gid, confirmDelete = () => false) {
-    const _cf = this._cf.bind(this);
+
     const list = this._lists.find(item => item.gid === gid);
     if (!Number.isInteger(list?.revision)) {
       console.warn('[ListSidebar] 删除清单失败: 缺少当前 revision');

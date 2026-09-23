@@ -1,8 +1,6 @@
 'use strict';
 
-function _cf(method, path, opts = {}) {
-  return ListShell._cf(path, { ...opts, method });
-}
+
 
 // ── 列定义 ──────────────────────────────────────────────────
 const TASK_COLS = [
@@ -76,7 +74,7 @@ window.addEventListener('message', e => {
 
 async function loadFollows() {
   try {
-    const res = await _cf('GET', '/api/follows?item_type=task');
+    const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.follow.read.atomic.follows_list", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"item_type":(query.has("item_type")?query.get("item_type"):null)}}).arguments).filter(([k,v])=>v!=null||["item_type"].includes(k)))}}); return result; })({},{},new URLSearchParams(('/api/follows?item_type=task').split("?")[1]||""));
     _followedMap.clear();
     for (const f of (res?.data || [])) {
       _followedMap.set(f.item_gid, { gid: f.gid, conditions: f.notify_on || [] });
@@ -96,16 +94,16 @@ async function _onRowsChange(newRows) {
       if (!changed) continue;
       const fields = {};
       for (const k of editableKeys) { if (row[k] !== undefined) fields[k] = row[k]; }
-      await _cf('PUT', `/api/tasks/${row.gid}`, { method: 'PUT', body: JSON.stringify(fields) })
+      await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.tasks_update", {version:2,payload:{arguments:{"gid":path.gid,"updates":window.AI00Business.workItemChanges(body)}}}); return result; })(fields,{"gid":decodeURIComponent(String(row.gid))},new URLSearchParams())
         .catch(e => console.error('[update task cloud]', e));
       didSave = true;
     } else if (row.title) {
       const _listGid = ListShell._canonListGid(_currentList);
-      await _cf('POST', '/api/tasks', { method: 'POST', body: JSON.stringify({
+      await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.tasks_create", {version:2,payload:{arguments:{...{"description":"","owner_gid":"","assignee_team_gid":null,"project_gid":null,"status":"pending","priority":"normal","source_ref":{},"review_date":null,"meeting_level":"none","meeting_doc_link":null,"progress_logs":[],"due_date":null,"plan_start":null,"plan_end":null,"actual_start":null,"actual_end":null,"share_scope":"project","list_gid":null,"local_gid":null,"local_created_at":null,"attachments":[],"scheduled_date":null,"scheduled_start_time":null,"time_estimate":null,"is_deleted":false,"parent_task_gid":null,"canvas_x":null,"canvas_y":null,"completion":0,"node_type":"normal","canvas_icon":"star","feishu_assignee_open_id":null,"feishu_assignee_name":null,"feishu_group_chat_id":null,"feishu_group_name":null,"feishu_groups":[],"feishu_docs":[]},...body}}}); return result; })({
         title: row.title, priority: row.priority || 'normal',
         list_gid: _listGid,
         owner_gid: window.top?._authUser?.gid || window._authUser?.gid || '',
-      }) }).catch(e => console.error('[add-row task]', e));
+      },{},new URLSearchParams()).catch(e => console.error('[add-row task]', e));
       didSave = true;
     }
   }
@@ -130,7 +128,7 @@ async function load() {
   const isNoList = _currentList === ListShell.NO_LIST;
   try {
     const qs = (_currentList && !isNoList) ? `?list_gid=${_currentList}` : '';
-    const res = await _cf('GET', '/api/tasks' + qs).catch(() => null);
+    const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.read.atomic.tasks_search", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"project_gid":(query.has("project_gid")?query.get("project_gid"):null),"status":(query.has("status")?query.get("status"):null),"list_gid":(query.has("list_gid")?query.get("list_gid"):null),"scheduled_date_from":(query.has("scheduled_date_from")?query.get("scheduled_date_from"):null),"q":(query.has("q")?query.get("q"):null),"page_size":(query.has("page_size")?Number(query.get("page_size")):null)}}).arguments).filter(([k,v])=>v!=null||["list_gid","project_gid","q","scheduled_date_from","status"].includes(k)))}}); return result; })({},{},new URLSearchParams(('/api/tasks' + qs).split("?")[1]||"")).catch(() => null);
     const _toTime = v => {
       if (!v) return 0;
       if (typeof v === 'number') return v;
@@ -204,12 +202,12 @@ async function init() {
       async (rows, _fm, _c, signal) => {
         for (const r of rows) {
           if (signal?.aborted) break;
-          await _cf('POST', '/api/tasks', { method: 'POST', body: JSON.stringify({
+          await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.tasks_create", {version:2,payload:{arguments:{...{"description":"","owner_gid":"","assignee_team_gid":null,"project_gid":null,"status":"pending","priority":"normal","source_ref":{},"review_date":null,"meeting_level":"none","meeting_doc_link":null,"progress_logs":[],"due_date":null,"plan_start":null,"plan_end":null,"actual_start":null,"actual_end":null,"share_scope":"project","list_gid":null,"local_gid":null,"local_created_at":null,"attachments":[],"scheduled_date":null,"scheduled_start_time":null,"time_estimate":null,"is_deleted":false,"parent_task_gid":null,"canvas_x":null,"canvas_y":null,"completion":0,"node_type":"normal","canvas_icon":"star","feishu_assignee_open_id":null,"feishu_assignee_name":null,"feishu_group_chat_id":null,"feishu_group_name":null,"feishu_groups":[],"feishu_docs":[]},...body}}}); return result; })({
             title: r.title || '导入任务',
             priority: r.priority || 'normal',
             list_gid: shell?.currentListGid || null,
             owner_gid: window.top?._authUser?.gid || window._authUser?.gid || '',
-          }), signal }).catch(e => console.error('[import task]', e));
+          },{},new URLSearchParams()).catch(e => console.error('[import task]', e));
         }
         if (!signal?.aborted) await load();
       }),
@@ -239,7 +237,7 @@ async function init() {
       },
       share_scope: (val) => ListShell._esc(val || '-'),
       created_at:  (val) => val ? String(val).slice(0,10) : '-',
-      attachments: (val) => AttachmentsWidget?.renderCell(val) ?? '',
+      attachments: (val, row) => AttachmentsWidget?.renderCell(val, {itemType:'task',itemGid:row.gid}) ?? '',
       feishu_assignee: (val, row) => {
         if (!window.FeishuMentionChip) return '';
         if (row.feishu_assignee_open_id) {
@@ -293,7 +291,7 @@ async function init() {
           const patch = result.type === 'user'
             ? { feishu_assignee_open_id: result.open_id, feishu_assignee_name: result.name, feishu_assignee_avatar_url: result.avatar_url || '' }
             : { feishu_group_chat_id: result.chat_id, feishu_group_name: result.name };
-          await _cf('PUT', `/api/tasks/${gid}`, { method: 'PUT', body: JSON.stringify(patch) })
+          await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.tasks_update", {version:2,payload:{arguments:{"gid":path.gid,"updates":window.AI00Business.workItemChanges(body)}}}); return result; })(patch,{"gid":decodeURIComponent(String(gid))},new URLSearchParams())
             .catch(e => console.error('[fm patch task]', e));
           Object.assign(row, patch);
           shell.setRows(_all);
@@ -302,7 +300,7 @@ async function init() {
           const patch = field === 'feishu_assignee'
             ? { feishu_assignee_open_id: null, feishu_assignee_name: null }
             : { feishu_group_chat_id: null, feishu_group_name: null };
-          await _cf('PUT', `/api/tasks/${gid}`, { method: 'PUT', body: JSON.stringify(patch) })
+          await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.tasks_update", {version:2,payload:{arguments:{"gid":path.gid,"updates":window.AI00Business.workItemChanges(body)}}}); return result; })(patch,{"gid":decodeURIComponent(String(gid))},new URLSearchParams())
             .catch(e => console.error('[fm clear task]', e));
           Object.assign(row, patch);
           shell.setRows(_all);
@@ -317,7 +315,7 @@ async function init() {
       const gid = done.dataset.gid;
       const row = _all.find(t => t.gid === gid);
       if (!row) return;
-      await _cf('PUT', `/api/tasks/${gid}`, { method: 'PUT', body: JSON.stringify({ status: 'completed' }) });
+      await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.tasks_update", {version:2,payload:{arguments:{"gid":path.gid,"updates":window.AI00Business.workItemChanges(body)}}}); return result; })({ status: 'completed' },{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
       load();
     } else if (sub) {
       ev.stopPropagation();
@@ -357,7 +355,7 @@ async function init() {
     document.getElementById('tplPickList').innerHTML = '';
     _tplSelected = null;
     try {
-      const res = await _cf('GET', '/api/task-templates');
+      const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task_template.read.atomic.task_templates_list", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{}}).arguments).filter(([k,v])=>v!=null||[].includes(k)))}}); return result; })({},{},new URLSearchParams());
       _tplList = res?.data || [];
       _renderTplList();
     } catch (e) {
@@ -391,7 +389,7 @@ async function init() {
     const gid = sel.dataset.gid;
     document.getElementById('tplPickNext').disabled = true;
     try {
-      const res = await _cf('GET', `/api/task-templates/${gid}`);
+      const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task_template.read.atomic.task_templates_get", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"gid":path.gid}}).arguments).filter(([k,v])=>v!=null||[].includes(k)))}}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
       _tplSelected = res?.data;
       if (!_userList.length) {
         const ur = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
@@ -493,15 +491,12 @@ async function init() {
 
     document.getElementById('tplInstConfirm').disabled = true;
     try {
-      const res = await _cf('POST', `/api/task-templates/${_tplSelected.gid}/instantiate`, {
-        method: 'POST',
-        body: JSON.stringify({
+      const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task_template.change.apply.atomic.task_templates_instantiate", {version:1,payload:{arguments:{"gid":path.gid,...{...{"assignee_map":{},"title_vars":{},"owner_user_gid":null},...body}}}}); return result; })({
           project_gid:  projectGid || null,
           start_date:   startDate,
           title_vars:   titleVars,
           assignee_map: assigneeMap,
-        }),
-      });
+        },{"gid":decodeURIComponent(String(_tplSelected.gid))},new URLSearchParams());
       const count = res?.count ?? 0;
       _closeTplInst();
       _tplSelected = null;

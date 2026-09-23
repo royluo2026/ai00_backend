@@ -14,7 +14,7 @@
  *   w.render();
  *
  * 静态方法（用于 GridEditor cell 渲染）：
- *   AttachmentsWidget.renderCell(val)     → HTML 字符串（含 data-att-preview button）
+ *   AttachmentsWidget.renderCell(val, parent) → HTML 字符串（含 data-att-preview button）
  *   AttachmentsWidget.openPreview(att)    → 打开对应容器卡片预览
  */
 class AttachmentsWidget {
@@ -47,7 +47,7 @@ class AttachmentsWidget {
       // 点击图标名称区域 → 预览
       item.addEventListener('click', (e) => {
         if (e.target.closest('.att-delete-btn')) return;
-        AttachmentsWidget.openPreview(att);
+        AttachmentsWidget.openPreview(att, {itemType:this._itemType,itemGid:this._itemGid}).catch(error=>alert('附件读取失败：'+error.message));
       });
       // 删除按钮
       if (!this._readonly) {
@@ -84,121 +84,19 @@ class AttachmentsWidget {
   // ─── 本地上传（Electron IPC）──────────────────────────────────────────────
 
   async _uploadLocal() {
-    const api = window.electronAPI || window.parent?.electronAPI || window.top?.electronAPI;
-    console.log('[AttWidget._uploadLocal] api available:', !!api, 'openFileDialog:', !!api?.openFileDialog, 'copyToAttachments:', !!api?.copyToAttachments);
-    if (!api?.openFileDialog || !api?.copyToAttachments) {
-      alert('本地文件操作仅在 Electron 模式下可用');
-      return;
-    }
-    const paths = await api.openFileDialog([{ name: '所有文件', extensions: ['*'] }], { multi: true });
-    console.log('[AttWidget._uploadLocal] selected paths:', paths);
-    if (!paths?.length) return;
-
-    this._uploading = true;
-    this.render();
-    try {
-      for (const srcPath of paths) {
-        const fileName = srcPath.replace(/\\/g, '/').split('/').pop();
-        const url = await api.copyToAttachments(srcPath, this._itemType, this._itemGid, fileName);
-        console.log('[AttWidget._uploadLocal] copyToAttachments result:', fileName, '→', url);
-        const mime = AttachmentsWidget._detectMime(fileName);
-        this._list.push({ name: fileName, url, mime });
-      }
-      console.log('[AttWidget._uploadLocal] list before save:', JSON.stringify(this._list));
-      await this._save();
-      console.log('[AttWidget._uploadLocal] save completed successfully');
-    } catch (e) {
-      console.error('[AttachmentsWidget._uploadLocal]', e);
-      alert('复制文件失败：' + e.message);
-    } finally {
-      this._uploading = false;
-      this.render();
-    }
-  }
+return this._uploadCloud();
+}
 
   // ─── 云端上传（fetch /api/uploads）──────────────────────────────────────────
 
-  _uploadCloud() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.multiple = true;
-    input.accept = 'image/*,.pdf,.md,.markdown,.txt,.csv,.xlsx,.xls';
-    input.style.display = 'none';
-    document.body.appendChild(input);
-    input.addEventListener('change', async () => {
-      document.body.removeChild(input);
-      const files = Array.from(input.files || []);
-      if (!files.length) return;
-
-      this._uploading = true;
-      this.render();
-      try {
-        for (const file of files) {
-          // 验证 MIME（优先 file.type，部分浏览器对 .md 返回空则从文件名推断）
-          const mimeToCheck = file.type || AttachmentsWidget._detectMime(file.name);
-          if (!_isAllowedMime(mimeToCheck)) {
-            alert(`不支持的文件类型：${file.type || file.name}`);
-            continue;
-          }
-          // 验证大小（上传前预检）
-          if (file.size > 5 * 1024 * 1024) {
-            alert(`文件 "${file.name}" 超过 5MB 限制`);
-            continue;
-          }
-
-          let data;
-          // 图片：canvas 压缩
-          const effectiveMime = file.type || AttachmentsWidget._detectMime(file.name);
-          if (effectiveMime.startsWith('image/')) {
-            data = await _compressImage(file, 1600, 0.7);
-          } else {
-            data = await _readFileBase64(file);
-          }
-
-          const _cloudFetch = window._cloudFetch || window.parent?._cloudFetch;
-          if (!_cloudFetch) throw new Error('_cloudFetch 未就绪');
-
-          // _cloudFetch 已处理 HTTP 错误（!res.ok 时抛出），直接返回解析后的 JSON 对象
-          const json = await _cloudFetch('/api/uploads', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ filename: file.name, mime: effectiveMime, data_b64: data }),
-          });
-
-          let resolvedUrl = json.url;
-          if (json.storage === 'ois' && json.object_key) {
-            try {
-              const resolved = await _cloudFetch('/api/uploads/ois/resolve', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ object_key: json.object_key }),
-              });
-              resolvedUrl = resolved?.url || resolvedUrl;
-            } catch (resolveErr) {
-              console.warn('[AttachmentsWidget._uploadCloud] resolve OIS url failed', resolveErr);
-            }
-          }
-
-          // 云端文件始终挂载在 FastAPI (port 8080)，getServerInfo().port 是本地 bridge 端口不能用
-          this._list.push({
-            name: file.name,
-            url:  (window.AI00RuntimeConfig?.toAbsoluteBackendUrl?.(resolvedUrl) || resolvedUrl),
-            mime: effectiveMime,
-            storage: json.storage || '',
-            object_key: json.object_key || '',
-          });
-        }
-        await this._save();
-      } catch (e) {
-        console.error('[AttachmentsWidget._uploadCloud]', e);
-        alert('上传失败：' + e.message);
-      } finally {
-        this._uploading = false;
-        this.render();
-      }
-    });
-    input.click();
-  }
+  async _uploadCloud() {
+this._uploading=true;this.render();
+ try{const result=await window.AI00Business.invoke('base.artifact.batch.import',{version:1,payload:{},native_io:{select:'attachment'}});
+  for(const item of result.artifacts)this._list.push({name:item.name,mime:item.artifact_ref.media_type,artifact_ref:item.artifact_ref,url:window.AI00Business.artifactPath(item)});
+  await this._save();
+ }catch(error){if(error.code!=='native_selection_cancelled')alert('上传失败：'+error.message);}
+ finally{this._uploading=false;this.render();}
+}
 
   // ─── 删除 ─────────────────────────────────────────────────────────────────
 
@@ -210,7 +108,11 @@ class AttachmentsWidget {
 
   // ─── 保存 ─────────────────────────────────────────────────────────────────
 
-  _save() {
+  async _save() {
+    this._list=await Promise.all(this._list.map(async att=>{
+      const file=await window.AI00Business.resolveArtifactPath(await window.AI00Business.attachmentPath(att,{itemType:this._itemType,itemGid:this._itemGid}));
+      return {name:file.name,mime:file.artifact_ref.media_type,artifact_ref:file.artifact_ref,url:window.AI00Business.artifactPath(file)};
+    }));
     if (this._onSave) return this._onSave([...this._list]);
   }
 
@@ -268,7 +170,7 @@ class AttachmentsWidget {
   }
 
   /** Grid 单元格 HTML（只读图标列表）*/
-  static renderCell(val) {
+  static renderCell(val, parent) {
     let list = [];
     if (!val) return '';
     if (Array.isArray(val)) list = val;
@@ -276,7 +178,7 @@ class AttachmentsWidget {
     if (!list.length) return '';
 
     return `<span class="att-cell">${list.map(att => {
-      const safe = _b64EncUtf8(JSON.stringify(att));
+      const safe = _b64EncUtf8(JSON.stringify({attachment:att,parent_ref:{itemType:parent?.itemType,itemGid:parent?.itemGid}}));
       return `<button data-att-preview="${safe}" title="${_attEsc(att.name)}"
                 style="background:none;border:none;padding:2px;cursor:pointer;display:inline-flex;border-radius:3px;">
                 ${AttachmentsWidget._fileIcon(att)}
@@ -335,7 +237,13 @@ class AttachmentsWidget {
   }
 
   /** 按 mime 路由到容器卡片预览 */
-  static openPreview(att) {
+  static async openPreview(att, parent) {
+    const file=await window.AI00Business.resolveArtifactPath(await window.AI00Business.attachmentPath(att,parent));
+    att={name:file.name,mime:file.artifact_ref.media_type,artifact_ref:file.artifact_ref,url:window.AI00Business.artifactPath(file)};
+    if(att.mime.startsWith('image/')||att.mime==='application/pdf'){
+      const bytes=await window.AI00Business.invoke('base.artifact.bytes.get',{version:1,payload:{artifact_ref:file.artifact_ref}});
+      att.url='data:'+file.artifact_ref.media_type+';base64,'+bytes.data_base64;
+    }
     console.log('[AttWidget.openPreview] called with att:', JSON.stringify(att));
     const mime = att.mime || AttachmentsWidget._detectMime(att.name || '');
     console.log('[AttWidget.openPreview] mime:', mime);
@@ -390,8 +298,8 @@ class AttachmentsWidget {
     if (!btn) return;
     e.stopPropagation();
     try {
-      const att = JSON.parse(_b64DecUtf8(btn.dataset.attPreview));
-      AttachmentsWidget.openPreview(att);
+      const {attachment, parent_ref} = JSON.parse(_b64DecUtf8(btn.dataset.attPreview));
+      AttachmentsWidget.openPreview(attachment, parent_ref).catch(error=>alert('附件读取失败：'+error.message));
     } catch (err) {
       console.error('[AttachmentsWidget] preview parse error', err);
     }
@@ -441,17 +349,7 @@ function _isAllowedMime(mime) {
 }
 
 /** 读取文件为 base64（不含 data: 前缀）*/
-function _readFileBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result;
-      resolve(dataUrl.split(',')[1] || '');
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
+
 
 /** 图片压缩（canvas API，maxPx=1600，quality=0.7），返回 base64（不含前缀）*/
 function _compressImage(file, maxPx, quality) {

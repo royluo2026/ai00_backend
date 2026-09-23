@@ -23,11 +23,7 @@ function _applyTheme(theme) {
 })();
 
 // ── 云端 fetch ────────────────────────────────────────────────────────────────
-function _cf(method, path, opts = {}) {
-  const fetch = window._cloudFetch || window.parent?._cloudFetch;
-  if (!fetch) return Promise.reject(new Error('no cloud fetch'));
-  return fetch(path, { ...opts, method });
-}
+
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let _teams      = [];      // 所有可见团队
@@ -41,7 +37,7 @@ let _myGid      = '';
 async function init() {
   // 获取当前用户信息
   try {
-    const me = await _cf('GET', '/users/me');
+    const me = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.identity.current.get", {version:1,payload:({})}); return result; })({},{},new URLSearchParams());
     const meData = me.data || me;
     _myGid    = meData.gid || '';
     _myGrants = meData.grants || [];
@@ -54,7 +50,7 @@ async function init() {
 // ── Load teams ────────────────────────────────────────────────────────────────
 async function _loadTeams() {
   try {
-    const data = await _cf('GET', '/teams');
+    const data = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.team.directory.list", {version:1,payload:({})}); return result; })({},{},new URLSearchParams());
     _teams = Array.isArray(data) ? data : (data.data || data.teams || []);
   } catch (_) {
     _teams = [];
@@ -144,7 +140,7 @@ async function _selectTeam(team) {
 // ── Load members ──────────────────────────────────────────────────────────────
 async function _loadMembers(teamGid) {
   try {
-    const data = await _cf('GET', `/teams/${encodeURIComponent(teamGid)}/members`);
+    const data = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.team.member.list", {version:1,payload:({team_gid:path.gid})}); return result; })({},{"gid":decodeURIComponent(String(encodeURIComponent(teamGid)))},new URLSearchParams());
     _members = Array.isArray(data) ? data : (data.data || data.members || []);
   } catch (_) {
     _members = [];
@@ -267,7 +263,7 @@ async function _removeMember(userGid) {
   if (!userGid || !_currentTeam) return;
   if (!confirm('确认从团队移除该成员？')) return;
   try {
-    await _cf('DELETE', `/teams/${encodeURIComponent(_currentTeam.gid)}/members/${encodeURIComponent(userGid)}`, { method: 'DELETE' });
+    await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.team.member.remove", {version:1,payload:({team_gid:path.gid,user_gid:path.user_gid})}); return result; })({},{"gid":decodeURIComponent(String(encodeURIComponent(_currentTeam.gid))),"user_gid":decodeURIComponent(String(encodeURIComponent(userGid)))},new URLSearchParams());
     await _loadMembers(_currentTeam.gid);
   } catch (e) {
     alert('移除失败：' + (e.message || String(e)));
@@ -279,7 +275,7 @@ async function _deleteCurrentTeam() {
   if (!_currentTeam) return;
   if (!confirm(`确认软删除团队「${_currentTeam.name || _currentTeam.gid}」？\n\n团队将从列表隐藏，成员数据不受影响。`)) return;
   try {
-    await _cf('DELETE', `/teams/${encodeURIComponent(_currentTeam.gid)}`, { method: 'DELETE' });
+    await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.team.archive", {version:1,payload:({team_gid:path.gid})}); return result; })({},{"gid":decodeURIComponent(String(encodeURIComponent(_currentTeam.gid)))},new URLSearchParams());
     _currentTeam = null;
     document.getElementById('tsTeamName').textContent = '选择团队';
     document.getElementById('tsAdminBadge').style.display = 'none';
@@ -307,7 +303,7 @@ document.getElementById('dlgMemberSearch')?.addEventListener('input', _debounce(
   const q = e.target.value.trim();
   if (q.length < 2) { document.getElementById('dlgMemberResults').innerHTML = ''; return; }
   try {
-    const data = await _cf('GET', `/users/search?q=${encodeURIComponent(q)}&limit=8`);
+    const data = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.identity.user.search", {version:1,payload:({query:query.get("q")||"",limit:Number(query.get("limit")||10)})}); return result; })({},{},new URLSearchParams((`/users/search?q=${encodeURIComponent(q)}&limit=8`).split("?")[1]||""));
     const users = Array.isArray(data) ? data : (data.data || data.users || []);
     const resultsEl = document.getElementById('dlgMemberResults');
     resultsEl.innerHTML = users.map(u => `
@@ -339,10 +335,7 @@ document.getElementById('dlgMemberConfirm')?.addEventListener('click', async () 
   const userGid = selected.dataset.gid;
   const role = document.getElementById('dlgMemberRole').value;
   try {
-    await _cf('POST', `/teams/${encodeURIComponent(_currentTeam.gid)}/members`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_gid: userGid }),
-    });
+    await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.team.member.add", {version:1,payload:({team_gid:path.gid,member:body})}); return result; })({ user_gid: userGid },{"gid":decodeURIComponent(String(encodeURIComponent(_currentTeam.gid)))},new URLSearchParams());
     if (role === 'team_admin') {
       await _grantTeamAdmin(userGid);
     } else {
@@ -366,10 +359,7 @@ document.getElementById('dlgSubConfirm')?.addEventListener('click', async () => 
   const name = document.getElementById('dlgSubTeamName').value.trim();
   if (!name) { alert('请输入团队名称'); return; }
   try {
-    await _cf('POST', '/teams', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, parent_team_gid: _currentTeam?.gid || null }),
-    });
+    await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.team.create", {version:1,payload:body}); return result; })({ name, parent_team_gid: _currentTeam?.gid || null },{},new URLSearchParams());
     document.getElementById('dlgCreateSub').classList.remove('open');
     await _loadTeams();
   } catch (e) {
@@ -461,7 +451,7 @@ function _debounce(fn, ms) {
 // ── Start ─────────────────────────────────────────────────────────────────────
 // 等待 _cloudFetch 就绪（Electron 模式下可能需要等待 python:ready）
 (function waitAndInit(attempts) {
-  const fetch = window._cloudFetch || window.parent?._cloudFetch;
+  const fetch = window.AI00Business?.available() || window.AI00Business?.available();
   if (fetch) { init(); return; }
   if (attempts > 0) setTimeout(() => waitAndInit(attempts - 1), 400);
 })(15);

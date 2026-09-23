@@ -66,42 +66,7 @@ let _diffMgr = null; // DiffManager
 let _grid = null; // GridEditor
 
 // ─── 云端 API 封装 ─────────────────────────────────────────────
-async function callBridge(namespace, method, params = {}) {
-  try {
-    const _cloudFetch = window.parent?._cloudFetch || window._cloudFetch;
-    if (!_cloudFetch) {
-      console.warn('[table.js] _cloudFetch 未就绪，返回空数据');
-      return namespace === 'craft_plan' && method === 'list_work_plans' ? [] : null;
-    }
-    if (namespace === 'craft_plan') {
-      console.warn(`[table.js] V1 craft_plan 已停用: ${method}`);
-      return method.startsWith('list_') || method === 'get_table_view' ? [] : null;
-    }
-    if (namespace === 'std_op') {
-      if (method === 'list') {
-        const res = await _cloudFetch('/api/std_op/operations?status=active', { method: 'GET' });
-        return res?.data || [];
-      }
-      if (method === 'clone_to_post') {
-        console.warn('[table.js] 标准工序克隆到岗位接口已停用');
-        return null;
-      }
-    }
-    if (namespace === 'bop') {
-      if (method === 'drift_check') {
-        return { deprecated: true, message: 'V1 operations drift-check 已废弃，请使用新版 BOP 条目差异能力' };
-      }
-      if (method === 'reset_fields') {
-        return { deprecated: true, message: 'V1 operations reset-fields 已废弃，请使用新版 BOP 条目变更能力' };
-      }
-    }
-    console.warn(`[table.js] 未映射的 bridge 调用: ${namespace}.${method}`);
-    return null;
-  } catch (e) {
-    console.error('[table.js] API 调用失败:', e.message);
-    return null;
-  }
-}
+
 
 // ─── 主题同步 ──────────────────────────────────────────────────
 window.addEventListener('message', (e) => {
@@ -112,7 +77,7 @@ window.addEventListener('message', (e) => {
 // ─── 工艺方案列表 ──────────────────────────────────────────────
 async function loadWorkPlans() {
   try {
-    const plans = await callBridge('craft_plan', 'list_work_plans', {});
+    const plans = await Promise.resolve([]);
     const sel   = document.getElementById('workPlanSelect');
     sel.innerHTML = '<option value="">— 选择工艺方案 —</option>';
     (plans || []).forEach(wp => {
@@ -128,7 +93,7 @@ async function loadWorkPlans() {
 
 async function loadSections(workPlanGid) {
   try {
-    const sections = await callBridge('craft_plan', 'list_sections', { work_plan_gid: workPlanGid });
+    const sections = await Promise.resolve([]);
     const sel = document.getElementById('sectionSelect');
     sel.innerHTML = '<option value="">— 全部工段 —</option>';
     (sections || []).forEach(sec => {
@@ -150,7 +115,7 @@ async function loadTableView(workPlanGid, sectionGid) {
   try {
     const params = { work_plan_gid: workPlanGid };
     if (sectionGid) params.section_gid = sectionGid;
-    const rows = await callBridge('craft_plan', 'get_table_view', params);
+    const rows = await Promise.resolve([]);
     state.tableRows = rows || [];
     renderTable(state.tableRows);
   } catch (e) {
@@ -252,7 +217,7 @@ document.getElementById('btnSearchPart').addEventListener('click', async () => {
   try {
     const params = { keyword: kw };
     if (state.snapshotGid) params.snapshot_gid = state.snapshotGid;
-    const parts = await callBridge('ebom', 'search_parts', params);
+    const parts = await Promise.resolve([]);
     renderPartList(parts || []);
   } catch (e) {
     console.error('[table] search_parts 失败', e);
@@ -286,19 +251,7 @@ function renderPartList(parts) {
 async function bindPart(partEntry) {
   if (!state.currentOpGid) return;
   try {
-    await callBridge('craft_plan', 'bind_part', {
-      section_gid: state.currentSectionGid,
-      workstation_gid: state.currentWsGid,
-      post_gid: state.currentPostGid,
-      operation_gid: state.currentOpGid,
-      part_no: partEntry.part_no,
-      part_version: partEntry.part_version,
-      snapshot_gid: partEntry.snapshot_gid || state.snapshotGid || '',
-      part_snapshot: {
-        ebom_part_name: partEntry.ebom_part_name,
-        common_part_name: partEntry.common_part_name,
-      },
-    });
+    await Promise.reject(new Error('此旧工艺方案操作已停用，请使用 BOP 版本编辑器'));
     document.getElementById('partDrawer').classList.add('hidden');
     await loadTableView(state.workPlanGid, state.sectionGid);
   } catch (e) {
@@ -321,7 +274,7 @@ document.getElementById('btnConfirmWp').addEventListener('click', async () => {
   if (!name) { alert('请输入方案名称'); return; }
   const projectGid = document.getElementById('wpProjectGid').value.trim();
   try {
-    await callBridge('craft_plan', 'create_work_plan', { name, project_gid: projectGid });
+    await Promise.reject(new Error('此旧工艺方案操作已停用，请使用 BOP 版本编辑器'));
     document.getElementById('dialogWorkPlan').classList.add('hidden');
     await loadWorkPlans();
   } catch (e) { alert('创建失败：' + (e.message || e)); }
@@ -339,9 +292,7 @@ document.getElementById('btnConfirmSec').addEventListener('click', async () => {
   const name = document.getElementById('secName').value.trim();
   if (!name) { alert('请输入工段名称'); return; }
   try {
-    await callBridge('craft_plan', 'create_section', {
-      work_plan_gid: state.workPlanGid, name,
-    });
+    await Promise.reject(new Error('此旧工艺方案操作已停用，请使用 BOP 版本编辑器'));
     document.getElementById('dialogSection').classList.add('hidden');
     await loadSections(state.workPlanGid);
   } catch (e) { alert('创建失败：' + (e.message || e)); }
@@ -394,18 +345,15 @@ document.getElementById('btnConfirmAdd').addEventListener('click', async () => {
   if (!code || !name) { alert('编号和名称不能为空'); return; }
   try {
     if (_addMode === 'ws') {
-      await callBridge('craft_plan', 'add_workstation', { section_gid: secGid, code, name });
+      await Promise.reject(new Error('此旧工艺方案操作已停用，请使用 BOP 版本编辑器'));
     } else if (_addMode === 'post') {
       const wsGid = document.getElementById('add_ws')?.value.trim() || _firstWsGid();
-      await callBridge('craft_plan', 'add_post', { section_gid: secGid, workstation_gid: wsGid, code, name });
+      await Promise.reject(new Error('此旧工艺方案操作已停用，请使用 BOP 版本编辑器'));
     } else {
       const wsGid  = document.getElementById('add_ws')?.value.trim() || _firstWsGid();
       const postGid = document.getElementById('add_post')?.value.trim() || _firstPostGid(wsGid);
       const st     = parseFloat(document.getElementById('add_time')?.value) || 0;
-      await callBridge('craft_plan', 'add_operation', {
-        section_gid: secGid, workstation_gid: wsGid, post_gid: postGid,
-        code, name, standard_time: st,
-      });
+      await Promise.reject(new Error('此旧工艺方案操作已停用，请使用 BOP 版本编辑器'));
     }
     document.getElementById('dialogAdd').classList.add('hidden');
     await loadTableView(state.workPlanGid, state.sectionGid);
@@ -543,7 +491,7 @@ async function openStdOpDialog() {
   const list = document.getElementById('stdOpList');
   list.innerHTML = '<div style="padding:12px;color:var(--app-text-secondary,#888)">加载中…</div>';
 
-  _stdOpAll = await callBridge('std_op', 'list', {}) || [];
+  _stdOpAll = await window.AI00Business.invoke('craft.standard_operation.read',{version:1,payload:{operation:'list',status:'active'}}).then(result=>result.data||[]) || [];
   renderStdOpList(_stdOpAll);
 }
 
@@ -588,11 +536,7 @@ async function confirmCloneStdOp() {
   const postGid = _firstPostGid(_firstWsGid());
   if (!postGid) { alert('当前工段无岗位，请先添加岗位'); return; }
 
-  const result = await callBridge('std_op', 'clone_to_post', {
-    std_op_gid: _stdOpSel.gid,
-    post_gid: postGid,
-    seq_no: state.tableRows.length,
-  });
+  const result = await Promise.reject(new Error('此旧工艺方案操作已停用，请使用 BOP 版本编辑器'));
   document.getElementById('dialogStdOp').classList.add('hidden');
   if (result?.gid) {
     await loadTableView(state.workPlanGid, state.sectionGid);
@@ -617,7 +561,7 @@ async function openDriftDialog(opGid) {
   document.getElementById('btnResetDrift').disabled = true;
   document.getElementById('dialogDrift').classList.remove('hidden');
 
-  const data = await callBridge('bop', 'drift_check', { op_gid: opGid });
+  const data = await Promise.reject(new Error('此旧工艺方案操作已停用，请使用 BOP 版本编辑器'));
   _driftData = data;
 
   if (data?.deprecated) {
@@ -684,7 +628,7 @@ async function confirmResetDriftFields() {
   const fields = checked.map(cb => cb.dataset.field);
   if (!fields.length) return;
 
-  const result = await callBridge('bop', 'reset_fields', { op_gid: _driftOpGid, fields });
+  const result = await Promise.reject(new Error('此旧工艺方案操作已停用，请使用 BOP 版本编辑器'));
   if (result?.deprecated) {
     alert(result.message);
     return;

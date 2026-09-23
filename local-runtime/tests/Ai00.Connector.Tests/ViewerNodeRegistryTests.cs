@@ -226,6 +226,62 @@ public sealed class ViewerNodeRegistryTests : IDisposable
         Assert.All(new[] { tree, branch, left, right }, node => Assert.Equal(1, node.OccurrenceReads));
     }
 
+    [Fact]
+    public async Task Cold_resolution_matches_any_native_occurrence_alias()
+    {
+        var part = new AliasNode("11", "viewer-instance", "teamcenter-occurrence");
+        var tree = new CountingNode("10", "root", part);
+        var (adapter, _, _) = CreateAdapter(tree);
+        var result = Json(await adapter.ResolveViewerNodesAsync("source-1", Session("doc"),
+            Json(new[] { Occurrence("part", "teamcenter-occurrence") })));
+        Assert.Equal("mapped", result.GetProperty("nodes")[0].GetProperty("status").GetString());
+    }
+
+    [Fact]
+    public async Task Cold_resolution_stops_after_a_primary_occurrence_match()
+    {
+        var part = new PrimaryNode("11", "teamcenter-occurrence");
+        var tree = new CountingNode("10", "root", part);
+        var (adapter, _, _) = CreateAdapter(tree);
+
+        var result = Json(await adapter.ResolveViewerNodesAsync("source-1", Session("doc"),
+            Json(new[] { Occurrence("part", "teamcenter-occurrence") })));
+
+        Assert.Equal("mapped", result.GetProperty("nodes")[0].GetProperty("status").GetString());
+        Assert.Equal(0, part.AliasReads);
+    }
+
+    [Fact]
+    public async Task Cold_resolution_crosses_only_identityless_native_wrappers()
+    {
+        var part = new CountingNode("11", "teamcenter-occurrence");
+        var wrapper = new CountingNode("12", "", part);
+        var tree = new CountingNode("10", "root", wrapper);
+        var (adapter, _, _) = CreateAdapter(tree);
+        var result = Json(await adapter.ResolveViewerNodesAsync("source-1", Session("doc"),
+            Json(new[] { Occurrence("part", "teamcenter-occurrence") })));
+        Assert.Equal("mapped", result.GetProperty("nodes")[0].GetProperty("status").GetString());
+    }
+
+    [Fact]
+    public async Task Direct_occurrence_match_does_not_expand_unrelated_wide_wrappers()
+    {
+        var part = new CountingNode("target", "teamcenter-occurrence");
+        var wrappers = Enumerable.Range(1, 186).Select(i => new CountingNode("wrapper" + i, "",
+            new CountingNode("leaf" + i + "a", "other" + i + "a"),
+            new CountingNode("leaf" + i + "b", "other" + i + "b"),
+            new CountingNode("leaf" + i + "c", "other" + i + "c"))).ToArray();
+        var tree = new CountingNode("root", "root", [part, .. wrappers]);
+        var (adapter, _, _) = CreateAdapter(tree);
+        foreach (var wrapper in wrappers) wrapper.Reset();
+
+        var result = Json(await adapter.ResolveViewerNodesAsync("source-1", Session("doc"),
+            Json(new[] { Occurrence("part", "teamcenter-occurrence") })));
+
+        Assert.Equal("mapped", result.GetProperty("nodes")[0].GetProperty("status").GetString());
+        Assert.All(wrappers, wrapper => Assert.Equal(0, wrapper.ChildrenReads));
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
@@ -241,6 +297,35 @@ public sealed class ViewerNodeRegistryTests : IDisposable
         Assert.Equal("viewer_mapping_budget_exceeded", result.GetProperty("nodes")[0].GetProperty("error_code").GetString());
         Assert.Equal(0, tree.ChildrenReads);
         Assert.All(children, node => Assert.Equal(0, node.OccurrenceReads));
+    }
+
+    [Fact]
+    public async Task Wide_root_budget_reports_parent_and_actual_child_count()
+    {
+        var children = Enumerable.Range(1, 513).Select(i => new CountingNode(i.ToString(), "part" + i)).ToArray();
+        var tree = new CountingNode("0", "root", children);
+        var (adapter, _, _) = CreateAdapter(tree);
+        tree.Reset();
+        using var output = new StringWriter();
+        var original = Console.Error;
+        JsonElement result;
+        try
+        {
+            Console.SetError(output);
+            result = Json(await adapter.ResolveViewerNodesAsync("source-1", Session("doc"),
+                Json(new[] { Occurrence("part", "part1") })));
+        }
+        finally { Console.SetError(original); }
+
+        Assert.Equal("viewer_mapping_budget_exceeded", result.GetProperty("nodes")[0].GetProperty("error_code").GetString());
+        var line = Assert.Single(output.ToString().Split('\n', StringSplitOptions.RemoveEmptyEntries));
+        Assert.StartsWith("AI00_VIEWER_MAPPING_BUDGET_V1:", line);
+        using var diagnostic = JsonDocument.Parse(line["AI00_VIEWER_MAPPING_BUDGET_V1:".Length..]);
+        Assert.Equal("0", diagnostic.RootElement.GetProperty("parent_key").GetString());
+        Assert.True(diagnostic.RootElement.GetProperty("at_root").GetBoolean());
+        Assert.Equal(513, diagnostic.RootElement.GetProperty("child_count").GetInt32());
+        Assert.Equal(511, diagnostic.RootElement.GetProperty("remaining").GetInt32());
+        Assert.Equal(0, tree.ChildrenReads);
     }
 
     [Fact]
@@ -321,12 +406,38 @@ public sealed class ViewerNodeRegistryTests : IDisposable
         public Action? AfterOccurrenceRead { get; set; }
         public string OccurrenceId { get { OccurrenceReads++; AfterOccurrenceRead?.Invoke(); return occurrence; } }
         public IReadOnlyList<IVisMockupNode> Children { get { ChildrenReads++; AfterChildrenRead?.Invoke(); return children; } }
+        public int ChildCount => children.Length;
         public IReadOnlyList<IVisMockupNode> GetChildren(int maximum)
         {
             if (children.Length > maximum) throw new ConnectorNoEffectException("viewer_mapping_budget_exceeded");
             return Children;
         }
         public void Reset() { ChildrenReads = 0; OccurrenceReads = 0; }
+    }
+
+    private sealed class AliasNode(string key, params string[] aliases) : IVisMockupNode
+    {
+        public string NodeKey => key;
+        public string PrintableName => "part";
+        public string CadId => "cad:" + key;
+        public string ModelId => "rev";
+        public bool IsVisible => false;
+        public string OccurrenceId => aliases[0];
+        public IReadOnlyList<string> OccurrenceIds => aliases;
+        public IReadOnlyList<IVisMockupNode> Children => [];
+    }
+
+    private sealed class PrimaryNode(string key, string occurrence) : IVisMockupNode
+    {
+        public int AliasReads { get; private set; }
+        public string NodeKey => key;
+        public string PrintableName => "part";
+        public string CadId => "cad:" + key;
+        public string ModelId => "rev";
+        public bool IsVisible => false;
+        public string OccurrenceId => occurrence;
+        public IReadOnlyList<string> OccurrenceIds { get { AliasReads++; return [occurrence]; } }
+        public IReadOnlyList<IVisMockupNode> Children => [];
     }
 
     public void Dispose() { sta.Dispose(); if(Directory.Exists(root)) Directory.Delete(root,true); }

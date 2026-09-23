@@ -9,6 +9,8 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '../..');
+const {installCapabilityFixture}=require('../../scripts/helpers/legacy_gateway_fixture');
+function wireClassFixture(window,name){const Original=window[name];window[name]=class extends Original{constructor(deps){super(deps);const gateway=window._cloudFetch||deps.cf;installCapabilityFixture(window,(...args)=>gateway(...args));}};}
 const { runLineageLoadCoordinatorTests } = require(path.join(
   ROOT,
   'packages/craft-plugin/web/lineage_view/lineage_load_coordinator.test.js',
@@ -36,6 +38,13 @@ const { runGovernanceApiTests } = require(path.join(
 const { runAuthStateTests } = require(path.join(
   ROOT,
   'web/core/auth_state.test.js',
+));
+const { runExistingCapabilityClientTests } = require(path.join(
+  ROOT,
+  'web/core/existing_capability_client.test.js',
+));
+const { runOrchestrationGovernedEntryTests } = require(path.join(
+  ROOT, 'packages/agent-plugin/web/orchestration_center/governed_entry.test.js',
 ));
 
 // ── 颜色输出 ─────────────────────────────────────────────────────────
@@ -91,12 +100,20 @@ function makeEnv(extraHtml = '') {
 
   load('web/shared/lv_utils.js');
   load('packages/craft-plugin/web/lineage_view/lineage_version_mgr.js');
+  const OriginalManager=window.eval('LineageVersionManager');
+  window.LineageVersionManager=class extends OriginalManager{
+   constructor(deps){super(deps);window.electronAPI={invokeCapability:async(id,envelope)=>{
+    const value=await deps.cf('POST','/api/v1/capabilities/'+id+':invoke',{method:'POST',body:JSON.stringify(envelope)});
+    return value.success!==undefined?value:{success:true,data:{ok:true,data:value.data??value}};
+   }};window.AI00Business=require('../../web/core/business_facade').createBusinessFacade(window);}
+  };
+
 
   // 辅助：从脚本作用域读取 const/class 声明（不在 window 上，需通过 eval 访问）
   window._get = (name) => window.eval(name);
 
   // 将 class 构造函数挂到 window，使测试可用 w.ClassName 直接引用
-  window.LineageVersionManager = window.eval('LineageVersionManager');
+
 
   return window;
 }
@@ -233,6 +250,7 @@ function makeLayoutDetailPanelEnv() {
   const script = window.document.createElement('script');
   script.textContent = `${code}\nwindow.LayoutDetailPanel = LayoutDetailPanel;`;
   window.document.head.appendChild(script);
+  wireClassFixture(window,'LayoutDetailPanel');
   return window;
 }
 
@@ -252,9 +270,11 @@ function makeLayoutModeEnv() {
   const { window } = dom;
   window.console = console;
   window._cf = async () => ({ data: {} });
+  window._confirmDialog = async () => true;
+  window.confirm=()=>true;installCapabilityFixture(window,(...args)=>window._cf(...args));
   const code = fs.readFileSync(path.join(ROOT, 'packages/craft-plugin/web/lineage_view/layout_mode.js'), 'utf-8');
   const script = window.document.createElement('script');
-  script.textContent = `${code}\nwindow.LayoutMode = LayoutMode;`;
+  script.textContent = `${code}\nwindow.LayoutMode = LayoutMode; window.getProcessCardPresentation = _getProcessCardPresentation; window.invokeLayoutCapability = _invokeLayoutCapability;`;
   window.document.head.appendChild(script);
   return window;
 }
@@ -344,6 +364,7 @@ function makeLifecyclePanelEnv() {
   const script = window.document.createElement('script');
   script.textContent = `${code}\nwindow.BopLifecyclePanel = BopLifecyclePanel;`;
   window.document.head.appendChild(script);
+  wireClassFixture(window,'BopLifecyclePanel');
   return window;
 }
 
@@ -361,6 +382,9 @@ async function runTests() {
   await _assertAsync('inventory, findings, stale state, permissions and busy actions', runGovernanceControllerTests);
   console.log(section('auth_state: profile response mapping'));
   await _assertAsync('unwrap /users/me response and preserve effective permissions', runAuthStateTests);
+  console.log(section('existing_capability_client: identity profile compatibility'));
+  await _assertAsync('unwrap governed identity profile for authenticated consumers', runExistingCapabilityClientTests);
+  await runOrchestrationGovernedEntryTests(_assert, _assertAsync);
 
   console.log(section('lineage_load_coordinator: generation 与单飞加载'));
   await _assertAsync('取消旧请求、阻止过期提交并清理单飞槽', runLineageLoadCoordinatorTests);
@@ -1019,84 +1043,17 @@ async function runTests() {
     }
   });
 
-  await _assertAsync('AttachmentsWidget 云端 OIS 上传后解析签名地址', async () => {
-    const dom = new JSDOM('<!DOCTYPE html><html><body><div id="mount"></div></body></html>', {
-      runScripts: 'dangerously',
-      resources: 'usable',
-      url: 'http://localhost',
-    });
-    const { window } = dom;
-    window.console = console;
-    window._cloudFetch = async (path, opts = {}) => {
-      if (path === '/api/uploads') {
-        return { url: 'https://cdn.example.com/ois/uploads/raw.png', storage: 'ois', object_key: 'vb-prefix/uploads/raw.png' };
-      }
-      if (path === '/api/uploads/ois/resolve') {
-        const body = JSON.parse(opts.body || '{}');
-        if (body.object_key !== 'vb-prefix/uploads/raw.png') throw new Error('object_key 未透传');
-        return { url: 'https://signed.example.com/image.png?token=123' };
-      }
-      throw new Error('unexpected path ' + path);
-    };
-    window.AI00RuntimeConfig = { toAbsoluteBackendUrl: (url) => url };
-    window.URL.createObjectURL = () => 'blob:test';
-    window.URL.revokeObjectURL = () => {};
-    window.alert = () => {};
-    window.FileReader = class {
-      readAsDataURL() {
-        this.result = 'data:image/png;base64,AAAA';
-        this.onload?.();
-      }
-    };
-    window.Image = class {
-      set src(_value) {
-        this.width = 10;
-        this.height = 10;
-        this.onload?.();
-      }
-    };
-    const originalCreateElement = window.document.createElement.bind(window.document);
-    window.document.createElement = function(tagName) {
-      const el = originalCreateElement(tagName);
-      if (String(tagName).toLowerCase() === 'canvas') {
-        el.getContext = () => ({ drawImage() {} });
-        el.toDataURL = () => 'data:image/png;base64,BBBB';
-      }
-      return el;
-    };
-    const code = fs.readFileSync(path.join(ROOT, 'web/components/attachments_widget.js'), 'utf-8');
-    const script = window.document.createElement('script');
-    script.textContent = `${code}\nwindow.AttachmentsWidget = AttachmentsWidget;`;
-    window.document.head.appendChild(script);
-    const widget = new window.AttachmentsWidget({
-      el: window.document.getElementById('mount'),
-      attachments: [],
-      isCloud: true,
-      itemType: 'task',
-      itemGid: 'gid-1',
-      onSave() {},
-      readonly: false,
-    });
-    const file = new window.File(['raw'], 'demo.png', { type: 'image/png' });
-    const originalBodyAppend = window.document.body.appendChild.bind(window.document.body);
-    window.document.body.appendChild = function(node) {
-      const result = originalBodyAppend(node);
-      if (node.tagName === 'INPUT' && node.type === 'file') {
-        Object.defineProperty(node, 'files', { value: [file], configurable: true });
-        setTimeout(() => node.dispatchEvent(new window.Event('change')) , 0);
-      }
-      return result;
-    };
-    widget._uploadCloud();
-    await new Promise(resolve => setTimeout(resolve, 20));
-    if (widget._list.length !== 1) throw new Error('附件未写入');
-    if (widget._list[0].url !== 'https://signed.example.com/image.png?token=123') {
-      throw new Error('未使用签名地址: ' + widget._list[0].url);
-    }
-    if (widget._list[0].object_key !== 'vb-prefix/uploads/raw.png') {
-      throw new Error('object_key 未保留: ' + widget._list[0].object_key);
-    }
-  });
+  await _assertAsync('AttachmentsWidget 原生选择结果保存为不可变 ArtifactRef',async()=>{
+ const dom=new JSDOM('<!doctype html><body><div id="mount"></div></body>',{runScripts:'dangerously',url:'http://localhost'}),window=dom.window,calls=[];
+ const ref={artifact_id:'artifact_'+'a'.repeat(32),version:1,media_type:'image/png',byte_size:12,sha256:'b'.repeat(64)};
+ window.electronAPI={invokeCapability:async(id,envelope)=>{calls.push({id,envelope});return {success:true,data:{ok:true,data:{artifacts:[{name:'demo.png',artifact_ref:ref}]}}};}};
+ window.AI00Business=require('../../web/core/business_facade').createBusinessFacade(window);
+ window.eval(fs.readFileSync(path.join(ROOT,'web/components/attachments_widget.js'),'utf8')+'\nwindow.AttachmentsWidget=AttachmentsWidget;');
+ const widget=new window.AttachmentsWidget({el:window.document.getElementById('mount'),attachments:[],isCloud:true,itemType:'task',itemGid:'gid-1',onSave(){},readonly:false});await widget._uploadCloud();
+ if(widget._list.length!==1||widget._list[0].artifact_ref.artifact_id!==ref.artifact_id)throw Error('附件未写入');
+ if(window.AI00Business.parseArtifactPath(widget._list[0].url).artifact_ref.artifact_id!==ref.artifact_id)throw Error('Artifact 预览引用错误');
+ if(calls[0].id!=='base.artifact.batch.import'||calls[0].envelope.native_io.select!=='attachment'||Object.keys(calls[0].envelope.payload).length)throw Error('原生选择边界错误');
+ });
 
   await _assertAsync('TC 导入路线创建版本后自动打开 Excel 导入步骤', async () => {
     const w = makeLifecyclePanelEnv();
@@ -1150,8 +1107,8 @@ async function runTests() {
 
   _assert('工艺规划调用契约脚本使用同一新缓存版本', (() => {
     const html = fs.readFileSync(path.join(ROOT, 'packages/craft-plugin/web/lineage_view/index.html'), 'utf-8');
-    return ['lineage_version_mgr.js', 'lifecycle_panel.js', 'lineage.js', 'layout_mode.js']
-      .every(name => html.includes(`${name}?v=20260901a`));
+    return ['lineage_version_mgr.js', 'lifecycle_panel.js', 'lineage_progressive_loader.js', 'lineage.js', 'layout_mode.js']
+      .every(name => html.includes(`${name}?v=20260914c`));
   })());
 
   _assert('布局脚本不覆盖主视图的能力调用函数', (() => {
@@ -1194,6 +1151,7 @@ async function runTests() {
     const gatewayActions = [];
     const toasts = [];
     w._cloudFetch = async (path, opts = {}) => {
+      if(path.endsWith('craft.bop.lifecycle.state.read:invoke'))return {success:true,data:{ok:true,data:{lifecycle_phase:'init'}}};
       const action = path.split(':').pop();
       gatewayActions.push(action);
       if (action === 'confirm') {
@@ -1450,6 +1408,32 @@ async function runTests() {
     const body = JSON.parse(calls[0].opts.body || '{}').payload || {};
     if (body.parent_gid !== 'station-1') throw new Error('parent_gid 未指向目标工位: ' + body.parent_gid);
     if (body.node_type !== 'process') throw new Error('复制节点类型错误: ' + body.node_type);
+  });
+
+  await _assertAsync('layout_mode 按实际变更程度渲染新增和修改底色', async () => {
+    const w = makeLayoutModeEnv();
+    if (w.getProcessCardPresentation({ entity_data: { modified_type: '修改' } }).changeClass !== 'll-process-change-modified') {
+      throw new Error('修改工序未映射到淡黄色样式');
+    }
+    if (w.getProcessCardPresentation({ entity_data: { modified_type: '新增' } }).changeClass !== 'll-process-change-added') {
+      throw new Error('新增工序未映射到淡红色样式');
+    }
+  });
+
+  await _assertAsync('layout_mode 序字颜色写入使用页内确认并完成 Gateway 握手', async () => {
+    const w = makeLayoutModeEnv();
+    const calls = [];
+    w._cf = async (url, opts = {}) => {
+      calls.push({ url, body: JSON.parse(opts.body || '{}') });
+      if (url.endsWith(':confirm')) return { success: true, data: { confirmation_token: 'confirm-seq' } };
+      if (calls.length === 1) return { success: true, data: { ok: false, error: { code: 'confirmation_required' } } };
+      return { success: true, data: { ok: true, data: { changed: true } } };
+    };
+    const value = await w.invokeLayoutCapability('craft.bop.entry.change.apply', {
+      operation: 'update', entry_gid: 'entry-1', properties: [{ name: 'sequence_color', value: 'red' }],
+    });
+    if (value.changed !== true || calls.length !== 3) throw new Error('序字颜色确认握手未完成');
+    if (calls[2].body.confirmation_token !== 'confirm-seq') throw new Error('确认令牌未用于最终写入');
   });
 
   await _assertAsync('layout_mode 切换版本时释放大画布状态', async () => {

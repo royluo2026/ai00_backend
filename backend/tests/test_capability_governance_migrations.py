@@ -59,7 +59,7 @@ def test_shared_test_apply_never_probes_or_writes_unprefixed_tables(missing_name
 
     connection = RecordingConnection()
     applied = migrate(connection, table_prefix="test_", externally_serialized=missing_named_lock)
-    assert len(applied) == 9
+    assert len(applied) == 10
     assert connection.statements[0][1] == ("ai00:capability-governance:test:v1:test_", 30)
     if not missing_named_lock:
         assert connection.statements[-1][1] == ("ai00:capability-governance:test:v1:test_",)
@@ -68,13 +68,14 @@ def test_shared_test_apply_never_probes_or_writes_unprefixed_tables(missing_name
     assert any(args == ("test_workmanship_base_capability_governance_migrations",)
                for _, args in connection.statements)
     assert sum(sql.startswith("INSERT INTO test_workmanship_base_capability_governance_migrations")
-               for sql, _ in connection.statements) == 9
+               for sql, _ in connection.statements) == 10
     for sql, args in connection.statements:
         assert not re.search(r"(?<![A-Za-z0-9_])workmanship_", sql)
         if "information_schema" in sql:
             assert args[0].startswith("test_workmanship_")
 
 EXPECTED_TABLES = {
+    "workmanship_base_capability_runtime_fence",
     "workmanship_base_capability_entries",
     "workmanship_base_capability_versions",
     "workmanship_base_capability_scan_runs",

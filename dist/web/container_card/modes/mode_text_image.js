@@ -21,12 +21,12 @@ window.ContainerModes['text_image'] = (() => {
 
   // ── 加载数据（复用 row_detail 逻辑）─────────────────────────────────────
   async function _load(itemType, gid, source, _cloudFetch) {
-    if (!_cloudFetch) throw new Error('未连接云端');
+    if (!window.AI00Business?.available()) throw new Error('未连接云端');
     let res;
-    if (itemType === 'task') res = await _cloudFetch(`/api/tasks/${gid}`, { method: 'GET' });
-    else if (itemType === 'issue') res = await _cloudFetch(`/api/issues/${gid}`, { method: 'GET' });
+    if (itemType === 'task') res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.read.atomic.tasks_get", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"gid":path.gid}}).arguments).filter(([k,v])=>v!=null||[].includes(k)))}}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
+    else if (itemType === 'issue') res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.read.atomic.issues_get", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"gid":path.gid}}).arguments).filter(([k,v])=>v!=null||[].includes(k)))}}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
     else if (itemType === 'knowledge') res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('knowledge.get', { gid });
-    else if (itemType === 'rule') res = await _cloudFetch(`/api/rules/${gid}`, { method: 'GET' });
+    else if (itemType === 'rule') res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.library.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"get",gid:path.gid}).filter(([,v])=>v!=null))}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
     else throw new Error(`不支持的条目类型: ${itemType}`);
     return res?.data || res || null;
   }
@@ -154,7 +154,7 @@ window.ContainerModes['text_image'] = (() => {
 
   function renderInCard(containerEl, params, ctx) {
     const { item_type = 'task', gid, source = 'local' } = params || {};
-    const cloudFetch = ctx?.cloudFetch || window.parent?._cloudFetch || window._cloudFetch || null;
+    const cloudFetch = ctx?.cloudFetch || window.AI00Business?.available() || window.AI00Business?.available() || null;
 
     if (!gid) {
       containerEl.innerHTML = '<div style="padding:12px;font-size:12px;color:var(--cc-muted,#6e6e6e)">未指定条目</div>';
@@ -180,7 +180,7 @@ window.ContainerModes['text_image'] = (() => {
     const item_type  = urlParams.get('item_type') || 'task';
     const gid        = urlParams.get('gid');
     const source     = urlParams.get('source') || 'local';
-    const cloudFetch = window._cloudFetch || window.parent?._cloudFetch || null;
+    const cloudFetch = window.AI00Business?.available() || window.AI00Business?.available() || null;
 
     if (!gid) { containerEl.innerHTML = '<div class="cc-empty">未指定条目 GID</div>'; return; }
 

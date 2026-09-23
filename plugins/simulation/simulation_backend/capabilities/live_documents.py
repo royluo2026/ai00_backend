@@ -39,6 +39,11 @@ REBIND_OUTPUT = obj(dict(workspace_gid=GID, document_gid=GID,
 ONLINE_BIND_OUTPUT = REBIND_OUTPUT
 ONLINE_BIND_INPUT_V2 = obj({k: v for k, v in ONLINE_BIND_INPUT['properties'].items() if k != 'identity_operation_id'})
 ONLINE_BIND_OUTPUT_V2 = obj({**ONLINE_BIND_OUTPUT['properties'], 'source_association_id': KEY})
+RESUME_INPUT = obj(dict(workspace_gid=GID, document_gid=GID, identity_operation_id=KEY,
+    expected_document_session=HASH, expected_workspace_row_version={'type':'integer','minimum':1},
+    idempotency_key=KEY))
+RESUME_OUTPUT = obj(dict(workspace_gid=GID, document_gid=GID, document_session=HASH,
+    source_association_id=KEY, workspace_row_version={'type':'integer','minimum':1}))
 INVENTORY_APPLY_INPUT = obj(dict(workspace_gid=GID, inventory_operation_id=KEY, idempotency_key=KEY))
 INVENTORY_APPLY_OUTPUT = obj(dict(workspace_gid=GID,
     imported_hierarchy_count={'type':'integer','minimum':0}, next_index={'type':['integer','null'],'minimum':0},
@@ -48,8 +53,9 @@ INVENTORY_APPLY_OUTPUT = obj(dict(workspace_gid=GID,
 
 
 class LiveDocumentProvider:
-    def __init__(self, connectors, workspaces=None, *, clock=lambda: datetime.now(UTC)):
+    def __init__(self, connectors, workspaces=None, *, clock=lambda: datetime.now(UTC), signer=None):
         self.connectors, self.workspaces, self.clock = connectors, workspaces or WorkspaceRepository(), clock
+        self.signer = signer
 
     @staticmethod
     def _scope(payload, context, schema):
@@ -126,6 +132,14 @@ class LiveDocumentProvider:
             raise CapabilityBusinessError(str(exc), str(exc)) from exc
         return self._output(result)
 
+    def resume_online(self, payload, context):
+        scope = self._scope(payload, context, RESUME_INPUT)
+        try:
+            result = self.workspaces.resume_online_live_document(**scope, **payload, now=self.clock())
+        except (ConnectorRepositoryError, WorkspaceRepositoryError) as exc:
+            raise CapabilityBusinessError(str(exc), str(exc)) from exc
+        return self._output(result)
+
     def bind_online(self, payload, context):
         scope = self._scope(payload, context, ONLINE_BIND_INPUT)
         try:
@@ -170,15 +184,40 @@ class LiveDocumentProvider:
             raise CapabilityBusinessError(str(exc), str(exc)) from exc
         return self._output(result)
 
+    def bind_online_v3(self, payload, context):
+        from backend.contracts.viewer_open_completion_v1 import OpenCompletionRequest, OpenCompletionResult
+        from ..application.viewer_interaction import authorize_interaction
+        from ..data.viewer_interaction_repository import ViewerInteractionRepository
+        scope = self._scope(payload, context, OpenCompletionRequest.model_json_schema())
+        try:
+            request = OpenCompletionRequest.model_validate(payload)
+            now = self.clock()
+
+            def complete(cursor, binding):
+                grant = authorize_interaction(context, dict(workspace_gid=request.workspace_gid,
+                    document_gid=request.document_gid, source_association_id=binding['source_association_id'],
+                    session_nonce=request.session_nonce, prior_grant_id=None),
+                    ViewerInteractionRepository(), self.signer, now, transaction=cursor,
+                    issuer=('simulation.environment.online_source.live_document.bind', 3))
+                return OpenCompletionResult(binding=binding, grant=grant).model_dump(mode='json')
+
+            result = self.workspaces.bind_online_live_document(**scope, **request.model_dump(),
+                now=now, complete_binding=complete)
+        except (ConnectorRepositoryError, WorkspaceRepositoryError, ValueError) as exc:
+            raise CapabilityBusinessError(str(exc), str(exc)) from exc
+        return self._output(result)
+
 
 def register_live_document_capabilities(registry, control_plane):
     from .provider import register
-    provider = LiveDocumentProvider(control_plane.repository, clock=control_plane.clock)
+    provider = LiveDocumentProvider(control_plane.repository, clock=control_plane.clock,
+        signer=getattr(control_plane, 'plan_signer', None))
     for name, version, description, risk, input_schema, output_schema, handler in (
         ('adopt', 1, 'Create or reuse a private importing environment for one authenticated native document.', CapabilityRisk.WRITE, ADOPT_INPUT_V1, ADOPT_OUTPUT_V1, provider.adopt_v1),
         ('adopt', 2, 'Create or reuse an importing environment and register its primary live VisMockup document.', CapabilityRisk.WRITE, ADOPT_INPUT, ADOPT_OUTPUT, provider.adopt),
         ('binding.get', 1, 'Resolve the owner-scoped environment binding of a native document or selected environment.', CapabilityRisk.READ, BINDING_INPUT, BINDING_OUTPUT, provider.binding),
         ('rebind', 1, 'Explicitly bind the selected environment to a freshly attested current native document session.', CapabilityRisk.WRITE, REBIND_INPUT, REBIND_OUTPUT, provider.rebind),
+        ('resume_online', 1, 'Reassociate an already-open Teamcenter document with the current runtime after signed native identity verification; never launch a model.', CapabilityRisk.WRITE, RESUME_INPUT, RESUME_OUTPUT, provider.resume_online),
         ('inventory.apply', 1, 'Persist one signed bounded alternate-hierarchy inventory page into its bound environment.', CapabilityRisk.WRITE, INVENTORY_APPLY_INPUT, INVENTORY_APPLY_OUTPUT, provider.apply_inventory),
     ):
         register(registry, CapabilitySpec(id='simulation.environment.live_document.'+name, owner='simulation', version=version,
@@ -203,3 +242,12 @@ def register_live_document_capabilities(registry, control_plane):
         risk=CapabilityRisk.WRITE, confirmation='user', permissions=('simulation.use',),
         input_schema=ONLINE_BIND_INPUT_V2, output_schema=ONLINE_BIND_OUTPUT_V2,
         tags=('simulation', 'teamcenter_online', 'live_document', 'experimental')), provider.bind_online_v2)
+    from backend.contracts.viewer_open_completion_v1 import OpenCompletionRequest, OpenCompletionResult
+    register(registry, CapabilitySpec(
+        id='simulation.environment.online_source.live_document.bind', owner='simulation', version=3,
+        description='Complete a verified current open and issue its signed local interaction grant atomically.',
+        use_when='Electron completes an owner-confirmed Teamcenter launch major 2.',
+        do_not_use_when='The signed open receipt or owner source scope is unavailable.',
+        risk=CapabilityRisk.WRITE, confirmation='user', permissions=('simulation.use',),
+        input_schema=OpenCompletionRequest.model_json_schema(), output_schema=OpenCompletionResult.model_json_schema(),
+        tags=('simulation', 'teamcenter_online', 'live_document', 'experimental')), provider.bind_online_v3)

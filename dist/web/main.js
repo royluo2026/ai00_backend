@@ -351,13 +351,13 @@ const LogPanel = (() => {
   }
 
   async function refresh() {
-    const _cloudFetch = window._cloudFetch?.bind(window);
+
     try {
       const lines = [];
 
       // 1. 后端服务日志（/admin/debug-logs）
-      if (window._cloudFetch) {
-        const res = await _cloudFetch('/admin/debug-logs?limit=200', { method: 'GET' }).catch(() => null);
+      if (window.AI00Business?.available()) {
+        const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.runtime.log.search", {version:1,payload:({limit:Number(query.get("limit")||200)})}); return result; })({},{},new URLSearchParams(('/admin/debug-logs?limit=200').split("?")[1]||"")).catch(() => null);
         if (res?.data) lines.push(...res.data.map(l => '[Backend] ' + l));
       }
 
@@ -529,9 +529,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 飞书模式下启动通知轮询（auth 状态就绪后触发）
   window.electronAPI?.onAuthStateChanged?.((state) => {
     // 更新全局 auth 状态（账户切换时确保 _authUser/_authMode 是最新值）
-    window._authMode  = state?.mode  || 'none';
-    window._authUser  = state?.user  || null;
-    window._authToken = state?.token || '';
+    AuthStateManager.publish(state || {});
     _renderAuthStatus(state);
     _addCrumb('auth', `登录状态: ${window._authMode}`);
     if (state?.mode === 'feishu') {
@@ -638,7 +636,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── 深链接处理 ─────────────────────────────────────────────────────────────────
 async function _handleDeepLink(url) {
-  const _cloudFetch = window._cloudFetch?.bind(window);
+
   if (!url) return;
   try {
     const u = new URL(url);
@@ -654,7 +652,7 @@ async function _handleDeepLink(url) {
     if (!match) return;
     const token = match[1];
     if (window._authMode !== 'feishu') return;
-    const data = await _cloudFetch(`/api/share-links/${token}`, { method: 'GET' });
+    const data = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.sharing.read.atomic.share_links_resolve", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:"share_links.resolve"}).arguments).filter(([k,v])=>v!=null||[].includes(k)))}}); return result; })({},{"token":decodeURIComponent(String(token))},new URLSearchParams());
     if (data.current_permission && data.current_permission !== 'none') {
       // 有权限直接打开
       if (data.target_type === 'list') {
@@ -691,15 +689,12 @@ function _showPermissionRequestDialog(token, displayName) {
   document.body.appendChild(dlg);
   dlg.querySelector('#_prd-cancel').onclick = () => dlg.remove();
   dlg.querySelector('#_prd-submit').onclick = async () => {
-    const _cloudFetch = window._cloudFetch?.bind(window);
+
     const btn = dlg.querySelector('#_prd-submit');
     const message = dlg.querySelector('#_prd-message').value.trim();
     btn.disabled = true; btn.textContent = '提交中...';
     try {
-      await _cloudFetch('/api/permission-requests', {
-        method: 'POST',
-        body: JSON.stringify({ target_type: 'list', target_gid: token, message }),
-      });
+      await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.permission_request.change.apply.atomic.permission_requests_create", {version:1,payload:{arguments:"permission_requests.create"}}); return result; })({ target_type: 'list', target_gid: token, message },{},new URLSearchParams());
       _showToast('申请已发送，等待 Owner 审批', 'success');
       dlg.remove();
     } catch (e) {
@@ -761,10 +756,10 @@ function _applyStatusbarFlags() {
 }
 
 async function _loadFeatureFlags() {
-  const _cloudFetch = window._cloudFetch?.bind(window);
+
   try {
-    if (window._cloudFetch) {
-      const res = await _cloudFetch('/admin/config/feature_flags', { method: 'GET' });
+    if (window.AI00Business?.available()) {
+      const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.runtime.feature_flags.get", {version:1,payload:({})}); return result; })({},{},new URLSearchParams());
       if (res?.data?.value) {
         const parsed = JSON.parse(res.data.value);
         Object.assign(window._featureFlags, parsed);
@@ -847,11 +842,12 @@ window._addCrumb = _addCrumb;
 let _healthCheckTimer = null;
 
 async function _runHealthCheck() {
-  const _cloudFetch = window._cloudFetch?.bind(window);
   const dot = document.getElementById('health-dot');
-  if (!dot || !window._cloudFetch) return;
+  if (!dot) return;
   try {
-    const r = await _cloudFetch('/health', { method: 'GET' });
+    const response = await fetch(`${await _getRuntimeBackendBase('')}/health`, { method: 'GET' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const r = await response.json();
     const ok = r?.status === 'ok';
     dot.style.background = ok ? '#a6e3a1' : '#f9e2af';
     dot.title = ok
@@ -1083,65 +1079,7 @@ window._showCaptureProgress = function(msg) {
   }
 };
 
-window._cloudFetch = async function(path, opts = {}) {
-  const config = (await window.electronAPI?.getConfig?.()) || {};
-  const state  = (await window.electronAPI?.authGetState?.()) || {};
-  const baseUrl = await _getRuntimeBackendBase(config.backendUrl || '');
-  const token = state.token || '';
-  const isFormData = typeof opts.body?.append === 'function';
-  const reqId = Math.random().toString(36).slice(2, 9);
-  const t0 = performance.now();
-  const method = opts.method || 'GET';
-  _addCrumb('api', `${method} ${path}`);
-  let res;
-  try {
-    res = await fetch(`${baseUrl}${path}`, {
-      ...opts,
-      headers: {
-        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-        ...(token ? { 'X-AI00-Token': token } : {}),
-        'X-Request-ID': reqId,
-        ...(opts.headers || {}),
-      },
-    });
-  } catch (networkErr) {
-    const ms = Math.round(performance.now() - t0);
-    dbg.error(`[API ${reqId}] 网络错误 ${method} ${path} ${ms}ms: ${networkErr.message}`);
-    _netPush({ reqId, method, path, status: 0, ms, ok: false, err: networkErr.message });
-    throw networkErr;
-  }
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    const detail = err.detail;
-    const msg = typeof detail === 'string' ? detail
-      : Array.isArray(detail) ? detail.map(e => e.msg || JSON.stringify(e)).join('; ')
-      : detail ? JSON.stringify(detail) : `HTTP ${res.status}`;
-    const ms = Math.round(performance.now() - t0);
-    if (res.status >= 500) {
-      dbg.error(`[API ${reqId}] ${method} ${path} → ${res.status} ${ms}ms: ${msg}`);
-    } else if (res.status >= 400 && res.status !== 401 && res.status !== 403) {
-      dbg.warn(`[API ${reqId}] ${method} ${path} → ${res.status} ${ms}ms: ${msg}`);
-    }
-    _netPush({ reqId, method, path, status: res.status, ms, ok: false, err: msg });
-    // token 失效，跳登录页（网页版）
-    if (res.status === 401 && window.electronAPI?._isElectron === false) {
-      localStorage.removeItem('ai00_token');
-      localStorage.removeItem('ai00_user');
-      window.location.href = '/web/login/';
-    }
-    throw new Error(msg);
-  }
-  if (res.status === 204 || res.headers.get('content-length') === '0') {
-    const ms = Math.round(performance.now() - t0);
-    if (ms > 2000) dbg.warn(`[API ${reqId}] 🐢 慢请求 ${method} ${path} ${ms}ms`);
-    _netPush({ reqId, method, path, status: res.status, ms, ok: true });
-    return null;
-  }
-  const ms = Math.round(performance.now() - t0);
-  if (ms > 2000) dbg.warn(`[API ${reqId}] 🐢 慢请求 ${method} ${path} ${ms}ms`);
-  _netPush({ reqId, method, path, status: res.status, ms, ok: true });
-  return res.json();
-};
+
 
 
 // ══════════════════════════════════════════════════════════════
@@ -1189,7 +1127,7 @@ const TaskTimeline = {
   },
 
   async _loadAll() {
-    const _cloudFetch = window._cloudFetch?.bind(window);
+
     if (window._authMode !== 'feishu') {
       this._tasks = []; this._overdueTasks = []; this._calEvents = []; return;
     }
@@ -1206,8 +1144,8 @@ const TaskTimeline = {
 
     // 并行拉取任务 + 飞书日历
     const [taskRes, calRes] = await Promise.allSettled([
-      _taskEnabled ? _cloudFetch(`/api/tasks?scheduled_date_from=${from30}&page_size=300`, { method: 'GET' }) : Promise.resolve({ data: [] }),
-      _feishuEnabled ? _cloudFetch('/feishu/calendar/today', { method: 'GET' }) : Promise.resolve({ data: [] }),
+      _taskEnabled ? (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.read.atomic.tasks_search", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"project_gid":(query.has("project_gid")?query.get("project_gid"):null),"status":(query.has("status")?query.get("status"):null),"list_gid":(query.has("list_gid")?query.get("list_gid"):null),"scheduled_date_from":(query.has("scheduled_date_from")?query.get("scheduled_date_from"):null),"q":(query.has("q")?query.get("q"):null),"page_size":(query.has("page_size")?Number(query.get("page_size")):null)}}).arguments).filter(([k,v])=>v!=null||["list_gid","project_gid","q","scheduled_date_from","status"].includes(k)))}}); return result; })({},{},new URLSearchParams((`/api/tasks?scheduled_date_from=${from30}&page_size=300`).split("?")[1]||"")) : Promise.resolve({ data: [] }),
+      _feishuEnabled ? (async (body,path,query) => { const result = await window.AI00Business.invoke("base.feishu.calendar.day.get", {version:1,payload:(query.get("date")?{date:query.get("date")}:{})}); return result; })({},{},new URLSearchParams()) : Promise.resolve({ data: [] }),
     ]);
 
     const all = taskRes.status === 'fulfilled' ? (taskRes.value?.data || []) : [];
@@ -1479,17 +1417,15 @@ const TaskTimeline = {
   },
 
   async _save(gid, fields) {
-    const _cloudFetch = window._cloudFetch?.bind(window);
+
     try {
-      await _cloudFetch(`/api/tasks/${gid}`, {
-        method: 'PUT', body: JSON.stringify({ gid, ...fields }),
-      });
+      await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.tasks_update", {version:2,payload:{arguments:{"gid":path.gid,"updates":window.AI00Business.workItemChanges(body)}}}); return result; })({ gid, ...fields },{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
       await this.refresh();
     } catch (err) { console.error('[TaskTimeline] save:', err); }
   },
 
   async _openEntries(task) {
-    const _cloudFetch = window._cloudFetch?.bind(window);
+
     let entries = [];
     try {
       const r = await window.AI00ExistingCapabilityClient.call('project.itemEntries.get', { itemGid: task.gid });

@@ -1604,25 +1604,22 @@ class WorkflowCanvas {
 
   /* ── 持久化（云端 REST API） ─────────────────────────────────────────── */
 
-  _cf() { return window.top?._cloudFetch || window._cloudFetch || null; }
+
 
   /** 保存画布到云端 DB。ownerGid 由调用方传入。*/
   async save(title, ownerGid = '', existingGid = null) {
-    const _cloudFetch = this._cf();
-    if (!_cloudFetch) { console.error('[WFC] _cloudFetch 未就绪'); return null; }
+
+    if (!window.AI00Business?.available()) { console.error('[WFC] _cloudFetch 未就绪'); return null; }
     const data = this.toJSON();
     data.title = title || data.title;
     try {
-      const res = await _cloudFetch('/api/canvases', {
-        method: 'POST',
-        body: JSON.stringify({
+      const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.canvas.change.apply", {version:1,payload:Object.fromEntries(Object.entries({operation:"save",gid:(body["gid"]??null),record:body}).filter(([,v])=>v!=null))}); return result; })({
           owner_gid: ownerGid,
           title: title || '未命名画布',
           data,
           gid: existingGid || null,
           is_shared: false,
-        }),
-      });
+        },{},new URLSearchParams());
       return res; // { gid, title, updated_at }
     } catch (e) {
       console.error('[WFC] save_canvas failed', e);
@@ -1632,10 +1629,10 @@ class WorkflowCanvas {
 
   /** 从云端 DB 加载指定 gid 的画布。*/
   async load(gid) {
-    const _cloudFetch = this._cf();
-    if (!_cloudFetch) return null;
+
+    if (!window.AI00Business?.available()) return null;
     try {
-      const res = await _cloudFetch(`/api/canvases/${gid}`, { method: 'GET' });
+      const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.canvas.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"get",gid:path.gid}).filter(([,v])=>v!=null))}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
       if (res?.data) this.fromJSON(res.data);
       return res;
     } catch (e) {
@@ -1646,10 +1643,10 @@ class WorkflowCanvas {
 
   /** 列出当前用户的画布存档。*/
   async listSaves(ownerGid = '') {
-    const _cloudFetch = this._cf();
-    if (!_cloudFetch) return [];
+
+    if (!window.AI00Business?.available()) return [];
     try {
-      const res = await _cloudFetch('/api/canvases', { method: 'GET' });
+      const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.canvas.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"list"}).filter(([,v])=>v!=null))}); return result; })({},{},new URLSearchParams());
       return res?.canvases || [];
     } catch (e) {
       console.error('[WFC] list_canvases failed', e);
@@ -1659,10 +1656,10 @@ class WorkflowCanvas {
 
   /** 删除指定 gid 的存档。*/
   async deleteSave(gid) {
-    const _cloudFetch = this._cf();
-    if (!_cloudFetch) return null;
+
+    if (!window.AI00Business?.available()) return null;
     try {
-      return await _cloudFetch(`/api/canvases/${gid}`, { method: 'DELETE' });
+      return await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.canvas.change.apply", {version:1,payload:Object.fromEntries(Object.entries({operation:"delete",gid:path.gid}).filter(([,v])=>v!=null))}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
     } catch (e) {
       console.error('[WFC] delete_canvas failed', e);
       return null;
@@ -1671,13 +1668,10 @@ class WorkflowCanvas {
 
   /** 切换共享状态。*/
   async toggleShared(gid, isShared) {
-    const _cloudFetch = this._cf();
-    if (!_cloudFetch) return null;
+
+    if (!window.AI00Business?.available()) return null;
     try {
-      return await _cloudFetch(`/api/canvases/${gid}/shared`, {
-        method: 'PATCH',
-        body: JSON.stringify({ is_shared: isShared }),
-      });
+      return await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.canvas.change.apply", {version:1,payload:Object.fromEntries(Object.entries({operation:"toggle_shared",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); return result; })({ is_shared: isShared },{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
     } catch (e) {
       console.error('[WFC] toggle_shared failed', e);
       return null;

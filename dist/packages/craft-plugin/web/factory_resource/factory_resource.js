@@ -25,16 +25,10 @@ let _currentList = null;
 let _allLists    = [];
 let _shell       = null;
 
-function _cf(method, path, opts = {}) {
-  return ListShell._cf(path, { ...opts, method });
-}
+
 
 async function _factoryInvoke(id, payload = {}) {
-  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ version: 1, payload }),
-  });
+  const response = await window.AI00Business.request(id, { version: 1, payload });
   const envelope = response?.data;
   if (response?.success !== true || envelope?.ok !== true) {
     const detail = envelope?.error || response?.error || {};

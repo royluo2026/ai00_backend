@@ -33,6 +33,10 @@ export function mountAi00Plugin(options: {
     warnings: [],
     correlation: { request_id: requestId, trace_id: null },
   });
+  const compatibleResult = (result: CapabilityResult): CapabilityResult & { success: boolean } => ({
+    ...result,
+    success: result.ok,
+  });
 
   const send = (message: object) => iframe.contentWindow?.postMessage(message, "*");
   const onMessage = async (event: MessageEvent) => {
@@ -42,14 +46,14 @@ export function mountAi00Plugin(options: {
     if (message.type === "ai00.plugin.ready") { ready = true; return; }
     if (message.type !== "ai00.plugin.invoke" || message.protocol !== 1 || typeof message.requestId !== "string") return;
     if (!granted.has(message.capabilityId)) {
-      send({ type: "ai00.plugin.response", requestId: message.requestId, channelToken, result: rejected(message.capabilityId, message.requestId, "capability_not_granted", "Capability was not approved for this mount session") });
+      send({ type: "ai00.plugin.response", requestId: message.requestId, channelToken, result: compatibleResult(rejected(message.capabilityId, message.requestId, "capability_not_granted", "Capability was not approved for this mount session")) });
       return;
     }
     try {
       const result = await options.invoke(message.capabilityId, message.payload ?? {});
-      send({ type: "ai00.plugin.response", requestId: message.requestId, channelToken, result });
+      send({ type: "ai00.plugin.response", requestId: message.requestId, channelToken, result: compatibleResult(result) });
     } catch (error) {
-      send({ type: "ai00.plugin.response", requestId: message.requestId, channelToken, result: rejected(message.capabilityId, message.requestId, "host_bridge_failed", error instanceof Error ? error.message : "Capability host bridge failed") });
+      send({ type: "ai00.plugin.response", requestId: message.requestId, channelToken, result: compatibleResult(rejected(message.capabilityId, message.requestId, "host_bridge_failed", error instanceof Error ? error.message : "Capability host bridge failed")) });
     }
   };
   window.addEventListener("message", onMessage);

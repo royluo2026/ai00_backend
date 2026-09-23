@@ -559,9 +559,9 @@ class RowEditModal {
     const countEl = this._el.overlay.querySelector('#remChangeLogCount');
     if (!listEl) return;
     listEl.textContent = '加载中…';
-    const fetch = window._cloudFetch || window.parent?._cloudFetch;
+    const fetch = window.AI00Business?.available() || window.AI00Business?.available();
     if (!fetch) { listEl.textContent = '（无云端连接）'; return; }
-    fetch(`/api/change-logs?item_type=${encodeURIComponent(itemType)}&item_gid=${encodeURIComponent(itemGid)}&limit=50`)
+    (async (body,path,query) => { const result = await window.AI00Business.invoke("project.change_log.search", {version:1,payload:({...Object.fromEntries(["item_type","item_gid","list_gid"].filter(key=>query.get(key)).map(key=>[key,query.get(key)])),limit:Number(query.get("limit")||100),offset:Number(query.get("offset")||0)})}); return new Response(JSON.stringify(result.logs),{status:200,headers:{"Content-Type":"application/json"}}); })({},{},new URLSearchParams((`/api/change-logs?item_type=${encodeURIComponent(itemType)}&item_gid=${encodeURIComponent(itemGid)}&limit=50`).split("?")[1]||""))
       .then(r => r.json())
       .then(rows => {
         if (!Array.isArray(rows) || rows.length === 0) {

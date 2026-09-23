@@ -15,44 +15,88 @@ const _collapsed = new Set(); // 已折叠的 gid
 let _schemaDiff  = null;   // schema-diff 缓存 {prop_gid → sync_status}
 
 // ── 工具 ──────────────────────────────────────────────────────────────────────
-const _cf = (method, path, opts = {}) => {
-  const fn = window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
-  if (!fn) throw new TypeError('_cloudFetch 未就绪');
-  return fn(path, { ...opts, method });
-};
+
 const _ONTOLOGY_SCHEMA_VERSION_KEY = 'ai00:ontology-schema-version';
+const _ONTOLOGY_DETAIL_VISIBILITY_KEY = 'ai00:ontology-detail-visibility';
 const _ONTOLOGY_IDENTIFIER_RE = /^[A-Za-z_][A-Za-z0-9_]*$/;
 const _ONTOLOGY_IDENTIFIER_HINT = '只能使用英文字母、数字和下划线，且不能以数字开头，例如 critical_process';
 const _isValidOntologyIdentifier = value => _ONTOLOGY_IDENTIFIER_RE.test(String(value ?? ''));
+const _normalizeOntologyBoolean = value => value === 0 || value === '0' || value === false ? false : value === 1 || value === '1' || value === true ? true : value;
 
-async function _invokeCapability(id, payload = {}) {
-  const requestBody = {
-    version: 1,
-    payload,
-    idempotency_key: `${id}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-  };
-  const request = (suffix, body) => _cf('POST', `/api/v1/capabilities/${id}:${suffix}`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  let response = await request('invoke', requestBody);
-  if (response?.data?.error?.code === 'confirmation_required') {
-    if (!window.confirm('确认提交这次本体结构变更？')) throw new Error('已取消变更');
-    const confirmation = await request('confirm', requestBody);
-    const token = confirmation?.data?.confirmation_token;
-    if (!token) throw new Error(`能力确认失败：${id}@1`);
-    response = await request('invoke', { ...requestBody, confirmation_token: token });
-  }
-  const envelope = response?.data;
-  if (response?.success !== true || envelope?.ok !== true) {
-    const detail = envelope?.error || response?.error || {};
-    throw new Error(detail.message || `能力调用失败：${id}@1`);
-  }
-  const value = envelope.data;
-  return value?.data !== undefined && Object.keys(value).length === 1 ? value.data : value;
+function _ontologyDetailVisibility() {
+  try { return JSON.parse(localStorage.getItem(_ONTOLOGY_DETAIL_VISIBILITY_KEY) || '{}') || {}; }
+  catch { return {}; }
 }
 
+function _saveOntologyDetailVisibility(gid, visible) {
+  const values = _ontologyDetailVisibility();
+  const key = String(gid);
+  if (values[key] === !!visible) return;
+  values[key] = !!visible;
+  localStorage.setItem(_ONTOLOGY_DETAIL_VISIBILITY_KEY, JSON.stringify(values));
+  localStorage.setItem(_ONTOLOGY_SCHEMA_VERSION_KEY, `${Date.now()}:${gid}`);
+}
+
+function _applyOntologyDetailVisibility(item) {
+  const gid = item?.gid || item?.stable_gid;
+  const values = _ontologyDetailVisibility();
+  return gid && Object.prototype.hasOwnProperty.call(values, gid)
+    ? { ...item, show_in_detail: values[gid] }
+    : item;
+}
+
+function _withoutOntologyDetailVisibility(value) {
+  const schemaValue = { ...value };
+  delete schemaValue.show_in_detail;
+  return schemaValue;
+}
+
+async function _invokeCapability(id, payload = {}) { return window.AI00Business.invoke(id, {version:['ontology.concept.get','ontology.concept.resolve','ontology.object.list','ontology.change.proposal.get','ontology.change.proposal.search','ontology.schema.change.apply'].includes(id)?2:1,payload}, async () => true); }
+
 let _activeReleaseGid = null;
+let _pendingOntologyChangesPromise = null;
+async function _pendingOntologyChanges() {
+  if (!_pendingOntologyChangesPromise) {
+    const userGid = window.top?._authUser?.gid || window.parent?._authUser?.gid || window._authUser?.gid || '';
+    _pendingOntologyChangesPromise = _invokeCapability('ontology.change.proposal.search', {})
+      .then(async result => {
+        const summaries = (result?.items || []).filter(item =>
+          item.status === 'review' && item.base_release_gid === _activeReleaseGid && (!userGid || item.author_gid === userGid));
+        const proposals = await Promise.all(summaries.map(item =>
+          _invokeCapability('ontology.change.proposal.get', { proposal_gid: item.proposal_gid })));
+        return proposals.reverse().flatMap(item => item?.changes || []);
+      })
+      .catch(error => { _pendingOntologyChangesPromise = null; throw error; });
+  }
+  return _pendingOntologyChangesPromise;
+}
+
+function _applyPendingConceptChanges(concept, changes) {
+  const result = { ...concept };
+  for (const kind of ['property', 'relation']) {
+    const key = kind === 'property' ? 'properties' : 'relations';
+    const values = [...(result[key] || [])];
+    for (const change of changes) {
+      if (!String(change.operation || '').startsWith(kind + '.')) continue;
+      const operation = String(change.operation).split('.')[1];
+      const value = { ...(change.value || {}) };
+      const owner = value.class_gid || value.domain_class_gid;
+      const index = values.findIndex(item => (item.gid || item.stable_gid) === change.stable_gid);
+      if (operation === 'add') {
+        if (owner === result.gid && index < 0) values.push({ ...value, gid: change.stable_gid, stable_gid: change.stable_gid, _pending_review: true });
+      } else if (operation === 'change' && index >= 0) {
+        values[index] = { ...values[index], ...value, _pending_review: true };
+      } else if (operation === 'deprecate' && index >= 0) values.splice(index, 1);
+      if (Object.prototype.hasOwnProperty.call(value, 'show_in_detail')) {
+        _saveOntologyDetailVisibility(change.stable_gid, value.show_in_detail);
+      }
+    }
+    result[key] = values;
+  }
+  result._pending_review_count = changes.filter(change => ['property.', 'relation.'].some(prefix => String(change.operation || '').startsWith(prefix))).length;
+  return result;
+}
+
 async function _submitOntologyChange(change) {
   if (!_activeReleaseGid) {
     const release = await _invokeCapability('ontology.release.get');
@@ -80,8 +124,9 @@ async function _submitOntologyChange(change) {
     base_release_gid: _activeReleaseGid,
     changes: [{ operation, stable_gid: stableGid, value, source_evidence: [] }],
   });
+  _pendingOntologyChangesPromise = null;
   localStorage.setItem(_ONTOLOGY_SCHEMA_VERSION_KEY, `${Date.now()}:${stableGid}`);
-  return result;
+  return { ...(result && typeof result === 'object' ? result : { result }), stable_gid: stableGid };
 }
 
 async function _listOntologyObjects(kinds) {
@@ -103,18 +148,26 @@ async function _getOntologyConcept(stableGid) {
   const value = await _invokeCapability('ontology.concept.get', {
     stable_gid: stableGid, kind: 'concept', view: 'schema',
   });
+  if (value?.release_gid) _activeReleaseGid = String(value.release_gid);
   const concept = value?.concept || value || {};
-  const normalize = (item) => ({
-    ...item,
-    gid: item.gid || item.stable_gid,
-    parent_gid: item.parent_gid || item.parent_stable_gid,
-    class_gid: item.class_gid || item.class_stable_gid,
-    range_class_gid: item.range_class_gid || item.range_stable_gid,
-  });
-  const result = normalize(concept);
+  const normalize = (item) => {
+    const result = {
+      ...item,
+      gid: item.gid || item.stable_gid,
+      parent_gid: item.parent_gid || item.parent_stable_gid,
+      class_gid: item.class_gid || item.class_stable_gid,
+      range_class_gid: item.range_class_gid || item.range_stable_gid,
+    };
+    if (Object.prototype.hasOwnProperty.call(result, 'show_in_detail')) {
+      result.show_in_detail = _normalizeOntologyBoolean(result.show_in_detail);
+    }
+    return _applyOntologyDetailVisibility(result);
+  };
+  let result = normalize(concept);
   for (const key of ['properties', 'relations', 'constraints', 'axioms', 'rules']) {
     if (Array.isArray(result[key])) result[key] = result[key].map(normalize);
   }
+  result = _applyPendingConceptChanges(result, await _pendingOntologyChanges());
   return result;
 }
 
@@ -443,6 +496,11 @@ function _bindInlineToggles(pane) {
       const api   = cb.dataset.api; // 'properties' | 'relations'
       const val   = cb.checked;
       try {
+        if (field === 'show_in_detail') {
+          _saveOntologyDetailVisibility(gid, val);
+          _fullData = null;
+          return;
+        }
         await _submitOntologyChange({
           change_type: api === 'properties' ? 'property.update' : 'relation.update',
           stable_gid: gid, after: { [field]: val },
@@ -1035,7 +1093,8 @@ function _showAddPropModal() {
     const enumValsRaw = overlay.querySelector('#nPropEnumValues')?.value.trim() || '';
     const enumVals = enumValsRaw ? enumValsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
     try {
-      await _submitOntologyChange({ change_type: 'property.create', after: {
+      const showInDetail = overlay.querySelector('#nPropShowDetail').checked;
+      const result = await _submitOntologyChange({ change_type: 'property.create', after: _withoutOntologyDetailVisibility({
         class_gid: _selectedGid, name, label_zh: overlay.querySelector('#nPropLabel').value.trim(),
         prop_kind: 'data', data_type: overlay.querySelector('#nPropType').value,
         enum_values: enumVals,
@@ -1045,9 +1104,9 @@ function _showAddPropModal() {
         mapped_column: mappedColumn || null,
         storage_hint: storageHint || null,
         field_config: fieldConfig,
-        show_in_detail: overlay.querySelector('#nPropShowDetail').checked,
         detail_order:   parseInt(overlay.querySelector('#nPropDetailOrder').value) || 99,
-      }});
+      })});
+      _saveOntologyDetailVisibility(result.stable_gid, showInDetail);
       overlay.remove(); _fullData = null; await _renderActiveTab(); _showToast('属性已添加', 'success');
     } catch (e) { _showToast('添加失败：' + e, 'error'); }
   });
@@ -1200,7 +1259,8 @@ function _showEditPropModal(prop) {
     const enumValsRaw = overlay.querySelector('#ePropEnumValues')?.value.trim() || '';
     const enumVals = enumValsRaw ? enumValsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
     try {
-      await _submitOntologyChange({ change_type: 'property.update', stable_gid: prop.gid, after: {
+      const showInDetail = overlay.querySelector('#ePropShowDetail').checked;
+      await _submitOntologyChange({ change_type: 'property.update', stable_gid: prop.gid, after: _withoutOntologyDetailVisibility({
         label_zh:      overlay.querySelector('#ePropLabel').value.trim(),
         data_type:     overlay.querySelector('#ePropType').value,
         enum_values:   enumVals,
@@ -1211,9 +1271,9 @@ function _showEditPropModal(prop) {
         mapped_column: mappedColumn || null,
         storage_hint:  eStorageHint,
         field_config:  eFieldConfig,
-        show_in_detail: overlay.querySelector('#ePropShowDetail').checked,
         detail_order:   parseInt(overlay.querySelector('#ePropDetailOrder').value) || 99,
-      }});
+      })});
+      _saveOntologyDetailVisibility(prop.gid, showInDetail);
       overlay.remove(); _fullData = null; await _renderActiveTab(); _showToast('属性已更新', 'success');
     } catch (e) { _showToast('保存失败：' + e, 'error'); }
   });
@@ -1362,12 +1422,13 @@ function _showAddRelModal(editRel = null) {
         domain_class_gid: _selectedGid,
         range_class_gid: overlay.querySelector('#nRelRange').value || null,
         is_functional: overlay.querySelector('#nRelFunc').checked,
-        show_in_detail: overlay.querySelector('#nRelShowDetail').checked,
         link_type_binding: name,  // name 即 link_type，用于详情面板匹配
       };
-      await _submitOntologyChange(editRel
+      const showInDetail = overlay.querySelector('#nRelShowDetail').checked;
+      const result = await _submitOntologyChange(editRel
         ? { change_type: 'relation.update', stable_gid: editRel.gid, after: change }
         : { change_type: 'relation.create', after: change });
+      _saveOntologyDetailVisibility(editRel?.gid || result.stable_gid, showInDetail);
       overlay.remove(); _fullData = null; await _renderActiveTab();
       _showToast(editRel ? '已更新' : '已添加', 'success');
       _refreshGraph();
@@ -1464,15 +1525,15 @@ function _showEditRuleModal(rule) {
     if (!name) { _showToast('规则名不能为空', 'warn'); return; }
     try {
       if (isNew) {
-        await _cf('POST', '/api/rules', { method: 'POST', body: JSON.stringify({
+        await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"create",record:{...{"code":"","rule_type":"process","enforcement_level":"advisory","status":"draft","share_scope":"team","list_gid":null,"context_class_gid":null,"rule_definition":{}},...body}}).filter(([,v])=>v!=null))}); return result; })({
           name, enforcement_level: level, status, expression,
           context_class_gid: _selectedGid,
-        })});
+        },{},new URLSearchParams());
         _showToast('规则已创建', 'success');
       } else {
-        await _cf('PATCH', `/api/rules/${rule.gid}`, { method: 'PATCH', body: JSON.stringify({
+        await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); return result; })({
           name, enforcement_level: level, status, expression,
-        })});
+        },{"gid":decodeURIComponent(String(rule.gid))},new URLSearchParams());
         _showToast('规则已更新', 'success');
       }
       overlay.remove(); _fullData = null; await _renderActiveTab();
@@ -1486,7 +1547,7 @@ async function _runRuleCheck(ruleGid, ruleName) {
   let context;
   try { context = JSON.parse(ctx); } catch { _showToast('JSON 格式错误', 'error'); return; }
   try {
-    const resp = await _cf('POST', '/api/rule-engine/check', { method: 'POST', body: JSON.stringify({ rule_gid: ruleGid, context }) });
+    const resp = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.engine.evaluate", {version:1,payload:Object.fromEntries(Object.entries({operation:"check",dry_run:true,rule_gid:body.rule_gid,context:body.context}).filter(([,v])=>v!=null))}); return result; })({ rule_gid: ruleGid, context },{},new URLSearchParams());
     const r = resp.result;
     _showToast(`结果：${r.toUpperCase()}${resp.message ? ' — ' + resp.message : ''}`,
       r === 'pass' ? 'success' : r === 'fail' ? 'error' : 'warn');

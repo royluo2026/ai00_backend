@@ -550,6 +550,12 @@
       "legacy_name": false
     },
     {
+      "table": "workmanship_base_capability_runtime_fence",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
       "table": "workmanship_base_capability_worker_leases",
       "owner": "base",
       "runtime_domain": "base",

@@ -30,6 +30,7 @@ public static class ViewerInteractionProtocol
             "install_grant"=>"grant", "resolve_nodes"=>"interaction_id source_nodes",
             "execute"=>"interaction_id sequence structure_epoch operation_id targets arguments",
             "query_request"=>"interaction_id queried_request_id", "close"=>"interaction_id",
+            "prepare_document"=>"interaction_id", "activate_document"=>"interaction_id",
             _=>throw new InvalidDataException("interaction_message_forbidden")};
         ProtocolV2Schema.Closed(value,"type request_id "+fields);
         ProtocolV2Schema.Text(value,"request_id","[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}");

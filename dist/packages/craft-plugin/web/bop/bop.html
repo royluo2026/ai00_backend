@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script src="/web/core/business_facade.js"></script>
   <meta charset="UTF-8" />
   <title>BOP 工艺清单</title>
   
@@ -124,77 +125,36 @@
     </div>
   </div>
 
-  <!-- ═══ BOP Fork Modal ═══ -->
+  <!-- ═══ Project BOP Repository Fork Modal ═══ -->
   <div id="modal-fork-bop" class="modal-overlay hidden">
-    <div class="modal modal-wide">
-      <div class="modal-title">BOP Fork / 克隆</div>
-
-      <!-- 来源版本 -->
-      <label>来源版本 <span class="req">*</span>
-        <select id="inp-fork-src-version">
-          <option value="">-- 选择来源 BOP 版本 --</option>
+    <div class="modal">
+      <div class="modal-title">主项目 BOP Fork</div>
+      <div style="font-size:12px;color:var(--color-text3);margin-bottom:12px">
+        仅超级管理员可从团队主空间的不可变版本创建另一个项目的主 BOP。
+      </div>
+      <label>来源团队不可变版本 <span class="req">*</span>
+        <select id="inp-fork-src-version" required>
+          <option value="">-- 选择来源不可变版本 --</option>
         </select>
       </label>
-
-      <div class="modal-section-sep"></div>
-
-      <!-- 目标版本 -->
-      <div class="modal-section-title">目标版本</div>
-      <label>版本标签 <span class="req">*</span>
-        <input id="inp-fork-tag" type="text" placeholder="如 V2.0、X12-Rev-A" />
-      </label>
-      <label>BOP名称（留空则继承来源）
-        <input id="inp-fork-bop-name" type="text" placeholder="如 X12总装整车BOP" />
-      </label>
-      <label>加入版本族
-        <select id="inp-fork-family">
-          <option value="">-- 自成新版本族 --</option>
+      <label>目标项目 <span class="req">*</span>
+        <select id="inp-fork-target-project" required>
+          <option value="">-- 选择尚未建立主 BOP 的项目 --</option>
         </select>
       </label>
-      <label>变更说明
-        <input id="inp-fork-change-note" type="text" placeholder="如 从X11 fork，适配X12新工位布局" />
-      </label>
-
-      <div class="modal-section-sep"></div>
-
-      <!-- 预设 -->
-      <div class="modal-section-title">Fork 预设</div>
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
-        <select id="inp-fork-preset" style="flex:1">
-          <option value="">-- 手动配置 --</option>
-          <optgroup label="系统预设">
-            <option value="__new_model">新车型衍生</option>
-            <option value="__iteration">版本迭代</option>
-            <option value="__structure">结构复制</option>
-            <option value="__full_clone">完整克隆</option>
-          </optgroup>
-          <optgroup id="fork-preset-custom-group" label="自定义预设"></optgroup>
+      <label>复制深度 <span class="req">*</span>
+        <select id="inp-fork-depth">
+          <option value="all">全部复制</option>
+          <option value="operation">复制到操作</option>
+          <option value="process">复制到工序</option>
+          <option value="role">复制到岗位</option>
+          <option value="station">复制到工位</option>
         </select>
-        <button id="btn-fork-save-preset" class="btn-ghost" style="white-space:nowrap">保存预设</button>
-        <button id="btn-fork-delete-preset" class="btn-ghost" style="display:none;white-space:nowrap">删除预设</button>
-      </div>
-
-      <div class="modal-section-sep"></div>
-
-      <!-- 节点类型过滤 -->
-      <div class="modal-section-title">
-        节点类型过滤
-        <span style="font-size:11px;color:var(--color-text3);margin-left:6px">不勾 = 全部类型</span>
-      </div>
-      <div id="fork-node-types" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
-
-      <div class="modal-section-sep"></div>
-
-      <!-- 字段规则 -->
-      <div class="modal-section-title">
-        字段规则
-        <span style="font-size:11px;color:var(--color-text3);margin-left:6px">inherit = 继承值，reset = 清空</span>
-      </div>
-      <div id="fork-field-rules" style="display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:10px"></div>
-
+      </label>
+      <div id="fork-plan-summary" style="min-height:32px;margin-top:10px;color:var(--color-text3);font-size:12px"></div>
       <div class="modal-actions">
         <button class="btn-ghost" data-close-modal="modal-fork-bop">取消</button>
-        <button id="btn-confirm-fork-bop" class="btn-primary">执行 Fork</button>
+        <button id="btn-confirm-fork-bop" class="btn-primary" disabled>预览并 Fork</button>
       </div>
     </div>
   </div>

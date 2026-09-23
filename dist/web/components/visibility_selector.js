@@ -44,16 +44,10 @@ window.VisibilitySelector = (() => {
   };
 
   const _esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  const _cf  = () => window._cloudFetch || window.top?._cloudFetch || window.parent?._cloudFetch;
+  const _cf  = () => window.AI00Business?.available() || window.AI00Business?.available() || window.AI00Business?.available();
 
   async function _invokeCapability(id, payload = {}) {
-    const _cloudFetch = _cf();
-    if (!_cloudFetch) throw new Error('云端服务未连接');
-    const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ version: 1, payload }),
-    });
+    const response = await window.AI00Business.request(id, { version: 1, payload });
     const envelope = response?.data;
     if (response?.success !== true || envelope?.ok !== true) {
       const detail = envelope?.error || response?.error || {};

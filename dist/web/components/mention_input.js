@@ -163,7 +163,7 @@
       if (!this._cf) return;
       _ensureDrop();
       try {
-        const res = await this._cf(`/users/search?q=${encodeURIComponent(q)}&limit=8`);
+        const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.identity.user.search", {version:1,payload:({query:query.get("q")||"",limit:Number(query.get("limit")||10)})}); return result; })({},{},new URLSearchParams((`/users/search?q=${encodeURIComponent(q)}&limit=8`).split("?")[1]||""));
         if (_currentMI !== this) return;   // 已被其他实例接管
         const users = res?.data || [];
         this._showDrop(users);

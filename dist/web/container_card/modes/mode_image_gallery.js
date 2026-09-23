@@ -24,9 +24,9 @@ window.ContainerModes['image_gallery'] = (() => {
   async function _loadAnn(key) {
     if (!key) return {};
     try {
-      const _cloudFetch = window.parent?._cloudFetch || window._cloudFetch;
+      const _cloudFetch = window.AI00Business?.available() || window.AI00Business?.available();
       if (_cloudFetch) {
-        const resp = await _cloudFetch(`/api/annotations/${encodeURIComponent(key)}`, { method: 'GET' });
+        const resp = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.workbench.read.atomic.annotations_get", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"key":path.key}}).arguments).filter(([k,v])=>v!=null||[].includes(k)))}}); return result; })({},{"key":decodeURIComponent(String(encodeURIComponent(key)))},new URLSearchParams());
         if (resp?.data) return resp.data;
       }
     } catch (_) {}
@@ -40,12 +40,9 @@ window.ContainerModes['image_gallery'] = (() => {
     try { localStorage.setItem(key, JSON.stringify(data)); } catch (_) {}
     // 异步持久化到 DB
     try {
-      const _cloudFetch = window.parent?._cloudFetch || window._cloudFetch;
+      const _cloudFetch = window.AI00Business?.available() || window.AI00Business?.available();
       if (_cloudFetch) {
-        await _cloudFetch(`/api/annotations/${encodeURIComponent(key)}`, {
-          method: 'PUT',
-          body: JSON.stringify({ data }),
-        });
+        await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.workbench.change.apply.atomic.annotations_put", {version:1,payload:{arguments:{"key":path.key,"data":body.data}}}); return result; })({ data },{"key":decodeURIComponent(String(encodeURIComponent(key)))},new URLSearchParams());
       }
     } catch (_) {}
   }

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script src="/web/core/business_facade.js"></script>
   <meta charset="UTF-8">
   <title>AI 操作审计</title>
   <script src="/web/icons.js"></script>
@@ -121,19 +122,16 @@ async function _fetchLogs() {
     const params = new URLSearchParams({ limit: 500, offset: 0 });
     if (_writesOnly) params.set('is_write', 'true');
     // Prefer window.top._cloudFetch (handles auth automatically)
-    const _cloudFetch = window.top?._cloudFetch || window.parent?._cloudFetch;
+    const _cloudFetch = window.AI00Business?.available() || window.AI00Business?.available();
     if (_cloudFetch) {
-      const data = await _cloudFetch(`/api/ai/audit-logs?${params}`, { method: 'GET' });
+      const data = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.audit.read", {version:1,payload:Object.fromEntries(Object.entries({"session_gid":(query.has("session_gid")?query.get("session_gid"):null),"user_gid":(query.has("user_gid")?query.get("user_gid"):null),"tool_name":(query.has("tool_name")?query.get("tool_name"):null),"is_write":(query.has("is_write")?query.get("is_write"):null),"limit":(query.has("limit")?Number(query.get("limit")):null),"offset":(query.has("offset")?Number(query.get("offset")):null)}).filter(([,v])=>v!=null))}); return ((result!==null&&typeof result==='object'&&!Array.isArray(result))?(result["data"]??result):result); })({},{},new URLSearchParams((`/api/ai/audit-logs?${params}`).split("?")[1]||""));
       return data.logs || [];
     }
 
     // Fallback: manual fetch with token
     const token = window.top?._authToken || window.parent?.parent?._authToken || window.parent?._authToken || '';
     const baseUrl = 'http://127.0.0.1:8080';
-    const resp = await fetch(`${baseUrl}/api/ai/audit-logs?${params}`, {
-      method: 'GET',
-      headers: token ? { 'X-AI00-Token': token } : { 'X-AI00-Token': '' },
-    });
+    const resp = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.audit.search", {version:1,payload:({...Object.fromEntries(["session_gid","user_gid","tool_name","is_write"].filter(key=>query.has(key)).map(key=>[key,query.get(key)])),limit:Number(query.get("limit")||50),offset:Number(query.get("offset")||0)})}); return new Response(JSON.stringify(result),{status:200,headers:{"Content-Type":"application/json"}}); })({},{},new URLSearchParams((`${baseUrl}/api/ai/audit-logs?${params}`).split("?")[1]||""));
     if (!resp.ok) {
       console.error('[ai_audit] fetch failed', resp.status, await resp.text());
       return [];

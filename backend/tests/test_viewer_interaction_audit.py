@@ -46,7 +46,7 @@ def append(case, batch, now=NOW):
     return case.repository.append_events(batch, pins=case.pins, now=now)
 
 
-@pytest.mark.parametrize('change', ['missing', 'tampered', 'signed-digest', 'wrong-operation'])
+@pytest.mark.parametrize('change', ['missing', 'tampered', 'signed-digest', 'wrong-operation', 'issuer', 'issuer-hash'])
 def test_audit_requires_untampered_persisted_grant_operation(audit_case, signing, change):
     case = audit_case
     with case.connect() as conn, conn.cursor() as cur:
@@ -59,6 +59,11 @@ def test_audit_requires_untampered_persisted_grant_operation(audit_case, signing
             proof = json.loads(cur.fetchone()['proof_json'])
             if change == 'signed-digest':
                 proof['signed_grant']['document_gid'] = '21'
+            elif change in ('issuer', 'issuer-hash'):
+                if change == 'issuer':
+                    proof['authorization_descriptor']['major_version'] = 99
+                else:
+                    proof['authorization_business_definition_hash'] = 'sha256:' + '0'*64
             else:
                 unsigned = proof['signed_grant']
                 unsigned.pop('signature')

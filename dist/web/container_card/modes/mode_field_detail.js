@@ -59,23 +59,23 @@ window.ContainerModes['field_detail'] = (() => {
 
   // ── 加载条目数据 ──────────────────────────────────────────────────────────
   async function _fetchItem(itemType, gid, source, cloudFetch) {
-    const _cloudFetch = cloudFetch || window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
-    if (!_cloudFetch) return null;
+
+    if (!window.AI00Business?.available()) return null;
     let resp;
-    if (itemType === 'task') resp = await _cloudFetch(`/api/tasks/${gid}`, { method: 'GET' });
-    else if (itemType === 'issue') resp = await _cloudFetch(`/api/issues/${gid}`, { method: 'GET' });
+    if (itemType === 'task') resp = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.read.atomic.tasks_get", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"gid":path.gid}}).arguments).filter(([k,v])=>v!=null||[].includes(k)))}}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
+    else if (itemType === 'issue') resp = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.read.atomic.issues_get", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"gid":path.gid}}).arguments).filter(([k,v])=>v!=null||[].includes(k)))}}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
     else if (itemType === 'knowledge') resp = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('knowledge.get', { gid });
-    else if (itemType === 'rule') resp = await _cloudFetch(`/api/rules/${gid}`, { method: 'GET' });
+    else if (itemType === 'rule') resp = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.library.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"get",gid:path.gid}).filter(([,v])=>v!=null))}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
     else throw new Error(`不支持的条目类型: ${itemType}`);
     return resp?.data || resp;
   }
 
   // ── 保存字段 ─────────────────────────────────────────────────────────────
   async function _saveField(itemType, gid, field, value, source, cloudFetch, currentItem) {
-    const _cloudFetch = cloudFetch || window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
-    if (!_cloudFetch) return;
-    if (itemType === 'task') return _cloudFetch(`/api/tasks/${gid}`, { method: 'PUT', body: JSON.stringify({ [field]: value }) });
-    if (itemType === 'issue') return _cloudFetch(`/api/issues/${gid}`, { method: 'PUT', body: JSON.stringify({ [field]: value }) });
+
+    if (!window.AI00Business?.available()) return;
+    if (itemType === 'task') return (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.tasks_update", {version:2,payload:{arguments:{"gid":path.gid,"updates":window.AI00Business.workItemChanges(body)}}}); return result; })({ [field]: value },{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
+    if (itemType === 'issue') return (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.change.apply.atomic.issues_update", {version:2,payload:{arguments:{"gid":path.gid,"updates":window.AI00Business.workItemChanges(body)}}}); return result; })({ [field]: value },{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
     if (itemType === 'knowledge') return (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('knowledge.update', { gid, updates: { [field]: value } });
     if (itemType === 'rule') return _saveRuleDefinition(currentItem, field, value);
     throw new Error(`不支持的条目类型: ${itemType}`);
@@ -283,7 +283,7 @@ window.ContainerModes['field_detail'] = (() => {
     const gid      = urlParams.gid || '';
     const field    = urlParams.field || 'description';
     const source   = urlParams.source || 'local';
-    const cloudFetch = typeof _cf === 'function' ? _cf() : null;
+    const cloudFetch = null;
 
     containerEl.style.cssText = 'height:100%;overflow:hidden;';
     _buildEditor(containerEl, itemType, gid, field, source, cloudFetch, false);

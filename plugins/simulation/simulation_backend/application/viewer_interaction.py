@@ -11,7 +11,11 @@ OPERATION_CAPABILITIES = {
 }
 
 
-def catalog_binding(context, operations):
+AUTHORIZATION_ISSUERS = frozenset({('simulation.viewer.interaction.authorize', 1),
+    ('simulation.environment.online_source.live_document.bind', 3)})
+
+
+def catalog_binding(context, operations, *, issuer=('simulation.viewer.interaction.authorize', 1)):
     from backend.capability_v2.gateway import get_default_gateway
     try:
         release_id = context.catalog_release
@@ -20,7 +24,9 @@ def catalog_binding(context, operations):
         release = get_default_gateway().catalog(release_id)
         if release.release_id != release_id:
             raise ValueError('release mismatch')
-        authorization = release.descriptor('simulation.viewer.interaction.authorize', 1)
+        if issuer not in AUTHORIZATION_ISSUERS:
+            raise ValueError('unsupported issuer')
+        authorization = release.descriptor(*issuer)
         if (authorization is None or authorization.capability_version_gid != context.capability_version_gid
             or business_definition_hash(authorization) != context.business_definition_hash):
             raise ValueError('authorization mismatch')
@@ -43,7 +49,8 @@ def catalog_binding(context, operations):
         raise ValueError('interaction_catalog_binding_unavailable') from exc
 
 
-def authorize_interaction(context, request, repository, signer, now):
+def authorize_interaction(context, request, repository, signer, now, *, transaction=None,
+                          issuer=('simulation.viewer.interaction.authorize', 1)):
     if context.source != 'web' or not context.user_gid or not context.team_gid:
         raise ValueError('interaction_scope_denied')
     request = AuthorizeRequest.model_validate(request)
@@ -54,8 +61,8 @@ def authorize_interaction(context, request, repository, signer, now):
     from ..capabilities.connector_runtime import DIRECT_VISMOCKUP_OPERATIONS
     operations = [dict(id=op, contract_hash=digest) for op, digest in
                   (DIRECT_VISMOCKUP_OPERATIONS[name] for name in ('node_visibility', 'node_selection'))]
-    proof = catalog_binding(context, operations)
-    with repository.authorize_scope(context, request, now, evidence=proof) as scope:
+    proof = catalog_binding(context, operations, issuer=issuer)
+    with repository.authorize_scope(context, request, now, evidence=proof, transaction=transaction) as scope:
         grant = signer.sign_interaction_grant(dict(**scope, protocol=PROTOCOL,
             operations=operations, policy_version='viewer-interaction-v1', audience='ai00.connector.viewer-interaction'))
         proof['signed_grant'] = grant.model_dump(mode='json')

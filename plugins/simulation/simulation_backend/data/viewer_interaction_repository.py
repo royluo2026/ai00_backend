@@ -1,5 +1,5 @@
 """Low-frequency source authorization. Never used by a local control click."""
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from datetime import timedelta
 import uuid
 import hashlib
@@ -74,6 +74,13 @@ class ViewerInteractionRepository:
                 raise ValueError('missing proof')
             proof = json.loads(row['proof_json']) if isinstance(row['proof_json'], str) else row['proof_json']
             signed = SignedGrant.model_validate(proof['signed_grant'])
+            from backend.capability_v2.contracts import CapabilityDescriptorV2
+            from backend.capability_v2.business_definition import business_definition_hash
+            from ..application.viewer_interaction import AUTHORIZATION_ISSUERS
+            issuer = CapabilityDescriptorV2.model_validate(proof['authorization_descriptor'])
+            if ((issuer.id, issuer.major_version) not in AUTHORIZATION_ISSUERS
+                or business_definition_hash(issuer) != proof['authorization_business_definition_hash']):
+                raise ValueError('issuer proof mismatch')
             if (hashlib.sha256(canonicalize_v2(proof)).hexdigest() != row['proof_digest']
                 or proof['signed_grant_digest'] != 'sha256:' + hashlib.sha256(canonicalize_v2(signed)).hexdigest()
                 or not row['authorization_operation_id']
@@ -112,9 +119,10 @@ class ViewerInteractionRepository:
         return association_id
 
     @contextmanager
-    def authorize_scope(self, context, request, now, *, allocate=True, evidence=None):
+    def authorize_scope(self, context, request, now, *, allocate=True, evidence=None, transaction=None):
         """Keep locks and generation allocation through signing; failures roll back."""
-        with self.connect() as conn, conn.cursor() as cur:
+        with (self.connect() if transaction is None else nullcontext()) as conn, \
+                (conn.cursor() if transaction is None else nullcontext(transaction)) as cur:
             cur.execute('SELECT status FROM workmanship_sim_workspaces WHERE gid=%s '
                 'AND tenant_gid=%s AND owner_gid=%s AND removed_at IS NULL FOR UPDATE',
                 (request.workspace_gid, context.team_gid, context.user_gid))

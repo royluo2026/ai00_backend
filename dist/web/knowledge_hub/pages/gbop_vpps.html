@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script src="/web/core/business_facade.js"></script>
 <meta charset="UTF-8">
 <title>VPPS 管理</title>
 
@@ -209,7 +210,7 @@ function _cf() {
   try {
     let w = window;
     for (let i = 0; i < 6; i++) {
-      if (w._cloudFetch) return w._cloudFetch;
+      if (window.AI00Business?.available()) return window.AI00Business?.available();
       if (w.parent === w) break;
       w = w.parent;
     }
@@ -251,7 +252,7 @@ const SECTIONS = {
     addLabel: '新建零件名',
 
     async load(_cloudFetch) {
-      const r = await _cloudFetch('/api/craft_lib/part_names', { method: 'GET' });
+      const r = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"part_names.list",q:(query.has("q")?query.get("q"):null)}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result.items??[])}; })({},{},new URLSearchParams());
       return r?.data || [];
     },
 
@@ -339,9 +340,9 @@ const SECTIONS = {
       };
     },
 
-    async create(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/part_names', { method:'POST', body: JSON.stringify(body) }); },
-    async update(_cloudFetch, gid, body) { return _cloudFetch(`/api/craft_lib/part_names/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
-    async remove(_cloudFetch, gid) { return _cloudFetch(`/api/craft_lib/part_names/${gid}`, { method:'DELETE' }); },
+    async create(_cloudFetch, body) { return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"part_names.create",record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{},new URLSearchParams()); },
+    async update(_cloudFetch, gid, body) { return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"part_names.update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{"gid":decodeURIComponent(String(gid))},new URLSearchParams()); },
+    async remove(_cloudFetch, gid) { return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"part_names.delete",gid:path.gid}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams()); },
 
     buildImportBody(row) {
       const raw = row._raw || row;
@@ -379,32 +380,8 @@ const SECTIONS = {
     importRequiredFn(body) {
       return !!(body.vpps_description || body.vpps_desc_cn || body.vpps);
     },
-    async importOne(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/part_names', { method:'POST', body: JSON.stringify(body) }); },
-    async importMany(_cloudFetch, items) {
-      const payload = { operation:'part_names.bulk_import', items, conflict:'skip' };
-      const idempotencyKey = `vpps-part-import:${crypto.randomUUID()}`;
-      const confirmation = await _cloudFetch('/api/v1/capabilities/craft.library.change.apply:confirm', {
-        method:'POST',
-        body: JSON.stringify({ version:1, payload, idempotency_key:idempotencyKey }),
-      });
-      const confirmationToken = confirmation?.data?.confirmation_token || confirmation?.confirmation_token;
-      if (!confirmationToken) throw new Error('Gateway 未返回导入确认令牌');
-      const response = await _cloudFetch('/api/v1/capabilities/craft.library.change.apply:invoke', {
-        method:'POST',
-        body: JSON.stringify({
-          version:1,
-          payload,
-          idempotency_key:idempotencyKey,
-          confirmation_token:confirmationToken,
-        }),
-      });
-      const result = response?.data?.ok !== undefined ? response.data : response;
-      if (result?.ok !== true) {
-        const detail = result?.error || response?.error || {};
-        throw new Error(detail.message || detail.code || 'Capability 导入失败');
-      }
-      return result.data || {};
-    },
+    async importOne(_cloudFetch, body) { return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"part_names.create",record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{},new URLSearchParams()); },
+    async importMany(_cloudFetch, items) { throw new Error('Capability unavailable: part_names.bulk_import has no registered business handler'); },
   },
 
   // ── 标准件规格（fastener_spec） ───────────────────────────────
@@ -413,7 +390,7 @@ const SECTIONS = {
     addLabel: '新建标准件',
 
     async load(_cloudFetch) {
-      const r = await _cloudFetch('/api/craft_lib/fasteners', { method: 'GET' });
+      const r = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"fasteners.list"}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result.items??[])}; })({},{},new URLSearchParams());
       return r?.data || [];
     },
 
@@ -511,9 +488,9 @@ const SECTIONS = {
       };
     },
 
-    async create(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/fasteners', { method:'POST', body: JSON.stringify(body) }); },
-    async update(_cloudFetch, gid, body) { return _cloudFetch(`/api/craft_lib/fasteners/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
-    async remove(_cloudFetch, gid) { return _cloudFetch(`/api/craft_lib/fasteners/${gid}`, { method:'DELETE' }); },
+    async create(_cloudFetch, body) { return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"fasteners.create",record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{},new URLSearchParams()); },
+    async update(_cloudFetch, gid, body) { return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"fasteners.update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{"gid":decodeURIComponent(String(gid))},new URLSearchParams()); },
+    async remove(_cloudFetch, gid) { return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"fasteners.delete",gid:path.gid}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams()); },
 
     buildImportBody(row) {
       return {
@@ -531,7 +508,7 @@ const SECTIONS = {
         first_vehicle: row.first_vehicle || '',
       };
     },
-    async importOne(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/fasteners', { method:'POST', body: JSON.stringify(body) }); },
+    async importOne(_cloudFetch, body) { return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"fasteners.create",record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{},new URLSearchParams()); },
   },
 
   // ── VPPS Tools（工具模板） ──────────────────────────────────────
@@ -540,7 +517,7 @@ const SECTIONS = {
     addLabel: '新建工具',
 
     async load(_cloudFetch) {
-      const r = await _cloudFetch('/api/craft_lib/tools', { method: 'GET' });
+      const r = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"tools.list"}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result.items??[])}; })({},{},new URLSearchParams());
       return r?.data || [];
     },
 
@@ -671,9 +648,9 @@ const SECTIONS = {
       };
     },
 
-    async create(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/tools', { method:'POST', body: JSON.stringify(body) }); },
-    async update(_cloudFetch, gid, body) { return _cloudFetch(`/api/craft_lib/tools/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
-    async remove(_cloudFetch, gid) { return _cloudFetch(`/api/craft_lib/tools/${gid}`, { method:'DELETE' }); },
+    async create(_cloudFetch, body) { return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"tools.create",record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{},new URLSearchParams()); },
+    async update(_cloudFetch, gid, body) { return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"tools.update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{"gid":decodeURIComponent(String(gid))},new URLSearchParams()); },
+    async remove(_cloudFetch, gid) { return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"tools.delete",gid:path.gid}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams()); },
 
     buildImportBody(row) {
       return {
@@ -696,7 +673,7 @@ const SECTIONS = {
         extension_cad_no: row.extension_cad_no || '',
       };
     },
-    async importOne(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/tools', { method:'POST', body: JSON.stringify(body) }); },
+    async importOne(_cloudFetch, body) { return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"tools.create",record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{},new URLSearchParams()); },
   },
 
   // ── VPPS Fixtures（工装模板） ───────────────────────────────────
@@ -705,7 +682,7 @@ const SECTIONS = {
     addLabel: '新建工装',
 
     async load(_cloudFetch) {
-      const r = await _cloudFetch('/api/craft_lib/fixtures', { method: 'GET' });
+      const r = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"fixtures.list"}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result.items??[])}; })({},{},new URLSearchParams());
       return r?.data || [];
     },
 
@@ -744,14 +721,14 @@ const SECTIONS = {
       return { name, category: _val('fFixtureCat').trim(), spec };
     },
 
-    async create(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/fixtures', { method:'POST', body: JSON.stringify(body) }); },
-    async update(_cloudFetch, gid, body) { return _cloudFetch(`/api/craft_lib/fixtures/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
+    async create(_cloudFetch, body) { return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"fixtures.create",record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{},new URLSearchParams()); },
+    async update(_cloudFetch, gid, body) { return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"fixtures.update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{"gid":decodeURIComponent(String(gid))},new URLSearchParams()); },
     buildImportBody(row) {
       let spec = {};
       if (row.spec) { try { spec = typeof row.spec === 'string' ? JSON.parse(row.spec) : row.spec; } catch (_) {} }
       return { name: row.name || '', category: row.category || '', spec };
     },
-    async importOne(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/fixtures', { method:'POST', body: JSON.stringify(body) }); },
+    async importOne(_cloudFetch, body) { return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"fixtures.create",record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{},new URLSearchParams()); },
   },
 
   // ── VPPS Equipments（设备模板） ─────────────────────────────────
@@ -760,7 +737,7 @@ const SECTIONS = {
     addLabel: '新建设备',
 
     async load(_cloudFetch) {
-      const r = await _cloudFetch('/api/craft_lib/equipments', { method: 'GET' });
+      const r = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"equipments.list"}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result.items??[])}; })({},{},new URLSearchParams());
       return r?.data || [];
     },
 
@@ -799,14 +776,14 @@ const SECTIONS = {
       return { name, category: _val('fEquipCat').trim(), spec };
     },
 
-    async create(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/equipments', { method:'POST', body: JSON.stringify(body) }); },
-    async update(_cloudFetch, gid, body) { return _cloudFetch(`/api/craft_lib/equipments/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
+    async create(_cloudFetch, body) { return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"equipments.create",record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{},new URLSearchParams()); },
+    async update(_cloudFetch, gid, body) { return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"equipments.update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{"gid":decodeURIComponent(String(gid))},new URLSearchParams()); },
     buildImportBody(row) {
       let spec = {};
       if (row.spec) { try { spec = typeof row.spec === 'string' ? JSON.parse(row.spec) : row.spec; } catch (_) {} }
       return { name: row.name || '', category: row.category || '', spec };
     },
-    async importOne(_cloudFetch, body) { return _cloudFetch('/api/craft_lib/equipments', { method:'POST', body: JSON.stringify(body) }); },
+    async importOne(_cloudFetch, body) { return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"equipments.create",record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{},new URLSearchParams()); },
   },
 };
 
@@ -833,13 +810,27 @@ function _resourceRole() {
 }
 const _canManageResourceRequirements = () => canManageResources(_resourceRole());
 const _resourceRows = response => Array.isArray(response) ? response : (response?.data || response?.items || []);
+async function _loadAllResourceRequirements(_cloudFetch, resourceType) {
+  const rows = [], seenCursors = new Set();
+  let cursor = null;
+  do {
+    const cursorQuery = cursor ? `&cursor=${encodeURIComponent(cursor)}` : '';
+    const response = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.resource_requirement.search", {version:1,payload:Object.fromEntries(Object.entries({...{...{...{"status":(query.has("status")?query.get("status"):"active"),"page_size":(query.has("page_size")?Number(query.get("page_size")):100)},...((query.has("resource_type")?query.get("resource_type"):null)?{"resource_type":(query.has("resource_type")?query.get("resource_type"):null)}:{})},...((query.has("q")?query.get("q"):null)?{"q":(query.has("q")?query.get("q"):null)}:{})},...((query.has("cursor")?query.get("cursor"):null)?{"cursor":(query.has("cursor")?query.get("cursor"):null)}:{})}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result["items"]??[]),"next_cursor":(result["next_cursor"]??null)}; })({},{},new URLSearchParams((`/api/craft/resource-requirements?resource_type=${encodeURIComponent(resourceType)}&page_size=200${cursorQuery}`).split("?")[1]||""));
+    rows.push(..._resourceRows(response));
+    const nextCursor = response?.next_cursor || null;
+    if (!nextCursor || seenCursors.has(nextCursor)) break;
+    seenCursors.add(nextCursor);
+    cursor = nextCursor;
+  } while (cursor);
+  return rows;
+}
 function _resourceRequirementSection(section) {
   const resourceType = resourceTypeForSection(section);
   const title = RESOURCE_SECTION_TITLES[section];
   return {
     title, desc: `${title}标准库`, addLabel: '新建资源',
     async load(_cloudFetch) {
-      return _resourceRows(await _cloudFetch(`/api/craft/resource-requirements?resource_type=${resourceType}`, { method: 'GET' }));
+      return _loadAllResourceRequirements(_cloudFetch, resourceType);
     },
     formHtml() {
       return `<div class="md-form-grid"><div class="md-field"><label>代号 *</label><input id="fResourceCode" type="text"></div><div class="md-field"><label>名称 *</label><input id="fResourceName" type="text"></div><div class="md-field full"><label>属性（JSON）</label><textarea id="fResourceAttributes" placeholder='{}'></textarea></div></div>`;
@@ -859,17 +850,13 @@ function _resourceRequirementSection(section) {
       } catch (_) { _toast('属性必须是 JSON 对象'); return null; }
     },
     async create(_cloudFetch, body) {
-      return _cloudFetch('/api/craft/resource-requirements', { method: 'POST', body: JSON.stringify(body) });
+      return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.resource_requirement.create", {version:1,payload:Object.fromEntries(Object.entries({...{},...body}).filter(([,v])=>v!=null))}); return {"success":true,"data":result}; })(body,{},new URLSearchParams());
     },
     async update(_cloudFetch, gid, body) {
-      return _cloudFetch(`/api/craft/resource-requirements/${gid}`, {
-        method: 'PATCH', body: JSON.stringify(resourcePatchBody(_rawRowsMap[gid], body)),
-      });
+      return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.resource_requirement.update", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,...Object.fromEntries(Object.entries({...{"attributes":null},...body}).filter(([,v])=>v!=null))}).filter(([,v])=>v!=null))}); return {"success":true,"data":result}; })(resourcePatchBody(_rawRowsMap[gid], body),{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
     },
     async remove(_cloudFetch, gid) {
-      return _cloudFetch(`/api/craft/resource-requirements/${gid}/retire`, {
-        method: 'POST', body: JSON.stringify(resourceRetireBody(_rawRowsMap[gid])),
-      });
+      return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.resource_requirement.retire", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,...Object.fromEntries(Object.entries({...{},...body}).filter(([,v])=>v!=null))}).filter(([,v])=>v!=null))}); return {"success":true,"data":result}; })(resourceRetireBody(_rawRowsMap[gid]),{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
     },
   };
 }
@@ -1126,16 +1113,14 @@ async function _editResourceAliases(gid) {
   const input = prompt('别名（每行一个）', current.map(alias => alias.alias_value).join('\n'));
   if (input === null) return;
   const wanted = [...new Set(input.split(/\r?\n/).map(value => value.trim()).filter(Boolean))];
-  const _cloudFetch = _cf();
-  if (!_cloudFetch) return _toast('未连接云端');
+
+  if (!window.AI00Business?.available()) return _toast('未连接云端');
   try {
     for (const alias of current.filter(alias => !wanted.includes(alias.alias_value))) {
-      await _cloudFetch(`/api/craft/resource-requirements/${gid}/aliases/${alias.gid}`, { method: 'DELETE' });
+      await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.resource_requirement.alias.delete", {version:1,payload:Object.fromEntries(Object.entries({"resource_gid":path.resource_gid,"alias_gid":path.alias_gid}).filter(([,v])=>v!=null))}); return {"success":true,"data":result}; })({},{"resource_gid":decodeURIComponent(String(gid)),"alias_gid":decodeURIComponent(String(alias.gid))},new URLSearchParams());
     }
     for (const aliasValue of wanted.filter(value => !current.some(alias => alias.alias_value === value))) {
-      await _cloudFetch(`/api/craft/resource-requirements/${gid}/aliases`, {
-        method: 'POST', body: JSON.stringify({ alias_value: aliasValue }),
-      });
+      await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.resource_requirement.alias.create", {version:1,payload:Object.fromEntries(Object.entries({"resource_gid":path.resource_gid,...{...{},...body}}).filter(([,v])=>v!=null))}); return {"success":true,"data":result}; })({ alias_value: aliasValue },{"resource_gid":decodeURIComponent(String(gid))},new URLSearchParams());
     }
     await _tls?.refresh();
   } catch (e) { _toast('别名保存失败：' + (e.message || e)); }
@@ -1161,16 +1146,7 @@ function _closeImportModal() {
 }
 
 async function _handleFileSelect(e) {
-  const file = e.target.files?.[0];
-  if (!file) return;
-  const ext = file.name.split('.').pop().toLowerCase();
-  if (ext === 'csv') {
-    await _parseCSV(file);
-  } else if (ext === 'xlsx') {
-    await _parseXLSX(file);
-  } else {
-    _toast('仅支持 .xlsx 和 .csv 文件');
-  }
+e.preventDefault();return _parseXLSX();
 }
 
 async function _parseCSV(file) {
@@ -1208,27 +1184,7 @@ function _splitCSVLine(line) {
 }
 
 async function _parseXLSX(file) {
-  const _cloudFetch = _cf();
-  if (!_cloudFetch) { _toast('未连接云端，无法解析 Excel'); return; }
-  const buf = await file.arrayBuffer();
-  const b64 = _arrayBufferToBase64(buf);
-  try {
-    const res = await _cloudFetch('/api/import-export/import/parse-excel', {
-      method: 'POST',
-      body: JSON.stringify({ file_b64: b64, filename: file.name }),
-    });
-    if (!res?.data?.headers?.length) { _toast('Excel 解析无数据'); return; }
-    const headers = res.data.headers;
-    const rows = (res.data.rows || []).map(arr => {
-      const obj = {};
-      headers.forEach((h, i) => { obj[h] = arr[i] ?? ''; });
-      return obj;
-    });
-    if (!rows.length) { _toast('Excel 解析无有效数据行'); return; }
-    _showImportPreview(headers, rows);
-  } catch (e) {
-    _toast('解析失败：' + (e.message || e));
-  }
+try{const data=await (await window.AI00Business.invoke('craft.data_exchange.excel.parse',{version:1,payload:{},native_io:{select:'spreadsheet'}})).data;if(!data.headers.length){_toast('Excel 解析无数据');return;}const rows=data.rows.map(row=>Object.fromEntries(data.headers.map((header,index)=>[header,row[index]??''])));if(!rows.length){_toast('Excel 解析无有效数据行');return;}_showImportPreview(data.headers,rows);}catch(error){if(error.code!=='native_selection_cancelled')_toast('解析失败：'+error.message);}
 }
 
 function _arrayBufferToBase64(buffer) {
@@ -1395,7 +1351,7 @@ document.getElementById('importModal').addEventListener('click', e => {
   if (e.target === e.currentTarget) _closeImportModal();
 });
 document.getElementById('importConfirm').addEventListener('click', _doImport);
-document.getElementById('importFileInput').addEventListener('change', _handleFileSelect);
+document.getElementById('importFileInput').addEventListener('click', _handleFileSelect);
 
 // ── 主题同步 ──────────────────────────────────────────────────────
 function _syncTheme() {

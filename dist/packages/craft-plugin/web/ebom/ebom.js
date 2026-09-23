@@ -27,19 +27,10 @@ if (_standaloneMode) {
 }
 
 /* ── helpers ─────────────────────────────────────────────── */
-function _cf(method, path, opts = {}) {
-  const fn = window.parent?._cloudFetch || window._cloudFetch;
-  if (!fn) return Promise.resolve(null);
-  return fn(path, { ...opts, method }).catch(err => { console.warn('[PBOM] fetch error', err); return null; });
-}
+
 
 async function _invokeCapability(id, payload, options = {}) {
-  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ version: 1, payload }),
-    signal: options.signal,
-  });
+  const response = await window.AI00Business.request(id, { version: 1, payload });
   const result = response?.data;
   if (response?.success !== true || result?.ok !== true) {
     const detail = result?.error || response?.error || {};
@@ -301,8 +292,8 @@ function _autoVersionName(projectGid, suffix) {
 async function loadVersions() {
   const projGid = document.getElementById('sel-project').value;
   const res = projGid
-    ? await _cf('GET', `/api/ebom/snapshots?project_gid=${encodeURIComponent(projGid)}`)
-    : await _cf('GET', '/api/ebom/snapshots');
+    ? await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.pbom.version.search", {version:1,payload:Object.fromEntries(Object.entries({"project_ref":(query.has("project_gid")?query.get("project_gid"):null),"limit":200}).filter(([,v])=>v!=null))}); return {"success":true,"data":((result["items"]??[])).map(row=>({"gid":(row["gid"]??""),"project_gid":((row["project_gid"]??null)||(row["project_ref"]??null)),"version_tag":((row["version_tag"]??null)||""),"name":((row["name"]??null)||((row["version_tag"]??null)||"")),"source_type":((row["source_type"]??null)||"native"),"status":(row["status"]??"draft"),"created_at":((row["created_at"]??null)||"")}))}; })({},{},new URLSearchParams((`/api/ebom/snapshots?project_gid=${encodeURIComponent(projGid)}`).split("?")[1]||""))
+    : await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.pbom.version.search", {version:1,payload:Object.fromEntries(Object.entries({"project_ref":(query.has("project_gid")?query.get("project_gid"):null),"limit":200}).filter(([,v])=>v!=null))}); return {"success":true,"data":((result["items"]??[])).map(row=>({"gid":(row["gid"]??""),"project_gid":((row["project_gid"]??null)||(row["project_ref"]??null)),"version_tag":((row["version_tag"]??null)||""),"name":((row["name"]??null)||((row["version_tag"]??null)||"")),"source_type":((row["source_type"]??null)||"native"),"status":(row["status"]??"draft"),"created_at":((row["created_at"]??null)||"")}))}; })({},{},new URLSearchParams());
   _versions = res?.data || [];
   if (_shell?.getBaseTLS())   _shell.getBaseTLS().refreshItems();
   if (_shell?.getTargetTLS()) _shell.getTargetTLS().refreshItems();
@@ -312,15 +303,15 @@ async function _loadPbomLists() {
   if (!_versions.length) {
     const projGid = document.getElementById('sel-project').value;
     const res = projGid
-      ? await _cf('GET', `/api/ebom/snapshots?project_gid=${encodeURIComponent(projGid)}`)
-      : await _cf('GET', '/api/ebom/snapshots');
+      ? await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.pbom.version.search", {version:1,payload:Object.fromEntries(Object.entries({"project_ref":(query.has("project_gid")?query.get("project_gid"):null),"limit":200}).filter(([,v])=>v!=null))}); return {"success":true,"data":((result["items"]??[])).map(row=>({"gid":(row["gid"]??""),"project_gid":((row["project_gid"]??null)||(row["project_ref"]??null)),"version_tag":((row["version_tag"]??null)||""),"name":((row["name"]??null)||((row["version_tag"]??null)||"")),"source_type":((row["source_type"]??null)||"native"),"status":(row["status"]??"draft"),"created_at":((row["created_at"]??null)||"")}))}; })({},{},new URLSearchParams((`/api/ebom/snapshots?project_gid=${encodeURIComponent(projGid)}`).split("?")[1]||""))
+      : await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.pbom.version.search", {version:1,payload:Object.fromEntries(Object.entries({"project_ref":(query.has("project_gid")?query.get("project_gid"):null),"limit":200}).filter(([,v])=>v!=null))}); return {"success":true,"data":((result["items"]??[])).map(row=>({"gid":(row["gid"]??""),"project_gid":((row["project_gid"]??null)||(row["project_ref"]??null)),"version_tag":((row["version_tag"]??null)||""),"name":((row["name"]??null)||((row["version_tag"]??null)||"")),"source_type":((row["source_type"]??null)||"native"),"status":(row["status"]??"draft"),"created_at":((row["created_at"]??null)||"")}))}; })({},{},new URLSearchParams());
     _versions = res?.data || [];
   }
   return _versions.map(v => ({ gid: v.gid, name: v.name || v.version_tag || '未命名' }));
 }
 
 async function _loadPbomParts(itemType, listGid) {
-  const res = await _cf('GET', `/api/ebom/snapshots/${listGid}/parts`);
+  const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.pbom.part.search", {version:1,payload:Object.fromEntries(Object.entries({"version_gid":path.gid,"limit":(query.has("limit")?Number(query.get("limit")):500)}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result.items??[]).map(item=>({"gid":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["gid"],"snapshot_gid":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["snapshot_gid"],"part_no":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["part_no"],"name":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["name"],"quantity":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["quantity"],"unit":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["unit"],"material":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["material"],"parent_gid":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["parent_gid"],"vpps":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["vpps"]??null),"vpps_desc":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["vpps_desc"]??""),"parent_vpps":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["parent_vpps"]??""),"parent_vpps_name":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["parent_vpps_name"]??""),"bom_row":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["bom_row"]??""),"bom_row_label":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["bom_row_label"]??""),"component_id":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["component_id"]??""),"component_type":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["component_type"]??""),"component_version_status":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["component_version_status"]??""),"purchase_status":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["purchase_status"]??""),"variable_formula":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["variable_formula"]??""),"torque":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["torque"]??""),"torque_importance":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["torque_importance"]??""),"ownership_user":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["ownership_user"]??""),"level":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["level"]??null),"home":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["home"]??""),"configuration":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["configuration"]??""),"parent_bom_row":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["parent_bom_row"]??""),"remark":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["remark"]??""),"temp_vpps":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["temp_vpps"]??""),"catia_occurrence_name":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["catia_occurrence_name"]??""),"catia_file_name":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["catia_file_name"]??""),"catia_uuid":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["catia_uuid"]??""),"default_matrix":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["default_matrix"]??""),"abs_matrix":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["abs_matrix"]??""),"rel_matrix":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["rel_matrix"]??""),"local_bbox":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["local_bbox"]??""),"ecn":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["ecn"]??""),"fna":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["fna"]??""),"geo_main_part":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["geo_main_part"]??""),"ref_main_vpps_desc":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["ref_main_vpps_desc"]??""),"ref_main_vpps":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["ref_main_vpps"]??""),"main_part_consistency":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["main_part_consistency"]??""),"geo_evidence":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["geo_evidence"]??""),"lr_side":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["lr_side"]??""),"meta":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["meta"]??{}),"created_at":String(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["created_at"])}))}; })({},{"gid":decodeURIComponent(String(listGid))},new URLSearchParams());
   const rows = res?.data || [];
   setTimeout(() => _loadSapIndicators(rows.map(r => r.gid).filter(Boolean)), 0);
   return rows;
@@ -598,10 +589,7 @@ function _renderVppsCheckTable(checkResult, targetRows) {
           revertBtn.textContent = '撤销中…';
           try {
             const user = window._currentUser || {};
-            await _cf('POST', `/api/vpps-operations/${ignoredOp.gid}/revert`, {
-              method: 'POST',
-              body: JSON.stringify({ reverted_by_gid: user.gid || '', reverted_by_name: user.name || '' }),
-            });
+            await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.vpps_audit.change.apply", {version:1,payload:({operation:"revert",gid:path.gid,...(body.reverted_by_gid?{actor_gid:body.reverted_by_gid}:{}),actor_name:body.reverted_by_name||window._authUser?.name||window.parent?._authUser?.name||""})}); return result; })({ reverted_by_gid: user.gid || '', reverted_by_name: user.name || '' },{"gid":decodeURIComponent(String(ignoredOp.gid))},new URLSearchParams());
             // 直接 rerunCheck，让 API 重新加载已忽略状态，保证本地与服务端一致
             const activeIdx = _shell?._activeCheckIdx ?? -1;
             if (activeIdx >= 0) await _shell.rerunCheck(activeIdx);
@@ -771,10 +759,7 @@ function _queueVppsAlias({ vppsPartGid, alias, pbomPartGid }) {
     key,
     desc: `别名 "${alias}"`,
     fn: async () => {
-      const res = await _cf('POST', `/api/craft_lib/part_names/${vppsPartGid}/accept_alias`, {
-        method: 'POST',
-        body: JSON.stringify({ alias, pbom_part_gid: pbomPartGid }),
-      });
+      const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"part_names.accept_alias",gid:path.gid,alias:body.alias,record:{"pbom_part_gid":body.pbom_part_gid}}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })({ alias, pbom_part_gid: pbomPartGid },{"gid":decodeURIComponent(String(vppsPartGid))},new URLSearchParams());
       if (!res?.success) throw new Error(res?.detail || '未知错误');
     },
   });
@@ -800,7 +785,7 @@ const vppsCheckDef = {
     const _pbomVersionGid = _shell?.getTargetTLS()?.getSelectedList() || '';
     try {
       if (_pbomVersionGid) {
-        const ignRes = await _cf('GET', `/api/vpps-operations/rule4-ignores?pbom_version_gid=${encodeURIComponent(_pbomVersionGid)}`);
+        const ignRes = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.vpps_audit.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"rule4_ignores",pbom_version_gid:(query.has("pbom_version_gid")?query.get("pbom_version_gid"):null)}).filter(([,v])=>v!=null))}); return result; })({},{},new URLSearchParams((`/api/vpps-operations/rule4-ignores?pbom_version_gid=${encodeURIComponent(_pbomVersionGid)}`).split("?")[1]||""));
         _vppsIgnoredRowGids = new Set(ignRes?.ignored_row_gids || []);
         _vppsIgnoredOps     = ignRes?.operations || [];
       } else {
@@ -814,7 +799,7 @@ const vppsCheckDef = {
 
     let vppsRef = [];
     try {
-      const res = await _cf('GET', '/api/craft_lib/part_names');
+      const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"part_names.list",q:(query.has("q")?query.get("q"):null)}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result.items??[])}; })({},{},new URLSearchParams());
       vppsRef = res?.data || [];
     } catch (e) {
       return {
@@ -1399,9 +1384,7 @@ const vppsCheckDef = {
             vpps_desc_cn:     (p.vpps_desc || '').trim(),
             vpps_description: (p.vpps_desc || '').trim(),
           }));
-          const res = await _cf('POST', '/api/craft_lib/part_names/batch_add_from_pbom', {
-            method: 'POST', body: JSON.stringify({ entries, meta }),
-          });
+          const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"part_names.batch_add_from_pbom",items:(body.entries).map(row=>(row)),meta:body.meta}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })({ entries, meta },{},new URLSearchParams());
           if (!res?.success) throw new Error(res?.detail || '批量添加失败');
           return res;
         },
@@ -1416,9 +1399,7 @@ const vppsCheckDef = {
             alias:         d.alias,
             pbom_part_gid: d.pbomPartGid,
           }));
-          const res = await _cf('POST', '/api/craft_lib/part_names/batch_accept_alias', {
-            method: 'POST', body: JSON.stringify({ items, meta }),
-          });
+          const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"part_names.batch_accept_alias",items:(body.items).map(row=>(row)),meta:body.meta}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })({ items, meta },{},new URLSearchParams());
           if (!res?.success) throw new Error(res?.detail || '批量别名提交失败');
           return res;
         },
@@ -1439,10 +1420,7 @@ const vppsCheckDef = {
             pbom_row_gid:       r.gid,
             original_vpps_desc: r.vpps_desc,
           }));
-          const res = await _cf('POST', '/api/vpps-operations/rule4-bulk-ignore', {
-            method: 'POST',
-            body: JSON.stringify({ pbom_version_gid: _pbomVersionGid, rows, actor_gid, actor_name }),
-          });
+          const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.vpps_audit.change.apply", {version:1,payload:({operation:"rule4_bulk_ignore",pbom_version_gid:body.pbom_version_gid,rows:body.rows,...(body.actor_gid?{actor_gid:body.actor_gid}:{}),actor_name:body.actor_name||window._authUser?.name||window.parent?._authUser?.name||""})}); return result; })({ pbom_version_gid: _pbomVersionGid, rows, actor_gid, actor_name },{},new URLSearchParams());
           if (!res?.success) throw new Error(res?.detail || '忽略操作失败');
           const activeIdx = _shell?._activeCheckIdx ?? -1;
           if (activeIdx >= 0) await _shell.rerunCheck(activeIdx);
@@ -1453,10 +1431,7 @@ const vppsCheckDef = {
           let failed = 0;
           for (const op of ops) {
             try {
-              const res = await _cf('POST', `/api/vpps-operations/${op.gid}/revert`, {
-                method: 'POST',
-                body: JSON.stringify({ reverted_by_gid: user.gid || '', reverted_by_name: user.name || '' }),
-              });
+              const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.vpps_audit.change.apply", {version:1,payload:({operation:"revert",gid:path.gid,...(body.reverted_by_gid?{actor_gid:body.reverted_by_gid}:{}),actor_name:body.reverted_by_name||window._authUser?.name||window.parent?._authUser?.name||""})}); return result; })({ reverted_by_gid: user.gid || '', reverted_by_name: user.name || '' },{"gid":decodeURIComponent(String(op.gid))},new URLSearchParams());
               if (!res?.success) failed++;
             } catch (_) { failed++; }
           }

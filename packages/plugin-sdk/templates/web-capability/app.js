@@ -10,13 +10,13 @@ const runButton = document.querySelector("#run");
 const resetButton = document.querySelector("#reset");
 
 function requireSuccess(result, operation) {
-  if (!result?.success) throw new Error(result?.error?.message || `${operation}失败`);
+  if (!result?.ok) throw new Error(result?.error?.message || `${operation}失败`);
   return result.data;
 }
 
 async function readCounter() {
   const result = await client.storageGet(counterKey);
-  if (!result.success) return { value: 0, version: 0 };
+  if (!result.ok) return { value: 0, version: 0 };
   return { value: Number(result.data?.value || 0), version: Number(result.data?.version || 0) };
 }
 

@@ -119,19 +119,16 @@
       btn.disabled = true;
       btn.textContent = '提交中...';
       try {
-        const _cloudFetch = (window.parent && window.parent._cloudFetch) || window._cloudFetch;
+        const _cloudFetch = (window.parent && window.AI00Business?.available()) || window.AI00Business?.available();
         if (!_cloudFetch) throw new Error('_cloudFetch 未初始化');
-        await _cloudFetch('/api/approval/orders/scope_upgrade', {
-          method: 'POST',
-          body: JSON.stringify({
+        await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.approval.scope_upgrade.create", {version:1,payload:body}); return result; })({
             item_type: itemType,
             item_gid: itemGid,
             item_title: itemTitle,
             current_scope: currentScope,
             target_scope: selected.value,
             reason,
-          }),
-        });
+          },{},new URLSearchParams());
         _showToast('范围提升申请已提交，等待审批', 'success');
         dlg.remove();
       } catch (e) {
@@ -206,7 +203,7 @@
     `;
     document.body.appendChild(dlg);
 
-    const _cloudFetch = (window.parent && window.parent._cloudFetch) || window._cloudFetch;
+    const _cloudFetch = (window.parent && window.AI00Business?.available()) || window.AI00Business?.available();
     const shareList = dlg.querySelector('#_lsd-share-list');
     const search   = dlg.querySelector('#_lsd-user-search');
     const permSel  = dlg.querySelector('#_lsd-perm-select');
@@ -216,9 +213,9 @@
     let _selectedUser = null;
 
     async function loadShares() {
-      if (!_cloudFetch) return;
+      if (!window.AI00Business?.available()) return;
       try {
-        const data = await _cloudFetch(`/api/shares/lists/${listGid}`, { method: 'GET' });
+        const data = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.share.list", {version:1,payload:({list_gid:path.list_gid})}); return result; })({},{"list_gid":decodeURIComponent(String(listGid))},new URLSearchParams());
         shareList.innerHTML = !data.shares?.length
           ? '<p style="color:var(--text-muted);font-size:12px;margin:0">暂无分享</p>'
           : data.shares.map(s => `
@@ -229,7 +226,7 @@
               </div>`).join('');
         shareList.querySelectorAll('[data-share-gid]').forEach(btn => {
           btn.onclick = async () => {
-            await _cloudFetch(`/api/shares/lists/${listGid}/${btn.dataset.shareGid}`, { method: 'DELETE' });
+            await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.sharing.change.apply.atomic.shares_list_delete", {version:1,payload:{arguments:{"list_gid":path.list_gid,"gid":path.gid}}}); return result; })({},{"list_gid":decodeURIComponent(String(listGid)),"gid":decodeURIComponent(String(btn.dataset.shareGid))},new URLSearchParams());
             loadShares();
           };
         });
@@ -266,13 +263,10 @@
 
     addBtn.onclick = async () => {
       if (!_selectedUser) { _showToast('请选择用户', 'warning'); return; }
-      if (!_cloudFetch) return;
+      if (!window.AI00Business?.available()) return;
       addBtn.disabled = true;
       try {
-        await _cloudFetch(`/api/shares/lists/${listGid}`, {
-          method: 'POST',
-          body: JSON.stringify({ shared_to: _selectedUser.gid, permission: permSel.value }),
-        });
+        await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.sharing.change.apply.atomic.shares_list_create", {version:1,payload:{arguments:{"list_gid":path.list_gid,...{...{"permission":"read"},...body}}}}); return result; })({ shared_to: _selectedUser.gid, permission: permSel.value },{"list_gid":decodeURIComponent(String(listGid))},new URLSearchParams());
         _selectedUser = null;
         search.value = '';
         _showToast('已添加分享', 'success');

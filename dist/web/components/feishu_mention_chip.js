@@ -12,11 +12,7 @@ window.FeishuMentionChip = (() => {
     return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  function _cf(url, opts) {
-    const cf = window._cloudFetch || window.top?._cloudFetch || window.parent?._cloudFetch;
-    if (cf) return cf(url, opts);
-    return fetch(url, opts).then(r => r.json());
-  }
+
 
   // ── Chip HTML ─────────────────────────────────────────────────────────────
 
@@ -189,7 +185,7 @@ window.FeishuMentionChip = (() => {
     try {
       if (_activeTab === 'doc') {
         if (!q) { list.innerHTML = '<div class="fm-pick-empty">输入关键词搜索飞书文档</div>'; return; }
-        const res = await _cf(`/feishu/search/docs?q=${encodeURIComponent(q)}&limit=10`).catch(() => null);
+        const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.feishu.document.search", {version:1,payload:({query:query.get("q")||"",limit:Number(query.get("limit")||10)})}); return result; })({},{},new URLSearchParams((`/feishu/search/docs?q=${encodeURIComponent(q)}&limit=10`).split("?")[1]||"")).catch(() => null);
         const items = res?.data || [];
         if (!items.length) {
           list.innerHTML = '<div class="fm-pick-empty">无匹配文档</div>';
@@ -215,7 +211,7 @@ window.FeishuMentionChip = (() => {
         `).join('');
         return;
       } else if (_activeTab === 'user') {
-        const res = await _cf(`/feishu/search/users?q=${encodeURIComponent(q)}&limit=10`).catch(() => null);
+        const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.feishu.user.search", {version:1,payload:({query:query.get("q")||"",limit:Number(query.get("limit")||10)})}); return result; })({},{},new URLSearchParams((`/feishu/search/users?q=${encodeURIComponent(q)}&limit=10`).split("?")[1]||"")).catch(() => null);
         const items = res?.data || [];
         if (!items.length) {
           list.innerHTML = '<div class="fm-pick-empty">无匹配联系人</div>';
@@ -236,7 +232,7 @@ window.FeishuMentionChip = (() => {
           </div>
         `).join('');
       } else {
-        const res = await _cf(`/feishu/search/chats?q=${encodeURIComponent(q)}&limit=10`).catch(() => null);
+        const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.feishu.chat.search", {version:1,payload:({query:query.get("q")||"",limit:Number(query.get("limit")||10)})}); return result; })({},{},new URLSearchParams((`/feishu/search/chats?q=${encodeURIComponent(q)}&limit=10`).split("?")[1]||"")).catch(() => null);
         const items = res?.data || [];
         if (!items.length) {
           list.innerHTML = '<div class="fm-pick-empty">无匹配群聊</div>';

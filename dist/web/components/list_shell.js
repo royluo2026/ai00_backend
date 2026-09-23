@@ -109,6 +109,7 @@ class ListShell {
         columns:  this._cols || this._colDefs,
         getRows:  this._importExportCfg.getRows,
         onImport: this._importExportCfg.onImport,
+        colAliasMap: this._importExportCfg.colAliasMap,
       });
     }
 
@@ -561,26 +562,25 @@ class ListShell {
     });
   }
 
-  static _deleteFiniteItem(_cloudFetch, type, gid) {
-    if (type === 'task') return _cloudFetch(`/api/tasks/${gid}`, { method: 'DELETE' });
-    if (type === 'issue') return _cloudFetch(`/api/issues/${gid}`, { method: 'DELETE' });
+  static _deleteFiniteItem(type, gid) {
+    if (type === 'task') return (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.tasks_delete", {version:1,payload:{arguments:{"gid":path.gid}}}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
+    if (type === 'issue') return (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.change.apply.atomic.issues_delete", {version:1,payload:{arguments:{"gid":path.gid}}}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
     if (type === 'knowledge') return (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('knowledge.delete', { gid });
-    if (type === 'rule') return _cloudFetch(`/api/rules/${gid}`, { method: 'DELETE' });
+    if (type === 'rule') return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"delete",gid:path.gid}).filter(([,v])=>v!=null))}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
     throw new Error(`不支持的条目类型: ${type}`);
   }
 
-  static _patchFiniteItem(_cloudFetch, type, gid, patch) {
-    if (type === 'task') return _cloudFetch(`/api/tasks/${gid}`, { method: 'PATCH', body: JSON.stringify(patch) });
-    if (type === 'issue') return _cloudFetch(`/api/issues/${gid}`, { method: 'PATCH', body: JSON.stringify(patch) });
+  static _patchFiniteItem(type, gid, patch) {
+    if (type === 'task') return (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.tasks_update", {version:2,payload:{arguments:{"gid":path.gid,"updates":window.AI00Business.workItemChanges(body)}}}); return result; })(patch,{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
+    if (type === 'issue') return (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.change.apply.atomic.issues_update", {version:2,payload:{arguments:{"gid":path.gid,"updates":window.AI00Business.workItemChanges(body)}}}); return result; })(patch,{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
     if (type === 'knowledge') return (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('knowledge.update', { gid, updates: patch });
-    if (type === 'rule') return _cloudFetch(`/api/rules/${gid}`, { method: 'PATCH', body: JSON.stringify(patch) });
+    if (type === 'rule') return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); return result; })(patch,{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
     throw new Error(`不支持的条目类型: ${type}`);
   }
 
   // ── 删除行（软删除，owner 鉴权）───────────────────────────────────────────
   async _handleDeleteRow(row) {
-    const _cloudFetch = this.cf.bind(this);
-    // 无 gid（未保存新行）：直接从 grid 移除即可
+        // 无 gid（未保存新行）：直接从 grid 移除即可
     if (!row.gid) {
       this.grid.setRows(this.grid.getRows().filter(r => r.gid !== row.gid));
       return;
@@ -595,7 +595,7 @@ class ListShell {
         return;
       }
       try {
-        await ListShell._deleteFiniteItem(_cloudFetch, type, row.gid);
+        await ListShell._deleteFiniteItem(type, row.gid);
         if (this._onSelect) this._onSelect(this._currentList);
       } catch (err) {
         console.error('[ListShell._handleDeleteRow cloud]', err);
@@ -604,7 +604,7 @@ class ListShell {
     } else {
       // 非云端条目也通过云端删除
       try {
-        await ListShell._deleteFiniteItem(_cloudFetch, type, row.gid);
+        await ListShell._deleteFiniteItem(type, row.gid);
         if (this._onSelect) this._onSelect(this._currentList);
       } catch (err) {
         console.error('[ListShell._handleDeleteRow]', err);
@@ -615,8 +615,7 @@ class ListShell {
 
   // ── 移至清单（内置，跨存储自动迁移）──────────────────────────────────────────
   _openMoveToListModal(row) {
-    const _cloudFetch = this.cf.bind(this);
-    const type = this._itemType;   // 'task'|'issue'|'knowledge'|'rule'
+        const type = this._itemType;   // 'task'|'issue'|'knowledge'|'rule'
     const allLists = this.sidebar?._lists || [];
     const sourceIsCloud = row._source === 'cloud';
     // 本地条目可移至任意清单（含云端）；云端条目只能移至云端清单
@@ -651,10 +650,10 @@ class ListShell {
         // 直接改 list_gid（云端）
         const body = JSON.stringify({ list_gid: selected || null });
         const _cloudUpdateMap = {
-          task:      () => _cloudFetch(`/api/tasks/${row.gid}`,             { method: 'PUT',   body }),
-          issue:     () => _cloudFetch(`/api/issues/${row.gid}`,            { method: 'PUT',   body }),
-          rule:      () => _cloudFetch(`/api/rules/${row.gid}`,             { method: 'PATCH', body }),
-          knowledge: () => _cloudFetch(`/api/knowledge_entries/${row.gid}`, { method: 'PATCH', body }),
+          task:      () => (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.change.apply.atomic.tasks_update", {version:2,payload:{arguments:{"gid":path.gid,"updates":window.AI00Business.workItemChanges(body)}}}); return result; })((value=>typeof value==="string"?JSON.parse(value):value)(body),{"gid":decodeURIComponent(String(row.gid))},new URLSearchParams()),
+          issue:     () => (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.change.apply.atomic.issues_update", {version:2,payload:{arguments:{"gid":path.gid,"updates":window.AI00Business.workItemChanges(body)}}}); return result; })((value=>typeof value==="string"?JSON.parse(value):value)(body),{"gid":decodeURIComponent(String(row.gid))},new URLSearchParams()),
+          rule:      () => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); return result; })((value=>typeof value==="string"?JSON.parse(value):value)(body),{"gid":decodeURIComponent(String(row.gid))},new URLSearchParams()),
+          knowledge: () => (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.entry.change.apply.atomic.entries_update", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,"updates":body}).filter(([,v])=>v!=null))}); return {"success":true}; })((value=>typeof value==="string"?JSON.parse(value):value)(body),{"gid":decodeURIComponent(String(row.gid))},new URLSearchParams()),
         };
         const update = _cloudUpdateMap[type];
         if (!update) throw new Error(`不支持的条目类型: ${type}`);
@@ -672,12 +671,8 @@ class ListShell {
     const row = this._allRows.find(r => r.gid === gid);
     if (!row) return;
     try {
-      const _cloudFetch = ListShell._cf;
-      const resp = await _cloudFetch(`/api/item-entries/${this._itemType}/${gid}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ entries }),
-      });
+
+      const resp = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.list.change.apply.atomic.item_entries_replace", {version:1,payload:{arguments:{"item_type":path.item_type,"item_gid":path.item_gid,"entries":(body.entries||[])}}}); return result; })({ entries },{"item_type":decodeURIComponent(String(this._itemType)),"item_gid":decodeURIComponent(String(gid))},new URLSearchParams());
       // 使用后端返回的 entries（含生成的 gid 等字段）
       if (resp?.entries && Array.isArray(resp.entries)) {
         row.entries = resp.entries;
@@ -713,19 +708,7 @@ class ListShell {
       if (typeof savePatch === 'function') {
         await savePatch(row, patch);
       } else {
-        const rawCp = this._rdpSaveOpts?.cloudPath;
-        const _cloudFetch = ListShell._cf;
-        const opts = {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(patch),
-        };
-        if (rawCp) {
-          const cloudBase = typeof rawCp === 'function' ? rawCp(row) : rawCp;
-          await _cloudFetch(`${cloudBase}/${fields.gid}`, opts);
-        } else {
-          await ListShell._patchFiniteItem(_cloudFetch, this._itemType, fields.gid, patch);
-        }
+        await ListShell._patchFiniteItem(this._itemType, fields.gid, patch);
       }
 
       // 更新缓存行
@@ -1036,7 +1019,7 @@ class ListShell {
 
   /** 弹出居中 modal（RDP 弹出按钮触发，使用 RowEditModal 组件）*/
   async _openPopoutModal(params) {
-    const _cloudFetch = ListShell._cf;
+
     // 关闭侧边栏 RDP
     if (this.rdp) this.rdp.close();
 
@@ -1062,7 +1045,7 @@ class ListShell {
     const row = items[idx];
     if (row && (!Array.isArray(row.entries) || !row.entries.length)) {
       try {
-        const resp = await _cloudFetch(`/api/item-entries/${this._itemType}/${row.gid}`, { method: 'GET' });
+        const resp = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.list.read.atomic.item_entries_get", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"item_type":path.item_type,"item_gid":path.item_gid}}).arguments).filter(([k,v])=>v!=null||[].includes(k)))}}); return result; })({},{"item_type":decodeURIComponent(String(this._itemType)),"item_gid":decodeURIComponent(String(row.gid))},new URLSearchParams());
         const result = resp?.entries || [];
         if (Array.isArray(result) && result.length) {
           row.entries = result;
@@ -1154,19 +1137,7 @@ class ListShell {
         if (typeof savePatch === 'function') {
           await savePatch(row, patch);
         } else {
-          const rawCp = shell._rdpSaveOpts?.cloudPath;
-          const _cloudFetch = ListShell._cf;
-          const opts = {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(patch),
-          };
-          if (rawCp) {
-            const cloudBase = typeof rawCp === 'function' ? rawCp(row) : rawCp;
-            await _cloudFetch(`${cloudBase}/${gid}`, opts);
-          } else {
-            await ListShell._patchFiniteItem(_cloudFetch, shell._itemType, gid, patch);
-          }
+          await ListShell._patchFiniteItem(shell._itemType, gid, patch);
         }
 
         Object.assign(row, patch);
@@ -1191,35 +1162,7 @@ class ListShell {
    * 直接调用 window.top.electronAPI，避免跨 realm 调用 _cloudFetch 函数引用。
    * 用法：const res = await shell.cf('/api/lists', { method: 'POST', body: JSON.stringify({...}) });
    */
-  async cf(path, opts = {}) {
-    // 优先用主窗口的 _cloudFetch（已验证 task/issue CRUD 可用），避免 iframe 内 fetch() 跨域问题
-    const cf = window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
-    if (cf) return cf(path, opts);
 
-    // 降级：直接使用 electronAPI
-    const eAPI = window.top?.electronAPI || window.parent?.electronAPI || window.electronAPI;
-    if (!eAPI) throw new Error('_cloudFetch 未就绪');
-    const [config, state] = await Promise.all([
-      (eAPI.getConfig?.() || Promise.resolve({})).catch(() => ({})),
-      (eAPI.authGetState?.() || Promise.resolve({})).catch(() => ({})),
-    ]);
-    const runtimeBase = await window.AI00RuntimeConfig?.getRuntimeBackendBase?.(config?.backendUrl || '')
-    const baseUrl = (runtimeBase || config?.backendUrl || '').replace(/\/$/, '');
-    const token = state?.token || '';
-    const res = await fetch(`${baseUrl}${path}`, {
-      ...opts,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { 'X-AI00-Token': token } : {}),
-        ...(opts.headers || {}),
-      },
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.detail || `HTTP ${res.status}`);
-    }
-    return res.json();
-  }
 
   /**
    * 判断给定清单是否为云端清单（用于路由 create/update 到 PG 或 SQLite）
@@ -1242,17 +1185,10 @@ class ListShell {
   // ── 静态工具方法（各页面共用，不再各自重复定义）────────────────────────────
 
   /** 云端 fetch —— 与各页面的 _cf 等价 */
-  static _cf(path, opts = {}) {
-    const cf = window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
-    if (!cf) return Promise.reject(new Error('_cloudFetch 未就绪'));
-    return cf(path, opts);
-  }
+
 
   /** 云端 fetch（异常静默，失败返回 null）*/
-  static async _cfSafe(path, opts = {}) {
-    try { return await ListShell._cf(path, opts); }
-    catch (e) { console.warn('[ListShell._cfSafe]', e.message); return null; }
-  }
+
 
   /**
    * 文件上传专用 fetch —— 绕过 contextBridge 的结构化克隆。
@@ -1260,27 +1196,7 @@ class ListShell {
    * 克隆为空对象，导致 Content-Type 被错误设置为 application/json → 422。
    * 本方法直接调用 iframe 本地 fetch，FormData 不跨 contextBridge。
    */
-  static async _cfUpload(path, formData) {
-    const eAPI = window.top?.electronAPI || window.parent?.electronAPI || window.electronAPI;
-    const config = (await eAPI?.getConfig?.().catch(() => null)) || {};
-    const state  = (await eAPI?.authGetState?.().catch(() => null)) || {};
-    const runtimeBase = await window.AI00RuntimeConfig?.getRuntimeBackendBase?.(config?.backendUrl || '')
-    const baseUrl = (runtimeBase || config?.backendUrl || '').replace(/\/$/, '');
-    const token   = state.token || '';
-    const headers = {};
-    if (token) headers['X-AI00-Token'] = token;
-    const res = await fetch(`${baseUrl}${path}`, { method: 'POST', body: formData, headers });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      const detail = err.detail;
-      const msg = typeof detail === 'string' ? detail
-        : Array.isArray(detail) ? detail.map(e => e.msg || JSON.stringify(e)).join('; ')
-        : detail ? JSON.stringify(detail) : `HTTP ${res.status}`;
-      throw new Error(msg);
-    }
-    if (res.status === 204 || res.headers.get('content-length') === '0') return null;
-    return res.json();
-  }
+
 
   /** HTML 转义 */
   static _esc(s) {
@@ -1307,18 +1223,16 @@ class ListShell {
    * @param {()=>ListShell}   opts.getShell         返回 ListShell 实例
    * @param {(rows:any[])=>void} opts.setData        设置数据变量
    */
-  static buildLoadHandler({ cloudPath, cloudRequest, getCurrentList, getShell, setData }) {
+  static buildLoadHandler({ cloudRequest, getCurrentList, getShell, setData }) {
     return async function load() {
       const listGid  = getCurrentList?.();
       const canonGid = ListShell._canonListGid(listGid);
 
       let cloudData = [];
-      if (cloudPath || cloudRequest) {
+      if (cloudRequest) {
         const qp = new URLSearchParams();
         if (canonGid) qp.set('list_gid', canonGid);
-        const cr = cloudRequest
-          ? await cloudRequest(qp)
-          : await ListShell._cfSafe(`${cloudPath}?${qp}`);
+        const cr = await cloudRequest(qp);
         cloudData = (cr?.data || []).map(r => ({ ...r, _source: 'cloud' }));
       }
 
@@ -1342,7 +1256,7 @@ class ListShell {
    * @param {()=>ListShell}   opts.getShell         返回 ListShell 实例
    * @param {()=>Promise<void>} opts.load          load() 函数引用（保存后刷新）
    */
-  static buildRowsChangeHandler({ editableKeys, primaryKey, cloudUpdatePath, cloudCreatePath, cloudUpdate, cloudCreate, buildCreateBody, getData, getCurrentList, getShell, load }) {
+  static buildRowsChangeHandler({ editableKeys, primaryKey, cloudUpdate, cloudCreate, buildCreateBody, getData, getCurrentList, getShell, load }) {
     return async function onRowsChange(newRows) {
       let didSave = false;
       const data     = getData?.() || [];
@@ -1357,14 +1271,7 @@ class ListShell {
           editableKeys.forEach(k => { if (String(row[k] ?? '') !== String(orig[k] ?? '')) body[k] = row[k]; });
           if (!Object.keys(body).length) continue;
           try {
-            if (cloudUpdate) {
-              await cloudUpdate(row.gid, body);
-            } else {
-              const path = typeof cloudUpdatePath === 'function'
-                ? cloudUpdatePath(row.gid)
-                : `${cloudUpdatePath}/${row.gid}`;
-              await ListShell._cf(path, { method: 'PATCH', body: JSON.stringify(body) });
-            }
+            await cloudUpdate(row.gid, body);
             didSave = true;
           } catch (err) { console.warn('[cloud save]', err); }
         } else if (primaryKey && row[primaryKey]) {
@@ -1372,11 +1279,7 @@ class ListShell {
             const cb = buildCreateBody
               ? buildCreateBody(row, canonGid)
               : { [primaryKey]: row[primaryKey], list_gid: canonGid };
-            if (cloudCreate) {
-              await cloudCreate(cb);
-            } else if (cloudCreatePath) {
-              await ListShell._cf(cloudCreatePath, { method: 'POST', body: JSON.stringify(cb) });
-            }
+            if (cloudCreate) await cloudCreate(cb);
             didSave = true;
           } catch (err) { console.warn('[cloud create]', err); }
         }
@@ -1405,8 +1308,8 @@ ListShell.NO_LIST = '__no_list__';
  * makeImportExport / makeDiffManager — 清单模块配置工厂
  * 消除各模块重复的 importExport / diffManager 样板代码。
  */
-ListShell.makeImportExport = function(moduleId, getRows, onImport) {
-  return { moduleId, getRows, onImport };
+ListShell.makeImportExport = function(moduleId, getRows, onImport, colAliasMap = {}) {
+  return { moduleId, getRows, onImport, colAliasMap };
 };
 
 ListShell.makeDiffManager = function(moduleId, getRows, matchKey = 'title') {

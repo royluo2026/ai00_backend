@@ -52,6 +52,17 @@ def _verified_consumer_refs(capability_id: str, major_version: int = 1) -> tuple
     validation remain explicitly unverified in the desktop impact closure.
     """
     consumers: list[dict[str, str]] = []
+    from backend.base.plugin_marketplace_admin import CONTRACTS, PREFIX
+    if (capability_id, major_version) in {(PREFIX + value[0], value[1]) for value in CONTRACTS.values()}:
+        consumers.extend({"consumer_id": consumer, "consumer_type": "web", "version_constraint": f"=={major_version}"}
+                         for consumer in ("web/plugin_marketplace/model.js", "ai00.desktop.windows-x64"))
+    if (capability_id, major_version) in {
+        ("base.plugin.marketplace.search", 2), ("base.identity.session.profile.get", 1),
+        ("base.plugin.installation.request.create", 1), ("base.plugin.installation.transition.uninstall", 1),
+        ("plugin.enable", 1), ("plugin.disable", 1), ("plugin.upgrade", 1), ("plugin.rollback", 1),
+    }:
+        consumers.append({"consumer_id": "web/plugin_marketplace/model.js", "consumer_type": "web", "version_constraint": f"=={major_version}"})
+        consumers.append({"consumer_id": "ai00.desktop.windows-x64", "consumer_type": "web", "version_constraint": f"=={major_version}"})
     from backend.capability_v2.identity import DESKTOP_CONSUMER_ID
     from plugins.simulation.simulation_backend.capabilities.connector_pairing import DESKTOP_CAPABILITY_BINDINGS as pairing
     from plugins.simulation.simulation_backend.capabilities.connector_runtime import DESKTOP_CAPABILITY_BINDINGS as runtime
@@ -171,6 +182,35 @@ def _contract_test_revision() -> str:
     return f"sha256:{digest}"
 
 
+def _test_refs(capability_id: str, major_version: int):
+    if (capability_id, major_version) == ('base.plugin.marketplace.release.submit', 1):
+        path = 'backend/tests/test_plugin_package_upload.py'
+        from backend.capability_v2.acceptance_contract import canonical_test_source_hash
+        revision = canonical_test_source_hash((REPOSITORY_ROOT / path).read_bytes())
+        return tuple({'test_type': 'contract', 'test_node_id': f'{path}::{name}', 'code_revision': revision, 'path': path}
+                     for name in ('test_bundle_validates_embedded_package_and_detached_signature', 'test_bundle_rejects_unsafe_shape_before_storage'))
+    from backend.base.plugin_marketplace_admin import CONTRACTS, PREFIX
+    if (capability_id, major_version) in {(PREFIX + value[0], value[1]) for value in CONTRACTS.values()}:
+        path = "backend/tests/test_plugin_marketplace_admin.py"
+        from backend.capability_v2.acceptance_contract import canonical_test_source_hash
+        revision = canonical_test_source_hash((REPOSITORY_ROOT / path).read_bytes())
+        return tuple({"test_type": "contract", "test_node_id": f"{path}::{name}", "code_revision": revision, "path": path}
+                     for name in ("test_admin_boundary_rechecks_role_before_owner_write", "test_admin_search_is_bounded_and_does_not_expose_signatures", "test_admin_review_binds_exact_version_digest_and_actor", "test_gateway_admin_review_requires_confirmation_and_commits_only_matching_digest", "test_legacy_platform_routes_reject_team_admin_and_require_digest", "test_admin_owner_signing_revocation_and_publisher_registration"))
+    if (capability_id, major_version) == ("base.plugin.marketplace.search", 2):
+        path = "backend/tests/test_plugin_marketplace_search.py"
+        from backend.capability_v2.acceptance_contract import canonical_test_source_hash
+        revision = canonical_test_source_hash((REPOSITORY_ROOT / path).read_bytes())
+        return tuple({"test_type": "contract", "test_node_id": f"{path}::{name}",
+                      "code_revision": revision, "path": path} for name in (
+            "test_marketplace_search_is_versioned_closed_and_bounded",
+            "test_installed_search_keeps_failed_rows_and_is_tenant_scoped",
+            "test_catalog_omits_unpublished_and_uninstalled_is_available",
+            "test_malformed_stored_metadata_is_not_exposed_as_a_success",
+            "test_gateway_enforces_actor_tenant_version_and_closed_contract",
+        ))
+    return coverage_declarations(capability_id, major_version, code_revision=_contract_test_revision())
+
+
 def _providers() -> tuple[ProviderArtifact, ...]:
     document = json.loads(PROVIDERS_PATH.read_text(encoding="utf-8"))
     return tuple(ProviderArtifact.model_validate(item["artifact"]) for item in document["domains"])
@@ -197,10 +237,9 @@ def current_release() -> CatalogRelease:
             registrations[key].descriptor or descriptor_from_provider_spec(registrations[key].spec),
             provider_ref=f"{registrations[key].spec.owner}.provider",
             consumer_refs=_verified_consumer_refs(registrations[key].spec.id, registrations[key].spec.version),
-            test_refs=coverage_declarations(
+            test_refs=_test_refs(
                 registrations[key].spec.id,
                 registrations[key].spec.version,
-                code_revision=_contract_test_revision(),
             ),
         )
         for key in sorted(registrations)

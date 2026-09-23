@@ -17,7 +17,7 @@
   let _sessionGid = null;
   let _sending = false;
   let _aborted = false;
-  let _pendingConfirm = null;   // { confirm_token, tool_name, tool_use_id, inputs, preview }
+  let _pendingConfirm = null;   // { confirmation_handle, tool_name, tool_use_id, inputs, preview }
   let _sessions = [];
 
   // Orchestrator 模式：'auto' | 'on' | 'off'
@@ -153,7 +153,7 @@
     bindEvents();
     // 侧边栏状态栏：读取初始模型 + 启动余额轮询
     try {
-      const cfg = await _cf('GET', '/api/ai/admin-config');
+      const cfg = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.runtime.config.read", {version:1,payload:Object.fromEntries(Object.entries({}).filter(([,v])=>v!=null))}); return result; })({},{},new URLSearchParams());
       if (cfg?.model) _sbSetModel(cfg.model);
     } catch (_) {}
     _sbStartBalPolling();
@@ -286,7 +286,7 @@
   async function loadSessions() {
     try {
       const userGid = _getUserGid();
-      const _sessRes = await _cf('GET', '/api/ai/sessions');
+      const _sessRes = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.session.list", {version:1,payload:({})}); return result; })({},{},new URLSearchParams());
       _sessions = _sessRes?.sessions || [];
       renderSessionList();
       // 若当前无活跃会话，自动恢复最近一条
@@ -356,7 +356,7 @@
     if ($collabBadge) $collabBadge.classList.add('hidden');
     _updateActiveSession();
     try {
-      const _sessDetail = await _cf('GET', `/api/ai/sessions/${gid}`);
+      const _sessDetail = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.session.read", {version:1,payload:Object.fromEntries(Object.entries({"operation":"get","session_gid":path.gid}).filter(([,v])=>v!=null))}); return ((result!==null&&typeof result==='object'&&!Array.isArray(result))?(result["data"]??result):result); })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
       restoreTurns(_sessDetail?.turns);
     } catch (e) {
       console.warn('[AiAssistant] openSession 失败:', e);
@@ -365,7 +365,7 @@
 
   async function deleteSession(gid) {
     try {
-      await _cf('DELETE', `/api/ai/sessions/${gid}`);
+      await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.session.change.apply", {version:1,payload:Object.fromEntries(Object.entries({"operation":"delete","session_gid":path.gid}).filter(([,v])=>v!=null))}); return ((result!==null&&typeof result==='object'&&!Array.isArray(result))?(result["data"]??result):result); })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams());
       if (_sessionGid === gid) newSession();
       await loadSessions();
     } catch (e) {
@@ -555,12 +555,7 @@
     const typingEl = appendTyping();
 
     try {
-      const res = await _cf('POST', '/api/ai/chat', {
-        message: text,
-        session_id: _sessionGid || null,
-        auth_token: _getAuthToken(),
-        context: await _getContext(),
-      });
+      const res = await window.AI00Business.stream('agent.interaction.chat.change.apply', {version:3,payload:{operation:'chat_sync',body:{message:text,session_id:_sessionGid||null,context:await _getContext()}}});
 
       removeTyping(typingEl);
 
@@ -634,13 +629,7 @@
     const typingEl = appendTyping();
 
     try {
-      const res = await _cf('POST', '/api/ai/confirm/sync', {
-        session_gid: _sessionGid,
-        confirm_token: token,
-        tool_name: toolName,
-        tool_use_id: toolUseId,
-        auth_token: _getAuthToken(),
-      });
+      const res = await window.AI00Business.stream('agent.catalog_tool.confirm.apply', {version:1,payload:{},continuation:{handle:token,session_gid:_sessionGid,mode:'chat_sync'}});
 
       removeTyping(typingEl);
       if (res?.error) {
@@ -800,7 +789,7 @@
         <button class="ai-confirm-btn cancel">取消</button>
       </div>`;
     div.querySelector('.ok').addEventListener('click', () =>
-      confirmAction(pending.confirm_token, pending.tool_name,
+      confirmAction(pending.confirmation_handle, pending.tool_name,
                     pending.tool_use_id, pending.inputs, div));
     div.querySelector('.cancel').addEventListener('click', () => cancelConfirm(div));
     $messages.appendChild(div);
@@ -923,7 +912,7 @@
 
     let data;
     try {
-      data = await _cf('GET', '/api/ai/tools');
+      data = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.tool_catalog.list", {version:1,payload:({})}); return result; })({},{},new URLSearchParams());
     } catch (e) {
       $tlBody.innerHTML = `<div class="ai-tl-loading" style="color:var(--red)">加载失败：${_esc(String(e))}</div>`;
       return;
@@ -1164,14 +1153,7 @@
     catch (_) { return ''; }
   }
 
-  function _cf(method, path, body) {
-    const fn = window._cloudFetch || window.top?._cloudFetch || window.parent?._cloudFetch;
-    if (!fn) return Promise.reject(new Error('_cloudFetch 未就绪'));
-    if (method === 'GET') return fn(path);
-    const opts = { method };
-    if (body !== undefined) opts.body = JSON.stringify(body);
-    return fn(path, opts);
-  }
+
 
   function _getUserGid() {
     if (_IS_POPUP) return _authUser?.gid || '';
@@ -1185,11 +1167,6 @@
     catch (_) { return 'local'; }
   }
 
-  function _getAuthToken() {
-    if (_IS_POPUP) return _authToken || '';
-    try { return window.top?._authToken || window.parent?._authToken || ''; }
-    catch (_) { return ''; }
-  }
 
   async function _getContext() {
     try {
@@ -1227,7 +1204,7 @@
 
   async function _loadSkills() {
     try {
-      const skillRes = await _cf('GET', `/api/skills?scope_filter=all`);
+      const skillRes = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.skill.read", {version:1,payload:Object.fromEntries(Object.entries({"operation":"list","scope_filter":(query.has("scope_filter")?query.get("scope_filter"):"all")}).filter(([,v])=>v!=null))}); return result; })({},{},new URLSearchParams((`/api/skills?scope_filter=all`).split("?")[1]||""));
       const list = Array.isArray(skillRes) ? skillRes : (skillRes?.skills || []);
       _skills = Array.isArray(list) ? list : [];
     } catch (_) {

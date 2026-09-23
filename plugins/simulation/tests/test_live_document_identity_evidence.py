@@ -9,7 +9,7 @@ import pytest
 
 from backend.contracts.connector_execution_plan_v2 import canonicalize_v2, compute_plan_hash
 from backend.tests.test_simulation_connector_runtime_v2_sql import sign_outcome
-from plugins.simulation.simulation_backend.application.live_document_identity import verify_identity_evidence
+from plugins.simulation.simulation_backend.application.live_document_identity import verify_identity_evidence, verify_existing_identity_evidence
 
 ROOT = Path(__file__).resolve().parents[3]
 NOW = datetime(2026, 9, 7, 1, 3, tzinfo=UTC)
@@ -53,12 +53,42 @@ def test_verifies_only_persisted_signed_identity():
         document_session=row['outcome_json']['steps'][0]['result']['document_session'])
 
 
+def test_existing_document_identity_is_pinned_to_requested_session_and_current_runtime():
+    row, runtime = evidence()
+    session = row['outcome_json']['steps'][0]['result']['document_session']
+    plan = row['plan_json']
+    plan['capability_id'] = 'simulation.vismockup.document.existing_identity.read.request'
+    plan['steps'][0].update(operation_id='vismockup.document.existing_identity.read@1',
+        contract_hash='sha256:9aa9528fff83c565d3d005daa1167b41cef2f6d413d485790c6c98c139fc1471',
+        payload={'expected_document_session': session},
+        payload_hash='sha256:' + hashlib.sha256(canonicalize_v2({'expected_document_session': session})).hexdigest())
+    plan['plan_hash'] = compute_plan_hash(plan)
+    outcome = row['outcome_json']
+    outcome['plan_hash'] = plan['plan_hash']
+    outcome['signature'] = sign_outcome(outcome)
+    row['plan_hash'] = plan['plan_hash']
+    row['outcome_hash'] = hashlib.sha256(canonicalize_v2(outcome)).hexdigest()
+    assert verify_existing_identity_evidence(row, runtime, actor_id='user-001', tenant_id='tenant-001', now=NOW) == {
+        'connector_device_id':'device-001','document_session':session,
+        'runtime_instance_id':plan['runtime_instance_id'],'runtime_generation':plan['runtime_generation']}
+    runtime['current_runtime_instance_id'] = 'restarted'
+    with pytest.raises(ValueError):
+        verify_existing_identity_evidence(row, runtime, actor_id='user-001', tenant_id='tenant-001', now=NOW)
+
+
 def test_native_contract_pin_matches_canonical_descriptor():
     descriptor = json.loads((ROOT/'docs/contracts/vismockup.document.identity.read@1.json').read_text())
     digest = 'sha256:' + hashlib.sha256(json.dumps(descriptor,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
     from plugins.simulation.simulation_backend.capabilities.connector_runtime import DIRECT_VISMOCKUP_OPERATIONS
     assert DIRECT_VISMOCKUP_OPERATIONS['identity'] == ('vismockup.document.identity.read@1',digest)
     assert digest == CONTRACT_HASH
+
+
+def test_existing_identity_contract_pin_matches_canonical_descriptor():
+    descriptor = json.loads((ROOT/'docs/contracts/vismockup.document.existing_identity.read@1.json').read_text())
+    digest = 'sha256:' + hashlib.sha256(json.dumps(descriptor,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
+    from plugins.simulation.simulation_backend.capabilities.connector_runtime import DIRECT_VISMOCKUP_OPERATIONS
+    assert DIRECT_VISMOCKUP_OPERATIONS['identity_existing'] == (descriptor['id'],digest)
 
 
 @pytest.mark.parametrize('target,field,value', [

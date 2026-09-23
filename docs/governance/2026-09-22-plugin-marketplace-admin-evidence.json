@@ -1,0 +1,88 @@
+{
+  "created_at": "2026-09-22T09:50:04.238375+00:00",
+  "advisory": true,
+  "catalog_release": "rel_1c0610faebc715f015480841e31f317e",
+  "capabilities": [
+    {
+      "id": "base.plugin.marketplace.administration.access.get",
+      "major_version": 1,
+      "capability_version_gid": "cv2_7faf65d19b8caa188ac59450",
+      "business_definition_hash": "sha256:d0b89c40851218cedaf30b2cabe403816343cacafd559b1aa08e2d34131d214f",
+      "schema_hash": "sha256:50e73720a5be6ee32b8bd4d9bd3c97294c9124fba63bd43c76d22b463ff51137",
+      "consistency_policy": "strong"
+    },
+    {
+      "id": "base.plugin.marketplace.publisher.register",
+      "major_version": 2,
+      "capability_version_gid": "cv2_70a6dd05ee53854ed016aec4",
+      "business_definition_hash": "sha256:b61f9c71272a7a962c81cae8e7beba9803eefd7d430ce17a8c2f7bb4863e653d",
+      "schema_hash": "sha256:f096bc5653195aea275fb17f1cc47589d94860f540cca5dd2e3110d20e9eb19b",
+      "consistency_policy": "external"
+    },
+    {
+      "id": "base.plugin.marketplace.release.review",
+      "major_version": 1,
+      "capability_version_gid": "cv2_b594965d4b74f81e9badd1ad",
+      "business_definition_hash": "sha256:6101c2d2561b0a2cbf78750d355f5876f0cdc806f77c15da33ffc0c8c772dae5",
+      "schema_hash": "sha256:9837308d5031f0290796af058681a732f437ef14a88624b5f913b8997e7b04ef",
+      "consistency_policy": "external"
+    },
+    {
+      "id": "base.plugin.marketplace.release.revoke",
+      "major_version": 1,
+      "capability_version_gid": "cv2_5bb338b8467f517d33e2e089",
+      "business_definition_hash": "sha256:19466ee2eb520b47524f7f4fb2dda7cd3fa56e9f61ccd264dbf43d1326921951",
+      "schema_hash": "sha256:45727e1f9d676fc292db8acd9aee78a1b4c3c89747e6c164b30b43cfc74c9b1c",
+      "consistency_policy": "external"
+    },
+    {
+      "id": "base.plugin.marketplace.release.search",
+      "major_version": 1,
+      "capability_version_gid": "cv2_717f3ad5d0719c750544235f",
+      "business_definition_hash": "sha256:debb2361a6bf6d9b437ce2160846ffea460946982d519e9c4c4f9c92a07bbd35",
+      "schema_hash": "sha256:7baef49808946a61afd749b8293a240469f989c9559d0609d1b88662779b19d8",
+      "consistency_policy": "strong"
+    }
+  ],
+  "source_sha256": {
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\backend\\base\\plugin_marketplace_admin.py": "sha256:344e772bb96a0ef14aa037e71febe1a28d2c380c283730675f1502103ff73a8b",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\backend\\base\\official_provider.py": "sha256:f76ef867e7d68023394634ad49f76322ae855eb42525bc2c6dd07b7f54e34de6",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\backend\\plugin_platform\\service.py": "sha256:cbbfff1483a9d228e1f54ad919c79ea15486e87efdf1cde1e55bbcf81f4b6762",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\backend\\routers\\plugin_marketplace.py": "sha256:47ca2364d60bb8585bae976ed8012f09e85ddf1d6bdd16db0a5e44144678e473",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\backend\\tests\\test_plugin_marketplace_admin.py": "sha256:26b95647848ada220604392072d3fffdc603dc6622f8b3af80a3eb57ed3fd5f9",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\backend\\tests\\test_marketplace_lifecycle_sql.py": "sha256:747955c44a2725dfb74f5f9bc14443d9f05ab63fbfaa2f36dd6c349c0e5a1f17",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\backend\\scripts\\build_capability_catalog.py": "sha256:022737105f6d82022619a4110d01ada0d734d60e0dff01154734c4509c6a71b7",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\backend\\capability_v2\\official_domains.json": "sha256:c41526871e0d43341d4c947dc641b2596edb0419e82ffa5ddbed9e238a18ea49",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\docs\\governance\\capability-catalog-release.json": "sha256:abb3ffc9c7f35e5d866c5de14286ca4bb7611b9998d6101f28f98b108b8c4faf",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\web\\plugin_marketplace\\admin.html": "sha256:ea333ff0646669103895ccce81ec80533a2b08d6d7d83ea1038c8edc5c3af08c",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\web\\plugin_marketplace\\admin.js": "sha256:84e43c190689b2ed9c1e958d763ff197e11e3c4fe4c617503252952d7e3f1f63",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\web\\plugin_marketplace\\index.html": "sha256:f78166973dcc4c880bfa9afd93f4c33974a3720fd99a2a66c7ee1e0defd52d4a",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\web\\plugin_marketplace\\marketplace.js": "sha256:91f62e398ef1699c607bfcd5253792578c5de5f2a6a707bef2534a512816bb53",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\web\\plugin_marketplace\\model.js": "sha256:3c9070c526fc691c3a62ac31b4aef52ad0bdceb2160f5ffafd5ef5d2d23068aa",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\web\\plugin_marketplace\\marketplace.css": "sha256:b8e559743d6623e3868e9f2b74d3254b6d4f518a0d68cb4bf530d302fb68a2ae",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\web\\core\\business_facade.js": "sha256:8d3a9a42de926ca2382291e6cd94f6e41fd3ca9d41914e513e8ca0f10a682e03",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\packages\\core\\manifest.json": "sha256:08ff96d2361019cda1f0ade239b0fc3a362b76a24f00c738f4c26b713b910d63",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\scripts\\test_plugin_marketplace.js": "sha256:c01ab6a1f92ed9fb93674a4c6be7a19aa6138481042d860b79ed063e98ac0407"
+  },
+  "raw_results": {
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\.runtime\\marketplace-qa\\admin-tests.log": "sha256:984e3129191bbdc5379dc4acda060b845dedfae8d249966387aaeda3b677bf4d",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\.runtime\\marketplace-qa\\admin-catalog-check.log": "sha256:9a0d8e4c5a05a56e1e7e84a03c9260a22fdbb4fe911f8f905c8e09279c7c3305",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\.superpowers\\marketplace-qa\\admin-full-app-build.log": "sha256:4baed798c41f10a5e25a2a3697823d456af2f22fe85db609bf5e8d56392ade17",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\.superpowers\\marketplace-qa\\admin-current-client-deployment.json": "sha256:b9a71b85abcf4b324e1d2a290d2df7d362157324a0d11675d94d90a4ae249e86"
+  },
+  "verification": {
+    "targeted_backend_passed": 46,
+    "targeted_frontend_passed": 8,
+    "electron_lifecycle_and_boundary": "passed",
+    "catalog_check": "passed",
+    "full_desktop_test_resource_build": "passed",
+    "served_resource_byte_matches": 8,
+    "health_and_ready": "HTTP 200",
+    "authenticated_desktop_operations": "unverified"
+  },
+  "machine_passed": false,
+  "human_approved": "unverified",
+  "runtime_verified": "unverified",
+  "snapshot_gid": null,
+  "test_run_gid": null
+}

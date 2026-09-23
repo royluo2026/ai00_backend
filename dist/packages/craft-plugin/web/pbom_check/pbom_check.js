@@ -11,17 +11,10 @@
 const _p       = new URLSearchParams(location.search);
 const _initGid = _p.get('pbom_gid') || '';
 
-function _cf(method, path, opts = {}) {
-  const fn = window.parent?._cloudFetch || window._cloudFetch;
-  if (!fn) return Promise.resolve(null);
-  return fn(path, { ...opts, method }).catch(err => { console.warn('[PBOM check] fetch error', err); return null; });
-}
+
 
 async function _invokeCapability(id, payload) {
-  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ version: 1, payload }),
-  });
+  const response = await window.AI00Business.request(id, { version: 1, payload });
   const result = response?.data;
   if (response?.success !== true || result?.ok !== true) throw new Error(`能力调用失败：${id}@1`);
   const value = result.data;
@@ -98,10 +91,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 /* ── 版本列表 ────────────────────────────────────────────── */
 async function _loadVersions() {
-  const _cloudFetch = window._cloudFetch?.bind(window);
+
   try {
     _setStatus('加载版本…');
-    const res = await _cloudFetch('/api/ebom/snapshots', { method: 'GET' });
+    const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.pbom.version.search", {version:1,payload:Object.fromEntries(Object.entries({"project_ref":(query.has("project_gid")?query.get("project_gid"):null),"limit":200}).filter(([,v])=>v!=null))}); return {"success":true,"data":((result["items"]??[])).map(row=>({"gid":(row["gid"]??""),"project_gid":((row["project_gid"]??null)||(row["project_ref"]??null)),"version_tag":((row["version_tag"]??null)||""),"name":((row["name"]??null)||((row["version_tag"]??null)||"")),"source_type":((row["source_type"]??null)||"native"),"status":(row["status"]??"draft"),"created_at":((row["created_at"]??null)||"")}))}; })({},{},new URLSearchParams());
     _versions = res?.data || [];
     $verSel.innerHTML = '<option value="">— 选择 PBOM 版本 —</option>' +
       _versions.map(v =>
@@ -127,7 +120,7 @@ async function _onVerChange(gid) {
 
 /* ── TreeListShell 初始化 ─────────────────────────────────── */
 function _initTLS() {
-  const _cloudFetch = window._cloudFetch?.bind(window);
+
   const mountEl = document.getElementById('pcTlsMount');
 
   _tls = new TreeListShell({
@@ -156,7 +149,7 @@ function _initTLS() {
       // 同步顶部 select
       if ($verSel.value !== listGid) $verSel.value = listGid;
       try {
-        const res = await _cloudFetch(`/api/ebom/snapshots/${listGid}/parts`, { method: 'GET' });
+        const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.pbom.part.search", {version:1,payload:Object.fromEntries(Object.entries({"version_gid":path.gid,"limit":(query.has("limit")?Number(query.get("limit")):500)}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result.items??[]).map(item=>({"gid":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["gid"],"snapshot_gid":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["snapshot_gid"],"part_no":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["part_no"],"name":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["name"],"quantity":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["quantity"],"unit":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["unit"],"material":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["material"],"parent_gid":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["parent_gid"],"vpps":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["vpps"]??null),"vpps_desc":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["vpps_desc"]??""),"parent_vpps":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["parent_vpps"]??""),"parent_vpps_name":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["parent_vpps_name"]??""),"bom_row":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["bom_row"]??""),"bom_row_label":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["bom_row_label"]??""),"component_id":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["component_id"]??""),"component_type":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["component_type"]??""),"component_version_status":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["component_version_status"]??""),"purchase_status":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["purchase_status"]??""),"variable_formula":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["variable_formula"]??""),"torque":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["torque"]??""),"torque_importance":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["torque_importance"]??""),"ownership_user":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["ownership_user"]??""),"level":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["level"]??null),"home":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["home"]??""),"configuration":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["configuration"]??""),"parent_bom_row":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["parent_bom_row"]??""),"remark":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["remark"]??""),"temp_vpps":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["temp_vpps"]??""),"catia_occurrence_name":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["catia_occurrence_name"]??""),"catia_file_name":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["catia_file_name"]??""),"catia_uuid":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["catia_uuid"]??""),"default_matrix":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["default_matrix"]??""),"abs_matrix":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["abs_matrix"]??""),"rel_matrix":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["rel_matrix"]??""),"local_bbox":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["local_bbox"]??""),"ecn":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["ecn"]??""),"fna":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["fna"]??""),"geo_main_part":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["geo_main_part"]??""),"ref_main_vpps_desc":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["ref_main_vpps_desc"]??""),"ref_main_vpps":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["ref_main_vpps"]??""),"main_part_consistency":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["main_part_consistency"]??""),"geo_evidence":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["geo_evidence"]??""),"lr_side":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["lr_side"]??""),"meta":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["meta"]??{}),"created_at":String(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["created_at"])}))}; })({},{"gid":decodeURIComponent(String(listGid))},new URLSearchParams());
         _parts = res?.data || [];
         // 切换版本时清空上次核对结果
         _nokMap.clear(); _ignoredGids.clear(); _checkResult = null;
@@ -219,7 +212,7 @@ function _initTLS() {
 
 /* ── VPPS 核对 ───────────────────────────────────────────── */
 async function _runCheck() {
-  const _cloudFetch = window._cloudFetch?.bind(window);
+
   const gid = _tls?.getSelectedList() || $verSel.value;
   if (!gid) { alert('请先选择 PBOM 版本'); return; }
 
@@ -228,8 +221,8 @@ async function _runCheck() {
 
   try {
     const [checkRes, ignRes] = await Promise.all([
-      _cloudFetch(`/api/ebom/vpps_check?snapshot_gid=${encodeURIComponent(gid)}`, { method: 'GET' }),
-      _cloudFetch(`/api/vpps-operations/rule4-ignores?pbom_version_gid=${encodeURIComponent(gid)}`, { method: 'GET' }).catch(() => null),
+      window.AI00Business.invoke('craft.pbom.vpps_validation.get',{version:1,payload:{snapshot_gid:gid}}),
+      (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.vpps_audit.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"rule4_ignores",pbom_version_gid:(query.has("pbom_version_gid")?query.get("pbom_version_gid"):null)}).filter(([,v])=>v!=null))}); return result; })({},{},new URLSearchParams((`/api/vpps-operations/rule4-ignores?pbom_version_gid=${encodeURIComponent(gid)}`).split("?")[1]||"")).catch(() => null),
     ]);
 
     _checkResult  = checkRes;
@@ -277,7 +270,7 @@ async function _runCheck() {
 
 /* ── 结果面板渲染 ─────────────────────────────────────────── */
 function _renderResult(res, ignRes) {
-  const _cloudFetch = window._cloudFetch?.bind(window);
+
   const s      = res.summary;
   const ign    = s.rule4_ignored || 0;
   const r4Errs = res.errors?.rule4 || [];
@@ -321,13 +314,10 @@ function _renderResult(res, ignRes) {
           const part = _parts.find(p => p.vpps === e.vpps);
           return { vpps: e.vpps, vpps_desc_cn: part?.vpps_desc || '', vpps_description: part?.vpps_desc || '' };
         });
-        const r = await _cloudFetch('/api/craft_lib/part_names/batch_add_from_pbom', {
-          method: 'POST',
-          body: JSON.stringify({
+        const r = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"part_names.batch_add_from_pbom",items:(body.entries).map(row=>(row)),meta:body.meta}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })({
             entries,
             meta: { added_by: window._authUser?.name || '', project: ver?.name || '', added_at: new Date().toISOString() },
-          }),
-        });
+          },{},new URLSearchParams());
         if (!r?.success) throw new Error(r?.detail || '提交失败');
         btn.textContent = `✓ 已添加 ${r.added} 条，跳过 ${r.skipped} 条`;
         return true;
@@ -350,7 +340,7 @@ function _renderResult(res, ignRes) {
         const items = [];
         for (const a of aliases) {
           try {
-            const r = await _cloudFetch(`/api/craft_lib/part_names?vpps=${encodeURIComponent(a.vpps)}`, { method: 'GET' });
+            const r = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"part_names.list",q:(query.has("q")?query.get("q"):null)}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result.items??[])}; })({},{},new URLSearchParams((`/api/craft_lib/part_names?vpps=${encodeURIComponent(a.vpps)}`).split("?")[1]||""));
             const pn = (r?.data || [])[0];
             if (pn?.gid) {
               const pbomPart = _parts.find(p => p.vpps === a.vpps);
@@ -360,10 +350,7 @@ function _renderResult(res, ignRes) {
         }
         if (!items.length) throw new Error('未找到可处理的别名条目');
         const ver = _versions.find(v => v.gid === (_tls?.getSelectedList() || $verSel.value));
-        const r = await _cloudFetch('/api/craft_lib/part_names/batch_accept_alias', {
-          method: 'POST',
-          body: JSON.stringify({ items, meta: { added_by: window._authUser?.name || '', project: ver?.name || '' } }),
-        });
+        const r = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"part_names.batch_accept_alias",items:(body.items).map(row=>(row)),meta:body.meta}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })({ items, meta: { added_by: window._authUser?.name || '', project: ver?.name || '' } },{},new URLSearchParams());
         if (!r?.success) throw new Error(r?.detail || '提交失败');
         btn.textContent = `✓ 已处理 ${r.processed} 条，失败 ${r.failed} 条`;
         return true;
@@ -553,29 +540,26 @@ function _appendRule4Section(frag, errors, ignRes, count, ignCount) {
 
 /* ── Rule4 操作 ──────────────────────────────────────────── */
 async function _bulkIgnoreR4(errors) {
-  const _cloudFetch = window._cloudFetch?.bind(window);
+
   const gid  = _tls?.getSelectedList() || $verSel.value;
   const user = window._authUser || {};
   try {
-    await _cloudFetch('/api/vpps-operations/rule4-bulk-ignore', {
-      method: 'POST',
-      body: JSON.stringify({
+    await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.vpps_audit.change.apply", {version:1,payload:({operation:"rule4_bulk_ignore",pbom_version_gid:body.pbom_version_gid,rows:body.rows,...(body.actor_gid?{actor_gid:body.actor_gid}:{}),actor_name:body.actor_name||window._authUser?.name||window.parent?._authUser?.name||""})}); return result; })({
         pbom_version_gid: gid,
         rows: errors.map(e => ({ pbom_row_gid: e.gid || '', original_vpps_desc: e.vpps || '' })),
         actor_gid:  user.gid  || '',
         actor_name: user.name || '',
-      }),
-    });
+      },{},new URLSearchParams());
     await _runCheck();
   } catch (e) { alert('忽略失败: ' + e.message); }
 }
 
 async function _revertAllR4(ops) {
-  const _cloudFetch = window._cloudFetch?.bind(window);
+
   if (!confirm(`确认撤销全部 ${ops.length} 条让步？`)) return;
   let failed = 0;
   for (const op of ops) {
-    try { await _cloudFetch(`/api/vpps-operations/${op.gid}/revert`, { method: 'POST' }); }
+    try { await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.vpps_audit.change.apply", {version:1,payload:({operation:"revert",gid:path.gid,...(body.reverted_by_gid?{actor_gid:body.reverted_by_gid}:{}),actor_name:body.reverted_by_name||window._authUser?.name||window.parent?._authUser?.name||""})}); return result; })({},{"gid":decodeURIComponent(String(op.gid))},new URLSearchParams()); }
     catch (_) { failed++; }
   }
   if (failed) alert(`${failed} 条撤销失败`);
@@ -605,7 +589,7 @@ const _NOK_COLS = [
 ];
 
 function _showNokView() {
-  const _cloudFetch = window._cloudFetch?.bind(window);
+
   const col = document.getElementById('pcTlsMount');
   if (!col) return;
 
@@ -748,15 +732,12 @@ function _showNokView() {
       const part   = _parts.find(p => p.gid === rowGid);
       const user   = window._authUser || {};
       try {
-        await _cloudFetch('/api/vpps-operations/rule4-bulk-ignore', {
-          method: 'POST',
-          body: JSON.stringify({
+        await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.vpps_audit.change.apply", {version:1,payload:({operation:"rule4_bulk_ignore",pbom_version_gid:body.pbom_version_gid,rows:body.rows,...(body.actor_gid?{actor_gid:body.actor_gid}:{}),actor_name:body.actor_name||window._authUser?.name||window.parent?._authUser?.name||""})}); return result; })({
             pbom_version_gid: verGid,
             rows: [{ pbom_row_gid: rowGid, original_vpps_desc: part?.vpps_desc || '' }],
             actor_gid:  user.gid  || '',
             actor_name: user.name || '',
-          }),
-        });
+          },{},new URLSearchParams());
         await _runCheck();
       } catch (e) { alert('忽略失败: ' + e.message); }
     });
@@ -765,13 +746,11 @@ function _showNokView() {
   // 行内撤销按钮
   tableWrap.querySelectorAll('.pc-rev-row-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
-      const ignRes = await _cloudFetch(
-        `/api/vpps-operations?pbom_row_gid=${btn.dataset.gid}`
-      , { method: 'GET' }).catch(() => null);
+      const ignRes = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.vpps_audit.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"list",pbom_version_gid:(query.has("pbom_version_gid")?query.get("pbom_version_gid"):null),operation_type:(query.has("operation_type")?query.get("operation_type"):null)}).filter(([,v])=>v!=null))}); return result; })({},{},new URLSearchParams((`/api/vpps-operations?pbom_row_gid=${btn.dataset.gid}`).split("?")[1]||"")).catch(() => null);
       const ops = ignRes?.data || [];
       if (!ops.length) { alert('未找到可撤销的操作'); return; }
       try {
-        await _cloudFetch(`/api/vpps-operations/${ops[0].gid}/revert`, { method: 'POST' });
+        await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.vpps_audit.change.apply", {version:1,payload:({operation:"revert",gid:path.gid,...(body.reverted_by_gid?{actor_gid:body.reverted_by_gid}:{}),actor_name:body.reverted_by_name||window._authUser?.name||window.parent?._authUser?.name||""})}); return result; })({},{"gid":decodeURIComponent(String(ops[0].gid))},new URLSearchParams());
         await _runCheck();
       } catch (e) { alert('撤销失败: ' + e.message); }
     });

@@ -227,7 +227,7 @@ class DiffManager {
         e.preventDefault();
         zone.classList.remove('dragover');
         const file = e.dataTransfer.files[0];
-        if (file) { input.files = e.dataTransfer.files; input.dispatchEvent(new Event('change')); }
+        if (file) input.click();
       });
       return;
     }
@@ -576,101 +576,27 @@ class DiffManager {
   // ── 导出 Excel ────────────────────────────────────────────────────────────
 
   async _exportExcel(labelA, labelB) {
-    const _cf = this._cf.bind(this);
-    const exportBtn = this._overlay.querySelector('#dm-export-btn');
-    if (exportBtn) { exportBtn.disabled = true; exportBtn.textContent = '导出中…'; }
-    try {
-      const body = {
-        columns:   this._columns.map(c => ({ key: c.key, label: c.label, width: Math.round((c.width || 100) / 6) })),
-        diff_rows: this._diffRows,
-        label_a:   labelA,
-        label_b:   labelB,
-        filename:  `diff_${this._moduleId}_${_dmDateStr()}.xlsx`,
-      };
-      const resp = await _cf('POST', '/api/import-export/export/diff-report', body);
-      if (!resp?.file_b64) throw new Error('后端未返回文件数据');
-      _dmSaveBase64(resp.file_b64, resp.filename || body.filename);
-    } catch (err) {
-      alert('导出失败：' + (err.message || String(err)));
-    } finally {
-      if (exportBtn) { exportBtn.disabled = false; exportBtn.textContent = '导出报告 ▾'; }
-    }
-  }
+const button=this._overlay.querySelector('#dm-export-btn');if(button){button.disabled=true;button.textContent='导出中…';}
+ try{await window.AI00Business.invoke('craft.data_exchange.diff_report.export',{version:1,payload:window.AI00Business.diffPayload(this._columns,this._diffRows,{label_a:labelA,label_b:labelB,filename:'diff_'+this._moduleId+'_'+_dmDateStr()+'.xlsx'}),native_io:{save:true}});}catch(error){if(error.code!=='native_selection_cancelled')alert('导出失败：'+error.message);}finally{if(button){button.disabled=false;button.textContent='导出报告 ▾';}}
+}
 
   // ── 导出飞书电子表格 ──────────────────────────────────────────────────────
 
   async _exportLarkSheet(labelA, labelB) {
-    const _cf = this._cf.bind(this);
-    // 弹出简单输入对话框
-    const token = prompt('请输入飞书电子表格 Token（URL 中 spreadsheets/ 后面的部分）：');
-    if (!token) return;
-    const sheetId = prompt('请输入 Sheet ID（默认 Sheet1）：', 'Sheet1') || 'Sheet1';
-
-    const userToken = _getLarkToken();
-    if (!userToken) { alert('请先飞书登录后再导出到飞书电子表格'); return; }
-
-    const exportBtn = this._overlay.querySelector('#dm-export-btn');
-    if (exportBtn) { exportBtn.disabled = true; exportBtn.textContent = '写入中…'; }
-    try {
-      const body = {
-        user_access_token: userToken,
-        spreadsheet_token: token,
-        sheet_id:          sheetId,
-        columns:           this._columns.map(c => ({ key: c.key, label: c.label })),
-        diff_rows:         this._diffRows,
-        label_a:           labelA,
-        label_b:           labelB,
-      };
-      const resp = await _cf('POST', '/api/import-export/export/diff-lark-sheet', body);
-      alert(`写入成功，共 ${resp?.written_rows || 0} 行`);
-    } catch (err) {
-      alert('写入失败：' + (err.message || String(err)));
-    } finally {
-      if (exportBtn) { exportBtn.disabled = false; exportBtn.textContent = '导出报告 ▾'; }
-    }
-  }
+const token=prompt('请输入飞书电子表格 Token（URL 中 spreadsheets/ 后面的部分）：');if(!token)return;const sheetId=prompt('请输入 Sheet ID（默认 Sheet1）：','Sheet1')||'Sheet1';
+ const button=this._overlay.querySelector('#dm-export-btn');if(button){button.disabled=true;button.textContent='写入中…';}
+ try{const result=await window.AI00Business.invoke('craft.data_exchange.feishu_diff.write',{version:1,payload:window.AI00Business.diffPayload(this._columns,this._diffRows,{spreadsheet_token:token,sheet_id:sheetId,label_a:labelA,label_b:labelB})});alert('写入成功，共 '+result.written_rows+' 行');}catch(error){alert('写入失败：'+error.message);}finally{if(button){button.disabled=false;button.textContent='导出报告 ▾';}}
+}
 
   // ── 解析 Excel 文件 ───────────────────────────────────────────────────────
 
   async _parseExcelFile(file) {
-    const _cf = this._cf.bind(this);
-    // 读取 file 为 base64
-    const b64 = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = e => {
-        const arr    = new Uint8Array(e.target.result);
-        let binary   = '';
-        for (let i = 0; i < arr.length; i++) binary += String.fromCharCode(arr[i]);
-        resolve(btoa(binary));
-      };
-      reader.onerror = reject;
-      reader.readAsArrayBuffer(file);
-    });
-
-    const data = await _cf('POST', '/api/import-export/import/parse-excel', {
-      file_b64:  b64,
-      filename:  file.name,
-    });
-
-    // data = { headers, rows, warnings }
-    const { headers, rows } = data;
-    // 转为对象数组（按列名匹配）
-    return rows.map(row => {
-      const obj = {};
-      headers.forEach((h, i) => { obj[h] = row[i] ?? ''; });
-      return obj;
-    });
-  }
+const data=await (await window.AI00Business.invoke('craft.data_exchange.excel.parse',{version:1,payload:{},native_io:{select:'spreadsheet'}})).data;return data.rows.map(row=>Object.fromEntries(data.headers.map((header,index)=>[header,row[index]??''])));
+}
 
   // ── 工具：云端 API ────────────────────────────────────────────────────────
 
-  async _cf(method, path, body) {
-    const fn = window.parent?._cloudFetch || window._cloudFetch;
-    if (!fn) throw new Error('_cloudFetch 未就绪');
-    const resp = await fn(path, { method, body: JSON.stringify(body) });
-    if (!resp?.success) throw new Error(resp?.message || 'API 调用失败');
-    return resp.data;
-  }
+
 }
 
 // ── 模块级工具函数 ─────────────────────────────────────────────────────────

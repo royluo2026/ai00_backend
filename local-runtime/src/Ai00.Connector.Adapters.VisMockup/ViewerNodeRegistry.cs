@@ -65,7 +65,8 @@ public sealed partial class VisMockupAdapter
         // Each node's occurrence metadata is read at most once in this batch.
         var remaining = 511;
         var childrenByKey = new Dictionary<string, IReadOnlyList<IVisMockupNode>>(StringComparer.Ordinal);
-        var occurrenceByKey = new Dictionary<string, string>(StringComparer.Ordinal);
+        var primaryOccurrenceByKey = new Dictionary<string, string>(StringComparer.Ordinal);
+        var occurrencesByKey = new Dictionary<string, IReadOnlyList<string>>(StringComparer.Ordinal);
         var prefixes = new Dictionary<string, IVisMockupNode>(StringComparer.Ordinal) { [""] = root };
         IReadOnlyList<IVisMockupNode> Children(IVisMockupNode node)
         {
@@ -73,24 +74,48 @@ public sealed partial class VisMockupAdapter
             var key = node.NodeKey;
             if (childrenByKey.TryGetValue(key, out var known)) return known;
             RequireViewerAdmission();
-            var children = node.GetChildren(remaining);
+            IReadOnlyList<IVisMockupNode> children;
+            try { children = node.GetChildren(remaining); }
+            catch (ConnectorNoEffectException error) when (error.Code == "viewer_mapping_budget_exceeded")
+            {
+                try
+                {
+                    Console.Error.WriteLine("AI00_VIEWER_MAPPING_BUDGET_V1:" + JsonSerializer.Serialize(new
+                    {
+                        parent_key = key, at_root = string.Equals(key, root.NodeKey, StringComparison.Ordinal),
+                        child_count = node.ChildCount, remaining
+                    }));
+                }
+                catch { /* A failed diagnostic must not change the mapping result. */ }
+                throw;
+            }
             remaining -= children.Count;
             childrenByKey[key] = children;
             return children;
         }
-        string Occurrence(IVisMockupNode node)
+        IReadOnlyList<string> Occurrences(IVisMockupNode node)
         {
             RequireViewerAdmission();
             var key = node.NodeKey;
-            if (occurrenceByKey.TryGetValue(key, out var known)) return known;
+            if (occurrencesByKey.TryGetValue(key, out var known)) return known;
             RequireViewerAdmission();
-            return occurrenceByKey[key] = node.OccurrenceId;
+            return occurrencesByKey[key] = node.OccurrenceIds;
+        }
+        string PrimaryOccurrence(IVisMockupNode node)
+        {
+            RequireViewerAdmission();
+            var key = node.NodeKey;
+            if (primaryOccurrenceByKey.TryGetValue(key, out var known)) return known;
+            RequireViewerAdmission();
+            return primaryOccurrenceByKey[key] = node.OccurrenceId;
         }
         IVisMockupNode ResolvePath(string[] path)
         {
             var current = root;
             var prefix = "";
-            var start = Occurrence(root) == path[0] ? 1 : 0;
+            var rootPrimary = PrimaryOccurrence(root);
+            var start = string.Equals(rootPrimary, path[0], StringComparison.Ordinal)
+                || (!string.IsNullOrWhiteSpace(path[0]) && Occurrences(root).Contains(path[0], StringComparer.Ordinal)) ? 1 : 0;
             for (var index = start; index < path.Length; index++)
             {
                 RequireViewerAdmission();
@@ -98,11 +123,48 @@ public sealed partial class VisMockupAdapter
                 prefix += path[index].Length + ":" + path[index];
                 if (prefixes.TryGetValue(prefix, out var known)) { current = known; continue; }
                 IVisMockupNode? match = null;
-                foreach (var child in Children(current))
+                var pending = new Queue<IVisMockupNode>(Children(current));
+                var aliasFallback = new List<IVisMockupNode>();
+                while (pending.Count > 0)
                 {
-                    if (!string.Equals(Occurrence(child), path[index], StringComparison.Ordinal)) continue;
-                    if (match is not null) throw new ConnectorNoEffectException("vismockup_online_occurrence_ambiguous");
-                    match = child;
+                    var levelCount = pending.Count;
+                    var wrappers = new List<IVisMockupNode>();
+                    for (var sibling = 0; sibling < levelCount; sibling++)
+                    {
+                        var child = pending.Dequeue();
+                        var primary = PrimaryOccurrence(child);
+                        if (string.Equals(primary, path[index], StringComparison.Ordinal))
+                        {
+                            if (match is not null) throw new ConnectorNoEffectException("vismockup_online_occurrence_ambiguous");
+                            match = child;
+                        }
+                        else if (string.IsNullOrWhiteSpace(primary))
+                        {
+                            var aliases = Occurrences(child);
+                            if (aliases.Contains(path[index], StringComparer.Ordinal))
+                            {
+                                if (match is not null) throw new ConnectorNoEffectException("vismockup_online_occurrence_ambiguous");
+                                match = child;
+                            }
+                            else if (aliases.Count == 0) wrappers.Add(child);
+                        }
+                        else aliasFallback.Add(child);
+                    }
+                    if (match is not null) break;
+                    foreach (var wrapper in wrappers)
+                        foreach (var nested in Children(wrapper)) pending.Enqueue(nested);
+                }
+                // The Teamcenter occurrence UID is the canonical fast path. Older
+                // Siemens metadata aliases are consulted only when no primary UID
+                // matched, avoiding five COM metadata calls for every sibling.
+                if (match is null)
+                {
+                    foreach (var child in aliasFallback)
+                    {
+                        if (!Occurrences(child).Contains(path[index], StringComparer.Ordinal)) continue;
+                        if (match is not null) throw new ConnectorNoEffectException("vismockup_online_occurrence_ambiguous");
+                        match = child;
+                    }
                 }
                 current = match ?? throw new ConnectorNoEffectException("vismockup_online_occurrence_unmapped");
                 prefixes[prefix] = current;

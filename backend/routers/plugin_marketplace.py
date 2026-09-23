@@ -9,7 +9,7 @@ from types import SimpleNamespace
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from fastapi.responses import Response
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 from backend.plugin_platform.artifacts import ArtifactError, publish_web_assets, read_web_asset, upload_to_ois, validate_package
 from backend.plugin_platform.manifest import ManifestError, parse_manifest
@@ -28,6 +28,8 @@ from backend.capability_v2.contracts import (
 )
 from backend.capability_v2.gateway import get_default_gateway
 from backend.capability_v2.policies import GatewayPolicyError
+from backend.plugin_platform.local_providers import installed_providers, local_jobs, finalize_generated_artifact
+from backend.plugin_platform.provider_bindings import ProviderBindingError
 
 router = APIRouter(prefix="/api/v1/plugin-marketplace", tags=["plugin-marketplace"])
 
@@ -35,6 +37,12 @@ router = APIRouter(prefix="/api/v1/plugin-marketplace", tags=["plugin-marketplac
 def _manager(user: dict = Depends(get_current_user)) -> dict:
     if "system.plugin.manage" not in set(build_profile(user).get("permissions", [])):
         raise HTTPException(403, detail={"code": "permission_denied", "message": "system.plugin.manage is required"})
+    return user
+
+
+def _platform_admin(user: dict = Depends(get_current_user)) -> dict:
+    if not user.get('is_active') or 'super_admin' not in {user.get('system_role'), user.get('org_role')}:
+        raise HTTPException(403, detail={'code': 'permission_denied', 'message': 'A super administrator is required'})
     return user
 
 
@@ -47,6 +55,7 @@ class PublisherRequest(BaseModel):
 class ReviewRequest(BaseModel):
     approved: bool
     note: str = Field(default="", max_length=4000)
+    release_sha256: str = Field(pattern=r'^sha256:[a-f0-9]{64}$')
 
 
 class UpgradeHealthRequest(BaseModel):
@@ -67,11 +76,19 @@ def _mount_service() -> MountSessionService:
 
 
 def _catalog_release() -> CatalogRelease:
-    path = Path(__file__).resolve().parents[2] / "docs/governance/capability-catalog-release.json"
-    release = load_catalog_release(path.read_text(encoding="utf-8"))
-    if release.release_id != get_default_gateway().catalog_release:
-        raise MountSessionError("gateway and plugin mount catalog releases differ")
-    return release
+    # The running Gateway owns the validated snapshot, including test overlays.
+    return get_default_gateway().catalog()
+
+
+def _local_gateway(user, dispatch=None):
+    providers = installed_providers(user)
+    def handler(provider):
+        async def execute(payload,context):
+            if dispatch is None:
+                raise ProviderBindingError("provider_app_transport_required")
+            return await dispatch(provider,payload,context)
+        return execute
+    return get_default_gateway().with_local_providers(providers,handler)
 
 
 def _resolved_mount_grants(item: dict, release: CatalogRelease) -> tuple[tuple[str, ...], tuple[str, ...]]:
@@ -212,7 +229,7 @@ def registry(
     data = tenant_registry(user)
     tenant = user.get("team_id") or f"user:{user['gid']}"
     try:
-        release = _catalog_release()
+        release = (_local_gateway(user).catalog() if any(item.get("provides") for item in data) else _catalog_release())
         service = _mount_service()
         for item in data:
             grants, missing_required = _resolved_mount_grants(item, release)
@@ -238,6 +255,7 @@ def registry(
                 authenticated_at=principal.authenticated_at,
             )
             item["mount_session_id"] = issued.session.mount_session_id
+            item["mount_expires_at"] = issued.session.expires_at.isoformat()
             item["catalog_release"] = release.release_id
             item["capability_grants"] = grants
             item["capability_versions"] = {
@@ -250,6 +268,78 @@ def registry(
     except (MountSessionError, MountTokenError) as exc:
         raise HTTPException(503, detail={"code": "plugin_mount_unavailable", "message": str(exc)}) from exc
     return {"success": True, "data": data}
+
+
+class LocalJobRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    secret: str = Field(pattern=r"^[a-f0-9]{64}$")
+    output: dict | None = None
+    error: str | None = Field(default=None,max_length=128)
+
+
+def _job_scope(session, user):
+    return (str(user["gid"]),str(session.tenant_id),session.mount_session_id)
+
+
+@router.post("/mounts/{mount_session_id}/capabilities/{capability_id}:local-start")
+async def start_local_invocation(mount_session_id: str, capability_id: str, body: MountInvokeRequest,
+    user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal)):
+    try:
+        session = _resolve_mount_for_user(mount_session_id,user)
+        if f"{capability_id}@{body.major_version}" not in session.capability_grants:
+            raise ProviderBindingError("capability_not_granted")
+        request_id=f"plugin_{uuid.uuid4().hex}"
+        envelope=InvocationEnvelope(capability_id=capability_id,major_version=body.major_version,
+            catalog_release=session.catalog_release,payload=body.payload,identity=_plugin_identity(session,user,principal),
+            idempotency_key=body.idempotency_key,expected_resource_version=body.expected_resource_version,
+            approval_reference=body.approval_reference,request_id=request_id,trace_id=request_id)
+        async def invoke(dispatch):
+            async def execute(provider,payload,context):
+                output = await dispatch(provider,payload,context)
+                _resolve_mount_for_user(mount_session_id,user)
+                # Re-read the current signed installation and current exact approval.
+                current = next((item for item in installed_providers(user)
+                    if item.binding == provider.binding and item.installation_id == provider.installation_id
+                    and item.revision == provider.revision),None)
+                if current is None:
+                    raise ProviderBindingError("provider_binding_changed")
+                gateway.reauthorize(envelope)
+                if provider.binding.declaration.result == "artifact":
+                    from backend.platform_sdk.artifacts import artifact_service
+                    from backend.plugin_platform.local_providers import provider_commit_guard
+                    with provider_commit_guard(user,session,provider):
+                        return finalize_generated_artifact(output,envelope.identity,artifact_service())
+                return output
+            gateway=_local_gateway(user,execute)
+            descriptor=gateway.catalog().descriptor(capability_id,body.major_version)
+            if descriptor is None or descriptor.execution_mode.value!="local":
+                raise ProviderBindingError("local_provider_unavailable")
+            result=await gateway.invoke(envelope)
+            mount_invocation_audit.record(session=session,capability_id=capability_id,
+                major_version=body.major_version,request_id=request_id,payload=body.payload,
+                status=result.status.value,error=result.error.code if result.error else None)
+            return result.model_dump(mode="json")
+        return local_jobs.start(_job_scope(session,user),invoke)
+    except (MountSessionError,ProviderBindingError) as exc:
+        raise HTTPException(403,detail={"code":"plugin_provider_denied","message":str(exc)}) from exc
+
+
+@router.post("/mounts/{mount_session_id}/local-jobs/{job_id}/{action}")
+async def local_job(mount_session_id: str, job_id: str, action: str, body: LocalJobRequest,
+    user: dict=Depends(get_current_user)):
+    try:
+        session=_resolve_mount_for_user(mount_session_id,user)
+        scope=_job_scope(session,user)
+        if action=="poll": return local_jobs.poll(job_id,body.secret,scope)
+        if action=="complete":
+            local_jobs.complete(job_id,body.secret,scope,{"output":body.output,"error":body.error})
+            return {"status":"received"}
+        if action=="cancel":
+            local_jobs.cancel(job_id,body.secret,scope)
+            return {"status":"cancelled"}
+        raise ProviderBindingError("provider_job_action_invalid")
+    except (MountSessionError,ProviderBindingError) as exc:
+        raise HTTPException(403,detail={"code":"plugin_provider_denied","message":str(exc)}) from exc
 
 
 @router.post("/mounts/{mount_session_id}/capabilities/{capability_id}:invoke")
@@ -273,6 +363,8 @@ async def invoke_from_mount(
     except MountSessionError as exc:
         raise HTTPException(403, detail={"code": "plugin_mount_denied", "message": str(exc)}) from exc
     gateway = get_default_gateway()
+    if session.catalog_release != gateway.catalog_release:
+        gateway = _local_gateway(user)
     result = await gateway.invoke(InvocationEnvelope(
         capability_id=capability_id,
         major_version=body.major_version,
@@ -307,6 +399,8 @@ async def confirm_from_mount(
         if f"{capability_id}@{body.major_version}" not in session.capability_grants:
             raise MountSessionError("capability is not granted to this mount session")
         gateway = get_default_gateway()
+        if session.catalog_release != gateway.catalog_release:
+            gateway = _local_gateway(user)
         request_id = f"plugin_approval_{uuid.uuid4().hex}"
         issued = await gateway.request_approval(InvocationEnvelope(
             capability_id=capability_id, major_version=body.major_version,
@@ -330,7 +424,7 @@ async def confirm_from_mount(
 
 
 @router.post("/publishers")
-def create_publisher(body: PublisherRequest, user: dict = Depends(_manager)):
+def create_publisher(body: PublisherRequest, user: dict = Depends(_platform_admin)):
     try:
         data = register_publisher(body.publisher_id, body.display_name, body.public_key_pem, user["gid"])
     except (ValueError, SignatureError) as exc:
@@ -341,7 +435,7 @@ def create_publisher(body: PublisherRequest, user: dict = Depends(_manager)):
 @router.post("/releases")
 async def create_release(
     manifest_json: str = Form(...), publisher_signature: str = Form(...),
-    package: UploadFile = File(...), user: dict = Depends(_manager),
+    package: UploadFile = File(...), user: dict = Depends(_platform_admin),
 ):
     try:
         manifest = parse_manifest(json.loads(manifest_json))
@@ -359,7 +453,7 @@ async def create_release(
 
 
 @router.get("/releases")
-def releases(status: str | None = Query(default=None), user: dict = Depends(_manager)):
+def releases(status: str | None = Query(default=None), user: dict = Depends(_platform_admin)):
     try:
         data = list_releases(status)
     except ValueError as exc:
@@ -367,18 +461,18 @@ def releases(status: str | None = Query(default=None), user: dict = Depends(_man
     return {"success": True, "data": data}
 
 @router.post("/releases/{plugin_id}/{version}/review")
-def review(plugin_id: str, version: str, body: ReviewRequest, user: dict = Depends(_manager)):
+def review(plugin_id: str, version: str, body: ReviewRequest, user: dict = Depends(_platform_admin)):
     try:
-        data = review_release(plugin_id, version, body.approved, body.note, user["gid"])
+        data = review_release(plugin_id, version, body.approved, body.note, user["gid"], expected_sha256=body.release_sha256)
     except (ValueError, SignatureError) as exc:
         raise _bad(exc) from exc
     return {"success": True, "data": data}
 
 
 @router.post("/releases/{plugin_id}/{version}/revoke")
-def revoke(plugin_id: str, version: str, body: ReviewRequest, user: dict = Depends(_manager)):
+def revoke(plugin_id: str, version: str, body: ReviewRequest, user: dict = Depends(_platform_admin)):
     try:
-        data = revoke_release(plugin_id, version, body.note or "security revocation", user["gid"])
+        data = revoke_release(plugin_id, version, body.note or "security revocation", user["gid"], expected_sha256=body.release_sha256)
     except ValueError as exc:
         raise _bad(exc) from exc
     return {"success": True, "data": data}

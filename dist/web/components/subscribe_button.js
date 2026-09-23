@@ -104,23 +104,17 @@
   async function _onSave() {
     if (!_ctx) return;
     const checks = [..._panel.querySelectorAll('.sub-cond-chk:checked')].map(c => c.value);
-    const { itemType, itemGid, itemTitle, followed, followGid, cf: _cloudFetch, onSave } = _ctx;
+
 
     _setLoading(true);
     try {
       if (followed && followGid) {
         // 更新条件
-        await _cloudFetch(`/api/follows/${followGid}`, {
-          method: 'PATCH',
-          body: JSON.stringify({ notify_on: checks }),
-        });
+        await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.follow.change.apply.atomic.follows_update", {version:1,payload:{arguments:{"gid":path.gid,...{...{},...body}}}}); return result; })({ notify_on: checks },{"gid":decodeURIComponent(String(followGid))},new URLSearchParams());
         onSave({ followed: true, followGid, conditions: checks });
       } else {
         // 新建关注
-        const res = await _cloudFetch('/api/follows', {
-          method: 'POST',
-          body: JSON.stringify({ item_type: itemType, item_gid: itemGid, item_title: itemTitle, notify_on: checks }),
-        });
+        const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.follow.create", {version:1,payload:body}); return result; })({ item_type: itemType, item_gid: itemGid, item_title: itemTitle, notify_on: checks },{},new URLSearchParams());
         const newGid = res?.data?.gid || null;
         onSave({ followed: true, followGid: newGid, conditions: checks });
       }
@@ -134,12 +128,12 @@
 
   async function _onUnfollow() {
     if (!_ctx) return;
-    const { followGid, cf: _cloudFetch, onSave } = _ctx;
+
     if (!followGid) { SubscribeButton.close(); return; }
 
     _setLoading(true);
     try {
-      await _cloudFetch(`/api/follows/${followGid}`, { method: 'DELETE' });
+      await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.follow.change.apply.atomic.follows_delete", {version:1,payload:{arguments:{"gid":path.gid}}}); return result; })({},{"gid":decodeURIComponent(String(followGid))},new URLSearchParams());
       onSave({ followed: false, followGid: null, conditions: [] });
       SubscribeButton.close();
     } catch (err) {

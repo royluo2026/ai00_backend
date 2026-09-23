@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script src="/web/core/business_facade.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI00 - 问题清单</title>
@@ -140,6 +141,12 @@
 
     async function feishuLogin() {
       try {
+        if(location.protocol==='app:'||/Electron\//.test(navigator.userAgent)){
+          const bridge=window.electronAPI||window.parent?.electronAPI;
+          const result=await bridge?.authFeishuLogin();
+          if(!result?.success&&!result?.ok)throw Error(result?.error||'登录失败');
+          jwt='main-owned-session';showMain();await loadIssues();return;
+        }
         const res = await fetch(`${API}/auth/feishu/login-url`).then(r => r.json());
         const { login_url, state } = res;
         const popup = window.open(login_url, 'feishu_login', 'width=480,height=640,left=200,top=100');
@@ -149,6 +156,7 @@
           if (poll.status === 'ok') {
             jwt = poll.token;
             localStorage.setItem('ai00_web_jwt', jwt);
+            localStorage.setItem('ai00_token', jwt);
             popup?.close();
             showMain();
             loadIssues();
@@ -174,21 +182,8 @@
       document.getElementById('issueTable').style.display = 'none';
       document.getElementById('emptyState').style.display = 'none';
       try {
-        const qs = listGid ? `?list_gid=${encodeURIComponent(listGid)}` : '';
-        const res = await fetch(API + '/api/issues' + qs, {
-          headers: { 'X-AI00-Token': jwt }
-        });
-        if (res.status === 401) {
-          // token 过期，清除并重新登录
-          localStorage.removeItem('ai00_web_jwt');
-          jwt = null;
-          document.getElementById('loginWrap').style.display = 'flex';
-          document.getElementById('mainContent').style.display = 'none';
-          document.getElementById('headerActions').style.display = 'none';
-          return;
-        }
-        const data = await res.json();
-        const issues = data.data || [];
+        const data=await window.AI00Business.invoke('project.issue.read.atomic.issues_search',{version:1,payload:{arguments:listGid?{list_gid:listGid}:{}}});
+        const issues=Array.isArray(data)?data:data.data||data.items||[];
         document.getElementById('loadingMsg').style.display = 'none';
         if (issues.length === 0) {
           document.getElementById('emptyState').style.display = 'block';
@@ -201,6 +196,12 @@
           // 暂无更好方式，保持 URL 传入的名字
         }
       } catch (e) {
+        if(e.code==='authentication_required'){
+          localStorage.removeItem('ai00_web_jwt');jwt=null;
+          document.getElementById('loginWrap').style.display='flex';
+          document.getElementById('mainContent').style.display='none';
+          document.getElementById('headerActions').style.display='none';
+        }
         document.getElementById('loadingMsg').textContent = '加载失败：' + e.message;
       }
     }

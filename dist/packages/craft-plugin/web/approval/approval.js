@@ -3,16 +3,7 @@
  */
 
 // ── 云端 API 封装 ──────────────────────────────────────────────────────────────
-async function api(path, opts) {
-  try {
-    const fn = window.parent?._cloudFetch || window._cloudFetch;
-    if (!fn) throw new Error('_cloudFetch 未就绪');
-    return await fn(path, opts);
-  } catch (e) {
-    console.error(`[approval] API ${path} error:`, e.message);
-    return { success: false, error: String(e), data: {} };
-  }
-}
+
 
 // ── 主题同步 ──────────────────────────────────────────────────────────────────
 window.addEventListener('message', e => {
@@ -43,7 +34,7 @@ const STATUS_CLS = {
 
 // ── 加载列表 ──────────────────────────────────────────────────────────────────
 async function loadOrders() {
-  const res = await api('/api/approval/orders');
+  const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.approval.order.search", {version:1,payload:Object.fromEntries(["status","project_gid"].filter(key=>query.get(key)).map(key=>[key,query.get(key)]))}); return result; })({},{},new URLSearchParams());
   _orders = res?.data || [];
   renderList();
 }
@@ -66,7 +57,7 @@ function renderList() {
 
 // ── 选择审批单 ────────────────────────────────────────────────────────────────
 async function selectOrder(gid) {
-  const res = await api(`/api/approval/orders/${gid}`);
+  const res = await window.AI00Business.invoke('project.approval.order.get',{version:1,payload:{order_gid:gid}});
   if (!res?.data) { console.error('获取审批单失败'); return; }
   _selected = res.data;
   renderDetail();
@@ -103,7 +94,9 @@ function renderDetail() {
 
   // 操作区：仅 pending/in_review 时显示
   const actionArea = document.getElementById('action-area');
-  actionArea.style.display = o.is_finished ? 'none' : '';
+  actionArea.style.display = ['approved','rejected','withdrawn'].includes(o.status) ? 'none' : '';
+  const actionLabel = [...document.getElementById('btn-approve').childNodes].find(node => node.nodeType === 3);
+  if (actionLabel) actionLabel.textContent = o.status === 'pending' ? ' 提交审批' : ' 通过';
 
   // 意见区
   const opinionsArea = document.getElementById('opinions-area');
@@ -129,12 +122,12 @@ async function approveOrder() {
   if (!_selected) return;
   const comment = document.getElementById('approval-remark').value.trim();
   if (_selected.status === 'pending') {
-    await api(`/api/approval/orders/${_selected.gid}/start`, { method: 'POST' });
+    await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.approval.order.start", {version:1,payload:({order_gid:path.gid,expected_revision:(await window.AI00Business.invoke("project.approval.order.get",{version:1,payload:{order_gid:path.gid}})).data.revision,...(body.comment!==undefined?{comment:body.comment}:{})})}); return result; })({},{"gid":decodeURIComponent(String(_selected.gid))},new URLSearchParams());
+    await loadOrders();
+    await selectOrder(_selected.gid);
+    return;
   }
-  const res = await api(`/api/approval/orders/${_selected.gid}/approve`, {
-    method: 'POST',
-    body: JSON.stringify({ comment }),
-  });
+  const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.approval.order.approve", {version:1,payload:({order_gid:path.gid,expected_revision:(await window.AI00Business.invoke("project.approval.order.get",{version:1,payload:{order_gid:path.gid}})).data.revision,...(body.comment!==undefined?{comment:body.comment}:{})})}); return result; })({ comment },{"gid":decodeURIComponent(String(_selected.gid))},new URLSearchParams());
   if (res?.success !== false) {
     document.getElementById('approval-remark').value = '';
     await loadOrders();
@@ -209,7 +202,7 @@ async function rejectOrder() {
 
 async function withdrawOrder() {
   if (!_selected) return;
-  const res = await api(`/api/approval/orders/${_selected.gid}/withdraw`, { method: 'POST' });
+  const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.approval.order.withdraw", {version:1,payload:({order_gid:path.gid,expected_revision:(await window.AI00Business.invoke("project.approval.order.get",{version:1,payload:{order_gid:path.gid}})).data.revision,...(body.comment!==undefined?{comment:body.comment}:{})})}); return result; })({},{"gid":decodeURIComponent(String(_selected.gid))},new URLSearchParams());
   if (res?.success !== false) {
     await loadOrders();
     await selectOrder(_selected.gid);

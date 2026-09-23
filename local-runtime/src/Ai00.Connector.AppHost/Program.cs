@@ -27,7 +27,7 @@ public static class Program
             using var singleton=new FileStream(Path.Combine(root,$"host{stateSuffix}.lock"),FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);
             using var sta=new StaDispatcher();
             var com=new BreakawayVisMockupCom(verified.Manifest.VisMockupExecutable,verified.Manifest.VisMockupPublisher);
-            var teamcenter=TeamcenterReadOnlyRuntime.CreateInstalled(root);
+            var teamcenter=TeamcenterReadOnlyRuntime.CreateInstalled(root,options.Development);
             var adapter=new VisMockupAdapter(sta,new AllowedPathPolicy([Path.Combine(root,"artifacts")]),com,
                 Path.Combine(root,"captures"),Path.Combine(root,$"vismockup-tree-cache{stateSuffix}.db"),teamcenter);
             using var http=new HttpClient(new HttpClientHandler{AllowAutoRedirect=false,UseCookies=false}){Timeout=TimeSpan.FromSeconds(30)};
@@ -40,7 +40,7 @@ public static class Program
             builder.Services.AddSingleton(new DiagnosticIdentity(options.ParentPid,Environment.ProcessId,Environment.ProcessPath!,verified.Manifest.Publisher,verified.Digest,options.LaunchNonce));
             builder.Services.AddSingleton<DiagnosticPipeHost>();
             builder.Services.AddHostedService(s=>s.GetRequiredService<DiagnosticPipeHost>());
-            builder.Services.AddSingleton(teamcenter);
+            RegisterTeamcenterRuntime(builder.Services,teamcenter);
             builder.Services.AddHostedService<TeamcenterControlPipeHost>();
             builder.Services.AddSingleton(new RuntimeTransport(http,options.GatewayOrigin));
             builder.Services.AddSingleton<IAppArtifactMaterializer>(services=>new AppArtifactMaterializer(
@@ -81,6 +81,8 @@ public static class Program
             return 1; // Release builds never emit launch secrets, credentials, signed plans or COM payloads.
         }
     }
+    internal static void RegisterTeamcenterRuntime(IServiceCollection services,TeamcenterReadOnlyRuntime runtime)
+        =>services.AddSingleton(_=>runtime); // factory registration transfers disposal ownership to the host
     internal static string StateRoot(bool development)=>Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "AI00","App",development?"Connector-Test":"Connector");

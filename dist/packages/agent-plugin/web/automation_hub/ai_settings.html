@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
+  <script src="/web/core/business_facade.js"></script>
 <meta charset="UTF-8">
 <title>AI 设置</title>
 <style>
@@ -77,6 +78,32 @@ html, body { height: 100%; background: var(--bg); color: var(--text);
 }
 .chj-model-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--hover); }
 .chj-model-chip.selected { border-color: var(--accent); color: var(--accent); background: var(--active); font-weight: 600; }
+.chj-model-chips { display: contents; }
+.chj-model-manage {
+  margin-left: auto; padding: 3px 8px; border: none; background: transparent;
+  color: var(--text-muted); font-size: 11px; cursor: pointer;
+}
+.chj-model-manage:hover { color: var(--accent); }
+.chj-preset-editor {
+  display: none; flex: 1 0 100%; gap: 6px; padding-top: 8px;
+  border-top: 1px solid var(--border); margin-top: 2px;
+}
+.chj-preset-editor.show { display: flex; flex-direction: column; }
+.chj-preset-list { display: flex; flex-direction: column; gap: 5px; }
+.chj-preset-item, .chj-preset-add { display: flex; gap: 5px; }
+.chj-preset-item input, .chj-preset-add input {
+  flex: 1; min-width: 0; padding: 5px 8px; border-radius: 5px;
+  border: 1px solid var(--border); background: var(--bg2); color: var(--text);
+  outline: none; font: inherit;
+}
+.chj-preset-item input:focus, .chj-preset-add input:focus { border-color: var(--accent); }
+.chj-preset-small {
+  padding: 4px 9px; border-radius: 5px; border: 1px solid var(--border);
+  background: var(--bg2); color: var(--text-dim); cursor: pointer; font-size: 11px;
+}
+.chj-preset-small:hover { border-color: var(--accent); color: var(--accent); }
+.chj-preset-remove:hover { border-color: var(--red); color: var(--red); }
+.chj-preset-actions { display: flex; justify-content: flex-end; gap: 6px; }
 
 /* ── 表单 ── */
 .form-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
@@ -269,10 +296,19 @@ html, body { height: 100%; background: var(--bg); color: var(--text);
       <!-- CHJ 私有模型快选 -->
       <div class="chj-model-row" id="adminChjModelRow">
         <span class="chj-model-row-label">选择模型</span>
-        <span class="chj-model-chip" data-model="kivy-glm-5">GLM-5</span>
-        <span class="chj-model-chip" data-model="kivy-kimi-k2.5">Kimi-K2.5</span>
-        <span class="chj-model-chip" data-model="kivy-deepseek-v4-pro">DeepSeek-V4-Pro</span>
-        <span class="chj-model-chip" data-model="kivy-nvidia-nemotron-v3">NVIDIA-Nemotron-v3</span>
+        <span class="chj-model-chips" id="adminChjModelChips"></span>
+        <button type="button" class="chj-model-manage" id="adminChjManageBtn">管理预设</button>
+        <div class="chj-preset-editor" id="adminChjPresetEditor">
+          <div class="chj-preset-list" id="adminChjPresetList"></div>
+          <div class="chj-preset-add">
+            <input id="adminChjNewPreset" maxlength="200" placeholder="输入新的模型 ID">
+            <button type="button" class="chj-preset-small" id="adminChjAddPreset">添加</button>
+          </div>
+          <div class="chj-preset-actions">
+            <button type="button" class="chj-preset-small" id="adminChjPresetCancel">取消</button>
+            <button type="button" class="chj-preset-small" id="adminChjPresetSave">保存预设</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -350,17 +386,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text);
   const $adminStatus  = document.getElementById('adminStatusBar');
 
   // ── 云端 Fetch 帮助函数 ──────────────────────────────────────────────────
-  function _cf(method, path, body) {
-    const fn = window._cloudFetch || window.parent?._cloudFetch || window.top?._cloudFetch;
-    if (!fn) return Promise.reject(new Error('_cloudFetch not available'));
-    if (method === 'GET') return fn(path);
-    const opts = { method };
-    if (body !== undefined) {
-      opts.headers = { 'Content-Type': 'application/json' };
-      opts.body = JSON.stringify(body);
-    }
-    return fn(path, opts);
-  }
+
 
   // ── 工具函数 ─────────────────────────────────────────────────────────────
 
@@ -392,6 +418,68 @@ html, body { height: 100%; background: var(--bg); color: var(--text);
 
   // ── 管理员 Provider 快选 ───────────────────────────────────────────────
   const $adminChjModelRow = document.getElementById('adminChjModelRow');
+  const $adminChjModelChips = document.getElementById('adminChjModelChips');
+  const $adminChjPresetEditor = document.getElementById('adminChjPresetEditor');
+  const $adminChjPresetList = document.getElementById('adminChjPresetList');
+  const CHJ_PRESET_KEY = 'ai00.agent.chj-model-presets.v1';
+  const CHJ_PRESET_DEFAULTS = ['kivy-glm-5', 'kivy-kimi-k2.5', 'kivy-deepseek-v4-pro', 'kivy-nvidia-nemotron-v3'];
+
+  function _normalizePresets(values) {
+    return [...new Set((Array.isArray(values) ? values : []).map(v => String(v || '').trim()).filter(v => v && v.length <= 200))].slice(0, 20);
+  }
+
+  function _loadChjPresets() {
+    try {
+      const saved = _normalizePresets(JSON.parse(localStorage.getItem(CHJ_PRESET_KEY) || 'null'));
+      return saved.length ? saved : [...CHJ_PRESET_DEFAULTS];
+    } catch (_) {
+      return [...CHJ_PRESET_DEFAULTS];
+    }
+  }
+
+  let _chjPresets = _loadChjPresets();
+
+  function _renderChjChips() {
+    $adminChjModelChips.textContent = '';
+    _chjPresets.forEach(model => {
+      const chip = document.createElement('span');
+      chip.className = 'chj-model-chip';
+      chip.dataset.model = model;
+      chip.textContent = model;
+      chip.addEventListener('click', () => {
+        $adminModel.value = model;
+        _syncAdminChjChips(model);
+      });
+      $adminChjModelChips.appendChild(chip);
+    });
+    _syncAdminChjChips($adminModel.value);
+  }
+
+  function _readPresetInputs() {
+    return _normalizePresets([...$adminChjPresetList.querySelectorAll('input')].map(input => input.value));
+  }
+
+  function _renderPresetEditor(values = _chjPresets) {
+    $adminChjPresetList.textContent = '';
+    values.forEach((model, index) => {
+      const row = document.createElement('div');
+      row.className = 'chj-preset-item';
+      const input = document.createElement('input');
+      input.maxLength = 200;
+      input.value = model;
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'chj-preset-small chj-preset-remove';
+      remove.textContent = '删除';
+      remove.addEventListener('click', () => {
+        const current = _readPresetInputs();
+        current.splice(index, 1);
+        _renderPresetEditor(current);
+      });
+      row.append(input, remove);
+      $adminChjPresetList.appendChild(row);
+    });
+  }
 
   function _syncAdminChjChips(modelVal) {
     $adminChjModelRow.querySelectorAll('.chj-model-chip').forEach(c => {
@@ -408,22 +496,38 @@ html, body { height: 100%; background: var(--bg); color: var(--text);
       _syncAdminChjChips($adminModel.value);
     });
   });
-  $adminChjModelRow.querySelectorAll('.chj-model-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      $adminModel.value = chip.dataset.model || '';
-      _syncAdminChjChips($adminModel.value);
-    });
+  document.getElementById('adminChjManageBtn').addEventListener('click', () => {
+    _renderPresetEditor();
+    $adminChjPresetEditor.classList.add('show');
+    document.getElementById('adminChjNewPreset').focus();
   });
+  document.getElementById('adminChjAddPreset').addEventListener('click', () => {
+    const input = document.getElementById('adminChjNewPreset');
+    const values = _normalizePresets([..._readPresetInputs(), input.value]);
+    if (!input.value.trim() || values.length > 20) return;
+    input.value = '';
+    _renderPresetEditor(values);
+  });
+  document.getElementById('adminChjPresetCancel').addEventListener('click', () => {
+    $adminChjPresetEditor.classList.remove('show');
+  });
+  document.getElementById('adminChjPresetSave').addEventListener('click', () => {
+    _chjPresets = _readPresetInputs();
+    localStorage.setItem(CHJ_PRESET_KEY, JSON.stringify(_chjPresets));
+    _renderChjChips();
+    $adminChjPresetEditor.classList.remove('show');
+  });
+  _renderChjChips();
 
   $adminSaveBtn.addEventListener('click', async () => {
     $adminSaveBtn.disabled = true;
     showStatus($adminStatus, '正在保存…', 'info');
     try {
-      const cfg = await _cf('POST', '/api/ai/admin-config', {
+      const cfg = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.runtime.config.set", {version:1,payload:body}); return result; })({
         model: $adminModel.value.trim(),
         api_key: $adminKey.value.trim(),
         api_base: $adminBase.value.trim(),
-      });
+      },{},new URLSearchParams());
       $adminKey.value = '';
       updatePreview(cfg);
       _showAdminSection(cfg);
@@ -440,7 +544,16 @@ html, body { height: 100%; background: var(--bg); color: var(--text);
     $adminTestBtn.disabled = true;
     showStatus($adminStatus, '连接测试中…', 'info');
     try {
-      const res = await _cf('POST', '/api/ai/test-connection', {});
+      if ($adminKey.value.trim()) {
+        const cfg = await window.AI00Business.invoke('agent.runtime.config.set', {version:1,payload:{
+          model: $adminModel.value.trim(),
+          api_key: $adminKey.value.trim(),
+          api_base: $adminBase.value.trim(),
+        }}, async () => true);
+        $adminKey.value = '';
+        updatePreview(cfg);
+      }
+      const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.runtime.connection.test", {version:1,payload:({})}); return result; })({},{},new URLSearchParams());
       if (res && res.success) {
         showStatus($adminStatus, '✓ 连接成功：' + res.model, 'ok');
       } else {
@@ -521,7 +634,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text);
     // 路径 A：请求后端，刷新配置预览 + is_admin（权威判断）
     let cfg = null;
     try {
-      cfg = await _cf('GET', '/api/ai/admin-config');
+      cfg = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.runtime.config.read", {version:1,payload:Object.fromEntries(Object.entries({}).filter(([,v])=>v!=null))}); return result; })({},{},new URLSearchParams());
     } catch (e) {
       console.warn('[AiSettings] admin-config fetch failed:', e);
     }

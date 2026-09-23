@@ -7,6 +7,33 @@ using Xunit;
 namespace Ai00.Connector.Tests;
 public sealed class OutcomeUnknownRecoveryTests : IDisposable
 {
+    [Fact]
+    public async Task Worker_death_before_visualization_dispatch_does_not_quarantine()
+    {
+        var tcWorker=new TeamcenterSessionLifecycleTests.Worker();
+        using var runtime=new Ai00.Connector.Adapters.VisMockup.TeamcenterReadOnlyRuntime(tcWorker,Path.Combine(root,"tc.db"));
+        await runtime.LoginAsync("tc-production","u","p",default);
+        Assert.Equal("ready",runtime.GetSessionStatus().State);tcWorker.Ready=false;
+        var calls=0;
+        var payload=JsonSerializer.SerializeToElement(new {
+            source_selector=new Ai00.Connector.Adapters.VisMockup.TeamcenterSourceSelector("tc-production","uid","","","Latest Working","2026-09-22T00:00:00Z"),
+            expected_visdoc_uid="uid"});
+        using var key=new DeviceSigningKeyStore(root).GetOrCreate();
+        var journal=new AppPlanJournal(Path.Combine(root,"journal"));
+        const string operation="teamcenter.visualization.launch@2";
+        var plan=ProtocolV2VectorTests.Vector["plan"]!.DeepClone().AsObject();
+        plan["steps"]![0]!["operation_id"]=operation;
+        plan["steps"]![0]!["side_effect_classification"]="write";
+        plan["steps"]![0]!["post_condition_probe_id"]="vismockup.document.snapshot@1";
+        using var cloud=ProtocolV2VectorTests.TestKey("plan");ProtocolV2VectorTests.SignPlan(plan,cloud);
+        var adapter=new FakeAdapter(async()=>new AdapterResult(true,await runtime.ConsumeVisualizationAsync(payload,"Open",(p,c)=>{calls++;return Task.CompletedTask;},default)),operation);
+        var executor=Worker(journal,adapter,key);
+        var outcome=await executor.ExecuteAsync(Lease() with{PlanJson=plan.ToJsonString()},Session(),default);
+        Assert.Equal(0,calls);Assert.False(tcWorker.Entered.Task.IsCompleted);
+        Assert.Equal("failed_without_effect",outcome.OverallStatus);
+        Assert.Equal("teamcenter_session_expired",outcome.Steps[0].GetProperty("error_code").GetString());
+        Assert.False(executor.ExecutionQuarantined);
+    }
     [Theory] [InlineData("acknowledged")] [InlineData("reconciled")]
     public async Task FinalizedHistoricalOutcomesDoNotReenterExecutionValidation(string terminal)
     {

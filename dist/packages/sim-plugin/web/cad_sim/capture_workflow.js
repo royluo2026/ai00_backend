@@ -10,6 +10,7 @@
     'simulation.document_snapshot.get': 1,
     'simulation.document_snapshot.action.get': 1,
     'simulation.document_snapshot.dispatch': 1,
+    'simulation.environment.bop_vm_binding_draft.preview': 1,
     'simulation.environment.compose': 2,
     'simulation.environment.preflight': 1,
     'simulation.environment.materialize': 2,
@@ -53,6 +54,7 @@
       error.retryable = detail.retryable === true;
       throw error;
     }
+    if (envelope.status === 'accepted' && envelope.operation_ref) return envelope.operation_ref;
     return envelope.data !== undefined ? envelope.data : envelope;
   }
 
@@ -69,39 +71,6 @@
     const approve = typeof options.approve === 'function'
       ? options.approve : (async () => false);
 
-    async function gatewayPost(route, body) {
-      return fetcher(route, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-    }
-
-    async function confirm(
-      capabilityId, version, payload, idempotencyKey, payloadHash = null,
-    ) {
-      if (!await approve(capabilityId, version, payload, {
-        idempotencyKey, payloadHash,
-      })) throw new Error('user_cancelled');
-      const response = await gatewayPost(
-        `/api/v1/capabilities/${encodeURIComponent(capabilityId)}:confirm`,
-        { version, payload, idempotency_key: idempotencyKey },
-      );
-      return unwrap(response, capabilityId, version).confirmation_token;
-    }
-
-    async function confirmDownstream(action) {
-      if (!action || !DOWNSTREAM_CALLS.has(action.capability_id)) {
-        throw new Error('downstream_action_not_allowed');
-      }
-      return confirm(
-        action.capability_id,
-        Number(action.major_version),
-        JSON.parse(action.payload_json),
-        action.idempotency_key,
-        action.payload_hash,
-      );
-    }
-
     return {
       async invoke(capabilityId, payload, invokeOptions = {}) {
         if (!ALLOWED_CALLS.includes(capabilityId)) {
@@ -112,20 +81,12 @@
         );
         const idempotencyKey = WRITE_CALLS.has(capabilityId)
           ? (invokeOptions.idempotencyKey || randomKey(capabilityId)) : undefined;
-        let confirmationToken = invokeOptions.confirmationToken;
-        if (invokeOptions.downstreamAction) {
-          confirmationToken = await confirmDownstream(invokeOptions.downstreamAction);
-        } else if (USER_CONFIRMED_CALLS.has(capabilityId)) {
-          confirmationToken = await confirm(
-            capabilityId, version, payload, idempotencyKey,
-          );
-        }
-        const response = await gatewayPost(
-          `/api/v1/capabilities/${encodeURIComponent(capabilityId)}:invoke`,
-          {
-            version, payload, idempotency_key: idempotencyKey,
-            confirmation_token: confirmationToken,
-          },
+        if(invokeOptions.confirmationToken)throw new Error('raw_confirmation_not_allowed');
+        const handle=invokeOptions.downstreamAction?.confirmation_handle;
+        if(invokeOptions.downstreamAction&&!handle)throw new Error('capture_receipt_required');
+        const response = await fetcher(capabilityId,
+          { version, payload, idempotency_key: idempotencyKey, ...(handle?{capture_receipt:{handle}}:{}) },
+          () => approve(capabilityId, version, payload, { idempotencyKey }),
         );
         return unwrap(response, capabilityId, version);
       },
@@ -136,7 +97,7 @@
     if (typeof invoke !== 'function') throw new TypeError('invoke is required');
     const state = {
       environmentId: '', environmentVersion: 0, deviceId: '', preflight: null,
-      snapshotRequest: null, materializationRun: null, captureRun: null,
+      snapshotRequest: null, bindingDraft: null, materializationRun: null, captureRun: null,
       error: null, polling: false,
     };
     const publish = () => onChange({ ...state });
@@ -222,6 +183,12 @@
           error.code = state.snapshotRequest.failure_code || 'active_document_snapshot_required';
           throw error;
         }
+        state.bindingDraft = await call(
+          'simulation.environment.bop_vm_binding_draft.preview', {
+            execution_plan_ref: payload.execution_plan_ref,
+            snapshot_request_id: state.snapshotRequest.snapshot_request_id,
+          },
+        );
         return workflow.compose({
           ...payload,
           snapshot_request_id: state.snapshotRequest.snapshot_request_id,
@@ -260,7 +227,7 @@
       },
       async startCapture() {
         if (!workflow.canStartCapture()) throw new Error('connector_preflight_required');
-        if (!state.materializationRun) {
+        const prepareMaterialization = async () => {
           state.materializationRun = await call(
             'simulation.environment.materialize', environmentPayload(),
             { idempotencyKey: randomKey('materialize') },
@@ -273,11 +240,20 @@
           ) || state.materializationRun;
           publish();
           return { phase: 'materializing', ...state.materializationRun };
+        };
+        if (!state.materializationRun) {
+          return prepareMaterialization();
         }
-        state.captureRun = await call(
-          'simulation.capture_run.start', environmentPayload(),
-          { idempotencyKey: randomKey('capture') },
-        );
+        try {
+          state.captureRun = await call(
+            'simulation.capture_run.start', environmentPayload(),
+            { idempotencyKey: randomKey('capture') },
+          );
+        } catch (error) {
+          if (error.code !== 'simulation_result_not_ready') throw error;
+          state.materializationRun = null;
+          return prepareMaterialization();
+        }
         await workflow.dispatchNext();
         state.polling = !TERMINAL.has(state.captureRun.status);
         publish();
@@ -312,6 +288,33 @@
         state.polling = true;
         schedulePoll();
         return result;
+      },
+      async captureActiveDocument(deviceId) {
+        deviceId = String(deviceId || '');
+        if (!deviceId) throw new Error('connector_required');
+        state.deviceId = deviceId;
+        state.snapshotRequest = await call('simulation.document_snapshot.request', {
+          device_id: deviceId, request_key: randomKey('document-snapshot'),
+        }, { idempotencyKey: randomKey('document-snapshot-request') });
+        state.snapshotRequest = await dispatchPrepared(
+          'simulation.document_snapshot.action.get',
+          { snapshot_request_id: state.snapshotRequest.snapshot_request_id },
+          'simulation.document_snapshot.dispatch',
+          { snapshot_request_id: state.snapshotRequest.snapshot_request_id },
+        ) || state.snapshotRequest;
+        let polls = 0;
+        while (state.snapshotRequest.status === 'queued' && polls++ < 150) {
+          await wait();
+          state.snapshotRequest = await call('simulation.document_snapshot.get', {
+            snapshot_request_id: state.snapshotRequest.snapshot_request_id,
+          });
+        }
+        if (state.snapshotRequest.status !== 'completed') {
+          const error = new Error(state.snapshotRequest.failure_code || 'active_document_snapshot_required');
+          error.code = state.snapshotRequest.failure_code || 'active_document_snapshot_required';
+          throw error;
+        }
+        return state.snapshotRequest;
       },
     };
     return workflow;

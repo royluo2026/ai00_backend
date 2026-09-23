@@ -13,17 +13,13 @@
  */
 
 function _cf(method, path, opts = {}) {
-  const fn = window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch;
+  const fn = window.AI00Business?.available() || window.AI00Business?.available() || window.AI00Business?.available();
   if (!fn) throw new Error('cloudFetch not available');
   return fn(path, { ...opts, method });
 }
 
 async function _invokeCapability(id, payload) {
-  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ version: 1, payload }),
-  });
+  const response = await window.AI00Business.request(id, { version: 1, payload });
   const result = response?.data;
   if (response?.success !== true || result?.ok !== true) {
     const detail = result?.error || response?.error || {};

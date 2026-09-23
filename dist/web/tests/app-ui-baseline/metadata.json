@@ -1,0 +1,222 @@
+{
+  "fixture": "anonymous data service: every business request explicitly unbound; only authenticated public shell state supplied",
+  "fixture_sha256": "dc43eda62f655a8be5f86d0950f962055dbc3b867bddd69f3bb723f010fbb5a9",
+  "source_root": "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\.superpowers\\task-11-source-baseline",
+  "source_revision": "3223170e54b9f700105d9c872a6b7d489e0d60bf",
+  "platform": "win32",
+  "arch": "x64",
+  "versions": {
+    "node": "24.16.0",
+    "acorn": "8.16.0",
+    "ada": "3.4.4",
+    "amaro": "1.1.9",
+    "ares": "1.34.6",
+    "brotli": "1.0.9",
+    "cldr": "47.0",
+    "icu": "77.1",
+    "llhttp": "9.4.1",
+    "merve": "1.2.2",
+    "modules": "145",
+    "napi": "10",
+    "nbytes": "0.1.4",
+    "ncrypto": "0.0.1",
+    "nghttp2": "1.68.0",
+    "nghttp3": "",
+    "ngtcp2": "",
+    "openssl": "0.0.0",
+    "simdjson": "4.6.1",
+    "simdutf": "7.7.0",
+    "sqlite": "3.53.0",
+    "tz": "2025b",
+    "undici": "7.25.0",
+    "unicode": "16.0",
+    "uv": "1.52.1",
+    "uvwasi": "0.0.23",
+    "v8": "14.6.202.34-electron.0",
+    "zlib": "1.3.1",
+    "zstd": "1.6.0",
+    "electron": "41.8.0",
+    "chrome": "146.0.7680.216"
+  },
+  "scale": 1.25,
+  "expected_pixels": [
+    1920,
+    1080
+  ],
+  "capture_region_DIP": {
+    "x": 0,
+    "y": 0,
+    "width": 1536,
+    "height": 864
+  },
+  "masks": [],
+  "states": [
+    {
+      "name": "login",
+      "entry": "web/login/index.html",
+      "errors": [
+        "load_timeout"
+      ],
+      "status": "captured-shell",
+      "dom": {
+        "title": "AI00 柔性智能业务基座",
+        "visibility": "visible",
+        "text": "柔性智能业务基座\n✕\nAI00 柔性智能业务基座\n\n总装智能辅助工艺开发系统\n\n飞书扫码登录",
+        "dpr": 1.25,
+        "width": 1539,
+        "height": 867
+      },
+      "pixels": {
+        "width": 1920,
+        "height": 1080
+      },
+      "reason": "Business fixture coverage is unbound; screenshot is actual rendered shell, not workflow verification."
+    },
+    {
+      "name": "workspace",
+      "entry": "web/index.html",
+      "errors": [
+        "面板1加载失败 Error: Field required; Field required",
+        "工作台加载失败 Error: Field required; Field required",
+        "load_timeout"
+      ],
+      "status": "blocked",
+      "dom": {
+        "title": "总装智能辅助工艺开发系统(AI00)V1.0",
+        "visibility": "hidden",
+        "text": "",
+        "dpr": 1.25,
+        "width": 1539,
+        "height": 867
+      },
+      "pixels": {
+        "width": 1920,
+        "height": 1080
+      },
+      "reason": "Business fixture coverage is unbound; screenshot is actual rendered shell, not workflow verification."
+    },
+    {
+      "name": "craft-lineage",
+      "entry": "packages/craft-plugin/web/lineage_view/index.html",
+      "errors": [
+        "load_timeout"
+      ],
+      "status": "captured-shell",
+      "dom": {
+        "title": "BOP 工艺流程图",
+        "visibility": "visible",
+        "text": "100%\n◀\n节点树\n⊟\n属性与关系\n📋\n暂无 BOP 版本\n你尚未被加入任何项目，请联系管理员\n将你添加为项目成员并分配 BOP 版本\n节点详情\n◀\n加载版本列表失败: cloudFetch not available",
+        "dpr": 1.25,
+        "width": 1539,
+        "height": 867
+      },
+      "pixels": {
+        "width": 1920,
+        "height": 1080
+      },
+      "reason": "Business fixture coverage is unbound; screenshot is actual rendered shell, not workflow verification."
+    },
+    {
+      "name": "standard-operations",
+      "entry": "packages/craft-plugin/web/std_op_lib/std_op_lib.html",
+      "errors": [
+        "[ListSidebar] 云端清单加载失败: TypeError: Cannot read properties of undefined (reading 'call')",
+        "load_timeout"
+      ],
+      "status": "blocked",
+      "reason": "Error: renderer_timeout",
+      "pixels": {
+        "width": 1920,
+        "height": 1080
+      }
+    },
+    {
+      "name": "simulation",
+      "entry": "packages/sim-plugin/web/cad_sim/index.html",
+      "errors": [
+        "[cad_sim] loadBopVersions: TypeError: Failed to fetch",
+        "[cad_sim] loadTasks: TypeError: Failed to fetch",
+        "load_timeout"
+      ],
+      "status": "captured-shell",
+      "dom": {
+        "title": "数模仿真",
+        "visibility": "visible",
+        "text": "VisMockup 未运行\n数模仿真\n启动 VisMockup\n打开文件\n关闭模型\nVisMockup 未运行\n新建仿真任务\nAI00 Connector 截图\n复位\nBOP 结构树\n-- 选择 BOP 版本 --\n手动输入 GID\nVM 结构树\n扫描映射\n按工序截图\n连接后点击刷新加载结构树\n—\n\n点击\"启动 VisMockup\"连接 3D 查看器\n\nVisMockup 已打开时将自动连接，无需重新启动\n\n点击节点后在此查看详情 ▲\nVM\n全显\n全隐\n选可见\n取消选\n高亮↑\n高亮↓\n文档信息\n截图\n加载全部几何\nDebug树\n诊断匹配",
+        "dpr": 1.25,
+        "width": 1539,
+        "height": 867
+      },
+      "pixels": {
+        "width": 1920,
+        "height": 1080
+      },
+      "reason": "Business fixture coverage is unbound; screenshot is actual rendered shell, not workflow verification."
+    },
+    {
+      "name": "settings",
+      "entry": "web/settings/index.html",
+      "errors": [
+        "Uncaught (in promise) Error: 未登录或 token 为空"
+      ],
+      "status": "captured-shell",
+      "dom": {
+        "title": "系统设置",
+        "visibility": "visible",
+        "text": " 系统设置\n✕\n核心设定\n外观 / 主题\n快捷键\n通用\n数据库\n文件存储\n飞书集成\n用户管理\n功能开关\n关注清理\n通知设置\n插件市场\n清单设置\n关于 / 卸载\n外观 / 主题\n颜色主题\n 深色\n 浅色",
+        "dpr": 1.25,
+        "width": 1539,
+        "height": 867
+      },
+      "pixels": {
+        "width": 1920,
+        "height": 1080
+      },
+      "reason": "Business fixture coverage is unbound; screenshot is actual rendered shell, not workflow verification.",
+      "interaction": {
+        "passed": true,
+        "action": "settings shortcuts tab"
+      }
+    },
+    {
+      "name": "pop-outs",
+      "entry": "packages/agent-plugin/web/wfc_window/index.html",
+      "errors": [],
+      "status": "captured-shell",
+      "dom": {
+        "title": "AI 画布",
+        "visibility": "visible",
+        "text": "AI 画布\n节点库\nSkill 库\n加载中…\n▾\n执行者\nAGENT\nAI Agent\n☆\nHUMAN\n邀请人参与\n☆\n▾\n操作\nTOOL·R\n工具调用（读）\n☆\nTOOL·W\n工具调用（写）\n☆\nSC\n技能调用\n☆\n///\n并行分流\n☆\n\\\\\\\n并行合流\n☆\n?\n条件判断\n☆\n▾\n数据\nLIST\n清单/数据源\n☆\nDB\n数据库表\n☆\nMEM\n上下文变量\n☆\nFILE\n文件/快照\n☆\n工具库\n探索模式\n步骤 1\n步骤 2\n步骤 3\n步骤 4\n步骤 5\n+ 步骤\n交互画布\n向小柔发送消息，AI 可自动生成节点图\n或拖拽左侧节点库手动搭建流程\n0 节点 · 0 连线\n探索模式\n柔\n1",
+        "dpr": 1.25,
+        "width": 1539,
+        "height": 867
+      },
+      "pixels": {
+        "width": 1920,
+        "height": 1080
+      },
+      "reason": "Business fixture coverage is unbound; screenshot is actual rendered shell, not workflow verification."
+    },
+    {
+      "name": "approval",
+      "entry": "packages/craft-plugin/web/approval/approval_view.html",
+      "errors": [
+        "[approval] API /api/approval/orders error: _cloudFetch 未就绪"
+      ],
+      "status": "captured-shell",
+      "dom": {
+        "title": "审批中心",
+        "visibility": "visible",
+        "text": " 审批中心\n刷新\n审批单列表\n暂无审批单\n请选择审批单\n从左侧选择一条审批单查看详情",
+        "dpr": 1.25,
+        "width": 1539,
+        "height": 867
+      },
+      "pixels": {
+        "width": 1920,
+        "height": 1080
+      },
+      "reason": "Business fixture coverage is unbound; screenshot is actual rendered shell, not workflow verification."
+    }
+  ]
+}

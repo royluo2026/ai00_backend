@@ -1960,7 +1960,7 @@ select.wb-detail-inp { cursor: pointer; }
 }
 .wb-float-ball:hover {
   transform: scale(1.08);
-  box-shadow: 0 4px 16px rgba(203,166,247,.5);
+  box-shadow: 0 4px 16px rgba(30,102,245,.42);
 }
 
 .wb-fb-badge {

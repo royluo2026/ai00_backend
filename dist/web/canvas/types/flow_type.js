@@ -156,14 +156,10 @@
         throw error;
       }
     }
-    const _cloudFetch = _cf()?._cloudFetch;
-    if (!_cloudFetch) throw new Error('cloudFetch not available');
+
+    if (!window.AI00Business?.available()) throw new Error('cloudFetch not available');
     async function capability(id, payload) {
-      const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ version: 1, payload }),
-      });
+      const response = await window.AI00Business.request(id, { version: 1, payload });
       const envelope = response?.data;
       if (response?.success !== true || envelope?.ok !== true) {
         const detail = envelope?.error || response?.error || {};
@@ -175,7 +171,7 @@
     const runGid = args?.run_gid;
     switch (method) {
       case 'get_node_manifest':
-        return _cloudFetch('/api/flows/capability-manifest', { method: 'GET' });
+        return (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.flow.capability_manifest.get", {version:1,payload:({})}); return result; })({},{},new URLSearchParams());
       case 'get_flow':
         return capability('agent.flow.read', { operation: 'get', flow_gid: gid });
       case 'create_flow':
@@ -196,8 +192,8 @@
   }
 
   function _cf() {
-    return window.parent?._cloudFetch ? window.parent
-         : (window._cloudFetch       ? window : null);
+    return window.AI00Business?.available() ? window.parent
+         : (window.AI00Business?.available()       ? window : null);
   }
 
   // ── flowdef ↔ canvas 转换 ─────────────────────────────────────────────────
@@ -832,12 +828,8 @@
       try {
         const cfObj = _cf();
         if (!cfObj) throw new Error('cloudFetch 不可用');
-        const _cloudFetch = cfObj._cloudFetch;
-        const res = await _cloudFetch('/api/flows/gen-script', {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ prompt, context: FlowPlugin._genScriptConfig }),
-        });
+
+        const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.flow.change.apply", {version:1,payload:Object.fromEntries(Object.entries({...{},...body}).filter(([,v])=>v!=null))}); return result; })({ prompt, context: FlowPlugin._genScriptConfig },{},new URLSearchParams());
         const data = await res.json();
         const code = data?.script || data?.code || '';
         document.getElementById('csFlowGenCode').textContent    = code;

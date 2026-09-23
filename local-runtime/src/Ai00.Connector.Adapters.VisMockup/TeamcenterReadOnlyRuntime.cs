@@ -131,16 +131,22 @@ public interface ITeamcenterWorker
 public sealed partial class TeamcenterReadOnlyRuntime : IDisposable
 {
     private readonly ITeamcenterWorker worker;
+    private readonly TeamcenterRememberedLoginStore? rememberedLogin;
     private readonly string connectionString;
     private readonly SemaphoreSlim gate = new(1, 1);
     private readonly object credentialState = new();
     private char[] username = [];
     private char[] password = [];
     private string endpointId = "";
+    private long sessionGeneration;
+    private CancellationTokenSource sessionCancellation = new();
+    private bool disposed;
 
-    public TeamcenterReadOnlyRuntime(ITeamcenterWorker worker, string cachePath)
+    public TeamcenterReadOnlyRuntime(ITeamcenterWorker worker, string cachePath,
+        TeamcenterRememberedLoginStore? rememberedLogin = null)
     {
         this.worker = worker;
+        this.rememberedLogin = rememberedLogin;
         var fullPath = Path.GetFullPath(cachePath);
         Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
         connectionString = new SqliteConnectionStringBuilder { DataSource = fullPath,
@@ -148,8 +154,9 @@ public sealed partial class TeamcenterReadOnlyRuntime : IDisposable
         Initialize();
     }
 
-    public static TeamcenterReadOnlyRuntime CreateInstalled(string stateRoot)
+    public static TeamcenterReadOnlyRuntime CreateInstalled(string stateRoot, bool development = false)
     {
+        var remembered = development ? new TeamcenterRememberedLoginStore(stateRoot) : null;
         var java = @"C:\openjre11\bin\java.exe";
         var script = Path.Combine(AppContext.BaseDirectory, "teamcenter_readonly_worker.js");
         var launcher = Path.Combine(AppContext.BaseDirectory, "teamcenter_visualization_launch.js");
@@ -158,7 +165,7 @@ public sealed partial class TeamcenterReadOnlyRuntime : IDisposable
         if (!File.Exists(java) || !File.Exists(script) || !File.Exists(launcher)
             || !File.Exists(compatibilityAsset) || !Directory.Exists(lib))
             return new TeamcenterReadOnlyRuntime(new UnavailableTeamcenterWorker(),
-                Path.Combine(stateRoot, "teamcenter-structure-cache.db"));
+                Path.Combine(stateRoot, "teamcenter-structure-cache.db"), remembered);
         try
         {
             var compatibilityRoot = PrepareVisualizationCompatibility(compatibilityAsset, stateRoot);
@@ -169,12 +176,12 @@ public sealed partial class TeamcenterReadOnlyRuntime : IDisposable
             var materialRoot = Path.Combine(stateRoot, "teamcenter-visualization");
             TeamcenterProcessWorker.SecureVisualizationMaterialRoot(materialRoot);
             return new TeamcenterReadOnlyRuntime(new TeamcenterProcessWorker(java, script, launcher, jars, materialRoot),
-                Path.Combine(stateRoot, "teamcenter-structure-cache.db"));
+                Path.Combine(stateRoot, "teamcenter-structure-cache.db"), remembered);
         }
         catch
         {
             return new TeamcenterReadOnlyRuntime(new UnavailableTeamcenterWorker(),
-                Path.Combine(stateRoot, "teamcenter-structure-cache.db"));
+                Path.Combine(stateRoot, "teamcenter-structure-cache.db"), remembered);
         }
     }
 
@@ -206,25 +213,61 @@ public sealed partial class TeamcenterReadOnlyRuntime : IDisposable
         return root;
     }
 
-    public async Task LoginAsync(string endpoint, string user, string secret, CancellationToken ct)
+    public Task LoginAsync(string endpoint, string user, string secret, CancellationToken ct) =>
+        LoginAsync(endpoint, user, secret, ct, false);
+
+    public async Task LoginAsync(string endpoint, string user, string secret, CancellationToken ct, bool remember)
+    {
+        rememberedLogin?.Delete(); // An account switch must not restore the previous account.
+        await AuthenticateAsync(endpoint, user, secret, ct);
+        if (remember) rememberedLogin?.Save(endpoint, user, secret);
+    }
+
+    public async Task<bool> RestoreRememberedLoginAsync(CancellationToken ct)
+    {
+        var saved = rememberedLogin?.Load();
+        if (saved is null) return false;
+        try
+        {
+            await AuthenticateAsync(saved.Value.EndpointId, saved.Value.Username, saved.Value.Password, ct);
+            return true;
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
+        catch (ConnectorException error) when (InvalidatesSession(error)) { rememberedLogin?.Delete(); return false; }
+        catch { return false; }
+    }
+
+    private async Task AuthenticateAsync(string endpoint, string user, string secret, CancellationToken ct)
     {
         if (endpoint != "tc-production" || string.IsNullOrWhiteSpace(user) || string.IsNullOrEmpty(secret)
             || user.Length > 191 || secret.Length > 1024 || user.IndexOfAny(['\r','\n']) >= 0
             || secret.IndexOfAny(['\r','\n']) >= 0)
             throw new ConnectorException("teamcenter_credentials_invalid");
-        await gate.WaitAsync(ct);
+        var transition = RevokeSession();
+        var lifecycle = worker as ITeamcenterVisualizationLifecycle;
+        lifecycle?.Invalidate(transition.OldGeneration);
+        transition.OldCancellation.Cancel();
+        if (lifecycle is not null) await lifecycle.StopAsync(transition.OldGeneration, CancellationToken.None);
+        using var loginCancellation = CancellationTokenSource.CreateLinkedTokenSource(ct, transition.Token);
+        await gate.WaitAsync(loginCancellation.Token);
         try
         {
-            await worker.ValidateCredentialsAsync(endpoint, user, secret, ct);
+            if (lifecycle is not null)
+                await lifecycle.StartAsync(transition.Generation, endpoint, user, secret, loginCancellation.Token);
+            else await worker.ValidateCredentialsAsync(endpoint, user, secret, loginCancellation.Token);
             lock (credentialState)
             {
+                loginCancellation.Token.ThrowIfCancellationRequested();
+                ObjectDisposedException.ThrowIf(disposed, this);
+                if (sessionGeneration != transition.Generation) throw new ConnectorException("teamcenter_session_expired");
                 ClearCredentialsUnsafe();
                 endpointId = endpoint; username = user.ToCharArray(); password = secret.ToCharArray();
             }
         }
-        catch (ConnectorException error) when (InvalidatesSession(error))
+        catch
         {
-            ClearCredentials();
+            lifecycle?.Invalidate(transition.Generation);
+            if (lifecycle is not null) await lifecycle.StopAsync(transition.Generation, CancellationToken.None);
             throw;
         }
         finally { gate.Release(); }
@@ -234,7 +277,9 @@ public sealed partial class TeamcenterReadOnlyRuntime : IDisposable
     {
         lock (credentialState)
         {
-            if (username.Length == 0 || password.Length == 0) return new("logged_out", "");
+            if (disposed || username.Length == 0 || password.Length == 0
+                || worker is ITeamcenterVisualizationLifecycle lifecycle && !lifecycle.IsReady(sessionGeneration))
+                return new("logged_out", "");
             var user = new string(username);
             var masked = user.Length == 1 ? user + "***"
                 : user.Length == 2 ? user[0] + "***" : user[0] + "***" + user[^1];
@@ -244,9 +289,12 @@ public sealed partial class TeamcenterReadOnlyRuntime : IDisposable
 
     public async Task LogoutAsync(CancellationToken ct)
     {
-        await gate.WaitAsync(ct);
-        try { ClearCredentials(); }
-        finally { gate.Release(); }
+        rememberedLogin?.Delete();
+        var transition = RevokeSession();
+        var lifecycle = worker as ITeamcenterVisualizationLifecycle;
+        lifecycle?.Invalidate(transition.OldGeneration);
+        transition.OldCancellation.Cancel();
+        if (lifecycle is not null) await lifecycle.StopAsync(transition.OldGeneration, CancellationToken.None);
     }
 
     public async Task<object> ObserveAsync(JsonElement payload, CancellationToken ct)
@@ -403,6 +451,25 @@ public sealed partial class TeamcenterReadOnlyRuntime : IDisposable
     public async Task<object> ConsumeVisualizationAsync(JsonElement payload, string visualizationOperation,
         Func<string, CancellationToken, Task> consumer, CancellationToken ct)
     {
+        var consumerEntered = false;
+        try
+        {
+            return await ConsumeVisualizationCoreAsync(payload, visualizationOperation, (path, token) =>
+            {
+                consumerEntered = true;
+                return consumer(path, token);
+            }, ct);
+        }
+        catch (Exception error) when (!consumerEntered)
+        {
+            if (error is ConnectorException connector && InvalidatesSession(connector)) ClearCredentials();
+            throw TeamcenterProcessWorker.NoEffectBeforeVisualizationConsumer(error, "");
+        }
+    }
+
+    private async Task<object> ConsumeVisualizationCoreAsync(JsonElement payload, string visualizationOperation,
+        Func<string, CancellationToken, Task> consumer, CancellationToken ct)
+    {
         if (visualizationOperation is not ("Open" or "Insert"))
             throw new ConnectorException("teamcenter_visualization_operation_invalid");
         Closed(payload, "source_selector", "expected_visdoc_uid");
@@ -410,13 +477,27 @@ public sealed partial class TeamcenterReadOnlyRuntime : IDisposable
         var expected = payload.GetProperty("expected_visdoc_uid").GetString() ?? "";
         if (expected.Length > 128)
             throw new ConnectorException("teamcenter_launch_input_invalid");
-        await gate.WaitAsync(ct);
+        long generation; CancellationToken sessionToken;
+        lock (credentialState)
+        {
+            _ = RequireCredentials();
+            generation = sessionGeneration; sessionToken = sessionCancellation.Token;
+        }
+        using var linked = CancellationTokenSource.CreateLinkedTokenSource(ct, sessionToken);
+        await gate.WaitAsync(linked.Token);
         try
         {
             var credentials = RequireCredentials();
             if (selector.EndpointId != endpointId) throw new ConnectorException("teamcenter_launch_input_invalid");
-            return await worker.ConsumeVisualizationAsync(selector, expected, visualizationOperation, consumer,
-                credentials.User, credentials.Password, ct);
+            linked.Token.ThrowIfCancellationRequested();
+            var result = await worker.ConsumeVisualizationAsync(selector, expected, visualizationOperation, consumer,
+                credentials.User, credentials.Password, linked.Token);
+            lock (credentialState)
+            {
+                if (disposed || generation != sessionGeneration || linked.IsCancellationRequested)
+                    throw new ConnectorException("invocation_outcome_unknown");
+            }
+            return result;
         }
         catch (ConnectorException error) when (InvalidatesSession(error)) { ClearCredentials(); throw; }
         finally { gate.Release(); }
@@ -426,7 +507,10 @@ public sealed partial class TeamcenterReadOnlyRuntime : IDisposable
     {
         lock (credentialState)
         {
+            ObjectDisposedException.ThrowIf(disposed, this);
             if (username.Length == 0 || password.Length == 0) throw new ConnectorException("teamcenter_login_required");
+            if (worker is ITeamcenterVisualizationLifecycle lifecycle && !lifecycle.IsReady(sessionGeneration))
+                throw new ConnectorException("teamcenter_session_expired");
             return (new string(username), new string(password));
         }
     }
@@ -435,6 +519,7 @@ public sealed partial class TeamcenterReadOnlyRuntime : IDisposable
     {
         lock (credentialState)
         {
+            _ = RequireCredentials();
             if (username.Length == 0) throw new ConnectorException("teamcenter_login_required");
             return new string(username);
         }
@@ -518,7 +603,32 @@ public sealed partial class TeamcenterReadOnlyRuntime : IDisposable
 
     private void ClearCredentials()
     {
-        lock (credentialState) ClearCredentialsUnsafe();
+        long generation;
+        CancellationTokenSource cancellation;
+        lock (credentialState)
+        {
+            // A prior operation must not invalidate a newly reserved (not yet authenticated) login.
+            if (username.Length == 0) return;
+            generation = sessionGeneration; cancellation = sessionCancellation;
+            ClearCredentialsUnsafe();
+            rememberedLogin?.Delete();
+        }
+        (worker as ITeamcenterVisualizationLifecycle)?.Invalidate(generation);
+        cancellation.Cancel();
+        (worker as ITeamcenterVisualizationLifecycle)?.StopAsync(generation, CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    private (long OldGeneration, CancellationTokenSource OldCancellation, long Generation, CancellationToken Token) RevokeSession()
+    {
+        lock (credentialState)
+        {
+            ObjectDisposedException.ThrowIf(disposed, this);
+            var oldGeneration = sessionGeneration; var oldCancellation = sessionCancellation;
+            ClearCredentialsUnsafe();
+            sessionGeneration++;
+            sessionCancellation = new CancellationTokenSource();
+            return (oldGeneration, oldCancellation, sessionGeneration, sessionCancellation.Token);
+        }
     }
 
     private static bool InvalidatesSession(ConnectorException error) =>
@@ -527,7 +637,20 @@ public sealed partial class TeamcenterReadOnlyRuntime : IDisposable
     private void ClearCredentialsUnsafe()
     { Array.Clear(username); Array.Clear(password); username = []; password = []; endpointId = ""; }
 
-    public void Dispose() { ClearCredentials(); gate.Dispose(); }
+    public void Dispose()
+    {
+        long generation; CancellationTokenSource cancellation;
+        lock (credentialState)
+        {
+            if (disposed) return;
+            disposed = true; generation = sessionGeneration; cancellation = sessionCancellation;
+            sessionGeneration++; ClearCredentialsUnsafe();
+        }
+        (worker as ITeamcenterVisualizationLifecycle)?.Invalidate(generation);
+        cancellation.Cancel();
+        (worker as ITeamcenterVisualizationLifecycle)?.StopAsync(generation, CancellationToken.None).GetAwaiter().GetResult();
+        // Queued/in-flight operations still own their eventual Release. No semaphore wait handle is allocated.
+    }
 }
 
 internal sealed class UnavailableTeamcenterWorker : ITeamcenterWorker
@@ -542,8 +665,16 @@ internal sealed class UnavailableTeamcenterWorker : ITeamcenterWorker
 }
 
 public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, string launcherPath,
-    IReadOnlyList<string> classpath, string visualizationMaterialRoot) : ITeamcenterWorker
+    IReadOnlyList<string> classpath, string visualizationMaterialRoot) : ITeamcenterWorker, ITeamcenterVisualizationLifecycle
 {
+    private readonly TeamcenterVisualizationSession visualization = new(
+        () => Process.Start(CreateStartInfo(javaPath, launcherPath, classpath))
+            ?? throw new ConnectorException("teamcenter_worker_start_failed"), visualizationMaterialRoot);
+    bool ITeamcenterVisualizationLifecycle.IsReady(long generation) => visualization.IsReady(generation);
+    Task ITeamcenterVisualizationLifecycle.StartAsync(long generation, string endpointId, string username,
+        string password, CancellationToken ct) => visualization.StartAsync(generation, endpointId, username, password, ct);
+    void ITeamcenterVisualizationLifecycle.Invalidate(long generation) => visualization.Invalidate(generation);
+    Task ITeamcenterVisualizationLifecycle.StopAsync(long generation, CancellationToken ct) => visualization.StopAsync(generation, ct);
     private const string VisualizationProtocolPrefix = "AI00_TC_VIS_V1:";
     public async Task<TeamcenterNodePropertiesResult> ReadNodePropertiesAsync(
         TeamcenterSourceSelector selector, TeamcenterOccurrenceEdge[] path,
@@ -591,7 +722,7 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
             ? configuredFms : @"D:\Siemens\Teamcenter14\tccs";
         var info = new ProcessStartInfo(javaPath) { UseShellExecute = false, CreateNoWindow = true,
             RedirectStandardInput = true, RedirectStandardOutput = true, RedirectStandardError = true,
-            StandardInputEncoding = Encoding.UTF8, StandardOutputEncoding = Encoding.UTF8,
+            StandardInputEncoding = new UTF8Encoding(false), StandardOutputEncoding = Encoding.UTF8,
             StandardErrorEncoding = Encoding.UTF8 };
         info.ArgumentList.Add("--add-modules"); info.ArgumentList.Add("jdk.unsupported");
         info.ArgumentList.Add("-Dfile.encoding=UTF-8");
@@ -646,102 +777,10 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
             ?? throw new ConnectorException("teamcenter_worker_response_invalid");
     }
 
-    public async Task<TeamcenterLaunchResult> ConsumeVisualizationAsync(TeamcenterSourceSelector selector,
+    public Task<TeamcenterLaunchResult> ConsumeVisualizationAsync(TeamcenterSourceSelector selector,
         string expectedVisdocUid, string visualizationOperation, Func<string, CancellationToken, Task> consumer,
-        string username, string password, CancellationToken ct)
-    {
-        var materialRoot = Path.GetFullPath(visualizationMaterialRoot);
-        SecureVisualizationMaterialRoot(materialRoot);
-        var operationRoot = Path.Combine(materialRoot, Guid.NewGuid().ToString("N"));
-        SecureVisualizationMaterialRoot(operationRoot);
-        using var process = new Process { StartInfo = CreateStartInfo(javaPath, launcherPath, classpath) };
-        try
-        {
-            if (!process.Start()) throw new ConnectorException("teamcenter_worker_start_failed");
-        }
-        catch
-        {
-            try { Directory.Delete(operationRoot, true); } catch { }
-            throw;
-        }
-        var diagnosticTask = ReadBoundedAsync(process.StandardError, 8192, ct);
-        Exception? consumerError = null;
-        string? materialPath = null;
-        try
-        {
-            await process.StandardInput.WriteLineAsync(username.AsMemory(), ct);
-            await process.StandardInput.WriteLineAsync(password.AsMemory(), ct);
-            await process.StandardInput.WriteLineAsync(JsonSerializer.Serialize(new
-            {
-                command = "consume",
-                payload = new { source_selector = selector, expected_visdoc_uid = expectedVisdocUid,
-                    source_identity_hash = selector.IdentityHash, material_root = operationRoot,
-                    visualization_operation = visualizationOperation }
-            }).AsMemory(), ct);
-            await process.StandardInput.FlushAsync(ct);
-
-            try
-            {
-                var readyLine = await ReadVisualizationProtocolLineAsync(process.StandardOutput, 16 * 1024, ct);
-                materialPath = ValidateMaterialPath(operationRoot,
-                    ParseVisualizationMaterialReady(readyLine, expectedVisdocUid, selector.IdentityHash));
-            }
-            catch (ConnectorException error)
-            {
-                try { if (!process.HasExited) process.Kill(true); } catch { }
-                string preparationDiagnostic = "";
-                try
-                {
-                    using var cleanup = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-                    await process.WaitForExitAsync(cleanup.Token);
-                    preparationDiagnostic = await diagnosticTask.WaitAsync(cleanup.Token);
-                }
-                catch { }
-                throw NoEffectBeforeVisualizationConsumer(error, preparationDiagnostic);
-            }
-            string rendererPath;
-            try { rendererPath = RetainRendererMaterial(materialRoot, materialPath); }
-            catch (Exception error) when (error is IOException or UnauthorizedAccessException)
-            { throw new ConnectorNoEffectException("teamcenter_render_material_unavailable"); }
-            try { await consumer(rendererPath, ct); }
-            catch (Exception error) { consumerError = error; }
-
-            await process.StandardInput.WriteLineAsync(JsonSerializer.Serialize(new
-                { type = consumerError is null ? "material_consumed" : "material_failed" }));
-            await process.StandardInput.FlushAsync();
-            process.StandardInput.Close();
-            using var cleanupTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-            var finalLine = await ReadVisualizationProtocolLineAsync(process.StandardOutput, 64 * 1024, cleanupTimeout.Token);
-            await process.WaitForExitAsync(cleanupTimeout.Token);
-            var diagnostic = await diagnosticTask;
-            if (consumerError is not null)
-                System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(consumerError).Throw();
-            using var finalDocument = JsonDocument.Parse(finalLine);
-            var root = finalDocument.RootElement;
-            if (process.ExitCode != 0 || !root.TryGetProperty("ok", out var ok) || !ok.GetBoolean())
-                throw new ConnectorException(root.TryGetProperty("code", out var code)
-                    ? code.GetString()! : SanitizeDiagnostic(diagnostic));
-            return root.GetProperty("result").Deserialize<TeamcenterLaunchResult>(JsonOptions)
-                ?? throw new ConnectorException("teamcenter_worker_response_invalid");
-        }
-        catch
-        {
-            try { if (!process.HasExited) process.Kill(true); } catch { }
-            if (consumerError is not null)
-                System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(consumerError).Throw();
-            throw;
-        }
-        finally
-        {
-            if (materialPath is not null)
-            {
-                try { File.Delete(materialPath); }
-                catch { /* Java also cleans up; a later state-root sweep handles a locked file. */ }
-            }
-            try { if (Directory.Exists(operationRoot)) Directory.Delete(operationRoot, true); }
-            catch { /* Never replace the consumer result with best-effort material cleanup. */ }
-        }
-    }
+        string username, string password, CancellationToken ct) =>
+        visualization.ConsumeAsync(selector, expectedVisdocUid, visualizationOperation, consumer, ct);
 
     private async Task<JsonElement> RunAsync(string command, object payload, string username, string password, CancellationToken ct)
     {
@@ -790,6 +829,29 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
             catch { throw new ConnectorException("teamcenter_worker_cleanup_failed"); }
             throw;
         }
+    }
+
+    internal static string? SanitizeVisualizationTiming(string line)
+    {
+        const string prefix = "AI00_TC_TIMING_V1:";
+        if (line.Length > 1024 || !line.StartsWith(prefix, StringComparison.Ordinal)) return null;
+        try
+        {
+            using var doc = JsonDocument.Parse(line[prefix.Length..]);
+            var root = doc.RootElement;
+            if (root.ValueKind != JsonValueKind.Object
+                || !root.EnumerateObject().Select(p => p.Name).Order().SequenceEqual(new[] { "elapsed_ms", "phase" })
+                || root.GetProperty("phase").ValueKind != JsonValueKind.String
+                || root.GetProperty("elapsed_ms").ValueKind != JsonValueKind.Number) return null;
+            var phase = root.GetProperty("phase").GetString();
+            if (phase is not ("process_start" or "login" or "source_load" or "launch_info" or "dataset_resolve"
+                or "fms_init" or "file_load" or "fms_get_files" or "material_retain" or "native_consumer"
+                or "ack_final" or "logout")) return null;
+            if (!root.GetProperty("elapsed_ms").TryGetDouble(out var elapsed)
+                || !double.IsFinite(elapsed) || elapsed < 0 || elapsed > 3_600_000) return null;
+            return prefix + JsonSerializer.Serialize(new { phase, elapsed_ms = elapsed });
+        }
+        catch (JsonException) { return null; }
     }
 
     private static async Task<string> ReadBoundedAsync(StreamReader reader, int maximum, CancellationToken ct)

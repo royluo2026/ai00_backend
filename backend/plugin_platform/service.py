@@ -135,9 +135,21 @@ class CatalogDependencyResolver:
         self.catalog_release_port = catalog_release_port or ActiveCatalogReleasePort()
 
     def resolve(self, *, tenant_gid: str, manifest: PluginManifestV2) -> None:
+        own_providers = {}
+        if getattr(manifest,"provides", ()):
+            from .local_providers import approved_manifest_bindings
+            try:
+                own_providers = {(item.descriptor.id,item.descriptor.major_version):item.descriptor
+                    for item in approved_manifest_bindings(manifest)}
+            except ValueError as exc:
+                raise PluginLifecycleError("release_not_verified", "local provider governance approval is unavailable") from exc
         for requirement in manifest.capabilities.required:
             try:
-                capability = self.catalog_release_port.resolve(requirement.id, requirement.major)
+                capability = own_providers.get((requirement.id,requirement.major)) or self.catalog_release_port.resolve(requirement.id, requirement.major)
+                if capability is None and manifest.plugins.required:
+                    from .local_providers import providers_for_tenant
+                    capability = next((item.binding.descriptor for item in providers_for_tenant(tenant_gid)
+                        if (item.binding.descriptor.id,item.binding.descriptor.major_version)==(requirement.id,requirement.major)),None)
             except KeyError as exc:
                 raise PluginLifecycleError(
                     "release_not_verified", "required stable plugin capability dependency is unavailable"
@@ -154,13 +166,18 @@ class CatalogDependencyResolver:
 class SqlPluginLifecycleRepository:
     """Existing marketplace schema adapter with Base-owned lifecycle evidence."""
 
-    def __init__(self) -> None:
-        self._conn: Any | None = None
+    def __init__(self, *, connection: Any | None = None) -> None:
+        # Lifecycle transitions can share their already-open owner transaction.
+        self._conn: Any | None = connection
 
     @contextmanager
     def transaction(self) -> Iterator["SqlPluginLifecycleRepository"]:
         from backend.db.connection import get_conn
 
+        if self._conn is not None:
+            # The Gateway owns this already-open transaction and its outcome.
+            yield self
+            return
         with get_conn() as conn:
             self._conn = conn
             try:
@@ -171,6 +188,8 @@ class SqlPluginLifecycleRepository:
                 raise
             finally:
                 self._conn = None
+
+
 
     def _cursor(self) -> Any:
         if self._conn is None:
@@ -480,7 +499,7 @@ def submit_release(manifest_value: dict, publisher_signature: str, actor_gid: st
     return {"plugin_id": manifest.plugin_id, "version": manifest.version, "status": "submitted"}
 
 
-def review_release(plugin_id: str, version: str, approved: bool, note: str, actor_gid: str) -> dict:
+def review_release(plugin_id: str, version: str, approved: bool, note: str, actor_gid: str, *, expected_sha256: str | None = None) -> dict:
     from backend.db.connection import get_conn
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -488,6 +507,8 @@ def review_release(plugin_id: str, version: str, approved: bool, note: str, acto
             row = cur.fetchone()
             if not row or row["status"] != "submitted":
                 raise ValueError("only submitted releases can be reviewed")
+            if expected_sha256 is not None and expected_sha256 != 'sha256:' + row['artifact_sha256']:
+                raise ValueError('release digest changed; refresh before review')
             status = "rejected"
             platform_signature = None
             if approved:
@@ -507,14 +528,16 @@ def review_release(plugin_id: str, version: str, approved: bool, note: str, acto
     return {"plugin_id": plugin_id, "version": version, "status": status}
 
 
-def revoke_release(plugin_id: str, version: str, reason: str, actor_gid: str) -> dict:
+def revoke_release(plugin_id: str, version: str, reason: str, actor_gid: str, *, expected_sha256: str | None = None) -> dict:
     from backend.db.connection import get_conn
     with get_conn() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT status FROM workmanship_plugin_releases WHERE plugin_id=%s AND version=%s FOR UPDATE", (plugin_id, version))
+            cur.execute("SELECT status,artifact_sha256 FROM workmanship_plugin_releases WHERE plugin_id=%s AND version=%s FOR UPDATE", (plugin_id, version))
             release = cur.fetchone()
             if not release or release["status"] != "published":
                 raise ValueError("only a published release can be revoked")
+            if expected_sha256 is not None and expected_sha256 != 'sha256:' + release['artifact_sha256']:
+                raise ValueError('release digest changed; refresh before revocation')
             cur.execute("SELECT tenant_gid,state FROM workmanship_plugin_installations WHERE plugin_id=%s AND current_version=%s AND state<>'uninstalled' FOR UPDATE", (plugin_id, version))
             installations = list(cur.fetchall())
             cur.execute("UPDATE workmanship_plugin_releases SET status='revoked',review_note=%s,reviewed_by=%s,updated_at=NOW() WHERE plugin_id=%s AND version=%s", (reason[:4000], actor_gid, plugin_id, version))
@@ -523,7 +546,7 @@ def revoke_release(plugin_id: str, version: str, reason: str, actor_gid: str) ->
                 if old != "revoked":
                     require_transition(old, "revoked")
                     cur.execute("UPDATE workmanship_plugin_installations SET state='revoked',last_error=%s,"
-                                "mount_revocation_version=mount_revocation_version+1,updated_at=NOW() "
+                                "mount_revocation_version=mount_revocation_version+1,revision=revision+1,updated_at=NOW() "
                                 "WHERE tenant_gid=%s AND plugin_id=%s", (reason[:4000], installation["tenant_gid"], plugin_id))
                     _event(cur, installation["tenant_gid"], plugin_id, old, "revoked", version, actor_gid, {"reason": reason})
         conn.commit()
@@ -570,7 +593,7 @@ def list_releases(status: str | None = None) -> list[dict]:
     return rows
 
 def _release(cur, plugin_id: str, version: str) -> dict:
-    cur.execute("SELECT * FROM workmanship_plugin_releases WHERE plugin_id=%s AND version=%s AND status='published'", (plugin_id, version))
+    cur.execute("SELECT * FROM workmanship_plugin_releases WHERE plugin_id=%s AND version=%s AND status='published' FOR UPDATE", (plugin_id, version))
     row = cur.fetchone()
     if not row or not row.get("platform_signature"):
         raise ValueError("release is not published and platform-signed")
@@ -583,6 +606,14 @@ def _release(cur, plugin_id: str, version: str) -> dict:
     if not satisfies(web_sdk, manifest["compatibility"]["web_sdk"]):
         raise ValueError("release is incompatible with current Web Plugin SDK")
     return row
+
+
+def _verify_transition_release(conn, release: dict, tenant: str, grants) -> None:
+    """Reuse installation signature/dependency policy in the same transaction."""
+    PluginPlatformService(repository=SqlPluginLifecycleRepository(connection=conn))._verified_release(
+        release, {"release_sha256": "sha256:" + str(release.get("artifact_sha256") or ""),
+                  "requested_grants": list(grants)}, tenant_gid=tenant,
+    )
 
 
 def _apply_uninstall_data_policy(cur, tenant: str, plugin_id: str, version: str) -> str:
@@ -620,7 +651,7 @@ def install(payload: dict, context) -> dict:
                 cur.execute(
                     "UPDATE workmanship_plugin_installations SET current_version=%s,previous_version=NULL,state='disabled',"
                     "granted_capabilities=%s,previous_granted_capabilities=NULL,installed_by=%s,last_error=NULL,"
-                    "installation_id=%s,mount_revocation_version=mount_revocation_version+1,updated_at=NOW() "
+                    "installation_id=%s,mount_revocation_version=mount_revocation_version+1,revision=revision+1,updated_at=NOW() "
                     "WHERE tenant_gid=%s AND plugin_id=%s",
                     (version, _json(consented), context.user_gid, installation_id, tenant, plugin_id),
                 )
@@ -643,11 +674,14 @@ def transition(payload: dict, context, target: str) -> dict:
             row = cur.fetchone()
             if not row: raise ValueError("plugin is not installed")
             require_transition(row["state"], target)
+            if target == "enabled":
+                release = _release(cur, plugin_id, row["current_version"])
+                _verify_transition_release(conn, release, tenant, _decode(row["granted_capabilities"]))
             detail = None
             if target == "uninstalled":
                 detail = {"data": _apply_uninstall_data_policy(cur, tenant, plugin_id, row["current_version"])}
             cur.execute("UPDATE workmanship_plugin_installations SET state=%s,"
-                        "mount_revocation_version=mount_revocation_version+1,updated_at=NOW() "
+                        "mount_revocation_version=mount_revocation_version+1,revision=revision+1,updated_at=NOW() "
                         "WHERE tenant_gid=%s AND plugin_id=%s", (target, tenant, plugin_id))
             _event(cur, tenant, plugin_id, row["state"], target, row["current_version"], context.user_gid, detail)
         conn.commit()
@@ -665,6 +699,7 @@ def upgrade(payload: dict, context) -> dict:
             consented = validate_capability_grants(payload.get("granted_capabilities", []))
             if set(consented) != set(requested):
                 raise ValueError("granted_capabilities must exactly match the new signed manifest permissions")
+            _verify_transition_release(conn, release, tenant, consented)
             cur.execute("SELECT * FROM workmanship_plugin_installations WHERE tenant_gid=%s AND plugin_id=%s FOR UPDATE", (tenant, plugin_id))
             row = cur.fetchone()
             if not row: raise ValueError("plugin is not installed")
@@ -672,7 +707,7 @@ def upgrade(payload: dict, context) -> dict:
             result = begin_upgrade(row["current_version"], version)
             cur.execute("UPDATE workmanship_plugin_installations SET current_version=%s,previous_version=%s,state='upgrading',"
                         "previous_granted_capabilities=granted_capabilities,granted_capabilities=%s,"
-                        "mount_revocation_version=mount_revocation_version+1,updated_at=NOW() "
+                        "mount_revocation_version=mount_revocation_version+1,revision=revision+1,updated_at=NOW() "
                         "WHERE tenant_gid=%s AND plugin_id=%s",
                         (result.current_version, result.previous_version, _json(consented), tenant, plugin_id))
             _event(cur, tenant, plugin_id, row["state"], "upgrading", version, context.user_gid, {"previous_version": row["current_version"]})
@@ -696,12 +731,14 @@ def rollback(payload: dict, context) -> dict:
             if not row: raise ValueError("plugin is not installed")
             require_transition(row["state"], "rolled_back")
             result = plan_rollback(row["current_version"], row.get("previous_version"))
-            _release(cur, plugin_id, result.current_version)
+            release = _release(cur, plugin_id, result.current_version)
+            previous_grants = _decode(row.get("previous_granted_capabilities") or [])
+            _verify_transition_release(conn, release, tenant, previous_grants)
             cur.execute("UPDATE workmanship_plugin_installations SET current_version=%s,previous_version=%s,state='rolled_back',"
-                        "granted_capabilities=previous_granted_capabilities,previous_granted_capabilities=granted_capabilities,"
-                        "mount_revocation_version=mount_revocation_version+1,updated_at=NOW() "
+                        "granted_capabilities=%s,previous_granted_capabilities=%s,"
+                        "mount_revocation_version=mount_revocation_version+1,revision=revision+1,updated_at=NOW() "
                         "WHERE tenant_gid=%s AND plugin_id=%s",
-                        (result.current_version, result.previous_version, tenant, plugin_id))
+                        (result.current_version, result.previous_version, _json(previous_grants), _json(_decode(row["granted_capabilities"])), tenant, plugin_id))
             _event(cur, tenant, plugin_id, row["state"], "rolled_back", result.current_version, context.user_gid, {"rolled_back_from": row["current_version"]})
         conn.commit()
     return {"plugin_id": plugin_id, "version": result.current_version, "state": "rolled_back"}
@@ -775,6 +812,7 @@ def tenant_registry(user: dict) -> list[dict]:
             "version": row["current_version"], "web": manifest["runtimes"]["web"],
             "permissions": _decode(row["granted_capabilities"]),
             "capabilities": manifest.get("capabilities") or {"required": [], "optional": []},
+            "provides": manifest.get("provides") or [],
             "installation_id": row.get("installation_id"),
             "mount_revocation_version": int(row.get("mount_revocation_version") or 1),
             "artifact": {"object_key": row["artifact_object_key"], "sha256": row["artifact_sha256"]},

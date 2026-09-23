@@ -1,0 +1,343 @@
+{
+  "$defs": {
+    "Artifact": {
+      "additionalProperties": false,
+      "properties": {
+        "object_key": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "title": "Object Key",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "size": {
+          "exclusiveMinimum": 0,
+          "maximum": 104857600,
+          "title": "Size",
+          "type": "integer"
+        },
+        "media_type": {
+          "const": "application/zip",
+          "default": "application/zip",
+          "title": "Media Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "object_key",
+        "sha256",
+        "size"
+      ],
+      "title": "Artifact",
+      "type": "object"
+    },
+    "CapabilityRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z][a-z0-9_.-]{2,127}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "major": {
+          "maximum": 2147483647,
+          "minimum": 1,
+          "title": "Major",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "major"
+      ],
+      "title": "CapabilityRequirement",
+      "type": "object"
+    },
+    "CapabilityRequirements": {
+      "additionalProperties": false,
+      "properties": {
+        "required": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CapabilityRequirement"
+          },
+          "title": "Required",
+          "type": "array"
+        },
+        "optional": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CapabilityRequirement"
+          },
+          "title": "Optional",
+          "type": "array"
+        }
+      },
+      "title": "CapabilityRequirements",
+      "type": "object"
+    },
+    "Compatibility": {
+      "additionalProperties": false,
+      "properties": {
+        "platform_api": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Platform Api",
+          "type": "string"
+        },
+        "web_sdk": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Web Sdk",
+          "type": "string"
+        }
+      },
+      "required": [
+        "platform_api",
+        "web_sdk"
+      ],
+      "title": "Compatibility",
+      "type": "object"
+    },
+    "DataPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "stores_personal_data": {
+          "default": false,
+          "title": "Stores Personal Data",
+          "type": "boolean"
+        },
+        "retention": {
+          "default": "none",
+          "enum": [
+            "none",
+            "while-installed",
+            "tenant-policy"
+          ],
+          "title": "Retention",
+          "type": "string"
+        },
+        "uninstall": {
+          "default": "delete",
+          "enum": [
+            "delete",
+            "retain",
+            "export-then-delete"
+          ],
+          "title": "Uninstall",
+          "type": "string"
+        }
+      },
+      "title": "DataPolicy",
+      "type": "object"
+    },
+    "LocalProviderDeclaration": {
+      "additionalProperties": false,
+      "description": "A declaration is not an approval; governance bindings stay detached.",
+      "properties": {
+        "id": {
+          "pattern": "^[a-z][a-z0-9_.-]{2,127}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "major": {
+          "maximum": 2147483647,
+          "minimum": 1,
+          "title": "Major",
+          "type": "integer"
+        },
+        "owner_domain": {
+          "pattern": "^[a-z][a-z0-9_.-]{1,63}$",
+          "title": "Owner Domain",
+          "type": "string"
+        },
+        "module": {
+          "maxLength": 256,
+          "minLength": 5,
+          "title": "Module",
+          "type": "string"
+        },
+        "export": {
+          "pattern": "^[A-Za-z_$][A-Za-z0-9_$]{0,63}$",
+          "title": "Export",
+          "type": "string"
+        },
+        "result": {
+          "default": "json",
+          "enum": [
+            "json",
+            "artifact"
+          ],
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "major",
+        "owner_domain",
+        "module",
+        "export"
+      ],
+      "title": "LocalProviderDeclaration",
+      "type": "object"
+    },
+    "PluginRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "plugin_id": {
+          "title": "Plugin Id",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "plugin_id",
+        "version"
+      ],
+      "title": "PluginRequirement",
+      "type": "object"
+    },
+    "PluginRequirements": {
+      "additionalProperties": false,
+      "properties": {
+        "required": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PluginRequirement"
+          },
+          "title": "Required",
+          "type": "array"
+        },
+        "optional": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PluginRequirement"
+          },
+          "title": "Optional",
+          "type": "array"
+        }
+      },
+      "title": "PluginRequirements",
+      "type": "object"
+    },
+    "WebRuntime": {
+      "additionalProperties": false,
+      "properties": {
+        "entry": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Entry",
+          "type": "string"
+        },
+        "sandbox": {
+          "const": "allow-scripts",
+          "default": "allow-scripts",
+          "title": "Sandbox",
+          "type": "string"
+        }
+      },
+      "required": [
+        "entry"
+      ],
+      "title": "WebRuntime",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "2.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "plugin_id": {
+      "title": "Plugin Id",
+      "type": "string"
+    },
+    "publisher_id": {
+      "maxLength": 128,
+      "minLength": 3,
+      "title": "Publisher Id",
+      "type": "string"
+    },
+    "name": {
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "description": {
+      "default": "",
+      "maxLength": 2000,
+      "title": "Description",
+      "type": "string"
+    },
+    "version": {
+      "title": "Version",
+      "type": "string"
+    },
+    "compatibility": {
+      "$ref": "#/$defs/Compatibility"
+    },
+    "runtimes": {
+      "additionalProperties": {
+        "$ref": "#/$defs/WebRuntime"
+      },
+      "propertyNames": {
+        "const": "web"
+      },
+      "title": "Runtimes",
+      "type": "object"
+    },
+    "permissions": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Permissions",
+      "type": "array"
+    },
+    "capabilities": {
+      "$ref": "#/$defs/CapabilityRequirements"
+    },
+    "plugins": {
+      "$ref": "#/$defs/PluginRequirements"
+    },
+    "artifact": {
+      "$ref": "#/$defs/Artifact"
+    },
+    "data": {
+      "$ref": "#/$defs/DataPolicy"
+    },
+    "provides": {
+      "items": {
+        "$ref": "#/$defs/LocalProviderDeclaration"
+      },
+      "maxItems": 32,
+      "minItems": 1,
+      "title": "Provides",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "plugin_id",
+    "publisher_id",
+    "name",
+    "version",
+    "compatibility",
+    "runtimes",
+    "artifact",
+    "provides"
+  ],
+  "title": "PluginManifestV21",
+  "type": "object"
+}

@@ -11,6 +11,12 @@ public sealed class TeamcenterControlProtocolTests
         var command = Assert.IsType<TeamcenterLoginCommand>(TeamcenterControlProtocol.ParseRequest(
             """{"type":"teamcenter_login","request_id":"tc-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","endpoint_id":"tc-production","username":"user","password":"secret"}"""));
         Assert.Equal("user", command.Username);
+        Assert.False(command.Remember);
+        var remembered = Assert.IsType<TeamcenterLoginCommand>(TeamcenterControlProtocol.ParseRequest(
+            """{"type":"teamcenter_login","request_id":"tc-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","endpoint_id":"tc-production","username":"user","password":"secret","remember":true}"""));
+        Assert.True(remembered.Remember);
+        Assert.ThrowsAny<Exception>(() => TeamcenterControlProtocol.ParseRequest(
+            """{"type":"teamcenter_login","request_id":"tc-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","endpoint_id":"tc-production","username":"user","password":"secret","remember":"true"}"""));
         Assert.ThrowsAny<Exception>(() => TeamcenterControlProtocol.ParseRequest(
             """{"type":"teamcenter_login","request_id":"tc-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","endpoint_id":"https://evil/","username":"u","password":"p"}"""));
         Assert.ThrowsAny<Exception>(() => TeamcenterControlProtocol.ParseRequest(

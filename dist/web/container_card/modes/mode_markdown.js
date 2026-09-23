@@ -45,66 +45,23 @@ window.ContainerModes['markdown'] = (() => {
   }
 
   /** 将 file:// URL 或普通路径转为原生系统路径（Node fs 可读） */
-  function _toNativePath(p) {
-    if (!p) return p;
-    // 去掉 file:/// 前缀（Windows: file:///D:/... → D:/...）
-    let native = p.replace(/^file:\/\/\//, '');
-    // Windows: 把正斜杠转反斜杠
-    if (native.match(/^[a-zA-Z]:/)) {
-      native = native.replace(/\//g, '\\');
-    }
-    return native;
-  }
+
 
   async function _readFile(path) {
-    // http/https URL（云端文件）：直接 fetch
-    if (/^https?:\/\//i.test(path)) {
-      const res = await fetch(path);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.text();
-    }
-    // 本地路径：走 Electron IPC
-    const api = _eAPI();
-    if (!api?.readTextFile) throw new Error('electronAPI.readTextFile 不可用');
-    return api.readTextFile(_toNativePath(path));
-  }
+const file=await window.AI00Business.resolveArtifactPath(path);return (await window.AI00Business.invoke('base.artifact.text.get',{version:1,payload:{artifact_ref:file.artifact_ref}})).content;
+}
 
   async function _writeFile(path, content) {
-    // http/https URL（云端文件）：直接 fetch PUT，无需 _cloudFetch
-    if (/^https?:\/\//i.test(path)) {
-      const filename = path.split('/').pop();
-      const baseUrl  = path.match(/^https?:\/\/[^/]+/)?.[0] || window.AI00RuntimeConfig?.toAbsoluteBackendUrl?.('') || window._AI00_BASE || localStorage.getItem('ai00_backend_url') || '';
-      const res = await fetch(`${baseUrl}/api/uploads/${filename}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail || `HTTP ${res.status}`);
-      }
-      return;
-    }
-    // 本地路径：走 Electron IPC
-    const api = _eAPI();
-    if (!api?.writeTextFile) throw new Error('electronAPI.writeTextFile 不可用');
-    return api.writeTextFile(_toNativePath(path), content);
-  }
+const file=/^(artifact|attachment):/.test(path)?await window.AI00Business.resolveArtifactPath(path):{name:'document.md'};const result=await window.AI00Business.invoke('base.artifact.text.create',{version:1,payload:{content,media_type:'text/markdown',name:file.name},native_io:{save:true}});return window.AI00Business.artifactPath(result);
+}
 
   async function _openMdDialog() {
-    const api = _eAPI();
-    if (!api?.openMdDialog && !api?.openFileDialog) throw new Error('文件对话框不可用');
-    if (api.openMdDialog) return api.openMdDialog();
-    const result = await api.openFileDialog([{ name: 'Markdown', extensions: ['md', 'markdown', 'txt'] }]);
-    return result?.[0] || null;
-  }
+return window.AI00Business.artifactPath(await window.AI00Business.invoke('base.artifact.import',{version:1,payload:{},native_io:{select:'text'}}));
+}
 
   async function _saveMdDialog(defaultName) {
-    const api = _eAPI();
-    if (!api?.saveMdDialog && !api?.saveFileDialog) throw new Error('保存对话框不可用');
-    if (api.saveMdDialog) return api.saveMdDialog(defaultName || 'document.md');
-    return api.saveFileDialog({ defaultPath: defaultName || 'document.md', filters: [{ name: 'Markdown', extensions: ['md'] }] });
-  }
+return defaultName||'document.md';
+}
 
   // ── 工具栏插入辅助 ────────────────────────────────────────────────────────
   function _insertAt(textarea, before, after) {
@@ -166,7 +123,7 @@ window.ContainerModes['markdown'] = (() => {
         }
         const content = isEditMode ? editorEl.value : currentContent;
         try {
-          await _writeFile(path, content);
+          currentPath = await _writeFile(path, content);
           currentContent = content;
           if (pathLabel) pathLabel.textContent = path.split(/[\\/]/).pop();
           saveBtn.textContent = '已保存';

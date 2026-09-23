@@ -1,0 +1,42 @@
+{
+  "advisory": true,
+  "capability": {
+    "id": "base.plugin.marketplace.release.submit",
+    "major_version": 1,
+    "capability_version_gid": "cv2_547c2ddbdcf165d7a4bb76a6",
+    "business_definition_hash": "sha256:d232600f935f03843ff44eb86de685439cf0b9be62e1c74b7b6c743054141323",
+    "schema_hash": "sha256:2bc3939c043fa558666993518243fa7ae886be90082181ae5beba261ed5ca9dc",
+    "timeout_seconds": 600
+  },
+  "catalog_release": "rel_1f57cfc928aee3036165fc505df13be8",
+  "source_sha256": {
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\backend\\base\\plugin_marketplace_admin.py": "sha256:27d9b9667cc2fd8e7efa60c1e46ded55923c7a068cca1c785c3927df969715b5",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\backend\\plugin_platform\\package_upload.py": "sha256:b6313ed2d5a4546b8deb84575d8da9d3f22408a7e573e55423b971bb1a0bb95f",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\backend\\plugin_platform\\artifacts.py": "sha256:98a145eabcc341153f826027a1ba26300e08a5f13a4c0830c3a89fb74dfc6d38",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\backend\\scripts\\build_plugin_upload_bundle.py": "sha256:cb4a62875f573f49e0b21fb0676ebde32d85ec0084487323474a68ade27039a0",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\backend\\tests\\test_plugin_package_upload.py": "sha256:1b6a6912c65bd48144b1c78459c16701ad4db9c3c9bbd21b517a73b62b83b0b8",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\backend\\capability_v2\\official_domains.json": "sha256:c40d610b38574c4c9612b6270d38f88db51c7d07336406d218d72d3df89781d2",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\web\\admin_hub\\index.html": "sha256:ea078881174a7b0953efec4845469810419e46ee3381f218018323684e8f1fd3",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\web\\plugin_marketplace\\admin.html": "sha256:5317d5e2649ffaad1acfe049ac97cbfb22cafff79787e008c78e62e487929a5d",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\web\\plugin_marketplace\\admin.js": "sha256:7102508f7a429dad7dd9d9b81aded5893b0fe7d1dc494c6606f1bf066c92e3ef",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\web\\plugin_marketplace\\model.js": "sha256:74716c842fbd3ef4fbe13b5933ac0288937218413e0bd74d19197d3c2fb06a5e",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\packages\\core\\electron\\capability_client.js": "sha256:b960194e5664ea625d95c21b048d36a36f3f40145e8dbc16f1d14571a44af51b",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\packages\\core\\electron\\desktop_artifacts.js": "sha256:0e45ce340b26c2c2b132182785b019743475c5e189cb945dd1af1842ebd3023a",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\packages\\core\\manifest.json": "sha256:dae476d674bb81a6f580e5dcc5070b0724c1f27cc468d0a2bb0d3f18b29f3a10",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\scripts\\test_plugin_marketplace.js": "sha256:40d7611246be240331b6884d5d5306315b6e39f9169e6c370807ca398600df74"
+  },
+  "raw_results": {
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\.runtime\\marketplace-qa\\upload-backend-tests.log": "sha256:73b053abd50b0034debb1e68ee52e77c016ed42e6879566a50ddf483a6a0f018",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-backend-20260905\\.runtime\\marketplace-qa\\upload-catalog-check.log": "sha256:f2e75d69467d51a9d111441b3a170392ec7c35cbcd6ede870f070ff29917fde2",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\.superpowers\\marketplace-qa\\upload-frontend-tests.log": "sha256:8c1dcd893fcbfcfebb6f5f1b21276a88053181f1d21424709dc43d5b0c426d16",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\.superpowers\\marketplace-qa\\upload-full-app-build.log": "sha256:0b1e898be296af9bf2a643f7968f8e9cdbe4dd777ea20e2f4e9d6cd515cf95e0",
+    "E:\\Projects\\ai00_v3\\.worktrees\\orchestration-merge-frontend-20260905\\.superpowers\\marketplace-qa\\upload-current-client-deployment.json": "sha256:a0f63c3aae89b065d41897945482f313aed583ae84baafb4f88108a1e666c123"
+  },
+  "targeted_backend_passed": 48,
+  "targeted_frontend_passed": 11,
+  "machine_passed": false,
+  "human_approved": "unverified",
+  "runtime_verified": "unverified",
+  "snapshot_gid": null,
+  "test_run_gid": null
+}

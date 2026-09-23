@@ -46,38 +46,16 @@ window.ContainerModes['spreadsheet'] = (() => {
     return (p || '').replace(/\\/g, '/').split('/').pop() || p;
   }
 
-  function _getCf() {
-    return window._cf?.() || window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch || null;
-  }
 
   // 直接 fetch PUT（/api/uploads 用 optional auth，无需 _cloudFetch）
-  async function _putUpload(path, body) {
-    const filename = path.split('/').pop();
-    const baseUrl  = path.match(/^https?:\/\/[^/]+/)?.[0] || window.AI00RuntimeConfig?.toAbsoluteBackendUrl?.('') || window._AI00_BASE || localStorage.getItem('ai00_backend_url') || '';
-    const res = await fetch(`${baseUrl}/api/uploads/${filename}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.detail || `HTTP ${res.status}`);
-    }
-  }
+
 
   function _ext(name) {
     return (name || '').split('.').pop().toLowerCase();
   }
 
   // file:// URL → 原生系统路径（Node fs 可读）
-  function _toNativePath(p) {
-    if (!p) return p;
-    let native = p.replace(/^file:\/\/\//, '');
-    if (native.match(/^[a-zA-Z]:/)) {
-      native = native.replace(/\//g, '\\');
-    }
-    return native;
-  }
+
 
   function _esc(s) {
     return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -103,47 +81,8 @@ window.ContainerModes['spreadsheet'] = (() => {
 
   // 返回 { headers: string[], rows: string[][], sheetName: string }
   async function _loadData(path) {
-    const ext = _ext(_filename(path));
-    const isHttp = /^https?:\/\//i.test(path);
-
-    if (ext === 'csv') {
-      const nativePath = _toNativePath(path);
-      console.log('[mode_spreadsheet] _loadData csv, path:', path, '→ nativePath:', nativePath, 'isHttp:', isHttp);
-      let text = '';
-      try {
-        if (isHttp) {
-          const res = await fetch(path);
-          console.log('[mode_spreadsheet] fetch response, ok:', res.ok, 'status:', res.status);
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          text = await res.text();
-          console.log('[mode_spreadsheet] fetched text length:', text.length, 'first 100 chars:', text.substring(0, 100));
-        } else {
-          text = await (window.electronAPI || window.top?.electronAPI || window.parent?.electronAPI)?.readTextFile(nativePath) || '';
-        }
-      } catch (e) {
-        console.error('[mode_spreadsheet] _loadData csv error:', e);
-        throw e;
-      }
-      return _parseCSV(text || '');
-    }
-
-    // xlsx / xls：需要 SheetJS
-    const XLSX = await _loadXLSX();
-    let buf;
-    if (isHttp) {
-      buf = await fetch(path).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.arrayBuffer(); });
-    } else {
-      // 本地：暂不支持（IPC 没有 readBinaryFile，可后续扩展）
-      throw new Error('本地 xlsx 暂不支持，请通过云端上传后预览');
-    }
-    const wb = XLSX.read(new Uint8Array(buf), { type: 'array' });
-    const sheetName = wb.SheetNames[0];
-    const ws = wb.Sheets[sheetName];
-    const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
-    const headers = raw[0]?.map(String) || [];
-    const rows = raw.slice(1).map(r => headers.map((_, i) => String(r[i] ?? '')));
-    return { headers, rows, sheetName, wb, ws };
-  }
+const file=await window.AI00Business.resolveArtifactPath(path);const data=(await window.AI00Business.invoke('craft.data_exchange.excel.parse',{version:1,payload:{artifact_ref:file.artifact_ref,name:file.name}})).data;return {...data,sheetName:'Sheet1'};
+}
 
   // ── CSV 解析 / 序列化 ─────────────────────────────────────────────────────
 
@@ -177,42 +116,11 @@ window.ContainerModes['spreadsheet'] = (() => {
   // ── 保存 ──────────────────────────────────────────────────────────────────
 
   async function _save(path, headers, rows, xlsxMeta) {
-    const ext = _ext(_filename(path));
-    const isHttp = /^https?:\/\//i.test(path);
-
-    if (ext === 'csv') {
-      const content = _toCSV(headers, rows);
-      if (isHttp) {
-        const filename = path.split('/').pop();
-        await _putUpload(path, { content });
-      } else {
-        const api = window.electronAPI || window.top?.electronAPI || window.parent?.electronAPI;
-        if (!api?.writeTextFile) throw new Error('electronAPI.writeTextFile 不可用');
-        await api.writeTextFile(_toNativePath(path), content);
-      }
-      return;
-    }
-
-    // xlsx：用 SheetJS 序列化后 base64 上传
-    const XLSX = await _loadXLSX();
-    const { wb, ws, sheetName } = xlsxMeta;
-    // 更新 worksheet 数据
-    const newData = [headers, ...rows];
-    const newWs = XLSX.utils.aoa_to_sheet(newData);
-    wb.Sheets[sheetName] = newWs;
-    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const bytes = new Uint8Array(wbout);
-    let binary = '';
-    bytes.forEach(b => binary += String.fromCharCode(b));
-    const data_b64 = btoa(binary);
-
-    if (isHttp) {
-      const filename = path.split('/').pop();
-      await _putUpload(path, { data_b64 });
-    } else {
-      throw new Error('本地 xlsx 写入暂不支持');
-    }
-  }
+const file=await window.AI00Business.resolveArtifactPath(path);let result;
+ if(file.name.toLowerCase().endsWith('.csv'))result=await window.AI00Business.invoke('base.artifact.text.create',{version:1,payload:{content:_toCSV(headers,rows),media_type:'text/csv',name:file.name},native_io:{save:true}});
+ else result=await window.AI00Business.invoke('craft.data_exchange.excel.export',{version:1,payload:{columns:headers.map((header,index)=>({key:String(index),label:header})),rows,filename:file.name},native_io:{save:true}});
+ return window.AI00Business.artifactPath(result);
+}
 
   // ── 表格渲染 ──────────────────────────────────────────────────────────────
 
@@ -247,7 +155,7 @@ window.ContainerModes['spreadsheet'] = (() => {
         saveBtn.disabled = true;
         saveBtn.textContent = '保存中…';
         try {
-          await _save(filePath, headers, rows, xlsxMeta);
+          filePath = await _save(filePath, headers, rows, xlsxMeta);
           saveBtn.textContent = '已保存';
           setTimeout(() => { saveBtn.textContent = '保存'; saveBtn.disabled = false; }, 1500);
         } catch (e) {

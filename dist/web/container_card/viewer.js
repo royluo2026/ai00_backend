@@ -23,7 +23,7 @@
   // ── 工具函数（供 mode 文件引用）──────────────────────────────────────────
   /** 获取 cloudFetch 函数（供 mode_field_detail 等使用）*/
   window._cf = function() {
-    return window.top?._cloudFetch || window.parent?._cloudFetch || window._cloudFetch || null;
+    return window.AI00Business?.available() || window.AI00Business?.available() || window.AI00Business?.available() || null;
   };
 
   // ── B64 标题解码（UTF-8 安全，与 attachments_widget _b64EncUtf8 配对）───

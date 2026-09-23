@@ -59,16 +59,10 @@ function _toast(msg, type = 'info') {
   setTimeout(() => el.remove(), 3000);
 }
 
-function _cf(method, path, opts = {}) {
-  return ListShell._cf(path, { ...opts, method });
-}
+
 
 async function _invokeCapability(id, payload) {
-  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ version: 1, payload }),
-  });
+  const response = await window.AI00Business.request(id, { version: 1, payload });
   const result = response?.data;
   if (response?.success !== true || result?.ok !== true) {
     const detail = result?.error || response?.error || {};

@@ -4,6 +4,33 @@ using Xunit;
 namespace Ai00.Connector.Tests;
 public sealed class AppHostLifecycleTests
 {
+    [Theory]
+    [InlineData("unresolved")]
+    [InlineData("network")]
+    [InlineData("transient")]
+    public async Task UnresolvedPlansWaitForHumanRecoveryBeforeRegistering(string failure)
+    {
+        var attempts=0;var waits=0;
+        var expected=new RuntimeSession("device","tenant",1,"app","token",DateTimeOffset.UtcNow.AddMinutes(5));
+        var actual=await RuntimeSessionWorker.RegisterAfterRecoveryAsync(_=>
+        {
+            attempts++;
+            if(attempts<3)throw failure switch {
+                "network"=>new HttpRequestException("connection_reset"),
+                "transient"=>new RuntimeTransportException("cloud_temporarily_unavailable",true),
+                _=>new RuntimeTransportException("runtime_plans_unresolved")};
+            return Task.FromResult(expected);
+        },_=>{waits++;return Task.CompletedTask;},CancellationToken.None);
+        Assert.Same(expected,actual);Assert.Equal(2,waits);
+    }
+
+    [Fact] public async Task RecoveryWaitDoesNotSwallowAuthenticationFailure()
+    {
+        await Assert.ThrowsAsync<RuntimeTransportException>(()=>RuntimeSessionWorker.RegisterAfterRecoveryAsync(
+            _=>throw new RuntimeTransportException("runtime_owner_mismatch"),
+            _=>throw new Exception("must_not_wait"),CancellationToken.None));
+    }
+
     [Fact] public void RuntimeRequestsTheLargestServerSupportedPlanLease()
     {
         Assert.Equal(300, RuntimeSessionWorker.PlanLeaseSeconds);

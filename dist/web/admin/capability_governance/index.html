@@ -1,5 +1,6 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>能力治理中心</title>  <link rel="stylesheet" href="/assets/index-f4512495.css">
+<html lang="zh-CN"><head>
+  <script src="/web/core/business_facade.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>能力治理中心</title>  <link rel="stylesheet" href="/assets/index-f4512495.css">
 </head>
 <body><div id="auth-status" data-testid="auth-status" style="margin:12px 24px 0;padding:8px 12px;border:1px solid #315777;border-radius:7px;background:#102337;color:#d7e7f5;font-size:13px" title="正在确认登录状态">正在确认登录状态…</div><div id="app"></div><script src="/web/core/web_compat.js"></script><script src="/web/core/auth_state.js"></script><script src="governance_model.js"></script><script src="governance_api.js"></script><script src="governance_controller_next.js"></script><script src="governance_controller.js"></script><script>
   (() => {
@@ -12,9 +13,7 @@
       const state = await window.electronAPI?.authGetState?.() || {};
       const config = await window.electronAPI?.getConfig?.() || {};
       const base = String(config.backendUrl || window.location.origin).replace(/\/$/, '');
-      const response = await fetch(`${base}/users/me`, {
-        headers: state.token ? { 'X-AI00-Token': state.token } : {},
-      });
+      const response = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.identity.current.get", {version:1,payload:({})}); return new Response(JSON.stringify(result),{status:200,headers:{"Content-Type":"application/json"}}); })({},{},new URLSearchParams());
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return response.json();
     };
@@ -56,10 +55,10 @@
     const refreshTrustedProfile = async () => {
       const host = parentWindow();
       let fetcher;
-      try { fetcher = host._cloudFetch || window._cloudFetch; } catch (_) { fetcher = window._cloudFetch; }
+      try { fetcher = window.AI00Business?.available() || window.AI00Business?.available(); } catch (_) { fetcher = window.AI00Business?.available(); }
       if (typeof fetcher !== 'function') fetcher = standaloneProfileFetch;
       try {
-        const profile = profileFrom(await fetcher('/users/me'));
+        const profile = profileFrom(await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.identity.current.get", {version:1,payload:({})}); return result; })({},{},new URLSearchParams()));
         const permissions = readPermissions(profile);
         renderAuthStatus(profile, 'feishu');
         controller.state.permissions = permissions;

@@ -39,9 +39,18 @@ def validate_package(data: bytes, manifest: PluginManifestV2) -> str:
                 mode = item.external_attr >> 16
                 if stat.S_ISLNK(mode):
                     raise ArtifactError("symbolic links are forbidden")
+                if path.rstrip('/') in names or any(part in ('', '.') for part in path.rstrip('/').split('/')):
+                    raise ArtifactError('duplicate or ambiguous package paths are forbidden')
                 names.add(path.rstrip("/"))
             if "plugin.json" not in names:
                 raise ArtifactError("package root must contain plugin.json")
+            if manifest.runtimes['web'].entry not in names or archive.getinfo(manifest.runtimes['web'].entry).is_dir():
+                raise ArtifactError('package must contain its declared web entry')
+            for provider in getattr(manifest, "provides", ()):
+                if provider.module not in names or archive.getinfo(provider.module).is_dir():
+                    raise ArtifactError('package must contain every declared provider module')
+                if archive.getinfo(provider.module).file_size > 1024 * 1024:
+                    raise ArtifactError('provider module exceeds 1 MiB')
             embedded = json.loads(archive.read("plugin.json"))
             # Artifact digest/size describe the enclosing ZIP and cannot recursively
             # be embedded. plugin.json is the descriptor; artifact metadata is detached.

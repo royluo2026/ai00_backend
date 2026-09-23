@@ -157,7 +157,44 @@ class PluginManifestV2(BaseModel):
         return self
 
 
-def parse_manifest(value: dict[str, Any]) -> PluginManifestV2:
+class LocalProviderDeclaration(CapabilityRequirement):
+    """A declaration is not an approval; governance bindings stay detached."""
+    owner_domain: str = Field(pattern=r"^[a-z][a-z0-9_.-]{1,63}$")
+    module: str = Field(min_length=5, max_length=256)
+    export: str = Field(pattern=r"^[A-Za-z_$][A-Za-z0-9_$]{0,63}$")
+    result: Literal["json", "artifact"] = "json"
+
+    @field_validator("module")
+    @classmethod
+    def safe_module(cls, value: str) -> str:
+        if not re.fullmatch(r"(?:[A-Za-z0-9_-]+/)*[A-Za-z0-9_-]+\.mjs", value):
+            raise ValueError("provider module must be a canonical package-relative .mjs path")
+        return value
+
+    @field_validator("export")
+    @classmethod
+    def safe_export(cls, value: str) -> str:
+        if value in {"constructor", "prototype", "__proto__"}:
+            raise ValueError("reserved provider export")
+        return value
+
+
+class PluginManifestV21(PluginManifestV2):
+    schema_version: Literal["2.1"]
+    provides: tuple[LocalProviderDeclaration, ...] = Field(min_length=1, max_length=32)
+
+    @model_validator(mode="after")
+    def validate_providers(self):
+        keys = [(item.id, item.major) for item in self.provides]
+        if len(keys) != len(set(keys)):
+            raise ValueError("duplicate provided capability")
+        for item in self.provides:
+            if not item.owner_domain.startswith(self.publisher_id + ".") or not item.id.startswith(item.owner_domain + "."):
+                raise ValueError("provider owner and capability must belong to publisher namespace")
+        return self
+
+
+def parse_manifest(value: dict[str, Any]) -> PluginManifestV2 | PluginManifestV21:
     forbidden = {"backend", "routers_module", "python", "executable", "entrypoint"}
     found: set[str] = set()
 
@@ -175,6 +212,7 @@ def parse_manifest(value: dict[str, Any]) -> PluginManifestV2:
     if found:
         raise ManifestError(f"third-party executable declarations are forbidden: {', '.join(sorted(found))}")
     try:
-        return PluginManifestV2.model_validate(value)
+        model = PluginManifestV21 if value.get("schema_version") == "2.1" else PluginManifestV2
+        return model.model_validate(value)
     except ValidationError as exc:
         raise ManifestError(str(exc)) from exc

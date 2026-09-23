@@ -154,7 +154,7 @@ const _USER_GID = (() => {
 })();
 function _lsk(base) { return _USER_GID ? `${_USER_GID}:${base}` : base; }
 let _versionGid = _params.bop_version_gid || localStorage.getItem(_lsk('lv:lastVersionGid')) || '';
-const _versionTag = _params.version_tag || _versionGid.slice(-6);
+let _versionTag = _params.version_tag || _versionGid.slice(-6);
 
 let _rows            = [];      // flat array from API (may span multiple versions)
 let _rowByGid        = new Map();
@@ -180,12 +180,9 @@ const _projectionStore = new LineageProjectionStore({ maxScopes: 3, maxNodes: 12
 const _loadCoordinator = new LineageLoadCoordinator();
 
 async function _invokeCapability(id, version, payload, options = {}) {
-  const response = await _cf('POST', `/api/v1/capabilities/${id}:invoke`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ version, payload }),
-    signal: options.signal,
-  });
+  options.signal?.throwIfAborted();
+  const response = await window.AI00Business.request(id, { version, payload }, async () => true);
+  options.signal?.throwIfAborted();
   const result = response?.data;
   if (response?.success !== true || result?.ok !== true) {
     const detail = result?.error || response?.error || {};
@@ -459,6 +456,7 @@ function _getLineAncestorGid(gid) {
 
 function _canEditEntry(gid) {
   if (!_isVersionEditable()) return false;
+  if (_rowByGid.get(gid)?.__pending_create) return false;
   if (!_lineReadOnly) return true;
   const lineGid = _getLineAncestorGid(gid);
   return lineGid ? _lineGrantSet.has(lineGid) : true;
@@ -625,7 +623,7 @@ function _initCollapsed() {
 /** 取节点的树深度（根据 parent_gid 链预计算，替代旧的 ai00_level 固定分组） */
 function _treeDepth(r) { return _depthByGid.get(r?.gid) ?? 0; }
 
-async function _load() {
+async function _load({ layoutViewport = null } = {}) {
   if (!_versionGid) {
     // 显示空画布，画布内提示
     $columns.style.display = 'none';
@@ -648,9 +646,14 @@ async function _load() {
     return;
   }
   document.querySelector('.lv-empty-hint-overlay')?.remove();
+  document.getElementById('lvLoadingOverlay')?.classList.remove('hidden');
   $columns.innerHTML = '<div class="lv-loading"><div class="lv-spinner"></div>加载中…</div>';
 
   try {
+    if (_projectVersions[0]?.versionGid !== _versionGid) {
+      const current = _verMgr?.allVersions?.find(version => version.gid === _versionGid);
+      _projectVersions = [{ versionGid: _versionGid, versionTag: _versionTag, bopName: current?.bop_name || '' }];
+    }
     if (_layoutMode && typeof _layoutMode.destroyHeavyState === 'function') _layoutMode.destroyHeavyState();
     _progressiveLoader.clearHeavyData();
     for (const loader of _comparisonLoaders.values()) loader.dispose();
@@ -674,13 +677,26 @@ async function _load() {
           _restoreView();
           firstCommit = false;
         }
-        _render();
       },
     });
     if (loaded?.cancelled) return;
+    const preloadResults = await preloadFirstLineScopes(
+      loaded.lines,
+      row => _ensureScopeLoaded(row, { render: false, throwOnError: true }),
+      _level1Filter,
+    );
+    const preloadFailure = preloadResults.find(result => result.status === 'rejected');
+    if (preloadFailure?.status === 'rejected') throw preloadFailure.reason;
+    // A mutation reload clears LayoutMode's heavy state. Queue the camera only
+    // after data loading/restored preferences have finished so the final render
+    // applies the exact pre-mutation viewport instead of fitting the canvas.
+    if (layoutViewport) {
+      _pendingLayoutPan = { x: layoutViewport.panX, y: layoutViewport.panY };
+      _pendingLayoutZoom = layoutViewport.zoom;
+    }
+    _render();
     _loadLineGrants(loaded.version?.project_gid || '').then(() => {
       _updateVersionStatusUI();
-      if (_viewMode === 'layout') _render();
     });
     _loadCloudConfig(); // 异步拉取云端共享布局配置（覆盖本地，team 共享）
   } catch (e) {
@@ -887,7 +903,7 @@ function _lineScopeForRow(row) {
   return { version_gid: versionGid, revision, scope_kind: 'line', scope_gid: current.gid };
 }
 
-async function _ensureScopeLoaded(row) {
+async function _ensureScopeLoaded(row, { render = true, throwOnError = false } = {}) {
   const scope = _lineScopeForRow(row);
   if (!scope) return;
   const loader = scope.version_gid === _versionGid ? _progressiveLoader : _comparisonLoaders.get(scope.version_gid);
@@ -910,15 +926,18 @@ async function _ensureScopeLoaded(row) {
           version_gid: scope.version_gid,
           __governed_links: byEntry.get(item.gid) || [],
         })));
+      },
+      onComplete: () => {
         _rebuildProjectionRows();
-        _render();
-        if (_activeGid) {
+        if (render) _render();
+        if (render && _activeGid) {
           if (_viewMode === 'layout' && _layoutMode) _layoutMode.highlightNode(_activeGid);
           else _applyActiveState(_activeGid);
         }
       },
     });
   } catch (error) {
+    if (throwOnError) throw error;
     _toast('加载线体失败: ' + _capabilityLoadErrorMessage(error), 'error');
   }
 }
@@ -1155,6 +1174,17 @@ function _buildLineageData() {
     showDetailPopover: _openDetailPopover,
     showEntityDetailPopover: _openEntityDetailPopover,
     openImageLightbox: _openImageLightbox,
+    pictureUrl:       _pictureDisplayUrl,
+    bindPictureImage: _bindPictureImage,
+    resolvePictures:  _resolvePictureRecords,
+    processPictureRecords: _collectProcessPicRecords,
+    isLineScopeLoaded: row => {
+      const scope = _lineScopeForRow(row);
+      if (!scope) return false;
+      const loader = scope.version_gid === _versionGid ? _progressiveLoader : _comparisonLoaders.get(scope.version_gid);
+      return Boolean(loader?.hasLoadedScope(scope));
+    },
+    loadLineScope: row => _ensureScopeLoaded(row, { throwOnError: true }),
     openParentPicker:  _openParentPicker,
     toast:        _toast,
     cf:           _cf,
@@ -1170,6 +1200,8 @@ function _buildLineageData() {
     runAutoLink:       _runAutoLink,
     renderPicArea:     _renderPicArea,
     patchEntry:        _patchEntry,
+    createEntry:       _createEntryAndApply,
+    moveEntries:       _moveEntriesOptimistically,
     startInlineRename: _startInlineRename,
     preserveView: () => { if (_viewMode === 'layout' && _layoutMode) _layoutMode._preserveView = true; },
     onLineFilterChange: (newFilter) => {
@@ -1209,39 +1241,132 @@ function _normalizePicItems(items) {
   return out;
 }
 
-async function _resolvePicItem(pic) {
-  if (!pic) return null;
-  const normalized = typeof pic === 'string'
-    ? { url: pic, object_key: '', storage: '' }
-    : {
-        url: String(pic.url || '').trim(),
-        object_key: String(pic.object_key || '').trim(),
-        storage: String(pic.storage || '').trim(),
-      };
-  if (normalized.storage === 'ois' && normalized.object_key) {
-    try {
-      const resolved = await _cf('POST', '/api/uploads/ois/resolve', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ object_key: normalized.object_key }),
-      });
-      if (resolved?.url) return { ...normalized, url: resolved.url };
-    } catch (_) {}
+const _pictureDisplayCache = new Map();
+const _pictureDisplayPending = new Map();
+const _pictureAccessCache = new Map();
+const _pictureAccessPending = new Map();
+
+function _pictureCacheKey(pic, versionGid = _versionGid) {
+  const record = typeof pic === 'string' ? { url: pic } : pic;
+  if (!record) return null;
+  const normalized = {
+    object_key: String(record.object_key || '').trim(),
+    storage: String(record.storage || '').trim(),
+    url: String(record.url || record.src || '').trim(),
+  };
+  return String(versionGid || '') + ':' + JSON.stringify(normalized);
+}
+
+async function _resolvePictureDisplay(pic, versionGid = _versionGid) {
+  const record = typeof pic === 'string' ? { url: pic } : pic;
+  if (!record) return '';
+  const raw = String(record.url || record.src || '').trim();
+  if (raw.startsWith('data:image/')) return raw;
+  const key = _pictureCacheKey(record, versionGid);
+  if (_pictureDisplayCache.has(key)) return _pictureDisplayCache.get(key);
+  if (!_pictureDisplayPending.has(key)) {
+    const pending = _resolvePicItem(record, versionGid)
+      .then(resolved => {
+        const url = resolved?.url || '';
+        if (url) _pictureDisplayCache.set(key, url);
+        return url;
+      })
+      .catch(error => {
+        console.warn('[lineage] governed picture resolution failed:', {
+          versionGid, code: error?.code || '', message: error?.message || String(error),
+        });
+        return '';
+      })
+      .finally(() => _pictureDisplayPending.delete(key));
+    _pictureDisplayPending.set(key, pending);
   }
-  if (normalized.url) {
-    const abs = window.AI00RuntimeConfig?.toAbsoluteBackendUrl?.(normalized.url) || normalized.url;
-    return { ...normalized, url: abs };
+  return _pictureDisplayPending.get(key);
+}
+
+function _pictureDisplayUrl(pic, versionGid = _versionGid) {
+  const record = typeof pic === 'string' ? { url: pic } : pic;
+  const raw = String(record?.url || record?.src || '').trim();
+  if (raw.startsWith('data:image/')) return raw;
+  const key = _pictureCacheKey(record, versionGid);
+  return key ? (_pictureDisplayCache.get(key) || '') : '';
+}
+
+const _pictureObserverData = new WeakMap();
+const _pictureObserver = typeof IntersectionObserver === 'function'
+  ? new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        _pictureObserver.unobserve(entry.target);
+        const data = _pictureObserverData.get(entry.target);
+        if (data) data.load();
+      }
+    }, { rootMargin: '400px' })
+  : null;
+
+function _bindPictureImage(img, pic, versionGid = _versionGid, onError = null) {
+  const cached = _pictureDisplayUrl(pic, versionGid);
+  const load = async () => {
+    const url = cached || await _resolvePictureDisplay(pic, versionGid);
+    if (!url) { if (onError) onError(); return; }
+    img.src = url;
+  };
+  img.loading = 'lazy';
+  img.onerror = () => { if (onError) onError(); };
+  if (cached || !_pictureObserver) load();
+  else {
+    _pictureObserverData.set(img, { load });
+    _pictureObserver.observe(img);
   }
-  return normalized.object_key ? normalized : null;
+}
+
+async function _resolvePictureRecords(records) {
+  const settled = await Promise.allSettled((records || []).map(r =>
+    _resolvePictureDisplay(r.pic, r.versionGid || _versionGid)));
+  return settled.flatMap(r => r.status === 'fulfilled' && r.value ? [r.value] : []);
+}
+
+async function _resolvePicItem(pic, versionGid = _versionGid) {
+if(!pic)return null;
+ const record=typeof pic==='string'?{url:pic}:pic;
+ const bridge=window.top?.electronAPI||window.parent?.electronAPI||window.electronAPI;
+ let url='';
+ if(record.url?.startsWith('artifact:'))url=bridge?.artifactContentUrl?.(window.AI00Business.parseArtifactPath(record.url).artifact_ref)||'';
+ else{
+  const reference_hash=await _pictureReferenceHash(record);
+  const access=(await _loadPictureAccess(versionGid)).get(reference_hash);
+  url=bridge?.pictureContentUrl?.(access)||'';
+ }
+ if(!url)throw Error('image_required');
+ return {...record,url};
+}
+
+async function _pictureReferenceHash(record){
+ const normalized={object_key:String(record.object_key||'').trim(),storage:String(record.storage||'').trim(),url:String(record.url||'').trim()};
+ const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(normalized)));
+ return Array.from(new Uint8Array(digest),n=>n.toString(16).padStart(2,'0')).join('');
+}
+
+async function _loadPictureAccess(versionGid){
+ const key=String(versionGid||'');
+ if(_pictureAccessCache.has(key))return _pictureAccessCache.get(key);
+ if(!_pictureAccessPending.has(key)){
+  _pictureAccessPending.set(key,window.AI00Business.invoke('craft.bop.picture.access.list',{version:1,payload:{version_gid:key}}).then(result=>{
+   const map=new Map((result.items||[]).map(item=>[item.reference_hash,item]));
+   _pictureAccessCache.set(key,map);return map;
+  }).finally(()=>_pictureAccessPending.delete(key)));
+ }
+ return _pictureAccessPending.get(key);
 }
 
 async function _resolvePicItems(items) {
-  const resolved = [];
-  for (const item of _normalizePicItems(items)) {
-    const pic = await _resolvePicItem(item);
-    if (pic) resolved.push(pic);
-  }
-  return resolved;
+  const normalized = _normalizePicItems(items);
+  const settled = await Promise.allSettled(normalized.map((item, index) =>
+    _resolvePicItem(item).then(pic => ({ pic, index }))));
+  return settled.flatMap(result => {
+    if (result.status === 'fulfilled' && result.value.pic) return [result.value];
+    if (result.status === 'rejected') console.warn('[lineage] picture preview failed:', result.reason?.code || result.reason?.message || result.reason);
+    return [];
+  });
 }
 
 function _syncLayoutUI() {
@@ -1693,24 +1818,17 @@ function _renderThumbnailStatsBox(box, row, desc, picField, fallbackPrio) {
   if (hasPic) {
     // 有图：整框只显示图片，不显示统计行
     const pics = Array.isArray(picVal) ? picVal : [picVal];
-    const _abs = s => window.AI00RuntimeConfig?.toAbsoluteBackendUrl?.(typeof s === 'string' ? s : '') || s;
-    const firstPic = _abs(typeof pics[0] === 'string' ? pics[0] : (pics[0]?.url || pics[0]?.src || ''));
     const fill = document.createElement('div');
     fill.className = 'lv-stats-thumb-fill';
     fill.title = picField === 'process_flow_pic' ? '工艺流程图' : '工艺卡图片';
-    if (firstPic) {
-      const img = document.createElement('img');
-      img.className = 'lv-thumb-fill';
-      img.src = firstPic;
-      img.alt = picField;
-      img.onerror = function () {
-        fill.innerHTML = '';
-        fill.appendChild(_makeStatsRow('—'));
-      };
-      fill.appendChild(img);
-    } else {
+    const img = document.createElement('img');
+    img.className = 'lv-thumb-fill';
+    img.alt = picField;
+    _bindPictureImage(img, pics[0], row.version_gid || _versionGid, () => {
+      fill.innerHTML = '';
       fill.appendChild(_makeStatsRow('—'));
-    }
+    });
+    fill.appendChild(img);
     box.appendChild(fill);
   } else {
     // 无缩略图降级为 4 行统计
@@ -1745,14 +1863,12 @@ function _renderRegularStatsRows(box, desc, priority) {
 /**
  * 收集工序节点自身及其直接 operation 子节点的 process_flow_pic 第一张图
  */
-function _collectProcessPics(gid) {
-  const _abs = s => window.AI00RuntimeConfig?.toAbsoluteBackendUrl?.(typeof s === 'string' ? s : '') || s;
+function _collectProcessPicRecords(gid) {
   const pics = [];
   const _addFirst = r => {
     const v = r?.process_flow_pic;
     const raw = Array.isArray(v) ? v[0] : (typeof v === 'string' ? v : null);
-    const s = _abs(typeof raw === 'string' ? raw : (raw?.url || raw?.src || ''));
-    if (s) pics.push(s);
+    if (raw) pics.push({ pic: raw, versionGid: r?.version_gid || _versionGid });
   };
   _addFirst(_rowByGid.get(gid));
   for (const child of (_childMap.get(gid) || [])) {
@@ -1761,12 +1877,18 @@ function _collectProcessPics(gid) {
   return pics;
 }
 
+function _collectProcessPics(gid) {
+  return _collectProcessPicRecords(gid)
+    .map(r => _pictureDisplayUrl(r.pic, r.versionGid))
+    .filter(Boolean);
+}
+
 /**
  * 工序节点统计框：取自身或子 operation 第一张 process_flow_pic 做单图填充
  * 点击后灯箱展示全部图（由 layout_mode.js click handler 收集）
  */
 function _renderProcessCollageBox(box, gid, desc) {
-  const pics = _collectProcessPics(gid);
+  const pics = _collectProcessPicRecords(gid);
   if (!pics.length) {
     _renderRegularStatsRows(box, desc, _PROCESS_STATS_PRIORITY);
     return;
@@ -1776,12 +1898,11 @@ function _renderProcessCollageBox(box, gid, desc) {
   fill.title = '工艺流程图（点击灯箱）';
   const img = document.createElement('img');
   img.className = 'lv-thumb-fill';
-  img.src = pics[0];
   img.alt = 'process_flow_pic';
-  img.onerror = function () {
+  _bindPictureImage(img, pics[0].pic, pics[0].versionGid, () => {
     fill.innerHTML = '';
     fill.appendChild(_makeStatsRow('—'));
-  };
+  });
   fill.appendChild(img);
   box.appendChild(fill);
 }
@@ -2621,34 +2742,10 @@ const _NODE_FIELDS = {
 
 /**
  * 上传图片到 /api/bop/pics/upload，返回 URL
- * file: File 对象
+ * 使用 Electron 原生文件选择器导入一张图片。
  */
-async function _uploadBopPic(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = reject;
-    reader.onload = async ev => {
-      const dataUrl = ev.target.result;
-      const comma   = dataUrl.indexOf(',');
-      const mime    = dataUrl.slice(5, dataUrl.indexOf(';'));
-      const b64     = dataUrl.slice(comma + 1);
-      try {
-        const res = await _invokeCapability('craft.bop.picture.upload', 1, {
-          filename: file.name,
-          mime,
-          data_b64: b64,
-        });
-        const uploaded = res?.data || res;
-        if (!uploaded?.url) throw new Error('上传失败：无返回 URL');
-        resolve({
-          url: uploaded.url,
-          object_key: uploaded.object_key || '',
-          storage: uploaded.storage || '',
-        });
-      } catch (e) { reject(e); }
-    };
-    reader.readAsDataURL(file);
-  });
+async function _uploadBopPic(source = 'file') {
+const select=source==='clipboard'?'clipboard_image':'image';const artifact=await window.AI00Business.invoke('base.artifact.import',{version:1,payload:{},native_io:{select}});return {url:window.AI00Business.artifactPath(artifact),object_key:'',storage:'artifact'};
 }
 
 /**
@@ -2662,21 +2759,43 @@ function _renderPicArea(container, urls, max, onChange) {
   container.innerHTML = '';
   const area = document.createElement('div');
   area.className = 'lv-pic-area';
+  area.tabIndex = 0;
+  let currentItems = _normalizePicItems(urls);
+  let uploading = false;
+
+  async function upload(source, items) {
+    if (uploading || items.length >= max) return;
+    uploading = true;
+    const status = document.createElement('span');
+    status.className = 'lv-pic-uploading';
+    status.textContent = source === 'clipboard' ? '正在粘贴…' : '上传中…';
+    area.appendChild(status);
+    try {
+      const pic = await _uploadBopPic(source);
+      if (pic) items.push(pic);
+      onChange([...items]);
+      await refresh(items);
+    } catch (e) {
+      status.remove();
+      const message = e.code === 'native_clipboard_image_required' || e.message === 'native_clipboard_image_required' ? '剪贴板中没有图片' : e.message;
+      _toast('图片上传失败: ' + message, 'error');
+    } finally { uploading = false; }
+  }
 
   async function refresh(items) {
+    currentItems = items;
     area.innerHTML = '';
     const resolved = await _resolvePicItems(items);
-    resolved.forEach((pic, i) => {
+    resolved.forEach(({ pic, index }) => {
       const thumb = document.createElement('div');
       thumb.className = 'lv-pic-thumb';
       thumb.innerHTML = `<img src="${pic.url || ''}" title="点击全屏预览"><button class="lv-pic-del" title="删除">×</button>`;
       thumb.querySelector('img').addEventListener('click', () => {
         if (!pic.url) return;
-        const win = window.open();
-        win.document.write(`<body style="margin:0;background:#000"><img src="${pic.url}" style="max-width:100vw;max-height:100vh;object-fit:contain;display:block;margin:auto"></body>`);
+        _openImageLightbox([pic.url]);
       });
       thumb.querySelector('.lv-pic-del').addEventListener('click', () => {
-        items.splice(i, 1);
+        items.splice(index, 1);
         onChange([...items]);
         refresh(items);
       });
@@ -2684,42 +2803,20 @@ function _renderPicArea(container, urls, max, onChange) {
     });
 
     if (items.length < max) {
-      const addLabel = document.createElement('label');
+      const addLabel = document.createElement('button');
+      addLabel.type = 'button';
       addLabel.className = 'lv-pic-add';
       addLabel.title = '选择图片';
       addLabel.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>添加图片</span>`;
-      const fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      fileInput.accept = 'image/*';
-      fileInput.multiple = true;
-      fileInput.style.display = 'none';
-      fileInput.addEventListener('change', async () => {
-        const files = Array.from(fileInput.files).slice(0, max - items.length);
-        if (!files.length) return;
-        const status = document.createElement('span');
-        status.className = 'lv-pic-uploading';
-        status.textContent = '上传中…';
-        area.appendChild(status);
-        try {
-          for (const f of files) {
-            if (items.length >= max) break;
-            const pic = await _uploadBopPic(f);
-            items.push(pic);
-          }
-          onChange([...items]);
-          refresh(items);
-        } catch (e) {
-          status.remove();
-          _toast('图片上传失败: ' + e.message, 'error');
-        }
-        fileInput.value = '';
-      });
-      addLabel.appendChild(fileInput);
+      addLabel.addEventListener('click', () => upload('file', items));
       area.appendChild(addLabel);
     }
   }
 
-  refresh(_normalizePicItems(urls));
+  area.addEventListener('paste', event => { event.preventDefault(); upload('clipboard', currentItems); });
+  area.addEventListener('ai00:paste-image', () => upload('clipboard', currentItems));
+
+  refresh(currentItems);
   container.appendChild(area);
 }
 
@@ -2974,11 +3071,8 @@ async function _createNodeFromDialog(action, refGid) {
 
   try {
     _toast('创建中…', 'ok', 600);
-    const resp = await _invokeCapability('craft.bop.entry.bulk.change.apply', 1, {
-      operation: 'create',
-      ...body,
-    });
-    const newGid = resp?.data?.gid || resp?.gid;
+    const createdEntry = await _createEntryAndApply(body);
+    const newGid = createdEntry?.gid;
     // 上传图片（如有）
     if (newGid && (process_flow_pic?.length || process_chart_pic?.length)) {
       const picPatch = {};
@@ -2990,8 +3084,14 @@ async function _createNodeFromDialog(action, refGid) {
         updates: picPatch,
       });
     }
-    if (_viewMode === 'layout' && _layoutMode) _layoutMode._preserveView = true;
-    await _reload();
+    if (newGid && (process_flow_pic?.length || process_chart_pic?.length)) {
+      const local = _rowByGid.get(newGid);
+      if (local) {
+        if (process_flow_pic?.length) local.process_flow_pic = process_flow_pic;
+        if (process_chart_pic?.length) local.process_chart_pic = process_chart_pic;
+      }
+      _layoutMode?.refreshProcessCard?.(newGid);
+    }
     _toast('节点已创建', 'ok');
   } catch (e) {
     _toast('创建失败: ' + e.message, 'error');
@@ -3011,16 +3111,23 @@ async function _deleteEntry(gid) {
   if (!row) return;
   const ok = await _confirmDialog(`确认删除「${row.title || '(无名称)'}」？此操作不可恢复。`);
   if (!ok) return;
+  const snapshot = { ...row };
+  const wasActive = _activeGid === gid;
+  if (wasActive) _activeGid = null;
+  _applyLocalDeletedEntry(gid);
   try {
     await _invokeCapability('craft.bop.entry.change.apply', 1, {
       operation: 'delete',
       entry_gid: gid,
     });
-    if (_activeGid === gid) _activeGid = null;
-    if (_viewMode === 'layout' && _layoutMode) _layoutMode._preserveView = true;
-    await _reload();
     _toast('已删除', 'ok');
   } catch (e) {
+    _applyLocalCreatedEntry(snapshot, snapshot);
+    if (wasActive) {
+      _activeGid = gid;
+      if (_viewMode === 'layout' && _layoutMode) _layoutMode.highlightNode(gid);
+      else _applyActiveState(gid);
+    }
     _toast('删除失败: ' + e.message, 'error');
   }
 }
@@ -3048,7 +3155,7 @@ function _openDetailPopover(gid, anchorOrPos) {
     const hasPic = picVal && (Array.isArray(picVal) ? picVal.length > 0 : true);
     if (hasPic) {
       const pics = Array.isArray(picVal) ? picVal : [picVal];
-      const firstPic = typeof pics[0] === 'string' ? pics[0] : (pics[0]?.url || pics[0]?.src || '');
+      const firstPic = _pictureDisplayUrl(pics[0], row.version_gid || _versionGid);
       if (firstPic) {
         body.push('<div class="lv-det-section">');
         body.push(`<div style="font-size:11px;font-weight:600;color:var(--subtext0,#a6adc8);margin-bottom:4px">${family === 'process' ? '工艺流程图' : '工艺卡图片'}</div>`);
@@ -3820,11 +3927,13 @@ async function _saveView() {
  */
 async function _loadCloudConfig() {
   if (!_isCloud() || !_versionGid) return;
+  const requestedVersionGid = _versionGid;
   try {
     const res = await _invokeCapability('craft.bop.version.legacy_read', 1, {
       operation: 'layout_config',
-      version_gid: _versionGid,
+      version_gid: requestedVersionGid,
     });
+    if (requestedVersionGid !== _versionGid) return;
     const cloudCfg = res?.config || res?.data?.config;
     if (!cloudCfg) return;
 
@@ -4070,20 +4179,162 @@ async function _runAutoLink(opts = {}) {
 
 // ── 拖放操作串行队列（避免并发 PATCH 乱序）────────────────────────────────
 let _moveQueue = Promise.resolve();
+let _optimisticEntrySeq = 0;
 
-function _localMoveApply(gid, patchBody) {
-  const row = _rowByGid.get(gid);
-  if (!row) return;
-  if (patchBody.parent_gid !== undefined) row.parent_gid = patchBody.parent_gid;
-  if (patchBody.sort_order !== undefined) row.sort_order = patchBody.sort_order;
-  // 对同父级兄弟整数化 sort_order，避免浮点累积
-  const siblings = _rows.filter(r => r.parent_gid === row.parent_gid);
-  siblings.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
-  siblings.forEach((r, i) => { r.sort_order = i; });
+function _entryFromMutationResponse(response) {
+  let value = response;
+  for (let depth = 0; depth < 3 && value && typeof value === 'object' && !value.gid; depth++) {
+    value = value.data;
+  }
+  return value && typeof value === 'object' && value.gid ? value : null;
+}
+
+async function _createEntryAndApply(body) {
+  const optimisticGid = `pending_${Date.now()}_${++_optimisticEntrySeq}`;
+  _applyLocalCreatedEntry({ ...body, gid: optimisticGid, __pending_create: true }, body);
+  try {
+    const response = await _invokeCapability('craft.bop.entry.bulk.change.apply', 1, {
+      operation: 'create',
+      ...body,
+    });
+    const createdEntry = _entryFromMutationResponse(response);
+    if (!createdEntry?.gid) throw new Error('created_entry_missing');
+    _replaceLocalCreatedEntry(optimisticGid, createdEntry, body);
+    return createdEntry;
+  } catch (error) {
+    _applyLocalDeletedEntry(optimisticGid);
+    throw error;
+  }
+}
+
+function _refreshLocalStructure(lineGids, forceFullRender = false) {
   _buildIndexes(_rows);
   _buildStats();
-  _render();
-  if (_activeGid) _applyActiveState(_activeGid);
+  if (_viewMode === 'layout' && _layoutMode) {
+    if (forceFullRender) {
+      _layoutMode._preserveView = true;
+      _render();
+    } else {
+      _layoutMode.refreshMovedEntries([...new Set((lineGids || []).filter(Boolean))]);
+    }
+  } else {
+    _render();
+    if (_activeGid) _applyActiveState(_activeGid);
+  }
+  if (_layoutDetailPanel) _layoutDetailPanel.updateData(_buildLineageData());
+}
+
+function _applyLocalCreatedEntry(createdEntry, requested) {
+  if (!createdEntry?.gid) throw new Error('created_entry_missing');
+  const row = _flattenMeta([{
+    ...requested,
+    ...createdEntry,
+    version_gid: createdEntry.version_gid || requested.version_gid || _versionGid,
+  }])[0];
+  if (!_rowByGid.has(row.gid)) _rows.push(row);
+  if (row.node_type === 'line_process') {
+    const outline = _outlineRowsByVersion.get(row.version_gid) || [];
+    if (!outline.some(item => item.gid === row.gid)) outline.push({ ...row });
+    _outlineRowsByVersion.set(row.version_gid, outline);
+  } else {
+    // Keep the progressive projection cache aligned so a later scope commit
+    // cannot temporarily erase the newly created local row.
+    _buildIndexes(_rows);
+    const scope = _lineScopeForRow(row);
+    const key = scope ? _scopeKey(scope) : null;
+    const scoped = key ? _scopeRowsByKey.get(key) : null;
+    if (scoped && !scoped.some(item => item.gid === row.gid)) scoped.push({ ...row });
+  }
+  _refreshLocalStructure(
+    row.node_type === 'line_process' ? [row.gid] : [_getLineAncestorGid(row.gid)],
+    row.node_type === 'line_process',
+  );
+}
+
+function _replaceLocalCreatedEntry(optimisticGid, createdEntry, requested) {
+  const optimisticRow = _rowByGid.get(optimisticGid);
+  if (!optimisticRow) return _applyLocalCreatedEntry(createdEntry, requested);
+  const oldLineGid = _getLineAncestorGid(optimisticGid);
+  const row = _flattenMeta([{
+    ...requested,
+    ...createdEntry,
+    version_gid: createdEntry.version_gid || requested.version_gid || _versionGid,
+  }])[0];
+  const index = _rows.findIndex(item => item.gid === optimisticGid);
+  if (index >= 0) _rows[index] = row;
+  for (const [versionGid, rows] of _outlineRowsByVersion) {
+    _outlineRowsByVersion.set(versionGid, rows.map(item => item.gid === optimisticGid ? { ...row } : item));
+  }
+  for (const [key, rows] of _scopeRowsByKey) {
+    _scopeRowsByKey.set(key, rows.map(item => item.gid === optimisticGid ? { ...row } : item));
+  }
+  if (_activeGid === optimisticGid) _activeGid = row.gid;
+  _buildIndexes(_rows);
+  const newLineGid = _getLineAncestorGid(row.gid);
+  _refreshLocalStructure(
+    [oldLineGid, newLineGid],
+    row.node_type === 'line_process',
+  );
+}
+
+function _applyLocalDeletedEntry(gid) {
+  const row = _rowByGid.get(gid);
+  if (!row) return;
+  const lineGid = _getLineAncestorGid(gid);
+  _rows = _rows.filter(item => item.gid !== gid);
+  for (const [versionGid, rows] of _outlineRowsByVersion) {
+    _outlineRowsByVersion.set(versionGid, rows.filter(item => item.gid !== gid));
+  }
+  for (const [key, rows] of _scopeRowsByKey) {
+    _scopeRowsByKey.set(key, rows.filter(item => item.gid !== gid));
+  }
+  _refreshLocalStructure([lineGid], row.node_type === 'line_process');
+}
+
+function _localMoveApply(changes) {
+  const lineGids = new Set();
+  for (const change of changes) {
+    const row = _rowByGid.get(change.gid);
+    const oldLineGid = row ? _getLineAncestorGid(row.gid) : null;
+    if (oldLineGid) lineGids.add(oldLineGid);
+    if (!row) continue;
+    if (change.updates.parent_gid !== undefined) row.parent_gid = change.updates.parent_gid;
+    if (change.updates.sort_order !== undefined) row.sort_order = change.updates.sort_order;
+  }
+  _buildIndexes(_rows);
+  _buildStats();
+  for (const change of changes) {
+    const newLineGid = _getLineAncestorGid(change.gid);
+    if (newLineGid) lineGids.add(newLineGid);
+  }
+  if (_viewMode === 'layout' && _layoutMode) {
+    _layoutMode.refreshMovedEntries([...lineGids]);
+  } else {
+    _render();
+    if (_activeGid) _applyActiveState(_activeGid);
+  }
+}
+
+function _moveEntriesOptimistically(changes) {
+  const normalized = (changes || []).filter(change =>
+    change?.gid && change.updates && Object.keys(change.updates).length > 0);
+  if (!normalized.length) return Promise.resolve();
+
+  // Match the web interaction model: update the projection immediately, then
+  // serialize governed persistence in the background. A failed write reloads
+  // authoritative data; successful moves never reload the whole BOP version.
+  _localMoveApply(normalized);
+  const task = _moveQueue.then(async () => {
+    try {
+      for (const change of normalized) await _patchEntry(change.gid, change.updates);
+    } catch (error) {
+      _toast('移动失败，正在恢复: ' + error.message, 'error');
+      await _reload({ skipPendingMoves: true });
+      throw error;
+    }
+  });
+  _moveQueue = task.catch(() => {});
+  return task;
 }
 
 // ── reload helper ─────────────────────────────────────────────────────
@@ -4097,29 +4348,34 @@ async function _addBlankLine() {
   try {
     const maxSort = _rows.filter(r => r.node_type === 'line_process')
       .reduce((m, r) => Math.max(m, r.sort_order ?? 0), 0);
-    await _invokeCapability('craft.bop.entry.bulk.change.apply', 1, {
-      operation: 'create',
+    await _createEntryAndApply({
       version_gid: _versionGid,
       parent_gid: null,
       node_type: 'line_process',
       title: result.title,
       sort_order: maxSort + 1,
     });
-    await _load();
     _toast(`线体「${result.title}」已创建`, 'ok');
   } catch (e) {
     _toast('创建失败: ' + e.message, 'error');
   }
 }
 
-async function _reload() {
+async function _reload({ skipPendingMoves = false } = {}) {
   _closeOverlayPanel();
   try {
+    // A refresh issued immediately after a drag must observe the committed
+    // order. Keep normal reloads behind the move queue; the failure rollback
+    // bypasses it to avoid waiting on its own rejected task.
+    if (!skipPendingMoves) await _moveQueue;
+    const layoutViewport = (_viewMode === 'layout' && _layoutMode)
+      ? { panX: _layoutMode._panX, panY: _layoutMode._panY, zoom: _layoutMode._zoom }
+      : null;
     const comparisons = [..._loadedVersionGids]
       .filter(gid => gid !== _versionGid)
       .map(gid => ({ gid, tag: _versionTagMap.get(gid) || gid.slice(-6) }));
     const activeGid = _activeGid;
-    await _load();
+    await _load({ layoutViewport });
     for (const comparison of comparisons) await _addVersionRoots(comparison.gid, comparison.tag);
     _renderLinkAlerts(_collectLinkAlerts());
     // 刷新后更新底部详情面板数据
@@ -4142,7 +4398,7 @@ async function _reload() {
 function _bindEvents() {
 
   // ── 列区域事件委托 ──
-  $columns.addEventListener('click', e => {
+  $columns.addEventListener('click', async e => {
     const card = e.target.closest('.lv-card');
     if (!card) return;
     if (e.target.closest('.lv-fbtn')) return;
@@ -4172,7 +4428,7 @@ function _bindEvents() {
     _showCtxMenu(e.clientX, e.clientY, card.dataset.gid);
   });
 
-  $columns.addEventListener('click', e => {
+  $columns.addEventListener('click', async e => {
     const box = e.target.closest('.lv-stats-box');
     if (!box) return;
     e.stopPropagation();
@@ -4181,12 +4437,13 @@ function _bindEvents() {
     if (thumbEl) {
       // 有缩略图 → 灯箱预览，取该行所有图片
       const row = _rowByGid.get(gid);
-      const pics = [];
+      const records = [];
       for (const field of ['process_flow_pic', 'process_chart_pic']) {
         const val = row?.[field];
-        if (Array.isArray(val)) val.forEach(p => { const s = typeof p === 'string' ? p : (p?.url || p?.src || ''); if (s) pics.push(s); });
-        else if (typeof val === 'string' && val) pics.push(val);
+        if (Array.isArray(val)) val.forEach(pic => records.push({ pic, versionGid: row?.version_gid || _versionGid }));
+        else if (val) records.push({ pic: val, versionGid: row?.version_gid || _versionGid });
       }
+      const pics = await _resolvePictureRecords(records);
       if (pics.length) _openImageLightbox(pics);
     } else {
       if ($dpPopover.style.display !== 'none' && _detailGid === gid) {
@@ -4507,34 +4764,8 @@ function _bindEvents() {
     }
 
     try {
-      // 1. 立刻本地更新 + 重渲（用户无感知延迟）
       const savedGid = _dragGid;
-      _localMoveApply(savedGid, patchBody);
-
-      // 2. 串行队列：等上一个 PATCH 完成再发下一个，保证服务端顺序正确
-      _moveQueue = _moveQueue.then(async () => {
-        try {
-          await _patchEntry(savedGid, patchBody);
-          // 成功后只轻量同步这一行的最新数据，不做全量 reload
-          if (_currentRevision) _invokeCapability('craft.bop.entry.detail.get', 1, {
-            version_gid: _versionGid,
-            revision: _currentRevision,
-            entry_gid: savedGid,
-          }).then(res => {
-            const srv = res?.entry || res?.data || res;
-            if (srv && typeof srv === 'object') {
-              const local = _rowByGid.get(savedGid);
-              if (local) {
-                local.sort_order = srv.sort_order ?? local.sort_order;
-                local.parent_gid = srv.parent_gid ?? local.parent_gid;
-              }
-            }
-          }).catch(() => {});
-        } catch (ex) {
-          _toast('移动失败，正在恢复: ' + ex.message, 'error');
-          await _reload(); // 仅在持久化失败时全量回滚
-        }
-      });
+      _moveEntriesOptimistically([{ gid: savedGid, updates: patchBody }]).catch(() => {});
     } catch (ex) {
       _toast('移动失败: ' + ex.message, 'error');
     }
@@ -4645,6 +4876,7 @@ async function init() {
       cf: _cf,
       toast: _toast,
       patchEntry: _patchEntry,
+      createEntry: _createEntryAndApply,
       reloadData: _reload,
       loadEntryDetail: async (gid, row) => {
         await _ensureScopeLoaded(row);
@@ -4720,6 +4952,7 @@ async function init() {
     toast: _toast,
     onVersionSelected: (gid, tag) => {
       _versionGid = gid;
+      _versionTag = tag || _verMgr.allVersions.find(version => version.gid === gid)?.version_tag || gid.slice(-6);
       try { localStorage.setItem(_lsk('lv:lastVersionGid'), gid); } catch {}
       if (_assocPanel) _assocPanel.setVersionGid(gid);
       if (_lifecyclePanel) _lifecyclePanel.setVersionGid(gid);

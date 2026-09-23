@@ -9,7 +9,7 @@ using Microsoft.Extensions.Hosting;
 namespace Ai00.Connector.AppHost;
 
 public abstract record TeamcenterControlCommand(string RequestId);
-public sealed record TeamcenterLoginCommand(string RequestId, string EndpointId, string Username, string Password)
+public sealed record TeamcenterLoginCommand(string RequestId, string EndpointId, string Username, string Password, bool Remember)
     : TeamcenterControlCommand(RequestId);
 public sealed record TeamcenterStatusCommand(string RequestId) : TeamcenterControlCommand(RequestId);
 public sealed record TeamcenterLogoutCommand(string RequestId) : TeamcenterControlCommand(RequestId);
@@ -37,19 +37,22 @@ public static class TeamcenterControlProtocol
                 ? new TeamcenterStatusCommand(controlRequestId)
                 : new TeamcenterLogoutCommand(controlRequestId);
         }
-        var expected = new[] { "type", "request_id", "endpoint_id", "username", "password" };
-        if (fields.Length != expected.Length || fields.Distinct().Count() != fields.Length || fields.Except(expected).Any()
+        var expected = new[] { "type", "request_id", "endpoint_id", "username", "password", "remember" };
+        if (fields.Length is not (5 or 6) || fields.Distinct().Count() != fields.Length || fields.Except(expected).Any()
             || type != "teamcenter_login")
             throw new InvalidDataException("teamcenter_control_message_forbidden");
         var requestId = value.GetProperty("request_id").GetString() ?? "";
         var endpoint = value.GetProperty("endpoint_id").GetString() ?? "";
         var username = value.GetProperty("username").GetString() ?? "";
         var password = value.GetProperty("password").GetString() ?? "";
+        var remember = value.TryGetProperty("remember", out var rememberValue)
+            ? rememberValue.ValueKind switch { JsonValueKind.True => true, JsonValueKind.False => false,
+                _ => throw new InvalidDataException("teamcenter_control_message_invalid") } : false;
         if (!Regex.IsMatch(requestId, "\\Atc-[a-f0-9]{32}\\z") || endpoint != "tc-production"
             || username.Length is < 1 or > 191 || password.Length is < 1 or > 1024
             || username.IndexOfAny(['\r','\n']) >= 0 || password.IndexOfAny(['\r','\n']) >= 0)
             throw new InvalidDataException("teamcenter_control_message_invalid");
-        return new TeamcenterLoginCommand(requestId, endpoint, username, password);
+        return new TeamcenterLoginCommand(requestId, endpoint, username, password, remember);
     }
 
     public static string Result(string requestId, bool success, string code)
@@ -106,6 +109,7 @@ public sealed class TeamcenterControlPipeHost(AppHostOptions options, Teamcenter
 
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
+        if (options.Development) await runtime.RestoreRememberedLoginAsync(ct);
         while (!ct.IsCancellationRequested)
         {
             try
@@ -140,7 +144,8 @@ public sealed class TeamcenterControlPipeHost(AppHostOptions options, Teamcenter
                     attempts.Enqueue(now);
                     try
                     {
-                        await runtime.LoginAsync(loginCommand.EndpointId, loginCommand.Username, loginCommand.Password, ct);
+                        await runtime.LoginAsync(loginCommand.EndpointId, loginCommand.Username, loginCommand.Password, ct,
+                            options.Development && loginCommand.Remember);
                         await WriteAsync(pipe, TeamcenterControlProtocol.Result(loginCommand.RequestId, true, "ready"), ct);
                     }
                     catch (Exception error)

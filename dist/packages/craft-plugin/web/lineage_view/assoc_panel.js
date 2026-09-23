@@ -12,11 +12,7 @@ function _assocLsk(base) {
 }
 
 async function _assocInvoke(_cloudFetch, id, payload) {
-  const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ version: 1, payload }),
-  });
+  const response = await window.AI00Business.request(id, { version: 1, payload });
   const result = response?.data;
   if (response?.success !== true || result?.ok !== true) {
     const detail = result?.error || response?.error || {};
@@ -830,7 +826,7 @@ class AssocPanel {
     if (!options) {
       try {
         if (filterCfg.type === 'list') {
-          const _cloudFetch = this._cf;
+
           const res = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
             .call('project.lists.search', { itemType: filterCfg.itemType });
           options = (res.data || []).map(l => ({ gid: l.gid, name: l.name || l.gid }));

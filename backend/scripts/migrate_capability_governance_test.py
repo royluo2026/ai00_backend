@@ -34,6 +34,7 @@ MIGRATION_FILE_RE = re.compile(r"^(?P<id>\d{4})_(?P<name>[a-z][a-z0-9_]*)\.sql$"
 LEDGER_TABLE = "workmanship_base_capability_governance_migrations"
 LOCK_NAME = "ai00:capability-governance:test:v1"
 GOVERNANCE_TABLES = (
+    "workmanship_base_capability_runtime_fence",
     "workmanship_base_capability_entries",
     "workmanship_base_capability_versions",
     "workmanship_base_capability_scan_runs",

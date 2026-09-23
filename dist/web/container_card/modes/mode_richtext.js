@@ -55,15 +55,15 @@ window.ContainerModes['richtext'] = (() => {
   }
 
   function _cf() {
-    return window._cloudFetch || window.parent?._cloudFetch || null;
+    return window.AI00Business?.available() || window.AI00Business?.available() || null;
   }
 
   async function _loadContent(itemGid, scope) {
     if (!itemGid) return null;
     try {
-      const _cloudFetch = _cf();
-      if (!_cloudFetch) return null;
-      const data = await _cloudFetch(`/api/knowledge_hub/items/${itemGid}`, { method: 'GET' });
+
+      if (!window.AI00Business?.available()) return null;
+      const data = await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.read.atomic.items_get", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid}).filter(([,v])=>v!=null))}); return result; })({},{"gid":decodeURIComponent(String(itemGid))},new URLSearchParams());
       return data?.content_body || null;
     } catch (_) { return null; }
   }
@@ -72,9 +72,7 @@ window.ContainerModes['richtext'] = (() => {
     if (!itemGid) return;
     try {
       const _cloudFetch = _cf();
-      if (_cloudFetch) await _cloudFetch(`/api/knowledge_hub/items/${itemGid}`, {
-        method: 'PATCH', body: JSON.stringify({ content_body: content }),
-      });
+      if (_cloudFetch) await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.items_update", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,"updates":body}).filter(([,v])=>v!=null))}); return {"success":Boolean((result["changed"]??true))}; })({ content_body: content },{"gid":decodeURIComponent(String(itemGid))},new URLSearchParams());
     } catch (_) {}
   }
 

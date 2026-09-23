@@ -159,9 +159,7 @@
     return `${base}${p}`;
   }
 
-  async function _cf(method, path, opts = {}) {
-    return fetch(await _backendUrl(path), { ...opts, method });
-  }
+
 
   // ── 飞书 OAuth Web 流程（开新标签 + 轮询 JWT）───────────────────────────
   async function _webFeishuLogin() {

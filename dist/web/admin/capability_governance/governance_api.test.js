@@ -5,6 +5,15 @@ const fs = require('fs');
 const path = require('path');
 const { JSDOM } = require('jsdom');
 
+
+function installFacade(window){
+ window.electronAPI={invokeCapability:async(id,envelope)=>{
+  const value=await window._cloudFetch('/api/v1/capabilities/'+id+':invoke',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(envelope)});
+  return value.success!==undefined?value:{success:true,data:{ok:true,status:'completed',data:value.data??value}};
+ }};
+ window.AI00Business=require('../../core/business_facade').createBusinessFacade(window);
+}
+
 function makeApi() {
   const dom = new JSDOM('<!doctype html><body></body>', { runScripts: 'dangerously', url: 'http://localhost' });
   const calls = [];
@@ -27,6 +36,7 @@ function makeApi() {
   };
   const script = dom.window.document.createElement('script');
   script.textContent = fs.readFileSync(path.join(__dirname, 'governance_api.js'), 'utf8');
+  installFacade(dom.window);
   dom.window.document.head.appendChild(script);
   return { api: dom.window.CapabilityGovernanceApi, calls };
 }
@@ -105,6 +115,7 @@ async function runGovernanceApiTests() {
   snapshotDom.window._cloudFetch = async () => ({ data: { snapshot_gid: '1953048035824070999', items: [] } });
   const snapshotScript = snapshotDom.window.document.createElement('script');
   snapshotScript.textContent = fs.readFileSync(path.join(__dirname, 'governance_api.js'), 'utf8');
+  installFacade(snapshotDom.window);
   snapshotDom.window.document.head.appendChild(snapshotScript);
   const snapshotDashboard = await snapshotDom.window.CapabilityGovernanceApi.loadDashboard();
   assert.equal(snapshotDashboard.snapshot_gid, '1953048035824070999', 'dashboard retains the authoritative snapshot gid');
@@ -116,7 +127,7 @@ async function runGovernanceApiTests() {
   assert.deepEqual(calls[5].body, {
     version: 1,
     payload: { target_gid: '1953048035824070656', idempotency_key: 'review-1', row_version: 'rv-7', expected_resource_version: 'rv-7' },
-    idempotency_key: 'review-1', expected_resource_version: 'rv-7', confirmation_token: 'confirm-1',
+    idempotency_key: 'review-1', expected_resource_version: 'rv-7',
   }, 'review carries payload idempotency, target and current resource version');
 
   await api.generateRepairPrompt({ targetGid: '1953048035824070656' });
@@ -131,28 +142,14 @@ async function runGovernanceApiTests() {
     version: 1,
     payload: { target_gid: '1953048035824070656', idempotency_key: 'release-1' },
     idempotency_key: 'release-1',
-    confirmation_token: 'confirm-release-1',
   }, 'release evaluation uses the governed confirmation and idempotency flow');
 
-  await api.runScan({}, { idempotencyKey: 'scan-1', codeRevision: 'backend-rev-1' });
-  assert.equal(calls[8].url.includes('base.capability_scan.run:confirm'), true, '首次扫描先申请 Gateway 确认令牌');
-  assert.deepEqual(calls[8].body, {
-    version: 1,
-    payload: { code_revision: 'backend-rev-1', idempotency_key: 'scan-1' },
-    idempotency_key: 'scan-1',
-  }, '扫描确认请求使用闭合合约字段');
-  assert.equal(calls[9].url.includes('base.capability_scan.run:invoke'), true, '首次扫描随后调用 Gateway');
-  assert.deepEqual(calls[9].body, {
-    version: 1,
-    payload: { code_revision: 'backend-rev-1', idempotency_key: 'scan-1' },
-    idempotency_key: 'scan-1',
-    confirmation_token: 'issued-scan-token',
-  }, '首次扫描调用携带一次性确认令牌');
-
-  await api.evaluateReleaseGate({ targetGid: '1953048035824070656' }, { idempotencyKey: 'release-2' });
-  assert.equal(calls[10].url.includes('base.capability_release_gate.evaluate:confirm'), true, '其他治理写操作也先申请 Gateway 确认令牌');
-  assert.equal(calls[11].url.includes('base.capability_release_gate.evaluate:invoke'), true, '其他治理写操作随后调用 Gateway');
-  assert.equal(calls[11].body.confirmation_token, 'issued-write-token', '其他治理写操作携带一次性确认令牌');
+  await api.runScan({}, {idempotencyKey:'scan-1',codeRevision:'backend-rev-1'});
+  assert(calls[8].url.endsWith('base.capability_scan.run:invoke'));
+  assert.deepEqual(calls[8].body,{version:1,payload:{code_revision:'backend-rev-1',idempotency_key:'scan-1'},idempotency_key:'scan-1'});
+  await api.evaluateReleaseGate({targetGid:'1953048035824070656'},{idempotencyKey:'release-2'});
+  assert(calls[9].url.endsWith('base.capability_release_gate.evaluate:invoke'));
+  assert(calls.every(call=>!Object.hasOwn(call.body,'confirmation_token')),'Renderer API never carries a confirmation receipt');
 
   const failedDom = new JSDOM('<!doctype html><body></body>', { runScripts: 'dangerously', url: 'http://localhost' });
   failedDom.window._cloudFetch = async () => ({ success: false, data: {
@@ -162,31 +159,22 @@ async function runGovernanceApiTests() {
   } });
   const failedScript = failedDom.window.document.createElement('script');
   failedScript.textContent = fs.readFileSync(path.join(__dirname, 'governance_api.js'), 'utf8');
+  installFacade(failedDom.window);
   failedDom.window.document.head.appendChild(failedScript);
   await assert.rejects(
     failedDom.window.CapabilityGovernanceApi.runScan({}, { idempotencyKey: 'scan-failed', confirmationToken: 'confirm-failed' }),
     (error) => error && error.code === 'transaction_participant_required'
-      && /transaction_participant_required/.test(error.message)
       && /transactional capability provider/.test(error.message),
     'HTTP 200 CapabilityResultV2 failures must reject with a visible stable error',
   );
 
-  const standaloneDom = new JSDOM('<!doctype html><body></body>', { runScripts: 'dangerously', url: 'http://localhost:8094' });
-  const standaloneCalls = [];
-  standaloneDom.window.electronAPI = {
-    authGetState: async () => ({ token: 'session-token' }),
-    getConfig: async () => ({ backendUrl: 'http://localhost:8094' }),
-  };
-  standaloneDom.window.fetch = async (url, options) => {
-    standaloneCalls.push({ url, options });
-    return { ok: true, json: async () => ({ data: { items: [] } }) };
-  };
-  const standaloneScript = standaloneDom.window.document.createElement('script');
-  standaloneScript.textContent = fs.readFileSync(path.join(__dirname, 'governance_api.js'), 'utf8');
-  standaloneDom.window.document.head.appendChild(standaloneScript);
-  await standaloneDom.window.CapabilityGovernanceApi.searchRegistry({ query: 'direct' });
-  assert.equal(standaloneCalls[0].url, 'http://localhost:8094/api/v1/capabilities/base.capability_registry.search:invoke', '独立打开治理页使用当前后端地址');
-  assert.equal(standaloneCalls[0].options.headers['X-AI00-Token'], 'session-token', '独立打开治理页复用登录 token');
+  const standaloneDom=new JSDOM('<!doctype html><body></body>',{runScripts:'dangerously',url:'http://localhost:8094'});
+  const standaloneCalls=[];standaloneDom.window.electronAPI={invokeCapability:async(id,envelope)=>{standaloneCalls.push({id,envelope});return {success:true,data:{ok:true,data:{items:[]}}};}};
+  standaloneDom.window.AI00Business=require('../../core/business_facade').createBusinessFacade(standaloneDom.window);
+  const standaloneScript=standaloneDom.window.document.createElement('script');standaloneScript.textContent=fs.readFileSync(path.join(__dirname,'governance_api.js'),'utf8');standaloneDom.window.document.head.appendChild(standaloneScript);
+  await standaloneDom.window.CapabilityGovernanceApi.searchRegistry({query:'direct'});
+  assert.equal(standaloneCalls[0].id,'base.capability_registry.search');
+  assert(!JSON.stringify(standaloneCalls).includes('token'),'Standalone page uses the Main session boundary');
 
   const nestedDom = new JSDOM('<!doctype html><body></body>', { runScripts: 'dangerously', url: 'http://localhost' });
   nestedDom.window._cloudFetch = async (url) => {
@@ -198,6 +186,7 @@ async function runGovernanceApiTests() {
   };
   const nestedScript = nestedDom.window.document.createElement('script');
   nestedScript.textContent = fs.readFileSync(path.join(__dirname, 'governance_api.js'), 'utf8');
+  installFacade(nestedDom.window);
   nestedDom.window.document.head.appendChild(nestedScript);
   const nestedDashboard = await nestedDom.window.CapabilityGovernanceApi.loadDashboard();
   assert.equal(nestedDashboard.rows.length, 1, '真实 Gateway 的 CapabilityResultV2.data.items 会解包到能力清单');
@@ -213,6 +202,7 @@ async function runGovernanceApiTests() {
   };
   const queryScript = queryDom.window.document.createElement('script');
   queryScript.textContent = fs.readFileSync(path.join(__dirname, 'governance_api.js'), 'utf8');
+  installFacade(queryDom.window);
   queryDom.window.document.head.appendChild(queryScript);
   const queryApi = queryDom.window.CapabilityGovernanceApi;
   const proposals = await queryApi.loadProposals({ query: 'craft', domain: 'craft', stage: 'submitted', limit: 500 });
@@ -282,6 +272,7 @@ async function runGovernanceApiTests() {
   };
   const reviewScript = reviewDom.window.document.createElement('script');
   reviewScript.textContent = fs.readFileSync(path.join(__dirname, 'governance_api.js'), 'utf8');
+  installFacade(reviewDom.window);
   reviewDom.window.document.head.appendChild(reviewScript);
   const reviewApi = reviewDom.window.CapabilityGovernanceApi;
 
@@ -412,14 +403,14 @@ async function runGovernanceApiTests() {
     decision: 'approved', decisionReason: '目的、规则和证据一致',
   }, { idempotencyKey: 'business-review-101-3-approved' });
   const decisionCalls = reviewCalls.slice(decisionStart);
-  assert.equal(decisionCalls.length, 2, 'business decision uses the existing confirmation and invocation flow');
+  assert.equal(decisionCalls.length, 1, 'business decision passes one closed request to the Main confirmation boundary');
   assert.ok(decisionCalls.every((call) => call.url.includes('/api/v1/capabilities/base.capability_review.decide:')), 'business decision never bypasses the governed capability');
-  assert.deepEqual(decisionCalls[1].body.payload, {
+  assert.deepEqual(decisionCalls[0].body.payload, {
     proposal_gid: '101', row_version: '3', definition_hash: definitionHash,
     decision: 'approved', decision_reason: '目的、规则和证据一致',
     idempotency_key: 'business-review-101-3-approved',
   });
-  assert.equal(decisionCalls[1].body.expected_resource_version, '3', 'CAS binds the exact current proposal row version');
+  assert.equal(decisionCalls[0].body.expected_resource_version, '3', 'CAS binds the exact current proposal row version');
   assert.throws(
     () => reviewApi.decideBusinessReview({ proposalGid: '101', rowVersion: '3', definitionHash, decision: 'approved', decisionReason: '   ' }, { idempotencyKey: 'bad' }),
     /decision_reason is required/,
@@ -448,6 +439,7 @@ async function runGovernanceApiTests() {
   };
   const staleScript = staleDom.window.document.createElement('script');
   staleScript.textContent = fs.readFileSync(path.join(__dirname, 'governance_api.js'), 'utf8');
+  installFacade(staleDom.window);
   staleDom.window.document.head.appendChild(staleScript);
   await assert.rejects(
     staleDom.window.CapabilityGovernanceApi.loadBusinessReviewQueue({ analysisRunGid: 'run-9', reviewQueueLimit: 400, includeUnboundEntries: false }),
@@ -464,6 +456,7 @@ async function runGovernanceApiTests() {
   } });
   const aliasScript = aliasDom.window.document.createElement('script');
   aliasScript.textContent = fs.readFileSync(path.join(__dirname, 'governance_api.js'), 'utf8');
+  installFacade(aliasDom.window);
   aliasDom.window.document.head.appendChild(aliasScript);
   await assert.rejects(
     aliasDom.window.CapabilityGovernanceApi.loadBusinessReviewQueue({ analysisRunGid: 'run-9', includeUnboundEntries: false, includeProposals: false }),

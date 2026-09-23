@@ -3,9 +3,7 @@
  */
 'use strict';
 
-function _cf(method, path, opts = {}) {
-  return ListShell._cf(path, { ...opts, method });
-}
+
 
 // ── 列定义 ────────────────────────────────────────────────────────────────────
 const KNOWLEDGE_COLS = [
@@ -88,7 +86,7 @@ const EXTRA_CTX = (row) => [
 const load = ListShell.buildLoadHandler({
   bridgeNs:         'knowledge',
   bridgeListMethod: 'list_entries',
-  cloudRequest:     (query) => _cf('GET', `/api/knowledge_entries?${query}`),
+  cloudRequest:     (query) => (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.search", {version:1,payload:Object.fromEntries(Object.entries({"query":"","entry_type":(query.has("entry_type")?query.get("entry_type"):null),"list_gid":(query.has("list_gid")?query.get("list_gid"):null),"context_class_gid":(query.has("context_class_gid")?query.get("context_class_gid"):null),"include_content":true,"limit":(query.has("limit")?Number(query.get("limit")):200)}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result["items"]??[])}; })({},{},new URLSearchParams((`/api/knowledge_entries?${query}`).split("?")[1]||"")),
   getCurrentList:   () => _currentList,
   getAllLists:       () => _allLists,
   getShell:         () => _shell,
@@ -99,8 +97,8 @@ const load = ListShell.buildLoadHandler({
 const _onRowsChange = ListShell.buildRowsChangeHandler({
   editableKeys:       ['title', 'entry_type', 'status', 'tags'],
   primaryKey:         'title',
-  cloudUpdate:        (gid, body) => _cf('PATCH', `/api/knowledge_entries/${gid}`, { body: JSON.stringify(body) }),
-  cloudCreate:        (body) => _cf('POST', '/api/knowledge_entries', { body: JSON.stringify(body) }),
+  cloudUpdate:        (gid, body) => (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.entry.change.apply.atomic.entries_update", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,"updates":body}).filter(([,v])=>v!=null))}); return {"success":true}; })(body,{"gid":decodeURIComponent(String(gid))},new URLSearchParams()),
+  cloudCreate:        (body) => (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.entry.change.apply.atomic.entries_create", {version:1,payload:Object.fromEntries(Object.entries(Object.fromEntries(Object.entries({...{"entry_type":"guide","status":"draft","share_scope":"team","list_gid":null,"source_gid":null,"source_label":"","maintainer_gid":"","contributors":[],"attachments":[],"tags":[],"content_ref":{},"related_part_nos":[],"related_operation_gids":[]},...body}).filter(([,v])=>v!=null))).filter(([,v])=>v!=null))}); return {"success":true,"data":{"gid":(result["gid"]??"")}}; })(body,{},new URLSearchParams()),
   bridgeNs:           'knowledge',
   bridgeUpdateMethod: 'update_entry',
   bridgeCreateMethod: 'create_entry',
@@ -140,16 +138,12 @@ async function init() {
     onListsChange: (lists) => { _allLists = lists; },
     onSelect:      (gid) => { _currentList = gid; load(); },
     initListGid:   null,
-    rdpSaveOpts:   { bridgeNs: 'knowledge', bridgeMethod: 'update_entry', savePatch: (row, patch) => _cf('PATCH', `/api/knowledge_entries/${row.gid}`, { body: JSON.stringify(patch) }) },
+    rdpSaveOpts:   { bridgeNs: 'knowledge', bridgeMethod: 'update_entry', savePatch: (row, patch) => (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.entry.change.apply.atomic.entries_update", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,"updates":body}).filter(([,v])=>v!=null))}); return {"success":true}; })(patch,{"gid":decodeURIComponent(String(row.gid))},new URLSearchParams()) },
     importExport: ListShell.makeImportExport('knowledge', _getViewRows, async (rows, _fm, _c, signal) => {
         for (const r of rows) {
           if (signal?.aborted) break;
           if (!r.title) continue;
-          await _cf('POST', '/api/knowledge_entries', {
-            method: 'POST',
-            body: JSON.stringify({ title: r.title, entry_type: r.entry_type || 'guide', list_gid: _currentList || null }),
-            signal,
-          }).catch(e => console.error('[import knowledge]', e));
+          await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.entry.change.apply.atomic.entries_create", {version:1,payload:Object.fromEntries(Object.entries(Object.fromEntries(Object.entries({...{"entry_type":"guide","status":"draft","share_scope":"team","list_gid":null,"source_gid":null,"source_label":"","maintainer_gid":"","contributors":[],"attachments":[],"tags":[],"content_ref":{},"related_part_nos":[],"related_operation_gids":[]},...body}).filter(([,v])=>v!=null))).filter(([,v])=>v!=null))}); return {"success":true,"data":{"gid":(result["gid"]??"")}}; })({ title: r.title, entry_type: r.entry_type || 'guide', list_gid: _currentList || null },{},new URLSearchParams()).catch(e => console.error('[import knowledge]', e));
         }
         if (!signal?.aborted) await load();
       }),

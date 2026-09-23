@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script src="/web/core/business_facade.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>清单注册表</title>
@@ -594,17 +595,16 @@ function saveCustoms(a)  { localStorage.setItem(CUSTOM_KEY, JSON.stringify(a)); 
 async function persistNote(id, value) {
   const notes = loadNotes(); notes[id] = value; saveNotes(notes);
   try {
-    const cf = window._cloudFetch || window.parent?._cloudFetch || window.parent?.parent?._cloudFetch;
-    if (cf) await cf('/admin/config', { method:'PUT', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ key:`lists.${id}.note`, value }) });
+    const cf = window.AI00Business?.available() || window.AI00Business?.available() || window.AI00Business?.available();
+    if (cf) await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.runtime.list_note.set", {version:1,payload:({id:body.key.replace(/^lists\./,"").replace(/\.note$/,""),value:body.value})}); return result; })({ key:`lists.${id}.note`, value },{},new URLSearchParams());
   } catch {}
 }
 
 async function loadRemoteNotes() {
   try {
-    const cf = window._cloudFetch || window.parent?._cloudFetch || window.parent?.parent?._cloudFetch;
+    const cf = window.AI00Business?.available() || window.AI00Business?.available() || window.AI00Business?.available();
     if (!cf) return;
-    const res = await cf('/admin/config?prefix=lists.');
+    const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.runtime.annotation.search", {version:1,payload:({collection:query.get("prefix")==="lists."?"lists":"capabilities"})}); return ({...result,items:result.data}); })({},{},new URLSearchParams(('/admin/config?prefix=lists.').split("?")[1]||""));
     if (res?.items) {
       const notes = loadNotes();
       res.items.forEach(item => {

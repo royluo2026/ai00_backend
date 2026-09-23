@@ -42,6 +42,27 @@ public sealed class VisMockupDocumentIdentityTests
             JsonSerializer.SerializeToElement(new { })), token)).Data);
 
     [Fact]
+    public async Task ExistingIdentityOperationSelectsExactAlreadyOpenDocument()
+    {
+        using var sta=new StaDispatcher();
+        var bolt=new FakeDocument("bolt","tc://bolt",null!);
+        var w10=new FakeDocument("W10","tc://w10",null!);
+        var app=new FakeApplication("14.2",bolt){OpenDocuments=[bolt,w10]};
+        w10.AfterNativeActivation=()=>app.ActiveDocument=w10;
+        var com=new IdentityCom{Application=app};
+        var expected=CanonicalJson.Hash(new{process_id=123,
+            process_started_utc_ticks="638900000000000001",document_handle="W10"});
+
+        var result=await Adapter(sta,com).ExecuteAsync(new AdapterOperation(
+            "vismockup.document.existing_identity.read@1",
+            JsonSerializer.SerializeToElement(new{expected_document_session=expected})),CancellationToken.None);
+
+        Assert.Equal(expected,JsonSerializer.SerializeToElement(result.Data).GetProperty("document_session").GetString());
+        Assert.Same(w10,app.ActiveDocument);
+        Assert.Equal(0,app.OpenCalls);
+    }
+
+    [Fact]
     public void ProcessIdentityIgnoresAHeadlessEmbeddingInstance()
     {
         Assert.Equal((20, 200L), WindowsVisMockupCom.SelectProcessIdentity([

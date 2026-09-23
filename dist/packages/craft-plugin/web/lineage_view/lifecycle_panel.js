@@ -46,12 +46,8 @@ class BopLifecyclePanel {
   }
 
   async _invokeCapability(id, payload) {
-    const _cloudFetch = this._cf;
-    const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ version: 1, payload }),
-    });
+
+    const response = await window.AI00Business.request(id, { version: 1, payload });
     const result = response?.data;
     if (response?.success !== true || result?.ok !== true) {
       const detail = result?.error || response?.error || {};
@@ -1589,20 +1585,28 @@ class BopLifecyclePanel {
     diffTrigger.appendChild(genBtn);
     diffBody.appendChild(diffTrigger);
 
-    // 加载 PBOM 版本列表
-    const cf = window.parent?._cloudFetch || window._cloudFetch;
-    if (cf) {
-      this._invokeCapability('craft.bop.entry.legacy_read', {
-        operation: 'pbom_snapshots', limit: 200,
-      }).then(res => {
+    // PBOM 版本可能很多，且旧查询会阻塞本地测试后端。仅在用户展开
+    // 差异队列时加载一次，避免每次生命周期面板重绘都重复查询。
+    const cf = window.AI00Business?.available() || window.AI00Business?.available();
+    let pbomOptionsLoaded = false;
+    const loadPbomOptions = async () => {
+      if (!cf || pbomOptionsLoaded) return;
+      pbomOptionsLoaded = true;
+      try {
+        const res = await this._invokeCapability('craft.bop.entry.legacy_read', {
+          operation: 'pbom_snapshots', limit: 200,
+        });
         (res?.data || []).forEach(v => {
           const opt = document.createElement('option');
           opt.value = v.gid;
           opt.textContent = v.name || v.version_tag || v.gid.slice(-8);
           pbomSel.appendChild(opt);
         });
-      }).catch(() => {});
-
+      } catch (_) {
+        pbomOptionsLoaded = false;
+      }
+    };
+    if (cf) {
       genBtn.addEventListener('click', async () => {
         const targetGid = pbomSel.value;
         if (!targetGid) { this._toast('请选择 PBOM 版本', 'warn'); return; }
@@ -1648,7 +1652,9 @@ class BopLifecyclePanel {
     diffHdr.addEventListener('click', () => {
       diffOpen = !diffOpen;
       diffBody.style.display = diffOpen ? 'block' : 'none';
+      if (diffOpen) loadPbomOptions();
     });
+    if (diffOpen) loadPbomOptions();
     diffBlock.appendChild(diffHdr);
     diffBlock.appendChild(diffBody);
     frag.appendChild(diffBlock);
@@ -2464,7 +2470,7 @@ class BopLifecyclePanel {
     const el  = this._actionEl;
     el.innerHTML = '';
 
-    const cf  = window.parent?._cloudFetch || window._cloudFetch;
+    const cf  = window.AI00Business?.available() || window.AI00Business?.available();
     const api = window.top?.electronAPI || window.parent?.electronAPI || window.electronAPI;
 
     // localStorage 持久化：避免切出再切回重新创建

@@ -281,6 +281,7 @@ INPUT_SCHEMAS = {
     "simulation.teamcenter.visualization.launch": TC_LAUNCH_INPUT,
     "simulation.teamcenter.visualization.insert": TC_LAUNCH_INPUT,
     "simulation.vismockup.document.identity.read.request": obj({}, ()),
+    "simulation.vismockup.document.existing_identity.read.request": obj({"expected_document_session": HASH}, ("expected_document_session",)),
     "simulation.vismockup.document.hierarchy_inventory.read.request": obj({
         "document_session": HASH,
         "start_index": {"type": "integer", "minimum": 0},
@@ -490,6 +491,7 @@ OUTPUT_SCHEMAS = {
     "simulation.teamcenter.visualization.launch": TC_LAUNCH_RESULT,
     "simulation.teamcenter.visualization.insert": TC_LAUNCH_RESULT,
     "simulation.vismockup.document.identity.read.request": OPERATION_REF,
+    "simulation.vismockup.document.existing_identity.read.request": OPERATION_REF,
     "simulation.vismockup.document.hierarchy_inventory.read.request": OPERATION_REF,
     "simulation.connector.health.get": CONNECTOR_HEALTH,
     "simulation.connector.plan.queue": OPERATION_REF,

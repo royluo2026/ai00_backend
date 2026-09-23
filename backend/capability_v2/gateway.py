@@ -147,6 +147,21 @@ class CapabilityGatewayService:
     def catalog(self, release_id: str | None = None) -> CatalogRelease:
         return self._resolver.catalog(release_id or self.catalog_release)
 
+    def with_local_providers(self, providers, handler_factory) -> "CapabilityGatewayService":
+        """Scope approved plugin providers without changing global registrations/policy."""
+        if not providers:
+            return self
+        from backend.plugin_platform.local_providers import LocalProviderResolver
+        resolver = LocalProviderResolver(self._resolver, self.catalog(), providers, handler_factory)
+        return CapabilityGatewayService(resolver, self._policy, reliability=self._reliability,
+            operations=self._operations, admission=self._admission, metrics=self._metrics,
+            admission_timeout_seconds=self._admission_timeout_seconds).bind_release(resolver.release.release_id)
+
+    def reauthorize(self, envelope: InvocationEnvelope) -> None:
+        """Refresh actor and consumer grants before a delayed local effect is committed."""
+        descriptor, provider = self._resolve_envelope(envelope)
+        self._policy.authorize(descriptor, envelope, provider)
+
     def recent_metrics(self) -> tuple[CapabilityMetricRecord, ...]:
         """Return payload-free in-process measurements for administrator diagnostics."""
         return self._metrics.recent()

@@ -12,9 +12,55 @@
       };
   const api = factory(dependencies);
   if (typeof module === 'object' && module.exports) module.exports = api;
-  if (root) root.LineageProgressiveLoader = api.LineageProgressiveLoader;
+  if (root) {
+    root.LineageProgressiveLoader = api.LineageProgressiveLoader;
+    root.preloadFirstLineScopes = api.preloadFirstLineScopes;
+  }
 })(typeof globalThis !== 'undefined' ? globalThis : this, function createModule(dependencies) {
   const { LineageLoadCoordinator, LineageProjectionStore } = dependencies;
+
+  function preloadFirstLineScopes(lines, loadLine, selectedLineGids = null, options = {}) {
+    if (typeof loadLine !== 'function') throw new TypeError('loadLine is required');
+    const retryDelays = Array.isArray(options.retryDelays) ? options.retryDelays : [200, 600];
+    const sleep = typeof options.sleep === 'function'
+      ? options.sleep
+      : delay => new Promise(resolve => setTimeout(resolve, delay));
+    const transientErrors = new Set([
+      'invocation_unavailable',
+      'resource_pressure',
+      'capacity_unavailable',
+      'gateway_unavailable',
+    ]);
+    const loadWithRetry = async line => {
+      for (let attempt = 0; ; attempt += 1) {
+        try {
+          return await loadLine(line);
+        } catch (error) {
+          const code = error?.code || error?.message;
+          if (!transientErrors.has(code) || attempt >= retryDelays.length) throw error;
+          await sleep(retryDelays[attempt]);
+        }
+      }
+    };
+    const selected = selectedLineGids == null ? null : new Set(selectedLineGids);
+    const visible = (Array.isArray(lines) ? lines : [])
+      .filter(line => line?.gid && (!selected || selected.has(line.gid)));
+    // Keep first paint bounded; LayoutMode loads other lines when they enter view.
+    const initial = selected ? visible : visible.slice(0, 2);
+    const results = new Array(initial.length);
+    let next = 0;
+    const worker = async () => {
+      while (next < initial.length) {
+        const index = next++;
+        try {
+          results[index] = { status: 'fulfilled', value: await loadWithRetry(initial[index]) };
+        } catch (reason) {
+          results[index] = { status: 'rejected', reason };
+        }
+      }
+    };
+    return Promise.all(Array.from({ length: Math.min(2, initial.length) }, worker)).then(() => results);
+  }
 
   function isAbort(error) {
     return error?.name === 'AbortError' || error?.code === 'ABORT_ERR';
@@ -135,7 +181,9 @@
         cursor = page?.next_cursor || null;
       } while (cursor);
       this._loadedScopes.add(scopeKey(scope));
-      return { cancelled: false, scope, rows: this._store.rowsForActiveScope(scope) };
+      const completed = { cancelled: false, scope, rows: this._store.rowsForActiveScope(scope) };
+      if (typeof options.onComplete === 'function') options.onComplete(completed);
+      return completed;
     }
 
     hasLoadedScope(scope) {
@@ -181,5 +229,5 @@
     }
   }
 
-  return { LineageProgressiveLoader };
+  return { LineageProgressiveLoader, preloadFirstLineScopes };
 });

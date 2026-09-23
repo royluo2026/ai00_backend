@@ -3,8 +3,13 @@
  */
 'use strict';
 
-function _cf(method, path, opts = {}) {
-  return ListShell._cfSafe(path, { ...opts, method });
+
+
+async function _createElement(operation, record, opts = {}) {
+  if (Object.keys(opts).some(key => key !== 'signal')) throw new Error('unsupported element create option');
+  if (opts.signal?.aborted) throw new Error('element import aborted');
+  const {operation: completedOperation, ...legacyResult} = await window.AI00Business.invoke('craft.library.change.apply', {version: 2, payload: {operation, record}}, () => !opts.signal?.aborted && window.confirm('确认执行 craft.library.change.apply@2？'));
+  return legacyResult;
 }
 
 // ── 列定义（覆盖所有子类型的字段） ───────────────────────────────────────────
@@ -35,34 +40,34 @@ const ELEM_COLS = [
 // ── 子标签配置 ────────────────────────────────────────────────────────────────
 const TAB_CONFIG = {
   tool:      { label: '工具模板', fields: [{ id:'name', label:'名称' }, { id:'category', label:'分类' }],
-    load: listGid => _cf('GET', '/api/craft_lib/tools' + (listGid ? `?list_gid=${listGid}` : '')),
-    create: (body, opts = {}) => _cf('POST', '/api/craft_lib/tools', { ...opts, body: JSON.stringify(body) }),
-    update: (gid, body) => _cf('PATCH', `/api/craft_lib/tools/${gid}`, { body: JSON.stringify(body) }),
-    save: (gid, body) => { const _cloudFetch = ListShell._cf; return _cloudFetch(`/api/craft_lib/tools/${gid}`, { method: 'PATCH', body: JSON.stringify(body) }); },
-    obsolete: gid => _cf('POST', `/api/craft_lib/tools/${gid}/obsolete`) },
+    load: listGid => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"tools.list"}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result.items??[])}; })({},{},new URLSearchParams(('/api/craft_lib/tools' + (listGid ? `?list_gid=${listGid}` : '')).split("?")[1]||"")),
+    create: (body, opts = {}) => _createElement('tools.create', body, opts),
+    update: (gid, body) => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"tools.update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{"gid":decodeURIComponent(String(gid))},new URLSearchParams()),
+    save: (gid, body) => {  return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"tools.update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{"gid":decodeURIComponent(String(gid))},new URLSearchParams()); },
+    obsolete: gid => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"tools.obsolete",gid:path.gid}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams()) },
   equipment: { label: '设备模板', fields: [{ id:'name', label:'名称' }, { id:'category', label:'分类' }],
-    load: listGid => _cf('GET', '/api/craft_lib/equipments' + (listGid ? `?list_gid=${listGid}` : '')),
-    create: (body, opts = {}) => _cf('POST', '/api/craft_lib/equipments', { ...opts, body: JSON.stringify(body) }),
-    update: (gid, body) => _cf('PATCH', `/api/craft_lib/equipments/${gid}`, { body: JSON.stringify(body) }),
-    save: (gid, body) => { const _cloudFetch = ListShell._cf; return _cloudFetch(`/api/craft_lib/equipments/${gid}`, { method: 'PATCH', body: JSON.stringify(body) }); },
-    obsolete: gid => _cf('POST', `/api/craft_lib/equipments/${gid}/obsolete`) },
+    load: listGid => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"equipments.list"}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result.items??[])}; })({},{},new URLSearchParams(('/api/craft_lib/equipments' + (listGid ? `?list_gid=${listGid}` : '')).split("?")[1]||"")),
+    create: (body, opts = {}) => _createElement('equipments.create', body, opts),
+    update: (gid, body) => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"equipments.update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{"gid":decodeURIComponent(String(gid))},new URLSearchParams()),
+    save: (gid, body) => {  return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"equipments.update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{"gid":decodeURIComponent(String(gid))},new URLSearchParams()); },
+    obsolete: gid => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"equipments.obsolete",gid:path.gid}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams()) },
   fixture:   { label: '工装模板', fields: [{ id:'name', label:'名称' }],
-    load: listGid => _cf('GET', '/api/craft_lib/fixtures' + (listGid ? `?list_gid=${listGid}` : '')),
-    create: (body, opts = {}) => _cf('POST', '/api/craft_lib/fixtures', { ...opts, body: JSON.stringify(body) }),
-    update: (gid, body) => _cf('PATCH', `/api/craft_lib/fixtures/${gid}`, { body: JSON.stringify(body) }),
-    save: (gid, body) => { const _cloudFetch = ListShell._cf; return _cloudFetch(`/api/craft_lib/fixtures/${gid}`, { method: 'PATCH', body: JSON.stringify(body) }); },
-    obsolete: gid => _cf('POST', `/api/craft_lib/fixtures/${gid}/obsolete`) },
+    load: listGid => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"fixtures.list"}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result.items??[])}; })({},{},new URLSearchParams(('/api/craft_lib/fixtures' + (listGid ? `?list_gid=${listGid}` : '')).split("?")[1]||"")),
+    create: (body, opts = {}) => _createElement('fixtures.create', body, opts),
+    update: (gid, body) => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"fixtures.update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{"gid":decodeURIComponent(String(gid))},new URLSearchParams()),
+    save: (gid, body) => {  return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"fixtures.update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{"gid":decodeURIComponent(String(gid))},new URLSearchParams()); },
+    obsolete: gid => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"fixtures.obsolete",gid:path.gid}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams()) },
   fastener:  { label: '标准紧固件', fields: [{ id:'part_no', label:'零件号' }, { id:'name', label:'名称' }],
-    load: listGid => _cf('GET', '/api/craft_lib/fasteners' + (listGid ? `?list_gid=${listGid}` : '')),
-    create: (body, opts = {}) => _cf('POST', '/api/craft_lib/fasteners', { ...opts, body: JSON.stringify(body) }),
-    update: (gid, body) => _cf('PATCH', `/api/craft_lib/fasteners/${gid}`, { body: JSON.stringify(body) }),
-    save: (gid, body) => { const _cloudFetch = ListShell._cf; return _cloudFetch(`/api/craft_lib/fasteners/${gid}`, { method: 'PATCH', body: JSON.stringify(body) }); },
+    load: listGid => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"fasteners.list"}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result.items??[])}; })({},{},new URLSearchParams(('/api/craft_lib/fasteners' + (listGid ? `?list_gid=${listGid}` : '')).split("?")[1]||"")),
+    create: (body, opts = {}) => _createElement('fasteners.create', body, opts),
+    update: (gid, body) => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"fasteners.update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{"gid":decodeURIComponent(String(gid))},new URLSearchParams()),
+    save: (gid, body) => {  return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"fasteners.update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{"gid":decodeURIComponent(String(gid))},new URLSearchParams()); },
     obsolete: null },
   partname:  { label: '标准零件名',
-    load: listGid => _cf('GET', '/api/craft_lib/part_names' + (listGid ? `?list_gid=${listGid}` : '')),
-    create: (body, opts = {}) => _cf('POST', '/api/craft_lib/part_names', { ...opts, body: JSON.stringify(body) }),
-    update: (gid, body) => _cf('PATCH', `/api/craft_lib/part_names/${gid}`, { body: JSON.stringify(body) }),
-    save: (gid, body) => { const _cloudFetch = ListShell._cf; return _cloudFetch(`/api/craft_lib/part_names/${gid}`, { method: 'PATCH', body: JSON.stringify(body) }); },
+    load: listGid => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"part_names.list",q:(query.has("q")?query.get("q"):null)}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result.items??[])}; })({},{},new URLSearchParams(('/api/craft_lib/part_names' + (listGid ? `?list_gid=${listGid}` : '')).split("?")[1]||"")),
+    create: (body, opts = {}) => _createElement('part_names.create', body, opts),
+    update: (gid, body) => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"part_names.update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{"gid":decodeURIComponent(String(gid))},new URLSearchParams()),
+    save: (gid, body) => {  return (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.library.change.apply", {version:2,payload:Object.fromEntries(Object.entries({operation:"part_names.update",gid:path.gid,record:body}).filter(([,v])=>v!=null))}); const {operation: completedOperation, ...legacyResult} = result; return legacyResult; })(body,{"gid":decodeURIComponent(String(gid))},new URLSearchParams()); },
     obsolete: null,
                 fields: [
                   { id:'standard_name',          label:'标准名称'         },

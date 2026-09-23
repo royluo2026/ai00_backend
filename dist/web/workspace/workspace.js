@@ -385,8 +385,11 @@ const WorkspaceEngine = (() => {
     ps.tabs.forEach(tid => {
       const ts = _tabs.get(tid);
       if (ts) {
-        ts.tabEl.classList.toggle('active', tid === tabId);
-        ts.paneEl.classList.toggle('active', tid === tabId);
+        const visible = tid === tabId;
+        ts.tabEl.classList.toggle('active', visible);
+        ts.paneEl.classList.toggle('active', visible);
+        const iframe = ts.paneEl.querySelector?.('iframe');
+        try { iframe?.contentWindow?.postMessage({ type: 'workspace:visibility', visible }, '*'); } catch (_) {}
       }
     });
     ps.activeTabId = tabId;
@@ -491,6 +494,7 @@ const WorkspaceEngine = (() => {
       iframe.addEventListener('load', () => {
         const theme = document.documentElement.getAttribute('data-theme') || 'light';
         try { iframe.contentWindow?.postMessage({ type: 'theme', theme }, '*'); } catch (_) {}
+        try { iframe.contentWindow?.postMessage({ type: 'workspace:visibility', visible: paneEl.classList.contains('active') }, '*'); } catch (_) {}
         // 遮罩淡出，iframe 淡入
         iframe.classList.add('ws-pane-iframe-ready');
 

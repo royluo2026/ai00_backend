@@ -1,7 +1,7 @@
 /**
  * notification_manager.js — 通知管理器
  * 处理应用内通知面板的拉取、展示与已读标记。
- * 依赖 window._cloudFetch（定义于 main.js 底部，加载顺序 main.js 最后）。
+ * 依赖 window.AI00Business 的受控 Gateway 结果。
  */
 const NotifManager = (() => {
   let _pollTimer = null;
@@ -13,15 +13,17 @@ const NotifManager = (() => {
     new_follower:   '新关注者',
   };
 
-  async function _cloudFetch(path, opts = {}) {
-    return window._cloudFetch(path, opts);
+  // The facade removes the atomic Provider wrapper; this is the application outcome.
+  function notificationData(outcome) {
+    if (outcome?.success !== true) throw new Error('notification_outcome_invalid');
+    return outcome.data;
   }
 
   async function pollCount() {
     if (window._authMode !== 'feishu') return;
     try {
-      const res = await _cloudFetch('/api/notifications/unread_count', { method: 'GET' });
-      const count = res?.data?.count || 0;
+      const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.notification.read.atomic.notifications_unread_count", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{}}).arguments).filter(([k,v])=>v!=null||[].includes(k)))}}); return result; })({},{},new URLSearchParams());
+      const count = notificationData(res)?.count || 0;
       const badge = document.getElementById('notif-badge');
       if (badge) {
         if (count > 0) {
@@ -45,8 +47,8 @@ const NotifManager = (() => {
     }
     list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-faint);font-size:12px;">加载中...</div>';
     try {
-      const res = await _cloudFetch('/api/notifications', { method: 'GET' });
-      const items = res?.data || [];
+      const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.notification.read.atomic.notifications_list", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"unread_only":(query.has("unread_only")?['true','1','yes','on'].includes(query.get("unread_only").toLowerCase()):false)}}).arguments).filter(([k,v])=>v!=null||[].includes(k)))}}); return result; })({},{},new URLSearchParams());
+      const items = notificationData(res) || [];
       if (!items.length) {
         list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-faint,#6c7086);font-size:12px;">暂无通知</div>';
         return;
@@ -63,7 +65,7 @@ const NotifManager = (() => {
       list.querySelectorAll('.notif-item').forEach(el => {
         el.addEventListener('click', async () => {
           const gid = el.dataset.gid;
-          await _cloudFetch(`/api/notifications/${gid}/read`, { method: 'PATCH' }).catch(() => {});
+          await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.notification.change.apply.atomic.notifications_mark_read", {version:1,payload:{arguments:{"gid":path.gid}}}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams()).catch(() => {});
           el.classList.remove('notif-unread');
           el.style.background = 'transparent';
           await pollCount();
@@ -77,7 +79,7 @@ const NotifManager = (() => {
 
   async function readAll() {
     if (window._authMode !== 'feishu') return;
-    await _cloudFetch('/api/notifications/read_all', { method: 'PATCH' }).catch(() => {});
+    await (async (body,path,query) => { const result = await window.AI00Business.invoke("project.notification.change.apply.atomic.notifications_mark_all_read", {version:1,payload:{arguments:{}}}); return result; })({},{},new URLSearchParams()).catch(() => {});
     const badge = document.getElementById('notif-badge');
     if (badge) badge.style.display = 'none';
     // 同步清除任务栏角标

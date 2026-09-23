@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script src="/web/core/business_facade.js"></script>
   <meta charset="UTF-8">
   <title>快速清单</title>
   
@@ -287,7 +288,7 @@ const TYPE_API = {
   task: {
     list: (_cloudFetch, t) => (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
       .call('project.lists.search', { itemType: t }),
-    data: (_cloudFetch, listGid) => _cloudFetch('/api/tasks' + (listGid ? `?list_gid=${listGid}` : ''), { method: 'GET' }),
+    data: (_cloudFetch, listGid) => (async (body,path,query) => { const result = await window.AI00Business.invoke("project.task.read.atomic.tasks_search", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"project_gid":(query.has("project_gid")?query.get("project_gid"):null),"status":(query.has("status")?query.get("status"):null),"list_gid":(query.has("list_gid")?query.get("list_gid"):null),"scheduled_date_from":(query.has("scheduled_date_from")?query.get("scheduled_date_from"):null),"q":(query.has("q")?query.get("q"):null),"page_size":(query.has("page_size")?Number(query.get("page_size")):null)}}).arguments).filter(([k,v])=>v!=null||["list_gid","project_gid","q","scheduled_date_from","status"].includes(k)))}}); return result; })({},{},new URLSearchParams(('/api/tasks' + (listGid ? `?list_gid=${listGid}` : '')).split("?")[1]||"")),
     save: (_cloudFetch, updated) => {
       const { gid, ...updates } = updated;
       return (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
@@ -297,7 +298,7 @@ const TYPE_API = {
   issue: {
     list: (_cloudFetch, t) => (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
       .call('project.lists.search', { itemType: t }),
-    data: (_cloudFetch, listGid) => _cloudFetch('/api/issues' + (listGid ? `?list_gid=${listGid}` : ''), { method: 'GET' }),
+    data: (_cloudFetch, listGid) => (async (body,path,query) => { const result = await window.AI00Business.invoke("project.issue.read.atomic.issues_search", {version:1,payload:{arguments:Object.fromEntries(Object.entries(({arguments:{"project_gid":(query.has("project_gid")?query.get("project_gid"):null),"status":(query.has("status")?query.get("status"):null),"list_gid":(query.has("list_gid")?query.get("list_gid"):null),"q":(query.has("q")?query.get("q"):null),"page_size":(query.has("page_size")?Number(query.get("page_size")):null)}}).arguments).filter(([k,v])=>v!=null||["list_gid","project_gid","q","status"].includes(k)))}}); return result; })({},{},new URLSearchParams(('/api/issues' + (listGid ? `?list_gid=${listGid}` : '')).split("?")[1]||"")),
     save: (_cloudFetch, updated) => {
       const { gid, ...updates } = updated;
       return (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
@@ -318,8 +319,8 @@ const TYPE_API = {
   // BOP versions are read through craft.bop.version.list in _onLoadLists.
   bop_entry: {},
   pbom_part: {
-    list: (_cloudFetch) => _cloudFetch('/api/ebom/snapshots', { method: 'GET' }),
-    data: (_cloudFetch, listGid) => _cloudFetch(`/api/ebom/snapshots/${listGid}/parts`, { method: 'GET' }),
+    list: (_cloudFetch) => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.pbom.version.search", {version:1,payload:Object.fromEntries(Object.entries({"project_ref":(query.has("project_gid")?query.get("project_gid"):null),"limit":200}).filter(([,v])=>v!=null))}); return {"success":true,"data":((result["items"]??[])).map(row=>({"gid":(row["gid"]??""),"project_gid":((row["project_gid"]??null)||(row["project_ref"]??null)),"version_tag":((row["version_tag"]??null)||""),"name":((row["name"]??null)||((row["version_tag"]??null)||"")),"source_type":((row["source_type"]??null)||"native"),"status":(row["status"]??"draft"),"created_at":((row["created_at"]??null)||"")}))}; })({},{},new URLSearchParams()),
+    data: (_cloudFetch, listGid) => (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.pbom.part.search", {version:1,payload:Object.fromEntries(Object.entries({"version_gid":path.gid,"limit":(query.has("limit")?Number(query.get("limit")):500)}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result.items??[]).map(item=>({"gid":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["gid"],"snapshot_gid":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["snapshot_gid"],"part_no":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["part_no"],"name":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["name"],"quantity":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["quantity"],"unit":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["unit"],"material":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["material"],"parent_gid":({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["parent_gid"],"vpps":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["vpps"]??null),"vpps_desc":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["vpps_desc"]??""),"parent_vpps":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["parent_vpps"]??""),"parent_vpps_name":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["parent_vpps_name"]??""),"bom_row":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["bom_row"]??""),"bom_row_label":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["bom_row_label"]??""),"component_id":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["component_id"]??""),"component_type":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["component_type"]??""),"component_version_status":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["component_version_status"]??""),"purchase_status":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["purchase_status"]??""),"variable_formula":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["variable_formula"]??""),"torque":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["torque"]??""),"torque_importance":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["torque_importance"]??""),"ownership_user":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["ownership_user"]??""),"level":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["level"]??null),"home":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["home"]??""),"configuration":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["configuration"]??""),"parent_bom_row":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["parent_bom_row"]??""),"remark":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["remark"]??""),"temp_vpps":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["temp_vpps"]??""),"catia_occurrence_name":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["catia_occurrence_name"]??""),"catia_file_name":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["catia_file_name"]??""),"catia_uuid":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["catia_uuid"]??""),"default_matrix":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["default_matrix"]??""),"abs_matrix":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["abs_matrix"]??""),"rel_matrix":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["rel_matrix"]??""),"local_bbox":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["local_bbox"]??""),"ecn":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["ecn"]??""),"fna":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["fna"]??""),"geo_main_part":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["geo_main_part"]??""),"ref_main_vpps_desc":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["ref_main_vpps_desc"]??""),"ref_main_vpps":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["ref_main_vpps"]??""),"main_part_consistency":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["main_part_consistency"]??""),"geo_evidence":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["geo_evidence"]??""),"lr_side":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["lr_side"]??""),"meta":(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["meta"]??{}),"created_at":String(({...item,name:Object.hasOwn(item,'name')?item.name:(item.title??'')})["created_at"])}))}; })({},{"gid":decodeURIComponent(String(listGid))},new URLSearchParams()),
   },
 };
 const STATUS_LABELS   = { open:'待处理', todo:'待办', in_progress:'进行中', inprogress:'进行中', completed:'已完成', closed:'已关闭', blocked:'阻塞' };
@@ -338,16 +339,10 @@ window.addEventListener('message', e => {
 });
 
 // ── 状态 ──────────────────────────────────────────────────────
-const _cf = () => window._cloudFetch || window.parent?._cloudFetch;
+const _cf = () => window.AI00Business?.available() || window.AI00Business?.available();
 
 async function _invokeCapability(id, payload = {}) {
-  const _cloudFetch = _cf();
-  if (!_cloudFetch) throw new Error('云端服务未连接');
-  const response = await _cloudFetch(`/api/v1/capabilities/${id}:invoke`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ version: 1, payload }),
-  });
+  const response = await window.AI00Business.request(id, { version: 1, payload });
   const envelope = response?.data;
   if (response?.success !== true || envelope?.ok !== true) {
     const detail = envelope?.error || response?.error || {};
