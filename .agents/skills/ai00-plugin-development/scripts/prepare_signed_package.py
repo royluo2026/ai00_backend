@@ -83,14 +83,22 @@ def verify_bundle(bundle: Path, public_key: Path) -> dict[str, object]:
                     "signed package must contain exactly release.json, publisher.sig and plugin.zip"
                 )
             release = json.loads(archive.read("release.json").decode("utf-8-sig"))
+            if not isinstance(release, dict):
+                raise ValueError("release.json must contain an object")
             package = archive.read("plugin.zip")
             signature = base64.b64decode(
                 archive.read("publisher.sig").strip(), validate=True
             )
         digest = hashlib.sha256(package).hexdigest()
         artifact = release.get("artifact", {})
+        if not isinstance(artifact, dict):
+            raise ValueError("release artifact must contain an object")
         if digest != artifact.get("sha256") or len(package) != artifact.get("size"):
             raise ValueError("plugin ZIP does not match release artifact")
+        plugin_id = release.get("plugin_id")
+        version = release.get("version")
+        if not isinstance(plugin_id, str) or not isinstance(version, str):
+            raise ValueError("release must contain string plugin_id and version")
         key = serialization.load_pem_public_key(public_key.read_bytes())
         if not isinstance(key, Ed25519PublicKey):
             raise ValueError("public key must be Ed25519")
@@ -101,8 +109,8 @@ def verify_bundle(bundle: Path, public_key: Path) -> dict[str, object]:
         raise ValueError("invalid signed AI00 package") from exc
     return {
         "artifact_sha256": digest,
-        "version": release["version"],
-        "plugin_id": release["plugin_id"],
+        "version": version,
+        "plugin_id": plugin_id,
         "package_size": len(package),
     }
 

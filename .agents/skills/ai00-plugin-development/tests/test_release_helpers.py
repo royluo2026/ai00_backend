@@ -146,14 +146,26 @@ class PackagePreparationTests(unittest.TestCase):
             with self.subTest(entry=entry), self.assertRaises(ValueError):
                 prepare.verify_bundle(tampered, self.public)
 
+    def test_verify_bundle_rejects_non_object_release_as_value_error(self):
+        prepare = load_script("prepare_signed_package")
+        prepare.prepare_package(
+            self.plugin, SDK_ROOT, self.private, self.public, self.output, None
+        )
+        malformed = self.root / "malformed-release.ai00pkg"
+        with zipfile.ZipFile(self.output) as source, zipfile.ZipFile(malformed, "w") as target:
+            for name in source.namelist():
+                target.writestr(name, b"[]" if name == "release.json" else source.read(name))
+        with self.assertRaisesRegex(ValueError, "release.json must contain an object"):
+            prepare.verify_bundle(malformed, self.public)
+
     def test_prepare_package_rejects_manifest_v21(self):
         prepare = load_script("prepare_signed_package")
         self.manifest["schema_version"] = "2.1"
         self.manifest["provides"] = [
             {
-                "capability_id": "huangjing.demo.echo",
+                "id": "huangjing.demo.echo",
                 "major": 1,
-                "owner_domain": "huangjing",
+                "owner_domain": "huangjing.demo",
                 "module": "provider.mjs",
                 "export": "invoke",
                 "result": "json",
