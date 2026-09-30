@@ -39,7 +39,7 @@ from ..data.connector_repository import (
 )
 from .connector_contracts import (
     AdapterAdvertisement, AdapterOperation, ConnectorHealth,
-    TC_CHILDREN_INPUT, TC_NODE_PROPERTIES_INPUT,
+    TC_CHILDREN_INPUT, TC_NODE_PROPERTIES_INPUT, TC_CACHE_CONTRACT, TC_CACHE_V2_CONTRACT, TC_CACHE_LAUNCH_INPUT,
 )
 
 
@@ -78,9 +78,11 @@ DESKTOP_CAPABILITY_BINDINGS = (
     ("simulation.teamcenter.node_properties.read.request", 1),
     ("simulation.teamcenter.visualization.launch.request", 1),
     ("simulation.teamcenter.visualization.launch.request", 2),
+    ("simulation.teamcenter.visualization.launch.request", 3),
     ("simulation.viewer.interaction.scope.get", 1),
     ("simulation.viewer.interaction.authorize", 1),
     ("simulation.teamcenter.visualization.insert.request", 1),
+    ("simulation.teamcenter.visualization.insert.request", 2),
     ("simulation.environment.live_document.adopt", 1),
     ("simulation.environment.live_document.adopt", 2),
     ("simulation.environment.live_document.binding.get", 1),
@@ -118,7 +120,17 @@ DESKTOP_TRANSPORT_BINDINGS = tuple(dict(method=method,
 ))
 
 
+from .cloud_model_cache_file_contracts import FILE_CONTRACT, PREFLIGHT_CONTRACT
+
+from ..application.cache_tc_open_contract import TC_OPEN_CONTRACT_HASH
+
 DIRECT_VISMOCKUP_OPERATIONS = {
+    'cache_tc_open': ('vismockup.model.open@3',TC_OPEN_CONTRACT_HASH),
+    'cache_open': ('vismockup.model.open@2','sha256:ffa45d329b0d9f88358b7f0846670c3120992614b4eda0b8d6ddfe76bb8b1eec'),
+    'tc_file': ('teamcenter.model_file.fetch@1',canonical_hash(FILE_CONTRACT)),
+    'tc_file_preflight': ('teamcenter.model_files.size.preflight@1',canonical_hash(PREFLIGHT_CONTRACT)),
+    'tc_cache': ('teamcenter.model_cache.read@1',canonical_hash(TC_CACHE_CONTRACT)),
+    'tc_cache_v2': ('teamcenter.model_cache.read@2',canonical_hash(TC_CACHE_V2_CONTRACT)),
     "identity": ("vismockup.document.identity.read@1", "sha256:2a8b6e89d3a13cf35b0584a989ed79977700d3cd3fe9fcc918c3b871d1c8c4d7"),
     "identity_existing": ("vismockup.document.existing_identity.read@1", "sha256:9aa9528fff83c565d3d005daa1167b41cef2f6d413d485790c6c98c139fc1471"),
     "hierarchy_inventory": ("vismockup.document.hierarchy_inventory.read@1", "sha256:a89bdc3fbb04ee643f1434dee83c653df8a04fc406ac7fff1e61ce39ee99685a"),
@@ -142,6 +154,11 @@ DIRECT_VISMOCKUP_OPERATIONS = {
 }
 DIRECT_VISMOCKUP_OPERATION_IDS = frozenset(value[0] for value in DIRECT_VISMOCKUP_OPERATIONS.values())
 DIRECT_VISMOCKUP_CAPABILITIES = {
+    'cache_open': 'simulation.environment.cache_source.open.request',
+    'cache_tc_open': 'simulation.environment.cache_source.open.request',
+    'tc_file': 'simulation.model_cache.file.fetch.request',
+    'tc_cache': 'simulation.model_cache.advance',
+    'tc_cache_v2': 'simulation.model_cache.advance',
     "identity": "simulation.vismockup.document.identity.read.request",
     "identity_existing": "simulation.vismockup.document.existing_identity.read.request",
     "hierarchy_inventory": "simulation.vismockup.document.hierarchy_inventory.read.request",
@@ -163,6 +180,58 @@ DIRECT_VISMOCKUP_CAPABILITIES = {
     "tc_launch": "simulation.teamcenter.visualization.launch.request",
     "tc_insert": "simulation.teamcenter.visualization.insert.request",
 }
+
+
+def build_file_batch_steps(identity: dict, source_selector: dict, members: list[dict]) -> list[dict]:
+    """Build one exact-cache preflight followed by per-file JT fetches."""
+    if not isinstance(members, list) or not 1 <= len(members) <= 8:
+        raise ConnectorError("cache_file_batch_size_invalid")
+    preflight_id, preflight_hash = DIRECT_VISMOCKUP_OPERATIONS["tc_file_preflight"]
+    fetch_id, fetch_hash = DIRECT_VISMOCKUP_OPERATIONS["tc_file"]
+    digest = lambda value: "sha256:" + hashlib.sha256(canonicalize_v2(value)).hexdigest()
+    selected, fetch_steps = [], []
+    for index, member in enumerate(members, start=2):
+        step_id = f"step-{index:05d}"
+        payload = {
+            **identity,
+            "source_selector": source_selector,
+            "node_key": member["node_key"],
+            "item_revision_uid": member["item_revision_uid"],
+            "file_ref": member["file_ref"],
+            "expected_content_hash": member.get("expected_content_hash"),
+            "artifact_resource_refs": ["simulation://model-cache/" + identity["batch_id"]],
+        }
+        selected.append({key: value for key, value in {
+            "step_id": step_id,
+            "node_key": member["node_key"],
+            "item_revision_uid": member["item_revision_uid"],
+            "file_ref": member["file_ref"],
+            "expected_content_hash": member.get("expected_content_hash"),
+        }.items()})
+        fetch_steps.append({
+            "step_id": step_id,
+            "operation_id": fetch_id,
+            "contract_hash": fetch_hash,
+            "depends_on": ["step-00001"],
+            "payload": payload,
+            "payload_hash": digest(payload),
+            "timeout_seconds": 600,
+            "side_effect_classification": "read",
+            "post_condition_probe_id": None,
+        })
+    preflight_payload = {"identity": identity, "source_selector": source_selector, "files": selected}
+    preflight = {
+        "step_id": "step-00001",
+        "operation_id": preflight_id,
+        "contract_hash": preflight_hash,
+        "depends_on": [],
+        "payload": preflight_payload,
+        "payload_hash": digest(preflight_payload),
+        "timeout_seconds": 120,
+        "side_effect_classification": "read",
+        "post_condition_probe_id": None,
+    }
+    return [preflight, *fetch_steps]
 
 
 def connector_plan_signing_material(connector_id: str) -> tuple[str, str]:
@@ -460,6 +529,7 @@ def _direct_vismockup_plan(
 def _direct_vismockup_plan_v2(
     *, action: str, connector_id: str, payload: dict, context: CapabilityContext,
     now: datetime, capability_id: str | None = None, readback: bool = False, major_version: int = 1,
+    steps_override: list[dict] | None = None,
 ) -> dict:
     """Build the unsigned App-runtime plan; queue_v2 pins the live runtime then signs it."""
     now = now.astimezone(UTC).replace(microsecond=0)
@@ -476,15 +546,15 @@ def _direct_vismockup_plan_v2(
     ):
         raise ConnectorError("capability_provenance_required")
     operation_id, contract_hash = DIRECT_VISMOCKUP_OPERATIONS[action]
-    if major_version != 1:
-        if action != 'tc_launch' or major_version != 2:
-            raise ConnectorError('operation_version_invalid')
+    if action == 'tc_launch' and major_version in (2, 3):
         from ..application.teamcenter_launch_evidence import OPENED_SOURCE_CONTRACT_HASH
         operation_id, contract_hash = 'teamcenter.visualization.launch@2', OPENED_SOURCE_CONTRACT_HASH
+    elif major_version != 1 and not (action == 'tc_insert' and major_version == 2):
+        raise ConnectorError('operation_version_invalid')
     step_payload = {"allow_launch": action == "launch"} if action in {"attach", "launch"} else payload
-    classification = "read" if action in {"attach", "tree", "identity", "identity_existing", "hierarchy_inventory", "tc_search", "tc_rules", "tc_observe", "tc_page", "tc_children"} else "write"
+    classification = "read" if action in {"attach", "tree", "identity", "identity_existing", "hierarchy_inventory", "tc_search", "tc_rules", "tc_observe", "tc_page", "tc_children", "tc_node_properties", "tc_cache", "tc_cache_v2", "tc_file"} else "write"
     probe_id = None if classification == "read" else (
-        "vismockup.application.probe@1" if action in {"launch", "close", "tc_launch"}
+        "vismockup.application.probe@1" if action in {"launch", "close", "tc_launch", "cache_open", "cache_tc_open"}
         else "vismockup.document.snapshot@1"
     )
     digest = lambda value: "sha256:" + hashlib.sha256(canonicalize_v2(value)).hexdigest()
@@ -497,18 +567,18 @@ def _direct_vismockup_plan_v2(
         "normalized_input_hash": normalized_input_hash,
         **({'major_version': major_version} if major_version != 1 else {}),
     })).hexdigest()
-    steps = [{
+    steps = steps_override if steps_override is not None else [{
         "step_id": "step-00001",
         "operation_id": operation_id,
         "contract_hash": contract_hash,
         "depends_on": [],
         "payload": step_payload,
         "payload_hash": digest(step_payload),
-        "timeout_seconds": 600 if action in {"tree", "hierarchy_inventory", "tc_observe", "tc_children", "tc_launch", "tc_insert"} else 120,
+        "timeout_seconds": 600 if action in {"tree", "hierarchy_inventory", "tc_observe", "tc_children", "tc_cache", "tc_cache_v2", "tc_launch", "tc_insert", "tc_file", "cache_open", "cache_tc_open"} else 120,
         "side_effect_classification": classification,
         "post_condition_probe_id": probe_id,
     }]
-    if readback:
+    if readback and steps_override is None:
         readback_payload = {"max_depth": 8, "force_refresh": True}
         readback_operation, readback_contract = DIRECT_VISMOCKUP_OPERATIONS["tree"]
         steps.append({
@@ -560,6 +630,35 @@ def record_connector_heartbeat(
 
 def queue_connector_plan(plan: ConnectorExecutionPlanV1, context: CapabilityContext) -> OperationRef:
     return connector_control_plane.queue_plan(plan, context)
+
+
+def _resolve_cache_visualization_source(cache_source: dict, context: CapabilityContext) -> dict:
+    """Resolve a browser-safe cache binding to one exact Teamcenter revision."""
+    from backend.platform_sdk.project_access import can_manage_project
+    from .cloud_model_cache import admin
+    from ..data.cloud_model_cache_repository import CacheError, CloudModelCacheRepository
+    if not context.user_gid or not context.team_gid:
+        raise CapabilityBusinessError('cache_source_forbidden','cache_source_forbidden')
+    try:
+        value=CloudModelCacheRepository().resolve_visualization_node(
+            cache_source['batch_id'],str(context.team_gid),cache_source['node_key'],
+            authorize_project=lambda project:admin(context) or can_manage_project(context.user_gid,project))
+    except CacheError as exc:
+        code='cache_source_forbidden' if str(exc)=='cache_not_found' else str(exc)
+        raise CapabilityBusinessError(code,code) from exc
+    root=value.get('source_selector');revision_uid=value.get('item_revision_uid')
+    required=('endpoint_id','revision_rule','configuration_date')
+    if (not isinstance(root,dict) or any(not isinstance(root.get(key),str) or not root[key] for key in required)
+        or root.get('endpoint_id')!='tc-production' or not isinstance(revision_uid,str)
+        or not revision_uid.strip() or len(revision_uid)>128 or len(root.get('revision_rule',''))>128):
+        raise CapabilityBusinessError('cache_source_stale','cache_source_stale')
+    try:
+        parsed=datetime.fromisoformat(root['configuration_date'].replace('Z','+00:00'))
+        if parsed.tzinfo is None:raise ValueError('timezone_required')
+    except ValueError as exc:raise CapabilityBusinessError('cache_source_stale','cache_source_stale') from exc
+    return {'endpoint_id':root['endpoint_id'],'object_uid':revision_uid,
+        'item_revision_uid':revision_uid,'bom_view_uid':'',
+        'revision_rule':root['revision_rule'],'configuration_date':root['configuration_date']}
 
 
 def lease_connector_plan(connector_id: str, lease_seconds: int = 60):
@@ -703,7 +802,7 @@ def register_connector_runtime_capabilities(
             digest=plan.plan_hash,
         ),))
 
-    def request_direct(action, major_version=1):
+    def request_direct(action, major_version=1, cache_bound=False):
         def handler(payload, context):
             if action == 'identity' and (payload != {} or not context.user_gid or not context.team_gid):
                 raise CapabilityBusinessError('live_document_input_invalid', 'Identity read takes an empty payload.')
@@ -725,6 +824,9 @@ def register_connector_runtime_capabilities(
                         "connector_binding_not_found", "connector_binding_not_found",
                     )
                 connector_id = binding["connector_id"]
+            if cache_bound and payload.get('cache_source'):
+                source_selector=_resolve_cache_visualization_source(payload['cache_source'],context)
+                payload={'source_selector':source_selector,'expected_visdoc_uid':payload['expected_visdoc_uid']}
             plan_payload = (
                 {"artifact_ref": payload["artifact_ref"]} if action in {"open", "insert"}
                 else {"action": payload["action"]} if action == "visibility"
@@ -932,6 +1034,24 @@ def register_connector_runtime_capabilities(
         confirmation='user', permissions=('simulation.use',), input_schema=direct_schemas['tc_launch'],
         output_schema={}, tags=('simulation', 'connector', 'teamcenter', 'workflow', 'experimental')),
         request_direct('tc_launch', major_version=2))
+    register(registry, CapabilitySpec(
+        id='simulation.teamcenter.visualization.launch.request', owner='simulation', version=3,
+        description='Open one exact Teamcenter source or completed cloud-cache node in one signed launch.',
+        use_when='The owner opens an online source or a node selected from a completed Simulation model cache.',
+        do_not_use_when='The cache binding is incomplete, stale, outside the current project scope, or no App runtime exists.',
+        risk=CapabilityRisk.WRITE, confirmation='user', permissions=('simulation.use',),
+        input_schema=TC_CACHE_LAUNCH_INPUT, output_schema={},
+        tags=('simulation','connector','teamcenter','model_cache','workflow','experimental')),
+        request_direct('tc_launch',major_version=3,cache_bound=True))
+    register(registry, CapabilitySpec(
+        id='simulation.teamcenter.visualization.insert.request', owner='simulation', version=2,
+        description='Insert one exact Teamcenter source or completed cloud-cache node into the active document.',
+        use_when='The owner inserts an online source or a node selected from a completed Simulation model cache.',
+        do_not_use_when='The cache binding is incomplete, stale, outside the current project scope, or no active document exists.',
+        risk=CapabilityRisk.WRITE, confirmation='user', permissions=('simulation.use',),
+        input_schema=TC_CACHE_LAUNCH_INPUT, output_schema={},
+        tags=('simulation','connector','teamcenter','model_cache','workflow','experimental')),
+        request_direct('tc_insert',major_version=2,cache_bound=True))
     register_live_document_capabilities(registry, control_plane)
     from .viewer_interaction import register_viewer_interaction_capabilities
     register_viewer_interaction_capabilities(registry, control_plane)

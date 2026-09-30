@@ -7,10 +7,15 @@ namespace Ai00.Connector.Adapters.VisMockup;
 // keys stay in _sessionNodeKeys, shared with the existing mapping lifecycle.
 public sealed partial class VisMockupAdapter
 {
-    private readonly Dictionary<string,(string SourceNode, string Locator, string CadId)> _viewerNodes = new(StringComparer.Ordinal);
+    private readonly Dictionary<string,(string SourceNode, string Locator, string CadId, string Kind)> _viewerNodes = new(StringComparer.Ordinal);
+    private sealed record ViewerNodeResolution(string source_node_id,string? node_ref,string status,
+        string? error_code=null,bool? visible=null,string visibility_state="unknown");
     private (string Association,string Session,string Source,string Root)? _viewerScope;
     private long _viewerEpoch = 1;
     public Func<bool>? ViewerInteractionAdmissionAllowed { get; set; }
+    private Action<string,object>? _viewerDiagnostic;
+    public Action<string,object>? ViewerDiagnostic { get=>_viewerDiagnostic;set{_viewerDiagnostic=value;if(_treeCache is not null)_treeCache.Diagnostic=value;} }
+    private void TraceViewer(string stage,object detail){try{ViewerDiagnostic?.Invoke(stage,detail);}catch{}}
 
     private void RequireViewerAdmission()
     {
@@ -21,7 +26,7 @@ public sealed partial class VisMockupAdapter
     private void InvalidateViewerStructure()
     {
         foreach(var reference in _viewerNodes.Keys) _sessionNodeKeys.Remove(reference);
-        _viewerNodes.Clear(); _viewerScope=null; _viewerEpoch++;
+        _viewerNodes.Clear(); _viewerGeometry.Clear(); _viewerScope=null; _viewerEpoch++;
     }
 
     private IVisMockupDocument RequireViewerDocument(string association,string session)
@@ -63,17 +68,31 @@ public sealed partial class VisMockupAdapter
         var root = document.RootNode;
         // One shared budget includes the root and every materialized native node.
         // Each node's occurrence metadata is read at most once in this batch.
-        var remaining = 511;
+        var process = RequireProcessIdentity();
+        var environment=FindCacheEnvironment(document);
+        var managedCache = environment is not null || _openedCachePackages.Values.Any(item => item.ProcessId == process.ProcessId
+            && item.Started == process.ProcessStartUtcTicks && item.Handle == document.DocumentId
+            && string.Equals(item.Path, document.SourceIdentity, StringComparison.OrdinalIgnoreCase));
+        // Only packages opened and registered by the pinned cache path receive the
+        // larger bounded map. Existing online limits and conservative visibility stay.
+        var remaining = managedCache ? 32768 : 511;
+        var mappingClock = System.Diagnostics.Stopwatch.StartNew();
+        void MappingAdmission()
+        {
+            RequireViewerAdmission();
+            if(managedCache && mappingClock.ElapsedMilliseconds >= 20000)
+                throw new ConnectorNoEffectException("viewer_mapping_budget_exceeded");
+        }
         var childrenByKey = new Dictionary<string, IReadOnlyList<IVisMockupNode>>(StringComparer.Ordinal);
         var primaryOccurrenceByKey = new Dictionary<string, string>(StringComparer.Ordinal);
         var occurrencesByKey = new Dictionary<string, IReadOnlyList<string>>(StringComparer.Ordinal);
         var prefixes = new Dictionary<string, IVisMockupNode>(StringComparer.Ordinal) { [""] = root };
         IReadOnlyList<IVisMockupNode> Children(IVisMockupNode node)
         {
-            RequireViewerAdmission();
+            MappingAdmission();
             var key = node.NodeKey;
             if (childrenByKey.TryGetValue(key, out var known)) return known;
-            RequireViewerAdmission();
+            MappingAdmission();
             IReadOnlyList<IVisMockupNode> children;
             try { children = node.GetChildren(remaining); }
             catch (ConnectorNoEffectException error) when (error.Code == "viewer_mapping_budget_exceeded")
@@ -95,18 +114,18 @@ public sealed partial class VisMockupAdapter
         }
         IReadOnlyList<string> Occurrences(IVisMockupNode node)
         {
-            RequireViewerAdmission();
+            MappingAdmission();
             var key = node.NodeKey;
             if (occurrencesByKey.TryGetValue(key, out var known)) return known;
-            RequireViewerAdmission();
+            MappingAdmission();
             return occurrencesByKey[key] = node.OccurrenceIds;
         }
         string PrimaryOccurrence(IVisMockupNode node)
         {
-            RequireViewerAdmission();
+            MappingAdmission();
             var key = node.NodeKey;
             if (primaryOccurrenceByKey.TryGetValue(key, out var known)) return known;
-            RequireViewerAdmission();
+            MappingAdmission();
             return primaryOccurrenceByKey[key] = node.OccurrenceId;
         }
         IVisMockupNode ResolvePath(string[] path)
@@ -118,7 +137,7 @@ public sealed partial class VisMockupAdapter
                 || (!string.IsNullOrWhiteSpace(path[0]) && Occurrences(root).Contains(path[0], StringComparer.Ordinal)) ? 1 : 0;
             for (var index = start; index < path.Length; index++)
             {
-                RequireViewerAdmission();
+                MappingAdmission();
                 // Length prefixes keep arbitrary UID text from colliding.
                 prefix += path[index].Length + ":" + path[index];
                 if (prefixes.TryGetValue(prefix, out var known)) { current = known; continue; }
@@ -171,10 +190,10 @@ public sealed partial class VisMockupAdapter
             }
             return current;
         }
-        var results=new List<object>();
+        var results=new List<ViewerNodeResolution>();
         foreach(var descriptor in sourceNodes.EnumerateArray())
         {
-            RequireViewerAdmission();
+            MappingAdmission();
             var source = "";
             try
             {
@@ -197,15 +216,24 @@ public sealed partial class VisMockupAdapter
                         return uid;
                     }).ToArray();
                 }
-                else if (kind == "single_part_root" && fields.Length != 2)
+                else if (kind is "single_part_root" or "document_root" && fields.Length != 2)
                     throw new ConnectorNoEffectException("viewer_node_invalid");
                 var locator=CanonicalJson.Hash(descriptor);
                 var previous=_viewerNodes.FirstOrDefault(p=>p.Value.SourceNode==source && p.Value.Locator==locator);
                 if(previous.Key is not null && _sessionNodeKeys.ContainsKey(previous.Key))
-                { results.Add(new {source_node_id=source,node_ref=previous.Key,status="mapped"}); continue; }
+                { results.Add(new(source,previous.Key,"mapped")); continue; }
                 IVisMockupNode node;
-                switch(kind)
+                (string Key,string CadId)[]? geometry=null;
+                if(environment is not null && kind=="occurrence_path")
                 {
+                    geometry=ResolveEnvironmentGeometry(environment,document,path);
+                    node=document.FindNodeByKey(geometry[0].Key);
+                }
+                else switch(kind)
+                {
+                    case "document_root":
+                        node=root;
+                        break;
                     case "single_part_root":
                         node=root;
                         var children=Children(node);
@@ -219,18 +247,87 @@ public sealed partial class VisMockupAdapter
                 }
                 // CADID is native instance identity, not JT metadata. Without it
                 // a reused numeric key cannot be distinguished safely.
-                RequireViewerAdmission();
+                MappingAdmission();
                 var cadId = node.CadId;
                 if(string.IsNullOrWhiteSpace(cadId)) throw new ConnectorNoEffectException("viewer_instance_identity_unavailable");
-                if(_viewerNodes.Count>=4096 || _sessionNodeKeys.Count>=4096)
+                if(_viewerNodes.Count>=(managedCache?65536:4096) || _sessionNodeKeys.Count>=(managedCache?65536:4096))
                     throw new ConnectorNoEffectException("viewer_mapping_capacity");
                 var reference="viewer:"+Guid.NewGuid().ToString("N");
                 _sessionNodeKeys[reference]=node.NodeKey;
-                _viewerNodes[reference]=(source,locator,cadId);
-                results.Add(new {source_node_id=source,node_ref=reference,status="mapped"});
+                _viewerNodes[reference]=(source,locator,cadId,kind);
+                if(geometry is not null)_viewerGeometry[reference]=geometry;
+                results.Add(new(source,reference,"mapped"));
+                TraceViewer("node_mapped",new{source_node_id=source,node_ref=reference,structure_epoch=_viewerEpoch,budget_remaining=remaining});
             }
             catch(ConnectorNoEffectException error) when (error.Code != "viewer_authorization_required")
-            { results.Add(new {source_node_id=source,node_ref=(string?)null,status="unmapped",error_code=error.Code}); }
+            { TraceViewer("node_unmapped",new{source_node_id=source,error_code=error.Code,budget_remaining=remaining});results.Add(new(source,null,"unmapped",error.Code)); }
+        }
+        // Mapping finishes first: visibility calibration must never consume the
+        // traversal budget needed to identify another requested write target.
+        var visibilityByKey=new Dictionary<string,(bool? Visible,string State,string? Error)>(StringComparer.Ordinal);
+        var visiting=new HashSet<string>(StringComparer.Ordinal);
+        var visibilityRemaining=512;
+        (bool? Visible,string State,string? Error) ReadVisibility(IVisMockupNode node)
+        {
+            RequireViewerAdmission();
+            var key=node.NodeKey;
+            if(visibilityByKey.TryGetValue(key,out var cached))return cached;
+            if(!visiting.Add(key))return(null,"unknown","viewer_visibility_cycle");
+            (bool? Visible,string State,string? Error) result;
+            try
+            {
+                if(visibilityRemaining--<=0)throw new ConnectorNoEffectException("viewer_mapping_budget_exceeded");
+                var visible=node.IsVisible;
+                var seenVisible=visible;var seenHidden=!visible;string? unknown=null;
+                foreach(var child in Children(node))
+                {
+                    var observed=ReadVisibility(child);
+                    seenVisible|=observed.State is "visible" or "mixed";
+                    seenHidden|=observed.State is "hidden" or "mixed";
+                    unknown??=observed.Error;
+                }
+                result=seenVisible&&seenHidden?(null,"mixed",null):unknown is not null?(null,"unknown",unknown)
+                    :(visible,visible?"visible":"hidden",null);
+            }
+            catch(Exception error) when(error is not (OutOfMemoryException or StackOverflowException)
+                && error is not ConnectorNoEffectException { Code: "viewer_authorization_required" })
+            {
+                result=(null,"unknown",error is ConnectorNoEffectException { Code: "viewer_mapping_budget_exceeded" }
+                    ?"viewer_visibility_budget_exceeded":"viewer_visibility_read_failed");
+            }
+            finally{visiting.Remove(key);}
+            visibilityByKey[key]=result;return result;
+        }
+        for(var index=0;index<results.Count;index++)
+        {
+            var result=results[index];if(result.status!="mapped")continue;
+            RequireViewerAdmission();
+            (bool? Visible,string State,string? Error) observed;
+            try
+            {
+                var reference=result.node_ref!;var key=_sessionNodeKeys[reference];
+                var node=document.FindNodeByKey(key);
+                if(node.NodeKey!=key||node.CadId!=_viewerNodes[reference].CadId)
+                    observed=(null,"unknown","viewer_mapping_expired");
+                else if(_viewerGeometry.TryGetValue(reference,out var geometry))
+                {
+                    var states=geometry.Select(target=>{
+                        var native=document.FindNodeByKey(target.Key);
+                        return native.CadId==target.CadId?ReadVisibility(native):(Visible:(bool?)null,State:"unknown",Error:(string?)"viewer_mapping_expired");
+                    }).ToArray();
+                    var unknown=states.FirstOrDefault(item=>item.Error is not null).Error;
+                    var on=states.Any(item=>item.State is "visible" or "mixed");
+                    var off=states.Any(item=>item.State is "hidden" or "mixed");
+                    observed=unknown is not null?(null,"unknown",unknown):on&&off?(null,"mixed",null):(on,on?"visible":"hidden",null);
+                }
+                else observed=ReadVisibility(node);
+            }
+            catch(Exception error) when(error is not (OutOfMemoryException or StackOverflowException)
+                && error is not ConnectorNoEffectException { Code: "viewer_authorization_required" })
+            {observed=(null,"unknown","viewer_visibility_read_failed");}
+            results[index]=result with{visible=observed.Visible,visibility_state=observed.State,error_code=observed.Error};
+            TraceViewer("visibility_calibrated",new{source_node_id=result.source_node_id,visible=observed.Visible,
+                visibility_state=observed.State,error_code=observed.Error,budget_remaining=remaining});
         }
         RequireViewerAdmission();
         RecheckViewerDocument(sourceAssociationId, documentSession, epoch);
@@ -256,28 +353,52 @@ public sealed partial class VisMockupAdapter
         {
             var node=document.FindNodeByKey(key);
             if(node.NodeKey!=key || node.CadId!=mapping.CadId) throw new InvalidOperationException();
+            if(_viewerGeometry.TryGetValue(nodeRef,out var targets))foreach(var target in targets)
+            {
+                var native=document.FindNodeByKey(target.Key);
+                if(native.NodeKey!=target.Key||native.CadId!=target.CadId)throw new InvalidOperationException();
+            }
         }
         catch(Exception) { InvalidateViewerStructure(); throw new ConnectorNoEffectException("viewer_mapping_expired"); }
         document = RecheckViewerDocument(sourceAssociationId, documentSession, structureEpoch);
         RequireViewerAdmission();
         // After crossing the native write boundary no exception can prove no effect.
+        var watch=System.Diagnostics.Stopwatch.StartNew();
+        var stage="native_write";
+        var wholeDocumentHide=visibility && action=="hide" && mapping.Kind=="document_root";
+        var targetKeys=_viewerGeometry.TryGetValue(nodeRef,out var geometryTargets)?geometryTargets.Select(item=>item.Key).ToArray():new[]{key};
+        TraceViewer(stage,new{node_ref=nodeRef,action,structure_epoch=structureEpoch,scope=wholeDocumentHide?"document":"node",target_count=targetKeys.Length,visibility_dispatch=visibility?"batch":null});
         try
         {
             if(visibility)
             {
                 var visible=action=="show";
-                document.SetNodeVisible(key,visible);
-                if(document.IsNodeVisible(key)!=visible) throw new ConnectorException("viewer_visibility_unconfirmed");
+                if(wholeDocumentHide) document.SetAllNodesVisible(false);
+                else document.SetNodesVisible(targetKeys,visible);
+                stage="visibility_readback";
+                var observed=targetKeys.All(target=>document.IsNodeVisible(target)==visible)?visible:!visible;
+                // AllNodesOff supplies document-wide semantics. This bounded read
+                // checks the root flag, not every descendant or rendered geometry.
+                TraceViewer(stage,new{node_ref=nodeRef,expected=visible,observed,scope=wholeDocumentHide?"document":"node",verification_scope=wholeDocumentHide?"root_flag":"node_flag",elapsed_ms=watch.Elapsed.TotalMilliseconds});
+                if(observed!=visible) throw new ConnectorException("viewer_visibility_unconfirmed");
+                stage="document_recheck";
                 RecheckViewerDocument(sourceAssociationId, documentSession, structureEpoch);
                 return new {node_ref=nodeRef,visible};
             }
             var selected=action=="highlight";
-            document.SetNodeSelected(key,selected);
+            foreach(var target in targetKeys)
+            {
+                RequireViewerAdmission();
+                RecheckViewerDocument(sourceAssociationId,documentSession,structureEpoch);
+                document.SetNodeSelected(target,selected);
+            }
+            stage="document_recheck";
             RecheckViewerDocument(sourceAssociationId, documentSession, structureEpoch);
             return new {node_ref=nodeRef,selected};
         }
-        catch (Exception)
+        catch (Exception error)
         {
+            TraceViewer("adapter_failed",new{node_ref=nodeRef,action,failed_stage=stage,exception_type=error.GetType().Name,hresult=error.HResult,code=error is ConnectorException known?known.Code:null,elapsed_ms=watch.Elapsed.TotalMilliseconds});
             InvalidateViewerStructure();
             throw new ConnectorException("viewer_outcome_unknown");
         }

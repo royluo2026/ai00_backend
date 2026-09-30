@@ -13,6 +13,60 @@ public sealed class AppArtifactMaterializerTests : IDisposable
 {
     private readonly string root = Path.Combine(Path.GetTempPath(), "ai00-v2-artifact-" + Guid.NewGuid().ToString("N"));
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task CacheDependenciesUseBoundedParallelDownloadsAndStillAuthorizeCachedFiles(bool failDependency)
+    {
+        JsonObject Ref(string id,byte[] bytes)=>new(){["artifact_id"]=id,["media_type"]="model/jt",["sha256"]=Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant(),["byte_size"]=bytes.Length,["version"]=1};
+        var artifacts=Enumerable.Range(0,9).ToDictionary(i=>"file"+i,i=>{var bytes=Encoding.UTF8.GetBytes("verified-file"+i);return(Ref("file"+i,bytes),bytes);});
+        var dependencies=new JsonArray(Enumerable.Range(1,8).Select(i=>(JsonNode)new JsonObject{["package_path"]=$"dependencies/file{i}.jt",["artifact_ref"]=artifacts["file"+i].Item1.DeepClone()}).ToArray());
+        var payload=new JsonObject{["artifact_ref"]=artifacts["file0"].Item1.DeepClone(),["package_dependencies"]=dependencies};
+        var handler=new MultiArtifactHandler(artifacts){DelayMs=50,FailDependency=failDependency};
+        var materializer=new AppArtifactMaterializer(new RuntimeTransport(new HttpClient(handler),new Uri("https://gateway.example.com/")),root);
+        var step=Step("vismockup.model.open@2",payload);
+        if(failDependency)
+        {
+            await Assert.ThrowsAnyAsync<Exception>(()=>materializer.MaterializeAsync("parallel","lease",step,OutcomeUnknownRecoveryTests.Session(),default));
+            Assert.InRange(handler.MaximumConcurrent,2,4);Assert.True(handler.Cancelled>0);Assert.Equal(0,handler.Active);
+            Assert.Empty(Directory.GetFiles(root,"*.partial-*",SearchOption.AllDirectories));return;
+        }
+        await materializer.MaterializeAsync("parallel","lease",step,OutcomeUnknownRecoveryTests.Session(),default);
+        Assert.InRange(handler.MaximumConcurrent,2,4);Assert.Equal(9,handler.Downloads);
+        await materializer.MaterializeAsync("parallel","lease",step,OutcomeUnknownRecoveryTests.Session(),default);
+        Assert.Equal(9,handler.Downloads);Assert.Equal(18,handler.Grants);
+    }
+
+    [Theory]
+    [InlineData(false,false)]
+    [InlineData(true,false)]
+    [InlineData(false,true)]
+    public async Task NewCachePlansReuseVerifiedBytesAfterFreshGrantsAndRepairTampering(bool tamper,bool rejectGrant)
+    {
+        var bytes=Encoding.UTF8.GetBytes("shared-verified-bytes");
+        JsonObject Ref(string id,string media)=>new(){["artifact_id"]=id,["media_type"]=media,["sha256"]=Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant(),["byte_size"]=bytes.Length,["version"]=1};
+        var artifacts=Enumerable.Range(0,9).ToDictionary(i=>"file"+i,i=>(Ref("file"+i,i==0?"model/plmxml":"model/jt"),bytes));
+        var dependencies=new JsonArray(Enumerable.Range(1,8).Select(i=>(JsonNode)new JsonObject{["package_path"]=$"dependencies/file{i}.jt",["artifact_ref"]=artifacts["file"+i].Item1.DeepClone()}).ToArray());
+        var step=Step("vismockup.model.open@2",new JsonObject{["artifact_ref"]=artifacts["file0"].Item1.DeepClone(),["package_dependencies"]=dependencies});
+        var handler=new MultiArtifactHandler(artifacts){DelayMs=30};
+        AppArtifactMaterializer Materializer()=>new(new RuntimeTransport(new HttpClient(handler),new Uri("https://gateway.example.com/")),root);
+        await Materializer().MaterializeAsync("first-plan","lease-a",step,OutcomeUnknownRecoveryTests.Session(),default);
+        Assert.Equal(2,handler.Downloads);
+        if(rejectGrant)
+        {
+            handler.RejectGrants=true;
+            await Assert.ThrowsAnyAsync<Exception>(()=>Materializer().MaterializeAsync("second-plan","lease-b",step,OutcomeUnknownRecoveryTests.Session(),default));
+            Assert.Equal(2,handler.Downloads);Assert.Equal(10,handler.Grants);
+            Assert.Empty(Directory.GetFiles(Path.Combine(root,"second-plan"),"*",SearchOption.AllDirectories));return;
+        }
+        if(tamper)File.WriteAllText(Directory.GetFiles(Path.Combine(root,"shared-cache"),"*.jt").Single(),"tampered");
+        var result=await Materializer().MaterializeAsync("second-plan","lease-b",step,OutcomeUnknownRecoveryTests.Session(),default);
+        Assert.Equal(tamper?3:2,handler.Downloads);Assert.Equal(18,handler.Grants);
+        var package=Path.GetDirectoryName(result.GetProperty("local_artifact_path").GetString())!;
+        foreach(var file in Directory.GetFiles(Path.Combine(package,"dependencies")))Assert.Equal(bytes,await File.ReadAllBytesAsync(file));
+        Assert.Empty(Directory.GetFiles(root,"*.partial-*",SearchOption.AllDirectories));
+    }
+
     [Fact]
     public async Task DownloadsVerifiesAndProjectsOnlyAConnectorLocalPath()
     {
@@ -61,8 +115,10 @@ public sealed class AppArtifactMaterializerTests : IDisposable
         Assert.Empty(Directory.GetFiles(root));
     }
 
-    [Fact]
-    public async Task FrozenEnvironmentStagesDependenciesBesideOneGeneratedTopLevelDocument()
+    [Theory]
+    [InlineData("vismockup.model.open@1")]
+    [InlineData("vismockup.model.open@2")]
+    public async Task FrozenEnvironmentStagesDependenciesBesideOneGeneratedTopLevelDocument(string operation)
     {
         var topBytes = Encoding.UTF8.GetBytes("<PLMXML><ExternalFile location=\"dependencies/0001-tool.jt\"/></PLMXML>");
         var jtBytes = Encoding.UTF8.GetBytes("jt-data");
@@ -90,12 +146,12 @@ public sealed class AppArtifactMaterializerTests : IDisposable
             new RuntimeTransport(new HttpClient(handler), new Uri("https://gateway.example.com/")), root);
 
         var result = await materializer.MaterializeAsync("plan-package", "lease-package",
-            Step("vismockup.model.open@1", payload), OutcomeUnknownRecoveryTests.Session(), CancellationToken.None);
+            Step(operation, payload), OutcomeUnknownRecoveryTests.Session(), CancellationToken.None);
 
         var topPath = result.GetProperty("local_artifact_path").GetString()!;
         Assert.Equal(topBytes, await File.ReadAllBytesAsync(topPath));
         Assert.Equal(jtBytes, await File.ReadAllBytesAsync(Path.Combine(Path.GetDirectoryName(topPath)!, "dependencies", "0001-tool.jt")));
-        Assert.False(result.TryGetProperty("package_dependencies", out _));
+        Assert.Equal(operation=="vismockup.model.open@2",result.TryGetProperty("package_dependencies", out _));
     }
 
     private static ConnectorStepV2 Step(string operation, JsonObject payload)
@@ -129,18 +185,34 @@ public sealed class AppArtifactMaterializerTests : IDisposable
 
     private sealed class MultiArtifactHandler(Dictionary<string, (JsonObject Ref, byte[] Bytes)> artifacts) : HttpMessageHandler
     {
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        public int DelayMs,MaximumConcurrent,Downloads,Grants,Cancelled;
+        public bool FailDependency,RejectGrants;
+        public int Active=>active;
+        private int active;
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var parts = request.RequestUri!.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
             var id = parts[^1] == "content" ? parts[^2] : parts[^1];
             var item = artifacts[id];
             if (parts[^1] == "content")
-                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent(item.Bytes) });
+            {
+                lock(this){active++;Downloads++;MaximumConcurrent=Math.Max(MaximumConcurrent,active);}
+                try
+                {
+                    if(DelayMs>0)await Task.Delay(FailDependency && id is not ("file0" or "file1")?5000:DelayMs,cancellationToken);
+                    if(FailDependency && id=="file1")throw new HttpRequestException("dependency_download_failed");
+                    return new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent(item.Bytes) };
+                }
+                catch(OperationCanceledException){Interlocked.Increment(ref Cancelled);throw;}
+                finally{lock(this)active--;}
+            }
+            Interlocked.Increment(ref Grants);
+            if(RejectGrants)return new HttpResponseMessage(HttpStatusCode.Forbidden){Content=new StringContent("{\"detail\":{\"code\":\"lease_rejected\"}}")};
             var body = new JsonObject { ["success"] = true, ["data"] = new JsonObject
             {
                 ["artifact_ref"] = item.Ref.DeepClone(), ["download_url"] = $"/artifact/{id}/content",
             }};
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(body.ToJsonString()) });
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(body.ToJsonString()) };
         }
     }
 

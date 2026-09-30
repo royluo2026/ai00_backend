@@ -157,6 +157,7 @@ public sealed class OutcomeUnknownRecoveryTests : IDisposable
     [Theory]
     [InlineData("teamcenter.product_structure.children.read@1")]
     [InlineData("teamcenter.node_properties.read@1")]
+    [InlineData("teamcenter.model_cache.read@1")]
     public async Task TeamcenterReadTimeoutCompletesCleanupWithoutRestartAndAllowsNextPlan(string operationId)
     {
         using var key = new DeviceSigningKeyStore(root).GetOrCreate();

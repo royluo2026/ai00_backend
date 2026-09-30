@@ -79,6 +79,39 @@ def complete(case, **changes):
     return case.provider.bind_online_v3({**case.payload, **changes}, case.context).data
 
 
+def test_inserted_document_completion_preserves_primary_and_supersedes_old_binding(database, completion):
+    from backend.contracts.viewer_interaction_v1 import SignedGrant
+    with sqlite3.connect(database) as db:
+        db.row_factory = sqlite3.Row
+        primary = dict(db.execute("SELECT * FROM workmanship_sim_vm_documents WHERE gid='11'").fetchone())
+        inserted = {**primary, 'gid': '13', 'document_role': 'inserted', 'primary_slot': None,
+                    'source_identity_hash': 'd' * 64}
+        db.execute('INSERT INTO workmanship_sim_vm_documents (' + ','.join(inserted) + ') VALUES (' +
+                   ','.join('?' for _ in inserted) + ')', tuple(inserted.values()))
+        db.execute("INSERT INTO workmanship_sim_live_document_bindings VALUES ('20','30','old-session','old-device','old-doc','10','bound')")
+    result = complete(completion, document_gid='13')
+    assert result['binding']['document_gid'] == '13'
+    assert result['grant']['document_gid'] == '13'
+    assert SignedGrant.model_validate(result['grant']).verify_signature(completion.public)
+    assert result == complete(completion, document_gid='13')
+    with sqlite3.connect(database) as db:
+        db.row_factory = sqlite3.Row
+        assert dict(db.execute("SELECT * FROM workmanship_sim_vm_documents WHERE gid='11'").fetchone()) == primary
+        assert db.execute("SELECT document_role FROM workmanship_sim_vm_documents WHERE gid='13'").fetchone()[0] == 'inserted'
+        assert db.execute("SELECT COUNT(*) FROM workmanship_sim_live_document_bindings WHERE state='bound'").fetchone()[0] == 1
+        assert db.execute("SELECT state FROM workmanship_sim_live_document_bindings WHERE session_identity_hash='old-session'").fetchone()[0] == 'superseded'
+
+
+@pytest.mark.parametrize('change', ["content_sha256='" + 'f' * 64 + "'", "owner_gid='99'", "source_kind='local_file'", "document_role='unknown'"])
+def test_inserted_document_completion_rejects_source_owner_and_role_mismatch(database, completion, change):
+    with sqlite3.connect(database) as db:
+        db.execute("UPDATE workmanship_sim_vm_documents SET document_role='inserted',primary_slot=NULL")
+        db.execute('UPDATE workmanship_sim_vm_documents SET ' + change)
+    with pytest.raises(CapabilityBusinessError):
+        complete(completion)
+    assert counts(database) == [0, 0, 0, 0, 0]
+
+
 def counts(database):
     with sqlite3.connect(database) as db:
         return [db.execute('SELECT COUNT(*) FROM workmanship_sim_' + table).fetchone()[0]

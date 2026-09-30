@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Diagnostics;
 using Ai00.Connector.Contracts;
 using Ai00.Connector.Contracts.V2;
 using Ai00.Connector.Adapters.VisMockup;
@@ -10,6 +11,7 @@ public sealed class AppPlanJournal
     private readonly object gate=new();
     private List<AppJournalEvent> events;
     private long appendTailSequence;
+    private long appendTailOffset;
     private string AppendPath => Path + ".events";
     public string Path {get;}
     public IReadOnlyList<AppJournalEvent> Events{get{lock(gate)return events.ToArray();}}
@@ -19,7 +21,11 @@ public sealed class AppPlanJournal
         events=File.Exists(Path)?JsonSerializer.Deserialize<List<AppJournalEvent>>(File.ReadAllBytes(Path))??throw new InvalidDataException("journal_invalid"):[];
         if(events.Where((e,i)=>e.Sequence!=i+1).Any())throw new InvalidDataException("journal_sequence_invalid");
         appendTailSequence=events.Count;
-        ReadAppendEventsLocked();
+        if(File.Exists(AppendPath))
+        {
+            using var stream=new FileStream(AppendPath,FileMode.Open,FileAccess.Read,FileShare.Read);
+            ReadAppendEventsLocked(stream);
+        }
     }
     public void Append(string kind,string planId,string data)
     {
@@ -28,25 +34,29 @@ public sealed class AppPlanJournal
             // Another recovery worker may have opened the same journal before
             // this instance. Refresh the append-only tail before allocating a
             // sequence so a stale in-memory view cannot write a duplicate.
-            ReadAppendEventsLocked();
-            var item=new AppJournalEvent(events.Count+1,kind,planId,data);
             Directory.CreateDirectory(System.IO.Path.GetDirectoryName(AppendPath)??throw new InvalidDataException("journal_path_invalid"));
+            // Keep one exclusive writer handle from tail refresh through durable append.
+            // The validated prefix is immutable; only startup replays the full archive.
+            using var stream=new FileStream(AppendPath,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.Read,4096,FileOptions.WriteThrough);
+            ReadAppendEventsLocked(stream);
+            var item=new AppJournalEvent(events.Count+1,kind,planId,data);
             var bytes=JsonSerializer.SerializeToUtf8Bytes(item);
-            using(var stream=new FileStream(AppendPath,FileMode.Append,FileAccess.Write,FileShare.Read,4096,FileOptions.WriteThrough))
-            {
-                stream.Write(bytes);
-                stream.WriteByte((byte)'\n');
-                stream.Flush(true);
-            }
+            stream.Write(bytes);
+            stream.WriteByte((byte)'\n');
+            stream.Flush(true);
             events.Add(item);
             appendTailSequence=item.Sequence;
+            appendTailOffset=stream.Position;
         }
     }
-    private void ReadAppendEventsLocked()
+    private void ReadAppendEventsLocked(FileStream stream)
     {
-        if(!File.Exists(AppendPath))return;
-        long previousSequence=0;
-        foreach(var line in File.ReadLines(AppendPath))
+        if(stream.Length<appendTailOffset)throw new InvalidDataException("journal_sequence_invalid");
+        stream.Position=appendTailOffset;
+        if(stream.Position==stream.Length)return;
+        long previousSequence=appendTailOffset==0?0:appendTailSequence;
+        using var reader=new StreamReader(stream,System.Text.Encoding.UTF8,true,4096,leaveOpen:true);
+        while(reader.ReadLine() is { } line)
         {
             if(string.IsNullOrWhiteSpace(line))continue;
             var item=JsonSerializer.Deserialize<AppJournalEvent>(line)??throw new InvalidDataException("journal_invalid");
@@ -61,13 +71,14 @@ public sealed class AppPlanJournal
             events.Add(item);
             appendTailSequence=item.Sequence;
         }
+        appendTailOffset=stream.Position;
     }
 }
 
 public sealed record RuntimeSession(string DeviceId,string TenantId,long Generation,string InstanceId,string Token,DateTimeOffset ExpiresAt);
 public sealed record LeasedPlan(string LeaseId,DateTimeOffset LeaseUntil,string PlanJson);
 public sealed record TrustedPlanKey(string PublicJwk,DateTimeOffset NotBefore,DateTimeOffset NotAfter,bool Revoked);
-public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter adapter,DeviceSigningKey signingKey,string deviceKeyId,IReadOnlyDictionary<string,TrustedPlanKey> keys,Func<DateTimeOffset>? clock=null,IAppArtifactMaterializer? artifactMaterializer=null,IAppCaptureUploader? captureUploader=null,ViewerExecutionGate? viewerGate=null)
+public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter adapter,DeviceSigningKey signingKey,string deviceKeyId,IReadOnlyDictionary<string,TrustedPlanKey> keys,Func<DateTimeOffset>? clock=null,IAppArtifactMaterializer? artifactMaterializer=null,IAppCaptureUploader? captureUploader=null,ViewerExecutionGate? viewerGate=null,LocalOpenCancellation? localOpenCancellation=null)
 {
     private readonly SemaphoreSlim serial=new(1,1);
     private readonly ViewerExecutionGate executionGate=viewerGate??new();
@@ -91,6 +102,7 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
         {
             viewerLease=await executionGate.EnterPlanAsync(ct);
             var plan=Verify(lease.PlanJson);
+            var batchFilePlan=plan.CapabilityId=="simulation.model_cache.file.fetch.batch.request";
             if(plan.DeviceId!=session.DeviceId||plan.TenantId!=session.TenantId||plan.RuntimeGeneration!=session.Generation||plan.RuntimeInstanceId!=session.InstanceId||session.ExpiresAt<=Now||lease.LeaseUntil<=Now||lease.LeaseUntil>session.ExpiresAt||lease.LeaseUntil>plan.ExpiresAt||string.IsNullOrWhiteSpace(lease.LeaseId)||plan.IssuedAt>Now||plan.ExpiresAt<=Now)throw new InvalidDataException("plan_session_lease_binding_invalid");
             var previous=journal.Events.Where(e=>e.PlanId==plan.PlanId).ToArray();
             if(previous.Length>0)
@@ -111,8 +123,8 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
             var manifest=adapter.Manifest;
             if(plan.AdapterId!=manifest.AdapterId||plan.AdapterMajor!=manifest.AdapterMajor||plan.TargetProduct.GetProperty("product_id").GetString()!=manifest.ProductId||Version.Parse(manifest.ProductVersion)<Version.Parse(plan.TargetProduct.GetProperty("minimum_version").GetString()!)||Version.Parse(manifest.ProductVersion)>=Version.Parse(plan.TargetProduct.GetProperty("maximum_version_exclusive").GetString()!)||plan.Steps.Any(s=>!manifest.Supports(s.OperationId,s.ContractHash)))throw new InvalidDataException("adapter_contract_mismatch");
             ct.ThrowIfCancellationRequested();
-            if(plan.Steps.Any(s=>s.OperationId is "vismockup.model.open@1" or "vismockup.model.insert@1" or "vismockup.model.attach@1")&&artifactMaterializer is null)throw new InvalidDataException("v2_artifact_transport_unavailable");
-            if(plan.Steps.Any(s=>s.OperationId=="vismockup.view.capture@1")&&captureUploader is null)throw new InvalidDataException("v2_artifact_upload_unavailable");
+            if(plan.Steps.Any(s=>s.OperationId is "vismockup.model.open@1" or "vismockup.model.open@2" or "vismockup.model.insert@1" or "vismockup.model.attach@1")&&artifactMaterializer is null)throw new InvalidDataException("v2_artifact_transport_unavailable");
+            if(plan.Steps.Any(s=>s.OperationId is "vismockup.view.capture@1" or "teamcenter.model_file.fetch@1")&&captureUploader is null)throw new InvalidDataException("v2_artifact_upload_unavailable");
             journal.Append("plan_received",plan.PlanId,lease.PlanJson);
             journal.Append("lease_acquired",plan.PlanId,JsonSerializer.Serialize(lease));
             var results=new List<JsonElement>();
@@ -132,34 +144,60 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
                         : exception is OperationCanceledException?"artifact_materialization_timeout":"artifact_materialization_failed";
                     results.Add(StepResult(step.StepId,started,"failed_without_effect",null,code));
                     journal.Append("step_terminal",plan.PlanId,results[^1].GetRawText());
-                    break;
+                    if(!(batchFilePlan&&step.OperationId=="teamcenter.model_file.fetch@1"&&!ct.IsCancellationRequested))break;
+                    continue;
                 }
                 journal.Append("invocation_started",plan.PlanId,JsonSerializer.Serialize(new{step_id=step.StepId,started_at=Timestamp(started)}));
-                string status="succeeded";object? data=null;string? error=null;
-                Task<AdapterResult>? invocation=null;
+                string status="succeeded";object? data=null;string? error=null;bool artifactTransferStarted=false;
+                Task<AdapterResult>? invocation=null;var adapterTimer=Stopwatch.StartNew();
+                using var localOpen=step.OperationId=="vismockup.model.open@3"?localOpenCancellation?.Begin(plan.PlanId,timeout.Token):null;
+                var adapterToken=localOpen?.Token??timeout.Token;
                 try
                 {
+                    if(localOpen is not null&&adapterToken.IsCancellationRequested)throw new ConnectorNoEffectException("cache_open_interrupted");
                     invocationStarted=true;
-                    invocation=adapter.ExecuteAsync(new(step.OperationId,payload,step.StepId,step.ContractHash),timeout.Token);
+                    invocation=adapter.ExecuteAsync(new(step.OperationId,payload,step.StepId,step.ContractHash),adapterToken);
                     var result=await invocation.WaitAsync(timeout.Token);
                     timeout.Token.ThrowIfCancellationRequested();
                     if(!result.Ok)throw new ConnectorException("adapter_effect_unknown");
+                    if(batchFilePlan&&step.OperationId=="teamcenter.model_files.size.preflight@1"&&result.Data is JsonElement preflightData&&
+                        preflightData.TryGetProperty("error_code",out var preflightError)&&preflightError.ValueKind==JsonValueKind.String)
+                    {
+                        status="failed_without_effect";error=preflightError.GetString();data=result.Data;
+                    }
+                    if(step.OperationId=="teamcenter.model_file.fetch@1")
+                        ModelFileTiming.Write("tc_read_and_local_hash_completed",plan.PlanId,step.StepId,adapterTimer.Elapsed.TotalMilliseconds,
+                            result.Data is LocalModelArtifact acquired?acquired.ByteSize:0);
                     if(step.OperationId=="vismockup.view.capture@1")
                     {
                         if(result.Data is not LocalCaptureArtifact capture)throw new ConnectorException("capture_result_invalid");
+                        artifactTransferStarted=true;
                         var artifact=await captureUploader!.UploadAsync(plan.PlanId,lease.LeaseId,step.StepId,capture,session,timeout.Token);
                         data=new{artifact};
+                    }
+                    else if(step.OperationId=="teamcenter.model_file.fetch@1")
+                    {
+                        if(result.Data is not LocalModelArtifact model)throw new ConnectorNoEffectException("model_artifact_invalid");
+                        artifactTransferStarted=true;
+                        var artifact=await captureUploader!.UploadModelAsync(plan.PlanId,lease.LeaseId,step.StepId,model,session,timeout.Token);
+                        data=new{identity=model.Identity,node_key=model.NodeKey,item_revision_uid=model.ItemRevisionUid,file_ref=model.FileReference,artifact_ref=artifact,content_hash="sha256:"+model.Sha256,byte_length=model.ByteSize,acquired_at=model.AcquiredAt,captured_bytes_verified=false};
+                        // FMS copies can carry DOS ReadOnly. Cleanup is not publication failure.
+                        try{File.SetAttributes(model.Path,File.GetAttributes(model.Path)&~FileAttributes.ReadOnly);File.Delete(model.Path);}
+                        catch(IOException){}catch(UnauthorizedAccessException){}
                     }
                     else data=result.Data;
                 }
                 catch(Exception exception)
                 {
                     _ = exception;
+                    if(step.OperationId=="teamcenter.model_file.fetch@1")
+                        ModelFileTiming.Write("tc_read_failed",plan.PlanId,step.StepId,adapterTimer.Elapsed.TotalMilliseconds,0,
+                            exception is ConnectorException connectorFailure?connectorFailure.Code:"read_invocation_failed");
 #if DEBUG
                     Console.Error.WriteLine($"[ConnectorHost] adapter operation failed: {exception.GetType().Name}: {exception.Message}");
 #endif
                     var noEffect=exception is ConnectorNoEffectException ||
-                        (step.OperationId!="vismockup.view.capture@1"&&step.SideEffectClassification=="read");
+                        (!artifactTransferStarted&&step.OperationId!="vismockup.view.capture@1"&&step.SideEffectClassification=="read");
                     status=noEffect?"failed_without_effect":"outcome_unknown";
                     error=exception is ConnectorNoEffectException rejected
                         ? rejected.Code
@@ -172,8 +210,9 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
                         // cancellable subprocess worker. Both can prove cleanup;
                         // a timed-out COM call still requires a fresh host.
                         var cleaned=false;
-                        if((step.OperationId is "teamcenter.product_structure.children.read@1" or
-                            "teamcenter.node_properties.read@1") && invocation is not null)
+                    if((step.OperationId is "teamcenter.product_structure.children.read@1" or
+                        "teamcenter.node_properties.read@1" or "teamcenter.model_cache.read@1" or "teamcenter.model_cache.read@2" or
+                        "teamcenter.model_files.size.preflight@1") && invocation is not null)
                         {
                             try { await invocation.WaitAsync(TimeSpan.FromSeconds(5)); cleaned=true; }
                             catch(OperationCanceledException) { cleaned=invocation.IsCompleted; }
@@ -188,7 +227,8 @@ public sealed class PlanExecutionWorker(AppPlanJournal journal,IConnectorAdapter
                 }
                 results.Add(StepResult(step.StepId,started,status,data,error));
                 journal.Append("step_terminal",plan.PlanId,results[^1].GetRawText());
-                if(status!="succeeded")break;
+                if(status!="succeeded"&&!(batchFilePlan&&step.OperationId=="teamcenter.model_file.fetch@1"&&
+                    status=="failed_without_effect"&&!RequiresProcessRestart&&!ct.IsCancellationRequested))break;
             }
             return PersistOutcome(plan,lease,results);
         }

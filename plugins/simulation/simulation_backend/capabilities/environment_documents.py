@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from copy import deepcopy
 from typing import Any
 
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
@@ -26,8 +27,42 @@ def _output(data: Any, action: str, workspace_gid: str) -> CapabilityOutput:
 
 
 class EnvironmentDocumentProvider:
-    def __init__(self, repository: WorkspaceRepository | None = None) -> None:
+    def __init__(self, repository: WorkspaceRepository | None = None, cache_provider=None) -> None:
         self.repository = repository or WorkspaceRepository()
+        self.cache_provider = cache_provider
+
+    def search_v2(self, payload, context):
+        tenant_gid, actor_gid = _scope(context)
+        workspace_gid = str(payload.get("workspace_gid") or "")
+        try:
+            return _output(self.repository.search_model_documents(workspace_gid=workspace_gid,
+                tenant_gid=tenant_gid, actor_gid=actor_gid, include_cache_binding=True), "model_documents_searched", workspace_gid)
+        except WorkspaceRepositoryError as exc:
+            raise CapabilityBusinessError(str(exc), str(exc)) from exc
+
+    def bind_cache(self, payload, context):
+        tenant_gid, actor_gid = _scope(context)
+        if self.cache_provider is None:
+            from .cloud_model_cache import CloudModelCacheProvider
+            reader = CloudModelCacheProvider()
+        else:
+            reader = self.cache_provider
+        expected = payload["cache_binding"]
+        page = reader.query_pinned({"batch_id":expected["batch_id"],"scope":"roots","projection":"structure",
+            "page_size":1,"expected_generation":expected["generation"],
+            "expected_snapshot_hash":expected["snapshot_hash"]}, context).data
+        manifest, identity = page["manifest"], page["identity"]
+        if not manifest or manifest.get("status") != "completed" or identity["schema_version"] != expected["schema_version"]:
+            raise CapabilityBusinessError("cache_snapshot_binding_invalid", "cache_snapshot_binding_invalid")
+        workspace_gid = str(payload.get("workspace_gid") or "")
+        try:
+            result = self.repository.bind_cache_source(workspace_gid=workspace_gid,
+                expected_workspace_version=payload["expected_row_version"], binding=identity, manifest=manifest,
+                display_name=payload["display_name"], insertion_instance_id=payload["insertion_instance_id"],
+                tenant_gid=tenant_gid,actor_gid=actor_gid)
+            return _output(result,"cache_source_bound",workspace_gid)
+        except WorkspaceRepositoryError as exc:
+            raise CapabilityBusinessError(str(exc),str(exc),retryable=str(exc)=="version_conflict") from exc
 
     def search(self, payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
         tenant_gid, actor_gid = _scope(context); workspace_gid = str(payload.get("workspace_gid") or "")
@@ -91,10 +126,20 @@ def specs(provider: EnvironmentDocumentProvider | None = None):
     doc = {"type":"object","required":["document_gid","workspace_gid","role","display_name","media_type","artifact_ref","source_kind","source_identity_hash","content_sha256","portability","connector_device_id","sort_order","row_version","online_source_gid","source_selector","observation_id","observation_captured_at","observation_node_count"],"properties":{"document_gid":gid,"workspace_gid":gid,"role":doc_input["role"],"display_name":doc_input["display_name"],"media_type":doc_input["media_type"],"artifact_ref":{"anyOf":[artifact,{"type":"null"}]},"source_kind":{"type":"string"},"source_identity_hash":sha,"content_sha256":{"anyOf":[sha,{"type":"null"}]},"portability":doc_input["portability"],"connector_device_id":{"anyOf":[doc_input["connector_device_id"],{"type":"null"}]},"sort_order":{"type":"integer","minimum":0},"row_version":{"type":"integer","minimum":1},"online_source_gid":nullable_gid,"source_selector":source_selector,"observation_id":nullable_string,"observation_captured_at":nullable_string,"observation_node_count":nullable_integer},"additionalProperties":False}
     add_output={"type":"object","required":["document_gid","workspace_gid","role","row_version","workspace_row_version","cache_revision_hash"],"properties":{"document_gid":gid,"workspace_gid":gid,"role":doc_input["role"],"row_version":{"type":"integer","minimum":1},"workspace_row_version":{"type":"integer","minimum":2},"cache_revision_hash":sha},"additionalProperties":False}
     remove_output={"type":"object","required":["document_gid","workspace_gid","removed","workspace_row_version","cache_revision_hash"],"properties":{"document_gid":gid,"workspace_gid":gid,"removed":{"const":True},"workspace_row_version":{"type":"integer","minimum":2},"cache_revision_hash":sha},"additionalProperties":False}
+    cache_binding = {"type":"object","required":["batch_id","generation","snapshot_hash","schema_version"],
+        "properties":{"batch_id":{"type":"string","pattern":"^[a-f0-9]{32}$"},
+            "generation":{"type":["string","null"],"pattern":"^[a-f0-9]{32}$"},
+            "snapshot_hash":{"anyOf":[sha,{"type":"null"}]},"schema_version":{"type":"integer","const":1}},"additionalProperties":False}
+    doc_v2 = deepcopy(doc)
+    doc_v2["properties"]["cache_binding"] = {"anyOf":[cache_binding,{"type":"null"}]}
+    doc_v2["required"].append("cache_binding")
     return (
         (CapabilitySpec(id="simulation.environment.model_document.search", version=1, description="Search model documents in one readable Simulation environment.", risk="read", confirmation="none", input_schema={"type":"object","required":["workspace_gid"],"properties":{"workspace_gid":gid},"additionalProperties":False}, output_schema={"type":"object","required":["items"],"properties":{"items":{"type":"array","items":doc}},"additionalProperties":False}, **common), selected.search),
         (CapabilitySpec(id="simulation.environment.model_document.add", version=1, description="Add one PLMXML or JT model document to an owned Simulation environment.", risk="write", confirmation="none", idempotent=True, input_schema={"type":"object","required":[key for key in doc_input if key != "connector_device_id"],"properties":doc_input,"additionalProperties":False}, output_schema=add_output, **common), selected.add),
         (CapabilitySpec(id="simulation.environment.model_document.remove", version=1, description="Soft-remove one model document from an owned Simulation environment.", risk="write", confirmation="user", idempotent=True, input_schema={"type":"object","required":["workspace_gid","document_gid","expected_row_version","idempotency_key"],"properties":{"workspace_gid":gid,"document_gid":gid,"expected_row_version":{"type":"integer","minimum":1},"idempotency_key":{"type":"string","minLength":1,"maxLength":191}},"additionalProperties":False}, output_schema=remove_output, **common), selected.remove),
+        (CapabilitySpec(id="simulation.environment.model_document.search", version=2, description="Search environment model documents including immutable project-cache bindings.",risk="read",confirmation="none",input_schema={"type":"object","required":["workspace_gid"],"properties":{"workspace_gid":gid},"additionalProperties":False},output_schema={"type":"object","required":["items"],"properties":{"items":{"type":"array","items":doc_v2}},"additionalProperties":False},**common),selected.search_v2),
+        (CapabilitySpec(id="simulation.environment.cache_source.bind",version=1,description="Bind one completed project cache batch as an immutable source in a Simulation environment.",risk="write",confirmation="none",idempotent=True,
+            input_schema={"type":"object","required":["workspace_gid","expected_row_version","display_name","insertion_instance_id","cache_binding"],"properties":{"workspace_gid":gid,"expected_row_version":{"type":"integer","minimum":1},"display_name":{"type":"string","maxLength":255},"insertion_instance_id":{"type":"string","minLength":1,"maxLength":64},"cache_binding":cache_binding},"additionalProperties":False},output_schema=add_output,**common),selected.bind_cache),
     )
 
 

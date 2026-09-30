@@ -323,61 +323,6 @@ class CapabilityGatewayService:
         except Exception:
             return self._failed(envelope, "approval_failed", "Capability approval service failed.")
 
-        lease: InvocationLease | None = None
-        if is_write:
-            try:
-                lease = self._reliability.begin(
-                    envelope,
-                    descriptor,
-                    policy_version=(authorization.policy_version
-                                    if authorization is not None else "unversioned"),
-                )
-            except ReliabilityError as exc:
-                return self._rejected(envelope, str(exc), "Reliable invocation was rejected.")
-            except Exception:
-                return self._failed(
-                    envelope, "reliability_failed", "Durable reliability service failed."
-                )
-            if lease.replay_result is not None:
-                return project_result(
-                    lease.replay_result, descriptor, envelope.identity,
-                    data_scopes=authorization.data_scopes if authorization is not None else (),
-                )
-
-        async_operation = None
-        if descriptor.operation_policy == "required":
-            try:
-                async_operation = self._operations.create(
-                    kind=descriptor.id,
-                    requested_by=envelope.identity,
-                    resource_refs=(authorization.resource_refs if authorization is not None else ()),
-                )
-            except Exception:
-                result = self._failed(
-                    envelope, "operation_create_failed", "The asynchronous operation could not be created."
-                )
-                if lease is not None:
-                    try:
-                        self._reliability.complete(lease, result)
-                    except Exception:
-                        return self._failed(
-                            envelope, "operation_create_outcome_failed",
-                            "The asynchronous operation was not dispatched.",
-                        )
-                return result
-
-        context = self._legacy_context(
-            envelope, operation_id=(
-                async_operation.operation_id if async_operation is not None else
-                lease.operation_id if lease is not None else None
-            ),
-            outcome_operation_id=lease.operation_id if lease is not None else None,
-            async_operation_id=(
-                async_operation.operation_id if async_operation is not None else None
-            ),
-            permissions=authorization.permissions if authorization is not None else (),
-            resource_refs=authorization.resource_refs if authorization is not None else (),
-        )
         capability_key = f"{descriptor.id}@{descriptor.major_version}"
         started = time.perf_counter()
         before = self._admission.snapshot()
@@ -403,6 +348,67 @@ class CapabilityGatewayService:
                 result, descriptor, envelope.identity,
                 data_scopes=authorization.data_scopes if authorization is not None else (),
             )
+        dispatch_ready = False
+        try:
+            lease: InvocationLease | None = None
+            if is_write:
+                try:
+                    lease = self._reliability.begin(
+                        envelope,
+                        descriptor,
+                        policy_version=(authorization.policy_version
+                                        if authorization is not None else "unversioned"),
+                    )
+                except ReliabilityError as exc:
+                    return self._rejected(envelope, str(exc), "Reliable invocation was rejected.")
+                except Exception:
+                    return self._failed(
+                        envelope, "reliability_failed", "Durable reliability service failed."
+                    )
+                if lease.replay_result is not None:
+                    return project_result(
+                        lease.replay_result, descriptor, envelope.identity,
+                        data_scopes=authorization.data_scopes if authorization is not None else (),
+                    )
+
+            async_operation = None
+            if descriptor.operation_policy == "required":
+                try:
+                    async_operation = self._operations.create(
+                        kind=descriptor.id,
+                        requested_by=envelope.identity,
+                        resource_refs=(authorization.resource_refs if authorization is not None else ()),
+                    )
+                except Exception:
+                    result = self._failed(
+                        envelope, "operation_create_failed", "The asynchronous operation could not be created."
+                    )
+                    if lease is not None:
+                        try:
+                            self._reliability.complete(lease, result)
+                        except Exception:
+                            return self._failed(
+                                envelope, "operation_create_outcome_failed",
+                                "The asynchronous operation was not dispatched.",
+                            )
+                    return result
+
+            context = self._legacy_context(
+                envelope, operation_id=(
+                    async_operation.operation_id if async_operation is not None else
+                    lease.operation_id if lease is not None else None
+                ),
+                outcome_operation_id=lease.operation_id if lease is not None else None,
+                async_operation_id=(
+                    async_operation.operation_id if async_operation is not None else None
+                ),
+                permissions=authorization.permissions if authorization is not None else (),
+                resource_refs=authorization.resource_refs if authorization is not None else (),
+            )
+            dispatch_ready = True
+        finally:
+            if not dispatch_ready:
+                await admission_lease.release()
         transaction = None
         cancelled = False
         stream_output: CapabilityStreamOutput | None = None

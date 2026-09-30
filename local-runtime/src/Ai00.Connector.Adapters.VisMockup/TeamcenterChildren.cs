@@ -40,7 +40,8 @@ public sealed partial class TeamcenterReadOnlyRuntime
 {
     private static string ChildrenHash(string text) => "sha256:" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(text))).ToLowerInvariant();
 
-    public async Task<object> ReadChildrenAsync(JsonElement payload, CancellationToken ct)
+    public Task<object> ReadChildrenAsync(JsonElement payload,CancellationToken ct)=>ReadChildrenCoreAsync(payload,ct,false);
+    private async Task<object> ReadChildrenCoreAsync(JsonElement payload, CancellationToken ct,bool cloudCapture)
     {
         Closed(payload,"source_selector","parent_path","cursor","page_size","refresh","generation");
         var selector=ReadSelector(payload.GetProperty("source_selector"));
@@ -75,7 +76,8 @@ public sealed partial class TeamcenterReadOnlyRuntime
             var hit=batch!=null&&!refresh;
             if(!hit)
             {
-                batch=await worker.ReadChildrenAsync(selector,path,credentials.User,credentials.Password,ct);
+                batch=cloudCapture?await worker.ReadCacheChildrenAsync(selector,path,credentials.User,credentials.Password,ct,refresh)
+                    :await worker.ReadChildrenAsync(selector,path,credentials.User,credentials.Password,ct);
                 if(batch is null || batch.Parent is null || batch.Nodes is null || batch.Nodes.Length>250000) throw new ConnectorException("teamcenter_worker_response_invalid");
                 string Id(TeamcenterOccurrenceEdge[] edges)=>ChildrenHash(selector.IdentityHash+"|"+JsonSerializer.Serialize(edges));
                 var expectedRevision=path.Length>0?path[^1].ItemRevisionUid:selector.ItemRevisionUid;

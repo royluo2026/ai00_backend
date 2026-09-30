@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_1f857e1e265864513910f1469df58a71",
-  "catalog_hash": "sha256:1f857e1e265864513910f1469df58a71a0f8b7966544e13f2cc526d6a11d2799",
+  "release_id": "rel_db12264e8bee5bb7a0fa5dda17dfd99d",
+  "catalog_hash": "sha256:db12264e8bee5bb7a0fa5dda17dfd99d15b69b3b9b740669a20f5f93d9b66162",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -294676,6 +294676,34 @@
               "updates": {
                 "type": "object",
                 "properties": {
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "share_scope": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_open_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "project_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
                   "attachments": {
                     "type": "array",
                     "maxItems": 200,
@@ -294743,21 +294771,28 @@
                       ]
                     }
                   },
-                  "occurrence_root_cause": {
+                  "severity": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "scheduled_date": {
+                  "bop_entry_gid": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "feishu_group_name": {
+                  "related_task_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "interim_action": {
                     "type": [
                       "string",
                       "null"
@@ -294765,20 +294800,6 @@
                     "maxLength": 65536
                   },
                   "feishu_group_chat_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "escape_root_cause": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "severity": {
                     "type": [
                       "string",
                       "null"
@@ -294799,27 +294820,6 @@
                     ],
                     "maxLength": 65536
                   },
-                  "related_knowledge_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "title": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_assignee_open_id": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
                   "description": {
                     "type": [
                       "string",
@@ -294827,14 +294827,43 @@
                     ],
                     "maxLength": 65536
                   },
-                  "approval_order_gid": {
+                  "scheduled_date": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "related_task_gid": {
+                  "feishu_groups": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "chat_id": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "avatar": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "permanent_action": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "related_knowledge_gid": {
                     "type": [
                       "string",
                       "null"
@@ -294848,7 +294877,7 @@
                     ],
                     "maxLength": 65536
                   },
-                  "list_gid": {
+                  "escape_root_cause": {
                     "type": [
                       "string",
                       "null"
@@ -294885,57 +294914,28 @@
                       "additionalProperties": false
                     }
                   },
-                  "feishu_groups": {
-                    "type": "array",
-                    "maxItems": 200,
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "chat_id": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "name": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "avatar": {
-                          "type": "string",
-                          "maxLength": 2048
-                        }
-                      },
-                      "additionalProperties": false
-                    }
-                  },
-                  "permanent_action": {
+                  "approval_order_gid": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "share_scope": {
+                  "title": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "interim_action": {
+                  "feishu_group_name": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "bop_entry_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "project_gid": {
+                  "occurrence_root_cause": {
                     "type": [
                       "string",
                       "null"
@@ -315880,6 +315880,16 @@
       },
       "consumer_refs": [
         {
+          "consumer_id": "packages/sim-plugin/web/model_cache/model_cache.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        },
+        {
+          "consumer_id": "simulation.model_cache.create",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        },
+        {
           "consumer_id": "knowledge-hub/project_info.html",
           "consumer_type": "web",
           "version_constraint": ">=1"
@@ -316364,6 +316374,11 @@
         "boundary": "owning_domain"
       },
       "consumer_refs": [
+        {
+          "consumer_id": "packages/sim-plugin/web/model_cache/model_cache.js",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        },
         {
           "consumer_id": "knowledge-hub/project_info.html",
           "consumer_type": "web",
@@ -327278,6 +327293,13 @@
               "updates": {
                 "type": "object",
                 "properties": {
+                  "list_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
                   "attachments": {
                     "type": "array",
                     "maxItems": 200,
@@ -327345,52 +327367,30 @@
                       ]
                     }
                   },
+                  "scheduled_start_time": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
                   "is_deleted": {
                     "type": "boolean"
                   },
-                  "node_type": {
+                  "time_estimate": {
                     "type": [
-                      "string",
+                      "integer",
                       "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "actual_end": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "scheduled_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "priority": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "feishu_group_name": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "meeting_doc_link": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
+                    ]
                   },
                   "feishu_group_chat_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "assignee_team_gid": {
                     "type": [
                       "string",
                       "null"
@@ -327404,21 +327404,71 @@
                     ],
                     "maxLength": 65536
                   },
-                  "scheduled_start_time": {
+                  "status": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "canvas_y": {
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "scheduled_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_groups": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "chat_id": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "name": {
+                          "type": "string",
+                          "maxLength": 2048
+                        },
+                        "avatar": {
+                          "type": "string",
+                          "maxLength": 2048
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "due_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "canvas_x": {
                     "type": [
                       "integer",
                       "number",
                       "null"
                     ]
                   },
-                  "feishu_assignee_open_id": {
+                  "feishu_assignee_name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "parent_task_gid": {
                     "type": [
                       "string",
                       "null"
@@ -327432,6 +327482,34 @@
                     ],
                     "maxLength": 65536
                   },
+                  "share_scope": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "feishu_assignee_open_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "project_gid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "plan_start": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
                   "actual_start": {
                     "type": [
                       "string",
@@ -327439,12 +327517,33 @@
                     ],
                     "maxLength": 65536
                   },
-                  "feishu_assignee_name": {
+                  "meeting_doc_link": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
+                  },
+                  "actual_end": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "node_type": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 65536
+                  },
+                  "completion": {
+                    "type": [
+                      "integer",
+                      "number",
+                      "null"
+                    ]
                   },
                   "feishu_docs": {
                     "type": "array",
@@ -327476,84 +327575,21 @@
                       "additionalProperties": false
                     }
                   },
-                  "feishu_groups": {
-                    "type": "array",
-                    "maxItems": 200,
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "chat_id": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "name": {
-                          "type": "string",
-                          "maxLength": 2048
-                        },
-                        "avatar": {
-                          "type": "string",
-                          "maxLength": 2048
-                        }
-                      },
-                      "additionalProperties": false
-                    }
-                  },
-                  "share_scope": {
+                  "plan_end": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "meeting_level": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "plan_start": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "project_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "time_estimate": {
+                  "canvas_y": {
                     "type": [
                       "integer",
+                      "number",
                       "null"
                     ]
                   },
-                  "parent_task_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "assignee_team_gid": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "status": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "due_date": {
+                  "meeting_level": {
                     "type": [
                       "string",
                       "null"
@@ -327567,40 +327603,19 @@
                     ],
                     "maxLength": 65536
                   },
-                  "description": {
+                  "feishu_group_name": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
                   },
-                  "list_gid": {
+                  "priority": {
                     "type": [
                       "string",
                       "null"
                     ],
                     "maxLength": 65536
-                  },
-                  "plan_end": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "maxLength": 65536
-                  },
-                  "canvas_x": {
-                    "type": [
-                      "integer",
-                      "number",
-                      "null"
-                    ]
-                  },
-                  "completion": {
-                    "type": [
-                      "integer",
-                      "number",
-                      "null"
-                    ]
                   }
                 },
                 "additionalProperties": false,
@@ -397921,6 +397936,433 @@
       "business_definition_hash": "sha256:900b5b43057342b8fb9461792d05863fc831691842cf8ff766aaf54c6bbf3068"
     },
     {
+      "id": "simulation.environment.live_document.resume_online",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.environment.live_document.resume_online",
+      "description": "Reassociate an already-open Teamcenter document with the current runtime after signed native identity verification; never launch a model.",
+      "use_when": "The owner links or selects an already-open native document.",
+      "do_not_use_when": "Native identity is unavailable or another user owns the binding.",
+      "business_effect": "Renew the current runtime source association for the exact already-bound Teamcenter online document without opening a model.",
+      "business_acceptance_criteria": [
+        "The signed existing-document identity is fresh and belongs to the current owner App runtime.",
+        "The saved binding, active prior source association, source revision and primary Teamcenter document match exactly.",
+        "Only the runtime source association changes; no model is opened and no workspace content revision changes."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "simulation.viewer.existing_document_resume",
+          "version": 1,
+          "statement": "Only an exact already-bound Teamcenter document with a fresh signed current-runtime native identity can renew its source association.",
+          "applies_when": "an owner resumes local control of an already-open online-source document",
+          "enforcement_ref": "plugins/simulation/simulation_backend/data/workspace_repository.py:resume_online_live_document",
+          "error_code": "live_document_identity_mismatch",
+          "test_refs": [
+            "plugins/simulation/tests/test_live_document_resume.py::test_resume_rejects_wrong_source_or_session"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Writes simulation domain state through its Provider and records a capability audit event.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-workspace",
+          "payload_path": "workspace_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "document_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "identity_operation_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 191
+          },
+          "expected_document_session": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "expected_workspace_row_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 191
+          }
+        },
+        "required": [
+          "workspace_gid",
+          "document_gid",
+          "identity_operation_id",
+          "expected_document_session",
+          "expected_workspace_row_version",
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "document_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "document_session": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "source_association_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 191
+          },
+          "workspace_row_version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "workspace_gid",
+          "document_gid",
+          "document_session",
+          "source_association_id",
+          "workspace_row_version"
+        ],
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "workspace_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "document_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "document_session": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "source_association_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 191
+          },
+          "workspace_row_version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "workspace_gid",
+          "document_gid",
+          "document_session",
+          "source_association_id",
+          "workspace_row_version"
+        ],
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:074c4be7838a7bd51bbf4461ed85af031af96f572154e48c4b4d8031fb9af9ba",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "live_document_identity_unavailable",
+          "meaning": "The authenticated native identity cannot be established.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "live_document_identity_stale",
+          "meaning": "The signed native identity or server receipt is stale.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "live_document_owner_required",
+          "meaning": "The authenticated web owner and tenant are required.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "live_document_input_invalid",
+          "meaning": "The closed live document request is invalid.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "live_document_binding_stale",
+          "meaning": "The prior binding cannot be reused safely.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_session_changed",
+          "meaning": "The saved binding changed before the explicit rebind committed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "live_document_already_bound",
+          "meaning": "The newly attested native session belongs to another environment.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "live_document_binding_conflict",
+          "meaning": "The selected environment already has another active native session.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "launch_evidence_unavailable",
+          "meaning": "The signed Teamcenter launch result is unavailable or invalid.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "launch_evidence_stale",
+          "meaning": "The signed Teamcenter launch result is stale.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "launch_document_device_mismatch",
+          "meaning": "The launch and current native document were attested by different Connector devices.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "online_model_document_not_found",
+          "meaning": "The selected primary Teamcenter online-source document is unavailable.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "online_source_identity_mismatch",
+          "meaning": "The signed launch source does not match the selected online-source document.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "primary_live_document_unavailable",
+          "meaning": "The selected environment has no unique primary live document to rebind.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The request key was already used for different adoption input.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "runtime_v2_required",
+          "meaning": "A current App v2 runtime is required.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_ef4e24ea0beaa8acbb8a5fa8",
+      "error_schema": [
+        {
+          "error_code": "live_document_identity_unavailable",
+          "message_template": "The authenticated native identity cannot be established.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "live_document_identity_stale",
+          "message_template": "The signed native identity or server receipt is stale.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "live_document_owner_required",
+          "message_template": "The authenticated web owner and tenant are required.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "live_document_input_invalid",
+          "message_template": "The closed live document request is invalid.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "live_document_binding_stale",
+          "message_template": "The prior binding cannot be reused safely.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_session_changed",
+          "message_template": "The saved binding changed before the explicit rebind committed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "live_document_already_bound",
+          "message_template": "The newly attested native session belongs to another environment.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "live_document_binding_conflict",
+          "message_template": "The selected environment already has another active native session.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "launch_evidence_unavailable",
+          "message_template": "The signed Teamcenter launch result is unavailable or invalid.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "launch_evidence_stale",
+          "message_template": "The signed Teamcenter launch result is stale.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "launch_document_device_mismatch",
+          "message_template": "The launch and current native document were attested by different Connector devices.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "online_model_document_not_found",
+          "message_template": "The selected primary Teamcenter online-source document is unavailable.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "online_source_identity_mismatch",
+          "message_template": "The signed launch source does not match the selected online-source document.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "primary_live_document_unavailable",
+          "message_template": "The selected environment has no unique primary live document to rebind.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The request key was already used for different adoption input.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "runtime_v2_required",
+          "message_template": "A current App v2 runtime is required.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "owner": "simulation",
+        "atomicity": "signed current-runtime identity/owned binding/prior source revision check and association/idempotency renewal in one transaction",
+        "native_atomicity": "identity read and the following binding mutation are not atomic with native document changes",
+        "tables": [
+          "workmanship_sim_connector_runtime_plans",
+          "workmanship_sim_connector_runtime_devices",
+          "workmanship_sim_workspaces",
+          "workmanship_sim_vm_documents",
+          "workmanship_sim_live_document_bindings",
+          "workmanship_sim_viewer_source_associations",
+          "workmanship_sim_workspace_idempotency"
+        ],
+        "migration_refs": [
+          "backend/db/migrations/domains/simulation/0028_viewer_interaction.sql"
+        ],
+        "dependencies": [
+          "vismockup.document.existing_identity.read@1",
+          "simulation.environment.online_source.live_document.bind@3"
+        ],
+        "idempotency": "workspace/key plus exact signed identity operation, document session and expected workspace revision"
+      },
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "no_consumer_reason": null,
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.environment.live_document.resume_online:invoke"
+      ],
+      "test_refs": [
+        {
+          "path": "plugins/simulation/tests/test_live_document_resume.py"
+        }
+      ],
+      "business_definition_hash": "sha256:6ae9aa66760c6ef6f07945fa84631af475bf1424936483af3149674e89b43e16"
+    },
+    {
       "id": "simulation.environment.manifest.archive",
       "major_version": 1,
       "owner_domain": "simulation",
@@ -422703,6 +423145,3234 @@
       "business_definition_hash": "sha256:cc2b429d45039613845c5427998e0ff33754c6b2e0f88051caa0e1a591ee8f2a"
     },
     {
+      "id": "simulation.model_cache.advance",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.model_cache.advance",
+      "description": "Advance one durable TC cache work item through signed read-only Connector contracts.",
+      "use_when": "Advance one durable TC cache work item through signed read-only Connector contracts.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Advance one durable TC cache work item through signed read-only Connector contracts.",
+      "business_acceptance_criteria": [
+        "Only trusted super_admin can trigger/control; scheduled and project-manager triggers remain disabled.",
+        "One tenant/project/selector batch persists all actual TC business return fields with their original types.",
+        "A page receipt, node rows and continuation work commit atomically; retries never restart accepted pages.",
+        "Generation mismatch requires a new batch; incomplete/paused/failed batches cannot be consumed as complete snapshots.",
+        "Search and AND/OR filters run across the whole persisted batch, independent of UI page size."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "simulation.model_cache.atomic_checkpoint",
+          "version": 1,
+          "statement": "Accepted TC pages and their durable continuations are atomic, deduplicated and source/generation pinned.",
+          "applies_when": "cache advances a durable read-only TC task",
+          "enforcement_ref": "plugins/simulation/simulation_backend/data/cloud_model_cache_repository.py:apply_result",
+          "error_code": "cache_generation_stale",
+          "test_refs": [
+            "plugins/simulation/tests/test_cloud_model_cache.py::test_generation_mismatch_rolls_back_page"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Persist shared cache metadata and deterministic read-only TC work; never modify TC.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": true,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "simulation.model_cache:trusted_super_admin_trigger_project_scoped_read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "batch_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{32}$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "batch_id"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "batch_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "project_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "project_name": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "phase": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "display_name": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "source_hash": {
+            "type": "string"
+          },
+          "source_selector": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": {
+                "type": "string",
+                "const": "tc-production"
+              },
+              "object_uid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "item_revision_uid": {
+                "type": "string",
+                "maxLength": 128
+              },
+              "bom_view_uid": {
+                "type": "string",
+                "maxLength": 128
+              },
+              "revision_rule": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "configuration_date": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "endpoint_id",
+              "object_uid",
+              "item_revision_uid",
+              "bom_view_uid",
+              "revision_rule",
+              "configuration_date"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "running",
+              "paused",
+              "waiting_connector",
+              "waiting_auth",
+              "needs_refresh",
+              "failed",
+              "completed"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "updated_at": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "row_version": {
+            "type": "integer"
+          },
+          "node_count": {
+            "type": "integer"
+          },
+          "error_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trigger_kind": {
+            "const": "manual",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "batch_id",
+          "project_gid",
+          "project_name",
+          "phase",
+          "display_name",
+          "source_hash",
+          "source_selector",
+          "status",
+          "created_at",
+          "updated_at",
+          "completed_at",
+          "row_version",
+          "node_count",
+          "error_code",
+          "trigger_kind"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "batch_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "project_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "project_name": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "phase": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "display_name": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "source_hash": {
+            "type": "string"
+          },
+          "source_selector": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": {
+                "type": "string",
+                "const": "tc-production"
+              },
+              "object_uid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "item_revision_uid": {
+                "type": "string",
+                "maxLength": 128
+              },
+              "bom_view_uid": {
+                "type": "string",
+                "maxLength": 128
+              },
+              "revision_rule": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "configuration_date": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "endpoint_id",
+              "object_uid",
+              "item_revision_uid",
+              "bom_view_uid",
+              "revision_rule",
+              "configuration_date"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "running",
+              "paused",
+              "waiting_connector",
+              "waiting_auth",
+              "needs_refresh",
+              "failed",
+              "completed"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "updated_at": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "row_version": {
+            "type": "integer"
+          },
+          "node_count": {
+            "type": "integer"
+          },
+          "error_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trigger_kind": {
+            "const": "manual",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "batch_id",
+          "project_gid",
+          "project_name",
+          "phase",
+          "display_name",
+          "source_hash",
+          "source_selector",
+          "status",
+          "created_at",
+          "updated_at",
+          "completed_at",
+          "row_version",
+          "node_count",
+          "error_code",
+          "trigger_kind"
+        ]
+      },
+      "schema_hash": "sha256:0cb6de3eaafd36b1fd0111b27087e529ebcfb6ba2d892fb62fa3021d5ff3d532",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "cache_trigger_forbidden",
+          "meaning": "Only trusted super_admin may trigger or control.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_actor_mismatch",
+          "meaning": "Worker actor must be the original trigger actor.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_project_forbidden",
+          "meaning": "Actor cannot read this project.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_not_found",
+          "meaning": "Batch is absent in this tenant.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_version_conflict",
+          "meaning": "Reload the batch before changing its state.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_state_invalid",
+          "meaning": "The requested state transition is unavailable.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_generation_stale",
+          "meaning": "Pinned sibling generation changed; create a new batch.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_source_mismatch",
+          "meaning": "TC returned a different selector digest.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_sensitive_field_rejected",
+          "meaning": "Transport secrets cannot enter the shared cache.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_page_invalid",
+          "meaning": "TC page violates the durable task contract.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_receipt_conflict",
+          "meaning": "An accepted page has conflicting contents.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_filter_invalid",
+          "meaning": "Use a supported typed filter.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "cache_node_limit",
+          "meaning": "The bounded batch node budget is exhausted.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_page_too_large",
+          "meaning": "The TC page exceeds the governed byte limit.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_idempotency_conflict",
+          "meaning": "An existing creation key refers to different input.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_trigger_disabled",
+          "meaning": "Scheduled triggering is reserved and disabled.",
+          "retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_adfad35931ca09355c4baf42",
+      "error_schema": [
+        {
+          "error_code": "cache_trigger_forbidden",
+          "message_template": "Only trusted super_admin may trigger or control.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_actor_mismatch",
+          "message_template": "Worker actor must be the original trigger actor.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_project_forbidden",
+          "message_template": "Actor cannot read this project.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_not_found",
+          "message_template": "Batch is absent in this tenant.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_version_conflict",
+          "message_template": "Reload the batch before changing its state.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_state_invalid",
+          "message_template": "The requested state transition is unavailable.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_generation_stale",
+          "message_template": "Pinned sibling generation changed; create a new batch.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_source_mismatch",
+          "message_template": "TC returned a different selector digest.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_sensitive_field_rejected",
+          "message_template": "Transport secrets cannot enter the shared cache.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_page_invalid",
+          "message_template": "TC page violates the durable task contract.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_receipt_conflict",
+          "message_template": "An accepted page has conflicting contents.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_filter_invalid",
+          "message_template": "Use a supported typed filter.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "cache_node_limit",
+          "message_template": "The bounded batch node budget is exhausted.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_page_too_large",
+          "message_template": "The TC page exceeds the governed byte limit.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_idempotency_conflict",
+          "message_template": "An existing creation key refers to different input.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_trigger_disabled",
+          "message_template": "Scheduled triggering is reserved and disabled.",
+          "is_retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "simulation",
+        "atomicity": "batch lock; accepted node page, receipt and durable continuation commit together",
+        "tables": [
+          "workmanship_sim_cloud_cache_batches",
+          "workmanship_sim_cloud_cache_tasks",
+          "workmanship_sim_cloud_cache_nodes",
+          "workmanship_sim_cloud_cache_receipts"
+        ],
+        "migration_refs": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "dependencies": [
+          "simulation.teamcenter.model_cache.read@1",
+          "project.project.read.atomic.projects_get@1"
+        ],
+        "idempotency": "tenant/actor/create key; batch/task/attempt deterministic signed plan; task receipt/body hash",
+        "recovery": "worker reuses admitted operation after restart; stale generation is terminal; super_admin resumes auth/transient failures"
+      },
+      "consumer_refs": [
+        {
+          "consumer_id": "simulation.model_cache.worker",
+          "consumer_type": "worker",
+          "version_constraint": "==1"
+        }
+      ],
+      "no_consumer_reason": null,
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.model_cache.advance:invoke"
+      ],
+      "test_refs": [
+        {
+          "path": "plugins/simulation/tests/test_cloud_model_cache.py"
+        }
+      ],
+      "business_definition_hash": "sha256:b31cf69499d7777866fd98db02d50aff0ca6c6d1163e7decc3729a5c8ca0162b"
+    },
+    {
+      "id": "simulation.model_cache.control",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.model_cache.control",
+      "description": "Pause or resume a project cache batch with optimistic concurrency.",
+      "use_when": "Pause or resume a project cache batch with optimistic concurrency.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Pause or resume a project cache batch with optimistic concurrency.",
+      "business_acceptance_criteria": [
+        "Only trusted super_admin can trigger/control; scheduled and project-manager triggers remain disabled.",
+        "One tenant/project/selector batch persists all actual TC business return fields with their original types.",
+        "A page receipt, node rows and continuation work commit atomically; retries never restart accepted pages.",
+        "Generation mismatch requires a new batch; incomplete/paused/failed batches cannot be consumed as complete snapshots.",
+        "Search and AND/OR filters run across the whole persisted batch, independent of UI page size."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "simulation.model_cache.atomic_checkpoint",
+          "version": 1,
+          "statement": "Accepted TC pages and their durable continuations are atomic, deduplicated and source/generation pinned.",
+          "applies_when": "cache advances a durable read-only TC task",
+          "enforcement_ref": "plugins/simulation/simulation_backend/data/cloud_model_cache_repository.py:apply_result",
+          "error_code": "cache_generation_stale",
+          "test_refs": [
+            "plugins/simulation/tests/test_cloud_model_cache.py::test_generation_mismatch_rolls_back_page"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Persist shared cache metadata and deterministic read-only TC work; never modify TC.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.model_cache:trusted_super_admin_trigger_project_scoped_read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "batch_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "pause",
+              "resume"
+            ]
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "batch_id",
+          "action",
+          "expected_version"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "batch_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "project_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "project_name": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "phase": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "display_name": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "source_hash": {
+            "type": "string"
+          },
+          "source_selector": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": {
+                "type": "string",
+                "const": "tc-production"
+              },
+              "object_uid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "item_revision_uid": {
+                "type": "string",
+                "maxLength": 128
+              },
+              "bom_view_uid": {
+                "type": "string",
+                "maxLength": 128
+              },
+              "revision_rule": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "configuration_date": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "endpoint_id",
+              "object_uid",
+              "item_revision_uid",
+              "bom_view_uid",
+              "revision_rule",
+              "configuration_date"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "running",
+              "paused",
+              "waiting_connector",
+              "waiting_auth",
+              "needs_refresh",
+              "failed",
+              "completed"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "updated_at": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "row_version": {
+            "type": "integer"
+          },
+          "node_count": {
+            "type": "integer"
+          },
+          "error_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trigger_kind": {
+            "const": "manual",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "batch_id",
+          "project_gid",
+          "project_name",
+          "phase",
+          "display_name",
+          "source_hash",
+          "source_selector",
+          "status",
+          "created_at",
+          "updated_at",
+          "completed_at",
+          "row_version",
+          "node_count",
+          "error_code",
+          "trigger_kind"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "batch_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "project_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "project_name": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "phase": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "display_name": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "source_hash": {
+            "type": "string"
+          },
+          "source_selector": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": {
+                "type": "string",
+                "const": "tc-production"
+              },
+              "object_uid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "item_revision_uid": {
+                "type": "string",
+                "maxLength": 128
+              },
+              "bom_view_uid": {
+                "type": "string",
+                "maxLength": 128
+              },
+              "revision_rule": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "configuration_date": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "endpoint_id",
+              "object_uid",
+              "item_revision_uid",
+              "bom_view_uid",
+              "revision_rule",
+              "configuration_date"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "running",
+              "paused",
+              "waiting_connector",
+              "waiting_auth",
+              "needs_refresh",
+              "failed",
+              "completed"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "updated_at": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "row_version": {
+            "type": "integer"
+          },
+          "node_count": {
+            "type": "integer"
+          },
+          "error_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trigger_kind": {
+            "const": "manual",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "batch_id",
+          "project_gid",
+          "project_name",
+          "phase",
+          "display_name",
+          "source_hash",
+          "source_selector",
+          "status",
+          "created_at",
+          "updated_at",
+          "completed_at",
+          "row_version",
+          "node_count",
+          "error_code",
+          "trigger_kind"
+        ]
+      },
+      "schema_hash": "sha256:51968f818bf548c0bbf36dc75d88fba494150e49466ce931a9e7551b36d8fb24",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "expected_version",
+      "expected_version_payload_path": "expected_version",
+      "idempotency_policy": "required",
+      "replay_data_policy": "projected",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "cache_trigger_forbidden",
+          "meaning": "Only trusted super_admin may trigger or control.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_actor_mismatch",
+          "meaning": "Worker actor must be the original trigger actor.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_project_forbidden",
+          "meaning": "Actor cannot read this project.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_not_found",
+          "meaning": "Batch is absent in this tenant.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_version_conflict",
+          "meaning": "Reload the batch before changing its state.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_state_invalid",
+          "meaning": "The requested state transition is unavailable.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_generation_stale",
+          "meaning": "Pinned sibling generation changed; create a new batch.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_source_mismatch",
+          "meaning": "TC returned a different selector digest.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_sensitive_field_rejected",
+          "meaning": "Transport secrets cannot enter the shared cache.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_page_invalid",
+          "meaning": "TC page violates the durable task contract.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_receipt_conflict",
+          "meaning": "An accepted page has conflicting contents.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_filter_invalid",
+          "meaning": "Use a supported typed filter.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "cache_node_limit",
+          "meaning": "The bounded batch node budget is exhausted.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_page_too_large",
+          "meaning": "The TC page exceeds the governed byte limit.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_idempotency_conflict",
+          "meaning": "An existing creation key refers to different input.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_trigger_disabled",
+          "meaning": "Scheduled triggering is reserved and disabled.",
+          "retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_60fa79496fc03a88bdf19949",
+      "error_schema": [
+        {
+          "error_code": "cache_trigger_forbidden",
+          "message_template": "Only trusted super_admin may trigger or control.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_actor_mismatch",
+          "message_template": "Worker actor must be the original trigger actor.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_project_forbidden",
+          "message_template": "Actor cannot read this project.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_not_found",
+          "message_template": "Batch is absent in this tenant.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_version_conflict",
+          "message_template": "Reload the batch before changing its state.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_state_invalid",
+          "message_template": "The requested state transition is unavailable.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_generation_stale",
+          "message_template": "Pinned sibling generation changed; create a new batch.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_source_mismatch",
+          "message_template": "TC returned a different selector digest.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_sensitive_field_rejected",
+          "message_template": "Transport secrets cannot enter the shared cache.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_page_invalid",
+          "message_template": "TC page violates the durable task contract.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_receipt_conflict",
+          "message_template": "An accepted page has conflicting contents.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_filter_invalid",
+          "message_template": "Use a supported typed filter.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "cache_node_limit",
+          "message_template": "The bounded batch node budget is exhausted.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_page_too_large",
+          "message_template": "The TC page exceeds the governed byte limit.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_idempotency_conflict",
+          "message_template": "An existing creation key refers to different input.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_trigger_disabled",
+          "message_template": "Scheduled triggering is reserved and disabled.",
+          "is_retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "simulation",
+        "atomicity": "batch lock; accepted node page, receipt and durable continuation commit together",
+        "tables": [
+          "workmanship_sim_cloud_cache_batches",
+          "workmanship_sim_cloud_cache_tasks",
+          "workmanship_sim_cloud_cache_nodes",
+          "workmanship_sim_cloud_cache_receipts"
+        ],
+        "migration_refs": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "dependencies": [
+          "simulation.teamcenter.model_cache.read@1",
+          "project.project.read.atomic.projects_get@1"
+        ],
+        "idempotency": "tenant/actor/create key; batch/task/attempt deterministic signed plan; task receipt/body hash",
+        "recovery": "worker reuses admitted operation after restart; stale generation is terminal; super_admin resumes auth/transient failures"
+      },
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "no_consumer_reason": null,
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.model_cache.control:invoke"
+      ],
+      "test_refs": [
+        {
+          "path": "plugins/simulation/tests/test_cloud_model_cache.py"
+        }
+      ],
+      "business_definition_hash": "sha256:cb4b04ecb9fdb4f0408d85ee7851f3f3bf829d020763583a4a8395b3d94d283d"
+    },
+    {
+      "id": "simulation.model_cache.create",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.model_cache.create",
+      "description": "Create an independent project cache batch for one exact Teamcenter selector.",
+      "use_when": "Create an independent project cache batch for one exact Teamcenter selector.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Create an independent project cache batch for one exact Teamcenter selector.",
+      "business_acceptance_criteria": [
+        "Only trusted super_admin can trigger/control; scheduled and project-manager triggers remain disabled.",
+        "One tenant/project/selector batch persists all actual TC business return fields with their original types.",
+        "A page receipt, node rows and continuation work commit atomically; retries never restart accepted pages.",
+        "Generation mismatch requires a new batch; incomplete/paused/failed batches cannot be consumed as complete snapshots.",
+        "Search and AND/OR filters run across the whole persisted batch, independent of UI page size."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "simulation.model_cache.atomic_checkpoint",
+          "version": 1,
+          "statement": "Accepted TC pages and their durable continuations are atomic, deduplicated and source/generation pinned.",
+          "applies_when": "cache advances a durable read-only TC task",
+          "enforcement_ref": "plugins/simulation/simulation_backend/data/cloud_model_cache_repository.py:apply_result",
+          "error_code": "cache_generation_stale",
+          "test_refs": [
+            "plugins/simulation/tests/test_cloud_model_cache.py::test_generation_mismatch_rolls_back_page"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "write",
+      "side_effects": "Persist shared cache metadata and deterministic read-only TC work; never modify TC.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A1",
+      "authorization_policy": "simulation.model_cache:trusted_super_admin_trigger_project_scoped_read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "project_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "project_name": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "phase": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "display_name": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "source_selector": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": {
+                "type": "string",
+                "const": "tc-production"
+              },
+              "object_uid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "item_revision_uid": {
+                "type": "string",
+                "maxLength": 128
+              },
+              "bom_view_uid": {
+                "type": "string",
+                "maxLength": 128
+              },
+              "revision_rule": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "configuration_date": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "endpoint_id",
+              "object_uid",
+              "item_revision_uid",
+              "bom_view_uid",
+              "revision_rule",
+              "configuration_date"
+            ]
+          },
+          "trigger_kind": {
+            "type": "string",
+            "enum": [
+              "manual",
+              "scheduled"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "project_gid",
+          "project_name",
+          "phase",
+          "display_name",
+          "source_selector",
+          "trigger_kind"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "batch_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "project_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "project_name": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "phase": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "display_name": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "source_hash": {
+            "type": "string"
+          },
+          "source_selector": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": {
+                "type": "string",
+                "const": "tc-production"
+              },
+              "object_uid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "item_revision_uid": {
+                "type": "string",
+                "maxLength": 128
+              },
+              "bom_view_uid": {
+                "type": "string",
+                "maxLength": 128
+              },
+              "revision_rule": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "configuration_date": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "endpoint_id",
+              "object_uid",
+              "item_revision_uid",
+              "bom_view_uid",
+              "revision_rule",
+              "configuration_date"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "running",
+              "paused",
+              "waiting_connector",
+              "waiting_auth",
+              "needs_refresh",
+              "failed",
+              "completed"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "updated_at": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "row_version": {
+            "type": "integer"
+          },
+          "node_count": {
+            "type": "integer"
+          },
+          "error_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trigger_kind": {
+            "const": "manual",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "batch_id",
+          "project_gid",
+          "project_name",
+          "phase",
+          "display_name",
+          "source_hash",
+          "source_selector",
+          "status",
+          "created_at",
+          "updated_at",
+          "completed_at",
+          "row_version",
+          "node_count",
+          "error_code",
+          "trigger_kind"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "batch_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "project_gid": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "project_name": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "phase": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "display_name": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "source_hash": {
+            "type": "string"
+          },
+          "source_selector": {
+            "type": "object",
+            "properties": {
+              "endpoint_id": {
+                "type": "string",
+                "const": "tc-production"
+              },
+              "object_uid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "item_revision_uid": {
+                "type": "string",
+                "maxLength": 128
+              },
+              "bom_view_uid": {
+                "type": "string",
+                "maxLength": 128
+              },
+              "revision_rule": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "configuration_date": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "endpoint_id",
+              "object_uid",
+              "item_revision_uid",
+              "bom_view_uid",
+              "revision_rule",
+              "configuration_date"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "running",
+              "paused",
+              "waiting_connector",
+              "waiting_auth",
+              "needs_refresh",
+              "failed",
+              "completed"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "updated_at": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "row_version": {
+            "type": "integer"
+          },
+          "node_count": {
+            "type": "integer"
+          },
+          "error_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trigger_kind": {
+            "const": "manual",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "batch_id",
+          "project_gid",
+          "project_name",
+          "phase",
+          "display_name",
+          "source_hash",
+          "source_selector",
+          "status",
+          "created_at",
+          "updated_at",
+          "completed_at",
+          "row_version",
+          "node_count",
+          "error_code",
+          "trigger_kind"
+        ]
+      },
+      "schema_hash": "sha256:52d6bed08a6c34064c1c996940915944c5f6c25f5e0c77f1a00e9c32f0aa7daa",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "replay_data_policy": "projected",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "cache_trigger_forbidden",
+          "meaning": "Only trusted super_admin may trigger or control.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_actor_mismatch",
+          "meaning": "Worker actor must be the original trigger actor.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_project_forbidden",
+          "meaning": "Actor cannot read this project.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_not_found",
+          "meaning": "Batch is absent in this tenant.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_version_conflict",
+          "meaning": "Reload the batch before changing its state.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_state_invalid",
+          "meaning": "The requested state transition is unavailable.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_generation_stale",
+          "meaning": "Pinned sibling generation changed; create a new batch.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_source_mismatch",
+          "meaning": "TC returned a different selector digest.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_sensitive_field_rejected",
+          "meaning": "Transport secrets cannot enter the shared cache.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_page_invalid",
+          "meaning": "TC page violates the durable task contract.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_receipt_conflict",
+          "meaning": "An accepted page has conflicting contents.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_filter_invalid",
+          "meaning": "Use a supported typed filter.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "cache_node_limit",
+          "meaning": "The bounded batch node budget is exhausted.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_page_too_large",
+          "meaning": "The TC page exceeds the governed byte limit.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_idempotency_conflict",
+          "meaning": "An existing creation key refers to different input.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_trigger_disabled",
+          "meaning": "Scheduled triggering is reserved and disabled.",
+          "retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_5329153b2789c3722b482e4c",
+      "error_schema": [
+        {
+          "error_code": "cache_trigger_forbidden",
+          "message_template": "Only trusted super_admin may trigger or control.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_actor_mismatch",
+          "message_template": "Worker actor must be the original trigger actor.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_project_forbidden",
+          "message_template": "Actor cannot read this project.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_not_found",
+          "message_template": "Batch is absent in this tenant.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_version_conflict",
+          "message_template": "Reload the batch before changing its state.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_state_invalid",
+          "message_template": "The requested state transition is unavailable.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_generation_stale",
+          "message_template": "Pinned sibling generation changed; create a new batch.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_source_mismatch",
+          "message_template": "TC returned a different selector digest.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_sensitive_field_rejected",
+          "message_template": "Transport secrets cannot enter the shared cache.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_page_invalid",
+          "message_template": "TC page violates the durable task contract.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_receipt_conflict",
+          "message_template": "An accepted page has conflicting contents.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_filter_invalid",
+          "message_template": "Use a supported typed filter.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "cache_node_limit",
+          "message_template": "The bounded batch node budget is exhausted.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_page_too_large",
+          "message_template": "The TC page exceeds the governed byte limit.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_idempotency_conflict",
+          "message_template": "An existing creation key refers to different input.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_trigger_disabled",
+          "message_template": "Scheduled triggering is reserved and disabled.",
+          "is_retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "simulation",
+        "atomicity": "batch lock; accepted node page, receipt and durable continuation commit together",
+        "tables": [
+          "workmanship_sim_cloud_cache_batches",
+          "workmanship_sim_cloud_cache_tasks",
+          "workmanship_sim_cloud_cache_nodes",
+          "workmanship_sim_cloud_cache_receipts"
+        ],
+        "migration_refs": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "dependencies": [
+          "simulation.teamcenter.model_cache.read@1",
+          "project.project.read.atomic.projects_get@1"
+        ],
+        "idempotency": "tenant/actor/create key; batch/task/attempt deterministic signed plan; task receipt/body hash",
+        "recovery": "worker reuses admitted operation after restart; stale generation is terminal; super_admin resumes auth/transient failures"
+      },
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "no_consumer_reason": null,
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.model_cache.create:invoke"
+      ],
+      "test_refs": [
+        {
+          "path": "plugins/simulation/tests/test_cloud_model_cache.py"
+        }
+      ],
+      "business_definition_hash": "sha256:29a4f8668a645835b4f444245a88780b707b0be39e43270154bdeb1a83d604e9"
+    },
+    {
+      "id": "simulation.model_cache.list",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.model_cache.list",
+      "description": "List readable project cache batches newest first and current trigger policy.",
+      "use_when": "List readable project cache batches newest first and current trigger policy.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "List readable project cache batches newest first and current trigger policy.",
+      "business_acceptance_criteria": [
+        "Only trusted super_admin can trigger/control; scheduled and project-manager triggers remain disabled.",
+        "One tenant/project/selector batch persists all actual TC business return fields with their original types.",
+        "A page receipt, node rows and continuation work commit atomically; retries never restart accepted pages.",
+        "Generation mismatch requires a new batch; incomplete/paused/failed batches cannot be consumed as complete snapshots.",
+        "Search and AND/OR filters run across the whole persisted batch, independent of UI page size."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "simulation.model_cache.atomic_checkpoint",
+          "version": 1,
+          "statement": "Accepted TC pages and their durable continuations are atomic, deduplicated and source/generation pinned.",
+          "applies_when": "cache advances a durable read-only TC task",
+          "enforcement_ref": "plugins/simulation/simulation_backend/data/cloud_model_cache_repository.py:apply_result",
+          "error_code": "cache_generation_stale",
+          "test_refs": [
+            "plugins/simulation/tests/test_cloud_model_cache.py::test_generation_mismatch_rolls_back_page"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "read",
+      "side_effects": "Return authorized project cache metadata and bounded full-value rows.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "simulation.model_cache:trusted_super_admin_trigger_project_scoped_read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "cursor": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "page_size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "batches": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "properties": {
+                "batch_id": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{32}$"
+                },
+                "project_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "project_name": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "phase": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "display_name": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "source_hash": {
+                  "type": "string"
+                },
+                "source_selector": {
+                  "type": "object",
+                  "properties": {
+                    "endpoint_id": {
+                      "type": "string",
+                      "const": "tc-production"
+                    },
+                    "object_uid": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128
+                    },
+                    "item_revision_uid": {
+                      "type": "string",
+                      "maxLength": 128
+                    },
+                    "bom_view_uid": {
+                      "type": "string",
+                      "maxLength": 128
+                    },
+                    "revision_rule": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128
+                    },
+                    "configuration_date": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "endpoint_id",
+                    "object_uid",
+                    "item_revision_uid",
+                    "bom_view_uid",
+                    "revision_rule",
+                    "configuration_date"
+                  ]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "queued",
+                    "running",
+                    "paused",
+                    "waiting_connector",
+                    "waiting_auth",
+                    "needs_refresh",
+                    "failed",
+                    "completed"
+                  ]
+                },
+                "created_at": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "updated_at": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "completed_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "row_version": {
+                  "type": "integer"
+                },
+                "node_count": {
+                  "type": "integer"
+                },
+                "error_code": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "trigger_kind": {
+                  "const": "manual",
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "batch_id",
+                "project_gid",
+                "project_name",
+                "phase",
+                "display_name",
+                "source_hash",
+                "source_selector",
+                "status",
+                "created_at",
+                "updated_at",
+                "completed_at",
+                "row_version",
+                "node_count",
+                "error_code",
+                "trigger_kind"
+              ]
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "can_trigger": {
+            "type": "boolean"
+          },
+          "project_manager_enabled": {
+            "type": "boolean"
+          },
+          "scheduled_enabled": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "batches",
+          "next_cursor",
+          "can_trigger",
+          "project_manager_enabled",
+          "scheduled_enabled"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "batches": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "properties": {
+                "batch_id": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{32}$"
+                },
+                "project_gid": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                },
+                "project_name": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "phase": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "display_name": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "source_hash": {
+                  "type": "string"
+                },
+                "source_selector": {
+                  "type": "object",
+                  "properties": {
+                    "endpoint_id": {
+                      "type": "string",
+                      "const": "tc-production"
+                    },
+                    "object_uid": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128
+                    },
+                    "item_revision_uid": {
+                      "type": "string",
+                      "maxLength": 128
+                    },
+                    "bom_view_uid": {
+                      "type": "string",
+                      "maxLength": 128
+                    },
+                    "revision_rule": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128
+                    },
+                    "configuration_date": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "endpoint_id",
+                    "object_uid",
+                    "item_revision_uid",
+                    "bom_view_uid",
+                    "revision_rule",
+                    "configuration_date"
+                  ]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "queued",
+                    "running",
+                    "paused",
+                    "waiting_connector",
+                    "waiting_auth",
+                    "needs_refresh",
+                    "failed",
+                    "completed"
+                  ]
+                },
+                "created_at": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "updated_at": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "completed_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "row_version": {
+                  "type": "integer"
+                },
+                "node_count": {
+                  "type": "integer"
+                },
+                "error_code": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "trigger_kind": {
+                  "const": "manual",
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "batch_id",
+                "project_gid",
+                "project_name",
+                "phase",
+                "display_name",
+                "source_hash",
+                "source_selector",
+                "status",
+                "created_at",
+                "updated_at",
+                "completed_at",
+                "row_version",
+                "node_count",
+                "error_code",
+                "trigger_kind"
+              ]
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "can_trigger": {
+            "type": "boolean"
+          },
+          "project_manager_enabled": {
+            "type": "boolean"
+          },
+          "scheduled_enabled": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "batches",
+          "next_cursor",
+          "can_trigger",
+          "project_manager_enabled",
+          "scheduled_enabled"
+        ]
+      },
+      "schema_hash": "sha256:c07a7860e7476dcd85b9488f1bcb59ac4c9b07d7479089c725b339c9ffff807d",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "cache_trigger_forbidden",
+          "meaning": "Only trusted super_admin may trigger or control.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_actor_mismatch",
+          "meaning": "Worker actor must be the original trigger actor.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_project_forbidden",
+          "meaning": "Actor cannot read this project.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_not_found",
+          "meaning": "Batch is absent in this tenant.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_version_conflict",
+          "meaning": "Reload the batch before changing its state.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_state_invalid",
+          "meaning": "The requested state transition is unavailable.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_generation_stale",
+          "meaning": "Pinned sibling generation changed; create a new batch.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_source_mismatch",
+          "meaning": "TC returned a different selector digest.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_sensitive_field_rejected",
+          "meaning": "Transport secrets cannot enter the shared cache.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_page_invalid",
+          "meaning": "TC page violates the durable task contract.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_receipt_conflict",
+          "meaning": "An accepted page has conflicting contents.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_filter_invalid",
+          "meaning": "Use a supported typed filter.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "cache_node_limit",
+          "meaning": "The bounded batch node budget is exhausted.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_page_too_large",
+          "meaning": "The TC page exceeds the governed byte limit.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_idempotency_conflict",
+          "meaning": "An existing creation key refers to different input.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_trigger_disabled",
+          "meaning": "Scheduled triggering is reserved and disabled.",
+          "retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_36fbcc431d138e4e1a148988",
+      "error_schema": [
+        {
+          "error_code": "cache_trigger_forbidden",
+          "message_template": "Only trusted super_admin may trigger or control.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_actor_mismatch",
+          "message_template": "Worker actor must be the original trigger actor.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_project_forbidden",
+          "message_template": "Actor cannot read this project.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_not_found",
+          "message_template": "Batch is absent in this tenant.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_version_conflict",
+          "message_template": "Reload the batch before changing its state.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_state_invalid",
+          "message_template": "The requested state transition is unavailable.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_generation_stale",
+          "message_template": "Pinned sibling generation changed; create a new batch.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_source_mismatch",
+          "message_template": "TC returned a different selector digest.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_sensitive_field_rejected",
+          "message_template": "Transport secrets cannot enter the shared cache.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_page_invalid",
+          "message_template": "TC page violates the durable task contract.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_receipt_conflict",
+          "message_template": "An accepted page has conflicting contents.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_filter_invalid",
+          "message_template": "Use a supported typed filter.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "cache_node_limit",
+          "message_template": "The bounded batch node budget is exhausted.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_page_too_large",
+          "message_template": "The TC page exceeds the governed byte limit.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_idempotency_conflict",
+          "message_template": "An existing creation key refers to different input.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_trigger_disabled",
+          "message_template": "Scheduled triggering is reserved and disabled.",
+          "is_retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "simulation",
+        "atomicity": "batch lock; accepted node page, receipt and durable continuation commit together",
+        "tables": [
+          "workmanship_sim_cloud_cache_batches",
+          "workmanship_sim_cloud_cache_tasks",
+          "workmanship_sim_cloud_cache_nodes",
+          "workmanship_sim_cloud_cache_receipts"
+        ],
+        "migration_refs": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "dependencies": [
+          "simulation.teamcenter.model_cache.read@1",
+          "project.project.read.atomic.projects_get@1"
+        ],
+        "idempotency": "tenant/actor/create key; batch/task/attempt deterministic signed plan; task receipt/body hash",
+        "recovery": "worker reuses admitted operation after restart; stale generation is terminal; super_admin resumes auth/transient failures"
+      },
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "no_consumer_reason": null,
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.model_cache.list:invoke"
+      ],
+      "test_refs": [
+        {
+          "path": "plugins/simulation/tests/test_cloud_model_cache.py"
+        }
+      ],
+      "business_definition_hash": "sha256:64f22a7eb17f0f98777345131be99bdc838a72dd6c7e193db3e26776ca28c021"
+    },
+    {
+      "id": "simulation.model_cache.query",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.model_cache.query",
+      "description": "Search and filter every persisted TC field across a whole batch with bounded paging.",
+      "use_when": "Search and filter every persisted TC field across a whole batch with bounded paging.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Search and filter every persisted TC field across a whole batch with bounded paging.",
+      "business_acceptance_criteria": [
+        "Only trusted super_admin can trigger/control; scheduled and project-manager triggers remain disabled.",
+        "One tenant/project/selector batch persists all actual TC business return fields with their original types.",
+        "A page receipt, node rows and continuation work commit atomically; retries never restart accepted pages.",
+        "Generation mismatch requires a new batch; incomplete/paused/failed batches cannot be consumed as complete snapshots.",
+        "Search and AND/OR filters run across the whole persisted batch, independent of UI page size."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "simulation.model_cache.atomic_checkpoint",
+          "version": 1,
+          "statement": "Accepted TC pages and their durable continuations are atomic, deduplicated and source/generation pinned.",
+          "applies_when": "cache advances a durable read-only TC task",
+          "enforcement_ref": "plugins/simulation/simulation_backend/data/cloud_model_cache_repository.py:apply_result",
+          "error_code": "cache_generation_stale",
+          "test_refs": [
+            "plugins/simulation/tests/test_cloud_model_cache.py::test_generation_mismatch_rolls_back_page"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "read",
+      "side_effects": "Return authorized project cache metadata and bounded full-value rows.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "simulation.model_cache:trusted_super_admin_trigger_project_scoped_read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "batch_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "search": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "filters": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "op": {
+                  "type": "string",
+                  "enum": [
+                    "eq",
+                    "ne",
+                    "contains",
+                    "exists",
+                    "empty",
+                    "not_empty",
+                    "gt",
+                    "gte",
+                    "lt",
+                    "lte"
+                  ]
+                },
+                "value_json": {
+                  "type": "string",
+                  "maxLength": 4096
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "field",
+                "op",
+                "value_json"
+              ]
+            }
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "and",
+              "or"
+            ]
+          },
+          "cursor": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "page_size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "batch_id",
+          "search",
+          "filters",
+          "mode",
+          "cursor",
+          "page_size"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "batch": {
+            "type": "object",
+            "properties": {
+              "batch_id": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{32}$"
+              },
+              "project_gid": {
+                "type": "string",
+                "pattern": "^[1-9][0-9]*$"
+              },
+              "project_name": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "phase": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "display_name": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "source_hash": {
+                "type": "string"
+              },
+              "source_selector": {
+                "type": "object",
+                "properties": {
+                  "endpoint_id": {
+                    "type": "string",
+                    "const": "tc-production"
+                  },
+                  "object_uid": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "item_revision_uid": {
+                    "type": "string",
+                    "maxLength": 128
+                  },
+                  "bom_view_uid": {
+                    "type": "string",
+                    "maxLength": 128
+                  },
+                  "revision_rule": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "configuration_date": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "endpoint_id",
+                  "object_uid",
+                  "item_revision_uid",
+                  "bom_view_uid",
+                  "revision_rule",
+                  "configuration_date"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "queued",
+                  "running",
+                  "paused",
+                  "waiting_connector",
+                  "waiting_auth",
+                  "needs_refresh",
+                  "failed",
+                  "completed"
+                ]
+              },
+              "created_at": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "updated_at": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "completed_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "row_version": {
+                "type": "integer"
+              },
+              "node_count": {
+                "type": "integer"
+              },
+              "error_code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "trigger_kind": {
+                "const": "manual",
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "batch_id",
+              "project_gid",
+              "project_name",
+              "phase",
+              "display_name",
+              "source_hash",
+              "source_selector",
+              "status",
+              "created_at",
+              "updated_at",
+              "completed_at",
+              "row_version",
+              "node_count",
+              "error_code",
+              "trigger_kind"
+            ]
+          },
+          "rows": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_key": {
+                  "type": "string"
+                },
+                "data_json": {
+                  "type": "string",
+                  "maxLength": 8388608
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "node_key",
+                "data_json"
+              ]
+            }
+          },
+          "fields": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {
+              "type": "string",
+              "maxLength": 512
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "next_cursor": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "batch",
+          "rows",
+          "fields",
+          "total",
+          "next_cursor"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "batch": {
+            "type": "object",
+            "properties": {
+              "batch_id": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{32}$"
+              },
+              "project_gid": {
+                "type": "string",
+                "pattern": "^[1-9][0-9]*$"
+              },
+              "project_name": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "phase": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "display_name": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "source_hash": {
+                "type": "string"
+              },
+              "source_selector": {
+                "type": "object",
+                "properties": {
+                  "endpoint_id": {
+                    "type": "string",
+                    "const": "tc-production"
+                  },
+                  "object_uid": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "item_revision_uid": {
+                    "type": "string",
+                    "maxLength": 128
+                  },
+                  "bom_view_uid": {
+                    "type": "string",
+                    "maxLength": 128
+                  },
+                  "revision_rule": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "configuration_date": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "endpoint_id",
+                  "object_uid",
+                  "item_revision_uid",
+                  "bom_view_uid",
+                  "revision_rule",
+                  "configuration_date"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "queued",
+                  "running",
+                  "paused",
+                  "waiting_connector",
+                  "waiting_auth",
+                  "needs_refresh",
+                  "failed",
+                  "completed"
+                ]
+              },
+              "created_at": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "updated_at": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "completed_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "row_version": {
+                "type": "integer"
+              },
+              "node_count": {
+                "type": "integer"
+              },
+              "error_code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "trigger_kind": {
+                "const": "manual",
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "batch_id",
+              "project_gid",
+              "project_name",
+              "phase",
+              "display_name",
+              "source_hash",
+              "source_selector",
+              "status",
+              "created_at",
+              "updated_at",
+              "completed_at",
+              "row_version",
+              "node_count",
+              "error_code",
+              "trigger_kind"
+            ]
+          },
+          "rows": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "properties": {
+                "node_key": {
+                  "type": "string"
+                },
+                "data_json": {
+                  "type": "string",
+                  "maxLength": 8388608
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "node_key",
+                "data_json"
+              ]
+            }
+          },
+          "fields": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {
+              "type": "string",
+              "maxLength": 512
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "next_cursor": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "batch",
+          "rows",
+          "fields",
+          "total",
+          "next_cursor"
+        ]
+      },
+      "schema_hash": "sha256:70ee2c88243e438b5cf4a43ec96f33a4cc6e4b6faa6fd770147913e43bf8c31b",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "cache_trigger_forbidden",
+          "meaning": "Only trusted super_admin may trigger or control.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_actor_mismatch",
+          "meaning": "Worker actor must be the original trigger actor.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_project_forbidden",
+          "meaning": "Actor cannot read this project.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_not_found",
+          "meaning": "Batch is absent in this tenant.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_version_conflict",
+          "meaning": "Reload the batch before changing its state.",
+          "retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_state_invalid",
+          "meaning": "The requested state transition is unavailable.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_generation_stale",
+          "meaning": "Pinned sibling generation changed; create a new batch.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_source_mismatch",
+          "meaning": "TC returned a different selector digest.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_sensitive_field_rejected",
+          "meaning": "Transport secrets cannot enter the shared cache.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_page_invalid",
+          "meaning": "TC page violates the durable task contract.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_receipt_conflict",
+          "meaning": "An accepted page has conflicting contents.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_filter_invalid",
+          "meaning": "Use a supported typed filter.",
+          "retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "code": "cache_node_limit",
+          "meaning": "The bounded batch node budget is exhausted.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_page_too_large",
+          "meaning": "The TC page exceeds the governed byte limit.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_idempotency_conflict",
+          "meaning": "An existing creation key refers to different input.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "cache_trigger_disabled",
+          "meaning": "Scheduled triggering is reserved and disabled.",
+          "retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_5f7915083e5e5ca6f03c3653",
+      "error_schema": [
+        {
+          "error_code": "cache_trigger_forbidden",
+          "message_template": "Only trusted super_admin may trigger or control.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_actor_mismatch",
+          "message_template": "Worker actor must be the original trigger actor.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_project_forbidden",
+          "message_template": "Actor cannot read this project.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_not_found",
+          "message_template": "Batch is absent in this tenant.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_version_conflict",
+          "message_template": "Reload the batch before changing its state.",
+          "is_retryable": true,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_state_invalid",
+          "message_template": "The requested state transition is unavailable.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_generation_stale",
+          "message_template": "Pinned sibling generation changed; create a new batch.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_source_mismatch",
+          "message_template": "TC returned a different selector digest.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_sensitive_field_rejected",
+          "message_template": "Transport secrets cannot enter the shared cache.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_page_invalid",
+          "message_template": "TC page violates the durable task contract.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_receipt_conflict",
+          "message_template": "An accepted page has conflicting contents.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_filter_invalid",
+          "message_template": "Use a supported typed filter.",
+          "is_retryable": false,
+          "is_caller_error": true
+        },
+        {
+          "error_code": "cache_node_limit",
+          "message_template": "The bounded batch node budget is exhausted.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_page_too_large",
+          "message_template": "The TC page exceeds the governed byte limit.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_idempotency_conflict",
+          "message_template": "An existing creation key refers to different input.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "cache_trigger_disabled",
+          "message_template": "Scheduled triggering is reserved and disabled.",
+          "is_retryable": false,
+          "is_caller_error": true
+        }
+      ],
+      "transaction_policy": {
+        "mode": "provider",
+        "boundary": "simulation",
+        "atomicity": "batch lock; accepted node page, receipt and durable continuation commit together",
+        "tables": [
+          "workmanship_sim_cloud_cache_batches",
+          "workmanship_sim_cloud_cache_tasks",
+          "workmanship_sim_cloud_cache_nodes",
+          "workmanship_sim_cloud_cache_receipts"
+        ],
+        "migration_refs": [
+          "backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql"
+        ],
+        "dependencies": [
+          "simulation.teamcenter.model_cache.read@1",
+          "project.project.read.atomic.projects_get@1"
+        ],
+        "idempotency": "tenant/actor/create key; batch/task/attempt deterministic signed plan; task receipt/body hash",
+        "recovery": "worker reuses admitted operation after restart; stale generation is terminal; super_admin resumes auth/transient failures"
+      },
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "no_consumer_reason": null,
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.model_cache.query:invoke"
+      ],
+      "test_refs": [
+        {
+          "path": "plugins/simulation/tests/test_cloud_model_cache.py"
+        }
+      ],
+      "business_definition_hash": "sha256:1665f7a0bf11539d482ef314fd2aba17094f0dab0aac873e409fe97decfcbbb7"
+    },
+    {
       "id": "simulation.parameter_set.create",
       "major_version": 1,
       "owner_domain": "simulation",
@@ -431270,6 +434940,195 @@
         }
       ],
       "business_definition_hash": "sha256:2bed22059f070da8771bd63ba6c8284b3815f474b4d676ddf065ad9f08f1a754"
+    },
+    {
+      "id": "simulation.teamcenter.model_cache.read",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.teamcenter.model_cache.read",
+      "description": "Read a principal-pinned cache page through existing TC children traversal or full raw property projection; preserve original field read states.",
+      "use_when": "Read a principal-pinned cache page through existing TC children traversal or full raw property projection; preserve original field read states.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
+      "business_effect": "Read one TC cache page pinned to the authenticated TC principal, preserving every returned raw property field and read state.",
+      "business_acceptance_criteria": [
+        "Only a signed read-only Connector execution plan invokes this atom.",
+        "The expected TC principal, source selector and occurrence path remain fixed throughout the read.",
+        "Raw TC fields preserve object identity, field names, JSON values and unavailable/null read states."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "simulation.model_cache.principal_pinned",
+          "version": 1,
+          "statement": "Every page belongs to the same TC principal and Connector device as the durable batch.",
+          "applies_when": "a shared cache reads a TC page",
+          "enforcement_ref": "local-runtime/src/Ai00.Connector.Adapters.VisMockup/TeamcenterModelCache.cs:ReadModelCacheAsync",
+          "error_code": "cache_principal_changed",
+          "test_refs": [
+            "plugins/simulation/tests/test_cloud_model_cache.py::test_principal_change_rolls_back"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "read",
+      "side_effects": "Reads simulation domain state; emits no mutation event or external call.",
+      "execution_mode": "local",
+      "exposure": {
+        "web": false,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": true
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "children",
+              "properties"
+            ]
+          },
+          "read_payload_json": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 32768
+          },
+          "expected_principal_hash": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "kind",
+          "read_payload_json",
+          "expected_principal_hash"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "principal_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "result_json": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 8388608
+          }
+        },
+        "required": [
+          "principal_hash",
+          "result_json"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "principal_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "result_json": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 8388608
+          }
+        },
+        "required": [
+          "principal_hash",
+          "result_json"
+        ]
+      },
+      "schema_hash": "sha256:03d8140f8f3da42a731647b60d0f11fc15efb4c28eb58f9cc00b7642b51d4e63",
+      "artifact_policy": "none",
+      "operation_policy": "required",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "cache_principal_changed",
+          "meaning": "TC login changed; start a new batch.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_58d732a7d12469db4d1c06cf",
+      "error_schema": [
+        {
+          "error_code": "cache_principal_changed",
+          "message_template": "TC login changed; start a new batch.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "owner": "simulation",
+        "atomicity": "read-only TC access; principal-scoped local SQLite cache",
+        "dependencies": [
+          "teamcenter.product_structure.children.read@1"
+        ],
+        "contract_refs": [
+          "docs/contracts/teamcenter.model_cache.read@1.json"
+        ]
+      },
+      "consumer_refs": [
+        {
+          "consumer_id": "simulation.model_cache.advance",
+          "consumer_type": "worker",
+          "version_constraint": "==1"
+        }
+      ],
+      "no_consumer_reason": null,
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.teamcenter.model_cache.read:invoke"
+      ],
+      "test_refs": [
+        {
+          "path": "plugins/simulation/tests/test_cloud_model_cache.py"
+        }
+      ],
+      "business_definition_hash": "sha256:4beb907185d30c62d659d2a58e7162f625da29e0b0c000f35ab1970551e86fa9"
     },
     {
       "id": "simulation.teamcenter.node_properties.read",
@@ -461497,6 +465356,382 @@
       "business_definition_hash": "sha256:d75535b342b44d0ec6811fa31ed3f999329dd7b036a99af3571aca568016d344"
     },
     {
+      "id": "simulation.vismockup.document.existing_identity.read.request",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "simulation.vismockup.document.existing_identity.read.request",
+      "description": "Select an already open native document by its saved session and return signed identity evidence without launching VisMockup.",
+      "use_when": "The signed-in user requests one direct action on the bound workstation Connector.",
+      "do_not_use_when": "No current user-scoped Connector binding exists.",
+      "business_effect": "Select an already-open VisMockup document by exact native session and persist its signed identity in the current App runtime.",
+      "business_acceptance_criteria": [
+        "The Connector selects only an already-open document whose native session equals the requested saved session.",
+        "The signed identity result is scoped to the current owner runtime; mismatched or missing documents fail closed.",
+        "No Teamcenter launch or model opening occurs."
+      ],
+      "business_invariants": [
+        {
+          "rule_id": "simulation.viewer.existing_identity",
+          "version": 1,
+          "statement": "An existing native document identity is accepted only from a fresh signed current-runtime outcome for the exact requested session.",
+          "applies_when": "the owner reads an already-open document identity for runtime resumption",
+          "enforcement_ref": "plugins/simulation/simulation_backend/application/live_document_identity.py:verify_existing_identity_evidence",
+          "error_code": "live_document_identity_unavailable",
+          "test_refs": [
+            "plugins/simulation/tests/test_live_document_identity_evidence.py::test_existing_document_identity_is_pinned_to_requested_session_and_current_runtime"
+          ],
+          "machine_constraints": null
+        }
+      ],
+      "no_business_invariant_reason": null,
+      "side_effect_level": "read",
+      "side_effects": "Reads simulation domain state; emits no mutation event or external call.",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": false,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "exposure_policy_source": "provider_explicit",
+      "automation_level": "A2",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "expected_document_session": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "expected_document_session"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "operation_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "operation_id",
+          "status",
+          "version"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "operation_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "operation_id",
+          "status",
+          "version"
+        ]
+      },
+      "schema_hash": "sha256:adeeaa95fa4004ab4bf62568d659cf51a040d25184049dfcbea1e4bb78c7c10e",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "replay_data_policy": "metadata_only",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "live_document_identity_unavailable",
+          "meaning": "The authenticated native identity cannot be established.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "live_document_identity_stale",
+          "meaning": "The signed native identity or server receipt is stale.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "live_document_owner_required",
+          "meaning": "The authenticated web owner and tenant are required.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "live_document_input_invalid",
+          "meaning": "The closed live document request is invalid.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "live_document_binding_stale",
+          "meaning": "The prior binding cannot be reused safely.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "document_session_changed",
+          "meaning": "The saved binding changed before the explicit rebind committed.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "live_document_already_bound",
+          "meaning": "The newly attested native session belongs to another environment.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "live_document_binding_conflict",
+          "meaning": "The selected environment already has another active native session.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "launch_evidence_unavailable",
+          "meaning": "The signed Teamcenter launch result is unavailable or invalid.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "launch_evidence_stale",
+          "meaning": "The signed Teamcenter launch result is stale.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "launch_document_device_mismatch",
+          "meaning": "The launch and current native document were attested by different Connector devices.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "online_model_document_not_found",
+          "meaning": "The selected primary Teamcenter online-source document is unavailable.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "online_source_identity_mismatch",
+          "meaning": "The signed launch source does not match the selected online-source document.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "primary_live_document_unavailable",
+          "meaning": "The selected environment has no unique primary live document to rebind.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The request key was already used for different adoption input.",
+          "retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "code": "runtime_v2_required",
+          "meaning": "A current App v2 runtime is required.",
+          "retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "domain_errors_complete": false,
+      "capability_version_gid": "cv2_56e3e95f3775220f3176d4cb",
+      "error_schema": [
+        {
+          "error_code": "live_document_identity_unavailable",
+          "message_template": "The authenticated native identity cannot be established.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "live_document_identity_stale",
+          "message_template": "The signed native identity or server receipt is stale.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "live_document_owner_required",
+          "message_template": "The authenticated web owner and tenant are required.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "live_document_input_invalid",
+          "message_template": "The closed live document request is invalid.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "live_document_binding_stale",
+          "message_template": "The prior binding cannot be reused safely.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "document_session_changed",
+          "message_template": "The saved binding changed before the explicit rebind committed.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "live_document_already_bound",
+          "message_template": "The newly attested native session belongs to another environment.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "live_document_binding_conflict",
+          "message_template": "The selected environment already has another active native session.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "launch_evidence_unavailable",
+          "message_template": "The signed Teamcenter launch result is unavailable or invalid.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "launch_evidence_stale",
+          "message_template": "The signed Teamcenter launch result is stale.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "launch_document_device_mismatch",
+          "message_template": "The launch and current native document were attested by different Connector devices.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "online_model_document_not_found",
+          "message_template": "The selected primary Teamcenter online-source document is unavailable.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "online_source_identity_mismatch",
+          "message_template": "The signed launch source does not match the selected online-source document.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "primary_live_document_unavailable",
+          "message_template": "The selected environment has no unique primary live document to rebind.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "idempotency_conflict",
+          "message_template": "The request key was already used for different adoption input.",
+          "is_retryable": false,
+          "is_caller_error": false
+        },
+        {
+          "error_code": "runtime_v2_required",
+          "message_template": "A current App v2 runtime is required.",
+          "is_retryable": false,
+          "is_caller_error": false
+        }
+      ],
+      "transaction_policy": {
+        "owner": "simulation",
+        "atomicity": "read or signed queue persistence only; no workspace mutation",
+        "native_atomicity": "identity read and the following binding mutation are not atomic with native document changes",
+        "tables": [
+          "workmanship_sim_connector_runtime_plans",
+          "workmanship_sim_connector_runtime_devices",
+          "workmanship_sim_live_document_bindings",
+          "workmanship_sim_live_document_adoptions",
+          "workmanship_sim_workspaces",
+          "workmanship_sim_workspace_versions",
+          "workmanship_sim_workspace_heads"
+        ],
+        "migration_refs": [
+          "backend/db/migrations/domains/simulation/0008_connector_app_runtime_v2.sql",
+          "backend/db/migrations/domains/simulation/0025_simulation_live_document_bindings.sql"
+        ],
+        "dependencies": [
+          "vismockup.document.existing_identity.read@1"
+        ],
+        "idempotency": "owner/runtime/request key and exact expected native document session"
+      },
+      "consumer_refs": [
+        {
+          "consumer_id": "ai00.desktop.windows-x64",
+          "consumer_type": "web",
+          "version_constraint": "==1"
+        }
+      ],
+      "no_consumer_reason": null,
+      "provider_ref": "simulation.provider",
+      "api_refs": [
+        "gateway:/api/v1/capabilities/simulation.vismockup.document.existing_identity.read.request:invoke"
+      ],
+      "test_refs": [
+        {
+          "path": "plugins/simulation/tests/test_live_document_identity_evidence.py"
+        }
+      ],
+      "business_definition_hash": "sha256:dcf36d93bbe9434ac06301b91f48073ac951fe5aa6e6d6b885aeac54972de2f8"
+    },
+    {
       "id": "simulation.vismockup.document.hierarchy_inventory.read.request",
       "major_version": 1,
       "owner_domain": "simulation",
@@ -486179,8 +490414,8 @@
       "plugin_id": "official.simulation",
       "module": "simulation_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:35883bf17a002504ea99f0e8fc6f1ac8fc24c142ad790680e4c5c9cb3bef8691"
+      "artifact_hash": "sha256:e31d8b90ea0faaf8d916dcfd70b0a2ba7cb0fa08e77f8272f3c7a9b419ac0569"
     }
   ],
-  "created_at": "2026-09-22T10:20:35.486724Z"
+  "created_at": "2026-09-28T05:39:17.364081Z"
 }

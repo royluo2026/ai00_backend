@@ -28,6 +28,22 @@ class _Repo:
                 "row_version": 1, "workspace_row_version": 4, "status": "active", "node_count": len(kwargs["plan"]["nodes"])}
 
 
+def test_bop_insert_database_work_does_not_block_event_loop():
+    import threading
+    main_thread = threading.get_ident()
+    class Repo(_Repo):
+        def insert_bop_projection(self, **kwargs):
+            assert threading.get_ident() != main_thread
+            return super().insert_bop_projection(**kwargs)
+    provider = AlternateHierarchyProvider(Repo())
+    async def plan(*args):
+        return {"workspace_gid":"10", "hierarchy_name":"BOP", "nodes":[],
+                "expected_workspace_version":3, "plan_hash":"hash"}
+    provider._bop_plan = plan
+    context = CapabilityContext(user_gid="30", team_gid="20", request_id="bop-thread")
+    asyncio.run(provider.apply_bop_projection({"plan_hash":"hash","idempotency_key":"key"}, context))
+
+
 def test_hierarchy_capabilities_keep_sources_as_refs_and_allow_repeated_placement():
     repo = _Repo(); provider = AlternateHierarchyProvider(repo)
     ctx = CapabilityContext(user_gid="30", team_gid="20", request_id="r1")

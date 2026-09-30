@@ -6,6 +6,21 @@ namespace Ai00.Connector.Tests;
 
 public sealed class VisMockupTreeCacheRetentionTests
 {
+    [Fact] public void DiagnosticsDistinguishMissVerifiedHitAndCapacitySkip()
+    {
+        using var fixture=new CacheFixture();var entries=new List<(string Stage,string Detail)>();
+        var cache=new VisMockupTreeCache(fixture.DatabasePath){Diagnostic=(stage,detail)=>entries.Add((stage,System.Text.Json.JsonSerializer.Serialize(detail)))};
+        Assert.Null(cache.TryRead(fixture.Document("A"),3));
+        cache.Replace(fixture.Document("A"),3,fixture.Nodes("A1"));
+        Assert.NotNull(cache.TryRead(fixture.Document("A"),3));
+        Assert.Contains(entries,e=>e.Stage=="native_cache_miss"&&e.Detail.Contains("not_found"));
+        Assert.Contains(entries,e=>e.Stage=="native_cache_hit"&&e.Detail.Contains("verified"));
+        var bounded=new VisMockupTreeCache(fixture.DatabasePath,new VisMockupTreeCachePolicy(fixture.TotalBytes(),0.8,0.6)){Diagnostic=cache.Diagnostic};
+        bounded.Replace(fixture.Document("A"),3,fixture.Nodes("A2"));
+        Assert.Contains(entries,e=>e.Stage=="native_cache_skipped"&&e.Detail.Contains("capacity"));
+        cache.Diagnostic=(_,_)=>throw new IOException("unavailable");
+        Assert.NotNull(cache.TryRead(fixture.Document("A"),3));
+    }
     [Fact]
     public void CleanupRemovesOldGenerationsBeforeClosedDocuments()
     {

@@ -87,8 +87,11 @@ def authorize(case, signer, payload=None, context=None):
     return authorize_interaction(context or case.context, payload or request(case), case.repository, signer, NOW)
 
 
-def test_current_source_grant_and_monotonic_renewal(grant_case, signing):
+@pytest.mark.parametrize('role', ['primary', 'inserted'])
+def test_current_source_grant_and_monotonic_renewal(grant_case, signing, role):
     case = grant_case
+    with case.connect() as conn, conn.cursor() as cur:
+        cur.execute('UPDATE workmanship_sim_vm_documents SET document_role=%s', (role,))
     first = authorize(case, signing[0])
     assert first.document_session == 'sha256:'+'b'*64
     assert first.runtime_instance_id == 'runtime-1'
@@ -124,12 +127,38 @@ def test_other_actor_tenant_or_non_web_cannot_authorize(grant_case, signing, con
     "UPDATE workmanship_sim_vm_documents SET content_sha256='changed'",
     "UPDATE workmanship_sim_live_document_bindings SET state='superseded'",
 ])
-def test_current_association_fails_closed_after_scope_changes(grant_case, signing, sql):
+@pytest.mark.parametrize('role', ['primary', 'inserted'])
+def test_current_association_fails_closed_after_scope_changes(grant_case, signing, sql, role):
+    with grant_case.connect() as conn, conn.cursor() as cur:
+        cur.execute('UPDATE workmanship_sim_vm_documents SET document_role=%s', (role,))
     first = authorize(grant_case, signing[0])
     with grant_case.connect() as conn, conn.cursor() as cur:
         cur.execute(sql)
     with pytest.raises(ValueError, match='interaction_binding_stale'):
         authorize(grant_case, signing[0], {**request(grant_case), 'prior_grant_id': first.grant_id})
+
+
+@pytest.mark.parametrize('change,expected', [
+    ('', 'interaction_source_unassociated'),
+    ("owner_gid='99'", 'interaction_scope_denied'),
+    ("source_kind='local_file'", 'interaction_scope_denied'),
+    ("document_role='unknown'", 'interaction_scope_denied'),
+    ("removed_at='2026-09-22'", 'interaction_scope_denied'),
+    ("gid='99'", 'interaction_scope_denied'),
+])
+def test_unassociated_inserted_scope_requires_owned_online_document(grant_case, change, expected):
+    case = grant_case
+    with case.connect() as conn, conn.cursor() as cur:
+        cur.execute("UPDATE workmanship_sim_vm_documents SET document_role='inserted'")
+        cur.execute('UPDATE workmanship_sim_viewer_source_associations SET active=0')
+        if change:
+            cur.execute('UPDATE workmanship_sim_vm_documents SET ' + change)
+    with pytest.raises(ValueError, match='^' + expected + '$'):
+        with case.repository.authorize_scope(case.context, SimpleNamespace(**request(case)), NOW, allocate=False):
+            pytest.fail('unassociated source cannot authorize a session')
+    with pytest.raises(ValueError):
+        with case.repository.authorize_scope(case.context, SimpleNamespace(**request(case)), NOW):
+            pytest.fail('unassociated source cannot allocate a grant')
 
 
 def test_signing_failure_rolls_back_generation(grant_case, signing):

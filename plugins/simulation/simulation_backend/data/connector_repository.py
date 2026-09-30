@@ -483,6 +483,12 @@ class SimulationConnectorRepository:
         )
         return cursor.fetchone() is not None
 
+    @staticmethod
+    def _restart_safe_read_steps(steps):
+        # TC/viewer reads that publish artifacts can leave a durable external effect.
+        publishers={'teamcenter.model_file.fetch@1','vismockup.view.capture@1'}
+        return bool(steps) and all(step.get('side_effect_classification')=='read' and step.get('operation_id') not in publishers for step in steps)
+
     @classmethod
     def _retire_restart_safe_read_plans(cls, cursor, row, now, *, process_restarted=False):
         """Close expired read-only work that cannot have changed VisMockup."""
@@ -494,7 +500,7 @@ class SimulationConnectorRepository:
         for plan in cursor.fetchall():
             value = json.loads(plan["plan_json"]) if isinstance(plan["plan_json"], str) else plan["plan_json"]
             steps = value.get("steps", []) if isinstance(value, dict) else []
-            read_only = bool(steps) and all(step.get("side_effect_classification") == "read" for step in steps)
+            read_only = cls._restart_safe_read_steps(steps)
             lease_expired = process_restarted or plan["status"] == "outcome_unknown" or (
                 plan.get("lease_until") is not None and _utc(plan["lease_until"]) <= _utc(now)
             )
@@ -792,7 +798,7 @@ class SimulationConnectorRepository:
                     expired_queued_read = (previous['status'] == 'queued'
                         and previous.get('expires_at') is not None and _utc(previous['expires_at']) <= now)
                     if ((uncertain_read or expired_read_lease or expired_queued_read)
-                            and all(step.get('side_effect_classification') == 'read' for step in prior.get('steps', []))):
+                            and self._restart_safe_read_steps(prior.get('steps', []))):
                         cursor.execute(
                             "UPDATE workmanship_sim_connector_runtime_plans SET status='failed_without_effect',"
                             "reconciliation_state='not_required',updated_at=%s WHERE plan_id=%s "
@@ -1230,6 +1236,17 @@ class SimulationConnectorRepository:
         if isinstance(value, str):
             value = json.loads(value)
         return ConnectorExecutionPlanV1.model_validate(value)
+
+    def cache_read_interrupted_before_lease(self,plan_id: str,user_gid: str,team_gid: str) -> bool:
+        """Exact server evidence for safe cache-read rescheduling after replacement."""
+        with get_simulation_conn() as conn,conn.cursor() as cursor:
+            cursor.execute("SELECT p.plan_id FROM workmanship_sim_connector_runtime_plans p "
+                "WHERE p.plan_id=%s AND p.actor_gid=%s AND p.tenant_gid=%s AND p.protocol=%s "
+                "AND p.status='failed_without_effect' AND p.attempts=0 AND p.lease_id IS NULL "
+                "AND p.outcome_json IS NULL AND EXISTS (SELECT 1 FROM workmanship_sim_connector_runtime_audit a "
+                "WHERE a.plan_id=p.plan_id AND a.device_id=p.device_id AND a.event_type='plan_failed_without_effect' "
+                "AND a.reason='runtime_session_replaced_before_lease')",(plan_id,user_gid,team_gid,PROTOCOL_V2))
+            return cursor.fetchone() is not None
 
     def get_plan_result(self, plan_id: str, user_gid: str, team_gid: str) -> dict | None:
         with get_simulation_conn() as conn, conn.cursor() as cursor:

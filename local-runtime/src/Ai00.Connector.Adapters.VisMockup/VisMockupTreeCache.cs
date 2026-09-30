@@ -28,6 +28,8 @@ internal sealed class VisMockupTreeCache
 {
     private readonly string connectionString;
     private readonly VisMockupTreeCachePolicy policy;
+    internal Action<string,object>? Diagnostic {get;set;}
+    private void Trace(string stage,object detail){try{Diagnostic?.Invoke(stage,detail);}catch{}}
 
     public VisMockupTreeCache(string path, VisMockupTreeCachePolicy? policy = null)
     {
@@ -72,6 +74,7 @@ internal sealed class VisMockupTreeCache
 
     public CachedTree? TryRead(IVisMockupDocument document, int maxDepth)
     {
+        Trace("native_cache_lookup",new{max_depth=maxDepth});
         using var connection = Open();
         using var metadata = connection.CreateCommand();
         metadata.CommandText = """
@@ -84,7 +87,8 @@ internal sealed class VisMockupTreeCache
             """;
         metadata.Parameters.AddWithValue("$identity", Identity(document));
         using var metadataReader = metadata.ExecuteReader();
-        if (!metadataReader.Read() || metadataReader.GetInt32(4) < maxDepth) return null;
+        if (!metadataReader.Read()){Trace("native_cache_miss",new{reason="not_found"});return null;}
+        if(metadataReader.GetInt32(4)<maxDepth){Trace("native_cache_miss",new{reason="depth_insufficient",max_depth=maxDepth});return null;}
         var localId = metadataReader.GetInt64(0);
         var storedDocumentId = metadataReader.GetString(1);
         var storedExternalRevision = metadataReader.GetString(2);
@@ -115,30 +119,33 @@ internal sealed class VisMockupTreeCache
             reader.GetInt32(2), reader.GetInt32(3), reader.GetString(4),
             reader.GetString(5), reader.GetBoolean(6), reader.GetString(7)));
         reader.Close();
-        if (nodes.Count == 0) return null;
+        if (nodes.Count == 0){Trace("native_cache_miss",new{reason="empty_generation",generation});return null;}
         var crossSessionStableProjection = currentExternalRevision is null &&
             storedExternalRevision.Length == 0 &&
             !string.Equals(storedDocumentId, document.DocumentId, StringComparison.Ordinal) &&
             nodes.All(node => node.NodeKey.StartsWith("pdm:", StringComparison.Ordinal));
         if (!externallyVerified && !sameUnversionedSession && !crossSessionStableProjection)
-            return null;
+        {Trace("native_cache_miss",new{reason="source_revision_or_session_changed",generation});return null;}
+        Trace("native_cache_validation",new{generation,verified=externallyVerified,reason=externallyVerified?"external_revision_match":sameUnversionedSession?"same_unversioned_session":"stable_cross_session_projection"});
 
         using var touch = connection.CreateCommand();
         touch.CommandText = "UPDATE vm_cache_documents SET last_accessed_utc=$now WHERE local_id=$local_id";
         touch.Parameters.AddWithValue("$now", DateTimeOffset.UtcNow.ToString("O"));
         touch.Parameters.AddWithValue("$local_id", localId);
         touch.ExecuteNonQuery();
+        Trace("native_cache_hit",new{generation,node_count=nodes.Count,cache_state=externallyVerified?"verified":"verifying"});
         return new(nodes, maxDepth, externallyVerified ? "verified" : "verifying");
     }
 
     public void Replace(IVisMockupDocument document, int maxDepth, IReadOnlyList<CachedTreeNode> nodes)
     {
+        Trace("native_cache_write",new{node_count=nodes.Count,max_depth=maxDepth});
         var identity = Identity(document);
         var serialized = JsonSerializer.SerializeToUtf8Bytes(
             nodes.OrderBy(node => node.Depth).ThenBy(node => node.ParentNodeKey).ThenBy(node => node.ChildOrder)
                 .ThenBy(node => node.NodeKey));
         var byteSize = serialized.LongLength;
-        if (!EnsureCapacity(identity, byteSize)) return;
+        if (!EnsureCapacity(identity, byteSize)){Trace("native_cache_skipped",new{reason="capacity",node_count=nodes.Count});return;}
         var treeHash = "sha256:" + Convert.ToHexString(SHA256.HashData(serialized)).ToLowerInvariant();
         var externalRevision = VisMockupTreeFingerprint.ExternalRevisionFingerprint(document.SourceIdentity) ?? "";
         var now = DateTimeOffset.UtcNow.ToString("O");
@@ -235,6 +242,7 @@ internal sealed class VisMockupTreeCache
             publish.ExecuteNonQuery();
         }
         transaction.Commit();
+        Trace("native_cache_saved",new{generation,node_count=nodes.Count});
     }
 
     public void ReplaceProjection(IVisMockupDocument document, VisMockupPlmxmlProjection projection)

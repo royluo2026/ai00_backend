@@ -138,6 +138,19 @@ def register_capabilities(
     registry: Any, *, composition_provider: EnvironmentCompositionProvider | None = None,
     capture_provider: CaptureRunProvider | None = None,
 ) -> None:
+    from .cloud_model_cache import specs as cloud_cache_specs
+    for spec, handler in cloud_cache_specs():
+        register(registry, spec, handler)
+    from .cache_source_open import specs as cache_open_specs
+    for spec, handler in cache_open_specs():
+        register(registry, spec, handler)
+    from .cloud_model_cache_files import specs as cache_file_specs
+    for spec, handler in cache_file_specs():
+        register(registry, spec, handler)
+    if hasattr(registry, 'register_lifecycle'):
+        from ..application.cloud_model_cache_worker import CloudModelCacheWorker
+        cache_worker = CloudModelCacheWorker()
+        registry.register_lifecycle('simulation.model_cache.worker', cache_worker.start, cache_worker.stop, health=cache_worker.health)
     versioned_resource_resolvers.register("simulation.workspace_export", _resolve_workspace_export)
     resource_authorizers.register("simulation-document-snapshot", _authorize_document_snapshot)
     resource_authorizers.register("simulation-environment", _authorize_environment)

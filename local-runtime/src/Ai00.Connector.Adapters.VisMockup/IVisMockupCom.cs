@@ -20,6 +20,8 @@ public interface IVisMockupApplication
     string ProductVersion { get; }
     IVisMockupDocument? ActiveDocument { get; }
     IReadOnlyList<IVisMockupDocument> OpenDocuments { get; }
+    int OpenDocumentCount => OpenDocuments.Count;
+    void VerifyDocumentOpenScope() { }
     IVisMockupDocument OpenDocument(string path);
     void CloseAllDocuments();
 }
@@ -33,17 +35,25 @@ public interface IVisMockupDocument
     string SourceIdentity { get; }
     int HierarchyCount { get; }
     IVisMockupNode RootNode { get; }
+    IReadOnlyList<IVisMockupNode> GetAllNodes(int maximum)
+    {
+        var keys=AllNodeKeys;
+        if(keys.Count>maximum)throw new ConnectorNoEffectException("viewer_mapping_budget_exceeded");
+        return keys.Select(FindNodeByKey).ToArray();
+    }
     IVisMockupNode FindNodeByKey(string nodeKey) => throw new ConnectorException("vismockup_node_lookup_unsupported");
     IVisMockupNode FindNodeByCadId(string cadId) => throw new ConnectorException("vismockup_cad_lookup_unavailable");
     IReadOnlyCollection<string> AllNodeKeys { get; }
     IReadOnlyCollection<string> VisibleNodeKeys { get; }
     bool IsNodeVisible(string nodeKey);
     void SetNodeVisible(string nodeKey, bool visible);
+    void SetNodesVisible(IReadOnlyList<string> nodeKeys, bool visible) => throw new ConnectorException("vismockup_batch_visibility_unsupported");
     void SetNodeSelected(string nodeKey, bool selected);
     void SetAllNodesVisible(bool visible);
     void ApplyCaptureProfile(CaptureProfile profile);
     string AttachModel(string path);
     string InsertDocument(string path);
+    void DeleteInsertedDocument(int index) => throw new ConnectorException("vismockup_document_delete_unsupported");
     IReadOnlyList<string> InsertedDocumentPaths { get; }
     void CaptureImage(string path);
     void ExportPlmxml(string path, int hierarchyIndex);
@@ -65,6 +75,7 @@ public interface IVisMockupNode
         }
     }
     string CadId => "";
+    IReadOnlyList<double> GlobalTransform => throw new ConnectorNoEffectException("cache_environment_transform_unavailable");
     string ModelId { get; }
     IReadOnlyList<IVisMockupNode> Children { get; }
     int ChildCount => Children.Count;
@@ -402,7 +413,7 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
                 ||!MatchesProcessName(Path.GetFileNameWithoutExtension(configured),process.ProcessName))return false;
             var started=process.StartTime.ToUniversalTime().Ticks;
             var version=System.Diagnostics.FileVersionInfo.GetVersionInfo(configured).ProductVersion??"unknown";
-            _application=new DynamicApplication(outer,inner,version);
+            _application=new DynamicApplication(outer,inner,version,configured,pid);
             _attachedProcess=(pid,started);
             application=_application;
             return true;
@@ -414,6 +425,51 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         }
     }
 
+    // Startup-only recovery. COM activation can start a server, so it must never
+    // be used by a signed read operation as a fallback for GetActiveObject.
+    public bool TryReconnectExistingApplication()
+    {
+        if(TryAttachExistingApplication(out _))return true;
+        var configured=Path.GetFullPath(executable);
+        var candidates=new List<(int Id,long Started)>();
+        using var self=System.Diagnostics.Process.GetCurrentProcess();
+        try
+        {
+            foreach(var name in DocumentProcessNames(Path.GetFileNameWithoutExtension(configured)))
+            foreach(var process in System.Diagnostics.Process.GetProcessesByName(name))
+            {
+                using(process)
+                {
+                    if(process.SessionId!=self.SessionId)continue;
+                    var actual=process.MainModule?.FileName??"";
+                    if(string.Equals(Path.GetDirectoryName(actual),Path.GetDirectoryName(configured),StringComparison.OrdinalIgnoreCase))
+                        candidates.Add((process.Id,process.StartTime.ToUniversalTime().Ticks));
+                }
+            }
+            if(candidates.Count!=1)return false;
+            var expected=candidates[0];
+            // VisMockup's local COM server reuses its running application even
+            // when it does not publish VFFrame.Application in the ROT.
+            var type=Type.GetTypeFromProgID(ProgId,throwOnError:true)!;
+            var outer=Activator.CreateInstance(type)??throw new COMException("vismockup_unavailable");
+            var inner=VisMockupDispatch.GetProperty(outer,21);
+            var pid=Convert.ToInt32(VisMockupDispatch.GetProperty(inner,51));
+            using var connected=System.Diagnostics.Process.GetProcessById(pid);
+            if(pid!=expected.Id||connected.StartTime.ToUniversalTime().Ticks!=expected.Started)
+                throw new ConnectorException("vismockup_reconnect_process_changed");
+            var version=System.Diagnostics.FileVersionInfo.GetVersionInfo(configured).ProductVersion??"unknown";
+            _application=new DynamicApplication(outer,inner,version,configured,pid);
+            _attachedProcess=expected;
+            return true;
+        }
+        catch(Exception error) when(error is COMException or ArgumentException or InvalidOperationException
+            or System.ComponentModel.Win32Exception or ConnectorException or UnauthorizedAccessException)
+        {
+            Console.Error.WriteLine($"AI00_VISMOCKUP_RECONNECT_FAILED:{(error is ConnectorException connector?connector.Code:error.GetType().Name)}");
+            return false;
+        }
+    }
+
     internal static bool CanReuseCachedApplication(VisMockupProcessState process, (int ProcessId, long Started)? attached) =>
         process.Running && (process.ProcessId is not int pid || process.ProcessStartUtcTicks is not long started ||
             attached == (pid, started));
@@ -421,6 +477,13 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
     internal static bool MatchesProcessName(string configuredName, string runningName) =>
         string.Equals(configuredName, runningName, StringComparison.OrdinalIgnoreCase) ||
         string.Equals(configuredName + "_NG", runningName, StringComparison.OrdinalIgnoreCase);
+
+    internal static string[] DocumentProcessNames(string configuredName)
+    {
+        var name = configuredName.EndsWith("_NG", StringComparison.OrdinalIgnoreCase)
+            ? configuredName[..^3] : configuredName;
+        return [name, name + "_NG"];
+    }
 
     public void Launch()
     {
@@ -436,7 +499,7 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         using var process = System.Diagnostics.Process.GetProcessById(processId);
         var started = process.StartTime.ToUniversalTime().Ticks;
         var version = System.Diagnostics.FileVersionInfo.GetVersionInfo(path).ProductVersion ?? "unknown";
-        _application = new DynamicApplication(outer, inner, version);
+        _application = new DynamicApplication(outer, inner, version, path, processId);
         _attachedProcess = (processId, started);
         // Teamcenter's official runner discovers a VFFrame instance only after
         // it is registered as visible. Keep that COM state, but immediately
@@ -468,13 +531,45 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
     }
 
     private sealed class DynamicApplication(
-        object value, object activeApplication, string installedVersion) : IVisMockupApplication
+        object value, object activeApplication, string installedVersion, string executablePath, int processId) : IVisMockupApplication
     {
         // Do not query app.Version through COM. VisMockup 14.2 can block that
         // automation call indefinitely even though the application and document
         // DISPIDs are healthy. The installed executable is the authoritative,
         // non-blocking source for the adapter's advertised product version.
         public string ProductVersion => installedVersion;
+        public int OpenDocumentCount
+        {
+            get
+            {
+                // Count the native collection, including documents without a view.
+                var documents = VisMockupDispatch.GetProperty(activeApplication, 3);
+                var count = Convert.ToInt32(VisMockupDispatch.GetProperty(documents, 3));
+                if (count < 0 || (count == 0 && ActiveDocument is not null))
+                    throw new ConnectorNoEffectException("vismockup_document_limit_unverifiable");
+                return count;
+            }
+        }
+        public void VerifyDocumentOpenScope()
+        {
+            // Other instances cannot be counted through this COM application.
+            // MDI windows omit viewless documents, so never treat their count as
+            // proof of global capacity. Refuse creation if that proof is absent.
+            using var current = System.Diagnostics.Process.GetProcessById(processId);
+            var configuredName = Path.GetFileNameWithoutExtension(executablePath);
+            foreach (var name in DocumentProcessNames(configuredName))
+            foreach (var candidate in System.Diagnostics.Process.GetProcessesByName(name))
+            {
+                using (candidate)
+                {
+                    if (candidate.Id == processId || candidate.SessionId != current.SessionId) continue;
+                    var actual = candidate.MainModule?.FileName
+                        ?? throw new ConnectorNoEffectException("vismockup_document_limit_unverifiable");
+                    if (string.Equals(Path.GetDirectoryName(actual), Path.GetDirectoryName(executablePath), StringComparison.OrdinalIgnoreCase))
+                        throw new ConnectorNoEffectException("vismockup_document_limit_unverifiable");
+                }
+            }
+        }
         public IVisMockupDocument? ActiveDocument
             => ReadActiveDocument();
 
@@ -546,6 +641,9 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
             }
         }
         public IVisMockupDocument OpenDocument(string path)
+            => VisMockupDocumentOpen.Open(this, path, processId, () => OpenDocumentCore(path));
+
+        private IVisMockupDocument OpenDocumentCore(string path)
         {
             var expectedPath = Path.GetFullPath(path);
             var source=string.Equals(Path.GetExtension(path),".vvi",StringComparison.OrdinalIgnoreCase)
@@ -592,6 +690,13 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         public string SourceIdentity => Convert.ToString(VisMockupDispatch.GetProperty(value, 11)) ?? "";
         public int HierarchyCount => Convert.ToInt32(VisMockupDispatch.GetProperty(value, 14));
         public IVisMockupNode RootNode => new DynamicNode(VisMockupDispatch.GetProperty(ActiveView, 11));
+        public IReadOnlyList<IVisMockupNode> GetAllNodes(int maximum)
+        {
+            var nodes=VisMockupDispatch.GetProperty(ActiveView,10);
+            var count=Convert.ToInt32(VisMockupDispatch.GetProperty(nodes,2));
+            if(count>maximum)throw new ConnectorNoEffectException("viewer_mapping_budget_exceeded");
+            return MaterializeChildren(count,index=>new DynamicNode(VisMockupDispatch.GetProperty(nodes,3,index)));
+        }
         public IVisMockupNode FindNodeByKey(string nodeKey) => new DynamicNode(FindNode(nodeKey));
         public IVisMockupNode FindNodeByCadId(string cadId)
         {
@@ -604,13 +709,15 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         public IReadOnlyCollection<string> AllNodeKeys => Traverse().Select(NodeKey).ToArray();
         public IReadOnlyCollection<string> VisibleNodeKeys => Traverse().Where(IsVisible).Select(NodeKey).ToArray();
         public bool IsNodeVisible(string nodeKey) => IsVisible(FindNode(nodeKey));
-        public void SetNodeVisible(string nodeKey, bool visible)
+        public void SetNodeVisible(string nodeKey, bool visible) => SetNodesVisible([nodeKey],visible);
+        public void SetNodesVisible(IReadOnlyList<string> nodeKeys, bool visible)
         {
-            var node = FindNode(nodeKey);
+            if(nodeKeys.Count==0)return;
             // visible PUT changes a flag even for unloaded parts. The view
-            // command performs the display/load operation for the selected branch.
+            // command performs one display/load operation for the complete set.
             var nodes = VisMockupDispatch.InvokeMethodWithResult(ActiveView, 35);
-            VisMockupDispatch.InvokeMethod(nodes, 4, node);
+            foreach(var key in nodeKeys)VisMockupDispatch.InvokeMethod(nodes, 4, FindNode(key));
+            if(activeDocumentId()!=DocumentId)throw new ConnectorNoEffectException("vismockup_document_identity_changed");
             VisMockupDispatch.InvokeMethod(ActiveView, visible ? 19 : 20, nodes);
             VisMockupDispatch.InvokeMethod(ActiveView, 31);
         }
@@ -661,6 +768,7 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
             }
             throw new ConnectorException("vismockup_document_insert_timeout");
         }
+        public void DeleteInsertedDocument(int index) => VisMockupDispatch.InvokeMethod(value, 9, index);
         // VisAutomation.tlb: IVisDisp3DView.CaptureImage is DISPID 27.
         public void CaptureImage(string path) =>
             _ = VisMockupDispatch.InvokeMethod(ActiveView, 27, path);
@@ -764,6 +872,22 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         private dynamic Value => value;
         public string NodeKey => VisMockupDispatch.InvokeUInt32OutParameter(value, 21).ToString();
         public bool IsVisible => Convert.ToBoolean(VisMockupDispatch.GetProperty(value, 9));
+        public IReadOnlyList<double> GlobalTransform
+        {
+            get
+            {
+                try
+                {
+                    if (VisMockupDispatch.GetProperty(value, 15) is not Array matrix || matrix.Length != 16)
+                        throw new ConnectorNoEffectException("cache_environment_transform_unavailable");
+                    return matrix.Cast<object>().Select(item => Convert.ToDouble(item, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+                }
+                catch (Exception error) when (error is not ConnectorNoEffectException)
+                {
+                    throw new ConnectorNoEffectException("cache_environment_transform_unavailable");
+                }
+            }
+        }
         public string PrintableName => Convert.ToString(VisMockupDispatch.GetProperty(value, 7)) ?? "";
         // CADID is the viewer's occurrence path, not a display label or a runtime node key.
         // Unlike MetaDataProperties this does not open the JT payload.
@@ -796,11 +920,18 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         private string ReadOccurrenceMetadata(string name)
         {
             if (_occurrenceMetadata.TryGetValue(name, out var known)) return known;
-            try { known = (Convert.ToString(Value.MetaDataProperties.GetPropertyByName(name)) ?? "").Trim(); }
+            try
+            {
+                // VisAutomation returns metadata through [out] VARIANT*, not
+                // a retval. Omitting it made every native identity read fail.
+                object property;
+                Value.MetaDataProperties.GetPropertyByName(name, out property);
+                known = (Convert.ToString(property) ?? "").Trim();
+            }
             catch { known = ""; }
             return _occurrenceMetadata[name] = known;
         }
-        public string ModelId { get { try { return Convert.ToString(Value.MetaDataProperties.GetPropertyByName("itemId")) ?? ""; } catch { return ""; } } }
+        public string ModelId => ReadOccurrenceMetadata("itemId");
         public IReadOnlyList<IVisMockupNode> Children => GetChildren(int.MaxValue);
         public int ChildCount
         {

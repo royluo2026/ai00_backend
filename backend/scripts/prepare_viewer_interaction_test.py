@@ -16,6 +16,10 @@ TABLES = frozenset('test_workmanship_sim_' + name for name in (
 
 
 EVIDENCE_TABLES = frozenset({'test_workmanship_sim_viewer_grant_evidence'})
+CACHE_TABLES = frozenset('test_workmanship_sim_cloud_cache_'+name for name in ('batches','tasks','nodes','receipts'))
+CACHE_VERSION_TABLES = frozenset({'test_workmanship_sim_cloud_cache_versions'})
+def selected_tables(migration_id):
+    return {'0028':TABLES,'0029':EVIDENCE_TABLES,'0030':CACHE_TABLES,'0031':CACHE_VERSION_TABLES}[migration_id]
 
 
 def validate_test_sql(sql, tables=TABLES):
@@ -33,14 +37,14 @@ def validate_test_sql(sql, tables=TABLES):
 
 
 def test_migration(migration_id='0028'):
-    if migration_id not in {'0028', '0029'}:
+    if migration_id not in {'0028', '0029', '0030', '0031'}:
         raise ValueError('test_migration_scope_invalid')
     manifest = load_domain_manifests(ROOT / 'backend/capability_v2/official_domains.json').require('simulation')
     migration = next(m for m in discover_domain_migrations(ROOT, manifest) if m.migration_id == migration_id)
     # Fixed target prefix; no option can select production tables. The checksum
     # stays the canonical 0028 checksum used by the standard migration ledger.
     sql = re.sub(r'(?<![A-Za-z0-9_])workmanship_', 'test_workmanship_', migration.sql)
-    validate_test_sql(sql, TABLES if migration_id == '0028' else EVIDENCE_TABLES)
+    validate_test_sql(sql, selected_tables(migration_id))
     return manifest, replace(migration, sql=sql)
 
 
@@ -49,12 +53,12 @@ def main(argv=None):
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument('--check', action='store_true')
     mode.add_argument('--apply', action='store_true')
-    parser.add_argument('--migration', choices=('0028', '0029'), default='0028')
+    parser.add_argument('--migration', choices=('0028', '0029', '0030', '0031'), default='0028')
     parser.add_argument('--env-file', type=Path, help='Same backend .env as run_current_test_backend.py (USERS_DB_URL)')
     args = parser.parse_args(argv)
     manifest, migration = test_migration(args.migration)
     print('migration=' + args.migration + ' prefix=test_ checksum=' + migration.checksum)
-    print('tables=' + ','.join(sorted(TABLES if args.migration == '0028' else EVIDENCE_TABLES)) + '; ledger=test_ai00_simulation_schema_migrations')
+    print('tables=' + ','.join(sorted(selected_tables(args.migration))) + '; ledger=test_ai00_simulation_schema_migrations')
     if args.check:
         print(migration.sql)
         return 0

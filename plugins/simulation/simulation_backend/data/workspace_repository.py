@@ -239,8 +239,48 @@ class WorkspaceRepository:
                                      request_hash=request_hash, response=result)
         return result
 
+    def bind_cache_source(self, *, workspace_gid: str, expected_workspace_version: int,
+                          binding: Mapping[str, Any], manifest: Mapping[str, Any], display_name: str,
+                          insertion_instance_id: str, tenant_gid: str, actor_gid: str) -> dict[str, Any]:
+        """Persist a validated immutable snapshot identity, never a synthetic file artifact."""
+        workspace_gid = _gid(workspace_gid, "workspace_gid")
+        tenant_gid, actor_gid = _gid(tenant_gid, "tenant_gid"), _gid(actor_gid, "actor_gid")
+        envelope = {"cache_binding": dict(binding), "project_gid": manifest["project_gid"],
+                    "source_selector": manifest.get("source_selector"), "insertion_instance_id": insertion_instance_id}
+        encoded = json.dumps(envelope, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        identity_hash = hashlib.sha256(encoded.encode()).hexdigest()
+        key = "cache-source-" + insertion_instance_id
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            workspace = self._lock_owned_workspace(cursor, workspace_gid=workspace_gid,
+                tenant_gid=tenant_gid, actor_gid=actor_gid, expected_row_version=expected_workspace_version)
+            request_hash, replay = self._idempotency_begin(cursor, workspace_gid=workspace_gid,
+                idempotency_key=key, request={"op": "bind_cache_source", "source": envelope, "display_name": display_name})
+            if replay is not None:
+                return replay
+            cursor.execute("SELECT gid FROM workmanship_sim_vm_documents WHERE workspace_gid=%s "
+                "AND primary_slot=1 AND removed_at IS NULL FOR UPDATE", (workspace_gid,))
+            role = "inserted" if cursor.fetchone() else "primary"
+            cursor.execute("SELECT COALESCE(MAX(sort_order),-1)+1 AS position FROM workmanship_sim_vm_documents "
+                "WHERE workspace_gid=%s AND removed_at IS NULL", (workspace_gid,))
+            position = int((cursor.fetchone() or {}).get("position") or 0)
+            document_gid = str(next_gid())
+            cursor.execute("INSERT INTO workmanship_sim_vm_documents "
+                "(gid,workspace_gid,tenant_gid,owner_gid,document_role,primary_slot,display_name,media_type,"
+                "artifact_ref_json,content_sha256,portability,sort_order,source_kind,source_identity_hash,status,row_version) "
+                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,'','portable',%s,%s,%s,'active',1)",
+                (document_gid,workspace_gid,tenant_gid,actor_gid,role,1 if role == "primary" else None,
+                 display_name,"application/vnd.siemens.teamcenter.visualization-document",encoded,position,
+                 "teamcenter_cache_snapshot",identity_hash))
+            version, cache_hash = self._advance_workspace_revision(cursor, workspace_gid=workspace_gid,
+                current=workspace, patch={"op":"bind_cache_source","document_gid":document_gid,"cache_binding":dict(binding)})
+            result = {"document_gid":document_gid,"workspace_gid":workspace_gid,"role":role,"row_version":1,
+                      "workspace_row_version":version,"cache_revision_hash":cache_hash}
+            self._idempotency_finish(cursor, workspace_gid=workspace_gid,idempotency_key=key,
+                                    request_hash=request_hash,response=result)
+        return result
+
     def search_model_documents(self, *, workspace_gid: str, tenant_gid: str,
-                               actor_gid: str) -> dict[str, Any]:
+                               actor_gid: str, include_cache_binding: bool = False) -> dict[str, Any]:
         workspace_gid = _gid(workspace_gid, "workspace_gid")
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             cursor.execute(
@@ -274,7 +314,11 @@ class WorkspaceRepository:
                     row[key] = str(row[key])
             artifact = row.pop("artifact_ref_json", None)
             # Online registrations store a source envelope here, not a downloadable artifact.
-            row["artifact_ref"] = None if row["source_kind"] == "teamcenter_online" else (
+            is_cache = row["source_kind"] == "teamcenter_cache_snapshot"
+            if include_cache_binding:
+                envelope = json.loads(artifact) if isinstance(artifact, str) else artifact
+                row["cache_binding"] = envelope.get("cache_binding") if is_cache and isinstance(envelope, dict) else None
+            row["artifact_ref"] = None if row["source_kind"] in {"teamcenter_online", "teamcenter_cache_snapshot"} else (
                 json.loads(artifact) if isinstance(artifact, str) else artifact)
             metadata = online_by_document.get(str(row["document_gid"]), {})
             row.update({key: metadata.get(key) for key in ("online_source_gid", "source_selector_json",
@@ -301,6 +345,16 @@ class WorkspaceRepository:
                 idempotency_key=idempotency_key, request={"op": "remove_model_document", "document_gid": document_gid})
             if replay is not None:
                 return replay
+            cursor.execute(
+                "SELECT document_role AS role FROM workmanship_sim_vm_documents "
+                "WHERE gid=%s AND workspace_gid=%s AND tenant_gid=%s AND removed_at IS NULL FOR UPDATE",
+                (document_gid, workspace_gid, tenant_gid),
+            )
+            document = cursor.fetchone()
+            if not document:
+                raise WorkspaceRepositoryError("model_document_not_found")
+            if document["role"] != "inserted":
+                raise WorkspaceRepositoryError("primary_model_document_protected")
             cursor.execute(
                 "UPDATE workmanship_sim_vm_documents SET removed_at=NOW(6),primary_slot=NULL,row_version=row_version+1,updated_at=NOW(6) "
                 "WHERE gid=%s AND workspace_gid=%s AND tenant_gid=%s AND removed_at IS NULL",
@@ -509,8 +563,9 @@ class WorkspaceRepository:
                 position = sibling_positions.get(parent_source, 0); sibling_positions[parent_source] = position + 1
                 node_rows.append((node_map[item["source_gid"]], workspace_gid, tenant_gid, actor_gid,
                                   hierarchy_gid, node_map.get(parent_source), item["node_type"],
-                                  item["name"], position, item["source_gid"]))
-            node_insert = "INSERT INTO workmanship_sim_workspace_nodes (gid,workspace_gid,tenant_gid,owner_gid,hierarchy_gid,parent_gid,node_type,name,sort_order,source_bop_node_gid,row_version) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,1)"
+                                  item["name"], position, item["source_gid"], 1))
+            # PyMySQL batches only placeholder-only VALUES; a literal 1 falls back to per-row queries.
+            node_insert = "INSERT INTO workmanship_sim_workspace_nodes (gid,workspace_gid,tenant_gid,owner_gid,hierarchy_gid,parent_gid,node_type,name,sort_order,source_bop_node_gid,row_version) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
             for offset in range(0, len(node_rows), 500):
                 cursor.executemany(node_insert, node_rows[offset:offset + 500])
             next_version, cache_hash = self._advance_workspace_revision(cursor, workspace_gid=workspace_gid,
@@ -1304,13 +1359,19 @@ class WorkspaceRepository:
                 return None
             return self._live_document_bound_result(cursor, binding, tenant_gid=scope[0], actor_gid=scope[1])
 
+    def bind_cache_live_document(self, **request):
+        """Bind a verified cache open without converting its pinned source."""
+        if not request.get('launch_operation_id') or request.get('complete_binding') is None:
+            raise WorkspaceRepositoryError('completion_context_invalid')
+        return self.bind_online_live_document(**request, _cache_open=True)
+
     def bind_online_live_document(self, *, workspace_gid: str, document_gid: str,
                                   tenant_gid: str, actor_gid: str,
                                   connector_device_id: str | None = None, document_session: str | None = None,
                                   source_identity_hash: str | None = None,
                                   expected_workspace_row_version: int,
                                   idempotency_key: str, launch_operation_id: str | None = None,
-                                  now=None, session_nonce=None, complete_binding=None) -> dict[str, Any]:
+                                  now=None, session_nonce=None, complete_binding=None, _cache_open=False) -> dict[str, Any]:
         """Bind one attested native session to its immutable Teamcenter source document.
 
         This is deliberately not an import or a source conversion.  The online document
@@ -1338,7 +1399,7 @@ class WorkspaceRepository:
                 if not launch_operation_id or not session_nonce:
                     raise WorkspaceRepositoryError('completion_context_invalid')
                 request_hash, replay = self._idempotency_begin(cursor, workspace_gid=workspace_gid,
-                    idempotency_key=idempotency_key, request=dict(op='bind_online_live_document_v3',
+                    idempotency_key=idempotency_key, request=dict(op='bind_cache_live_document_v1' if _cache_open else 'bind_online_live_document_v3',
                         document_gid=document_gid, launch_operation_id=launch_operation_id,
                         expected_workspace_row_version=expected_workspace_row_version, session_nonce=session_nonce))
                 if replay is not None:
@@ -1346,8 +1407,9 @@ class WorkspaceRepository:
             opened = None
             if launch_operation_id is not None:
                 from .connector_repository import SimulationConnectorRepository
-                opened = SimulationConnectorRepository.verified_teamcenter_opened_source_evidence(
-                    cursor, launch_operation_id, actor_id=actor_gid, tenant_id=tenant_gid, now=now)
+                from ..application.cache_open_evidence import locked_cache_open_evidence
+                verify_open = locked_cache_open_evidence if _cache_open else SimulationConnectorRepository.verified_teamcenter_opened_source_evidence
+                opened = verify_open(cursor, launch_operation_id, actor_id=actor_gid, tenant_id=tenant_gid, now=now)
                 connector_device_id, document_session = opened['connector_device_id'], opened['document_session']
                 source_identity_hash = opened['source_identity_hash']
             source_hash = _sha256_body(source_identity_hash, 'source_identity_hash')
@@ -1367,16 +1429,27 @@ class WorkspaceRepository:
             if int(workspace["row_version"]) != int(expected_workspace_row_version):
                 raise WorkspaceRepositoryError("version_conflict")
             cursor.execute(
-                "SELECT source_kind,content_sha256,connector_device_id,row_version FROM "
+                "SELECT source_kind,artifact_ref_json,content_sha256,connector_device_id,row_version FROM "
                 "workmanship_sim_vm_documents WHERE gid=%s AND workspace_gid=%s AND tenant_gid=%s "
-                "AND owner_gid=%s AND document_role='primary' AND removed_at IS NULL FOR UPDATE",
+                "AND owner_gid=%s AND document_role IN ('primary','inserted') AND removed_at IS NULL FOR UPDATE",
                 (document_gid, workspace_gid, tenant_gid, actor_gid),
             )
             document = cursor.fetchone()
-            if not document or str(document.get("source_kind") or "") != "teamcenter_online":
-                raise WorkspaceRepositoryError("online_model_document_not_found")
-            if _sha256_body(document.get("content_sha256"), "content_sha256") != source_hash:
-                raise WorkspaceRepositoryError("online_source_identity_mismatch")
+            if not document or document.get('source_kind') != ('teamcenter_cache_snapshot' if _cache_open else 'teamcenter_online'):
+                raise WorkspaceRepositoryError('cache_model_document_not_found' if _cache_open else 'online_model_document_not_found')
+            if _cache_open:
+                envelope = document.get('artifact_ref_json') or {}
+                envelope = json.loads(envelope) if isinstance(envelope, str) else dict(envelope)
+                if not isinstance(envelope, dict) or envelope.get('cache_binding') != opened['cache_binding']:
+                    raise WorkspaceRepositoryError('cache_source_identity_mismatch')
+                if 'tc_open_payload' in opened:
+                    for key in ('artifact_ref','package_dependencies'):envelope.pop(key,None)
+                    envelope.update(tc_open_payload=opened['tc_open_payload'],package_hash=opened['package_hash'])
+                else:
+                    envelope.pop('tc_open_payload',None)
+                    envelope.update({key: opened[key] for key in ('artifact_ref', 'package_dependencies', 'package_hash')})
+            elif _sha256_body(document.get('content_sha256'), 'content_sha256') != source_hash:
+                raise WorkspaceRepositoryError('online_source_identity_mismatch')
             cursor.execute(
                 "SELECT session_identity_hash,workspace_gid,connector_device_id,document_session,state FROM "
                 "workmanship_sim_live_document_bindings WHERE tenant_gid=%s AND actor_gid=%s "
@@ -1418,6 +1491,11 @@ class WorkspaceRepository:
                     (connector_device_id, document_session, *scope),
                 )
 
+            if _cache_open and document.get('content_sha256') != source_hash:
+                already_bound = False
+            if _cache_open:
+                cursor.execute('UPDATE workmanship_sim_vm_documents SET artifact_ref_json=%s,content_sha256=%s WHERE gid=%s',
+                    (json.dumps(envelope, ensure_ascii=False, sort_keys=True, separators=(',', ':')), source_hash, document_gid))
             if already_bound:
                 next_version = int(workspace["row_version"])
                 cache_hash = str(workspace.get("cache_revision_hash") or _EMPTY_CACHE_REVISION_HASH)
@@ -1431,7 +1509,7 @@ class WorkspaceRepository:
                     raise WorkspaceRepositoryError("version_conflict")
                 next_version, cache_hash = self._advance_workspace_revision(
                     cursor, workspace_gid=workspace_gid, current=workspace,
-                    patch={"op": "bind_online_live_document", "document_gid": document_gid,
+                    patch={"op": "bind_cache_live_document" if _cache_open else "bind_online_live_document", "document_gid": document_gid,
                            "session_identity_hash": scope[2], "source_identity_hash": source_hash},
                 )
             result = {
@@ -1485,7 +1563,7 @@ class WorkspaceRepository:
             if int(workspace['row_version']) != int(expected_workspace_row_version):
                 raise WorkspaceRepositoryError('version_conflict')
             cursor.execute('SELECT source_kind,content_sha256,connector_device_id FROM workmanship_sim_vm_documents '
-                "WHERE gid=%s AND workspace_gid=%s AND tenant_gid=%s AND owner_gid=%s AND document_role='primary' "
+                "WHERE gid=%s AND workspace_gid=%s AND tenant_gid=%s AND owner_gid=%s AND document_role IN ('primary','inserted') "
                 'AND removed_at IS NULL FOR UPDATE',
                 (document_gid, workspace_gid, tenant_gid, actor_gid))
             document = cursor.fetchone()

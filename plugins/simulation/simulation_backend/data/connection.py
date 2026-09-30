@@ -55,6 +55,9 @@ def _get_pool():
 def get_simulation_conn():
     conn = wrap_connection(_get_pool().connection())
     try:
+        # Start explicitly: OceanBase sessions can still report autocommit=1
+        # after PyMySQL's autocommit=False, which would release page/counter locks.
+        conn.begin()
         yield conn
         conn.commit()
     except Exception:
@@ -66,4 +69,10 @@ def get_simulation_conn():
 
 def open_simulation_transaction():
     """Return an uncommitted connection whose lifecycle belongs to the Gateway."""
-    return wrap_connection(_get_pool().connection())
+    conn = wrap_connection(_get_pool().connection())
+    try:
+        conn.begin()
+    except Exception:
+        conn.close()
+        raise
+    return conn

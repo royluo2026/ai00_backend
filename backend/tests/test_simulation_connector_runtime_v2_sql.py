@@ -1333,6 +1333,9 @@ def test_replacement_terminates_queued_plan_without_rebinding_and_audits(databas
         cur.execute("SELECT runtime_instance_id,reason FROM workmanship_sim_connector_runtime_audit "
             "WHERE device_id=%s AND plan_id=%s AND event_type='plan_failed_without_effect'", (device, plan.plan_id))
         assert cur.fetchone() == {"runtime_instance_id": old.runtime_instance_id, "reason": "runtime_session_replaced_before_lease"}
+    repository=SimulationConnectorRepository()
+    assert repository.cache_read_interrupted_before_lease(plan.plan_id,plan.actor_id,plan.tenant_id)
+    assert not repository.cache_read_interrupted_before_lease(plan.plan_id,'other',plan.tenant_id)
     with pytest.raises(ConnectorRepositoryError, match="plan_session_mismatch"):
         SimulationConnectorRepository().insert_v2_plan(plan, new.session_token, now)
     with pytest.raises(ConnectorRepositoryError, match="plan_session_mismatch"):

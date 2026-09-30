@@ -49,6 +49,9 @@ _VISMOCKUP_WEB_WORKFLOWS = {
 }
 
 _TEAMCENTER_BUSINESS_EFFECTS = {
+    "simulation.teamcenter.model_file.fetch": "Acquire one exact cached JT ImanFile through FMS and publish verified immutable bytes without opening a viewer.",
+    "simulation.teamcenter.model_files.size.preflight": "Read the byte sizes of up to eight exact cached Teamcenter ImanFiles before bounded JT acquisition.",
+    "simulation.teamcenter.model_cache.read": "Read one TC cache page pinned to the authenticated TC principal, preserving every returned raw property field and read state.",
     "simulation.teamcenter.node_properties.read.request": "Queue a read of the fixed display-property projection for one exact Teamcenter occurrence, preferring the current principal's local Connector cache.",
     "simulation.teamcenter.node_properties.read": "Return the fixed display-property projection for one exact Teamcenter occurrence with source identity, capture time and authoritative cache-hit evidence.",
     "simulation.teamcenter.product_structure.children.read.request": "Queue a read-only generation-pinned page of direct children for one exact Teamcenter source and occurrence path.",
@@ -171,6 +174,10 @@ _RESOURCES = {
     "simulation.environment.model_document.add": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.model_document.remove": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.online_source.bind": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.cache_source.materialization.inspect": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.cache_source.open.request": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.cache_source.bind": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.cache_source.live_document.bind": (("simulation-workspace", "workspace_gid"),),
     "simulation.product_structure.observation.begin": (("simulation-workspace", "workspace_gid"),),
     "simulation.product_structure.observation.page.append": (),
     "simulation.product_structure.observation.publish": (),
@@ -922,6 +929,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                        "simulation.vismockup.document.hierarchy_inventory.read.request"} or "live_document" in governed.tags:
         from backend.capability_v2.identity import DESKTOP_CONSUMER_ID
         effects = {
+            "simulation.environment.cache_source.live_document.bind": "Bind the exact frozen-cache package and returned native document identity without changing the cached source.",
             "simulation.vismockup.document.identity.read.request": "Queue one signed read identifying the active native document on the owner's current App workstation.",
             "simulation.vismockup.document.existing_identity.read.request": "Select an already-open VisMockup document by exact native session and persist its signed identity in the current App runtime.",
             "simulation.vismockup.document.hierarchy_inventory.read.request": "Queue one signed bounded read of alternate hierarchies from an exact active document session.",
@@ -1108,6 +1116,267 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                     'tables':[*updates['transaction_policy']['tables'], 'workmanship_sim_viewer_interaction_grants', 'workmanship_sim_viewer_grant_evidence'],
                     'migration_refs':[*updates['transaction_policy']['migration_refs'], 'backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql'],
                     'idempotency':'workspace/key plus launch operation/document/expected revision/Main nonce; immutable replay, nonce conflict rejected'})
+    if governed.id == 'simulation.environment.cache_source.live_document.bind':
+        updates.update(
+            concurrency_policy='expected_version', expected_version_payload_path='expected_workspace_row_version',
+            business_effect='Atomically bind an attested frozen-cache package open and issue its exact document interaction grant.',
+            business_acceptance_criteria=(
+                'The completed signed open receipt matches the pinned cache batch, package and current owner runtime.',
+                'The cache source is preserved; no online selector or independent active-window identity is substituted.',
+                'Binding, source association, revision, signed grant proof and immutable idempotent result commit together.'),
+            business_invariants=(BusinessInvariantContract(rule_id='simulation.viewer.cache_open_receipt',version=1,
+                statement='A cached source association requires a verified signed package-open receipt matching its immutable batch identity.',
+                applies_when='a cached model document is bound for local interaction',
+                enforcement_ref='plugins/simulation/simulation_backend/application/cache_open_evidence.py',
+                error_code='cache_open_evidence_unavailable',
+                test_refs=('plugins/simulation/tests/test_cache_open_evidence.py',)),),
+            no_business_invariant_reason=None,
+            test_refs=({'path':'plugins/simulation/tests/test_cache_open_evidence.py'},),
+            transaction_policy={**updates['transaction_policy'],
+                'atomicity':'cache binding/package/association/workspace revision/grant proof/idempotent completion in one transaction',
+                'tables':['workmanship_sim_workspaces','workmanship_sim_vm_documents','workmanship_sim_live_document_bindings',
+                    'workmanship_sim_connector_runtime_plans','workmanship_sim_connector_runtime_devices',
+                    'workmanship_sim_viewer_source_associations','workmanship_sim_viewer_interaction_grants',
+                    'workmanship_sim_viewer_grant_evidence','workmanship_sim_workspace_idempotency'],
+                'migration_refs':['backend/db/migrations/domains/simulation/0028_viewer_interaction.sql',
+                    'backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql'],
+                'dependencies':['vismockup.model.open@3'],
+                'idempotency':'workspace/key plus exact cache open operation/document/revision/Main nonce'})
+    if governed.id == 'simulation.teamcenter.model_cache.read':
+        bulk=governed.version==2
+        updates.update(
+            exposure=ExposurePolicy(local_runtime=True),
+            timeout_seconds=600,
+            lifecycle_status=LifecycleStatus.EXPERIMENTAL,
+            consumer_refs=({'consumer_id':'simulation.model_cache.advance','consumer_type':'worker','version_constraint':'==1'},),
+            business_acceptance_criteria=(
+                'Only a signed read-only Connector execution plan invokes this atom.',
+                'The expected TC principal, source selector and occurrence path remain fixed throughout the read.',
+                'Raw TC fields preserve object identity, field names, JSON values and unavailable/null read states.'),
+            business_invariants=(BusinessInvariantContract(rule_id='simulation.model_cache.principal_pinned',version=1,
+                statement='Every page belongs to the same TC principal and Connector device as the durable batch.',
+                applies_when='a shared cache reads a TC page',
+                enforcement_ref='local-runtime/src/Ai00.Connector.Adapters.VisMockup/TeamcenterBulkModelCache.cs:ReadModelCacheV2Async' if bulk else 'local-runtime/src/Ai00.Connector.Adapters.VisMockup/TeamcenterModelCache.cs:ReadModelCacheAsync',
+                error_code='cache_principal_changed',test_refs=('plugins/simulation/tests/test_cloud_model_cache.py::test_principal_change_rolls_back',)),),
+            no_business_invariant_reason=None,
+            test_refs=({'path':'local-runtime/tests/Ai00.Connector.Tests/TeamcenterBulkModelCacheTests.cs'}, {'path':'local-runtime/tests/teamcenter_bulk_cache.test.cjs'}) if bulk else ({'path':'plugins/simulation/tests/test_cloud_model_cache.py'},),
+            transaction_policy={'owner':'simulation','atomicity':'read-only TC access; principal-scoped local SQLite staging; complete durable topology and replay-stable property pages' if bulk else 'read-only TC access; principal-scoped local SQLite cache',
+                'dependencies':['teamcenter.product_structure.children.read@1'],
+                'contract_refs':[f'docs/contracts/teamcenter.model_cache.read@{governed.version}.json']},
+            domain_errors=(DomainErrorContract(code='cache_principal_changed',meaning='TC login changed; start a new batch.'),),
+            domain_errors_complete=False)
+        if bulk:
+            updates.update(business_effect=governed.description,
+                execution_budget={**descriptor.execution_budget.model_dump(),'max_output_bytes':16*1024*1024,'memory_class':'large','collection_policy':'paged','max_page_size':500},
+                business_acceptance_criteria=(*updates['business_acceptance_criteria'],
+                    'Each new durable capture reads a fresh configured BOM; repeated occurrence instances preserve exact parent paths.',
+                    'A saved page replays identical bytes without TC; unfinished blocks rebuild and compare the full topology after reconnection.',
+                    'Native and escaped output pages obey independent byte limits; unavailable optional fields retain explicit states.'))
+    if governed.id.startswith('simulation.model_cache.'):
+        from .cloud_model_cache import WORKER_ID
+        from backend.capability_v2.identity import DESKTOP_CONSUMER_ID
+        advance = governed.id.endswith('.advance')
+        control = governed.id.endswith('.control')
+        updates.update(
+            exposure=ExposurePolicy(web=not advance, worker=advance),
+            timeout_seconds=600 if advance else 300 if governed.id.endswith('.query') else 30,
+            execution_budget={**descriptor.execution_budget.model_dump(),
+                'memory_class':'medium' if advance or governed.id.endswith('.query') else 'small',
+                'max_parallel_per_consumer':1 if advance else 2,
+                'max_parallel_per_tenant':4 if advance else 8,
+                'max_output_bytes':32*1024*1024 if governed.id.endswith('.query') else 4*1024*1024,
+                'collection_policy':'paged' if governed.id.endswith(('.query','.list')) else 'bounded',
+                'max_page_size':500 if governed.id.endswith(('.query','.list')) else None},
+            delegation_policy='none', execution_mode=ExecutionMode.CLOUD_SYNC,
+            authorization_policy='simulation.model_cache:trusted_super_admin_trigger_project_scoped_read',
+            business_effect=governed.description,
+            side_effects='Persist shared cache metadata and deterministic read-only TC work; never modify TC.' if is_write else 'Return authorized project cache metadata and bounded full-value rows.',
+            consumer_refs=({'consumer_id':WORKER_ID if advance else DESKTOP_CONSUMER_ID,'consumer_type':'worker' if advance else 'web','version_constraint':'==1'},),
+            business_acceptance_criteria=(
+                'Only trusted super_admin can trigger/control; scheduled and project-manager triggers remain disabled.',
+                'Cloud writes enlist their open Simulation transaction with Gateway Outcome and audit persistence.',
+                'Each project/data-stage batch receives its v1/v2 label from a locked server counter; callers cannot name it.',
+                'One tenant/project/selector batch persists all actual TC business return fields with their original types.',
+                'A page receipt, node rows and continuation work commit atomically; retries never restart accepted pages.',
+                'Generation mismatch requires a new batch; incomplete/paused/failed batches cannot be consumed as complete snapshots.',
+                'Search and AND/OR filters run across the whole persisted batch, independent of UI page size.'),
+            business_invariants=(BusinessInvariantContract(rule_id='simulation.model_cache.atomic_checkpoint',version=1,
+                statement='Accepted TC pages and their durable continuations are atomic, deduplicated and source/generation pinned.',
+                applies_when='cache advances a durable read-only TC task',
+                enforcement_ref='plugins/simulation/simulation_backend/data/cloud_model_cache_repository.py:apply_result',
+                error_code='cache_generation_stale',test_refs=('plugins/simulation/tests/test_cloud_model_cache.py::test_generation_mismatch_rolls_back_page',)),),
+            test_refs=({'path':'plugins/simulation/tests/test_cloud_model_cache.py'},{'path':'plugins/simulation/tests/test_cloud_model_cache_gateway.py'},{'path':'plugins/simulation/tests/test_cloud_model_cache_bulk.py'}),
+            domain_errors=tuple(DomainErrorContract(code=code,meaning=meaning,retryable=code in ('cache_version_conflict',),is_caller_error=code in ('cache_filter_invalid','cache_trigger_disabled')) for code,meaning in (
+                ('cache_trigger_forbidden','Only trusted super_admin may trigger or control.'),('cache_actor_mismatch','Worker actor must be the original trigger actor.'),
+                ('cache_project_forbidden','Actor cannot read this project.'),('cache_not_found','Batch is absent in this tenant.'),
+                ('cache_version_conflict','Reload the batch before changing its state.'),('cache_state_invalid','The requested state transition is unavailable.'),
+                ('cache_generation_stale','Pinned sibling generation changed; create a new batch.'),('cache_source_mismatch','TC returned a different selector digest.'),
+                ('cache_sensitive_field_rejected','Transport secrets cannot enter the shared cache.'),('cache_page_invalid','TC page violates the durable task contract.'),
+                ('cache_receipt_conflict','An accepted page has conflicting contents.'),('cache_filter_invalid','Use a supported typed filter.'),
+                ('cache_node_limit','The bounded batch node budget is exhausted.'),('cache_page_too_large','The TC page exceeds the governed byte limit.'),
+                ('cache_idempotency_conflict','An existing creation key refers to different input.'),('cache_trigger_disabled','Scheduled triggering is reserved and disabled.'))),
+            domain_errors_complete=False,
+            concurrency_policy='expected_version' if control else 'none',
+            expected_version_payload_path='expected_version' if control else None,
+            idempotency_policy='required' if is_write else 'none',
+            consistency_policy='strong',evidence_policy='required',
+            replay_data_policy='projected' if is_write and not advance else 'metadata_only',
+            transaction_policy={'mode':'provider','boundary':'simulation','atomicity':'batch lock; accepted node page, receipt and durable continuation commit together',
+                'outcome_enlistment':'Gateway commits or rolls back the shared open transaction; rejected TC pages roll back to repository savepoints.',
+                'tables':['workmanship_sim_cloud_cache_batches','workmanship_sim_cloud_cache_tasks','workmanship_sim_cloud_cache_nodes','workmanship_sim_cloud_cache_receipts','workmanship_sim_cloud_cache_versions','workmanship_sim_cloud_cache_manifests'],
+                'migration_refs':['backend/db/migrations/domains/simulation/0030_cloud_model_cache.sql','backend/db/migrations/domains/simulation/0031_cloud_model_cache_versions.sql','backend/db/migrations/domains/simulation/0032_cloud_model_cache_snapshot_coverage.sql','backend/db/migrations/domains/simulation/0033_cloud_model_cache_pinned_query.sql'],
+                'dependencies':['simulation.teamcenter.model_cache.read@1','simulation.teamcenter.model_cache.read@2','project.project.read.atomic.projects_get@2'],
+                'idempotency':'tenant/actor/create key; batch/task/attempt deterministic signed plan; task receipt/body hash',
+                'recovery':'worker reuses admitted operation after restart; stale generation is terminal; super_admin resumes auth/transient failures'},
+            automation_level=AutomationLevel.A2 if advance or not is_write else AutomationLevel.A1)
+        if governed.id=='simulation.model_cache.query' and governed.version==2:
+            updates.update(
+                side_effects='Return the authorized fixed completed snapshot; never query current TC, mutate snapshots or download model files.',
+                business_acceptance_criteria=(
+                    'Roots and children read bounded indexed structure rows without scanning full property bags, including cold legacy snapshots.',
+                    'Node details come from the same batch, with original read states and exact geometry references.',
+                    'Only completed batches can be consumed; pinned generation/hash and cursor scope mismatches fail explicitly.',
+                    'Legacy unknown hashes and spatial semantics remain unknown; completion is distinct from downloaded JT readiness.'),
+                business_invariants=(BusinessInvariantContract(rule_id='simulation.model_cache.fixed_snapshot',version=1,
+                    statement='Every returned node belongs to the requested authorized completed batch and pinned identity; no latest or live fallback.',
+                    applies_when='a consumer reads an explicit completed cache source',
+                    enforcement_ref='plugins/simulation/simulation_backend/data/cloud_model_cache_snapshot.py:read',
+                    error_code='cache_snapshot_mismatch',test_refs=('plugins/simulation/tests/test_cloud_model_cache_pinned.py::test_unready_missing_and_mismatched_snapshots_fail_explicitly',)),),
+                test_refs=({'path':'plugins/simulation/tests/test_cloud_model_cache_pinned.py'},),
+                domain_errors=updates['domain_errors']+tuple(DomainErrorContract(code=code,meaning=meaning,retryable=False,is_caller_error=False) for code,meaning in (
+                    ('cache_snapshot_not_ready','Only completed batches can be bound.'),('cache_snapshot_mismatch','The fixed content digest differs.'),
+                    ('cache_snapshot_hash_unavailable','The requested content digest cannot be verified.'),('cache_cursor_invalid','Cursor binding or shape is invalid.'),
+                    ('cache_node_not_found','Node is absent from this batch.'),('cache_snapshot_unindexed','This snapshot lacks the requested indexed position.'))))
+    if governed.id in ('simulation.environment.cache_source.materialization.inspect','simulation.environment.cache_source.open.request'):
+        from backend.capability_v2.identity import DESKTOP_CONSUMER_ID
+        opening=governed.id.endswith('open.request')
+        updates.update(exposure=ExposurePolicy(web=True), timeout_seconds=600,
+            authorization_policy='simulation.workspace:owner_cache_materialization',
+            business_effect=governed.description,
+            side_effects='Admit one exact native open from prepared shared TC metadata; the current client downloads missing JT through TC/FMS and reports local file proofs. No JT upload or OIS JT artifact is created.' if opening else 'Read prepared fixed cache structure and exact TC file references; no native effect or JT transfer.',
+            consumer_refs=({'consumer_id':DESKTOP_CONSUMER_ID,'consumer_type':'web','version_constraint':'==1'},),
+            concurrency_policy='expected_version' if opening else 'none',
+            expected_version_payload_path='expected_workspace_row_version' if opening else None,
+            idempotency_policy='required' if opening else 'none', consistency_policy='strong',evidence_policy='required',
+            execution_budget={**descriptor.execution_budget.model_dump(),'max_output_bytes':8*1024*1024,'memory_class':'large',
+                'collection_policy':'paged' if not opening else 'bounded','max_page_size':500 if not opening else None},
+            business_acceptance_criteria=(
+                'Only the owned document fixed cache identity supplies nodes and geometry; request bodies cannot supply nodes, artifact receipts or spatial authority.',
+                'When root_node_key is supplied, only that exact occurrence and its descendants supply geometry and file requests; unknown keys fail without widening to the document.',
+                'Original logical groups remain mapped; unsupported own geometry is explicitly excluded and valid geometry uses frozen absolute transforms with documented server-owned spatial evidence.',
+                'Each included JT is resolved on the current client from the exact pinned TC file reference and attested by its signed local SHA256/size proof; no JT upload occurs.',
+                'Package and native receipt use canonical V2 hashes; request replay never opens a second document.'),
+            business_invariants=(BusinessInvariantContract(rule_id='simulation.cache_source.exact_materialization',version=1,
+                statement='The assembly description, TC dependencies and node map come only from prepared project-authorized fixed cache metadata; file readiness remains client-local.',
+                applies_when='a cache source is inspected or opened',
+                enforcement_ref='plugins/simulation/simulation_backend/capabilities/cache_tc_open.py:TcCacheSourceOpenProvider',
+                error_code='cache_materialization_changed',test_refs=('plugins/simulation/tests/test_cache_tc_open.py',)),),
+            no_business_invariant_reason=None,test_refs=({'path':'plugins/simulation/tests/test_cache_tc_open.py'},{'path':'plugins/simulation/tests/test_cache_preparation_store.py'}),
+            transaction_policy={'owner':'simulation','mode':'provider' if opening else 'read_only','boundary':'simulation',
+                'atomicity':'owner workspace lock and idempotent response enlist in Gateway Outcome; deterministic queue admission is independently durable and recovered by exact plan identity',
+                'tables':['workmanship_sim_workspaces','workmanship_sim_vm_documents','workmanship_sim_workspace_idempotency','workmanship_sim_connector_runtime_plans'],
+                'migration_refs':['backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql','backend/db/migrations/domains/simulation/0036_cache_assembly_preparation.sql','backend/db/migrations/domains/simulation/0037_cache_assembly_preparation_chunks.sql'],
+                'dependencies':['simulation.model_cache.query@2','vismockup.model.open@3'],
+                'idempotency':'workspace/request key and exact normalized input; replay returns original operation/package/node map'},
+            domain_errors_complete=False)
+    if governed.id == 'simulation.environment.cache_source.bind':
+        updates.update(
+            business_effect='Associate one explicitly selected completed project-cache snapshot with a Simulation model document.',
+            business_acceptance_criteria=(
+                'The caller can read the selected project batch and owns the target workspace.',
+                'Batch, generation, schema and available digest are validated before persistence; no latest-batch substitution.',
+                'The binding is source metadata, not a file Artifact or a VisMockup runtime session.'),
+            concurrency_policy='expected_version', expected_version_payload_path='expected_row_version',
+            test_refs=({'path':'plugins/simulation/tests/test_cache_source_binding.py'},),
+            transaction_policy={'mode':'provider','boundary':'simulation',
+                'atomicity':'document binding, workspace revision and idempotency receipt commit together',
+                'tables':['workmanship_sim_vm_documents','workmanship_sim_workspaces','workmanship_sim_workspace_idempotency'],
+                'migration_refs':['backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql'],
+                'dependencies':['simulation.model_cache.query@2'],
+                'recovery':'reuse the same insertion identity; never substitute another batch'})
+    cache_visualization_version=(
+        governed.id=='simulation.teamcenter.visualization.launch.request' and governed.version==3
+        or governed.id=='simulation.teamcenter.visualization.insert.request' and governed.version==2)
+    if cache_visualization_version:
+        from backend.capability_v2.identity import DESKTOP_CONSUMER_ID
+        updates.update(
+            authorization_policy='simulation.model_cache:project_scoped_completed_node_open',
+            business_effect=('Resolve one completed cloud-cache node to its exact Teamcenter ItemRevision and '
+                'queue one native Visualization open or insert; JT bytes remain in FMS/FCC.'),
+            resource_selectors=(
+                ResourceSelector(resource_type='simulation-model-cache-batch',payload_path='cache_source.batch_id',required=False),
+                ResourceSelector(resource_type='simulation-model-cache-node',payload_path='cache_source.node_key',required=False),
+                ResourceSelector(resource_type='teamcenter-endpoint',payload_path='source_selector.endpoint_id',required=False),
+                ResourceSelector(resource_type='teamcenter-online-source',payload_path='source_selector.object_uid',required=False),
+            ),
+            consumer_refs=({'consumer_id':DESKTOP_CONSUMER_ID,'consumer_type':'web',
+                'version_constraint':'==1'},),
+            business_acceptance_criteria=(
+                'A cache-bound request reads one completed tenant/project-scoped batch and one exact node.',
+                'The browser cannot submit the resolved ItemRevision UID in the cache_source branch.',
+                'One request queues exactly one existing Teamcenter Visualization operation.',
+                'The normal path performs no product search, BOM traversal, property read, JT file fetch or OIS upload.',
+            ),
+            business_invariants=(BusinessInvariantContract(
+                rule_id='simulation.model_cache.visualization_exact_node',version=1,
+                statement='A cache-bound Visualization root is the exact ItemRevision stored on the selected completed cache node.',
+                applies_when='a model-file tree node is opened or inserted from the cloud cache',
+                enforcement_ref='plugins/simulation/simulation_backend/capabilities/connector_runtime.py:_resolve_cache_visualization_source',
+                error_code='cache_source_identity_missing',
+                test_refs=('plugins/simulation/tests/test_viewer_interaction_provider.py::test_cache_bound_launch_resolves_server_identity_and_queues_one_native_launch',)),),
+            no_business_invariant_reason=None,
+            test_refs=({'path':'plugins/simulation/tests/test_viewer_interaction_provider.py'},
+                {'path':'plugins/simulation/tests/test_cloud_model_cache.py'},
+                {'path':'packages/sim-plugin/web/cad_sim/teamcenter_lazy_tree.test.js'}),
+            transaction_policy={'mode':'external','boundary':'simulation_and_teamcenter_visualization',
+                'atomicity':'Read the fixed cache identity before deterministic signed Connector queue admission; the viewer effect is confirmed by the existing signed receipt.',
+                'tables':['workmanship_sim_cloud_cache_batches','workmanship_sim_cloud_cache_nodes','workmanship_sim_connector_runtime_plans'],
+                'dependencies':['simulation.model_cache.query@2','teamcenter.visualization.launch@2','teamcenter.visualization.insert@1'],
+                'recovery':'Retry the same deterministic admission key; never fall back to product search, Latest, or the document root.'},
+            domain_errors=tuple(updates['domain_errors'])+tuple(DomainErrorContract(code=code,meaning=code,retryable=False,
+                is_caller_error=code in {'cache_source_forbidden','cache_source_node_not_found','cache_source_identity_missing','cache_source_stale'})
+                for code in ('cache_source_not_ready','cache_source_forbidden','cache_source_node_not_found','cache_source_identity_missing','cache_source_stale')),
+            domain_errors_complete=False,
+        )
+    if governed.id in ('simulation.model_cache.file.fetch.request','simulation.model_cache.file.fetch.result','simulation.teamcenter.model_file.fetch',
+        'simulation.model_cache.file.fetch.batch.request','simulation.model_cache.file.fetch.batch.result','simulation.teamcenter.model_files.size.preflight'):
+        from backend.capability_v2.identity import DESKTOP_CONSUMER_ID
+        local=governed.execution=='local'
+        updates.update(
+            exposure=ExposurePolicy(local_runtime=True) if local else ExposurePolicy(web=True),
+            timeout_seconds=600 if local else 30,
+            authorization_policy='simulation.model_cache:project_scoped_exact_file_read',
+            business_effect=governed.description,
+            side_effects=('Read exact ImanFile sizes for preflighted cache members; do not fetch file contents or open the viewer.' if governed.id=='simulation.teamcenter.model_files.size.preflight' else
+                'Read an exact TC ImanFile and publish immutable verified bytes through Base ArtifactService; no BOM rebuild or viewer open.' if local else
+                'Admit or read a bounded actor/tenant-bound signed file batch; preserve the pinned snapshot and separate per-file artifacts.' if '.batch.' in governed.id else
+                'Admit or read an actor/tenant-bound deterministic signed file acquisition plan; preserve completed cache snapshots.'),
+            consumer_refs=({'consumer_id':'simulation.model_cache.file.fetch.batch.request' if governed.id=='simulation.teamcenter.model_files.size.preflight' else 'simulation.model_cache.file.fetch.request','consumer_type':'worker','version_constraint':'==1'},) if local else ({'consumer_id':DESKTOP_CONSUMER_ID,'consumer_type':'web','version_constraint':'==1'},),
+            business_acceptance_criteria=(
+                'Only exact JT references present in the authorized completed node snapshot may be acquired; arbitrary file identifiers and latest revision fallback fail.',
+                'A batch contains at most eight unique members; Teamcenter size preflight rejects multi-file totals above 100 MiB; a single JT may be up to 512 MiB.',
+                'The signed result binds each member step to the batch/generation/hash, node/revision/file reference, artifact SHA-256 and byte length.',
+                'Bytes acquired now are distinguished from bytes captured with the original cache; captured_bytes_verified stays false.',
+                'Each JT remains a separate artifact mediated by its signed leased step and Base ArtifactService; acquisition never opens a viewer.'),
+            business_invariants=(BusinessInvariantContract(rule_id='simulation.model_cache.file_membership',version=1,
+                statement='The exact file reference and result belong to the fixed completed snapshot and admitted request.',
+                applies_when='a cache consumer requests or reads JT acquisition',
+                enforcement_ref='plugins/simulation/simulation_backend/capabilities/cloud_model_cache_files.py:member',
+                error_code='cache_file_not_referenced',test_refs=('plugins/simulation/tests/test_cache_file_materialization.py',)),),
+            no_business_invariant_reason=None,
+            test_refs=({'path':'plugins/simulation/tests/test_cache_file_materialization.py'},{'path':'local-runtime/tests/Ai00.Connector.Tests/TeamcenterModelFileTests.cs'},{'path':'local-runtime/tests/teamcenter_cache_file.test.cjs'}),
+            transaction_policy={'owner':'simulation','mode':'provider' if is_write and not local else 'read_only',
+                'atomicity':'Gateway Outcome enlists the open Simulation read transaction; signed queue admission uses its existing deterministic idempotent transaction and survives replay.',
+                'tables':['workmanship_sim_cloud_cache_batches','workmanship_sim_cloud_cache_nodes','workmanship_sim_connector_runtime_plans'],
+                'dependencies':['simulation.model_cache.query@2','simulation.teamcenter.model_file.fetch@1','simulation.teamcenter.model_files.size.preflight@1','Base ArtifactService'],
+                'contract_refs':['docs/contracts/teamcenter.model_file.fetch@1.json','docs/contracts/teamcenter.model_files.size.preflight@1.json',
+                    *(['docs/contracts/simulation.model_cache.file.fetch.batch.request@1.json','docs/contracts/simulation.model_cache.file.fetch.batch.result@1.json'] if '.batch.' in governed.id else [])],
+                'recovery':'Retry the same deterministic admission key; unknown artifact publication is not claimed to have no effect.'},
+            idempotency_policy='required' if is_write else 'none',
+            consistency_policy='strong',evidence_policy='required',
+            replay_data_policy='projected' if is_write else 'metadata_only',
+            domain_errors=tuple(DomainErrorContract(code=code,meaning=code) for code in ('cache_file_not_referenced','cache_file_references_unavailable','cache_file_operation_not_found','cache_file_operation_mismatch','cache_file_result_invalid','cache_file_content_mismatch','cache_file_batch_size_invalid','cache_file_batch_duplicate_member','cache_file_batch_member_invalid','cache_file_batch_size_exceeded','cache_project_forbidden','cache_snapshot_not_ready','cache_generation_stale','cache_snapshot_mismatch','connector_offline','cache_file_integrity_failed')),
+            domain_errors_complete=False)
     return CapabilityDescriptorV2.model_validate({**descriptor.model_dump(), **updates})
 
 

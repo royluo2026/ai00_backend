@@ -1,0 +1,9 @@
+-- Batch-plan binding index only; every exposed file is still revalidated from
+-- the device-signed plan and Outcome. No plan or Outcome JSON is rewritten.
+ALTER TABLE workmanship_sim_connector_runtime_plans
+ ADD COLUMN IF NOT EXISTS cache_file_batch_plan VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin GENERATED ALWAYS AS (CASE WHEN JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.capability_id'))='simulation.model_cache.file.fetch.batch.request' AND JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].operation_id'))='teamcenter.model_files.size.preflight@1' THEN NULLIF(JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].payload.identity.batch_id')),'null') ELSE NULL END) STORED;
+ALTER TABLE workmanship_sim_connector_runtime_plans
+ ADD COLUMN IF NOT EXISTS cache_file_batch_generation VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin GENERATED ALWAYS AS (CASE WHEN JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.capability_id'))='simulation.model_cache.file.fetch.batch.request' AND JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].operation_id'))='teamcenter.model_files.size.preflight@1' THEN NULLIF(JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].payload.identity.generation')),'null') ELSE NULL END) STORED;
+ALTER TABLE workmanship_sim_connector_runtime_plans
+ ADD COLUMN IF NOT EXISTS cache_file_batch_snapshot_hash VARCHAR(71) CHARACTER SET ascii COLLATE ascii_bin GENERATED ALWAYS AS (CASE WHEN JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.capability_id'))='simulation.model_cache.file.fetch.batch.request' AND JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].operation_id'))='teamcenter.model_files.size.preflight@1' THEN NULLIF(JSON_UNQUOTE(JSON_EXTRACT(plan_json,'$.steps[0].payload.identity.snapshot_hash')),'null') ELSE NULL END) STORED;
+CREATE INDEX IF NOT EXISTS ix_cache_file_batch_receipts ON workmanship_sim_connector_runtime_plans(tenant_gid,actor_gid,cache_file_batch_plan,cache_file_batch_generation,cache_file_batch_snapshot_hash,status,plan_id);

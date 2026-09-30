@@ -1,0 +1,270 @@
+{
+  "id": "vismockup.model.open@2",
+  "input": {
+    "type": "object",
+    "properties": {
+      "artifact_ref": {
+        "type": "object",
+        "properties": {
+          "artifact_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "media_type": {
+            "type": "string",
+            "enum": [
+              "model/jt",
+              "model/plmxml",
+              "application/vnd.siemens.plmxml+xml",
+              "model/step",
+              "image/png"
+            ]
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "byte_size": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_id",
+          "media_type",
+          "sha256",
+          "byte_size",
+          "version"
+        ]
+      },
+      "package_dependencies": {
+        "type": "array",
+        "maxItems": 10000,
+        "items": {
+          "type": "object",
+          "properties": {
+            "package_path": {
+              "type": "string",
+              "pattern": "^dependencies/[A-Za-z0-9_.-]+[.]jt$"
+            },
+            "artifact_ref": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "media_type": {
+                  "type": "string",
+                  "enum": [
+                    "model/jt",
+                    "model/plmxml",
+                    "application/vnd.siemens.plmxml+xml",
+                    "model/step",
+                    "image/png"
+                  ]
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "byte_size": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "artifact_id",
+                "media_type",
+                "sha256",
+                "byte_size",
+                "version"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "package_path",
+            "artifact_ref"
+          ]
+        }
+      },
+      "cache_binding": {
+        "type": "object",
+        "properties": {
+          "batch_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "generation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "snapshot_hash": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          },
+          "schema_version": {
+            "type": "integer",
+            "const": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "batch_id",
+          "generation",
+          "snapshot_hash",
+          "schema_version"
+        ]
+      },
+      "package_hash": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "artifact_ref",
+      "cache_binding",
+      "package_hash"
+    ]
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "protocol": {
+        "type": "string",
+        "const": "ai00.viewer.opened-cache.v1"
+      },
+      "cache_binding": {
+        "type": "object",
+        "properties": {
+          "batch_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "generation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "snapshot_hash": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          },
+          "schema_version": {
+            "type": "integer",
+            "const": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "batch_id",
+          "generation",
+          "snapshot_hash",
+          "schema_version"
+        ]
+      },
+      "package_hash": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "artifact_ref": {
+        "type": "object",
+        "properties": {
+          "artifact_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "media_type": {
+            "type": "string",
+            "enum": [
+              "model/jt",
+              "model/plmxml",
+              "application/vnd.siemens.plmxml+xml",
+              "model/step",
+              "image/png"
+            ]
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "byte_size": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_id",
+          "media_type",
+          "sha256",
+          "byte_size",
+          "version"
+        ]
+      },
+      "document_identity": {
+        "type": "object",
+        "properties": {
+          "document_session": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "process_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "process_started_utc_ticks": {
+            "type": "string",
+            "pattern": "^[0-9]+$"
+          },
+          "document_handle": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "document_session",
+          "process_id",
+          "process_started_utc_ticks",
+          "document_handle"
+        ]
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "protocol",
+      "cache_binding",
+      "package_hash",
+      "artifact_ref",
+      "document_identity"
+    ]
+  }
+}

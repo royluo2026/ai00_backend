@@ -27,10 +27,15 @@ public static class Program
             using var singleton=new FileStream(Path.Combine(root,$"host{stateSuffix}.lock"),FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);
             using var sta=new StaDispatcher();
             var com=new BreakawayVisMockupCom(verified.Manifest.VisMockupExecutable,verified.Manifest.VisMockupPublisher);
+            var reconnected=await sta.InvokeAsync(com.TryReconnectExistingApplication);
+            Console.Error.WriteLine($"AI00_VISMOCKUP_STARTUP_RECONNECT:{reconnected}");
             var teamcenter=TeamcenterReadOnlyRuntime.CreateInstalled(root,options.Development);
             var adapter=new VisMockupAdapter(sta,new AllowedPathPolicy([Path.Combine(root,"artifacts")]),com,
                 Path.Combine(root,"captures"),Path.Combine(root,$"vismockup-tree-cache{stateSuffix}.db"),teamcenter);
             using var http=new HttpClient(new HttpClientHandler{AllowAutoRedirect=false,UseCookies=false}){Timeout=TimeSpan.FromSeconds(30)};
+            // Large JT uploads retain the plan/session cancellation budget;
+            // ordinary control requests and screenshots keep their short timeout.
+            using var artifactHttp=new HttpClient(new HttpClientHandler{AllowAutoRedirect=false,UseCookies=false}){Timeout=TimeSpan.FromMinutes(10)};
             var builder=Host.CreateApplicationBuilder(new HostApplicationBuilderSettings{Args=[],DisableDefaults=true});
             builder.Logging.ClearProviders();
 #if DEBUG
@@ -41,16 +46,21 @@ public static class Program
             builder.Services.AddSingleton<DiagnosticPipeHost>();
             builder.Services.AddHostedService(s=>s.GetRequiredService<DiagnosticPipeHost>());
             RegisterTeamcenterRuntime(builder.Services,teamcenter);
+            builder.Services.AddSingleton<LocalOpenCancellation>();
             builder.Services.AddHostedService<TeamcenterControlPipeHost>();
-            builder.Services.AddSingleton(new RuntimeTransport(http,options.GatewayOrigin));
+            builder.Services.AddSingleton(new RuntimeTransport(http,options.GatewayOrigin,artifactHttp));
             builder.Services.AddSingleton<IAppArtifactMaterializer>(services=>new AppArtifactMaterializer(
                 services.GetRequiredService<RuntimeTransport>(),Path.Combine(root,"artifacts")));
             builder.Services.AddSingleton<IAppCaptureUploader>(services=>new AppCaptureUploader(
-                services.GetRequiredService<RuntimeTransport>(),Path.Combine(root,"captures")));
+                services.GetRequiredService<RuntimeTransport>(),Path.Combine(root,"captures"),Path.Combine(root,"teamcenter-model-files")));
             builder.Services.AddSingleton(key);builder.Services.AddSingleton(new AppCredentialStore(root,options.GatewayOrigin));
             builder.Services.AddSingleton(new AppPlanJournal(Path.Combine(root,$"execution{stateSuffix}.v2.journal")));
             builder.Services.AddSingleton(adapter);builder.Services.AddSingleton(new PostConditionProbes(sta,com,adapter));
             var viewerGate=new ViewerExecutionGate();
+            var viewerLog=new ViewerDiagnosticLog(Path.Combine(root,"logs","viewer-interaction.jsonl"));
+            viewerLog.Write("runtime_started",new{development=options.Development});
+            adapter.ViewerDiagnostic=viewerLog.Write;
+            teamcenter.Diagnostic=viewerLog.Write;
             var viewerSession=new ViewerInteractionSession();
             var viewerContext=new ViewerInteractionRuntimeContext();
             var viewerJournal=new ViewerInteractionJournal(Path.Combine(root,$"viewer-interaction{stateSuffix}.v1.journal"));
@@ -60,7 +70,7 @@ public static class Program
             builder.Services.AddSingleton(viewerGate);builder.Services.AddSingleton(viewerSession);
             builder.Services.AddSingleton(viewerContext);builder.Services.AddSingleton(viewerJournal);
             builder.Services.AddSingleton(new ViewerInteractionExecutor(viewerSession,viewerContext,viewerGate,viewerJournal,
-                (operation,hash)=>adapter.Manifest.Supports(operation,hash),adapter.ExecuteViewerNodeAsync));
+                (operation,hash)=>adapter.Manifest.Supports(operation,hash),adapter.ExecuteViewerNodeAsync,diagnostic:viewerLog.Write));
             // Main owns the default-off UI feature flag. This channel cannot dispatch
             // until a server-signed grant is installed for the authenticated runtime.
             builder.Services.AddHostedService<ViewerInteractionPipeHost>();

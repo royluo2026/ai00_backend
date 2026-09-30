@@ -28,6 +28,11 @@ public sealed class BreakawayVisMockupCom(string executable,string publisher):IV
     public VisMockupProcessState InspectProcess()=>inner.InspectProcess();
     public bool TryGetActiveApplication(out IVisMockupApplication? application)=>inner.TryGetActiveApplication(out application);
     public bool TryAttachExistingApplication(out IVisMockupApplication? application)=>inner.TryAttachExistingApplication(out application);
+    public bool TryReconnectExistingApplication()
+    {
+        _ = new VisMockupBreakawayLauncher(executable,publisher).Verify();
+        return inner.TryReconnectExistingApplication();
+    }
     public void Launch()
     {
         _ = new VisMockupBreakawayLauncher(executable,publisher).Verify();

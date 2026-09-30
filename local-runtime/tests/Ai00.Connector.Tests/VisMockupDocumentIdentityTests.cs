@@ -18,10 +18,12 @@ public sealed class VisMockupDocumentIdentityTests
         public Action<int>? OnInspect;
         public int Connections, Inspections;
         public bool Available = true;
+        public bool RequireAttachment, Attached;
         public VisMockupProcessState InspectProcess()
         {
             Assert.Equal(ApartmentState.STA, Thread.CurrentThread.GetApartmentState());
             OnInspect?.Invoke(++Inspections);
+            if (RequireAttachment && !Attached) return new(false, "14.2");
             return Process;
         }
         public bool TryGetActiveApplication(out IVisMockupApplication? application)
@@ -32,6 +34,12 @@ public sealed class VisMockupDocumentIdentityTests
             return Available;
         }
         public void Launch() => throw new Exception("must not launch");
+        public bool TryAttachExistingApplication(out IVisMockupApplication? application)
+        {
+            Attached = Available;
+            application = Available ? Application : null;
+            return Available;
+        }
         public IVisMockupApplication WaitForActiveApplication(TimeSpan timeout) => throw new Exception("must not wait");
     }
 
@@ -40,6 +48,17 @@ public sealed class VisMockupDocumentIdentityTests
     private static async Task<JsonElement> Read(VisMockupAdapter adapter, CancellationToken token = default) =>
         JsonSerializer.SerializeToElement((await adapter.ExecuteAsync(new(Operation,
             JsonSerializer.SerializeToElement(new { })), token)).Data);
+
+    [Fact]
+    public async Task FreshConnectorAttachesExistingApplicationBeforeReadingProcessIdentity()
+    {
+        using var sta = new StaDispatcher();
+        var com = new IdentityCom { RequireAttachment = true };
+        var result = await Read(Adapter(sta, com));
+        Assert.True(com.Attached);
+        Assert.Equal(123, result.GetProperty("process_id").GetInt32());
+        Assert.Equal(0, com.Application.OpenCalls);
+    }
 
     [Fact]
     public async Task ExistingIdentityOperationSelectsExactAlreadyOpenDocument()

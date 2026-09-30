@@ -50,12 +50,13 @@ public sealed class FakeApplication(string productVersion, IVisMockupDocument? a
     public IReadOnlyList<IVisMockupDocument> OpenDocuments { get; set; } = activeDocument is null ? [] : [activeDocument];
     public FakeDocument? LastOpenedDocument { get; private set; }
     public int OpenCalls { get; private set; }
+    public Func<string,FakeDocument>? DocumentFactory { get; set; }
     public IVisMockupDocument OpenDocument(string path)
     {
         OpenCalls++;
-        LastOpenedDocument = new FakeDocument(Path.GetFullPath(path), Path.GetFullPath(path), FakeNode.FlatTree(1));
+        LastOpenedDocument = DocumentFactory?.Invoke(path) ?? new FakeDocument(Path.GetFullPath(path), Path.GetFullPath(path), FakeNode.FlatTree(1));
         ActiveDocument = LastOpenedDocument;
-        OpenDocuments = [LastOpenedDocument];
+        OpenDocuments = [.. OpenDocuments, LastOpenedDocument];
         return LastOpenedDocument;
     }
     public void CloseAllDocuments()
@@ -99,6 +100,12 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
     public bool Closed { get; private set; }
     public List<bool> VisibilityChanges { get; } = [];
     public int SetNodeVisibleCalls { get; private set; }
+    public List<(string[] Keys,bool Visible)> BatchVisibilityWrites { get; } = [];
+    public void SetNodesVisible(IReadOnlyList<string> keys,bool visible)
+    {
+        BatchVisibilityWrites.Add((keys.ToArray(),visible));
+        foreach(var key in keys)SetNodeVisible(key,visible);
+    }
     public int SetNodeSelectedCalls { get; private set; }
     public int FindNodeByKeyCalls { get; private set; }
     public Action? AfterNodeLookup { get; set; }
@@ -116,11 +123,18 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
         return node;
     }
     public IVisMockupNode FindNodeByCadId(string cadId) => CadNodes[cadId];
+    public IReadOnlyList<IVisMockupNode> GetAllNodes(int maximum)
+    {
+        if(RuntimeNodes.Count>maximum)throw new Ai00.Connector.Contracts.ConnectorNoEffectException("viewer_mapping_budget_exceeded");
+        return RuntimeNodes.Values.ToArray();
+    }
     public Exception? SetNodeVisibleError { get; set; }
     public bool ApplyVisibilityBeforeThrow { get; set; }
     public Exception? SetNodeSelectedError { get; set; }
     public IReadOnlyList<string> InsertedDocumentPaths => _insertedDocumentPaths;
     public int InsertDocumentCalls { get; private set; }
+    public Action<string>? AfterInsertDocument { get; set; }
+    public Action<string>? AfterDeleteInsertedDocument { get; set; }
     public CaptureProfile Profile { get; private set; } = new("png", 1, 1, "current");
     public IReadOnlyCollection<string> AllNodeKeys => Traverse().Select(item => item.NodeKey).ToArray();
     public IReadOnlyCollection<string> VisibleNodeKeys => _visible.ToArray();
@@ -163,7 +177,14 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
         InsertDocumentCalls++;
         var fullPath = Path.GetFullPath(path);
         _insertedDocumentPaths.Add(fullPath);
+        AfterInsertDocument?.Invoke(fullPath);
         return fullPath;
+    }
+    public void DeleteInsertedDocument(int index)
+    {
+        var path=_insertedDocumentPaths[index];
+        _insertedDocumentPaths.RemoveAt(index);
+        AfterDeleteInsertedDocument?.Invoke(path);
     }
     public void CaptureImage(string path)
     {
@@ -181,7 +202,19 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
         File.WriteAllText(path, ExportPlmxmlByHierarchy.GetValueOrDefault(hierarchyIndex)
             ?? ExportPlmxmlContent ?? $"<PLMXML hierarchy=\"{hierarchyIndex}\"/>");
     }
-    public void SetAllNodesVisible(bool visible) => VisibilityChanges.Add(visible);
+    public Exception? SetAllNodesVisibleError { get; set; }
+    public Action? AfterAllNodesVisibilityWrite { get; set; }
+    public void SetAllNodesVisible(bool visible)
+    {
+        VisibilityChanges.Add(visible);
+        foreach (var node in RuntimeNodes.Values)
+        {
+            if (visible) _visible.Add(node.NodeKey); else _visible.Remove(node.NodeKey);
+            if (node is FakeNode fakeNode) fakeNode.IsVisible = visible;
+        }
+        AfterAllNodesVisibilityWrite?.Invoke();
+        if (SetAllNodesVisibleError is not null) throw SetAllNodesVisibleError;
+    }
     public void Close() => Closed = true;
     private static Dictionary<string, IVisMockupNode> IndexNodes(IVisMockupNode root)
     {
@@ -214,6 +247,7 @@ public sealed record FakeNode(
     IReadOnlyList<IVisMockupNode> Children) : IVisMockupNode
 {
     public string CadId { get; init; } = "";
+    public IReadOnlyList<double> GlobalTransform { get; set; } = new double[]{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1};
     public bool IsVisible { get; set; }
     public static IVisMockupNode FlatTree(int count)
     {

@@ -12,7 +12,8 @@ OPERATION_CAPABILITIES = {
 
 
 AUTHORIZATION_ISSUERS = frozenset({('simulation.viewer.interaction.authorize', 1),
-    ('simulation.environment.online_source.live_document.bind', 3)})
+    ('simulation.environment.online_source.live_document.bind', 3),
+    ('simulation.environment.cache_source.live_document.bind', 1)})
 
 
 def catalog_binding(context, operations, *, issuer=('simulation.viewer.interaction.authorize', 1)):

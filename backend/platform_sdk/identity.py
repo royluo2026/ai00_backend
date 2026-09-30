@@ -22,6 +22,17 @@ def get_user_summaries(user_gids) -> dict[str, dict]:
     return {str(row["gid"]): dict(row) for row in rows}
 
 
+def get_active_identity_profile(user_gid: str) -> dict | None:
+    """Minimal Base-owned identity projection for trusted background consumers."""
+    from .effective_identity import derive_org_role
+    with get_conn() as conn, conn.cursor() as cur:
+        cur.execute('SELECT gid,team_id,system_role,is_active FROM workmanship_auth_users WHERE gid=%s AND is_active=1', (user_gid,))
+        row = cur.fetchone()
+    if not row:
+        return None
+    return dict(row, org_role=derive_org_role(row['system_role']))
+
+
 def get_active_team_member_gids(team_gid: str) -> tuple[str, ...]:
     team = str(team_gid or "").strip()
     if not team:

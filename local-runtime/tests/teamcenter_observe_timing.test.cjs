@@ -10,6 +10,7 @@ const lines = [];
 let now = 0;
 const context = {
   request: { command: 'observe' },
+  persistent: false,
   Java: { type: name => ({
     'java.lang.System': { nanoTime: () => now, getProperty: () => 'TEMP' },
     'java.lang.ProcessHandle': { current: () => ({ pid: () => 123 }) },
@@ -32,4 +33,17 @@ context.request.command = 'children';
 context.observationTiming('failed_line', 230);
 assert.equal(lines.length, 3, 'lazy children SDK failures need safe local diagnostics too');
 assert.deepEqual(JSON.parse(lines[2]), { stage: 'failed_line', elapsed_ms: 42000, count: 230 });
+context.request.command = 'cache_structure';
+context.observationTiming('cache_structure_ready_done', 10000);
+assert.equal(lines.length, 4, 'bulk structure reads need timing evidence');
+assert.equal(JSON.parse(lines[3]).count, 10000);
+context.request.command = 'cache_properties';
+context.observationTiming('cache_properties_done', 200);
+assert.equal(lines.length, 5, 'bulk property reads need timing evidence');
+context.observationTiming('cache_structure_errors',1,[{codes:[214000],messages:['read denied'],object_uid:'denied',object_type:'Dataset',levels:[3]}]);
+assert.equal(JSON.parse(lines[5]).detail[0].object_uid,'denied');
+vm.runInContext(source.slice(source.indexOf('function serviceErrors('),source.indexOf('function loaded(')),context);
+context.Java.from=value=>value;
+const denied=context.serviceErrors({sizeOfPartialErrors:()=>1,getPartialError:()=>({getCodes:()=>[214000],getMessages:()=>['read denied'],getLevels:()=>[3],hasAssociatedObject:()=>true,getAssociatedObject:()=>({getUid:()=> 'denied',getTypeObject:()=>({getName:()=> 'Dataset'})})})});
+assert.equal(denied[0].object_uid,'denied');
 console.log('observation timing passed');

@@ -13,9 +13,9 @@ namespace Ai00.Connector.Adapters.VisMockup;
 
 public static class TeamcenterReadOnlyPolicy
 {
-    public static readonly string[] WorkerCommands = ["status", "revision_rules", "search", "observe", "launch", "children", "node_properties"];
+    public static readonly string[] WorkerCommands = ["status", "revision_rules", "search", "observe", "launch", "children", "node_properties", "node_properties_raw", "cache_file_preflight"];
     public static readonly string[] AllowedServiceTokens =
-        ["login", "logout", "loadObjects", "getItemFromId", "getProperties", "getRevisionRules", "getSavedQueries", "executeSavedQueries", "createBOMWindows", "expandPSAllLevels", "expandPSOneLevel", "closeBOMWindows", "expandGRMRelationsForPrimary", "createLaunchInfo"];
+        ["login", "logout", "setObjectPropertyPolicy", "loadObjects", "getItemFromId", "getProperties", "getRevisionRules", "getSavedQueries", "executeSavedQueries", "createBOMWindows", "expandPSAllLevels", "expandPSOneLevel", "closeBOMWindows", "expandGRMRelationsForPrimary", "createLaunchInfo"];
     public static readonly string[] ForbiddenServiceTokens =
         ["setProperties", "saveBOMWindows", "createObjects", "deleteObjects", "setDatasetFile", "getFileWriteTickets", "commitDatasetFiles"];
 }
@@ -110,6 +110,13 @@ public sealed record TeamcenterSessionStatus(string State, string MaskedUsername
 
 public interface ITeamcenterWorker
 {
+    Task<JsonElement> ReadCacheBulkAsync(string command,object payload,string username,string password,CancellationToken ct)=>
+        Task.FromException<JsonElement>(new ConnectorException("teamcenter_runtime_unavailable"));
+    Task<TeamcenterChildrenBatch> ReadCacheChildrenAsync(TeamcenterSourceSelector selector,TeamcenterOccurrenceEdge[] path,
+        string username,string password,CancellationToken ct,bool refresh)=>ReadChildrenAsync(selector,path,username,password,ct);
+    Task<JsonElement> ReadRawNodePropertiesAsync(TeamcenterSourceSelector selector,
+        TeamcenterOccurrenceEdge[] path,string username,string password,CancellationToken ct) =>
+        Task.FromException<JsonElement>(new ConnectorException("teamcenter_runtime_unavailable"));
     Task<TeamcenterNodePropertiesResult> ReadNodePropertiesAsync(TeamcenterSourceSelector selector,
         TeamcenterOccurrenceEdge[] path, string username, string password, CancellationToken ct) =>
         Task.FromException<TeamcenterNodePropertiesResult>(new ConnectorException("teamcenter_runtime_unavailable"));
@@ -141,6 +148,11 @@ public sealed partial class TeamcenterReadOnlyRuntime : IDisposable
     private long sessionGeneration;
     private CancellationTokenSource sessionCancellation = new();
     private bool disposed;
+
+    public Action<string,object>? Diagnostic
+    {
+        set{if(worker is TeamcenterProcessWorker process)process.Diagnostic=value;}
+    }
 
     public TeamcenterReadOnlyRuntime(ITeamcenterWorker worker, string cachePath,
         TeamcenterRememberedLoginStore? rememberedLogin = null)
@@ -667,15 +679,30 @@ internal sealed class UnavailableTeamcenterWorker : ITeamcenterWorker
 public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, string launcherPath,
     IReadOnlyList<string> classpath, string visualizationMaterialRoot) : ITeamcenterWorker, ITeamcenterVisualizationLifecycle
 {
+    private readonly TeamcenterReadOnlySession reads=new(()=>Process.Start(CreateStartInfo(javaPath,scriptPath,classpath))
+        ??throw new ConnectorException("teamcenter_worker_start_failed"));
+    public Action<string,object>? Diagnostic {set=>reads.Diagnostic=value;}
     private readonly TeamcenterVisualizationSession visualization = new(
         () => Process.Start(CreateStartInfo(javaPath, launcherPath, classpath))
             ?? throw new ConnectorException("teamcenter_worker_start_failed"), visualizationMaterialRoot);
     bool ITeamcenterVisualizationLifecycle.IsReady(long generation) => visualization.IsReady(generation);
-    Task ITeamcenterVisualizationLifecycle.StartAsync(long generation, string endpointId, string username,
-        string password, CancellationToken ct) => visualization.StartAsync(generation, endpointId, username, password, ct);
-    void ITeamcenterVisualizationLifecycle.Invalidate(long generation) => visualization.Invalidate(generation);
-    Task ITeamcenterVisualizationLifecycle.StopAsync(long generation, CancellationToken ct) => visualization.StopAsync(generation, ct);
+    async Task ITeamcenterVisualizationLifecycle.StartAsync(long generation, string endpointId, string username,
+        string password, CancellationToken ct) {await visualization.StartAsync(generation, endpointId, username, password, ct);reads.Activate(generation);}
+    void ITeamcenterVisualizationLifecycle.Invalidate(long generation) {reads.Invalidate(generation);visualization.Invalidate(generation);}
+    async Task ITeamcenterVisualizationLifecycle.StopAsync(long generation, CancellationToken ct)
+    {await Task.WhenAll(reads.StopAsync(generation),visualization.StopAsync(generation,ct));}
     private const string VisualizationProtocolPrefix = "AI00_TC_VIS_V1:";
+    public Task<JsonElement> ReadCacheBulkAsync(string command,object payload,string username,string password,CancellationToken ct)=>
+        reads.RunAsync(command,payload,username,password,ct);
+    public Task<JsonElement> ReadRawNodePropertiesAsync(TeamcenterSourceSelector selector,
+        TeamcenterOccurrenceEdge[] path,string username,string password,CancellationToken ct) =>
+        reads.RunAsync("node_properties_raw",new{source_selector=selector,occurrence_path=path},username,password,ct);
+    public async Task<TeamcenterChildrenBatch> ReadCacheChildrenAsync(TeamcenterSourceSelector selector,TeamcenterOccurrenceEdge[] path,
+        string username,string password,CancellationToken ct,bool refresh)
+    {
+        var result=await reads.RunAsync("children",new{source_selector=selector,parent_path=path,refresh},username,password,ct);
+        return result.Deserialize<TeamcenterChildrenBatch>()??throw new ConnectorException("teamcenter_worker_response_invalid");
+    }
     public async Task<TeamcenterNodePropertiesResult> ReadNodePropertiesAsync(
         TeamcenterSourceSelector selector, TeamcenterOccurrenceEdge[] path,
         string username, string password, CancellationToken ct)
@@ -768,13 +795,14 @@ public sealed class TeamcenterProcessWorker(string javaPath, string scriptPath, 
             ?? throw new ConnectorException("teamcenter_worker_response_invalid");
     }
 
-    public async Task<TeamcenterLaunchResult> LaunchAsync(TeamcenterSourceSelector selector, string expectedVisdocUid,
+    public Task<TeamcenterLaunchResult> LaunchAsync(TeamcenterSourceSelector selector, string expectedVisdocUid,
         string username, string password, CancellationToken ct)
     {
-        var result = await RunScriptAsync(launcherPath, "launch", new { source_selector = selector,
-            expected_visdoc_uid = expectedVisdocUid, source_identity_hash = selector.IdentityHash }, username, password, ct);
-        return result.Deserialize<TeamcenterLaunchResult>(JsonOptions)
-            ?? throw new ConnectorException("teamcenter_worker_response_invalid");
+        ct.ThrowIfCancellationRequested();
+        // Retained ConsumeVisualizationAsync hands material to the guarded COM
+        // opener. The legacy Java launch path cannot prove document capacity.
+        return Task.FromException<TeamcenterLaunchResult>(
+            new ConnectorNoEffectException("vismockup_document_limit_unverifiable"));
     }
 
     public Task<TeamcenterLaunchResult> ConsumeVisualizationAsync(TeamcenterSourceSelector selector,

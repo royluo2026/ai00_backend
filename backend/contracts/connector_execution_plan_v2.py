@@ -22,6 +22,7 @@ P256_ORDER = 0xFFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551
 SAFE_INTEGER_MAX = (1 << 53) - 1
 # Every object/array counts, including the root as 1; scalars add no depth.
 MAX_JSON_DEPTH = 64
+SURROGATE_PATTERN = re.compile(r"[\ud800-\udfff]")
 
 IDENTITY_PATTERN = r"^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$"
 CAPABILITY_PATTERN = r"^[a-z][a-z0-9_.-]{2,127}$"
@@ -52,7 +53,7 @@ def _validate_json_depth(value: Any, depth: int = 0) -> None:
 
 def _validate_json(value: Any) -> Any:
     if value is None or isinstance(value, (str, bool)):
-        if isinstance(value, str) and any(0xD800 <= ord(char) <= 0xDFFF for char in value):
+        if isinstance(value, str) and SURROGATE_PATTERN.search(value) is not None:
             raise ValueError("json_surrogate_forbidden")
         return value
     if isinstance(value, int):

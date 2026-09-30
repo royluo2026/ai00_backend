@@ -111,8 +111,9 @@ public sealed class TeamcenterReadOnlyRuntimeTests
     [Fact]
     public void Policy_has_no_generic_or_persistent_write_operation()
     {
-        Assert.Equal(new[] { "status", "revision_rules", "search", "observe", "launch", "children", "node_properties" }, TeamcenterReadOnlyPolicy.WorkerCommands);
+        Assert.Equal(new[] { "status", "revision_rules", "search", "observe", "launch", "children", "node_properties", "node_properties_raw" }, TeamcenterReadOnlyPolicy.WorkerCommands);
         Assert.Contains("executeSavedQueries", TeamcenterReadOnlyPolicy.AllowedServiceTokens);
+        Assert.Contains("setObjectPropertyPolicy", TeamcenterReadOnlyPolicy.AllowedServiceTokens);
         Assert.DoesNotContain(TeamcenterReadOnlyPolicy.ForbiddenServiceTokens,
             token => TeamcenterReadOnlyPolicy.AllowedServiceTokens.Contains(token));
     }

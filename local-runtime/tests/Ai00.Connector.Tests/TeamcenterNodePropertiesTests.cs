@@ -8,6 +8,29 @@ namespace Ai00.Connector.Tests;
 
 public class TeamcenterNodePropertiesTests
 {
+    [Fact]
+    public async Task Cloud_cache_raw_values_are_durable_and_different_principal_cannot_resume()
+    {
+        var worker=new PropertyWorker();using var runtime=new TeamcenterReadOnlyRuntime(worker,Path.GetTempFileName());
+        await runtime.LoginAsync("tc-production","first","secret",default);
+        JsonElement Request(string? hash)=>JsonSerializer.SerializeToElement(new{kind="properties",read_payload_json=Input().GetRawText(),expected_principal_hash=hash});
+        var first=Assert.IsType<TeamcenterModelCacheResult>(await runtime.ReadModelCacheAsync(Request(null),default));
+        Assert.DoesNotContain("first",first.PrincipalHash);Assert.DoesNotContain("secret",first.ResultJson);
+        using var data=JsonDocument.Parse(first.ResultJson);
+        Assert.Equal("\"\"",data.RootElement.GetProperty("raw_fields")[0].GetProperty("value_json").GetString());
+        var references=data.RootElement.GetProperty("raw_fields")[1].GetProperty("value_json").GetString();
+        using var geometry=JsonDocument.Parse(references!);
+        Assert.Equal("file",geometry.RootElement[0].GetProperty("file_uid").GetString());
+        worker.FailIfCalled=true;
+        var second=Assert.IsType<TeamcenterModelCacheResult>(await runtime.ReadModelCacheAsync(Request(first.PrincipalHash),default));
+        Assert.True(JsonDocument.Parse(second.ResultJson).RootElement.GetProperty("cache_hit").GetBoolean());
+        Assert.Equal(references,JsonDocument.Parse(second.ResultJson).RootElement.GetProperty("raw_fields")[1].GetProperty("value_json").GetString());
+        await runtime.LoginAsync("tc-production","other","secret",default);
+        Assert.Equal("cache_principal_changed",(await Assert.ThrowsAsync<ConnectorException>(()=>runtime.ReadModelCacheAsync(Request(first.PrincipalHash),default))).Message);
+        using var sta=new StaDispatcher();var adapter=new VisMockupAdapter(sta,new AllowedPathPolicy([Path.GetTempPath()]),new FakeVisMockupCom(),Path.GetTempPath(),Path.GetTempFileName(),runtime);
+        using var contract=JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"teamcenter.model_cache.read@1.json")));
+        Assert.True(adapter.Manifest.Supports("teamcenter.model_cache.read@1",CanonicalJson.Hash(contract.RootElement)));
+    }
     private static readonly TeamcenterOccurrenceEdge[] ChildPath = [new("occ-1", "rev-child")];
 
     private static JsonElement Input(
@@ -179,6 +202,12 @@ public class TeamcenterNodePropertiesTests
         public int Calls;
         public bool FailIfCalled;
         public string? SourceIdentityHash;
+        public async Task<JsonElement> ReadRawNodePropertiesAsync(TeamcenterSourceSelector selector,TeamcenterOccurrenceEdge[] path,string username,string password,CancellationToken ct)
+        {
+            var result=await ReadNodePropertiesAsync(selector,path,username,password,ct);
+            return JsonSerializer.SerializeToElement(new{properties=result.Properties,raw_fields=new[]{new{object_uid="revision",object_kind="ItemRevision",field="object_name",read_state="value",value_json="\"\""},
+                new{object_uid="revision",object_kind="ItemRevision",field="IMAN_Rendering",read_state="value",value_json=JsonSerializer.Serialize(new[]{new{dataset_uid="dataset",file_uid="file",file_name="model.jt",relation_type="IMAN_Rendering"}})}}});
+        }
 
         public Task<TeamcenterNodePropertiesResult> ReadNodePropertiesAsync(
             TeamcenterSourceSelector selector, TeamcenterOccurrenceEdge[] path,

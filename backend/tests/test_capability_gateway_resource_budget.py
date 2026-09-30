@@ -64,7 +64,7 @@ def _gateway(handler, budget: ExecutionBudget, *, ratio: float | None = None):
     gateway = CapabilityGatewayService(
         CatalogResolver(store, registry), _Policy(), admission=admission, metrics=metrics,
         admission_timeout_seconds=0.01,
-    )
+    ).bind_release(release.release_id)
     identity = ConsumerIdentity(
         actor=ActorIdentity(
             user_id="user_1", authentication_method="jwt",
@@ -166,3 +166,54 @@ def test_cancelled_provider_is_measured_and_releases_lease():
         assert metrics.recent()[-1].error_code == "cancelled"
 
     asyncio.run(scenario())
+
+
+def test_write_capacity_rejection_leaves_no_claim_and_exact_key_retries_once():
+    from backend.tests.test_capability_gateway_pipeline import _descriptor,_gateway as write_gateway,_envelope
+    from backend.capability_v2.contracts import SideEffectLevel
+    from backend.capability_v2.outcomes import InMemoryOutcomeStore
+    from backend.capability_v2.reliability import ReliabilityCoordinator,InMemoryRateLimiter,idempotency_scope
+    async def scenario():
+        entered=asyncio.Event();release=asyncio.Event();calls=[]
+        async def handler(payload,context):
+            calls.append(context.idempotency_key)
+            if context.idempotency_key=='busy':
+                entered.set();await release.wait()
+            return {'routing_id':'r1'}
+        descriptor=_descriptor().model_copy(update=dict(side_effect_level=SideEffectLevel.WRITE,
+            idempotency_policy='required',consistency_policy='eventual',execution_budget=ExecutionBudget(max_parallel_per_consumer=1,max_parallel_per_tenant=1)))
+        store=InMemoryOutcomeStore();reliability=ReliabilityCoordinator(store,InMemoryRateLimiter(limit=100))
+        gateway,catalog=write_gateway(descriptor,handler,_Policy(),reliability)
+        gateway._admission_timeout_seconds=0.01
+        busy=_envelope(catalog).model_copy(update=dict(idempotency_key='busy'))
+        retry=busy.model_copy(update=dict(idempotency_key='retry',request_id='request_retry'))
+        task=asyncio.create_task(gateway.invoke(busy));await entered.wait()
+        rejected=await gateway.invoke(retry)
+        assert rejected.error.code=='capacity_unavailable' and rejected.error.retryable
+        assert store.find_by_idempotency(idempotency_scope(retry)) is None
+        assert calls==['busy']
+        still_running=await gateway.invoke(busy)
+        assert still_running.error.code=='idempotency_in_progress'
+        release.set();assert (await task).ok
+        assert (await gateway.invoke(retry)).ok
+        # Completed replay bypasses busy capacity and never redispatches.
+        held=await gateway._admission.acquire(capability_key='craft.routing.get@1',tenant_key=retry.identity.tenant.tenant_id,
+            consumer_key=gateway._consumer_key(retry),budget=descriptor.execution_budget,timeout_seconds=0)
+        try:assert (await gateway.invoke(retry)).ok
+        finally:await held.release()
+        assert calls==['busy','retry'] and gateway._admission.in_flight('craft.routing.get@1')==0
+    asyncio.run(scenario())
+
+
+def test_write_reliability_rejection_releases_preacquired_capacity():
+    from backend.tests.test_capability_gateway_pipeline import _descriptor,_gateway as write_gateway,_envelope
+    from backend.capability_v2.contracts import SideEffectLevel
+    from backend.capability_v2.outcomes import InMemoryOutcomeStore
+    from backend.capability_v2.reliability import ReliabilityCoordinator,InMemoryRateLimiter
+    descriptor=_descriptor().model_copy(update=dict(side_effect_level=SideEffectLevel.WRITE,
+        idempotency_policy='required',consistency_policy='eventual'))
+    gateway,catalog=write_gateway(descriptor,lambda *_:{'routing_id':'r1'},_Policy(),
+        ReliabilityCoordinator(InMemoryOutcomeStore(),InMemoryRateLimiter(limit=0)))
+    result=asyncio.run(gateway.invoke(_envelope(catalog).model_copy(update=dict(idempotency_key='limited'))))
+    assert result.error.code=='rate_limit_exceeded'
+    assert gateway._admission.in_flight('craft.routing.get@1')==0

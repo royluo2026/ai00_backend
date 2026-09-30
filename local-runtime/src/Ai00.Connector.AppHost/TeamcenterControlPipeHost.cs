@@ -13,6 +13,7 @@ public sealed record TeamcenterLoginCommand(string RequestId, string EndpointId,
     : TeamcenterControlCommand(RequestId);
 public sealed record TeamcenterStatusCommand(string RequestId) : TeamcenterControlCommand(RequestId);
 public sealed record TeamcenterLogoutCommand(string RequestId) : TeamcenterControlCommand(RequestId);
+public sealed record CacheOpenCancelCommand(string RequestId,string OperationId) : TeamcenterControlCommand(RequestId);
 
 public static class TeamcenterControlProtocol
 {
@@ -24,6 +25,13 @@ public static class TeamcenterControlProtocol
         var value = document.RootElement;
         var fields = value.EnumerateObject().Select(item => item.Name).ToArray();
         var type = value.TryGetProperty("type", out var typeValue) ? typeValue.GetString() : null;
+        if(type=="cache_open_cancel")
+        {
+            if(fields.Length!=3||fields.Distinct().Count()!=3||fields.Except(new[]{"type","request_id","operation_id"}).Any())throw new InvalidDataException("cache_open_cancel_invalid");
+            var request=value.GetProperty("request_id").GetString()??"";var operation=value.GetProperty("operation_id").GetString()??"";
+            if(!Regex.IsMatch(request,"\\Atc-[a-f0-9]{32}\\z")||!Regex.IsMatch(operation,"\\Avismockup-command-[a-f0-9]{64}\\z"))throw new InvalidDataException("cache_open_cancel_invalid");
+            return new CacheOpenCancelCommand(request,operation);
+        }
         if (type is "teamcenter_status" or "teamcenter_logout")
         {
             var expectedControl = new[] { "type", "request_id" };
@@ -78,7 +86,7 @@ public static class TeamcenterControlProtocol
 
 // Separate from the diagnostic pipe: business credentials can never enter diagnostics.
 // The current-user ACL and peer PID check bind this control channel to the Electron parent.
-public sealed class TeamcenterControlPipeHost(AppHostOptions options, TeamcenterReadOnlyRuntime runtime,ViewerInteractionSession? viewerSession=null) : BackgroundService
+public sealed class TeamcenterControlPipeHost(AppHostOptions options, TeamcenterReadOnlyRuntime runtime,ViewerInteractionSession? viewerSession=null,LocalOpenCancellation? localOpenCancellation=null) : BackgroundService
 {
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern bool GetNamedPipeClientProcessId(Microsoft.Win32.SafeHandles.SafePipeHandle pipe, out uint pid);
@@ -122,6 +130,13 @@ public sealed class TeamcenterControlPipeHost(AppHostOptions options, Teamcenter
                 while (pipe.IsConnected && !ct.IsCancellationRequested)
                 {
                     var command = TeamcenterControlProtocol.ParseRequest(await ReadAsync(pipe, ct));
+                    if(command is CacheOpenCancelCommand cancelCommand)
+                    {
+                        if(localOpenCancellation is null)throw new InvalidDataException("cache_open_cancel_unavailable");
+                        localOpenCancellation.Cancel(cancelCommand.OperationId);
+                        await WriteAsync(pipe,JsonSerializer.Serialize(new{type="cache_open_cancel_result",request_id=cancelCommand.RequestId,state="ready",code="cache_open_cancel_requested"}),ct);
+                        continue;
+                    }
                     if (command is TeamcenterStatusCommand statusCommand)
                     {
                         var status = runtime.GetSessionStatus();

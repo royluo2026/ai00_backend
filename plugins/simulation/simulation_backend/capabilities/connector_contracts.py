@@ -1,5 +1,14 @@
 """Closed contracts for Simulation-owned Connector and VisMockup atoms."""
 from __future__ import annotations
+import json as _cache_json
+from pathlib import Path as _CachePath
+
+TC_CACHE_CONTRACT = _cache_json.loads((_CachePath(__file__).resolve().parents[4] / 'docs/contracts/teamcenter.model_cache.read@1.json').read_text(encoding='utf-8'))
+TC_CACHE_INPUT = TC_CACHE_CONTRACT['input']
+TC_CACHE_OUTPUT = TC_CACHE_CONTRACT['output']
+TC_CACHE_V2_CONTRACT = _cache_json.loads((_CachePath(__file__).resolve().parents[4] / 'docs/contracts/teamcenter.model_cache.read@2.json').read_text(encoding='utf-8'))
+TC_CACHE_V2_INPUT = TC_CACHE_V2_CONTRACT['input']
+TC_CACHE_V2_OUTPUT = TC_CACHE_V2_CONTRACT['output']
 
 from datetime import datetime
 from typing import Literal
@@ -144,6 +153,19 @@ TC_VISUALIZATION_SOURCE_SELECTOR = obj({
 TC_LAUNCH_INPUT = obj({"source_selector":TC_VISUALIZATION_SOURCE_SELECTOR,
     "expected_visdoc_uid":{"type":"string","maxLength":128}},
     ("source_selector","expected_visdoc_uid"))
+TC_CACHE_SOURCE = obj({
+    "batch_id":{"type":"string","pattern":"^[a-f0-9]{32}$"},
+    "node_key":{"type":"string","minLength":1,"maxLength":512},
+}, ("batch_id","node_key"))
+TC_CACHE_LAUNCH_INPUT = obj({
+    "source_selector":TC_VISUALIZATION_SOURCE_SELECTOR,
+    "cache_source":TC_CACHE_SOURCE,
+    "expected_visdoc_uid":{"type":"string","maxLength":128},
+}, ("expected_visdoc_uid",))
+TC_CACHE_LAUNCH_INPUT["oneOf"] = [
+    {"required":["source_selector"],"not":{"required":["cache_source"]}},
+    {"required":["cache_source"],"not":{"required":["source_selector"]}},
+]
 TC_OCCURRENCE_EDGE = obj({
     "occurrence_uid": {"type": "string", "minLength": 1, "maxLength": 128},
     "item_revision_uid": {"type": "string", "minLength": 1, "maxLength": 128},
@@ -274,6 +296,8 @@ INPUT_SCHEMAS = {
     "simulation.teamcenter.product_structure.page.read.request": TC_PAGE_INPUT,
     "simulation.teamcenter.visualization.launch.request": TC_LAUNCH_INPUT,
     "simulation.teamcenter.visualization.insert.request": TC_LAUNCH_INPUT,
+    ("simulation.teamcenter.visualization.launch.request", 3): TC_CACHE_LAUNCH_INPUT,
+    ("simulation.teamcenter.visualization.insert.request", 2): TC_CACHE_LAUNCH_INPUT,
     "simulation.teamcenter.product_structure.observe": TC_OBSERVE_INPUT,
     "simulation.teamcenter.product.search": TC_SEARCH_INPUT,
     "simulation.teamcenter.revision_rule.search": TC_REVISION_RULE_INPUT,

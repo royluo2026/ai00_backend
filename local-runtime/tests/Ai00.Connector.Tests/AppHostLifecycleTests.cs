@@ -4,6 +4,23 @@ using Xunit;
 namespace Ai00.Connector.Tests;
 public sealed class AppHostLifecycleTests
 {
+    [Fact] public async Task LongExecutionKeepsItsRuntimeAliveWithoutAnotherAdapterProbe()
+    {
+        var alive=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var beats=0;
+        var result=await RuntimeSessionWorker.ExecuteWithHeartbeatAsync(async ct=>
+        {
+            await alive.Task.WaitAsync(TimeSpan.FromSeconds(2),ct);return 42;
+        },ct=>{if(++beats==2)alive.SetResult();return Task.CompletedTask;},CancellationToken.None,TimeSpan.FromMilliseconds(5));
+        Assert.Equal(42,result);Assert.True(beats>=2);
+    }
+    [Fact] public async Task DefinitiveHeartbeatRejectionCancelsExecution()
+    {
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(()=>RuntimeSessionWorker.ExecuteWithHeartbeatAsync(async ct=>
+        {
+            await Task.Delay(Timeout.Infinite,ct);return 42;
+        },ct=>throw new RuntimeTransportException("runtime_session_invalid"),CancellationToken.None,TimeSpan.FromMilliseconds(5)));
+    }
     [Theory]
     [InlineData("unresolved")]
     [InlineData("network")]

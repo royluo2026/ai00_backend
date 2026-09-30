@@ -5,6 +5,38 @@ namespace Ai00.Connector.Tests;
 
 public class ViewerInteractionExecutionTests
 {
+    [Fact] public async Task SlowNativeVisibilityCompletesWithoutReplayOrQuarantine()
+    {
+        using var rig=new Rig();
+        var executor=new ViewerInteractionExecutor(rig.Session,rig.Runtime,rig.Gate,rig.Journal,(_,_)=>true,
+            async(_,_,_,_,_,_)=>{rig.Writes++;await Task.Delay(5200);return new{visible=false};},
+            ()=>ViewerInteractionSessionTests.Now,()=>TimeSpan.Zero);
+        var result=await executor.ExecuteAsync(Rig.Request(),default);
+        Assert.Equal("completed",result.status);Assert.False(rig.Gate.IsQuarantined);Assert.Equal(1,rig.Writes);
+    }
+    [Fact] public async Task TimeoutDiagnosticsRetainCauseAndLateNativeCompletionWithoutReplaying()
+    {
+        using var rig=new Rig();var pending=new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var events=new System.Collections.Concurrent.ConcurrentQueue<(string Stage,string Detail)>();
+        var executor=new ViewerInteractionExecutor(rig.Session,rig.Runtime,rig.Gate,rig.Journal,(_,_)=>true,
+            (_,_,_,_,_,_)=>{rig.Writes++;return pending.Task;},()=>ViewerInteractionSessionTests.Now,()=>TimeSpan.Zero,
+            TimeSpan.FromMilliseconds(80),(stage,detail)=>events.Enqueue((stage,JsonSerializer.Serialize(detail))));
+        Assert.Equal("outcome_unknown",(await executor.ExecuteAsync(Rig.Request(),default)).status);
+        Assert.Contains(events,e=>e.Stage=="native_failed"&&e.Detail.Contains("TimeoutException")&&e.Detail.Contains("r1"));
+        pending.SetResult(new{visible=false});
+        for(var i=0;i<100&&!events.Any(e=>e.Stage=="native_settled");i++)await Task.Delay(5);
+        Assert.Contains(events,e=>e.Stage=="native_settled"&&e.Detail.Contains("RanToCompletion"));
+        Assert.True(rig.Gate.IsQuarantined);Assert.Equal(1,rig.Writes);
+        Assert.DoesNotContain(events,e=>e.Detail.Contains(new string('a',64)));
+    }
+    [Fact] public async Task FailedDiagnosticSinkCannotChangeSuccessfulExecution()
+    {
+        using var rig=new Rig();
+        var executor=new ViewerInteractionExecutor(rig.Session,rig.Runtime,rig.Gate,rig.Journal,(_,_)=>true,
+            (_,_,_,_,_,_)=>Task.FromResult<object>(new{}),()=>ViewerInteractionSessionTests.Now,()=>TimeSpan.Zero,
+            diagnostic:(_,_)=>throw new IOException("diagnostic_disk_full"));
+        Assert.Equal("completed",(await executor.ExecuteAsync(Rig.Request(),default)).status);
+    }
     [Fact] public async Task OutcomeDiskFailureReturnsUnknownAndRetainsAdmissionForQuery()
     {
         FileStream? locked=null;Rig? active=null;

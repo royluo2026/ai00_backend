@@ -107,6 +107,21 @@ def test_insert_bop_projection_batches_large_node_sets(monkeypatch):
     assert result["node_count"] == 501
     assert [len(batch) for batch in batches] == [500, 1]
     assert batches[1][0][5] == batches[0][-1][0]
+    # Exercise the real driver: executemany can silently fall back to one query per row.
+    import pymysql
+    connection = pymysql.Connection(defer_connect=True)
+    connection.server_status = 0
+    wire_queries = []
+    driver = connection.cursor()
+    def record_query(query):
+        wire_queries.append(query)
+        driver.rowcount = 1
+        return 1
+    driver._query = record_query
+    for sql, params in cursor.calls:
+        if sql.startswith("INSERT INTO workmanship_sim_workspace_nodes"):
+            driver.executemany(sql, params)
+    assert len(wire_queries) == 2
 
 
 def test_same_source_can_be_placed_more_than_once(monkeypatch):

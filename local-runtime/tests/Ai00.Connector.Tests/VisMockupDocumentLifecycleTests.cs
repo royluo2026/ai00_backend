@@ -9,6 +9,31 @@ public sealed class VisMockupDocumentLifecycleTests : IDisposable
 {
     private readonly string _directory = Path.Combine(Path.GetTempPath(), "ai00-vismockup-lifecycle", Guid.NewGuid().ToString("N"));
 
+    [Theory]
+    [InlineData(1, 9)]
+    [InlineData(2, 9)]
+    [InlineData(1, 10)]
+    [InlineData(2, 10)]
+    public async Task Teamcenter_launch_versions_obey_document_capacity(int version, int count)
+    {
+        Directory.CreateDirectory(_directory);
+        var app = new FakeApplication("14.2.0", null) { OpenDocuments = Enumerable.Range(0, count)
+            .Select(index => (IVisMockupDocument)new FakeDocument($"doc-{index}", $"tc://other/{index}", FakeNode.FlatTree(1))).ToArray() };
+        var worker = new OnlineMaterialTeamcenterWorker(Path.Combine(_directory, "limit.vvi"));
+        using var runtime = new TeamcenterReadOnlyRuntime(worker, Path.Combine(_directory, "tc.db"));
+        await runtime.LoginAsync("tc-production", "user", "secret", default);
+        using var sta = new StaDispatcher();
+        var adapter = new VisMockupAdapter(sta, new AllowedPathPolicy([_directory]),
+            new FakeVisMockupCom { ExistingApplication = app, ProcessId = 123, ProcessStartUtcTicks = 456 },
+            _directory, Path.Combine(_directory, "tree.db"), runtime);
+        var operation = new AdapterOperation($"teamcenter.visualization.launch@{version}", OnlineSelectorPayload());
+        if (count == 9) Assert.True((await adapter.ExecuteAsync(operation, default)).Ok);
+        else Assert.Equal("vismockup_document_limit_exceeded", (await Assert.ThrowsAsync<ConnectorNoEffectException>(() =>
+            adapter.ExecuteAsync(operation, default))).Code);
+        Assert.Equal(count == 9 ? 1 : 0, app.OpenCalls);
+        Assert.Equal(10, app.OpenDocuments.Count);
+    }
+
     [Fact]
     public async Task Open_receipt_keeps_returned_document_identity_when_active_document_changes()
     {
@@ -215,7 +240,7 @@ public sealed class VisMockupDocumentLifecycleTests : IDisposable
         Assert.NotSame(existing, application.LastOpenedDocument);
         Assert.Same(application.LastOpenedDocument, application.ActiveDocument);
         Assert.Equal(Path.GetFullPath(worker.MaterialPath), application.LastOpenedDocument!.SourceIdentity);
-        Assert.Equal([application.LastOpenedDocument], application.OpenDocuments);
+        Assert.Equal([existing, application.LastOpenedDocument], application.OpenDocuments);
         Assert.False(File.Exists(worker.MaterialPath));
     }
 

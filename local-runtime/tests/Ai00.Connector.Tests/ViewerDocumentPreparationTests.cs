@@ -193,8 +193,43 @@ public class ViewerDocumentPreparationTests
 
         Task Act()=>adapter.ActivateViewerDocumentAsync(scenario=="unknown"?"sha256:"+new string('0',64):sessionA,cancel.Token);
         if(scenario=="cancelled")await Assert.ThrowsAnyAsync<OperationCanceledException>(Act);
-        else Assert.Equal("document_session_changed",(await Assert.ThrowsAsync<ConnectorNoEffectException>(Act)).Code);
+        else Assert.Equal(scenario=="closed"?"document_closed":"document_session_changed",(await Assert.ThrowsAsync<ConnectorNoEffectException>(Act)).Code);
         Assert.Equal(0,app.OpenCalls);
+    }
+
+    [Theory]
+    [InlineData("process_changed")]
+    [InlineData("enumeration_failed")]
+    [InlineData("duplicate_handle")]
+    public async Task AmbiguousAbsenceNeverReportsDocumentClosed(string scenario)
+    {
+        using var sta=new StaDispatcher();
+        var document=new FakeDocument("A","cache.plmxml",FakeNode.FlatTree(1)){NativeWindow=new("41","401")};
+        var original=new FakeApplication("14.2",document);
+        var application=new ObservedApplication(original);
+        var com=new FakeVisMockupCom{ExistingApplication=application,ProcessId=123,ProcessStartUtcTicks=456};
+        var adapter=new VisMockupAdapter(sta,new AllowedPathPolicy([Path.GetTempPath()]),com);
+        var session=CanonicalJson.Hash(new{process_id=123,process_started_utc_ticks="456",document_handle="A"});
+        await adapter.PrepareViewerDocumentAsync(session,default);
+        application.ReadDocuments=()=>
+        {
+            if(scenario=="enumeration_failed")throw new InvalidOperationException("enumeration_failed");
+            if(scenario=="duplicate_handle")return new IVisMockupDocument[]{document,document};
+            com.ProcessStartUtcTicks=789;return Array.Empty<IVisMockupDocument>();
+        };
+        var error=await Assert.ThrowsAnyAsync<Exception>(()=>adapter.ActivateViewerDocumentAsync(session,default));
+        Assert.False(error is ConnectorException connector && connector.Code=="document_closed");
+        Assert.Equal(0,original.OpenCalls);
+    }
+
+    private sealed class ObservedApplication(FakeApplication inner):IVisMockupApplication
+    {
+        public Func<IReadOnlyList<IVisMockupDocument>>? ReadDocuments;
+        public string ProductVersion=>inner.ProductVersion;
+        public IVisMockupDocument? ActiveDocument=>inner.ActiveDocument;
+        public IReadOnlyList<IVisMockupDocument> OpenDocuments=>ReadDocuments?.Invoke()??inner.OpenDocuments;
+        public IVisMockupDocument OpenDocument(string path)=>inner.OpenDocument(path);
+        public void CloseAllDocuments()=>inner.CloseAllDocuments();
     }
 
     [Theory]
@@ -258,7 +293,7 @@ public class ViewerDocumentPreparationTests
     }
 
     [Fact]
-    public void ColdDocumentPreparationHasItsOwnBudgetWithoutRelaxingNodeMapping()
+    public void ColdDocumentPreparationAndNodeMappingHaveSeparateBoundedBudgets()
     {
         var method=typeof(ViewerInteractionPipeHost).GetMethod("InteractionTimeout",
             System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Public);
@@ -266,6 +301,6 @@ public class ViewerDocumentPreparationTests
         TimeSpan Budget(string type)=>(TimeSpan)method!.Invoke(null,[type])!;
         Assert.Equal(TimeSpan.FromSeconds(15),Budget("prepare_document"));
         Assert.Equal(TimeSpan.FromSeconds(15),Budget("activate_document"));
-        Assert.Equal(TimeSpan.FromSeconds(5),Budget("resolve_nodes"));
+        Assert.Equal(TimeSpan.FromSeconds(25),Budget("resolve_nodes"));
     }
 }

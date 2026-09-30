@@ -54,3 +54,9 @@ htmlcov/
 /.test-runs/
 /.tmp-schema-*/
 /pytest-cache-files-*/
+
+# Local diagnostic and test outputs (keep on disk, do not publish)
+/.pytest-prepush-*/
+/.test-tmp-*/
+/local-runtime/**/bin-*/
+/local-runtime/**/TestResults/

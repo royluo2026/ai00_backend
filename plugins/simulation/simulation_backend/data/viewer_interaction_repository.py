@@ -129,12 +129,38 @@ class ViewerInteractionRepository:
             workspace = cur.fetchone()
             if not workspace:
                 raise ValueError('interaction_scope_denied')
+            cur.execute('SELECT * FROM workmanship_sim_vm_documents WHERE gid=%s '
+                'AND workspace_gid=%s AND tenant_gid=%s AND owner_gid=%s '
+                "AND document_role IN ('primary','inserted') AND source_kind IN ('teamcenter_online','teamcenter_cache_snapshot') AND removed_at IS NULL FOR UPDATE",
+                (request.document_gid, request.workspace_gid, context.team_gid, context.user_gid))
+            document = cur.fetchone()
+            if not document:
+                raise ValueError('interaction_binding_stale' if allocate else 'interaction_scope_denied')
+            if document.get('source_kind') == 'teamcenter_cache_snapshot':
+                from ..application.cache_open_evidence import CacheOpenPayload, cache_package_hash
+                try:
+                    envelope = document.get('artifact_ref_json') or {}
+                    envelope = json.loads(envelope) if isinstance(envelope, str) else envelope
+                    if 'tc_open_payload' in envelope:
+                        from ..application.cache_tc_open_contract import TcCacheOpenPayload
+                        package=TcCacheOpenPayload.model_validate(envelope['tc_open_payload']).model_dump()
+                        if package['cache_binding']!=envelope['cache_binding']:raise ValueError('binding mismatch')
+                    else:
+                        package = CacheOpenPayload.model_validate({key: envelope[key] for key in
+                            ('cache_binding', 'artifact_ref', 'package_dependencies', 'package_hash')}).model_dump()
+                    expected = cache_package_hash({key: value for key, value in package.items() if key != 'package_hash'})
+                    if expected != envelope['package_hash'] or expected != 'sha256:' + document['content_sha256']:
+                        raise ValueError('package mismatch')
+                except (ValueError, TypeError, KeyError) as exc:
+                    raise ValueError('interaction_binding_stale') from exc
             cur.execute('SELECT * FROM workmanship_sim_viewer_source_associations '
                 'WHERE workspace_gid=%s AND document_gid=%s '
                 'AND tenant_gid=%s AND actor_gid=%s AND active=1 FOR UPDATE',
                 (request.workspace_gid, request.document_gid,
                  context.team_gid, context.user_gid))
             sources = cur.fetchall()
+            if not allocate and not sources and workspace['status'] != 'frozen':
+                raise ValueError('interaction_source_unassociated')
             source = sources[0] if len(sources) == 1 else None
             if (not source or workspace['status'] == 'frozen'
                 or allocate and source['source_association_id'] != request.source_association_id):
@@ -150,11 +176,6 @@ class ViewerInteractionRepository:
                 or not runtime['session_expires_at'] or _utc(runtime['session_expires_at']) <= now
                 or not runtime['heartbeat_at'] or not now-timedelta(seconds=120) <= _utc(runtime['heartbeat_at']) <= now):
                 raise ValueError('interaction_binding_stale')
-            cur.execute('SELECT content_sha256 FROM workmanship_sim_vm_documents WHERE gid=%s '
-                'AND workspace_gid=%s AND tenant_gid=%s AND owner_gid=%s '
-                "AND document_role='primary' AND source_kind='teamcenter_online' AND removed_at IS NULL FOR UPDATE",
-                (request.document_gid, request.workspace_gid, context.team_gid, context.user_gid))
-            document = cur.fetchone()
             cur.execute('SELECT document_session FROM workmanship_sim_live_document_bindings WHERE workspace_gid=%s '
                 "AND tenant_gid=%s AND actor_gid=%s AND connector_device_id=%s AND state='bound' FOR UPDATE",
                 (request.workspace_gid, context.team_gid, context.user_gid, source['device_id']))

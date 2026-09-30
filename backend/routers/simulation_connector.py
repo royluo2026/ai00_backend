@@ -296,6 +296,21 @@ def _plan_artifact(plan, artifact_id: str):
         return None
 
     value = plan.model_dump(mode="json") if hasattr(plan, "model_dump") else plan
+    for step in value.get('steps', []):
+        if step.get('operation_id') != 'vismockup.model.open@2':
+            continue
+        from plugins.simulation.simulation_backend.application.cache_open_evidence import (
+            CACHE_OPEN_CONTRACT_HASH, CacheOpenPayload, cache_package_hash,
+        )
+        try:
+            if step.get('contract_hash') != CACHE_OPEN_CONTRACT_HASH:
+                raise ValueError('contract_hash_mismatch')
+            payload = CacheOpenPayload.model_validate(step['payload']).model_dump()
+            expected_hash = payload.pop('package_hash')
+            if cache_package_hash(payload) != expected_hash:
+                raise ValueError('package_hash_mismatch')
+        except (ValueError, TypeError, KeyError) as exc:
+            raise ConnectorRepositoryError('cache_open_artifact_plan_invalid') from exc
     return visit(value)
 
 
@@ -602,12 +617,18 @@ def runtime_artifact_content(
         raise HTTPException(status_code=503, detail={'code': 'artifact_download_unavailable'}) from exc
 
 
+def runtime_artifact_media(operation_id):
+    media={'vismockup.view.capture@1':'image/png','teamcenter.model_file.fetch@1':'model/jt'}
+    if operation_id not in media:raise ValueError('result_artifact_step_not_bound')
+    return media[operation_id]
+
+
 @router.put('/v2/plans/{plan_id}/steps/{step_id}/result-artifact')
 async def runtime_capture_artifact(
     plan_id: str, step_id: str, request: Request,
     lease_id: str = Query(min_length=1),
     content_sha256: str = Header(alias='X-AI00-Content-SHA256', pattern='^[0-9a-f]{64}$'),
-    content_length: int = Header(alias='X-AI00-Content-Length', ge=24, le=100 * 1024 * 1024),
+    content_length: int = Header(alias='X-AI00-Content-Length', ge=24, le=512 * 1024 * 1024),
     pins: dict = Depends(_runtime_auth),
 ):
     from backend.capability_v2.artifacts import ArtifactIntegrityError, ArtifactService, SqlArtifactStore, configured_object_storage
@@ -616,8 +637,12 @@ async def runtime_capture_artifact(
             runtime_session_service.leased_plan(**pins, plan_id=plan_id, lease_id=lease_id)
         )
         step = next((item for item in plan.steps if item.step_id == step_id), None)
-        if step is None or step.operation_id != 'vismockup.view.capture@1':
+        if step is None or step.operation_id not in ('vismockup.view.capture@1','teamcenter.model_file.fetch@1'):
             raise ConnectorRepositoryError('capture_step_not_bound_to_plan')
+        media_type=runtime_artifact_media(step.operation_id)
+        byte_limit=(512 if media_type=='model/jt' else 100)*1024*1024
+        if content_length>byte_limit:
+            raise ValueError('result_artifact_size_exceeded')
         refs = step.payload.get('artifact_resource_refs', ())
         if not isinstance(refs, list) or any(not isinstance(item, str) or not item for item in refs):
             raise ValueError('artifact_resource_refs_invalid')
@@ -629,7 +654,7 @@ async def runtime_capture_artifact(
         )
         service = ArtifactService(SqlArtifactStore(get_conn), configured_object_storage())
         session = service.create_upload(
-            identity, media_type='image/png', expected_sha256=content_sha256,
+            identity, media_type=media_type, expected_sha256=content_sha256,
             expected_byte_size=content_length, resource_refs=tuple(refs),
         )
         with tempfile.SpooledTemporaryFile(max_size=8 * 1024 * 1024) as stream:
@@ -640,8 +665,8 @@ async def runtime_capture_artifact(
                     raise ArtifactIntegrityError('uploaded object exceeds expected byte size')
                 stream.write(chunk)
             stream.seek(0)
-            service.upload_stream(session.upload_id, identity, stream)
-        ref = service.finalize(session.upload_id, identity, reported_sha256=content_sha256)
+            await run_in_threadpool(service.upload_stream, session.upload_id, identity, stream)
+        ref = await run_in_threadpool(service.finalize, session.upload_id, identity, reported_sha256=content_sha256)
         return {'success': True, 'data': {'artifact_ref': ref.model_dump(mode='json')}}
     except ConnectorRepositoryError as exc:
         raise HTTPException(status_code=409, detail={'code': str(exc)}) from exc

@@ -184,7 +184,13 @@ class LiveDocumentProvider:
             raise CapabilityBusinessError(str(exc), str(exc)) from exc
         return self._output(result)
 
+    def bind_cache(self, payload, context):
+        return self._complete_open(payload, context, cache=True)
+
     def bind_online_v3(self, payload, context):
+        return self._complete_open(payload, context, cache=False)
+
+    def _complete_open(self, payload, context, *, cache):
         from backend.contracts.viewer_open_completion_v1 import OpenCompletionRequest, OpenCompletionResult
         from ..application.viewer_interaction import authorize_interaction
         from ..data.viewer_interaction_repository import ViewerInteractionRepository
@@ -198,11 +204,12 @@ class LiveDocumentProvider:
                     document_gid=request.document_gid, source_association_id=binding['source_association_id'],
                     session_nonce=request.session_nonce, prior_grant_id=None),
                     ViewerInteractionRepository(), self.signer, now, transaction=cursor,
-                    issuer=('simulation.environment.online_source.live_document.bind', 3))
+                    issuer=('simulation.environment.cache_source.live_document.bind', 1) if cache
+                        else ('simulation.environment.online_source.live_document.bind', 3))
                 return OpenCompletionResult(binding=binding, grant=grant).model_dump(mode='json')
 
-            result = self.workspaces.bind_online_live_document(**scope, **request.model_dump(),
-                now=now, complete_binding=complete)
+            bind = self.workspaces.bind_cache_live_document if cache else self.workspaces.bind_online_live_document
+            result = bind(**scope, **request.model_dump(), now=now, complete_binding=complete)
         except (ConnectorRepositoryError, WorkspaceRepositoryError, ValueError) as exc:
             raise CapabilityBusinessError(str(exc), str(exc)) from exc
         return self._output(result)
@@ -251,3 +258,12 @@ def register_live_document_capabilities(registry, control_plane):
         risk=CapabilityRisk.WRITE, confirmation='user', permissions=('simulation.use',),
         input_schema=OpenCompletionRequest.model_json_schema(), output_schema=OpenCompletionResult.model_json_schema(),
         tags=('simulation', 'teamcenter_online', 'live_document', 'experimental')), provider.bind_online_v3)
+
+    register(registry, CapabilitySpec(
+        id='simulation.environment.cache_source.live_document.bind', owner='simulation', version=1,
+        description='Atomically bind an attested frozen-cache package open and issue its signed local interaction grant.',
+        use_when='Electron completes an owner-confirmed frozen-cache model open major 2.',
+        do_not_use_when='The signed package receipt or pinned cache source differs from the owned document.',
+        risk=CapabilityRisk.WRITE, confirmation='user', permissions=('simulation.use',),
+        input_schema=OpenCompletionRequest.model_json_schema(), output_schema=OpenCompletionResult.model_json_schema(),
+        tags=('simulation', 'teamcenter_cache', 'live_document', 'experimental')), provider.bind_cache)

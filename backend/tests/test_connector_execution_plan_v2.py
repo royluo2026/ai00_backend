@@ -23,6 +23,20 @@ from backend.contracts.connector_execution_plan_v2 import (
 VECTOR_PATH = Path(__file__).with_name("fixtures") / "connector_execution_plan_v2.json"
 
 
+@pytest.mark.parametrize("text", ["", "ascii\x00\x7f", "\u0080\ud7ff\ue000\uffff", "零件-扭矩-😀", "a" * (3 * 1024 * 1024)],ids=["empty","ascii-controls","unicode-boundaries","tc-text","large-result"])
+def test_json_string_validation_preserves_unicode_and_large_result_bytes(text):
+    expected=json.dumps({"result_json":text},ensure_ascii=False,separators=(",", ":")).encode()
+    assert canonicalize_v2({"result_json":text})==expected
+
+
+@pytest.mark.parametrize("text", ["\ud800", "\udbff", "\udc00", "\udfff", "ok\ud800tail", "\ud800\udc00"])
+@pytest.mark.parametrize("as_key", [False, True])
+def test_json_string_validation_rejects_every_surrogate_boundary_in_keys_and_values(text,as_key):
+    value={text:"value"} if as_key else {"result_json":text}
+    with pytest.raises(ValueError,match="json_surrogate_forbidden"):
+        canonicalize_v2(value)
+
+
 @pytest.fixture(scope="module")
 def vector() -> dict:
     return json.loads(VECTOR_PATH.read_text(encoding="utf-8"))

@@ -6,9 +6,16 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
+    <None Update="Fixtures\tc-local-open.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\..\docs\contracts\vismockup.model.open@3.json" Link="vismockup.model.open@3.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\..\docs\contracts\vismockup.model.open@2.json" Link="vismockup.model.open@2.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\fixtures\teamcenter_readonly_child.cjs" Link="teamcenter_readonly_child.cjs" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\Ai00.Connector.Adapters.VisMockup\teamcenter_readonly_worker.js" Link="teamcenter_readonly_worker.js" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\fixtures\teamcenter_visualization_child.cjs" Link="teamcenter_visualization_child.cjs" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\..\backend\tests\fixtures\viewer_interaction_v1.json" Link="viewer_interaction_v1.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\..\docs\contracts\teamcenter.node_properties.read@1.json" Link="teamcenter.node_properties.read@1.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\..\docs\contracts\teamcenter.model_cache.read@1.json" Link="teamcenter.model_cache.read@1.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\..\docs\contracts\teamcenter.model_cache.read@2.json" Link="teamcenter.model_cache.read@2.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\..\docs\contracts\teamcenter.product_structure.children.read@1.json" Link="teamcenter.product_structure.children.read@1.json" CopyToOutputDirectory="PreserveNewest" />
     <ProjectReference Include="..\..\src\Ai00.Connector.AppHost\Ai00.Connector.AppHost.csproj" />
     <ProjectReference Include="..\..\src\Ai00.Connector.Contracts.V2\Ai00.Connector.Contracts.V2.csproj" />

@@ -1,0 +1,945 @@
+{
+  "id": "simulation.model_cache.query@2",
+  "input": {
+    "type": "object",
+    "properties": {
+      "batch_id": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{32}$"
+      },
+      "scope": {
+        "type": "string",
+        "enum": [
+          "roots",
+          "batch",
+          "children",
+          "node"
+        ]
+      },
+      "node_key": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "maxLength": 512
+      },
+      "projection": {
+        "type": "string",
+        "enum": [
+          "structure",
+          "properties",
+          "raw"
+        ]
+      },
+      "cursor": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "maxLength": 2048
+      },
+      "page_size": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 500
+      },
+      "expected_generation": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "pattern": "^[a-f0-9]{32}$"
+      },
+      "expected_snapshot_hash": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "pattern": "^sha256:[a-f0-9]{64}$"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "batch_id"
+    ]
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "identity": {
+        "type": "object",
+        "properties": {
+          "batch_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "generation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "snapshot_hash": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          },
+          "schema_version": {
+            "const": 1,
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "batch_id",
+          "generation",
+          "snapshot_hash",
+          "schema_version"
+        ]
+      },
+      "manifest": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "batch_id": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{32}$"
+              },
+              "project_gid": {
+                "type": "string",
+                "pattern": "^[1-9][0-9]*$"
+              },
+              "project_name": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "phase": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "display_name": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "source_hash": {
+                "type": "string"
+              },
+              "source_selector": {
+                "type": "object",
+                "properties": {
+                  "endpoint_id": {
+                    "type": "string",
+                    "const": "tc-production"
+                  },
+                  "object_uid": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "item_revision_uid": {
+                    "type": "string",
+                    "maxLength": 128
+                  },
+                  "bom_view_uid": {
+                    "type": "string",
+                    "maxLength": 128
+                  },
+                  "revision_rule": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "configuration_date": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "endpoint_id",
+                  "object_uid",
+                  "item_revision_uid",
+                  "bom_view_uid",
+                  "revision_rule",
+                  "configuration_date"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "queued",
+                  "running",
+                  "paused",
+                  "waiting_connector",
+                  "waiting_auth",
+                  "needs_refresh",
+                  "failed",
+                  "completed"
+                ]
+              },
+              "created_at": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "updated_at": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "completed_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "row_version": {
+                "type": "integer"
+              },
+              "node_count": {
+                "type": "integer"
+              },
+              "error_code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "trigger_kind": {
+                "const": "manual",
+                "type": "string"
+              },
+              "generation": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[a-f0-9]{32}$"
+              },
+              "snapshot_hash": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^sha256:[a-f0-9]{64}$"
+              },
+              "schema_version": {
+                "const": 1,
+                "type": "integer"
+              },
+              "configuration_date": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "capture_started_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "structure_hash": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^sha256:[a-f0-9]{64}$"
+              },
+              "snapshot_hash_algorithm": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 512
+              },
+              "hash_status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "unavailable"
+                ]
+              },
+              "readiness": {
+                "type": "object",
+                "properties": {
+                  "structure": {
+                    "type": "string",
+                    "enum": [
+                      "complete"
+                    ]
+                  },
+                  "properties": {
+                    "type": "string",
+                    "enum": [
+                      "complete",
+                      "complete_with_unavailable",
+                      "unverified"
+                    ]
+                  },
+                  "geometry_references": {
+                    "type": "string",
+                    "enum": [
+                      "complete",
+                      "partial",
+                      "unverified"
+                    ]
+                  },
+                  "geometry_files": {
+                    "type": "string",
+                    "enum": [
+                      "not_requested"
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "structure",
+                  "properties",
+                  "geometry_references",
+                  "geometry_files"
+                ]
+              },
+              "spatial_semantics": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "const": "unverified",
+                    "type": "string"
+                  },
+                  "unit": {
+                    "type": "null"
+                  },
+                  "layout": {
+                    "type": "null"
+                  },
+                  "reference_frame": {
+                    "type": "null"
+                  },
+                  "direction": {
+                    "type": "null"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "status",
+                  "unit",
+                  "layout",
+                  "reference_frame",
+                  "direction"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "batch_id",
+              "capture_started_at",
+              "completed_at",
+              "configuration_date",
+              "created_at",
+              "display_name",
+              "error_code",
+              "generation",
+              "hash_status",
+              "node_count",
+              "phase",
+              "project_gid",
+              "project_name",
+              "readiness",
+              "row_version",
+              "schema_version",
+              "snapshot_hash",
+              "snapshot_hash_algorithm",
+              "source_hash",
+              "source_selector",
+              "spatial_semantics",
+              "status",
+              "structure_hash",
+              "trigger_kind",
+              "updated_at"
+            ]
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "nodes": {
+        "type": "array",
+        "maxItems": 500,
+        "items": {
+          "type": "object",
+          "properties": {
+            "node_key": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "occurrence_id": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "parent_occurrence_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 512
+            },
+            "occurrence_path": {
+              "type": "array",
+              "maxItems": 128,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "occurrence_uid": {
+                    "type": "string",
+                    "maxLength": 512
+                  },
+                  "item_revision_uid": {
+                    "type": "string",
+                    "maxLength": 512
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "occurrence_uid",
+                  "item_revision_uid"
+                ]
+              }
+            },
+            "depth": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 128
+            },
+            "child_order": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "child_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "name": {
+              "type": "string"
+            },
+            "item_revision_uid": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "revision_id": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "component_type": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 512
+            },
+            "has_children": {
+              "type": "boolean"
+            },
+            "properties_result": {
+              "type": "object",
+              "properties": {
+                "source_identity_hash": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$"
+                },
+                "captured_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "cache_hit": {
+                  "type": "boolean"
+                },
+                "properties": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 4096
+                    },
+                    "item_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 4096
+                    },
+                    "revision_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 4096
+                    },
+                    "component_type": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 4096
+                    },
+                    "owning_user": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 4096
+                    },
+                    "owning_group": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 4096
+                    },
+                    "weight_raw": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 4096
+                    },
+                    "unit_weight_raw": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 4096
+                    },
+                    "torque_raw": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 4096
+                    },
+                    "torque_importance": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 4096
+                    },
+                    "occurrence_uid": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "minLength": 1,
+                      "maxLength": 128
+                    }
+                  },
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    ".*": {}
+                  }
+                },
+                "raw_fields": {
+                  "type": "array",
+                  "maxItems": 64,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "object_uid": {
+                        "type": "string",
+                        "maxLength": 512
+                      },
+                      "object_kind": {
+                        "type": "string",
+                        "maxLength": 512
+                      },
+                      "field": {
+                        "type": "string",
+                        "maxLength": 512
+                      },
+                      "read_state": {
+                        "type": "string",
+                        "enum": [
+                          "value",
+                          "null",
+                          "unavailable"
+                        ]
+                      },
+                      "value_json": {
+                        "type": "string",
+                        "maxLength": 8388608
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                      "object_uid",
+                      "object_kind",
+                      "field",
+                      "read_state",
+                      "value_json"
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "source_identity_hash",
+                "captured_at",
+                "cache_hit",
+                "properties",
+                "raw_fields"
+              ]
+            },
+            "geometry_refs": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "object",
+                "properties": {
+                  "dataset_uid": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "file_uid": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "file_name": {
+                    "type": "string"
+                  },
+                  "relation_type": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "dataset_uid",
+                  "file_uid",
+                  "file_name",
+                  "relation_type"
+                ]
+              }
+            },
+            "raw_snapshot": {
+              "type": "object",
+              "properties": {
+                "structure": {
+                  "type": "object",
+                  "properties": {
+                    "occurrence_id": {
+                      "type": "string",
+                      "maxLength": 512
+                    },
+                    "parent_occurrence_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 512
+                    },
+                    "occurrence_path": {
+                      "type": "array",
+                      "maxItems": 128,
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "occurrence_uid": {
+                            "type": "string",
+                            "maxLength": 512
+                          },
+                          "item_revision_uid": {
+                            "type": "string",
+                            "maxLength": 512
+                          }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                          "occurrence_uid",
+                          "item_revision_uid"
+                        ]
+                      }
+                    },
+                    "depth": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 128
+                    },
+                    "child_order": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "child_count": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "item_revision_uid": {
+                      "type": "string",
+                      "maxLength": 512
+                    },
+                    "revision_id": {
+                      "type": "string",
+                      "maxLength": 512
+                    },
+                    "component_type": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 512
+                    },
+                    "has_children": {
+                      "type": "boolean"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "occurrence_id",
+                    "parent_occurrence_id",
+                    "occurrence_path",
+                    "has_children"
+                  ]
+                },
+                "page": {
+                  "type": "object",
+                  "properties": {
+                    "source_identity_hash": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "captured_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "cache_hit": {
+                      "type": "boolean"
+                    },
+                    "generation": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{32}$"
+                    },
+                    "cursor": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "next_cursor": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "minimum": 0
+                    },
+                    "child_count": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "complete": {
+                      "type": "boolean",
+                      "const": false
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "child_count"
+                  ]
+                },
+                "properties_result": {
+                  "type": "object",
+                  "properties": {
+                    "source_identity_hash": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "captured_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "cache_hit": {
+                      "type": "boolean"
+                    },
+                    "properties": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "maxLength": 4096
+                        },
+                        "item_id": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "maxLength": 4096
+                        },
+                        "revision_id": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "maxLength": 4096
+                        },
+                        "component_type": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "maxLength": 4096
+                        },
+                        "owning_user": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "maxLength": 4096
+                        },
+                        "owning_group": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "maxLength": 4096
+                        },
+                        "weight_raw": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "maxLength": 4096
+                        },
+                        "unit_weight_raw": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "maxLength": 4096
+                        },
+                        "torque_raw": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "maxLength": 4096
+                        },
+                        "torque_importance": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "maxLength": 4096
+                        },
+                        "occurrence_uid": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "minLength": 1,
+                          "maxLength": 128
+                        }
+                      },
+                      "additionalProperties": false,
+                      "patternProperties": {
+                        ".*": {}
+                      }
+                    },
+                    "raw_fields": {
+                      "type": "array",
+                      "maxItems": 64,
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "object_uid": {
+                            "type": "string",
+                            "maxLength": 512
+                          },
+                          "object_kind": {
+                            "type": "string",
+                            "maxLength": 512
+                          },
+                          "field": {
+                            "type": "string",
+                            "maxLength": 512
+                          },
+                          "read_state": {
+                            "type": "string",
+                            "enum": [
+                              "value",
+                              "null",
+                              "unavailable"
+                            ]
+                          },
+                          "value_json": {
+                            "type": "string",
+                            "maxLength": 8388608
+                          }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                          "object_uid",
+                          "object_kind",
+                          "field",
+                          "read_state",
+                          "value_json"
+                        ]
+                      }
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "source_identity_hash",
+                    "captured_at",
+                    "cache_hit",
+                    "properties",
+                    "raw_fields"
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "structure",
+                "page",
+                "properties_result"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "node_key",
+            "occurrence_id",
+            "parent_occurrence_id",
+            "occurrence_path",
+            "has_children"
+          ]
+        }
+      },
+      "next_cursor": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "maxLength": 2048
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "identity",
+      "manifest",
+      "nodes",
+      "next_cursor"
+    ]
+  }
+}

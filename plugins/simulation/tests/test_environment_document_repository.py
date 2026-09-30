@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from types import SimpleNamespace
 import json
+import sqlite3
 
 import pytest
 
@@ -114,6 +115,54 @@ def test_add_document_rejects_stale_workspace_version(monkeypatch):
             actor_gid="30", tenant_gid="20",
         )
     assert not any(sql.startswith("INSERT") for sql, _ in cursor.calls)
+
+
+@pytest.mark.parametrize("role", ["primary", "unexpected"])
+def test_remove_model_document_rejects_non_inserted_role(monkeypatch, role):
+    cursor = _install(monkeypatch, [{"row_version": 3}, {"role": role}])
+    with pytest.raises(WorkspaceRepositoryError, match="primary_model_document_protected"):
+        WorkspaceRepository().remove_model_document(workspace_gid="10", document_gid="40",
+            expected_workspace_version=3, actor_gid="30", tenant_gid="20")
+    assert not any(sql.startswith("UPDATE") for sql, _ in cursor.calls)
+
+
+def test_remove_inserted_document_soft_removes_only_association(monkeypatch):
+    cursor = _install(monkeypatch, [{"row_version": 3}, {"role": "inserted"}])
+    result = WorkspaceRepository().remove_model_document(workspace_gid="10", document_gid="40",
+        expected_workspace_version=3, actor_gid="30", tenant_gid="20")
+    assert result["removed"] is True
+    assert result["workspace_row_version"] == 4
+    update = next((sql, params) for sql, params in cursor.calls if sql.startswith("UPDATE workmanship_sim_vm_documents"))
+    assert "removed_at=NOW(6)" in update[0]
+    assert update[1] == ("40", "10", "20")
+    assert not any(sql.startswith("DELETE") for sql, _ in cursor.calls)
+
+
+def test_remove_document_role_query_uses_migrated_column(monkeypatch):
+    migration = (Path(__file__).resolve().parents[3] / "backend/db/migrations/domains/simulation/0018_simulation_environment_documents_and_hierarchies.sql").read_text(encoding="utf-8")
+    assert "ADD COLUMN IF NOT EXISTS `document_role`" in migration
+    cursor = _install(monkeypatch, [{"row_version": 3}, {"role": "inserted"}])
+    WorkspaceRepository().remove_model_document(workspace_gid="10", document_gid="40",
+        expected_workspace_version=3, actor_gid="30", tenant_gid="20")
+    sql, params = next((sql, params) for sql, params in cursor.calls
+                      if sql.startswith("SELECT") and "FROM workmanship_sim_vm_documents " in sql)
+    assert sql.endswith("FOR UPDATE")
+    # Execute the actual projection against the migrated column names instead of
+    # accepting arbitrary SQL through the repository's ordinary stub cursor.
+    with sqlite3.connect(":memory:") as connection:
+        connection.row_factory = sqlite3.Row
+        connection.execute("CREATE TABLE workmanship_sim_vm_documents (gid TEXT, workspace_gid TEXT, tenant_gid TEXT, document_role TEXT, removed_at TEXT)")
+        connection.execute("INSERT INTO workmanship_sim_vm_documents VALUES ('40','10','20','inserted',NULL)")
+        query = sql.removesuffix(" FOR UPDATE").replace("%s", "?")
+        assert dict(connection.execute(query, params).fetchone()) == {"role": "inserted"}
+
+
+def test_remove_model_document_rejects_stale_workspace_version(monkeypatch):
+    cursor = _install(monkeypatch, [{"row_version": 4}])
+    with pytest.raises(WorkspaceRepositoryError, match="version_conflict"):
+        WorkspaceRepository().remove_model_document(workspace_gid="10", document_gid="40",
+            expected_workspace_version=3, actor_gid="30", tenant_gid="20")
+    assert not any(sql.startswith("UPDATE") for sql, _ in cursor.calls)
 
 
 def test_migration_declares_document_hierarchy_placement_and_verification_storage():

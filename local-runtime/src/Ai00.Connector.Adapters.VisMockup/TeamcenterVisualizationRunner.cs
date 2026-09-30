@@ -140,21 +140,11 @@ internal sealed class TeamcenterVisualizationRunner(
         return info;
     }
 
-    public async Task LaunchAsync(string materialPath, CancellationToken ct)
+    public Task LaunchAsync(string materialPath, CancellationToken ct)
     {
-        using var process = new Process { StartInfo = CreateStartInfo(materialPath) };
-        try
-        {
-            if (!process.Start())
-                throw new ConnectorNoEffectException("teamcenter_visualization_runner_start_failed");
-        }
-        catch (ConnectorException) { throw; }
-        catch { throw new ConnectorNoEffectException("teamcenter_visualization_runner_start_failed"); }
-
-        var exit = process.WaitForExitAsync(ct);
-        var consumed = await Task.WhenAny(exit, Task.Delay(TimeSpan.FromSeconds(20), ct));
         ct.ThrowIfCancellationRequested();
-        if (consumed == exit && process.ExitCode != 0)
-            throw new ConnectorNoEffectException("teamcenter_visualization_runner_failed");
+        // The external runner chooses its renderer asynchronously; it cannot
+        // prove capacity or participate in the retained application's guard.
+        return Task.FromException(new ConnectorNoEffectException("vismockup_document_limit_unverifiable"));
     }
 }

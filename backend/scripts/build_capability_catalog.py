@@ -52,6 +52,11 @@ def _verified_consumer_refs(capability_id: str, major_version: int = 1) -> tuple
     validation remain explicitly unverified in the desktop impact closure.
     """
     consumers: list[dict[str, str]] = []
+    if capability_id=='project.project.read.atomic.projects_search' and major_version==1:
+        consumers.append({'consumer_id':'packages/sim-plugin/web/model_cache/model_cache.js','consumer_type':'web','version_constraint':'==1'})
+    if capability_id=='project.project.read.atomic.projects_get' and major_version==2:
+        consumers.append({'consumer_id':'simulation.model_cache.create','consumer_type':'web','version_constraint':'==2'})
+        return tuple(consumers)
     from backend.base.plugin_marketplace_admin import CONTRACTS, PREFIX
     if (capability_id, major_version) in {(PREFIX + value[0], value[1]) for value in CONTRACTS.values()}:
         consumers.extend({"consumer_id": consumer, "consumer_type": "web", "version_constraint": f"=={major_version}"}
@@ -183,6 +188,41 @@ def _contract_test_revision() -> str:
 
 
 def _test_refs(capability_id: str, major_version: int):
+    if (capability_id,major_version)==('project.project.read.atomic.projects_get',2):
+        from backend.capability_v2.acceptance_contract import canonical_test_source_hash
+        path='plugins/project_management/tests/test_project_get_v2.py'
+        revision=canonical_test_source_hash((REPOSITORY_ROOT/path).read_bytes())
+        return tuple({'test_type':'contract','test_node_id':f'{path}::{name}','code_revision':revision,'path':path}
+            for name in ('test_project_read_v2_keeps_v1_frozen_and_returns_closed_real_application_data',
+                'test_project_read_v2_rejects_foreign_or_invisible_projects[True-False]',
+                'test_project_read_v2_rejects_foreign_or_invisible_projects[False-True]',
+                'test_project_read_v2_declares_actual_application_errors[missing-not_found]',
+                'test_project_read_v2_declares_actual_application_errors[ -invalid_input]',
+                'test_legacy_unowned_project_uses_only_the_authenticated_super_admin_tenant'))
+    if capability_id.startswith('simulation.model_cache.') or capability_id=='simulation.teamcenter.model_cache.read':
+        from backend.capability_v2.acceptance_contract import canonical_test_source_hash
+        path='plugins/simulation/tests/test_cloud_model_cache.py'
+        revision=canonical_test_source_hash((REPOSITORY_ROOT/path).read_bytes())
+        refs=tuple({'test_type':'contract','test_node_id':f'{path}::{name}','code_revision':revision,'path':path}
+            for name in ('test_restart_replay_and_all_fields','test_generation_mismatch_rolls_back_page',
+                'test_provider_rejects_member_trigger_and_wrong_actor','test_connector_dispatch_reuses_admitted_plan_after_restart_and_completes',
+                'test_principal_change_rolls_back','test_late_attempt_cannot_commit_or_fail_new_attempt',
+                'test_incomplete_and_duplicate_pages_cannot_publish','test_project_validation_uses_governed_owner_and_canonical_name'))
+        if capability_id.startswith('simulation.model_cache.'):
+            path='plugins/simulation/tests/test_cloud_model_cache_gateway.py'
+            revision=canonical_test_source_hash((REPOSITORY_ROOT/path).read_bytes())
+            refs+=tuple({'test_type':'contract','test_node_id':f'{path}::{name}','code_revision':revision,'path':path}
+                for name in ('test_gateway_cache_create_control_and_worker_writes_commit_and_replay',
+                    'test_gateway_failure_rolls_back_batch_root_task_and_version[outbox]',
+                    'test_gateway_failure_rolls_back_batch_root_task_and_version[projection]',
+                    'test_repository_borrowed_transaction_rolls_back_only_the_rejected_page',
+                    'test_worker_handler_locks_batch_before_ordinary_snapshot_reads',
+                    'test_gateway_abandonment_rolls_back_and_closes_open_participant[cancel]',
+                    'test_gateway_abandonment_rolls_back_and_closes_open_participant[timeout]',
+                    'test_cache_creation_uses_the_real_registered_project_reader',
+                    'test_registered_project_read_rejects_foreign_tenant_before_cache_creation',
+                    'test_cache_creation_handles_legacy_unowned_project_through_owner_policy'))
+        return refs
     if (capability_id, major_version) == ('base.plugin.marketplace.release.submit', 1):
         path = 'backend/tests/test_plugin_package_upload.py'
         from backend.capability_v2.acceptance_contract import canonical_test_source_hash

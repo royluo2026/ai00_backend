@@ -13,6 +13,199 @@ public sealed class ViewerNodeRegistryTests : IDisposable
     static string Session(string handle) => CanonicalJson.Hash(new { process_id=123,
         process_started_utc_ticks="456", document_handle=handle });
 
+    [Theory]
+    [InlineData(true, true, "visible", true)]
+    [InlineData(false, false, "hidden", false)]
+    [InlineData(true, false, "mixed", null)]
+    public async Task Resolution_reports_subtree_visibility_without_writing(bool parentVisible, bool childVisible, string state, bool? visible)
+    {
+        var child = new CountingNode("child", "child") { Visible = childVisible };
+        var tree = new CountingNode("root", "", child) { Visible = parentVisible };
+        var (adapter, _, document) = CreateAdapter(tree);
+        var result = Json(await adapter.ResolveViewerNodesAsync("source-1", Session("doc"),
+            Json(new[] { new { source_node_id = "root", kind = "document_root" } })));
+        var node = result.GetProperty("nodes")[0];
+        Assert.Equal("mapped", node.GetProperty("status").GetString());
+        Assert.Equal(state, node.GetProperty("visibility_state").GetString());
+        Assert.Equal(visible, node.GetProperty("visible").Deserialize<bool?>());
+        Assert.Empty(document.VisibilityChanges);
+        Assert.Equal(0, document.SetNodeVisibleCalls + document.SetNodeSelectedCalls);
+    }
+
+    [Fact]
+    public async Task Cached_resolution_reads_visibility_again_and_unknown_never_becomes_checked()
+    {
+        var leaf = new CountingNode("root", "") { Visible = true };
+        var (adapter, _, document) = CreateAdapter(leaf);
+        var descriptors = Json(new[] { new { source_node_id = "root", kind = "document_root" } });
+        var first = Json(await adapter.ResolveViewerNodesAsync("source-1", Session("doc"), descriptors)).GetProperty("nodes")[0];
+        Assert.Equal("visible", first.GetProperty("visibility_state").GetString());
+        leaf.Visible = false;
+        var second = Json(await adapter.ResolveViewerNodesAsync("source-1", Session("doc"), descriptors)).GetProperty("nodes")[0];
+        Assert.Equal(first.GetProperty("node_ref").GetString(), second.GetProperty("node_ref").GetString());
+        Assert.Equal("hidden", second.GetProperty("visibility_state").GetString());
+        leaf.VisibilityError = new InvalidOperationException("native read failed");
+        var failed = Json(await adapter.ResolveViewerNodesAsync("source-1", Session("doc"), descriptors)).GetProperty("nodes")[0];
+        Assert.Equal("unknown", failed.GetProperty("visibility_state").GetString());
+        Assert.Equal(JsonValueKind.Null, failed.GetProperty("visible").ValueKind);
+        Assert.Equal(0, document.SetNodeVisibleCalls + document.SetNodeSelectedCalls);
+    }
+
+    [Fact]
+    public async Task Visibility_budget_does_not_prevent_later_target_mapping_or_assert_full_visibility()
+    {
+        var target = new CountingNode("target", "target") { Visible = true };
+        var others = Enumerable.Range(1, 513).Select(i => new CountingNode("other" + i, "other" + i)).ToArray();
+        var wide = new CountingNode("wide", "wide", others) { Visible = true };
+        var tree = new CountingNode("root", "", wide, target) { Visible = true };
+        var (adapter, _, _) = CreateAdapter(tree);
+        wide.Reset();
+        var result = Json(await adapter.ResolveViewerNodesAsync("source-1", Session("doc"), Json(new object[]
+        {
+            new { source_node_id = "root", kind = "document_root" }, Occurrence("target", "target")
+        })));
+        Assert.All(result.GetProperty("nodes").EnumerateArray(), node => Assert.Equal("mapped", node.GetProperty("status").GetString()));
+        Assert.Equal("unknown", result.GetProperty("nodes")[0].GetProperty("visibility_state").GetString());
+        Assert.Equal(JsonValueKind.Null, result.GetProperty("nodes")[0].GetProperty("visible").ValueKind);
+        Assert.Equal("visible", result.GetProperty("nodes")[1].GetProperty("visibility_state").GetString());
+        Assert.Equal(0, wide.ChildrenReads);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Visibility_calibration_stops_on_revoked_admission_or_document_change(bool changeDocument)
+    {
+        var tree = new CountingNode("root", "", new CountingNode("child", ""));
+        var (adapter, app, document) = CreateAdapter(tree);
+        tree.AfterChildrenRead = () =>
+        {
+            if (changeDocument) app.ActiveDocument = new FakeDocument("other", "other", tree);
+            else adapter.ViewerInteractionAdmissionAllowed = () => false;
+        };
+        var error = await Assert.ThrowsAsync<ConnectorNoEffectException>(() => adapter.ResolveViewerNodesAsync("source-1", Session("doc"),
+            Json(new[] { new { source_node_id = "root", kind = "document_root" } })));
+        Assert.Equal(changeDocument ? "document_session_changed" : "viewer_authorization_required", error.Code);
+        Assert.Empty(document.VisibilityChanges);
+        Assert.Equal(0, document.SetNodeVisibleCalls + document.SetNodeSelectedCalls);
+    }
+
+    [Fact]
+    public async Task Document_root_hide_clears_siblings_once_and_later_child_show_preserves_other_branches()
+    {
+        var left = new CountingNode("left", "left");
+        var right = new CountingNode("right", "right");
+        var tree = new CountingNode("root", "", left, right);
+        var (adapter, _, document) = CreateAdapter(tree);
+        document.SetNodeVisible("left", true);
+        document.SetNodeVisible("right", true);
+        var mapped = Json(await adapter.ResolveViewerNodesAsync("source-1", Session("doc"), Json(new object[]
+        {
+            new { source_node_id = "document", kind = "document_root" },
+            Occurrence("L", "left"), Occurrence("R", "right")
+        })));
+        tree.Reset(); left.Reset(); right.Reset();
+        var events = new List<(string Stage, JsonElement Detail)>();
+        adapter.ViewerDiagnostic = (stage, detail) => events.Add((stage, Json(detail)));
+        var initialWrites = document.SetNodeVisibleCalls;
+
+        await Act(adapter, mapped, "hide");
+        Assert.Equal(new[] { false }, document.VisibilityChanges);
+        Assert.Empty(document.VisibleNodeKeys);
+        Assert.Equal(initialWrites, document.SetNodeVisibleCalls);
+        Assert.Contains(events, entry => entry.Stage == "visibility_readback"
+            && entry.Detail.GetProperty("scope").GetString() == "document"
+            && entry.Detail.GetProperty("verification_scope").GetString() == "root_flag");
+
+        async Task ActChild(int index, string action) => await adapter.ExecuteViewerNodeAsync("source-1", Session("doc"),
+            mapped.GetProperty("structure_epoch").GetInt64(), mapped.GetProperty("nodes")[index].GetProperty("node_ref").GetString()!,
+            "vismockup.node.visibility.change@1", Json(new { action }));
+        await ActChild(1, "show");
+        Assert.True(document.IsNodeVisible("left"));
+        Assert.False(document.IsNodeVisible("right"));
+        await ActChild(2, "show");
+        await ActChild(1, "hide");
+        Assert.False(document.IsNodeVisible("left"));
+        Assert.True(document.IsNodeVisible("right"));
+        Assert.Single(document.VisibilityChanges);
+        Assert.Equal(0, tree.ChildrenReads + tree.OccurrenceReads + left.ChildrenReads + left.OccurrenceReads + right.ChildrenReads + right.OccurrenceReads);
+    }
+
+    [Theory]
+    [InlineData("exception")]
+    [InlineData("session")]
+    [InlineData("readback")]
+    public async Task Document_root_hide_failure_after_write_is_unknown(string failure)
+    {
+        var (adapter, app, document) = CreateAdapter(new CountingNode("root", "", new CountingNode("child", "")));
+        var mapped = Json(await adapter.ResolveViewerNodesAsync("source-1", Session("doc"),
+            Json(new[] { new { source_node_id = "root", kind = "document_root" } })));
+        if (failure == "exception") document.SetAllNodesVisibleError = new ConnectorNoEffectException("native_all_off_failed");
+        if (failure == "session") document.AfterAllNodesVisibilityWrite = () => app.ActiveDocument = new FakeDocument("other", "other", new CountingNode("root", ""));
+        if (failure == "readback") document.AfterAllNodesVisibilityWrite = () => document.SetNodeVisible("root", true);
+        Assert.Equal("viewer_outcome_unknown", (await Assert.ThrowsAsync<ConnectorException>(() => Act(adapter, mapped, "hide"))).Code);
+        Assert.Equal(new[] { false }, document.VisibilityChanges);
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(513)]
+    public async Task Document_root_controls_actual_assembly_root_without_writing_siblings(int childCount)
+    {
+        var children = Enumerable.Range(1, childCount).Select(i => new CountingNode(i.ToString(), "child" + i)).ToArray();
+        var tree = new CountingNode("root", "", children);
+        var (adapter, _, document) = CreateAdapter(tree);
+        tree.Reset();
+        foreach (var child in children) child.Reset();
+        var mapped = Json(await adapter.ResolveViewerNodesAsync("source-1", Session("doc"),
+            Json(new[] { new { source_node_id = "assembly", kind = "document_root" } })));
+
+        Assert.Equal("mapped", mapped.GetProperty("nodes")[0].GetProperty("status").GetString());
+        tree.Reset();
+        foreach (var child in children) child.Reset();
+        await Act(adapter, mapped, "show");
+        await Act(adapter, mapped, "highlight");
+        Assert.True(document.IsNodeVisible("root"));
+        Assert.Equal("root", Assert.Single(document.SelectedNodeKeys));
+        Assert.Equal(1, document.SetNodeVisibleCalls);
+        Assert.Equal(1, document.SetNodeSelectedCalls);
+        Assert.Equal(0, tree.ChildrenReads + tree.OccurrenceReads);
+        Assert.All(children, child => Assert.Equal(0, child.ChildrenReads + child.OccurrenceReads));
+    }
+
+    [Fact]
+    public async Task Document_root_remains_bound_to_authorized_session_and_single_part_stays_leaf_only()
+    {
+        var tree = new CountingNode("root", "", new CountingNode("left", ""), new CountingNode("right", ""));
+        var (adapter, app, document) = CreateAdapter(tree);
+        var descriptors = Json(new[] { new { source_node_id = "assembly", kind = "document_root" } });
+        var mapped = Json(await adapter.ResolveViewerNodesAsync("source-1", Session("doc"), descriptors));
+        Assert.Equal("mapped", mapped.GetProperty("nodes")[0].GetProperty("status").GetString());
+        var leaf = Json(await adapter.ResolveViewerNodesAsync("source-1", Session("doc"),
+            Json(new[] { new { source_node_id = "leaf", kind = "single_part_root" } })));
+        Assert.Equal("viewer_single_part_required", leaf.GetProperty("nodes")[0].GetProperty("error_code").GetString());
+        adapter.ViewerInteractionAdmissionAllowed = () => false;
+        Assert.Equal("viewer_authorization_required", (await Assert.ThrowsAsync<ConnectorNoEffectException>(
+            () => adapter.ResolveViewerNodesAsync("source-1", Session("doc"), descriptors))).Code);
+        await Assert.ThrowsAsync<ConnectorNoEffectException>(() => Act(adapter, mapped, "show"));
+        adapter.ViewerInteractionAdmissionAllowed = () => true;
+        app.ActiveDocument = new FakeDocument("other", "tc://other", tree);
+        Assert.Equal("document_session_changed", (await Assert.ThrowsAsync<ConnectorNoEffectException>(
+            () => adapter.ResolveViewerNodesAsync("source-1", Session("doc"), descriptors))).Code);
+        await Assert.ThrowsAsync<ConnectorNoEffectException>(() => Act(adapter, mapped, "show"));
+        Assert.Equal(0, document.SetNodeVisibleCalls + document.SetNodeSelectedCalls);
+    }
+
+    [Fact]
+    public async Task Document_root_rejects_occurrence_path_in_direct_adapter_calls()
+    {
+        var (adapter, _, _) = CreateAdapter(new CountingNode("root", ""));
+        var result = Json(await adapter.ResolveViewerNodesAsync("source-1", Session("doc"),
+            Json(new[] { new { source_node_id = "root", kind = "document_root", occurrence_path = Array.Empty<object>() } })));
+        Assert.Equal("viewer_node_invalid", result.GetProperty("nodes")[0].GetProperty("error_code").GetString());
+    }
+
     [Fact]
     public async Task Opaque_root_mapping_controls_only_bound_document_and_rejects_reused_key()
     {
@@ -107,6 +300,29 @@ public sealed class ViewerNodeRegistryTests : IDisposable
         }
         finally { release.Set(); await blocking; }
         await Assert.ThrowsAsync<ConnectorNoEffectException>(()=>pending!);
+        Assert.Equal(0,document.SetNodeVisibleCalls);
+    }
+
+    [Fact]
+    public async Task Registered_cached_package_can_map_beyond_online_sibling_budget()
+    {
+        var (adapter, app, _) = CreateAdapter(new CountingNode("old", ""));
+        var path = Path.Combine(root, "snapshot.jt");
+        File.WriteAllText(path, "frozen test geometry");
+        var artifact = new { artifact_id="test", media_type="model/jt",
+            sha256=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(path))).ToLowerInvariant(),
+            byte_size=new FileInfo(path).Length, version=1 };
+        var packet = new { artifact_ref=artifact, package_dependencies=Array.Empty<object>(),
+            cache_binding=new {batch_id=new string('a',32),generation=(string?)null,snapshot_hash=(string?)null,schema_version=1} };
+        var payload=System.Text.Json.Nodes.JsonNode.Parse(Json(packet).GetRawText())!.AsObject();
+        payload["package_hash"]=Ai00.Connector.Contracts.V2.CanonicalJsonV2.Hash(Json(packet));
+        payload["local_artifact_path"]=path;
+        await adapter.OpenManagedCacheAsync(Json(payload),default);
+        var tree = new CountingNode("root", "", Enumerable.Range(0,600).Select(i=>new CountingNode("key"+i,"part"+i)).ToArray());
+        var document = new FakeDocument(path,path,tree);_ = document.RuntimeNodes;
+        app.ActiveDocument=document;app.OpenDocuments=[document];
+        var result=Json(await adapter.ResolveViewerNodesAsync("source",Session(path),Json(new[]{Occurrence("last","part599")})));
+        Assert.Equal("mapped",result.GetProperty("nodes")[0].GetProperty("status").GetString());
         Assert.Equal(0,document.SetNodeVisibleCalls);
     }
 
@@ -399,7 +615,9 @@ public sealed class ViewerNodeRegistryTests : IDisposable
         public string PrintableName => "part";
         public string CadId => "cad:" + key;
         public string ModelId => "rev";
-        public bool IsVisible => false;
+        public bool Visible { get; set; }
+        public Exception? VisibilityError { get; set; }
+        public bool IsVisible => VisibilityError is null ? Visible : throw VisibilityError;
         public int ChildrenReads { get; private set; }
         public int OccurrenceReads { get; private set; }
         public Action? AfterChildrenRead { get; set; }

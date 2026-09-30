@@ -28,6 +28,8 @@ def test_document_capabilities_are_atomic_and_scoped():
         "simulation.environment.model_document.search",
         "simulation.environment.model_document.add",
         "simulation.environment.model_document.remove",
+        "simulation.environment.model_document.search",
+        "simulation.environment.cache_source.bind",
     ]
 
 

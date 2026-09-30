@@ -88,6 +88,8 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
             new("vismockup.document.existing_identity.read@1", "sha256:9aa9528fff83c565d3d005daa1167b41cef2f6d413d485790c6c98c139fc1471"),
             new("vismockup.document.hierarchy_inventory.read@1", "sha256:a89bdc3fbb04ee643f1434dee83c653df8a04fc406ac7fff1e61ce39ee99685a"),
             new("vismockup.document.snapshot@1", "sha256:aa7c11c2501026c470a9cc7bfcbbecc7339879c18bf2b6b86f68ed7fc2e1861b"),
+            new("vismockup.model.open@3", TcOpenContractHash),
+            new("vismockup.model.open@2", "sha256:ffa45d329b0d9f88358b7f0846670c3120992614b4eda0b8d6ddfe76bb8b1eec"),
             new("vismockup.model.open@1", "sha256:aabd43bb066794c250f7eeed41def7c147a4da7263e813f192efa59a0cb40e34"),
             new("vismockup.model.insert@1", "sha256:70e68f565989a75406fabb5ffcc5b6f87233f2e55be9a011b202671a26f7c370"),
             new("vismockup.model.close@1", "sha256:a1a27969ab8638c9868b384ccb546aed1ece56219ded7c7ec3bb3d6b19861771"),
@@ -107,6 +109,9 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
             new("teamcenter.product_structure.page.read@1", "sha256:0ef57b5769664cebca42562cbb711228994e6257901786f84f5dfb82a8a6c6ad"),
             new("teamcenter.product_structure.children.read@1", "sha256:a76cbb3fba1abefdef619baad7a718a641dc6a4ab51ceb1e2e6575851837196f"),
             new("teamcenter.node_properties.read@1", "sha256:aab317614eb33e600e66660b0879fe59fdda138b7c37fe373af1c12d75eff6b5"),
+            new("teamcenter.model_files.size.preflight@1", "sha256:ed99a125e673f46071a961e1a6a63eadc4b0268a88a9584b9484dee13cfcefa1"),
+            new("teamcenter.model_cache.read@1", "sha256:49f8a673509c85d73a8202773260750336c6437b8e08ec1d29868adc0369792c"),
+            new("teamcenter.model_cache.read@2", "sha256:d2a0b76cb6eb7852dd2aaa0368e7526be3ce139f342e582e58876627aed84106"),
             new("teamcenter.visualization.launch@1", "sha256:d74338b54d5abd84dad3435768aa56756ef4fbb560f1d605b2b1bb9cc18519a8"),
             new("teamcenter.visualization.launch@2", "sha256:807ebf90b7f92d994a1da3963c459191750fb21ca8890a096e3bb04d398e407a"),
             new("teamcenter.visualization.insert@1", "sha256:d3bd3656f14f8bfb9e3e2090c2462317aac1f4f1ca983fb92a7f8553fae84d1d"),
@@ -144,6 +149,7 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
         var result = await _sta.InvokeAsync<object>(() =>
         {
             cancellationToken.ThrowIfCancellationRequested();
+            _connection.RequireExistingApplication();
             var before = RequireProcessIdentity();
             var handle = _connection.RequireActiveDocument(allowLaunch: false).DocumentId;
             if (string.IsNullOrWhiteSpace(handle))
@@ -256,8 +262,12 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
             var document=application.OpenDocuments.SingleOrDefault(item=>item.DocumentId==prepared.Target.DocumentId);
             if(document is null)
             {
+                ct.ThrowIfCancellationRequested();
+                var afterEnumeration=RequireProcessIdentity();
+                if(afterEnumeration.ProcessId!=process.ProcessId || afterEnumeration.ProcessStartUtcTicks!=process.ProcessStartUtcTicks)
+                    throw new ConnectorNoEffectException("document_session_changed");
                 _preparedTargets.Remove(expectedDocumentSession);
-                throw new ConnectorNoEffectException("document_session_changed");
+                throw new ConnectorNoEffectException("document_closed");
             }
             var window=document.ActivateNativeWindow(process.ProcessId!.Value,
                 new(prepared.Target.DocumentWindow,prepared.Target.WindowToken));
@@ -372,6 +382,8 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
             "vismockup.document.snapshot@1" => await SnapshotAsync(
                 operation.Payload.GetProperty("max_nodes").GetInt32(),
                 operation.Payload.GetProperty("max_depth").GetInt32()),
+            "vismockup.model.open@3" => await OpenTcCacheAsync(operation.Payload, cancellationToken),
+            "vismockup.model.open@2" => await OpenManagedCacheAsync(operation.Payload, cancellationToken),
             "vismockup.model.open@1" => await OpenManagedFileAsync(
                 operation.Payload.GetProperty("local_artifact_path").GetString() ?? ""),
             "vismockup.model.insert@1" => await InsertManagedFileAsync(
@@ -415,6 +427,10 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
             "teamcenter.product_structure.observe@1" => await _teamcenter.ObserveAsync(operation.Payload, cancellationToken),
             "teamcenter.product_structure.children.read@1" => await _teamcenter.ReadChildrenAsync(operation.Payload, cancellationToken),
             "teamcenter.node_properties.read@1" => await _teamcenter.ReadNodePropertiesAsync(operation.Payload, cancellationToken),
+            "teamcenter.model_file.fetch@1" => throw new ConnectorNoEffectException("cache_jt_upload_disabled"),
+            "teamcenter.model_files.size.preflight@1" => await _teamcenter.PreflightModelFilesAsync(operation.Payload, cancellationToken),
+            "teamcenter.model_cache.read@1" => await _teamcenter.ReadModelCacheAsync(operation.Payload, cancellationToken),
+            "teamcenter.model_cache.read@2" => await _teamcenter.ReadModelCacheV2Async(operation.Payload, cancellationToken),
             "teamcenter.product.search@1" => await _teamcenter.SearchAsync(operation.Payload, cancellationToken),
             "teamcenter.product.search@2" => await _teamcenter.SearchV2Async(operation.Payload, cancellationToken),
             "teamcenter.revision_rule.search@1" => await _teamcenter.GetRevisionRulesAsync(operation.Payload, cancellationToken),
@@ -442,7 +458,7 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
         InvalidateViewerStructure();
         var safePath = _paths.ValidateModelPath(filePath);
         var application = _connection.RequireActiveApplication(true);
-        var document = application.OpenDocument(safePath);
+        var document = VisMockupDocumentOpen.Open(application, safePath, _com.InspectProcess().ProcessId);
         _ownedDocumentId = document.DocumentId;
         return new { opened = true, document_id = document.DocumentId };
     });
@@ -492,7 +508,7 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
                 var process = captureIdentity ? RequireProcessIdentity() : null;
                 InvalidateViewerStructure();
                 _com.HideOwnedWindows();
-                var document = application.OpenDocument(path);
+                var document = VisMockupDocumentOpen.Open(application, path, _com.InspectProcess().ProcessId);
                 _ownedDocumentId = document.DocumentId;
                 if (process is not null)
                 {
@@ -820,10 +836,11 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
         Process.Start(new ProcessStartInfo(fullExe) { UseShellExecute = true });
         return new { status = "starting" };
     }
-    public Task<object> OpenFileAsync(string filePath) => _sta.InvokeAsync<object>(() =>
+    public async Task<object> OpenFileAsync(string filePath)
     {
-        var safePath = _paths.ValidateModelPath(filePath); dynamic app = Connect(); app.Documents.Open(safePath); return new { opened = true };
-    });
+        await OpenManagedFileAsync(filePath);
+        return new { opened = true };
+    }
     public Task<object> VisibilityAsync(string action) => _sta.InvokeAsync<object>(() =>
     {
         dynamic app = Connect(); dynamic documents = app.Documents;
@@ -834,6 +851,9 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
     });
     public Task<object> TreeAsync(int maxDepth, bool forceRefresh = false, bool includeVisibility = false, string? expectedSession = null) => _sta.InvokeAsync<object>(() =>
     {
+        var traceId=Guid.NewGuid().ToString("N");var timer=System.Diagnostics.Stopwatch.StartNew();
+        TraceViewer("native_tree_started",new{trace_id=traceId,max_depth=maxDepth,force_refresh=forceRefresh});
+        try{
         if (maxDepth is < 1 or > 8) throw new ConnectorException("vismockup_tree_depth_invalid");
         var document = _connection.RequireActiveDocument();
         RequireExpectedDocumentSession(document, expectedSession);
@@ -844,17 +864,21 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
             var cachedResult=TreeResult(document, cached.Nodes, maxDepth, cached.CacheState,
                 includeVisibility ? ReadLiveVisibility(document, cached.Nodes, maxDepth, cached.CacheState) : null);
             RequireExpectedDocumentSession(document, expectedSession);
+            TraceViewer("native_tree_completed",new{trace_id=traceId,node_count=cached.Nodes.Count,cache_hit=true,cache_state=cached.CacheState,elapsed_ms=timer.Elapsed.TotalMilliseconds});
             return cachedResult;
         }
         // The interactive tree must not wait on VisMockup's non-cancellable
         // ExportEx call. The governed document-snapshot workflow owns PLMXML
         // acquisition; this read path mirrors the proven direct COM traversal.
         var visibility = includeVisibility ? new Dictionary<string, bool?>(StringComparer.Ordinal) : null;
+        TraceViewer("native_tree_traversal",new{trace_id=traceId,reason=forceRefresh?"force_refresh":"cache_unavailable"});
         var complete = ReadCompleteComTree(document, maxDepth, visibility);
         _treeCache?.Replace(document, maxDepth, complete);
         var result=TreeResult(document, complete, maxDepth, "verified", visibility);
         RequireExpectedDocumentSession(document, expectedSession);
+        TraceViewer("native_tree_completed",new{trace_id=traceId,node_count=complete.Count,cache_hit=false,cache_state="verified",elapsed_ms=timer.Elapsed.TotalMilliseconds});
         return result;
+        }catch(Exception error){TraceViewer("native_tree_failed",new{trace_id=traceId,exception_type=error.GetType().Name,hresult=error.HResult,error_code=error is ConnectorException known?known.Code:null,elapsed_ms=timer.Elapsed.TotalMilliseconds});throw;}
     });
 
     private VisMockupDocumentSnapshot ReadPlmxmlSnapshot(IVisMockupDocument document, int maxNodes, int maxDepth)

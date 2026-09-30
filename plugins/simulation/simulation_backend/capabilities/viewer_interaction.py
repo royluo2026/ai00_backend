@@ -21,7 +21,8 @@ class ViewerInteractionProvider:
                 result = dict(scope)
             return LiveDocumentProvider._output(result)
         except ValueError as exc:
-            raise CapabilityBusinessError('interaction_scope_denied', str(exc)) from exc
+            code = 'interaction_source_unassociated' if str(exc) == 'interaction_source_unassociated' else 'interaction_scope_denied'
+            raise CapabilityBusinessError(code, str(exc)) from exc
 
     def authorize(self, payload, context):
         try:

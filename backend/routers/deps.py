@@ -512,6 +512,14 @@ def build_capability_authorization_grants(
         data_scopes.add("*")
     capability_scopes = ("*",) if consumer_type in {"web", "api"} else ()
     policy_version = "legacy-rbac-to-abac-v1"
+    if consumer_type == 'worker' and identity is not None and (
+        identity.consumer.consumer_id == 'simulation.model_cache.worker'
+        and identity.actor.user_id == str(user.get('gid'))
+        and identity.actor.authentication_method == 'durable_cache_trigger'
+        and is_super_admin
+    ):
+        capability_scopes = ('simulation.model_cache.advance',)
+        policy_version = 'simulation-model-cache-worker-v1'
     if consumer_type == "local_runtime":
         if (
             identity is None

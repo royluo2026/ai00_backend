@@ -43,7 +43,7 @@ public static class ViewerInteractionProtocol
             foreach(var node in nodes.EnumerateArray())
             {
                 var kind=Text(node,"kind");
-                ProtocolV2Schema.Closed(node,kind switch{"single_part_root"=>"source_node_id kind","occurrence_path"=>"source_node_id kind occurrence_path",_=>throw new InvalidDataException("source_node_kind_invalid")});
+                ProtocolV2Schema.Closed(node,kind switch{"single_part_root" or "document_root"=>"source_node_id kind","occurrence_path"=>"source_node_id kind occurrence_path",_=>throw new InvalidDataException("source_node_kind_invalid")});
                 if(!ids.Add(Text(node,"source_node_id")))throw new InvalidDataException("duplicate_source_node");
                 if(kind=="occurrence_path")foreach(var edge in Array(node,"occurrence_path").EnumerateArray())
                 {ProtocolV2Schema.Closed(edge,"occurrence_uid item_revision_uid");Text(edge,"occurrence_uid");Text(edge,"item_revision_uid");}

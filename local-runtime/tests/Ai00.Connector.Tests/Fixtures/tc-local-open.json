@@ -1,0 +1,70 @@
+[
+  {
+    "cache_binding": {
+      "batch_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "generation": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "snapshot_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "schema_version": 1
+    },
+    "preparation_hash": "sha256:9c8e235a0d68dd295e43479bbc5f26255e1f92411e43f680a1eca844e43aafdd",
+    "assembly_xml": "<?xml version='1.0' encoding='utf-8'?>\n<PLMXML xmlns=\"http://www.plmxml.org/Schemas/PLMXMLSchema\" schemaVersion=\"6\" author=\"AI00\" units=\"metre\" name=\"W10 test2\"><UserData id=\"snapshot-metadata\"><UserValue title=\"ai00_snapshot_identity\" value=\"{&quot;batch_id&quot;:&quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;,&quot;generation&quot;:&quot;bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb&quot;,&quot;schema_version&quot;:1,&quot;snapshot_hash&quot;:&quot;sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc&quot;}\" /><UserValue title=\"ai00_environment_gid\" value=\"10\" /><UserValue title=\"ai00_source_document_gid\" value=\"11\" /><UserValue title=\"ai00_cache_layout\" value=\"frozen_absolute_geometry.v1\" /></UserData><ProductDef id=\"cached-product\"><InstanceGraph id=\"cached-graph\" rootRefs=\"instance-c9b9b55a0344421b40def4d8f987e59f7e3c053594c580adbfe58bc1d7ae8e5c\"><ProductInstance id=\"instance-c9b9b55a0344421b40def4d8f987e59f7e3c053594c580adbfe58bc1d7ae8e5c\" name=\"Root\" partRef=\"#view-instance-c9b9b55a0344421b40def4d8f987e59f7e3c053594c580adbfe58bc1d7ae8e5c\"><UserData id=\"metadata-instance-c9b9b55a0344421b40def4d8f987e59f7e3c053594c580adbfe58bc1d7ae8e5c\"><UserValue title=\"bl_occurrence_uid\" value=\"instance-c9b9b55a0344421b40def4d8f987e59f7e3c053594c580adbfe58bc1d7ae8e5c\" /></UserData><Transform id=\"transform-instance-c9b9b55a0344421b40def4d8f987e59f7e3c053594c580adbfe58bc1d7ae8e5c\">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</Transform></ProductInstance><ProductRevisionView id=\"view-instance-c9b9b55a0344421b40def4d8f987e59f7e3c053594c580adbfe58bc1d7ae8e5c\" name=\"Root\" instanceRefs=\"instance-0b84cb883ce735635bb43623193ea4a74304f1f916a16c724a4c865862363bb7\"><UserData id=\"revision-metadata-instance-c9b9b55a0344421b40def4d8f987e59f7e3c053594c580adbfe58bc1d7ae8e5c\"><UserValue title=\"item_revision_uid\" value=\"r\" /><UserValue title=\"bl_occurrence_uid\" value=\"instance-c9b9b55a0344421b40def4d8f987e59f7e3c053594c580adbfe58bc1d7ae8e5c\" /></UserData></ProductRevisionView><ProductInstance id=\"instance-0b84cb883ce735635bb43623193ea4a74304f1f916a16c724a4c865862363bb7\" name=\"Root\" partRef=\"#view-instance-0b84cb883ce735635bb43623193ea4a74304f1f916a16c724a4c865862363bb7\"><UserData id=\"metadata-instance-0b84cb883ce735635bb43623193ea4a74304f1f916a16c724a4c865862363bb7\"><UserValue title=\"bl_occurrence_uid\" value=\"instance-0b84cb883ce735635bb43623193ea4a74304f1f916a16c724a4c865862363bb7\" /></UserData><Transform id=\"transform-instance-0b84cb883ce735635bb43623193ea4a74304f1f916a16c724a4c865862363bb7\">1 0 0 0 0 1 0 0 0 0 1 0 10 3 4 1</Transform></ProductInstance><ProductRevisionView id=\"view-instance-0b84cb883ce735635bb43623193ea4a74304f1f916a16c724a4c865862363bb7\" name=\"Root\"><UserData id=\"revision-metadata-instance-0b84cb883ce735635bb43623193ea4a74304f1f916a16c724a4c865862363bb7\"><UserValue title=\"item_revision_uid\" value=\"r\" /></UserData><Representation id=\"representation-instance-0b84cb883ce735635bb43623193ea4a74304f1f916a16c724a4c865862363bb7-9d11524752adce8765e706c5849dea0f11ae2ac9550ce992c93d1c122192d05c\" format=\"JT\" location=\"dependencies/9d11524752adce8765e706c5849dea0f11ae2ac9550ce992c93d1c122192d05c.jt\" /></ProductRevisionView></InstanceGraph></ProductDef></PLMXML>",
+    "tc_dependencies": [
+      {
+        "package_path": "dependencies/9d11524752adce8765e706c5849dea0f11ae2ac9550ce992c93d1c122192d05c.jt",
+        "file_ref": {
+          "dataset_uid": "dataset",
+          "file_uid": "file",
+          "file_name": "bolt.jt",
+          "relation_type": "IMAN_Rendering",
+          "endpoint_id": "tc-production",
+          "dependency_key": "9d11524752adce8765e706c5849dea0f11ae2ac9550ce992c93d1c122192d05c"
+        },
+        "node_key": "a",
+        "item_revision_uid": "r"
+      }
+    ],
+    "source_selector": {
+      "endpoint_id": "tc-production",
+      "object_uid": "item",
+      "item_revision_uid": "revision",
+      "bom_view_uid": "",
+      "revision_rule": "Latest Working",
+      "configuration_date": "2026-09-28T00:00:00Z"
+    },
+    "package_hash": "sha256:06a081b9299014a98e66774600498bdc94d2d4332b936f30e0611d2a5a8b8ba6"
+  },
+  {
+    "cache_binding": {
+      "batch_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "generation": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "snapshot_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "schema_version": 1
+    },
+    "preparation_hash": "sha256:9c8e235a0d68dd295e43479bbc5f26255e1f92411e43f680a1eca844e43aafdd",
+    "assembly_xml": "<?xml version='1.0' encoding='utf-8'?>\n<PLMXML xmlns=\"http://www.plmxml.org/Schemas/PLMXMLSchema\" schemaVersion=\"6\" author=\"AI00\" units=\"metre\" name=\"W10 test2\"><UserData id=\"snapshot-metadata\"><UserValue title=\"ai00_snapshot_identity\" value=\"{&quot;batch_id&quot;:&quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;,&quot;generation&quot;:&quot;bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb&quot;,&quot;schema_version&quot;:1,&quot;snapshot_hash&quot;:&quot;sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc&quot;}\" /><UserValue title=\"ai00_environment_gid\" value=\"10\" /><UserValue title=\"ai00_source_document_gid\" value=\"11\" /><UserValue title=\"ai00_cache_layout\" value=\"frozen_absolute_geometry.v1\" /></UserData><ProductDef id=\"cached-product\"><InstanceGraph id=\"cached-graph\" rootRefs=\"instance-a5985b798f99e1b0c32c0c25b90550d4d38ac63c4c35bd373d0ab38b7eee3feb\"><ProductInstance id=\"instance-a5985b798f99e1b0c32c0c25b90550d4d38ac63c4c35bd373d0ab38b7eee3feb\" name=\"Root\" partRef=\"#view-instance-a5985b798f99e1b0c32c0c25b90550d4d38ac63c4c35bd373d0ab38b7eee3feb\"><UserData id=\"metadata-instance-a5985b798f99e1b0c32c0c25b90550d4d38ac63c4c35bd373d0ab38b7eee3feb\"><UserValue title=\"bl_occurrence_uid\" value=\"instance-a5985b798f99e1b0c32c0c25b90550d4d38ac63c4c35bd373d0ab38b7eee3feb\" /></UserData><Transform id=\"transform-instance-a5985b798f99e1b0c32c0c25b90550d4d38ac63c4c35bd373d0ab38b7eee3feb\">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</Transform></ProductInstance><ProductRevisionView id=\"view-instance-a5985b798f99e1b0c32c0c25b90550d4d38ac63c4c35bd373d0ab38b7eee3feb\" name=\"Root\" instanceRefs=\"instance-a2dcd1128308fc7133599154d73bd23858bd3e53ef3f14c9f2d8ae8cd62a5735\"><UserData id=\"revision-metadata-instance-a5985b798f99e1b0c32c0c25b90550d4d38ac63c4c35bd373d0ab38b7eee3feb\"><UserValue title=\"item_revision_uid\" value=\"r\" /><UserValue title=\"bl_occurrence_uid\" value=\"instance-a5985b798f99e1b0c32c0c25b90550d4d38ac63c4c35bd373d0ab38b7eee3feb\" /></UserData></ProductRevisionView><ProductInstance id=\"instance-a2dcd1128308fc7133599154d73bd23858bd3e53ef3f14c9f2d8ae8cd62a5735\" name=\"Root\" partRef=\"#view-instance-a2dcd1128308fc7133599154d73bd23858bd3e53ef3f14c9f2d8ae8cd62a5735\"><UserData id=\"metadata-instance-a2dcd1128308fc7133599154d73bd23858bd3e53ef3f14c9f2d8ae8cd62a5735\"><UserValue title=\"bl_occurrence_uid\" value=\"instance-a2dcd1128308fc7133599154d73bd23858bd3e53ef3f14c9f2d8ae8cd62a5735\" /></UserData><Transform id=\"transform-instance-a2dcd1128308fc7133599154d73bd23858bd3e53ef3f14c9f2d8ae8cd62a5735\">1 0 0 0 0 1 0 0 0 0 1 0 20 3 4 1</Transform></ProductInstance><ProductRevisionView id=\"view-instance-a2dcd1128308fc7133599154d73bd23858bd3e53ef3f14c9f2d8ae8cd62a5735\" name=\"Root\"><UserData id=\"revision-metadata-instance-a2dcd1128308fc7133599154d73bd23858bd3e53ef3f14c9f2d8ae8cd62a5735\"><UserValue title=\"item_revision_uid\" value=\"r\" /></UserData><Representation id=\"representation-instance-a2dcd1128308fc7133599154d73bd23858bd3e53ef3f14c9f2d8ae8cd62a5735-9d11524752adce8765e706c5849dea0f11ae2ac9550ce992c93d1c122192d05c\" format=\"JT\" location=\"dependencies/9d11524752adce8765e706c5849dea0f11ae2ac9550ce992c93d1c122192d05c.jt\" /></ProductRevisionView></InstanceGraph></ProductDef></PLMXML>",
+    "tc_dependencies": [
+      {
+        "package_path": "dependencies/9d11524752adce8765e706c5849dea0f11ae2ac9550ce992c93d1c122192d05c.jt",
+        "file_ref": {
+          "dataset_uid": "dataset",
+          "file_uid": "file",
+          "file_name": "bolt.jt",
+          "relation_type": "IMAN_Rendering",
+          "endpoint_id": "tc-production",
+          "dependency_key": "9d11524752adce8765e706c5849dea0f11ae2ac9550ce992c93d1c122192d05c"
+        },
+        "node_key": "b",
+        "item_revision_uid": "r"
+      }
+    ],
+    "source_selector": {
+      "endpoint_id": "tc-production",
+      "object_uid": "item",
+      "item_revision_uid": "revision",
+      "bom_view_uid": "",
+      "revision_rule": "Latest Working",
+      "configuration_date": "2026-09-28T00:00:00Z"
+    },
+    "package_hash": "sha256:55eb7a71da6ee02b9042ec2c5c62b255490ce1c8d988cb9ddf32b52dee9497df"
+  }
+]

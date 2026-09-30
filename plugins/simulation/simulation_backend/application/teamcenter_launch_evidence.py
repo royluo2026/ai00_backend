@@ -45,7 +45,7 @@ def _json(value):
 def launch_only_plan(plan: ConnectorExecutionPlanV2, *, opened_source=False) -> bool:
     if not (
         plan.capability_id == LAUNCH_CAPABILITY
-        and plan.major_version == (2 if opened_source else 1)
+        and plan.major_version in ((2, 3) if opened_source else (1,))
         and len(plan.steps) == 1
         and plan.adapter_id == "ai00.vismockup"
         and plan.adapter_major == 1

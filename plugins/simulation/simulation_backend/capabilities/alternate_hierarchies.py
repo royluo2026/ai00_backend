@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import asyncio
 import json
 from typing import Any
 
@@ -260,7 +261,7 @@ class AlternateHierarchyProvider:
         if str(payload.get("plan_hash") or "") != plan["plan_hash"]:
             raise CapabilityBusinessError("bop_projection_plan_changed", "bop_projection_plan_changed", retryable=True)
         try:
-            data = self.repository.insert_bop_projection(workspace_gid=plan["workspace_gid"], plan=plan,
+            data = await asyncio.to_thread(self.repository.insert_bop_projection, workspace_gid=plan["workspace_gid"], plan=plan,
                 expected_workspace_version=plan["expected_workspace_version"], actor_gid=actor_gid,
                 tenant_gid=tenant_gid, idempotency_key=str(payload.get("idempotency_key") or ""))
         except WorkspaceRepositoryError as exc:

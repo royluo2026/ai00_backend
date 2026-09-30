@@ -1,5 +1,6 @@
 from types import SimpleNamespace
 
+import json
 import jsonschema
 import pytest
 
@@ -48,6 +49,21 @@ def test_scope_get_resolves_authoritative_association_and_authorize_returns_sign
     assert grant['grant_generation'] == 1
     for suffix, data in [('scope.get', scope), ('authorize', grant)]:
         jsonschema.validate(data, registry()['simulation.viewer.interaction.' + suffix, 1][0].output_schema)
+
+
+@pytest.mark.parametrize('owned,expected', [(True, 'interaction_source_unassociated'), (False, 'interaction_scope_denied')])
+def test_scope_get_only_exposes_unassociated_code_for_owned_online_document(grant_case, owned, expected):
+    from plugins.simulation.simulation_backend.capabilities.viewer_interaction import ViewerInteractionProvider
+    from backend.capability_v2.provider_contracts import CapabilityBusinessError
+    with grant_case.connect() as conn, conn.cursor() as cur:
+        cur.execute("UPDATE workmanship_sim_vm_documents SET document_role='inserted'")
+        cur.execute('UPDATE workmanship_sim_viewer_source_associations SET active=0')
+        if not owned:
+            cur.execute("UPDATE workmanship_sim_vm_documents SET owner_gid='99'")
+    provider = ViewerInteractionProvider(grant_case.repository, None, clock=lambda: NOW)
+    with pytest.raises(CapabilityBusinessError) as raised:
+        provider.scope_get(dict(workspace_gid='10', document_gid='20'), grant_case.context)
+    assert raised.value.code == expected
 
 
 @pytest.mark.parametrize('payload', [dict(workspace_gid='10', document_gid='21'),
@@ -115,3 +131,70 @@ def test_launch_v2_preserves_explicit_confirmation_requirement_for_new_runtime()
     assert not SimulationConnectorRepository._repeat_is_freshly_confirmed_document_launch(plan, prior)
     assert not SimulationConnectorRepository._repeat_is_freshly_confirmed_document_launch(
         plan.model_copy(update={'confirmation_receipt_id':None}), prior)
+
+
+def test_cache_bound_launch_resolves_server_identity_and_queues_one_native_launch(monkeypatch):
+    from backend.capability_v2.provider_contracts import CapabilityContext
+    from backend.capability_v2.contracts import OperationRef, OperationStatus
+    queued=[];runtime=dict(device_id='device-1',runtime_type='electron')
+    class Control:
+        repository=SimpleNamespace(bound_runtime_for_user=lambda *_:runtime)
+        clock=staticmethod(lambda:NOW);plan_signer=None
+        def queue_v2(self,plan,context,*,runtime_row):
+            queued.append(plan);return OperationRef(operation_id=plan['plan_id'],status=OperationStatus.ACCEPTED)
+    monkeypatch.setattr(
+        'plugins.simulation.simulation_backend.capabilities.connector_runtime._resolve_cache_visualization_source',
+        lambda source,context:dict(endpoint_id='tc-production',object_uid='rev-node',item_revision_uid='rev-node',
+            bom_view_uid='',revision_rule='Latest Working',configuration_date='2026-09-22T00:00:00Z'))
+    value=Registry();register_connector_runtime_capabilities(value,Control())
+    handler=value.items['simulation.teamcenter.visualization.launch.request',3][1]
+    payload={'cache_source':{'batch_id':'a'*32,'node_key':'sha256:'+'b'*64},'expected_visdoc_uid':''}
+    result=handler(payload,CapabilityContext(user_gid='11',team_gid='12',source='web',request_id='cache-open',
+        catalog_release='rel_'+'a'*32,normalized_input_hash='sha256:'+'b'*64,confirmation_token='confirm-open'))
+    assert result.data['operation_id']==queued[0]['plan_id']
+    assert queued[0]['major_version']==3
+    assert len(queued[0]['steps'])==1
+    assert queued[0]['steps'][0]['operation_id']=='teamcenter.visualization.launch@2'
+    assert queued[0]['steps'][0]['payload']=={
+        'source_selector':{'endpoint_id':'tc-production','object_uid':'rev-node','item_revision_uid':'rev-node',
+            'bom_view_uid':'','revision_rule':'Latest Working','configuration_date':'2026-09-22T00:00:00Z'},
+        'expected_visdoc_uid':''}
+    assert all(token not in json.dumps(queued[0]).lower() for token in ('file.fetch','artifact.upload','ois'))
+
+
+def test_cache_bound_insert_reuses_single_existing_insert_operation(monkeypatch):
+    from backend.capability_v2.provider_contracts import CapabilityContext
+    from backend.capability_v2.contracts import OperationRef, OperationStatus
+    queued=[];runtime=dict(device_id='device-1',runtime_type='electron')
+    class Control:
+        repository=SimpleNamespace(bound_runtime_for_user=lambda *_:runtime)
+        clock=staticmethod(lambda:NOW);plan_signer=None
+        def queue_v2(self,plan,context,*,runtime_row):
+            queued.append(plan);return OperationRef(operation_id=plan['plan_id'],status=OperationStatus.ACCEPTED)
+    monkeypatch.setattr(
+        'plugins.simulation.simulation_backend.capabilities.connector_runtime._resolve_cache_visualization_source',
+        lambda *_:dict(endpoint_id='tc-production',object_uid='rev-node',item_revision_uid='rev-node',bom_view_uid='',
+            revision_rule='Latest Working',configuration_date='2026-09-22T00:00:00Z'))
+    value=Registry();register_connector_runtime_capabilities(value,Control())
+    handler=value.items['simulation.teamcenter.visualization.insert.request',2][1]
+    handler({'cache_source':{'batch_id':'a'*32,'node_key':'node'},'expected_visdoc_uid':''},CapabilityContext(
+        user_gid='11',team_gid='12',source='web',request_id='cache-insert',catalog_release='rel_'+'a'*32,
+        normalized_input_hash='sha256:'+'b'*64,confirmation_token='confirm-insert'))
+    assert queued[0]['major_version']==2
+    assert len(queued)==1 and len(queued[0]['steps'])==1
+    assert queued[0]['steps'][0]['operation_id']=='teamcenter.visualization.insert@1'
+
+
+@pytest.mark.parametrize('version,key',[(3,('simulation.teamcenter.visualization.launch.request',3)),
+    (2,('simulation.teamcenter.visualization.insert.request',2))])
+def test_cache_bound_visualization_contract_is_closed(version,key):
+    spec,_,descriptor=registry()[key]
+    assert descriptor.transaction_policy['mode']=='external'
+    assert any(resource.resource_type=='simulation-model-cache-node' and not resource.required
+        for resource in descriptor.resource_selectors)
+    good={'cache_source':{'batch_id':'a'*32,'node_key':'node'},'expected_visdoc_uid':''}
+    jsonschema.validate(good,spec.input_schema)
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate({**good,'item_revision_uid':'injected'},spec.input_schema)
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate({**good,'source_selector':{'endpoint_id':'tc-production'}},spec.input_schema)

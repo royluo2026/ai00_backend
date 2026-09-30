@@ -1,0 +1,197 @@
+{
+  "id": "simulation.model_cache.file.fetch.batch.request@1",
+  "input": {
+    "type": "object",
+    "properties": {
+      "batch_id": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{32}$"
+      },
+      "expected_generation": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "pattern": "^[a-f0-9]{32}$"
+      },
+      "expected_snapshot_hash": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "pattern": "^sha256:[a-f0-9]{64}$"
+      },
+      "files": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 8,
+        "items": {
+          "type": "object",
+          "properties": {
+            "node_key": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "dataset_uid": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "file_uid": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "expected_content_hash": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^sha256:[a-f0-9]{64}$"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "node_key",
+            "dataset_uid",
+            "file_uid"
+          ]
+        }
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "batch_id",
+      "files"
+    ]
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "operation_id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      },
+      "identity": {
+        "type": "object",
+        "properties": {
+          "batch_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "generation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "snapshot_hash": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          },
+          "schema_version": {
+            "const": 1,
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "batch_id",
+          "generation",
+          "snapshot_hash",
+          "schema_version"
+        ]
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "queued",
+          "running",
+          "completed",
+          "failed",
+          "outcome_unknown",
+          "cancelled",
+          "leased",
+          "pending",
+          "executing",
+          "expired",
+          "reconciling",
+          "failed_without_effect",
+          "manual_review_required"
+        ]
+      },
+      "files": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 8,
+        "items": {
+          "type": "object",
+          "properties": {
+            "step_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "node_key": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "item_revision_uid": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "file_ref": {
+              "type": "object",
+              "properties": {
+                "dataset_uid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_uid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_name": {
+                  "type": "string"
+                },
+                "relation_type": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "dataset_uid",
+                "file_uid",
+                "file_name",
+                "relation_type"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "step_id",
+            "node_key",
+            "item_revision_uid",
+            "file_ref"
+          ]
+        }
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "operation_id",
+      "identity",
+      "status",
+      "files"
+    ]
+  }
+}

@@ -1,0 +1,328 @@
+{
+  "id": "simulation.model_cache.file.fetch.result@1",
+  "input": {
+    "type": "object",
+    "properties": {
+      "batch_id": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{32}$"
+      },
+      "node_key": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      },
+      "dataset_uid": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      },
+      "file_uid": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      },
+      "expected_generation": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "pattern": "^[a-f0-9]{32}$"
+      },
+      "expected_snapshot_hash": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "pattern": "^sha256:[a-f0-9]{64}$"
+      },
+      "expected_content_hash": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "pattern": "^sha256:[a-f0-9]{64}$"
+      },
+      "operation_id": {
+        "type": "string",
+        "maxLength": 512
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "batch_id",
+      "node_key",
+      "dataset_uid",
+      "file_uid",
+      "operation_id"
+    ]
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "operation_id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      },
+      "identity": {
+        "type": "object",
+        "properties": {
+          "batch_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "generation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "snapshot_hash": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          },
+          "schema_version": {
+            "const": 1,
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "batch_id",
+          "generation",
+          "snapshot_hash",
+          "schema_version"
+        ]
+      },
+      "node_key": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      },
+      "item_revision_uid": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      },
+      "file_ref": {
+        "type": "object",
+        "properties": {
+          "dataset_uid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "file_uid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "file_name": {
+            "type": "string"
+          },
+          "relation_type": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "dataset_uid",
+          "file_uid",
+          "file_name",
+          "relation_type"
+        ]
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "queued",
+          "running",
+          "completed",
+          "failed",
+          "outcome_unknown",
+          "cancelled",
+          "leased",
+          "pending",
+          "executing",
+          "expired",
+          "reconciling",
+          "failed_without_effect",
+          "manual_review_required"
+        ]
+      },
+      "file": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "identity": {
+                "type": "object",
+                "properties": {
+                  "batch_id": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{32}$"
+                  },
+                  "generation": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^[a-f0-9]{32}$"
+                  },
+                  "snapshot_hash": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^sha256:[a-f0-9]{64}$"
+                  },
+                  "schema_version": {
+                    "const": 1,
+                    "type": "integer"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "batch_id",
+                  "generation",
+                  "snapshot_hash",
+                  "schema_version"
+                ]
+              },
+              "node_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "item_revision_uid": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "file_ref": {
+                "type": "object",
+                "properties": {
+                  "dataset_uid": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "file_uid": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "file_name": {
+                    "type": "string"
+                  },
+                  "relation_type": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "dataset_uid",
+                  "file_uid",
+                  "file_name",
+                  "relation_type"
+                ]
+              },
+              "artifact_ref": {
+                "type": "object",
+                "properties": {
+                  "artifact_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "media_type": {
+                    "type": "string",
+                    "enum": [
+                      "model/jt",
+                      "model/plmxml",
+                      "application/vnd.siemens.plmxml+xml",
+                      "model/step",
+                      "image/png"
+                    ]
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "byte_size": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "version": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "artifact_id",
+                  "media_type",
+                  "sha256",
+                  "byte_size",
+                  "version"
+                ]
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[a-f0-9]{64}$"
+              },
+              "byte_length": {
+                "type": "integer",
+                "minimum": 24,
+                "maximum": 536870912
+              },
+              "acquired_at": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "captured_bytes_verified": {
+                "const": false,
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "identity",
+              "node_key",
+              "item_revision_uid",
+              "file_ref",
+              "artifact_ref",
+              "content_hash",
+              "byte_length",
+              "acquired_at",
+              "captured_bytes_verified"
+            ]
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "error_code": {
+        "type": [
+          "string",
+          "null"
+        ]
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "operation_id",
+      "identity",
+      "node_key",
+      "item_revision_uid",
+      "file_ref",
+      "status",
+      "file",
+      "error_code"
+    ]
+  }
+}

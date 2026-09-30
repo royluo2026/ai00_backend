@@ -58,7 +58,10 @@ def resume(bound, **changes):
         {**payload,**changes},CapabilityContext(user_gid='30',team_gid='20',source='web')).data
 
 
-def test_resume_renews_only_source_association(database, restarted):
+@pytest.mark.parametrize('role', ['primary', 'inserted'])
+def test_resume_renews_only_source_association(database, restarted, role):
+    with sqlite3.connect(database) as db:
+        db.execute('UPDATE workmanship_sim_vm_documents SET document_role=?', (role,))
     result=resume(restarted)
     assert result['source_association_id'] != restarted['source_association_id']
     assert result['workspace_row_version'] == 2
@@ -68,6 +71,7 @@ def test_resume_renews_only_source_association(database, restarted):
         assert db.execute('SELECT COUNT(*) FROM workmanship_sim_live_document_bindings').fetchone()[0] == 1
         assert db.execute('SELECT COUNT(*) FROM workmanship_sim_viewer_source_associations WHERE active=1').fetchone()[0] == 1
         assert db.execute('SELECT runtime_instance_id FROM workmanship_sim_viewer_source_associations WHERE active=1').fetchone()[0] == 'new-instance'
+        assert db.execute('SELECT document_role FROM workmanship_sim_vm_documents').fetchone()[0] == role
 
 
 @pytest.mark.parametrize('sql', [

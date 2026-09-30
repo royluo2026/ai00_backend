@@ -3,6 +3,15 @@ using Xunit;
 namespace Ai00.Connector.Tests;
 public class ViewerInteractionProtocolTests
 {
+    [Fact]
+    public void Document_root_accepts_only_source_identity_and_kind()
+    {
+        const string json="""{"type":"resolve_nodes","request_id":"root-1","interaction_id":"session","source_nodes":[{"source_node_id":"assembly","kind":"document_root"}]}""";
+        Assert.Equal("resolve_nodes",ViewerInteractionProtocol.ParseRequest(json).Type);
+        Assert.ThrowsAny<Exception>(()=>ViewerInteractionProtocol.ParseRequest(json.Replace("\"kind\":\"document_root\"","\"kind\":\"document_root\",\"occurrence_path\":[]")));
+        Assert.ThrowsAny<Exception>(()=>ViewerInteractionProtocol.ParseRequest(json.Replace("\"kind\":\"document_root\"","\"kind\":\"document_root\",\"node_key\":\"10\"")));
+    }
+
     [Theory]
     [InlineData("null")]
     [InlineData("[]")]

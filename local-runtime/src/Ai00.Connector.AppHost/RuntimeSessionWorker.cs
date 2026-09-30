@@ -10,7 +10,7 @@ using Ai00.Connector.Contracts.V2;
 using Microsoft.Extensions.Hosting;
 namespace Ai00.Connector.AppHost;
 
-public sealed class RuntimeTransport(HttpClient http,Uri origin)
+public sealed class RuntimeTransport(HttpClient http,Uri origin,HttpClient? artifactHttp=null)
 {
     private const string Prefix="api/v1/simulation/connectors/v2/";
     public Uri Endpoint(string path)=>new(origin,Prefix+path);
@@ -37,7 +37,7 @@ public sealed class RuntimeTransport(HttpClient http,Uri origin)
     }
     public async Task<JsonElement> UploadCaptureAsync(
         string planId,string leaseId,string stepId,Stream content,string sha256,long byteSize,
-        RuntimeSession session,CancellationToken ct)
+        RuntimeSession session,CancellationToken ct,string mediaType="image/png")
     {
         var path=$"plans/{Uri.EscapeDataString(planId)}/steps/{Uri.EscapeDataString(stepId)}/result-artifact"+
             $"?lease_id={Uri.EscapeDataString(leaseId)}";
@@ -46,8 +46,8 @@ public sealed class RuntimeTransport(HttpClient http,Uri origin)
         request.Headers.Add("X-AI00-Content-SHA256",sha256);
         request.Headers.Add("X-AI00-Content-Length",byteSize.ToString(System.Globalization.CultureInfo.InvariantCulture));
         request.Content=new StreamContent(content);
-        request.Content.Headers.ContentType=new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
-        using var response=await http.SendAsync(request,HttpCompletionOption.ResponseHeadersRead,ct);
+        request.Content.Headers.ContentType=new System.Net.Http.Headers.MediaTypeHeaderValue(mediaType);
+        using var response=await (mediaType=="model/jt"?artifactHttp??http:http).SendAsync(request,HttpCompletionOption.ResponseHeadersRead,ct);
         await using var input=await response.Content.ReadAsStreamAsync(ct);
         using var bytes=new MemoryStream();var buffer=new byte[8192];
         while(true)
@@ -227,7 +227,7 @@ public sealed class AppCredentialStore(string root,Uri origin)
 public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeTransport transport,DeviceSigningKey key,
     AppCredentialStore credentials,AppPlanJournal journal,VisMockupAdapter adapter,PostConditionProbes probes,
     HostManifest manifest,IAppArtifactMaterializer artifactMaterializer,IAppCaptureUploader captureUploader,IHostApplicationLifetime lifetime,
-    ViewerExecutionGate viewerGate,ViewerInteractionRuntimeContext viewerContext):BackgroundService
+    ViewerExecutionGate viewerGate,ViewerInteractionRuntimeContext viewerContext,LocalOpenCancellation? localOpenCancellation=null):BackgroundService
 {
     internal const int PlanLeaseSeconds=300;
     internal static async Task<RuntimeSession> RegisterAfterRecoveryAsync(
@@ -246,6 +246,33 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
     internal static bool HeartbeatDue(DateTimeOffset now,DateTimeOffset lastHeartbeat) =>
         now-lastHeartbeat>=TimeSpan.FromSeconds(30);
 
+    internal static async Task<T> ExecuteWithHeartbeatAsync<T>(Func<CancellationToken,Task<T>> execute,
+        Func<CancellationToken,Task> heartbeat,CancellationToken ct,TimeSpan? interval=null)
+    {
+        using var executionCancellation=CancellationTokenSource.CreateLinkedTokenSource(ct);
+        var execution=execute(executionCancellation.Token);
+        async Task KeepAlive()
+        {
+            while(!execution.IsCompleted)
+            {
+                await Task.Delay(interval??TimeSpan.FromSeconds(30),executionCancellation.Token);
+                if(execution.IsCompleted)return;
+                try{await heartbeat(executionCancellation.Token);}
+                catch(HttpRequestException){}
+                catch(RuntimeTransportException error)when(error.Transient){}
+                catch(OperationCanceledException)when(!executionCancellation.IsCancellationRequested){}
+                catch{executionCancellation.Cancel();return;}
+            }
+        }
+        var keepAlive=KeepAlive();
+        try{return await execution;}
+        finally
+        {
+            executionCancellation.Cancel();
+            try{await keepAlive;}catch(OperationCanceledException)when(executionCancellation.IsCancellationRequested){}
+        }
+    }
+
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
         await diagnostics.Ready.WaitAsync(ct);
@@ -254,7 +281,7 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
         var deviceId=credential.GetProperty("device_id").GetString()!;var tenantId=credential.GetProperty("tenant_gid").GetString()!;
         var generation=credential.GetProperty("runtime_generation").GetInt64();var secret=credential.GetProperty("device_credential").GetString()!;
         var keyId=credential.GetProperty("device_key_id").GetString()!;
-        var executor=new PlanExecutionWorker(journal,adapter,key,keyId,manifest.PlanKeys,null,artifactMaterializer,captureUploader,viewerGate);
+        var executor=new PlanExecutionWorker(journal,adapter,key,keyId,manifest.PlanKeys,null,artifactMaterializer,captureUploader,viewerGate,localOpenCancellation);
         var savedSession=credentials.LoadSession();
         var recovered=executor.Recover();
         if(recovered.Count>0)
@@ -293,7 +320,8 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
             JsonElement leased;
             try
             {
-                if(session.ExpiresAt-DateTimeOffset.UtcNow<TimeSpan.FromMinutes(2))
+                // A newly leased plan needs the full supported lease budget.
+                if(session.ExpiresAt-DateTimeOffset.UtcNow<TimeSpan.FromSeconds(PlanLeaseSeconds))
                 {
                     var renewed=await transport.SendAsync(HttpMethod.Post,"runtime/renew",null,ct,session);
                     session=session with{ExpiresAt=renewed.GetProperty("expires_at").GetDateTimeOffset()};
@@ -313,7 +341,8 @@ public sealed class RuntimeSessionWorker(DiagnosticPipeHost diagnostics,RuntimeT
             catch(HttpRequestException){await Task.Delay(TimeSpan.FromSeconds(5),ct);continue;}
             if(leased.ValueKind==JsonValueKind.Null){await transport.WaitForWakeAsync(session,ct);continue;}
             var lease=new LeasedPlan(leased.GetProperty("lease_id").GetString()!,leased.GetProperty("lease_until").GetDateTimeOffset(),leased.GetProperty("plan").GetRawText());
-            var outcome=await executor.ExecuteAsync(lease,session,ct);
+            var outcome=await ExecuteWithHeartbeatAsync(token=>executor.ExecuteAsync(lease,session,token),
+                token=>transport.SendAsync(HttpMethod.Post,"heartbeat",null,token,session),ct);
             if(outcome.OverallStatus is "succeeded" or "failed_without_effect")
             {
                 await DeliverNormalAsync(outcome,session,deviceId,tenantId,generation,secret,ct);
