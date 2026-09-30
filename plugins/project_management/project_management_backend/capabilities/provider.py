@@ -82,6 +82,8 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             "lifecycle_status": (
                 LifecycleStatus.DEPRECATED
                 if spec.id in DEPRECATED_CAPABILITY_IDS
+                else LifecycleStatus.EXPERIMENTAL
+                if (spec.id, spec.version) == ('project.project.read.atomic.projects_get', 2)
                 else LifecycleStatus.STABLE
             ),
             "deprecation_message": (
@@ -109,7 +111,15 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             "audit_policy": "standard",
             "concurrency_policy": "expected_version" if is_approval_rejection else "none",
             "expected_version_payload_path": "expected_revision" if is_approval_rejection else None,
-            "domain_errors": DOMAIN_ERRORS,
+            "domain_errors": DOMAIN_ERRORS + tuple(
+                DomainErrorContract(code=code, meaning=meaning, retryable=False)
+                for code, meaning in (
+                    ('forbidden', 'The project is outside the active tenant or is not visible to the actor.'),
+                    ('not_found', 'The requested project does not exist.'),
+                    ('invalid_input', 'A nonblank project gid is required.'),
+                    ('unauthenticated', 'A user identity is required to read the project.'),
+                )
+            ) if (spec.id, spec.version) == ('project.project.read.atomic.projects_get', 2) else DOMAIN_ERRORS,
             "domain_errors_complete": True,
             **_business_definition(spec, is_write=is_write),
         }

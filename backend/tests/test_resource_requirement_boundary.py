@@ -71,6 +71,7 @@ def test_bop_entry_link_provider_validates_standard_resource_links(monkeypatch):
         def __exit__(self, *_args): return False
         def cursor(self): return Cursor()
         def commit(self): return None
+        def begin(self): return None
 
     validated = []
     monkeypatch.setattr(bop_entry_link_change, "get_craft_conn", lambda: Connection())

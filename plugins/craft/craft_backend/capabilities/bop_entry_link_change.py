@@ -8,7 +8,10 @@ from fastapi import HTTPException
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilitySpec
 from backend.platform_sdk.ids import next_gid
 
+from backend.capabilities.validation_next import validate_payload
+
 from ..data.connection import get_craft_conn
+from .contracts import output_schema_for
 from ..routers._bop._helpers import _check_line_editable, _log_entry_op
 from .resource_requirements import RESOURCE_TYPES_BY_LINK, validate_resource_link
 
@@ -43,6 +46,16 @@ def _ensure_editable(cur: Any, version_gid: str, entry_gid: str, context: Capabi
         raise CapabilityBusinessError("permission_denied", str(exc.detail)) from exc
 
 
+def _result(data: dict[str, Any]) -> dict[str, Any]:
+    """Validate the provider-owned result before the Craft transaction commits."""
+    result = {"data": data}
+    try:
+        validate_payload(output_schema_for("craft.bop.entry_link.change.apply", 1), result, label="output")
+    except ValueError as exc:
+        raise RuntimeError("BOP entry-link output contract violation") from exc
+    return result
+
+
 def apply_bop_entry_link_change(payload: dict[str, Any], context: CapabilityContext) -> dict[str, Any]:
     operation = str(payload.get("operation") or "").strip()
     if operation not in OPERATIONS:
@@ -55,8 +68,9 @@ def apply_bop_entry_link_change(payload: dict[str, Any], context: CapabilityCont
         link_gid = _required(payload, "link_gid")
 
     with get_craft_conn() as conn, conn.cursor() as cur:
+        conn.begin()
         if operation == "attach":
-            cur.execute("SELECT version_gid FROM workmanship_bop_bop_entries WHERE gid=%s", (entry_gid,))
+            cur.execute("SELECT version_gid FROM workmanship_bop_bop_entries WHERE gid=%s FOR UPDATE", (entry_gid,))
             entry = cur.fetchone()
             if not entry:
                 raise CapabilityBusinessError("resource_not_found", f"BOP entry {entry_gid} does not exist")
@@ -64,6 +78,18 @@ def apply_bop_entry_link_change(payload: dict[str, Any], context: CapabilityCont
             _ensure_editable(cur, version_gid, entry_gid, context)
             if link_type in RESOURCE_TYPES_BY_LINK:
                 validate_resource_link(link_type, entity_gid, cur)
+            cur.execute(
+                "SELECT gid, is_primary, is_deleted, deleted_at FROM workmanship_bop_bop_entry_links "
+                "WHERE entry_gid=%s AND link_type=%s AND entity_gid=%s",
+                (entry_gid, link_type, entity_gid),
+            )
+            existing = cur.fetchone()
+            if existing:
+                if existing.get("is_deleted") or existing.get("deleted_at"):
+                    raise CapabilityBusinessError("invalid_state", "The existing link is deleted; restore it before attaching again")
+                if bool(existing.get("is_primary")) != bool(payload.get("is_primary", False)):
+                    raise CapabilityBusinessError("invalid_state", "The existing link has a different primary setting")
+                return _result({"gid": str(existing["gid"])})
             link_gid = str(next_gid())
             cur.execute(
                 "INSERT INTO workmanship_bop_bop_entry_links "
@@ -76,8 +102,7 @@ def apply_bop_entry_link_change(payload: dict[str, Any], context: CapabilityCont
                 old_state=None, new_state={"link_type": link_type, "entity_gid": entity_gid, "is_primary": bool(payload.get("is_primary", False))},
                 user_gid=context.user_gid, user_name=context.user_gid,
             )
-            conn.commit()
-            return {"data": {"gid": link_gid}}
+            return _result({"gid": link_gid})
 
         cur.execute(
             "SELECT l.entry_gid, e.version_gid, l.link_type, l.entity_gid, l.is_primary, e.title AS entry_title "
@@ -95,8 +120,7 @@ def apply_bop_entry_link_change(payload: dict[str, Any], context: CapabilityCont
             user_gid=context.user_gid, user_name=context.user_gid,
         )
         cur.execute("DELETE FROM workmanship_bop_bop_entry_links WHERE gid=%s", (link_gid,))
-        conn.commit()
-    return {"data": {"gid": link_gid, "deleted": True}}
+        return _result({"gid": link_gid, "deleted": True})
 
 
 def register_bop_entry_link_change_capability(registry: Any) -> None:

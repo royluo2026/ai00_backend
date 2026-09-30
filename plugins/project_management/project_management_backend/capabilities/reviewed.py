@@ -310,6 +310,41 @@ def _approval_reject_handler(payload: dict[str, Any], context: object) -> dict[s
     return project_outcome_port.invoke(APPROVAL_REJECT_CAPABILITY_ID, payload, context)
 
 
+def register_project_get_v2(registry: Any) -> None:
+    """Describe the real project read without mutating the frozen empty v1."""
+    import json
+    from backend.capability_v2.provider_contracts import CapabilityBusinessError
+    from backend.platform_sdk.project_access import can_manage_project
+
+    def handler(payload, context):
+        result = _atomic_handler('project.project.read', 'projects.get')(payload, context)
+        project = dict(result['data']['data'])
+        roles = set(context.active_roles or ())
+        if not project.get('team_id') and 'super_admin' in roles:
+            from types import SimpleNamespace
+            from ..application.org_management import _project_tenant
+            project['team_id'] = _project_tenant(SimpleNamespace(project=lambda _: project), project['gid'], context)
+        if str(project.get('team_id') or '') != str(context.team_gid or ''):
+            raise CapabilityBusinessError('forbidden', 'The project is outside the active tenant.')
+        if not (roles & {'super_admin', 'team_admin'} or str(project.get('owner_gid')) == context.user_gid
+                or project.get('share_scope') in ('team', 'global') or can_manage_project(context.user_gid, project['gid'])):
+            raise CapabilityBusinessError('forbidden', 'The project is not readable by this actor.')
+        project['meta_json'] = json.dumps(project.pop('meta', None), ensure_ascii=False, separators=(',', ':'))
+        return {'data': {'success': True, 'data': project}}
+
+    project_schema = _object({**_PROJECT['properties'], 'meta_json': {'type': 'string', 'maxLength': 1048576}}, required=('gid', 'team_id', 'meta_json'))
+    register_capability(registry, CapabilitySpec(
+        id='project.project.read.atomic.projects_get', version=2, owner='project_management',
+        description='Read one visible project in the active tenant with its complete typed fields.',
+        use_when='A consumer needs the authoritative project record for one project gid.',
+        do_not_use_when='The consumer needs a project list or a project change.',
+        risk=CapabilityRisk.READ, confirmation='none', permissions=('project.view',),
+        input_schema=_object({'arguments': _object({'gid': {'type': 'string', 'minLength': 1, 'maxLength': 128}}, required=('gid',))}, required=('arguments',)),
+        output_schema=_object({'data': _application_result(project_schema)}, required=('data',)),
+        tags=('project_management', 'atomic', 'projects.get'),
+    ), handler)
+
+
 def register_reviewed_capabilities(registry: Any) -> None:
     for capability_id in sorted(PROJECT_CAPABILITY_IDS):
         is_write = capability_id.endswith(".change.apply")
@@ -379,6 +414,7 @@ def register_reviewed_capabilities(registry: Any) -> None:
                 _atomic_handler(capability_id, operation),
             )
 
+    register_project_get_v2(registry)
     register_capability(
         registry,
         CapabilitySpec(

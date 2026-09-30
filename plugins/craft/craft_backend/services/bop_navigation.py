@@ -106,10 +106,10 @@ CASE
             'status',rr.status,'attributes',rr.attributes)
 END
 """
-_PRIMARY_CARD_EXPRESSION = f"CASE WHEN l.is_primary=1 THEN {_ENTITY_CARD_EXPRESSION} END"
+_LINK_CARD_EXPRESSION = f"CASE WHEN l.is_primary=1 OR l.link_type='pbom_part' THEN {_ENTITY_CARD_EXPRESSION} END"
 _LINK_CARD_SELECT = f"""
 SELECT l.gid AS link_gid,l.entry_gid,l.version_gid,l.link_type,l.entity_gid,l.is_primary,
-       l.snapshot_data,{_PRIMARY_CARD_EXPRESSION} AS entity_data
+       l.snapshot_data,{_LINK_CARD_EXPRESSION} AS entity_data
 FROM workmanship_bop_bop_entry_links l
 JOIN workmanship_bop_bop_versions v ON v.gid=l.version_gid
 LEFT JOIN workmanship_bop_bop_line ln ON ln.gid=l.entity_gid AND l.link_type='bop_line'
@@ -201,6 +201,10 @@ def _public_link(link: Mapping[str, Any], *, include_snapshot: bool = False) -> 
         projected["is_primary"] = bool(projected["is_primary"])
     if include_snapshot:
         projected["snapshot_data"] = _json_value(link.get("snapshot_data"), {})
+        if link.get("link_type") == "pbom_part":
+            card = _entity_card(link.get("entity_data")) or {}
+            projected["entity_part_no"] = card.get("part_no")
+            projected["entity_title"] = card.get("name") or card.get("title")
     return projected
 
 

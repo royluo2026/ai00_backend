@@ -587,6 +587,7 @@ OUTPUT_SCHEMAS.update({
         }, required=("gid", "version_gid", "node_type", "sort_order", "meta")),
         "links": {"type": "array", "maxItems": 500, "items": _object({
             **_LINK["properties"], "snapshot_data": _ANY_JSON,
+            "entity_part_no": _NULLABLE_STRING, "entity_title": _NULLABLE_STRING,
         }, required=("entry_gid", "link_type", "entity_gid", "is_primary", "snapshot_data"))},
     }, required=("version_gid", "revision", "entry", "links")),
     ("craft.bop.entry.relation.list", 1): _object({
@@ -874,7 +875,7 @@ OUTPUT_SCHEMAS[("craft.bop.version.layout.change.apply", 1)] = _object({"data": 
 INPUT_SCHEMAS[("craft.bop.version.freeze.change.apply", 1)] = _object({"operation": {"type": "string", "enum": ["freeze", "unfreeze"]}, "version_gid": STRING}, required=("operation", "version_gid"))
 OUTPUT_SCHEMAS[("craft.bop.version.freeze.change.apply", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
 INPUT_SCHEMAS[("craft.bop.entry_link.change.apply", 1)] = _object({"operation": {"type": "string", "enum": ["attach", "detach"]}, "entry_gid": STRING, "link_gid": STRING, "link_type": STRING, "entity_gid": STRING, "is_primary": BOOLEAN}, required=("operation",))
-OUTPUT_SCHEMAS[("craft.bop.entry_link.change.apply", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
+OUTPUT_SCHEMAS[("craft.bop.entry_link.change.apply", 1)] = _object({"data": _object({"gid": STRING, "deleted": BOOLEAN}, required=("gid",))}, required=("data",))
 INPUT_SCHEMAS[("craft.bop.staging.lifecycle.change.apply", 1)] = _object({"operation": {"type": "string", "enum": ["demote", "promote"]}, "entry_gid": STRING, "staging_gid": STRING, "parent_gid": {"type": ["string", "null"]}, "sort_order": {"type": "number"}}, required=("operation",))
 OUTPUT_SCHEMAS[("craft.bop.staging.lifecycle.change.apply", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
 _BOP_ENTRY_UPDATES = _object({

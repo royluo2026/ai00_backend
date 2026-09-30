@@ -39,6 +39,26 @@ def _repository(responses):
     return BopNavigationRepository(lambda: connection), connection.cursor_value
 
 
+@pytest.mark.parametrize("is_primary", [0, 1])
+def test_entry_detail_keeps_part_number_and_name_for_each_link(is_primary):
+    repository, cursor = _repository([
+        {"one": {"revision": 5}},
+        {"one": {"gid": "e1", "version_gid": "v1", "node_type": "operation", "sort_order": 1}},
+        {"all": [{"link_gid": "l1", "entry_gid": "e1", "version_gid": "v1",
+                  "link_type": "pbom_part", "entity_gid": "p1", "is_primary": is_primary,
+                  "entity_data": '{"part_no":"P-100","name":"安装支架","internal":"hidden"}',
+                  "snapshot_data": None}]},
+        {"one": {"revision": 5}},
+    ])
+    result = repository.get_entry_detail("v1", 5, "e1")
+    link = result["links"][0]
+    assert link["entity_part_no"] == "P-100"
+    assert link["entity_title"] == "安装支架"
+    assert "entity_data" not in link and "internal" not in link
+    validate_payload(OUTPUT_SCHEMAS[("craft.bop.entry.detail.get", 1)], result, label="output")
+    assert "OR l.link_type='pbom_part'" in cursor.statements[2][0]
+
+
 def test_cursor_is_opaque_stable_and_rejects_tampering():
     cursor = encode_cursor(1.5, "gid_002")
 

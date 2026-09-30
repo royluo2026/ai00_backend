@@ -987,6 +987,7 @@ def _order_entry_rows_by_parent(entry_rows):
 def _legacy_import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
     """批量导入 TC CSV 解析结果"""
     from ...capabilities.resource_requirements import TC_RESOURCE_NODES, resolve_tc_resource_for_import
+    from ...services.tc_import_hierarchy import existing_label_index, fingerprint, resolve_parent
 
     _IMPORT_ENTITY_MAP = {
         'line_process':     ('workmanship_bop_bop_line',       'bop_line'),
@@ -1030,9 +1031,10 @@ def _legacy_import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_
         rows = sorted(rows, key=lambda r: _safe_int(r.get('_level', 0)))
 
         with get_conn() as conn:
+            conn.begin()
             with conn.cursor() as cur:
                 cur.execute("SELECT project_gid, frozen_at, pbom_version_gid, bop_name"
-                            " FROM workmanship_bop_bop_versions WHERE gid=%s",
+                            " FROM workmanship_bop_bop_versions WHERE gid=%s FOR UPDATE",
                             (version_gid,))
                 ver = cur.fetchone()
                 if not ver:
@@ -1125,34 +1127,19 @@ def _legacy_import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_
 
                 # ── 重复检测：加载该版本已有条目的字段指纹 ─────────────────
                 cur.execute(
-                    "SELECT node_type, title, vpps, vpps_desc, parent_bop_title"
+                    "SELECT gid,parent_gid,node_type,title,vpps,vpps_desc,parent_bop_title,meta"
                     " FROM workmanship_bop_bop_entries"
                     " WHERE version_gid=%s AND is_deleted=FALSE",
                     (version_gid,)
                 )
-                def _fp(node_type, title, vpps, vpps_desc, parent_bop_title):
-                    return (
-                        node_type or '',
-                        title or '',
-                        vpps or '',
-                        vpps_desc or '',
-                        parent_bop_title or '',
-                    )
-                existing_fps = {
-                    _fp(e['node_type'], e['title'], e['vpps'], e['vpps_desc'], e['parent_bop_title'])
-                    for e in cur.fetchall()
-                }
+                existing_rows = list(cur.fetchall())
+                label_to_gids = existing_label_index(existing_rows, rows)
+                existing_fps = {fingerprint(row) for row in existing_rows}
 
                 # 过滤掉已存在的行
                 new_rows = [
                     r for r in rows
-                    if _fp(
-                        r.get('node_type', ''),
-                        r.get('title', ''),
-                        r.get('vpps') or '',
-                        r.get('vpps_desc') or '',
-                        r.get('parent_bop_label') or r.get('parent_label') or '',
-                    ) not in existing_fps
+                    if fingerprint(r) not in existing_fps
                 ]
                 skipped = len(rows) - len(new_rows)
                 if not new_rows:
@@ -1163,18 +1150,16 @@ def _legacy_import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_
                 entry_gids  = [str(next_gid()) for _ in rows]
                 entity_gids = [str(next_gid()) for _ in rows]
                 link_gids   = [str(next_gid()) for _ in rows]
-                label_to_gid: dict = {}
                 part_label_to_entity_gid: dict = {}
                 for i, r in enumerate(rows):
                     lbl = r.get('bom_row_label') or r.get('label') or ''
                     if lbl:
-                        label_to_gid[lbl] = entry_gids[i]
+                        label_to_gids.setdefault(lbl, set()).add(entry_gids[i])
                         if r.get('node_type') in _PART_NODE_TYPES:
                             part_label_to_entity_gid[lbl] = entity_gids[i]
                         # 同时注册 "/" 前的短 ID（TC 格式：AS-000499138/00;1-...）
                         short = lbl.split('/')[0].strip()
                         if short and short != lbl:
-                            label_to_gid.setdefault(short, entry_gids[i])
                             if r.get('node_type') in _PART_NODE_TYPES:
                                 part_label_to_entity_gid.setdefault(short, entity_gids[i])
 
@@ -1196,8 +1181,14 @@ def _legacy_import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_
                     vpps_desc    = r.get('vpps_desc') or None
                     parent_label = r.get('parent_bop_label') or r.get('parent_label') or None
                     if parent_label:
-                        parent_gid = (label_to_gid.get(parent_label)
-                                      or label_to_gid.get(parent_label.split('/')[0].strip()))
+                        try:
+                            parent_gid = resolve_parent(parent_label, label_to_gids)
+                        except ValueError as error:
+                            # The UI omits the factory root; top-level lines remain valid roots.
+                            if node_type == 'line_process' and ' is missing:' in str(error):
+                                parent_gid = None
+                            else:
+                                raise HTTPException(409, str(error)) from error
                     else:
                         parent_gid = None
 
@@ -1292,6 +1283,7 @@ def _legacy_import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_
                         json.dumps({
                             'import_source': 'tc',
                             'tc_key': r.get('bom_row_id') or r.get('bom_row_label') or '',
+                            'tc_bom_label': r.get('bom_row_label') or r.get('label') or '',
                             **({'tc_resource_staging_gid': staging_gid} if staging_gid else {}),
                         }, ensure_ascii=False),
                     ))

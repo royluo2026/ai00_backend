@@ -110,6 +110,7 @@ class _ImportConnection:
         )
         self.commits = 0
         self.rollbacks = 0
+        self.begins = 0
 
     def __enter__(self):
         return self
@@ -123,6 +124,9 @@ class _ImportConnection:
 
     def cursor(self):
         return self.cursor_value
+
+    def begin(self):
+        self.begins += 1
 
     def commit(self):
         self.commits += 1
@@ -268,6 +272,7 @@ def test_tc_import_rolls_back_entries_when_resource_link_write_fails(monkeypatch
 
     assert connection.commits == 0
     assert connection.rollbacks == 1
+    assert connection.begins == 1
     assert connection.cursor_value.entry_rows == []
     assert connection.cursor_value.link_rows == []
 
@@ -306,3 +311,38 @@ def test_tc_import_orders_parent_entries_before_children(monkeypatch) -> None:
     assert result["data"]["count"] == 2
     assert [row[0] for row in connection.cursor_value.entry_rows] == ["gid-1", "gid-0"]
     assert connection.cursor_value.entry_rows[1][2] == "gid-1"
+
+
+@pytest.mark.parametrize("existing_count", [1, 2])
+def test_tc_import_preserves_parent_skipped_by_deduplication(monkeypatch, existing_count):
+    from fastapi import HTTPException
+    from plugins.craft.craft_backend.routers._bop import entries
+
+    class Cursor(_ImportCursor):
+        def execute(self, sql, params=()):
+            super().execute(sql, params)
+            normalized = " ".join(sql.split())
+            if normalized.startswith("SELECT node_type, title") or normalized.startswith("SELECT gid,parent_gid,node_type"):
+                self._many = [dict(gid=f"existing-{i}", parent_gid=None, node_type="operation",
+                    title="Existing operation", vpps=None, vpps_desc=None, parent_bop_title=None, meta={})
+                    for i in range(existing_count)]
+
+    connection = _ImportConnection()
+    connection.cursor_value = Cursor()
+    monkeypatch.setattr(entries, "get_conn", lambda: connection)
+    gids = iter(f"new-{i}" for i in range(100))
+    monkeypatch.setattr(entries, "next_gid", lambda: next(gids))
+    payload = {"operation": "import_tc", "version_gid": "version-1", "rows": [
+        {"_level": 4, "node_type": "operation", "title": "Existing operation", "bom_row_label": "op/00"},
+        {"_level": 5, "node_type": "standard_part", "title": "Bolt", "bom_row_id": "P-100",
+         "bom_row_label": "P-100/00", "parent_bop_label": "op/00"},
+    ]}
+    if existing_count > 1:
+        with pytest.raises(HTTPException, match="ambiguous"):
+            apply_bop_entry_bulk_change(payload, _context())
+        assert connection.commits == 0
+    else:
+        apply_bop_entry_bulk_change(payload, _context())
+        assert len(connection.cursor_value.entry_rows) == 1
+        assert connection.cursor_value.entry_rows[0][2] == "existing-0"
+        assert json.loads(connection.cursor_value.entry_rows[0][-1])["tc_bom_label"] == "P-100/00"
