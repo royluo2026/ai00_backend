@@ -11,7 +11,7 @@ from plugins.knowledge.knowledge_backend.feishu_catalog import (
 )
 from plugins.knowledge.knowledge_backend.ids import new_knowledge_id
 from plugins.knowledge.knowledge_backend.provider import register_capability
-from .knowledge_documents_next import _require_superadmin, _tenant
+from .knowledge_documents_next import _require_superadmin, _tenant, _trusted_profile
 
 
 def get_catalog_config(_payload: dict, context: CapabilityContext) -> dict:
@@ -97,6 +97,7 @@ def sync_catalog(_payload: dict, context: CapabilityContext) -> dict:
 
 def list_catalog(payload: dict, context: CapabilityContext) -> dict:
     tenant = _tenant(context)
+    _trusted_profile(context, tenant)
     limit = max(1, min(int(payload.get("limit") or 100), 500))
     offset = max(0, int(payload.get("offset") or 0))
     with get_knowledge_conn() as conn, conn.cursor() as cur:

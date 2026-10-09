@@ -14,6 +14,8 @@ _PREFIXES = {
     "maturity": "knm",
     "source": "knf",
     "catalog_record": "knc",
+    "snapshot": "knsnp",
+    "asset": "kna",
     "folder": "knf",
     "item": "kni",
 }

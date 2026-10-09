@@ -224,7 +224,7 @@
         "plugin_id": "official.knowledge",
         "module": "knowledge_backend.capabilities",
         "version": "2.0.0",
-        "artifact_hash": "sha256:ad389376dfc01a5683b24a41691fb06159b4246130a574ee573b5e2bf2b5d9e0"
+        "artifact_hash": "sha256:bbc4a2181436a9cebdbcf14348f5eeed3b0dcb4b35dc97056b4e1552e507d111"
       },
       "artifact_path": "plugins/knowledge/knowledge_backend",
       "allowed_owners": [
