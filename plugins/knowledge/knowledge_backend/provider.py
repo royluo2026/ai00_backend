@@ -30,6 +30,7 @@ _RESOURCE_FIELDS = {
     "knowledge.document.draft.get": ("knowledge-document", "document_gid"),
     "knowledge.document.draft.save": ("knowledge-document", "document_gid"),
     "knowledge.source.pull": ("knowledge-source", "source_gid"),
+    "knowledge.source.snapshot.latest": ("knowledge-source", "source_gid"),
     "knowledge.source.snapshot.get": ("knowledge-source-snapshot", "snapshot_gid"),
     "knowledge.source.asset.get": ("knowledge-source-asset", "asset_gid"),
     "knowledge.source.import.preview": ("knowledge-source-snapshot", "source_snapshot_gid"),
@@ -59,6 +60,19 @@ _LEGACY_V1_BUSINESS_DEFINITION_IDS = frozenset({
 })
 
 _DOMAIN_ERRORS = (
+    DomainErrorContract(
+        code="feishu_document_authorization_required",
+        meaning="The delegated Feishu session lacks document read authorization.",
+    ),
+    DomainErrorContract(
+        code="feishu_document_view_denied",
+        meaning="The delegated Feishu user cannot view this document.",
+    ),
+    DomainErrorContract(
+        code="feishu_document_read_failed",
+        meaning="Feishu document read failed.",
+        retryable=True,
+    ),
     DomainErrorContract(
         code="resource_not_found",
         meaning="The scoped Knowledge resource does not exist or is not visible.",
@@ -206,6 +220,8 @@ def descriptor_for(spec):
         and spec.id in _LEGACY_V1_BUSINESS_DEFINITION_IDS
     ):
         updates.update(_business_definition(spec, is_write=is_write))
+    if spec.id == "knowledge.source.pull.batch":
+        updates["timeout_seconds"] = 600
     if spec.id == "knowledge.resource_model_mapping.resolve":
         updates.update({
             "business_effect": "Resolve each typed process resource code to one exact governed tool, equipment or fixture model version, returning all missing or ambiguous mappings.",

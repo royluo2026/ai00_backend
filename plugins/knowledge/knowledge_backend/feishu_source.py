@@ -30,13 +30,13 @@ def read_all_blocks(fetch_page, *, max_pages: int = 200, max_blocks: int = 20000
     raise ValueError("incomplete Feishu document pagination: page limit exceeded")
 
 
-def read_document_blocks(document_url: str) -> tuple[str, list[dict]]:
+def read_document_blocks(document_url: str, *, access_token: str) -> tuple[str, list[dict]]:
     token = parse_document_url(document_url)
     kind = urlparse(document_url).path.split("/")[1]
     if kind == "wiki":
-        node = feishu_service.resolve_wiki_node(token)
+        node = feishu_service.resolve_wiki_node(token, access_token=access_token)
         if node.get("obj_type") != "docx" or not node.get("obj_token"):
             raise ValueError("Wiki node is not a Docx document")
         token = str(node["obj_token"])
-    blocks = read_all_blocks(lambda page: feishu_service.get_doc_blocks_page(token, page))
+    blocks = read_all_blocks(lambda page: feishu_service.get_doc_blocks_page(token, page, access_token=access_token))
     return token, blocks

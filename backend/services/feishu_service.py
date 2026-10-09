@@ -1193,7 +1193,7 @@ class FeishuService:
         )
         return resp.json().get("data", {}).get("items", [])
 
-    def get_doc_blocks_page(self, doc_token: str, page_token: str | None = None) -> dict:
+    def get_doc_blocks_page(self, doc_token: str, page_token: str | None = None, *, access_token: str | None = None) -> dict:
         """Read one Docx block page, preserving the pagination contract."""
         import re
         if not re.fullmatch(r"[A-Za-z0-9_-]{3,128}", doc_token or ""):
@@ -1203,7 +1203,7 @@ class FeishuService:
             params["page_token"] = page_token
         response = requests.get(
             f"{FEISHU_API}/docx/v1/documents/{doc_token}/blocks",
-            headers={"Authorization": f"Bearer {self._get_tenant_token()}"}, params=params, timeout=30,
+            headers={"Authorization": f"Bearer {access_token or self._get_tenant_token()}"}, params=params, timeout=30,
         )
         response.raise_for_status()
         body = response.json()
@@ -1227,14 +1227,14 @@ class FeishuService:
             raise ValueError(f"Feishu Wiki lookup failed: {body.get('code')}")
         return node
 
-    def download_doc_media(self, media_token: str) -> tuple[bytes, str]:
+    def download_doc_media(self, media_token: str, *, access_token: str | None = None) -> tuple[bytes, str]:
         """Download one bounded image from Feishu for immutable Knowledge storage."""
         import re
         if not re.fullmatch(r"[A-Za-z0-9_-]{3,128}", media_token or ""):
             raise ValueError("invalid Feishu media token")
         response = requests.get(
             f"{FEISHU_API}/drive/v1/medias/{media_token}/download",
-            headers={"Authorization": f"Bearer {self._get_tenant_token()}"},
+            headers={"Authorization": f"Bearer {access_token or self._get_tenant_token()}"},
             timeout=30, stream=True,
         )
         response.raise_for_status()

@@ -7,7 +7,7 @@ from urllib.parse import parse_qs, urlparse
 _ID = re.compile(r"^[A-Za-z0-9_-]{3,128}$")
 _HOST = re.compile(r"(^|\.)(feishu\.cn|larksuite\.com)$", re.I)
 _DOCUMENT_FIELDS = ("飞书文档", "文档链接", "文档地址", "document_url", "Document URL", "链接", "URL")
-_TITLE_FIELDS = ("名称", "文档名称", "文档标题", "知识名称", "标题", "Name", "Title")
+_TITLE_FIELDS = ("名称", "知识文档主题", "文档名称", "文档标题", "知识名称", "标题", "Name", "Title")
 
 
 def _url_parts(value: str):
@@ -66,6 +66,15 @@ def _field_text(value) -> str:
     return ""
 
 
+def _document_links(value) -> list[tuple[str, str]]:
+    if isinstance(value, list):
+        links = [(_field_text(part), str(part.get("text") or "").strip()) for part in value
+                 if isinstance(part, dict) and (part.get("link") or part.get("url"))]
+        if links:
+            return links
+    return [(_field_text(value), "")]
+
+
 def catalog_row(record: dict) -> dict[str, str | None]:
     record_id = str(record.get("record_id") or "").strip()
     fields = record.get("fields") or {}
@@ -75,6 +84,8 @@ def catalog_row(record: dict) -> dict[str, str | None]:
     token = None
     if not document_url:
         error = "document_link_missing"
+    elif re.match(r"^合并[到至入]", document_url):
+        error = "document_merged"
     else:
         try:
             token = parse_document_url(document_url)
@@ -119,17 +130,26 @@ def sheet_catalog_records(values: list[list]) -> list[dict]:
         if inferred_link_index is not None:
             fields["飞书文档"] = cells[inferred_link_index] if inferred_link_index < len(cells) else ""
         explicit_id = next((_field_text(fields.get(name)) for name in ("GID", "gid", "ID", "编号") if _field_text(fields.get(name))), "")
-        document_url = next((_field_text(fields.get(name)) for name in _DOCUMENT_FIELDS if _field_text(fields.get(name))), "")
-        try:
-            document_token = parse_document_url(document_url)
-        except ValueError:
-            document_token = ""
-        identity = explicit_id or (f"sheet:{document_token}" if document_token else f"sheet-row:{row_number}")
-        counts[identity] = counts.get(identity, 0) + 1
-        # Duplicate links remain visible as errors; they cannot share a record ID.
-        if counts[identity] > 1:
-            identity = f"{identity}:{row_number}"
-        result.append({"record_id": identity[:128], "fields": fields})
+        title = next((_field_text(fields.get(name)) for name in _TITLE_FIELDS if _field_text(fields.get(name))), "")
+        raw_link = next((fields.get(name) for name in _DOCUMENT_FIELDS if _field_text(fields.get(name))), "")
+        links = _document_links(raw_link)
+        if not title and not any(url for url, _ in links):
+            continue
+        for link_index, (document_url, link_title) in enumerate(links, start=1):
+            item_fields = dict(fields)
+            item_fields["飞书文档"] = document_url
+            if len(links) > 1 and link_title:
+                item_fields["名称"] = f"{title} · {link_title}" if title and title != link_title else link_title
+            try:
+                document_token = parse_document_url(document_url)
+            except ValueError:
+                document_token = ""
+            identity = explicit_id if explicit_id and len(links) == 1 else (f"sheet:{document_token}" if document_token else f"sheet-row:{row_number}")
+            counts[identity] = counts.get(identity, 0) + 1
+            # Duplicate links remain visible as errors; they cannot share a record ID.
+            if counts[identity] > 1:
+                identity = f"{identity}:{row_number}:{link_index}"
+            result.append({"record_id": identity[:128], "fields": item_fields})
     if not result:
         raise ValueError("总表没有可同步的清单行，已取消同步")
     if not any(catalog_row(record)["document_token"] for record in result):

@@ -148,7 +148,7 @@ def sync_catalog(_payload: dict, context: CapabilityContext) -> dict:
         "updated": sum(1 for row in rows if row["record_id"] in existing and
                        (row["source_new"] or row["title"] != existing[row["record_id"]].get("title"))),
         "inactive": sum(1 for record_id, row in existing.items() if row.get("active") and record_id not in {item["record_id"] for item in rows}),
-        "errors": [{"record_id": row["record_id"], "code": row["error"]} for row in rows if row["error"]],
+        "errors": [{"record_id": row["record_id"], "code": row["error"]} for row in rows if row["error"] and row["error"] != "document_merged"],
         "checked_at": datetime.now(UTC).isoformat(),
     }
 

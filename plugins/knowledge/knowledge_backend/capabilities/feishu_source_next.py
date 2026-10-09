@@ -3,8 +3,12 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
+import time
+from requests import HTTPError
 
-from backend.capability_v2.provider_contracts import CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
+from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
+from backend.platform_sdk.feishu import user_credential
 from plugins.knowledge.knowledge_backend.data.connection import get_knowledge_conn
 from plugins.knowledge.knowledge_backend.feishu_markdown import convert_blocks
 from plugins.knowledge.knowledge_backend.feishu_source import read_document_blocks
@@ -18,6 +22,14 @@ from .knowledge_documents_next import _require_document_editor, _require_superad
 def _source_evidence(snapshot_gid: str, source_gid: str, digest: str) -> EvidenceRef:
     return EvidenceRef(kind="knowledge.source.snapshot", reference=f"knowledge-source-snapshot:{snapshot_gid}",
                        digest=f"sha256:{digest}", metadata={"source_gid": source_gid})
+
+
+def _feishu_read_error(code: int | None) -> CapabilityBusinessError:
+    if code == 99991679:
+        return CapabilityBusinessError("feishu_document_authorization_required", "当前飞书登录缺少文档读取权限，请重新授权飞书。")
+    if code in {131006, 1310213}:
+        return CapabilityBusinessError("feishu_document_view_denied", "当前飞书身份没有这篇文档的查看权限。")
+    return CapabilityBusinessError("feishu_document_read_failed", f"飞书文档读取失败（错误码 {code or 'unknown'}）。")
 
 
 def pull_source(payload: dict, context: CapabilityContext) -> CapabilityOutput:
@@ -42,14 +54,28 @@ def pull_source(payload: dict, context: CapabilityContext) -> CapabilityOutput:
         else:
             _require_superadmin(context, tenant)
     # Read and convert before any metadata write. Failure cannot advance the accepted baseline.
-    document_token, blocks = read_document_blocks(source["document_url"])
+    access_token = user_credential(context)
+    try:
+        document_token, blocks = read_document_blocks(source["document_url"], access_token=access_token)
+    except HTTPError as exc:
+        response = exc.response
+        try:
+            code = response.json().get("code") if response is not None else None
+        except (ValueError, AttributeError):
+            code = None
+        raise _feishu_read_error(code or (response.status_code if response is not None else None)) from exc
+    except ValueError as exc:
+        match = re.search(r"Feishu (?:Docx read|Wiki lookup) failed: (\d+)", str(exc))
+        if not match:
+            raise
+        raise _feishu_read_error(int(match.group(1))) from exc
     snapshot_gid = new_knowledge_id("snapshot")
     assets = []
     def resolve_asset(token: str, kind: str) -> str:
         if kind != "image":
             raise ValueError("unsupported Feishu media kind")
         asset = store_source_image(tenant_gid=tenant, source_gid=source_gid,
-                                   snapshot_gid=snapshot_gid, feishu_token=token)
+                                   snapshot_gid=snapshot_gid, feishu_token=token, access_token=access_token)
         assets.append(asset)
         return asset["markdown_ref"]
     converted = convert_blocks(blocks, resolve_asset=resolve_asset)
@@ -87,6 +113,68 @@ def pull_source(payload: dict, context: CapabilityContext) -> CapabilityOutput:
               "markdown": markdown, "sha256": digest, "anchors": converted.anchors,
               "diagnostics": converted.diagnostics, "complete": converted.complete}
     return CapabilityOutput(data=result, evidence=(_source_evidence(snapshot_gid, source_gid, digest),))
+
+
+def batch_pull_sources(_payload: dict, context: CapabilityContext) -> CapabilityOutput:
+    tenant = _tenant(context)
+    _require_superadmin(context, tenant)
+    with get_knowledge_conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT s.gid AS source_gid,r.title FROM workmanship_know_feishu_sources s "
+            "JOIN workmanship_know_feishu_catalog_records r ON r.gid=s.catalog_record_gid "
+            "WHERE s.tenant_gid=%s AND r.tenant_gid=%s AND s.active=TRUE AND r.active=TRUE "
+            "AND s.linked_document_gid IS NULL AND NOT EXISTS ("
+            "SELECT 1 FROM workmanship_know_feishu_snapshots snap WHERE snap.source_gid=s.gid AND snap.tenant_gid=%s) "
+            "ORDER BY r.title,r.gid LIMIT 101", (tenant, tenant, tenant),
+        )
+        pending = [dict(row) for row in cur.fetchall()]
+    deadline = time.monotonic() + 510
+    items, evidence = [], []
+    for source in pending[:100]:
+        source_gid, title = str(source["source_gid"]), str(source["title"])
+        item = {"source_gid": source_gid, "title": title, "status": "deferred", "snapshot_gid": None,
+                "error_code": None, "message": None}
+        if time.monotonic() < deadline:
+            try:
+                candidate = pull_source({"source_gid": source_gid}, context)
+                item["status"] = "pulled" if candidate.data["complete"] else "needs_review"
+                item["snapshot_gid"] = candidate.data["snapshot_gid"]
+                evidence.extend(candidate.evidence)
+            except CapabilityBusinessError as exc:
+                item.update(status="failed", error_code=exc.code, message=exc.message)
+            except Exception:
+                item.update(status="failed", error_code="feishu_document_pull_failed", message="文档拉取失败，请单独重试并查看详情。")
+        items.append(item)
+    return CapabilityOutput(data={"items": items, "has_more": len(pending) > 100}, evidence=tuple(evidence))
+
+
+def get_latest_source_snapshot(payload: dict, context: CapabilityContext) -> dict:
+    tenant = _tenant(context)
+    source_gid = str(payload.get("source_gid") or "").strip()
+    with get_knowledge_conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT s.gid,s.linked_document_gid FROM workmanship_know_feishu_sources s "
+            "WHERE s.gid=%s AND s.tenant_gid=%s AND s.active=TRUE", (source_gid, tenant),
+        )
+        source = cur.fetchone()
+        if not source:
+            raise LookupError("active Feishu source not found")
+        if source.get("linked_document_gid"):
+            cur.execute("SELECT gid,created_by FROM workmanship_know_documents WHERE gid=%s AND tenant_gid=%s",
+                        (source["linked_document_gid"], tenant))
+            document = cur.fetchone()
+            if not document:
+                raise LookupError("linked Markdown document not found")
+            _require_document_editor(cur, dict(document), context, tenant)
+        else:
+            _require_superadmin(context, tenant)
+        cur.execute(
+            "SELECT gid,complete FROM workmanship_know_feishu_snapshots "
+            "WHERE source_gid=%s AND tenant_gid=%s ORDER BY created_at DESC,gid DESC LIMIT 1", (source_gid, tenant),
+        )
+        latest = cur.fetchone()
+    return {"source_gid": source_gid, "snapshot_gid": latest["gid"] if latest else None,
+            "complete": bool(latest["complete"]) if latest else None}
 
 
 def get_source_snapshot(payload: dict, context: CapabilityContext) -> CapabilityOutput:
@@ -142,6 +230,32 @@ def register_feishu_source_capabilities(registry) -> None:
         effects=("read:feishu.document", "create:knowledge.source_snapshot"), risk="write", confirmation="user", idempotent=False,
         input_schema={"type": "object", "required": ["source_gid"], "properties": {"source_gid": {"type": "string"}}},
         output_schema=candidate, tags=("knowledge", "source", "pull")), pull_source)
+    batch_item = {"type": "object", "additionalProperties": False,
+        "required": ["source_gid", "title", "status", "snapshot_gid", "error_code", "message"],
+        "properties": {"source_gid": {"type": "string"}, "title": {"type": "string"},
+                       "status": {"type": "string", "enum": ["pulled", "needs_review", "failed", "deferred"]},
+                       "snapshot_gid": {"type": ["string", "null"]}, "error_code": {"type": ["string", "null"]},
+                       "message": {"type": ["string", "null"]}}}
+    register_capability(registry, CapabilitySpec(
+        **common, id="knowledge.source.pull.batch", description="Pull up to 100 unimported Feishu documents into separate unaccepted source candidates.",
+        use_when="A superadmin manually prepares multiple catalog documents for individual Markdown review.",
+        do_not_use_when="Confirming candidates or publishing Markdown revisions.",
+        effects=("read:feishu.document", "create:knowledge.source_snapshot"), risk="write", confirmation="user", idempotent=False,
+        input_schema={"type": "object", "additionalProperties": False},
+        output_schema={"type": "object", "additionalProperties": False, "required": ["items", "has_more"],
+                       "properties": {"items": {"type": "array", "maxItems": 100, "items": batch_item},
+                                      "has_more": {"type": "boolean"}}},
+        tags=("knowledge", "source", "pull", "batch")), batch_pull_sources)
+    register_capability(registry, CapabilitySpec(
+        **common, id="knowledge.source.snapshot.latest", description="Find the newest unaccepted Feishu source candidate for review.",
+        use_when="Opening a source after a batch pull or returning to unfinished review.",
+        do_not_use_when="Reading the accepted Markdown document revision.",
+        effects=("read:knowledge.source_snapshot",),
+        input_schema={"type": "object", "required": ["source_gid"], "properties": {"source_gid": {"type": "string"}}},
+        output_schema={"type": "object", "additionalProperties": False, "required": ["source_gid", "snapshot_gid", "complete"],
+                       "properties": {"source_gid": {"type": "string"}, "snapshot_gid": {"type": ["string", "null"]},
+                                      "complete": {"type": ["boolean", "null"]}}},
+        tags=("knowledge", "source", "read")), get_latest_source_snapshot)
     register_capability(registry, CapabilitySpec(
         **common, id="knowledge.source.snapshot.get", description="Read an immutable Feishu-converted Markdown candidate.",
         use_when="Comparing a pulled source with the accepted baseline.", do_not_use_when="Reading a confirmed document revision.",

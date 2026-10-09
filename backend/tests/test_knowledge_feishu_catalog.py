@@ -50,6 +50,30 @@ def test_sheet_catalog_reads_rich_link_and_refuses_an_unreadable_snapshot():
         sheet_catalog_records([["名称", "文档链接"], ["BOP", "打开"]])
 
 
+def test_sheet_catalog_distinguishes_missing_merged_multi_link_and_non_document_rows():
+    values = [
+        ["序号", "知识文档主题", "链接", "备注"],
+        [12, "黑漆支架", None, "计划中"],
+        [26, "电机", "合并到动力总成文档", ""],
+        [48, "四门设备", [
+            {"type": "mention", "text": "铰链设备知识", "link": "https://li.feishu.cn/wiki/wikiAAA"},
+            {"type": "mention", "text": "升降器设备知识", "link": "https://li.feishu.cn/wiki/wikiBBB"},
+        ], ""],
+        [None, None, None, "10/64.8*28.4"],
+    ]
+    records = sheet_catalog_records(values)
+    parsed = [catalog_row(record) for record in records]
+    assert len(parsed) == 4
+    assert [(row["title"], row["error"]) for row in parsed[:2]] == [
+        ("黑漆支架", "document_link_missing"), ("电机", "document_merged"),
+    ]
+    assert [row["record_id"] for row in parsed[2:]] == ["sheet:wikiAAA", "sheet:wikiBBB"]
+    assert [row["title"] for row in parsed[2:]] == ["四门设备 · 铰链设备知识", "四门设备 · 升降器设备知识"]
+    assert [row["document_token"] for row in parsed[2:]] == ["wikiAAA", "wikiBBB"]
+    shifted = sheet_catalog_records([values[0], [], *values[1:]])
+    assert [catalog_row(record)["record_id"] for record in shifted[2:4]] == ["sheet:wikiAAA", "sheet:wikiBBB"]
+
+
 def test_fetch_all_records_consumes_every_page_and_rejects_partial_results():
     calls = []
     pages = [

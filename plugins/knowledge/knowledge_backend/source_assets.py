@@ -14,10 +14,10 @@ _SEGMENT = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 _EXTENSION = {"image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/gif": "gif"}
 
 
-def store_source_image(*, tenant_gid: str, source_gid: str, snapshot_gid: str, feishu_token: str) -> dict:
+def store_source_image(*, tenant_gid: str, source_gid: str, snapshot_gid: str, feishu_token: str, access_token: str) -> dict:
     if not all(_SEGMENT.fullmatch(part or "") for part in (tenant_gid, source_gid, snapshot_gid)):
         raise ValueError("invalid Knowledge source identity")
-    data, media_type = feishu_service.download_doc_media(feishu_token)
+    data, media_type = feishu_service.download_doc_media(feishu_token, access_token=access_token)
     if not data or media_type not in _EXTENSION:
         raise ValueError("unsupported Feishu image")
     digest = hashlib.sha256(data).hexdigest()

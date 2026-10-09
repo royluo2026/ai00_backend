@@ -61,9 +61,6 @@ def convert_blocks(blocks: list[dict], *, resolve_asset: Callable[[str, str], st
     if len(roots) != 1:
         return ConversionResult("", [], diagnostics + [{"block_id": "", "code": "document_root_missing"}], False)
 
-    def emit(value: str) -> None:
-        parts.append(value + "\n")
-
     def plain_cell(cell_id: str) -> str:
         cell = by_id.get(cell_id)
         if not cell or cell.get("block_type") != 32:
@@ -79,7 +76,10 @@ def convert_blocks(blocks: list[dict], *, resolve_asset: Callable[[str, str], st
             contents.append(_inline((child.get(key) or {}).get("elements") or [], diagnostics, child_id))
         return "<br>".join(contents).replace("|", "\\|").replace("\n", "<br>")
 
-    def render(block_id: str, path: list[int], depth: int = 0) -> None:
+    def render(block_id: str, path: list[int], depth: int = 0, prefix: str = "") -> None:
+        def emit(value: str) -> None:
+            parts.append(prefix + value + "\n")
+
         block = by_id.get(block_id)
         if not block:
             diagnostics.append({"block_id": block_id, "code": "block_missing"})
@@ -105,9 +105,14 @@ def convert_blocks(blocks: list[dict], *, resolve_asset: Callable[[str, str], st
             else:
                 emit(content)
             for index, child in enumerate(block.get("children") or []):
-                render(child, path + [index], depth + 1 if kind in {12, 13, 17} else depth)
+                render(child, path + [index], depth + 1 if kind in {12, 13, 17} else depth, prefix)
             if kind not in {12, 13, 17}:
                 emit("")
+        elif kind == 19:
+            emit("> [!NOTE]")
+            for index, child in enumerate(block.get("children") or []):
+                render(child, path + [index], depth, prefix + "> ")
+            emit("")
         elif kind == 22:
             emit("---"); emit("")
         elif kind == 27:
@@ -140,4 +145,7 @@ def convert_blocks(blocks: list[dict], *, resolve_asset: Callable[[str, str], st
     for index, block_id in enumerate(roots[0].get("children") or []):
         render(block_id, [index])
     markdown = "".join(parts).rstrip("\n") + "\n"
+    for anchor in anchors:
+        anchor["start"] = min(anchor["start"], len(markdown))
+        anchor["end"] = min(anchor["end"], len(markdown))
     return ConversionResult(markdown, anchors, diagnostics, not diagnostics)

@@ -87,7 +87,20 @@ def test_block_pagination_requires_every_page():
 def test_wiki_node_resolves_to_docx_before_block_read():
     with patch("plugins.knowledge.knowledge_backend.feishu_source.feishu_service.resolve_wiki_node", return_value={"obj_type": "docx", "obj_token": "doc123"}) as resolve, \
          patch("plugins.knowledge.knowledge_backend.feishu_source.feishu_service.get_doc_blocks_page", return_value={"items": [{"block_id": "root", "block_type": 1}], "has_more": False}) as page:
-        token, blocks = read_document_blocks("https://example.feishu.cn/wiki/wiki123")
+        token, blocks = read_document_blocks("https://example.feishu.cn/wiki/wiki123", access_token="user-token")
     assert token == "doc123" and len(blocks) == 1
-    resolve.assert_called_once_with("wiki123")
-    page.assert_called_once_with("doc123", None)
+    resolve.assert_called_once_with("wiki123", access_token="user-token")
+    page.assert_called_once_with("doc123", None, access_token="user-token")
+
+
+def test_callout_children_are_preserved_as_markdown_note():
+    blocks = [
+        {"block_id": "root", "block_type": 1, "children": ["callout"]},
+        {"block_id": "callout", "block_type": 19, "callout": {"emoji_id": "bulb"}, "children": ["text"]},
+        {"block_id": "text", "block_type": 2, "text": {"elements": [{"text_run": {"content": "检查扭矩"}}]}},
+    ]
+    result = convert_blocks(blocks)
+    assert result.complete is True
+    assert "> [!NOTE]" in result.markdown
+    assert "> 检查扭矩" in result.markdown
+    assert result.anchors[-1]["end"] <= len(result.markdown)
