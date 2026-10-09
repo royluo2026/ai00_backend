@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from .knowledge_context_next import register_knowledge_context_capability
 from .knowledge_documents_next import register_knowledge_document_capabilities
+from .feishu_catalog_next import register_feishu_catalog_capabilities
 from .knowledge_migration_next import register_knowledge_migration_capabilities
 from .knowledge_next import register_knowledge_capabilities
 from .outbox_next import register_outbox_capability
@@ -18,6 +19,7 @@ from .resource_model_mapping import register_resource_model_mapping_capability
 def register_capabilities(registry) -> None:
     register_knowledge_capabilities(registry)
     register_knowledge_document_capabilities(registry)
+    register_feishu_catalog_capabilities(registry)
     register_knowledge_context_capability(registry)
     register_knowledge_migration_capabilities(registry)
     register_proposal_capability(registry)

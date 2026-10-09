@@ -12,6 +12,8 @@ _PREFIXES = {
     "outbox": "kno",
     "entry": "kne",
     "maturity": "knm",
+    "source": "knf",
+    "catalog_record": "knc",
     "folder": "knf",
     "item": "kni",
 }

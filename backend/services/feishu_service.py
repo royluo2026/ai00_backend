@@ -1124,6 +1124,25 @@ class FeishuService:
         data = resp.json()
         return data.get("data", {}).get("content", "")
 
+    def list_bitable_records(self, app_token: str, table_id: str, page_token: str | None = None) -> dict:
+        """Read one complete Bitable page with app credentials; callers own pagination."""
+        import re
+        if not all(re.fullmatch(r"[A-Za-z0-9_-]{3,128}", value or "") for value in (app_token, table_id)):
+            raise ValueError("invalid Bitable identifier")
+        token = self._get_tenant_token()
+        params = {"page_size": 500}
+        if page_token:
+            params["page_token"] = page_token
+        response = requests.get(
+            f"{FEISHU_API}/bitable/v1/apps/{app_token}/tables/{table_id}/records",
+            headers={"Authorization": f"Bearer {token}"}, params=params, timeout=30,
+        )
+        response.raise_for_status()
+        body = response.json()
+        if body.get("code") != 0 or not isinstance(body.get("data"), dict):
+            raise ValueError(f"Feishu Bitable read failed: {body.get('code')}")
+        return body["data"]
+
     def get_doc_blocks(self, doc_token: str) -> list:
         """获取文档所有 block（用于定位表格行，tenant token）。"""
         token = self._get_tenant_token()
