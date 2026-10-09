@@ -1143,6 +1143,42 @@ class FeishuService:
             raise ValueError(f"Feishu Bitable read failed: {body.get('code')}")
         return body["data"]
 
+    def list_spreadsheet_sheets(self, spreadsheet_token: str) -> list[dict]:
+        """Read worksheet metadata so the Knowledge catalog can select 总表 by title."""
+        import re
+        if not re.fullmatch(r"[A-Za-z0-9_-]{3,128}", spreadsheet_token or ""):
+            raise ValueError("invalid spreadsheet token")
+        response = requests.get(
+            f"{FEISHU_API}/sheets/v3/spreadsheets/{spreadsheet_token}/sheets/query",
+            headers={"Authorization": f"Bearer {self._get_tenant_token()}"}, timeout=30,
+        )
+        response.raise_for_status()
+        body = response.json()
+        sheets = (body.get("data") or {}).get("sheets")
+        if body.get("code") != 0 or not isinstance(sheets, list):
+            raise ValueError(f"Feishu spreadsheet metadata read failed: {body.get('code')}")
+        return sheets
+
+    def read_spreadsheet_values(self, spreadsheet_token: str, sheet_id: str, start_row: int, end_row: int) -> list[list]:
+        """Read a bounded worksheet range; the caller handles complete snapshot assembly."""
+        import re
+        from urllib.parse import quote
+        if not all(re.fullmatch(r"[A-Za-z0-9_-]{3,128}", value or "") for value in (spreadsheet_token, sheet_id)):
+            raise ValueError("invalid spreadsheet or sheet identifier")
+        if not (1 <= start_row <= end_row <= 10000 and end_row - start_row < 500):
+            raise ValueError("spreadsheet range out of bounds")
+        sheet_range = quote(f"{sheet_id}!A{start_row}:AZ{end_row}", safe="!:" )
+        response = requests.get(
+            f"{FEISHU_API}/sheets/v2/spreadsheets/{spreadsheet_token}/values/{sheet_range}",
+            headers={"Authorization": f"Bearer {self._get_tenant_token()}"}, timeout=30,
+        )
+        response.raise_for_status()
+        body = response.json()
+        values = ((body.get("data") or {}).get("valueRange") or {}).get("values")
+        if body.get("code") != 0 or not isinstance(values, list):
+            raise ValueError(f"Feishu spreadsheet values read failed: {body.get('code')}")
+        return values
+
     def get_doc_blocks(self, doc_token: str) -> list:
         """获取文档所有 block（用于定位表格行，tenant token）。"""
         token = self._get_tenant_token()
