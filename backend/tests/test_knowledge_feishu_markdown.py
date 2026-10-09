@@ -104,3 +104,29 @@ def test_callout_children_are_preserved_as_markdown_note():
     assert "> [!NOTE]" in result.markdown
     assert "> 检查扭矩" in result.markdown
     assert result.anchors[-1]["end"] <= len(result.markdown)
+
+
+def test_grid_table_images_embeds_and_document_mentions_have_reviewable_references():
+    blocks = [
+        {"block_id": "root", "block_type": 1, "children": ["grid", "table", "board", "sheet", "view"]},
+        {"block_id": "grid", "block_type": 24, "children": ["column"]},
+        {"block_id": "column", "block_type": 25, "children": ["grid_text"]},
+        _text("grid_text", 2, "网格中的正文"),
+        {"block_id": "table", "block_type": 31, "children": ["cell"], "table": {"property": {"row_size": 1, "column_size": 1}}},
+        {"block_id": "cell", "block_type": 32, "children": ["image"]},
+        {"block_id": "image", "block_type": 27, "image": {"token": "asset"}},
+        {"block_id": "board", "block_type": 43, "board": {"token": "board-token"}},
+        {"block_id": "sheet", "block_type": 30, "sheet": {"token": "sheet-token"}},
+        {"block_id": "view", "block_type": 33, "children": ["quote_container"]},
+        {"block_id": "quote_container", "block_type": 23, "children": ["mention"]},
+        {"block_id": "mention", "block_type": 2, "text": {"elements": [{"mention_doc": {
+            "title": "工艺对标", "url": "https://li.feishu.cn/docs/doc123"}}]}},
+    ]
+    result = convert_blocks(blocks, source_url="https://li.feishu.cn/wiki/wiki123")
+    assert "网格中的正文" in result.markdown
+    assert "[工艺对标](https://li.feishu.cn/docs/doc123)" in result.markdown
+    for block_id in ("image", "board", "sheet"):
+        assert f"区块 {block_id}" in result.markdown
+    assert "table_cell_content_unsupported" not in {item["code"] for item in result.diagnostics}
+    assert {item["code"] for item in result.diagnostics} == {
+        "image_requires_manual_review", "embedded_visual_requires_manual_review"}

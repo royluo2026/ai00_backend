@@ -72,7 +72,7 @@ def pull_source(payload: dict, context: CapabilityContext) -> CapabilityOutput:
     snapshot_gid = new_knowledge_id("snapshot")
     # The Knowledge import reads Docx blocks only. Images require a separate
     # reviewed path; the Feishu media download endpoint is not used here.
-    converted = convert_blocks(blocks)
+    converted = convert_blocks(blocks, source_url=source["document_url"])
     markdown = converted.markdown
     data = markdown.encode("utf-8")
     if len(data) > 5_000_000:

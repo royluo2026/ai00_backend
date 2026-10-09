@@ -41,8 +41,13 @@ def _inline(elements: list[dict], diagnostics: list[dict], block_id: str) -> str
             chunks.append(content)
         elif element.get("mention_doc"):
             mention = element["mention_doc"]
-            chunks.append(str(mention.get("title") or "[文档]"))
-            diagnostics.append({"block_id": block_id, "code": "mention_doc_unresolved"})
+            title = re.sub(r"([\\*_`\[\]])", r"\\\1", html.escape(str(mention.get("title") or "文档"), quote=False))
+            url = str(mention.get("url") or "")
+            if re.match(r"^https://[^\s)]+$", url, re.I):
+                chunks.append(f"[{title}]({url})")
+            else:
+                chunks.append(title)
+                diagnostics.append({"block_id": block_id, "code": "mention_doc_unresolved"})
         elif element.get("equation"):
             chunks.append(f"${element['equation'].get('content') or ''}$")
         else:
@@ -50,7 +55,8 @@ def _inline(elements: list[dict], diagnostics: list[dict], block_id: str) -> str
     return "".join(chunks)
 
 
-def convert_blocks(blocks: list[dict], *, resolve_asset: Callable[[str, str], str] | None = None) -> ConversionResult:
+def convert_blocks(blocks: list[dict], *, resolve_asset: Callable[[str, str], str] | None = None,
+                   source_url: str = "") -> ConversionResult:
     by_id = {str(block.get("block_id")): block for block in blocks if block.get("block_id")}
     roots = [block for block in blocks if block.get("block_type") == 1]
     diagnostics: list[dict] = []
@@ -61,6 +67,12 @@ def convert_blocks(blocks: list[dict], *, resolve_asset: Callable[[str, str], st
     if len(roots) != 1:
         return ConversionResult("", [], diagnostics + [{"block_id": "", "code": "document_root_missing"}], False)
 
+    source_link = source_url if re.match(r"^https://[^\s)]+$", source_url, re.I) else ""
+
+    def visual_reference(block_id: str, label: str) -> str:
+        reference = f"飞书原文：{label}（区块 {block_id}，需人工核对）"
+        return f"[{reference}]({source_link})" if source_link else reference
+
     def plain_cell(cell_id: str) -> str:
         cell = by_id.get(cell_id)
         if not cell or cell.get("block_type") != 32:
@@ -69,8 +81,16 @@ def convert_blocks(blocks: list[dict], *, resolve_asset: Callable[[str, str], st
         contents = []
         for child_id in cell.get("children") or []:
             child = by_id.get(child_id)
-            if not child or child.get("block_type") not in {2, 3, 4, 5, 6, 7, 8, 9, 10, 11}:
+            if not child:
                 diagnostics.append({"block_id": child_id, "code": "table_cell_content_unsupported"})
+                continue
+            if child.get("block_type") == 27:
+                diagnostics.append({"block_id": child_id, "code": "image_requires_manual_review", "detail": "表格内图片待核对"})
+                contents.append(visual_reference(child_id, "表格内图片"))
+                continue
+            if child.get("block_type") not in {2, 3, 4, 5, 6, 7, 8, 9, 10, 11}:
+                diagnostics.append({"block_id": child_id, "code": "table_cell_content_unsupported"})
+                contents.append(visual_reference(child_id, "表格单元格内容"))
                 continue
             key = "text" if child["block_type"] == 2 else f"heading{child['block_type'] - 2}"
             contents.append(_inline((child.get(key) or {}).get("elements") or [], diagnostics, child_id))
@@ -115,16 +135,25 @@ def convert_blocks(blocks: list[dict], *, resolve_asset: Callable[[str, str], st
             emit("")
         elif kind == 22:
             emit("---"); emit("")
+        elif kind in {23, 24, 25, 33}:
+            for index, child in enumerate(block.get("children") or []):
+                render(child, path + [index], depth, prefix)
         elif kind == 27:
             token = str((block.get("image") or {}).get("token") or "")
             if not token or not resolve_asset:
                 diagnostics.append({"block_id": block_id, "code": "image_requires_manual_review", "detail": "图片待处理"})
+                emit(visual_reference(block_id, "图片")); emit("")
             else:
                 try:
                     ref = resolve_asset(token, "image")
                     emit(f"![image]({ref})"); emit("")
                 except Exception as exc:
                     diagnostics.append({"block_id": block_id, "code": "image_asset_unavailable", "detail": str(exc)[:200]})
+                    emit(visual_reference(block_id, "图片")); emit("")
+        elif kind in {30, 43}:
+            label = "电子表格" if kind == 30 else "白板"
+            diagnostics.append({"block_id": block_id, "code": "embedded_visual_requires_manual_review", "detail": label})
+            emit(visual_reference(block_id, label)); emit("")
         elif kind == 31:
             prop = (block.get("table") or {}).get("property") or {}
             rows, columns = int(prop.get("row_size") or 0), int(prop.get("column_size") or 0)

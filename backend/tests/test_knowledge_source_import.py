@@ -61,15 +61,40 @@ def test_incomplete_candidate_cannot_be_confirmed():
 
 
 class SuccessCursor(Cursor):
-    def __init__(self, *, source_unchanged=False):
+    def __init__(self, *, source_unchanged=False, complete=True, diagnostics=None):
         super().__init__(current="rev_1")
         self.source_unchanged = source_unchanged
+        self.complete = complete
+        self.diagnostics = diagnostics or []
     def fetchone(self):
         if "workmanship_know_feishu_baselines" in self.sql:
             return {"snapshot_gid": "old", "content_sha256": "a" * 64 if self.source_unchanged else "c" * 64}
         if "MAX(revision_no)" in self.sql: return {"n": 1}
         if "SELECT revision_no FROM" in self.sql: return {"revision_no": 1}
-        return super().fetchone()
+        row = super().fetchone()
+        if "workmanship_know_feishu_snapshots" in self.sql and row:
+            return {**row, "complete": self.complete, "diagnostics_json": self.diagnostics}
+        return row
+
+
+def test_reviewed_visual_references_can_be_confirmed_but_unknown_content_cannot():
+    visual = [{"block_id": "image_1", "code": "image_requires_manual_review"}]
+    cursor = SuccessCursor(complete=False, diagnostics=visual)
+    conn = TrackedConnection(cursor)
+    with patch("plugins.knowledge.knowledge_backend.capabilities.feishu_import_next.get_knowledge_conn", return_value=conn), \
+         patch("backend.platform_sdk.identity.get_active_identity_profile", return_value=_profile()), \
+         patch("plugins.knowledge.knowledge_backend.capabilities.feishu_import_next.get_immutable", return_value=b"# Feishu image reference\n"), \
+         patch("plugins.knowledge.knowledge_backend.capabilities.feishu_import_next.new_knowledge_id", side_effect=lambda kind: f"{kind}_new"), \
+         patch("plugins.knowledge.knowledge_backend.capabilities.feishu_import_next.store_markdown_revision", side_effect=lambda prepared: {
+             "object_key": prepared.object_key, "sha256": prepared.sha256, "byte_size": len(prepared.data), "media_type": prepared.media_type,
+         }):
+        result = confirm_import({**_payload(), "visuals_reviewed": True}, _context())
+    assert result.data["changed"] is True
+    cursor = SuccessCursor(complete=False, diagnostics=visual + [{"block_id": "unknown", "code": "unsupported_block"}])
+    with patch("plugins.knowledge.knowledge_backend.capabilities.feishu_import_next.get_knowledge_conn", return_value=Connection(cursor)), \
+         patch("backend.platform_sdk.identity.get_active_identity_profile", return_value=_profile()):
+        with pytest.raises(ValueError, match="incomplete"):
+            confirm_import({**_payload(), "visuals_reviewed": True}, _context())
 
 
 class TrackedConnection(Connection):

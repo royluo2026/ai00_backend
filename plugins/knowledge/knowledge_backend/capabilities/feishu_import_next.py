@@ -27,7 +27,7 @@ def _snapshot_markdown(row: dict) -> str:
 
 
 def _request_hash(payload: dict) -> str:
-    value = {key: payload.get(key) for key in ("source_snapshot_gid", "expected_revision_gid", "markdown")}
+    value = {key: payload.get(key) for key in ("source_snapshot_gid", "expected_revision_gid", "markdown", "visuals_reviewed")}
     return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()
 
 
@@ -111,7 +111,7 @@ def confirm_import(payload: dict, context: CapabilityContext) -> CapabilityOutpu
                         raise ValueError("idempotency key was already used for another reviewed result")
                     return _receipt(prior)
                 cur.execute(
-                    "SELECT s.gid AS snapshot_gid,s.source_gid,s.object_key,s.content_sha256,s.complete,"
+                    "SELECT s.gid AS snapshot_gid,s.source_gid,s.object_key,s.content_sha256,s.complete,s.diagnostics_json,"
                     "src.linked_document_gid,r.title FROM workmanship_know_feishu_snapshots s "
                     "JOIN workmanship_know_feishu_sources src ON src.gid=s.source_gid "
                     "JOIN workmanship_know_feishu_catalog_records r ON r.gid=src.catalog_record_gid "
@@ -122,7 +122,12 @@ def confirm_import(payload: dict, context: CapabilityContext) -> CapabilityOutpu
                 if not snapshot:
                     raise LookupError("active source candidate not found")
                 if not snapshot["complete"]:
-                    raise ValueError("incomplete Feishu source candidate cannot be confirmed")
+                    raw = snapshot.get("diagnostics_json") or []
+                    issues = raw if isinstance(raw, list) else json.loads(raw)
+                    visual_codes = {"image_requires_manual_review", "embedded_visual_requires_manual_review"}
+                    if not (payload.get("visuals_reviewed") is True and issues
+                            and all(issue.get("code") in visual_codes for issue in issues)):
+                        raise ValueError("incomplete Feishu source candidate cannot be confirmed")
                 source_gid = snapshot["source_gid"]
                 document_gid = snapshot.get("linked_document_gid")
                 document = None
@@ -254,10 +259,11 @@ def register_feishu_import_capabilities(registry) -> None:
         output_schema=preview_output, tags=("knowledge", "source", "diff", "read")), preview_import)
     register_capability(registry, CapabilitySpec(
         **common, id="knowledge.source.import.confirm", description="Confirm reviewed Markdown as one immutable OIS revision and advance the Feishu baseline.",
-        use_when="An authorized editor explicitly accepts a complete source candidate after reviewing the diff.", do_not_use_when="A comparison is stale or incomplete.",
+        use_when="An authorized editor accepts a complete candidate, or explicitly reviews every visual reference before confirming.", do_not_use_when="A comparison is stale or has unresolved non-visual content.",
         effects=("create:knowledge.revision", "update:knowledge.document_head", "update:knowledge.source_baseline"),
         risk="write", confirmation="user", idempotent=True,
         input_schema={"type": "object", "required": ["source_snapshot_gid", "expected_revision_gid", "markdown", "idempotency_key"],
             "properties": {"source_snapshot_gid": {"type": "string"}, "expected_revision_gid": {"type": "string"},
-                           "markdown": {"type": "string", "minLength": 1}, "idempotency_key": {"type": "string", "minLength": 1, "maxLength": 128}}},
+                           "markdown": {"type": "string", "minLength": 1}, "idempotency_key": {"type": "string", "minLength": 1, "maxLength": 128},
+                           "visuals_reviewed": {"type": "boolean"}}},
         output_schema=receipt_output, tags=("knowledge", "source", "import", "write")), confirm_import)
