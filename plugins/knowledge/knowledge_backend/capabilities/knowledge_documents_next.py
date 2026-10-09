@@ -547,6 +547,21 @@ def list_document_acl(payload: dict[str, Any], context: CapabilityContext) -> di
     )
 
 
+def search_document_collaborators(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+    """Superadmin picker is scoped to the caller's trusted team."""
+    tenant = _tenant(context)
+    _require_superadmin(context, tenant)
+    query = str(payload.get("query") or "").strip()
+    if not query or len(query) > 200:
+        raise ValueError("query must be 1-200 characters")
+    limit = max(1, min(int(payload.get("limit") or 10), 50))
+    from backend.services.user_service import search_users
+    users = search_users(query, limit, team_gid=tenant)
+    items = [{"gid": str(user["gid"]), "name": str(user.get("name") or ""),
+              "email": str(user.get("email") or "")} for user in users]
+    return CapabilityOutput(data={"items": items, "total": len(items)})
+
+
 def revoke_document_acl(payload: dict[str, Any], context: CapabilityContext) -> dict[str, Any]:
     tenant = _tenant(context)
     _require_superadmin(context, tenant)
@@ -710,6 +725,16 @@ def register_knowledge_document_capabilities(registry) -> None:
         "subject_type": {"type": "string", "enum": ["user", "team"]},
         "subject_gid": {"type": "string"},
     }
+    register_capability(registry, CapabilitySpec(
+        **common, id="knowledge.document.collaborator.search", description="Search active system users in the current Knowledge tenant for an editor grant.",
+        use_when="A superadmin adds a document collaborator.", do_not_use_when="Searching users in another team.",
+        effects=("read:base.user",),
+        input_schema={"type": "object", "required": ["query"], "properties": {"query": {"type": "string", "minLength": 1, "maxLength": 200}, "limit": {"type": "integer", "minimum": 1, "maximum": 50}}},
+        output_schema={"type": "object", "additionalProperties": False, "required": ["items", "total"],
+            "properties": {"items": {"type": "array", "maxItems": 50, "items": {"type": "object", "additionalProperties": False,
+                "required": ["gid", "name", "email"], "properties": {"gid": {"type": "string"}, "name": {"type": "string"}, "email": {"type": "string"}}}},
+                "total": {"type": "integer"}}},
+        tags=("knowledge", "document", "collaborator", "read")), search_document_collaborators)
     register_capability(registry, CapabilitySpec(
         **common, id="knowledge.document.acl.list", description="List governed access grants for a document the caller administers.",
         use_when="A document administrator needs its explicit grants.", do_not_use_when="Only document content is required.",
