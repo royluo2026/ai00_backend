@@ -74,7 +74,10 @@ class KnowledgeDocumentCapabilityTests(unittest.TestCase):
             def __exit__(self, *_args): return False
             def cursor(self): return Cursor()
 
-        with patch("backend.knowledge.data.connection.get_knowledge_conn", return_value=Connection()):
+        with patch("backend.knowledge.data.connection.get_knowledge_conn", return_value=Connection()), \
+             patch("backend.platform_sdk.identity.get_active_identity_profile", return_value={
+                 "gid": "user_1", "team_id": "tenant_1", "system_role": "super_admin", "is_active": True,
+             }):
             result = list_document_acl(
                 {"document_gid": "doc_1"}, CapabilityContext(user_gid="user_1", team_gid="tenant_1")
             )

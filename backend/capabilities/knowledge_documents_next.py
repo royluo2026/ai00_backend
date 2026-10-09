@@ -33,6 +33,7 @@ DOCUMENT_SEARCH_SCHEMA = {
                 "revision_ref": {"type": "string", "pattern": "^knowledge-revision:[A-Za-z0-9_.:-]+$"},
                 "space_ref": {"type": "string", "pattern": "^knowledge-space:[A-Za-z0-9_.:-]+$"},
                 "title": {"type": "string"}, "slug": {"type": "string"}, "space_gid": {"type": "string"},
+                "maturity": {"type": "string", "enum": ["V1", "V2", "V3"]},
                 "document_gid": {"type": "string"}, "revision_gid": {"type": "string"},
                 "revision_no": {"type": "integer", "minimum": 1}, "state": {"type": "string"},
             },
@@ -78,6 +79,34 @@ def _tenant(context: CapabilityContext) -> str:
             "tenant_scope_denied", "Knowledge Workspace requires a team tenant."
         )
     return tenant
+
+
+def _trusted_profile(context: CapabilityContext, tenant: str) -> dict[str, Any]:
+    from backend.platform_sdk.identity import get_active_identity_profile
+    profile = get_active_identity_profile(str(context.user_gid or ""))
+    if not profile or not profile.get("is_active") or str(profile.get("team_id") or "") != tenant:
+        raise PermissionError("active tenant membership required")
+    return profile
+
+
+def _require_superadmin(context: CapabilityContext, tenant: str) -> None:
+    profile = _trusted_profile(context, tenant)
+    if profile.get("system_role") != "super_admin":
+        raise PermissionError("superadmin access required")
+
+
+def _require_document_editor(cur, document: dict[str, Any], context: CapabilityContext, tenant: str) -> None:
+    profile = _trusted_profile(context, tenant)
+    if profile.get("system_role") == "super_admin" or str(document.get("created_by") or "") == context.user_gid:
+        return
+    cur.execute(
+        "SELECT permission FROM workmanship_know_document_acl "
+        "WHERE document_gid=%s AND subject_type='user' AND subject_gid=%s "
+        "AND permission IN ('edit','admin')",
+        (document["gid"], context.user_gid),
+    )
+    if not cur.fetchone():
+        raise PermissionError("document edit access denied")
 
 
 def _access_sql(permission: str) -> str:
@@ -174,6 +203,7 @@ def _create_revision(payload: dict[str, Any], context: CapabilityContext, *, exi
                 if not document:
                     raise LookupError("document not found")
                 document = dict(document)
+                _require_document_editor(cur, document, context, tenant)
                 requested_base = str(payload.get("base_revision_gid") or "").strip()
                 current_base = str(document.get("current_revision_gid") or "").strip()
                 if requested_base != current_base:
@@ -256,6 +286,81 @@ def revise_document(payload: dict[str, Any], context: CapabilityContext) -> Capa
     return _create_revision(payload, context, existing=True)
 
 
+def change_document_maturity(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+    tenant = _tenant(context)
+    document_gid = str(payload.get("document_gid") or "").strip()
+    maturity = str(payload.get("maturity") or "").strip().upper()
+    if maturity not in {"V1", "V2", "V3"}:
+        raise ValueError("maturity must be V1, V2, or V3")
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT gid,created_by,maturity FROM workmanship_know_documents WHERE gid=%s AND tenant_gid=%s FOR UPDATE", (document_gid, tenant))
+            document = cur.fetchone()
+            if not document:
+                raise LookupError("document not found")
+            _require_document_editor(cur, dict(document), context, tenant)
+            old = str(document["maturity"])
+            if old != maturity:
+                cur.execute("UPDATE workmanship_know_documents SET maturity=%s,updated_at=NOW() WHERE gid=%s", (maturity, document_gid))
+                cur.execute(
+                    "INSERT INTO workmanship_know_document_maturity_events (gid,tenant_gid,document_gid,from_maturity,to_maturity,changed_by) VALUES (%s,%s,%s,%s,%s,%s)",
+                    (new_knowledge_id("maturity"), tenant, document_gid, old, maturity, context.user_gid),
+                )
+        conn.commit()
+    return CapabilityOutput(data={"document_gid": document_gid, "document_ref": document_ref(document_gid), "maturity": maturity, "changed": old != maturity}, evidence=(_acl_evidence(document_gid),))
+
+
+def save_document_draft(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+    tenant = _tenant(context)
+    document_gid = str(payload.get("document_gid") or "").strip()
+    base = str(payload.get("base_revision_gid") or "").strip()
+    markdown = str(payload.get("markdown") or "")
+    if not base or len(markdown.encode("utf-8")) > 2_000_000:
+        raise ValueError("base_revision_gid is required and draft must be at most 2 MB")
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT gid,created_by,current_revision_gid FROM workmanship_know_documents WHERE gid=%s AND tenant_gid=%s", (document_gid, tenant))
+            document = cur.fetchone()
+            if not document:
+                raise LookupError("document not found")
+            _require_document_editor(cur, dict(document), context, tenant)
+            cur.execute(
+                "INSERT INTO workmanship_know_document_drafts (document_gid,user_gid,tenant_gid,base_revision_gid,markdown) VALUES (%s,%s,%s,%s,%s) "
+                "ON DUPLICATE KEY UPDATE base_revision_gid=VALUES(base_revision_gid),markdown=VALUES(markdown),updated_at=NOW()",
+                (document_gid, context.user_gid, tenant, base, markdown),
+            )
+        conn.commit()
+    return CapabilityOutput(data={"document_gid": document_gid, "document_ref": document_ref(document_gid), "base_revision_gid": base, "saved": True}, evidence=(_acl_evidence(document_gid),))
+
+
+def get_document_draft(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+    tenant = _tenant(context)
+    document_gid = str(payload.get("document_gid") or "").strip()
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT gid,created_by,current_revision_gid FROM workmanship_know_documents WHERE gid=%s AND tenant_gid=%s", (document_gid, tenant))
+            document = cur.fetchone()
+            if not document:
+                raise LookupError("document not found")
+            _require_document_editor(cur, dict(document), context, tenant)
+            cur.execute(
+                "SELECT base_revision_gid,markdown,updated_at FROM workmanship_know_document_drafts "
+                "WHERE document_gid=%s AND user_gid=%s AND tenant_gid=%s",
+                (document_gid, context.user_gid, tenant),
+            )
+            draft = cur.fetchone()
+    return CapabilityOutput(data={
+        "document_gid": document_gid, "document_ref": document_ref(document_gid),
+        "base_revision_gid": str(draft["base_revision_gid"]) if draft else None,
+        "markdown": str(draft["markdown"]) if draft else None,
+        "updated_at": transport_value(draft["updated_at"]) if draft else None,
+        "exists": bool(draft),
+    }, evidence=(_acl_evidence(document_gid),))
+
+
 def get_document(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
     tenant = _tenant(context)
     document_gid = str(payload.get("document_gid") or "").strip()
@@ -266,7 +371,7 @@ def get_document(payload: dict[str, Any], context: CapabilityContext) -> Capabil
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT d.title,d.tenant_gid,d.space_gid,d.gid AS document_gid,r.gid AS revision_gid,r.revision_no,r.object_key,r.content_sha256,r.state "
+                "SELECT d.title,d.maturity,d.tenant_gid,d.space_gid,d.gid AS document_gid,r.gid AS revision_gid,r.revision_no,r.object_key,r.content_sha256,r.state "
                 "FROM workmanship_know_documents d JOIN workmanship_know_revisions r ON r.document_gid=d.gid "
                 "WHERE d.gid=%s AND d.tenant_gid=%s AND r.gid=COALESCE(NULLIF(%s,''),d.published_revision_gid)",
                 (document_gid, tenant, revision_gid),
@@ -289,7 +394,7 @@ def search_documents(payload: dict[str, Any], context: CapabilityContext) -> Cap
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT d.title,d.slug,d.tenant_gid,d.space_gid,d.gid AS document_gid,r.gid AS revision_gid,r.revision_no,r.object_key,r.content_sha256,r.state "
+                "SELECT d.title,d.slug,d.maturity,d.tenant_gid,d.space_gid,d.gid AS document_gid,r.gid AS revision_gid,r.revision_no,r.object_key,r.content_sha256,r.state "
                 "FROM workmanship_know_documents d JOIN workmanship_know_revisions r ON r.gid=d.published_revision_gid "
                 "WHERE d.tenant_gid=%s AND (d.title LIKE %s OR d.slug LIKE %s)"
                 " ORDER BY d.updated_at DESC LIMIT %s",
@@ -299,6 +404,7 @@ def search_documents(payload: dict[str, Any], context: CapabilityContext) -> Cap
     items = [
         {
             **{key: row[key] for key in ("title", "slug", "space_gid", "document_gid", "revision_gid", "revision_no", "state")},
+            "maturity": row.get("maturity") or "V1",
             "object_ref": document_ref(row["document_gid"]),
             "revision_ref": revision_ref(row["revision_gid"]),
             "space_ref": space_ref(row["space_gid"]),
@@ -397,6 +503,7 @@ def rollback_document(payload: dict[str, Any], context: CapabilityContext) -> Ca
     )
 def list_document_acl(payload: dict[str, Any], context: CapabilityContext) -> dict[str, Any]:
     tenant = _tenant(context)
+    _require_superadmin(context, tenant)
     document_gid = str(payload.get("document_gid") or "").strip()
     if not document_gid:
         raise ValueError("document_gid is required")
@@ -404,8 +511,8 @@ def list_document_acl(payload: dict[str, Any], context: CapabilityContext) -> di
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT d.gid FROM workmanship_know_documents d WHERE d.gid=%s AND d.tenant_gid=%s AND " + _access_sql("admin"),
-                (document_gid, tenant, context.user_gid, context.user_gid, tenant),
+                "SELECT d.gid FROM workmanship_know_documents d WHERE d.gid=%s AND d.tenant_gid=%s",
+                (document_gid, tenant),
             )
             if not cur.fetchone():
                 raise PermissionError("document admin access denied")
@@ -424,6 +531,7 @@ def list_document_acl(payload: dict[str, Any], context: CapabilityContext) -> di
 
 def revoke_document_acl(payload: dict[str, Any], context: CapabilityContext) -> dict[str, Any]:
     tenant = _tenant(context)
+    _require_superadmin(context, tenant)
     document_gid = str(payload.get("document_gid") or "").strip()
     subject_type = str(payload.get("subject_type") or "").strip()
     subject_gid = str(payload.get("subject_gid") or "").strip()
@@ -436,8 +544,8 @@ def revoke_document_acl(payload: dict[str, Any], context: CapabilityContext) -> 
         with conn.cursor() as cur:
             cur.execute(
                 "SELECT d.gid,d.created_by FROM workmanship_know_documents d "
-                "WHERE d.gid=%s AND d.tenant_gid=%s AND " + _access_sql("admin") + " FOR UPDATE",
-                (document_gid, tenant, context.user_gid, context.user_gid, tenant),
+                "WHERE d.gid=%s AND d.tenant_gid=%s FOR UPDATE",
+                (document_gid, tenant),
             )
             document = cur.fetchone()
             if not document:
@@ -461,6 +569,7 @@ def revoke_document_acl(payload: dict[str, Any], context: CapabilityContext) -> 
 
 def grant_document_acl(payload: dict[str, Any], context: CapabilityContext) -> dict[str, Any]:
     tenant = _tenant(context)
+    _require_superadmin(context, tenant)
     document_gid = str(payload.get("document_gid") or "").strip()
     subject_type = str(payload.get("subject_type") or "").strip()
     subject_gid = str(payload.get("subject_gid") or "").strip()
@@ -478,8 +587,8 @@ def grant_document_acl(payload: dict[str, Any], context: CapabilityContext) -> d
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT d.gid FROM workmanship_know_documents d WHERE d.gid=%s AND d.tenant_gid=%s AND " + _access_sql("admin"),
-                (document_gid, tenant, context.user_gid, context.user_gid, tenant),
+                "SELECT d.gid FROM workmanship_know_documents d WHERE d.gid=%s AND d.tenant_gid=%s",
+                (document_gid, tenant),
             )
             if not cur.fetchone():
                 raise PermissionError("document admin access denied")
@@ -501,6 +610,36 @@ def register_knowledge_document_capabilities(registry) -> None:
         "subject_concepts": ("knowledge.document", "knowledge.revision"),
         "plugin_callable": True,
     }
+    maturity_schema = {"type": "object", "additionalProperties": False,
+        "required": ["document_gid", "document_ref", "maturity", "changed"],
+        "properties": {"document_gid": {"type": "string"}, "document_ref": {"type": "string"},
+            "maturity": {"type": "string", "enum": ["V1", "V2", "V3"]}, "changed": {"type": "boolean"}}}
+    draft_schema = {"type": "object", "additionalProperties": False,
+        "required": ["document_gid", "document_ref", "base_revision_gid", "markdown", "updated_at", "exists"],
+        "properties": {"document_gid": {"type": "string"}, "document_ref": {"type": "string"},
+            "base_revision_gid": {"type": ["string", "null"]}, "markdown": {"type": ["string", "null"]},
+            "updated_at": {"type": ["string", "null"]}, "exists": {"type": "boolean"}}}
+    draft_saved_schema = {"type": "object", "additionalProperties": False,
+        "required": ["document_gid", "document_ref", "base_revision_gid", "saved"],
+        "properties": {"document_gid": {"type": "string"}, "document_ref": {"type": "string"},
+            "base_revision_gid": {"type": "string"}, "saved": {"type": "boolean"}}}
+    register_capability(registry, CapabilitySpec(
+        **common, id="knowledge.document.maturity.change", description="Change a document's V1/V2/V3 maturity independently of immutable revisions.",
+        use_when="An authorized editor advances document maturity.", do_not_use_when="Editing Markdown content.",
+        effects=("update:knowledge.document", "create:knowledge.maturity_event"), risk="write", confirmation="user", idempotent=False,
+        input_schema={"type": "object", "required": ["document_gid", "maturity"], "properties": {"document_gid": {"type": "string"}, "maturity": {"type": "string", "enum": ["V1", "V2", "V3"]}}},
+        output_schema=maturity_schema, tags=("knowledge", "document", "write")), change_document_maturity)
+    register_capability(registry, CapabilitySpec(
+        **common, id="knowledge.document.draft.get", description="Read the current user's private Markdown working copy.",
+        use_when="An editor resumes unfinished work.", do_not_use_when="Reading a published revision.",
+        effects=("read:knowledge.document_draft",), input_schema={"type": "object", "required": ["document_gid"], "properties": {"document_gid": {"type": "string"}}},
+        output_schema=draft_schema, tags=("knowledge", "document", "draft", "read")), get_document_draft)
+    register_capability(registry, CapabilitySpec(
+        **common, id="knowledge.document.draft.save", description="Save the current user's private Markdown working copy without publishing a revision.",
+        use_when="An editor pauses unfinished work.", do_not_use_when="Publishing a revision.",
+        effects=("update:knowledge.document_draft",), risk="write", confirmation="user", idempotent=False,
+        input_schema={"type": "object", "required": ["document_gid", "base_revision_gid", "markdown"], "properties": {"document_gid": {"type": "string"}, "base_revision_gid": {"type": "string"}, "markdown": {"type": "string"}}},
+        output_schema=draft_saved_schema, tags=("knowledge", "document", "draft", "write")), save_document_draft)
     register_capability(registry, CapabilitySpec(
         **common, id="knowledge.space.search", description="Search spaces available in the current tenant.",
         use_when="A caller needs a knowledge space.", do_not_use_when="The space gid is already known.",

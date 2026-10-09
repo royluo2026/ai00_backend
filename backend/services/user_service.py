@@ -224,15 +224,17 @@ def get_feishu_token(user_gid: str) -> str:
     return access_token
 
 
-def search_users(q: str, limit: int = 10) -> list:
+def search_users(q: str, limit: int = 10, *, team_gid: str | None = None) -> list:
     """模糊搜索活跃用户（按姓名或邮箱），用于 @mention 候选人列表。"""
     with get_conn() as conn:
         with conn.cursor() as cur:
             pattern = f"%{q}%"
+            tenant_clause = "team_id = %s AND " if team_gid else ""
+            params = (team_gid, pattern, pattern, limit) if team_gid else (pattern, pattern, limit)
             cur.execute(
                 "SELECT gid, name, email, avatar_url FROM workmanship_auth_users "
-                "WHERE is_active = TRUE AND (name LIKE %s OR email LIKE %s) "
+                f"WHERE {tenant_clause}is_active = TRUE AND (name LIKE %s OR email LIKE %s) "
                 "ORDER BY name LIMIT %s",
-                (pattern, pattern, limit),
+                params,
             )
             return [dict(r) for r in cur.fetchall()]

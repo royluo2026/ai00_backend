@@ -97,6 +97,7 @@ DOCUMENT_SCHEMA = _object({
     "revision_ref": REVISION_REF_SCHEMA,
     "space_ref": SPACE_REF_SCHEMA,
     "title": {"type": "string"},
+    "maturity": {"type": "string", "enum": ["V1", "V2", "V3"]},
     "tenant_gid": {"type": "string"},
     "space_gid": {"type": "string"},
     "document_gid": {"type": "string"},

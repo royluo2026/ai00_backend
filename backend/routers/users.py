@@ -40,10 +40,14 @@ def get_me(current_user: dict = Depends(get_current_user)):
 def search_users(
     q: str = Query("", description="搜索关键词（姓名/邮箱）"),
     limit: int = Query(10, le=50),
+    team_only: bool = Query(False, description="仅返回当前团队的协作者候选人"),
     current_user: dict = Depends(get_current_user),
 ):
     """模糊搜索用户，用于 @mention 候选人浮层。"""
-    results = user_service.search_users(q, limit)
+    team_gid = str(current_user.get("team_id") or "") if team_only else None
+    if team_only and not team_gid:
+        raise HTTPException(status_code=403, detail="active team required")
+    results = user_service.search_users(q, limit, team_gid=team_gid)
     return {"success": True, "data": [
         {"gid": u["gid"], "name": u["name"],
          "email": u["email"], "avatar_url": u.get("avatar_url", "")}
