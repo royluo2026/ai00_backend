@@ -26,5 +26,6 @@ CREATE TABLE IF NOT EXISTS workmanship_know_feishu_assets (
   byte_size BIGINT NOT NULL,
   media_type VARCHAR(128) NOT NULL,
   created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
-  KEY idx_know_feishu_asset_snapshot (tenant_gid,snapshot_gid)
+  KEY idx_know_feishu_asset_snapshot (tenant_gid,snapshot_gid),
+  UNIQUE KEY uq_know_feishu_asset_identity (tenant_gid,source_gid,feishu_token,content_sha256)
 );

@@ -16,6 +16,7 @@ _PREFIXES = {
     "catalog_record": "knc",
     "snapshot": "knsnp",
     "asset": "kna",
+    "import": "kni",
     "folder": "knf",
     "item": "kni",
 }

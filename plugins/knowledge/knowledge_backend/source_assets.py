@@ -6,6 +6,7 @@ import hashlib
 import re
 
 from backend.services.feishu_service import feishu_service
+from .data.connection import get_knowledge_conn
 from .ids import new_knowledge_id
 from .storage import get_immutable, put_immutable
 
@@ -20,6 +21,17 @@ def store_source_image(*, tenant_gid: str, source_gid: str, snapshot_gid: str, f
     if not data or media_type not in _EXTENSION:
         raise ValueError("unsupported Feishu image")
     digest = hashlib.sha256(data).hexdigest()
+    with get_knowledge_conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT gid,object_key,content_sha256,byte_size,media_type FROM workmanship_know_feishu_assets "
+            "WHERE tenant_gid=%s AND source_gid=%s AND feishu_token=%s AND content_sha256=%s LIMIT 1",
+            (tenant_gid, source_gid, feishu_token, digest),
+        )
+        existing = cur.fetchone()
+    if existing:
+        return {"gid": existing["gid"], "feishu_token": feishu_token, "object_key": existing["object_key"],
+                "content_sha256": digest, "byte_size": int(existing["byte_size"]), "media_type": existing["media_type"],
+                "markdown_ref": f"knowledge-asset:{existing['gid']}", "new": False}
     asset_gid = new_knowledge_id("asset")
     key = f"knowledge/{tenant_gid}/sources/{source_gid}/snapshots/{snapshot_gid}/assets/{asset_gid}.{digest}.{_EXTENSION[media_type]}"
     stored = put_immutable(key, data, media_type)
@@ -27,7 +39,7 @@ def store_source_image(*, tenant_gid: str, source_gid: str, snapshot_gid: str, f
         raise RuntimeError("OIS image verification failed")
     return {"gid": asset_gid, "feishu_token": feishu_token, "object_key": key,
             "content_sha256": digest, "byte_size": len(data), "media_type": media_type,
-            "markdown_ref": f"knowledge-asset:{asset_gid}"}
+            "markdown_ref": f"knowledge-asset:{asset_gid}", "new": True}
 
 
 def asset_data_url(asset: dict) -> str:

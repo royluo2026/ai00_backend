@@ -73,6 +73,8 @@ def pull_source(payload: dict, context: CapabilityContext) -> CapabilityOutput:
                  converted.complete, context.user_gid),
             )
             for asset in assets:
+                if not asset["new"]:
+                    continue
                 cur.execute(
                     "INSERT INTO workmanship_know_feishu_assets "
                     "(gid,tenant_gid,snapshot_gid,source_gid,feishu_token,object_key,content_sha256,byte_size,media_type) "

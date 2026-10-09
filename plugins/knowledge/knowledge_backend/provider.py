@@ -32,6 +32,8 @@ _RESOURCE_FIELDS = {
     "knowledge.source.pull": ("knowledge-source", "source_gid"),
     "knowledge.source.snapshot.get": ("knowledge-source-snapshot", "snapshot_gid"),
     "knowledge.source.asset.get": ("knowledge-source-asset", "asset_gid"),
+    "knowledge.source.import.preview": ("knowledge-source-snapshot", "source_snapshot_gid"),
+    "knowledge.source.import.confirm": ("knowledge-source-snapshot", "source_snapshot_gid"),
     "knowledge.reference_dataset.publish": ("knowledge-reference-dataset", "dataset_gid"),
     "knowledge.proposal.get": ("knowledge-proposal", "proposal_gid"),
     "knowledge.proposal.review": ("knowledge-proposal", "proposal_gid"),
@@ -177,13 +179,12 @@ def descriptor_for(spec):
         "operation_policy": "optional" if is_write else "none",
         "concurrency_policy": (
             "expected_version"
-            if spec.id in {"knowledge.document.revise", "knowledge.document.restore"}
+            if spec.id in {"knowledge.document.revise", "knowledge.document.restore", "knowledge.source.import.confirm"}
             else "none"
         ),
         "expected_version_payload_path": (
-            "base_revision_gid"
-            if spec.id in {"knowledge.document.revise", "knowledge.document.restore"}
-            else None
+            "base_revision_gid" if spec.id in {"knowledge.document.revise", "knowledge.document.restore"}
+            else "expected_revision_gid" if spec.id == "knowledge.source.import.confirm" else None
         ),
         "idempotency_policy": "required" if is_write else "none",
         # Current Knowledge repositories commit their own database/OIS unit of work.
