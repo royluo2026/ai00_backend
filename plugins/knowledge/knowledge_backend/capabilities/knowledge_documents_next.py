@@ -389,7 +389,7 @@ def get_document(payload: dict[str, Any], context: CapabilityContext) -> Capabil
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT d.title,d.maturity,d.tenant_gid,d.space_gid,d.gid AS document_gid,r.gid AS revision_gid,r.revision_no,r.object_key,r.content_sha256,r.state "
+                "SELECT d.title,d.tenant_gid,d.space_gid,d.gid AS document_gid,r.gid AS revision_gid,r.revision_no,r.object_key,r.content_sha256,r.state "
                 "FROM workmanship_know_documents d JOIN workmanship_know_revisions r ON r.document_gid=d.gid "
                 "WHERE d.gid=%s AND d.tenant_gid=%s AND r.gid=COALESCE(NULLIF(%s,''),d.published_revision_gid)",
                 (document_gid, tenant, revision_gid),

@@ -1,4 +1,6 @@
 import unittest
+import json
+from pathlib import Path
 from datetime import datetime, timezone
 from unittest.mock import patch
 
@@ -14,6 +16,35 @@ from backend.capabilities.models_next import CapabilityContext, CapabilityOutput
 
 
 class KnowledgeDocumentCapabilityTests(unittest.TestCase):
+    def test_document_get_matches_published_output_contract(self):
+        from backend.capabilities.validation_next import validate_payload
+        from plugins.knowledge.knowledge_backend.capabilities.knowledge_documents_next import get_document
+
+        class Cursor:
+            def __enter__(self): return self
+            def __exit__(self, *_args): return False
+            def execute(self, query, *_args):
+                self.query = query
+            def fetchone(self):
+                self_case.assertNotIn("d.maturity", self.query)
+                return {"title": "D", "tenant_gid": "t", "space_gid": "s", "document_gid": "d",
+                        "revision_gid": "r", "revision_no": 1, "object_key": "k",
+                        "content_sha256": "a" * 64, "state": "published"}
+
+        class Connection:
+            def __enter__(self): return self
+            def __exit__(self, *_args): return False
+            def cursor(self): return Cursor()
+
+        self_case = self
+        with patch("plugins.knowledge.knowledge_backend.data.connection.get_knowledge_conn", return_value=Connection()), \
+             patch("plugins.knowledge.knowledge_backend.capabilities.knowledge_documents_next.load_markdown_revision", return_value="# D"):
+            result = get_document({"document_gid": "d"}, CapabilityContext(user_gid="u", team_gid="t"))
+
+        release = json.loads((Path(__file__).resolve().parents[2] / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8"))
+        descriptor = next(item for item in release["descriptors"] if item["id"] == "knowledge.document.get")
+        validate_payload(descriptor["output_schema"], result.data, label="output")
+
     def test_revision_evidence_is_stable_and_complete(self):
         evidence = _evidence({
             "title": "标准作业", "tenant_gid": "t1", "space_gid": "s1",
