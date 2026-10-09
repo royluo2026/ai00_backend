@@ -2,9 +2,10 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from requests import HTTPError
 
-from backend.capability_v2.provider_contracts import CapabilityContext, CapabilitySpec
-from backend.services.feishu_service import feishu_service
+from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilitySpec
+from backend.platform_sdk.feishu import feishu_service, user_credential
 from plugins.knowledge.knowledge_backend.data.connection import get_knowledge_conn
 from plugins.knowledge.knowledge_backend.feishu_catalog import (
     catalog_row, fetch_all_records, parse_catalog_url, reconcile_catalog_rows, sheet_catalog_records,
@@ -12,6 +13,30 @@ from plugins.knowledge.knowledge_backend.feishu_catalog import (
 from plugins.knowledge.knowledge_backend.ids import new_knowledge_id
 from plugins.knowledge.knowledge_backend.provider import register_capability
 from .knowledge_documents_next import _require_superadmin, _tenant, _trusted_profile
+
+
+def _read_sheet_or_explain(read):
+    try:
+        return read()
+    except HTTPError as exc:
+        response = exc.response
+        try:
+            code = (response.json() if response is not None else {}).get("code")
+        except (ValueError, AttributeError):
+            code = None
+        if code == 99991679:
+            raise CapabilityBusinessError(
+                "feishu_sheet_authorization_required",
+                "当前飞书登录缺少电子表格读取权限；请重新连接飞书并授权后再同步。",
+            ) from exc
+        if code in {131006, 1310213}:
+            raise CapabilityBusinessError(
+                "feishu_sheet_view_denied",
+                "当前飞书身份没有这张电子表格的查看权限。",
+            ) from exc
+        raise CapabilityBusinessError(
+            "feishu_sheet_read_failed", f"飞书电子表格读取失败（错误码 {code or response.status_code if response is not None else 'unknown'}）。",
+        ) from exc
 
 
 def get_catalog_config(_payload: dict, context: CapabilityContext) -> dict:
@@ -58,13 +83,14 @@ def sync_catalog(_payload: dict, context: CapabilityContext) -> dict:
     if source_kind == "bitable":
         remote = fetch_all_records(lambda token: feishu_service.list_bitable_records(app_token, table_id, token))
     else:
+        access_token = user_credential(context)
         spreadsheet_token = app_token
         if source_kind == "wiki_sheet":
-            node = feishu_service.resolve_wiki_node(app_token)
+            node = _read_sheet_or_explain(lambda: feishu_service.resolve_wiki_node(app_token, access_token=access_token))
             if node.get("obj_type") != "sheet" or not node.get("obj_token"):
                 raise ValueError("Wiki 链接未指向飞书电子表格")
             spreadsheet_token = str(node["obj_token"])
-        sheets = feishu_service.list_spreadsheet_sheets(spreadsheet_token)
+        sheets = _read_sheet_or_explain(lambda: feishu_service.list_spreadsheet_sheets(spreadsheet_token, access_token=access_token))
         selected = next((item for item in sheets if item.get("title") == "总表"), None)
         if not selected:
             raise ValueError("电子表格中找不到“总表”工作表")
@@ -76,7 +102,9 @@ def sync_catalog(_payload: dict, context: CapabilityContext) -> dict:
         values = []
         for start in range(1, row_count + 1, 500):
             end = min(start + 499, row_count)
-            part = feishu_service.read_spreadsheet_values(spreadsheet_token, sheet_id, start, end)
+            part = _read_sheet_or_explain(lambda: feishu_service.read_spreadsheet_values(
+                spreadsheet_token, sheet_id, start, end, access_token=access_token,
+            ))
             if len(part) > end - start + 1:
                 raise ValueError("电子表格返回的行数超出请求范围")
             values.extend(part)

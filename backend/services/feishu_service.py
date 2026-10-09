@@ -53,6 +53,7 @@ class FeishuService:
         # drive:drive.search:readonly    — 搜索云文档文件列表
         # docs:document.content:read     — 读取文档内容
         # im:chat:readonly               — 读取群聊列表
+        # sheets:spreadsheet:readonly    — 手动同步知识源电子表格
         # 空格编码为 %20，冒号编码为 %3A，点不编码
         scope = (
             "calendar%3Acalendar.event%3Areply"
@@ -63,6 +64,7 @@ class FeishuService:
             "%20docs%3Adocument.content%3Aread"
             "%20im%3Achat%3Areadonly"
             "%20wiki%3Awiki%3Areadonly"
+            "%20sheets%3Aspreadsheet%3Areadonly"
         )
         params = (
             f"?app_id={s.feishu_app_id}"
@@ -1143,14 +1145,14 @@ class FeishuService:
             raise ValueError(f"Feishu Bitable read failed: {body.get('code')}")
         return body["data"]
 
-    def list_spreadsheet_sheets(self, spreadsheet_token: str) -> list[dict]:
+    def list_spreadsheet_sheets(self, spreadsheet_token: str, *, access_token: str | None = None) -> list[dict]:
         """Read worksheet metadata so the Knowledge catalog can select 总表 by title."""
         import re
         if not re.fullmatch(r"[A-Za-z0-9_-]{3,128}", spreadsheet_token or ""):
             raise ValueError("invalid spreadsheet token")
         response = requests.get(
             f"{FEISHU_API}/sheets/v3/spreadsheets/{spreadsheet_token}/sheets/query",
-            headers={"Authorization": f"Bearer {self._get_tenant_token()}"}, timeout=30,
+            headers={"Authorization": f"Bearer {access_token or self._get_tenant_token()}"}, timeout=30,
         )
         response.raise_for_status()
         body = response.json()
@@ -1159,7 +1161,8 @@ class FeishuService:
             raise ValueError(f"Feishu spreadsheet metadata read failed: {body.get('code')}")
         return sheets
 
-    def read_spreadsheet_values(self, spreadsheet_token: str, sheet_id: str, start_row: int, end_row: int) -> list[list]:
+    def read_spreadsheet_values(self, spreadsheet_token: str, sheet_id: str, start_row: int, end_row: int,
+                                *, access_token: str | None = None) -> list[list]:
         """Read a bounded worksheet range; the caller handles complete snapshot assembly."""
         import re
         from urllib.parse import quote
@@ -1170,7 +1173,7 @@ class FeishuService:
         sheet_range = quote(f"{sheet_id}!A{start_row}:AZ{end_row}", safe="!:" )
         response = requests.get(
             f"{FEISHU_API}/sheets/v2/spreadsheets/{spreadsheet_token}/values/{sheet_range}",
-            headers={"Authorization": f"Bearer {self._get_tenant_token()}"}, timeout=30,
+            headers={"Authorization": f"Bearer {access_token or self._get_tenant_token()}"}, timeout=30,
         )
         response.raise_for_status()
         body = response.json()
@@ -1208,13 +1211,13 @@ class FeishuService:
             raise ValueError(f"Feishu Docx read failed: {body.get('code')}")
         return body["data"]
 
-    def resolve_wiki_node(self, wiki_token: str) -> dict:
+    def resolve_wiki_node(self, wiki_token: str, *, access_token: str | None = None) -> dict:
         import re
         if not re.fullmatch(r"[A-Za-z0-9_-]{3,128}", wiki_token or ""):
             raise ValueError("invalid Wiki token")
         response = requests.get(
             f"{FEISHU_API}/wiki/v2/spaces/get_node",
-            headers={"Authorization": f"Bearer {self._get_tenant_token()}"},
+            headers={"Authorization": f"Bearer {access_token or self._get_tenant_token()}"},
             params={"token": wiki_token}, timeout=20,
         )
         response.raise_for_status()

@@ -184,11 +184,35 @@ def test_wiki_sheet_read_failure_never_opens_catalog_write_transaction():
     with patch("backend.platform_sdk.identity.get_active_identity_profile", return_value={
         "gid": "admin", "team_id": "team_1", "system_role": "super_admin", "is_active": True,
     }), patch("plugins.knowledge.knowledge_backend.capabilities.feishu_catalog_next.get_knowledge_conn", return_value=Connection()) as connect, \
-         patch("plugins.knowledge.knowledge_backend.capabilities.feishu_catalog_next.feishu_service.resolve_wiki_node", return_value={"obj_type": "sheet", "obj_token": "VlNasZDMphGVwYtrgZOcKaTBnsg"}), \
+         patch("plugins.knowledge.knowledge_backend.capabilities.feishu_catalog_next.user_credential", return_value="user-token"), \
+         patch("plugins.knowledge.knowledge_backend.capabilities.feishu_catalog_next.feishu_service.resolve_wiki_node", return_value={"obj_type": "sheet", "obj_token": "VlNasZDMphGVwYtrgZOcKaTBnsg"}) as resolve, \
          patch("plugins.knowledge.knowledge_backend.capabilities.feishu_catalog_next.feishu_service.list_spreadsheet_sheets", side_effect=RuntimeError("Feishu permission denied")):
         with pytest.raises(RuntimeError, match="permission denied"):
             sync_catalog({}, CapabilityContext(user_gid="admin", team_gid="team_1"))
     assert connect.call_count == 1
+    assert resolve.call_args.kwargs == {"access_token": "user-token"}
+
+
+def test_sheet_read_permission_error_is_actionable():
+    from requests import HTTPError, Response
+    from plugins.knowledge.knowledge_backend.capabilities.feishu_catalog_next import _read_sheet_or_explain
+    from backend.capability_v2.provider_contracts import CapabilityBusinessError
+
+    response = Response()
+    response.status_code = 400
+    response._content = b'{"code":99991679,"msg":"Unauthorized"}'
+    error = HTTPError("400 Bad Request", response=response)
+    with pytest.raises(CapabilityBusinessError, match="电子表格读取权限"):
+        _read_sheet_or_explain(lambda: (_ for _ in ()).throw(error))
+
+
+def test_login_requests_readonly_sheet_scope():
+    from backend.services.feishu_service import FeishuService
+    from types import SimpleNamespace
+    from unittest.mock import patch
+    settings = SimpleNamespace(feishu_app_id="app", feishu_redirect_uri="https://example.test/callback")
+    with patch("backend.services.feishu_service.get_settings", return_value=settings):
+        assert "sheets%3Aspreadsheet%3Areadonly" in FeishuService().build_login_url("state")
 
 
 def test_sheet_service_uses_bounded_read_only_ranges():
