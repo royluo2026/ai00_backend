@@ -118,7 +118,7 @@ def convert_blocks(blocks: list[dict], *, resolve_asset: Callable[[str, str], st
         elif kind == 27:
             token = str((block.get("image") or {}).get("token") or "")
             if not token or not resolve_asset:
-                diagnostics.append({"block_id": block_id, "code": "image_asset_unavailable"})
+                diagnostics.append({"block_id": block_id, "code": "image_requires_manual_review", "detail": "图片待处理"})
             else:
                 try:
                     ref = resolve_asset(token, "image")

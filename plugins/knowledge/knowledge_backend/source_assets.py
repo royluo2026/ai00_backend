@@ -1,45 +1,11 @@
-"""Immutable Feishu image copies, addressed by a tenant-scoped Knowledge asset GID."""
+"""Read historical tenant-scoped Knowledge image assets."""
 from __future__ import annotations
 
 import base64
-import hashlib
-import re
 
-from backend.services.feishu_service import feishu_service
-from .data.connection import get_knowledge_conn
-from .ids import new_knowledge_id
-from .storage import get_immutable, put_immutable
+from .storage import get_immutable
 
-_SEGMENT = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 _EXTENSION = {"image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/gif": "gif"}
-
-
-def store_source_image(*, tenant_gid: str, source_gid: str, snapshot_gid: str, feishu_token: str, access_token: str) -> dict:
-    if not all(_SEGMENT.fullmatch(part or "") for part in (tenant_gid, source_gid, snapshot_gid)):
-        raise ValueError("invalid Knowledge source identity")
-    data, media_type = feishu_service.download_doc_media(feishu_token, access_token=access_token)
-    if not data or media_type not in _EXTENSION:
-        raise ValueError("unsupported Feishu image")
-    digest = hashlib.sha256(data).hexdigest()
-    with get_knowledge_conn() as conn, conn.cursor() as cur:
-        cur.execute(
-            "SELECT gid,object_key,content_sha256,byte_size,media_type FROM workmanship_know_feishu_assets "
-            "WHERE tenant_gid=%s AND source_gid=%s AND feishu_token=%s AND content_sha256=%s LIMIT 1",
-            (tenant_gid, source_gid, feishu_token, digest),
-        )
-        existing = cur.fetchone()
-    if existing:
-        return {"gid": existing["gid"], "feishu_token": feishu_token, "object_key": existing["object_key"],
-                "content_sha256": digest, "byte_size": int(existing["byte_size"]), "media_type": existing["media_type"],
-                "markdown_ref": f"knowledge-asset:{existing['gid']}", "new": False}
-    asset_gid = new_knowledge_id("asset")
-    key = f"knowledge/{tenant_gid}/sources/{source_gid}/snapshots/{snapshot_gid}/assets/{asset_gid}.{digest}.{_EXTENSION[media_type]}"
-    stored = put_immutable(key, data, media_type)
-    if not stored or stored.get("object_key") != key or stored.get("sha256") != digest:
-        raise RuntimeError("OIS image verification failed")
-    return {"gid": asset_gid, "feishu_token": feishu_token, "object_key": key,
-            "content_sha256": digest, "byte_size": len(data), "media_type": media_type,
-            "markdown_ref": f"knowledge-asset:{asset_gid}", "new": True}
 
 
 def asset_data_url(asset: dict) -> str:

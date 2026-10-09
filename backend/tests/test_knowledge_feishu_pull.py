@@ -5,8 +5,10 @@ import hashlib
 import pytest
 
 from backend.capabilities.models_next import CapabilityContext
-from plugins.knowledge.knowledge_backend.capabilities.feishu_source_next import pull_source, batch_pull_sources, get_latest_source_snapshot
+from plugins.knowledge.knowledge_backend.capabilities.feishu_source_next import pull_source, batch_pull_sources, get_latest_source_snapshot, register_feishu_source_capabilities
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityOutput
+from backend.capabilities.registry_next import CapabilityRegistry
+from backend.capabilities.validation_next import validate_payload
 
 
 class Cursor:
@@ -43,10 +45,31 @@ def test_pull_stores_candidate_without_creating_document_revision():
          patch("plugins.knowledge.knowledge_backend.capabilities.feishu_source_next.new_knowledge_id", return_value="snapshot_1"):
         result = pull_source({"source_gid": "knf_1"}, CapabilityContext(user_gid="admin", team_gid="team_1"))
     assert result.data["complete"] is True
+    registry = CapabilityRegistry()
+    register_feishu_source_capabilities(registry)
+    output_schema = next(item.descriptor.output_schema for item in registry.snapshot() if item.spec.id == "knowledge.source.pull")
+    validate_payload(output_schema, result.data, label="output")
     read_blocks.assert_called_once_with("https://example.feishu.cn/docx/doc123", access_token="user-token")
     assert "BOP" in result.data["markdown"]
     assert any("INSERT INTO workmanship_know_feishu_snapshots" in sql for sql, _ in cursor.calls)
     assert not any("workmanship_know_revisions" in sql for sql, _ in cursor.calls)
+
+
+def test_pull_with_image_marks_candidate_incomplete_without_media_download():
+    cursor = Cursor()
+    blocks = [{"block_id": "root", "block_type": 1, "children": ["image_1"]},
+              {"block_id": "image_1", "block_type": 27, "image": {"token": "image123"}}]
+    with patch("plugins.knowledge.knowledge_backend.capabilities.feishu_source_next.get_knowledge_conn", return_value=Connection(cursor)), \
+         patch("backend.platform_sdk.identity.get_active_identity_profile", return_value=_profile()), \
+         patch("plugins.knowledge.knowledge_backend.capabilities.feishu_source_next.user_credential", return_value="user-token"), \
+         patch("plugins.knowledge.knowledge_backend.capabilities.feishu_source_next.read_document_blocks", return_value=("doc123", blocks)), \
+         patch("plugins.knowledge.knowledge_backend.capabilities.feishu_source_next.put_immutable",
+               side_effect=lambda key, data, _type: {"object_key": key, "sha256": hashlib.sha256(data).hexdigest()}), \
+         patch("plugins.knowledge.knowledge_backend.capabilities.feishu_source_next.new_knowledge_id", return_value="snapshot_1"):
+        result = pull_source({"source_gid": "knf_1"}, CapabilityContext(user_gid="admin", team_gid="team_1"))
+    assert result.data["complete"] is False
+    assert result.data["diagnostics"] == [{"block_id": "image_1", "code": "image_requires_manual_review", "detail": "图片待处理"}]
+    assert not any("workmanship_know_feishu_assets" in sql for sql, _ in cursor.calls)
 
 
 def test_partial_feishu_read_does_not_write_snapshot():
@@ -107,3 +130,16 @@ def test_latest_snapshot_reopens_batch_candidate_without_publishing():
         result = get_latest_source_snapshot({"source_gid": "knf_1"}, CapabilityContext(user_gid="admin", team_gid="team_1"))
     assert result == {"source_gid": "knf_1", "snapshot_gid": "snap_1", "complete": True}
     assert not any(sql.startswith("INSERT") or sql.startswith("UPDATE") for sql, _ in cursor.calls)
+
+
+def test_source_candidate_output_contract_accepts_real_anchor_and_diagnostic_shapes():
+    registry = CapabilityRegistry()
+    register_feishu_source_capabilities(registry)
+    output = next(item.descriptor.output_schema for item in registry.snapshot() if item.spec.id == "knowledge.source.pull")
+    validate_payload(output, {
+        "snapshot_gid": "snap_1", "source_gid": "knf_1", "document_token": "doc123",
+        "markdown": "# BOP\n", "sha256": "a" * 64,
+        "anchors": [{"block_id": "block_1", "path": [0, 2], "start": 0, "end": 6}],
+        "diagnostics": [{"block_id": "image_1", "code": "image_requires_manual_review", "detail": "图片待处理"}],
+        "complete": False,
+    }, label="output")

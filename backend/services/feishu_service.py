@@ -1227,38 +1227,6 @@ class FeishuService:
             raise ValueError(f"Feishu Wiki lookup failed: {body.get('code')}")
         return node
 
-    def download_doc_media(self, media_token: str, *, access_token: str | None = None) -> tuple[bytes, str]:
-        """Download one bounded image from Feishu for immutable Knowledge storage."""
-        import re
-        if not re.fullmatch(r"[A-Za-z0-9_-]{3,128}", media_token or ""):
-            raise ValueError("invalid Feishu media token")
-        response = requests.get(
-            f"{FEISHU_API}/drive/v1/medias/{media_token}/download",
-            headers={"Authorization": f"Bearer {access_token or self._get_tenant_token()}"},
-            timeout=30, stream=True,
-        )
-        response.raise_for_status()
-        chunks = []
-        size = 0
-        try:
-            for chunk in response.iter_content(chunk_size=65536):
-                size += len(chunk)
-                if size > 10_000_000:
-                    raise ValueError("Feishu image exceeds 10 MB")
-                chunks.append(chunk)
-        finally:
-            response.close()
-        data = b"".join(chunks)
-        media_type = (
-            "image/png" if data.startswith(b"\x89PNG\r\n\x1a\n") else
-            "image/jpeg" if data.startswith(b"\xff\xd8\xff") else
-            "image/gif" if data.startswith((b"GIF87a", b"GIF89a")) else
-            "image/webp" if data.startswith(b"RIFF") and data[8:12] == b"WEBP" else None
-        )
-        if media_type is None:
-            raise ValueError("Feishu media is not a supported image")
-        return data, media_type
-
     def update_block_text(self, doc_token: str, block_id: str, text: str) -> dict:
         """更新指定 block 的文本内容（tenant token）。"""
         token = self._get_tenant_token()

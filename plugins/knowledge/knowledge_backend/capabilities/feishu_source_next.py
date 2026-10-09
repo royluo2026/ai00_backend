@@ -14,7 +14,7 @@ from plugins.knowledge.knowledge_backend.feishu_markdown import convert_blocks
 from plugins.knowledge.knowledge_backend.feishu_source import read_document_blocks
 from plugins.knowledge.knowledge_backend.ids import new_knowledge_id
 from plugins.knowledge.knowledge_backend.provider import register_capability
-from plugins.knowledge.knowledge_backend.source_assets import asset_data_url, store_source_image
+from plugins.knowledge.knowledge_backend.source_assets import asset_data_url
 from plugins.knowledge.knowledge_backend.storage import get_immutable, put_immutable
 from .knowledge_documents_next import _require_document_editor, _require_superadmin, _tenant, _trusted_profile
 
@@ -70,15 +70,9 @@ def pull_source(payload: dict, context: CapabilityContext) -> CapabilityOutput:
             raise
         raise _feishu_read_error(int(match.group(1))) from exc
     snapshot_gid = new_knowledge_id("snapshot")
-    assets = []
-    def resolve_asset(token: str, kind: str) -> str:
-        if kind != "image":
-            raise ValueError("unsupported Feishu media kind")
-        asset = store_source_image(tenant_gid=tenant, source_gid=source_gid,
-                                   snapshot_gid=snapshot_gid, feishu_token=token, access_token=access_token)
-        assets.append(asset)
-        return asset["markdown_ref"]
-    converted = convert_blocks(blocks, resolve_asset=resolve_asset)
+    # The Knowledge import reads Docx blocks only. Images require a separate
+    # reviewed path; the Feishu media download endpoint is not used here.
+    converted = convert_blocks(blocks)
     markdown = converted.markdown
     data = markdown.encode("utf-8")
     if len(data) > 5_000_000:
@@ -98,16 +92,6 @@ def pull_source(payload: dict, context: CapabilityContext) -> CapabilityOutput:
                  json.dumps(converted.anchors, ensure_ascii=False), json.dumps(converted.diagnostics, ensure_ascii=False),
                  converted.complete, context.user_gid),
             )
-            for asset in assets:
-                if not asset["new"]:
-                    continue
-                cur.execute(
-                    "INSERT INTO workmanship_know_feishu_assets "
-                    "(gid,tenant_gid,snapshot_gid,source_gid,feishu_token,object_key,content_sha256,byte_size,media_type) "
-                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-                    (asset["gid"], tenant, snapshot_gid, source_gid, asset["feishu_token"],
-                     asset["object_key"], asset["content_sha256"], asset["byte_size"], asset["media_type"]),
-                )
         conn.commit()
     result = {"snapshot_gid": snapshot_gid, "source_gid": source_gid, "document_token": document_token,
               "markdown": markdown, "sha256": digest, "anchors": converted.anchors,
@@ -218,12 +202,18 @@ def get_source_asset(payload: dict, context: CapabilityContext) -> dict:
 
 def register_feishu_source_capabilities(registry) -> None:
     common = {"owner": "knowledge", "subject_concepts": ("knowledge.source", "knowledge.document"), "plugin_callable": True}
+    anchor = {"type": "object", "additionalProperties": False, "required": ["block_id", "path", "start", "end"],
+              "properties": {"block_id": {"type": "string"}, "path": {"type": "array", "items": {"type": "integer"}},
+                             "start": {"type": "integer"}, "end": {"type": "integer"}}}
+    diagnostic = {"type": "object", "additionalProperties": False, "required": ["block_id", "code"],
+                  "properties": {"block_id": {"type": "string"}, "code": {"type": "string"},
+                                 "detail": {"type": "string"}, "block_type": {"type": "integer"}}}
     candidate = {"type": "object", "additionalProperties": False,
         "required": ["snapshot_gid", "source_gid", "document_token", "markdown", "sha256", "anchors", "diagnostics", "complete"],
         "properties": {"snapshot_gid": {"type": "string"}, "source_gid": {"type": "string"}, "document_token": {"type": "string"},
                        "markdown": {"type": "string"}, "sha256": {"type": "string"},
-                       "anchors": {"type": "array", "items": {"type": "object"}},
-                       "diagnostics": {"type": "array", "items": {"type": "object"}}, "complete": {"type": "boolean"}}}
+                       "anchors": {"type": "array", "items": anchor},
+                       "diagnostics": {"type": "array", "items": diagnostic}, "complete": {"type": "boolean"}}}
     register_capability(registry, CapabilitySpec(
         **common, id="knowledge.source.pull", description="Pull one Feishu document into an unaccepted immutable Markdown source candidate.",
         use_when="An editor manually checks one linked Feishu document for changes.", do_not_use_when="Confirming a candidate as a Markdown revision.",
