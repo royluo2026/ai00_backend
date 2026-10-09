@@ -29,6 +29,9 @@ _RESOURCE_FIELDS = {
     "knowledge.document.maturity.change": ("knowledge-document", "document_gid"),
     "knowledge.document.draft.get": ("knowledge-document", "document_gid"),
     "knowledge.document.draft.save": ("knowledge-document", "document_gid"),
+    "knowledge.extraction.candidate.list": ("knowledge-document", "document_gid"),
+    "knowledge.extraction.candidate.save": ("knowledge-document", "document_gid"),
+    "knowledge.extraction.candidate.submit": ("knowledge-extraction-candidate", "candidate_gid"),
     "knowledge.source.pull": ("knowledge-source", "source_gid"),
     "knowledge.source.snapshot.latest": ("knowledge-source", "source_gid"),
     "knowledge.source.snapshot.get": ("knowledge-source-snapshot", "snapshot_gid"),
@@ -171,7 +174,9 @@ def descriptor_for(spec):
         if resource else ()
     )
     updates = {
-        "lifecycle_status": LifecycleStatus.DEPRECATED if deprecated else LifecycleStatus.STABLE,
+        "lifecycle_status": (LifecycleStatus.DEPRECATED if deprecated else
+                             LifecycleStatus.EXPERIMENTAL if spec.id.startswith("knowledge.extraction.candidate.")
+                             else LifecycleStatus.STABLE),
         "exposure": ExposurePolicy(
             web=True,
             api=True,

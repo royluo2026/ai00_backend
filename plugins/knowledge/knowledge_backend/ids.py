@@ -12,6 +12,7 @@ _PREFIXES = {
     "outbox": "kno",
     "entry": "kne",
     "maturity": "knm",
+    "candidate": "kncand",
     "source": "knf",
     "catalog_record": "knc",
     "snapshot": "knsnp",
