@@ -1,6 +1,6 @@
 -- Document maturity is independent of immutable revision numbering.
 ALTER TABLE workmanship_know_documents
-  ADD COLUMN maturity VARCHAR(2) NOT NULL DEFAULT 'V1';
+  ADD COLUMN IF NOT EXISTS maturity VARCHAR(2) NOT NULL DEFAULT 'V1';
 
 CREATE TABLE IF NOT EXISTS workmanship_know_document_maturity_events (
   gid VARCHAR(128) PRIMARY KEY,
@@ -24,6 +24,5 @@ CREATE TABLE IF NOT EXISTS workmanship_know_document_drafts (
   PRIMARY KEY (document_gid, user_gid)
 );
 
--- Historical team-wide grants cannot confer editor rights. User grants remain intact.
-DELETE FROM workmanship_know_document_acl
-WHERE subject_type='team' AND permission IN ('edit','admin');
+-- Historical team-wide grants remain visible for review; the Provider ignores
+-- them when checking editor rights. Cleanup needs a separately governed write.
