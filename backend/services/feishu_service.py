@@ -53,7 +53,7 @@ class FeishuService:
         # drive:drive.search:readonly    — 搜索云文档文件列表
         # docs:document.content:read     — 读取文档内容
         # im:chat:readonly               — 读取群聊列表
-        # sheets:spreadsheet:readonly    — 手动同步知识源电子表格
+        # sheets:spreadsheet:read        — 查看知识源电子表格，不申请导出
         # 空格编码为 %20，冒号编码为 %3A，点不编码
         scope = (
             "calendar%3Acalendar.event%3Areply"
@@ -64,7 +64,7 @@ class FeishuService:
             "%20docs%3Adocument.content%3Aread"
             "%20im%3Achat%3Areadonly"
             "%20wiki%3Awiki%3Areadonly"
-            "%20sheets%3Aspreadsheet%3Areadonly"
+            "%20sheets%3Aspreadsheet%3Aread"
         )
         params = (
             f"?app_id={s.feishu_app_id}"

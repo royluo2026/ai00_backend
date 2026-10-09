@@ -212,7 +212,9 @@ def test_login_requests_readonly_sheet_scope():
     from unittest.mock import patch
     settings = SimpleNamespace(feishu_app_id="app", feishu_redirect_uri="https://example.test/callback")
     with patch("backend.services.feishu_service.get_settings", return_value=settings):
-        assert "sheets%3Aspreadsheet%3Areadonly" in FeishuService().build_login_url("state")
+        url = FeishuService().build_login_url("state")
+        assert "sheets%3Aspreadsheet%3Aread" in url
+        assert "sheets%3Aspreadsheet%3Areadonly" not in url
 
 
 def test_sheet_service_uses_bounded_read_only_ranges():
