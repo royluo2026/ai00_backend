@@ -43,6 +43,13 @@ async function runAuthStateTests() {
   assert.match(status.text, /治理管理员/);
   assert.match(status.text, /super_admin/);
   assert.match(status.title, /已通过后端鉴权/);
+
+  const before = { mode: 'feishu', user: { gid: 'user-1', org_role: 'super_admin' }, expires_at: '2026-09-23T10:32:59Z' };
+  const renewed = { ...before, expires_at: '2026-09-23T11:02:59Z' };
+  assert.equal(manager.shouldReloadTabs(before, renewed), false, 'same-user token renewal must not interrupt an open model');
+  assert.equal(manager.shouldReloadTabs(before, { ...renewed, user: { gid: 'user-2', org_role: 'super_admin' } }), true);
+  assert.equal(manager.shouldReloadTabs(before, { ...renewed, user: { gid: 'user-1', org_role: 'member' } }), true);
+  assert.equal(manager.shouldReloadTabs(before, { mode: 'none', user: null }), true);
 }
 
 module.exports = { runAuthStateTests };

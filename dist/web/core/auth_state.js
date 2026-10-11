@@ -108,11 +108,21 @@ const AuthStateManager = (() => {
     _subscribers.push(fn);
   }
 
+  function shouldReloadTabs(previous, next) {
+    const identity = state => {
+      const mode = state?.mode || 'none';
+      const user = state?.user;
+      return JSON.stringify([mode, user?.gid || null, user?.org_role || user?.system_role || user?.role || null]);
+    };
+    return identity(previous) !== identity(next);
+  }
+
   return {
     init,
     subscribe,
     publish: _publish,
     mergeUserProfile: _mergeUserProfile,
+    shouldReloadTabs,
     formatUserStatus: _formatUserStatus,
     renderUserStatus: _renderUserStatus,
   };

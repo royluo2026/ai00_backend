@@ -12,6 +12,7 @@ from backend.platform_sdk.feishu import user_credential
 from plugins.knowledge.knowledge_backend.data.connection import get_knowledge_conn
 from plugins.knowledge.knowledge_backend.feishu_markdown import convert_blocks
 from plugins.knowledge.knowledge_backend.feishu_source import read_document_blocks
+from plugins.knowledge.knowledge_backend.feishu_metadata import read_source_metadata
 from plugins.knowledge.knowledge_backend.ids import new_knowledge_id
 from plugins.knowledge.knowledge_backend.provider import register_capability
 from plugins.knowledge.knowledge_backend.source_assets import asset_data_url
@@ -27,8 +28,8 @@ def _source_evidence(snapshot_gid: str, source_gid: str, digest: str) -> Evidenc
 def _feishu_read_error(code: int | None) -> CapabilityBusinessError:
     if code == 99991679:
         return CapabilityBusinessError("feishu_document_authorization_required", "当前飞书登录缺少文档读取权限，请重新授权飞书。")
-    if code in {131006, 1310213}:
-        return CapabilityBusinessError("feishu_document_view_denied", "当前飞书身份没有这篇文档的查看权限。")
+    if code in {131006, 1310213, 1770032}:
+        return CapabilityBusinessError("feishu_document_view_denied", "飞书拒绝当前登录账号查看这篇文档，请在飞书原文中确认查看权限后再重试。")
     return CapabilityBusinessError("feishu_document_read_failed", f"飞书文档读取失败（错误码 {code or 'unknown'}）。")
 
 
@@ -70,6 +71,8 @@ def pull_source(payload: dict, context: CapabilityContext) -> CapabilityOutput:
             raise
         raise _feishu_read_error(int(match.group(1))) from exc
     snapshot_gid = new_knowledge_id("snapshot")
+    attribution = read_source_metadata([{**source, 'active': True}], user_gid=context.user_gid,
+                                       access_token=access_token).get(source['gid'], {})
     # The Knowledge import reads Docx blocks only. Images require a separate
     # reviewed path; the Feishu media download endpoint is not used here.
     converted = convert_blocks(blocks, source_url=source["document_url"])
@@ -86,11 +89,11 @@ def pull_source(payload: dict, context: CapabilityContext) -> CapabilityOutput:
         with conn.cursor() as cur:
             cur.execute(
                 "INSERT INTO workmanship_know_feishu_snapshots "
-                "(gid,tenant_gid,source_gid,document_token,object_key,content_sha256,byte_size,anchors_json,diagnostics_json,complete,created_by) "
-                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                "(gid,tenant_gid,source_gid,document_token,object_key,content_sha256,byte_size,anchors_json,diagnostics_json,complete,created_by,source_author_open_id,source_author_name) "
+                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                 (snapshot_gid, tenant, source_gid, document_token, object_key, digest, len(data),
                  json.dumps(converted.anchors, ensure_ascii=False), json.dumps(converted.diagnostics, ensure_ascii=False),
-                 converted.complete, context.user_gid),
+                 converted.complete, context.user_gid, attribution.get('feishu_author_open_id'), attribution.get('feishu_author_name')),
             )
         conn.commit()
     result = {"snapshot_gid": snapshot_gid, "source_gid": source_gid, "document_token": document_token,

@@ -189,6 +189,34 @@ def test_bop_rest_branches_delegate_to_exact_gateway_outcomes() -> None:
     assert len(gateway.approvals) == 1
 
 
+def test_visible_lists_read_derives_project_scope_from_authenticated_user(monkeypatch) -> None:
+    import plugins.craft.craft_backend.routers.lists as route
+
+    user = {"gid": "u1", "team_id": "t1"}
+    scope = {"user_gid": "u1", "team_gids": ["t1"], "project_gids": ["p1"], "is_admin": False}
+    calls = []
+
+    def derive_scope(value):
+        assert value is user
+        return scope
+
+    async def invoke_project(request, current_user, principal, gateway, operation, arguments):
+        calls.append((operation, arguments))
+        return {"success": True, "data": []}
+
+    monkeypatch.setattr(route, "build_access_scope", derive_scope)
+    monkeypatch.setattr(route, "_invoke_project", invoke_project)
+    request = Request({"type": "http", "method": "GET", "path": "/api/lists", "headers": []})
+    result = asyncio.run(route.list_cloud_lists(
+        item_type=None, owner_team_gid=None, q=None, request=request,
+        current_user=user, principal=object(), gateway=object(),
+    ))
+    assert result == {"success": True, "data": []}
+    assert calls == [("lists.search", {
+        "item_type": None, "owner_team_gid": None, "q": None, "scope": scope,
+    })]
+
+
 def test_catalog_contains_exact_file_store_capability() -> None:
     catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
     descriptor = next(item for item in catalog["capabilities"] if item["id"] == PUBLIC_CONFIG_CAPABILITY_ID)

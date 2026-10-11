@@ -56,6 +56,14 @@ def _require_scope(tenant_gid: str | None, project_gid: str | None) -> tuple[str
     return tenant_gid, project_gid
 
 
+def _require_graph_scope(tenant_gid, project_gid, organization=False):
+    if not organization:
+        return _require_scope(tenant_gid, project_gid)
+    if not tenant_gid or tenant_gid.startswith('user:') or project_gid is not None:
+        raise ResourceNotAccessible('authenticated organization scope is required')
+    return tenant_gid, None
+
+
 class OrchestrationRepository:
     def __init__(self, connection_factory: Callable[[], AbstractContextManager] = get_agent_conn):
         self._connection_factory = connection_factory
@@ -64,7 +72,23 @@ class OrchestrationRepository:
     def _owned_version_for_update(
         cur: Any, version_gid: str, actor_gid: str,
         tenant_gid: str | None = None, project_gid: str | None = None,
+        organization: bool = False,
     ) -> dict[str, Any]:
+        if organization:
+            _require_graph_scope(tenant_gid, project_gid, True)
+            cur.execute(
+                """SELECT v.panorama_gid,v.status,v.revision
+                   FROM workmanship_agent_orch_versions v
+                   JOIN workmanship_agent_orch_panoramas p ON p.gid=v.panorama_gid
+                   WHERE v.gid=%s AND v.tenant_gid=%s AND v.project_gid IS NULL
+                     AND p.tenant_gid=%s AND p.project_gid IS NULL
+                     AND p.scope_kind='organization' FOR UPDATE""",
+                (version_gid, tenant_gid, tenant_gid),
+            )
+            version = cur.fetchone()
+            if not version:
+                raise ResourceNotAccessible('organization version is not accessible')
+            return dict(version)
         scope_sql = ""
         scope_params: list[str] = []
         if tenant_gid:
@@ -85,6 +109,43 @@ class OrchestrationRepository:
         if not version:
             raise ResourceNotAccessible("orchestration version is not accessible")
         return dict(version)
+
+    def get_organization_panorama(self, tenant_gid: str) -> dict[str, Any] | None:
+        _require_graph_scope(tenant_gid, None, True)
+        with self._connection_factory() as conn, conn.cursor() as cur:
+            cur.execute(
+                """SELECT p.gid,p.name,p.current_version_gid,p.revision,p.updated_at,
+                          v.status AS version_status,v.revision AS version_revision
+                   FROM workmanship_agent_orch_organization_roots r
+                   JOIN workmanship_agent_orch_panoramas p ON p.gid=r.panorama_gid AND p.tenant_gid=r.tenant_gid
+                   JOIN workmanship_agent_orch_versions v ON v.gid=p.current_version_gid AND v.tenant_gid=p.tenant_gid
+                   WHERE r.tenant_gid=%s AND p.scope_kind='organization'
+                     AND p.project_gid IS NULL AND v.project_gid IS NULL""",
+                (tenant_gid,),
+            )
+            row = cur.fetchone()
+            return {key: _iso(value) for key, value in dict(row).items()} if row else None
+
+    def create_organization_panorama(self, tenant_gid: str, actor_gid: str, name: str) -> dict[str, Any]:
+        _require_graph_scope(tenant_gid, None, True)
+        with self._connection_factory() as conn, conn.cursor() as cur:
+            # The organization row serializes concurrent creators without an owner filter.
+            cur.execute("""INSERT INTO workmanship_agent_orch_organization_roots (tenant_gid,panorama_gid)
+                           VALUES (%s,NULL) ON DUPLICATE KEY UPDATE tenant_gid=VALUES(tenant_gid)""", (tenant_gid,))
+            cur.execute("SELECT panorama_gid FROM workmanship_agent_orch_organization_roots WHERE tenant_gid=%s FOR UPDATE", (tenant_gid,))
+            if cur.fetchone()['panorama_gid']:
+                raise RevisionConflict('organization panorama already exists; reload it')
+            panorama_gid, version_gid = str(uuid.uuid4()), str(uuid.uuid4())
+            cur.execute("""INSERT INTO workmanship_agent_orch_panoramas
+                           (gid,tenant_gid,project_gid,scope_kind,owner_user_gid,name,current_version_gid,revision,created_at,updated_at)
+                           VALUES (%s,%s,NULL,'organization',%s,%s,%s,1,NOW(6),NOW(6))""",
+                        (panorama_gid, tenant_gid, actor_gid, name, version_gid))
+            cur.execute("""INSERT INTO workmanship_agent_orch_versions
+                           (gid,panorama_gid,tenant_gid,project_gid,status,mode,revision,updated_by,created_at,updated_at)
+                           VALUES (%s,%s,%s,NULL,'draft','fixed',1,%s,NOW(6),NOW(6))""",
+                        (version_gid, panorama_gid, tenant_gid, actor_gid))
+            cur.execute("UPDATE workmanship_agent_orch_organization_roots SET panorama_gid=%s WHERE tenant_gid=%s", (panorama_gid, tenant_gid))
+        return {'panorama_gid': panorama_gid, 'version_gid': version_gid, 'revision': 1}
 
     @staticmethod
     def _insert_run_event(
@@ -268,32 +329,48 @@ class OrchestrationRepository:
         successful = {str(row["gid"]) for row in rows if int(row.get("ran") or 0) == 1}
         return published, successful
 
+    def get_organization_slice(self, version_gid, **kwargs):
+        from .lazy_reads import read_slice
+        return read_slice(self, version_gid, **kwargs)
+
     def get_graph(
         self, version_gid: str, *, actor_gid: str,
-        tenant_gid: str, project_gid: str,
+        tenant_gid: str, project_gid: str | None, organization: bool = False, expected_revision: int | None = None,
     ) -> GraphDraft:
-        tenant_gid, project_gid = _require_scope(tenant_gid, project_gid)
+        tenant_gid, project_gid = _require_graph_scope(tenant_gid, project_gid, organization)
         scope_sql = (" AND p.tenant_gid=%s" if tenant_gid else "") + (" AND p.project_gid=%s" if project_gid else "")
         scope_params = tuple(value for value in (tenant_gid, project_gid) if value)
         with self._connection_factory() as conn, conn.cursor() as cur:
-            cur.execute(
-                """SELECT v.mode FROM workmanship_agent_orch_versions v
-                   JOIN workmanship_agent_orch_panoramas p ON p.gid=v.panorama_gid
-                   WHERE v.gid=%s AND v.tenant_gid=%s AND v.project_gid=%s
-                     AND p.owner_user_gid=%s""" + scope_sql,
-                (version_gid, tenant_gid, project_gid, actor_gid, *scope_params),
-            )
+            if organization:
+                cur.execute(
+                    """SELECT v.mode,v.revision FROM workmanship_agent_orch_versions v
+                       JOIN workmanship_agent_orch_panoramas p ON p.gid=v.panorama_gid
+                       WHERE v.gid=%s AND v.tenant_gid=%s AND v.project_gid IS NULL
+                         AND p.tenant_gid=%s AND p.project_gid IS NULL
+                         AND p.scope_kind='organization'""",
+                    (version_gid, tenant_gid, tenant_gid),
+                )
+            else:
+                cur.execute(
+                    """SELECT v.mode,v.revision FROM workmanship_agent_orch_versions v
+                       JOIN workmanship_agent_orch_panoramas p ON p.gid=v.panorama_gid
+                       WHERE v.gid=%s AND v.tenant_gid=%s AND v.project_gid=%s
+                         AND p.owner_user_gid=%s""" + scope_sql,
+                    (version_gid, tenant_gid, project_gid, actor_gid, *scope_params),
+                )
             version = cur.fetchone()
             if not version:
                 raise ResourceNotAccessible("orchestration version is not accessible")
+            if expected_revision is not None and int(version['revision'])!=expected_revision:
+                raise RevisionConflict('workspace revision changed; refresh required')
             cur.execute(
-                "SELECT x_items_json,y_items_json FROM workmanship_agent_orch_axis_views WHERE version_gid=%s AND tenant_gid=%s AND project_gid=%s ORDER BY created_at LIMIT 1",
+                "SELECT x_items_json,y_items_json FROM workmanship_agent_orch_axis_views WHERE version_gid=%s AND tenant_gid=%s AND project_gid<=>%s ORDER BY created_at LIMIT 1",
                 (version_gid, tenant_gid, project_gid),
             )
             axis = cur.fetchone() or {}
 
             cur.execute(
-                "SELECT gid,node_key,title,x_item_key,y_item_key,objective,owner_ref,position_json,inputs_json,outputs_json,acceptance_json FROM workmanship_agent_orch_business_nodes WHERE version_gid=%s AND tenant_gid=%s AND project_gid=%s ORDER BY created_at",
+                "SELECT gid,node_key,title,x_item_key,y_item_key,objective,owner_ref,position_json,inputs_json,outputs_json,acceptance_json FROM workmanship_agent_orch_business_nodes WHERE version_gid=%s AND tenant_gid=%s AND project_gid<=>%s ORDER BY created_at",
                 (version_gid, tenant_gid, project_gid),
             )
             nodes = [{
@@ -312,7 +389,7 @@ class OrchestrationRepository:
             } for row in cur.fetchall()]
 
             cur.execute(
-                "SELECT gid,edge_type,source_node_gid,target_node_gid,label,route_points_json FROM workmanship_agent_orch_flow_edges WHERE version_gid=%s AND tenant_gid=%s AND project_gid=%s ORDER BY created_at",
+                "SELECT gid,edge_type,source_node_gid,target_node_gid,label,route_points_json FROM workmanship_agent_orch_flow_edges WHERE version_gid=%s AND tenant_gid=%s AND project_gid<=>%s ORDER BY created_at",
                 (version_gid, tenant_gid, project_gid),
             )
             edges = [{
@@ -322,7 +399,7 @@ class OrchestrationRepository:
             } for row in cur.fetchall()]
 
             cur.execute(
-                "SELECT gid,business_node_gid,item_type,title,sequence_no,config_json FROM workmanship_agent_orch_items WHERE version_gid=%s AND tenant_gid=%s AND project_gid=%s ORDER BY sequence_no,gid",
+                "SELECT gid,business_node_gid,item_type,title,sequence_no,config_json FROM workmanship_agent_orch_items WHERE version_gid=%s AND tenant_gid=%s AND project_gid<=>%s ORDER BY sequence_no,gid",
                 (version_gid, tenant_gid, project_gid),
             )
             items = [{
@@ -332,13 +409,13 @@ class OrchestrationRepository:
             } for row in cur.fetchall()]
 
             cur.execute(
-                "SELECT gid,source_item_gid,target_item_gid,relation_type,sequence_no FROM workmanship_agent_orch_item_edges WHERE version_gid=%s AND tenant_gid=%s AND project_gid=%s ORDER BY sequence_no,gid",
+                "SELECT gid,source_item_gid,target_item_gid,relation_type,sequence_no FROM workmanship_agent_orch_item_edges WHERE version_gid=%s AND tenant_gid=%s AND project_gid<=>%s ORDER BY sequence_no,gid",
                 (version_gid, tenant_gid, project_gid),
             )
             item_edges = list(cur.fetchall())
 
             cur.execute(
-                "SELECT gid,source_item_gid,capability_id,capability_version_gid,purpose,version_constraint,input_mapping_json,output_mapping_json,authorization_scope_json,execution_policy_json,evidence_policy_json FROM workmanship_agent_orch_capability_bindings WHERE version_gid=%s AND tenant_gid=%s AND project_gid=%s ORDER BY created_at",
+                "SELECT gid,source_item_gid,capability_id,capability_version_gid,purpose,version_constraint,input_mapping_json,output_mapping_json,authorization_scope_json,execution_policy_json,evidence_policy_json FROM workmanship_agent_orch_capability_bindings WHERE version_gid=%s AND tenant_gid=%s AND project_gid<=>%s ORDER BY created_at",
                 (version_gid, tenant_gid, project_gid),
             )
             capability_bindings = []
@@ -357,12 +434,24 @@ class OrchestrationRepository:
                 })
 
             cur.execute(
-                "SELECT gid,source_item_gid,ref_type,ref_gid,ref_version,snapshot_gid,purpose FROM workmanship_agent_orch_context_bindings WHERE version_gid=%s AND tenant_gid=%s AND project_gid=%s ORDER BY created_at",
+                "SELECT gid,source_item_gid,ref_type,ref_gid,ref_version,snapshot_gid,purpose FROM workmanship_agent_orch_context_bindings WHERE version_gid=%s AND tenant_gid=%s AND project_gid<=>%s ORDER BY created_at",
                 (version_gid, tenant_gid, project_gid),
             )
             context_bindings = list(cur.fetchall())
+            cur.execute(
+                "SELECT definition_json FROM workmanship_agent_orch_workspaces WHERE version_gid=%s AND tenant_gid=%s AND project_gid<=>%s",
+                (version_gid, tenant_gid, project_gid),
+            )
+            extension = _decoded((cur.fetchone() or {}).get('definition_json'), {})
+            for node in nodes:
+                node.update({key: value for key, value in extension.get('nodes', {}).get(node['gid'], {}).items()
+                             if key in ('home_scope_gid','semantic_type','implementation')})
+            for edge in edges:
+                edge.update({key: value for key, value in extension.get('edges', {}).get(edge['gid'], {}).items()
+                             if key in ('relation_semantics','source_port_key','target_port_key')})
 
         return GraphDraft.model_validate({
+            'workspace': extension.get('workspace'),
             "mode": version.get("mode") or "fixed",
             "axis": {
                 "x_items": _decoded(axis.get("x_items_json"), None),
@@ -390,16 +479,17 @@ class OrchestrationRepository:
         resolved_bindings: list[dict[str, Any]],
         tenant_gid: str | None = None,
         project_gid: str | None = None,
+        organization: bool = False,
     ) -> dict[str, Any]:
-        tenant_gid, project_gid = _require_scope(tenant_gid, project_gid)
+        tenant_gid, project_gid = _require_graph_scope(tenant_gid, project_gid, organization)
         with self._connection_factory() as conn, conn.cursor() as cur:
-            version = self._owned_version_for_update(cur, version_gid, actor_gid, tenant_gid, project_gid)
+            version = self._owned_version_for_update(cur, version_gid, actor_gid, tenant_gid, project_gid, organization)
             if version["status"] != "draft" or int(version["revision"]) != expected_revision:
                 raise RevisionConflict("orchestration version is published or stale")
             cur.execute(
                 """SELECT gid,capability_version_gid
                    FROM workmanship_agent_orch_capability_bindings
-                   WHERE version_gid=%s AND tenant_gid=%s AND project_gid=%s ORDER BY gid FOR UPDATE""",
+                   WHERE version_gid=%s AND tenant_gid=%s AND project_gid<=>%s ORDER BY gid FOR UPDATE""",
                 (version_gid, tenant_gid, project_gid),
             )
             stored_bindings = list(cur.fetchall())
@@ -433,7 +523,7 @@ class OrchestrationRepository:
                     """UPDATE workmanship_agent_orch_capability_bindings
                        SET capability_id=%s,version_constraint=%s,execution_policy_json=%s,updated_at=NOW(6)
                        WHERE gid=%s AND version_gid=%s AND capability_version_gid=%s
-                         AND tenant_gid=%s AND project_gid=%s""",
+                         AND tenant_gid=%s AND project_gid<=>%s""",
                     (
                         binding["capability_id"],
                         f"={binding['major_version']}",
@@ -452,7 +542,7 @@ class OrchestrationRepository:
                    SET status='published', revision=revision+1, published_at=NOW(6),
                        updated_at=NOW(6), updated_by=%s
                    WHERE gid=%s AND status='draft' AND revision=%s
-                     AND tenant_gid=%s AND project_gid=%s""",
+                     AND tenant_gid=%s AND project_gid<=>%s""",
                 (actor_gid, version_gid, expected_revision, tenant_gid, project_gid),
             )
             if cur.rowcount != 1:
@@ -461,8 +551,8 @@ class OrchestrationRepository:
                 """UPDATE workmanship_agent_orch_panoramas
                    SET current_version_gid=%s, revision=revision+1, updated_at=NOW(6)
                    WHERE gid=(SELECT v.panorama_gid FROM workmanship_agent_orch_versions v
-                              WHERE v.gid=%s AND v.tenant_gid=%s AND v.project_gid=%s)
-                     AND tenant_gid=%s AND project_gid=%s""",
+                              WHERE v.gid=%s AND v.tenant_gid=%s AND v.project_gid<=>%s)
+                     AND tenant_gid=%s AND project_gid<=>%s""",
                 (version_gid, version_gid, tenant_gid, project_gid, tenant_gid, project_gid),
             )
         return {"version_gid": version_gid, "revision": expected_revision + 1, "status": "published"}
@@ -523,6 +613,13 @@ class OrchestrationRepository:
             )
             if not cur.fetchone():
                 raise ResourceNotAccessible("published orchestration version is not accessible")
+            cur.execute(
+                "SELECT definition_json FROM workmanship_agent_orch_workspaces WHERE version_gid=%s AND tenant_gid=%s AND project_gid=%s",
+                (version_gid,tenant_gid,project_gid),
+            )
+            definition=_decoded((cur.fetchone() or {}).get('definition_json'),{})
+            if any(edge.get('relation_semantics') in ('feedback','feedforward') for edge in definition.get('edges',{}).values()):
+                raise InvalidTransition('closed_loop_execution_not_supported: modelled feedback requires a governed execution contract')
             cur.execute(
                 """INSERT INTO workmanship_agent_orch_runs
                    (tenant_gid,project_gid,gid,panorama_gid,version_gid,status,frozen_context_json,started_at,started_by,created_at,updated_at)
@@ -632,6 +729,30 @@ class OrchestrationRepository:
             raise KeyError(f"orchestration run not found: {run_gid}")
         return {"status": row["status"], "last_sequence_no": int(row["last_sequence_no"])}
 
+    def create_organization_revision(self, version_gid: str, *, expected_revision: int, actor_gid: str, tenant_gid: str):
+        from contextlib import contextmanager
+        from .workspace_model import clone_revision_graph
+        graph=clone_revision_graph(self.get_graph(version_gid,actor_gid=actor_gid,tenant_gid=tenant_gid,project_gid=None,organization=True))
+        new_gid=str(uuid.uuid4())
+        with self._connection_factory() as conn,conn.cursor() as cur:
+            version=self._owned_version_for_update(cur,version_gid,actor_gid,tenant_gid,None,True)
+            if version['status']!='published' or int(version['revision'])!=expected_revision:
+                raise RevisionConflict('only the expected published version can create a revision')
+            cur.execute("SELECT current_version_gid FROM workmanship_agent_orch_panoramas WHERE gid=%s AND tenant_gid=%s FOR UPDATE",(version['panorama_gid'],tenant_gid))
+            if (cur.fetchone() or {}).get('current_version_gid')!=version_gid:
+                raise RevisionConflict('a newer draft or version already exists')
+            cur.execute("""INSERT INTO workmanship_agent_orch_versions
+                (gid,tenant_gid,project_gid,panorama_gid,status,mode,revision,parent_version_gid,updated_by,created_at,updated_at)
+                VALUES (%s,%s,NULL,%s,'draft',%s,1,%s,%s,NOW(6),NOW(6))""",
+                (new_gid,tenant_gid,version['panorama_gid'],graph.mode,version_gid,actor_gid))
+            @contextmanager
+            def same_transaction():
+                yield conn
+            revision=OrchestrationRepository(same_transaction).save_graph(new_gid,graph,expected_revision=1,actor_gid=actor_gid,tenant_gid=tenant_gid,project_gid=None,organization=True)
+            cur.execute("UPDATE workmanship_agent_orch_panoramas SET current_version_gid=%s,revision=revision+1,updated_at=NOW(6) WHERE gid=%s AND tenant_gid=%s AND current_version_gid=%s",(new_gid,version['panorama_gid'],tenant_gid,version_gid))
+            if cur.rowcount!=1:raise RevisionConflict('panorama changed while revising')
+        return {'version_gid':new_gid,'revision':revision,'parent_version_gid':version_gid}
+
     def save_graph(
         self,
         version_gid: str,
@@ -641,24 +762,26 @@ class OrchestrationRepository:
         actor_gid: str,
         tenant_gid: str | None = None,
         project_gid: str | None = None,
+        organization: bool = False,
     ) -> int:
-        tenant_gid, project_gid = _require_scope(tenant_gid, project_gid)
+        tenant_gid, project_gid = _require_graph_scope(tenant_gid, project_gid, organization)
         next_revision = expected_revision + 1
         with self._connection_factory() as conn, conn.cursor() as cur:
-            version = self._owned_version_for_update(cur, version_gid, actor_gid, tenant_gid, project_gid)
+            version = self._owned_version_for_update(cur, version_gid, actor_gid, tenant_gid, project_gid, organization)
             if version["status"] != "draft" or int(version["revision"]) != expected_revision:
                 raise RevisionConflict("orchestration version is published or stale")
             cur.execute(
                 """UPDATE workmanship_agent_orch_versions
                    SET mode=%s, revision=revision+1, updated_at=NOW(6), updated_by=%s
                    WHERE gid=%s AND status='draft' AND revision=%s
-                     AND tenant_gid=%s AND project_gid=%s""",
+                     AND tenant_gid=%s AND project_gid<=>%s""",
                 (graph.mode, actor_gid, version_gid, expected_revision, tenant_gid, project_gid),
             )
             if cur.rowcount != 1:
                 raise RevisionConflict("orchestration version is published or stale")
 
             for table in (
+                'workmanship_agent_orch_workspaces',
                 "workmanship_agent_orch_axis_views",
                 "workmanship_agent_orch_flow_edges",
                 "workmanship_agent_orch_item_edges",
@@ -668,9 +791,21 @@ class OrchestrationRepository:
                 "workmanship_agent_orch_business_nodes",
             ):
                 cur.execute(
-                    f"DELETE FROM {table} WHERE version_gid=%s AND tenant_gid=%s AND project_gid=%s",
+                    f"DELETE FROM {table} WHERE version_gid=%s AND tenant_gid=%s AND project_gid<=>%s",
                     (version_gid, tenant_gid, project_gid),
                 )
+
+            extension = {
+                'workspace': graph.workspace.model_dump(mode='json') if graph.workspace else None,
+                'nodes': {node.gid: {key: node.model_dump(mode='json')[key] for key in
+                          ('home_scope_gid','semantic_type','implementation')} for node in graph.nodes},
+                'edges': {edge.gid: {key: edge.model_dump(mode='json')[key] for key in
+                          ('relation_semantics','source_port_key','target_port_key')} for edge in graph.edges},
+            }
+            cur.execute(
+                "INSERT INTO workmanship_agent_orch_workspaces (version_gid,tenant_gid,project_gid,definition_json) VALUES (%s,%s,%s,%s)",
+                (version_gid,tenant_gid,project_gid,_json(extension)),
+            )
 
             cur.execute(
                 """INSERT INTO workmanship_agent_orch_axis_views

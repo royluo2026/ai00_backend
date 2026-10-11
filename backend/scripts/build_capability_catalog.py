@@ -73,6 +73,9 @@ def _verified_consumer_refs(capability_id: str, major_version: int = 1) -> tuple
     from plugins.simulation.simulation_backend.capabilities.connector_runtime import DESKTOP_CAPABILITY_BINDINGS as runtime
     if (capability_id, major_version) in (*pairing, *runtime):
         consumers.append({"consumer_id": DESKTOP_CONSUMER_ID, "consumer_type": "web", "version_constraint": f"=={major_version}"})
+    if (capability_id, major_version) in {("ontology.object.list", 3), ("ontology.concept.get", 2)}:
+        consumers.extend({"consumer_id": consumer, "consumer_type": "web", "version_constraint": f"=={major_version}"}
+                         for consumer in ("packages/shared/semantic_workspace/model.js", "ai00.desktop.windows-x64"))
     if major_version == 2 and capability_id in {
         "ontology.concept.get", "ontology.concept.resolve", "ontology.object.list",
     }:

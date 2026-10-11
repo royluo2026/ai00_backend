@@ -29,12 +29,17 @@ const CmdPalette = (() => {
 
   function _render(query) {
     const q = (query || '').trim().toLowerCase();
+    const isWeb = window.electronAPI?._isElectron === false;
+    const commands = isWeb
+      ? [..._cmds, { id: 'open.craft_hub', name: '打开工艺规划', desc: '工艺规划', fn: () => window.TabManager.open('craft_hub') }]
+        .filter(c => !c.id.startsWith('open.') || ['open.workbench', 'open.craft_hub', 'open.settings'].includes(c.id))
+      : _cmds;
     _filtered = q
-      ? _cmds.filter(c =>
+      ? commands.filter(c =>
           c.name.toLowerCase().includes(q) ||
           c.id.toLowerCase().includes(q)   ||
           (c.desc || '').toLowerCase().includes(q))
-      : _cmds;
+      : commands;
     _selected = 0;
 
     const list = document.getElementById('cmd-results');

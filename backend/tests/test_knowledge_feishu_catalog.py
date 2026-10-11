@@ -8,7 +8,17 @@ from plugins.knowledge.knowledge_backend.feishu_catalog import (
     parse_catalog_url,
     sheet_catalog_records,
     reconcile_catalog_rows,
+    is_placeholder_title,
 )
+
+
+def test_single_link_label_fills_missing_title_without_changing_identity():
+    records = sheet_catalog_records([["链接"], [[{"link": "https://li.feishu.cn/wiki/doc123", "text": "拧紧技术手册"}]]])
+    row = catalog_row(records[0])
+    assert row["title"] == "拧紧技术手册"
+    assert row["record_id"] == "sheet:doc123"
+    assert is_placeholder_title("sheet:doc123:38", row["record_id"], "doc123")
+    assert not is_placeholder_title("专家修订的拧紧手册", row["record_id"], "doc123")
 
 
 def test_bitable_url_requires_unambiguous_app_and_table_ids():

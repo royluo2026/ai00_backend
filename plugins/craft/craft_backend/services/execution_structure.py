@@ -219,6 +219,20 @@ def _ref(prefix: str, value: Any) -> str:
     return f"{prefix}:{value}"
 
 
+def _binding_refs(links):
+    refs = {name: [] for name in ("part_refs", "tool_refs", "fixture_refs", "equipment_refs", "knowledge_refs", "rule_refs")}
+    kinds = {"pbom_part": "part", "project_tools": "tool", "physical_tool": "tool", "tool": "tool",
+             "project_tooling": "fixture", "physical_fixture": "fixture", "fixture": "fixture",
+             "project_equipment": "equipment", "physical_equipment": "equipment", "equipment": "equipment",
+             "knowledge": "knowledge", "knowledge_revision": "knowledge", "knowledge_document": "knowledge",
+             "rule": "rule", "policy": "rule", "rule_ref": "rule"}
+    for link in links:
+        kind = kinds.get(str(link.get("link_type") or ""))
+        if kind and link.get("entity_gid"):
+            refs[kind + "_refs"].append(_ref(kind, link["entity_gid"]))
+    return {name: sorted(set(values)) for name, values in refs.items()}
+
+
 def _normalize(aggregate: BopAggregate) -> dict[str, Any]:
     ordered = _ordered_entries(aggregate.entries)
     entry_by_gid = {str(item["gid"]): item for item in ordered}
@@ -232,6 +246,20 @@ def _normalize(aggregate: BopAggregate) -> dict[str, Any]:
         ),
     ):
         links_by_entry.setdefault(str(link.get("entry_gid")), []).append(link)
+
+    # TC imports keep bindings on leaf nodes. Their nearest process/operation
+    # owns them; never propagate through a nested operation into its parent.
+    links_by_operation: dict[str, list[Mapping[str, Any]]] = {}
+    for linked_gid, links in links_by_entry.items():
+        current = linked_gid
+        visited = set()
+        while current in entry_by_gid and current not in visited:
+            visited.add(current)
+            owner = entry_by_gid[current]
+            if _operation_kind(owner.get("node_type")):
+                links_by_operation.setdefault(current, []).extend(links)
+                break
+            current = str(owner.get("parent_gid") or "")
 
     nodes: list[dict[str, Any]] = []
     operations: list[dict[str, Any]] = []
@@ -286,6 +314,8 @@ def _normalize(aggregate: BopAggregate) -> dict[str, Any]:
         operation_kind = _operation_kind(entry.get("node_type"))
         if operation_kind is None:
             continue
+        node_links = links_by_operation.get(gid, [])
+        refs = _binding_refs(node_links)
         explicit = [
             str(item)
             for item in _json_array(meta.get("predecessor_ids"))

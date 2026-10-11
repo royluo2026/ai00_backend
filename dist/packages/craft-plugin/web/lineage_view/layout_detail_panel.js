@@ -10,6 +10,13 @@ function _ldpLsk(base) {
   try { const u = window.parent?._authUser || window.top?._authUser || window._authUser; const g = u?.gid || u?.user_gid || ''; return g ? `${g}:${base}` : base; } catch { return base; }
 }
 
+function _relationLinkTitle(link) {
+  if (['pbom_part', 'usesPart'].includes(link.link_type)) {
+    return [link.entity_part_no, link.entity_title].filter(Boolean).join(' · ') || link.entity_gid;
+  }
+  return link.entity_title || link.entity_gid;
+}
+
 const _ONTOLOGY_DETAIL_VISIBILITY_KEY = 'ai00:ontology-detail-visibility';
 function _ontologyDetailVisibility() {
   try { return JSON.parse(localStorage.getItem(_ONTOLOGY_DETAIL_VISIBILITY_KEY) || '{}') || {}; }
@@ -308,22 +315,30 @@ class LayoutDetailPanel {
       const key = String(nodeType || '').trim();
       if (!key) return { properties: [], relations: [], rules: [] };
       if (this._ontologySchemaCache.has(key)) return this._ontologySchemaCache.get(key);
-      const resolved = await this._invokeCapability('ontology.concept.resolve', { term: key });
-      const concept = resolved?.concept || null;
-      const stableGid = concept?.concept_ref?.concept_id || concept?.stable_gid;
-      if (!stableGid) return { properties: [], relations: [], rules: [] };
-      const detail = await this._invokeCapability('ontology.concept.get', {
-        stable_gid: stableGid, kind: 'concept', view: 'schema', release_gid: resolved?.release_gid,
-      });
-      const schema = detail?.concept || detail || {};
-      const normalized = {
-        ...schema,
-        properties: Array.isArray(schema.properties) ? schema.properties.map(_applyOntologyDetailVisibility) : [],
-        relations: Array.isArray(schema.relations) ? schema.relations.map(_applyOntologyDetailVisibility) : [],
-        rules: Array.isArray(schema.rules) ? schema.rules : [],
-      };
-      this._ontologySchemaCache.set(key, normalized);
-      return normalized;
+      const pending = (async () => {
+        const resolved = await this._invokeCapability('ontology.concept.resolve', { term: key });
+        const concept = resolved?.concept || null;
+        const stableGid = concept?.concept_ref?.concept_id || concept?.stable_gid;
+        if (!stableGid) return { properties: [], relations: [], rules: [] };
+        const detail = await this._invokeCapability('ontology.concept.get', {
+          stable_gid: stableGid, kind: 'concept', view: 'schema', release_gid: resolved?.release_gid,
+        });
+        const schema = detail?.concept || detail || {};
+        const normalized = {
+          ...schema,
+          properties: Array.isArray(schema.properties) ? schema.properties.map(_applyOntologyDetailVisibility) : [],
+          relations: Array.isArray(schema.relations) ? schema.relations.map(_applyOntologyDetailVisibility) : [],
+          rules: Array.isArray(schema.rules) ? schema.rules : [],
+        };
+        return normalized;
+      })();
+      this._ontologySchemaCache.set(key, pending);
+      try {
+        return await pending;
+      } catch (error) {
+        if (this._ontologySchemaCache.get(key) === pending) this._ontologySchemaCache.delete(key);
+        throw error;
+      }
     };
 
     this._isOpen = false;
@@ -468,20 +483,36 @@ class LayoutDetailPanel {
     void this._hydrateEntryDetail(gid, row);
   }
 
-  async _hydrateEntryDetail(gid, row) {
+  async _hydrateEntryDetail(gid, row, { throwOnError = false, force = false } = {}) {
     if (!this._loadEntryDetail) return;
     const generation = ++this._detailGeneration;
     try {
-      const detail = await this._loadEntryDetail(gid, row);
+      const detail = await this._loadEntryDetail(gid, row, { force });
       if (generation !== this._detailGeneration || this._currentGid !== gid || detail?.cancelled) return;
       Object.assign(row, detail?.entry || {});
       row.__governed_links = Array.isArray(detail?.links) ? detail.links : [];
       this._currentRow = row;
-      this._renderAll(gid, row);
+      this._renderAll(gid, row, { preserveDrawer: force });
+      return true;
     } catch (error) {
+      if (throwOnError) throw error;
       if (generation === this._detailGeneration && this._currentGid === gid) {
         this._toast?.(`详情加载失败：${error?.message || '未知错误'}`, 'error');
       }
+    }
+  }
+
+  async _refreshLinkedEntry(gid, confirm = this._detDrawerBody?.querySelector('#llAddConfirm')) {
+    if (this._currentGid !== gid) return;
+    const row = this._getLineageData()?.rowByGid.get(gid);
+    if (this._loadEntryDetail && row) {
+      if (!await this._hydrateEntryDetail(gid, row, { throwOnError: true, force: true })) return;
+    } else {
+      await this._reloadData();
+      this.refresh();
+    }
+    if (this._currentGid === gid && this._detDrawerBody?.querySelector('#llAddConfirm') === confirm) {
+      this._closeDetDrawer();
     }
   }
 
@@ -644,9 +675,7 @@ class LayoutDetailPanel {
     const mainTypeFilter   = data.typeFilter;
     const mainLevel1Filter = data.level1Filter;
 
-    const visTypes = mainTypeFilter && mainTypeFilter.length
-      ? new Set(mainTypeFilter)
-      : new Set(['line_process', 'station_process', 'operator_process', 'process', 'operation']);
+    const visTypes = new Set(mainTypeFilter ?? allRows.map(row => row.node_type));
 
     const visibleLines = allLines.filter(l =>
       !mainLevel1Filter || mainLevel1Filter.size === 0 || mainLevel1Filter.has(l.gid)
@@ -973,10 +1002,10 @@ class LayoutDetailPanel {
     document.getElementById('llDetDrawerPin')?.classList.remove('active');
   }
 
-  _renderAll(gid, row) {
+  _renderAll(gid, row, { preserveDrawer = false } = {}) {
     this._renderTree(gid);
     this._renderProps(gid, row);
-    this._renderDetailEmpty();
+    if (!preserveDrawer) this._renderDetailEmpty();
   }
 
   // ── 列0：节点树 ───────────────────────────────────────────────────────────
@@ -1601,7 +1630,7 @@ class LayoutDetailPanel {
         items = links
           .filter(l => grp.linkTypes.includes(l.link_type))
           .map(l => ({
-            _key: grp.key, _title: l.entity_title || l.entity_gid, _badge: l.link_type,
+            _key: grp.key, _title: _relationLinkTitle(l), _badge: l.link_type,
             _ntType: grp.ntType, link: l,
             source_entry_gid: l.source_entry_gid || gid,
             source_entry_title: l.source_entry_title,
@@ -1659,7 +1688,7 @@ class LayoutDetailPanel {
       });
       for (const [lt, ltLinks] of Object.entries(byType)) {
         const items = ltLinks.map(l => ({
-          _key: 'link:' + lt, _title: l.entity_title || l.entity_gid, _badge: lt,
+          _key: 'link:' + lt, _title: _relationLinkTitle(l), _badge: lt,
           _ntType: 'process', link: l,
           source_entry_gid: l.source_entry_gid || gid,
           source_entry_title: l.source_entry_title,
@@ -1718,14 +1747,14 @@ class LayoutDetailPanel {
           this._openViewDetail(childItems[idx], gid);
         } else if (grp) {
           const grpLinks = links.filter(l => grp.linkTypes.includes(l.link_type))
-            .map(l => ({ _key: key, _title: l.entity_title || l.entity_gid, link: l,
+            .map(l => ({ _key: key, _title: _relationLinkTitle(l), link: l,
               source_entry_gid: l.source_entry_gid || gid, source_entry_title: l.source_entry_title }));
           this._openViewDetail(grpLinks[idx], gid);
         } else if (key.startsWith('link:')) {
           // 动态关系（本体自定义 link_type）
           const linkType = key.slice(5);
           const dynLinks = links.filter(l => l.link_type === linkType)
-            .map(l => ({ _key: key, _title: l.entity_title || l.entity_gid, link: l,
+            .map(l => ({ _key: key, _title: _relationLinkTitle(l), link: l,
               source_entry_gid: l.source_entry_gid || gid, source_entry_title: l.source_entry_title }));
           if (dynLinks[idx]) this._openViewDetail(dynLinks[idx], gid);
         }
@@ -2167,7 +2196,8 @@ class LayoutDetailPanel {
     _bindCandClicks();
 
     // ── 确认添加 ──
-    this._detDrawerBody.querySelector('#llAddConfirm')?.addEventListener('click', async () => {
+    this._detDrawerBody.querySelector('#llAddConfirm')?.addEventListener('click', async event => {
+      const confirmButton = event.currentTarget;
       const sel = this._detDrawerBody.querySelector('.ll-det-sr-item.sel');
       if (!sel) { this._toast?.('请先选择一个候选零件', 'warn'); return; }
       const entityGid = sel.dataset.gid;
@@ -2198,8 +2228,12 @@ class LayoutDetailPanel {
             operation: 'attach', entry_gid: parentGid, link_type: 'pbom_part',
             entity_gid: entityGid, is_primary: true,
           });
-          await this._reloadData();
-          this.refresh();
+          try {
+            await this._refreshLinkedEntry(parentGid, confirmButton);
+          } catch (error) {
+            this._toast?.('关联已保存，详情刷新失败：' + (error?.message || error), 'warn');
+            return;
+          }
           this._toast?.('已关联 PBOM 零件', 'ok', 1200);
         } else if (key === 'issue' || key === 'task') {
           this._toast?.('关联已有实体请从右侧关联面板选择', 'info');
@@ -2318,7 +2352,7 @@ class LayoutDetailPanel {
       } else {
         let html = '';
         for (const l of knowLinks) {
-          const title = l.entity_title || l.entity_gid;
+          const title = _relationLinkTitle(l);
           const typeLabel = l.link_type === 'knowledge' ? '知识' : '规则';
           html += `
             <div class="ll-kn" data-link-gid="${_he(l.gid)}">
@@ -2967,7 +3001,7 @@ class LayoutDetailPanel {
         items = links
           .filter(l => grp.linkTypes.includes(l.link_type))
           .map(l => ({
-            _key: grp.key, _title: l.entity_title || l.entity_gid, _badge: l.link_type,
+            _key: grp.key, _title: _relationLinkTitle(l), _badge: l.link_type,
             _ntType: grp.ntType, link: l,
             source_entry_gid: l.source_entry_gid || gid,
             source_entry_title: l.source_entry_title,
@@ -3025,7 +3059,7 @@ class LayoutDetailPanel {
       });
       for (const [lt, ltLinks] of Object.entries(byType)) {
         const items = ltLinks.map(l => ({
-          _key: 'link:' + lt, _title: l.entity_title || l.entity_gid, _badge: lt,
+          _key: 'link:' + lt, _title: _relationLinkTitle(l), _badge: lt,
           _ntType: 'process', link: l,
           source_entry_gid: l.source_entry_gid || gid,
           source_entry_title: l.source_entry_title,
@@ -3084,14 +3118,14 @@ class LayoutDetailPanel {
           this._openViewDetail(childItems[idx], gid);
         } else if (grp) {
           const grpLinks = links.filter(l => grp.linkTypes.includes(l.link_type))
-            .map(l => ({ _key: key, _title: l.entity_title || l.entity_gid, link: l,
+            .map(l => ({ _key: key, _title: _relationLinkTitle(l), link: l,
               source_entry_gid: l.source_entry_gid || gid, source_entry_title: l.source_entry_title }));
           this._openViewDetail(grpLinks[idx], gid);
         } else if (key.startsWith('link:')) {
           // 动态关系（本体自定义 link_type）
           const linkType = key.slice(5);
           const dynLinks = links.filter(l => l.link_type === linkType)
-            .map(l => ({ _key: key, _title: l.entity_title || l.entity_gid, link: l,
+            .map(l => ({ _key: key, _title: _relationLinkTitle(l), link: l,
               source_entry_gid: l.source_entry_gid || gid, source_entry_title: l.source_entry_title }));
           if (dynLinks[idx]) this._openViewDetail(dynLinks[idx], gid);
         }
@@ -3520,7 +3554,8 @@ class LayoutDetailPanel {
     _bindCandClicks();
 
     // ── 确认添加 ──
-    this._detDrawerBody.querySelector('#llAddConfirm')?.addEventListener('click', async () => {
+    this._detDrawerBody.querySelector('#llAddConfirm')?.addEventListener('click', async event => {
+      const confirmButton = event.currentTarget;
       const sel = this._detDrawerBody.querySelector('.ll-det-sr-item.sel');
       if (!sel) { this._toast?.('请先选择一个候选零件', 'warn'); return; }
       const entityGid = sel.dataset.gid;
@@ -3551,8 +3586,12 @@ class LayoutDetailPanel {
             operation: 'attach', entry_gid: parentGid, link_type: 'pbom_part',
             entity_gid: entityGid, is_primary: true,
           });
-          await this._reloadData();
-          this.refresh();
+          try {
+            await this._refreshLinkedEntry(parentGid, confirmButton);
+          } catch (error) {
+            this._toast?.('关联已保存，详情刷新失败：' + (error?.message || error), 'warn');
+            return;
+          }
           this._toast?.('已关联 PBOM 零件', 'ok', 1200);
         } else if (key === 'issue' || key === 'task') {
           this._toast?.('关联已有实体请从右侧关联面板选择', 'info');
@@ -3671,7 +3710,7 @@ class LayoutDetailPanel {
       } else {
         let html = '';
         for (const l of knowLinks) {
-          const title = l.entity_title || l.entity_gid;
+          const title = _relationLinkTitle(l);
           const typeLabel = l.link_type === 'knowledge' ? '知识' : '规则';
           html += `
             <div class="ll-kn" data-link-gid="${_he(l.gid)}">
@@ -4081,6 +4120,7 @@ class LayoutDetailPanel {
     try {
       const data = this._getLineageData();
       const groups = {};
+      const structuralPartGids = new Set();
 
       // ── 1. 结构后代：从 childMap 递归统计 ────────────────────────────────
       const STRUCT_MAP = {
@@ -4088,6 +4128,10 @@ class LayoutDetailPanel {
         operator_process: { label: '岗位', ntType: 'operator_process' },
         process:          { label: '工序', ntType: 'process' },
         operation:        { label: '操作', ntType: 'operation' },
+        part:             { label: '零件', ntType: 'part' },
+        non_standard_part:{ label: '零件', ntType: 'non_standard_part' },
+        standard_part:    { label: '零件', ntType: 'standard_part' },
+        support_material: { label: '零件', ntType: 'support_material' },
       };
       if (data?.childMap) {
         const walk = (parentGid) => {
@@ -4096,7 +4140,10 @@ class LayoutDetailPanel {
             const cat = STRUCT_MAP[r.node_type];
             if (cat) {
               if (!groups[cat.label]) groups[cat.label] = { ntType: cat.ntType, items: [], isStruct: true };
-              groups[cat.label].items.push({ title: r.title || r.gid, gid: r.gid });
+              const isPart = cat.label === '零件';
+              if (isPart) structuralPartGids.add(r.gid);
+              const title = isPart ? [r.vpps, r.title].filter(Boolean).join(' · ') : r.title;
+              groups[cat.label].items.push({ title: title || r.gid, gid: r.gid, isStruct: true });
             }
             walk(r.gid);
           }
@@ -4121,6 +4168,7 @@ class LayoutDetailPanel {
           governedLinks = resp?.data || resp || [];
         }
         for (const l of governedLinks) {
+          if (l.link_type === 'pbom_part' && l.is_primary && structuralPartGids.has(l.entry_gid || l.source_entry_gid)) continue;
           const cat = catMap[l.link_type];
           if (!cat) continue;
           if (!groups[cat.label]) groups[cat.label] = { ntType: cat.ntType, items: [], isStruct: false };
@@ -4134,7 +4182,7 @@ class LayoutDetailPanel {
       // ── 3. 渲染 ───────────────────────────────────────────────────────────
       let html = '<div class="ll-props-sec">下属统计</div>';
       for (const label of keys) {
-        const { ntType, items, isStruct } = groups[label];
+        const { ntType, items } = groups[label];
         html += `<div class="ll-stats-grp">
           <div class="ll-stats-hdr">
             <span class="ll-stats-tog">▶</span>
@@ -4144,7 +4192,7 @@ class LayoutDetailPanel {
           </div>
           <div class="ll-stats-items">
             ${items.map(item => {
-              if (isStruct) {
+              if (item.isStruct) {
                 return `<div class="ll-stats-item ll-stats-item-nav" data-nav-gid="${_he(item.gid)}">
                   <span class="ll-stats-item-title">${_he(item.title)}</span>
                 </div>`;
@@ -4157,7 +4205,7 @@ class LayoutDetailPanel {
                 const parts = [l.entity_vpps || l.entity_part_no, l.entity_title].filter(Boolean);
                 displayTitle = parts.join(' · ') || l.entity_gid;
               } else {
-                displayTitle = l.entity_title || l.entity_gid || '—';
+                displayTitle = _relationLinkTitle(l) || '—';
               }
               return `<div class="ll-stats-item">
                 <span class="ll-stats-item-title">${_he(displayTitle)}</span>
@@ -4251,9 +4299,42 @@ class LayoutDetailPanel {
         ...REL_GROUPS.map(group => ({ ...group, linkType: group.linkTypes[0] })),
         ...CRAFT_RESOURCE_GROUPS.map(group => ({ ...group, linkTypes: [group.linkType, ...group.legacyLinkTypes] })),
       ];
+    // Imported BOP parts live in the entry tree and may have no PBOM binding.
+    const partTypes = new Set(['part', 'non_standard_part', 'standard_part', 'support_material']);
+    const partItems = [];
+    const pending = childRows.slice().reverse();
+    const visited = new Set([gid]);
+    while (pending.length) {
+      const partRow = pending.pop();
+      if (partRow.is_deleted || visited.has(partRow.gid)) continue;
+      visited.add(partRow.gid);
+      if (partTypes.has(partRow.node_type)) {
+        partItems.push({
+          _key: 'bop_parts', _row: partRow,
+          _title: [partRow.entity_data?.part_no || partRow.meta?.tc_key || partRow.bom_row_id || partRow.vpps,
+            partRow.title || partRow.gid].filter(Boolean).join(' · '),
+          _badge: partRow.node_type, _ntType: partRow.node_type,
+          source_entry_gid: partRow.parent_gid,
+          source_entry_title: data?.rowByGid?.get(partRow.parent_gid)?.title,
+        });
+      }
+      pending.push(...(data?.childMap.get(partRow.gid) || []).slice().reverse());
+    }
+    const partLinkTypes = ['pbom_part', 'usesPart'];
+    const partGroup = groups.find(group => group.linkTypes.some(type => partLinkTypes.includes(type)));
+    if (partGroup) {
+      // Both ontology bindings refer to assembly parts; old imports only have BOP nodes.
+      const configuredBindings = new Set(configuredRelations.map(relation => relation.link_type_binding));
+      partGroup.linkTypes = [...partGroup.linkTypes, ...partLinkTypes.filter(type => !configuredBindings.has(type) && !partGroup.linkTypes.includes(type))];
+      partGroup.items = partItems;
+    } else if (partItems.length && !configuredRelations.some(relation => partLinkTypes.includes(relation.link_type_binding))) {
+      groups.unshift({ key: 'bop_parts', name: '零件', ntType: 'part', linkTypes: [], items: partItems });
+    }
     this._currentRelGroups = groups;
 
     let html = '';
+    const itemsByGroup = new Map();
+    const partGids = new Set(partItems.map(item => item._row.gid));
     for (const grp of groups) {
       let items = [];
       if (grp.key === 'child') {
@@ -4266,13 +4347,16 @@ class LayoutDetailPanel {
       } else {
         items = links
           .filter(l => grp.linkTypes.includes(l.link_type))
+          .filter(l => grp !== partGroup || !(l.is_primary && partGids.has(l.entry_gid || l.source_entry_gid)))
           .map(l => ({
-            _key: grp.key, _title: l.entity_title || l.entity_gid, _badge: l.link_type,
+            _key: grp.key, _title: _relationLinkTitle(l), _badge: l.link_type,
             _ntType: grp.ntType, link: l,
             source_entry_gid: l.source_entry_gid || gid,
             source_entry_title: l.source_entry_title,
           }));
       }
+      if (grp.items) items = [...grp.items, ...items];
+      itemsByGroup.set(grp.key, items);
 
       const isOpen = !items.length ? false : true;
       const addSupported = grp.key === 'child' || !!grp.linkType;
@@ -4283,7 +4367,7 @@ class LayoutDetailPanel {
             <span class="lv-nt-dot lv-nt-${_he(grp.ntType)}"></span>
             <span class="ll-rg-name">${_he(grp.name)}</span>
             <span class="ll-rg-cnt">${items.length}</span>
-            <button class="ll-rg-add" data-key="${_he(grp.key)}" title="${_he(addSupported ? `添加${grp.name}` : `${grp.name} 暂不支持在此处新增`)}"${canEditCurrentLine && addSupported ? '' : ' disabled style="opacity:.45;cursor:not-allowed"'}>＋</button>
+            ${grp.key === 'bop_parts' ? '' : `<button class="ll-rg-add" data-key="${_he(grp.key)}" title="${_he(addSupported ? `添加${grp.name}` : `${grp.name} 暂不支持在此处新增`)}"${canEditCurrentLine && addSupported ? '' : ' disabled style="opacity:.45;cursor:not-allowed"'}>＋</button>`}
           </div>
           <div class="ll-rg-items${isOpen ? ' open' : ''}">
             ${items.length ? items.map((item, idx) => {
@@ -4320,18 +4404,14 @@ class LayoutDetailPanel {
         const grp = groups.find(g => g.key === key);
         if (!grp) return;
 
-        if (key === 'child') {
-          const childItems = childRows.map(r => ({
-            _key: 'child', _title: r.title || r.gid, _row: r,
-            source_entry_gid: gid, source_entry_title: null, link: { link_type: 'child', entity_gid: r.gid },
-          }));
-          this._openViewDetail(childItems[idx], gid);
-        } else {
-          const grpLinks = links.filter(l => grp.linkTypes.includes(l.link_type))
-            .map(l => ({ _key: key, _title: l.entity_title || l.entity_gid, link: l,
-              source_entry_gid: l.source_entry_gid || gid, source_entry_title: l.source_entry_title }));
-          this._openViewDetail(grpLinks[idx], gid);
-        }
+        const item = itemsByGroup.get(key)?.[idx];
+        if (grp.items && item?._row) {
+          const partGid = item._row.gid;
+          if (partGid) {
+            this.open(partGid);
+            this._onNodeActivate?.(partGid);
+          }
+        } else if (item) this._openViewDetail(item, gid);
       });
     });
 

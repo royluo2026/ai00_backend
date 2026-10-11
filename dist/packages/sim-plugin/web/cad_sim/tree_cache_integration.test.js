@@ -5,6 +5,20 @@ function page(){
   for(const file of ['model_document_collection.js','tree_projection_cache.js','cad_sim.js']) vm.runInContext(fs.readFileSync(path.join(__dirname,file),'utf8'),dom.getInternalVMContext());
   return dom;
 }
+test('revoked cached model projection disappears from the selected tree',async()=>{
+  const dom=page();await new Promise(r=>setImmediate(r));
+  vm.runInContext(`
+    _modelDocumentCollection=window.AI00ModelDocumentCollection.createCollection();
+    window.__doc={document_gid:'2',role:'primary',source_kind:'teamcenter_cache_snapshot',media_type:'application/vnd.siemens.teamcenter.visualization-document',product_tree:{state:'ready',node_count:1,nodes:[{node_key:'cache:root',name:'Old cache'}]}};
+    _modelDocumentWorkspaceGid='10';_modelDocumentCollection.replace([window.__doc]);_renderModelDocuments([window.__doc]);
+    window.__removed=[];window.electronAPI={simulationTreeCache:{remove:async(w,k)=>window.__removed.push([w,k])}};
+  `,dom.getInternalVMContext());
+  await assert.doesNotReject(dom.window._discardCachedModelProjection('10'));
+  assert.equal(dom.window.document.querySelector('.cs-model-document-row'),null);
+  assert.equal(dom.window.__removed.length,1);
+  assert.deepEqual([...dom.window.__removed[0]],['10','models']);
+  dom.window.close();
+});
 test('cached model checkbox and name dispatch node actions instead of being disabled',async()=>{
   const dom=page();await new Promise(r=>setImmediate(r));
   vm.runInContext(`
@@ -65,7 +79,7 @@ test('Teamcenter root visibility fans out through real child occurrence locators
   document.querySelector('.cs-model-document-toggle').click();
   document.querySelector('.cs-alternate-tree-check').click();
   await new Promise(r=>setImmediate(r));
-  assert.deepEqual([...dom.window.__actions].map(x=>[...x]),[['tc:a','show'],['tc:b','show']]);
+  assert.deepEqual([...dom.window.__actions].map(x=>[...x]),[['tc:a','show'],['tc:b','show']],document.querySelector('.cs-alternate-tree-check').title);
   assert.equal(document.querySelector('.cs-alternate-tree-check').checked,true);
   dom.window.close();
 });

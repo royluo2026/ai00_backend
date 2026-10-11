@@ -1,10 +1,11 @@
 """Open prepared shared TC metadata using client-local JT files, never OIS JT."""
 import json
 from .cache_source_open import (CacheSourceOpenProvider,INSPECT_INPUT,OPEN_INPUT,FILE,CacheError,
-    WorkspaceRepository,WorkspaceRepositoryError,CapabilityBusinessError,_output)
+    WorkspaceRepository,WorkspaceRepositoryError,CapabilityBusinessError,_output,_log_materialization_error)
 from ..application.cache_preparation import scoped_preparation
 from ..application.cache_open_evidence import cache_package_hash
-from ..application.cache_tc_open_contract import TcCacheOpenPayload,TC_OPEN_CONTRACT_HASH
+from ..application.cache_tc_open_contract import (TcCacheOpenPayload,TC_OPEN_CONTRACT_HASH,
+    MAX_ASSEMBLY_XML_BYTES,MAX_CACHE_OPEN_PACKET_BYTES)
 from ..data.cache_assembly_preparation import load_preparation
 
 class TcCacheSourceOpenProvider(CacheSourceOpenProvider):
@@ -18,6 +19,8 @@ class TcCacheSourceOpenProvider(CacheSourceOpenProvider):
         prepared=self.load_prepared(self.cache,identity,context)
         if prepared['identity']!=identity:raise CacheError('cache_snapshot_mismatch')
         scope=scoped_preparation(prepared,payload.get('root_node_key'),environment,verified=self.load_prepared is load_preparation)
+        if len(scope['assembly_xml'].encode('utf-8'))>MAX_ASSEMBLY_XML_BYTES:
+            raise CacheError('cache_package_result_limit')
         materialization_hash=cache_package_hash(dict(identity=identity,preparation_hash=prepared['preparation_hash'],root_node_key=payload.get('root_node_key')))
         return row,identity,prepared,scope,materialization_hash
 
@@ -69,7 +72,7 @@ class TcCacheSourceOpenProvider(CacheSourceOpenProvider):
             assembly_xml=scope['assembly_xml'],tc_dependencies=dependencies)
         packet['package_hash']=cache_package_hash(packet)
         packet=TcCacheOpenPayload.model_validate(packet).model_dump()
-        if len(json.dumps(packet,ensure_ascii=False).encode())>7*1024*1024:raise CacheError('cache_package_result_limit')
+        if len(json.dumps(packet,ensure_ascii=False).encode('utf-8'))>MAX_CACHE_OPEN_PACKET_BYTES:raise CacheError('cache_package_result_limit')
         self.runtime(context)
         return dict(identity=identity,packet=packet,scope=scope)
 
@@ -92,4 +95,6 @@ class TcCacheSourceOpenProvider(CacheSourceOpenProvider):
             repository._idempotency_finish(cursor,workspace_gid=payload['workspace_gid'],idempotency_key=key,request_hash=request_hash,response=result)
             return _output(result,'cache_open_queued',payload['workspace_gid'])
         except (CacheError,ConnectorError,WorkspaceRepositoryError,ValueError,KeyError,TypeError) as exc:
-            raise CapabilityBusinessError(str(exc) if isinstance(exc,ValueError) else 'cache_materialization_invalid',str(exc)) from exc
+            code=str(exc) if isinstance(exc,(CacheError,ConnectorError,WorkspaceRepositoryError)) else 'cache_materialization_invalid'
+            if code=='cache_materialization_invalid':_log_materialization_error(exc)
+            raise CapabilityBusinessError(code,code) from exc

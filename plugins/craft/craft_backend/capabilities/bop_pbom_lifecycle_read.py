@@ -26,7 +26,7 @@ def read_bop_pbom_lifecycle(payload: dict[str, Any], _context: CapabilityContext
                     raise ValueError("BOP version not found")
                 meta = dict(row).get("meta") or {}
                 pbom_gid = (meta.get("pbom_match") or {}).get("pbom_version_gid", "")
-                cur.execute("SELECT COUNT(*) AS cnt FROM workmanship_bop_bop_entry_links WHERE version_gid=%s AND link_type='pbom_part'", (gid,))
+                cur.execute("SELECT COUNT(DISTINCT entity_gid) AS cnt FROM workmanship_bop_bop_entry_links WHERE version_gid=%s AND link_type='pbom_part' AND is_deleted=FALSE", (gid,))
                 linked = (cur.fetchone() or {}).get("cnt", 0) or 0
                 total = 0
                 if pbom_gid:

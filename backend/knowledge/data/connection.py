@@ -12,11 +12,12 @@ _lock = Lock()
 
 
 from backend.db.table_prefix import configure_table_prefix
-from backend.db.prefixed_cursor import wrap_cursor
+from backend.db.prefixed_cursor import wrap_connection
 
 import os
 
-configure_table_prefix(os.getenv("TABLE_PREFIX", ""))
+from backend.base.remote_data_environment import runtime_table_prefix
+configure_table_prefix(runtime_table_prefix())
 
 
 def _params() -> dict:
@@ -62,9 +63,7 @@ def _get_pool():
 
 @contextmanager
 def get_knowledge_conn():
-    conn = _get_pool().connection()
-    _orig_cursor = conn.cursor
-    conn.cursor = lambda *a, **k: wrap_cursor(_orig_cursor(*a, **k))
+    conn = wrap_connection(_get_pool().connection())
     try:
         yield conn
     finally:

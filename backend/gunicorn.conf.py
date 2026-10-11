@@ -30,6 +30,8 @@ port = int(os.getenv("PORT", "8080") or "8080")
 
 bind             = f"{host}:{port}"
 workers          = _positive_env("AI00_WEB_WORKERS", default=1)
+if os.getenv('AI00_ALLOW_DATA_ENVIRONMENT_SWITCH') == '1' and workers != 1:
+    raise ValueError('environment switching requires exactly one Gunicorn worker')
 worker_class     = "uvicorn.workers.UvicornWorker"
 timeout          = 120
 graceful_timeout = 10

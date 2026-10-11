@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from backend.capability_v2.catalog import load_catalog_release
 from backend.capabilities.models_next import CapabilityRisk, CapabilitySpec
 from plugins.project_management.project_management_backend.capabilities.provider import descriptor_for
@@ -72,6 +74,55 @@ def test_project_search_scope_is_derived_for_direct_capability_consumers(monkeyp
     assert captured["payload"]["arguments"]["scope"] == {
         "user_gid": "u1", "team_gids": ["team-1"], "project_gids": ["project-1"], "is_admin": False,
     }
+
+
+@pytest.mark.parametrize('capability_id,operation', [
+    ('project.task.read', 'tasks.search'),
+    ('project.issue.read', 'issues.search'),
+])
+def test_workbench_search_overrides_caller_scope(monkeypatch, capability_id, operation):
+    captured = {}
+    monkeypatch.setattr(
+        project_reviewed,
+        "build_access_scope",
+        lambda user: {"user_gid": user["gid"], "team_gids": ["team-1"],
+                      "project_gids": ["project-1"], "is_admin": False},
+    )
+    monkeypatch.setattr(
+        project_reviewed.project_outcome_port,
+        "invoke",
+        lambda capability_id, payload, context: captured.update({"capability_id": capability_id, "payload": payload})
+        or {"success": True, "data": []},
+    )
+    handler = project_reviewed._atomic_handler(capability_id, operation)
+    handler({"arguments": {"list_gid": "list-1", "project_gid": "project-1", "page_size": 500,
+                           "scope": {"user_gid": "forged", "is_admin": True}}},
+            type("Context", (), {"user_gid": "user-1", "team_gid": "team-1", "active_roles": ()})())
+
+    assert captured["capability_id"] == capability_id
+    assert captured["payload"] == {"operation": operation, "arguments": {
+        "list_gid": "list-1", "project_gid": "project-1", "page_size": 500,
+        "scope": {"user_gid": "user-1", "team_gids": ["team-1"],
+                  "project_gids": ["project-1"], "is_admin": False},
+    }}
+
+
+def test_task_list_navigation_search_overrides_caller_scope(monkeypatch):
+    captured = {}
+    monkeypatch.setattr(project_reviewed, "build_access_scope", lambda user: {
+        "user_gid": user["gid"], "team_gids": ["team-1"], "is_admin": False,
+    })
+    monkeypatch.setattr(project_reviewed.project_outcome_port, "invoke",
+                        lambda capability_id, payload, context: captured.update(payload=payload)
+                        or {"success": True, "data": []})
+    handler = project_reviewed._atomic_handler("project.list.read", "lists.search")
+    handler({"arguments": {"item_type": "task", "q": "焊接",
+                           "scope": {"user_gid": "forged", "is_admin": True}}},
+            type("Context", (), {"user_gid": "user-1", "team_gid": "team-1", "active_roles": ()})())
+    assert captured["payload"] == {"operation": "lists.search", "arguments": {
+        "item_type": "task", "q": "焊接",
+        "scope": {"user_gid": "user-1", "team_gids": ["team-1"], "is_admin": False},
+    }}
 
 
 def test_craft_unconstrained_transport_leaves_do_not_become_empty_objects():

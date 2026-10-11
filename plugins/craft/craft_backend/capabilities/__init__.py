@@ -6,6 +6,7 @@ from .bop_compare import register_bop_compare_capability
 from .bop_structure import register_bop_structure_capabilities
 from .bop_navigation import register_bop_navigation_capabilities
 from .bop_entry_relations import register_bop_entry_relation_capabilities
+from .entity_editor import register_entity_editor_capabilities
 from .bop_versions import register_bop_version_capabilities
 from .gbop_descriptors import register_gbop_capabilities
 from .rule_descriptors import register_rule_capabilities
@@ -68,6 +69,7 @@ from .gbop_version_change import register_gbop_version_change_capability
 from .gbop_entity_change import register_gbop_entity_change_capability
 from .gbop_import_change import register_gbop_import_change_capability
 from .gbop_station_autolink_change import register_gbop_station_autolink_change_capability
+from .demo_relation_change import register_demo_relation_change_capability
 from .gbop_import_tc_change import register_gbop_import_tc_change_capability
 from .ebom_change import register_ebom_change_capability
 from .ebom_snapshot_change import register_ebom_snapshot_change_capabilities
@@ -116,6 +118,7 @@ def _authorize_proposal(resource_id,identity):return _authorize_repository_resou
 
 def register_capabilities(registry: Any) -> None:
     """Register Craft-owned handlers; never mount routers or start workers."""
+    register_entity_editor_capabilities(registry)
     resource_authorizers.register("craft-bop-version", _authorize_bop_version)
     resource_authorizers.register("craft-bop-repository", _authorize_repository)
     resource_authorizers.register("craft-bop-space", _authorize_space)
@@ -194,6 +197,7 @@ def register_capabilities(registry: Any) -> None:
     register_gbop_entity_change_capability(native)
     register_gbop_import_change_capability(native)
     register_gbop_station_autolink_change_capability(native)
+    register_demo_relation_change_capability(native)
     register_gbop_import_tc_change_capability(native)
     register_ebom_change_capability(native)
     register_ebom_snapshot_change_capabilities(native)

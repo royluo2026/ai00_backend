@@ -78,6 +78,7 @@
       this._store = options.store || new LineageProjectionStore();
       this._versions = new Map();
       this._loadedScopes = new Set();
+      this._detailRequests = new Map();
       this._disposed = false;
     }
 
@@ -194,23 +195,31 @@
       return this._disposed ? null : (this._versions.get(versionGid)?.revision ?? null);
     }
 
-    loadDetail(scope, entryGid) {
+    loadDetail(scope, entryGid, options = {}) {
       this._assertActive();
       const state = this._versions.get(scope?.version_gid);
       if (!state || state.revision !== scope?.revision || !this._coordinator.isCurrent(state.token, state.revision)) {
         return Promise.reject(new Error('detail version is not the active generation'));
       }
-      return this._coordinator.runSingleFlight(`detail:${scopeKey(scope)}:${entryGid}`, async () => {
-        const detail = await this._invokeCapability(
-          'craft.bop.entry.detail.get',
-          1,
-          { version_gid: scope.version_gid, revision: scope.revision, entry_gid: entryGid },
-          { signal: state.token.signal },
-        );
-        if (!this._coordinator.isCurrent(state.token, state.revision)) return { cancelled: true };
-        if (this._store.rowsForActiveScope(scope).length) this._store.selectDetail(scope, detail);
-        return detail;
-      });
+      const key = `detail:${scopeKey(scope)}:${entryGid}`;
+      return this._coordinator.runSingleFlight(key, async () => {
+        const request = {};
+        this._detailRequests.set(key, request);
+        try {
+          const detail = await this._invokeCapability(
+            'craft.bop.entry.detail.get',
+            1,
+            { version_gid: scope.version_gid, revision: scope.revision, entry_gid: entryGid },
+            { signal: state.token.signal },
+          );
+          if (!this._coordinator.isCurrent(state.token, state.revision)
+            || this._detailRequests.get(key) !== request) return { cancelled: true };
+          if (this._store.rowsForActiveScope(scope).length) this._store.selectDetail(scope, detail);
+          return detail;
+        } finally {
+          if (this._detailRequests.get(key) === request) this._detailRequests.delete(key);
+        }
+      }, options);
     }
 
     clearHeavyData() {
@@ -226,6 +235,7 @@
       this._versions.clear();
       this._loadedScopes.clear();
       this._disposed = true;
+      this._detailRequests.clear();
     }
   }
 

@@ -91,11 +91,13 @@ def build_materialization_plan(
             "binding": binding.model_dump(mode="json"),
         })
     baseline = manifest.operations[-1].scene
-    add("vismockup.scene.apply@1", {
+    add("vismockup.scene.render@1", {
         "document_id": manifest.document_source.document_id,
         "baseline_snapshot_hash": manifest.document_source.snapshot_hash,
         "operation_id": baseline.operation_id,
         "scene": baseline.model_dump(mode="json"),
+        "highlight_products": [],
+        "fit_all": True,
     })
     add("vismockup.scene.verify@1", {
         "document_id": manifest.document_source.document_id,
@@ -144,7 +146,10 @@ def build_capture_plan(
             "baseline_snapshot_hash": manifest.document_source.snapshot_hash,
             "operation_id": operation.operation_id,
         }
-        add("vismockup.scene.apply@1", {**common, "scene": scene.model_dump(mode="json")})
+        add("vismockup.scene.render@1", {
+            **common, "scene": scene.model_dump(mode="json"),
+            "highlight_products": list(operation.product_node_keys), "fit_all": False,
+        })
         add("vismockup.scene.verify@1", {
             "document_id": common["document_id"], "operation_id": operation.operation_id,
             "expected_scene_hash": scene.scene_hash,
@@ -156,6 +161,22 @@ def build_capture_plan(
                 f"craft-bop-version:{manifest.execution_source.bop_version_gid}"
             ],
             **manifest.capture_profile.model_dump(mode="json"),
+        })
+        earlier_products = {
+            node_key for item in manifest.operations
+            if (item.sequence, item.operation_id) < (operation.sequence, operation.operation_id)
+            for node_key in item.product_node_keys
+        }
+        hidden_products = set(operation.product_node_keys) - earlier_products
+        after = scene.model_dump(mode="json", exclude={"scene_hash"})
+        after["visible_products"] = sorted(set(scene.visible_products) - hidden_products)
+        after["scene_hash"] = canonical_hash(after)
+        add("vismockup.scene.render@1", {
+            **common, "scene": after, "highlight_products": [], "fit_all": False,
+        })
+        add("vismockup.scene.verify@1", {
+            "document_id": common["document_id"], "operation_id": operation.operation_id,
+            "expected_scene_hash": after["scene_hash"],
         })
     return _plan(
         manifest, plan_id=plan_id, device_id=device_id, tenant_id=tenant_id,

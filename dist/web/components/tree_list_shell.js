@@ -1646,7 +1646,7 @@ class TreeListShell {
             self._renderTree();
           }
         } catch (err) {
-          alert('保存失败: ' + err.message);
+          (await window.AI00Dialogs.alert('保存失败: ' + err.message));
         }
       });
     }

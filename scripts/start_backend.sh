@@ -5,7 +5,7 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 LOG_DIR="$ROOT_DIR/logs"
 PID_FILE="$LOG_DIR/backend.pid"
 OUT_LOG="$LOG_DIR/backend.out.log"
-ENV_FILE="$ROOT_DIR/backend/.env.dev"
+ENV_FILE="${ENV_FILE:-$ROOT_DIR/backend/.env.dev}"
 
 cd "$ROOT_DIR"
 mkdir -p "$LOG_DIR"
@@ -26,6 +26,10 @@ if [[ ! -d "$ROOT_DIR/.venv" ]]; then
 fi
 
 if [[ ! -f "$ENV_FILE" ]]; then
+  if [[ "$ENV_FILE" != "$ROOT_DIR/backend/.env.dev" ]]; then
+    echo "[ERROR] 指定的部署配置不存在: $ENV_FILE"
+    exit 1
+  fi
   cat > "$ENV_FILE" <<'EOF'
 FEISHU_APP_ID=local_dummy_app_id
 FEISHU_APP_SECRET=local_dummy_app_secret
@@ -69,11 +73,19 @@ if [[ "$HOST" == "0.0.0.0" || "$HOST" == "::" ]]; then
   PROBE_HOST="127.0.0.1"
 fi
 
-nohup "$VENV_PY" -m uvicorn backend.main:app --host "$HOST" --port "$PORT" > "$OUT_LOG" 2>&1 &
+if [[ "${AI00_DEPLOY_PROFILE:-}" == "production" && "${AI00_ALLOW_DATA_ENVIRONMENT_SWITCH:-}" == "1" ]]; then
+  nohup "$VENV_PY" -m backend.scripts.supervise_environment > "$OUT_LOG" 2>&1 &
+else
+  nohup "$VENV_PY" -m uvicorn backend.main:app --host "$HOST" --port "$PORT" > "$OUT_LOG" 2>&1 &
+fi
 NEW_PID=$!
 echo "$NEW_PID" > "$PID_FILE"
 
-for _ in $(seq 1 15); do
+READY_ATTEMPTS=15
+if [[ "${AI00_DEPLOY_PROFILE:-}" == "production" && "${AI00_ALLOW_DATA_ENVIRONMENT_SWITCH:-}" == "1" ]]; then
+  READY_ATTEMPTS=180
+fi
+for _ in $(seq 1 "$READY_ATTEMPTS"); do
   if curl -fsS "http://${PROBE_HOST}:${PORT}/ready" >/dev/null 2>&1; then
     echo "[OK] 后端已启动: PID=$NEW_PID"
     echo "[OK] 日志文件: $OUT_LOG"

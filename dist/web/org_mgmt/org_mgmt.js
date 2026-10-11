@@ -330,7 +330,7 @@ async function _loadTeamMembers(gid) {
 }
 
 window.removeTeamMember = async function(teamGid, userGid) {
-  if (!confirm('确定将该成员移出团队？')) return;
+  if (!(await window.AI00Dialogs.confirm('确定将该成员移出团队？'))) return;
   const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.team.member.remove", {version:1,payload:({team_gid:path.gid,user_gid:path.user_gid})}); return result; })({},{"gid":decodeURIComponent(String(teamGid)),"user_gid":decodeURIComponent(String(userGid))},new URLSearchParams());
   if (res?.success) _loadTeamMembers(teamGid);
 };
@@ -364,7 +364,9 @@ document.getElementById('struct-save-btn').addEventListener('click', async () =>
 // 删除团队
 document.getElementById('struct-delete-btn').addEventListener('click', async () => {
   if (!_selectedTeamGid) return;
-  if (!confirm('确定删除该团队？此操作不可恢复。')) return;
+  const confirmedTeamGid = _selectedTeamGid;
+  if (!(await window.AI00Dialogs.confirm('确定删除该团队？此操作不可恢复。'))) return;
+  if (_selectedTeamGid !== confirmedTeamGid) return;
   const res = await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.team.archive", {version:1,payload:({team_gid:path.gid})}); return result; })({},{"gid":decodeURIComponent(String(_selectedTeamGid))},new URLSearchParams());
   if (res?.success) {
     _expandedTeams.delete(_selectedTeamGid);
@@ -416,7 +418,7 @@ document.getElementById('btn-confirm-role').addEventListener('click', async () =
   const res = await _baseCall('base.users.assignRole', {
     userGid: _editingUserId, newRole, externalSubtype: body.external_subtype || null,
   }, {
-    confirm: () => window.confirm(`确认将该成员的角色修改为「${newRole}」？`),
+    confirm: async () => (await window.AI00Dialogs.confirm(`确认将该成员的角色修改为「${newRole}」？`)),
   });
   if (res?.cancelled) return;
   if (res?.success) {
@@ -1118,9 +1120,9 @@ function _manualLineHtml(project, line) {
   </div>`;
 }
 
-function _promptPeople(currentGids) {
+async function _promptPeople(currentGids) {
   const current = (currentGids || []).map(gid => _person(gid).name || gid).join('、');
-  const value = prompt('输入负责人姓名或 GID，多个用逗号分隔；清空即移除全部负责人', current);
+  const value = (await window.AI00Dialogs.prompt('输入负责人姓名或 GID，多个用逗号分隔；清空即移除全部负责人', current));
   if (value === null) return null;
   const tokens = value.split(/[，,、]/).map(item => item.trim()).filter(Boolean);
   const gids = tokens.map(token => _allUsers.find(user => user.gid === token || user.name === token)?.gid || token);
@@ -1129,7 +1131,7 @@ function _promptPeople(currentGids) {
 
 async function _editManagers(projectGid) {
   const project = _responsibilityProjects.find(item => item.gid === projectGid);
-  const gids = _promptPeople((project.managerState?.managers || []).map(item => item.gid));
+  const gids = await _promptPeople((project.managerState?.managers || []).map(item => item.gid));
   if (gids === null) return;
   const revision = project.managerState?.revision || 0;
   const idempotencyKey = crypto.randomUUID();
@@ -1233,7 +1235,7 @@ async function _changeLine(project, operation, changeArguments) {
 
 async function _createManualLine(projectGid) {
   const project = _responsibilityProjects.find(item => item.gid === projectGid);
-  const name = prompt('新线体名称');
+  const name = (await window.AI00Dialogs.prompt('新线体名称'));
   if (!name?.trim()) return;
   await _changeLine(project, 'managed_line.create', { name: name.trim(), leader_user_gids: [], bop_line_gid: null });
 }
@@ -1241,7 +1243,7 @@ async function _createManualLine(projectGid) {
 async function _editManualLine(projectGid, lineGid) {
   const project = _responsibilityProjects.find(item => item.gid === projectGid);
   const line = project.lines.find(item => item.gid === lineGid);
-  const name = prompt('线体名称', line.name);
+  const name = (await window.AI00Dialogs.prompt('线体名称', line.name));
   if (name === null || !name.trim()) return;
   await _changeLine(project, 'managed_line.update', { line_gid: lineGid, name: name.trim() });
 }
@@ -1252,7 +1254,7 @@ async function _mapManualLine(projectGid, lineGid, bopLineGid) {
 }
 
 async function _deleteManualLine(projectGid, lineGid) {
-  if (!confirm('确定删除这条人工线体及其责任映射？')) return;
+  if (!(await window.AI00Dialogs.confirm('确定删除这条人工线体及其责任映射？'))) return;
   const project = _responsibilityProjects.find(item => item.gid === projectGid);
   await _changeLine(project, 'managed_line.delete', { line_gid: lineGid });
 }

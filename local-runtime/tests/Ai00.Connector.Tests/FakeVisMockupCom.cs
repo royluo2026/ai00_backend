@@ -94,6 +94,15 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
     public int HierarchyCount { get; set; } = 1;
     public IVisMockupNode RootNode { get; } = rootNode;
     public int CaptureImageCalls { get; private set; }
+    public Action<string>? CaptureWriter { get; set; }
+    public Dictionary<string, (double Red, double Green, double Blue)> NodeColors { get; } = [];
+    public bool IgnoreNodeColors { get; set; }
+    public int FitCaptureCalls { get; private set; }
+    public void SetNodeColors(IReadOnlyList<string> keys, double red, double green, double blue)
+    {
+        if (!IgnoreNodeColors) foreach (var key in keys) NodeColors[key] = (red, green, blue);
+    }
+    public void FitCaptureView() => FitCaptureCalls++;
     public int ExportPlmxmlCalls { get; private set; }
     public string? ExportPlmxmlContent { get; set; }
     public Dictionary<int, string> ExportPlmxmlByHierarchy { get; } = [];
@@ -189,6 +198,7 @@ public sealed class FakeDocument(string documentId, string sourceIdentity, IVisM
     public void CaptureImage(string path)
     {
         CaptureImageCalls++;
+        if (CaptureWriter is not null) { CaptureWriter(path); return; }
         var header = new byte[24] { 137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 0, 0, 0, 0, 0 };
         System.Buffers.Binary.BinaryPrimitives.WriteInt32BigEndian(header.AsSpan(16, 4), Profile.Width);
         System.Buffers.Binary.BinaryPrimitives.WriteInt32BigEndian(header.AsSpan(20, 4), Profile.Height);

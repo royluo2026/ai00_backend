@@ -8,7 +8,8 @@
 async function _createElement(operation, record, opts = {}) {
   if (Object.keys(opts).some(key => key !== 'signal')) throw new Error('unsupported element create option');
   if (opts.signal?.aborted) throw new Error('element import aborted');
-  const {operation: completedOperation, ...legacyResult} = await window.AI00Business.invoke('craft.library.change.apply', {version: 2, payload: {operation, record}}, () => !opts.signal?.aborted && window.confirm('确认执行 craft.library.change.apply@2？'));
+  const {operation: completedOperation, ...legacyResult} = await window.AI00Business.invoke('craft.library.change.apply', {version: 2, payload: {operation, record}}, async () =>
+    !opts.signal?.aborted && await window.AI00Dialogs.confirm({message:'确认执行 craft.library.change.apply@2？',signal:opts.signal}) && !opts.signal?.aborted);
   return legacyResult;
 }
 
@@ -90,13 +91,13 @@ let _shell       = null;
 
 // ── 废弃操作（inline onclick 需要全局暴露）────────────────────────────────────
 async function obsoleteItem(gid) {
-  if (!confirm('确认废弃？')) return;
+  if (!(await window.AI00Dialogs.confirm('确认废弃？'))) return;
   const cfg = TAB_CONFIG[_currentTab];
-  if (!cfg.obsolete) { alert('该类型不支持废弃操作'); return; }
+  if (!cfg.obsolete) { (await window.AI00Dialogs.alert('该类型不支持废弃操作')); return; }
   try {
     await cfg.obsolete(gid);
     await loadItems();
-  } catch (e) { alert('废弃失败: ' + e.message); }
+  } catch (e) { (await window.AI00Dialogs.alert('废弃失败: ' + e.message)); }
 }
 
 // ── 单元格渲染 ────────────────────────────────────────────────────────────────

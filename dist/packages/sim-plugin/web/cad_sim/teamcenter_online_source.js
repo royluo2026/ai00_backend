@@ -22,11 +22,15 @@
     absolute_transform: node.absolute_transform, transform_unit: node.transform_unit,
     transform_convention: node.transform_convention, bbox_unit: node.bbox_unit,
     torque_raw: node.torque_raw, torque_importance: node.torque_importance,
+    catia_occurrence_name: node.catia_occurrence_name, catia_file_name: node.catia_file_name,
+    vpps: node.vpps, vpps_desc: node.vpps_desc, catia_parent_part_name: node.catia_parent_part_name,
+    parent_name: node.parent_name, parent_vpps: node.parent_vpps, parent_vpps_name: node.parent_vpps_name,
     weight_raw: node.weight_raw, unit_weight_raw: node.unit_weight_raw,
     geometry_refs: node.geometry_refs || [], visible: null,
   });
 
   const pendingReads = new WeakMap();
+  const trace=(stage,detail)=>{try{global._simulationDebug?.(stage,detail);}catch{}};
   function partialTree() {
     return {state:'ready',source:'teamcenter_children',complete:false,node_count:0,nodes:[],pages:{}};
   }
@@ -35,10 +39,13 @@
     const key=JSON.stringify(parentPath), old=tree.pages[key];
     let pending=pendingReads.get(tree);
     if(!pending){pending=new Map();pendingReads.set(tree,pending);}
-    if(pending.has(key))return pending.get(key).promise;
+    if(pending.has(key)){trace('tc_page_shared',{document_gid:document.document_gid,depth:parentPath.length});return pending.get(key).promise;}
     const cursor=more ? old?.next_cursor : 0;
     if(more && cursor==null)return Promise.resolve();
     const request={valid:true,promise:null};
+    const started=Date.now(),trace_id=global.crypto?.randomUUID?.();
+    const report=(stage,detail={})=>trace(stage,{trace_id,document_gid:document.document_gid,depth:parentPath.length,cursor,force_refresh:refresh,elapsed_ms:Date.now()-started,...detail});
+    report('tc_page_started',{capability_id:'simulation.teamcenter.product_structure.children.read.request',capability_version:1});
     pending.set(key,request);
     const current=()=>request.valid&&isCurrent();
     tree.pages[key]={...old,state:'loading',error:null};
@@ -48,16 +55,17 @@
           source_selector:document.source_selector,parent_path:parentPath,cursor,page_size:200,
           refresh:!more&&refresh,generation:more?old.generation:null,
         },{confirmation:false,waitAttempts:750}));
-        if(!current())return;
+        if(!current()){report('tc_page_stale');return;}
         // Online registration stores the selector digest in content_sha256;
         // source_identity_hash identifies this insertion (selector + insertion ID).
         // Do not compare that insertion identity with a Connector source page.
         const sourceHash=document.source_kind==='teamcenter_online'&&document.content_sha256
           ? document.content_sha256 : document.source_identity_hash;
-        if(!page?.parent || !Array.isArray(page.nodes) || page.cursor!==cursor || page.complete!==false
-          || !/^[a-f0-9]{32}$/.test(page.generation) || JSON.stringify(page.parent.occurrence_path)!==key
-          || (sourceHash && page.source_identity_hash!==sourceHash)
-          || (more && page.generation!==old.generation)) throw Error('teamcenter_children_page_invalid');
+        const checks={parent:!!page?.parent,nodes:Array.isArray(page?.nodes),cursor:page?.cursor===cursor,complete:page?.complete===false,
+          generation:/^[a-f0-9]{32}$/.test(page?.generation),parent_path:JSON.stringify(page?.parent?.occurrence_path)===key,
+          source_identity:!sourceHash||page?.source_identity_hash===sourceHash,pinned_generation:!more||page?.generation===old.generation};
+        if(Object.values(checks).some(value=>!value)){report('tc_page_rejected',{reason:Object.keys(checks).filter(key=>!checks[key]).join(','),error_code:'teamcenter_children_page_invalid'});throw Error('teamcenter_children_page_invalid');}
+        report('tc_page_validated',{generation:page.generation,node_count:page.nodes.length,cache_hit:page.cache_hit,next_cursor:page.next_cursor});
         const parent=productNode(page.parent);
         // A new generation replaces the requested subtree, including previously loaded descendants.
         const retainGeneration=!more&&!refresh&&page.cache_hit&&old?.generation===page.generation&&!old.restart_required;
@@ -74,7 +82,9 @@
         for(const node of [parent,...page.nodes.map(productNode)])nodes.set(node.node_key,node);
         tree.nodes=[...nodes.values()];tree.node_count=tree.nodes.length;
         tree.pages[key]={state:'loaded',generation:page.generation,next_cursor:retainGeneration?old.next_cursor:page.next_cursor,child_count:page.child_count,captured_at:page.captured_at,cache_hit:page.cache_hit};
+        report('tc_page_applied',{generation:page.generation,node_count:tree.node_count,cache_hit:page.cache_hit,next_cursor:tree.pages[key].next_cursor,reason:retainGeneration?'retained_generation':more?'appended_page':'replaced_subtree'});
       } catch(error) {
+        report('tc_page_failed',{capability_id:'simulation.teamcenter.product_structure.children.read.request',capability_version:1,error_code:error?.message||'teamcenter_children_unavailable'});
         if(current())tree.pages[key]={...old,state:'failed',error:error?.message||'teamcenter_children_unavailable',
           restart_required:old?.restart_required||/teamcenter_children_generation_stale/.test(error?.message||'')};
         throw error;
@@ -88,6 +98,19 @@
       workspace_gid:workspace.workspace_gid,expected_row_version:workspace.row_version,
       display_name:source.display_name,insertion_instance_id:source.insertion_instance_id,source_selector:source.source_selector,
     },{idempotency:true,idempotencyKey:`tc-source-${source.insertion_instance_id}`});
+  }
+
+  async function refreshAncestor(requestConnector,document,tree,path,isCurrent) {
+    for(let depth=Math.max(0,path.length-1);depth>=0;depth--){
+      if(!isCurrent())return false;
+      const ancestor=path.slice(0,depth),key=JSON.stringify(ancestor),pending=pendingReads.get(tree);
+      // Do not mistake a shared in-flight "load more" for the requested refresh.
+      while(pending?.has(key)&&isCurrent())await pending.get(key).promise.catch(()=>{});
+      if(!isCurrent())return false;
+      try{await readChildren(requestConnector,document,tree,ancestor,{refresh:true,isCurrent});return isCurrent();}
+      catch(error){if(error.message!=='teamcenter_parent_path_not_found'||depth===0)throw error;}
+    }
+    return false;
   }
 
   async function readSnapshot(invoke, observationId, pageSize = 1000) {
@@ -144,14 +167,19 @@
     return { ...binding, ...manifest };
   }
 
-  async function openOnline(requestConnector, document, mode = 'new') {
-    if (!document?.source_selector) throw new Error('teamcenter_source_selector_missing');
+  async function openOnline(requestConnector, document, mode = 'new', cacheSource = null) {
+    if (!cacheSource && !document?.source_selector) throw new Error('teamcenter_source_selector_missing');
+    if (cacheSource && (!/^[a-f0-9]{32}$/.test(cacheSource.batch_id || '')
+        || typeof cacheSource.node_key !== 'string' || !cacheSource.node_key))
+      throw new Error('teamcenter_cache_source_missing');
     const capability = mode === 'new' ? 'simulation.teamcenter.visualization.launch.request'
       : mode === 'insert' ? 'simulation.teamcenter.visualization.insert.request' : null;
     if (!capability) throw new Error('teamcenter_visualization_action_invalid');
     return requestConnector(capability, {
-      source_selector: document.source_selector, expected_visdoc_uid: '',
-    }, { confirmation: true, waitAttempts: 1000 });
+      ...(cacheSource ? {cache_source:cacheSource} : {source_selector:document.source_selector}),
+      expected_visdoc_uid: '',
+    }, { confirmation: true, waitAttempts: 1000,
+      ...(cacheSource ? {version:mode==='new'?3:2} : {}) });
   }
 
   async function search(requestConnector, query) {
@@ -213,7 +241,7 @@
 
   global.AI00TeamcenterOnlineSource = Object.freeze({
     launchOnline: (requestConnector, document) => openOnline(requestConnector, document, 'new'),
-    bindSource, cachedRevisionRules, clearRevisionRules, partialTree, hydrateControlKeys, readChildren, readNodeProperties, observeAndPersist, openOnline, productNode, readSnapshot, resultOf, revisionRules, search,
+    bindSource, cachedRevisionRules, clearRevisionRules, partialTree, hydrateControlKeys, readChildren, refreshAncestor, readNodeProperties, observeAndPersist, openOnline, productNode, readSnapshot, resultOf, revisionRules, search,
     searchExact: search,
   });
 })(typeof window !== 'undefined' ? window : globalThis);

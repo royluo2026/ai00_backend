@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import stat
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -14,10 +16,23 @@ from backend.capability_v2.domain_migrations import (
 from backend.scripts.run_domain_migrations import main
 from backend.scripts import run_domain_migrations as runner_module
 from backend.db.table_prefix import configure_table_prefix
+from backend.db.table_prefix import prefixed_trigger_name, rewrite_sql
 from backend.db.versioned_migrations import prepare_resumable_statement
 
 
 ROOT = Path(__file__).resolve().parents[2]
+SIMULATION_0033_COLUMNS = [
+    ("parent_node_key", "varchar(128)", "utf8mb4", "utf8mb4_bin", "STORED GENERATED",
+     "NULLIF(JSON_UNQUOTE(JSON_EXTRACT(data_json,'$.structure.parent_occurrence_id')),'null')"),
+    ("sibling_order", "int", None, None, "STORED GENERATED",
+     "CAST(JSON_UNQUOTE(JSON_EXTRACT(data_json,'$.structure.child_order')) AS UNSIGNED)"),
+]
+
+
+def _simulation_0033_create_table(rows, table):
+    definitions = [f" `{row[0]}` {row[1]} GENERATED ALWAYS AS ({row[5]}) STORED,"
+                   for row in rows]
+    return f"CREATE TABLE `{table}` (\n" + "\n".join(definitions) + "\n)"
 
 
 @pytest.fixture
@@ -32,6 +47,13 @@ def simulation_manifest():
     return load_domain_manifests(
         ROOT / "backend/capability_v2/official_domains.json"
     ).require("simulation")
+
+
+@pytest.fixture
+def base_manifest():
+    return load_domain_manifests(
+        ROOT / "backend/capability_v2/official_domains.json"
+    ).require("base")
 
 
 def _migration_root(tmp_path: Path, craft_manifest) -> Path:
@@ -210,6 +232,154 @@ class ExistingPrefixedColumnCursor(RecordingCursor):
             self._one = (1 if params[0] == "test_workmanship_sim_capture_requests" else 0,)
 
 
+TRIGGER_ACTION = "SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Historical upload provenance is append-only'"
+
+
+class HistoricalTriggerCursor(RecordingCursor):
+    def execute(self, sql, params=()):
+        super().execute(sql, params)
+        if "information_schema.TRIGGERS" in sql:
+            name = params[0]
+            trigger = self.connection.triggers.get(name)
+            if "COUNT(*)" in sql:
+                self._one = (int(trigger is not None),)
+            else:
+                self._all = [trigger] if trigger else []
+        elif "CREATE TRIGGER" in sql:
+            import re
+            match = re.search(r"CREATE TRIGGER (\w+) BEFORE (UPDATE|DELETE)", sql)
+            if match:
+                name = prefixed_trigger_name(match.group(1))
+                self.connection.triggers[name] = (
+                    name, rewrite_sql("workmanship_base_historical_uploads"),
+                    match.group(2), "BEFORE", "ROW", TRIGGER_ACTION,
+                )
+
+
+class HistoricalTriggerConnection(RecordingConnection):
+    def __init__(self, triggers=None, ledger_rows=()):
+        super().__init__(ledger_rows=ledger_rows)
+        self.triggers = dict(triggers or {})
+
+    def cursor(self):
+        return HistoricalTriggerCursor(self)
+
+
+def _expected_trigger(name, event):
+    return (name, rewrite_sql("workmanship_base_historical_uploads"), event,
+            "BEFORE", "ROW", TRIGGER_ACTION)
+
+
+def test_base_0004_preserves_checksum_and_marks_only_frozen_trigger_sql(base_manifest, tmp_path):
+    migration = next(item for item in discover_domain_migrations(ROOT, base_manifest)
+                     if item.migration_id == "0004")
+    assert migration.checksum == "8da1d92e0fb3743ab8034edf8d97cdcda0be1db48f2ba259aee196c5c7a31a61"
+    assert migration.sql.count("AI00: RESUMABLE CREATE TRIGGER") == 2
+    directory = tmp_path / base_manifest.database.migration_path
+    directory.mkdir(parents=True)
+    original = ROOT / base_manifest.database.migration_path / "0004_historical_uploads.sql"
+    (directory / original.name).write_bytes(original.read_bytes().replace(
+        b"append-only", b"append-only changed"))
+    with pytest.raises(MigrationError, match="non-resumable"):
+        discover_domain_migrations(tmp_path, base_manifest)
+
+
+@pytest.mark.parametrize("prefix", ["test_", "pp_"])
+def test_base_0004_resumes_only_missing_trigger_with_verified_definition(base_manifest, prefix):
+    migration = next(item for item in discover_domain_migrations(ROOT, base_manifest)
+                     if item.migration_id == "0004")
+    configure_table_prefix(prefix)
+    try:
+        update_name = prefixed_trigger_name("base_historical_uploads_no_update")
+        delete_name = prefixed_trigger_name("base_historical_uploads_no_delete")
+        connection = HistoricalTriggerConnection({update_name: _expected_trigger(update_name, "UPDATE")})
+        assert apply_domain_migrations(connection, base_manifest, (migration,)) == ("0004",)
+        assert connection.triggers[delete_name] == _expected_trigger(delete_name, "DELETE")
+        statements = [sql for sql, _ in connection.statements]
+        assert not any(sql.startswith("CREATE TRIGGER base_historical_uploads_no_update") for sql in statements)
+        assert len([sql for sql in statements if "CREATE TRIGGER base_historical_uploads_no_delete" in sql]) == 1
+        probes = [params for sql, params in connection.statements if "information_schema.TRIGGERS" in sql]
+        assert set(probes) == {(update_name,), (delete_name,)}
+    finally:
+        configure_table_prefix("")
+
+
+@pytest.mark.parametrize("prefix", ["test_", "pp_"])
+@pytest.mark.parametrize("field,value", [
+    (1, "other_table"), (2, "DELETE"), (3, "AFTER"), (4, "STATEMENT"),
+    (5, "SET @anything=1"),
+])
+def test_base_0004_refuses_wrong_same_name_trigger_before_ddl(base_manifest, prefix, field, value):
+    migration = next(item for item in discover_domain_migrations(ROOT, base_manifest)
+                     if item.migration_id == "0004")
+    configure_table_prefix(prefix)
+    try:
+        name = prefixed_trigger_name("base_historical_uploads_no_update")
+        wrong = list(_expected_trigger(name, "UPDATE"))
+        wrong[field] = value
+        connection = HistoricalTriggerConnection({name: tuple(wrong)})
+        with pytest.raises(MigrationError, match="historical_upload_trigger_definition_mismatch"):
+            apply_domain_migrations(connection, base_manifest, (migration,))
+        assert not any("CREATE TRIGGER" in sql for sql, _ in connection.statements)
+    finally:
+        configure_table_prefix("")
+
+
+@pytest.mark.parametrize("prefix", ["test_", "pp_"])
+@pytest.mark.parametrize("present", [False, True])
+def test_base_0004_applied_ledger_rejects_missing_or_changed_trigger(base_manifest, prefix, present):
+    migration = next(item for item in discover_domain_migrations(ROOT, base_manifest)
+                     if item.migration_id == "0004")
+    configure_table_prefix(prefix)
+    try:
+        update_name = prefixed_trigger_name("base_historical_uploads_no_update")
+        delete_name = prefixed_trigger_name("base_historical_uploads_no_delete")
+        update = _expected_trigger(update_name, "UPDATE")
+        if present:
+            update = (*update[:5], "SET @anything=1")
+        connection = HistoricalTriggerConnection({update_name: update,
+            delete_name: _expected_trigger(delete_name, "DELETE")}, ledger_rows=({
+                "migration_id": "0004", "checksum": migration.checksum,
+                "artifact_version": migration.artifact_version,
+            },))
+        if not present:
+            connection.triggers.pop(delete_name)
+        with pytest.raises(MigrationError, match=("historical_upload_trigger_definition_mismatch" if present
+                                                   else "historical_upload_triggers_missing")):
+            apply_domain_migrations(connection, base_manifest, (migration,))
+    finally:
+        configure_table_prefix("")
+
+
+@pytest.mark.parametrize("prefix", ["test_", "pp_"])
+def test_base_0004_rechecks_new_trigger_before_ledger_insert(base_manifest, prefix):
+    migration = next(item for item in discover_domain_migrations(ROOT, base_manifest)
+                     if item.migration_id == "0004")
+
+    class WrongCreatedCursor(HistoricalTriggerCursor):
+        def execute(self, sql, params=()):
+            super().execute(sql, params)
+            if "CREATE TRIGGER base_historical_uploads_no_delete" in sql:
+                name = prefixed_trigger_name("base_historical_uploads_no_delete")
+                row = self.connection.triggers[name]
+                self.connection.triggers[name] = (*row[:5], "SET @anything=1")
+
+    class WrongCreatedConnection(HistoricalTriggerConnection):
+        def cursor(self):
+            return WrongCreatedCursor(self)
+
+    configure_table_prefix(prefix)
+    try:
+        name = prefixed_trigger_name("base_historical_uploads_no_update")
+        connection = WrongCreatedConnection({name: _expected_trigger(name, "UPDATE")})
+        with pytest.raises(MigrationError, match="historical_upload_trigger_definition_mismatch"):
+            apply_domain_migrations(connection, base_manifest, (migration,))
+        assert not any(sql.startswith("INSERT INTO ai00_base_schema_migrations")
+                       for sql, _ in connection.statements)
+    finally:
+        configure_table_prefix("")
+
+
 def test_simulation_historical_0004_checksum_upgrades_through_current_chain(simulation_manifest):
     migrations = discover_domain_migrations(ROOT, simulation_manifest)
     old = next(item for item in migrations if item.migration_id == "0004")
@@ -226,6 +396,287 @@ def test_simulation_historical_0004_checksum_upgrades_through_current_chain(simu
     applied = apply_domain_migrations(connection, simulation_manifest, migrations)
 
     assert applied == tuple(item.migration_id for item in migrations if item.migration_id > "0004")
+
+
+def test_simulation_0033_preserves_checksum_with_replay_safe_executable(simulation_manifest):
+    migration = next(item for item in discover_domain_migrations(ROOT, simulation_manifest)
+                     if item.migration_id == "0033")
+    assert migration.checksum == "92b0b1d5fd7551dd96fd64a7dbf4d2b8da72ff2cda0822e2939864979ca31931"
+    assert migration.sql.count("ADD COLUMN IF NOT EXISTS") == 2
+    assert "CREATE INDEX IF NOT EXISTS ix_cloud_cache_parent_order" in migration.sql
+    assert "CREATE TABLE IF NOT EXISTS workmanship_sim_cloud_cache_manifests" in migration.sql
+
+
+def test_simulation_0033_drift_does_not_receive_historical_replay_exception(tmp_path, simulation_manifest):
+    directory = tmp_path / simulation_manifest.database.migration_path
+    directory.mkdir(parents=True)
+    original = ROOT / simulation_manifest.database.migration_path / "0033_cloud_model_cache_pinned_query.sql"
+    (directory / original.name).write_bytes(original.read_bytes().replace(
+        b"ix_cloud_cache_parent_order", b"ix_cloud_cache_parent_order_changed"))
+    with pytest.raises(MigrationError, match="non-resumable"):
+        discover_domain_migrations(tmp_path, simulation_manifest)
+
+
+@pytest.mark.parametrize("prefix", ["test_", "pp_"])
+def test_simulation_0033_resumes_after_columns_and_index_commit(simulation_manifest, prefix):
+    migration = next(item for item in discover_domain_migrations(ROOT, simulation_manifest)
+                     if item.migration_id == "0033")
+
+    class ExistingMetadataCursor(RecordingCursor):
+        def execute(self, sql, params=()):
+            super().execute(sql, params)
+            if "SELECT COLUMN_NAME, COLUMN_TYPE" in sql:
+                self._all = [row[:5] for row in SIMULATION_0033_COLUMNS]
+            if sql.startswith("SHOW CREATE TABLE"):
+                table = sql.split("`")[1]
+                self._one = (table, _simulation_0033_create_table(SIMULATION_0033_COLUMNS, table))
+            if "SELECT COLUMN_NAME, SEQ_IN_INDEX" in sql and params[1] == "ix_cloud_cache_parent_order":
+                self._all = [(column, position, 1, None) for position, column in enumerate(
+                    ("batch_id", "parent_node_key", "sibling_order", "node_key"), 1)]
+            if ("information_schema.COLUMNS" in sql and
+                    params[1] in {"parent_node_key", "sibling_order"}):
+                self._one = (1,)
+            if "information_schema.STATISTICS" in sql and params[1] == "ix_cloud_cache_parent_order":
+                self._one = (1,)
+
+    class ExistingMetadataConnection(RecordingConnection):
+        def cursor(self):
+            return ExistingMetadataCursor(self)
+
+    connection = ExistingMetadataConnection()
+    configure_table_prefix(prefix)
+    try:
+        assert apply_domain_migrations(connection, simulation_manifest, (migration,)) == ("0033",)
+    finally:
+        configure_table_prefix("")
+    statements = [sql for sql, _ in connection.statements]
+    metadata = [(sql, params) for sql, params in connection.statements
+                if "information_schema.COLUMNS" in sql or "information_schema.STATISTICS" in sql]
+    assert len(metadata) == 5
+    assert all(params[0] == prefix + "workmanship_sim_cloud_cache_nodes"
+               for _, params in metadata)
+    assert not any(sql.startswith("ALTER TABLE workmanship_sim_cloud_cache_nodes") for sql in statements)
+    assert not any(sql.startswith("CREATE INDEX ix_cloud_cache_parent_order") for sql in statements)
+    assert any(sql.startswith("CREATE TABLE IF NOT EXISTS workmanship_sim_cloud_cache_manifests")
+               for sql in statements)
+
+
+@pytest.mark.parametrize("prefix", ["test_", "pp_"])
+@pytest.mark.parametrize("column, value", [
+    ("parent_node_key", ("parent_node_key", "varchar(64)", "utf8mb4", "utf8mb4_bin", "STORED GENERATED",
+                         SIMULATION_0033_COLUMNS[0][5])),
+    ("parent_node_key", ("parent_node_key", "varchar(128)", "utf8mb4", "utf8mb4_general_ci",
+                         "STORED GENERATED", SIMULATION_0033_COLUMNS[0][5])),
+    ("sibling_order", ("sibling_order", "int", None, None, "VIRTUAL GENERATED",
+                       SIMULATION_0033_COLUMNS[1][5])),
+    ("sibling_order", ("sibling_order", "int", None, None, "STORED GENERATED",
+                       "CAST(JSON_UNQUOTE(JSON_EXTRACT(data_json,'$.structure.other_order')) AS UNSIGNED)")),
+])
+def test_simulation_0033_refuses_conflicting_generated_column_before_ddl(
+    simulation_manifest, prefix, column, value,
+):
+    migration = next(item for item in discover_domain_migrations(ROOT, simulation_manifest)
+                     if item.migration_id == "0033")
+
+    class ConflictingColumnCursor(RecordingCursor):
+        def execute(self, sql, params=()):
+            super().execute(sql, params)
+            if "SELECT COLUMN_NAME, COLUMN_TYPE" in sql:
+                self._all = [value[:5]]
+            if sql.startswith("SHOW CREATE TABLE"):
+                table = sql.split("`")[1]
+                self._one = (table, _simulation_0033_create_table([value], table))
+            if "information_schema.COLUMNS" in sql and "COUNT(*)" in sql:
+                self._one = (1 if params[1] == column else 0,)
+
+    class ConflictingColumnConnection(RecordingConnection):
+        def cursor(self):
+            return ConflictingColumnCursor(self)
+
+    connection = ConflictingColumnConnection()
+    configure_table_prefix(prefix)
+    try:
+        with pytest.raises(MigrationError, match="simulation_0033_column_definition_mismatch"):
+            apply_domain_migrations(connection, simulation_manifest, (migration,))
+    finally:
+        configure_table_prefix("")
+    assert not any(sql.startswith("ALTER TABLE workmanship_sim_cloud_cache_nodes") or
+                   sql.startswith("INSERT INTO ai00_simulation_schema_migrations")
+                   for sql, _ in connection.statements)
+    assert any("SELECT COLUMN_NAME, COLUMN_TYPE" in sql and params[0] ==
+               prefix + "workmanship_sim_cloud_cache_nodes" for sql, params in connection.statements)
+
+
+@pytest.mark.parametrize("prefix", ["test_", "pp_"])
+def test_simulation_0033_applied_ledger_requires_both_generated_columns(simulation_manifest, prefix):
+    migration = next(item for item in discover_domain_migrations(ROOT, simulation_manifest)
+                     if item.migration_id == "0033")
+
+    class MissingColumnCursor(RecordingCursor):
+        def execute(self, sql, params=()):
+            super().execute(sql, params)
+            if "SELECT COLUMN_NAME, COLUMN_TYPE" in sql:
+                self._all = [SIMULATION_0033_COLUMNS[0][:5]]
+            if sql.startswith("SHOW CREATE TABLE"):
+                table = sql.split("`")[1]
+                self._one = (table, _simulation_0033_create_table(SIMULATION_0033_COLUMNS[:1], table))
+
+    class MissingColumnConnection(RecordingConnection):
+        def cursor(self):
+            return MissingColumnCursor(self)
+
+    connection = MissingColumnConnection(ledger_rows=({
+        "migration_id": "0033", "checksum": migration.checksum,
+        "artifact_version": migration.artifact_version,
+    },))
+    configure_table_prefix(prefix)
+    try:
+        with pytest.raises(MigrationError, match="simulation_0033_columns_missing"):
+            apply_domain_migrations(connection, simulation_manifest, (migration,))
+    finally:
+        configure_table_prefix("")
+    assert not any(sql.startswith("INSERT INTO ai00_simulation_schema_migrations")
+                   for sql, _ in connection.statements)
+
+
+@pytest.mark.parametrize("prefix", ["test_", "pp_"])
+def test_simulation_0033_refuses_crossed_show_create_table(simulation_manifest, prefix):
+    migration = next(item for item in discover_domain_migrations(ROOT, simulation_manifest)
+                     if item.migration_id == "0033")
+
+    class CrossedMetadataCursor(RecordingCursor):
+        def execute(self, sql, params=()):
+            super().execute(sql, params)
+            if "SELECT COLUMN_NAME, COLUMN_TYPE" in sql:
+                self._all = [row[:5] for row in SIMULATION_0033_COLUMNS]
+            if sql.startswith("SHOW CREATE TABLE"):
+                other = ("pp_" if prefix == "test_" else "test_") + "workmanship_sim_cloud_cache_nodes"
+                self._one = (other, _simulation_0033_create_table(SIMULATION_0033_COLUMNS, other))
+
+    class CrossedMetadataConnection(RecordingConnection):
+        def cursor(self):
+            return CrossedMetadataCursor(self)
+
+    connection = CrossedMetadataConnection()
+    configure_table_prefix(prefix)
+    try:
+        with pytest.raises(MigrationError, match="simulation_0033_column_definition_mismatch"):
+            apply_domain_migrations(connection, simulation_manifest, (migration,))
+    finally:
+        configure_table_prefix("")
+    assert not any(sql.startswith("ALTER TABLE workmanship_sim_cloud_cache_nodes") or
+                   sql.startswith("INSERT INTO ai00_simulation_schema_migrations")
+                   for sql, _ in connection.statements)
+
+
+def test_simulation_0033_accepts_matching_show_create_expression_with_charset_introducer(simulation_manifest):
+    migration = next(item for item in discover_domain_migrations(ROOT, simulation_manifest)
+                     if item.migration_id == "0033")
+
+    class NormalizedMetadataCursor(RecordingCursor):
+        def execute(self, sql, params=()):
+            super().execute(sql, params)
+            if "SELECT COLUMN_NAME, COLUMN_TYPE" in sql:
+                self._all = [row[:5] for row in SIMULATION_0033_COLUMNS]
+            if sql.startswith("SHOW CREATE TABLE"):
+                table = sql.split("`")[1]
+                ddl = _simulation_0033_create_table(SIMULATION_0033_COLUMNS, table)
+                ddl = ddl.replace("data_json", "`data_json`").replace("'$.structure.", "_utf8mb4'$.structure.")
+                ddl = ddl.replace("'null'", "_utf8mb4'null'")
+                self._one = (table, ddl)
+            if "SELECT COLUMN_NAME, SEQ_IN_INDEX" in sql:
+                self._all = [(column, position, 1, None) for position, column in enumerate(
+                    ("batch_id", "parent_node_key", "sibling_order", "node_key"), 1)]
+
+    class NormalizedMetadataConnection(RecordingConnection):
+        def cursor(self):
+            return NormalizedMetadataCursor(self)
+
+    connection = NormalizedMetadataConnection(ledger_rows=({
+        "migration_id": "0033", "checksum": migration.checksum,
+        "artifact_version": migration.artifact_version,
+    },))
+    configure_table_prefix("test_")
+    try:
+        assert apply_domain_migrations(connection, simulation_manifest, (migration,)) == ()
+    finally:
+        configure_table_prefix("")
+
+
+@pytest.mark.parametrize("prefix", ["test_", "pp_"])
+@pytest.mark.parametrize("columns, non_unique", [
+    (("batch_id", "node_key", "sibling_order", "parent_node_key"), 1),
+    (("batch_id", "parent_node_key", "sibling_order", "node_key"), 0),
+])
+def test_simulation_0033_refuses_conflicting_named_index_before_ddl(
+    simulation_manifest, prefix, columns, non_unique,
+):
+    migration = next(item for item in discover_domain_migrations(ROOT, simulation_manifest)
+                     if item.migration_id == "0033")
+
+    class ConflictingIndexCursor(RecordingCursor):
+        def execute(self, sql, params=()):
+            super().execute(sql, params)
+            if "SELECT COLUMN_NAME, SEQ_IN_INDEX" in sql:
+                self._all = [(column, position, non_unique, None)
+                             for position, column in enumerate(columns, 1)]
+
+    class ConflictingIndexConnection(RecordingConnection):
+        def cursor(self):
+            return ConflictingIndexCursor(self)
+
+    connection = ConflictingIndexConnection()
+    configure_table_prefix(prefix)
+    try:
+        with pytest.raises(MigrationError, match="simulation_0033_index_definition_mismatch"):
+            apply_domain_migrations(connection, simulation_manifest, (migration,))
+    finally:
+        configure_table_prefix("")
+    statements = [sql for sql, _ in connection.statements]
+    assert not any(sql.startswith("ALTER TABLE workmanship_sim_cloud_cache_nodes") for sql in statements)
+    assert not any(sql.startswith("CREATE INDEX ix_cloud_cache_parent_order") for sql in statements)
+    assert not any(sql.startswith("INSERT INTO ai00_simulation_schema_migrations") for sql in statements)
+
+
+@pytest.mark.parametrize("prefix", ["test_", "pp_"])
+@pytest.mark.parametrize("index_rows, error", [
+    ([], "simulation_0033_index_missing"),
+    ([("batch_id", 1, 1, None), ("node_key", 2, 1, None)],
+     "simulation_0033_index_definition_mismatch"),
+])
+def test_simulation_0033_applied_ledger_still_requires_matching_physical_index(
+    simulation_manifest, prefix, index_rows, error,
+):
+    migration = next(item for item in discover_domain_migrations(ROOT, simulation_manifest)
+                     if item.migration_id == "0033")
+
+    class AppliedIndexCursor(RecordingCursor):
+        def execute(self, sql, params=()):
+            super().execute(sql, params)
+            if "SELECT COLUMN_NAME, COLUMN_TYPE" in sql:
+                self._all = [row[:5] for row in SIMULATION_0033_COLUMNS]
+            if sql.startswith("SHOW CREATE TABLE"):
+                table = sql.split("`")[1]
+                self._one = (table, _simulation_0033_create_table(SIMULATION_0033_COLUMNS, table))
+            if "SELECT COLUMN_NAME, SEQ_IN_INDEX" in sql:
+                self._all = index_rows
+
+    class AppliedIndexConnection(RecordingConnection):
+        def cursor(self):
+            return AppliedIndexCursor(self)
+
+    connection = AppliedIndexConnection(ledger_rows=({
+        "migration_id": "0033", "checksum": migration.checksum,
+        "artifact_version": migration.artifact_version,
+    },))
+    configure_table_prefix(prefix)
+    try:
+        with pytest.raises(MigrationError, match=error):
+            apply_domain_migrations(connection, simulation_manifest, (migration,))
+    finally:
+        configure_table_prefix("")
+    assert not any(sql.startswith("INSERT INTO ai00_simulation_schema_migrations")
+                   for sql, _ in connection.statements)
 
 
 def test_apply_uses_domain_lock_ledger_and_artifact_version(craft_manifest):
@@ -440,3 +891,53 @@ def test_apply_configures_selected_table_prefix(monkeypatch, capsys, simulation_
     assert result == 0
     assert prefixes == ["test_"]
     assert f"domain=simulation migrations={len(discover_domain_migrations(ROOT, simulation_manifest))} applied=0" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize(("profile", "prefix", "url"), [
+    ("production", "test_", "https://workmanship-backend.chehejia.com"),
+    ("test", "pp_", "http://127.0.0.1:8080"),
+    ("", "pp_", "https://workmanship-backend.chehejia.com"),
+])
+def test_domain_migration_refuses_wrong_profile_before_connection(monkeypatch, profile, prefix, url):
+    monkeypatch.setattr(runner_module, "connect_domain_database", lambda _url: pytest.fail("database connection attempted"))
+    with pytest.raises(SystemExit, match="profile|ENV_FILE|prefix"):
+        main(["--domain", "craft", "--apply"], root=ROOT, environ={
+            "AI00_CRAFT_DDL_DB_URL": "mysql://ddl:secret@db.example/ai00",
+            "AI00_DEPLOY_PROFILE": profile, "TABLE_PREFIX": prefix, "PUBLIC_URL": url,
+        })
+
+
+def test_domain_migration_env_file_cannot_inherit_production_profile(monkeypatch, tmp_path):
+    env_file = tmp_path / "domain.env"
+    env_file.write_text(
+        "TABLE_PREFIX=pp_\nPUBLIC_URL=https://workmanship-backend.chehejia.com\n"
+        "AI00_CRAFT_DDL_DB_URL=mysql://ddl:secret@db.example/ai00\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(runner_module, "connect_domain_database", lambda _url: pytest.fail("database connection attempted"))
+    with pytest.raises(SystemExit, match="managed_deployment_requires_explicit_profile"):
+        main(["--domain", "craft", "--apply"], root=ROOT, environ={
+            "ENV_FILE": str(env_file), "AI00_DEPLOY_PROFILE": "production",
+        })
+
+
+@pytest.mark.parametrize("mode", ["--check", "--apply"])
+def test_domain_migration_refuses_duplicate_env_before_connection(monkeypatch, tmp_path, mode):
+    env_file = tmp_path / "domain.env"
+    env_file.write_text("AI00_DEPLOY_PROFILE=test\nTABLE_PREFIX=test_\n"
+                        "PUBLIC_URL=http://127.0.0.1:8080\n"
+                        "AI00_REQUIRE_MIGRATIONS=0\nAI00_REQUIRE_MIGRATIONS=1\n", encoding="utf-8")
+    monkeypatch.setattr(runner_module, "connect_domain_database",
+                        lambda _url: pytest.fail("database connection attempted"))
+    with pytest.raises(SystemExit, match="duplicate"):
+        main(["--domain", "craft", mode], root=ROOT, environ={"ENV_FILE": str(env_file)})
+
+
+def test_domain_migration_refuses_linked_env_before_connection(monkeypatch, tmp_path):
+    env_file = tmp_path / "domain.env"
+    env_file.write_text("AI00_DEPLOY_PROFILE=test", encoding="utf-8")
+    original = type(env_file).lstat
+    monkeypatch.setattr(type(env_file), "lstat", lambda path: SimpleNamespace(st_mode=stat.S_IFLNK)
+                        if path == env_file else original(path))
+    with pytest.raises(SystemExit, match="missing or invalid"):
+        main(["--domain", "craft", "--check"], root=ROOT, environ={"ENV_FILE": str(env_file)})

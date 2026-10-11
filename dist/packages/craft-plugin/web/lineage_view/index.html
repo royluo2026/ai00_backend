@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+
+<script src="/web/core/dialogs.js?rev=20260922-unified-1"></script>
+
   <script src="/web/core/business_facade.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,8 +36,9 @@
     })();
   </script>
   <script src="/web/components/iframe_error_bridge.js"></script>
-  <link rel="stylesheet" href="/assets/index-30efa611.css">
-  <link rel="stylesheet" href="/assets/main-921414fe.css">
+  <link rel="stylesheet" href="/assets/index-858e4a5d.css">
+  <link rel="stylesheet" href="/assets/dialogs-e48cd6c5.css">
+  <link rel="stylesheet" href="/assets/main-66a85af0.css">
   <link rel="stylesheet" href="/assets/import_export-97b455f2.css">
 </head>
 <body style="background:#eff1f5">
@@ -308,6 +312,28 @@
       </svg>
       适应全局
     </button>
+    <!-- 布局视图专用：W10 演示工艺关系（仅超管可见）-->
+    <div class="lv-compare-wrap" id="lvDemoRelationWrap" style="display:none">
+      <button class="lv-btn lv-btn-sm" id="lvDemoRelationBtn" title="演示连接：agent 按编码自动连接 工位→工序→操作→装配零件（仅搬数据，不播放）">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+        演示连接
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="lv-compare-menu lv-dropdown" id="lvDemoRelationMenu" style="display:none"></div>
+    </div>
+    <span class="lv-demo-status" id="lvDemoStatus" style="display:none" title=""><i class="lv-demo-dot"></i><em>未连接</em></span>
+    <button class="lv-btn lv-btn-sm" id="lvDemoPlayBtn" style="display:none" title="播放演示：工艺卡逐个长出；播放中点击=暂停/继续，停止请用画布顶部控制条">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+      <span>播放演示</span>
+    </button>
+    <button class="lv-btn lv-btn-sm" id="lvDemoSpeedBtn" style="display:none" title="演示速度：正常（点击切换2倍速）">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 15 15"/><path d="M9 2h6"/></svg>
+      <span>1x</span>
+    </button>
+    <button class="lv-btn lv-btn-sm" id="lvDemoResetBtn" style="display:none" title="演示：把工序全部移回待连接工序区（仅影响演示数据，可反复演示）">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+      恢复待连接
+    </button>
     <!-- 编辑按钮（暂隐藏）
     <button class="lv-btn lv-btn-sm" id="lvLayoutEditBtn" style="display:none" title="编辑模式">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -507,8 +533,8 @@
   <script src="/web/components/miller_columns.js?v=20260623"></script>
   <script src="/web/components/diff_nav_tree.js?v=20260623"></script>
   <script src="staging_panel.js?v=20260902r"></script>
-  <script src="assoc_panel.js?v=20260623"></script>
-  <script src="layout_detail_panel.js?v=20260908b"></script>
+  <script src="assoc_panel.js?v=20260930-demo-progress"></script>
+  <script src="layout_detail_panel.js"></script>
   
   <style>
     /* 桥接 import_export.css 的 CSS 变量到 lineage 主题体系 */
@@ -537,13 +563,13 @@
   </style>
   <script src="/web/components/import_export.js"></script>
   <script src="/web/shared/lv_utils.js?v=20260623"></script>
-  <script src="lineage_version_mgr.js?v=20260914c"></script>
-  <script src="lifecycle_panel.js?v=20260914c"></script>
-  <script src="lineage_load_coordinator.js?v=20260818"></script>
+  <script src="lineage_version_mgr.js?v=20260930a"></script>
+  <script src="lifecycle_panel.js?v=20260930a"></script>
+  <script src="lineage_load_coordinator.js"></script>
   <script src="lineage_projection_store.js?v=20260818"></script>
-  <script src="lineage_progressive_loader.js?v=20260914c"></script>
-  <script src="lineage.js?v=20260914c"></script>
-  <script src="layout_mode.js?v=20260914c"></script>
+  <script src="lineage_progressive_loader.js?v=20260930a"></script>
+  <script src="lineage.js?v=20261008-browser-pictures-2"></script>
+  <script src="layout_mode.js?v=20260930a"></script>
 
   <!-- ═══ LV: 新建 / 导入 BOP Modal ═══ -->
   <div id="lv-modal-create" class="lv-modal-overlay hidden">

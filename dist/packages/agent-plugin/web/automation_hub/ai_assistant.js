@@ -1533,9 +1533,9 @@
     if (_wfCanvas) _wfCanvas._mode = next;
   }
 
-  function _wfcSave() {
+  async function _wfcSave() {
     if (!_wfCanvas) return;
-    const name = prompt('保存为（名称）：', '画布 ' + new Date().toLocaleString('zh-CN', {hour:'2-digit', minute:'2-digit'}));
+    const name = (await window.AI00Dialogs.prompt('保存为（名称）：', '画布 ' + new Date().toLocaleString('zh-CN', {hour:'2-digit', minute:'2-digit'})));
     if (!name) return;
     const ownerGid = _getUserGid() || 'local';
     _wfCanvas.save(name, ownerGid).then(res => {
@@ -1549,7 +1549,7 @@
     if (!_wfCanvas) { _ensureWfCanvas(); }
     const ownerGid = _getUserGid() || 'local';
     const saves = await _wfCanvas.listSaves(ownerGid);
-    if (saves.length === 0) { alert('暂无保存的画布'); return; }
+    if (saves.length === 0) { (await window.AI00Dialogs.alert('暂无保存的画布')); return; }
     _showWfcSavesModal(saves, ownerGid);
   }
 
@@ -1798,10 +1798,10 @@
       <span class="ai-topic-status ${topic.status}">${topic.status === 'resolved' ? '已解决' : '进行中'}</span>
       <button class="ai-topic-act-btn" data-act="resolve" title="${topic.status === 'resolved' ? '重新打开' : '标记解决'}">✓</button>
       <button class="ai-topic-act-btn danger" data-act="delete" title="删除话题">×</button>`;
-    hdr.addEventListener('click', e => {
+    hdr.addEventListener('click', async e => {
       const act = e.target.closest('[data-act]')?.dataset.act;
       if (act === 'resolve') { e.stopPropagation(); _resolveTopic(topic.id); return; }
-      if (act === 'delete')  { e.stopPropagation(); if (confirm('删除此话题？')) _deleteTopic(topic.id); return; }
+      if (act === 'delete')  { e.stopPropagation(); if ((await window.AI00Dialogs.confirm('删除此话题？'))) _deleteTopic(topic.id); return; }
       topic.collapsed = !topic.collapsed;
       el.classList.toggle('collapsed', topic.collapsed);
     });
@@ -1828,8 +1828,8 @@
     const addBtn = document.createElement('button');
     addBtn.className = 'ai-topic-add-q';
     addBtn.textContent = '+ 添加问题';
-    addBtn.addEventListener('click', () => {
-      const text = prompt('输入问题：');
+    addBtn.addEventListener('click', async () => {
+      const text = (await window.AI00Dialogs.prompt('输入问题：'));
       if (text?.trim()) _addQuestion(topic.id, text.trim(), null);
     });
     body.appendChild(addBtn);
@@ -1860,8 +1860,8 @@
       addOpt.className = 'ai-opt-chip';
       addOpt.style.cssText = 'border-style:dashed;opacity:.6;';
       addOpt.textContent = '+ 选项';
-      addOpt.addEventListener('click', () => {
-        const text = prompt('输入选项文本：');
+      addOpt.addEventListener('click', async () => {
+        const text = (await window.AI00Dialogs.prompt('输入选项文本：'));
         if (text?.trim()) _addOption(topic.id, q.id, text.trim(), 'user');
       });
       optWrap.appendChild(addOpt);
@@ -1884,12 +1884,12 @@
     const actions = document.createElement('div');
     actions.className = 'ai-q-actions';
     [
-      ['回复', () => {
-        const text = prompt('输入子问题：');
+      ['回复', async () => {
+        const text = (await window.AI00Dialogs.prompt('输入子问题：'));
         if (text?.trim()) _addQuestion(topic.id, text.trim(), q.id);
       }, false],
       [q.status === 'resolved' ? '重开' : '✓解决', () => _resolveQuestion(topic.id, q.id), false],
-      ['删除', () => { if (confirm('删除此问题？')) _deleteQuestion(topic.id, q.id); }, true],
+      ['删除', async () => { if ((await window.AI00Dialogs.confirm('删除此问题？'))) _deleteQuestion(topic.id, q.id); }, true],
     ].forEach(([label, fn, isDanger]) => {
       const b = document.createElement('button');
       b.className = 'ai-q-act-btn' + (isDanger ? ' danger' : '');
@@ -1983,8 +1983,8 @@
   // ── 话题按钮绑定（在 init 时调用） ─────────────────────────────────────────
   function _initDiscussionPanel() {
     document.getElementById('aiDiscOrganizeBtn')?.addEventListener('click', _organizeToCanvas);
-    document.getElementById('aiDiscAddBtn')?.addEventListener('click', () => {
-      const title = prompt('话题标题：');
+    document.getElementById('aiDiscAddBtn')?.addEventListener('click', async () => {
+      const title = (await window.AI00Dialogs.prompt('话题标题：'));
       if (title?.trim()) _createTopic(title.trim(), 'user');
     });
     document.getElementById('aiDiscExportBtn')?.addEventListener('click', _discExportSession);

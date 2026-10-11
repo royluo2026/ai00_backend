@@ -1,4 +1,8 @@
 import pytest
+import os
+import subprocess
+import sys
+from pathlib import Path
 
 from backend.config import Settings, get_settings
 
@@ -26,6 +30,44 @@ def make_settings(monkeypatch, **overrides):
 def test_port_defaults_to_8080(monkeypatch):
     settings = make_settings(monkeypatch, PORT=None, PUBLIC_URL=None, CORS_ALLOW_ORIGINS=None)
     assert settings.port == 8080
+
+
+def test_explicit_env_file_isolates_profile_and_domain_urls(tmp_path):
+    env_file = tmp_path / "runtime.env"
+    env_file.write_text("TABLE_PREFIX=test_\nUSERS_DB_URL=${STALE_DB_URL}\n", encoding="utf-8")
+    environment = os.environ.copy()
+    environment.update({
+        "ENV_FILE": str(env_file),
+        "AI00_DEPLOY_PROFILE": "production",
+        "TABLE_PREFIX": "pp_",
+        "PUBLIC_URL": "https://workmanship-backend.chehejia.com",
+        "AI00_FACTORY_DB_URL": "mysql://inherited:secret@wrong/db",
+        "STALE_DB_URL": "mysql://inherited:secret@wrong/db",
+    })
+    result = subprocess.run(
+        [sys.executable, "-B", "-c",
+         "import os, backend.config; "
+         "print('|'.join(os.getenv(key, '') for key in "
+         "('AI00_DEPLOY_PROFILE', 'TABLE_PREFIX', 'PUBLIC_URL', "
+         "'AI00_FACTORY_DB_URL', 'USERS_DB_URL')))"] ,
+        env=environment, cwd=Path(__file__).resolve().parents[2],
+        capture_output=True, text=True, check=True,
+    )
+    assert result.stdout.strip() == "|test_|||${STALE_DB_URL}"
+
+
+def test_explicit_env_file_does_not_inherit_migration_check_switch(tmp_path):
+    env_file = tmp_path / "runtime.env"
+    env_file.write_text("AI00_DEPLOY_PROFILE=test\nTABLE_PREFIX=test_\n", encoding="utf-8")
+    environment = os.environ.copy()
+    environment.update({"ENV_FILE": str(env_file), "AI00_REQUIRE_MIGRATIONS": "1"})
+    result = subprocess.run(
+        [sys.executable, "-B", "-c",
+         "import os, backend.config; print(os.getenv('AI00_REQUIRE_MIGRATIONS', ''))"],
+        env=environment, cwd=Path(__file__).resolve().parents[2],
+        capture_output=True, text=True, check=True,
+    )
+    assert result.stdout.strip() == ""
 
 
 def test_public_url_trims_trailing_slash(monkeypatch):
@@ -92,6 +134,23 @@ def test_saved_feishu_config_overrides_env(monkeypatch, tmp_path):
     assert settings.feishu_app_id == 'saved-app-id'
     assert settings.feishu_app_secret == 'saved-app-secret'
     assert settings.feishu_redirect_uri == 'https://saved.example.com/callback'
+
+
+def test_managed_profile_does_not_use_desktop_saved_database_or_oauth(monkeypatch, tmp_path):
+    config_dir = tmp_path / ".ai00" / "config"
+    config_dir.mkdir(parents=True)
+    (config_dir / "system.json").write_text(
+        '{"cloud_db_config":{"host":"wrong","user":"saved","password":"secret","collab_db":"wrong"},'
+        '"feishu_config":{"app_id":"saved-app","app_secret":"saved-secret"},'
+        '"ois_config":{"identify":"saved-bucket"}}',
+        encoding="utf-8",
+    )
+    monkeypatch.setattr("backend.config.Path.home", lambda: tmp_path)
+    settings = make_settings(monkeypatch, AI00_DEPLOY_PROFILE="test")
+    assert settings.users_db_url == REQUIRED_ENV["USERS_DB_URL"]
+    assert settings.feishu_app_id == REQUIRED_ENV["FEISHU_APP_ID"]
+    assert settings.feishu_app_secret == REQUIRED_ENV["FEISHU_APP_SECRET"]
+    assert settings.ois_identify != "saved-bucket"
 
 
 def test_cloud_db_url_builder_encodes_mysql_credentials():

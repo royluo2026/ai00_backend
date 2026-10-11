@@ -105,6 +105,10 @@ RUNTIME_CONFIG_OUTPUT = obj({
 })
 
 CAPABILITY_IDS = (
+    'agent.orchestration.organization.panorama.read', 'agent.orchestration.organization.panorama.create',
+    'agent.orchestration.organization.graph.read', 'agent.orchestration.organization.graph.save',
+    'agent.orchestration.organization.version.publish',
+    'agent.orchestration.organization.version.revise',
     "agent.audit.read", "agent.audit.record", "agent.flow.change.apply", "agent.flow.read",
     "agent.interaction.request", "agent.interaction.cancel", "agent.memory.change.apply", "agent.memory.read", "agent.runtime.config.read", "agent.tool_catalog.read", "agent.script.generate",
     "agent.run.change.apply", "agent.run.read", "agent.session.change.apply", "agent.session.read",
@@ -160,6 +164,39 @@ _GRAPH_OUTPUT = obj({
     "item_edges": {"type": "array", "maxItems": 2000, "items": obj({"gid": STRING, "source_item_gid": STRING, "target_item_gid": STRING, "relation_type": STRING, "sequence_no": {"type": "integer"}})},
     "capability_bindings": {"type": "array", "maxItems": 4000, "items": obj({"gid": STRING, "source_item_gid": STRING, "capability_version_gid": STRING, "purpose": STRING, "input_mapping": BOUNDED_MAP, "output_mapping": BOUNDED_MAP, "authorization_scope": BOUNDED_MAP, "timeout_seconds": {"type": "integer"}, "retry_policy": BOUNDED_MAP, "fallback_policy": BOUNDED_MAP, "evidence_policy": BOUNDED_MAP}, required=("gid", "source_item_gid", "capability_version_gid", "purpose", "input_mapping", "output_mapping", "authorization_scope", "timeout_seconds", "retry_policy", "fallback_policy", "evidence_policy"))},
     "context_bindings": {"type": "array", "maxItems": 4000, "items": obj({"gid": STRING, "source_item_gid": STRING, "ref_type": STRING, "ref_gid": STRING, "ref_version": {"type": ["string", "null"]}, "snapshot_gid": {"type": ["string", "null"]}, "purpose": STRING})},
+})
+# Keep Gateway DTOs closed while deriving workspace extensions from their
+# Agent-owned contracts. Inline local refs because the DTO is embedded.
+from ..orchestration.workspace_model import WorkspaceDefinition, Implementation, SemanticType, RelationType
+def _inline_model_schema(model):
+    schema = model.model_json_schema()
+    definitions = schema.pop('$defs', {})
+    def inline(value):
+        if isinstance(value, list): return [inline(item) for item in value]
+        if not isinstance(value, dict): return value
+        if '$ref' in value:
+            return inline(definitions[value['$ref'].rsplit('/', 1)[-1]])
+        result = {key:inline(item) for key,item in value.items()}
+        if result.get('type') == 'object' and isinstance(result.get('additionalProperties'), dict):
+            result['patternProperties'] = {'^[A-Za-z0-9_.:-]{1,128}$': result['additionalProperties']}
+            result['additionalProperties'] = False
+            result['maxProperties'] = 500
+        elif result.get('type') == 'object' and result.get('additionalProperties') is True:
+            result = obj({'name': STRING, 'key': STRING, 'data_type': {'type':'string'}, 'unit': {'type':'string'}, 'value': VALUE})
+        return result
+    return inline(schema)
+_GRAPH_OUTPUT['properties']['workspace'] = {'anyOf': [_inline_model_schema(WorkspaceDefinition), {'type':'null'}]}
+_node_properties = _GRAPH_OUTPUT['properties']['nodes']['items']['properties']
+_node_properties.update({
+    'home_scope_gid': {'type':['string','null']},
+    'semantic_type': {'type':'string','enum':['target','decision','action','object','measurement','compare','disturbance','uncertainty']},
+    'implementation': _inline_model_schema(Implementation),
+})
+for _port_dimension in ('inputs','outputs'):
+    _node_properties[_port_dimension]['items']['properties'].update({'key':STRING,'data_type':{'type':'string'},'unit':{'type':'string'}})
+_GRAPH_OUTPUT['properties']['edges']['items']['properties'].update({
+    'relation_semantics': {'type':['string','null'],'enum':['sequence','data','control','measurement','feedback','feedforward','disturbance','association',None]},
+    'source_port_key': {'type':['string','null']}, 'target_port_key': {'type':['string','null']},
 })
 _ORCHESTRATION_OUTPUT = obj({
     "graph": _GRAPH_OUTPUT,
@@ -287,5 +324,28 @@ INPUT_SCHEMAS["agent.interaction.cancel"] = obj({"session_gid": STRING}, require
 OUTPUT_SCHEMAS["agent.interaction.cancel"] = obj({"ok": {"type": "boolean"}, "session_gid": STRING}, required=("ok", "session_gid"))
 INPUT_SCHEMAS["agent.interaction.chat.change.apply"] = obj({"operation": {"type": "string", "enum": ["chat_stream", "chat_sync", "confirm", "confirm_sync"]}, "body": {"type": "object", "additionalProperties": True}, "ai00_token": STRING}, required=("operation", "body"))
 OUTPUT_SCHEMAS["agent.interaction.chat.change.apply"] = obj({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
+
+_ORG_PREFIX = 'agent.orchestration.organization.'
+_ORG_PANORAMA = obj({
+    **_ORCHESTRATION_ITEM['properties'],
+    'version_status': {'type': 'string', 'enum': ['draft', 'published']},
+    'version_revision': REVISION,
+}, required=(*_ORCHESTRATION_ITEM['required'], 'version_status', 'version_revision'))
+INPUT_SCHEMAS.update({
+    _ORG_PREFIX+'panorama.read': obj({}),
+    _ORG_PREFIX+'panorama.create': obj({'name': {'type':'string','minLength':1,'maxLength':255}}, required=('name',)),
+    _ORG_PREFIX+'graph.read': obj({'version_gid': STRING,'projection':{'type':'string','enum':['directory','view','node','full']},'view_gid':STRING,'node_gid':STRING,'expected_revision':REVISION}, required=('version_gid',)),
+    _ORG_PREFIX+'graph.save': obj({'version_gid': STRING, 'expected_revision': REVISION, 'graph': _GRAPH_OUTPUT}, required=('version_gid','expected_revision','graph')),
+    _ORG_PREFIX+'version.publish': obj({'version_gid': STRING, 'expected_revision': REVISION}, required=('version_gid','expected_revision')),
+    _ORG_PREFIX+'version.revise': obj({'version_gid': STRING, 'expected_revision': REVISION}, required=('version_gid','expected_revision')),
+})
+OUTPUT_SCHEMAS.update({
+    _ORG_PREFIX+'panorama.read': obj({'panorama': {'anyOf': [_ORG_PANORAMA, {'type':'null'}]}, 'can_edit': {'type':'boolean'}}, required=('panorama','can_edit')),
+    _ORG_PREFIX+'panorama.create': obj({'panorama_gid': STRING, 'version_gid': STRING, 'revision': REVISION}, required=('panorama_gid','version_gid','revision')),
+    _ORG_PREFIX+'version.revise': obj({'version_gid':STRING,'revision':REVISION,'parent_version_gid':STRING},required=('version_gid','revision','parent_version_gid')),
+    **{_ORG_PREFIX+suffix: OUTPUT_SCHEMAS['agent.orchestration.'+suffix] for suffix in ('graph.read','graph.save','version.publish')},
+})
+
+OUTPUT_SCHEMAS[_ORG_PREFIX+'graph.read'] = obj({'graph':_GRAPH_OUTPUT,'complete':{'type':'boolean'},'revision':REVISION,'loaded_view_gids':{'type':'array','maxItems':1000,'items':STRING},'loaded_node_gids':{'type':'array','maxItems':500,'items':STRING}},required=('graph',))
 
 __all__ = ["CAPABILITY_IDS", "INPUT_SCHEMAS", "OUTPUT_SCHEMAS"]

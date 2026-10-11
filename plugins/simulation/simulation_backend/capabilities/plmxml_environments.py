@@ -29,6 +29,7 @@ from ..domain.plmxml_environment_codec import (
 )
 from ..domain.plmxml_projection import PlmxmlError, PlmxmlLimits, PlmxmlStructureError, parse_plmxml
 from ..application.environment_materialization import EnvironmentMaterializationError, build_runtime_package
+from ..application.demo_environment_labels import anonymous_runtime_model
 
 
 class _Artifacts:
@@ -366,7 +367,7 @@ class PlmxmlEnvironmentProvider:
         tenant_gid,actor_gid=_scope(context); workspace_gid=str(payload.get("workspace_gid") or "")
         try: model=self.repository.load_environment_runtime_model(workspace_gid=workspace_gid,tenant_gid=tenant_gid,actor_gid=actor_gid)
         except WorkspaceRepositoryError as exc: raise CapabilityBusinessError(str(exc),str(exc)) from exc
-        result=export_environment_plmxml(model)
+        result=export_environment_plmxml(anonymous_runtime_model(model,context.user_gid))
         try: ref=self.artifacts.create(result.content,"application/plmxml+xml",context)
         except (ArtifactError,ValueError) as exc: raise CapabilityBusinessError("plmxml_artifact_unavailable","plmxml_artifact_unavailable") from exc
         return _output({"workspace_gid":workspace_gid,"artifact_ref":ref,"semantic_hash":result.semantic_hash,"report":dict(result.report)},"plmxml_environment_exported",workspace_gid)
@@ -397,7 +398,7 @@ class PlmxmlEnvironmentProvider:
             runtime_model = runtime_model_from_dict(runtime_raw)
             if runtime_model.environment_gid != workspace_gid:
                 raise WorkspaceRepositoryError("frozen_runtime_model_mismatch")
-            source={"runtime_model":runtime_model,"version_gid":version_gid,
+            source={"runtime_model":anonymous_runtime_model(runtime_model,context.user_gid),"version_gid":version_gid,
                     "connector_device_id":str(connector_device_id or "") or None}
             package=build_runtime_package(source)
             top_ref=self.artifacts.create(package.top_level_content,"application/plmxml+xml",context)

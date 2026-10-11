@@ -18,27 +18,40 @@ internal static class VisMockupDocumentOpen
         {
             try { acquired = gate.WaitOne(TimeSpan.FromMinutes(3)); }
             catch (AbandonedMutexException) { acquired = true; }
-            if (!acquired) throw new ConnectorNoEffectException("vismockup_document_limit_unverifiable");
+            if (!acquired) throw PreflightFailure("lock_timeout", processId);
             int count;
             try { count = application.OpenDocumentCount; }
             catch (Exception error)
             {
-                Console.Error.WriteLine($"AI00_DOCUMENT_COUNT_FAILED:{(error is ConnectorException native ? native.Code : error.GetType().Name)}");
-                throw new ConnectorNoEffectException("vismockup_document_limit_unverifiable");
+                throw PreflightFailure("count_read", processId, error);
             }
-            if (count < 0) throw new ConnectorNoEffectException("vismockup_document_limit_unverifiable");
+            if (count < 0) throw PreflightFailure("count_invalid", processId);
             if (count >= MaximumDocuments)
                 return ReuseExisting(application, path, processId)
                     ?? throw new ConnectorNoEffectException("vismockup_document_limit_exceeded");
             try { application.VerifyDocumentOpenScope(); }
-            catch
+            catch (Exception error)
             {
                 return ReuseExisting(application, path, processId)
-                    ?? throw new ConnectorNoEffectException("vismockup_document_limit_unverifiable");
+                    ?? throw PreflightFailure("scope_read", processId, error);
             }
             return create is null ? application.OpenDocument(path) : create();
         }
         finally { if (acquired) gate.ReleaseMutex(); }
+    }
+
+    private static ConnectorNoEffectException PreflightFailure(string stage, int? processId, Exception? cause = null)
+    {
+        var error = new ConnectorNoEffectException("vismockup_document_limit_unverifiable");
+        error.Data["preflight_stage"] = stage;
+        Console.Error.WriteLine("AI00_DOCUMENT_PREFLIGHT_FAILED:" + System.Text.Json.JsonSerializer.Serialize(new
+        {
+            stage, process_id = processId, error_type = cause?.GetType().Name,
+            error_code = cause is ConnectorException native ? native.Code :
+                cause is ConnectorNoEffectException rejected ? rejected.Code : null,
+            hresult = cause?.HResult
+        }));
+        return error;
     }
 
     private static IVisMockupDocument? ReuseExisting(IVisMockupApplication application, string path, int? processId)

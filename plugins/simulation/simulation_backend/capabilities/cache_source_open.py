@@ -6,6 +6,9 @@ from contextlib import nullcontext
 from datetime import timedelta
 import json
 import hashlib
+import logging
+import traceback
+from pathlib import Path
 from threading import RLock
 from time import monotonic
 import jsonschema
@@ -41,6 +44,12 @@ INSPECT_OUTPUT = obj(dict(identity=IDENTITY,materialization_hash=HASH,node_count
     next_cursor={'type':['integer','null'],'minimum':0}))
 NODE_MAP = {'type':'object','patternProperties':{'.+':obj(dict(instance_id=TEXT,parent_node_key={'type':['string','null']}))},'additionalProperties':False}
 OPEN_OUTPUT = obj(dict(operation_id=TEXT,package_hash=HASH,node_map=NODE_MAP,excluded=EXCLUDED,identity=IDENTITY))
+
+def _log_materialization_error(error):
+    from pydantic import ValidationError
+    fields = [dict(location=list(item['loc']),type=item['type']) for item in error.errors(include_input=False,include_context=False,include_url=False)[:10]] if isinstance(error,ValidationError) else []
+    frames = [(Path(frame.filename).name,frame.lineno) for frame in traceback.extract_tb(error.__traceback__)[-5:]]
+    logging.getLogger(__name__).warning('cache materialization rejected: exception=%s fields=%s frames=%s',type(error).__name__,fields,frames)
 
 class CacheSourceOpenProvider:
     open_operation="vismockup.model.open@2"
@@ -192,6 +201,8 @@ class CacheSourceOpenProvider:
         try:return self._prepare(payload,context)
         except (CacheError,ConnectorError,WorkspaceRepositoryError,ValueError,KeyError,TypeError) as exc:
             code=str(exc) if isinstance(exc,(CacheError,ConnectorError,WorkspaceRepositoryError)) else 'cache_materialization_invalid'
+            if code == 'cache_materialization_invalid':
+                _log_materialization_error(exc)
             raise CapabilityBusinessError(code,code) from exc
 
     def _prepare(self,payload,context):

@@ -133,22 +133,22 @@ async function approveOrder() {
     await loadOrders();
     await selectOrder(_selected.gid);
   } else {
-    alert('操作失败：' + (res?.error || '未知错误'));
+    (await window.AI00Dialogs.alert('操作失败：' + (res?.error || '未知错误')));
   }
 }
 
 async function rejectOrder() {
   if (!_selected) return;
   const comment = document.getElementById('approval-remark').value.trim();
-  if (!comment) { alert('驳回请填写审批意见'); return; }
+  if (!comment) { (await window.AI00Dialogs.alert('驳回请填写审批意见')); return; }
   const expectedRevision = _selected.revision;
   if (!Number.isInteger(expectedRevision) || expectedRevision < 1) {
-    alert('审批单版本无效，请刷新后重试');
+    (await window.AI00Dialogs.alert('审批单版本无效，请刷新后重试'));
     return;
   }
   const capabilityClient = window.parent?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient;
   if (!capabilityClient?.invoke) {
-    alert('操作失败：审批能力客户端未就绪');
+    (await window.AI00Dialogs.alert('操作失败：审批能力客户端未就绪'));
     return;
   }
   const payload = {
@@ -164,10 +164,10 @@ async function rejectOrder() {
     const confirmation = _rejectionOperation
       ? '存在待协调的驳回请求。确认以当前意见发起新的驳回操作？'
       : '确认驳回该审批单？';
-    if (!window.confirm(confirmation)) return;
+    if (!(await window.AI00Dialogs.confirm(confirmation))) return;
     const operationId = window.crypto?.randomUUID?.();
     if (!operationId) {
-      alert('操作失败：无法创建驳回操作标识');
+      (await window.AI00Dialogs.alert('操作失败：无法创建驳回操作标识'));
       return;
     }
     _rejectionOperation = Object.freeze({
@@ -183,15 +183,15 @@ async function rejectOrder() {
     });
   } catch (error) {
     if (error?.code === 'outcome_unknown') {
-      alert('驳回结果待协调，请刷新后确认审批单状态');
+      (await window.AI00Dialogs.alert('驳回结果待协调，请刷新后确认审批单状态'));
       return;
     }
-    alert('操作失败：' + (error?.message || '未知错误'));
+    (await window.AI00Dialogs.alert('操作失败：' + (error?.message || '未知错误')));
     return;
   }
   if (res?.order_gid !== _selected.gid || res?.status !== 'rejected' ||
       !Number.isInteger(res?.revision) || !res?.notification_event_gid) {
-    alert('驳回结果待协调，请刷新后确认审批单状态');
+    (await window.AI00Dialogs.alert('驳回结果待协调，请刷新后确认审批单状态'));
     return;
   }
   _rejectionOperation = null;
@@ -207,7 +207,7 @@ async function withdrawOrder() {
     await loadOrders();
     await selectOrder(_selected.gid);
   } else {
-    alert('操作失败：' + (res?.error || '未知错误'));
+    (await window.AI00Dialogs.alert('操作失败：' + (res?.error || '未知错误')));
   }
 }
 

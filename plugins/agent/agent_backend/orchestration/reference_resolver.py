@@ -44,13 +44,18 @@ class ReferenceResolver:
             self._lookups["capability"] = capability_lookup
 
     def resolve_many(self, refs: list[dict[str, str]], actor_gid: str) -> list[dict[str, Any]]:
-        cache: dict[tuple[str, str], dict[str, Any]] = {}
+        cache: dict[tuple[str, str, str | None], dict[str, Any]] = {}
         result = []
         for ref in refs:
             ref_type, ref_gid = ref["ref_type"], ref["ref_gid"]
-            key = (ref_type, ref_gid)
+            bound_version = ref.get('ref_version')
+            key = (ref_type, ref_gid, bound_version)
             if key not in cache:
                 cache[key] = self._resolve(ref_type, ref_gid, actor_gid)
+                if bound_version is not None:
+                    cache[key]['bound_version'] = bound_version
+                    cache[key]['resolved'] = bool(cache[key]['resolved'] and cache[key].get('version') == bound_version)
+                    cache[key]['check_status'] = 'matched' if cache[key]['resolved'] else 'version_unverified'
             result.append(dict(cache[key]))
         return result
 

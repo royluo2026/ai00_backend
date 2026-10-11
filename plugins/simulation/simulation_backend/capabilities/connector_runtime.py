@@ -88,6 +88,7 @@ DESKTOP_CAPABILITY_BINDINGS = (
     ("simulation.environment.live_document.binding.get", 1),
     ("simulation.environment.live_document.rebind", 1),
     ("simulation.environment.live_document.resume_online", 1),
+    ("simulation.environment.cache_source.live_document.resume", 1),
     ("simulation.environment.online_source.live_document.bind", 1),
     ("simulation.environment.online_source.live_document.bind", 2),
     ("simulation.environment.online_source.live_document.bind", 3),

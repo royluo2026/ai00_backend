@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "registry_version": 1,
-  "table_count": 382,
+  "table_count": 385,
   "tables": [
     {
       "table": "workmanship_agent_canvas_audit_events",
@@ -2300,6 +2300,18 @@
       "owner": "project_management",
       "runtime_domain": "project_management",
       "legacy_name": true
+    },
+    {
+      "table": "workmanship_agent_orch_organization_roots",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_agent_orch_workspaces",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "legacy_name": false
     }
   ]
 }

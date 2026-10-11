@@ -51,5 +51,14 @@ require('./teamcenter_online_source.js');
   await globalThis.AI00TeamcenterOnlineSource.openOnline(connector,source,'insert');
   assert.deepEqual(actions.map(item=>item[0]),[
     'simulation.teamcenter.visualization.launch.request','simulation.teamcenter.visualization.insert.request']);
+  const cached=[];
+  await globalThis.AI00TeamcenterOnlineSource.openOnline(async(...args)=>{cached.push(args);return{};},source,'new',
+    {batch_id:'a'.repeat(32),node_key:'occ-1'});
+  await globalThis.AI00TeamcenterOnlineSource.openOnline(async(...args)=>{cached.push(args);return{};},source,'insert',
+    {batch_id:'a'.repeat(32),node_key:'occ-1'});
+  assert.deepEqual(cached.map(([,payload,options])=>[payload,options.version]),[
+    [{cache_source:{batch_id:'a'.repeat(32),node_key:'occ-1'},expected_visdoc_uid:''},3],
+    [{cache_source:{batch_id:'a'.repeat(32),node_key:'occ-1'},expected_visdoc_uid:''},2],
+  ]);
   console.log('teamcenter_online_source tests passed');
 })().catch(error=>{console.error(error);process.exitCode=1;});

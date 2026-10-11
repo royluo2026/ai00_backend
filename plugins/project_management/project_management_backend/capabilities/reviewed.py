@@ -315,6 +315,7 @@ def register_project_get_v2(registry: Any) -> None:
     import json
     from backend.capability_v2.provider_contracts import CapabilityBusinessError
     from backend.platform_sdk.project_access import can_manage_project
+    from backend.platform_sdk.access import team_in_access_scope
 
     def handler(payload, context):
         result = _atomic_handler('project.project.read', 'projects.get')(payload, context)
@@ -324,7 +325,7 @@ def register_project_get_v2(registry: Any) -> None:
             from types import SimpleNamespace
             from ..application.org_management import _project_tenant
             project['team_id'] = _project_tenant(SimpleNamespace(project=lambda _: project), project['gid'], context)
-        if str(project.get('team_id') or '') != str(context.team_gid or ''):
+        if not team_in_access_scope(context.user_gid, context.team_gid, str(project.get('team_id') or '')):
             raise CapabilityBusinessError('forbidden', 'The project is outside the active tenant.')
         if not (roles & {'super_admin', 'team_admin'} or str(project.get('owner_gid')) == context.user_gid
                 or project.get('share_scope') in ('team', 'global') or can_manage_project(context.user_gid, project['gid'])):

@@ -172,7 +172,7 @@ function closeProjectDialog() {
 }
 async function confirmProjectDialog() {
   const name = document.getElementById('inputName').value.trim();
-  if (!name) { alert('项目名称不能为空'); return; }
+  if (!name) { (await window.AI00Dialogs.alert('项目名称不能为空')); return; }
   const vmGid = document.getElementById('selectVehicle').value;
   const factoryGid = document.getElementById('selectFactory').value;
 
@@ -203,7 +203,7 @@ function closeTaskDialog() {
 }
 async function confirmTaskDialog() {
   const title = document.getElementById('taskTitle').value.trim();
-  if (!title) { alert('任务标题不能为空'); return; }
+  if (!title) { (await window.AI00Dialogs.alert('任务标题不能为空')); return; }
   const priority = document.getElementById('taskPriority').value;
   const due      = document.getElementById('taskDue').value;
 
@@ -211,7 +211,7 @@ async function confirmTaskDialog() {
     await apiCapability('project.task.change.apply.atomic.tasks_create', {
       title, project_gid: _selectedProject.gid, priority, due_date: due || null,
     });
-  } catch (e) { alert('创建失败: ' + (e?.message || e)); return; }
+  } catch (e) { (await window.AI00Dialogs.alert('创建失败: ' + (e?.message || e))); return; }
   closeTaskDialog();
   await loadTasksForProject(_selectedProject.gid);
 }
@@ -284,7 +284,7 @@ const STATUS_ADV = { preparing: 'in_progress', in_progress: 'completed', complet
 async function advanceProjectStatus() {
   if (!_selectedProject) return;
   const nextStatus = STATUS_ADV[_selectedProject.status];
-  if (!nextStatus) { alert('当前状态无法继续推进'); return; }
+  if (!nextStatus) { (await window.AI00Dialogs.alert('当前状态无法继续推进')); return; }
   await apiCapability('project.project.change.apply.atomic.projects_update', {
     gid: _selectedProject.gid, updates: { status: nextStatus },
   });
@@ -395,7 +395,7 @@ window._assignLineLead = async function (projectGid, lineGid, currentUserGid, cu
   try {
     let nextUserGid = currentUserGid || '';
     if (currentUserGid) {
-      const clear = confirm('确定清空当前线体管理员吗？点击“取消”可改派他人。');
+      const clear = (await window.AI00Dialogs.confirm('确定清空当前线体管理员吗？点击“取消”可改派他人。'));
       if (clear) {
         await apiCapability('project.member.change.apply', {
           operation: 'members.line_assignment.replace',
@@ -405,7 +405,7 @@ window._assignLineLead = async function (projectGid, lineGid, currentUserGid, cu
         return;
       }
     }
-    nextUserGid = prompt('输入要设为线体管理员的 user_gid') || '';
+    nextUserGid = (await window.AI00Dialogs.prompt('输入要设为线体管理员的 user_gid')) || '';
     if (!nextUserGid.trim()) return;
     await apiCapability('project.member.change.apply', {
       operation: 'members.line_assignment.replace',
@@ -413,7 +413,7 @@ window._assignLineLead = async function (projectGid, lineGid, currentUserGid, cu
     });
     await loadProjectMembers(projectGid);
   } catch (e) {
-    alert('授权失败：' + (e.message || String(e)));
+    (await window.AI00Dialogs.alert('授权失败：' + (e.message || String(e))));
   }
 };
 

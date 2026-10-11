@@ -56,3 +56,14 @@ def get_craft_conn():
 
 
 get_conn = get_craft_conn
+
+
+def open_craft_transaction():
+    """Return an explicitly begun transaction whose lifecycle belongs to Gateway."""
+    conn = wrap_connection(_get_pool().connection())
+    try:
+        conn.begin()
+    except BaseException:
+        conn.close()
+        raise
+    return conn

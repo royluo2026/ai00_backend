@@ -159,7 +159,7 @@ const file=await window.AI00Business.resolveArtifactPath(path);let result;
           saveBtn.textContent = '已保存';
           setTimeout(() => { saveBtn.textContent = '保存'; saveBtn.disabled = false; }, 1500);
         } catch (e) {
-          alert('保存失败：' + e.message);
+          (await window.AI00Dialogs.alert('保存失败：' + e.message));
           saveBtn.textContent = '保存';
           saveBtn.disabled = false;
         }

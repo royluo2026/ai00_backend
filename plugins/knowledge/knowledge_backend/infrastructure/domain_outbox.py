@@ -5,6 +5,7 @@ import json
 from datetime import UTC, datetime
 
 from backend.capability_v2.domain_events import DomainEventEnvelope
+from backend.platform_sdk.prefixed_connection import wrap_connection
 from ..data.connection import _get_pool
 
 
@@ -15,8 +16,8 @@ class KnowledgeOutboxPoller:
 
     def _connection(self):
         if self._connection_factory is not None:
-            return self._connection_factory()
-        return _get_pool().connection()
+            return wrap_connection(self._connection_factory())
+        return wrap_connection(_get_pool().connection())
 
     @staticmethod
     def _close(connection) -> None:

@@ -1,0 +1,8 @@
+{
+  "programVersion": "1.0.7",
+  "frontendVersions": {
+    "browser": "1.0.3",
+    "desktop": "1.0.3"
+  },
+  "backendVersion": "0.1.0-dev"
+}

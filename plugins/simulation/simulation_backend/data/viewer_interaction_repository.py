@@ -137,20 +137,9 @@ class ViewerInteractionRepository:
             if not document:
                 raise ValueError('interaction_binding_stale' if allocate else 'interaction_scope_denied')
             if document.get('source_kind') == 'teamcenter_cache_snapshot':
-                from ..application.cache_open_evidence import CacheOpenPayload, cache_package_hash
+                from ..application.cache_open_evidence import validated_cache_package_revision
                 try:
-                    envelope = document.get('artifact_ref_json') or {}
-                    envelope = json.loads(envelope) if isinstance(envelope, str) else envelope
-                    if 'tc_open_payload' in envelope:
-                        from ..application.cache_tc_open_contract import TcCacheOpenPayload
-                        package=TcCacheOpenPayload.model_validate(envelope['tc_open_payload']).model_dump()
-                        if package['cache_binding']!=envelope['cache_binding']:raise ValueError('binding mismatch')
-                    else:
-                        package = CacheOpenPayload.model_validate({key: envelope[key] for key in
-                            ('cache_binding', 'artifact_ref', 'package_dependencies', 'package_hash')}).model_dump()
-                    expected = cache_package_hash({key: value for key, value in package.items() if key != 'package_hash'})
-                    if expected != envelope['package_hash'] or expected != 'sha256:' + document['content_sha256']:
-                        raise ValueError('package mismatch')
+                    validated_cache_package_revision(document)
                 except (ValueError, TypeError, KeyError) as exc:
                     raise ValueError('interaction_binding_stale') from exc
             cur.execute('SELECT * FROM workmanship_sim_viewer_source_associations '

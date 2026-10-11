@@ -20,8 +20,9 @@ from dbutils.pooled_db import PooledDB
 
 from backend.config import get_settings
 from backend.capability_v2.domain_resource_config import pool_limits
-from backend.db.table_prefix import configure_table_prefix
-from backend.db.prefixed_cursor import wrap_cursor
+from backend.db.table_prefix import configure_table_prefix, validate_runtime_profile
+from backend.db.prefixed_cursor import wrap_connection
+from backend.base.remote_data_environment import runtime_table_prefix
 
 _pool: Optional[PooledDB] = None
 _log = logging.getLogger("backend.db")
@@ -36,8 +37,17 @@ def init_pool() -> None:
         _pool = None
         _log.info("pytest offline mode: Base database connection pool is disabled")
         return
-    configure_table_prefix(os.getenv("TABLE_PREFIX", ""))
     s = get_settings()
+    if os.getenv("ENV_FILE", "").strip() and not os.getenv("AI00_DEPLOY_PROFILE", "").strip():
+        raise RuntimeError("managed_deployment_requires_explicit_profile")
+    validate_runtime_profile(
+        os.getenv("AI00_DEPLOY_PROFILE", ""),
+        os.getenv("TABLE_PREFIX", ""),
+        s.public_url,
+    )
+    if os.getenv("AI00_DEPLOY_PROFILE", "") == "production" and not os.getenv("ENV_FILE", "").strip():
+        raise RuntimeError("production backend requires ENV_FILE")
+    configure_table_prefix(runtime_table_prefix())
     params = s.get_db_params()
     limits = pool_limits("base")
     _log.info(f"🔌 尝试连接数据库: mysql://{params['host']}:{params['port']}/{params['db']}")
@@ -76,9 +86,7 @@ def get_conn():
         raise RuntimeError(
             "MySQL 不可用，请检查 USERS_DB_URL 配置和数据库连接。"
         )
-    conn = _pool.connection()
-    _orig_cursor = conn.cursor
-    conn.cursor = lambda *a, **k: wrap_cursor(_orig_cursor(*a, **k))
+    conn = wrap_connection(_pool.connection())
     try:
         yield conn
         conn.commit()
@@ -96,10 +104,7 @@ def acquire_connection():
         init_pool()
     if _pool is None:
         raise RuntimeError("MySQL 不可用，无法创建持久化平台仓储。")
-    conn = _pool.connection()
-    _orig_cursor = conn.cursor
-    conn.cursor = lambda *a, **k: wrap_cursor(_orig_cursor(*a, **k))
-    return conn
+    return wrap_connection(_pool.connection())
 
 
 def get_pool_status() -> dict:

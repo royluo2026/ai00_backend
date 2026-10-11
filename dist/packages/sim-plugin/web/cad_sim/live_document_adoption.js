@@ -1,9 +1,11 @@
 (function (root) {
   'use strict';
   const unavailable = '当前连接尚未提供实时文档绑定，暂不能创建；不会导出或重载模型';
+  const trace=(stage,detail)=>{try{root._simulationDebug?.(stage,detail);}catch{}};
 
-  function createAdapter({ readIdentity, readHierarchyInventory, readTree, invoke, getStore, getDisplayName, getNativeView, refreshWorkspace, executeNodeAction, getLocalInteraction, confirmRebind = () => false }) {
+  function createAdapter({ readIdentity, readHierarchyInventory, readTree, invoke, getStore, getDisplayName, getNativeView, refreshWorkspace, executeNodeAction, getLocalInteraction, ensureCachedReady, confirmRebind = () => false }) {
     const pendingTrees = new Map();
+    let nodeActionChain=Promise.resolve();const calibratedDocuments=new WeakMap();
     let controlMappings = new WeakMap();
     const invalidateControlMappings = () => { controlMappings = new WeakMap(); };
     async function readRuntimeIdentity() {
@@ -68,8 +70,47 @@
       if (!valid()) throw Error('document_selection_changed');
       return {...result, structure_verification:'unverified'};
     }
+    async function calibrateLoadedCache({workspaceGid,document,viewer,isCurrent=()=>true}){
+      const store=getStore?.(),workspace=store?.state?.workspace,tree=document?.product_tree,nodes=tree?.nodes,local=getLocalInteraction?.();
+      if(document?.source_kind!=='teamcenter_cache_snapshot'||!Array.isArray(nodes)||!viewer?.node_map||!local||local.state!=='ready'||typeof viewer.visibility_context!=='string'||local.visibilityContext!==viewer.visibility_context)throw Error('cache_document_not_ready');
+      const current=()=>{if(!isCurrent()||store?.state?.workspace!==workspace||String(workspace?.workspace_gid)!==String(workspaceGid)||document.product_tree!==tree||document.product_tree.nodes!==nodes||local.visibilityContext!==viewer.visibility_context||local.state==='outcome_unknown')throw Error('document_selection_changed');};
+      const descriptors=root.AI00ViewerInteraction || (typeof require==='function'?require('./viewer_interaction'):null);
+      const probe={...document,_cacheViewer:viewer},excluded=new Set((viewer.excluded||[]).map(entry=>entry.node_key));
+      const selected=nodes.flatMap(item=>{
+        if(!Object.hasOwn(viewer.node_map,item.cache_node_key)||excluded.has(item.cache_node_key))return [];
+        try{return [{item,descriptor:descriptors.sourceDescriptor(probe,item)}];}catch{return [];}
+      });
+      const observed=new Map();let structureEpoch=null;
+      try{
+        current();
+        for(let offset=0;offset<selected.length;offset+=128){
+          const batch=selected.slice(offset,offset+128);
+          const result=await local.readVisibility({source_nodes:batch.map(entry=>entry.descriptor)});current();
+          if(!Number.isSafeInteger(result?.structure_epoch)||structureEpoch!==null&&result.structure_epoch!==structureEpoch)throw Error('cache_structure_changed');
+          structureEpoch=result.structure_epoch;
+          if(result.visibility_context!==viewer.visibility_context||!Array.isArray(result.nodes)||result.nodes.length!==batch.length)throw Error('document_selection_changed');
+          for(let index=0;index<batch.length;index++){
+            const value=result.nodes[index],{item,descriptor}=batch[index];
+            if(value.source_node_id!==descriptor.source_node_id)throw Error('document_selection_changed');
+            if(value.error_code)continue;
+            if(value.visibility_state==='mixed')observed.set(item,{visible:null,visibility_state:'mixed'});
+            else if(value.visibility_state==='visible'&&value.visible===true||value.visibility_state==='hidden'&&value.visible===false)observed.set(item,{visible:value.visible,visibility_state:value.visibility_state});
+          }
+        }
+        current();
+        const incomplete=descriptors.cacheIncompleteAncestors(viewer);
+        viewer.native_visibility=Object.create(null);
+        for(const item of nodes){
+          const value=observed.get(item)||{visible:null,visibility_state:'unknown'};
+          viewer.native_visibility[item.cache_node_key]={...value};
+          Object.assign(item,incomplete.has(item.cache_node_key)&&value.visibility_state!=='mixed'?{visible:null,visibility_state:'unknown'}:value);
+        }
+        return {calibrated:observed.size,unknown_count:nodes.filter(item=>item.visibility_state==='unknown').length};
+      }catch(error){for(const item of nodes){item.visible=null;item.visibility_state='unknown';}throw error;}
+    }
     return {
       invalidateControlMappings,
+      calibrateLoadedCache,
       readCurrentDocument,
       async reconnectDocument(workspaceGid, {isCurrent = () => true, expectedWindowKey} = {}) {
         const workspaceKey = String(workspaceGid);
@@ -83,14 +124,64 @@
           return {...binding, structure_verification:'unverified'};
         return rebindDocument(workspaceKey, before, binding, {isCurrent, expectedWindowKey});
       },
-      async actOnProductNode({workspaceGid,document,nodeKey,action,isCurrent=()=>true}) {
+      async actOnProductNode({workspaceGid,document,nodeKey,action,isCurrent=()=>true,calibrateOnly=false}) {
         if(!['show','hide','highlight','unhighlight'].includes(action)) throw Error('node_action_unsupported');
         const node=document?.product_tree?.nodes?.find(n=>String(n.node_key)===String(nodeKey));
         const local=getLocalInteraction?.();
+        const cached=document?.source_kind==='teamcenter_cache_snapshot';
+        if(cached&&!node)throw Error('cache_scope_node_not_found');
+        if(cached&&(!local||typeof ensureCachedReady!=='function'))throw Error('cache_document_not_ready');
         if(local){
-          if(!isCurrent()||String(getStore()?.state?.workspace?.workspace_gid)!==String(workspaceGid)
-            ||local.scope?.workspace_gid!==String(workspaceGid)||local.scope?.document_gid!==String(document?.document_gid))throw Error('interaction_scope_mismatch');
+          const workspace=getStore()?.state?.workspace;
+          if(!isCurrent()||String(workspace?.workspace_gid)!==String(workspaceGid))throw Error('interaction_scope_mismatch');
           const descriptors=root.AI00ViewerInteraction || (typeof require==='function'?require('./viewer_interaction'):null);
+          if(typeof local.executeIntent==='function'){
+            if((!cached&&(document?.source_kind!=='teamcenter_online'||!document.source_selector))||!Number.isInteger(workspace.row_version))throw Error('model_node_runtime_identity_unavailable');
+            const pending=nodeActionChain.catch(()=>{}).then(async()=>{
+              const current=()=>{if(!isCurrent()||String(getStore()?.state?.workspace?.workspace_gid)!==String(workspaceGid))throw Error('document_selection_changed');};
+              current();if(local.state==='outcome_unknown')throw Error('outcome_unknown');
+              const cachedReady=cached?await ensureCachedReady(document,node):null;current();
+              const input={scope:{workspace_gid:String(workspaceGid),document_gid:String(document.document_gid),expected_workspace_row_version:getStore().state.workspace.row_version},...(cached?{}:{source_selector:document.source_selector}),source_nodes:[descriptors.sourceDescriptor(document,node)],action};
+              const ready=cached?cachedReady:await local.ensureReady(input);current();
+              if(typeof ready?.visibility_context!=='string'||!ready.visibility_context)throw Error('interaction_visibility_context_invalid');
+              const nodes=document.product_tree.nodes,signature=JSON.stringify(nodes.map(n=>[n.node_key,n.occurrence_path])),prior=calibratedDocuments.get(document);
+              const readback=async()=>{
+                calibratedDocuments.delete(document);
+                for(const item of nodes){item.visible=null;item.visibility_state='unknown';}
+                const byKey=new Map(nodes.map(item=>[String(item.node_key),item])),priority=new Set();let ancestor=node;
+                while(ancestor&&!priority.has(ancestor)&&priority.size<2000){priority.add(ancestor);ancestor=ancestor.parent_key==null?null:byKey.get(String(ancestor.parent_key));}
+                const selected=[...priority,...nodes.filter(item=>!priority.has(item))].slice(0,2000).flatMap(item=>{try{return [{item,descriptor:descriptors.sourceDescriptor(document,item)}];}catch{return [];}}),attempted=new Set(),observed=new Map();
+                for(let offset=0;offset<selected.length;offset+=128){
+                  const batch=selected.slice(offset,offset+128),result=await local.readVisibility({source_nodes:batch.map(entry=>entry.descriptor)});current();
+                  if(document.product_tree.nodes!==nodes)throw Error('document_selection_changed');
+                  if(result.visibility_context!=null&&result.visibility_context!==ready.visibility_context)throw Error('document_selection_changed');
+                  const values=new Map(result.nodes.map(value=>[value.source_node_id,value]));
+                  for(const {item,descriptor}of batch){
+                    attempted.add(descriptor.source_node_id);
+                    const value=values.get(descriptor.source_node_id),state=value?.visibility_state;
+                    if(value?.error_code)continue;
+                    if(state==='mixed')observed.set(item,{visible:null,visibility_state:state});
+                    else if((state==='visible'&&value.visible===true)||(state==='hidden'&&value.visible===false))observed.set(item,{visible:value.visible,visibility_state:state});
+                  }
+                }
+                const incomplete=cached?descriptors.cacheIncompleteAncestors(document._cacheViewer):null;
+                if(cached)document._cacheViewer.native_visibility=Object.create(null);
+                for(const item of nodes){
+                  const native=observed.get(item)||{visible:null,visibility_state:'unknown'};
+                  if(cached)document._cacheViewer.native_visibility[item.cache_node_key]={...native};
+                  Object.assign(item,incomplete?.has(item.cache_node_key)?{visible:null,visibility_state:'unknown'}:native);
+                }
+                calibratedDocuments.set(document,{context:ready.visibility_context,nodes,signature,attempted});
+              };
+              if(calibrateOnly||prior?.context!==ready.visibility_context||prior.nodes!==nodes||prior.signature!==signature||!prior.attempted.has(String(node.node_key))){await readback();return {ok:true,calibrated:true,calibration_unknown:nodes.some(item=>item.visibility_state==='unknown')};}
+              input.scope.expected_workspace_row_version=getStore().state.workspace.row_version;
+              input.visibility_context=ready.visibility_context;
+              let result;try{result=cached?await local.executeCachedIntent({workspace_gid:input.scope.workspace_gid,document_gid:input.scope.document_gid,source_nodes:input.source_nodes,action,visibility_context:ready.visibility_context}):await local.executeIntent(input);}catch(error){if(['visibility_calibration_required','cache_document_not_ready','outcome_unknown'].includes(error?.message)){calibratedDocuments.delete(document);for(const item of nodes){item.visible=null;item.visibility_state='unknown';}}throw error;}current();await readback();
+              const {visible,...confirmed}=result;return {...confirmed,readback:true};
+            });
+            nodeActionChain=pending;return pending;
+          }
+          if(local.scope?.workspace_gid!==String(workspaceGid)||local.scope?.document_gid!==String(document?.document_gid))throw Error('interaction_scope_mismatch');
           return local.execute({source_nodes:[descriptors.sourceDescriptor(document,node)],action});
         }
         const onlineOccurrence=document?.source_kind==='teamcenter_online'
@@ -161,23 +252,27 @@
         const key = `${workspaceKey}:${allowRebind ? 'rebind' : 'strict'}`;
         if (pendingTrees.has(key)) return pendingTrees.get(key);
         const pending = (async () => {
+          trace('live_tree_verification_started',{workspace_gid:workspaceKey});
           const before = await readRuntimeIdentity();
           let binding = await invoke('simulation.environment.live_document.binding.get', { workspace_gid: workspaceKey });
           if (String(binding?.workspace_gid) !== workspaceKey || binding.document_session !== before.document_session) {
+            trace('live_tree_binding_mismatch',{workspace_gid:workspaceKey,level:'warn',reason:allowRebind?'rebind_allowed':'strict_binding_required'});
             if (!allowRebind || !binding?.document_session) throw new Error('document_environment_binding_mismatch');
             binding = await rebindDocument(workspaceKey, before, binding, {refreshStructure:true});
           }
           const outcome = await readTree();
           const after = await readRuntimeIdentity();
           if (after.document_session !== before.document_session) throw new Error('document_session_changed');
+          trace('live_tree_session_verified',{workspace_gid:workspaceKey,reason:'identity_before_after_matches'});
           const step = outcome?.steps?.length === 1 ? outcome.steps[0] : null;
           if (step?.status !== 'succeeded' || !Array.isArray(step.result?.nodes)) throw new Error('vismockup_tree_result_invalid');
           const nodes = step.result.nodes.map((node, index) => ({ ...node, parent_key: node.parent_node_key, child_order: index }));
           const parents = new Set(nodes.map(node => node.parent_key).filter(key => key != null));
+          trace('live_tree_result_verified',{workspace_gid:workspaceKey,node_count:nodes.length,complete:!nodes.some(node=>node.has_more&&!parents.has(node.node_key))});
           return { state: 'ready', nodes, node_count: nodes.length,
             complete: !nodes.some(node => node.has_more && !parents.has(node.node_key)),
             document_session: before.document_session, observed_at: new Date().toISOString() };
-        })().finally(() => pendingTrees.delete(key));
+        })().catch(error=>{trace('live_tree_verification_failed',{workspace_gid:workspaceKey,error_code:error.message});throw error;}).finally(() => pendingTrees.delete(key));
         pendingTrees.set(key, pending);
         return pending;
       },

@@ -37,12 +37,38 @@ from fastapi.staticfiles import StaticFiles
 
 from backend.core.log_setup import setup_logging
 from backend.config import get_settings
+from backend.scripts.managed_entrypoint import adopt_managed_remote_entrypoint
+adopt_managed_remote_entrypoint()
+from backend.frontend_static import legacy_browser_dist
+from backend.release_version import read_backend_source_version
 from backend.db.connection import init_pool
-from backend.db.table_prefix import configure_table_prefix
+from backend.db.table_prefix import configure_table_prefix, validate_runtime_profile
 
 # ── 日志初始化（必须在所有模块 import 之前完成）─────────────────────────────────
 setup_logging(os.getenv("LOG_LEVEL", "INFO"))
-configure_table_prefix(os.getenv("TABLE_PREFIX", ""))
+_deploy_profile = os.getenv("AI00_DEPLOY_PROFILE", "").strip()
+_env_file_name = os.getenv("ENV_FILE", "").strip()
+if _deploy_profile and not _env_file_name:
+    raise RuntimeError("managed_deployment_requires_env_file")
+if _env_file_name and not _deploy_profile:
+    raise RuntimeError("managed_deployment_requires_explicit_profile")
+if _env_file_name:
+    from backend.scripts.runtime_preflight import evaluate as _runtime_preflight
+
+    _env_file = _Path(_env_file_name)
+    if not _env_file.is_absolute():
+        _env_file = _Path(__file__).parent / _env_file
+    _preflight_errors = _runtime_preflight(_env_file, process_env=os.environ)
+    if _preflight_errors:
+        raise RuntimeError("managed_runtime_preflight_failed: " + "; ".join(_preflight_errors))
+validate_runtime_profile(
+    os.getenv("AI00_DEPLOY_PROFILE", ""),
+    os.getenv("TABLE_PREFIX", ""),
+    os.getenv("PUBLIC_URL", ""),
+)
+from backend.base.remote_data_environment import activate_remote_environment, runtime_table_prefix
+activate_remote_environment()
+configure_table_prefix(runtime_table_prefix())
 
 _log = logging.getLogger(__name__)
 
@@ -129,7 +155,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="AI00 Cloud Backend",
-    version="1.0.0",  # ⚠️ 发版时需与 package.json 的 version 字段手动保持同步
+    version=read_backend_source_version(),
     description="AI00 厂商云端服务 — 持有飞书凭证，代理 OAuth 和 API 调用",
     docs_url="/docs",
     lifespan=lifespan,
@@ -330,9 +356,16 @@ app.mount("/static", StaticFiles(directory=str(_STATIC_DIR), check_dir=False), n
 _start_time = time.time()
 _SLOW_MS = 2000  # 慢请求阈值（毫秒）
 
+
+@app.get("/api/system/version", tags=["system"], include_in_schema=False)
+def get_release_version():
+    from backend.release_version import read_system_version
+
+    return JSONResponse(read_system_version(), headers={"Cache-Control": "no-store"})
+
 # ── 网页版：服务 Vite 构建产物 dist/ ──────────────────────────────────────────
-_DIST_DIR = Path(__file__).parent.parent / "dist"
-if _DIST_DIR.exists():
+_DIST_DIR = legacy_browser_dist(Path(__file__).parent.parent, os.getenv("AI00_DEPLOY_PROFILE", ""))
+if _DIST_DIR is not None:
     # assets/ 子目录（JS/CSS bundle，带内容哈希，可长期缓存）
     _assets_dir = _DIST_DIR / "assets"
     if _assets_dir.exists():

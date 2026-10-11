@@ -841,7 +841,7 @@ class ListSidebar {
       add('删除', 'danger', async () => {
         await this._deleteList(
           listObj.gid,
-          () => confirm(`确认删除清单"${listObj.name}"？清单内条目将变为未归类。`),
+          async () => (await window.AI00Dialogs.confirm(`确认删除清单"${listObj.name}"？清单内条目将变为未归类。`)),
         );
       });
     }
@@ -877,7 +877,7 @@ class ListSidebar {
       const value = await this._invokeCapability('project.project.read.atomic.projects_search', { arguments: {} });
       projects = Array.isArray(value) ? value : (value?.data || value?.projects || []);
     } catch (e) {
-      alert('加载项目列表失败：' + e.message);
+      (await window.AI00Dialogs.alert('加载项目列表失败：' + e.message));
       return;
     }
 
@@ -949,7 +949,7 @@ class ListSidebar {
           <span class="ls-om-uemail">${u.email||''}</span>`;
         row.addEventListener('click', async () => {
           _selGid = u.gid; _selName = u.name;
-          if (!confirm(`确认将"${listObj.name}"的 Owner 转让给 ${_selName}？`)) return;
+          if (!(await window.AI00Dialogs.confirm(`确认将"${listObj.name}"的 Owner 转让给 ${_selName}？`))) return;
           overlay.remove();
           await this._updateList(listObj.gid, { owner_gid: _selGid });
         });
@@ -1063,7 +1063,7 @@ class ListSidebar {
 
   async _migrateListScope(listObj, newScope) {
     // 纯云端模式：无本地存储，迁移功能不可用
-    alert('当前为云端模式，清单迁移功能不适用。');
+    (await window.AI00Dialogs.alert('当前为云端模式，清单迁移功能不适用。'));
   }
 
   async _deleteList(gid, confirmDelete = () => false) {

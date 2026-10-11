@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+
+<script src="/web/core/dialogs.js?rev=20260922-unified-1"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>插件市场</title>
+  
+  
+  <script src="../core/business_facade.js"></script>
+  <script src="../core/existing_capability_client.js"></script>
+  <link rel="stylesheet" href="/assets/dialogs-e48cd6c5.css">
+  <link rel="stylesheet" href="/assets/app-ui-6f33ba9e.css">
+  <link rel="stylesheet" href="/assets/marketplace-56fbcda1.css">
+</head>
+<body>
+  <script src="../core/web_compat.js"></script>
+  <script src="../icons.js"></script>
+  <main class="marketplace">
+    <header class="market-header">
+      <div class="market-icon" aria-hidden="true"><svg width="28" height="28"><use href="#icon-plugin-marketplace"/></svg></div>
+      <div><h1>插件市场</h1><p>发现团队插件，管理安装、启停与版本更新。</p></div>
+      <button id="refresh" class="market-button">刷新</button>
+      <a id="admin-entry" class="market-button" href="admin.html" hidden>超管管理</a>
+    </header>
+    <div class="market-toolbar">
+      <div class="market-tabs" role="tablist" aria-label="插件视图">
+        <button data-view="catalog" role="tab" aria-selected="true" class="active">市场</button>
+        <button data-view="installed" role="tab" aria-selected="false">已安装</button>
+      </div>
+      <input id="search" type="search" placeholder="搜索插件名称、ID 或描述" aria-label="搜索插件" maxlength="200">
+    </div>
+    <p id="access-hint" class="market-hint"></p>
+    <div id="load-error" class="market-error" role="alert" hidden></div>
+    <div id="plugin-list" class="plugin-list" aria-live="polite"></div>
+    <button id="load-more" class="market-button more" hidden>加载更多</button>
+  </main>
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title">
+    <form method="dialog"><h2 id="confirm-title"></h2><p id="confirm-message"></p>
+      <div class="dialog-actions"><button value="cancel" class="market-button">取消</button><button value="confirm" class="market-button primary" id="confirm-action">确认</button></div>
+    </form>
+  </dialog>
+  <div id="feedback" class="market-toast" role="status" hidden></div>
+  <script src="model.js"></script>
+  <script src="marketplace.js"></script>
+</body>
+</html>

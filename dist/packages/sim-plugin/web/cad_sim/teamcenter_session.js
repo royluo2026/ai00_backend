@@ -17,5 +17,25 @@
     return common(clean(query), clean(revisionId), clean(revisionRule), clean(configurationDate));
   }
   const isReady = value => value?.state === 'ready' && typeof value.masked_username === 'string';
-  global.AI00TeamcenterSession = Object.freeze({ fuzzySearchInput, isReady, projectSearchInput });
+  function createSessionState({api,onChange}) {
+    let sequence=0,disposed=false;
+    async function run(method,input) {
+      if(disposed)return null;
+      const current=++sequence;onChange(method==='teamcenterLogin'?'signing-in':'checking');
+      try {
+        if(typeof api?.[method]!=='function')throw Error('teamcenter_login_unavailable');
+        const status=await api[method](input);
+        if(!disposed&&sequence===current)onChange(isReady(status)?'ready':'signed-out',status);
+        return status;
+      } catch(error) {
+        if(!disposed&&sequence===current)onChange('error',null,error?.message||'Teamcenter 状态检查失败');
+        throw error;
+      }
+    }
+    const refresh=()=>run('teamcenterGetSession');
+    const off=api?.onTeamcenterSessionChanged?.(()=>refresh().catch(()=>null));
+    return {refresh,login:input=>run('teamcenterLogin',input),logout:()=>run('teamcenterLogout'),
+      dispose(){disposed=true;++sequence;off?.();}};
+  }
+  global.AI00TeamcenterSession = Object.freeze({ fuzzySearchInput, isReady, projectSearchInput, createSessionState });
 })(typeof window !== 'undefined' ? window : globalThis);

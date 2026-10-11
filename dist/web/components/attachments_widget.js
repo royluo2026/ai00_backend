@@ -47,7 +47,7 @@ class AttachmentsWidget {
       // 点击图标名称区域 → 预览
       item.addEventListener('click', (e) => {
         if (e.target.closest('.att-delete-btn')) return;
-        AttachmentsWidget.openPreview(att, {itemType:this._itemType,itemGid:this._itemGid}).catch(error=>alert('附件读取失败：'+error.message));
+        AttachmentsWidget.openPreview(att, {itemType:this._itemType,itemGid:this._itemGid}).catch(async error=>(await window.AI00Dialogs.alert('附件读取失败：'+error.message)));
       });
       // 删除按钮
       if (!this._readonly) {
@@ -94,7 +94,7 @@ this._uploading=true;this.render();
  try{const result=await window.AI00Business.invoke('base.artifact.batch.import',{version:1,payload:{},native_io:{select:'attachment'}});
   for(const item of result.artifacts)this._list.push({name:item.name,mime:item.artifact_ref.media_type,artifact_ref:item.artifact_ref,url:window.AI00Business.artifactPath(item)});
   await this._save();
- }catch(error){if(error.code!=='native_selection_cancelled')alert('上传失败：'+error.message);}
+ }catch(error){if(error.code!=='native_selection_cancelled')(await window.AI00Dialogs.alert('上传失败：'+error.message));}
  finally{this._uploading=false;this.render();}
 }
 
@@ -299,7 +299,7 @@ this._uploading=true;this.render();
     e.stopPropagation();
     try {
       const {attachment, parent_ref} = JSON.parse(_b64DecUtf8(btn.dataset.attPreview));
-      AttachmentsWidget.openPreview(attachment, parent_ref).catch(error=>alert('附件读取失败：'+error.message));
+      AttachmentsWidget.openPreview(attachment, parent_ref).catch(async error=>(await window.AI00Dialogs.alert('附件读取失败：'+error.message)));
     } catch (err) {
       console.error('[AttachmentsWidget] preview parse error', err);
     }

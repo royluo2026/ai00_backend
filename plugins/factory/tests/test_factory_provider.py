@@ -63,6 +63,7 @@ def test_factory_migration_backfills_legacy_structure_hierarchy():
 
 
 def test_factory_compatibility_uses_user_tenant_when_team_is_missing():
+    from backend.capability_v2.identity import AuthenticatedPrincipal
     from plugins.factory.factory_backend.api.compatibility import (
         build_web_compatibility_envelope,
     )
@@ -77,12 +78,10 @@ def test_factory_compatibility_uses_user_tenant_when_team_is_missing():
             "org_role": "member",
             "system_role": "member",
         },
-        principal=SimpleNamespace(
-            model_dump=lambda: {
-                "user_id": "user-1",
-                "authentication_method": "jwt",
-                "authenticated_at": "2026-08-14T00:00:00Z",
-            }
+        principal=AuthenticatedPrincipal(
+            user_id="user-1",
+            authentication_method="jwt",
+            authenticated_at="2026-08-14T00:00:00Z",
         ),
         request_id="request-1",
         trace_id="trace-1",

@@ -17,12 +17,39 @@ class ScriptedCursor:
         self.responses = list(responses)
         self.statements = []
         self.current = None
+        self.scope_row = None
+        self.graph_rows = None
 
     def __enter__(self): return self
     def __exit__(self, *_args): return False
     def execute(self, sql, params=()):
         self.statements.append((" ".join(sql.split()), tuple(params)))
+        if "AND parent_gid IN (" in sql and "ORDER BY gid LIMIT 201" in sql:
+            if self.graph_rows is None:
+                self.graph_rows = self.responses.pop(0).get('all', []) + [self.scope_row]
+            parents, after_gid = set(params[1:-1]), params[-1]
+            self.current = {'all': sorted(
+                ({field: row.get(field) for field in ('gid','parent_gid','node_type','sort_order')}
+                 for row in self.graph_rows if row.get('parent_gid') in parents and row['gid'] > after_gid),
+                key=lambda row: row['gid'])[:201]}
+            return
+        if "SELECT gid,parent_gid,node_type,sort_order,title,vpps," in sql and "AND gid IN (" in sql:
+            self.current = {"all": [row for row in self.graph_rows if row["gid"] in params[1:]]}
+            return
+        if 'FROM workmanship_bop_bop_entry_links' in sql and self.responses and 'one' in self.responses[0]:
+            self.current = {'all': []}
+            return
         self.current = self.responses.pop(0)
+        if sql.startswith('SELECT gid,parent_gid,node_type,sort_order FROM') and self.current.get('one'):
+            self.graph_rows = None
+            # Coherent scope fixture: the scope root belongs to its own graph.
+            # Keep it after the existing card rows so their paging assertions
+            # continue to exercise the same returned cards and cursor ties.
+            self.scope_row = {'parent_gid':None, 'sort_order':1000000, 'title':'scope', 'meta':{},
+                              **self.current['one']}
+            self.current = {'one': self.scope_row}
+        if "SELECT gid,parent_gid,node_type,sort_order " in sql and 'ORDER BY sort_order,gid' in sql:
+            self.graph_rows = self.current.get("all", [])
     def fetchone(self): return self.current.get("one")
     def fetchall(self): return self.current.get("all", [])
 
@@ -105,8 +132,9 @@ def test_work_package_uses_keyset_page_and_batches_links_for_returned_gids_only(
     assert result["next_cursor"] == encode_cursor(1.0, "e2")
     page_sql, page_params = cursor.statements[2]
     assert "WITH RECURSIVE" not in page_sql
-    assert page_params == ("version1",)
-    link_sql, link_params = cursor.statements[3]
+    assert page_params == ("version1", "line1", "")
+    assert "parent_gid IN (%s)" in page_sql and "LIMIT 201" in page_sql
+    link_sql, link_params = next(item for item in cursor.statements if 'FROM workmanship_bop_bop_entry_links' in item[0])
     assert "entry_gid IN (%s,%s)" in link_sql
     assert "e3" not in link_params
     assert link_params[-2:] == ("e1", "e2")
@@ -129,6 +157,24 @@ def test_work_package_avoids_recursive_database_queries():
     )
 
     assert all("WITH RECURSIVE" not in sql for sql, _params in cursor.statements)
+
+
+@pytest.mark.parametrize('field,value', [('parent_gid','other-line'), ('node_type','part'), ('sort_order',8)])
+def test_work_package_rejects_page_structure_changed_between_graph_and_hydration(field, value):
+    row = {"gid":"e1", "parent_gid":"line1", "node_type":"process", "sort_order":1.0, "title":"P1"}
+    repository, cursor = _repository([
+        {"one":{"revision":7}}, {"one":{"gid":"line1","node_type":"line_process"}},
+        {"all":[row]}, {"all":[]}, {"one":{"revision":7}},
+    ])
+    execute = cursor.execute
+    def racing_execute(sql, params=()):
+        execute(sql, params)
+        if "SELECT gid,parent_gid,node_type,sort_order,title,vpps," in sql and "AND gid IN (" in sql:
+            cursor.current = {"all":[{**row, field:value}]}
+    cursor.execute = racing_execute
+    with pytest.raises(CapabilityBusinessError) as raised:
+        repository.get_work_package_page('version1',7,'line','line1',cursor=None,page_size=10)
+    assert raised.value.code == 'revision_conflict'
 
 
 def test_work_package_projects_bounded_primary_entity_cards_and_entry_fields():
@@ -224,6 +270,9 @@ def test_work_package_pages_preserve_cross_page_parent_child_identity_without_du
         {"one": {"revision": 9}}, {"one": {"gid": "line1", "node_type": "line_process"}},
         {"all": [parent, child]}, {"all": []},
         {"one": {"revision": 9}},
+        {"one": {"revision": 9}}, {"one": {"gid": "line1", "node_type": "line_process"}},
+        {"all": [parent, child]}, {"all": []},
+        {"one": {"revision": 9}},
     ])
 
     first = repository.get_work_package_page(
@@ -237,7 +286,12 @@ def test_work_package_pages_preserve_cross_page_parent_child_identity_without_du
     assert [row["gid"] for row in combined] == ["process-1", "operation-1"]
     assert len({row["gid"] for row in combined}) == 2
     assert second["nodes"][0]["parent_gid"] == first["nodes"][0]["gid"]
-    assert second["next_cursor"] is None
+    third = repository.get_work_package_page(
+        "version1", 9, "line", "line1", cursor=second["next_cursor"], page_size=1,
+    )
+    assert [row['gid'] for row in third['nodes']] == ['line1']
+    assert first['total_count'] == second['total_count'] == third['total_count'] == 3
+    assert third["next_cursor"] is None
 
 
 def test_outline_is_bounded_and_counts_only_current_page_lines():
@@ -249,7 +303,6 @@ def test_outline_is_bounded_and_counts_only_current_page_lines():
         {"one": {"revision": 3}},
         {"one": {"gid": "root", "parent_gid": None, "node_type": "factory_bop", "sort_order": 0, "title": "Root"}},
         {"all": lines},
-        {"one": {"total_count": 2}},
         {"all": [
             *lines,
             {"gid": "station1", "parent_gid": "line1", "node_type": "station_process"},
@@ -266,13 +319,13 @@ def test_outline_is_bounded_and_counts_only_current_page_lines():
 
     result = repository.get_outline_page("version1", 3, cursor=None, page_size=2)
 
-    assert result["total_lines"] == 2
+    assert result["total_lines"] == 3
     assert result["lines"][0]["counts"] == {
         "stations": 1, "roles": 0, "processes": 1,
         "operations": 1, "parts": 1, "resources": 1,
     }
     assert result["lines"][1]["counts"]["operations"] == 1
-    count_sql, count_params = cursor.statements[4]
+    count_sql, count_params = cursor.statements[3]
     assert "WITH RECURSIVE" not in count_sql
     assert count_params == ("version1",)
 

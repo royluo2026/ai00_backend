@@ -78,10 +78,22 @@ class GovernedSimulationRuntimeClient:
         return result.data
 
     async def get_execution_plan(self, reference, context):
-        execution = await self._invoke(DomainInvocation(
-            "craft.bop.execution_structure.get", 1,
-            {"version_gid": str(reference["version_gid"])},
-        ), context)
+        try:
+            execution = await self._invoke(DomainInvocation(
+                "craft.bop.execution_structure.get", 1,
+                {"version_gid": str(reference["version_gid"])},
+            ), context)
+        except CapabilityBusinessError as error:
+            if error.code not in {"version_not_published", "bop_version_not_published"}:
+                raise
+            revision = reference.get("revision")
+            if isinstance(revision, bool) or not isinstance(revision, int) or revision < 1:
+                raise CapabilityBusinessError("bop_revision_unavailable", "bop_revision_unavailable") from error
+            execution = await self._invoke(DomainInvocation(
+                "craft.bop.execution_structure.preview", 1,
+                {"version_gid": str(reference["version_gid"]), "expected_revision": revision},
+                expected_resource_version=str(revision),
+            ), context)
         scope = reference.get("scope")
         if not scope:
             return execution

@@ -42,7 +42,7 @@ window.ContainerModes['field_detail'] = (() => {
       operation = { idempotencyKey, payload };
       _ruleChangeOperations.set(operationKey, operation);
     }
-    if (!window.confirm('确认保存此规则定义变更？')) throw new Error('已取消规则定义变更');
+    if (!(await window.AI00Dialogs.confirm('确认保存此规则定义变更？'))) throw new Error('已取消规则定义变更');
     try {
       const result = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).invoke(
         'craft.rule.definition.change.apply', operation.payload,

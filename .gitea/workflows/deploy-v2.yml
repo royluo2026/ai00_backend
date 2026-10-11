@@ -1,59 +1,13 @@
-name: Deploy to V2 Test
+name: Legacy V2 Deployment Disabled
 
 on:
-  push:
-    branches: [test]
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  legacy-disabled:
+    if: ${{ false }}
     runs-on: [self-hosted, test-server]
     steps:
-      - name: Checkout backend
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          path: workmanship-backend
-
-      - name: Checkout frontend
-        uses: actions/checkout@v4
-        with:
-          repository: devteam/workmanship-web
-          ref: test
-          path: workmanship-web
-          token: ${{ secrets.CROSS_REPO_TOKEN }}
-
-      - name: Install frontend dependencies
+      - name: Legacy deployment is not an approved release path
         shell: cmd
-        working-directory: workmanship-web
-        run: npm ci --ignore-scripts
-
-      - name: Build frontend
-        shell: cmd
-        working-directory: workmanship-web
-        run: npm run build:web
-        env:
-          NODE_OPTIONS: --max-old-space-size=4096
-
-      - name: Install backend dependencies
-        shell: cmd
-        run: E:\projects\ai00-v2\venv\Scripts\python.exe -m pip install -r workmanship-backend\backend\requirements.txt
-
-      - name: freeze-domains
-        shell: cmd
-        working-directory: workmanship-backend
-        run: E:\projects\ai00-v2\venv\Scripts\python.exe backend/scripts/freeze_official_domains.py --check
-
-      - name: catalog-check
-        shell: cmd
-        working-directory: workmanship-backend
-        run: E:\projects\ai00-v2\venv\Scripts\python.exe backend/scripts/build_capability_catalog.py --check
-
-      - name: docs-check
-        shell: cmd
-        working-directory: workmanship-backend
-        run: E:\projects\ai00-v2\venv\Scripts\python.exe backend/scripts/generate_capability_docs.py --check
-
-      - name: Deploy
-        shell: cmd
-        run: |
-          call workmanship-backend\scripts\deploy.bat "%CD%"
+        run: exit /b 2

@@ -148,7 +148,7 @@ def test_save_graph_hides_foreign_version_and_rejects_stale_owned_version():
 
 def test_get_graph_rehydrates_only_an_owned_version():
     cursor = RecordingCursor({
-        "SELECT v.mode FROM workmanship_agent_orch_versions v": [{"mode": "exploration"}],
+        "SELECT v.mode,v.revision FROM workmanship_agent_orch_versions v": [{"mode": "exploration"}],
         "workmanship_agent_orch_axis_views": [{"x_items_json": '["TG0"]', "y_items_json": '["工艺规划"]'}],
     })
     repo = OrchestrationRepository(connection_factory(cursor))

@@ -4,6 +4,7 @@ import json
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+from .workspace_model import Implementation, SemanticType, RelationType, WorkspaceDefinition, validate_workspace
 
 
 X_AXIS = ["TG0前", "TG0", "TG1", "TG2", "EP", "PPV", "PP", "P", "SOP"]
@@ -34,6 +35,9 @@ class BusinessNode(Contract):
     gid: str = Field(min_length=1)
     node_key: str = Field(min_length=1)
     title: str = Field(min_length=1)
+    home_scope_gid: str | None = None
+    semantic_type: SemanticType = 'action'
+    implementation: Implementation = Field(default_factory=Implementation)
     x_item_key: str
     y_item_key: str
     objective: str = ""
@@ -55,6 +59,9 @@ class FlowEdge(Contract):
     source_node_gid: str = Field(min_length=1)
     target_node_gid: str = Field(min_length=1)
     label: str = ""
+    relation_semantics: RelationType | None = None
+    source_port_key: str | None = None
+    target_port_key: str | None = None
     route_points: list[Point] = Field(default_factory=list)
 
     @model_validator(mode="after")
@@ -125,6 +132,7 @@ class ContextBinding(Contract):
 
 
 class GraphDraft(Contract):
+    workspace: WorkspaceDefinition | None = None
     mode: Literal["exploration", "fixed"] = "fixed"
     axis: AxisView = Field(default_factory=AxisView)
     nodes: list[BusinessNode] = Field(max_length=MAX_GRAPH_NODES)
@@ -147,6 +155,7 @@ class GraphDraft(Contract):
         for edge in self.edges:
             if edge.source_node_gid not in node_ids or edge.target_node_gid not in node_ids:
                 raise ValueError("flow edge points to missing node")
+        validate_workspace(self)
         self._validate_business_dag(node_ids)
 
         items = {item.gid: item for item in self.items}
@@ -186,6 +195,10 @@ class GraphDraft(Contract):
         for edge in self.edges:
             if edge.source_node_gid == edge.target_node_gid:
                 raise ValueError("business flow edge cannot reference itself")
+            # Typed observations/feedback model business relationships, not
+            # executable dependency edges. Legacy graphs retain the old DAG.
+            if edge.relation_semantics not in (None, 'sequence'):
+                continue
             adjacency[edge.source_node_gid].append(edge.target_node_gid)
             indegree[edge.target_node_gid] += 1
         queue = [node_gid for node_gid, degree in indegree.items() if degree == 0]

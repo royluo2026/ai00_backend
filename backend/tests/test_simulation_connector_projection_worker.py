@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from contextlib import contextmanager
 from types import SimpleNamespace
 
 from backend.tests.test_connector_runtime_control_plane import completed_outcome, plan
@@ -8,6 +9,28 @@ from plugins.simulation.simulation_backend.application.connector_projection_work
     ConnectorProjectionWorker,
 )
 from backend.domain_ports.simulation_runtime import GovernedSimulationRuntimeClient
+
+
+def test_targeted_projection_claim_does_not_take_an_older_plan(monkeypatch):
+    from plugins.simulation.simulation_backend.data import connector_repository as module
+    class Cursor:
+        rowcount = 1
+        def __enter__(self): return self
+        def __exit__(self, *args): pass
+        def execute(self, sql, params=None):
+            if sql.startswith('SELECT'):
+                self.selected = params[0] if params else 'older-plan'
+        def fetchone(self):
+            return dict(plan_id=self.selected, outcome_hash='a'*64,
+                        target_capability='simulation.connector_document_snapshot_outcome.apply', attempt=0)
+    cursor = Cursor()
+    @contextmanager
+    def connect(): yield SimpleNamespace(cursor=lambda: cursor)
+    monkeypatch.setattr(module, 'get_simulation_conn', connect)
+    targeted = module.SimulationConnectorRepository(projection_protocol='ai00.connector.execution-plan.v2',
+                                                    projection_plan_id='current-snapshot')
+    assert targeted.claim_projection('test-worker').plan_id == 'current-snapshot'
+    assert module.SimulationConnectorRepository().claim_projection('test-worker').plan_id == 'older-plan'
 
 
 class Repository:

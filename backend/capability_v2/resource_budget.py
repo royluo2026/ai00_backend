@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import time
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
@@ -89,10 +90,11 @@ class MemoryPressureSampler:
 
 
 class AdmissionRejected(RuntimeError):
-    def __init__(self, code: str, *, retryable: bool = True) -> None:
+    def __init__(self, code: str, *, retryable: bool = True, diagnostics: dict | None = None) -> None:
         super().__init__(code)
         self.code = code
         self.retryable = retryable
+        self.diagnostics = diagnostics or {}
 
 
 class AdmissionLease:
@@ -156,7 +158,22 @@ class ResourceAdmissionController:
         tenant_counter_key = (capability_key, tenant_key)
         consumer_counter_key = (capability_key, consumer_key)
         loop = asyncio.get_running_loop()
-        deadline = loop.time() + max(0.0, timeout_seconds)
+        admission_wall_started = time.perf_counter()
+        admission_started = loop.time()
+        deadline = admission_started + max(0.0, timeout_seconds)
+        def capacity_failure():
+            tenant_count = self._tenant_counts[tenant_counter_key]
+            consumer_count = self._consumer_counts[consumer_counter_key]
+            tenant_full = tenant_count >= budget.max_parallel_per_tenant
+            consumer_full = consumer_count >= budget.max_parallel_per_consumer
+            reason = ("tenant_and_consumer_limit" if tenant_full and consumer_full else
+                      "tenant_limit" if tenant_full else "consumer_limit" if consumer_full else "admission_wait_timeout")
+            return AdmissionRejected("capacity_unavailable", diagnostics={
+                "reason": reason, "in_flight": self._capability_counts[capability_key],
+                "tenant_in_flight": tenant_count, "consumer_in_flight": consumer_count,
+                "tenant_limit": budget.max_parallel_per_tenant, "consumer_limit": budget.max_parallel_per_consumer,
+                "wait_seconds": round(time.perf_counter() - admission_wall_started, 6),
+            })
         async with self._condition:
             while (
                 self._tenant_counts[tenant_counter_key] >= budget.max_parallel_per_tenant
@@ -164,11 +181,11 @@ class ResourceAdmissionController:
             ):
                 remaining = deadline - loop.time()
                 if remaining <= 0:
-                    raise AdmissionRejected("capacity_unavailable")
+                    raise capacity_failure()
                 try:
                     await asyncio.wait_for(self._condition.wait(), timeout=remaining)
                 except TimeoutError as exc:
-                    raise AdmissionRejected("capacity_unavailable") from exc
+                    raise capacity_failure() from exc
             self._tenant_counts[tenant_counter_key] += 1
             self._consumer_counts[consumer_counter_key] += 1
             self._capability_counts[capability_key] += 1

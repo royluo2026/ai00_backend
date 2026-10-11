@@ -1,5 +1,56 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const {createViewerInteraction,sourceDescriptor}=require('./viewer_interaction');
+test('missing own geometry marks every compact-map ancestor incomplete without excluding valid siblings',()=>{
+ const {cacheIncompleteAncestors}=require('./viewer_interaction');
+ const viewer={node_map:{root:{instance_id:'r',parent_node_key:null},group:{instance_id:'g',parent_node_key:'root'},missing:{instance_id:'m',parent_node_key:'group'},sibling:{instance_id:'s',parent_node_key:'root'}},excluded:[{node_key:'missing'}]};
+ assert.deepEqual([...cacheIncompleteAncestors(viewer)],['group','root']);
+ assert.equal(cacheIncompleteAncestors(viewer).has('sibling'),false);
+});
+test('cached source descriptors use generated instance paths before root shortcuts',()=>{
+ const node={node_key:'cache:n',cache_node_key:'n',parent_key:null,has_children:false,item_revision_uid:'revision',occurrence_path:[]};
+ const document={source_kind:'teamcenter_cache_snapshot',product_tree:{nodes:[node]},_cacheViewer:{node_map:{root:{instance_id:'instance-root',parent_node_key:null},n:{instance_id:'instance-n',parent_node_key:'root'}}}};
+ assert.deepEqual(sourceDescriptor(document,node),{source_node_id:'cache:n',kind:'occurrence_path',occurrence_path:[{occurrence_uid:'instance-root',item_revision_uid:'revision'},{occurrence_uid:'instance-n',item_revision_uid:'revision'}]});
+ document._cacheViewer.excluded=[{node_key:'n',reason:'transform_missing'}];assert.throws(()=>sourceDescriptor(document,node),/cache_node_excluded/);
+ document._cacheViewer.excluded=[];document._cacheViewer.node_map.root.parent_node_key='n';assert.throws(()=>sourceDescriptor(document,node),/cache_node_mapping_invalid/);
+ document._cacheViewer.node_map.root.parent_node_key=null;delete document._cacheViewer.node_map.root;assert.throws(()=>sourceDescriptor(document,node),/cache_node_mapping_invalid/);
+});
+test('cached controller opens and calibrates without an online readiness call',async()=>{
+ const calls=[],scope={workspace_gid:'1',document_gid:'2'},source_nodes=[{source_node_id:'n',kind:'document_root'}];
+ const c=createViewerInteraction({api:{openFromCache:async input=>{calls.push(input);return {status:'completed',result:{interaction_id:'cache-session',visibility_context:'context',...scope}};},ensureReady:()=>{throw Error('online_forbidden');},readVisibility:async input=>({status:'completed',result:{nodes:[],visibility_context:'context'}}),executeCachedIntent:async input=>{calls.push(input);return {status:'completed',result:{}};},close:async()=>{},cancelOpen:async()=>{}}});
+ assert.equal((await c.openFromCache(scope)).visibility_context,'context');assert.deepEqual(c.scope,scope);
+ assert.equal((await c.readVisibility({source_nodes})).visibility_context,'context');
+ assert.equal((await c.executeCachedIntent({...scope,source_nodes,action:'hide',visibility_context:'context'})).visible,false);
+ await c.close();await assert.rejects(c.executeCachedIntent({...scope,source_nodes,action:'show',visibility_context:'context'}),/cache_document_not_ready/);
+ assert.equal(calls.length,2);
+});
+test('page cache resume uses its own bridge and late completion is fenced',async()=>{
+ const input={workspace_gid:'1',document_gid:'2',identity_operation_id:'fresh',expected_document_session:'sha256:'+'a'.repeat(64),expected_workspace_row_version:2,idempotency_key:'resume'};
+ let finish,closed=[];const c=createViewerInteraction({api:{resumeFromCache:()=>new Promise(resolve=>finish=resolve),openFromCache:()=>{throw Error('old_open_forbidden');},close:async p=>closed.push(p),cancelOpen:async()=>{}}});
+ const pending=c.resumeFromCache(input);await new Promise(r=>setImmediate(r));await c.close();
+ finish({status:'completed',result:{interaction_id:'late',document_gid:'2',workspace_row_version:2,visibility_context:'context'}});
+ await assert.rejects(pending,/document_selection_changed/);assert.deepEqual(closed,[{interaction_id:'late'}]);assert.equal(c.state,'closed');
+});
+test('a replaced readiness context cannot execute an intent calibrated against the old document',async()=>{
+ let writes=0;const c=createViewerInteraction({api:{ensureReady:async()=>({status:'completed',result:{visibility_context:'new-context'}}),executeIntent:async()=>{writes++;return {status:'completed',result:{}};}}});
+ await assert.rejects(c.executeIntent({scope:{workspace_gid:'1',document_gid:'2'},source_selector:{},source_nodes:[{source_node_id:'front',kind:'document_root'}],action:'show',visibility_context:'old-context'}),/visibility_calibration_required/);assert.equal(writes,0);
+});
+test('calibration forwards readiness intent and reads actual visibility without a native write',async()=>{
+ const source_nodes=[{source_node_id:'front',kind:'document_root'}],result={nodes:[{source_node_id:'front',visible:null,visibility_state:'mixed'}],structure_epoch:3};
+ const c=createViewerInteraction({api:{ensureReady:async input=>{assert.deepEqual(input.source_nodes,source_nodes);assert.equal(input.action,'show');return {status:'completed',result:{visibility_context:'session-1'}};},readVisibility:async input=>{assert.deepEqual(input,{workspace_gid:'1',document_gid:'2',source_nodes});return {status:'completed',result};},executeIntent:async()=>{throw Error('unexpected_write');}}});
+ assert.equal((await c.ensureReady({scope:{workspace_gid:'1',document_gid:'2'},source_selector:{},source_nodes,action:'show'})).visibility_context,'session-1');
+ assert.equal(await c.readVisibility({source_nodes}),result);
+});
+
+test('closing a document fences late visibility readback',async()=>{
+ let finish;const c=createViewerInteraction({api:{ensureReady:async()=>({status:'completed',result:{}}),readVisibility:()=>new Promise(resolve=>finish=resolve),cancelOpen:async()=>{}}});
+ await c.ensureReady({scope:{workspace_gid:'1',document_gid:'2'},source_selector:{}});const reading=c.readVisibility({source_nodes:[]});await c.close();finish({status:'completed',result:{nodes:[]}});await assert.rejects(reading,/document_selection_changed/);assert.equal(c.state,'closed');
+});
+test('node intent reaches readiness and cancellation prevents execution',async()=>{
+ const source_nodes=[{source_node_id:'front',kind:'occurrence_path',occurrence_path:[{occurrence_uid:'a',item_revision_uid:'r'}]}];let executed=false;
+ const c=createViewerInteraction({api:{ensureReady:async input=>{assert.deepEqual(input.source_nodes,source_nodes);assert.equal(input.action,'show');return {status:'rejected',error_code:'confirmation_cancelled'};},executeIntent:async()=>{executed=true;}}});
+ await assert.rejects(c.executeIntent({scope:{workspace_gid:'1',document_gid:'2'},source_selector:{},source_nodes,action:'show'}),/confirmation_cancelled/);
+ assert.equal(executed,false);
+});
 test('environment cancellation fences a Main open before it can attach',async()=>{
  let finish,cancelled=0;
  const c=createViewerInteraction({api:{openFromLaunch:()=>new Promise(resolve=>finish=resolve),cancelOpen:async()=>{cancelled++;},close:async()=>{}}});
@@ -85,6 +136,101 @@ test('production adoption uses local session without binding.get or command.get'
  const adapter=createAdapter({getStore:()=>({state:{workspace:{workspace_gid:'1'}}}),getLocalInteraction:()=>local,invoke:()=>{throw Error('cloud_forbidden');}});
  const result=await adapter.actOnProductNode({workspaceGid:'1',document,nodeKey:'n',action:'hide'});assert.equal(result.visible,false);
 });
+test('demand-driven hide then show coalesces to one Main intent with final absolute state',async()=>{
+ let finish;const calls=[];
+ const c=createViewerInteraction({api:{ensureReady:async()=>({status:'completed',result:{}}),executeIntent:input=>{calls.push(input);return new Promise(resolve=>finish=resolve);}}});
+ const scope={workspace_gid:'1',document_gid:'2',expected_workspace_row_version:3},source_selector={endpoint_id:'ep'};
+ const source_nodes=[{source_node_id:'n',kind:'single_part_root'}];
+ const hide=c.executeIntent({scope,source_selector,source_nodes,action:'hide'});
+ const show=c.executeIntent({scope,source_selector,source_nodes,action:'show'});
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(calls.length,1);assert.equal(calls[0].action,'show');
+ finish({status:'completed',result:{targets:[{status:'completed'}]}});
+ assert.equal((await hide).visible,true);assert.equal((await show).visible,true);
+});
+test('demand-driven intents preserve order across distinct targets and outcome unknown blocks writes',async()=>{
+ const calls=[];const c=createViewerInteraction({api:{ensureReady:async()=>({status:'completed',result:{}}),executeIntent:async input=>{calls.push(input.source_nodes[0].source_node_id);return input.source_nodes[0].source_node_id==='b'?{status:'outcome_unknown'}:{status:'completed',result:{targets:[{status:'completed'}]}};}}});
+ const base={scope:{workspace_gid:'1',document_gid:'2',expected_workspace_row_version:3},source_selector:{endpoint_id:'ep'}};
+ const first=c.executeIntent({...base,source_nodes:[{source_node_id:'a',kind:'single_part_root'}],action:'hide'});
+ const second=c.executeIntent({...base,source_nodes:[{source_node_id:'b',kind:'single_part_root'}],action:'highlight'});
+ await first;await assert.rejects(second,/outcome_unknown/);
+ await assert.rejects(c.executeIntent({...base,source_nodes:[{source_node_id:'c',kind:'single_part_root'}],action:'show'}),/outcome_unknown/);
+ assert.deepEqual(calls,['a','b']);
+});
+test('environment selection alone does not invoke Main open',()=>{
+ let calls=0;createViewerInteraction({api:{ensureReady:async()=>{calls++;}}});assert.equal(calls,0);
+});
+
+test('readiness completion reconciles page version and view before dispatching the intent',async()=>{
+ const steps=[],scope={workspace_gid:'1',document_gid:'2',expected_workspace_row_version:3};
+ const result={document_gid:'2',workspace_row_version:4};
+ const c=createViewerInteraction({onReady:(value,current)=>{assert.equal(value,result);assert.equal(current,scope);steps.push('ready');},api:{
+  ensureReady:async()=>({status:'completed',result}),
+  executeIntent:async()=>{steps.push('execute');return {status:'completed',result:{}};}
+ }});
+ await c.executeIntent({scope,source_selector:{endpoint_id:'ep'},source_nodes:[{source_node_id:'n',kind:'single_part_root'}],action:'show'});
+ assert.deepEqual(steps,['ready','execute']);
+});
+
+test('a cancelled readiness completion never reconciles the page',async()=>{
+ let finish,ready=0;
+ const c=createViewerInteraction({onReady:()=>ready++,api:{ensureReady:()=>new Promise(r=>finish=r),cancelOpen:async()=>{}}});
+ const opening=c.ensureReady({scope:{workspace_gid:'1',document_gid:'2'},source_selector:{}});
+ await c.close();finish({status:'completed',result:{}});
+ await assert.rejects(opening,/document_selection_changed/);assert.equal(ready,0);
+});
+test('demand-driven close always releases Main and fences a late readiness result',async()=>{
+ let finish,released=0;const c=createViewerInteraction({api:{ensureReady:()=>new Promise(resolve=>finish=resolve),cancelOpen:async()=>{released++;return {status:'completed'};}}});
+ const pending=c.ensureReady({scope:{workspace_gid:'1',document_gid:'2',expected_workspace_row_version:1},source_selector:{endpoint_id:'ep'}});await new Promise(resolve=>setImmediate(resolve));
+ await c.close();assert.equal(released,1);finish({status:'completed',result:{document_gid:'2',workspace_row_version:1}});
+ await assert.rejects(pending,/document_selection_changed/);assert.equal(c.state,'closed');
+});
+test('opening permits confirmation while execution has a bounded 90s bridge deadline',async()=>{
+ const {MessageChannel}=require('node:worker_threads'),{frameAPI}=require('./viewer_interaction');
+ const timers=new Map(),ports=[],channels=[];let next=0;
+ const win={MessageChannel:class extends MessageChannel{constructor(){super();channels.push(this);}},crypto:require('node:crypto'),location:{origin:'app://root'},
+  setTimeout:(fn,ms)=>{timers.set(++next,{fn,ms});return next;},clearTimeout:id=>timers.delete(id),
+  parent:{electronAPI:{},postMessage:(_message,_origin,p)=>ports.push(p[0])}};
+ const api=frameAPI(win);
+ try{
+  for(const method of ['ensureReady','openFromLaunch','execute']){
+   let error=null;const pending=api[method]({}).catch(e=>{error=e;});
+   const timer=timers.get(next);
+   assert.equal(timer.ms,method==='execute'?90000:3600000);
+   if(method==='execute')timer.fn();
+   ports.at(-1).postMessage({result:{status:'completed',result:{interaction_id:'session'}}});
+   await pending;
+   assert.equal(error?.message||null,method==='execute'?'outcome_unknown':null,method);
+  }
+ }finally{for(const channel of channels){channel.port1.close();channel.port2.close();}}
+});
+test('model intent bridge waits for bounded native mapping before declaring outcome unknown',async()=>{
+ const {MessageChannel}=require('node:worker_threads'),{frameAPI}=require('./viewer_interaction');
+ const timers=[],ports=[];
+ const win={MessageChannel,crypto:require('node:crypto'),location:{origin:'app://root'},
+  setTimeout:(fn,ms)=>{timers.push({fn,ms});return timers.length;},clearTimeout:()=>{},
+  parent:{electronAPI:{},postMessage:(_message,_origin,p)=>ports.push(p[0])}};
+ const pending=frameAPI(win).executeIntent({action:'show'});
+ try{
+  assert.equal(timers[0].ms,120000);
+  for(const timer of timers)if(timer.ms<=60000)timer.fn();
+  ports[0].postMessage({result:{status:'completed',result:{targets:[{status:'completed'}]}}});
+  assert.equal((await pending).status,'completed');
+ }finally{for(const port of ports)port.close();}
+});
+test('node resolution bridge outlives the native mapping deadline',async()=>{
+ const {MessageChannel}=require('node:worker_threads'),{frameAPI}=require('./viewer_interaction');
+ const timers=[],ports=[];
+ const win={MessageChannel,crypto:require('node:crypto'),location:{origin:'app://root'},
+  setTimeout:(fn,ms)=>{timers.push({fn,ms});return timers.length;},clearTimeout:()=>{},
+  parent:{electronAPI:{},postMessage:(_message,_origin,p)=>ports.push(p[0])}};
+ const pending=frameAPI(win).resolve({interaction_id:'session'});
+ try{
+  assert.ok(timers[0].ms>=35000);
+  ports[0].postMessage({result:{status:'completed',result:{nodes:[]}}});
+  assert.equal((await pending).status,'completed');
+ }finally{for(const port of ports)port.close();}
+});
 test('four actions reuse one mapping and use opaque targets without cloud calls',async()=>{
  const calls=[],states=[];
  const api={open:async()=>({status:'completed',result:{interaction_id:'session'}}),close:async()=>({status:'completed'}),
@@ -131,7 +277,7 @@ test('partial or not-started target results never update UI as a completed actio
 });
 test('visible route marker distinguishes Main enabled local from cloud and unknown',async()=>{
  const {JSDOM}=require('jsdom'),fs=require('node:fs'),path=require('node:path');
- const dom=new JSDOM('<span id="viewerInteractionRoute"></span>',{runScripts:'outside-only'}),w=dom.window;
+ const dom=new JSDOM('<span id="viewerInteractionRoute"></span><span data-viewer-interaction-route></span>',{runScripts:'outside-only'}),w=dom.window;
  let onState;
  w.AI00ViewerInteraction={frameAPI:()=>({enabled:async()=>true}),createViewerInteraction:options=>{onState=options.onState;return {close:async()=>{}};}};
  w._eAPI=()=>({});w._notifyNativeViewportBounds=()=>{};
@@ -140,7 +286,41 @@ test('visible route marker distinguishes Main enabled local from cloud and unkno
  w.eval(fs.readFileSync(path.join(__dirname,'live_document_bootstrap.js'),'utf8'));w.AI00LiveDocumentBootstrap();
  await w._localViewerInteractionEnabled();
  const marker=w.document.getElementById('viewerInteractionRoute');assert.equal(marker.dataset.route,'local');assert.match(marker.textContent,/本地/);
+ onState('opening');assert.match(marker.textContent,/正在打开/);assert.equal(marker.getAttribute('aria-busy'),'true');
+ assert.equal(w.document.querySelector('[data-viewer-interaction-route]').textContent,marker.textContent);
+ onState('executing','hide');assert.match(marker.textContent,/正在隐藏/);
+ onState('ready');assert.match(marker.textContent,/就绪/);assert.equal(marker.getAttribute('aria-busy'),'false');
  onState('outcome_unknown');assert.match(marker.textContent,/结果未知/);assert.equal(marker.dataset.state,'outcome_unknown');dom.window.close();
+});
+
+test('node intent stays opening until ready and executing until the native result returns',async()=>{
+ let finishOpen,finishExecute;const states=[];
+ const controller=createViewerInteraction({api:{ensureReady:()=>new Promise(r=>finishOpen=r),executeIntent:()=>new Promise(r=>finishExecute=r)},onState:(...state)=>states.push(state)});
+ const pending=controller.executeIntent({scope:{workspace_gid:'1',document_gid:'2'},source_selector:{},source_nodes:[],action:'show'});
+ await new Promise(r=>setImmediate(r));assert.equal(controller.state,'opening');
+ finishOpen({status:'completed',result:{}});await new Promise(r=>setImmediate(r));
+ assert.equal(controller.state,'executing');assert.deepEqual(states.at(-1),['executing','show']);
+ finishExecute({status:'completed'});await pending;assert.equal(controller.state,'ready');
+});
+
+test('bootstrap readiness removes the unavailable overlay and reconciles the selected version',async()=>{
+ const {JSDOM}=require('jsdom'),fs=require('node:fs'),path=require('node:path');
+ const dom=new JSDOM('<span id="viewerInteractionRoute"></span>',{runScripts:'outside-only'}),w=dom.window;
+ const workspace={workspace_gid:'1',row_version:3,cache_revision_hash:'old'};
+ w._simulationEnvironmentWorkspace={store:{state:{workspace},subscribe:()=>{}}};
+ w._liveDocumentContextUnavailable=true;
+ w.AI00ViewerInteraction={createViewerInteraction,frameAPI:()=>({enabled:async()=>true,cancelOpen:async()=>{},ensureReady:async()=>({status:'completed',result:{document_gid:'2',workspace_row_version:4}})})};
+ w._eAPI=()=>({});w._notifyNativeViewportBounds=()=>{};
+ w._setVmStatus=(state,message)=>{w.__status={state,message};};
+ w._completeLocalViewerPresentation=()=>{w._liveDocumentContextUnavailable=false;w._setVmStatus('connected','已内嵌');};
+ w.AI00LiveDocumentAdoption={createAdapter:()=>({invalidateControlMappings:()=>{}}),mount:()=>{}};
+ w.AI00LiveDocumentSwitcher={createAdapter:()=>({isOwnWorkspaceChange:()=>false,cancel:()=>{}}),mount:()=>{}};
+ w.eval(fs.readFileSync(path.join(__dirname,'live_document_bootstrap.js'),'utf8'));w.AI00LiveDocumentBootstrap();
+ await w._localViewerInteractionEnabled();
+ await w._ensureLocalViewerReady({document_gid:'2',source_selector:{endpoint_id:'ep'}});
+ assert.equal(w._liveDocumentContextUnavailable,false);assert.equal(workspace.row_version,4);
+ assert.equal(workspace.cache_revision_hash,undefined);assert.equal(w.__status.message,'已内嵌');
+ dom.window.close();
 });
 test('VM node action uses the bound source descriptor locally and never probes cloud',async()=>{
  const {JSDOM}=require('jsdom'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');

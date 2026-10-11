@@ -3369,14 +3369,14 @@
             await (async (body,path,query) => { const result = await window.AI00Business.invoke("knowledge.hub.change.apply.atomic.items_update", {version:1,payload:Object.fromEntries(Object.entries({"gid":path.gid,"updates":body}).filter(([,v])=>v!=null))}); return {"success":Boolean((result["changed"]??true))}; })({ title: newName },{"gid":decodeURIComponent(String(item.gid))},new URLSearchParams());
             item.title = newName; item.name = newName;
           } else if (isBopVer) {
-            alert('BOP 版本元数据编辑暂未开放，请通过新版 BOP 版本元数据能力处理');
+            (await window.AI00Dialogs.alert('BOP 版本元数据编辑暂未开放，请通过新版 BOP 版本元数据能力处理'));
             return;
           } else if (isPbom) {
             await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.ebom.snapshot.update", {version:1,payload:Object.fromEntries(Object.entries({"snapshot_gid":path.gid,"changes":Object.fromEntries(Object.entries({...{"name":null,"version_tag":null,"visibility":null,"shared_team_gid":null,"shared_project_gid":null},...body}).filter(([,v])=>v!=null))}).filter(([,v])=>v!=null))}); return result; })({ name: newName },{"gid":decodeURIComponent(String(item.gid))},new URLSearchParams());
             item.name = newName;
           }
           _renderP2TreeSections(_treeSections);
-        } catch (err) { alert('改名失败：' + (err.message || err)); }
+        } catch (err) { (await window.AI00Dialogs.alert('改名失败：' + (err.message || err))); }
 
       } else if (action.dataset.action === 'visibility') {
         _showListVisibilityDialog(item, _cloudFetch);
@@ -3394,7 +3394,7 @@
         await _existingCapabilityClient().call('project.lists.patch', {
           gid: list.gid,
           patch: { visibility: val.visibility, shared_team_gid: val.shared_team_gid || null, project_gid: val.shared_project_gid || list.project_gid || null },
-        }).catch(err => alert('设置失败：' + err.message));
+        }).catch(async err => (await window.AI00Dialogs.alert('设置失败：' + err.message)));
         list.visibility = val.visibility;
         list.shared_team_gid = val.shared_team_gid;
       });
@@ -3429,7 +3429,7 @@
       if (!vis) { dlg.remove(); return; }
       await _existingCapabilityClient().call('project.lists.patch', {
         gid: list.gid, patch: { visibility: vis },
-      }).catch(err => alert('设置失败：' + err.message));
+      }).catch(async err => (await window.AI00Dialogs.alert('设置失败：' + err.message)));
       list.visibility = vis;
       dlg.remove();
     };
@@ -3463,7 +3463,7 @@
       const projGid = dlg.querySelector('#_wbProjSel').value || null;
       await _existingCapabilityClient().call('project.lists.patch', {
         gid: list.gid, patch: { project_gid: projGid },
-      }).catch(err => alert('绑定失败：' + err.message));
+      }).catch(async err => (await window.AI00Dialogs.alert('绑定失败：' + err.message)));
       list.project_gid = projGid;
       dlg.remove();
       _renderP2TreeSections(_treeSections);
@@ -3911,19 +3911,24 @@
       _setCount(4, 0, 0);
       return;
     }
-    const typeLabel = (t) =>
-      ({ task:'任务', issue:'问题', knowledge:'知识', rule:'规则' }[t] || t);
+    const navigableTypes = ['task', 'issue', 'knowledge', 'rule'];
+    const typeLabel = (type) => navigableTypes.includes(type)
+      ? ({ task:'任务', issue:'问题', knowledge:'知识', rule:'规则' })[type]
+      : '详情待核';
 
     body.innerHTML = follows.map((item, i) => `
-      <div class="wb-row" data-idx="${i}" data-gid="${item.item_gid}" data-type="${item.item_type}">
+      <div class="wb-row" data-idx="${i}" data-gid="${_esc(item.item_gid)}" data-type="${_esc(item.item_type)}">
         <span class="wb-row-type follow"></span>
         <span class="wb-row-title" title="${_esc(item.item_title)}">${_esc(item.item_title)}</span>
-        <span class="wb-row-badge">${typeLabel(item.item_type)}</span>
+        <span class="wb-row-badge">${_esc(typeLabel(item.item_type))}</span>
       </div>
     `).join('');
 
     body.querySelectorAll('.wb-row').forEach((row, i) => {
-      row.addEventListener('click', () => { _selectRow(4, i); _openTab(row.dataset.type); });
+      row.addEventListener('click', () => {
+        _selectRow(4, i);
+        if (navigableTypes.includes(row.dataset.type)) _openTab(row.dataset.type);
+      });
     });
     _setCount(4, follows.length, follows.length);
   }
@@ -4743,13 +4748,13 @@
     }, 10);
   }
 
-  function _showRsvpAuthPrompt() {
+  async function _showRsvpAuthPrompt() {
     // 找日历面板容器，在其内追加提示条（单例）
     const existing = document.getElementById('wbRsvpAuthBanner');
     if (existing) return;
     const container = document.querySelector('.wb-cal-agenda') || document.querySelector('.wb-widget-body');
     if (!container) {
-      alert('回复日程需要重新授权飞书日历权限，请点击设置 → 退出登录后重新登录。');
+      (await window.AI00Dialogs.alert('回复日程需要重新授权飞书日历权限，请点击设置 → 退出登录后重新登录。'));
       return;
     }
     const banner = document.createElement('div');
@@ -4775,7 +4780,7 @@
     `;
     container.insertBefore(banner, container.firstChild);
     document.getElementById('wbRsvpBannerClose').onclick = () => banner.remove();
-    document.getElementById('wbRsvpReauthBtn').onclick = () => {
+    document.getElementById('wbRsvpReauthBtn').onclick = async () => {
       banner.remove();
       // 触发飞书重新登录（会弹出新的授权页面，用户同意后刷新 token）
       if (window.electronAPI?.authFeishuLogin) {
@@ -4783,7 +4788,7 @@
       } else if (window.parent?.electronAPI?.authFeishuLogin) {
         window.parent.electronAPI?.authFeishuLogin?.();
       } else {
-        alert('请点击应用设置 → 退出登录，然后重新飞书登录以授权日历权限。');
+        (await window.AI00Dialogs.alert('请点击应用设置 → 退出登录，然后重新飞书登录以授权日历权限。'));
       }
     };
   }
@@ -5276,6 +5281,8 @@
   const _LS_APP = 'wb:app-items-v1';
 
   const _ALL_APP_ITEMS = [
+    { id: 'model_cache', title: '数模缓存', icon: 'icon-model-cache', requiresAuth: true },
+    { id: 'plugin_marketplace', title: '插件市场', icon: 'icon-plugin-marketplace', requiresAuth: true },
     { id: 'workbench',      title: '工作台',     icon: 'icon-home',       requiresAuth: false },
     { id: 'my_files',       title: '我的文件',   icon: 'icon-files',      requiresAuth: false },
     { id: 'craft_hub',      title: '工艺规划',   icon: 'icon-canvas',     requiresAuth: true,  minPerm: 'craft.view' },
@@ -5316,6 +5323,8 @@
   function _getAppItem(id) { return _ALL_APP_ITEMS.find(i => i.id === id); }
 
   function _appItemAllowed(item) {
+    // 与父窗口侧栏共用网页版顶层入口规则，不改变详情页的 Tab 定义。
+    if (window.parent?.NavManager?.isTopLevelAllowed(item.id) === false) return false;
     const authMode = window.parent?._authMode || window._authMode || 'none';
     if (authMode !== 'feishu' && item.requiresAuth) return false;
     if (item.minPerm) {
@@ -5354,6 +5363,7 @@
     const grid = document.getElementById('wbAppGrid');
     if (!grid) return;
     if (!_appState) _appState = _loadAppState();
+    const isWeb = window.parent?.electronAPI?._isElectron === false;
 
     grid.innerHTML = '';
 
@@ -5376,7 +5386,7 @@
     grid.appendChild(settingsBtn);
 
     // ── 可见模块（用户可排序/隐藏）──────────────────────────────
-    _appState.visible.forEach((id, idx) => {
+    (isWeb ? ['workbench', 'craft_hub'] : _appState.visible).forEach((id, idx) => {
       const item = _getAppItem(id);
       if (!item || !_appItemAllowed(item)) return;
 
@@ -5399,7 +5409,7 @@
           window.parent?.postMessage({ type: 'tab:open', id: item.id }, '*');
         });
       }
-      btn.addEventListener('contextmenu', e => { e.preventDefault(); _showAppCtxMenu(e, id, idx); });
+      if (!isWeb) btn.addEventListener('contextmenu', e => { e.preventDefault(); _showAppCtxMenu(e, id, idx); });
       grid.appendChild(btn);
     });
 
@@ -5413,7 +5423,7 @@
     moreBtn.title = '更多 App';
     moreBtn.innerHTML = _GRID9_SVG + '<span>更多</span>';
     moreBtn.addEventListener('click', e => _showAppMorePopover(e));
-    grid.appendChild(moreBtn);
+    if (!isWeb) grid.appendChild(moreBtn);
   }
 
   function _showAppCtxMenu(e, id, visIdx) {

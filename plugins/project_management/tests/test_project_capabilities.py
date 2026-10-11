@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 import pytest
@@ -47,6 +48,12 @@ class SnapshotRegistry:
 
     def register(self, spec, handler, *, descriptor=None):
         self.items.append((spec, handler, descriptor))
+
+    def get(self, capability_id, version):
+        for spec, handler, descriptor in self.items:
+            if spec.id == capability_id and spec.version == version:
+                return SimpleNamespace(spec=spec, handler=handler, descriptor=descriptor)
+        raise KeyError((capability_id, version))
 
 
 def _frozen_project_capability_ids() -> set[str]:

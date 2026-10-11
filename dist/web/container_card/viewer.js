@@ -77,18 +77,25 @@
       },
     });
 
-    const renderer = window.ContainerModes?.[mode];
-    if (!renderer) {
-      bodyEl.innerHTML = `<div class="cc-empty">未知模式: ${mode}</div>`;
+    const renderer = Object.prototype.hasOwnProperty.call(window.ContainerModes || {}, mode)
+      ? window.ContainerModes[mode] : null;
+    if (!renderer || typeof renderer.renderFullPage !== 'function') {
+      const message = document.createElement('div');
+      message.className = 'cc-empty';
+      message.textContent = `未知模式: ${mode}`;
+      bodyEl.replaceChildren(message);
       return;
     }
 
-    bodyEl.innerHTML = '';
+    bodyEl.replaceChildren();
     try {
       renderer.renderFullPage(bodyEl, mergedParams);
     } catch (e) {
       console.error('[ContainerCard] renderFullPage error:', e);
-      bodyEl.innerHTML = `<div class="cc-empty">渲染失败: ${e}</div>`;
+      const message = document.createElement('div');
+      message.className = 'cc-empty';
+      message.textContent = '渲染失败';
+      bodyEl.replaceChildren(message);
     }
   }
 

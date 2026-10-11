@@ -60,6 +60,8 @@ def test_insert_bop_projection_is_one_owned_workspace_transaction(monkeypatch):
         {"row_version": 3, "cache_revision_hash": "sha256:" + "0" * 64, "status": "active"},
         None, None, {"position": 0},
     ])
+    gids = count(9001)
+    monkeypatch.setattr(module, "next_gid", lambda: next(gids))
     result = WorkspaceRepository().insert_bop_projection(
         workspace_gid="10", expected_workspace_version=3, actor_gid="30", tenant_gid="20",
         idempotency_key="bop-1", plan={
@@ -79,22 +81,41 @@ def test_insert_bop_projection_is_one_owned_workspace_transaction(monkeypatch):
     assert hierarchy_insert[1][6] == "sha256:" + "a" * 64
     assert '"model_references"' in hierarchy_insert[1][7]
     node_inserts = [call for call in cursor.calls if call[0].startswith("INSERT INTO workmanship_sim_workspace_nodes")]
-    assert len(node_inserts) == 1
-    assert len(node_inserts[0][1]) == 2
+    assert len(node_inserts) == 2
+    assert len(node_inserts[0][1]) == 1
     assert node_inserts[0][1][0][5] is None
-    assert node_inserts[0][1][1][5] == node_inserts[0][1][0][0]
+    assert node_inserts[1][1][0][5] == node_inserts[0][1][0][0]
     assert any(call[0].startswith("INSERT INTO workmanship_sim_workspace_idempotency") for call in cursor.calls)
 
 
-def test_insert_bop_projection_batches_large_node_sets(monkeypatch):
+def test_full_bop_projection_does_not_collide_with_legacy_process_only_insertion(monkeypatch):
+    cursor = _install(monkeypatch, [
+        {"row_version": 3, "cache_revision_hash": "sha256:" + "0" * 64, "status": "active"},
+        None, None, {"position": 1},
+    ])
+    legacy_identity = 'craft-bop:100:all:all:sha256:' + 'a' * 64
+    WorkspaceRepository().insert_bop_projection(workspace_gid='10', expected_workspace_version=3,
+        actor_gid='30', tenant_gid='20', idempotency_key='full', plan={
+            'source_version_gid': '100', 'source_content_hash': 'sha256:' + 'a' * 64,
+            'fork_depth': 'all', 'hierarchy_name': 'Full', 'plan_hash': 'sha256:' + 'b' * 64,
+            'nodes': [{'source_gid': '1', 'parent_source_gid': None, 'node_type': 'part', 'name': 'Part'}],
+        })
+    duplicate_query = next(params for sql, params in cursor.calls if 'projection_identity=%s' in sql)
+    insertion = next(params for sql, params in cursor.calls if sql.startswith('INSERT INTO workmanship_sim_workspace_hierarchies'))
+    assert duplicate_query[1] != legacy_identity
+    assert duplicate_query[1] == insertion[8]
+
+
+@pytest.mark.parametrize('node_count', [502, 20000])
+def test_insert_bop_projection_batches_large_node_sets(monkeypatch, node_count):
     cursor = _install(monkeypatch, [
         {"row_version": 3, "cache_revision_hash": "sha256:" + "0" * 64, "status": "active"},
         None, None, {"position": 0},
     ])
     gids = count(9001)
     monkeypatch.setattr(module, "next_gid", lambda: next(gids))
-    nodes = [{"source_gid": str(gid), "parent_source_gid": str(gid - 1) if gid > 1 else None,
-              "node_type": "process", "name": f"P{gid}", "position": gid} for gid in range(1, 502)]
+    nodes = [{"source_gid": str(gid), "parent_source_gid": "1" if gid > 1 else None,
+              "node_type": "part" if gid > 1 else "process", "name": f"P{gid}", "position": gid} for gid in range(1, node_count + 1)]
     result = WorkspaceRepository().insert_bop_projection(
         workspace_gid="10", expected_workspace_version=3, actor_gid="30", tenant_gid="20",
         idempotency_key="bop-large", plan={
@@ -104,8 +125,10 @@ def test_insert_bop_projection_batches_large_node_sets(monkeypatch):
         },
     )
     batches = [params for sql, params in cursor.calls if sql.startswith("INSERT INTO workmanship_sim_workspace_nodes")]
-    assert result["node_count"] == 501
-    assert [len(batch) for batch in batches] == [500, 1]
+    assert result["node_count"] == node_count
+    assert sum(len(batch) for batch in batches) == node_count
+    assert len(batches[0]) == 1
+    assert all(len(batch) <= 500 for batch in batches)
     assert batches[1][0][5] == batches[0][-1][0]
     # Exercise the real driver: executemany can silently fall back to one query per row.
     import pymysql
@@ -121,7 +144,12 @@ def test_insert_bop_projection_batches_large_node_sets(monkeypatch):
     for sql, params in cursor.calls:
         if sql.startswith("INSERT INTO workmanship_sim_workspace_nodes"):
             driver.executemany(sql, params)
-    assert len(wire_queries) == 2
+    assert len(wire_queries) == len(batches)
+    # OceanBase checks self-referencing FKs against earlier statements, not this batch.
+    persisted = set()
+    for batch in batches:
+        assert all(row[5] is None or row[5] in persisted for row in batch)
+        persisted.update(row[0] for row in batch)
 
 
 def test_same_source_can_be_placed_more_than_once(monkeypatch):

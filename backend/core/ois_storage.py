@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import logging
 import uuid
+from functools import lru_cache
 from urllib.parse import quote
 
 _log = logging.getLogger(__name__)
@@ -76,6 +77,12 @@ def is_enabled() -> bool:
     )
 
 
+@lru_cache(maxsize=1)
+def _client_from_options(options: tuple):
+    from client.ois_s3_client import OisS3Client, ClientOptions
+    return OisS3Client(ClientOptions(**dict(options)))
+
+
 def _make_client():
     """创建 OisS3Client 实例，返回 (client, error_msg)。"""
     try:
@@ -102,7 +109,12 @@ def _make_client():
         )
         _log.info("OIS SDK init: env=%s ois_service_url=%s identify=%s",
                   options.env, options.ois_service_url, cfg.get("identify"))
-        client = OisS3Client(options)
+        # SDK clients retain their credential and region caches. Configuration
+        # changes (including credential rotation) create a different cache key.
+        client = _client_from_options(tuple((name, getattr(options, name)) for name in (
+            "env", "region", "app_id", "ois_service_url", "idaas_url",
+            "idaas_client_id", "idaas_client_secret", "idaas_service_id",
+        )))
         return client, None
     except Exception as e:
         return None, str(e)

@@ -139,3 +139,36 @@ def test_connector_outcome_idempotency_is_stable_across_retry_attempts():
     assert [call[0].idempotency_key for call in adapter.client.calls] == [
         expected, expected,
     ]
+
+
+def test_unpublished_simulation_source_uses_exact_revision_preview():
+    from backend.capability_v2.provider_contracts import CapabilityBusinessError
+    adapter = GovernedSimulationRuntimeClient(Gateway())
+    calls = []
+    async def invoke(invocation, context):
+        calls.append(invocation)
+        if invocation.capability_id == "craft.bop.execution_structure.get":
+            raise CapabilityBusinessError("version_not_published", "version_not_published")
+        return {"official": False, "source": {"bop_version_gid": "bop-1", "revision": 3}, "operations": []}
+    adapter._invoke = invoke
+    result = asyncio.run(adapter.get_execution_plan({"version_gid": "bop-1", "revision": 3}, object()))
+    assert result["official"] is False
+    assert calls[-1].capability_id == "craft.bop.execution_structure.preview"
+    assert calls[-1].payload == {"version_gid": "bop-1", "expected_revision": 3}
+    assert calls[-1].expected_resource_version == "3"
+
+
+def test_unpublished_simulation_preview_cannot_bypass_permission_or_revision_failures():
+    import pytest
+    from backend.capability_v2.provider_contracts import CapabilityBusinessError
+    for code in ("permission_denied", "revision_conflict"):
+        adapter = GovernedSimulationRuntimeClient(Gateway())
+        calls = []
+        async def invoke(invocation, context):
+            calls.append(invocation.capability_id)
+            raise CapabilityBusinessError(code, code)
+        adapter._invoke = invoke
+        with pytest.raises(CapabilityBusinessError) as error:
+            asyncio.run(adapter.get_execution_plan({"version_gid": "bop-1", "revision": 3}, object()))
+        assert error.value.code == code
+        assert calls == ["craft.bop.execution_structure.get"]

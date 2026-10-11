@@ -588,13 +588,18 @@ def test_official_provider_requires_exact_frozen_release_allowlist():
     ) == provider
 
 
-def test_checked_in_official_domain_hashes_match_exact_source_artifacts():
+def _official_domain_artifacts():
     root = Path(__file__).resolve().parents[2]
     document = json.loads(
         (root / "backend" / "capability_v2" / "official_domains.json").read_text(encoding="utf-8")
     )
-    for domain in document["domains"]:
-        assert domain["artifact"]["artifact_hash"] == hash_domain_artifact(
-            root,
-            domain["artifact_path"],
-        )
+    return document["domains"]
+
+
+@pytest.mark.parametrize("domain", _official_domain_artifacts(), ids=lambda domain: domain["domain_id"])
+def test_checked_in_official_domain_hashes_match_exact_source_artifacts(domain):
+    root = Path(__file__).resolve().parents[2]
+    assert domain["artifact"]["artifact_hash"] == hash_domain_artifact(
+        root,
+        domain["artifact_path"],
+    )

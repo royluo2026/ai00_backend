@@ -3,7 +3,7 @@ const {JSDOM}=require('jsdom');
 const tick=()=>new Promise(r=>setImmediate(r));
 function page(){
   const dom=new JSDOM('<div id="modelDocumentList"></div>',{runScripts:'outside-only'});
-  for(const file of ['model_document_collection.js','teamcenter_online_source.js','tree_projection_cache.js','cad_sim.js']) vm.runInContext(fs.readFileSync(path.join(__dirname,file),'utf8'),dom.getInternalVMContext());
+  for(const file of ['model_document_collection.js','teamcenter_online_source.js','teamcenter_session.js','tree_projection_cache.js','cad_sim.js']) vm.runInContext(fs.readFileSync(path.join(__dirname,file),'utf8'),dom.getInternalVMContext());
   return dom;
 }
 test('local open completes in Main without independent identity, scope or workspace refresh',async()=>{
@@ -40,6 +40,7 @@ async function setup(){
   `,dom.getInternalVMContext());
   await dom.window.__pending;return dom;
 }
+
 test('initial children browse renders root plus direct child, unknown disclosure and disabled visibility',async()=>{
   const dom=await setup(),d=dom.window.document;
   assert.equal(dom.window.__calls.length,1);assert.match(dom.window.__calls[0][0],/children.read.request$/);
@@ -48,6 +49,59 @@ test('initial children browse renders root plus direct child, unknown disclosure
   assert.equal(vm.runInContext(`_modelDocumentCollection.state.documents[0].product_tree.nodes.find(node=>node.occurrence_id==='child').control_key`,dom.getInternalVMContext()),'tc:edge');
   assert.ok([...d.querySelectorAll('input')].every(x=>x.disabled));
   assert.equal(d.querySelector('.cs-model-document-tree').classList.contains('hidden'),false);dom.window.close();
+});
+
+test('missing historical parent path preserves the cached revision without refreshing or replacing ancestors',async()=>{
+ const dom=await setup();try{
+  const d=vm.runInContext('_modelDocumentCollection.state.documents[0]',dom.getInternalVMContext());
+  const before=JSON.stringify(d.product_tree.nodes),calls=dom.window.__calls.length;
+  dom.window.document.querySelectorAll('.cs-alternate-tree-toggle')[1].click();
+  dom.window.__reject(Error('teamcenter_parent_path_not_found'));await tick();await tick();
+  assert.equal(JSON.stringify(d.product_tree.nodes),before);
+  assert.equal(dom.window.__calls.length,calls+1);assert.equal(dom.window.__calls.at(-1)[1].refresh,false);
+  assert.match(dom.window.document.querySelector('[data-tc-retry]').textContent,/teamcenter_parent_path_not_found/);
+ }finally{dom.window.close();}
+});
+
+test('historical path mismatch refreshes only after user choice and saves the old tree first',async()=>{
+ const dom=await setup();try{
+  vm.runInContext(`window.__order=[];window.__saved=[];window.__prompt=null;
+   window.AI00Dialogs={confirm:async o=>{__prompt=o;__order.push('choice');return true;}};
+   window.electronAPI={simulationTreeCache:{put:async(w,k,data)=>{if(k==='models'){__order.push('saved');__saved.push(JSON.parse(JSON.stringify(data)));}}}};
+   _requestVisMockupCommand=async(id,payload)=>{if(payload.parent_path.length)throw Error('teamcenter_parent_path_not_found');__order.push('refresh');if(!payload.refresh)throw Error('refresh_required');
+    const n=__node('new-revision','root',[{occurrence_uid:'edge',item_revision_uid:'new-rev'}],null);n.name='Assembly / 09';return{steps:[{result:{...__page(__root,[n]),cache_hit:false,generation:'b'.repeat(32)}}]};};
+  `,dom.getInternalVMContext());
+  dom.window.document.querySelectorAll('.cs-alternate-tree-toggle')[1].click();await tick();await tick();
+  assert.deepEqual(Array.from(dom.window.__order).slice(0,3),['choice','saved','refresh']);
+  assert.equal(dom.window.__prompt.cancelText,'保留缓存');
+  const saved=dom.window.__saved[0].items[0],d=vm.runInContext('_modelDocumentCollection.state.documents[0]',dom.getInternalVMContext());
+  assert.ok(saved.product_tree_baseline.product_tree.nodes.some(n=>n.occurrence_id==='child'));
+  assert.ok(d.product_tree.nodes.some(n=>n.occurrence_id==='new-revision'));
+  assert.ok(d.product_tree_baseline.product_tree.nodes.some(n=>n.occurrence_id==='child'));
+ }finally{dom.window.close();}
+});
+
+for(const mode of ['keep','storage_failed'])test('historical path choice does not refresh when '+mode,async()=>{
+ const dom=await setup();try{
+  vm.runInContext(`window.__prompted=0;window.AI00Dialogs={confirm:async()=>{__prompted++;return ${mode==='storage_failed'};}};
+   window.electronAPI={simulationTreeCache:{put:async()=>{throw Error('disk_full');}}};
+  `,dom.getInternalVMContext());
+  const d=vm.runInContext('_modelDocumentCollection.state.documents[0]',dom.getInternalVMContext()),before=JSON.stringify(d.product_tree.nodes),calls=dom.window.__calls.length;
+  dom.window.document.querySelectorAll('.cs-alternate-tree-toggle')[1].click();dom.window.__reject(Error('teamcenter_parent_path_not_found'));await tick();await tick();
+  assert.equal(dom.window.__prompted,1);assert.equal(dom.window.__calls.length,calls+1);assert.equal(JSON.stringify(d.product_tree.nodes),before);
+ }finally{dom.window.close();}
+});
+
+test('user-selected refresh waits for parent pagination and sends a fresh first page',async()=>{
+ const dom=await setup();try{
+  const d=vm.runInContext('_modelDocumentCollection.state.documents[0]',dom.getInternalVMContext()),tree=d.product_tree,calls=[];let finish;
+  tree.pages['[]'].next_cursor=1;
+  const read=async(id,payload)=>{calls.push(payload);if(payload.cursor)return new Promise(resolve=>{finish=()=>resolve({steps:[{result:dom.window.__page(dom.window.__root,[],1)}]});});return{steps:[{result:{...dom.window.__page(dom.window.__root,[]),cache_hit:false,generation:'c'.repeat(32)}}]};};
+  const more=dom.window.AI00TeamcenterOnlineSource.readChildren(read,d,tree,[],{more:true});
+  const refreshed=dom.window.AI00TeamcenterOnlineSource.refreshAncestor(read,d,tree,[{occurrence_uid:'edge',item_revision_uid:'rev'}],()=>true);
+  await tick();assert.equal(calls.length,1);finish();await more;assert.equal(await refreshed,true);
+  assert.equal(calls.length,2);assert.equal(calls[1].refresh,true);assert.equal(calls[1].cursor,0);assert.equal(tree.nodes.length,1);
+ }finally{dom.window.close();}
 });
 test('bound embedded Teamcenter tree enables occurrence visibility controls',async()=>{
   const dom=await setup(),d=dom.window.document;
@@ -238,6 +292,23 @@ test('online document actions live in the context menu, including cached rows an
   buttons.find(b=>b.textContent==='插入当前文档').click();await tick();
   assert.equal(dom.window.__loginChecks,2);
   assert.match(dom.window.__opens[1],/visualization.insert.request$/);dom.window.close();
+});
+
+test('explicit new document action launches even when local interaction has a stale saved binding',async()=>{
+  const dom=await setup(),d=dom.window.document;
+  vm.runInContext(`
+    window.__opens=[];window.__ensures=0;
+    window._localViewerInteractionEnabled=async()=>true;
+    window._ensureLocalViewerReady=async()=>{__ensures++;throw Error('stale_binding');};
+    _openTeamcenterOnlineDocument=async(document,mode)=>{__opens.push([document.document_gid,mode]);return true;};
+    _cmdShow=()=>{};
+  `,dom.getInternalVMContext());
+  d.querySelector('.cs-model-document-name').dispatchEvent(new dom.window.MouseEvent('contextmenu',{bubbles:true,cancelable:true}));
+  [...d.querySelectorAll('[role="menuitem"]')].find(button=>button.textContent==='新文档打开').click();
+  await tick();
+  assert.deepEqual(JSON.parse(JSON.stringify(dom.window.__opens)),[['2','new']]);
+  assert.equal(dom.window.__ensures,0);
+  dom.window.close();
 });
 
 test('cancelling Teamcenter login does not enqueue an online open command',async()=>{
@@ -468,6 +539,26 @@ test('Teamcenter login hides the native viewport before focusing credentials',as
   d.querySelector('[data-cancel]').click();await dom.window.__loginPending;dom.window.close();
 });
 
+test('local test login sends an explicit remember choice and clears the password field',async()=>{
+  const dom=page();dom.reconfigure({url:'http://localhost:5173/packages/sim-plugin/web/cad_sim/index.html'});
+  await tick();const d=dom.window.document;
+  vm.runInContext(`
+    window.__loginInput=null;
+    _getTeamcenterSessionState=()=>({login:async input=>{window.__loginInput=input;return {state:'ready',masked_username:'u***r'};}});
+    _syncNativeViewportOcclusion=()=>{};
+    requestAnimationFrame=callback=>callback();
+    window.__loginPending=_teamcenterLoginDialog();
+  `,dom.getInternalVMContext());
+  const form=d.querySelector('.cs-teamcenter-login-dialog');
+  form.elements.username.value='user';form.elements.password.value='secret';
+  form.elements.remember.checked=true;
+  form.dispatchEvent(new dom.window.Event('submit',{bubbles:true,cancelable:true}));
+  await dom.window.__loginPending;
+  assert.equal(dom.window.__loginInput.remember,true);
+  assert.equal(form.elements.password.value,'');
+  dom.window.close();
+});
+
 test('source mapper produces a valid prefixed forest for a complete snapshot',async()=>{
   const dom=page();await tick();const api=dom.window.AI00TeamcenterOnlineSource;
   const tree=await api.readSnapshot(async()=>({node_count:2,nodes:[{occurrence_id:'r',parent_occurrence_id:null},{occurrence_id:'c',parent_occurrence_id:'r'}],next_cursor:null}),'snapshot');
@@ -648,4 +739,82 @@ test('targeted add preserves newer loaded descendants over serialized older proj
   assert.equal(dom.window.__calls.length,3);
   assert.equal(dom.window.__calls.at(-1)[1].source_selector.object_uid,'new');
   dom.window.close();
+});
+
+test('unknown visibility is unchecked with a question mark state and rerendered children use stored visibility',async()=>{
+ const dom=await setup();try{
+  vm.runInContext(`window._localViewerInteraction=()=>({});window._actOnModelNode=async()=>({visible:true});_renderModelDocuments(_modelDocumentCollection.state.documents);`,dom.getInternalVMContext());
+  if(!dom.window.document.querySelector('.cs-alternate-tree-check'))dom.window.document.querySelector('.cs-model-document-toggle').click();
+  if(dom.window.document.querySelectorAll('.cs-alternate-tree-check').length===1)dom.window.document.querySelector('.cs-alternate-tree-toggle').click();
+  const checks=dom.window.document.querySelectorAll('.cs-alternate-tree-check');
+  assert.equal(checks[0].checked,false);assert.equal(checks[0].indeterminate,false);
+  assert.equal(checks[0].dataset.visibility,'unknown');
+  checks[1].click();await tick();await tick();
+  assert.equal(checks[0].checked,true);assert.equal(checks[0].indeterminate,false);
+  // A lazy refresh creates new child objects while an ancestor row is retained.
+  vm.runInContext(`for(const node of _modelDocumentCollection.state.documents[0].product_tree.nodes)node.visible=false;`,dom.getInternalVMContext());
+  for(const row of dom.window.document.querySelectorAll('.cs-alternate-tree-item'))row._syncModelVisibility?.();
+  assert.equal(checks[0].checked,false);assert.equal(checks[1].checked,false);
+ }finally{dom.window.close();}
+});
+
+test('partial root visibility keeps confirmed effects and marks the failed target unknown',async()=>{
+ const dom=await setup();try{
+  vm.runInContext(`
+   const doc=_modelDocumentCollection.state.documents[0],child=doc.product_tree.nodes.find(n=>n.parent_key!=null);
+   doc.product_tree.nodes.push({...child,node_key:'second',occurrence_id:'second',name:'second',child_order:1,control_key:'tc:second',occurrence_path:[{occurrence_uid:'second',item_revision_uid:'rev'}]});
+   for(const n of doc.product_tree.nodes)n.visible=false;
+   window._localViewerInteraction=()=>({});window.__writes=0;_cmdShow=()=>{};
+   window._actOnModelNode=async()=>{if(++__writes===2)throw Error('outcome_unknown');return{visible:true};};
+   _renderModelDocuments([doc]);`,dom.getInternalVMContext());
+  if(!dom.window.document.querySelector('.cs-alternate-tree-check'))dom.window.document.querySelector('.cs-model-document-toggle').click();
+  if(dom.window.document.querySelectorAll('.cs-alternate-tree-check').length===1)dom.window.document.querySelector('.cs-alternate-tree-toggle').click();
+  dom.window.document.querySelector('.cs-alternate-tree-check').click();await tick();await tick();
+  const stored=vm.runInContext(`_modelDocumentCollection.state.documents[0].product_tree.nodes`,dom.getInternalVMContext());
+  assert.equal(stored.find(n=>n.control_key==='tc:edge').visible,true);
+  assert.equal(stored.find(n=>n.node_key==='second').visible,null);
+  const checks=dom.window.document.querySelectorAll('.cs-alternate-tree-check');
+  assert.equal(checks[0].checked,false);assert.equal(checks[0].indeterminate,false);assert.equal(checks[1].checked,true);assert.equal(checks[2].checked,false);assert.equal(checks[2].indeterminate,false);
+  assert.equal(checks[2].getAttribute('aria-label'),'显隐状态未确认');
+ }finally{dom.window.close();}
+});
+
+test('lazy child arrival clears a retained parent check when new visibility is unknown',async()=>{
+ const dom=await setup();try{
+  vm.runInContext(`window._localViewerInteraction=()=>({});window._actOnModelNode=async()=>({visible:true});_renderModelDocuments(_modelDocumentCollection.state.documents);`,dom.getInternalVMContext());
+  const d=dom.window.document;
+  if(!d.querySelector('.cs-alternate-tree-check'))d.querySelector('.cs-model-document-toggle').click();
+  if(d.querySelectorAll('.cs-alternate-tree-check').length===1)d.querySelector('.cs-alternate-tree-toggle').click();
+  d.querySelectorAll('.cs-alternate-tree-check')[1].click();await tick();await tick();
+  assert.equal(d.querySelector('.cs-alternate-tree-check').checked,true);
+  d.querySelectorAll('.cs-alternate-tree-toggle')[1].click();
+  const grand=dom.window.__node('grandchild','child',[{occurrence_uid:'edge',item_revision_uid:'rev'},{occurrence_uid:'edge2',item_revision_uid:'rev2'}],false);
+  dom.window.__resolve({steps:[{result:dom.window.__page(dom.window.__child,[grand])}]});await tick();await tick();
+  for(const check of d.querySelectorAll('.cs-alternate-tree-check')){assert.equal(check.checked,false);assert.equal(check.indeterminate,false);assert.equal(check.dataset.visibility,'unknown');}
+ }finally{dom.window.close();}
+});
+
+test('a partial child page cannot mark an unconfirmed whole branch visible',async()=>{
+ const dom=await setup();try{
+  vm.runInContext(`window._localViewerInteraction=()=>({});window._actOnModelNode=async()=>({visible:true});const doc=_modelDocumentCollection.state.documents[0];doc.product_tree.pages['[]'].next_cursor=1;_renderModelDocuments([doc]);`,dom.getInternalVMContext());
+  const d=dom.window.document;
+  if(!d.querySelector('.cs-alternate-tree-check'))d.querySelector('.cs-model-document-toggle').click();
+  if(d.querySelectorAll('.cs-alternate-tree-check').length===1)d.querySelector('.cs-alternate-tree-toggle').click();
+  d.querySelectorAll('.cs-alternate-tree-check')[1].click();await tick();await tick();
+  const root=d.querySelector('.cs-alternate-tree-check');
+  assert.equal(root.checked,false);assert.equal(root.indeterminate,false);assert.equal(root.dataset.visibility,'unknown');
+  assert.equal(d.querySelectorAll('.cs-alternate-tree-check')[1].checked,true);
+ }finally{dom.window.close();}
+});
+
+test('Teamcenter diagnostics retain the exact rejected page checks and stale replies',async()=>{
+ const dom=await setup();try{
+  dom.window.__debug=[];dom.window._simulationDebug=(stage,detail)=>dom.window.__debug.push({stage,...detail});
+  const toggle=dom.window.document.querySelectorAll('.cs-alternate-tree-toggle')[1];toggle.click();
+  const page=dom.window.__page(dom.window.__child,[]);page.source_identity_hash='wrong-source';
+  dom.window.__resolve({steps:[{result:page}]});await tick();
+  assert.ok(dom.window.__debug.some(e=>e.stage==='tc_page_started'&&e.capability_id==='simulation.teamcenter.product_structure.children.read.request'&&e.capability_version===1));
+  assert.ok(dom.window.__debug.some(e=>e.stage==='tc_page_rejected'&&e.reason.includes('source_identity')));
+  assert.ok(dom.window.__debug.some(e=>e.stage==='tc_page_failed'&&e.error_code==='teamcenter_children_page_invalid'&&e.capability_id==='simulation.teamcenter.product_structure.children.read.request'&&e.capability_version===1));
+ }finally{dom.window.close();}
 });

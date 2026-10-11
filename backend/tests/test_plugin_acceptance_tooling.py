@@ -31,7 +31,7 @@ class PluginAcceptanceToolingTests(unittest.TestCase):
     def test_database_isolation_verifier_covers_all_first_class_domains(self):
         self.assertEqual(set(URLS), {
             "base", "agent", "craft", "digital_model", "project_management",
-            "simulation", "ontology", "knowledge", "local_integration",
+            "simulation", "ontology", "knowledge", "device", "factory", "integration",
         })
 
     def test_reference_package_is_deterministic_and_platform_valid(self):

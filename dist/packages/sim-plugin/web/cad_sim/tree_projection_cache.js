@@ -3,35 +3,41 @@
   if(typeof module==='object'&&module.exports) module.exports=api;
   else root.AI00TreeProjectionCache=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
-  function create(getApi){
+  function create(getApi,diagnostic=()=>{}){
     return {async run({workspaceGid,kind,load,render:display,isCurrent,useCache=false,previewCache=true,acceptCached=()=>true,preserveFreshItems=false}){
       const api=getApi?.(); let cached=null,view=null;
+      const started=Date.now(),trace_id=globalThis.crypto?.randomUUID?.();
+      const trace=(stage,detail={})=>{try{diagnostic(stage,{trace_id,workspace_gid:workspaceGid,cache_kind:kind,elapsed_ms:Date.now()-started,...detail});}catch{}};
       const render=(data,meta)=>display(data,{...meta,...(!data.items?.length?{cached_at:undefined,pending:false}:{}),workspaceGid,kind,viewState:view?.data});
-      try { cached=await api?.get(workspaceGid,kind); } catch(_) { /* Cache failure must not prevent a governed read. */ }
+      trace('projection_lookup');
+      try { cached=await api?.get(workspaceGid,kind);trace(cached?'projection_hit':'projection_miss',{cached_at:cached?.cached_at}); } catch(error) { trace('projection_storage_failed',{error_code:error?.message,action:'read'}); }
       try { view=await api?.get(workspaceGid,kind+'-view'); } catch(_) {}
-      if(!isCurrent()) return;
+      if(!isCurrent()){trace('projection_stale');return;}
       if(cached) {
         try {
           if(!Array.isArray(cached.data?.items)) throw Error('cache_projection_invalid');
-          if(previewCache)render(cached.data,{cached_at:cached.cached_at,pending:!useCache,cacheOnly:useCache});
-          if(useCache&&acceptCached(cached.data)) return;
-        } catch(_) { cached=null; }
+          if(previewCache){render(cached.data,{cached_at:cached.cached_at,pending:!useCache,cacheOnly:useCache});trace('projection_preview',{cached_at:cached.cached_at,item_count:cached.data.items.length,cache_state:'unverified'});}
+          if(useCache&&acceptCached(cached.data)){trace('projection_accepted',{cache_state:'unverified'});return;}
+          if(useCache)trace('projection_rejected',{reason:'accept_cached_false'});
+        } catch(error) {trace('projection_rejected',{error_code:error?.message});cached=null;}
       }
       try {
-        const data=await load(cached?.data);
-        if(!isCurrent()) return;
+        trace('projection_read_started');const data=await load(cached?.data);
+        if(!isCurrent()){trace('projection_stale');return;}
         const failure=data.items?.find(item=>item.product_tree_error)?.product_tree_error;
         if(failure&&(/forbidden|unauthorized|not_found|permission_denied/.test(failure)||cached&&!preserveFreshItems)) throw Error(failure);
         render(data,{error:failure||null,...(failure&&cached&&previewCache?{cached_at:cached.cached_at}:{})});
-        if(!failure) { try { await api?.put(workspaceGid,kind,data); } catch(_) { /* Display remains usable without persistence. */ } }
+        trace('projection_read_completed',{item_count:data.items?.length,error_code:failure||null});
+        if(!failure&&api?.put) { try { await api.put(workspaceGid,kind,data);trace('projection_write'); } catch(error) {trace('projection_storage_failed',{action:'write',error_code:error?.message});} }
       } catch(error) {
         if(!isCurrent()) return;
         const message=error?.message||'tree_refresh_failed';
+        trace('projection_failed',{error_code:message});
         if(/forbidden|unauthorized|not_found|permission_denied/.test(message)) {
-          try { await api?.remove(workspaceGid,kind); } catch(_) {}
+          try { await api?.remove(workspaceGid,kind);trace('projection_removed'); } catch(error) {trace('projection_storage_failed',{action:'remove',error_code:error?.message});}
           render({items:[]},{error:message}); throw error;
         }
-        if(cached) render(cached.data,{cached_at:cached.cached_at,error:message});
+        if(cached){render(cached.data,{cached_at:cached.cached_at,error:message});trace('projection_fallback',{cached_at:cached.cached_at,cache_state:'unverified'});}
         else throw error;
       }
     }};

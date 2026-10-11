@@ -114,6 +114,8 @@ async def get_workbench_home(
                 "project_gid": str(project.get("gid") or ""),
                 "project_name": str(project.get("name") or ""),
                 "role": role,
+                "status": str(project.get("status") or ""),
+                "vehicle_model_gid": project.get("vehicle_model_gid"),
                 "section_gid": None,
             }
             for project in projects
@@ -155,7 +157,7 @@ async def get_workbench_panel1(
             value, = await execute_constituents(
                 request, current_user, principal, gateway, ((capability_id, arguments, frozenset()),),
             )
-            items.extend(_items(value))
+            items.extend({**item, "item_type": source} for item in _items(value))
     unique: dict[tuple[str, str], dict[str, Any]] = {}
     for item in items:
         key = (str(item.get("item_type") or ""), str(item.get("gid") or ""))

@@ -179,6 +179,14 @@ const _comparisonLoaders = new Map();
 const _projectionStore = new LineageProjectionStore({ maxScopes: 3, maxNodes: 12_000, maxBytes: 16 * 1024 * 1024 });
 const _loadCoordinator = new LineageLoadCoordinator();
 
+/** 当前登录用户是否超管（与 bop.js 判定口径一致：org_role / system_role / role） */
+function _isSuperAdminUser() {
+  try {
+    const u = window.parent?._authUser || window.top?._authUser || window._authUser;
+    return (u?.org_role || u?.system_role || u?.role) === 'super_admin';
+  } catch { return false; }
+}
+
 async function _invokeCapability(id, version, payload, options = {}) {
   options.signal?.throwIfAborted();
   const response = await window.AI00Business.request(id, { version, payload }, async () => true);
@@ -305,6 +313,12 @@ const $addNodeBtn    = document.getElementById('lvAddNode');
 const $layoutCanvas  = document.getElementById('lvLayoutCanvas');
 const $layoutEditBtn   = document.getElementById('lvLayoutEditBtn');
 const $layoutFitBtn    = document.getElementById('lvLayoutFitBtn');
+const $demoRelationWrap = document.getElementById('lvDemoRelationWrap');
+const $demoRelationBtn  = document.getElementById('lvDemoRelationBtn');
+const $demoRelationMenu = document.getElementById('lvDemoRelationMenu');
+const $demoResetBtn     = document.getElementById('lvDemoResetBtn');
+const $demoPlayBtn      = document.getElementById('lvDemoPlayBtn');
+const $demoSpeedBtn     = document.getElementById('lvDemoSpeedBtn');
 const $importPbomBtn   = document.getElementById('lvImportPbomBtn');
 const $importTcBtn     = document.getElementById('lvImportTcBtn');
 const $arrangeMode     = null; // 已移除
@@ -623,7 +637,17 @@ function _initCollapsed() {
 /** 取节点的树深度（根据 parent_gid 链预计算，替代旧的 ai00_level 固定分组） */
 function _treeDepth(r) { return _depthByGid.get(r?.gid) ?? 0; }
 
-async function _load({ layoutViewport = null } = {}) {
+async function _load({ layoutViewport = null, silent = false, demoLineGid = null } = {}) {
+  if (_demoStepsVersionGid !== _versionGid) {
+    _demoSelectionEpoch++;
+    _demoConnecting = false;
+    document.getElementById('lvDemoProgress')?.remove();
+    document.getElementById('lvLayoutCanvas')?.classList.remove('lv-demo-preparing');
+    _assocPanel?.stopDemo?.();
+    _demoStepsVersionGid = _versionGid;
+    _demoStepsByLine = {}; _demoSteps = null; _demoLastLineGid = null;
+    _syncDemoStatusUI([]);
+  }
   if (!_versionGid) {
     // 显示空画布，画布内提示
     $columns.style.display = 'none';
@@ -646,8 +670,10 @@ async function _load({ layoutViewport = null } = {}) {
     return;
   }
   document.querySelector('.lv-empty-hint-overlay')?.remove();
-  document.getElementById('lvLoadingOverlay')?.classList.remove('hidden');
-  $columns.innerHTML = '<div class="lv-loading"><div class="lv-spinner"></div>加载中…</div>';
+  if (!silent) {
+    document.getElementById('lvLoadingOverlay')?.classList.remove('hidden');
+    $columns.innerHTML = '<div class="lv-loading"><div class="lv-spinner"></div>加载中…</div>';
+  }
 
   try {
     if (_projectVersions[0]?.versionGid !== _versionGid) {
@@ -675,6 +701,8 @@ async function _load({ layoutViewport = null } = {}) {
         if (firstCommit) {
           _initCollapsed();
           _restoreView();
+          // A demo selection takes precedence over the saved (possibly old) line filter.
+          if (demoLineGid) _level1Filter = new Set([demoLineGid]);
           firstCommit = false;
         }
       },
@@ -695,10 +723,11 @@ async function _load({ layoutViewport = null } = {}) {
       _pendingLayoutZoom = layoutViewport.zoom;
     }
     _render();
+    _refreshDemoStatus().catch(() => {});
     _loadLineGrants(loaded.version?.project_gid || '').then(() => {
       _updateVersionStatusUI();
     });
-    _loadCloudConfig(); // 异步拉取云端共享布局配置（覆盖本地，team 共享）
+    if (!demoLineGid) _loadCloudConfig(); // 演示切线不再恢复旧共享视图
   } catch (e) {
     const hint = _capabilityLoadErrorMessage(e);
     $columns.innerHTML = `<div class="lv-empty">加载失败：${hint}</div>`;
@@ -709,6 +738,7 @@ async function _load({ layoutViewport = null } = {}) {
     if (!_params.bop_version_gid && localStorage.getItem(_lsk('lv:lastVersionGid')) === _versionGid) {
       localStorage.removeItem(_lsk('lv:lastVersionGid'));
     }
+    if (demoLineGid) throw e;
   }
 }
 
@@ -1223,12 +1253,35 @@ function _buildLineageData() {
 /**
  * 同步布局模式相关 UI（工具栏按钮显示/隐藏、分段开关激活状态）
  */
+async function _applyCapturePicture(operation, artifactRef, versionGid) {
+  if (versionGid !== _versionGid || (operation.bop_version_gid && operation.bop_version_gid !== versionGid)) return;
+  const row = _rowByGid.get(operation.bop_entry_gid);
+  if (!row || (row.version_gid && row.version_gid !== versionGid)) return;
+  const picture = _normalizePicItems([{ artifact_ref: artifactRef }])[0];
+  if (!picture || !await _resolvePictureDisplay(picture, versionGid)) throw Error('capture_picture_unavailable');
+  if (versionGid !== _versionGid || _rowByGid.get(operation.bop_entry_gid) !== row) return;
+  row.process_flow_pic = [picture];
+  const visited = new Set();
+  let current = row;
+  while (current && !visited.has(current.gid)) {
+    visited.add(current.gid);
+    if (_viewMode === 'layout') _layoutMode?.refreshProcessCard?.(current.gid);
+    else {
+      for (const card of $columns.querySelectorAll('.lv-card')) {
+        if (card.dataset.gid === current.gid) card.replaceWith(_renderCard(current));
+      }
+    }
+    if (['process', 'bop_process'].includes(current.node_type)) break;
+    current = _rowByGid.get(current.parent_gid);
+  }
+}
+
 function _normalizePicItems(items) {
   const out = [];
   for (const item of items || []) {
     if (item && typeof item === 'object' && !Array.isArray(item)) {
       const pic = {
-        url: String(item.url || '').trim(),
+        url: item.artifact_ref ? window.AI00Business.artifactPath({ artifact_ref: item.artifact_ref, name: 'screenshot' }) : String(item.url || '').trim(),
         object_key: String(item.object_key || '').trim(),
         storage: String(item.storage || '').trim(),
       };
@@ -1252,7 +1305,7 @@ function _pictureCacheKey(pic, versionGid = _versionGid) {
   const normalized = {
     object_key: String(record.object_key || '').trim(),
     storage: String(record.storage || '').trim(),
-    url: String(record.url || record.src || '').trim(),
+    url: record.artifact_ref ? window.AI00Business.artifactPath({ artifact_ref: record.artifact_ref, name: 'screenshot' }) : String(record.url || record.src || '').trim(),
   };
   return String(versionGid || '') + ':' + JSON.stringify(normalized);
 }
@@ -1272,7 +1325,7 @@ async function _resolvePictureDisplay(pic, versionGid = _versionGid) {
         return url;
       })
       .catch(error => {
-        console.warn('[lineage] governed picture resolution failed:', {
+        console.warn('[lineage] governed picture resolution failed:', error?.code || error?.message || String(error), {
           versionGid, code: error?.code || '', message: error?.message || String(error),
         });
         return '';
@@ -1325,16 +1378,59 @@ async function _resolvePictureRecords(records) {
   return settled.flatMap(r => r.status === 'fulfilled' && r.value ? [r.value] : []);
 }
 
+let _browserPictureActive = 0;
+const _browserPictureQueue = [];
+async function _browserPictureContentUrl(ref, artifact = false) {
+  if (!ref || !/^image\/[a-z0-9.+-]{1,64}$/.test(ref.media_type || '') ||
+      !/^[a-f0-9]{64}$/.test(ref.sha256 || '') || !Number.isInteger(ref.byte_size) ||
+      ref.byte_size < 1 || ref.byte_size > 5 * 1024 * 1024) throw Error('invalid_picture_ref');
+  if (artifact ? !/^artifact_[a-f0-9]{32}$/.test(ref.artifact_id || '') || ref.version !== 1
+               : typeof ref.access_grant !== 'string' || !ref.access_grant) throw Error('invalid_picture_ref');
+  // Start the download timeout after acquiring a slot, not while the browser queues it.
+  if (_browserPictureActive >= 4) await new Promise(resolve => _browserPictureQueue.push(resolve));
+  else _browserPictureActive++;
+  try {
+  const headers = { Accept: ref.media_type };
+  const token = localStorage.getItem('ai00_token');
+  if (token) headers['X-AI00-Token'] = token;
+  const route = artifact ? `/api/v2/capability-artifacts/${ref.artifact_id}/content`
+                         : '/api/v2/capability-artifacts/historical-picture/content';
+  const options = { headers, credentials: 'include', redirect: 'error', signal: AbortSignal.timeout(30000) };
+  if (!artifact) {
+    options.method = 'POST';
+    headers['Content-Type'] = 'application/json';
+    options.body = JSON.stringify({ access_grant: ref.access_grant });
+  }
+  const response = await fetch(route, options);
+  if (!response.ok || response.headers.get('Content-Type')?.split(';')[0] !== ref.media_type ||
+      Number(response.headers.get('Content-Length')) > ref.byte_size) throw Error('picture_transport_failed');
+  const bytes = await response.arrayBuffer();
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+  const hash = Array.from(new Uint8Array(digest), n => n.toString(16).padStart(2, '0')).join('');
+  if (bytes.byteLength !== ref.byte_size || hash !== ref.sha256) throw Error('artifact_integrity_failed');
+  return URL.createObjectURL(new Blob([bytes], { type: ref.media_type }));
+  } finally {
+    const next = _browserPictureQueue.shift();
+    if (next) next();
+    else _browserPictureActive--;
+  }
+}
+
 async function _resolvePicItem(pic, versionGid = _versionGid) {
 if(!pic)return null;
  const record=typeof pic==='string'?{url:pic}:pic;
  const bridge=window.top?.electronAPI||window.parent?.electronAPI||window.electronAPI;
  let url='';
- if(record.url?.startsWith('artifact:'))url=bridge?.artifactContentUrl?.(window.AI00Business.parseArtifactPath(record.url).artifact_ref)||'';
+ if(record.artifact_ref)url=bridge?.artifactContentUrl ? bridge.artifactContentUrl(record.artifact_ref) : await _browserPictureContentUrl(record.artifact_ref, true);
+ else if(record.url?.startsWith('artifact:')){
+  const ref=window.AI00Business.parseArtifactPath(record.url).artifact_ref;
+  url=bridge?.artifactContentUrl ? bridge.artifactContentUrl(ref) : await _browserPictureContentUrl(ref, true);
+ }
  else{
   const reference_hash=await _pictureReferenceHash(record);
   const access=(await _loadPictureAccess(versionGid)).get(reference_hash);
-  url=bridge?.pictureContentUrl?.(access)||'';
+  if (!access) throw Error('picture_unavailable');
+  url=bridge?.pictureContentUrl ? bridge.pictureContentUrl(access) : await _browserPictureContentUrl(access);
  }
  if(!url)throw Error('image_required');
  return {...record,url};
@@ -1381,6 +1477,15 @@ function _syncLayoutUI() {
   // 布局模式下显示适应全局按钮和编辑按钮
   if ($layoutEditBtn) $layoutEditBtn.style.display = isLayout ? '' : 'none';
   $layoutFitBtn.style.display = isLayout ? '' : 'none';
+  // W10 演示按钮：仅布局模式 + 超管可见（后端能力同样校验超管与演示版本标记）
+  const _showDemoBtns = isLayout && _isSuperAdminUser();
+  if ($demoRelationWrap) $demoRelationWrap.style.display = _showDemoBtns ? '' : 'none';
+  if ($demoResetBtn) $demoResetBtn.style.display = _showDemoBtns ? '' : 'none';
+  if ($demoPlayBtn) $demoPlayBtn.style.display = _showDemoBtns ? '' : 'none';
+  if ($demoSpeedBtn) $demoSpeedBtn.style.display = _showDemoBtns ? '' : 'none';
+  const $demoStatus = document.getElementById('lvDemoStatus');
+  if ($demoStatus) $demoStatus.style.display = _showDemoBtns ? '' : 'none';
+  if (!_showDemoBtns && $demoRelationMenu) $demoRelationMenu.style.display = 'none';
   if ($importTcBtn) $importTcBtn.style.display = isLayout ? '' : 'none';
   const $layoutSep = document.getElementById('lvLayoutSep');
   if ($layoutSep) $layoutSep.style.display = isLayout ? '' : 'none';
@@ -2033,6 +2138,7 @@ function _initSidebarPanels() {
     cf:         _cf,
     toast:      _toast,
     onActionComplete: () => _reload(),
+    onCaptureAttached: _applyCapturePicture,
     applyActiveState: _applyActiveState,
     // Demo 动画回调
     getBopLinkedNodes: () => {
@@ -2071,21 +2177,29 @@ function _initSidebarPanels() {
         '#lvColumns .lv-demo-pending, #lvColumns .lv-demo-reveal, #llWorld .lv-demo-pending, #llWorld .lv-demo-reveal'
       ).forEach(el => el.classList.remove('lv-demo-pending', 'lv-demo-reveal'));
     },
-    demoSetupView: (stationGid) => {
+    demoSetupView: async (stationGid, lineGid = null) => {
       if (!_layoutMode) return;
-      const newZoom = 0.61;
-      _layoutMode._zoom = newZoom;
-      if (stationGid) {
-        const el = _layoutMode._world?.querySelector(`.ll-station-card[data-gid="${stationGid}"]`);
-        if (el) {
-          const cx = (parseFloat(el.style.left) || 0) + (el.offsetWidth || 0) / 2;
-          const cy = (parseFloat(el.style.top) || 0) + (el.offsetHeight || 0) / 2;
-          const vw = _layoutMode._viewport.clientWidth;
-          const vh = _layoutMode._viewport.clientHeight;
-          _layoutMode._panX = vw / 2 - cx * newZoom;
-          _layoutMode._panY = vh / 2 - cy * newZoom - 120;
-        }
+      cancelAnimationFrame(_demoPanFrame);
+      _demoPanFrame = null;
+      const targetLineGid = lineGid || _layoutMode._getLineForGid(stationGid)?.gid || _demoLastLineGid;
+      const demoLineRow = _rowByGid.get(targetLineGid) || null;
+      if (!demoLineRow) throw new Error('演示目标线体不存在，请重新选择');
+      await _ensureScopeLoaded(demoLineRow, { render: false, throwOnError: true });
+      if (_level1Filter !== null && !_level1Filter.has(demoLineRow.gid)) {
+        _level1Filter = new Set([demoLineRow.gid]);
+        if ($l1DD.style.display !== 'none') _buildLevel1Dropdown();
       }
+      _layoutMode._preserveView = true;
+      _render();
+      _layoutMode._renderLineCards(demoLineRow.gid);
+      const lineEl = _layoutMode._world?.querySelector(`.ll-line-box[data-gid="${demoLineRow.gid}"]`);
+      if (!lineEl?.querySelector(`.ll-station-card[data-gid="${stationGid}"]`)) {
+        throw new Error('演示工位未加载到目标线体，无法开始播放');
+      }
+      _layoutMode._zoom = 0.61;
+      _layoutMode._setTransform();
+      _layoutMode.scrollToNode(stationGid);
+      _layoutMode._panY -= 120;
       _layoutMode._setTransform();
       _layoutMode._syncZoomDependent?.();
       _layoutMode._updateZoomLabel?.();
@@ -2093,27 +2207,34 @@ function _initSidebarPanels() {
     },
     demoPanToStation: (stationGid) => {
       if (!_layoutMode) return;
+      cancelAnimationFrame(_demoPanFrame);
+      _demoPanFrame = null;
       const el = _layoutMode._world?.querySelector(`.ll-station-card[data-gid="${stationGid}"]`);
       if (!el) return;
-      const cx = (parseFloat(el.style.left) || 0) + (el.offsetWidth || 0) / 2;
+      const rect = el.getBoundingClientRect();
+      const viewportRect = _layoutMode._viewport.getBoundingClientRect();
+      const cx = rect.left - viewportRect.left + rect.width / 2;
       // 只做水平平移，Y 轴保持不动
-      const zoom = _layoutMode._zoom;
       const vw = _layoutMode._viewport.clientWidth;
-      const targetPanX = vw / 2 - cx * zoom;
+      const targetPanX = _layoutMode._panX + vw / 2 - cx;
       const startPanX = _layoutMode._panX;
       if (Math.abs(targetPanX - startPanX) < 2) return; // 无需移动
-      const dur = 600;
+      const dur = 600 / (_demoSpeed || 1);
       const t0 = performance.now();
       const tick = (now) => {
         const t = Math.min((now - t0) / dur, 1);
         const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
         _layoutMode._panX = startPanX + (targetPanX - startPanX) * ease;
         _layoutMode._setTransform();
-        if (t < 1) requestAnimationFrame(tick);
-        else _layoutMode._syncMinimapViewport?.();
+        if (t < 1) _demoPanFrame = requestAnimationFrame(tick);
+        else {
+          _demoPanFrame = null;
+          _layoutMode._syncMinimapViewport?.();
+        }
       };
-      requestAnimationFrame(tick);
+      _demoPanFrame = requestAnimationFrame(tick);
     },
+    onDemoPauseChange: () => _setDemoPlayLabel(),
     onEntityClick: (bopEntryGid, anchorEl) => {
       // 直接跳转到被关联的 bop_entry 卡片
       if (_viewMode === 'layout' && _layoutMode) {
@@ -3877,6 +3998,12 @@ function _saveSession() {
 
 // 页面关闭/刷新前自动保存工作状态
 window.addEventListener('beforeunload', _saveSession);
+window.addEventListener('pagehide', event => {
+  if (event.persisted) return;
+  for (const url of _pictureDisplayCache.values()) {
+    if (url.startsWith('blob:')) URL.revokeObjectURL(url);
+  }
+});
 // visibilitychange 兜底（移动端/切 tab 时 beforeunload 可能不触发）
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') _saveSession();
@@ -3928,12 +4055,13 @@ async function _saveView() {
 async function _loadCloudConfig() {
   if (!_isCloud() || !_versionGid) return;
   const requestedVersionGid = _versionGid;
+  const demoSelectionEpoch = _demoSelectionEpoch;
   try {
     const res = await _invokeCapability('craft.bop.version.legacy_read', 1, {
       operation: 'layout_config',
       version_gid: requestedVersionGid,
     });
-    if (requestedVersionGid !== _versionGid) return;
+    if (requestedVersionGid !== _versionGid || demoSelectionEpoch !== _demoSelectionEpoch) return;
     const cloudCfg = res?.config || res?.data?.config;
     if (!cloudCfg) return;
 
@@ -4361,22 +4489,30 @@ async function _addBlankLine() {
   }
 }
 
-async function _reload({ skipPendingMoves = false } = {}) {
+async function _reload({ skipPendingMoves = false, silent = false, demoLineGid = null } = {}) {
+  const requestedVersion = _versionGid;
+  const requestedSelection = _demoSelectionEpoch;
+  const superseded = () => demoLineGid && (requestedVersion !== _versionGid || requestedSelection !== _demoSelectionEpoch);
   _closeOverlayPanel();
   try {
     // A refresh issued immediately after a drag must observe the committed
     // order. Keep normal reloads behind the move queue; the failure rollback
     // bypasses it to avoid waiting on its own rejected task.
     if (!skipPendingMoves) await _moveQueue;
+    if (superseded()) return;
     const layoutViewport = (_viewMode === 'layout' && _layoutMode)
       ? { panX: _layoutMode._panX, panY: _layoutMode._panY, zoom: _layoutMode._zoom }
       : null;
     const comparisons = [..._loadedVersionGids]
       .filter(gid => gid !== _versionGid)
       .map(gid => ({ gid, tag: _versionTagMap.get(gid) || gid.slice(-6) }));
-    const activeGid = _activeGid;
-    await _load({ layoutViewport });
-    for (const comparison of comparisons) await _addVersionRoots(comparison.gid, comparison.tag);
+    const activeGid = demoLineGid || _activeGid;
+    await _load({ layoutViewport, silent, demoLineGid });
+    if (superseded()) return;
+    for (const comparison of comparisons) {
+      await _addVersionRoots(comparison.gid, comparison.tag);
+      if (superseded()) return;
+    }
     _renderLinkAlerts(_collectLinkAlerts());
     // 刷新后更新底部详情面板数据
     if (_layoutDetailPanel) _layoutDetailPanel.updateData(_buildLineageData());
@@ -4390,10 +4526,146 @@ async function _reload({ skipPendingMoves = false } = {}) {
     }
   } catch (e) {
     _toast('刷新失败: ' + e.message, 'error');
+    if (demoLineGid) throw e;
   }
 }
 
 // ── 事件绑定 ─────────────────────────────────────────────────────────
+
+// ── W10 演示：连接与播放分离，播放状态模块级共享 ──
+let _demoSteps = null;
+let _demoStepsByLine = {};
+let _demoLastLineGid = null;
+let _demoPanFrame = null;
+let _demoConnecting = false;
+let _demoSelectionEpoch = 0;
+let _demoStatusRequest = 0;
+let _demoStepsVersionGid = null;
+// 演示播放速度：1=正常，2=两倍速（记住用户选择）
+let _demoSpeed = 1;
+try { if (parseFloat(localStorage.getItem(_lsk('lv:demoSpeed'))) === 2) _demoSpeed = 2; } catch (_) {}
+function _updateDemoSpeedBtn() {
+  const span = $demoSpeedBtn?.querySelector('span');
+  if (span) span.textContent = _demoSpeed === 2 ? '2x' : '1x';
+  $demoSpeedBtn?.classList.toggle('lv-demo-speed-active', _demoSpeed === 2);
+  $demoSpeedBtn?.setAttribute('title', _demoSpeed === 2 ? '演示速度：2倍（点击切回正常）' : '演示速度：正常（点击切换2倍速）');
+  // 卡片生长动画时长通过 body 类联动 CSS
+  document.body.classList.toggle('lv-demo-2x', _demoSpeed === 2);
+}
+function _syncDemoStatusUI(lines, failed = false) {
+  const el = document.getElementById('lvDemoStatus');
+  if (!el) return;
+  const selected = (lines || []).find(l => l.line_gid === _demoLastLineGid);
+  const title = selected?.line_title || _rowByGid.get(_demoLastLineGid)?.title || _demoLastLineGid || '';
+  const connected = !_demoConnecting && !failed && !!selected?.connected;
+  const em = el.querySelector('em');
+  el.classList.toggle('connected', connected);
+  el.classList.toggle('connecting', _demoConnecting);
+  if (em) em.textContent = (_demoConnecting ? '准备中' : failed ? '未就绪' : connected ? '已连接' : '未连接') + (title ? '：' + title : '');
+  el.title = title;
+  for (const button of [$demoPlayBtn, $demoResetBtn, $demoRelationBtn]) {
+    if (button) button.disabled = _demoConnecting;
+  }
+}
+
+async function _refreshDemoStatus() {
+  if (_demoConnecting) return;
+  const request = ++_demoStatusRequest;
+  const versionGid = _versionGid;
+  const selectionEpoch = _demoSelectionEpoch;
+  const isCurrent = () => request === _demoStatusRequest && versionGid === _versionGid && selectionEpoch === _demoSelectionEpoch && !_demoConnecting;
+  const el = document.getElementById('lvDemoStatus');
+  if (!_versionGid || !_isSuperAdminUser() || _viewMode !== 'layout') {
+    _demoStepsByLine = {}; _demoSteps = null;
+    return;
+  }
+  try {
+    const res = await _invokeCapability('craft.bop.demo.relation.change.apply', 1, {
+      operation: 'status',
+      bop_gid: versionGid,
+      line_gid: null,
+    });
+    if (!isCurrent()) return;
+    const data = res?.data || {};
+    if (!data.ok) throw new Error('status not ok');
+    const lines = data.lines || [];
+    _demoStepsVersionGid = versionGid;
+    _demoStepsByLine = {};
+    for (const ln of lines) {
+      if (ln.connected && ln.steps && ln.steps.length) _demoStepsByLine[ln.line_gid] = ln.steps;
+    }
+    // Never choose another connected line on behalf of the current selection.
+    _demoSteps = _demoLastLineGid ? (_demoStepsByLine[_demoLastLineGid] || null) : null;
+    _syncDemoStatusUI(lines);
+  } catch {
+    if (!isCurrent()) return;
+    // 非演示版本或无权限：清空状态并显示未连接
+    _demoStepsByLine = {}; _demoSteps = null;
+    if (el) _syncDemoStatusUI([]);
+  }
+}
+
+/** Local presentation only; the atomic provider does not stream per-card progress. */
+function _showDemoConnectProgress(lineTitle) {
+  document.getElementById('lvDemoProgress')?.remove();
+  const card = document.createElement('section');
+  card.id = 'lvDemoProgress';
+  card.className = 'lv-demo-progress';
+  card.setAttribute('role', 'status');
+  card.setAttribute('aria-live', 'polite');
+  card.innerHTML = '<button class="lv-demo-progress-close" aria-label="关闭进度提示" hidden>×</button>' +
+    '<div class="lv-demo-progress-kicker">W10 · 工艺关系演示</div>' +
+    '<h3></h3><p class="lv-demo-progress-message"></p>' +
+    '<div class="lv-demo-progress-stats"></div>' +
+    '<div class="lv-demo-progress-track" aria-hidden="true"><i></i></div>' +
+    '<ol><li>匹配与分配</li><li>准备画布</li><li>就位待播放</li></ol>';
+  card.querySelector('h3').textContent = lineTitle;
+  const close = card.querySelector('button');
+  let timer;
+  const remove = () => { clearTimeout(timer); card.remove(); };
+  close.addEventListener('click', remove);
+  const update = (phase, steps = null, message = '') => {
+    clearTimeout(timer);
+    card.dataset.phase = phase;
+    card.setAttribute('aria-busy', String(phase === 'connecting' || phase === 'loading'));
+    const messages = {
+      connecting: '正在按工艺规划匹配工序编码，分配工艺卡及所属操作…',
+      loading: '关系已生成，正在准备线体画布…',
+      ready: '已就位，正在开始演示',
+      empty: '该线体暂无可播放的工艺卡',
+      error: '准备未完成，请重试',
+    };
+    card.querySelector('.lv-demo-progress-message').textContent = message || messages[phase];
+    if (steps) {
+      const count = steps.reduce((sum, station) => sum + (station.processes?.length || 0), 0);
+      card.querySelector('.lv-demo-progress-stats').textContent = `总计发现 ${count} 张工艺卡 · ${steps.length} 个工位`;
+    } else {
+      card.querySelector('.lv-demo-progress-stats').textContent = '正在统计工艺卡与目标工位…';
+    }
+    const stage = phase === 'connecting' ? 0 : phase === 'loading' ? 1 : phase === 'ready' ? 3 : -1;
+    card.querySelectorAll('li').forEach((el, i) => {
+      el.classList.toggle('done', i < stage);
+      el.classList.toggle('current', i === stage);
+    });
+    close.hidden = phase === 'connecting' || phase === 'loading';
+    if (phase === 'ready') timer = setTimeout(remove, 2400);
+  };
+  (document.getElementById('lvLayoutCanvas') || document.body).appendChild(card);
+  update('connecting');
+  return { update, remove };
+}
+
+function _setDemoPlayLabel() {
+  const btn = document.getElementById('lvDemoPlayBtn');
+  if (!btn) return;
+  const span = btn.querySelector('span');
+  if (!span) return;
+  if (_assocPanel && _assocPanel._demoRunning) {
+    span.textContent = _assocPanel._demoPaused ? '继续' : '暂停';
+  } else {
+    span.textContent = '播放演示';
+  }
+}
 
 function _bindEvents() {
 
@@ -4804,6 +5076,208 @@ function _bindEvents() {
     }
   });
 
+  // ── W10 演示：工艺关系自动连接 / 恢复待连接（仅超管可见，后端双重校验）──
+  // 演示遮罩：静默刷新期间盖住画布，避免露出空白重建过程
+  function _demoVeil(text) {
+    const cv = document.getElementById('lvLayoutCanvas');
+    if (!cv) return () => {};
+    cv.style.position = 'relative';
+    const veil = document.createElement('div');
+    veil.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--base,#eff1f5);opacity:.94;z-index:6;pointer-events:none;';
+    veil.innerHTML = `<div style="text-align:center;color:var(--subtext0,#6c6f85);font-size:13px"><div class="lv-spinner" style="margin:0 auto 10px"></div>${text}</div>`;
+    cv.appendChild(veil);
+    return () => veil.remove();
+  }
+
+  function _demoLines() {
+    return _rows
+      .filter(r => r.node_type === 'line_process' && !(r.title || '').startsWith('【演示】'))
+      .map(r => ({ gid: r.gid, title: r.title || r.gid }));
+  }
+
+  async function _runDemoRelationConnect(lineGid, lineTitle) {
+    if (_demoConnecting) return;
+    if (!lineGid || !_versionGid) throw new Error('请先选择演示版本与线体');
+    const versionGid = _versionGid;
+    const epoch = ++_demoSelectionEpoch;
+    const isCurrent = () => versionGid === _versionGid && epoch === _demoSelectionEpoch;
+    if (_demoStepsVersionGid !== versionGid) _demoStepsByLine = {};
+    _demoStepsVersionGid = versionGid;
+    _assocPanel?.stopDemo?.();
+    cancelAnimationFrame(_demoPanFrame);
+    _demoPanFrame = null;
+    _demoLastLineGid = lineGid;
+    _demoSteps = null;
+    _demoConnecting = true;
+    _syncDemoStatusUI([{ line_gid: lineGid, line_title: lineTitle }]);
+    const progress = _showDemoConnectProgress(lineTitle || _rowByGid.get(lineGid)?.title || lineGid);
+    const canvas = document.getElementById('lvLayoutCanvas');
+    canvas?.classList.add('lv-demo-preparing');
+    let failed = false;
+    try {
+      // Commit selection before the first await; don't leave the previous line on screen.
+      _level1Filter = new Set([lineGid]);
+      _activeGid = lineGid;
+      _applyFilters();
+      _layoutMode?._scrollToLine(lineGid);
+      let steps = _demoStepsByLine[lineGid];
+      if (!steps?.length) {
+        const res = await _invokeCapability('craft.bop.demo.relation.change.apply', 1, {
+          operation: 'connect', bop_gid: versionGid, line_gid: lineGid,
+        });
+        if (!isCurrent()) return;
+        const data = res?.data || {};
+        if (!data.ok || (data.line_gid && data.line_gid !== lineGid)) throw new Error('演示连接未返回所选线体的结果');
+        steps = data.steps || [];
+        _demoStepsByLine[lineGid] = steps;
+        progress.update('loading', steps);
+        await _reload({ silent: true, demoLineGid: lineGid });
+      } else {
+        progress.update('loading', steps, '已读取连接结果，正在准备线体画布…');
+      }
+      if (!isCurrent()) return;
+      if (steps.length) {
+        await _assocPanel?._demoSetupView?.(steps[0].station_gid, lineGid);
+        if (!isCurrent()) return;
+        _demoSteps = steps;
+        progress.update('ready', steps);
+        if (_assocPanel?._runRelationDemoAnimation) {
+          _assocPanel._demoSpeed = _demoSpeed;
+          // Prepared playback hides every card synchronously before exposing the canvas.
+          const run = _assocPanel._runRelationDemoAnimation(steps, lineGid, { prepared: true });
+          run.catch(error => {
+            if (isCurrent()) {
+              progress.update('error', steps, '演示播放失败：' + (error.message || '请重试'));
+              _toast(error.message || '演示播放失败', 'error');
+            }
+          }).finally(() => { if (isCurrent()) _setDemoPlayLabel(); });
+        }
+      } else {
+        progress.update('empty', steps);
+      }
+    } catch (error) {
+      if (!isCurrent()) return;
+      failed = true;
+      // Preserve committed relation steps for retry, but never advertise a failed view as ready.
+      _demoSteps = null;
+      progress.update('error', _demoStepsByLine[lineGid],
+        (_demoStepsByLine[lineGid]?.length ? '关系已保存，画布准备失败：' : '连接未完成：') + (error.message || '请重试'));
+      throw error;
+    } finally {
+      if (isCurrent()) {
+        canvas?.classList.remove('lv-demo-preparing');
+        _demoConnecting = false;
+        _syncDemoStatusUI([{ line_gid: lineGid, line_title: lineTitle, connected: !!_demoSteps?.length }], failed);
+        _setDemoPlayLabel();
+      } else progress.remove();
+    }
+  }
+
+  async function _runDemoRelationReset() {
+    if (_demoConnecting) return;
+    if (!(await window.AI00Dialogs.confirm('确定把演示工序全部移回「待连接工序区」？仅影响演示数据，可反复演示。'))) return;
+    const res = await _invokeCapability('craft.bop.demo.relation.change.apply', 1, {
+      operation: 'reset',
+      bop_gid: _versionGid,
+      line_gid: null,
+    });
+    const data = res?.data || {};
+    if (!data.ok) { _toast('恢复待连接未完成', 'warn'); return; }
+    _demoSteps = null;
+    _demoSelectionEpoch++;
+    _demoStepsByLine = {};
+    _demoLastLineGid = null;
+    _assocPanel?.stopDemo?.();
+    _setDemoPlayLabel();
+    await _refreshDemoStatus();
+    _toast(`已恢复待连接：${data.processes_moved || 0} 工序 / 解除 ${data.part_links_removed || 0} 装配零件`, 'ok', 4000);
+    const removeVeil = _demoVeil('正在恢复待连接…');
+    try {
+      await _reload({ silent: true });
+    } finally {
+      removeVeil();
+    }
+  }
+
+  if ($demoRelationBtn && $demoRelationMenu) {
+    $demoRelationBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = $demoRelationMenu.style.display !== 'none';
+      if (isOpen) { $demoRelationMenu.style.display = 'none'; return; }
+      const lines = _demoLines();
+      $demoRelationMenu.innerHTML = '';
+      if (!lines.length) {
+        $demoRelationMenu.innerHTML = '<div class="lv-compare-menu-empty">当前版本暂无工位线体</div>';
+      } else {
+        for (const ln of lines) {
+          const item = document.createElement('div');
+          item.className = 'lv-compare-menu-item';
+          const label = document.createElement('span');
+          label.style.flex = '1';
+          label.textContent = ln.title;
+          const action = document.createElement('span');
+          action.style.cssText = 'font-size:9px;color:var(--subtext0,#a6adc8)';
+          action.textContent = '连接';
+          item.appendChild(label);
+          item.appendChild(action);
+          item.addEventListener('click', async (ev) => {
+            ev.stopPropagation();
+            $demoRelationMenu.style.display = 'none';
+            try { await _runDemoRelationConnect(ln.gid, ln.title); }
+            catch (err) { _toast(err.message || '演示连接失败', 'error'); }
+          });
+          $demoRelationMenu.appendChild(item);
+        }
+      }
+      $demoRelationMenu.style.display = '';
+    });
+    document.addEventListener('click', () => { $demoRelationMenu.style.display = 'none'; });
+  }
+
+  if ($demoPlayBtn) {
+    $demoPlayBtn.addEventListener('click', async () => {
+      if (_demoConnecting) return;
+      if (!_assocPanel || typeof _assocPanel._runRelationDemoAnimation !== 'function') return;
+      if (_assocPanel._demoRunning) {
+        _assocPanel._demoPaused = !_assocPanel._demoPaused;
+        _setDemoPlayLabel();
+        return;
+      }
+      if (!_demoSteps || !_demoSteps.length) {
+        await _refreshDemoStatus();
+      }
+      if (!_demoSteps || !_demoSteps.length) {
+        _toast('请先用「演示连接」连接一条线体', 'warn');
+        return;
+      }
+      _assocPanel._demoSpeed = _demoSpeed;
+      const run = _assocPanel._runRelationDemoAnimation(_demoSteps, _demoLastLineGid);
+      _setDemoPlayLabel();
+      try { await run; }
+      catch (err) { _toast(err.message || '播放演示失败', 'error'); }
+      finally { _setDemoPlayLabel(); }
+    });
+  }
+
+  if ($demoSpeedBtn) {
+    _updateDemoSpeedBtn();
+    $demoSpeedBtn.addEventListener('click', () => {
+      _demoSpeed = _demoSpeed === 2 ? 1 : 2;
+      try { localStorage.setItem(_lsk('lv:demoSpeed'), String(_demoSpeed)); } catch (_) {}
+      // 播放中切换立即生效（动画循环每次 sleep 都读取当前速度）
+      if (_assocPanel) _assocPanel._demoSpeed = _demoSpeed;
+      _updateDemoSpeedBtn();
+      _toast(_demoSpeed === 2 ? '演示速度：2倍' : '演示速度：正常', 'ok', 1200);
+    });
+  }
+
+  if ($demoResetBtn) {
+    $demoResetBtn.addEventListener('click', async () => {
+      try { await _runDemoRelationReset(); }
+      catch (err) { _toast(err.message || '恢复待连接失败', 'error'); }
+    });
+  }
+
   // ── 导入 PBOM ──
   $importPbomBtn?.addEventListener('click', async () => {
     if (!_pbomProjects.length) await _loadPbomProjects();
@@ -4878,7 +5352,7 @@ async function init() {
       patchEntry: _patchEntry,
       createEntry: _createEntryAndApply,
       reloadData: _reload,
-      loadEntryDetail: async (gid, row) => {
+      loadEntryDetail: async (gid, row, options) => {
         await _ensureScopeLoaded(row);
         const scope = _lineScopeForRow(_rowByGid.get(gid) || row);
         if (!scope) throw new Error('无法确定条目所属线体范围');
@@ -4886,7 +5360,7 @@ async function init() {
           ? _progressiveLoader
           : _comparisonLoaders.get(scope.version_gid);
         if (!loader) throw new Error('条目版本加载上下文不存在');
-        return loader.loadDetail(scope, gid);
+        return loader.loadDetail(scope, gid, options);
       },
       loadVersionProjection: async (gid) => {
         const version = _verMgr?.allVersions?.find(item => item.gid === gid);

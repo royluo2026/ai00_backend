@@ -120,6 +120,26 @@ ENV_FILE=/chj/app/backend/.env.test.runtime \
 gunicorn backend.main:app -c backend/gunicorn.conf.py
 ```
 
+受管 test/production 配置文件必须显式声明 `AI00_DEPLOY_PROFILE`、`TABLE_PREFIX`、`PUBLIC_URL` 和 11 个领域连接 URL（可共用同一数据库账号）。在任何重启前执行只读的 `python backend/scripts/runtime_preflight.py --env-file /absolute/path/to/runtime.env`；预检拒绝符号链接、重复键、超大或非法 ENV_FILE，以及 profile/前缀/地址错配、不同配置数据库、含插值或歧义的 URL。通过只证明文件形态与账号目标一致，不证明真实库连接、权限隔离、迁移状态或发布批准；后续隔离探针及生产部署必须另行受控审核。不要将真实账号文件提交到 git。
+
+四工况候选可在不连接数据库的隔离目录中先运行只读组合门：
+
+```bash
+python -m backend.scripts.check_four_scenario_candidate \
+  --test-env /protected/test.env --production-env /protected/production.env \
+  --test-manifest /artifacts/test/release-manifest.json \
+  --production-manifest /artifacts/production/release-manifest.json \
+  --test-browser /artifacts/test/browser --test-desktop /artifacts/test/desktop \
+  --test-backend /artifacts/test/backend \
+  --production-browser /artifacts/production/browser \
+  --production-desktop /artifacts/production/desktop \
+  --production-backend /artifacts/production/backend
+```
+
+该命令先核对两份独立 ENV_FILE 的 profile、`test_`/`pp_`、同一配置 host/port/schema ；允许领域及环境复用同一运行用户名，再顺序运行两份单环境产物、版本和哈希候选检查；在候选检查之间复核受控配置原字节，发现变更即停止。不将密码作为命令行参数，也不生成清单、执行 DDL/GRANT、签名、部署或访问真实数据库。运行前必须保护配置文件不被其它进程替换；字节复核不能取代文件权限/锁。配置地址相同不等于已证明物理库身份或表级权限，模拟测试不等于 A/B/C/D 真实运行；发布 Owner、DBA 与平台审批及受控运行证据另行取得。带 `release-blocked.json` 的骨架必须继续拒发。
+
+`/ready` 使用同一 11 域配置校验；错误配置会在数据库连接前返回脱敏的 `domain_db_config: invalid` 和 HTTP 503。配置通过后，11 个领域连接分别以有限超时执行只读 `SELECT 1`，最多并发 4 个、成功结果缓存 15 秒、失败缓存 3 秒，账号或 profile 改变立即重查。失败仅返回领域配置键名和错误类型，不返回密码或数据库地址；仍另查 Base 迁移账本和 Craft。连通性通过不证明表级最小权限、跨前缀拒绝、迁移可恢复性或发布批准，须另行执行经 DBA 授权的隔离验证。
+
 推荐把以下值放进运行时配置文件，而不是提交到 git：
 - `FEISHU_APP_ID`
 - `FEISHU_APP_SECRET`
@@ -132,6 +152,12 @@ gunicorn backend.main:app -c backend/gunicorn.conf.py
 - `AI00_DEVICE_DB_URL`
 - `AI00_PROJECT_MANAGEMENT_DB_URL`
 - `AI00_KNOWLEDGE_DB_URL`
+- `AI00_DIGITAL_MODEL_DB_URL`
+- `AI00_INTEGRATION_DB_URL`
+- `AI00_FACTORY_DB_URL`
+- `AI00_ONTOLOGY_DB_URL`
+- `AI00_DEPLOY_PROFILE`
+- `TABLE_PREFIX`
 - `PUBLIC_URL`
 - `CORS_ALLOW_ORIGINS`
 - `OIS_IDENTIFY`

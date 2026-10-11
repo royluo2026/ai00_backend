@@ -337,6 +337,12 @@ class CapabilityGatewayService:
                 timeout_seconds=self._admission_timeout_seconds,
             )
         except AdmissionRejected as exc:
+            if exc.code == "capacity_unavailable" and os.getenv("AI00_DEMO_CAPACITY_DIAGNOSTICS") == "1":
+                # Operator evidence only; no principal, selector, token or payload.
+                allowed = ("reason", "in_flight", "tenant_in_flight", "consumer_in_flight", "tenant_limit", "consumer_limit", "wait_seconds")
+                safe = {key: exc.diagnostics[key] for key in allowed if key in exc.diagnostics}
+                safe.update(capability_id=descriptor.id, version=descriptor.major_version, code=exc.code)
+                _log.warning("demo_capacity_admission %s", json.dumps(safe, sort_keys=True))
             result = self._rejected(
                 envelope, exc.code, "Capability capacity is temporarily unavailable.",
                 retryable=exc.retryable,

@@ -780,13 +780,13 @@ class ListDiffShell {
       btn.className = 'lds-submit-pending-btn lds-batch-btn-warn';
       btn.textContent = `批量提交无主数据处理（共 ${count} 条）`;
       btn.onclick = async () => {
-        if (!confirm(`将 ${count} 条无主数据零件写入 vpps_parts 知识库（已存在的将跳过）？`)) return;
+        if (!(await window.AI00Dialogs.confirm(`将 ${count} 条无主数据零件写入 vpps_parts 知识库（已存在的将跳过）？`))) return;
         btn.disabled = true; btn.textContent = '提交中…';
         try {
           const res = await run();
           btn.textContent = `✓ 已添加 ${res.added} 条，跳过 ${res.skipped} 条`;
           await checkResult.rerunCheck?.();
-        } catch (e) { btn.disabled = false; btn.textContent = `批量提交无主数据处理（共 ${count} 条）`; alert('操作失败: ' + e.message); }
+        } catch (e) { btn.disabled = false; btn.textContent = `批量提交无主数据处理（共 ${count} 条）`; (await window.AI00Dialogs.alert('操作失败: ' + e.message)); }
       };
       _makeActionSection({
         cardA: { count, label: '无主数据', type: 'pending' },
@@ -803,13 +803,13 @@ class ListDiffShell {
       btn.className = 'lds-submit-pending-btn lds-batch-btn-warn';
       btn.textContent = `批量提交可接受别名（共 ${count} 条）`;
       btn.onclick = async () => {
-        if (!confirm(`批量接受全部 ${count} 条描述别名？`)) return;
+        if (!(await window.AI00Dialogs.confirm(`批量接受全部 ${count} 条描述别名？`))) return;
         btn.disabled = true; btn.textContent = '提交中…';
         try {
           const res = await run();
           btn.textContent = `✓ 已处理 ${res.processed} 条，失败 ${res.failed} 条`;
           await checkResult.rerunCheck?.();
-        } catch (e) { btn.disabled = false; btn.textContent = `批量提交可接受别名（共 ${count} 条）`; alert('操作失败: ' + e.message); }
+        } catch (e) { btn.disabled = false; btn.textContent = `批量提交可接受别名（共 ${count} 条）`; (await window.AI00Dialogs.alert('操作失败: ' + e.message)); }
       };
       _makeActionSection({
         cardA: { count, label: '待接受别名', type: 'pending' },
@@ -827,11 +827,11 @@ class ListDiffShell {
       btn.disabled = count === 0;
       btn.textContent = count > 0 ? `暂时忽略规则4（${count} 条零件）` : '规则4已全部忽略';
       btn.onclick = async () => {
-        if (!confirm(`将当前 ${count} 条规则4 NOK 零件标记为已忽略？下次核对时不再显示，可通过审计记录撤销。`)) return;
+        if (!(await window.AI00Dialogs.confirm(`将当前 ${count} 条规则4 NOK 零件标记为已忽略？下次核对时不再显示，可通过审计记录撤销。`))) return;
         btn.disabled = true; btn.textContent = '忽略中…';
         try {
           await run();
-        } catch (e) { btn.disabled = false; btn.textContent = `暂时忽略规则4（${count} 条零件）`; alert('操作失败: ' + e.message); }
+        } catch (e) { btn.disabled = false; btn.textContent = `暂时忽略规则4（${count} 条零件）`; (await window.AI00Dialogs.alert('操作失败: ' + e.message)); }
       };
 
       // 集中撤销按钮
@@ -841,14 +841,14 @@ class ListDiffShell {
         revertBtn.className = 'lds-submit-pending-btn lds-batch-btn-revert-ignored';
         revertBtn.textContent = `集中撤销（${ignoredCount} 条已忽略）`;
         revertBtn.onclick = async () => {
-          if (!confirm(`撤销全部 ${ignoredCount} 条已忽略的规则4记录，恢复为 NOK 状态？`)) return;
+          if (!(await window.AI00Dialogs.confirm(`撤销全部 ${ignoredCount} 条已忽略的规则4记录，恢复为 NOK 状态？`))) return;
           revertBtn.disabled = true; revertBtn.textContent = '撤销中…';
           try {
             await revertAll();
           } catch (e) {
             revertBtn.disabled = false;
             revertBtn.textContent = `集中撤销（${ignoredCount} 条已忽略）`;
-            alert('撤销失败: ' + e.message);
+            (await window.AI00Dialogs.alert('撤销失败: ' + e.message));
           }
         };
       }

@@ -813,7 +813,20 @@ INPUT_SCHEMAS[("craft.rule.library.read", 1)] = _object({
     "operation": {"type": "string", "enum": ["list", "get"]}, "gid": STRING, "status": STRING, "list_gid": STRING,
     "q": {"type": "string", "maxLength": 200}, "limit": {"type": "integer", "minimum": 1, "maximum": 500},
 }, required=("operation",))
-OUTPUT_SCHEMAS[("craft.rule.library.read", 1)] = _object({"success": {"type": "boolean"}, "data": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}}}, required=("success", "data"))
+_RULE_LIBRARY_ROW = _object({
+    **_fields(
+        "gid", "display_id", "code", "name", "rule_type", "enforcement_level",
+        "rule_definition", "applicable_scope", "status", "knowledge_source_gid",
+        "share_scope", "list_gid", "attachments", "scheduled_date", "owner_user_gid",
+        "creator_gid", "expression", "context_class_gid", "created_at", "updated_at",
+        "rule_gid", "revision",
+    ),
+    "rule_reference": _object({"rule_gid": STRING, "rule_revision": INTEGER}),
+})
+OUTPUT_SCHEMAS[("craft.rule.library.read", 1)] = _object({"success": {"type": "boolean"}, "data": {"oneOf": [
+    {"type": "array", "maxItems": 500, "items": _RULE_LIBRARY_ROW},
+    _RULE_LIBRARY_ROW,
+]}}, required=("success", "data"))
 INPUT_SCHEMAS[("craft.rule.library.change.apply", 1)] = _object({
     "operation": {"type": "string", "enum": ["create", "update", "delete"]}, "gid": STRING, "record": {"type": "object", "maxProperties": 20, "additionalProperties": True},
 }, required=("operation",))
@@ -977,6 +990,37 @@ INPUT_SCHEMAS[("craft.gbop.station_autolink.change.apply", 1)] = _object({
     "line_gids": {"type": ["array", "null"], "items": STRING}, "mode": {"type": "string", "enum": ["soft", "hard"]},
 }, required=("operation", "bop_gid"))
 OUTPUT_SCHEMAS[("craft.gbop.station_autolink.change.apply", 1)] = _object({"data": {"type": "object", "additionalProperties": True}}, required=("data",))
+INPUT_SCHEMAS[("craft.bop.demo.relation.change.apply", 1)] = _object({
+    "operation": {"type": "string", "enum": ["connect", "reset", "status"]}, "bop_gid": STRING,
+    "line_gid": {"type": ["string", "null"]},
+}, required=("operation", "bop_gid"))
+_DEMO_RELATION_TEXT = {"type": "string"}
+_DEMO_RELATION_PART = _object({"entry_gid": STRING, "title": _DEMO_RELATION_TEXT})
+_DEMO_RELATION_OPERATION = _object({
+    "entry_gid": STRING, "title": _DEMO_RELATION_TEXT,
+    "parts": {"type": "array", "maxItems": 500, "items": _DEMO_RELATION_PART},
+})
+_DEMO_RELATION_PROCESS = _object({
+    "entry_gid": STRING, "title": _DEMO_RELATION_TEXT, "process_code": STRING,
+    "operations": {"type": "array", "maxItems": 500, "items": _DEMO_RELATION_OPERATION},
+})
+_DEMO_RELATION_STATION = _object({
+    "station_gid": STRING, "station_title": _DEMO_RELATION_TEXT,
+    "processes": {"type": "array", "maxItems": 500, "items": _DEMO_RELATION_PROCESS},
+})
+_DEMO_RELATION_LINE = _object({
+    "line_gid": STRING, "line_title": _DEMO_RELATION_TEXT,
+    "connected": BOOLEAN, "processes_connected": INTEGER,
+    "steps": {"type": "array", "maxItems": 500, "items": _DEMO_RELATION_STATION},
+})
+OUTPUT_SCHEMAS[("craft.bop.demo.relation.change.apply", 1)] = _object({"data": _object({
+    "ok": BOOLEAN, "operation": {"type": "string", "enum": ["connect", "reset", "status"]},
+    "line_gid": {"type": ["string", "null"]}, "line_title": _DEMO_RELATION_TEXT,
+    "stations": INTEGER, "processes_moved": INTEGER, "operations": INTEGER,
+    "part_links": INTEGER, "part_links_removed": INTEGER,
+    "steps": {"type": "array", "maxItems": 500, "items": _DEMO_RELATION_STATION},
+    "lines": {"type": "array", "maxItems": 100, "items": _DEMO_RELATION_LINE},
+}, required=("ok", "operation", "processes_moved"))}, required=("data",))
 INPUT_SCHEMAS[("craft.gbop.import.tc.change.apply", 1)] = _object({
     "operation": {"type": "string", "enum": ["import_tc_excel"]}, "version_gid": STRING, "filename": STRING, "content_b64": STRING,
 }, required=("operation", "version_gid", "content_b64"))

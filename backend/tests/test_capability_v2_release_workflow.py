@@ -57,16 +57,19 @@ def test_both_workflows_have_identical_ordered_mandatory_gates():
     assert gitea == github
 
 
-def test_gitea_test_deploy_rejects_provider_catalog_drift_before_deploy():
-    steps = _load(GITEA_DEPLOY_WORKFLOW)["jobs"]["deploy"]["steps"]
-    names = [str(step.get("name", "")) for step in steps]
-    deploy_index = names.index("Deploy")
-    for gate in ("freeze-domains", "catalog-check", "docs-check"):
-        gate_index = names.index(gate)
-        assert gate_index < deploy_index
-        command = str(steps[gate_index].get("run", ""))
-        assert "workmanship-backend" in str(steps[gate_index].get("working-directory", ""))
-        assert "--check" in command
+def test_legacy_gitea_deploy_has_no_push_or_executable_deployment_steps():
+    source = GITEA_DEPLOY_WORKFLOW.read_text(encoding="utf-8")
+    workflow = _load(GITEA_DEPLOY_WORKFLOW)
+    assert "workflow_dispatch:" in source
+    assert "push:" not in source
+    assert "CROSS_REPO_TOKEN" not in source
+    assert list(workflow["jobs"]) == ["legacy-disabled"]
+    job = workflow["jobs"]["legacy-disabled"]
+    assert job["if"] == "${{ false }}"
+    assert len(job["steps"]) == 1
+    assert job["steps"][0]["run"] == "exit /b 2"
+    for command in ("npm ci", "pip install", "deploy.bat", "run_migrations.py", "E:\\projects\\ai00-v2"):
+        assert command not in source
 
 
 def test_workflows_bootstrap_one_admin_secret_and_import_generated_domain_urls():

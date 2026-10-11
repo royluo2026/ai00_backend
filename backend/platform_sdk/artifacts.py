@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from backend.capability_v2.artifacts import ArtifactService, configured_object_storage, SqlArtifactStore
+from backend.capability_v2.artifacts import ArtifactService, configured_object_storage, SqlArtifactStore, register_shared_download_authorizer
 from backend.capability_v2.contracts import (
     ActorIdentity,
     ArtifactRef,
@@ -63,4 +63,4 @@ def create_artifact(data,media_type,context,*,maximum=5*1024*1024):
     return service.finalize(session.upload_id,identity,reported_sha256=digest).model_dump(mode='json')
 
 
-__all__ = ["require_artifact","read_artifact","create_artifact"]
+__all__ = ["require_artifact","read_artifact","create_artifact", "register_shared_download_authorizer"]

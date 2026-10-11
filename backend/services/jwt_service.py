@@ -89,6 +89,36 @@ def sign_desktop_session(principal, *, tenant_id: str, installation_id: str, con
         desktop_consumer=claim.model_dump()), settings.jwt_secret, algorithm=ALGORITHM)
 
 
+def sign_demo_desktop_session(principal, *, installation_id: str, consumer_version: str) -> str:
+    """Test-only issuer after the private demo adapter verifies its password.
+
+    The adapter owns password/session verification; this owner boundary rereads
+    the persisted actor and derives the tenant. It never claims an OAuth login.
+    No HTTP token-exchange route is added to the ordinary backend.
+    """
+    from backend.capability_v2.identity import DesktopConsumerClaim, DESKTOP_CONSUMER_ID, IdentityError
+    from backend.platform_sdk.demo_access import has_relation_demo_access
+    from backend.services.user_service import get_by_gid
+    now = datetime.now(timezone.utc)
+    if (principal.authentication_method != 'demo_password'
+            or not has_relation_demo_access(principal.user_id)
+            or principal.authenticated_at > now
+            or now - principal.authenticated_at > timedelta(hours=1)):
+        raise IdentityError('verified_test_demo_authentication_required')
+    user = get_by_gid(principal.user_id)
+    if (not user or not user.get('is_active') or user.get('system_role') != 'member'
+            or user.get('org_role') != 'member'):
+        raise IdentityError('demo_actor_unavailable')
+    tenant = str(user.get('team_id') or f"user:{user['gid']}")
+    claim = DesktopConsumerClaim(consumer_id=DESKTOP_CONSUMER_ID, tenant_id=tenant,
+        installation_id=installation_id, consumer_version=consumer_version)
+    return jwt.encode(dict(sub=str(user['gid']), team_id=user.get('team_id'),
+        system_role='member', org_role='member', authentication_method='demo_password',
+        auth_time=principal.authenticated_at.timestamp(), iat=now,
+        exp=min(now + timedelta(minutes=15), principal.authenticated_at + timedelta(hours=1)),
+        desktop_consumer=claim.model_dump()), get_settings().jwt_secret, algorithm=ALGORITHM)
+
+
 def decode_unverified(token: str) -> dict:
     """不验证签名，仅解码（调试用）"""
     return jwt.decode(token, options={"verify_signature": False})

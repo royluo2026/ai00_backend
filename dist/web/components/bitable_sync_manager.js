@@ -40,8 +40,8 @@ class BitableSyncManager {
   async _fetchBinding() { return null; }
   async unbind() { return false; }
 
-  openBindingModal() {
-    alert('飞书多维表格同步已停用。');
+  async openBindingModal() {
+    (await window.AI00Dialogs.alert('飞书多维表格同步已停用。'));
     return false;
   }
 

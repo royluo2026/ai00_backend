@@ -38,7 +38,43 @@ from backend.platform_sdk.auth import get_authenticated_principal
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
+
+@router.get("/data-environment")
+async def active_data_environment():
+    # Public runtime metadata, like /api/system/version; no credentials or data.
+    from backend.db.table_prefix import current_table_prefix
+    return {"prefix": current_table_prefix()}
+
 _SUPER_ONLY = require_role("super_admin")
+
+
+class DataEnvironmentChangeBody(BaseModel):
+    prefix: str
+    expected_prefix: str
+    model_config = {"extra": "forbid"}
+
+
+@router.get("/data-environments")
+async def data_environments(request: Request, current_user=Depends(_SUPER_ONLY),
+                            principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_runtime_database_capability(
+        "base.runtime.data_environment.get", {}, request, current_user, principal, gateway)
+
+
+@router.post("/data-environments/connection-test")
+async def test_data_environment_connection(request: Request, current_user=Depends(_SUPER_ONLY),
+                                           principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_runtime_database_capability(
+        "base.runtime.data_environment.connection.test", {}, request, current_user, principal, gateway)
+
+
+@router.post("/data-environments/switch")
+async def switch_data_environment(body: DataEnvironmentChangeBody, request: Request,
+                                  current_user=Depends(_SUPER_ONLY), principal=Depends(get_authenticated_principal),
+                                  gateway=Depends(get_default_gateway)):
+    return await _invoke_runtime_database_capability(
+        "base.runtime.data_environment.change.apply", body.model_dump(), request,
+        current_user, principal, gateway, write=True)
 
 
 def _require_super_claims(current_user: dict = Depends(get_current_user_claims_only)):

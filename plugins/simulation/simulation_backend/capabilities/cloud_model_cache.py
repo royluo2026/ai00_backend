@@ -1,6 +1,7 @@
 """Project-shared TC cache capabilities; all dispatch remains Simulation-owned."""
 from backend.capability_v2.provider_contracts import CapabilitySpec, CapabilityRisk, CapabilityOutput, CapabilityBusinessError, EvidenceRef
 from backend.platform_sdk.project_access import can_manage_project, list_user_project_memberships
+from backend.platform_sdk.access import team_in_access_scope
 from ..data.cloud_model_cache_repository import CloudModelCacheRepository, CacheError, canonical, digest
 from .connector_contracts import TC_VISUALIZATION_SOURCE_SELECTOR, TC_CHILDREN_INPUT, TC_NODE_PROPERTIES_INPUT, TC_CACHE_INPUT, TC_CACHE_OUTPUT, TC_CACHE_V2_INPUT, TC_CACHE_V2_OUTPUT, obj
 from .connector_runtime import connector_control_plane, _direct_vismockup_plan_v2, ConnectorError, DIRECT_VISMOCKUP_OPERATIONS
@@ -120,7 +121,7 @@ class CloudModelCacheProvider:
             project=await GovernedSimulationRuntimeClient(get_default_gateway())._invoke(DomainInvocation('project.project.read.atomic.projects_get',2,{'arguments':{'gid':payload['project_gid']}}),context)
         for _ in range(4):
             if isinstance(project,dict) and 'gid' not in project and isinstance(project.get('data'),dict): project=project['data']
-        if not isinstance(project,dict) or str(project.get('gid'))!=payload['project_gid'] or str(project.get('team_id'))!=context.team_gid or project.get('is_deleted'):
+        if not isinstance(project,dict) or str(project.get('gid'))!=payload['project_gid'] or project.get('is_deleted') or not team_in_access_scope(context.user_gid,context.team_gid,str(project.get('team_id') or '')):
             raise CapabilityBusinessError('cache_project_forbidden','The project must exist in the current tenant.')
         try:
             return self.output(self.repo.create(**{**payload,'project_name':str(project.get('name') or payload['project_name'])},tenant_gid=context.team_gid,actor_gid=context.user_gid,request_key=str(getattr(context,'idempotency_key','') or context.request_id)))

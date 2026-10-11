@@ -235,6 +235,10 @@ def probe_context(plan_row, recovery, *, last_journal_sequence):
             continue
         probe = dict(step_id=step['step_id'], probe_id=step['post_condition_probe_id'])
         payload = step.get('payload') or {}
+        if step['operation_id'] == 'vismockup.model.close@1':
+            # Derive the intended post-condition from the signed operation;
+            # never accept a caller assertion or replay the close during recovery.
+            probe['probe_input'] = dict(expected_all_documents_closed=True)
         if (step['operation_id'] == 'vismockup.node.visibility.change@1'
                 and payload.get('action') in {'show', 'hide'}):
             probe['probe_input'] = dict(node_key=payload['node_key'],

@@ -104,7 +104,7 @@ window.ContainerModes['row_detail'] = (() => {
       operation = { idempotencyKey, payload };
       _ruleChangeOperations.set(operationKey, operation);
     }
-    if (!window.confirm('确认保存此规则定义变更？')) throw new Error('已取消规则定义变更');
+    if (!(await window.AI00Dialogs.confirm('确认保存此规则定义变更？'))) throw new Error('已取消规则定义变更');
     try {
       const result = await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).invoke(
         'craft.rule.definition.change.apply', operation.payload,
@@ -821,7 +821,7 @@ window.ContainerModes['row_detail'] = (() => {
     containerEl.querySelector('.cc-new-submit')?.addEventListener('click', async () => {
       const titleInput = containerEl.querySelector('.cc-new-title');
       const title = titleInput?.value?.trim();
-      if (!title) { alert('请输入标题'); return; }
+      if (!title) { (await window.AI00Dialogs.alert('请输入标题')); return; }
 
       const prioEl = containerEl.querySelector('.cc-new-prio');
       const sevEl  = containerEl.querySelector('.cc-new-severity');
@@ -842,7 +842,7 @@ window.ContainerModes['row_detail'] = (() => {
         if (titleInput) titleInput.value = '';
         _navigateToCurrent(containerEl, fields_);
       } catch (e) {
-        alert('创建失败: ' + (e?.message || e));
+        (await window.AI00Dialogs.alert('创建失败: ' + (e?.message || e)));
         submitBtn.disabled = false; submitBtn.textContent = '创建';
       }
     });

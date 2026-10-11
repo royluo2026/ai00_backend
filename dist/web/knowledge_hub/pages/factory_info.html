@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+
+<script src="/web/core/dialogs.js?rev=20260922-unified-1"></script>
+
   <script src="/web/core/business_facade.js"></script>
 <meta charset="UTF-8">
 <title>现场信息</title>
@@ -187,6 +190,7 @@ td { padding: 8px 12px; white-space: nowrap; vertical-align: middle; }
   color: var(--text); font-size: 11px; outline: none;
 }
 </style>
+  <link rel="stylesheet" href="/assets/dialogs-e48cd6c5.css">
 </head>
 <body>
 <div class="md-root">
@@ -1035,7 +1039,7 @@ async function _saveModal() {
 }
 
 async function _deleteRow(gid, name) {
-  if (!confirm(`确认删除「${name}」？`)) return;
+  if (!(await window.AI00Dialogs.confirm(`确认删除「${name}」？`))) return;
   const _cloudFetch = _cf();
   const sec = SECTIONS[_section];
   if (!_cloudFetch) return;

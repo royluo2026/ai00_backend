@@ -11,6 +11,7 @@ from backend.base.export_templates import register_export_template_capability
 from backend.base.approval import register_approval_capabilities
 from backend.base.collaboration import register_collaboration_capabilities
 from backend.base.runtime_database_config import register_runtime_database_capabilities
+from backend.base.data_environment import register_data_environment_capabilities
 from backend.base.web_atomic import register_atomic_web_capabilities
 from backend.base.file_store_public_config import register_file_store_public_config_capability
 from backend.base.desktop_actions import register_desktop_capabilities
@@ -31,6 +32,7 @@ def register_capabilities(registry: Any) -> None:
     register_approval_capabilities(registry)
     register_collaboration_capabilities(registry)
     register_runtime_database_capabilities(registry)
+    register_data_environment_capabilities(registry)
     register_atomic_web_capabilities(registry)
     register_file_store_public_config_capability(registry)
     register_desktop_capabilities(registry)

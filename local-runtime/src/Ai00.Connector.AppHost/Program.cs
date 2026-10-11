@@ -12,6 +12,13 @@ public static class Program
     {
         try
         {
+            var startupClock=System.Diagnostics.Stopwatch.StartNew();
+            void StartupStage(string stage)
+            {
+#if DEBUG
+                Console.Error.WriteLine($"[ConnectorHost] startup {stage}: {startupClock.ElapsedMilliseconds}ms");
+#endif
+            }
             if(!OperatingSystem.IsWindows()||!Environment.Is64BitProcess)throw new PlatformNotSupportedException("windows_x64_required");
             var options=AppHostOptions.Parse(args);
             var verified=HostManifest.Verify(options);using var parent=verified.Parent;
@@ -30,6 +37,7 @@ public static class Program
             var reconnected=await sta.InvokeAsync(com.TryReconnectExistingApplication);
             Console.Error.WriteLine($"AI00_VISMOCKUP_STARTUP_RECONNECT:{reconnected}");
             var teamcenter=TeamcenterReadOnlyRuntime.CreateInstalled(root,options.Development);
+            StartupStage("teamcenter");
             var adapter=new VisMockupAdapter(sta,new AllowedPathPolicy([Path.Combine(root,"artifacts")]),com,
                 Path.Combine(root,"captures"),Path.Combine(root,$"vismockup-tree-cache{stateSuffix}.db"),teamcenter);
             using var http=new HttpClient(new HttpClientHandler{AllowAutoRedirect=false,UseCookies=false}){Timeout=TimeSpan.FromSeconds(30)};
@@ -55,6 +63,7 @@ public static class Program
                 services.GetRequiredService<RuntimeTransport>(),Path.Combine(root,"captures"),Path.Combine(root,"teamcenter-model-files")));
             builder.Services.AddSingleton(key);builder.Services.AddSingleton(new AppCredentialStore(root,options.GatewayOrigin));
             builder.Services.AddSingleton(new AppPlanJournal(Path.Combine(root,$"execution{stateSuffix}.v2.journal")));
+            StartupStage("journal");
             builder.Services.AddSingleton(adapter);builder.Services.AddSingleton(new PostConditionProbes(sta,com,adapter));
             var viewerGate=new ViewerExecutionGate();
             var viewerLog=new ViewerDiagnosticLog(Path.Combine(root,"logs","viewer-interaction.jsonl"));

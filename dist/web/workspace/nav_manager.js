@@ -6,21 +6,28 @@
  */
 const NavManager = (() => {
   const KEY = 'ui.nav.state';
+  const DEFAULTS_VERSION = 2;
 
   const ALL_ITEMS = [
+    { id: 'model_cache', title: '数模缓存', icon: 'icon-model-cache', requiresAuth: true },
+    { id: 'plugin_marketplace', title: '插件市场', icon: 'icon-plugin-marketplace', requiresAuth: true },
     { id: 'workbench',      title: '工作台',    icon: 'icon-home',         requiresAuth: false },
     { id: 'my_files',       title: '我的文件',  icon: 'icon-files',        requiresAuth: false },
     { id: 'craft_hub',      title: '工艺规划',  icon: 'icon-canvas',       requiresAuth: true,  minPerm: 'craft.view' },
     { id: 'project_hub',    title: '项目管理',  icon: 'icon-project',      requiresAuth: false, minPerm: 'project.view' },
     { id: 'knowledge_hub',  title: '知识库',    icon: 'icon-knowledge',    requiresAuth: false },
     { id: 'automation_hub', title: '自动化与AI', icon: 'icon-robot',        requiresAuth: false },
+    { id: 'ai_chat',        title: 'AI 对话',   icon: 'icon-robot',        requiresAuth: false },
+    { id: 'wfc_canvas',     title: 'AI 画布',   icon: 'icon-canvas',       requiresAuth: false },
     { id: 'cad_sim',        title: '数模仿真',  icon: 'icon-cube',         requiresAuth: false },
-    { id: 'ontology',       title: '本体编辑器', icon: 'icon-onto',        requiresAuth: true,  minPerm: 'system.tech_config' },
-    { id: 'team_space',     title: '团队空间',  icon: 'icon-team',         requiresAuth: true },
     { id: 'admin_hub',      title: '管理中心',  icon: 'icon-org',          requiresAuth: true,  minPerm: 'system.user.manage' },
+    { id: 'ontology',       title: '本体编辑器', icon: 'icon-onto',        requiresAuth: true,  minPerm: 'system.tech_config' },
+    { id: 'ext_datasource', title: '外部数据源', icon: 'icon-datasource',  requiresAuth: true,  minPerm: 'system.tech_config' },
+    { id: 'handbook',       title: '帮助手册',  icon: 'icon-help',         requiresAuth: false },
+    { id: 'team_space',     title: '团队空间',  icon: 'icon-team',         requiresAuth: true },
   ];
 
-  const DEFAULT_VISIBLE = ['workbench', 'my_files', 'craft_hub', 'project_hub', 'knowledge_hub', 'automation_hub', 'cad_sim', 'admin_hub'];
+  const DEFAULT_VISIBLE = ['workbench', 'plugin_marketplace', 'craft_hub', 'cad_sim', 'model_cache', 'knowledge_hub', 'handbook'];
 
   let _state = null;
   let _ctxTarget = null;
@@ -30,7 +37,7 @@ const NavManager = (() => {
       const raw = localStorage.getItem(KEY);
       console.log('[Nav] localStorage raw:', raw);
       const s = JSON.parse(raw);
-      if (s && Array.isArray(s.visible) && Array.isArray(s.hidden)) {
+      if (s?.defaultsVersion === DEFAULTS_VERSION && Array.isArray(s.visible) && Array.isArray(s.hidden)) {
         const allIds = ALL_ITEMS.map(i => i.id);
 
         // ── 去重（防止重复点击"+"导致 visible 里出现多个相同 id）──────────
@@ -44,14 +51,6 @@ const NavManager = (() => {
         allIds.filter(id => !covered.has(id)).forEach(id => {
           if (DEFAULT_VISIBLE.includes(id)) s.visible.push(id);
           else s.hidden.push(id);
-        });
-        // DEFAULT_VISIBLE 中若被旧状态放入 hidden，自动迁回 visible
-        DEFAULT_VISIBLE.forEach(id => {
-          if (s.hidden.includes(id) && !s.visible.includes(id)) {
-            console.log('[Nav] auto-healing: moving', id, 'from hidden to visible');
-            s.hidden  = s.hidden.filter(x => x !== id);
-            s.visible.push(id);
-          }
         });
         // 过滤已删除的模块
         s.visible = s.visible.filter(id => allIds.includes(id));
@@ -70,9 +69,12 @@ const NavManager = (() => {
     } catch(e) { console.warn('[Nav] _loadState error:', e); }
     const allIds = ALL_ITEMS.map(i => i.id);
     const fresh = {
+      defaultsVersion: DEFAULTS_VERSION,
       visible: [...DEFAULT_VISIBLE],
       hidden:  allIds.filter(id => !DEFAULT_VISIBLE.includes(id)),
     };
+    // 旧布局只迁移一次；之后保留用户自己调整的顺序和显隐。
+    localStorage.setItem(KEY, JSON.stringify(fresh));
     console.log('[Nav] fresh state → visible:', [...fresh.visible], 'hidden:', [...fresh.hidden]);
     return fresh;
   }
@@ -85,11 +87,64 @@ const NavManager = (() => {
     return ALL_ITEMS.find(i => i.id === id);
   }
 
+  // 网页版只展示两个顶层模块；未列入导航的内部详情页不受影响。
+  function isTopLevelAllowed(id) {
+    return window.electronAPI?._isElectron !== false ||
+      !ALL_ITEMS.some(item => item.id === id) ||
+      id === 'workbench' || id === 'craft_hub';
+  }
+
+  function _itemAllowed(item) {
+    if (!item) return false;
+    if (!isTopLevelAllowed(item.id)) return false;
+    if (window._authMode !== 'feishu' && item.requiresAuth) return false;
+    if (item.minPerm && !_hasTabPerm(item.minPerm)) return false;
+    if (item.grantCheck && !window._hasGrant?.(item.grantCheck)) return false;
+    const visibility = window._featureFlags?.['app_' + item.id]?.visibility;
+    return !visibility || !window._meetsRoleLevel || window._meetsRoleLevel(visibility);
+  }
+
+  function _itemEnabled(item) {
+    const availability = window._featureFlags?.['app_' + item.id]?.availability;
+    return !availability || !window._meetsRoleLevel || window._meetsRoleLevel(availability);
+  }
+
   function render() {
     const container = document.getElementById('nav-items-top');
     if (!container) return;
-    // Nav 模块入口已移至工作台 App 面板，侧边栏不再渲染导航项
+    if (!_state) _state = _loadState();
     container.innerHTML = '';
+    const isWeb = window.electronAPI?._isElectron === false;
+    const moreBtn = document.getElementById('nav-more-btn');
+    if (moreBtn) moreBtn.style.display = isWeb ? 'none' : '';
+    const activeId = window.TabManager?.activeId?.();
+    for (const id of isWeb ? ['workbench', 'craft_hub'] : _state.visible) {
+      const item = _getItem(id);
+      if (!_itemAllowed(item)) continue;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'nav-item';
+      btn.dataset.view = id;
+      btn.disabled = !_itemEnabled(item);
+      btn.title = item.title + (btn.disabled ? '（权限不足）' : '');
+      btn.setAttribute('aria-label', item.title);
+      btn.classList.toggle('active', id === activeId);
+      const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      icon.setAttribute('class', 'icon');
+      icon.setAttribute('width', '20');
+      icon.setAttribute('height', '20');
+      icon.setAttribute('aria-hidden', 'true');
+      const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+      use.setAttribute('href', '#' + item.icon);
+      icon.appendChild(use);
+      btn.appendChild(icon);
+      btn.addEventListener('click', () => window.TabManager.open(id));
+      if (!isWeb) btn.addEventListener('contextmenu', e => {
+        e.preventDefault();
+        _showCtxMenu(e, id, 'visible');
+      });
+      container.appendChild(btn);
+    }
   }
 
   function _showCtxMenu(e, itemId, listType) {
@@ -159,7 +214,7 @@ const NavManager = (() => {
       _state.hidden = _state.hidden.filter(x => x !== id);
       _state.visible.unshift(id);
     } else if (action === 'open') {
-      window.TabManager.open(id);
+      if (_itemEnabled(_getItem(id))) window.TabManager.open(id);
       return;
     }
 
@@ -174,16 +229,8 @@ const NavManager = (() => {
     const list = panel.querySelector('.more-panel-list');
     if (!list) return;
 
-    const isUnauth = window._authMode !== 'feishu';
     // 过滤掉当前用户无权访问的项（不应出现在"添加"列表里）
-    const visibleHidden = _state.hidden.filter(id => {
-      const item = _getItem(id);
-      if (!item) return false;
-      if (isUnauth && item.requiresAuth) return false;
-      if (item.minPerm && !_hasTabPerm(item.minPerm)) return false;
-      if (item.grantCheck && !window._hasGrant?.(item.grantCheck)) return false;
-      return true;
-    });
+    const visibleHidden = _state.hidden.filter(id => _itemAllowed(_getItem(id)));
 
     if (visibleHidden.length === 0) {
       list.innerHTML = '<div class="more-panel-empty">所有模块均已显示</div>';
@@ -211,7 +258,7 @@ const NavManager = (() => {
         render();
         _renderMorePanel();
       });
-      el.addEventListener('click', () => { window.TabManager.open(id); _toggleMorePanel(false); });
+      el.addEventListener('click', () => { if (_itemEnabled(item)) window.TabManager.open(id); _toggleMorePanel(false); });
       el.addEventListener('contextmenu', e => {
         e.preventDefault();
         _toggleMorePanel(false);
@@ -383,6 +430,7 @@ const NavManager = (() => {
     try {
       const allIds = ALL_ITEMS.map(i => i.id);
       const s = {
+        defaultsVersion: DEFAULTS_VERSION,
         visible: [...new Set(savedState.visible)].filter(id => allIds.includes(id)),
         hidden:  [...new Set(savedState.hidden  || [])].filter(id => allIds.includes(id)),
       };
@@ -404,10 +452,7 @@ const NavManager = (() => {
   function register(item) {
     if (ALL_ITEMS.find(i => i.id === item.id)) return;
     ALL_ITEMS.push(item);
-    // 新增 nav 项默认加入 DEFAULT_VISIBLE（除非 requiresAuth 且 hidden）
-    if (!DEFAULT_VISIBLE.includes(item.id) && item.id !== 'admin_hub') {
-      DEFAULT_VISIBLE.push(item.id);
-    }
+    // 新注册的 App 默认隐藏，用户可从“更多”固定到侧边栏。
   }
 
   /**
@@ -420,7 +465,7 @@ const NavManager = (() => {
       let added = 0;
       for (const item of registry.navItems) {
         if (!ALL_ITEMS.find(i => i.id === item.id)) {
-          ALL_ITEMS.push(item);
+          register(item);
           added++;
         }
       }
@@ -435,7 +480,7 @@ const NavManager = (() => {
     }
   }
 
-  return { boot, render, loadFromPython, register, loadFromRegistry };
+  return { boot, render, loadFromPython, register, loadFromRegistry, isTopLevelAllowed };
 })();
 
 window.NavManager = NavManager;

@@ -9,6 +9,7 @@
   if (window.electronAPI) return;   // Electron 环境已注入，直接退出
 
   const DEFAULT_LOCAL_BACKEND = 'http://127.0.0.1:8080';
+  const PRODUCTION_BACKEND = 'https://workmanship-backend.chehejia.com';
   const _BACKEND_ENV_CONFIG_URL = '/web/runtime-env.json';
   let _backendEnvMapPromise = null;
 
@@ -39,21 +40,7 @@
         }
       } catch {}
 
-      const injectedMap =
-        window.__AI00_BACKEND_BY_ENV && typeof window.__AI00_BACKEND_BY_ENV === 'object'
-          ? window.__AI00_BACKEND_BY_ENV
-          : {};
-
-      let localMap = {};
-      try {
-        const raw = localStorage.getItem('ai00_backend_by_env') || '';
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (parsed && typeof parsed === 'object') localMap = parsed;
-        }
-      } catch {}
-
-      return { ...fallback, ...fileMap, ...injectedMap, ...localMap };
+      return { ...fallback, ...fileMap };
     })();
 
     return _backendEnvMapPromise;
@@ -78,7 +65,7 @@
     try {
       u = new URL(origin);
     } catch {
-      return DEFAULT_LOCAL_BACKEND;
+      throw new Error('Browser 前端地址无效');
     }
 
     const host = (u.hostname || '').toLowerCase();
@@ -96,30 +83,27 @@
 
     const envMap = await _loadBackendEnvMapAsync();
     const mappedByEnv = _normalizeBaseUrl(envMap[env]);
-    if (mappedByEnv) return mappedByEnv;
-
-    if (host.endsWith('.chehejia.com') && host.includes('-web')) {
-      return `${u.protocol}//${host.replace('-web', '-backend')}`;
+    if (env === 'prod') {
+      if (mappedByEnv !== PRODUCTION_BACKEND || u.protocol !== 'https:') {
+        throw new Error('生产 Browser 后端地址未正确配置');
+      }
+      return mappedByEnv;
     }
-
-    return `${u.protocol}//${u.host}`;
+    if (['test', 'staging'].includes(env) && /^https:\/\/[a-z0-9.-]+$/.test(mappedByEnv)) {
+      return mappedByEnv;
+    }
+    throw new Error('Browser 后端地址未正确配置');
   }
 
   function _getStoredBackendBase() {
-    return _normalizeBaseUrl(localStorage.getItem('ai00_backend_url') || '')
+    return '';
   }
 
   async function _getRuntimeBackendBase(configBackendUrl = '') {
-    const explicit = _normalizeBaseUrl(configBackendUrl)
-    if (explicit) return explicit
-
+    if (_isViteDevServerLocation()) return '';
     const inferred = await _inferBackendFromFrontendOrigin(window.location.origin)
     if (inferred === '') return ''
-
-    const stored = _getStoredBackendBase()
-    if (stored) return stored
-
-    return _normalizeBaseUrl(inferred, DEFAULT_LOCAL_BACKEND)
+    return inferred;
   }
 
   async function _resolveBackendBase(configBackendUrl = '') {
@@ -127,16 +111,24 @@
   }
 
   function _storeBackendBase(base) {
-    const normalized = _normalizeBaseUrl(base, DEFAULT_LOCAL_BACKEND);
+    const normalized = _isViteDevServerLocation() ? '' : _normalizeBaseUrl(base);
+    if (_detectRuntimeEnvByHost(window.location.hostname) === 'prod' && normalized !== PRODUCTION_BACKEND) {
+      throw new Error('生产 Browser 不允许写入其他后端地址');
+    }
     window._AI00_BASE = normalized;
     if (normalized) localStorage.setItem('ai00_backend_url', normalized);
     else localStorage.removeItem('ai00_backend_url');
+    localStorage.removeItem('ai00_backend_by_env');
     return normalized;
   }
 
   function _toAbsoluteBackendUrl(url) {
     if (!(typeof url === 'string' && url.startsWith('/'))) return url
-    const base = _getStoredBackendBase() || window._AI00_BASE || ''
+    if (_isViteDevServerLocation()) return url;
+    const base = window._AI00_BASE || '';
+    if (_detectRuntimeEnvByHost(window.location.hostname) === 'prod' && base !== PRODUCTION_BACKEND) {
+      throw new Error('生产 Browser 后端地址尚未验证');
+    }
     return `${base}${url}`
   }
 
@@ -256,6 +248,7 @@
       return Promise.resolve({
         backendUrl: await _getRuntimeBackendBase(''),
         version:    ver,
+        clientType: 'browser',
       });
     },
 
@@ -290,7 +283,7 @@
         releaseVersion: release.release_version || release.version,
         releaseSha256: release.release_sha256 || release.sha256,
         requestedGrants: release.requested_grants || release.grants,
-      }, { confirm: () => window.confirm(`确认安装已签名插件「${release.plugin_id}」？`) })
+      }, { confirm: async () => (await window.AI00Dialogs.confirm(`确认安装已签名插件「${release.plugin_id}」？`)) })
         .then(data => ({ ok: true, ...data }))
         .catch(error => ({ ok: false, error: error?.message || String(error) }));
     },
@@ -305,7 +298,7 @@
       return client.call('base.plugins.uninstall', {
         pluginId: installation.plugin_id,
         expectedRevision: installation.revision,
-      }, { confirm: () => window.confirm(`确认卸载插件「${installation.plugin_id}」？其租户数据将被保留。`) })
+      }, { confirm: async () => (await window.AI00Dialogs.confirm(`确认卸载插件「${installation.plugin_id}」？其租户数据将被保留。`)) })
         .then(data => ({ ok: true, ...data }))
         .catch(error => ({ ok: false, error: error?.message || String(error) }));
     },

@@ -32,7 +32,7 @@ async function _invokeConnectorCapability(
   capabilityId, payload, { write = false, confirmation = '', idempotencyKey = '' } = {}
 ) {
   if (!write) return _connectorCapabilityClient().invoke(capabilityId, payload);
-  if (!window.confirm(confirmation)) {
+  if (!(await window.AI00Dialogs.confirm(confirmation))) {
     const error = new Error('操作已取消');
     error.code = 'capability_confirmation_cancelled';
     throw error;

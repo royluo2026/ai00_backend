@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
+
+<script src="/web/core/dialogs.js?rev=20260922-unified-1"></script>
+
   <script src="/web/core/business_facade.js"></script>
 <meta charset="UTF-8">
 <title>数模仿真</title>
 
 
-  <link rel="stylesheet" href="/assets/index-e3936a52.css">
+  <link rel="stylesheet" href="/assets/index-6c489cf5.css">
+  <link rel="stylesheet" href="/assets/dialogs-e48cd6c5.css">
 </head>
 <body>
 
@@ -39,11 +43,12 @@
   <button id="btnEnvironmentInsert" class="cs-btn" type="button" disabled>插入 ▾</button>
   <button id="btnAdoptCurrentDocument" type="button" class="cs-btn cs-adoption-entry">从当前文档创建环境</button>
   <button id="btnSwitchVmDocument" type="button" class="cs-btn" title="选择同一 VisMockup 中已打开的文档">切换 VisMockup 文档 ▾</button>
-  <span id="viewerInteractionRoute" role="status" aria-live="polite" data-route="pending">正在确认交互通道…</span>
+  <button id="btnSimulationDebug" type="button" class="cs-btn" title="查看数模仿真步骤、模型树缓存与验证、原生执行及错误">调试日志</button>
   <div id="environmentInsertMenu" class="cs-action-menu hidden" role="menu">
     <button type="button" data-insert-source="bop">插入 BOP…</button>
     <button type="button" data-insert-source="plmxml">插入 PLMXML…</button>
     <button type="button" data-insert-source="jt">插入本地 JT…</button>
+    <button type="button" data-insert-source="cache_snapshot">从共用数模缓存加载…</button>
     <button type="button" data-insert-source="environment_version" disabled title="待环境版本投影能力发布">插入已有环境版本（待发布）</button>
     <button type="button" data-insert-source="vismockup_document" disabled title="第二阶段">插入 VisMockup 已打开文档（第二阶段）</button>
   </div>
@@ -162,8 +167,11 @@
         <button id="btnTeamcenterSession" class="cs-btn cs-btn-xs cs-teamcenter-session-button" data-state="checking" type="button" title="正在检查 Teamcenter 登录状态" aria-label="Teamcenter 登录状态：检查中">
           <span class="cs-teamcenter-session-dot" aria-hidden="true"></span><span data-label>Teamcenter 检查中</span>
         </button>
+      </div>
+      <div class="cs-model-source-actions">
         <button id="btnAddTeamcenterSource" class="cs-btn cs-btn-xs" type="button">＋ Teamcenter</button>
         <button id="btnAddModelDocument" class="cs-btn cs-btn-xs" type="button">＋ PLMXML / JT</button>
+        <button id="btnAddCacheSnapshot" class="cs-btn cs-btn-xs" type="button" title="选择系统共用的项目缓存批次">从共用数模缓存加载…</button>
       </div>
       <div id="modelDocumentList" class="cs-model-document-list">
         <span class="cs-model-document-empty">选择仿真环境后添加模型文件</span>
@@ -289,6 +297,8 @@
       <div class="cs-dp-handle" id="dpHandle">
         <div class="cs-dp-grip"></div>
         <span class="cs-dp-handle-label" id="dpHandleLabel">点击节点后在此查看详情 ▲</span>
+        <span id="viewerInteractionRoute" class="cs-interaction-status" role="status" aria-live="polite" data-route="pending">正在确认交互通道…</span>
+        <button type="button" class="cs-document-count" data-viewer-documents aria-haspopup="dialog">文档 ?/10</button>
       </div>
       <!-- 开启状态：拖拽调高条 + 头部 + 主体 -->
       <div class="cs-dp-resize" id="dpResize"></div>
@@ -296,6 +306,8 @@
         <span class="cs-dp-source-tag" id="dpSourceTag">—</span>
         <span class="cs-dp-title" id="dpTitle">—</span>
         <div style="flex:1"></div>
+        <span class="cs-interaction-status" data-viewer-interaction-route role="status" aria-live="polite" data-route="pending">正在确认交互通道…</span>
+        <button type="button" class="cs-document-count" data-viewer-documents aria-haspopup="dialog">文档 ?/10</button>
         <button class="cs-dp-close" id="dpClose" title="关闭详情面板">✕</button>
       </div>
       <div class="cs-dp-body">
@@ -494,8 +506,9 @@
 <!-- 新建仿真任务弹窗 -->
 <div id="connectorCaptureOverlay" class="cs-modal-overlay hidden">
   <div class="cs-modal cs-connector-modal">
-    <div class="cs-modal-title">AI00 Connector · 环境搭建与倒序截图</div>
+    <div class="cs-modal-title">AI00 Connector · 线体逆序截图</div>
     <div class="cs-connector-note">浏览器只提交受治理任务；VisMockup COM、场景控制和内部截图均在本机 Connector 中执行。</div>
+    <div class="cs-connector-note">线体零件全灰 → 工位/工序倒序 → 当前工序蓝色截图 → 回灰并隐藏。前序工序仍需使用的共享零件暂留；空工序跳过，验图失败停止。有效图片沿用现有受治理回填流程。</div>
     <div class="cs-field">
       <label>环境名称</label>
       <input id="connectorEnvironmentName" value="工艺倒序截图环境" maxlength="255">
@@ -518,7 +531,7 @@
       <button class="cs-btn" id="connectorClose">关闭</button>
       <button class="cs-btn" id="connectorCompose">搭建环境</button>
       <button class="cs-btn" id="connectorPreflight" disabled>重新预检</button>
-      <button class="cs-btn primary" id="connectorStart" disabled>物化并截图</button>
+      <button class="cs-btn primary" id="connectorStart" disabled>准备 / 开始逆序截图</button>
       <button class="cs-btn" id="connectorCancel" disabled>取消</button>
     </div>
   </div>
@@ -600,22 +613,27 @@
 <script src="vm_snapshot_tree.js"></script>
 <script src="plmxml_tree_import.js"></script>
 <script src="bop_vm_binding_draft.js"></script>
-<script src="environment_store.js?v=20260916-capacity-backoff"></script>
+<script src="environment_store.js?v=20260923-w10-open-route-1"></script>
 <script src="environment_records.js"></script>
 <script src="environment_tree.js"></script>
 <script src="model_binding_panel.js"></script>
-  <script src="model_document_collection.js"></script>
-  <script src="teamcenter_session.js?v=20260917-teamcenter-search-fix-v2"></script>
-<script src="teamcenter_online_source.js?v=20260917-teamcenter-runtime-controls-2"></script>
-<script src="tree_projection_cache.js?v=20260916-model-load-state-3"></script>
+  <script src="model_document_collection.js?rev=20260928-simulation-debug-1"></script>
+  <script src="teamcenter_session.js?v=20260922-session-events-1"></script>
+<script src="teamcenter_online_source.js?rev=20260928-user-tree-choice-1"></script>
+<script src="../model_cache/cache_model.js"></script>
+<script src="cache_snapshot_source.js"></script>
+<script src="cache_snapshot_picker.js"></script>
+<script src="tree_projection_cache.js?rev=20260928-simulation-debug-1"></script>
 <script src="environment_workspace.js"></script>
-<script src="viewer_interaction.js?rev=20260922-open-shortpath-2"></script>
-<script src="cad_sim.js?rev=20260922-local-interaction-1"></script>
+<script src="viewer_interaction.js?rev=20260928-cache-viewer-1"></script>
+<script src="cache_snapshot_viewer.js?rev=20260930-cancel-retry-1"></script>
+<script src="viewer_document_manager.js?rev=20260928-document-manager-1"></script>
+<script src="cad_sim.js?rev=20260929-cache-subtree-1"></script>
 <!-- Vite treats ?v= as immutable dependency content; source fixes must revalidate. -->
-<script src="connector_recovery.js?rev=20260916-recovery-fingerprint-1"></script>
-<script src="live_document_adoption.js?v=20260922-local-interaction-1"></script>
+<script src="connector_recovery.js?rev=20260922-unified-dialogs-1"></script>
+<script src="live_document_adoption.js?rev=20260929-cache-subtree-1"></script>
 <script src="live_document_switcher.js?v=20260917-exact-session-recovery-1"></script>
-<script src="live_document_bootstrap.js?rev=20260922-open-shortpath-2"></script>
+<script src="live_document_bootstrap.js?rev=20260929-cache-subtree-1"></script>
 <script>window.addEventListener('DOMContentLoaded', () => { AI00ConnectorRecovery.mount(); AI00LiveDocumentBootstrap(); });</script>
 <script>
   // 主题同步

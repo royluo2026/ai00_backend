@@ -1,20 +1,24 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+
+<script src="/web/core/dialogs.js?rev=20260922-unified-1"></script>
+
   <script src="/web/core/business_facade.js"></script>
   <meta charset="UTF-8">
   <meta name="app-version" content="1.0.3">
   <title>总装智能辅助工艺开发系统(AI00)V1.0</title>
   <link rel="icon" type="image/svg+xml" href="/assets/logo_light-e3521d72.svg">
   <!-- 未登录时隐藏页面，避免主页内容闪现 -->
-  <style id="_auth_gate">body{visibility:hidden}</style>
+  <style id="_auth_gate">body,body *{visibility:hidden!important}</style>
   
   
   <!-- 浏览器模式兼容层：Electron 已注入 electronAPI 时自动跳过 -->
   <script src="/web/core/web_compat.js"></script>
   <script src="/web/core/existing_capability_client.js"></script>
   <link rel="stylesheet" href="/assets/index-2f66384e.css">
-  <link rel="stylesheet" href="/assets/main-921414fe.css">
+  <link rel="stylesheet" href="/assets/dialogs-e48cd6c5.css">
+  <link rel="stylesheet" href="/assets/main-66a85af0.css">
 </head>
 <body>
   <script src="/web/icons.js"></script>
@@ -83,6 +87,14 @@
           <circle cx="24" cy="12" r="3" fill="currentColor"/>
         </svg>
         <span style="font-size:11px;font-weight:600;color:var(--color-primary);letter-spacing:0.02em">柔性智能业务基座</span>
+      </span>
+      <span id="sb-build-info" class="sb-build-info" title="版本信息读取中">
+        <span class="sb-build-dot" aria-hidden="true">·</span>
+        <span id="sb-program-version">整体版本读取中</span>
+        <span class="sb-build-dot" aria-hidden="true">·</span>
+        <span id="sb-runtime-environment">环境识别中</span>
+        <span class="sb-build-dot" aria-hidden="true">·</span>
+        <span id="data-environment-badge" class="sb-data-environment" role="status">数据库状态读取中</span>
       </span>
       <span class="sb-sep" style="margin:0 4px;color:var(--border-default)">│</span>
       <span id="current-user" class="status-item">未登录</span>
@@ -210,6 +222,7 @@
   <!-- workspace 模块（TabManager / NavManager，依赖 WorkspaceEngine + core）-->
   <script src="/web/workspace/tab_manager.js"></script>
   <script src="/web/workspace/nav_manager.js"></script>
+  <script src="/web/core/statusbar_build_info.js"></script>
   <!-- main.js 协调入口（依赖上述所有模块，必须最后加载）-->
   <script src="/web/main.js?v=20260908a"></script>
 

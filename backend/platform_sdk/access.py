@@ -43,4 +43,14 @@ def build_access_scope(user: dict) -> dict:
     }
 
 
-__all__ = ["build_access_scope"]
+def team_in_access_scope(user_gid: str, team_gid: str, resource_team_gid: str) -> bool:
+    """Check team ownership using the authenticated actor's Base projection."""
+    if not user_gid or not team_gid or not resource_team_gid:
+        return False
+    if str(resource_team_gid) == str(team_gid):
+        return True
+    scope = build_access_scope({'gid': user_gid, 'team_id': team_gid})
+    return str(resource_team_gid) in {str(gid) for gid in scope['team_gids']}
+
+
+__all__ = ["build_access_scope", "team_in_access_scope"]

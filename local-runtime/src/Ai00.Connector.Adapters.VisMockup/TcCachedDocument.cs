@@ -9,7 +9,9 @@ using Ai00.Connector.Contracts.V2;
 namespace Ai00.Connector.Adapters.VisMockup;
 public sealed partial class VisMockupAdapter
 {
-    internal const string TcOpenContractHash="sha256:ae5547ff86c1d537cefe34098c68c0e8bbbec1aa20df850996767022029bf4d3";
+    private const int MaximumAssemblyXmlBytes=64*1024*1024;
+    private const int MaximumCacheOpenPacketBytes=96*1024*1024;
+    internal const string TcOpenContractHash="sha256:ed3b82d97c619831446e32110d7ca40f8cce6eac32f223a6fd8db1b7202f6399";
     private static void TcClosed(JsonElement value,params string[] names)
     {
         if(value.ValueKind!=JsonValueKind.Object||value.EnumerateObject().Count()!=names.Length||value.EnumerateObject().Any(p=>!names.Contains(p.Name))||value.EnumerateObject().Select(p=>p.Name).Distinct().Count()!=names.Length)
@@ -17,6 +19,7 @@ public sealed partial class VisMockupAdapter
     }
     internal async Task<object> OpenTcCacheAsync(JsonElement payload,CancellationToken ct)
     {
+        if(Encoding.UTF8.GetByteCount(payload.GetRawText())>MaximumCacheOpenPacketBytes)throw new ConnectorNoEffectException("cache_package_result_limit");
         TcClosed(payload,"cache_binding","preparation_hash","package_hash","source_selector","assembly_xml","tc_dependencies");
         var package=JsonNode.Parse(payload.GetRawText())!.AsObject();package.Remove("package_hash");
         var hash=CanonicalJsonV2.Hash(JsonSerializer.SerializeToElement(package));
@@ -26,9 +29,9 @@ public sealed partial class VisMockupAdapter
         var dependencies=payload.GetProperty("tc_dependencies");
         if(dependencies.ValueKind!=JsonValueKind.Array||dependencies.GetArrayLength() is <1 or >10000)throw new ConnectorNoEffectException("cache_open_input_invalid");
         var text=payload.GetProperty("assembly_xml").GetString()??"";
-        if(Encoding.UTF8.GetByteCount(text)>7*1024*1024)throw new ConnectorNoEffectException("cache_package_result_limit");
+        if(Encoding.UTF8.GetByteCount(text)>MaximumAssemblyXmlBytes)throw new ConnectorNoEffectException("cache_package_result_limit");
         XDocument xml;
-        using(var reader=XmlReader.Create(new StringReader(text),new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=7*1024*1024}))xml=XDocument.Load(reader);
+        using(var reader=XmlReader.Create(new StringReader(text),new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=MaximumAssemblyXmlBytes}))xml=XDocument.Load(reader);
         var root=Path.Combine(_plmxmlRoot,"tc-local");TeamcenterProcessWorker.SecureVisualizationMaterialRoot(root);
         var directory=Path.Combine(root,"packages",hash[7..]);TeamcenterProcessWorker.SecureVisualizationMaterialRoot(directory);
         var dependencyRoot=Path.Combine(directory,"dependencies");TeamcenterProcessWorker.SecureVisualizationMaterialRoot(dependencyRoot);

@@ -402,7 +402,7 @@ def build_profile(user: dict, *, load_grants: bool = True) -> dict:
     if "system.user.manage" in perms:
         v2_perms.add("base.read")
     if org_role == "super_admin":
-        v2_perms.add("base.write")
+        v2_perms.update({"base.write", "agent.write"})
     if org_role != "external":
         v2_perms.update({"agent.interact", "agent.read", "ontology.propose"})
     # Physical factory topology is an independent Capability V2 domain.  The
@@ -423,6 +423,10 @@ def build_profile(user: dict, *, load_grants: bool = True) -> dict:
     if org_role != "external":
         v2_perms.update({"digital_model.use", "simulation.use"})
     perms = list(set(perms) | v2_perms)
+
+    from backend.base.demo_access import has_relation_demo_access
+    if has_relation_demo_access(str(user['gid'])):
+        perms = list(set(perms) | {'craft.demo.relation'})
 
     return {
         **{k: v for k, v in user.items() if k != "feishu_open_id"},

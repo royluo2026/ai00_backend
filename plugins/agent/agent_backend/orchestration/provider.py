@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import Any
+from backend.capability_v2.provider_contracts import CapabilityBusinessError
 
 from .models import GraphDraft
 from .metrics import (
@@ -11,13 +12,17 @@ from .metrics import (
     calculate_effective_intelligent_work_rate,
 )
 from .reference_resolver import CatalogReferenceResolver
-from .repository import OrchestrationRepository
-from .service import OrchestrationService
+from .repository import OrchestrationRepository, ResourceNotAccessible, RevisionConflict, UntrustedBindingEvidence
+from .service import OrchestrationService, PublishBlocked
 from .runtime import OrchestrationRuntime
 from .bop_repository_assistant import BopRepositoryAssistant
 
 
 ORCHESTRATION_CAPABILITIES = frozenset({
+    'agent.orchestration.organization.panorama.read', 'agent.orchestration.organization.panorama.create',
+    'agent.orchestration.organization.graph.read', 'agent.orchestration.organization.graph.save',
+    'agent.orchestration.organization.version.publish',
+    'agent.orchestration.organization.version.revise',
     "agent.orchestration.panorama.read", "agent.orchestration.graph.read",
     "agent.orchestration.graph.save", "agent.orchestration.version.publish",
     "agent.orchestration.binding.delete", "agent.orchestration.run.start",
@@ -32,6 +37,49 @@ def make_handler(
 ):
     service = OrchestrationService(repository, resolver)
     runtime = OrchestrationRuntime(repository)
+
+    def organization_scope(payload, context):
+        effective = getattr(context, 'effective_identity', None)
+        tenant_gid = getattr(getattr(effective, 'tenant', None), 'tenant_id', None)
+        if not tenant_gid or tenant_gid.startswith('user:') or any(key in payload for key in ('tenant_gid', 'project_gid', 'organization_gid')):
+            raise PermissionError('organization scope must come from authenticated Gateway identity')
+        return {'tenant_gid': tenant_gid, 'project_gid': None, 'organization': True}
+
+    if capability_id.startswith('agent.orchestration.organization.'):
+        def organization_operation(payload, context):
+            bounded = organization_scope(payload, context)
+            if capability_id.endswith('panorama.read'):
+                return {'panorama': repository.get_organization_panorama(bounded['tenant_gid']),
+                        'can_edit': 'agent.write' in (getattr(context, 'permissions', ()) or ())}
+            if capability_id.endswith('panorama.create'):
+                return repository.create_organization_panorama(bounded['tenant_gid'], context.user_gid, payload['name'])
+            if capability_id.endswith('graph.read'):
+                if payload.get('projection'):
+                    return repository.get_organization_slice(payload['version_gid'],tenant_gid=bounded['tenant_gid'],actor_gid=context.user_gid,
+                        **{k:payload[k] for k in ('projection','view_gid','node_gid','expected_revision') if k in payload})
+                return {'graph': repository.get_graph(payload['version_gid'], actor_gid=context.user_gid, **bounded).model_dump(mode='json')}
+            if capability_id.endswith('graph.save'):
+                return {'revision': repository.save_graph(payload['version_gid'], GraphDraft.model_validate(payload['graph']),
+                    actor_gid=context.user_gid, expected_revision=payload['expected_revision'], **bounded)}
+            if capability_id.endswith('version.revise'):
+                return repository.create_organization_revision(payload['version_gid'],expected_revision=payload['expected_revision'],actor_gid=context.user_gid,tenant_gid=bounded['tenant_gid'])
+            publish_service = service
+            if authorization_checker_factory is not None:
+                publish_service = OrchestrationService(repository, resolver.for_authorization(authorization_checker_factory(context)))
+            return publish_service.publish(payload['version_gid'], actor_gid=context.user_gid,
+                expected_revision=payload['expected_revision'], **bounded)
+        def organization_handler(payload, context):
+            try:
+                return organization_operation(payload, context)
+            except RevisionConflict as error:
+                raise CapabilityBusinessError('version_conflict', str(error)) from error
+            except (ResourceNotAccessible, PermissionError) as error:
+                raise CapabilityBusinessError('permission_denied', '当前组织身份无法访问此业务全景。') from error
+            except (PublishBlocked, UntrustedBindingEvidence) as error:
+                raise CapabilityBusinessError('publish_blocked', str(error)) from error
+            except ValueError as error:
+                raise CapabilityBusinessError('invalid_input', '业务图不符合契约：'+str(error)) from error
+        return organization_handler
 
     def scope(payload: dict[str, Any], context) -> dict[str, str]:
         effective = getattr(context, "effective_identity", None)

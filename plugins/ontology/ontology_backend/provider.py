@@ -40,12 +40,22 @@ _READ_V2_BUSINESS = {
     ),
 }
 
+_GRAPH_BUSINESS = (
+    "Consumers browse lightweight immutable ontology graph summaries and bidirectional one-hop concept neighbourhoods by stable GID.",
+    (
+        "Graph pages contain only concepts and relations from the resolved release, with exact release references and no full schema or document bodies.",
+        "A neighbourhood includes the selected concept, its existing parents, children, outgoing and incoming relation endpoints and incident relations.",
+        "Deterministic pages contain at most one hundred objects and expose the complete matching total for continued pagination.",
+    ),
+    "test_v3_graph_list_is_lightweight_bidirectional_and_release_pinned",
+)
+
 def descriptor_for(spec):
     base = descriptor_from_provider_spec(spec); write = base.side_effect_level is not SideEffectLevel.READ
     business = {}
-    if spec.version == 2 and spec.id in _READ_V2_BUSINESS:
-        effect, criteria, test_name = _READ_V2_BUSINESS[spec.id]
-        handler = {
+    if (spec.version == 2 and spec.id in _READ_V2_BUSINESS) or (spec.version == 3 and spec.id == "ontology.object.list"):
+        effect, criteria, test_name = _GRAPH_BUSINESS if spec.version == 3 else _READ_V2_BUSINESS[spec.id]
+        handler = "list_graph_objects" if spec.version == 3 else {
             "ontology.concept.get": "get_concept",
             "ontology.concept.resolve": "resolve_concept_v2",
             "ontology.object.list": "list_objects",
@@ -56,7 +66,7 @@ def descriptor_for(spec):
             "business_invariants": (BusinessInvariantContract(
                 rule_id=f"{spec.id}.release_projection", version=1,
                 statement=criteria[0],
-                applies_when=f"{spec.id}@2 returns a result",
+                applies_when=f"{spec.id}@{spec.version} returns a result",
                 enforcement_ref=f"plugins/ontology/ontology_backend/capabilities/ontology_concepts_next.py:{handler}",
                 error_code="resource_not_found",
                 test_refs=(f"backend/tests/test_ontology_read_versions.py::{test_name}",),

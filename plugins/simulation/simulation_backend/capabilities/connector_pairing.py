@@ -10,7 +10,7 @@ from backend.capability_v2.provider_contracts import (
 )
 from backend.contracts.connector_execution_plan_v1 import canonical_hash
 
-from ..data.connector_repository import SqlPairingRepository
+from ..data.connector_repository import SqlPairingRepository, SimulationConnectorRepository
 from ..data.connector_app_pairing_repository import SqlAppPairingRepository
 from ..domain.connector_pairing import PairingError, PairingRequest, PairingService
 from .connector_runtime import connector_plan_signing_material
@@ -124,9 +124,11 @@ class ConnectorPairingProvider:
         ),))
 
     def binding(self, _payload, context):
-        row = self.service.repository.binding_for_user(context.user_gid, self._team_scope(context))
+        scope = self._team_scope(context)
+        runtime = SimulationConnectorRepository().bound_runtime_for_user(context.user_gid, scope)
+        row = None if runtime else self.service.repository.binding_for_user(context.user_gid, scope)
         data = {
-            "connector_id": row["connector_id"] if row else None,
+            "connector_id": runtime["device_id"] if runtime else row["connector_id"] if row else None,
             "installation_id": row["installation_id"] if row else None,
         }
         return CapabilityOutput(data=data, evidence=(EvidenceRef(

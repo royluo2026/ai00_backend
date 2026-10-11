@@ -14,10 +14,11 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
     private readonly string _executable;
     private readonly VisMockupConnection _connection;
     private readonly IVisMockupCom _com;
-    private readonly VisMockupSessionState _state = new();
+    private readonly VisMockupSessionState _state;
     private readonly SceneController _scene;
     private readonly ModelAttacher _attacher;
     private readonly InternalCapture _capture;
+    private readonly ReverseCaptureRenderer _renderer;
     private readonly VisMockupTreeCache? _treeCache;
     private readonly string _plmxmlRoot;
     private readonly ILiveHierarchyInventoryReader _liveHierarchyReader;
@@ -70,9 +71,14 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
         _executable = executable;
         _com = com;
         _connection = new VisMockupConnection(com);
+        _state = new VisMockupSessionState(
+            document => ReadCaptureSnapshot(document, 250_000, 64),
+            (document, key) => ResolveSessionNodeKey(document, key),
+            CaptureSessionIdentity);
         _scene = new SceneController(_state);
         _attacher = new ModelAttacher(paths, _state);
         _capture = new InternalCapture(captureRoot);
+        _renderer = new ReverseCaptureRenderer(_state, _scene, _capture);
         _treeCache = treeCache;
         _plmxmlRoot = Path.Combine(Path.GetDirectoryName(captureRoot) ?? captureRoot, "plmxml");
         _liveHierarchyReader = liveHierarchyReader ?? new VisMockupInProcessHierarchyReader(
@@ -100,6 +106,7 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
             new("vismockup.tree.read@2", "sha256:5d69cc98e38bd721fb55623b62df5162e68cbfb9bcb51c1b6c25d351c486de7c"),
             new("vismockup.model.attach@1", "sha256:444b6b8a963b5a7e04d6b607cfe53699a5c93196a5bf78c98843d12d073fe844"),
             new("vismockup.scene.apply@1", "sha256:fce8ff3a33d996a26c3121d015839e2d68bc3c631a8c8c1091201e95d0bcabd3"),
+            new("vismockup.scene.render@1", "sha256:0cb32eaf55dc0a4ec477878ad9a3934fcf08273f4ab6e0b78a6fa5d504c0c1e2"),
             new("vismockup.scene.verify@1", "sha256:e99bf5896c3f655afc7470fc140d261225d6f37a1d8224b7e9438a2e7b7a211a"),
             new("vismockup.view.capture@1", "sha256:10a4b5540a34fb32a2e6a4d24fd1efbe7afb929e2cc3c9fed44f6b4d9893962d"),
             new("teamcenter.product.search@1", "sha256:212e3c2396bf642456efa5e12674878fdbc201fc60250bcb3f150e19353d0acc"),
@@ -333,14 +340,29 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
             var document = _connection.RequireActiveDocument();
             _sessionNodeKeys.Clear();
             _mappedSession = null;
-            try { return ReadPlmxmlSnapshot(document, maxNodes, maxDepth); }
-            catch (ConnectorException error) when (error.Code is
-                "plmxml_current_state_structure_missing" or
-                "plmxml_current_state_root_identity_missing")
-            {
-                return new DocumentSnapshotReader().Read(document, maxNodes, maxDepth);
-            }
+            _state.Reset();
+            return ReadCaptureSnapshot(document, maxNodes, maxDepth);
         });
+
+    private VisMockupDocumentSnapshot ReadCaptureSnapshot(IVisMockupDocument document, int maxNodes, int maxDepth)
+    {
+        try { return ReadPlmxmlSnapshot(document, maxNodes, maxDepth); }
+        catch (ConnectorException error) when (error.Code is
+            "plmxml_current_state_structure_missing" or "plmxml_current_state_root_identity_missing")
+        {
+            return new DocumentSnapshotReader().Read(document, maxNodes, maxDepth);
+        }
+    }
+
+    private string CaptureSessionIdentity(IVisMockupDocument document)
+    {
+        var process = _com.InspectProcess();
+        return JsonSerializer.Serialize(new {
+            process.ProcessId, process.ProcessStartUtcTicks, document.DocumentId,
+            document.SourceIdentity, RootKey = document.RootNode.NodeKey,
+            Revision = VisMockupTreeFingerprint.ExternalRevisionFingerprint(document.SourceIdentity),
+        });
+    }
 
     public Task<NodeBinding> AttachModelAsync(string documentId, string baselineSnapshotHash, System.Text.Json.JsonElement binding) =>
         _sta.InvokeAsync(() =>
@@ -355,6 +377,7 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
             var document = _connection.RequireActiveDocument();
             if (document.DocumentId != documentId) throw new ConnectorException("vismockup_document_changed");
             if (baselineSnapshotHash is not null) _state.RequireBaseline(document, baselineSnapshotHash);
+            _sessionNodeKeys.Clear();
             return _scene.Apply(document, scene);
         });
 
@@ -363,11 +386,42 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
         {
             var document = _connection.RequireActiveDocument();
             if (document.DocumentId != documentId) throw new ConnectorException("vismockup_document_changed");
+            if (_state.BaselineSnapshotHash is { } baseline) _state.RequireBaseline(document, baseline);
             return _scene.Verify(document, operationId, expectedHash);
         });
 
     public Task<LocalCaptureArtifact> CaptureAsync(CaptureRequest request) =>
-        _sta.InvokeAsync(() => _capture.Capture(_connection.RequireActiveDocument(), request));
+        _sta.InvokeAsync(() => {
+            var document = _connection.RequireActiveDocument();
+            if (_state.BaselineSnapshotHash is { } baseline) _state.RequireBaseline(document, baseline);
+            return _renderer.Capture(document, request);
+        });
+
+    private Task<object> RenderSceneAsync(JsonElement payload) => _sta.InvokeAsync<object>(() =>
+    {
+        var allowed = new[] { "document_id", "baseline_snapshot_hash", "operation_id", "scene", "highlight_products", "fit_all" };
+        if (payload.ValueKind != JsonValueKind.Object || payload.EnumerateObject().Count() != allowed.Length
+            || payload.EnumerateObject().Any(field => !allowed.Contains(field.Name)))
+            throw new ConnectorException("scene_render_input_invalid");
+        var document = _connection.RequireActiveDocument(allowLaunch: false);
+        var scene = ReadScene(payload.GetProperty("scene"));
+        if (document.DocumentId != payload.GetProperty("document_id").GetString()
+            || scene.OperationId != payload.GetProperty("operation_id").GetString())
+            throw new ConnectorException("vismockup_document_changed");
+        _state.RequireBaseline(document, payload.GetProperty("baseline_snapshot_hash").GetString() ?? "");
+        _sessionNodeKeys.Clear();
+        var actual = _renderer.Render(document, scene,
+            payload.GetProperty("highlight_products").EnumerateArray().Select(item => item.GetString() ?? "").ToArray(),
+            payload.GetProperty("fit_all").GetBoolean());
+        return new { actual_scene_hash = actual };
+    });
+
+    private async Task<SceneVerification> VerifyRequiredSceneAsync(string documentId, string operationId, string expectedHash)
+    {
+        var result = await VerifySceneAsync(documentId, operationId, expectedHash);
+        if (!result.Matches) throw new ConnectorException("scene_verification_failed");
+        return result;
+    }
 
     public async Task<AdapterResult> ExecuteAsync(AdapterOperation operation, CancellationToken cancellationToken)
     {
@@ -419,7 +473,8 @@ public sealed partial class VisMockupAdapter : IConnectorAdapter
                 operation.Payload.GetProperty("document_id").GetString() ?? "",
                 ReadScene(operation.Payload.GetProperty("scene")),
                 operation.Payload.GetProperty("baseline_snapshot_hash").GetString() ?? ""),
-            "vismockup.scene.verify@1" => await VerifySceneAsync(
+            "vismockup.scene.render@1" => await RenderSceneAsync(operation.Payload),
+            "vismockup.scene.verify@1" => await VerifyRequiredSceneAsync(
                 operation.Payload.GetProperty("document_id").GetString() ?? "",
                 operation.Payload.GetProperty("operation_id").GetString() ?? "",
                 operation.Payload.GetProperty("expected_scene_hash").GetString() ?? ""),

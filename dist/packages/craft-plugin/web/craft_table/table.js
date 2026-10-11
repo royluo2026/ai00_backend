@@ -256,7 +256,7 @@ async function bindPart(partEntry) {
     await loadTableView(state.workPlanGid, state.sectionGid);
   } catch (e) {
     console.error('[table] bind_part 失败', e);
-    alert('绑定零件失败：' + (e.message || e));
+    (await window.AI00Dialogs.alert('绑定零件失败：' + (e.message || e)));
   }
 }
 
@@ -271,13 +271,13 @@ document.getElementById('btnCancelWp').addEventListener('click', () => {
 });
 document.getElementById('btnConfirmWp').addEventListener('click', async () => {
   const name = document.getElementById('wpName').value.trim();
-  if (!name) { alert('请输入方案名称'); return; }
+  if (!name) { (await window.AI00Dialogs.alert('请输入方案名称')); return; }
   const projectGid = document.getElementById('wpProjectGid').value.trim();
   try {
     await Promise.reject(new Error('此旧工艺方案操作已停用，请使用 BOP 版本编辑器'));
     document.getElementById('dialogWorkPlan').classList.add('hidden');
     await loadWorkPlans();
-  } catch (e) { alert('创建失败：' + (e.message || e)); }
+  } catch (e) { (await window.AI00Dialogs.alert('创建失败：' + (e.message || e))); }
 });
 
 // ─── 新建工段 ────────────────────────────────────────────────────
@@ -290,12 +290,12 @@ document.getElementById('btnCancelSec').addEventListener('click', () => {
 });
 document.getElementById('btnConfirmSec').addEventListener('click', async () => {
   const name = document.getElementById('secName').value.trim();
-  if (!name) { alert('请输入工段名称'); return; }
+  if (!name) { (await window.AI00Dialogs.alert('请输入工段名称')); return; }
   try {
     await Promise.reject(new Error('此旧工艺方案操作已停用，请使用 BOP 版本编辑器'));
     document.getElementById('dialogSection').classList.add('hidden');
     await loadSections(state.workPlanGid);
-  } catch (e) { alert('创建失败：' + (e.message || e)); }
+  } catch (e) { (await window.AI00Dialogs.alert('创建失败：' + (e.message || e))); }
 });
 
 // ─── 通用添加对话框 ──────────────────────────────────────────────
@@ -339,10 +339,10 @@ document.getElementById('btnCancelAdd').addEventListener('click', () => {
 
 document.getElementById('btnConfirmAdd').addEventListener('click', async () => {
   const secGid = state.sectionGid;
-  if (!secGid) { alert('请先选择工段'); return; }
+  if (!secGid) { (await window.AI00Dialogs.alert('请先选择工段')); return; }
   const code = document.getElementById('add_code')?.value.trim();
   const name = document.getElementById('add_name')?.value.trim();
-  if (!code || !name) { alert('编号和名称不能为空'); return; }
+  if (!code || !name) { (await window.AI00Dialogs.alert('编号和名称不能为空')); return; }
   try {
     if (_addMode === 'ws') {
       await Promise.reject(new Error('此旧工艺方案操作已停用，请使用 BOP 版本编辑器'));
@@ -360,7 +360,7 @@ document.getElementById('btnConfirmAdd').addEventListener('click', async () => {
     document.getElementById('btnAddPost').disabled = false;
     document.getElementById('btnAddOp').disabled   = false;
   } catch (e) {
-    alert('操作失败：' + (e.message || e));
+    (await window.AI00Dialogs.alert('操作失败：' + (e.message || e)));
   }
 });
 
@@ -481,7 +481,7 @@ let _stdOpAll = [];   // 完整标准工序列表缓存
 let _stdOpSel = null; // 当前选中的标准工序
 
 async function openStdOpDialog() {
-  if (!state.sectionGid) { alert('请先选择工段'); return; }
+  if (!state.sectionGid) { (await window.AI00Dialogs.alert('请先选择工段')); return; }
   _stdOpSel = null;
   document.getElementById('stdOpSearch').value = '';
   document.getElementById('stdOpSelected').textContent = '';
@@ -534,14 +534,14 @@ function filterStdOpList() {
 async function confirmCloneStdOp() {
   if (!_stdOpSel || !state.sectionGid) return;
   const postGid = _firstPostGid(_firstWsGid());
-  if (!postGid) { alert('当前工段无岗位，请先添加岗位'); return; }
+  if (!postGid) { (await window.AI00Dialogs.alert('当前工段无岗位，请先添加岗位')); return; }
 
   const result = await Promise.reject(new Error('此旧工艺方案操作已停用，请使用 BOP 版本编辑器'));
   document.getElementById('dialogStdOp').classList.add('hidden');
   if (result?.gid) {
     await loadTableView(state.workPlanGid, state.sectionGid);
   } else {
-    alert('克隆失败，请检查控制台');
+    (await window.AI00Dialogs.alert('克隆失败，请检查控制台'));
   }
 }
 
@@ -630,7 +630,7 @@ async function confirmResetDriftFields() {
 
   const result = await Promise.reject(new Error('此旧工艺方案操作已停用，请使用 BOP 版本编辑器'));
   if (result?.deprecated) {
-    alert(result.message);
+    (await window.AI00Dialogs.alert(result.message));
     return;
   }
   document.getElementById('dialogDrift').classList.add('hidden');

@@ -1,9 +1,18 @@
 from backend.capability_v2.provider_contracts import CapabilityContext
 from backend.capabilities.validation_next import validate_payload
 from plugins.simulation.simulation_backend.capabilities.workspaces import WorkspaceProvider, candidate_specs
+from plugins.simulation.simulation_backend.data.workspace_repository import WorkspaceRepository
+from plugins.simulation.tests.test_live_document_binding_repository import database, seed_teamcenter_online_workspace
 
 
 _CACHE_REVISION_HASH = "sha256:" + "a" * 64
+
+
+def test_workspace_search_and_get_hide_another_tenants_private_workspace(database):
+    seed_teamcenter_online_workspace(database)
+    repository = WorkspaceRepository()
+    assert repository.search(tenant_gid="21", owner_gid="30", offset=0, page_size=10)["items"] == []
+    assert repository.get("10", tenant_gid="21", owner_gid="30") is None
 
 
 class StubRepository:

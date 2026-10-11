@@ -167,6 +167,32 @@ async function runLineageProgressiveLoadingTests() {
   }
 
   {
+    const oldRead = deferred();
+    const newRead = deferred();
+    let reads = 0;
+    const store = new LineageProjectionStore();
+    const loader = new LineageProgressiveLoader({ store, invokeCapability: async (id) => {
+      if (id === 'craft.bop.version.get') return { revision: 1 };
+      if (id === 'craft.bop.structure.outline.get') return { lines: [], next_cursor: null };
+      if (id === 'craft.bop.work_package.get') return { nodes: [{ gid: 'entry' }], next_cursor: null };
+      reads++;
+      return reads === 1 ? oldRead.promise : newRead.promise;
+    }});
+    await loader.loadVersion('v1');
+    const scope = { version_gid: 'v1', revision: 1, scope_kind: 'line', scope_gid: 'line' };
+    await loader.loadScope(scope);
+    const beforeSave = loader.loadDetail(scope, 'entry');
+    const afterSave = loader.loadDetail(scope, 'entry', { force: true });
+    assert.equal(reads, 2, 'post-save read must not reuse a pre-save flight');
+    const saved = { entry: { gid: 'entry' }, links: [{ link_gid: 'saved' }] };
+    newRead.resolve(saved);
+    assert.strictEqual(await afterSave, saved);
+    oldRead.resolve({ entry: { gid: 'entry' }, links: [] });
+    assert.equal((await beforeSave).cancelled, true, 'late old detail must not replace saved state');
+    assert.strictEqual(store.selectedDetail(), saved);
+  }
+
+  {
     const oldOutline = deferred();
     const commits = [];
     let oldSignal;

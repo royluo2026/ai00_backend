@@ -51,6 +51,10 @@ public interface IVisMockupDocument
     void SetNodeSelected(string nodeKey, bool selected);
     void SetAllNodesVisible(bool visible);
     void ApplyCaptureProfile(CaptureProfile profile);
+    void SetNodeColors(IReadOnlyList<string> nodeKeys, double red, double green, double blue)
+        => throw new ConnectorException("vismockup_color_unsupported");
+    void FitCaptureView() => throw new ConnectorException("vismockup_fit_unsupported");
+    void RefreshCaptureView() { }
     string AttachModel(string path);
     string InsertDocument(string path);
     void DeleteInsertedDocument(int index) => throw new ConnectorException("vismockup_document_delete_unsupported");
@@ -599,7 +603,7 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
                 VisMockupDispatch.GetProperty(activeApplication, 5),
                 new DynamicPlmxmlSaveOptions(
                     VisMockupDispatch.GetProperty(activeApplication, 69)),
-                ReadActiveDocumentId);
+                ReadActiveDocumentId, RefreshApplication);
         }
         public IReadOnlyList<IVisMockupDocument> OpenDocuments
         {
@@ -615,7 +619,9 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
                 // call.  A single open document is therefore still completely
                 // enumerable without using that unstable member.
                 if (count == 1)
-                    return activeDocument is null ? [] : [activeDocument];
+                    return activeDocument is null
+                        ? throw new ConnectorException("vismockup_document_enumeration_unavailable")
+                        : [activeDocument];
 
                 var saveOptions = new DynamicPlmxmlSaveOptions(VisMockupDispatch.GetProperty(activeApplication, 69));
                 var result = new List<IVisMockupDocument>(count);
@@ -628,7 +634,7 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
                         var views = VisMockupDispatch.GetProperty(document, 3);
                         if (Convert.ToInt32(VisMockupDispatch.GetProperty(views, 1)) <= 0) continue;
                         var view = VisMockupDispatch.GetProperty(views, 2, 1);
-                        result.Add(new DynamicDocument(document, view, saveOptions, ReadActiveDocumentId));
+                        result.Add(new DynamicDocument(document, view, saveOptions, ReadActiveDocumentId, RefreshApplication));
                     }
                 }
                 catch (Exception error) when (error is not ConnectorException)
@@ -670,14 +676,16 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
             var document=VisMockupDispatch.GetProperty(activeApplication,4);
             return Convert.ToString(VisMockupDispatch.GetProperty(document,6))??"";
         }
+        private void RefreshApplication() => VisMockupDispatch.InvokeMethod(activeApplication, 59);
     }
 
     private sealed class DynamicDocument(
         object value,
         object activeView,
         IVisMockupPlmxmlSaveOptions saveOptions,
-        Func<string> activeDocumentId) : IVisMockupDocument
+        Func<string> activeDocumentId, Action refreshApplication) : IVisMockupDocument
     {
+        private CaptureProfile _captureProfile = new("png", 1920, 1080, "current");
         private dynamic Value => value;
         private object ActiveView => activeView;
         public NativeDocumentWindow LocateNativeWindow(int processId,NativeDocumentWindow? previous)
@@ -735,6 +743,46 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         {
             if (profile is not { Format: "png", Width: 1920, Height: 1080, Background: "current" })
                 throw new ConnectorException("capture_profile_unsupported");
+            _captureProfile = profile;
+        }
+        public void SetNodeColors(IReadOnlyList<string> nodeKeys, double red, double green, double blue)
+        {
+            dynamic view = ActiveView;
+            foreach (var key in nodeKeys)
+            {
+                dynamic node = FindNode(key);
+                foreach (var identity in new[] {
+                    "E4D0731F-CAB3-4463-BF66-2DFF81E70CAA", "DA54B404-8623-4EDA-AF4D-6A38685B3C8C",
+                    "E8792C49-D955-4400-BD9C-57B224AF09FF", "2E01D8D5-7383-4A5B-B745-BED3C26EED05" })
+                {
+                    try { view.AppearanceSysManager.RemoveAppearanceEntity(node, new Guid(identity), false); }
+                    catch (COMException) { }
+                    catch (RuntimeBinderException) { }
+                }
+                node.RestoreDefaultMaterial();
+                dynamic material = node.BasicMaterial;
+                material.Diffuse = SetColor(material.Diffuse, red, green, blue);
+                material.Ambient = SetColor(material.Ambient, red * .465, green * .465, blue * .465);
+                material.Emission = SetColor(material.Emission, 0, 0, 0);
+                material.Specular = SetColor(material.Specular, .41, .41, .41);
+                material.Shininess = 32;
+                node.BasicMaterial = material;
+            }
+        }
+        private static object SetColor(dynamic color, double red, double green, double blue)
+        {
+            color.Red = red; color.Green = green; color.Blue = blue; color.Alpha = 1.0;
+            return color;
+        }
+        public void FitCaptureView()
+        {
+            VisMockupDispatch.InvokeMethod(ActiveView, 23);
+        }
+        public void RefreshCaptureView()
+        {
+            refreshApplication();
+            VisMockupDispatch.InvokeMethod(ActiveView, 31);
+            Thread.Sleep(150);
         }
         public string AttachModel(string path)
         {
@@ -770,8 +818,11 @@ public sealed class WindowsVisMockupCom(string executable) : IVisMockupCom
         }
         public void DeleteInsertedDocument(int index) => VisMockupDispatch.InvokeMethod(value, 9, index);
         // VisAutomation.tlb: IVisDisp3DView.CaptureImage is DISPID 27.
-        public void CaptureImage(string path) =>
-            _ = VisMockupDispatch.InvokeMethod(ActiveView, 27, path);
+        public void CaptureImage(string path)
+        {
+            VisMockupDispatch.InvokeMethod(ActiveView, 27, path);
+            CapturePixels.NormalizePng(path, _captureProfile);
+        }
         public void ExportPlmxml(string path, int hierarchyIndex)
         {
             if (hierarchyIndex < 0) throw new ConnectorException("vismockup_hierarchy_index_invalid");

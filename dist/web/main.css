@@ -34,7 +34,7 @@
   --border-subtle: #313244;
 
   /* 尺寸（与 JS 共享，避免硬编码）*/
-  --nav-width:         48px;
+  --nav-width:         36px;
   --sidebar-width:     240px;
   --titlebar-height:   0px;
   --statusbar-height:  34px;
@@ -121,7 +121,7 @@ button { font-family: inherit; }
 
 /* ==================== 导航栏 Logo ==================== */
 .nav-logo {
-  height: 52px;
+  height: 39px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -129,6 +129,7 @@ button { font-family: inherit; }
   border-bottom: 1px solid var(--border-subtle);
   -webkit-app-region: no-drag;
 }
+.nav-logo svg { width: 24px; height: 24px; }
 
 /* ==================== 标题栏（已移除，保留 win-btn 供 tab bar 使用）==================== */
 
@@ -179,33 +180,24 @@ button { font-family: inherit; }
   overflow: hidden;
 }
 
-/* 左侧细轨道：取代导航栏，给内容区提供视觉边界 */
-#workspace::before {
-  content: '';
-  width: 4px;
-  flex-shrink: 0;
-  background: var(--bg-secondary);
-  border-right: 1px solid var(--border-subtle);
-}
-
 /* ==================== 左侧图标导航 ==================== */
 .nav-sidebar {
-  display: none;
+  display: flex;
   width: var(--nav-width);
   background: var(--bg-secondary);
   border-right: 1px solid var(--border-subtle);
   flex-direction: column;
   justify-content: space-between;
   flex-shrink: 0;
-  padding: 8px 0;
+  padding: 6px 0;
   overflow: hidden;
 }
 
 .nav-items-top {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 0 4px;
+  gap: 1.5px;
+  padding: 0 3px;
   flex: 1;
   min-height: 0;
   overflow-y: auto;
@@ -216,14 +208,17 @@ button { font-family: inherit; }
 .nav-items-bottom {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 0 4px;
+  gap: 1.5px;
+  padding: 0 3px;
 }
 
 .nav-item {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -234,6 +229,9 @@ button { font-family: inherit; }
 }
 .nav-item:hover  { background: var(--bg-hover); color: var(--text-normal); }
 .nav-item.active { background: var(--color-primary); color: var(--text-on-primary); }
+.nav-item:disabled { opacity: .4; cursor: not-allowed; }
+.nav-item:focus-visible { outline: 2px solid var(--color-primary); outline-offset: -2px; }
+.nav-item .icon { width: 15px; height: 15px; }
 
 .nav-icon { display: flex; align-items: center; justify-content: center; pointer-events: none; }
 .icon { display: inline-block; vertical-align: middle; flex-shrink: 0; }
@@ -552,6 +550,9 @@ button { font-family: inherit; }
 .statusbar-right { display: flex; align-items: center; gap: 6px; }
 
 .sb-app-logo { display: flex; align-items: center; gap: 4px; }
+
+.sb-build-info { display: inline-flex; align-items: center; gap: 6px; color: var(--color-primary); font-size: 11px; font-weight: 600; white-space: nowrap; }
+.sb-build-dot { font-weight: 700; }
 
 .status-item { font-size: 11px; opacity: 0.75; }
 .status-sep   { opacity: 0.3; }
@@ -1069,3 +1070,8 @@ button { font-family: inherit; }
   background: var(--bg-tertiary, #313244);
   color: var(--text-normal, #cdd6f4);
 }
+
+.sb-data-environment { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 11px; line-height: 18px; white-space: nowrap; color: #475569; background: #e2e8f0; }
+.sb-data-environment[data-prefix="test_"] { color: #1d4ed8; background: #dbeafe; }
+.sb-data-environment[data-prefix="pp_"] { color: #9a3412; background: #ffedd5; }
+.sb-data-environment[data-prefix=""] { color: #b91c1c; background: #fee2e2; }

@@ -16,6 +16,7 @@ from backend.capability_v2.provider_contracts import (
 from backend.platform_sdk.artifacts import require_artifact
 
 from ..data.connection import get_craft_conn
+from ..services.bop_picture_refs import screenshot_picture
 from .provider import register_capability
 
 
@@ -66,6 +67,7 @@ class ProcessScreenshotRepository:
                          encoded, artifact_ref["sha256"], actor_gid),
                     )
                     projection = json.dumps([{
+                        **screenshot_picture(artifact_ref),
                         "screenshot_gid": screenshot_gid,
                         "capture_run_id": capture_run_id,
                         "artifact_ref": artifact_ref,

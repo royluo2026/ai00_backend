@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh">
-<head>
+<head><script>window.__AI00_PRODUCTION_BUILD__=true;</script>
+
+<script src="/web/core/dialogs.js?rev=20260922-unified-1"></script>
+
   <script src="/web/core/business_facade.js"></script>
 <meta charset="UTF-8">
 <title>管理中心</title>
@@ -45,6 +48,7 @@
   .project-scope { margin: 0 10px 8px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg2); color: var(--text); font-size: 12px; width: calc(100% - 20px); }
   .placeholder p { font-size: 14px; }
 </style>
+  <link rel="stylesheet" href="/assets/dialogs-e48cd6c5.css">
 </head>
 <body>
 <div class="layout">
@@ -100,6 +104,8 @@
   }
 
   const NAV_DEFS = [
+    { id:'admin_plugin_marketplace', label:'插件管理', src:'../plugin_marketplace/admin.html',
+      icon:'<path d="M3 9h18l-2-6H5L3 9zM5 9v12h14V9M9 21v-7h6v7"/>' },
     { id:'admin_bug_tracker',   label:'开发看板',  src:'../admin/bug_tracker.html',
       icon:'<circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>' },
     { id:'admin_approval',      label:'审批中心', src:'../approval/approval_view.html',

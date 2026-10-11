@@ -155,7 +155,7 @@ async function _linkBopEntry(issueRow) {
       const row = _all.find(r => r.gid === issueRow.gid);
       if (row) row.bop_entry_gid = entry.gid || null;
       shell?.setRows(_all);
-    } catch (err) { alert('关联失败：' + err.message); }
+    } catch (err) { (await window.AI00Dialogs.alert('关联失败：' + err.message)); }
   };
   await _openBopPicker(issueRow.gid, issueRow.bop_entry_gid);
 }
@@ -590,7 +590,7 @@ async function _doShare(listName, shareUrl, overlay) {
   } catch (e) {
     sendBtn.disabled = false;
     sendBtn.textContent = '发送到群';
-    alert('发送失败：' + e.message);
+    (await window.AI00Dialogs.alert('发送失败：' + e.message));
   }
 }
 

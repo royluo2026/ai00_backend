@@ -15,7 +15,7 @@ def _workflow_identity(operations: set[str]) -> tuple[str, int]:
         return "simulation.document_snapshot.request", 2
     if operations <= {
         "vismockup.application.probe@1", "vismockup.model.attach@1",
-        "vismockup.scene.apply@1", "vismockup.scene.verify@1",
+        "vismockup.scene.apply@1", "vismockup.scene.render@1", "vismockup.scene.verify@1",
     }:
         return "simulation.environment.materialize", 2
     raise ValueError("workflow_v2_operation_unsupported")
@@ -23,7 +23,7 @@ def _workflow_identity(operations: set[str]) -> tuple[str, int]:
 
 def _effect(operation_id: str) -> tuple[str, str | None]:
     if operation_id in {
-        "vismockup.model.attach@1", "vismockup.scene.apply@1",
+        "vismockup.model.attach@1", "vismockup.scene.apply@1", "vismockup.scene.render@1",
         "vismockup.view.capture@1",
     }:
         return "write", "vismockup.document.snapshot@1"

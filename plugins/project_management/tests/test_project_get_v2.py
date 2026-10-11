@@ -13,6 +13,7 @@ from plugins.project_management.project_management_backend.application.service i
 
 @pytest.fixture
 def project_read(monkeypatch):
+    monkeypatch.setattr('backend.platform_sdk.access.build_access_scope',lambda user:{'team_gids':[user['team_id'],'10']})
     row=dict(gid='3',team_id='2',owner_gid='1',name='Project',status='active',share_scope='team',
         created_at='2026-09-28',updated_at='2026-09-28',meta={'zero':0,'empty':'','nil':None})
     monkeypatch.setattr(project_outcome_port,'provider',ProjectManagementApplication(SimpleNamespace(get_project=lambda gid:row if gid=='3' else None)))
@@ -62,3 +63,10 @@ def test_legacy_unowned_project_uses_only_the_authenticated_super_admin_tenant(p
     result=handler({'arguments':{'gid':'3'}},CapabilityContext(user_gid='1',team_gid='2',active_roles=('super_admin',)))
     assert result['data']['data']['team_id']=='2' and row['team_id'] is None
     with pytest.raises(CapabilityBusinessError):handler({'arguments':{'gid':'3'}},CapabilityContext(user_gid='1',team_gid='2'))
+
+
+def test_shared_parent_team_project_keeps_its_actual_ownership(project_read):
+    registry,row=project_read;row['team_id']='10'
+    result=registry.get('project.project.read.atomic.projects_get',2).handler(
+        {'arguments':{'gid':'3'}},CapabilityContext(user_gid='1',team_gid='2'))
+    assert result['data']['data']['team_id']=='10' and row['team_id']=='10'

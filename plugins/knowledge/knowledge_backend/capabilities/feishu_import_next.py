@@ -112,7 +112,7 @@ def confirm_import(payload: dict, context: CapabilityContext) -> CapabilityOutpu
                     return _receipt(prior)
                 cur.execute(
                     "SELECT s.gid AS snapshot_gid,s.source_gid,s.object_key,s.content_sha256,s.complete,s.diagnostics_json,"
-                    "src.linked_document_gid,r.title FROM workmanship_know_feishu_snapshots s "
+                    "src.linked_document_gid,r.title,s.source_author_open_id,s.source_author_name FROM workmanship_know_feishu_snapshots s "
                     "JOIN workmanship_know_feishu_sources src ON src.gid=s.source_gid "
                     "JOIN workmanship_know_feishu_catalog_records r ON r.gid=src.catalog_record_gid "
                     "WHERE s.gid=%s AND s.tenant_gid=%s AND src.active=TRUE FOR UPDATE",
@@ -163,6 +163,12 @@ def confirm_import(payload: dict, context: CapabilityContext) -> CapabilityOutpu
                 source_unchanged = bool(baseline and baseline["content_sha256"] == snapshot["content_sha256"])
                 local_unchanged = bool(document and document.get("before_sha256") == reviewed_sha)
                 changed = not (source_unchanged and local_unchanged)
+                if document and snapshot.get('source_author_open_id'):
+                    cur.execute(
+                        "UPDATE workmanship_know_documents SET source_author_open_id=COALESCE(source_author_open_id,%s),"
+                        "source_author_name=COALESCE(source_author_name,%s),updated_at=updated_at WHERE gid=%s AND tenant_gid=%s",
+                        (snapshot['source_author_open_id'], snapshot.get('source_author_name'), document_gid, tenant),
+                    )
                 if changed:
                     if document:
                         space_gid = document["space_gid"]
@@ -186,10 +192,11 @@ def confirm_import(payload: dict, context: CapabilityContext) -> CapabilityOutpu
                     if not document:
                         cur.execute(
                             "INSERT INTO workmanship_know_documents "
-                            "(gid,tenant_gid,space_gid,title,slug,status,current_revision_gid,published_revision_gid,source_entry_gid,created_by) "
-                            "VALUES (%s,%s,%s,%s,%s,'published',%s,%s,%s,%s)",
+                            "(gid,tenant_gid,space_gid,title,slug,status,current_revision_gid,published_revision_gid,source_entry_gid,created_by,source_author_open_id,source_author_name) "
+                            "VALUES (%s,%s,%s,%s,%s,'published',%s,%s,%s,%s,%s,%s)",
                             (document_gid, tenant, space_gid, title, f"feishu-{source_gid.lower()}",
-                             revision_gid, revision_gid, source_gid, context.user_gid),
+                             revision_gid, revision_gid, source_gid, context.user_gid,
+                             snapshot.get('source_author_open_id'), snapshot.get('source_author_name')),
                         )
                         cur.execute("UPDATE workmanship_know_feishu_sources SET linked_document_gid=%s WHERE gid=%s AND tenant_gid=%s",
                                     (document_gid, source_gid, tenant))

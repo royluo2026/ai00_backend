@@ -19,6 +19,7 @@ MIGRATION_RE = re.compile(
 )
 LOCK_NAME = "ai00:database-migrations:v1"
 LEDGER_TABLE = "workmanship_base_schema_migrations"
+HISTORICAL_UPLOAD_MIGRATION = ("202609080002", "19cc31d72b5a81c6092d59a5c0491df3a26fe6416ad75346829b86c15ecb6188")
 KNOWN_LEGACY_CHECKSUMS = {
     "202608030010": ("2647a9edcc06a4f37aa60e4338e71d4e0bb9a89bb2a003b078d3f9c743b51ee2",),
     "202608040001": ("1f6032096a447ed34bdb89d151e57f6706ff7ed7332438f334e5fc47d9f62020",),
@@ -273,6 +274,13 @@ def is_resumable_ddl(statement: str) -> bool:
         or re.match(
             r"^ALTER TABLE\s+`?[A-Z0-9_]+`?\s+MODIFY COLUMN\s+`?[A-Z0-9_]+`?.*\bNOT NULL\b",
             normalized,
+        )
+        or (
+            'AI00: RESUMABLE NULLABILITY' in statement.upper()
+            and re.fullmatch(
+                r'ALTER TABLE WORKMANSHIP_AGENT_ORCH_[A-Z0-9_]+ MODIFY COLUMN PROJECT_GID VARCHAR\(128\) NULL',
+                normalized,
+            )
         )
         or re.match(
             r"^ALTER TABLE\s+`?[A-Z0-9_]+`?\s+DROP PRIMARY KEY\s*,\s*ADD PRIMARY KEY\s*\(",
@@ -561,6 +569,9 @@ def assert_oceanbase_ddl_policy(path: Path, sql: str) -> None:
 
 
 def validate_migration(migration: Migration, registry: DomainRegistry) -> None:
+    if (migration.migration_id == HISTORICAL_UPLOAD_MIGRATION[0]
+            and migration.checksum != HISTORICAL_UPLOAD_MIGRATION[1]):
+        raise MigrationError("historical_upload_migration_checksum_changed")
     statements = split_sql(migration.sql)
     meaningful = [statement for statement in statements if strip_sql_comments(statement)]
     if not meaningful:
@@ -585,6 +596,45 @@ def _scalar(row):
     if isinstance(row, dict):
         return next(iter(row.values()))
     return row[0]
+
+
+def assert_historical_upload_triggers(conn, *, require_existing: bool) -> None:
+    table = rewrite_sql("workmanship_base_historical_uploads")
+    message = "Historical upload provenance is append-only"
+    for event in ("UPDATE", "DELETE"):
+        name = prefixed_trigger_name(f"base_historical_uploads_no_{event.lower()}")
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT TRIGGER_NAME, EVENT_OBJECT_TABLE, EVENT_MANIPULATION, "
+                "ACTION_TIMING, ACTION_ORIENTATION, ACTION_STATEMENT "
+                "FROM information_schema.TRIGGERS "
+                "WHERE TRIGGER_SCHEMA=DATABASE() AND TRIGGER_NAME=%s",
+                (name,),
+            )
+            rows = cursor.fetchall()
+        if not rows:
+            if require_existing:
+                raise MigrationError("historical_upload_triggers_missing")
+            continue
+        if len(rows) != 1:
+            raise MigrationError("historical_upload_trigger_definition_mismatch")
+        row = rows[0]
+        try:
+            fields = tuple(row[field] for field in (
+                "TRIGGER_NAME", "EVENT_OBJECT_TABLE", "EVENT_MANIPULATION",
+                "ACTION_TIMING", "ACTION_ORIENTATION", "ACTION_STATEMENT",
+            )) if isinstance(row, dict) else tuple(row)
+        except (KeyError, TypeError):
+            raise MigrationError("historical_upload_trigger_definition_mismatch") from None
+        if len(fields) != 6 or not all(isinstance(value, str) for value in fields):
+            raise MigrationError("historical_upload_trigger_definition_mismatch")
+        action = re.fullmatch(
+            r"SIGNAL\s+SQLSTATE\s+'45000'\s+SET\s+MESSAGE_TEXT\s*=\s*'([^']*)'\s*;?",
+            fields[5].strip(), re.I,
+        )
+        if (fields[:5] != (name, table, event, "BEFORE", "ROW") or
+                not action or action.group(1) != message):
+            raise MigrationError("historical_upload_trigger_definition_mismatch")
 
 
 def _ensure_ledger(conn) -> None:
@@ -631,6 +681,7 @@ def apply_migrations(conn, directory: Path | None = None, registry: DomainRegist
         existing = {row["migration_id"] if isinstance(row, dict) else row[0]: row for row in rows}
         for migration in migrations:
             old = existing.get(migration.migration_id)
+            check_historical_triggers = migration.migration_id == HISTORICAL_UPLOAD_MIGRATION[0]
             if old:
                 checksum = old["checksum"] if isinstance(old, dict) else old[1]
                 status = old["status"] if isinstance(old, dict) else old[2]
@@ -638,10 +689,14 @@ def apply_migrations(conn, directory: Path | None = None, registry: DomainRegist
                 if checksum not in valid_checksums and status == "applied":
                     raise MigrationError(f"checksum changed for applied migration {migration.migration_id}")
                 if status == "applied":
+                    if check_historical_triggers:
+                        assert_historical_upload_triggers(conn, require_existing=True)
                     continue
             started = time.monotonic()
             effective_owner = registry.migration_owner(migration.migration_id, migration.domain)
             try:
+                if check_historical_triggers:
+                    assert_historical_upload_triggers(conn, require_existing=False)
                 # OceanBase commits before and after DDL. Each statement is deliberately
                 # replay-safe and committed independently so retries can resume safely.
                 for statement in split_sql(migration.sql):
@@ -651,6 +706,8 @@ def apply_migrations(conn, directory: Path | None = None, registry: DomainRegist
                     with conn.cursor() as cur:
                         cur.execute(prepared)
                     conn.commit()
+                if check_historical_triggers:
+                    assert_historical_upload_triggers(conn, require_existing=True)
                 duration = int((time.monotonic() - started) * 1000)
                 with conn.cursor() as cur:
                     cur.execute(

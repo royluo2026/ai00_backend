@@ -16,6 +16,13 @@ async function _bridge(_ns, _method, ..._args) {
 
 const _eAPI = () => window.electronAPI || window.parent?.electronAPI;
 const $ = id => document.getElementById(id);
+function _simulationDebug(stage,detail={}) {
+  try {
+    const api=window.AI00ViewerInteraction?.frameAPI(window);
+    void api?.debugRecord?.({stage,workspace_gid:window._simulationEnvironmentWorkspace?.store?.state?.workspace?.workspace_gid,...detail})?.catch(()=>{});
+  } catch (_) { /* Diagnostics cannot interrupt model work. */ }
+}
+window._simulationDebug=_simulationDebug;
 
 async function _invokeCapability(id,payload={}, {confirmation=false,idempotency=false,version=1,idempotencyKey,approvalReference,expectedResourceVersion}={}) {
   if (approvalReference) throw new Error('downstream_confirmation_receipt_unavailable');
@@ -31,10 +38,19 @@ async function _invokeCapability(id,payload={}, {confirmation=false,idempotency=
   if (expectedResourceVersion !== undefined && expectedResourceVersion !== null && String(expectedResourceVersion).trim()) {
     envelope.expected_resource_version = String(expectedResourceVersion);
   }
-  return window.AI00Business.invoke(id, envelope, confirmation ? async () => true : undefined);
+  const started=performance.now(),trace_id=window.crypto?.randomUUID?.(),poll=id==='simulation.vismockup.command.get';
+  if(!poll)_simulationDebug('capability_started',{trace_id,capability_id:id,capability_version:version,operation_id:payload.operation_id});
+  try {
+    const result=await window.AI00Business.invoke(id, envelope, confirmation ? async () => true : undefined);
+    if(!poll)_simulationDebug('capability_completed',{trace_id,capability_id:id,capability_version:version,operation_id:result?.operation_id,elapsed_ms:performance.now()-started});
+    return result;
+  } catch(error) {
+    _simulationDebug('capability_failed',{trace_id,capability_id:id,capability_version:version,operation_id:payload.operation_id,error_code:error?.message||'capability_failed',elapsed_ms:performance.now()-started});throw error;
+  }
 }
 
 async function _waitVisMockupCommand(operationId, maxAttempts = 750) {
+  let lastStatus;const started=performance.now();
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     let command;
     try {
@@ -44,7 +60,9 @@ async function _waitVisMockupCommand(operationId, maxAttempts = 750) {
       await new Promise(resolve => setTimeout(resolve, 200));
       continue;
     }
+    if(command.status!==lastStatus){lastStatus=command.status;_simulationDebug('command_progress',{operation_id:operationId,status:command.status,elapsed_ms:performance.now()-started});}
     if (['completed', 'failed', 'cancelled', 'outcome_unknown', 'manual_review_required', 'expired'].includes(command.status)) {
+      for(const step of command.outcome?.steps||[])_simulationDebug('command_step',{operation_id:operationId,status:step.status,error_code:step.error_code,message:step.step_id});
       if (command.status !== 'completed') {
         const error = command.outcome?.steps?.at(-1)?.error_code || command.status;
         throw new Error(error);
@@ -139,7 +157,7 @@ async function _requireConnectorRuntime() {
             promise: window.AI00Business.invoke('simulation.connector.pairing.approve', {
               version: 2,
               payload: { pairing_id: state.pairing.id, expected_version: 1 },
-            }, async () => window.confirm('确认将此 AI00 App 绑定到当前账号？')),
+            }, async () => (await window.AI00Dialogs.confirm('确认将此 AI00 App 绑定到当前账号？'))),
           };
         }
         try { await _connectorPairingApproval.promise; }
@@ -189,6 +207,7 @@ let _vmAction = 'connect';
 let _nativeStatusUnsubscribe = null;
 let _nativeViewportOccluded = false;
 let _workspacePageVisible = true;
+let _viewerDocumentManager = null;
 let _catiaScanDone = false;   // scan_vis_catia_map 是否完成
 
 // ── Vis 结构树状态 ─────────────────────────────────────────────────────────────
@@ -252,6 +271,10 @@ const _BOP_NT_MAP = {
 
 // ── 初始化 ───────────────────────────────────────────────────────────────────
 async function init() {
+  $('btnSimulationDebug')?.addEventListener('click',async()=>{
+    try{const api=window.AI00ViewerInteraction?.frameAPI(window);if(!api?.debugOpen)throw Error('请在 AI00 桌面端查看本机调试日志');await api.debugOpen({});}
+    catch(error){_cmdShow(error?.message||'调试窗口打开失败','err');}
+  });
   _applyTheme();
   _initWorkspaceLayout();
   _bindToolbar();
@@ -265,6 +288,8 @@ async function init() {
   _initGovernedCapture();
   _initVmVersioning();
   _initDetailPanel();
+  _viewerDocumentManager?.dispose();
+  _viewerDocumentManager=window.AI00ViewerDocumentManager?.createManager({document,getAPI:()=>_eAPI()?.visMockupNativeView,isVisible:()=>_workspacePageVisible&&!$('csDetailPanel')?.classList.contains('hidden'),diagnostic:_simulationDebug});
   _setVmStatus('disconnected', '打开模型时启动专用 VisMockup');
   await Promise.all([_loadBopVersions(), _loadTasks()]);
 }
@@ -393,6 +418,7 @@ function _initWorkspaceLayout() {
       placeholder?.classList.toggle('hidden', showNative);
       if (placeholder && !showNative) placeholder.textContent = labels[tab] || '';
       if (tab === 'detail' && detailPanel && !detailPanel.classList.contains('open')) $('dpHandle')?.click();
+      _viewerDocumentManager?.visibilityChanged();
       _notifyNativeViewportBounds();
     });
   });
@@ -408,8 +434,9 @@ function _initWorkspaceLayout() {
   });
 
   new MutationObserver(_syncNativeViewportOcclusion).observe(document.body, {
-    attributes: true, attributeFilter: ['class'], childList: true, subtree: true,
+    attributes: true, attributeFilter: ['class','open'], childList: true, subtree: true,
   });
+  window.addEventListener('ai00:dialog-visibility',_syncNativeViewportOcclusion);
   _syncNativeViewportOcclusion();
 
   if (nativeSlot && typeof ResizeObserver === 'function') {
@@ -532,8 +559,10 @@ function _notifyNativeViewportBounds() {
   const nativeView = _eAPI()?.visMockupNativeView || _eAPI()?.visMockupView;
   const visible = _workspacePageVisible && !_nativeViewportOccluded && !window._liveDocumentContextUnavailable && Boolean(bounds?.width && bounds?.height);
   nativeView?.setVisible?.(visible);
+  // Stage layout before readiness; an unbound view remains hidden, but Main
+  // needs its dimensions to perform the first exact native attachment.
+  if (bounds?.width && bounds?.height) nativeView?.updateBounds?.(bounds);
   if (!visible) return;
-  nativeView?.updateBounds?.(bounds);
   window.dispatchEvent(new CustomEvent('ai00:native-viewport-bounds', { detail: bounds }));
 }
 
@@ -563,8 +592,8 @@ async function _hasNativeViewportDocumentBinding() {
 }
 
 function _syncNativeViewportOcclusion() {
-  const occluded = Boolean(document.querySelector(
-    '.cs-modal-overlay:not(.hidden), .cs-meta-overlay',
+  const occluded = Boolean(window.AI00Dialogs?.isAnyOpen?.() || document.querySelector(
+    '.cs-modal-overlay:not(.hidden), .cs-meta-overlay, dialog.ai00-dialog[open]',
   ));
   if (occluded === _nativeViewportOccluded) return;
   _nativeViewportOccluded = occluded;
@@ -574,7 +603,7 @@ function _syncNativeViewportOcclusion() {
 let _nativeAttachFlight = null;
 function _attachNativeViewport(probe = {}) {
   const workspaceGid = window._simulationEnvironmentWorkspace?.store?.state?.workspace?.workspace_gid;
-  const manual = probe.forDocumentSelection === true;
+  const manual = probe.managedDocumentKey || (probe.currentDocumentPreview === true ? 'current-preview' : probe.forDocumentSelection === true);
   const openedDocumentSession = probe.openedDocumentSession || null;
   if (_nativeAttachFlight) {
     if (_nativeAttachFlight.workspaceGid === workspaceGid && _nativeAttachFlight.manual === manual
@@ -600,14 +629,26 @@ async function _performNativeViewportAttach(probe = {}) {
   if (!visMockupNativeView?.attach || !bounds?.width || !bounds?.height) return;
   const workspaceGid = window._simulationEnvironmentWorkspace?.store?.state?.workspace?.workspace_gid;
   const current = () => workspaceGid === window._simulationEnvironmentWorkspace?.store?.state?.workspace?.workspace_gid;
-  const manualSelection = probe.forDocumentSelection === true;
+  if(probe.managedDocumentKey){
+    const status=await visMockupNativeView.restoreDocument({key:probe.managedDocumentKey,bounds});
+    if(!current())return;
+    _applyNativeViewStatus(status);_syncNativeViewportOcclusion();_notifyNativeViewportBounds();return status;
+  }
+  const manualSelection = probe.forDocumentSelection === true || probe.currentDocumentPreview === true;
   const openedDocumentSession = probe.openedDocumentSession || null;
   const binding = manualSelection || openedDocumentSession ? null : await _hasNativeViewportDocumentBinding();
   if ((!manualSelection && !openedDocumentSession && !binding) || !current()) return;
   // The readiness response has no PID. Resolve the same document runtime used
   // by model synchronization before selecting a native window.
   let targetPid;
-  {
+  if(probe.currentDocumentPreview===true){
+    // Showing the already-open native window does not require a Connector
+    // binding. Model controls still establish their exact session separately.
+    const snapshot=await visMockupNativeView.manageDocuments();
+    if(!current())return;
+    if(snapshot.documents?.filter(item=>item.current).length!==1)throw Error('current_document_ambiguous');
+    targetPid=0;
+  }else{
     try {
       const identity = await _requestVisMockupCommand('simulation.vismockup.document.identity.read.request', {}, { confirmation: false });
       const step = identity?.steps?.length === 1 ? identity.steps[0] : null;
@@ -756,7 +797,7 @@ function _renderVmPlaceholder() {
   if (!ph) return;
   const {state,message} = _vmPresentation;
   const selected = !!window._simulationEnvironmentWorkspace?.store?.state?.workspace?.workspace_gid;
-  const ready = selected && state === 'connected' && message === '已内嵌' && !window._liveDocumentContextUnavailable;
+  const ready = selected && state === 'connected' && ['已内嵌','当前文档已显示'].includes(message) && !window._liveDocumentContextUnavailable;
   const renderKey = JSON.stringify([state,message,selected,ready]);
   if (ph.dataset.presentation === renderKey) return;
   ph.dataset.presentation = renderKey;
@@ -808,7 +849,8 @@ function _renderVmPlaceholder() {
       if (recover.disabled) return;
       recover.disabled = true;
       try {
-        await _openTeamcenterOnlineDocument(onlineDocument,'new');
+        if(await window._localViewerInteractionEnabled?.()===true)await window._ensureLocalViewerReady(onlineDocument);
+        else await _openTeamcenterOnlineDocument(onlineDocument,'new');
         _cmdShow('模型已在专用后台会话中打开并内嵌');
       } catch (error) {
         _cmdShow(error?.message || '文档绑定未完成','err');
@@ -853,6 +895,7 @@ function _bindToolbar() {
 // ── 测试命令条 ────────────────────────────────────────────────────────────────
 
 function _cmdShow(msg, type = 'ok') {
+  if(msg)_simulationDebug('ui_notice',{message:String(msg),level:type==='err'?'error':'info'});
   const el = $('cmdResult');
   if (!el) return;
   el.textContent = msg;
@@ -1771,9 +1814,9 @@ function _closeTaskModal() { $('taskModalOverlay').classList.add('hidden'); }
 
 async function _saveTask() {
   const title = $('taskModalTitle').value.trim();
-  if (!title) { alert('请输入任务标题'); return; }
+  if (!title) { (await window.AI00Dialogs.alert('请输入任务标题')); return; }
   const cf = window.AI00Business?.available() || window.AI00Business?.available();
-  if (!cf) { alert('需要飞书登录才能创建任务'); return; }
+  if (!cf) { (await window.AI00Dialogs.alert('需要飞书登录才能创建任务')); return; }
   try {
     await _invokeCapability('project.task.change.apply.atomic.tasks_create', {
       title,
@@ -1784,23 +1827,13 @@ async function _saveTask() {
     });
     _closeTaskModal();
     await _loadTasks();
-  } catch(e) { alert('创建失败: ' + e.message); }
+  } catch(e) { (await window.AI00Dialogs.alert('创建失败: ' + e.message)); }
 }
 
 // ── VisMockup 结构树 ──────────────────────────────────────────────────────────
 
-/**
- * 对选中 BOP 树节点的所有子 operation，按 sort_order 倒序执行：
- *   着蓝 → 截图 → 上传 → PATCH bop_steps.process_flow_pic → 隐藏 → 下一个
- * 参考：vis_tree_v7.py（每步严格串行，hide 无论成功与否必须执行）
- *
- * @param {string|null} overrideRootGid  由外部传入的 lineGid（assoc_panel 跨面板调用时使用）；
- *                                        为 null 时从 BOP 树 UI 选中状态读取
- * @param {Function|null} progressCb     每张截图上传成功后的回调 (op, uploadUrl) => void；
- *                                        assoc_panel 用此实现缩略图逐张飞入
- */
 async function _captureOpSequence(overrideRootGid = null, progressCb = null) {
-return _openGovernedCapture(overrideRootGid,progressCb);
+  return _openGovernedCapture(overrideRootGid, progressCb);
 }
 
 function _bindVisPanel() {
@@ -1864,19 +1897,178 @@ function _setTreeCacheStatus(host, meta = {}) {
   if(meta.workspaceGid) window.AI00TreeProjectionCache.bindView(host,_eAPI()?.simulationTreeCache,meta);
 }
 function _projectionCache() {
-  return window.AI00TreeProjectionCache.create(() => _eAPI()?.simulationTreeCache);
+  return window.AI00TreeProjectionCache.create(() => _eAPI()?.simulationTreeCache,_simulationDebug);
 }
 
-async function _persistModelProjectionCache() {
+window._discardCachedModelProjection = async workspaceGid => {
+  if(String(_modelDocumentWorkspaceGid)!==String(workspaceGid))return;
+  _modelDocumentCollection?.replace([]);
+  _renderModelDocuments([]);
+  _setTreeCacheStatus($('modelDocumentList'),{error:'cache_model_document_not_found'});
+  try { await _eAPI()?.simulationTreeCache?.remove?.(workspaceGid,'models'); }
+  catch(error){_simulationDebug('projection_storage_failed',{workspace_gid:workspaceGid,cache_kind:'models',action:'remove',error_code:error?.message});}
+};
+
+async function _persistModelProjectionCache({required=false}={}) {
   const workspaceGid = _modelDocumentWorkspaceGid;
   const api = _eAPI()?.simulationTreeCache;
-  if (!workspaceGid || typeof api?.put !== 'function') return;
+  if (!workspaceGid || typeof api?.put !== 'function') {if(required)throw Error('tree_cache_unavailable');return;}
   try {
     await api.put(workspaceGid, 'models', { items: _modelDocumentCollection.state.documents });
-  } catch (_) { /* Display remains usable when local cache persistence is unavailable. */ }
+    _simulationDebug('projection_write',{workspace_gid:workspaceGid,cache_kind:'models',item_count:_modelDocumentCollection.state.documents.length,reason:'lazy_page_persisted'});
+  } catch (error) { _simulationDebug('projection_storage_failed',{workspace_gid:workspaceGid,cache_kind:'models',action:'write',error_code:error?.message});if(required)throw error; }
 }
 
+const _modelDocumentRemovals = new Set();
+async function _removeModelDocument(documentGid) {
+  const workspace = window._simulationEnvironmentWorkspace?.store?.state?.workspace;
+  const item = _modelDocumentCollection?.state.documents.find(item => item.document_gid === documentGid);
+  if (!workspace?.workspace_gid || _modelDocumentWorkspaceGid !== workspace.workspace_gid) throw new Error('请先选择仿真环境');
+  if (!item) throw new Error('model_document_not_found');
+  if (item.role !== 'inserted') throw new Error('primary_model_document_protected');
+  const removalKey = `${workspace.workspace_gid}:${documentGid}`;
+  if (_modelDocumentRemovals.has(removalKey)) return;
+  _modelDocumentRemovals.add(removalKey);
+  try {
+    const expectedVersion = workspace.row_version;
+    const result = await _invokeCapability('simulation.environment.model_document.remove', {
+      workspace_gid: workspace.workspace_gid, document_gid: documentGid, expected_row_version: expectedVersion,
+      idempotency_key: `model-remove-${removalKey}-${window.crypto?.randomUUID?.() || Date.now()}`,
+    }, { confirmation: true, idempotency: true });
+    if (result?.removed !== true || result.document_gid !== documentGid || result.workspace_gid !== workspace.workspace_gid) throw new Error('model_document_remove_unverified');
+    window.dispatchEvent(new CustomEvent('simulation:model-document-removed', {detail: {workspace_gid: workspace.workspace_gid, document_gid: documentGid}}));
+    if (window._simulationEnvironmentWorkspace?.store?.state?.workspace !== workspace || _modelDocumentWorkspaceGid !== workspace.workspace_gid) return;
+    ++_modelRefreshGeneration;
+    // Keep unsaved environment edits; removal returns the authoritative revision.
+    if (workspace.row_version === expectedVersion) {
+      workspace.row_version = result.workspace_row_version;
+      workspace.cache_revision_hash = result.cache_revision_hash;
+    }
+    _modelDocumentCollection.replace(_modelDocumentCollection.state.documents.filter(item => item.document_gid !== documentGid));
+    _renderModelDocuments(_modelDocumentCollection.state.documents);
+    await _persistModelProjectionCache();
+    _cmdShow(`${item.display_name || documentGid} 已从当前环境移除，源文件保留`, 'ok');
+  } finally { _modelDocumentRemovals.delete(removalKey); }
+}
+
+let _cacheSnapshotViewerController=null;
+const _cacheSnapshotResumeCandidates=new Map();
+const _cacheSnapshotResumeKey=(workspaceGid,documentGid)=>`${workspaceGid}:${documentGid}`;
+window._cacheSnapshotResumeCandidate=(workspaceGid,documentGid)=>_cacheSnapshotResumeCandidates.get(_cacheSnapshotResumeKey(workspaceGid,documentGid))||null;
+window._cacheSnapshotResumeCandidatesForWorkspace=workspaceGid=>[..._cacheSnapshotResumeCandidates.values()].filter(value=>value.workspace_gid===String(workspaceGid));
+window._cacheSnapshotCurrentDocument=(workspaceGid,documentGid)=>String(_modelDocumentWorkspaceGid)===String(workspaceGid)?_modelDocumentCollection?.state?.documents?.find(item=>String(item.document_gid)===String(documentGid))||null:null;
+window._forgetCacheSnapshotResumeCandidate=(workspaceGid,documentGid)=>{
+  if(workspaceGid==null||documentGid==null)_cacheSnapshotResumeCandidates.clear();
+  else _cacheSnapshotResumeCandidates.delete(_cacheSnapshotResumeKey(workspaceGid,documentGid));
+};
+window.addEventListener('pagehide',()=>window._forgetCacheSnapshotResumeCandidate());
+window.addEventListener('simulation:model-document-removed',event=>window._forgetCacheSnapshotResumeCandidate(event.detail?.workspace_gid,event.detail?.document_gid));
+window._cancelCacheSnapshotOpening=()=>_cacheSnapshotViewerController?.invalidate?.();
+function _cacheSnapshotReason(code){
+  return ({
+    relative_missing_absolute_may_be_placeholder:'缓存缺少相对装配位置，现有绝对矩阵不能单独作为可靠位置',
+    relative_transform_invalid:'缓存中的相对装配位置格式无效',
+    transform_composition_mismatch:'相对位置与父级位置组合后，与缓存的绝对位置不一致',
+    parent_absolute_unavailable:'缓存缺少可用的父级绝对位置，无法核对装配位置',
+    root_absolute_missing:'缓存缺少根节点的绝对位置',root_absolute_invalid:'缓存中的根节点绝对位置无效',
+    absolute_transform_missing:'缓存缺少节点的绝对位置',absolute_transform_invalid:'缓存中的节点绝对位置无效',
+    cache_absolute_transform_unavailable:'缓存中没有可用的绝对装配位置',
+    cache_transform_unavailable:'缓存中的装配位置尚未通过核对',transform_missing:'缓存缺少可靠的装配位置',
+    cache_geometry_references_unavailable:'缓存中未能取得模型文件引用',
+    cache_geometry_reference_unsupported:'缓存中的模型文件引用不是受支持的 JT 文件',
+    cache_node_excluded:'此节点缺少可靠的装配或模型文件信息',
+  })[code]||'此节点缺少可靠的装配或模型文件信息';
+}
+function _renderCacheSnapshotExclusions(model,row){
+  row.querySelector('.cs-cache-exclusions')?.remove();
+  const excluded=model._cacheViewer?.excluded;if(!excluded?.length)return;
+  const details=document.createElement('details');details.className='cs-cache-exclusions cs-model-document-warning';
+  const summary=document.createElement('summary');summary.textContent=`${excluded.length} 个节点未加载`;details.append(summary);
+  const list=document.createElement('ul');
+  const names=new Map((model.product_tree?.nodes||[]).map(node=>[node.cache_node_key,node.name]));
+  for(const entry of excluded){const item=document.createElement('li');item.textContent=`${entry.name||names.get(entry.node_key)||entry.node_key}：${_cacheSnapshotReason(entry.error_code||entry.reason)}`;item.title=entry.node_key;list.append(item);}
+  details.append(list);row.append(details);
+}
+function _cacheSnapshotExclusion(model,node){
+  if(!model._cacheViewer)return null;
+  const excluded=model._cacheViewer.excluded?.find(item=>item.node_key===node.cache_node_key);
+  if(excluded)return excluded.reason||excluded.error_code||'cache_node_excluded';
+  if(model._cacheViewer.node_map?.[node.cache_node_key])return null;
+  return null; // A branch outside this materialization remains available to load.
+}
+window._invalidateCacheSnapshotVisibility=reason=>{
+  if(reason==='outcome_unknown'||reason==='auth_lost')window._forgetCacheSnapshotResumeCandidate();
+  for(const model of _modelDocumentCollection?.state?.documents||[]){
+    if(model.source_kind!=='teamcenter_cache_snapshot')continue;
+    delete model._cacheViewer;
+    for(const node of model.product_tree?.nodes||[]){node.visible=null;node.visibility_state='unknown';}
+    for(const row of $('modelDocumentList')?.querySelectorAll('.cs-model-document-row')||[])if(row.dataset.documentGid===String(model.document_gid))_renderCacheSnapshotExclusions(model,row);
+  }
+  for(const row of $('modelDocumentList')?.querySelectorAll('.cs-alternate-tree-item')||[])row._syncModelVisibility?.();
+};
+window._ensureCacheSnapshotViewer=async (model,node)=>{
+  model=_modelDocumentCollection?.state?.documents?.find(item=>String(item.document_gid)===String(model?.document_gid))||model;
+  const workspace=window._simulationEnvironmentWorkspace?.store?.state?.workspace,local=window._localViewerInteraction?.();
+  if(!workspace?.workspace_gid||!model?.cache_binding||!local||!window.AI00CacheSnapshotViewer)throw Error('cache_document_not_ready');
+  if(local.state==='outcome_unknown'){window._forgetCacheSnapshotResumeCandidate(workspace.workspace_gid,model.document_gid);throw Error('outcome_unknown');}
+  if(node&&(!node.cache_node_key||!model.product_tree?.nodes?.some(item=>item.node_key===node.node_key&&item.cache_node_key===node.cache_node_key)))throw Error('cache_scope_node_not_found');
+  const coversScope=model._cacheViewer&&(node?Object.hasOwn(model._cacheViewer.node_map||{},node.cache_node_key):!model._cacheViewer.root_node_key);
+  if(coversScope&&local.state==='ready'&&local.scope?.workspace_gid===String(workspace.workspace_gid)&&local.scope.document_gid===String(model.document_gid)&&local.visibilityContext===model._cacheViewer.visibility_context)return model._cacheViewer;
+  const input={workspace_gid:String(workspace.workspace_gid),document_gid:String(model.document_gid),cache_binding:model.cache_binding,...(node?{root_node_key:node.cache_node_key,source_node_id:node.node_key,node_name:node.name}:{})};
+  const current=value=>String(window._simulationEnvironmentWorkspace?.store?.state?.workspace?.workspace_gid)===value.workspace_gid&&(_modelDocumentCollection?.state?.documents||[]).some(doc=>String(doc.document_gid)===value.document_gid&&JSON.stringify(doc.cache_binding)===JSON.stringify(value.cache_binding));
+  if(!current(input))throw Error('document_selection_changed');
+  if(!_cacheSnapshotViewerController)_cacheSnapshotViewerController=window.AI00CacheSnapshotViewer.create({invoke:(...args)=>_invokeCapability(...args),interaction:local,cancelOpen:id=>{const api=_eAPI();if(!api?.cancelModelOpen)throw Error('cache_open_cancel_unavailable');return api.cancelModelOpen(id);},localProgress:hash=>_eAPI()?.modelFileProgress?.(hash),isCurrent:current,log:_simulationDebug,onProgress:progress=>{
+    if(String(window._simulationEnvironmentWorkspace?.store?.state?.workspace?.workspace_gid)!==progress.workspace_gid)return;
+    const labels={local_cache_checked:'检查本机 JT 缓存',jt_download_started:'正在从 TC/FMS 下载 JT',jt_download_completed:'JT 已下载，正在校验',local_file_verified:'本机 JT 已校验',local_materialization_failed:'本机 JT 准备失败',native_open_started:'正在载入 VisMockup',native_open_completed:'VisMockup 已载入',dependencies_resolved:'已确认 TC 文件引用',assembly_prepared:'装配依据就绪',local_materialization:'检查本机缓存，按需从 TC/FMS 下载并打开',waiting_admission:'等待执行名额',inspecting:'读取固定快照',scope_resolved:'已确认加载范围',node_excluded:'部分缓存节点未加载',file_requested:'获取 JT 文件',file_started:'获取 JT 文件',file_result_retry:'等待 FMS 文件结果',batch_requested:'提交 JT 文件批次',batch_admitted:'JT 文件批次已提交',batch_running:'正在获取 JT 文件',batch_result_retry:'等待 JT 文件批次结果',batch_result_received:'已读取批次明细',batch_history_replaced:'重新准备 JT 文件',batch_preflight_failed:'批次预检失败',batch_outcome_unknown:'JT 文件批次结果待确认',file_failed:'JT 文件获取失败',file_outcome_unknown:'JT 文件结果待确认',file_completed:'JT 文件就绪',files_progress:'获取 JT 文件',building_package:'组装固定快照',opening_document:'打开缓存模型',binding_document:'核对缓存文档',ready:'缓存模型已打开',failed:'缓存模型打开失败'};
+    const detail=progress.error_code==='cache_package_result_limit'
+      ? '装配描述或打开请求超过当前运行端的大小上限；尚未打开或截图'
+      : progress.stage==='node_excluded'?`${progress.name||''} · ${_cacheSnapshotReason(progress.error_code)}`:progress.message;
+    const message=(labels[progress.stage]||progress.stage)+(Number.isFinite(progress.total)?` · ${progress.completed||0}/${progress.total}`:'')+(Number.isFinite(progress.cache_hits)?` · 本机命中 ${progress.cache_hits}`:'')+(detail?` · ${detail}`:'');
+    for(const marker of document.querySelectorAll('#viewerInteractionRoute, [data-viewer-interaction-route]')){marker.textContent=message;marker.dataset.state=progress.stage;marker.setAttribute('aria-busy',String(!['ready','failed'].includes(progress.stage)));}
+  }});
+  const previous=model._cacheViewer;
+  _cmdShow('');
+  let opened,result;
+  try{
+    opened=await _cacheSnapshotViewerController.open(input);
+    result=window.AI00CacheSnapshotViewer.mergeLoadedBranches(previous,opened);
+  }catch(error){if(error.cache_effect_unknown||/outcome_unknown|interaction_bridge_timeout|cache_open_interrupted|cache_environment_mapping_conflict/.test(error.message))window._forgetCacheSnapshotResumeCandidate(input.workspace_gid,input.document_gid);throw error;}
+  if(!current(input))throw Error('document_selection_changed');
+  // Runtime mapping and calibration never enter the persisted structure cache.
+  Object.defineProperty(model,'_cacheViewer',{value:result,writable:true,configurable:true,enumerable:false});
+  try{
+    const candidate=window.AI00CacheSnapshotViewer.captureResumeCandidate({...input,product_tree:model.product_tree},result);
+    _cacheSnapshotResumeCandidates.set(_cacheSnapshotResumeKey(input.workspace_gid,input.document_gid),candidate);
+  }catch{window._forgetCacheSnapshotResumeCandidate(input.workspace_gid,input.document_gid);}
+  for(const row of $('modelDocumentList')?.querySelectorAll('.cs-model-document-row')||[])if(row.dataset.documentGid===String(model.document_gid))_renderCacheSnapshotExclusions(model,row);
+  for(const node of model.product_tree?.nodes||[]){node.visible=null;node.visibility_state='unknown';}
+  for(const row of $('modelDocumentList')?.querySelectorAll('.cs-alternate-tree-item')||[])row._syncModelVisibility?.();
+  return result;
+};
+async function _openCachedModelDocument(model){
+  model=_modelDocumentCollection?.state?.documents?.find(item=>String(item.document_gid)===String(model?.document_gid))||model;
+  try{
+    await window._ensureLocalViewerReady(model);
+    const node=model.product_tree?.nodes?.find(node=>!_cacheSnapshotExclusion(model,node));
+    if(node)await window._actOnModelNode({workspaceGid:window._simulationEnvironmentWorkspace.store.state.workspace.workspace_gid,document:model,nodeKey:node.node_key,action:'show',calibrateOnly:true});
+    for(const row of $('modelDocumentList')?.querySelectorAll('.cs-alternate-tree-item')||[])row._syncModelVisibility?.();
+    _cmdShow('缓存模型已打开；显隐以 VisMockup 回读为准，未加载节点保留问号');
+  }catch(error){_cmdShow(error.message||'缓存模型打开失败','err');}
+}
+window._syncModelDocumentVisibility = model => {
+  if (!_modelDocumentCollection?.state?.documents?.includes(model)) return;
+  const branches = new Map(), stack = window.AI00ModelDocumentCollection.buildProductForest(model.product_tree?.nodes || []);
+  while (stack.length) { const node = stack.pop(); branches.set(String(node.node_key), node); stack.push(...node.children); }
+  for (const documentRow of $('modelDocumentList')?.querySelectorAll('.cs-model-document-row') || []) {
+    if (documentRow.dataset.documentGid !== String(model.document_gid)) continue;
+    for (const row of documentRow.querySelectorAll('.cs-alternate-tree-item')) row._syncModelVisibility?.(branches);
+  }
+};
+window._renderCacheSnapshotResumeDocument=model=>{
+  if(_modelDocumentCollection?.state?.documents?.includes(model))_renderModelDocuments(_modelDocumentCollection.state.documents);
+};
 function _renderModelDocuments(items = []) {
+  for(const model of items)if(model.source_kind==='teamcenter_cache_snapshot'&&!model._cacheViewer)for(const node of model.product_tree?.nodes||[]){node.visible=null;node.visibility_state='unknown';}
   const host = $('modelDocumentList');
   if (!host) return;
   if (!items.length) {
@@ -1889,7 +2081,7 @@ function _renderModelDocuments(items = []) {
     row.className = 'cs-model-document-row';
     row.dataset.documentGid = item.document_gid;
     row.dataset.cacheViewKey = 'doc:'+item.document_gid;
-    const type = item.media_type.includes('teamcenter') ? '在线' : item.media_type.includes('jt') ? 'JT' : 'PLMXML';
+    const type = item.source_kind==='teamcenter_cache_snapshot' ? '缓存批次' : item.media_type.includes('teamcenter') ? '在线' : item.media_type.includes('jt') ? 'JT' : 'PLMXML';
     const hasTree = item.product_tree?.state === 'ready' && item.product_tree.node_count > 0;
     row.innerHTML = `<div class="cs-model-document-summary"><button type="button" class="cs-model-document-toggle" ${hasTree ? '' : 'disabled'}>${hasTree ? '▸' : ''}</button><span class="cs-model-document-role">${item.role === 'primary' ? '主文件' : '插入'}</span><span class="cs-model-document-name"></span><span class="cs-model-document-count"></span><span class="cs-model-document-type">${type}</span></div><div class="cs-model-document-tree hidden"></div>`;
     const name = row.querySelector('.cs-model-document-name');
@@ -1922,6 +2114,20 @@ function _renderModelDocuments(items = []) {
         event.currentTarget.textContent = hidden ? '▸' : '▾';
         if (!hidden && !rendered) { tree.replaceChildren(...forest.map(node => _buildProductTreeItem(node, item.document_gid))); rendered = true; }
       });
+      if(item.product_tree.source==='teamcenter_cache_snapshot') {
+        const info=document.createElement('div');info.className='cs-model-document-empty';
+        info.textContent=`固定批次 ${item.cache_binding.batch_id} · ${item._cacheViewer?'已加载有效实例；未加载节点保留问号':'可打开有效实例并校准显隐'}`;row.append(info);
+        const open=document.createElement('button');open.type='button';open.textContent='打开缓存模型';open.dataset.modelRuntimeControl='true';open.disabled=!window.AI00CacheSnapshotViewer;
+        open.onclick=async event=>{event.stopPropagation();open.disabled=true;try{await _openCachedModelDocument(item);}finally{open.disabled=!window.AI00CacheSnapshotViewer;}};row.append(open);
+        const rootsPage=item.product_tree.pages.roots;
+        if(rootsPage?.next_cursor!=null||rootsPage?.error){
+          const more=document.createElement('button');more.type='button';more.textContent=rootsPage.error?'重试根节点读取':'加载更多根节点';
+          more.onclick=async()=>{more.disabled=true;try{
+            await window.AI00CacheSnapshotSource.readChildren(_invokeCapability,item.product_tree,null,{more:rootsPage.next_cursor!=null,isCurrent:()=>_modelDocumentCollection.state.documents.includes(item)});
+            if(_modelDocumentCollection.state.documents.includes(item))_renderModelDocuments(_modelDocumentCollection.state.documents);
+          }catch(error){more.textContent=`重试：${error.message}`;more.disabled=false;}};row.append(more);
+        }
+      }
       if(item.product_tree.source==='teamcenter_children') {
         if(item.product_tree_error){const warning=document.createElement('div');warning.className='cs-model-document-warning';warning.textContent=`结构读取失败，保留已加载内容：${item.product_tree_error}`;row.append(warning);}
         const hostHasView=$('modelDocumentList')?._viewState;
@@ -1929,9 +2135,15 @@ function _renderModelDocuments(items = []) {
       }
     }
     const summary = row.querySelector('.cs-model-document-summary');
-    summary.draggable = true;
-    summary.addEventListener('contextmenu', event => _showAlternateContextMenu(event, []));
+    if(item.source_kind==='teamcenter_cache_snapshot')_renderCacheSnapshotExclusions(item,row);
+    summary.draggable = item.source_kind!=='teamcenter_cache_snapshot';
+    summary.addEventListener('contextmenu', event => _showAlternateContextMenu(event, [...(item.source_kind==='teamcenter_cache_snapshot'?[{label:'打开缓存模型',disabled:!window.AI00CacheSnapshotViewer,run:()=>_openCachedModelDocument(item)}]:[]),...(item.role === 'inserted' ? [{
+      label:'移除', danger:true,
+      disabled:_modelDocumentRemovals.has(`${_modelDocumentWorkspaceGid}:${item.document_gid}`),
+      run:()=>{void _removeModelDocument(item.document_gid).catch(error=>_cmdShow(error.message||'模型移除失败','err'));},
+    }] : [])]));
     summary.addEventListener('dragstart', event => {
+      if(item.source_kind==='teamcenter_cache_snapshot'){event.preventDefault();return;}
       event.dataTransfer?.setData('application/x-ai00-model-document', item.document_gid);
       if (event.dataTransfer) event.dataTransfer.effectAllowed = 'copy';
     });
@@ -1974,7 +2186,7 @@ function _renderTeamcenterNodeDetail(modelDocument, node, state = {}) {
   if (handle) handle.textContent = `Teamcenter: ${title} ▲`;
   const source = $('dpSourceTag');
   if (source) {
-    source.textContent = state.loaded && state.cacheHit ? '本地缓存' : 'Teamcenter';
+    source.textContent = modelDocument.source_kind==='teamcenter_cache_snapshot'?'项目缓存批次':state.loaded && state.cacheHit ? '本地缓存' : 'Teamcenter';
     source.style.cssText = state.loaded && state.cacheHit
       ? 'background:rgba(137,180,250,.15);color:#89b4fa'
       : 'background:rgba(166,227,161,.15);color:#a6e3a1';
@@ -1985,9 +2197,9 @@ function _renderTeamcenterNodeDetail(modelDocument, node, state = {}) {
   $('dpBopContent')?.classList.add('hidden');
   $('dpVisContent')?.classList.remove('hidden');
   const left = $('dpVisLeft');
-  if (left) left.innerHTML = `<div class="cs-dp-section-title">在线模型节点</div>
+  if (left) left.innerHTML = `<div class="cs-dp-section-title">${modelDocument.source_kind==='teamcenter_cache_snapshot'?'缓存模型节点':'在线模型节点'}</div>
     <div class="cs-dp-field-row"><span class="cs-dp-field-label">节点</span><span class="cs-dp-field-val mono">${_esc(node.node_key || '')}</span></div>
-    <div class="cs-dp-field-row"><span class="cs-dp-field-label">来源</span><span class="cs-dp-field-val">Teamcenter 在线结构</span></div>`;
+    <div class="cs-dp-field-row"><span class="cs-dp-field-label">来源</span><span class="cs-dp-field-val">${modelDocument.source_kind==='teamcenter_cache_snapshot'?'缓存批次 '+_esc(modelDocument.cache_binding.batch_id):'Teamcenter 在线结构'}</span></div>`;
   const rows = _teamcenterDetailFields
     .filter(([key]) => values[key] !== null && values[key] !== undefined && String(values[key]).trim() !== '')
     .map(([key,label]) => `<div class="cs-dp-field-row"><span class="cs-dp-field-label">${label}</span><span class="cs-dp-field-val mono">${_esc(String(values[key]))}</span></div>`)
@@ -2000,6 +2212,12 @@ function _renderTeamcenterNodeDetail(modelDocument, node, state = {}) {
       ? `<div class="cs-dp-empty-hint">属性读取失败：${_esc(state.error)}</div><button class="cs-dp-meta-btn" type="button" data-teamcenter-detail-retry>${state.loginRequired ? '登录并重试' : '重试'}</button>`
       : '';
   right.innerHTML = `<div class="cs-dp-section-title">节点属性</div>${rows}${status}`;
+  if(modelDocument.source_kind==='teamcenter_cache_snapshot'&&state.rawFields){
+    const details=document.createElement('details'),summary=document.createElement('summary'),raw=document.createElement('pre');
+    summary.textContent=`批次原始属性与读取状态（${state.rawFields.length} 项）`;
+    raw.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere';raw.textContent=JSON.stringify(state.rawFields,null,2);
+    details.append(summary,raw);right.append(details);
+  }
   right.querySelector('[data-teamcenter-detail-retry]')?.addEventListener('click', async event => {
     event.currentTarget.disabled = true;
     if (state.loginRequired && !await _requireTeamcenterLogin()) {
@@ -2018,11 +2236,13 @@ async function _selectTeamcenterNodeDetail(modelDocument, node) {
   try {
     const currentNode = Array.isArray(node?.occurrence_path) ? node : await _ensureTeamcenterControlNode(
       modelDocument, node, () => request === _teamcenterDetailRequest && _teamcenterDetailSelection === identity, true);
-    const result = await window.AI00TeamcenterOnlineSource.readNodeProperties(
-      _requestVisMockupCommand, modelDocument, currentNode);
+    const result = modelDocument.source_kind==='teamcenter_cache_snapshot'
+      ? (await window.AI00CacheSnapshotSource.readNode(_invokeCapability,modelDocument.product_tree,currentNode.cache_node_key)).properties_result
+      : currentNode.cloud_properties_result || await window.AI00TeamcenterOnlineSource.readNodeProperties(
+        _requestVisMockupCommand, modelDocument, currentNode);
     if (request !== _teamcenterDetailRequest || _teamcenterDetailSelection !== identity) return;
     _renderTeamcenterNodeDetail(modelDocument, currentNode, {
-      loaded:true, cacheHit:result.cache_hit, properties:result.properties,
+      loaded:true, cacheHit:result.cache_hit, properties:result.properties,rawFields:result.raw_fields,
     });
   } catch (error) {
     if (request !== _teamcenterDetailRequest || _teamcenterDetailSelection !== identity) return;
@@ -2061,15 +2281,17 @@ function _buildProductTreeItem(item, documentGid) {
   const children = document.createElement('div'); children.className = 'cs-alternate-tree-children hidden';
   const toggle = document.createElement('button'); toggle.type = 'button'; toggle.className = 'cs-alternate-tree-toggle';
   const modelDocument=_modelDocumentCollection?.state.documents.find(doc=>String(doc.document_gid)===String(documentGid));
-  const lazy=modelDocument?.product_tree?.source==='teamcenter_children';
-  if(lazy)wrapper.dataset.lazyUnloaded=modelDocument.product_tree.pages[JSON.stringify(item.occurrence_path)]?'false':'true';
+  const cachedSnapshot=modelDocument?.source_kind==='teamcenter_cache_snapshot';
+  const lazy=cachedSnapshot||modelDocument?.product_tree?.source==='teamcenter_children';
+  const pageKey=node=>cachedSnapshot?node.cache_node_key:JSON.stringify(node.occurrence_path);
+  if(lazy)wrapper.dataset.lazyUnloaded=modelDocument.product_tree.pages[pageKey(item)]?'false':'true';
   toggle.textContent = item.children.length || lazy&&item.has_children!==false ? '▸' : ''; toggle.disabled = !item.children.length && !(lazy&&item.has_children!==false);
   let rendered = false;
   toggle.addEventListener('click', event => {
     event.stopPropagation(); const hidden = children.classList.toggle('hidden'); toggle.textContent = hidden ? '▸' : '▾';
     if(lazy){
-      if(!hidden){renderLazy();const page=modelDocument.product_tree.pages[JSON.stringify(item.occurrence_path)];if(!page&&!$('modelDocumentList')?._viewRestoring)void loadLazy();}
-    } else if (!hidden && !rendered) { children.replaceChildren(...item.children.map(node => _buildProductTreeItem(node, documentGid))); rendered = true; }
+      if(!hidden){renderLazy();const page=modelDocument.product_tree.pages[pageKey(item)];if(!page&&!$('modelDocumentList')?._viewRestoring)void loadLazy();}
+    } else if (!hidden && !rendered) { children.replaceChildren(...currentBranch(item.node_key).children.map(node => _buildProductTreeItem(node, documentGid))); rendered = true; }
   });
   const treeState=modelDocument?.product_tree;
   const refreshGeneration=_modelRefreshGeneration, workspaceGid=_modelDocumentWorkspaceGid;
@@ -2078,7 +2300,7 @@ function _buildProductTreeItem(item, documentGid) {
     && _modelDocumentCollection.state.documents.some(doc=>doc.document_gid===modelDocument.document_gid&&doc.product_tree===treeState&&JSON.stringify(doc.source_selector)===selector);
   let renderedLazyGeneration;
   const renderLazy=()=>{
-    const page=treeState.pages[JSON.stringify(item.occurrence_path)];
+    const page=treeState.pages[pageKey(item)];
     wrapper.dataset.lazyUnloaded=page?'false':'true';
     const forest=window.AI00ModelDocumentCollection.buildProductForest(treeState.nodes);
     const find=nodes=>{for(const node of nodes){if(node.node_key===item.node_key)return node;const found=find(node.children);if(found)return found;}};
@@ -2095,12 +2317,40 @@ function _buildProductTreeItem(item, documentGid) {
       action.addEventListener('click',event=>{event.stopPropagation();void loadLazy(!page.restart_required&&page.next_cursor!=null);});children.append(action);
     }
     if(page?.captured_at){const info=document.createElement('div');info.className='cs-model-document-empty';info.textContent=`${page.cache_hit?'Connector 缓存':'已读取'} · ${page.captured_at}`;children.append(info);}
+    syncVisibility();
   };
   if(lazy)wrapper._refreshLazy=renderLazy;
   const loadLazy=async(more=false)=>{
-    const pending=window.AI00TeamcenterOnlineSource.readChildren(_requestVisMockupCommand,modelDocument,treeState,item.occurrence_path,{more,isCurrent:current});
+    const pending=cachedSnapshot
+      ? window.AI00CacheSnapshotSource.readChildren(_invokeCapability,treeState,item.cache_node_key,{more,isCurrent:current})
+      : window.AI00TeamcenterOnlineSource.readChildren(_requestVisMockupCommand,modelDocument,treeState,item.occurrence_path,{more,isCurrent:current});
     renderLazy();
-    try{await pending;}catch(_){/* Failure stays beside existing children with a retry action. */}
+    try{await pending;}catch(error){
+      if(!cachedSnapshot&&error.message==='teamcenter_parent_path_not_found'&&current()){
+        const detail={document_gid:documentGid,node_name:item.name,source_node_id:item.node_key};
+        _simulationDebug('tc_path_choice_required',{...detail,level:'warn',error_code:error.message});
+        const refresh=await window.AI00Dialogs?.confirm({title:'缓存路径与当前配置不一致',tone:'warning',
+          message:`“${item.name||item.node_key}”无法按当前 Teamcenter 配置继续读取。可能是版本或装配结构已变化，并不代表缓存的旧树无效。\n\n保留缓存：继续查看已缓存的旧结构，本次不补读缺失的子节点。\n刷新分支：按当前配置重新读取最近有效的上层分支，并保留原缓存作为对比基线。`,
+          cancelText:'保留缓存',confirmText:'保留基线并刷新'});
+        if(!current())return;
+        _simulationDebug('tc_path_choice',{...detail,action:refresh?'refresh':'keep_cache'});
+        if(refresh){
+          try{
+            if(!modelDocument.product_tree_baseline)modelDocument.product_tree_baseline=JSON.parse(JSON.stringify({captured_at:new Date().toISOString(),source_selector:modelDocument.source_selector,product_tree:treeState}));
+            await _persistModelProjectionCache({required:true});
+            if(!current())return;
+            _simulationDebug('tc_path_baseline_saved',{...detail,node_count:modelDocument.product_tree_baseline.product_tree.node_count});
+            const refreshed=await window.AI00TeamcenterOnlineSource.refreshAncestor(_requestVisMockupCommand,modelDocument,treeState,item.occurrence_path,current);
+            if(!refreshed||!current())return;
+            window._invalidateModelControlMappings?.();
+            _renderModelDocuments(_modelDocumentCollection.state.documents);
+            window.AI00TreeProjectionCache.bindView($('modelDocumentList'),_eAPI()?.simulationTreeCache,{workspaceGid,kind:'models'});
+            _simulationDebug('tc_path_refreshed',{...detail,node_count:treeState.node_count});
+            _cmdShow('分支已刷新，原缓存对比基线已保留');
+          }catch(refreshError){_simulationDebug('tc_path_refresh_failed',{...detail,error_code:refreshError.message});_cmdShow('刷新未完成：'+refreshError.message,'err');}
+        }
+      }
+    }
     if(!current())return;
     const visibleWrapper=Array.from($('modelDocumentList')?.querySelectorAll('[data-cache-view-key]')||[]).find(row=>row.dataset.cacheViewKey===wrapper.dataset.cacheViewKey);
     visibleWrapper?._refreshLazy();
@@ -2109,17 +2359,55 @@ function _buildProductTreeItem(item, documentGid) {
     await _persistModelProjectionCache();
   };
   const check = document.createElement('input'); check.type = 'checkbox'; check.className = 'cs-alternate-tree-check';
-  const controllable=Boolean(window._actOnModelNode&&(modelDocument?.product_tree?.document_session
-    ||modelDocument?.source_kind==='teamcenter_online'));
-  const visibilityState=()=>{
-    const leaves=[]; const stack=[item];
-    while(stack.length){const node=stack.pop();if(node.children.length)stack.push(...node.children);else leaves.push(node);}
-    const shown=leaves.filter(node=>node.visible===true).length;
-    return {checked:shown===leaves.length,indeterminate:shown>0&&shown<leaves.length};
+  const controllable=Boolean(window._actOnModelNode&&(cachedSnapshot?window.AI00CacheSnapshotViewer:(modelDocument?.product_tree?.document_session
+    ||modelDocument?.source_kind==='teamcenter_online')));
+  const currentBranch=key=>{
+    const stack=window.AI00ModelDocumentCollection.buildProductForest(modelDocument?.product_tree?.nodes||[]);
+    while(stack.length){const node=stack.pop();if(String(node.node_key)===String(key))return node;stack.push(...node.children);}
+    return item;
   };
-  wrapper._syncModelVisibility=()=>Object.assign(check,visibilityState());
-  check.disabled=!controllable; wrapper._syncModelVisibility();
+  const visibilityState=(branch=currentBranch(item.node_key))=>{
+    if(cachedSnapshot&&(_cacheSnapshotExclusion(modelDocument,item)||window.AI00ViewerInteraction?.cacheIncompleteAncestors(modelDocument._cacheViewer).has(item.cache_node_key)))return {checked:false,indeterminate:false,unknown:true};
+    if(['visible','hidden','mixed','unknown'].includes(branch.visibility_state))return {checked:branch.visibility_state==='visible',indeterminate:branch.visibility_state==='mixed',unknown:branch.visibility_state==='unknown'};
+    // Lazy refreshes replace child objects; stored nodes are the shared source
+    // for every row, including retained ancestors and collapsed branches.
+    const leaves=[]; const stack=[branch];
+    while(stack.length){
+      const node=stack.pop();
+      if(node.children.length){
+        stack.push(...node.children);
+        const page=lazy?treeState.pages[pageKey(node)]:null;
+        // Unloaded siblings cannot be inferred from the visible page. A prior
+        // confirmed branch operation can supply their state; otherwise unknown.
+        if(lazy&&(!page||page.state!=='loaded'||page.next_cursor!=null))leaves.push(node);
+      }else leaves.push(node);
+    }
+    const shown=leaves.filter(node=>node.visible===true).length;
+    const unknown=leaves.some(node=>typeof node.visible!=='boolean');
+    return {checked:!unknown&&shown===leaves.length,indeterminate:!unknown&&shown>0&&shown<leaves.length,unknown};
+  };
+  wrapper._syncModelVisibility=branches=>{
+    if(cachedSnapshot){const reason=_cacheSnapshotExclusion(modelDocument,item),incomplete=window.AI00ViewerInteraction?.cacheIncompleteAncestors(modelDocument._cacheViewer).has(item.cache_node_key);check.disabled=!controllable||Boolean(reason);check.title=reason?`未加载 · ${_cacheSnapshotReason(reason)}`:incomplete?'部分节点未加载，显隐仅作用于已加载部分':modelDocument._cacheViewer?'显示 / 隐藏（缓存实例）':'打开缓存模型并读取实际显隐；本次不会直接改变显隐';}
+    const state=visibilityState(branches?.get(String(item.node_key)));check.checked=state.checked;check.indeterminate=state.indeterminate;
+    check.dataset.visibility=state.unknown?'unknown':state.indeterminate?'mixed':state.checked?'visible':'hidden';
+    check.setAttribute('aria-label',state.unknown?'显隐状态未确认':state.indeterminate?'部分显示':state.checked?'已显示':'已隐藏');
+  };
+  const syncVisibility=()=>{
+    const branches=new Map(),stack=window.AI00ModelDocumentCollection.buildProductForest(modelDocument.product_tree.nodes);
+    while(stack.length){const node=stack.pop();branches.set(String(node.node_key),node);stack.push(...node.children);}
+    for(const row of line.closest('.cs-model-document-tree')?.querySelectorAll('.cs-alternate-tree-item')||[wrapper])row._syncModelVisibility?.(branches);
+  };
+  const applyVisibility=(target,visible)=>{
+    const affected=new Set(),stack=[currentBranch(target.node_key)];
+    while(stack.length){const node=stack.pop();affected.add(String(node.node_key));stack.push(...node.children);}
+    for(const stored of modelDocument.product_tree.nodes)if(affected.has(String(stored.node_key))){stored.visible=visible;delete stored.visibility_state;}
+    const byKey=new Map(modelDocument.product_tree.nodes.map(stored=>[String(stored.node_key),stored]));
+    for(const key of affected){const seen=new Set();let parent=byKey.get(key)?.parent_key;while(parent!=null&&!seen.has(String(parent))){seen.add(String(parent));const ancestor=byKey.get(String(parent));if(!ancestor)break;if(!affected.has(String(parent))){ancestor.visible=null;delete ancestor.visibility_state;}parent=ancestor.parent_key;}}
+    syncVisibility();
+  };
+  check.disabled=!controllable; wrapper._syncModelVisibility(new Map([[String(item.node_key),item]]));
   check.title=controllable?(window._localViewerInteraction?.()?'显示 / 隐藏（本地交互会话）':'显示 / 隐藏（操作前核对文档绑定）'):'尚无运行节点身份，请先关联当前 VisMockup 文档';
+  if(cachedSnapshot)wrapper._syncModelVisibility();
   const icon = document.createElement('span'); icon.className = 'cs-alternate-tree-icon cs-alternate-tree-icon-model'; icon.textContent = item.children.length ? '◇' : '▣';
   const name = document.createElement('span'); name.className = 'cs-alternate-tree-name'; name.textContent = item.name || item.node_key;
   name.title = [name.textContent, item.bom_line, item.item_id, item.revision].filter(Boolean).join(' · ');
@@ -2127,13 +2415,24 @@ function _buildProductTreeItem(item, documentGid) {
     line.dataset.modelRuntimeControl='true';
     let pending=false;
     const run=async action=>{
-      if(pending)return;
+      if(cachedSnapshot&&_cacheSnapshotExclusion(modelDocument,item))return;
+      const tree=line.closest('.cs-model-document-tree');
+      if(pending||tree?.dataset.runtimeBusy==='true')return;
       const workspace=window._simulationEnvironmentWorkspace?.store?.state?.workspace;
       if(!workspace?.workspace_gid)return;
-      pending=true;check.disabled=true;
+      const controls=[...tree?.querySelectorAll('.cs-alternate-tree-check')||[]].map(control=>[control,control.disabled]);
+      if(tree)tree.dataset.runtimeBusy='true';for(const [control]of controls)control.disabled=true;
+      pending=true;check.disabled=true;line.setAttribute('aria-busy','true');_cmdShow('');
+      const trace_id=window.crypto?.randomUUID?.(),started=performance.now();
+      _simulationDebug('ui_action_started',{trace_id,document_gid:documentGid,source_node_id:item.node_key,node_name:item.name,action});
+      let activeTarget;
       try {
         const localInteraction=window._localViewerInteraction?.();
-        const currentNode=localInteraction?item:await _ensureTeamcenterControlNode(modelDocument,item,()=>line.isConnected,true);
+        const resolvedOccurrenceRoot=modelDocument?.source_kind==='teamcenter_online'
+          &&item?.parent_key==null&&!_isRawTeamcenterControlKey(item?.control_key)
+          &&item.children.some(node=>_isRawTeamcenterControlKey(node.control_key));
+        const currentNode=cachedSnapshot||localInteraction||resolvedOccurrenceRoot
+          ?item:await _ensureTeamcenterControlNode(modelDocument,item,()=>line.isConnected,true);
         // A Teamcenter source root is synthetic and has no occurrence UID.  Do
         // not send its cache key to VisMockup: fan the action out through the
         // distinct direct-child occurrences instead.  Their control_key values
@@ -2144,26 +2443,27 @@ function _buildProductTreeItem(item, documentGid) {
         const singlePartRoot=modelDocument?.role==='primary'&&currentNode.parent_key==null
           &&Array.isArray(currentNode.occurrence_path)&&currentNode.occurrence_path.length===0
           &&currentNode.has_children===false&&modelDocument.product_tree.nodes.length===1;
-        const targets=!localInteraction&&modelDocument?.source_kind==='teamcenter_online'&&!_isRawTeamcenterControlKey(currentNode.control_key)&&!singlePartRoot
+        const targets=typeof localInteraction?.executeIntent!=='function'&&modelDocument?.source_kind==='teamcenter_online'&&!_isRawTeamcenterControlKey(currentNode.control_key)&&!singlePartRoot
           ? renderedNode.children.filter(node=>_isRawTeamcenterControlKey(node.control_key)) : [currentNode];
         if(!targets.length)throw Error('model_node_runtime_identity_unavailable');
-        let result;
         for(const target of targets){
-          const actionableTarget=localInteraction?target:await _ensureTeamcenterControlNode(modelDocument,target,()=>line.isConnected,true);
-          result=await window._actOnModelNode({workspaceGid:workspace.workspace_gid,document:modelDocument,nodeKey:actionableTarget.node_key,action,isCurrent:()=>line.isConnected});
+          const actionableTarget=cachedSnapshot||localInteraction||_isRawTeamcenterControlKey(target.control_key)
+            ?target:await _ensureTeamcenterControlNode(modelDocument,target,()=>line.isConnected,true);
+          activeTarget=actionableTarget;
+          const result=await window._actOnModelNode({workspaceGid:workspace.workspace_gid,document:modelDocument,nodeKey:actionableTarget.node_key,action,isCurrent:()=>line.isConnected});
+          if(!line.isConnected)return;
+          if(result.calibrated)_cmdShow(result.calibration_unknown?'已读取 VisMockup 实际显隐，部分节点仍未确认；请核对 ? 状态后操作':'已按 VisMockup 实际显隐校准，请按当前勾选状态操作',result.calibration_unknown?'warn':'ok');
+          if(typeof result.visible==='boolean')applyVisibility(actionableTarget,result.visible);
+          if(typeof result.selected==='boolean')line.classList.toggle('cs-vis-active',result.selected);
+          _simulationDebug('ui_state_applied',{trace_id,document_gid:documentGid,source_node_id:actionableTarget.node_key,node_name:actionableTarget.name,action,observed:result.visible??result.selected,elapsed_ms:performance.now()-started});
+          activeTarget=null;
         }
         if(!line.isConnected)return;
-        if(typeof result.visible==='boolean') {
-          const affected=new Set(); const stack=[item];
-          while(stack.length){const node=stack.pop();node.visible=result.visible;affected.add(String(node.node_key));stack.push(...node.children);}
-          for(const stored of modelDocument.product_tree.nodes)if(affected.has(String(stored.node_key)))stored.visible=result.visible;
-          // Update rendered ancestors and descendants, without expanding collapsed trees.
-          for(const row of line.closest('.cs-model-document-tree').querySelectorAll('.cs-alternate-tree-item'))row._syncModelVisibility?.();
-        }
-        if(action==='highlight'||action==='unhighlight') line.classList.toggle('cs-vis-active',action==='highlight');
       } catch(error) {
         const reason=error?.message||'model_node_control_failed';
-        const hint=reason==='model_node_relocation_required'
+        _simulationDebug('ui_action_failed',{trace_id,document_gid:documentGid,source_node_id:activeTarget?.node_key||item.node_key,action,error_code:reason,elapsed_ms:performance.now()-started});
+        if(activeTarget&&line.isConnected&&['show','hide'].includes(action)&&/outcome_unknown|transport_unknown/.test(reason))applyVisibility(activeTarget,null);
+        const hint=reason==='vismockup_document_limit_exceeded'?'已达到 10 个文档上限，请在“文档 N/10”中关闭非活动文档后再打开。':reason==='model_node_relocation_required'
           ? '文档已连接；这份旧缓存未保存实例定位标识，需要右键“刷新结构”补采一次。以后按实例路径定位，无需每次重读；本次未执行节点操作'
           : /vismockup_cad_locator_missing/.test(reason) ? '本地实例定位缓存缺失，请右键“刷新结构”补采；未执行节点操作'
           : /vismockup_cad_instance_(unmapped|ambiguous|changed)/.test(reason) ? '当前文档中的实例已变化或无法唯一定位；未按同名零件猜测，请刷新结构后重试'
@@ -2171,9 +2471,9 @@ function _buildProductTreeItem(item, documentGid) {
             ? '未取得该节点的 Teamcenter 实例定位标识；已尝试刷新结构，本次未执行节点操作'
           : reason==='document_session_changed'?'VisMockup 文档会话已变化，请核对当前文档；未执行节点操作':reason;
         check.title=hint;_cmdShow(hint,'err');
-      } finally {pending=false;check.disabled=false;}
+      } finally {pending=false;check.disabled=false;if(tree)delete tree.dataset.runtimeBusy;for(const [control,disabled]of controls)control.disabled=disabled;line.removeAttribute('aria-busy');syncVisibility();}
     };
-    check.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();void run(visibilityState().checked?'hide':'show');});
+    check.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();const shown=cachedSnapshot?modelDocument._cacheViewer?.native_visibility?.[item.cache_node_key]?.visible:undefined;void run((typeof shown==='boolean'?shown:visibilityState().checked)?'hide':'show');});
     name.addEventListener('click',event=>{event.stopPropagation();void run('highlight');});
     line.addEventListener('contextmenu',event=>_showAlternateContextMenu(event,[
       {label:'显示',run:()=>run('show')},{label:'隐藏',run:()=>run('hide')},
@@ -2184,8 +2484,9 @@ function _buildProductTreeItem(item, documentGid) {
     event.stopPropagation();
     void _selectTeamcenterNodeDetail(modelDocument,item);
   });
-  line.draggable = true;
+  line.draggable = !cachedSnapshot;
   line.addEventListener('dragstart', event => {
+    if(cachedSnapshot){event.preventDefault();return;}
     event.stopPropagation();
     event.dataTransfer?.setData('application/x-ai00-model-node', JSON.stringify({ document_gid: documentGid, node_key: item.node_key }));
     if (event.dataTransfer) event.dataTransfer.effectAllowed = 'copy';
@@ -2336,8 +2637,8 @@ function _alternateVisibilityState(item) {
   return { keys, state: globalThis.AI00ModelDocumentCollection.deriveVisibilityState({ children: leaves }) };
 }
 
-function _updateAlternateVisibilityControls() {
-  for (const { check, item } of _alternateVisibilityChecks) {
+function _updateAlternateVisibilityControls(controls = _alternateVisibilityChecks) {
+  for (const { check, item } of controls) {
     const { state } = _alternateVisibilityState(item);
     check.checked = state.checked;
     check.indeterminate = state.indeterminate;
@@ -2348,7 +2649,7 @@ function _updateAlternateVisibilityControls() {
 
 function _wireAlternateVisibilityCheck(check, item) {
   _alternateVisibilityChecks.add({ check, item });
-  _updateAlternateVisibilityControls();
+  _updateAlternateVisibilityControls([{ check, item }]);
   check.addEventListener('click', async event => {
     event.stopPropagation();
     event.preventDefault();
@@ -2384,13 +2685,18 @@ function _buildAlternateTreeItem(item, hierarchy) {
   line.className = 'cs-alternate-tree-line';
   if (item.kind === 'node') line.setAttribute('data-node-gid', item.node_gid);
   const children = document.createElement('div');
-  children.className = 'cs-alternate-tree-children';
+  children.className = 'cs-alternate-tree-children hidden';
+  let childrenBuilt = false;
   const hasChildren = Boolean(item.children?.length);
   const toggle = document.createElement('button');
-  toggle.type = 'button'; toggle.className = 'cs-alternate-tree-toggle'; toggle.textContent = hasChildren ? '▾' : '';
+  toggle.type = 'button'; toggle.className = 'cs-alternate-tree-toggle'; toggle.textContent = hasChildren ? '▸' : '';
   toggle.disabled = !hasChildren;
   toggle.addEventListener('click', event => {
     event.stopPropagation();
+    if (!childrenBuilt) {
+      children.replaceChildren(...(item.children || []).map(value => _buildAlternateTreeItem(value, hierarchy)));
+      childrenBuilt = true;
+    }
     const hidden = children.classList.toggle('hidden');
     toggle.textContent = hidden ? '▸' : '▾';
   });
@@ -2405,19 +2711,31 @@ function _buildAlternateTreeItem(item, hierarchy) {
   name.textContent = item.name || item.display_name || item.node_gid || item.placement_gid;
   name.title = name.textContent;
   line.append(toggle, check, icon, name);
+  if (item.kind === 'node') {
+    name.addEventListener('click', () => {
+      _alternateCaptureSelection = { workspace_gid: hierarchy.workspace_gid, hierarchy_gid: hierarchy.hierarchy_gid, node_gid: item.node_gid };
+      for (const selected of document.querySelectorAll('.cs-alternate-tree-line.active')) selected.classList.remove('active');
+      line.classList.add('active');
+    });
+    line.addEventListener('contextmenu', event => _showAlternateContextMenu(event, [
+      { label: '所属线体逆序工序截图', run: () => {
+        _alternateCaptureSelection = { workspace_gid: hierarchy.workspace_gid, hierarchy_gid: hierarchy.hierarchy_gid, node_gid: item.node_gid };
+        return _openGovernedCapture();
+      } },
+    ]));
+  }
   if (item.kind === 'placement') {
     line.title = '右键删除放置';
     line.addEventListener('contextmenu', event => _showAlternateContextMenu(event, [
       { label: '删除放置', danger: true, run: () => _removePlacement(hierarchy, item).catch(error => _cmdShow(error?.message || '移除失败', 'err')) },
     ]));
   }
-  children.replaceChildren(...(item.children || []).map(value => _buildAlternateTreeItem(value, hierarchy)));
   wrapper.append(line, children);
   return wrapper;
 }
 
 async function _renameAlternateHierarchy(hierarchy) {
-  const name = window.prompt('备选层次结构名称', hierarchy.name || '');
+  const name = (await window.AI00Dialogs.prompt('备选层次结构名称', hierarchy.name || ''));
   if (!name?.trim() || name.trim() === hierarchy.name) return;
   await _invokeCapability('simulation.environment.alternate_hierarchy.update', {
     hierarchy_gid: hierarchy.hierarchy_gid, name: name.trim(), expected_row_version: hierarchy.row_version,
@@ -2427,7 +2745,7 @@ async function _renameAlternateHierarchy(hierarchy) {
 }
 
 async function _archiveAlternateHierarchy(hierarchy) {
-  if (!window.confirm(`归档“${hierarchy.name || hierarchy.hierarchy_gid}”？`)) return;
+  if (!(await window.AI00Dialogs.confirm(`归档“${hierarchy.name || hierarchy.hierarchy_gid}”？`))) return;
   await _invokeCapability('simulation.environment.alternate_hierarchy.archive', {
     hierarchy_gid: hierarchy.hierarchy_gid, expected_row_version: hierarchy.row_version,
     idempotency_key: `hierarchy-archive-${hierarchy.hierarchy_gid}-${Date.now()}`,
@@ -2436,7 +2754,7 @@ async function _archiveAlternateHierarchy(hierarchy) {
 }
 
 async function _removePlacement(hierarchy, placement) {
-  if (!window.confirm(`从层次结构移除“${placement.display_name || placement.placement_gid}”？`)) return;
+  if (!(await window.AI00Dialogs.confirm(`从层次结构移除“${placement.display_name || placement.placement_gid}”？`))) return;
   await _invokeCapability('simulation.environment.placement.remove', {
     placement_gid: placement.placement_gid, expected_row_version: hierarchy.row_version,
     idempotency_key: `placement-remove-${placement.placement_gid}-${Date.now()}`,
@@ -2495,6 +2813,7 @@ async function _addAlternateHierarchy() {
 async function _placeModelDocument(documentGid, targetNodeGid) {
   const hierarchy = _modelDocumentCollection.state.hierarchies.find(item => item.hierarchy_gid === _modelDocumentCollection.state.selectedHierarchyGid);
   const documentRow = _modelDocumentCollection.state.documents.find(item => item.document_gid === documentGid);
+  if(documentRow?.source_kind==='teamcenter_cache_snapshot')throw Error('缓存批次的模型文件和装配位置尚未就绪，暂不能编排');
   if (!hierarchy) throw new Error('请先选择备选层次结构');
   if (!documentRow) throw new Error('model_document_not_found');
   const result = await _invokeCapability('simulation.environment.placement.create', {
@@ -2515,6 +2834,7 @@ async function _placeModelDocument(documentGid, targetNodeGid) {
 async function _placeModelNode(source, targetNodeGid) {
   const hierarchy = _modelDocumentCollection.state.hierarchies.find(item => item.hierarchy_gid === _modelDocumentCollection.state.selectedHierarchyGid);
   const documentRow = _modelDocumentCollection.state.documents.find(item => item.document_gid === source.document_gid);
+  if(documentRow?.source_kind==='teamcenter_cache_snapshot')throw Error('缓存批次的模型文件和装配位置尚未就绪，暂不能编排');
   if (!hierarchy) throw new Error('请先选择备选层次结构');
   const modelNode = documentRow?.product_tree?.nodes?.find(item => item.node_key === source.node_key);
   if (!modelNode) throw new Error('model_node_not_found');
@@ -2640,12 +2960,13 @@ async function _refreshModelDocuments(workspace = window._simulationEnvironmentW
     _setTreeCacheStatus($('modelDocumentList'),meta);
   },
   async load(previous) {
-  const result = await _invokeCapability('simulation.environment.model_document.search', { workspace_gid: workspaceGid });
+  const result = await _invokeCapability('simulation.environment.model_document.search', { workspace_gid: workspaceGid },{version:2});
   if (generation !== _modelRefreshGeneration) return {items:[]};
   const items = result?.items || [];
   const priorTrees = new Map([...(previous?.items||[]).map(item => [item.document_gid, item]), ...currentTrees]);
   items.forEach(item => {
     const prior = priorTrees.get(item.document_gid);
+    if(prior?.product_tree_baseline)item.product_tree_baseline=prior.product_tree_baseline;
     if(refreshDocumentGid&&String(item.document_gid)!==refreshDocumentGid){
       if(prior?.source_kind===item.source_kind&&prior?.source_identity_hash===item.source_identity_hash
         &&prior?.content_sha256===item.content_sha256&&prior?.observation_id===item.observation_id
@@ -2658,17 +2979,28 @@ async function _refreshModelDocuments(workspace = window._simulationEnvironmentW
     }
     if (item.source_kind === 'teamcenter_online' && prior && prior.observation_id === item.observation_id && JSON.stringify(prior.source_selector)===JSON.stringify(item.source_selector) && prior.product_tree?.state === 'ready') {
       item.product_tree = prior.product_tree;
-    } else if (item.source_kind !== 'live_document' && item.source_kind !== 'teamcenter_online' && prior?.content_sha256 === item.content_sha256 && prior.product_tree?.state === 'ready') {
+    } else if(item.source_kind==='teamcenter_cache_snapshot'&&prior?.source_kind===item.source_kind&&JSON.stringify(prior.cache_binding)===JSON.stringify(item.cache_binding)&&prior.product_tree?.state==='ready'){
+      item.product_tree=prior.product_tree;
+    } else if (!['live_document','teamcenter_online','teamcenter_cache_snapshot'].includes(item.source_kind) && prior?.content_sha256 === item.content_sha256 && prior?.product_tree?.state === 'ready') {
       item.product_tree = prior.product_tree;
     }
   });
   _modelDocumentCollection.replace(items);
   if (!previous || refreshDocumentGid) {
-    _renderModelDocuments(items.map(item => ({ ...item, product_tree_loading: (!refreshDocumentGid || String(item.document_gid) === refreshDocumentGid) && (item.media_type.includes('plmxml') || ['live_document','teamcenter_online'].includes(item.source_kind)) && !item.product_tree })));
+    _renderModelDocuments(items.map(item => ({ ...item, product_tree_loading: (!refreshDocumentGid || String(item.document_gid) === refreshDocumentGid) && (item.media_type.includes('plmxml') || ['live_document','teamcenter_online','teamcenter_cache_snapshot'].includes(item.source_kind)) && !item.product_tree })));
     _setTreeCacheStatus($('modelDocumentList'), {});
   }
   await Promise.all(items.map(async item => {
     if(refreshDocumentGid&&String(item.document_gid)!==refreshDocumentGid)return;
+    if(item.source_kind==='teamcenter_cache_snapshot'){
+      try{
+        if(!item.cache_binding)throw Error('cache_snapshot_binding_missing');
+        if(!item.product_tree||refreshChildren)item.product_tree=window.AI00CacheSnapshotSource.partialTree(item.cache_binding,{workspace_gid:workspaceGid,document_gid:item.document_gid});
+        for(const page of Object.values(item.product_tree.pages))if(page.state==='loading'){page.state='failed';page.error='读取已中断，请重试';}
+        if(item.product_tree.pages.roots?.state!=='loaded')await window.AI00CacheSnapshotSource.readChildren(_invokeCapability,item.product_tree,null,{isCurrent:()=>generation===_modelRefreshGeneration});
+      }catch(error){item.product_tree_error=error.message;}
+      return;
+    }
     if (item.source_kind === 'live_document') {
       try {
         if (item.role !== 'primary' || !window._readLiveModelProductTree) throw new Error('live_model_tree_unavailable');
@@ -2682,7 +3014,10 @@ async function _refreshModelDocuments(workspace = window._simulationEnvironmentW
     }
     if (item.source_kind === 'teamcenter_online') {
       try {
-        if(item.observation_id) item.product_tree = await window.AI00TeamcenterOnlineSource.readSnapshot(_invokeCapability, item.observation_id);
+        const sharedTree=!refreshChildren&&window.AI00ModelCache
+          ? await window.AI00ModelCache.readSnapshot(_invokeCapability,workspace.primary_project_gid,item.source_selector,window.AI00TeamcenterOnlineSource.productNode).catch(()=>null) : null;
+        if(sharedTree)item.product_tree=sharedTree;
+        else if(item.observation_id) item.product_tree = await window.AI00TeamcenterOnlineSource.readSnapshot(_invokeCapability, item.observation_id);
         else {
           item.product_tree = item.product_tree ? JSON.parse(JSON.stringify(item.product_tree)) : window.AI00TeamcenterOnlineSource.partialTree();
           for(const page of Object.values(item.product_tree.pages))if(page.state==='loading'){page.state='failed';page.error='读取已中断，请重试';}
@@ -2705,6 +3040,16 @@ window._refreshModelDocuments = _refreshModelDocuments;
 window._refreshAlternateHierarchies = _refreshAlternateHierarchies;
 
 let _teamcenterSessionStatus = null;
+let _teamcenterSessionState = null;
+function _getTeamcenterSessionState() {
+  if (!_teamcenterSessionState) {
+    _teamcenterSessionState=window.AI00TeamcenterSession.createSessionState({api:_eAPI(),onChange:_setTeamcenterSessionButton});
+    const refresh=()=>{if(document.visibilityState==='visible')void _refreshTeamcenterSessionButton();};
+    document.addEventListener('visibilitychange',refresh);
+    window.addEventListener('pagehide',()=>{_teamcenterSessionState.dispose();document.removeEventListener('visibilitychange',refresh);},{once:true});
+  }
+  return _teamcenterSessionState;
+}
 const _isTeamcenterSessionReady = value => window.AI00TeamcenterSession?.isReady?.(value) === true;
 function _setTeamcenterSessionButton(state, sessionStatus=null, detail='') {
   const button=$('btnTeamcenterSession');if(!button)return;
@@ -2718,29 +3063,22 @@ function _setTeamcenterSessionButton(state, sessionStatus=null, detail='') {
 }
 
 async function _refreshTeamcenterSessionButton() {
-  _setTeamcenterSessionButton('checking');
-  try {
-    const api=_eAPI();if(typeof api?.teamcenterGetSession!=='function')throw new Error('teamcenter_login_unavailable');
-    const status=await api.teamcenterGetSession();
-    _setTeamcenterSessionButton(_isTeamcenterSessionReady(status)?'ready':'signed-out',status);
-    return status;
-  } catch(error) {_setTeamcenterSessionButton('error',null,error?.message||'Teamcenter 状态检查失败');return null;}
+  try {return await _getTeamcenterSessionState().refresh();}
+  catch {return null;}
 }
 
 async function _openTeamcenterSessionControl() {
   _setTeamcenterSessionButton('checking',null,'正在连接本机 Connector…');
   try {
     await _requireConnectorRuntime();
-    const current=await _eAPI().teamcenterGetSession();
-    if(_isTeamcenterSessionReady(current))_setTeamcenterSessionButton('ready',current);
-    else _setTeamcenterSessionButton('signed-out');
+    await _getTeamcenterSessionState().refresh();
   } catch(error) {
     _setTeamcenterSessionButton('error',null,error?.message||'本机 Connector 连接失败');
     throw error;
   }
   if(_isTeamcenterSessionReady(_teamcenterSessionStatus)){
-    if(!window.confirm(`Teamcenter 当前已登录：${_teamcenterSessionStatus.masked_username}\n是否退出登录？`))return;
-    try{await _eAPI().teamcenterLogout();window.AI00TeamcenterOnlineSource.clearRevisionRules();_setTeamcenterSessionButton('signed-out');}
+    if(!(await window.AI00Dialogs.confirm(`Teamcenter 当前已登录：${_teamcenterSessionStatus.masked_username}\n是否退出登录？`)))return;
+    try{await _getTeamcenterSessionState().logout();window.AI00TeamcenterOnlineSource.clearRevisionRules();}
     catch(error){_setTeamcenterSessionButton('error',null,error?.message||'Teamcenter 退出失败');throw error;}
     return;
   }
@@ -2749,18 +3087,21 @@ async function _openTeamcenterSessionControl() {
 
 function _teamcenterLoginDialog() {
   return new Promise(resolve => {
-    const previous=_teamcenterSessionStatus;_setTeamcenterSessionButton('signing-in');
+    _getTeamcenterSessionState();
+    const canRemember=['localhost','127.0.0.1'].includes(location.hostname);
     const overlay=document.createElement('div');overlay.className='cs-modal-overlay';
     overlay.innerHTML=`<form class="cs-modal cs-teamcenter-login-dialog"><div class="cs-modal-title">登录 Teamcenter</div>
-      <p class="cs-teamcenter-note">登录只保留在本机 Connector 当前运行期间，密码不会写入磁盘。</p>
+      <p class="cs-teamcenter-note">${canRemember?'默认只保留到本次运行结束；可选择在本机测试版记住 7 天。':'登录只保留在本机 Connector 当前运行期间，密码不会写入磁盘。'}</p>
       <div class="cs-teamcenter-fields"><div class="cs-field"><label>账号</label><input name="username" autocomplete="username" required maxlength="191"></div><div class="cs-field"><label>密码</label><input name="password" type="password" autocomplete="current-password" required maxlength="1024"></div></div>
+      ${canRemember?'<label class="cs-teamcenter-note"><input name="remember" type="checkbox"> 在此 Windows 用户下加密记住登录，重启后自动认证</label>':''}
       <div class="cs-model-document-warning" data-error></div><div class="cs-modal-actions"><button type="button" class="cs-btn" data-cancel>取消</button><button type="submit" class="cs-btn cs-btn-primary">登录</button></div></form>`;
     const form=overlay.querySelector('form'),password=form.elements.password,error=overlay.querySelector('[data-error]');
-    const close=value=>{password.value='';overlay.remove();if(_isTeamcenterSessionReady(value))_setTeamcenterSessionButton('ready',value);else _setTeamcenterSessionButton(_isTeamcenterSessionReady(previous)?'ready':'signed-out',previous);resolve(value);};
+    let closed=false;
+    const close=value=>{if(closed)return;closed=true;password.value='';overlay.remove();if(!value)void _refreshTeamcenterSessionButton();resolve(value);};
     overlay.querySelector('[data-cancel]').onclick=()=>close(null);overlay.addEventListener('click',event=>{if(event.target===overlay)close(null);});
     form.onsubmit=async event=>{event.preventDefault();const submit=form.querySelector('[type=submit]');submit.disabled=true;error.textContent='正在本机认证…';
-      try{if(typeof _eAPI().teamcenterLogin!=='function')throw new Error('teamcenter_login_unavailable');const status=await _eAPI().teamcenterLogin({endpoint_id:'tc-production',username:form.elements.username.value.trim(),password:password.value});window.AI00TeamcenterOnlineSource.clearRevisionRules();password.value='';close(status);
-      }catch(caught){password.value='';error.textContent=caught?.message||'Teamcenter 登录失败';_setTeamcenterSessionButton('error',null,error.textContent);submit.disabled=false;}};
+      try{const status=await _getTeamcenterSessionState().login({endpoint_id:'tc-production',username:form.elements.username.value.trim(),password:password.value,remember:canRemember&&form.elements.remember.checked});window.AI00TeamcenterOnlineSource.clearRevisionRules();password.value='';close(status);
+      }catch(caught){password.value='';error.textContent=caught?.message?.includes('teamcenter_session_refresh_failed')?'认证已完成，但会话状态暂未确认，请稍后刷新状态，不必重复登录。':caught?.message||'Teamcenter 登录失败';submit.disabled=false;}};
     document.body.appendChild(overlay);_syncNativeViewportOcclusion();requestAnimationFrame(()=>form.elements.username.focus());
   });
 }
@@ -2768,9 +3109,8 @@ function _teamcenterLoginDialog() {
 async function _requireTeamcenterLogin() {
   await _requireConnectorRuntime(); const api=_eAPI();
   if(typeof api?.teamcenterGetSession!=='function')throw new Error('teamcenter_login_unavailable');
-  const current=await api.teamcenterGetSession();
-  if(_isTeamcenterSessionReady(current)){_setTeamcenterSessionButton('ready',current);return current;}
-  _setTeamcenterSessionButton('signed-out');
+  const current=await _getTeamcenterSessionState().refresh();
+  if(_isTeamcenterSessionReady(current))return current;
   const loggedIn=await _teamcenterLoginDialog();
   return _isTeamcenterSessionReady(loggedIn)?loggedIn:null;
 }
@@ -2795,7 +3135,7 @@ async function _teamcenterSourceDialog(sessionStatus) {
   const resultPromise=new Promise(resolve=>{
     overlay.querySelector('[data-cancel]').onclick=()=>resolve(close(null));
     overlay.addEventListener('click',event=>{if(event.target===overlay)resolve(close(null));});
-    overlay.querySelector('[data-logout]').onclick=async()=>{await _eAPI().teamcenterLogout();window.AI00TeamcenterOnlineSource.clearRevisionRules();_setTeamcenterSessionButton('signed-out');resolve(close(null));};
+    overlay.querySelector('[data-logout]').onclick=async()=>{await _getTeamcenterSessionState().logout();window.AI00TeamcenterOnlineSource.clearRevisionRules();resolve(close(null));};
     overlay.querySelectorAll('[data-entry]').forEach(button=>button.onclick=()=>{
       mode=button.dataset.entry;selected=null;overlay.querySelectorAll('[data-entry]').forEach(item=>item.classList.toggle('active',item===button));
       overlay.querySelectorAll('[data-panel]').forEach(panel=>panel.hidden=panel.dataset.panel!==mode);
@@ -2872,6 +3212,12 @@ function _teamcenterBindingStillCurrent(pending){
     &&item.source_kind==='teamcenter_online');
 }
 
+function _completeLocalViewerPresentation(){
+  window._liveDocumentContextUnavailable=false;
+  _vmConnected=true;_setVmDocumentReady(true);_setLaunchButton('reconnect');
+  _setVmStatus('connected','已内嵌');_notifyNativeViewportBounds();
+}
+
 async function _completeTeamcenterOnlineBinding(pending){
   const controller=window._simulationEnvironmentWorkspace,workspace=controller?.store?.state?.workspace;
   if(!_teamcenterBindingStillCurrent(pending))throw new Error('online_binding_environment_changed');
@@ -2885,9 +3231,7 @@ async function _completeTeamcenterOnlineBinding(pending){
     if(!_teamcenterBindingStillCurrent(pending)||!controller.store.applyOpenedDocument(pending.workspaceGid,pending.expectedWorkspaceRowVersion,result)){
       await window._localViewerInteraction?.()?.close();throw new Error('online_binding_environment_changed');
     }
-    window._liveDocumentContextUnavailable=false;
-    _vmConnected=true;_setVmDocumentReady(true);_setLaunchButton('reconnect');
-    _setVmStatus('connected','已内嵌');_notifyNativeViewportBounds();
+    _completeLocalViewerPresentation();
     if(_pendingTeamcenterOnlineBinding===pending)_pendingTeamcenterOnlineBinding=null;
     return result;
   }
@@ -3107,6 +3451,18 @@ async function _exportCurrentEnvironment() {
   _cmdShow('PLMXML 已导出', 'ok');
 }
 
+function _openCacheSnapshotPicker() {
+  const workspace=window._simulationEnvironmentWorkspace?.store?.state?.workspace;
+  if(!workspace?.workspace_gid){_cmdShow('请先选择仿真环境','err');return;}
+  return window.AI00CacheSnapshotPicker.open({invoke:_invokeCapability,workspace,
+    isCurrent:()=>window._simulationEnvironmentWorkspace?.store?.state?.workspace===workspace,
+    onAdded:async result=>{
+      workspace.row_version=result.workspace_row_version;workspace.cache_revision_hash=result.cache_revision_hash;
+      await _refreshModelDocuments(workspace,{refreshDocumentGid:result.document_gid});
+      _cmdShow('共用缓存批次已加载，模型树按需读取','ok');
+    }}).catch(error=>_cmdShow(error.message,'err'));
+}
+
 function _bindEnvironmentActions() {
   const menu = $('environmentInsertMenu');
   $('btnEnvironmentInsert')?.addEventListener('click', event => { event.stopPropagation(); menu?.classList.toggle('hidden'); });
@@ -3116,6 +3472,7 @@ function _bindEnvironmentActions() {
     menu.classList.add('hidden');
     if (source === 'plmxml' || source === 'jt') _addModelDocument().catch(error => { if (error?.message !== 'native_selection_cancelled') _cmdShow(error?.message || '插入失败', 'err'); });
     else if (source === 'bop') _openBopInsert().catch(error => _cmdShow(error?.message || 'BOP 插入准备失败', 'err'));
+    else if(source==='cache_snapshot')void _openCacheSnapshotPicker();
   });
   $('btnEnvironmentSave')?.addEventListener('click', () => _saveCurrentEnvironment().catch(error => _cmdShow(error?.message || '保存失败', 'err')));
   $('btnEnvironmentSync')?.addEventListener('click', () => _syncCurrentEnvironment().catch(error => _cmdShow(error?.message || '同步失败', 'err')));
@@ -3123,11 +3480,12 @@ function _bindEnvironmentActions() {
 }
 
 async function _openBopInsert() {
+  const overlay = $('bopInsertOverlay');
+  if (overlay.dataset.busy === 'true') { overlay.classList.remove('hidden'); return; }
   const controller = window._simulationEnvironmentWorkspace;
   const workspace = controller?.store?.state?.workspace;
   if (!workspace?.workspace_gid) throw new Error('请先新建或打开个人仿真环境');
   if (!_bopVersions.length) await _loadBopVersions();
-  const overlay = $('bopInsertOverlay');
   const form = $('bopInsertForm');
   const version = $('bopInsertVersion');
   const line = $('bopInsertLine');
@@ -3137,6 +3495,13 @@ async function _openBopInsert() {
   const error = $('bopInsertError');
   const submit = $('bopInsertSubmit');
   let preview = null;
+  let previewPayload = null;
+  let inputRevision = 0;
+  const requireCurrentEnvironment = () => {
+    if (String(controller.store.state.workspace?.workspace_gid) !== String(workspace.workspace_gid)) {
+      throw new Error('仿真环境已切换，请关闭后重新打开插入窗口');
+    }
+  };
   const versionGid = item => String(item.version_gid || item.gid || '');
   version.replaceChildren(new Option('— 选择 BOP 版本 —', ''), ..._bopVersions
     .filter(item => versionGid(item))
@@ -3147,6 +3512,7 @@ async function _openBopInsert() {
     error.textContent = '暂无可用 BOP 版本';
   }
   const resetPreview = () => {
+    inputRevision += 1; previewPayload = null;
     preview = null; submit.textContent = '生成预览'; error.textContent = '';
     summary.textContent = '先预览节点、模型引用和资源引用数量，再确认插入。';
   };
@@ -3167,16 +3533,38 @@ async function _openBopInsert() {
   line.onchange = resetPreview; depth.onchange = resetPreview; name.oninput = resetPreview;
   form.onsubmit = async event => {
     event.preventDefault(); error.textContent = '';
-    const payload = { workspace_gid: String(workspace.workspace_gid), version_gid: version.value,
+    if (submit.disabled) return;
+    const revision = inputRevision;
+    const payload = previewPayload || { workspace_gid: String(workspace.workspace_gid), version_gid: version.value,
       line_gid: line.value || null, fork_depth: depth.value, hierarchy_name: name.value.trim(),
       expected_row_version: Number(workspace.row_version) };
     if (!payload.version_gid || !payload.hierarchy_name) { error.textContent = '请选择 BOP 版本并填写层次名称'; return; }
     submit.disabled = true;
+    overlay.dataset.busy = 'true';
+    const controls = [version, line, depth, name];
+    controls.forEach(control => { control.disabled = true; });
+    const startedAt = Date.now();
+    const action = preview ? '正在插入 BOP' : '正在生成预览';
+    const showProgress = () => {
+      submit.textContent = `${action}… ${Math.floor((Date.now() - startedAt) / 1000)} 秒`;
+      summary.textContent = `${action}，请等待。关闭弹窗不会取消已提交的请求；重新打开可查看状态。`;
+    };
+    showProgress();
+    const progressTimer = setInterval(showProgress, 1000);
     try {
+      requireCurrentEnvironment();
       if (!preview) {
-        preview = await _invokeCapability('simulation.environment.bop_projection.preview', payload, {
+        // Read the target revision without replacing the user's cached model tree.
+        const current = await _invokeCapability('simulation.environment.workspace.get', { workspace_gid: payload.workspace_gid });
+        requireCurrentEnvironment();
+        if (revision !== inputRevision) return;
+        payload.expected_row_version = Number(current.row_version);
+        const result = await _invokeCapability('simulation.environment.bop_projection.preview', payload, {
           expectedResourceVersion: payload.expected_row_version,
         });
+        requireCurrentEnvironment();
+        if (revision !== inputRevision) return;
+        preview = result; previewPayload = payload;
         summary.textContent = `将插入 ${preview.node_count} 个工艺节点；分离 ${preview.model_reference_count} 个模型引用、${preview.resource_reference_count} 个资源引用。来源 r${preview.source_revision}。`;
         submit.textContent = '确认插入';
       } else {
@@ -3188,14 +3576,30 @@ async function _openBopInsert() {
           expectedResourceVersion: payload.expected_row_version,
         });
         overlay.classList.add('hidden');
+        if (String(controller.store.state.workspace?.workspace_gid) !== payload.workspace_gid) return;
         await controller.store.openWorkspace(workspace.workspace_gid);
         await _refreshAlternateHierarchies(controller.store.state.workspace, inserted.hierarchy_gid);
         _cmdShow(`${payload.hierarchy_name} 已插入`, 'ok');
       }
-    } catch (caught) { error.textContent = caught?.message || 'BOP 插入失败'; }
-    finally { submit.disabled = false; }
+    } catch (caught) {
+      const code = caught?.code || caught?.message;
+      if (['version_conflict', 'bop_projection_plan_changed'].includes(code)) {
+        resetPreview();
+        error.textContent = '仿真环境或 BOP 已更新，旧预览已失效。请重新生成预览，再确认插入。';
+      } else error.textContent = caught?.message || 'BOP 插入失败';
+    }
+    finally {
+      clearInterval(progressTimer);
+      delete overlay.dataset.busy;
+      controls.forEach(control => { control.disabled = false; });
+      submit.disabled = false;
+      submit.textContent = preview ? '确认插入' : '生成预览';
+    }
   };
-  $('bopInsertCancel').onclick = () => overlay.classList.add('hidden');
+  $('bopInsertCancel').onclick = () => { if (overlay.dataset.busy !== 'true') resetPreview(); overlay.classList.add('hidden'); };
+  submit.disabled = false;
+  submit.textContent = '生成预览';
+  summary.textContent = '先预览节点、模型引用和资源引用数量，再确认插入。';
   overlay.classList.remove('hidden');
 }
 
@@ -3212,6 +3616,7 @@ function _bindModelDocuments() {
     _modelDocumentCollection?.setRuntimeProgress('failed', { domainCode: error?.message || 'model_document_add_failed' });
   }));
   $('btnAddTeamcenterSource')?.addEventListener('click', () => _addTeamcenterSource().catch(error => _cmdShow(error?.message || 'Teamcenter 在线模型添加失败','err')));
+  $('btnAddCacheSnapshot')?.addEventListener('click', () => {void _openCacheSnapshotPicker();});
   $('btnTeamcenterSession')?.addEventListener('click', () => _openTeamcenterSessionControl().catch(error => _cmdShow(error?.message || 'Teamcenter 登录操作失败','err')));
   void _refreshTeamcenterSessionButton();
   $('btnAddAlternateHierarchy')?.addEventListener('click', () => _addAlternateHierarchy().catch(error => _cmdShow(error?.message || '层次结构创建失败', 'err')));
@@ -3385,6 +3790,7 @@ async function _loadVisTree(force = false) {
     );
     const treeResult = outcome?.steps?.at(-1)?.result;
     if (!treeResult?.nodes) throw new Error('vismockup_tree_result_invalid');
+    _simulationDebug('ui_tree_validated',{node_count:treeResult.nodes.length,cache_state:treeResult.cache_state||'verified',force_refresh:force});
     r = {
       success: true,
       data: {
@@ -3434,6 +3840,7 @@ async function _loadVisTree(force = false) {
 }
 
 function _renderVisTreeSnapshot(virtualRoot, cacheState = 'verified') {
+  _simulationDebug('ui_tree_rendered',{cache_state:cacheState});
   $('visTreeEmpty').classList.add('hidden');
   _visTreeSnapshot = virtualRoot;
   const roots = virtualRoot.children || [];
@@ -4111,7 +4518,12 @@ let _connectorOnboarding = null;
 let _boundConnectorId = '';
 let _governedCaptureScopeLineGid = null;
 let _governedCaptureProgressCb = null;
+let _governedCaptureBopVersionGid = null;
 let _governedCaptureReportedOps = new Set();
+let _governedCaptureSourceKey = '';
+let _alternateCaptureSelection = null;
+let _governedCaptureSource = null;
+let _governedCaptureSourceLoading = false;
 
 function _renderGovernedCapture(state) {
   const progress = $('connectorProgress');
@@ -4128,16 +4540,28 @@ function _renderGovernedCapture(state) {
   }
   const issues = state.preflight?.problems || [];
   problems.classList.toggle('hidden', issues.length === 0 && !state.error);
+  const errorLabels = {
+    simulation_capture_environment_upgrade_required: '截图环境版本较旧，请更新本机 Connector 后重新搭建环境。',
+    capture_run_active: '当前任务尚未结束，请勿重复启动或切换线体。',
+    capture_target_not_blue_or_occluded: '当前工序未通过蓝色像素验证，未隐藏零件。请检查映射、遮挡及视角。',
+    capture_empty_or_clipped_scene: '截图场景为空或被裁切，请检查模型是否加载完成。',
+  };
   problems.textContent = state.error
-    ? `${state.error.code}: ${state.error.message}`
+    ? `${state.error.code}: ${errorLabels[state.error.code] || state.error.message}`
     : issues.map(item => `${item.code}（期望 ${item.expected ?? '—'}，实际 ${item.actual ?? '—'}）`).join('\n');
   const run = state.captureRun;
   for (const step of run?.steps || []) {
     if (!step.artifact_attached || _governedCaptureReportedOps.has(step.operation_id)) continue;
     _governedCaptureReportedOps.add(step.operation_id);
-    _governedCaptureProgressCb?.({
-      bop_entry_gid: step.operation_id, title: step.operation_id,
-    }, step.artifact_ref);
+    const progressCallback = _governedCaptureProgressCb;
+    const bopVersionGid = _governedCaptureBopVersionGid;
+    Promise.resolve().then(() => progressCallback?.({
+      bop_entry_gid: step.operation_id, bop_version_gid: bopVersionGid,
+      title: _bopEntryIndex[step.operation_id]?.title || step.operation_id,
+    }, step.artifact_ref)).catch(error => {
+      _governedCaptureReportedOps.delete(step.operation_id);
+      _showBanner(`截图已关联，但工序卡刷新失败：${error.message}`, 'error');
+    });
   }
   if (!run) {
     progress.textContent = state.materializationRun
@@ -4145,13 +4569,14 @@ function _renderGovernedCapture(state) {
       : (state.preflight?.compatible ? 'Connector 预检通过，可以开始。' : '尚未通过 Connector 预检。');
   } else {
     const rows = (run.steps || []).map(step =>
-      `${step.operation_id}  ·  ${step.status}  ·  attempt ${step.attempt}`
+      `${_bopEntryIndex[step.operation_id]?.title || step.operation_id}  ·  ${step.status}  ·  attempt ${step.attempt}`
     );
     progress.textContent = [`运行 ${run.capture_run_id}：${run.status}`, ...rows].join('\n');
   }
   $('connectorStart').disabled = !_governedCapture?.canStartCapture();
+  $('connectorCompose').disabled = Boolean(_governedCaptureSourceLoading || !_governedCaptureSource?.execution_plan_ref || state.busy || (run && !['completed', 'failed', 'partial', 'cancelled', 'outcome_unknown'].includes(run.status)));
   $('connectorPreflight').disabled = !state.environmentId;
-  $('connectorCancel').disabled = !run || ['completed', 'failed', 'cancelled', 'outcome_unknown'].includes(run.status);
+  $('connectorCancel').disabled = !run || ['completed', 'failed', 'partial', 'cancelled', 'outcome_unknown'].includes(run.status);
 }
 
 function _renderConnectorOnboarding(state) {
@@ -4186,15 +4611,56 @@ function _renderConnectorOnboarding(state) {
   }
 }
 
-function _openGovernedCapture(lineGid = null, progressCb = null) {
+async function _openGovernedCapture(lineGid = null, progressCb = null) {
+  if (_governedCaptureSourceLoading) return;
+  const library = window.SimulationCaptureWorkflow;
+  const selected = typeof lineGid === 'string' ? lineGid
+    : ($('bopTreeBody')?.querySelector('.cs-bop-node.active')?.closest('.cs-bop-row')?.dataset?.gid || _dpBopSelGid);
+  let source;
+  if (typeof lineGid !== 'string' && _alternateCaptureSelection) {
+    const selection = _alternateCaptureSelection;
+    const hierarchy = _modelDocumentCollection?.state.hierarchies.find(item => item.hierarchy_gid === selection.hierarchy_gid);
+    if (selection.workspace_gid !== _currentSimulationWorkspace()?.workspace_gid || hierarchy?.hierarchy_gid !== _modelDocumentCollection?.state.selectedHierarchyGid) {
+      return _showBanner('仿真环境或备选层次已切换，请重新选择门线', 'error');
+    }
+    source = library?.resolveHierarchyCaptureSource(hierarchy, selection.node_gid);
+    lineGid = source?.line_gid;
+  } else {
+    lineGid = library?.resolveCaptureLine(_bopEntryIndex, selected);
+    source = { version_gid: _selectedBopGid, line_gid: lineGid };
+  }
+  if (!lineGid) return _showBanner('请先在 BOP 中选择需要逆序截图的线体或其下的工位/工序', 'error');
+  const sourceKey = `${source.workspace_gid || 'bop'}:${source.hierarchy_gid || ''}:${source.version_gid}:${lineGid}`;
+  if (_governedCaptureSourceKey !== sourceKey) {
+    try { _governedCapture?.setEnvironment('', 0); }
+    catch (_) { return _showBanner('当前截图尚未结束，请先取消或等待完成再切换线体', 'error'); }
+    _governedCaptureSourceKey = sourceKey;
+  }
   _governedCaptureScopeLineGid = lineGid;
+  _governedCaptureSource = source;
   _governedCaptureProgressCb = typeof progressCb === 'function' ? progressCb : null;
+  _governedCaptureBopVersionGid = source.version_gid;
   _governedCaptureReportedOps = new Set();
-  const version = _bopVersions.find(item => item.gid === _selectedBopGid);
-  $('connectorSource').textContent = version
-    ? `${version.gid} · revision ${version.revision ?? '未知'} · ${version.content_hash || version.structure_hash || '缺少 content hash'}${lineGid ? ` · 选中线体 ${lineGid}` : ''}`
-    : '请先选择已发布的 BOP 版本';
+  $('connectorSource').textContent = `${source.name || '选中线体'} ${lineGid} · BOP ${source.version_gid} · 正在核对已发布执行结构`;
   $('connectorCaptureOverlay').classList.remove('hidden');
+  _governedCaptureSourceLoading = true;
+  $('connectorCompose').disabled = true;
+  try {
+    const reference = await library.readCaptureExecutionSource(_invokeCapability, source);
+    if (source.workspace_gid && (source.workspace_gid !== _currentSimulationWorkspace()?.workspace_gid
+        || source.hierarchy_gid !== _modelDocumentCollection?.state.selectedHierarchyGid)) throw Error('capture_source_changed');
+    _governedCaptureSource = { ...source, execution_plan_ref: reference };
+    $('connectorSource').textContent = `${source.name || '选中线体'} ${lineGid} · BOP ${reference.version_gid} · revision ${reference.revision} · ${reference.content_hash}`;
+  } catch (error) {
+    const message = error.code === 'version_not_published' || error.message === 'version_not_published'
+      ? '关联 BOP 尚未发布，当前受治理截图仅接受已发布执行结构；尚未截图或回写工序卡。'
+      : `无法核对截图源：${error.message}`;
+    $('connectorSource').textContent = `${source.name || '选中线体'} ${lineGid} · BOP ${source.version_gid} · ${message}`;
+    _showBanner(message, 'error');
+  } finally {
+    _governedCaptureSourceLoading = false;
+    _renderGovernedCapture(_governedCapture.state);
+  }
 }
 
 function _currentSimulationWorkspace() {
@@ -4226,7 +4692,7 @@ function _initVmVersioning() {
     getAuthSubjectGid: authSubject,
     invoke: (id, payload) => window.AI00Business.invoke(id, { version: 1, payload,
       ...(payload.idempotency_key ? { idempotency_key: payload.idempotency_key } : {}) },
-      async () => window.confirm(`确认执行 ${id}@1？`)),
+      async () => (await window.AI00Dialogs.confirm(`确认执行 ${id}@1？`))),
     captureSnapshot: async () => {
       if (!_boundConnectorId || !_governedCapture) throw new Error('connector_required');
       const result = await _governedCapture.captureActiveDocument(_boundConnectorId);
@@ -4241,7 +4707,7 @@ function _initVmVersioning() {
   $('btnVmCheckpoint')?.addEventListener('click', async () => {
     const workspace = _currentSimulationWorkspace();
     if (!workspace) return _showBanner('请先选择仿真环境', 'error');
-    const name = window.prompt('快照名称', `手动快照 ${new Date().toLocaleString()}`);
+    const name = (await window.AI00Dialogs.prompt('快照名称', `手动快照 ${new Date().toLocaleString()}`));
     if (!name) return;
     try { _vmManualCapture = true; await _vmVersioning.createCheckpoint({ workspaceGid: workspace.workspace_gid, name });
       _showBanner('快照已创建', 'success'); }
@@ -4279,9 +4745,9 @@ function _initGovernedCapture() {
     approve: async (capabilityId, majorVersion, payload, metadata = {}) => {
       const fields = Object.keys(payload || {}).sort().join('、') || '无';
       const digest = metadata.payloadHash ? `\n负载哈希：${metadata.payloadHash}` : '';
-      return window.confirm(
+      return (await window.AI00Dialogs.confirm(
         `确认执行受治理能力 ${capabilityId}@${majorVersion}？\n负载字段：${fields}${digest}`,
-      );
+      ));
     },
   });
   _governedCapture = library.createCaptureWorkflow({
@@ -4302,7 +4768,7 @@ function _initGovernedCapture() {
   if (onboardingLibrary) {
     const gatewayInvoke = onboardingLibrary.createGatewayInvoker(
       window.AI00Business.request,
-      async () => window.confirm('确认绑定此 Connector？'),
+      async () => (await window.AI00Dialogs.confirm('确认绑定此 Connector？')),
     );
     _connectorOnboarding = onboardingLibrary.createConnectorOnboarding({
       invoke: gatewayInvoke,
@@ -4348,28 +4814,33 @@ function _initGovernedCapture() {
         _connectorOnboarding.startPolling();
     }).catch(() => {});
   }
-  $('btnGovernedCapture')?.addEventListener('click', _openGovernedCapture);
+  $('btnGovernedCapture')?.addEventListener('click', () => _openGovernedCapture());
   $('connectorClose')?.addEventListener('click', () => $('connectorCaptureOverlay').classList.add('hidden'));
   $('connectorCompose')?.addEventListener('click', async () => {
-    const version = _bopVersions.find(item => item.gid === _selectedBopGid);
-    const contentHash = version?.content_hash || version?.structure_hash;
+    if (_governedCaptureSourceLoading) return;
+    const source = _governedCaptureSource;
     const deviceId = _boundConnectorId;
-    const revision = Number(version?.revision);
-    if (!version || !Number.isInteger(revision) || revision < 1 || !contentHash || !deviceId) {
-      _showBanner('请选择带 revision/content hash 的已发布 BOP，并先连接本机 Connector', 'error');
+    if (!source?.execution_plan_ref || !deviceId || !_governedCaptureScopeLineGid) {
+      _showBanner('请先核对已发布 BOP，并连接本机 Connector', 'error');
       return;
     }
+    _governedCaptureSourceLoading = true;
+    $('connectorCompose').disabled = true;
     try {
+      if (source.workspace_gid && (source.workspace_gid !== _currentSimulationWorkspace()?.workspace_gid
+          || source.hierarchy_gid !== _modelDocumentCollection?.state.selectedHierarchyGid)) throw Error('capture_source_changed');
+      const reference = await library.readCaptureExecutionSource(_invokeCapability, source);
+      if (JSON.stringify(reference) !== JSON.stringify(source.execution_plan_ref)) throw Error('capture_source_changed');
       const result = await _governedCapture.composeFromActiveDocument({
         name: $('connectorEnvironmentName').value.trim() || '工艺倒序截图环境',
         device_id: deviceId,
-        execution_plan_ref: { version_gid: version.gid, revision, content_hash: contentHash },
+        execution_plan_ref: reference,
         capture_profile: { format: 'png', width: 1920, height: 1080, background: 'current' },
-        ...(_governedCaptureScopeLineGid
-          ? { scope: { kind: 'line', gid: _governedCaptureScopeLineGid } } : {}),
+        scope: { kind: 'line', gid: _governedCaptureScopeLineGid },
       });
       if (result.status === 'composed') await _governedCapture.selectConnector(deviceId);
-    } catch (_) { /* state renderer displays stable code */ }
+    } catch (error) { _showBanner(`截图环境构建失败：${error.message}`, 'error'); }
+    finally { _governedCaptureSourceLoading = false; _renderGovernedCapture(_governedCapture.state); }
   });
   $('connectorPreflight')?.addEventListener('click', async () => {
     try { await _governedCapture.selectConnector(_boundConnectorId); } catch (_) {}
@@ -4388,8 +4859,12 @@ window.addEventListener('message', e => {
     document.documentElement.setAttribute('data-theme', e.data.theme || 'dark');
   if (e.data?.type === 'workspace:visibility' && (window.parent === window || e.source === window.parent)) {
     _workspacePageVisible = e.data.visible !== false;
+    _viewerDocumentManager?.visibilityChanged();
+    if (_workspacePageVisible) void _refreshTeamcenterSessionButton();
     _notifyNativeViewportBounds();
   }
 });
 
 document.addEventListener('DOMContentLoaded', init);
+window.addEventListener('error',event=>_simulationDebug('ui_error',{message:event.message,exception_type:event.error?.name}));
+window.addEventListener('unhandledrejection',event=>_simulationDebug('ui_error',{message:event.reason?.message||String(event.reason),exception_type:event.reason?.name}));

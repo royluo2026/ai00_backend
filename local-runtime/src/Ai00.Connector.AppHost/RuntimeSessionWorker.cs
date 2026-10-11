@@ -16,25 +16,31 @@ public sealed class RuntimeTransport(HttpClient http,Uri origin,HttpClient? arti
     public Uri Endpoint(string path)=>new(origin,Prefix+path);
     public async Task<JsonElement> SendAsync(HttpMethod method,string path,object? body,CancellationToken ct,RuntimeSession? session=null,string? credential=null)
     {
-        using var request=new HttpRequestMessage(method,Endpoint(path));
-        if(body!=null)request.Content=body is string rawJson ? new StringContent(rawJson,Encoding.UTF8,"application/json") : JsonContent.Create(body);
-        if(credential!=null)request.Headers.Add("X-AI00-Device-Credential",credential);
-        if(session!=null)foreach(var header in Headers(session))request.Headers.Add(header.Key,header.Value);
-        using var response=await http.SendAsync(request,HttpCompletionOption.ResponseHeadersRead,ct);
-        if((int)response.StatusCode>=500||response.StatusCode is HttpStatusCode.RequestTimeout or HttpStatusCode.TooManyRequests)
-            throw new RuntimeTransportException("cloud_temporarily_unavailable",true);
-        await using var stream=await response.Content.ReadAsStreamAsync(ct);
-        using var bytes=new MemoryStream();var buffer=new byte[8192];
-        while(true){var count=await stream.ReadAsync(buffer,ct);if(count==0)break;if(bytes.Length+count>4*1024*1024)throw new InvalidDataException("cloud_response_size_invalid");bytes.Write(buffer,0,count);}
-        var json=CanonicalJsonV2.Parse(Encoding.UTF8.GetString(bytes.ToArray()));
-        if(!response.IsSuccessStatusCode)
+        try
         {
-            var code=json.TryGetProperty("detail",out var detail)&&detail.ValueKind==JsonValueKind.Object&&detail.TryGetProperty("code",out var item)?item.GetString():"cloud_request_failed";
-            throw new RuntimeTransportException(code??"cloud_request_failed");
+            using var request=new HttpRequestMessage(method,Endpoint(path));
+            if(body!=null)request.Content=body is string rawJson ? new StringContent(rawJson,Encoding.UTF8,"application/json") : JsonContent.Create(body);
+            if(credential!=null)request.Headers.Add("X-AI00-Device-Credential",credential);
+            if(session!=null)foreach(var header in Headers(session))request.Headers.Add(header.Key,header.Value);
+            using var response=await http.SendAsync(request,HttpCompletionOption.ResponseHeadersRead,ct);
+            if((int)response.StatusCode>=500||response.StatusCode is HttpStatusCode.RequestTimeout or HttpStatusCode.TooManyRequests)
+                throw new RuntimeTransportException("cloud_temporarily_unavailable",true);
+            await using var stream=await response.Content.ReadAsStreamAsync(ct);
+            using var bytes=new MemoryStream();var buffer=new byte[8192];
+            while(true){var count=await stream.ReadAsync(buffer,ct);if(count==0)break;if(bytes.Length+count>(path=="plans/lease"?100*1024*1024:4*1024*1024))throw new InvalidDataException("cloud_response_size_invalid");bytes.Write(buffer,0,count);}
+            var json=CanonicalJsonV2.Parse(Encoding.UTF8.GetString(bytes.ToArray()));
+            if(!response.IsSuccessStatusCode)
+            {
+                var code=json.TryGetProperty("detail",out var detail)&&detail.ValueKind==JsonValueKind.Object&&detail.TryGetProperty("code",out var item)?item.GetString():"cloud_request_failed";
+                throw new RuntimeTransportException(code??"cloud_request_failed");
+            }
+            if(!json.GetProperty("success").GetBoolean())throw new InvalidDataException("cloud_response_invalid");
+            return json.GetProperty("data").Clone();
         }
-        if(!json.GetProperty("success").GetBoolean())throw new InvalidDataException("cloud_response_invalid");
-        return json.GetProperty("data").Clone();
+        catch(OperationCanceledException)when(!ct.IsCancellationRequested)
+        {throw new RuntimeTransportException("cloud_request_timeout",true);}
     }
+
     public async Task<JsonElement> UploadCaptureAsync(
         string planId,string leaseId,string stepId,Stream content,string sha256,long byteSize,
         RuntimeSession session,CancellationToken ct,string mediaType="image/png")
@@ -114,6 +120,8 @@ public sealed class RuntimeTransport(HttpClient http,Uri origin,HttpClient? arti
                 {
                     if(count==buffer.Length)throw new InvalidDataException("wake_size_invalid");
                     frame=await socket.ReceiveAsync(new ArraySegment<byte>(buffer,count,buffer.Length-count),timeout.Token);
+                    if(frame.MessageType==WebSocketMessageType.Close)
+                    {await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure,"",timeout.Token);return;}
                     if(frame.MessageType!=WebSocketMessageType.Text)throw new InvalidDataException("wake_type_invalid");
                     count+=frame.Count;
                 }while(!frame.EndOfMessage);

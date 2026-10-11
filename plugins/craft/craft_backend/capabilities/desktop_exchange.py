@@ -15,6 +15,7 @@ from backend.platform_sdk.feishu import user_credential
 from .data_exchange import _export_excel, _export_diff_report, _export_diff_lark_sheet
 from .lark_exchange import read_lark_data, write_lark_data
 from .desktop_pictures import resolve_picture,list_picture_access
+from .member_pictures import register_member_pictures
 
 TEXT={'type':'string','maxLength':4096}
 ID={'type':'string','minLength':1,'maxLength':128,'pattern':'^[A-Za-z0-9_.-]+$'}
@@ -112,6 +113,7 @@ DEFINITIONS=[
 ]
 
 def register_desktop_exchange(registry):
+    register_member_pictures()
     for capability_id,input_schema,output_schema,write,service in DEFINITIONS:
         def handler(payload,context,_input=input_schema,_output=output_schema,_service=service):
             if not Draft202012Validator(_input).is_valid(payload): fail('The request does not match the spreadsheet action.')
@@ -119,7 +121,7 @@ def register_desktop_exchange(registry):
             if not Draft202012Validator(_output).is_valid(result): raise CapabilityBusinessError('provider_error','The spreadsheet outcome exceeds its closed model.')
             return result
         picture_access=capability_id=='craft.bop.picture.access.list'
-        effect=('Authorize the authenticated reader to view the bounded historical picture set attached to one visible BOP version.' if picture_access else
+        effect=('Authorize every active member to read the bounded historical picture set attached to a BOP version.' if picture_access else
             ('Write ' if write else 'Read ')+capability_id.removeprefix('craft.data_exchange.').replace('.',' ')+' using owned immutable artifacts or the authenticated Feishu delegation.')
         spec=CapabilitySpec(id=capability_id,version=1,owner='craft',description=effect,use_when=effect,do_not_use_when='Another export, import, resource or remote method is requested.',risk='write' if write else 'read',confirmation='user' if write else 'none',idempotent=True,permissions=('craft.write',) if write else ('craft.read',),input_schema=input_schema,output_schema=output_schema,tags=('craft','desktop','artifact'))
         acceptance=((effect,'The parent, tenant, owner and registered upload provenance are re-read once for the requested BOP version.','The result contains at most 5000 short-lived image grants and identifies unavailable historical records.') if picture_access else

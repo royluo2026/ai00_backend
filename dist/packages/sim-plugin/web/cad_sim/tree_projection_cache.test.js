@@ -76,3 +76,13 @@ test('permission revocation removes the projection instead of retaining cached b
   await assert.rejects(cache.run({workspaceGid:'1',kind:'models',isCurrent:()=>true,render:d=>views.push(d),load:async()=>{throw Error('workspace_forbidden')}}),/workspace_forbidden/);
   assert.equal(removed.length,1); assert.deepEqual(views.at(-1),{items:[]});
 });
+
+test('cache diagnostics distinguish preview, failed refresh, fallback and storage failure without breaking display',async()=>{
+ const events=[],views=[];
+ const runner=create(()=>({get:async()=>({cached_at:'old',data:{items:[{name:'cached'}]}})}),(stage,detail)=>events.push({stage,...detail}));
+ await runner.run({workspaceGid:'1',kind:'models',isCurrent:()=>true,render:d=>views.push(d),load:async()=>{throw Error('tree_timeout');}});
+ assert.deepEqual(events.map(e=>e.stage),['projection_lookup','projection_hit','projection_preview','projection_read_started','projection_failed','projection_fallback']);
+ assert.equal(events.at(-1).cache_state,'unverified');assert.equal(views.at(-1).items[0].name,'cached');
+ const safe=create(()=>({get:async()=>null,put:async()=>{throw Error('disk_full');}}),()=>{throw Error('diagnostic_unavailable');});
+ await safe.run({workspaceGid:'1',kind:'models',isCurrent:()=>true,render:()=>{},load:async()=>({items:[]})});
+});

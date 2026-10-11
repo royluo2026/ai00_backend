@@ -37,6 +37,18 @@ _FALLBACK_ENV = {
     "FIRST_SUPER_ADMIN_EMAIL": "",
 }
 
+_DEPLOYMENT_DB_DOMAINS = (
+    "BASE", "CRAFT", "AGENT", "SIMULATION", "DEVICE", "PROJECT_MANAGEMENT",
+    "KNOWLEDGE", "DIGITAL_MODEL", "INTEGRATION", "FACTORY", "ONTOLOGY",
+)
+_DEPLOYMENT_CONFIG_KEYS = (
+    "USERS_DB_URL", "AI00_DDL_DB_URL", "AI00_DEPLOY_PROFILE", "TABLE_PREFIX",
+    "AI00_ALLOW_DATA_ENVIRONMENT_SWITCH", "AI00_DATA_ENVIRONMENT_STATE_FILE",
+    "PUBLIC_URL", "BACKEND_BASE_URL", "HOST", "PORT", "DEBUG", "AI00_REQUIRE_MIGRATIONS",
+    "CORS_ALLOW_ORIGINS", "FEISHU_APP_ID", "FEISHU_APP_SECRET",
+    "FEISHU_REDIRECT_URI", "JWT_SECRET",
+) + tuple(f"AI00_{domain}_{suffix}DB_URL" for domain in _DEPLOYMENT_DB_DOMAINS for suffix in ("", "DDL_"))
+
 
 def _system_json_path() -> Path:
     return Path.home() / '.ai00' / 'config' / 'system.json'
@@ -77,12 +89,20 @@ def _load_saved_cloud_db_url() -> str:
     return ''
 
 
+def _managed_deployment_config() -> bool:
+    return bool(_env_file or os.getenv("AI00_DEPLOY_PROFILE", "").strip())
+
+
 def _load_saved_feishu_config() -> dict:
+    if _managed_deployment_config():
+        return {}
     cfg = _load_system_json().get('feishu_config') or {}
     return cfg if isinstance(cfg, dict) else {}
 
 
 def _load_saved_ois_config() -> dict:
+    if _managed_deployment_config():
+        return {}
     cfg = _load_system_json().get('ois_config') or {}
     return cfg if isinstance(cfg, dict) else {}
 
@@ -106,9 +126,12 @@ def _get_csv_list(key: str, default: str = "") -> list[str]:
 # 兼容 Windows 下 GBK/ANSI 编码的 .env 文件。
 _HERE = Path(__file__).parent
 _env_file = os.getenv("ENV_FILE", "").strip()
-_in_container = Path("/.dockerenv").exists()
+_in_container = (Path("/.dockerenv").exists()
+                 or (os.getenv('COMP_NAME') == 'workmanship-backend' and bool(os.getenv('LI_ENV'))))
 if _env_file:
     _candidates = [_env_file]
+elif os.getenv("AI00_DEPLOY_PROFILE", "").strip():
+    _candidates = []
 elif _in_container:
     _candidates = [".env", ".env.test.example"]
 else:
@@ -118,7 +141,8 @@ if _env_file:
     if not _must_exist.exists():
         raise RuntimeError(f"ENV_FILE 指定的配置文件不存在: {_must_exist}")
     # 避免继承镜像或运行时残留的旧数据库地址（例如 127.0.0.1）。
-    os.environ.pop("USERS_DB_URL", None)
+    for _key in _DEPLOYMENT_CONFIG_KEYS:
+        os.environ.pop(_key, None)
 
 _loaded_env_path = None
 for _fname in _candidates:
@@ -127,9 +151,9 @@ for _fname in _candidates:
         # 显式指定 ENV_FILE 或容器内运行时，以文件为准覆盖已有环境变量，避免残留默认值干扰。
         _override = bool(_env_file or _in_container)
         try:
-            load_dotenv(_p, override=_override, encoding='utf-8')
+            load_dotenv(_p, override=_override, encoding='utf-8', interpolate=not bool(_env_file))
         except UnicodeDecodeError:
-            load_dotenv(_p, override=_override, encoding='gbk')
+            load_dotenv(_p, override=_override, encoding='gbk', interpolate=not bool(_env_file))
         _loaded_env_path = str(_p)
         break
 
@@ -155,7 +179,7 @@ def _configured_users_db_url() -> str:
     settings remain a legacy convenience only when no deployment file is used.
     New domain-owned database configuration never falls back to this value.
     """
-    if _env_file:
+    if _managed_deployment_config():
         return _require("USERS_DB_URL")
     return _load_saved_cloud_db_url() or _require("USERS_DB_URL")
 
@@ -243,7 +267,8 @@ class Settings:
         self.feishu_redirect_uri      = str(_feishu_saved.get("redirect_uri") or _require("FEISHU_REDIRECT_URI")).strip()
         self.jwt_secret               = _require("JWT_SECRET")
         self.users_db_url             = _configured_users_db_url()
-        self.table_prefix             = os.getenv("TABLE_PREFIX", "").strip()
+        from backend.base.remote_data_environment import runtime_table_prefix
+        self.table_prefix             = runtime_table_prefix()
         self.jwt_expire_hours         = int(_get_with_fallback("JWT_EXPIRE_HOURS") or "72")
         self.host                     = (_get_with_fallback("HOST") or "0.0.0.0").strip()
         self.port                     = int(_get_with_fallback("PORT") or "8080")

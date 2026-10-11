@@ -28,7 +28,7 @@ class RecordingGateway:
         responses = {
             "project.project.read.atomic.projects_search": {
                 "success": True,
-                "data": [{"gid": "project-1", "name": "Alpha"}],
+                "data": [{"gid": "project-1", "name": "Alpha", "status": "preparing", "vehicle_model_gid": "vehicle-1"}],
             },
             "project.follow.read.atomic.follows_list": {
                 "success": True,
@@ -47,7 +47,6 @@ class RecordingGateway:
                 "success": True,
                 "data": [
                     {
-                        "item_type": "task",
                         "gid": "task-1",
                         "title": "Prepare BOP",
                         "status": "pending",
@@ -59,7 +58,6 @@ class RecordingGateway:
                 "success": True,
                 "data": [
                     {
-                        "item_type": "issue",
                         "gid": "issue-1",
                         "title": "Resolve clash",
                         "status": "open",
@@ -122,6 +120,8 @@ def test_home_composes_projects_and_follows_through_capability_gateway(monkeypat
                 "project_gid": "project-1",
                 "project_name": "Alpha",
                 "role": "member",
+                "status": "preparing",
+                "vehicle_model_gid": "vehicle-1",
                 "section_gid": None,
             }
         ],
@@ -210,6 +210,30 @@ def test_panel1_composes_task_and_issue_sources_through_capability_gateway(monke
             "scope": scope,
         },
     }
+
+
+def test_panel1_uses_requested_source_not_provider_row_type_for_deduplication(monkeypatch):
+    application, gateway, _scope = _client(monkeypatch)
+    original_invoke = gateway.invoke
+
+    async def conflicting_rows(envelope):
+        result = await original_invoke(envelope)
+        if envelope.capability_id.startswith("project.task."):
+            result.data["data"]["data"][0]["item_type"] = "issue"
+        if envelope.capability_id.startswith("project.issue."):
+            result.data["data"]["data"][0]["item_type"] = "task"
+            result.data["data"]["data"][0]["gid"] = "task-1"
+        return result
+
+    gateway.invoke = conflicting_rows
+    with TestClient(application) as client:
+        response = client.get("/api/workbench/panel1")
+
+    assert response.status_code == 200
+    assert [(item["item_type"], item["gid"]) for item in response.json()["items"]] == [
+        ("task", "task-1"), ("issue", "task-1"),
+    ]
+    assert response.json()["total"] == 2
 
 
 def test_bff_transport_failure_fails_closed_with_constituent_audit_detail(monkeypatch):

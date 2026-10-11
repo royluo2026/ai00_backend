@@ -22,10 +22,12 @@ def test_start_backend_uses_env_file_host_and_port():
 
 def test_dockerfile_requires_runtime_env_file_in_container():
     text = (REPO_ROOT / 'backend' / 'Dockerfile').read_text(encoding='utf-8')
-    assert 'ENV ENV_FILE=' not in text
+    assert 'ENV ENV_FILE=/chj/app/backend/.env' in text
     assert 'SERVICE_PORT' not in text
     assert 'ENV_FILE is required for container runtime' in text
-    assert 'gunicorn backend.main:app -c backend/gunicorn.conf.py' in text
+    assert 'exec python -m backend.scripts.supervise_environment' in text
+    supervisor = (REPO_ROOT / 'backend' / 'scripts' / 'supervise_environment.py').read_text(encoding='utf-8')
+    assert "'gunicorn', 'backend.main:app', '-c', 'backend/gunicorn.conf.py'" in supervisor
 
 
 def test_gunicorn_workers_are_explicit_and_memory_safe():
@@ -81,3 +83,14 @@ def test_bootstrap_skips_unusable_python_shims_and_checks_python():
     assert 'source "$VENV_DIR/bin/activate"' not in text
     assert '"$VENV_PY" -m pip install --upgrade pip >/dev/null' in text
     assert '"$VENV_PY" -m pip install -r backend/requirements.txt' in text
+
+
+def test_gunicorn_logs_to_container_streams_without_a_logs_directory(monkeypatch, tmp_path):
+    monkeypatch.delenv('ENV_FILE', raising=False)
+    monkeypatch.delenv('AI00_WEB_WORKERS', raising=False)
+    monkeypatch.delenv('AI00_ALLOW_DATA_ENVIRONMENT_SWITCH', raising=False)
+    monkeypatch.chdir(tmp_path)
+    config = runpy.run_path(str(REPO_ROOT / 'backend' / 'gunicorn.conf.py'))
+    assert not (tmp_path / 'logs').exists()
+    assert config['accesslog'] == '-'
+    assert config['errorlog'] == '-'

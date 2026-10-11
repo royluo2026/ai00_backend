@@ -1,0 +1,48 @@
+/* Shared, opt-in dialog skin. Never restyle third-party content or native pickers. */
+.ai00-dialog {
+ --dialog-bg:var(--bg-primary,var(--surface,#fff));
+ --dialog-text:var(--text-primary,var(--text,#242424));
+ --dialog-muted:var(--text-secondary,var(--text-muted,#696969));
+ --dialog-border:var(--border-color,var(--border,#dfe2e8));
+ --dialog-accent:var(--accent-color,var(--accent,#7057ff));
+ box-sizing:border-box;margin:auto;padding:0;width:min(460px,calc(100vw - 40px));max-height:calc(100dvh - 48px);
+ color:var(--dialog-text);background:var(--dialog-bg);border:1px solid var(--dialog-border);border-radius:16px;
+ box-shadow:0 24px 80px #11182730,0 4px 16px #11182714;font:14px/1.6 system-ui,"Microsoft YaHei",sans-serif;overflow:auto;
+}
+:root[data-theme="dark"] .ai00-dialog {--dialog-bg:var(--bg-primary,var(--surface,#262637));--dialog-text:var(--text-primary,var(--text,#e2e5ef));--dialog-muted:var(--text-secondary,var(--text-muted,#a6adc2));--dialog-border:var(--border-color,var(--border,#414458));}
+.ai00-dialog::backdrop{background:rgb(16 24 40 / .38);backdrop-filter:blur(3px);}
+.ai00-dialog form{margin:0;display:block;}
+.ai00-dialog-header{display:flex;align-items:center;gap:12px;padding:22px 24px 12px;}
+.ai00-dialog-title{margin:0;flex:1;font-size:17px;font-weight:650;line-height:1.4;color:inherit;}
+.ai00-dialog-icon{display:inline-grid;place-items:center;width:30px;height:30px;flex:none;border-radius:9px;background:color-mix(in srgb,var(--dialog-accent) 12%,transparent);color:var(--dialog-accent);font-weight:700;}
+.ai00-dialog[data-tone="danger"] .ai00-dialog-icon{color:#d63b4b;background:#d63b4b15;}
+.ai00-dialog-body{padding:4px 24px 22px;overflow-wrap:anywhere;}
+.ai00-dialog-body p{margin:0;white-space:pre-wrap;}
+.ai00-dialog-body details{margin-top:14px;color:var(--dialog-muted);font-size:12px;}
+.ai00-dialog-body pre{white-space:pre-wrap;max-height:240px;overflow:auto;font-size:12px;user-select:text;}
+.ai00-dialog-body input{box-sizing:border-box;width:100%;margin-top:14px;padding:10px 12px;color:inherit;background:transparent;border:1px solid var(--dialog-border);border-radius:8px;font:inherit;}
+.ai00-dialog-actions{display:flex;justify-content:flex-end;gap:10px;padding:14px 24px 20px;border-top:1px solid var(--dialog-border);}
+.ai00-dialog button{padding:8px 17px;border:1px solid var(--dialog-border);border-radius:8px;background:transparent;color:inherit;cursor:pointer;font:inherit;line-height:1.4;}
+.ai00-dialog button:hover{background:color-mix(in srgb,var(--dialog-text) 6%,transparent);}
+.ai00-dialog button.ai00-dialog-primary{background:var(--dialog-accent);border-color:var(--dialog-accent);color:#fff;}
+.ai00-dialog[data-tone="danger"] button.ai00-dialog-primary{background:#cc3444;border-color:#cc3444;}
+.ai00-dialog button.ai00-dialog-close{border:0;padding:0;width:28px;height:28px;font-size:23px;color:var(--dialog-muted);}
+.ai00-dialog :focus-visible{outline:2px solid var(--dialog-accent);outline-offset:3px;}
+.ai00-dialog button:disabled{opacity:.55;cursor:wait;}
+@media(prefers-reduced-motion:reduce){.ai00-dialog,.ai00-dialog *{animation:none!important;transition:none!important;}}
+
+/* Existing owned business forms keep their layout, field validation and lifecycle.
+   These are card selectors, never the overlay or third-party popup classes. */
+html body :is(.modal,.cs-modal,.cs-meta-dialog,.dm-modal,.eds-modal,.fe-modal,.fs-modal,.ie-modal,.kh-modal,.ls-popout-modal,.lv-dialog-box,.lv-modal,.lv-modal-box,.lv-pp-dialog,.md-modal,.mf-modal,.mini-modal,.onto-modal,.rem-modal,.sb-entries-modal,.sl-edit-modal,.sl-modal,.sl-test-modal,.ts-dialog,.wb-modal,.wfc-saves-modal,.wfcw-cc-cfg-modal,.ai-agent-detail-modal,.ai-detail-modal,.ai-skill-var-modal,.ai-tl-modal,dialog:not(.ai00-dialog)) {
+ --ai00-form-bg:var(--bg-primary,var(--surface,var(--bg2,#fff)));
+ --ai00-form-text:var(--text-primary,var(--text,var(--text-normal,#242424)));
+ --ai00-form-border:var(--border-color,var(--border,var(--border-default,#dfe2e8)));
+ background:var(--ai00-form-bg);color:var(--ai00-form-text);border:1px solid var(--ai00-form-border);border-radius:16px;
+ box-shadow:0 24px 80px #11182730,0 4px 16px #11182714;
+ font-family:system-ui,"Microsoft YaHei",sans-serif;
+}
+html body :is(.modal,.cs-modal,.cs-meta-dialog,.dm-modal,.eds-modal,.fe-modal,.fs-modal,.ie-modal,.kh-modal,.ls-popout-modal,.lv-dialog-box,.lv-modal,.lv-modal-box,.lv-pp-dialog,.md-modal,.mf-modal,.mini-modal,.onto-modal,.rem-modal,.sb-entries-modal,.sl-edit-modal,.sl-modal,.sl-test-modal,.ts-dialog,.wb-modal,.wfc-saves-modal,.wfcw-cc-cfg-modal,.ai-agent-detail-modal,.ai-detail-modal,.ai-skill-var-modal,.ai-tl-modal,dialog:not(.ai00-dialog)) :is(button,input,textarea,select) {border-radius:8px;font-family:inherit;}
+html body :is(.modal-title,.cs-modal-title,.dm-modal-title,.eds-modal-title,.ie-modal-title,.lv-modal-title,.onto-modal-title,.sl-modal-title,.wb-modal-title,.wfc-saves-title) {font-size:16px;line-height:1.5;font-weight:650;}
+html body :is(.modal-footer,.modal-actions,.cs-modal-actions,.dm-modal-footer,.eds-modal-actions,.ie-modal-footer,.kh-modal-footer,.lv-modal-actions,.sl-modal-footer,.ts-dialog-footer,.wb-modal-footer,.dialog-actions) {gap:10px;}
+html body :is(.modal-overlay,.cs-modal-overlay,.lv-modal-overlay,.sl-modal-overlay,.ts-dialog-overlay,.wb-modal-overlay,.md-overlay) {background:rgb(16 24 40 / .38);backdrop-filter:blur(3px);}
+html body dialog:not(.ai00-dialog)::backdrop{background:rgb(16 24 40 / .38);backdrop-filter:blur(3px);}

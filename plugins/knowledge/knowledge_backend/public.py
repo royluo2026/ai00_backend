@@ -28,5 +28,18 @@ def require_readable_item(gid, context):
     if not result:raise CapabilityBusinessError('resource_not_found','The Knowledge item is unavailable.')
 
 
-__all__ = ["list_knowledge_workbench_items", "require_readable_item"]
+def readable_entry_scope(gid, context):
+    """Return typed Knowledge-entry scope after the owner's current visibility check."""
+    from backend.capability_v2.provider_contracts import CapabilityBusinessError
+    from .capabilities.knowledge_next import get_knowledge
+    if not gid or not context.user_gid or not context.team_gid or 'knowledge.read' not in context.permissions:
+        raise CapabilityBusinessError('permission_denied', 'Authenticated Knowledge read access is required.')
+    try:
+        row = get_knowledge({'gid': str(gid)}, context).data
+    except LookupError:
+        raise CapabilityBusinessError('resource_not_found', 'The Knowledge entry is unavailable.') from None
+    return {key: row.get(key) for key in ('gid', 'source_project_gid', 'share_scope', 'creator_gid')}
+
+
+__all__ = ["list_knowledge_workbench_items", "require_readable_item", "readable_entry_scope"]
 

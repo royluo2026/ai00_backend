@@ -4,6 +4,10 @@ from pydantic import BaseModel,ConfigDict,Field
 from .cache_open_evidence import CacheBinding, cache_package_hash
 from .live_document_identity import NativeDocumentIdentity
 
+# Bounds on metadata, not on the JT geometry files fetched by the client.
+MAX_ASSEMBLY_XML_BYTES = 64 * 1024 * 1024
+MAX_CACHE_OPEN_PACKET_BYTES = 96 * 1024 * 1024
+
 class ClosedModel(BaseModel):
     model_config=ConfigDict(extra='forbid',strict=True)
 class TcFileReference(ClosedModel):
@@ -23,7 +27,7 @@ class TcCacheOpenPayload(ClosedModel):
     preparation_hash:str=Field(pattern='^sha256:[a-f0-9]{64}$')
     package_hash:str=Field(pattern='^sha256:[a-f0-9]{64}$')
     source_selector:dict[str,Any]
-    assembly_xml:str=Field(min_length=1,max_length=7*1024*1024)
+    assembly_xml:str=Field(min_length=1,max_length=MAX_ASSEMBLY_XML_BYTES)
     tc_dependencies:list[TcDependency]=Field(max_length=10000)
 class LocalFileProof(ClosedModel):
     dependency_key:str=Field(pattern='^[a-f0-9]{64}$')

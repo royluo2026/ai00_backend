@@ -43,6 +43,20 @@
     'completed', 'failed', 'partial', 'cancelled', 'outcome_unknown',
   ]);
 
+  function resolveCaptureLine(entries, selectedGid) {
+    if (typeof selectedGid !== 'string') return null;
+    const visited = new Set();
+    let current = selectedGid;
+    while (current && !visited.has(current) && visited.size < 256) {
+      visited.add(current);
+      const entry = entries[current];
+      if (!entry) return null;
+      if (entry.node_type === 'line_process') return String(entry.gid);
+      current = entry.parent_gid;
+    }
+    return null;
+  }
+
   function unwrap(response, capabilityId, version) {
     const envelope = response && response.success === true ? response.data : response;
     if (!envelope || response?.success === false || envelope.ok === false) {
@@ -56,6 +70,28 @@
     }
     if (envelope.status === 'accepted' && envelope.operation_ref) return envelope.operation_ref;
     return envelope.data !== undefined ? envelope.data : envelope;
+  }
+
+  function resolveHierarchyCaptureSource(hierarchy, selectedNodeGid) {
+    if (!hierarchy?.source_bop_version_gid || !Array.isArray(hierarchy.nodes)) return null;
+    const entries = Object.fromEntries(hierarchy.nodes.map(node => [node.node_gid, { ...node, gid: node.node_gid }]));
+    const lineGid = resolveCaptureLine(entries, selectedNodeGid);
+    const line = entries[lineGid];
+    if (!line?.source_bop_node_gid) return null;
+    return { version_gid: hierarchy.source_bop_version_gid, line_gid: line.source_bop_node_gid,
+      workspace_gid: hierarchy.workspace_gid, hierarchy_gid: hierarchy.hierarchy_gid, name: line.name };
+  }
+
+  async function readCaptureExecutionSource(invoke, source) {
+    const structure = await invoke('craft.bop.execution_structure.get', { version_gid: source.version_gid });
+    if (structure?.official !== true || structure.source?.bop_version_gid !== source.version_gid
+        || !Number.isInteger(structure.source?.revision) || structure.source.revision < 1
+        || !/^sha256:[0-9a-f]{64}$/.test(structure.content_hash || '')
+        || !Array.isArray(structure.nodes)
+        || !structure.nodes.some(node => node.node_id === source.line_gid && node.kind === 'line_process')) {
+      throw new Error('capture_execution_source_mismatch');
+    }
+    return { version_gid: source.version_gid, revision: structure.source.revision, content_hash: structure.content_hash };
   }
 
   function randomKey(prefix) {
@@ -98,7 +134,7 @@
     const state = {
       environmentId: '', environmentVersion: 0, deviceId: '', preflight: null,
       snapshotRequest: null, bindingDraft: null, materializationRun: null, captureRun: null,
-      error: null, polling: false,
+      error: null, polling: false, busy: false,
     };
     const publish = () => onChange({ ...state });
     const call = async (id, payload, options = {}) => {
@@ -119,6 +155,7 @@
       }
     };
     const wait = () => new Promise(resolve => setTimer(resolve, 2000));
+    const active = () => state.busy || Boolean(state.captureRun && !TERMINAL.has(state.captureRun.status));
     const environmentPayload = () => ({
       environment_id: state.environmentId,
       environment_version: state.environmentVersion,
@@ -135,15 +172,22 @@
     const schedulePoll = () => {
       if (!state.polling || !state.captureRun || TERMINAL.has(state.captureRun.status)) return;
       setTimer(async () => {
-        try { await workflow.refresh(); } finally { schedulePoll(); }
+        try { await workflow.refresh(); } catch (_) { state.polling = false; publish(); }
+        finally { schedulePoll(); }
       }, 2000);
     };
     const workflow = {
       state,
       setEnvironment(environmentId, environmentVersion) {
+        if (state.environmentId === String(environmentId || '')
+            && state.environmentVersion === Number(environmentVersion || 0)) return;
+        if (active()) throw new Error('capture_run_active');
         state.environmentId = String(environmentId || '');
         state.environmentVersion = Number(environmentVersion || 0);
         state.preflight = null;
+        state.materializationRun = null;
+        state.captureRun = null;
+        state.polling = false;
         publish();
       },
       async compose(payload) {
@@ -157,6 +201,7 @@
         return result;
       },
       async composeFromActiveDocument(payload) {
+        if (active()) throw new Error('capture_run_active');
         const deviceId = String(payload?.device_id || '');
         if (!deviceId) throw new Error('connector_required');
         state.deviceId = deviceId;
@@ -195,6 +240,11 @@
         });
       },
       async selectConnector(deviceId) {
+        if (String(deviceId || '') !== state.deviceId) {
+          if (active()) throw new Error('capture_run_active');
+          state.materializationRun = null;
+          state.captureRun = null;
+        }
         state.deviceId = String(deviceId || '');
         if (!state.environmentId || !state.environmentVersion || !state.deviceId) {
           state.preflight = null;
@@ -210,7 +260,7 @@
       canStartCapture() {
         return Boolean(
           state.environmentId && state.environmentVersion
-          && state.deviceId && state.preflight?.compatible,
+          && state.deviceId && state.preflight?.compatible && !active(),
         );
       },
       async dispatchNext() {
@@ -226,7 +276,11 @@
         return dispatched;
       },
       async startCapture() {
+        if (active()) throw new Error('capture_run_active');
         if (!workflow.canStartCapture()) throw new Error('connector_preflight_required');
+        state.busy = true;
+        publish();
+        try {
         const prepareMaterialization = async () => {
           state.materializationRun = await call(
             'simulation.environment.materialize', environmentPayload(),
@@ -242,7 +296,7 @@
           return { phase: 'materializing', ...state.materializationRun };
         };
         if (!state.materializationRun) {
-          return prepareMaterialization();
+          return await prepareMaterialization();
         }
         try {
           state.captureRun = await call(
@@ -252,13 +306,14 @@
         } catch (error) {
           if (error.code !== 'simulation_result_not_ready') throw error;
           state.materializationRun = null;
-          return prepareMaterialization();
+          return await prepareMaterialization();
         }
         await workflow.dispatchNext();
         state.polling = !TERMINAL.has(state.captureRun.status);
         publish();
         schedulePoll();
         return state.captureRun;
+        } finally { state.busy = false; publish(); }
       },
       async refresh() {
         if (!state.captureRun?.capture_run_id) return null;
@@ -276,6 +331,7 @@
           capture_run_id: state.captureRun.capture_run_id,
         }, { idempotencyKey: randomKey('cancel') });
         state.polling = result.status === 'cancelling';
+        state.captureRun = { ...state.captureRun, status: result.status };
         publish();
         return result;
       },
@@ -285,6 +341,7 @@
           capture_run_id: state.captureRun.capture_run_id,
           operation_id: operationId,
         }, { idempotencyKey: randomKey('retry') });
+        state.captureRun = { ...state.captureRun, status: result.status };
         state.polling = true;
         schedulePoll();
         return result;
@@ -321,6 +378,7 @@
   }
 
   return {
-    ALLOWED_CALLS, CAPABILITY_VERSIONS, createCaptureWorkflow, createGatewayApi,
+    ALLOWED_CALLS, CAPABILITY_VERSIONS, createCaptureWorkflow, createGatewayApi, resolveCaptureLine,
+    resolveHierarchyCaptureSource, readCaptureExecutionSource,
   };
 });

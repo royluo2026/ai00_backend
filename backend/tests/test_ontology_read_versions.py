@@ -46,6 +46,10 @@ def repository(monkeypatch):
             assert release_gid == "release-1"
             return next((item for item in self.objects if item["kind"] == kind and item["stable_gid"] == stable_gid), None)
 
+        def get_read_index(self, release):
+            from plugins.ontology.ontology_backend.read_index import ReleaseReadIndex
+            return ReleaseReadIndex(self.objects)
+
         def list_objects(self, release_gid, kinds=None):
             assert release_gid == "release-1"
             return [item for item in self.objects if item["kind"] in kinds]
@@ -124,6 +128,22 @@ def test_v2_list_is_paged_and_release_pinned(registry, repository):
         validate_payload(registered.descriptor.input_schema, {"limit": 101})
     with pytest.raises(ValueError):
         validate_payload(registered.descriptor.output_schema, {**result.data, "unpublished_field": True})
+
+
+def test_v3_graph_list_is_lightweight_bidirectional_and_release_pinned(registry, repository):
+    repository.objects[3]["range_class_gid"] = "parent"
+    repository.objects[0]["description"] = "large body"
+    registered = registry.get("ontology.object.list", 3)
+    result = registered.handler({"release_gid": "release-1", "around_gid": "parent", "limit": 100}, CONTEXT)
+    assert {row["stable_gid"] for row in result.data["items"]} == {"parent", "child", "own"}
+    assert all("description" not in row for row in result.data["items"])
+    assert result.data["total"] == 3
+    validate_payload(registered.descriptor.output_schema, result.data)
+    assert substantive_business_definition_errors(registered.descriptor) == ()
+    with pytest.raises(ValueError):
+        validate_payload(registered.descriptor.input_schema, {"limit": 101})
+    with pytest.raises(ValueError):
+        validate_payload(registered.descriptor.input_schema, {"unknown": True})
 
 
 @pytest.mark.parametrize("mutation", [None, "effect", "schema", "version", "identity"])

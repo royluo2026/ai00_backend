@@ -311,6 +311,8 @@ def candidate_specs(provider: WorkspaceProvider | None = None) -> tuple[tuple[Ca
                            "node_type": {"type": "string", "enum": [
                                "line", "line_process", "station", "station_process",
                                "role", "operator_process", "process", "operation",
+                               "part", "standard_part", "non_standard_part", "support_material",
+                               "tool_need", "fixture_need", "equipment_need",
                                "alternate_hierarchy",
                            ]},
                            "name": {"type": "string"}, "position": {"type": "integer", "minimum": 0},

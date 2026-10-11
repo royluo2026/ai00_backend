@@ -298,7 +298,7 @@ window.ContainerModes['richtext'] = (() => {
       } catch (_) {}
     } else {
       // fallback：URL 输入
-      const url = prompt('图片 URL：');
+      const url = (await window.AI00Dialogs.prompt('图片 URL：'));
       if (url) editor.chain().focus().setImage({ src: url }).run();
     }
   }

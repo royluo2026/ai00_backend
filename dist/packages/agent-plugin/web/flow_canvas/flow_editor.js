@@ -564,7 +564,7 @@ async function _saveFlow() {
 
   const intent = document.getElementById('feFlowIntent')?.value?.trim() || '';
   if (!intent) {
-    alert('请填写流程意图（intent 字段必填）');
+    (await window.AI00Dialogs.alert('请填写流程意图（intent 字段必填）'));
     document.getElementById('feFlowIntent')?.focus();
     return;
   }
@@ -581,7 +581,7 @@ async function _saveFlow() {
         _setSaveStatus('已保存');
         history.replaceState(null, '', `?flow_gid=${_flowGid}`);
       } else {
-        alert('保存失败');
+        (await window.AI00Dialogs.alert('保存失败'));
       }
     } else {
       await _invokeCapability('agent.flow.change.apply', { operation: 'update', flow_gid: _flowGid, name, flowdef, description: intent });
@@ -589,7 +589,7 @@ async function _saveFlow() {
       _setSaveStatus('已保存');
     }
   } catch (e) {
-    alert('保存出错: ' + e);
+    (await window.AI00Dialogs.alert('保存出错: ' + e));
   }
 }
 
@@ -605,7 +605,7 @@ function _setSaveStatus(text) {
 // ── 运行 / 调试 ───────────────────────────────────────────────────────────────
 
 async function _runFlow() {
-  if (!_flowGid) { alert('请先保存流程'); return; }
+  if (!_flowGid) { (await window.AI00Dialogs.alert('请先保存流程')); return; }
 
   const btn = document.getElementById('feBtnRun');
   if (btn) { btn.disabled = true; btn.textContent = '运行中…'; }
@@ -616,7 +616,7 @@ async function _runFlow() {
       _runGid = res.run_gid || res.data?.run_gid;
       _startPolling();
     } else {
-      alert('启动失败');
+      (await window.AI00Dialogs.alert('启动失败'));
     }
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '运行'; }
@@ -624,7 +624,7 @@ async function _runFlow() {
 }
 
 async function _runFlowStep() {
-  if (!_flowGid) { alert('请先保存流程'); return; }
+  if (!_flowGid) { (await window.AI00Dialogs.alert('请先保存流程')); return; }
   _stepMode = true;
 
   try {
@@ -635,7 +635,7 @@ async function _runFlowStep() {
       _startPolling();
     }
   } catch (e) {
-    alert('调试启动失败: ' + e);
+    (await window.AI00Dialogs.alert('调试启动失败: ' + e));
   }
 }
 
@@ -793,7 +793,7 @@ async function _runTest() {
   } catch (e) {
     const unknown = !e?.code || e.code === 'outcome_unknown';
     if (!unknown) _nodeTestOperation = null;
-    alert(unknown ? '测试结果未知，可使用相同输入重试。' : '测试失败: ' + e);
+    (await window.AI00Dialogs.alert(unknown ? '测试结果未知，可使用相同输入重试。' : '测试失败: ' + e));
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '执行测试'; }
   }
@@ -823,7 +823,7 @@ function _reviewScript(nodeId) {
 
 async function _generateScript() {
   const desc = document.getElementById('feGenDesc')?.value?.trim();
-  if (!desc) { alert('请输入需求描述'); return; }
+  if (!desc) { (await window.AI00Dialogs.alert('请输入需求描述')); return; }
 
   const btn = document.getElementById('feBtnGenScript');
   if (btn) { btn.disabled = true; btn.textContent = 'AI 生成中…'; }
@@ -834,15 +834,15 @@ async function _generateScript() {
     const codeEl = document.getElementById('feGenCode');
     if (codeEl) codeEl.value = code;
   } catch (e) {
-    alert('生成失败: ' + e);
+    (await window.AI00Dialogs.alert('生成失败: ' + e));
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = 'AI 生成'; }
   }
 }
 
-function _useGeneratedScript() {
+async function _useGeneratedScript() {
   const code = document.getElementById('feGenCode')?.value?.trim();
-  if (!code) { alert('请先生成或输入脚本'); return; }
+  if (!code) { (await window.AI00Dialogs.alert('请先生成或输入脚本')); return; }
   if (_pendingScriptNodeId === null) return;
 
   const nodeData = _drawflow.getNodeFromId(_pendingScriptNodeId);

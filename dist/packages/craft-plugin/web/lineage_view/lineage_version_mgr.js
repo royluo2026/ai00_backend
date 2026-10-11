@@ -432,7 +432,7 @@ class LineageVersionManager {
   }
 
   async archiveFamily(familyGid) {
-    if (!confirm('确认归档此版本族？归档后不可编辑，可恢复。')) return;
+    if (!(await window.AI00Dialogs.confirm('确认归档此版本族？归档后不可编辑，可恢复。'))) return;
     try {
       await this._invokeCapability('craft.bop.version.lifecycle.change.apply', {
         operation: 'archive_family', family_gid: familyGid,
@@ -456,8 +456,8 @@ class LineageVersionManager {
 
   async _purgeEntries(ver, mode) {
     const modeLabel = mode === 'hard' ? '硬删（永久不可恢复）' : '软删（可数据库恢复）';
-    if (!confirm(`确认对版本「${ver.version_tag}」执行 ${modeLabel}？\n将清空全部条目及关联私有实体。`)) return;
-    if (mode === 'hard' && !confirm('⚠️ 再次确认：硬删将永久清除所有数据，是否继续？')) return;
+    if (!(await window.AI00Dialogs.confirm(`确认对版本「${ver.version_tag}」执行 ${modeLabel}？\n将清空全部条目及关联私有实体。`))) return;
+    if (mode === 'hard' && !(await window.AI00Dialogs.confirm('⚠️ 再次确认：硬删将永久清除所有数据，是否继续？'))) return;
     try {
       const res = await this._invokeCapability('craft.bop.entry.bulk.change.apply', {
         operation: 'purge', version_gid: ver.gid, mode,

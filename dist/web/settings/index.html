@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+
+<script src="/web/core/dialogs.js?rev=20260922-unified-1"></script>
+
   <script src="/web/core/business_facade.js"></script>
   <meta charset="UTF-8">
   <title>系统设置</title>
   
-  <link rel="stylesheet" href="/assets/index-61754b16.css">
+  
+  <script type="module" crossorigin src="/assets/web--settings--index-ec0f9f6a.js"></script>
+  <link rel="stylesheet" href="/assets/index-be2e11d9.css">
+  <link rel="stylesheet" href="/assets/dialogs-e48cd6c5.css">
 </head>
 <body>
   <script src="/web/core/web_compat.js"></script>
@@ -26,7 +32,7 @@
       <div class="nav-item active" data-panel="appearance">外观 / 主题</div>
       <div class="nav-item" data-panel="shortcuts">快捷键</div>
       <div class="nav-item" data-panel="general">通用</div>
-      <div class="nav-item" data-panel="database">数据库</div>
+      <div class="nav-item" data-panel="database">数据库与环境切换</div>
       <div class="nav-item" data-panel="file-store">文件存储</div>
       <div class="nav-item" data-panel="feishu">飞书集成</div>
       <div class="nav-item perm-panel" data-panel="user-management" data-perm-role="team_admin">用户管理</div>
@@ -135,86 +141,8 @@
 
       <!-- 数据库 -->
       <div class="settings-panel" id="panel-database">
-        <div class="panel-title">数据库</div>
-
-        <!-- 本地 SQLite -->
-        <div class="setting-group">
-          <div class="setting-group-title">本地数据库（SQLite）</div>
-
-          <div class="setting-item">
-            <div class="setting-item-info">
-              <div class="setting-item-label">数据库路径</div>
-              <div class="setting-item-desc">修改后重启应用生效。建议存放在本地非同步目录（避免 OneDrive/网盘）</div>
-            </div>
-            <div style="display:flex;gap:6px;align-items:center;flex:1;min-width:0;">
-              <input type="text" class="setting-input" id="local-db-path-input"
-                     placeholder="例：C:/Users/xxx/.ai00/data/local.db"
-                     style="flex:1;min-width:200px;" autocomplete="off">
-              <button class="btn-secondary" id="btn-browse-local-db" title="选择或新建数据库文件" style="white-space:nowrap;flex-shrink:0;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>浏览
-              </button>
-            </div>
-          </div>
-
-          <div class="setting-item" style="justify-content:flex-end;gap:8px;">
-            <button class="btn-secondary" id="btn-test-local-db">测试连接</button>
-            <button class="btn-primary"   id="btn-save-local-db">保存路径</button>
-            <span class="save-feedback" id="local-db-feedback"></span>
-          </div>
-          <div class="db-test-result hidden" id="local-db-result"></div>
-        </div>
-
-        <!-- 云端 MySQL / OceanBase 只读连接检测 -->
-        <div class="setting-group">
-          <div class="setting-group-title">
-            云端数据库（MySQL）
-            <span style="font-size:11px;color:var(--text-muted);font-weight:400;margin-left:8px;">只读连接检测</span>
-          </div>
-          <div class="setting-item-desc" style="margin:0 0 10px;line-height:1.6;">
-            此处仅执行 SELECT 1，不切换运行中的数据库。生产环境由 USERS_DB_URL 和各领域 AI00_*_DB_URL 管理，修改后需重启后端。
-          </div>
-
-          <div class="setting-item">
-            <div class="setting-item-info"><div class="setting-item-label">主机地址</div></div>
-            <input type="text" class="setting-input" id="pg-host" placeholder="数据库主机地址" autocomplete="off">
-          </div>
-          <div class="setting-item">
-            <div class="setting-item-info"><div class="setting-item-label">端口</div></div>
-            <input type="number" class="setting-input" id="pg-port" value="2883" style="width:80px;">
-          </div>
-          <div class="setting-item">
-            <div class="setting-item-info"><div class="setting-item-label">用户名</div></div>
-            <input type="text" class="setting-input" id="pg-user" placeholder="数据库用户名" autocomplete="off">
-          </div>
-          <div class="setting-item">
-            <div class="setting-item-info">
-              <div class="setting-item-label">密码</div>
-              <div class="setting-item-desc">已保存的密码以 ●●●● 显示</div>
-            </div>
-            <input type="password" class="setting-input" id="pg-password" placeholder="输入密码（留空则不修改）" autocomplete="new-password">
-          </div>
-          <div class="setting-item">
-            <div class="setting-item-info">
-              <div class="setting-item-label">协作库名</div>
-              <div class="setting-item-desc">团队数据、工艺方案等</div>
-            </div>
-            <input type="text" class="setting-input" id="pg-collab-db" placeholder="协作库名" autocomplete="off">
-          </div>
-          <div class="setting-item">
-            <div class="setting-item-info">
-              <div class="setting-item-label">公共库名</div>
-              <div class="setting-item-desc">公共资源、全局配置等</div>
-            </div>
-            <input type="text" class="setting-input" id="pg-public-db" placeholder="公共库名（可选）" autocomplete="off">
-          </div>
-
-          <div class="setting-item" style="justify-content:flex-end;gap:8px;margin-top:4px;">
-            <button class="btn-secondary" id="btn-test-pg">测试连接</button>
-            <button class="btn-primary"   id="btn-save-pg">保存配置</button>
-            <span class="save-feedback" id="pg-feedback"></span>
-          </div>
-          <div class="db-test-result hidden" id="pg-result"></div>
-        </div>
+        <div class="panel-title">数据库与环境切换</div>
+        <section id="data-environment-settings"><p>正在读取当前环境和可切换状态…</p></section>
       </div>
 
       <!-- 文件存储 -->
@@ -453,71 +381,10 @@
         </div>
       </div>
 
-      <!-- 插件管理（Phase 7A：Obsidian 风格）-->
-      <div class="settings-panel" id="panel-plugin-market">
-        <div class="panel-title">插件管理</div>
-
-        <!-- Tab 切换：已安装 / 浏览市场 -->
-        <div style="display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border-default,#313244);padding-bottom:0;">
-          <button class="pm-tab active" data-tab="installed"
-                  style="padding:6px 14px;font-size:13px;background:none;border:none;border-bottom:2px solid var(--color-primary,#89b4fa);color:var(--text-normal);cursor:pointer;margin-bottom:-1px;">
-            已安装
-          </button>
-          <button class="pm-tab" data-tab="market"
-                  style="padding:6px 14px;font-size:13px;background:none;border:none;border-bottom:2px solid transparent;color:var(--text-muted);cursor:pointer;margin-bottom:-1px;">
-            浏览市场
-          </button>
-        </div>
-
-        <!-- 已安装面板 -->
-        <div id="pm-pane-installed">
-          <div class="setting-group">
-            <div id="pm-installed-list" style="display:flex;flex-direction:column;gap:4px">
-              <div class="empty-state" style="padding:20px;text-align:center;color:var(--text-muted)">加载中...</div>
-            </div>
-          </div>
-
-          <div class="setting-group" style="margin-top:20px">
-            <div class="setting-group-title">安装已签名市场发布</div>
-            <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px">
-              粘贴市场提供的已签名发布信息（插件 ID、版本、SHA-256 和明确授权）。URL 安装不可用。
-            </p>
-            <div style="display:flex;gap:8px;align-items:center">
-              <input type="text" id="pm-install-release"
-                     placeholder='{"plugin_id":"example.plugin","release_version":"1.2.3","release_sha256":"sha256:…","requested_grants":[]}'
-                     style="flex:1;padding:8px 12px;background:var(--bg-primary);border:1px solid var(--border-default);border-radius:6px;color:var(--text-normal);font-size:13px">
-              <button class="btn-primary" id="pm-btn-install-release" style="white-space:nowrap">安装</button>
-            </div>
-            <div id="pm-install-feedback" style="margin-top:8px;font-size:12px;min-height:16px"></div>
-          </div>
-        </div>
-
-        <!-- 市场浏览面板 -->
-        <div id="pm-pane-market" style="display:none">
-          <!-- 注册表地址 + 刷新 -->
-          <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
-            <input type="text" id="pm-registry-url"
-                   placeholder="插件注册表 URL（plugin-registry.json）"
-                   style="flex:1;padding:7px 12px;background:var(--bg-primary);border:1px solid var(--border-default);border-radius:6px;color:var(--text-normal);font-size:12px">
-            <button class="btn-secondary" id="pm-btn-refresh-market" style="white-space:nowrap;font-size:12px;padding:7px 12px;">
-              刷新
-            </button>
-          </div>
-
-          <!-- 搜索框 -->
-          <div style="margin-bottom:12px;">
-            <input type="text" id="pm-market-search"
-                   placeholder="搜索插件名称或描述..."
-                   style="width:100%;box-sizing:border-box;padding:8px 12px;background:var(--bg-secondary);border:1px solid var(--border-default);border-radius:6px;color:var(--text-normal);font-size:13px">
-          </div>
-
-          <!-- 插件列表 -->
-          <div id="pm-market-list" style="display:flex;flex-direction:column;gap:6px">
-            <div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">
-              输入注册表地址后点击「刷新」加载插件清单
-            </div>
-          </div>
-        </div>
+      <!-- 与工作台一级 APP 共用同一个受治理插件市场。 -->
+      <div class="settings-panel" id="panel-plugin-market" style="max-width:none;height:100%">
+        <iframe src="../plugin_marketplace/index.html" title="插件市场" loading="lazy"
+                style="width:100%;height:calc(100vh - 100px);border:0"></iframe>
       </div>
 
       <!-- 关注清理 -->
@@ -786,6 +653,7 @@
   </div><!-- .settings-body -->
 
   <script src="/web/event_bus.js"></script>
-  <script src="settings.js?v=11"></script>
+  <script src="settings.js?v=13"></script>
+  
 </body>
 </html>

@@ -55,9 +55,11 @@ def build_binding_draft(
             identities, basis, confidence = [], "none", 0
 
         operation_matched = False
+        operation_incomplete = False
         for identity in identities:
             candidates = vm_by_identity.get(identity, [])
             if not candidates:
+                operation_incomplete = True
                 continue
             operation_matched = True
             disposition = "auto" if len(candidates) == 1 else "ambiguous"
@@ -73,7 +75,7 @@ def build_binding_draft(
                     "match_basis": basis,
                     "conflict_code": "duplicate_vm_identity" if disposition == "ambiguous" else "",
                 })
-        if not operation_matched:
+        if not operation_matched or operation_incomplete:
             unmatched_bop.append(operation_id)
 
     load_by_vm: dict[str, list[dict[str, Any]]] = defaultdict(list)

@@ -285,3 +285,16 @@ def test_compose_v2_forwards_one_exact_line_scope_to_the_craft_port():
     assert provider.craft_port.references == [{
         **payload["execution_plan_ref"], "scope": payload["scope"],
     }]
+
+
+def test_binding_draft_v2_uses_same_line_scope_as_composition():
+    provider, repository = _provider()
+    registry = CapabilityRegistry()
+    register_capabilities(registry, composition_provider=provider)
+    payload = {"execution_plan_ref": _payload()["execution_plan_ref"],
+               "snapshot_request_id": "snapshot-1", "scope": {"kind": "line", "gid": "line-1"}}
+    context = CapabilityContext(user_gid="user-1", team_gid="team-1", source="agent", permissions=("simulation.use",))
+    result = asyncio.run(registry.invoke("simulation.environment.bop_vm_binding_draft.preview", payload, context, version=2))
+    assert result.data["auto_count"] == 1
+    assert provider.craft_port.references == [{**payload["execution_plan_ref"], "scope": payload["scope"]}]
+    assert repository.manifests == {}

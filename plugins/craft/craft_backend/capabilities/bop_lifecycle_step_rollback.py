@@ -38,15 +38,7 @@ def _state(value: Any) -> dict[str, Any]:
 
 
 def _soft_delete_links(cur: Any, where_sql: str, params: tuple[Any, ...]) -> int:
-    cur.execute(
-        "SELECT COUNT(*) AS count FROM information_schema.columns WHERE table_schema='ai00' AND table_name='bop_entry_links' AND column_name='is_deleted'"
-    )
-    row = cur.fetchone()
-    has_deleted = bool(_value(row, "count")) if row else False
-    if has_deleted:
-        cur.execute(f"UPDATE workmanship_bop_bop_entry_links SET is_deleted=TRUE WHERE {where_sql} AND is_deleted=FALSE", params)
-    else:
-        cur.execute(f"DELETE FROM workmanship_bop_bop_entry_links WHERE {where_sql}", params)
+    cur.execute(f"UPDATE workmanship_bop_bop_entry_links SET is_deleted=TRUE WHERE {where_sql} AND is_deleted=FALSE", params)
     return int(getattr(cur, "rowcount", 0) or 0)
 
 
@@ -80,7 +72,7 @@ def apply_bop_lifecycle_step_rollback(payload: dict[str, Any], context: Capabili
                 deleted_links = _soft_delete_links(cur, f"entry_gid IN ({entry_placeholders})", tuple(gids))
         elif step_key == "vpps_imported":
             if pbom_version_gid:
-                deleted_links = _soft_delete_links(cur, "version_gid=%s AND link_type='pbom_part' AND ref_gid IN (SELECT gid FROM workmanship_bop_pbom WHERE snapshot_gid=%s)", (version_gid, pbom_version_gid))
+                deleted_links = _soft_delete_links(cur, "version_gid=%s AND link_type='pbom_part' AND entity_gid IN (SELECT gid FROM workmanship_bop_pbom WHERE snapshot_gid=%s)", (version_gid, pbom_version_gid))
             else:
                 deleted_links = _soft_delete_links(cur, "version_gid=%s AND link_type='pbom_part'", (version_gid,))
 

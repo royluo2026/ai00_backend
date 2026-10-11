@@ -24,7 +24,8 @@ from backend.capability_v2.domain_migrations import (
     discover_domain_migrations,
 )
 from backend.db.oceanbase_compat import verify_live_server
-from backend.db.table_prefix import configure_table_prefix
+from backend.db.table_prefix import configure_table_prefix, validate_runtime_profile
+from backend.scripts.runtime_preflight import read_controlled_values
 
 
 def main(
@@ -41,7 +42,23 @@ def main(
     args = parser.parse_args(argv)
 
     environment = os.environ if environ is None else environ
-    configure_table_prefix(str(environment.get("TABLE_PREFIX", "")))
+    env_file = str(environment.get("ENV_FILE") or "").strip()
+    if env_file:
+        try:
+            environment, _ = read_controlled_values(Path(env_file))
+        except ValueError as error:
+            raise SystemExit(str(error)) from error
+    prefix = str(environment.get("TABLE_PREFIX", ""))
+    profile = str(environment.get("AI00_DEPLOY_PROFILE", ""))
+    if env_file and not profile:
+        raise SystemExit("managed_deployment_requires_explicit_profile")
+    try:
+        validate_runtime_profile(profile, prefix, str(environment.get("PUBLIC_URL", "")))
+    except ValueError as error:
+        raise SystemExit(str(error)) from error
+    if args.apply and prefix == "pp_" and not env_file:
+        raise SystemExit("pp_ migration requires ENV_FILE")
+    configure_table_prefix(prefix)
     manifests = load_domain_manifests(root / "backend/capability_v2/official_domains.json")
     try:
         manifest = manifests.require(args.domain)

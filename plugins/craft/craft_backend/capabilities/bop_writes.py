@@ -7,6 +7,7 @@ from typing import Any, Mapping
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilityExecutionBudget, CapabilityOutput, CapabilitySpec, EvidenceRef
 from backend.platform_sdk.ids import next_gid
 from ..data.connection import get_craft_conn
+from .member_pictures import validate_picture_updates
 
 _ALLOWED_COMMANDS = frozenset({"entry.create", "entry.update", "entry.archive", "link.attach", "link.detach", "version.metadata.update"})
 _ENTRY_FIELDS = frozenset({"parent_gid", "node_type", "sort_order", "title", "vpps", "vpps_desc", "parent_bop_title", "meta"})
@@ -398,6 +399,9 @@ def apply_draft_change(payload, context):
     if not version: raise CapabilityBusinessError("bop_version_not_found", "BOP version not found")
     if _revision(version.get("revision")) != preview["base_revision"]: raise CapabilityBusinessError("revision_conflict", "BOP revision changed after preview")
     before_hash = _state_hash(version)
+    for command in preview["commands"]:
+        if command["kind"] in ("entry.create", "entry.update"):
+            validate_picture_updates(command.get("entry") or command.get("changes") or {}, context)
     after = _apply_commands(version, preview["commands"], allocate_gid=next_gid)
     after["revision"] = preview["base_revision"] + 1
     result = {"version_gid": after["gid"], "revision": after["revision"], "before_hash": before_hash, "after_hash": _state_hash(after), "preview_gid": preview_gid, "idempotency_key": idempotency_key}

@@ -72,6 +72,9 @@ class AgentTransaction:
             raise RuntimeError("Agent transaction is closed")
         if self._connection is None:
             self._connection = wrap_connection(_get_pool().connection())
+            # Explicit BEGIN fences proxies that retain session autocommit
+            # and prevents pooled connections from reconnecting mid-write.
+            self._connection.begin()
         return self._connection
 
     def record_outbox(self, capability_id, major_version, context, output):
@@ -146,6 +149,7 @@ def get_agent_conn():
         return
     conn = wrap_connection(_get_pool().connection())
     try:
+        conn.begin()
         yield conn
         conn.commit()
     except Exception:

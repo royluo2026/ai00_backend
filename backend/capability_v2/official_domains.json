@@ -36,7 +36,7 @@
         "plugin_id": "official.base",
         "module": "backend.base.official_provider",
         "version": "1.0.0",
-        "artifact_hash": "sha256:963a56392dd4a71a448e26585485b87fcfbdde69183fda0b72be89632970e358"
+        "artifact_hash": "sha256:179b3ab9eae57a31f3bd3601555b60b5d82ab88c46b7eb356e8a55ccb08ca663"
       },
       "artifact_path": "backend/base",
       "allowed_owners": [
@@ -90,7 +90,7 @@
         "plugin_id": "official.craft",
         "module": "craft_backend.capabilities",
         "version": "1.2.0",
-        "artifact_hash": "sha256:f4a1c163664da1675807ed358145d22b064c2fc9cdd4f13e3dc4751d54a45b71"
+        "artifact_hash": "sha256:6048257d466871e8e3ff1bdf09609670bff7b99b08153afa1c55cc13f0848a4b"
       },
       "artifact_path": "plugins/craft/craft_backend",
       "allowed_owners": [
@@ -224,7 +224,7 @@
         "plugin_id": "official.knowledge",
         "module": "knowledge_backend.capabilities",
         "version": "2.0.0",
-        "artifact_hash": "sha256:a8c02bdb94cf2127e86dccbd9341cb3fcf496eac1fe44b631c4a548a27c91851"
+        "artifact_hash": "sha256:37ea9eda2a2df35ea2f39582fd20d21d715a1d837758d0d6cee8257755a7c178"
       },
       "artifact_path": "plugins/knowledge/knowledge_backend",
       "allowed_owners": [
@@ -278,7 +278,7 @@
         "plugin_id": "official.project-management",
         "module": "project_management_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:6b74c4a036068ef9f0149ec850cb4c712381fa44bf18c981bc4cbbb0b54be464"
+        "artifact_hash": "sha256:9ab22374a2563371b0748af44e906c964392e7712af26caec8a5a73a3cea99ee"
       },
       "artifact_path": "plugins/project_management/project_management_backend",
       "allowed_owners": [
@@ -304,7 +304,7 @@
         "plugin_id": "official.simulation",
         "module": "simulation_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:e31d8b90ea0faaf8d916dcfd70b0a2ba7cb0fa08e77f8272f3c7a9b419ac0569"
+        "artifact_hash": "sha256:2af55a6b2c0f959b137be76ac70865e05f6434ab83abc523577c11eec0451078"
       },
       "artifact_path": "plugins/simulation/simulation_backend",
       "allowed_owners": [

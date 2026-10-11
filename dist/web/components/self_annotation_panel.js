@@ -177,7 +177,7 @@ const SelfAnnotationPanel = (() => {
     const res = await _client().call('base.annotations.apply', {
       itemGid: _currentGid, expectedRevision: _currentRevision, status: statusVal || 'open',
       schedule: scheduleVal || null, note: noteVal, attachments: _currentAttachments,
-    }, { confirm: () => window.confirm('确认保存此自我标注？') }).catch(() => null);
+    }, { confirm: async () => (await window.AI00Dialogs.confirm('确认保存此自我标注？')) }).catch(() => null);
 
     if (res) {
       _currentRevision = res.revision;

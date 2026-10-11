@@ -89,6 +89,7 @@ function makeEnv(extraHtml = '') {
 
   // jsdom 没有 KeyboardEvent.dispatchEvent 的 bubbles 支持，补丁
   window.confirm = () => true;
+  window.AI00Dialogs = {confirm: async (...args) => window.confirm(...args)};
 
   // 通过 <script> 元素注入脚本（与浏览器行为一致：const/class 声明在后续 eval 中可见）
   const load = (filePath) => {
@@ -118,7 +119,7 @@ function makeEnv(extraHtml = '') {
   return window;
 }
 
-function makeTabManagerEnv({ authMode = 'feishu', hasCraftPerm = true } = {}) {
+function makeTabManagerEnv({ authMode = 'feishu', hasCraftPerm = true, isElectron = false } = {}) {
   const dom = new JSDOM('<!DOCTYPE html><html><body><div id="ws-content"></div></body></html>', {
     runScripts: 'dangerously',
     resources: 'usable',
@@ -134,7 +135,7 @@ function makeTabManagerEnv({ authMode = 'feishu', hasCraftPerm = true } = {}) {
   window._authMode = authMode;
   window._hasTabPerm = (perm) => perm === 'craft.view' ? hasCraftPerm : true;
   window._showToast = () => {};
-  window.electronAPI = { _isElectron: false, openSettings() {} };
+  window.electronAPI = { _isElectron: isElectron, openSettings() {} };
   window.WorkspaceEngine = {
     init(containerId) {
       calls.push({ type: 'init', containerId });
@@ -271,7 +272,7 @@ function makeLayoutModeEnv() {
   window.console = console;
   window._cf = async () => ({ data: {} });
   window._confirmDialog = async () => true;
-  window.confirm=()=>true;installCapabilityFixture(window,(...args)=>window._cf(...args));
+  window.confirm=()=>true;window.AI00Dialogs={confirm:async(...args)=>window.confirm(...args)};installCapabilityFixture(window,(...args)=>window._cf(...args));
   const code = fs.readFileSync(path.join(ROOT, 'packages/craft-plugin/web/lineage_view/layout_mode.js'), 'utf-8');
   const script = window.document.createElement('script');
   script.textContent = `${code}\nwindow.LayoutMode = LayoutMode; window.getProcessCardPresentation = _getProcessCardPresentation; window.invokeLayoutCapability = _invokeLayoutCapability;`;
@@ -323,6 +324,7 @@ function makeSettingsEnv() {
   window.parent = window;
   window.top = window;
   window.confirm = () => true;
+  window.AI00Dialogs = {confirm: async (...args) => window.confirm(...args)};
   window.AI00RuntimeConfig = { getRuntimeBackendBase: async () => 'http://127.0.0.1:8081' };
   window.electronAPI = {
     getConfig: async () => ({ backendUrl: 'http://127.0.0.1:8081', version: 'test' }),
@@ -338,7 +340,7 @@ function makeSettingsEnv() {
   };
 
   const script = fs.readFileSync(path.join(ROOT, 'web/settings/settings.js'), 'utf-8');
-  window.eval(`${script}\nwindow.__settingsTestHooks = {\n  _start,\n  _backendFetch,\n  _initDatabase,\n  _initFileStore,\n  _initFeishu,\n  _initPluginMarket,\n  _initInstalledPlugins,\n  _initFeatureFlags,\n  _initNotifPrefs,\n  _initUserManagement,\n  _initFollowsCleanup\n};`);
+  window.eval(`${script}\nwindow.__settingsTestHooks = {\n  _start,\n  _backendFetch,\n  _initFileStore,\n  _initFeishu,\n  _initPluginMarket,\n  _initInstalledPlugins,\n  _initFeatureFlags,\n  _initNotifPrefs,\n  _initUserManagement,\n  _initFollowsCleanup\n};`);
 
   const hooks = window.__settingsTestHooks;
   const originalBackendFetch = hooks._backendFetch;
@@ -360,6 +362,7 @@ function makeLifecyclePanelEnv() {
   const { window } = dom;
   window.console = console;
   window.confirm = () => true;
+  window.AI00Dialogs = {confirm: async (...args) => window.confirm(...args)};
   const code = fs.readFileSync(path.join(ROOT, 'packages/craft-plugin/web/lineage_view/lifecycle_panel.js'), 'utf-8');
   const script = window.document.createElement('script');
   script.textContent = `${code}\nwindow.BopLifecyclePanel = BopLifecyclePanel;`;
@@ -906,7 +909,7 @@ async function runTests() {
   console.log(section('TabManager: plugin-backed app entry fallbacks'));
 
   await _assertAsync('project_hub fallback 可直接打开', async () => {
-    const w = makeTabManagerEnv({ authMode: 'feishu', hasCraftPerm: true });
+    const w = makeTabManagerEnv({ authMode: 'feishu', hasCraftPerm: true, isElectron: true });
     w.TabManager.open('project_hub');
     const tab = w.__tabRecords.get('project_hub');
     if (!tab) throw new Error('project_hub 未创建 tab');
@@ -916,7 +919,7 @@ async function runTests() {
   });
 
   await _assertAsync('automation_hub fallback 可直接打开', async () => {
-    const w = makeTabManagerEnv({ authMode: 'feishu', hasCraftPerm: true });
+    const w = makeTabManagerEnv({ authMode: 'feishu', hasCraftPerm: true, isElectron: true });
     w.TabManager.open('automation_hub');
     const tab = w.__tabRecords.get('automation_hub');
     if (!tab) throw new Error('automation_hub 未创建 tab');
@@ -926,7 +929,7 @@ async function runTests() {
   });
 
   await _assertAsync('ai_chat fallback 可直接打开', async () => {
-    const w = makeTabManagerEnv({ authMode: 'feishu', hasCraftPerm: true });
+    const w = makeTabManagerEnv({ authMode: 'feishu', hasCraftPerm: true, isElectron: true });
     w.TabManager.open('ai_chat');
     const tab = w.__tabRecords.get('ai_chat');
     if (!tab) throw new Error('ai_chat 未创建 tab');
@@ -936,7 +939,7 @@ async function runTests() {
   });
 
   await _assertAsync('wfc_canvas fallback 可直接打开', async () => {
-    const w = makeTabManagerEnv({ authMode: 'feishu', hasCraftPerm: true });
+    const w = makeTabManagerEnv({ authMode: 'feishu', hasCraftPerm: true, isElectron: true });
     w.TabManager.open('wfc_canvas');
     const tab = w.__tabRecords.get('wfc_canvas');
     if (!tab) throw new Error('wfc_canvas 未创建 tab');
@@ -952,52 +955,17 @@ async function runTests() {
     }
   });
 
-  await _assertAsync('生产数据库配置全部通过 Base capability 治理', async () => {
-    const src = fs.readFileSync(path.join(ROOT, 'web/settings/settings.js'), 'utf-8');
+  await _assertAsync('数据库页面只保留受控环境切换、结构检测与当前连接测试', async () => {
     const html = fs.readFileSync(path.join(ROOT, 'web/settings/index.html'), 'utf-8');
-    for (const id of [
-      'base.runtime.database_config.get',
-      'base.runtime.database_config.change.apply',
-      'base.runtime.database_connection.test',
-    ]) {
-      if (!src.includes(id)) throw new Error(`settings 缺少能力调用 ${id}`);
+    const src = fs.readFileSync(path.join(ROOT, 'web/core/data_environment.mjs'), 'utf-8');
+    for (const id of ['base.runtime.data_environment.get', 'base.runtime.data_environment.change.apply', 'base.runtime.data_environment.connection.test']) {
+      if (!src.includes(id)) throw new Error(`数据库页面缺少受控能力 ${id}`);
     }
-    if (src.includes("_backendFetch('/admin/cloud-db-config")) {
-      throw new Error('settings 仍直接调用未治理数据库配置 REST 路由');
+    for (const obsolete of ['local-db-path-input', 'pg-host', 'pg-password', 'btn-save-pg']) {
+      if (html.includes(obsolete)) throw new Error(`数据库页面仍有旧配置项 ${obsolete}`);
     }
-    if (!src.includes("fb.textContent = r?.saved ? '已保存'")) {
-      throw new Error('settings 未按 Base 保存能力的 saved 输出展示成功态');
-    }
-    if (!src.includes("res.textContent = r?.connected ? '连接成功'")) {
-      throw new Error('settings 未按 Base 连接能力的 connected 输出展示成功态');
-    }
-    if (html.includes('value="sam-bdmsdb01-test.chj.cloud"')) {
-      throw new Error('settings 仍预填测试主机');
-    }
-    if (src.includes("d.host || 'sam-bdmsdb01-test.chj.cloud'")) {
-      throw new Error('settings 仍回退测试主机');
-    }
-    for (const code of [
-      'password_required',
-      'authentication_failed',
-      'database_not_found',
-      'network_unreachable',
-      'tls_or_server_config_failed',
-    ]) {
-      if (!src.includes(code)) throw new Error(`settings 缺少脱敏错误映射 ${code}`);
-    }
-    if (!src.includes('!window.electronAPI')) {
-      throw new Error('Web 部署模式未禁止保存数据库配置');
-    }
-    if (!src.includes('window.self !== window.top')) {
-      throw new Error('iframe 设置页未识别为 Web 部署模式');
-    }
-    if (!html.includes('只读连接检测') || !html.includes('AI00_*_DB_URL')) {
-      throw new Error('settings 未说明生产数据库由部署配置管理');
-    }
-    if (!html.includes('settings.js?v=11')) {
-      throw new Error('settings 修改后未更新脚本缓存版本');
-    }
+    if (!html.includes('data_environment_settings_entry.mjs')) throw new Error('环境控件未独立初始化');
+    if (!src.includes('result.connected') || !src.includes('result.elapsed_ms')) throw new Error('连接检测缺少成功状态或耗时');
   });
 
   await _assertAsync('本体属性写入使用 Craft 原子属性能力', async () => {
@@ -1105,10 +1073,11 @@ async function runTests() {
       && code.includes('云端布局加载失败，已使用本地配置');
   })());
 
-  _assert('工艺规划调用契约脚本使用同一新缓存版本', (() => {
+  _assert('工艺规划依赖脚本缓存版本一致且主脚本单独更新', (() => {
     const html = fs.readFileSync(path.join(ROOT, 'packages/craft-plugin/web/lineage_view/index.html'), 'utf-8');
-    return ['lineage_version_mgr.js', 'lifecycle_panel.js', 'lineage_progressive_loader.js', 'lineage.js', 'layout_mode.js']
-      .every(name => html.includes(`${name}?v=20260914c`));
+    return ['lineage_version_mgr.js', 'lifecycle_panel.js', 'lineage_progressive_loader.js', 'layout_mode.js']
+      .every(name => html.includes(`${name}?v=20260930a`))
+      && html.includes('lineage.js?v=20260930-demo-progress');
   })());
 
   _assert('布局脚本不覆盖主视图的能力调用函数', (() => {

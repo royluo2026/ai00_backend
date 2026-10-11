@@ -152,7 +152,7 @@ def test_capture_prepares_then_dispatches_only_the_first_reverse_order_operation
     assert captures == ["op-30"]
     assert connector.plans[0][1] == "approval-device-1"
     assert connector.major_versions == [3]
-    assert all(len(plan.steps) == 3 for plan, _approval in connector.plans)
+    assert all(len(plan.steps) == 5 for plan, _approval in connector.plans)
     assert all(
         step.payload["artifact_resource_refs"] == ["craft-bop-version:bop-v1"]
         for plan, _approval in connector.plans for step in plan.steps
@@ -182,8 +182,9 @@ def test_prepared_capture_intent_reissues_as_signed_v2_plan_for_current_app_sess
     signed = signer.sign(draft)
 
     assert signed.plan_id == source.plan_id
-    assert signed.steps[-1].operation_id == "vismockup.view.capture@1"
-    assert signed.steps[-1].side_effect_classification == "write"
+    assert signed.steps[2].operation_id == "vismockup.view.capture@1"
+    assert signed.steps[2].side_effect_classification == "write"
+    assert signed.steps[3].side_effect_classification == "write"
     assert signed.issued_at.startswith("2026-09-04")
     assert same_workflow_intent(source, signed)
     changed = signed.model_copy(update={"normalized_input_hash": "sha256:" + "0" * 64})
@@ -191,7 +192,7 @@ def test_prepared_capture_intent_reissues_as_signed_v2_plan_for_current_app_sess
     unconfirmed = signed.model_copy(update={"confirmation_receipt_id": None})
     assert not same_workflow_intent(source, unconfirmed)
     unsafe = signed.model_copy(update={"steps": [*signed.steps[:-1],
-        signed.steps[-1].model_copy(update={"side_effect_classification": "read"})]})
+        signed.steps[-1].model_copy(update={"side_effect_classification": "write"})]})
     assert not same_workflow_intent(source, unsafe)
 
 
@@ -398,7 +399,7 @@ def test_materialization_plan_attaches_models_before_scene_verification():
     operation_ids = [step.operation_id for step in connector.last_plan.steps]
     assert operation_ids[0] == "vismockup.application.probe@1"
     assert operation_ids[1:4] == ["vismockup.model.attach@1"] * 3
-    assert operation_ids[-2:] == ["vismockup.scene.apply@1", "vismockup.scene.verify@1"]
+    assert operation_ids[-2:] == ["vismockup.scene.render@1", "vismockup.scene.verify@1"]
     assert connector.last_plan.steps[-1].depends_on == (connector.last_plan.steps[-2].step_id,)
 
 

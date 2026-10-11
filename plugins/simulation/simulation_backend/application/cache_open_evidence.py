@@ -1,6 +1,7 @@
 """Attest exactly one admitted frozen-cache package open in the current runtime."""
 from typing import Literal
 import hashlib
+import json
 from pydantic import BaseModel, ConfigDict, Field
 from backend.contracts.connector_execution_plan_v2 import ConnectorExecutionPlanV2, canonicalize_v2
 from .connector_protocol_v2 import OutcomeVerifier
@@ -38,6 +39,26 @@ class CacheOpenPayload(BaseModel):
 
 def cache_package_hash(package):
     return 'sha256:' + hashlib.sha256(canonicalize_v2(package)).hexdigest()
+
+
+def validated_cache_package_revision(document):
+    """Recompute the immutable package revision from a stored cached document."""
+    envelope = document.get('artifact_ref_json') or {}
+    envelope = json.loads(envelope) if isinstance(envelope, str) else envelope
+    if not isinstance(envelope, dict):
+        raise ValueError('interaction_binding_stale')
+    if 'tc_open_payload' in envelope:
+        from .cache_tc_open_contract import TcCacheOpenPayload
+        package = TcCacheOpenPayload.model_validate(envelope['tc_open_payload']).model_dump()
+        if package['cache_binding'] != envelope['cache_binding']:
+            raise ValueError('interaction_binding_stale')
+    else:
+        package = CacheOpenPayload.model_validate({key: envelope[key] for key in
+            ('cache_binding', 'artifact_ref', 'package_dependencies', 'package_hash')}).model_dump()
+    expected = cache_package_hash({key: value for key, value in package.items() if key != 'package_hash'})
+    if expected != package['package_hash'] or expected != envelope['package_hash'] or expected != 'sha256:' + document['content_sha256']:
+        raise ValueError('interaction_binding_stale')
+    return expected
 
 class OpenedCacheResult(BaseModel):
     model_config = ConfigDict(extra='forbid', strict=True)

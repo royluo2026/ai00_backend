@@ -188,10 +188,10 @@ class StagingPanel {
       const response = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.resource_requirement.search", {version:1,payload:Object.fromEntries(Object.entries({...{...{...{"status":(query.has("status")?query.get("status"):"active"),"page_size":(query.has("page_size")?Number(query.get("page_size")):100)},...((query.has("resource_type")?query.get("resource_type"):null)?{"resource_type":(query.has("resource_type")?query.get("resource_type"):null)}:{})},...((query.has("q")?query.get("q"):null)?{"q":(query.has("q")?query.get("q"):null)}:{})},...((query.has("cursor")?query.get("cursor"):null)?{"cursor":(query.has("cursor")?query.get("cursor"):null)}:{})}).filter(([,v])=>v!=null))}); return {"success":true,"data":(result["items"]??[]),"next_cursor":(result["next_cursor"]??null)}; })({},{},new URLSearchParams((`/api/craft/resource-requirements?resource_type=${encodeURIComponent(item.resource_type)}`).split("?")[1]||""));
       const candidates = response?.data || response?.items || [];
       if (!candidates.length) return this._toast('没有可用的同类型资源标准', 'error');
-      const choice = window.prompt(
+      const choice = (await window.AI00Dialogs.prompt(
         `输入资源代号或 GID：\n${candidates.map(value => `${value.code} · ${value.name} · ${value.gid}`).join('\n')}`,
         candidates[0].code,
-      );
+      ));
       if (!choice) return;
       const selected = candidates.find(value => value.gid === choice.trim() || value.code === choice.trim());
       if (!selected) return this._toast('未找到所选资源标准', 'error');

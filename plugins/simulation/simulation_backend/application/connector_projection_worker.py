@@ -54,10 +54,12 @@ def main(argv=None) -> int:
     parser.add_argument("--lease-seconds", type=int, default=60)
     parser.add_argument("--idle-seconds", type=float, default=1.0)
     parser.add_argument('--protocol', choices=('v1', 'v2'), default='v1')
+    parser.add_argument('--plan-id', help='Project only this prepared plan during a scoped recovery')
     args = parser.parse_args(argv)
     owner = f"{socket.gethostname()}:{os.getpid()}:{uuid.uuid4().hex}"
     worker = ConnectorProjectionWorker(
-        SimulationConnectorRepository(projection_protocol='ai00.connector.execution-plan.' + args.protocol),
+        SimulationConnectorRepository(projection_protocol='ai00.connector.execution-plan.' + args.protocol,
+                                      projection_plan_id=args.plan_id),
         GovernedSimulationRuntimeClient(get_default_gateway()),
         owner=owner,
         lease_seconds=args.lease_seconds,

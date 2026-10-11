@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Callable, Iterator, Mapping, Sequence
 
@@ -36,6 +37,29 @@ class OntologyReleaseRepository:
             from .infrastructure.connection import get_ontology_conn
             connection_factory = get_ontology_conn
         self._connection_factory = connection_factory
+
+    def get_read_index(self, release: Mapping[str, Any]):
+        from backend.db.table_prefix import current_table_prefix
+        from .read_index import READ_INDEX_CACHE, ReleaseReadIndex
+        # Never retain credentials in cache keys or cache the mutable active pointer.
+        def scope():
+            return (hashlib.sha256(os.getenv("AI00_ONTOLOGY_DB_URL", "").encode()).hexdigest(), current_table_prefix())
+        selected_scope = scope()
+        key = (self._connection_factory, *selected_scope,
+               str(release["release_gid"]), str(release["content_sha256"]))
+        def build():
+            objects = self.list_objects(release["release_gid"])
+            canonical = [{name: value for name, value in row.items() if name != "object_sha256"} for row in objects]
+            _, digest = canonicalize_release(canonical)
+            if digest != str(release["content_sha256"]) or (release.get("object_count") is not None and len(objects) != int(release["object_count"])):
+                raise ReleaseIntegrityError("ontology read index does not match immutable release metadata")
+            if scope() != selected_scope:
+                raise ReleaseIntegrityError("ontology data environment changed during index construction")
+            return ReleaseReadIndex(objects)
+        index = READ_INDEX_CACHE.get(key, build)
+        if scope() != selected_scope:
+            raise ReleaseIntegrityError("ontology data environment changed during index lookup")
+        return index
 
     def create_release(
         self,

@@ -40,6 +40,12 @@ from plugins.simulation.simulation_backend.capabilities.provider import descript
 NOW = datetime(2026, 9, 3, 8, 0, tzinfo=UTC)
 
 
+@pytest.fixture(autouse=True)
+def no_app_runtime_by_default(monkeypatch):
+    from plugins.simulation.simulation_backend.data.connector_repository import SimulationConnectorRepository
+    monkeypatch.setattr(SimulationConnectorRepository, "bound_runtime_for_user", lambda *_: None)
+
+
 def _request(installation_id="install-1", verifier="proof-1"):
     key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
     public_key = key.public_key().public_bytes(
@@ -273,6 +279,30 @@ def test_read_providers_return_required_governance_evidence():
 
     assert summary.evidence and summary.evidence[0].digest
     assert binding.evidence and binding.evidence[0].digest
+
+
+def test_binding_prefers_current_owner_scoped_app_runtime(monkeypatch):
+    from plugins.simulation.simulation_backend.data import connector_repository as module
+    scopes = []
+    def runtime(_repository, actor, tenant):
+        scopes.append((actor, tenant))
+        return {"device_id": "app-device-current", "runtime_type": "electron"}
+    monkeypatch.setattr(module.SimulationConnectorRepository, "bound_runtime_for_user", runtime)
+    provider = ConnectorPairingProvider(_service())
+    result = provider.binding({}, CapabilityContext(user_gid="user-1", team_gid="team-1", source="web"))
+    assert result.data == {"connector_id": "app-device-current", "installation_id": None}
+    assert scopes == [("user-1", "team-1")]
+    assert result.evidence[0].digest
+
+
+def test_binding_keeps_legacy_fallback_when_no_current_app_runtime(monkeypatch):
+    from plugins.simulation.simulation_backend.data import connector_repository as module
+    monkeypatch.setattr(module.SimulationConnectorRepository, "bound_runtime_for_user", lambda *_: None)
+    service = _service()
+    monkeypatch.setattr(service.repository, "binding_for_user", lambda actor, tenant: {
+        "connector_id": "legacy-device", "installation_id": "install-1"})
+    result = ConnectorPairingProvider(service).binding({}, CapabilityContext(user_gid="user-1", team_gid="team-1", source="web"))
+    assert result.data == {"connector_id": "legacy-device", "installation_id": "install-1"}
 
 
 def test_one_user_cannot_silently_replace_binding():

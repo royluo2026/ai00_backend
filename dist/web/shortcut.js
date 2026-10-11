@@ -93,9 +93,9 @@ window.ShortcutManager = (() => {
 })();
 
 // 提示工具
-function showToast(msg, type = "success") {
+async function showToast(msg, type = "success") {
   console.log(`[${type}] ${msg}`);
-  alert(msg);
+  (await window.AI00Dialogs.alert(msg));
 }
 
 // 初始化

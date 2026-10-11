@@ -255,25 +255,28 @@ async function _grantTeamAdmin(userGid) {
     });
     await _loadMembers(_currentTeam.gid);
   } catch (e) {
-    alert('授权失败：' + (e.message || String(e)));
+    (await window.AI00Dialogs.alert('授权失败：' + (e.message || String(e))));
   }
 }
-
 async function _removeMember(userGid) {
   if (!userGid || !_currentTeam) return;
-  if (!confirm('确认从团队移除该成员？')) return;
+  const confirmedTeamGid = _currentTeam.gid;
+  if (!(await window.AI00Dialogs.confirm('确认从团队移除该成员？'))) return;
+  if (_currentTeam?.gid !== confirmedTeamGid) return;
   try {
     await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.team.member.remove", {version:1,payload:({team_gid:path.gid,user_gid:path.user_gid})}); return result; })({},{"gid":decodeURIComponent(String(encodeURIComponent(_currentTeam.gid))),"user_gid":decodeURIComponent(String(encodeURIComponent(userGid)))},new URLSearchParams());
     await _loadMembers(_currentTeam.gid);
   } catch (e) {
-    alert('移除失败：' + (e.message || String(e)));
+    (await window.AI00Dialogs.alert('移除失败：' + (e.message || String(e))));
   }
 }
 
 // ── Delete team ───────────────────────────────────────────────────────────────
 async function _deleteCurrentTeam() {
   if (!_currentTeam) return;
-  if (!confirm(`确认软删除团队「${_currentTeam.name || _currentTeam.gid}」？\n\n团队将从列表隐藏，成员数据不受影响。`)) return;
+  const confirmedTeamGid = _currentTeam.gid;
+  if (!(await window.AI00Dialogs.confirm(`确认软删除团队「${_currentTeam.name || _currentTeam.gid}」？\n\n团队将从列表隐藏，成员数据不受影响。`))) return;
+  if (_currentTeam?.gid !== confirmedTeamGid) return;
   try {
     await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.team.archive", {version:1,payload:({team_gid:path.gid})}); return result; })({},{"gid":decodeURIComponent(String(encodeURIComponent(_currentTeam.gid)))},new URLSearchParams());
     _currentTeam = null;
@@ -288,7 +291,7 @@ async function _deleteCurrentTeam() {
     document.getElementById('tsWidgets').style.display = 'none';
     await _loadTeams();
   } catch (e) {
-    alert('删除失败：' + (e.message || String(e)));
+    (await window.AI00Dialogs.alert('删除失败：' + (e.message || String(e))));
   }
 }
 
@@ -331,7 +334,7 @@ document.getElementById('dlgMemberCancel')?.addEventListener('click', () => {
 });
 document.getElementById('dlgMemberConfirm')?.addEventListener('click', async () => {
   const selected = document.querySelector('#dlgMemberResults [data-selected="1"]');
-  if (!selected || !_currentTeam) { alert('请先选择一个用户'); return; }
+  if (!selected || !_currentTeam) { (await window.AI00Dialogs.alert('请先选择一个用户')); return; }
   const userGid = selected.dataset.gid;
   const role = document.getElementById('dlgMemberRole').value;
   try {
@@ -343,7 +346,7 @@ document.getElementById('dlgMemberConfirm')?.addEventListener('click', async () 
     }
     document.getElementById('dlgAddMember').classList.remove('open');
   } catch (e) {
-    alert('添加失败：' + (e.message || String(e)));
+    (await window.AI00Dialogs.alert('添加失败：' + (e.message || String(e))));
   }
 });
 
@@ -357,13 +360,13 @@ document.getElementById('dlgSubCancel')?.addEventListener('click', () => {
 });
 document.getElementById('dlgSubConfirm')?.addEventListener('click', async () => {
   const name = document.getElementById('dlgSubTeamName').value.trim();
-  if (!name) { alert('请输入团队名称'); return; }
+  if (!name) { (await window.AI00Dialogs.alert('请输入团队名称')); return; }
   try {
     await (async (body,path,query) => { const result = await window.AI00Business.invoke("base.team.create", {version:1,payload:body}); return result; })({ name, parent_team_gid: _currentTeam?.gid || null },{},new URLSearchParams());
     document.getElementById('dlgCreateSub').classList.remove('open');
     await _loadTeams();
   } catch (e) {
-    alert('创建失败：' + (e.message || String(e)));
+    (await window.AI00Dialogs.alert('创建失败：' + (e.message || String(e))));
   }
 });
 
@@ -382,12 +385,14 @@ document.getElementById('dlgTransferCancel')?.addEventListener('click', () => {
 document.getElementById('dlgTransferConfirm')?.addEventListener('click', async () => {
   const targetGid = document.getElementById('dlgTransferTarget').value;
   if (!targetGid || !_currentTeam) return;
-  if (!confirm('确认转让？此操作将撤销您在该团队的 team_admin 权限。')) return;
+  const confirmedTeamGid = _currentTeam.gid;
+  if (!(await window.AI00Dialogs.confirm('确认转让？此操作将撤销您在该团队的 team_admin 权限。'))) return;
+  if (_currentTeam?.gid !== confirmedTeamGid) return;
   try {
     await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('base.grants.create', {
-      granteeGid: targetGid, grantType: 'team_admin', scopeGid: _currentTeam.gid,
+      granteeGid: targetGid, grantType: 'team_admin', scopeGid: confirmedTeamGid,
     });
-    const ownGrant = _myGrants.find(g => g.grant_type === 'team_admin' && g.scope_gid === _currentTeam.gid);
+    const ownGrant = _myGrants.find(g => g.grant_type === 'team_admin' && g.scope_gid === confirmedTeamGid);
     if (ownGrant) {
       await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient).call('base.grants.revoke', { gid: ownGrant.gid }).catch(() => {});
     }
@@ -395,7 +400,7 @@ document.getElementById('dlgTransferConfirm')?.addEventListener('click', async (
     await _loadTeams();
     if (_currentTeam) await _loadMembers(_currentTeam.gid);
   } catch (e) {
-    alert('转让失败：' + (e.message || String(e)));
+    (await window.AI00Dialogs.alert('转让失败：' + (e.message || String(e))));
   }
 });
 

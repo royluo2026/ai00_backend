@@ -1,3 +1,5 @@
+> 2026-10-08：本文中的独立领域数据库账号部署方案已废弃，仅保留历史记录。当前采用同库、共享账号、不同表；以 docs/runbooks/dual-prefix-domain-grants.md 为准。
+
 # Capability V2 Gitea RC 运维手册（多库强化隔离配置）
 
 本文用于在专用、隔离的 OceanBase test/rc 租户与受保护 Windows runner 上执行 Capability V2 的完整 RC 验收。它不会创建生产租户，也不会接受静态或模拟证据。

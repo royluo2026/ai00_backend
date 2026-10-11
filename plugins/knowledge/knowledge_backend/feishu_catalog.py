@@ -72,7 +72,11 @@ def _document_links(value) -> list[tuple[str, str]]:
                  if isinstance(part, dict) and (part.get("link") or part.get("url"))]
         if links:
             return links
-    return [(_field_text(value), "")]
+    return [(_field_text(value), str(value.get("text") or value.get("name") or "").strip() if isinstance(value, dict) else "")]
+
+
+def is_placeholder_title(title: str, record_id: str, token: str | None) -> bool:
+    return title in {record_id, token, f"sheet:{token}"} or bool(re.fullmatch(r"sheet(?:-row)?:[A-Za-z0-9_:-]+", title or ""))
 
 
 def catalog_row(record: dict) -> dict[str, str | None]:
@@ -138,7 +142,7 @@ def sheet_catalog_records(values: list[list]) -> list[dict]:
         for link_index, (document_url, link_title) in enumerate(links, start=1):
             item_fields = dict(fields)
             item_fields["飞书文档"] = document_url
-            if len(links) > 1 and link_title:
+            if link_title and (len(links) > 1 or not title):
                 item_fields["名称"] = f"{title} · {link_title}" if title and title != link_title else link_title
             try:
                 document_token = parse_document_url(document_url)

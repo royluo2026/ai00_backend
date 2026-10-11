@@ -591,7 +591,7 @@ class ListShell {
       // 云端条目：只有 owner（owner_user_gid）可以删除
       const myGid = window.top?._authUser?.gid || window._authUser?.gid || '';
       if (myGid && row.owner_user_gid && row.owner_user_gid !== myGid) {
-        alert('只有创建者才能删除该条目。');
+        (await window.AI00Dialogs.alert('只有创建者才能删除该条目。'));
         return;
       }
       try {
@@ -599,7 +599,7 @@ class ListShell {
         if (this._onSelect) this._onSelect(this._currentList);
       } catch (err) {
         console.error('[ListShell._handleDeleteRow cloud]', err);
-        alert('删除失败：' + err.message);
+        (await window.AI00Dialogs.alert('删除失败：' + err.message));
       }
     } else {
       // 非云端条目也通过云端删除
@@ -608,7 +608,7 @@ class ListShell {
         if (this._onSelect) this._onSelect(this._currentList);
       } catch (err) {
         console.error('[ListShell._handleDeleteRow]', err);
-        alert('删除失败：' + err.message);
+        (await window.AI00Dialogs.alert('删除失败：' + err.message));
       }
     }
   }
@@ -662,7 +662,7 @@ class ListShell {
         if (this._onSelect) this._onSelect(this._currentList);
       } catch (err) {
         console.error('[ListShell._openMoveToListModal]', err);
-        alert('移动失败：' + err.message);
+        (await window.AI00Dialogs.alert('移动失败：' + err.message));
       }
     });
   }

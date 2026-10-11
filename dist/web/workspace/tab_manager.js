@@ -44,12 +44,14 @@ const TabManager = (() => {
       src: '../packages/sim-plugin/web/cad_sim/index.html?rev=20260918-teamcenter-node-detail-recovery-2',
       minPerm: null,
     },
+    model_cache: { title: '数模缓存', src: '../packages/sim-plugin/web/model_cache/index.html', requiresAuth: true, minPerm: null },
     // 模块 Hub — 二级横排页签入口
     admin_hub:        { title: '管理中心',  src: 'admin_hub/index.html',      requiresAuth: true,   minPerm: 'system.user.manage' },
     team_space:       { title: '团队空间',  src: 'team_space/index.html',     requiresAuth: true,   minPerm: null },
     knowledge_hub:    { title: '知识库',    src: 'knowledge_hub/index.html',  requiresAuth: false,  minPerm: null },
     // automation_hub / cad_sim / ai_chat / wfc_canvas 来自插件，不硬编码，由 loadFromRegistry() 注册
     settings:         { title: '设置',      src: 'settings/index.html',                              minPerm: null },
+    plugin_marketplace: { title: '插件市场', src: 'plugin_marketplace/index.html', requiresAuth: true, minPerm: null },
     // 保留（在各 hub 内以 iframe 加载，主导航已隐藏）
     knowledge:        { title: '知识库',    src: 'knowledge/knowledge.html',  requiresAuth: true,    minPerm: 'knowledge.view', hidden: true },
     rule:             { title: '规则管理',  src: 'rule_mgmt/rule_mgmt.html',  minPerm: 'rule.view',  hidden: true },
@@ -119,9 +121,9 @@ const TabManager = (() => {
         <button class="quick-btn" onclick="TabManager.open('craft_hub')">
           <svg class="icon" width="16" height="16"><use href="#icon-canvas"/></svg> 工艺规划
         </button>
-        <button class="quick-btn" onclick="TabManager.open('project_hub')">
+        ${window.electronAPI?._isElectron === false ? '' : `<button class="quick-btn" onclick="TabManager.open('project_hub')">
           <svg class="icon" width="16" height="16"><use href="#icon-project"/></svg> 项目管理
-        </button>
+        </button>`}
       </div>
     </div>`;
 
@@ -143,6 +145,13 @@ const TabManager = (() => {
 
   /** 打开一个视图 Tab，已存在则切换，设置页特殊处理 */
   function open(viewId, params = {}) {
+    if (window.electronAPI?._isElectron === false &&
+        ['project_hub', 'my_files', 'plugin_marketplace', 'knowledge_hub', 'team_space',
+          'admin_hub', 'automation_hub', 'ai_chat', 'wfc_canvas', 'cad_sim', 'model_cache',
+          'ontology', 'ext_datasource', 'handbook'].includes(viewId)) {
+      window.dbg?.warn(`[Tab] Browser 不提供顶级模块: ${viewId}`);
+      return;
+    }
     if (viewId === 'settings') {
       window.electronAPI?.openSettings?.();
       return;
@@ -264,7 +273,14 @@ const TabManager = (() => {
     });
   }
 
-  return { open, close, activate, boot, closeUnauthorizedTabs, registerTab, loadFromRegistry, activeId: () => WorkspaceEngine.activeTabId() };
+  function openPlugin(pluginId, name) {
+    if (!/^[a-z][a-z0-9_.-]{2,127}$/.test(pluginId)) throw new Error('invalid_plugin');
+    const id = `market_plugin_${pluginId}`;
+    registerTab(id, { title: String(name || pluginId).slice(0, 120), src: `plugin_marketplace/host.html?plugin_id=${encodeURIComponent(pluginId)}`, requiresAuth: true, minPerm: null });
+    open(id);
+  }
+
+  return { openPlugin, open, close, activate, boot, closeUnauthorizedTabs, registerTab, loadFromRegistry, activeId: () => WorkspaceEngine.activeTabId() };
 })();
 
 window.TabManager = TabManager;

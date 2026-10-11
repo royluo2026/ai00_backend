@@ -1,8 +1,8 @@
 (function (root, factory) {
-  const api = factory();
+  const api = factory(root);
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.AI00ModelDocumentCollection = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (root) {
   'use strict';
 
   const MEDIA = new Set(['application/plmxml+xml', 'model/vnd.jt', 'application/vnd.siemens.teamcenter.visualization-document']);
@@ -89,6 +89,8 @@
   }
 
   async function readAllProductTreePages(invoke, artifactRef, pageSize = 5000, dependencyArtifacts = [], documentGid = null) {
+    const trace=(stage,detail={})=>{try{root._simulationDebug?.(stage,{document_gid:documentGid,...detail});}catch{}};
+    try{
     const limit = Math.max(1, Math.min(5000, Number(pageSize) || 5000));
     const nodes = [];
     let offset = 0;
@@ -99,6 +101,7 @@
       if (documentGid) payload.document_gid = documentGid;
       if (dependencyArtifacts.length) payload.dependency_artifacts = dependencyArtifacts;
       const page = await invoke('simulation.plmxml.model_tree.read', payload);
+      trace('plmxml_tree_page',{capability_id:'simulation.plmxml.model_tree.read',capability_version:1,cursor:offset,node_count:page?.nodes?.length,status:page?.state,next_cursor:page?.next_offset});
       if (page?.state !== 'ready') return page;
       const pageTotal = Number(page.node_count || 0);
       if (total == null) total = pageTotal;
@@ -115,7 +118,9 @@
       offset = nextOffset;
     }
     if (nodes.length !== total) throw new Error('product_tree_page_incomplete');
+    trace('plmxml_tree_verified',{node_count:nodes.length,complete:true});
     return { state: 'ready', node_count: total, nodes, dependency_locations: pendingDependencies, next_offset: null };
+    }catch(error){trace('plmxml_tree_failed',{error_code:error.message});throw error;}
   }
 
   function createCollection() {

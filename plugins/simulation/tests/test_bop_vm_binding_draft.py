@@ -73,3 +73,10 @@ def test_multiple_load_claims_for_one_vm_node_are_demoted_to_conflict():
 
     assert [item["disposition"] for item in draft["bindings"]] == ["conflict", "conflict"]
     assert all(item["conflict_code"] == "multiple_load_claims" for item in draft["bindings"])
+
+
+def test_partially_matched_operation_is_still_reported_as_unmatched():
+    draft = build_binding_draft({"operations": [{"operation_id": "op-1", "products": [
+        {"product_ref": "P-100"}, {"product_ref": "P-missing"}]}]}, _snapshot("P-100"))
+    assert draft["auto_count"] == 1
+    assert draft["unmatched_bop_node_gids"] == ["op-1"]

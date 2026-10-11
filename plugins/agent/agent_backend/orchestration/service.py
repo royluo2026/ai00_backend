@@ -25,13 +25,15 @@ class OrchestrationService:
 
     def publish(
         self, version_gid: str, *, expected_revision: int, actor_gid: str,
-        tenant_gid: str, project_gid: str,
+        tenant_gid: str, project_gid: str | None, organization: bool = False,
     ) -> Any:
         scope = {
             key: value for key, value in {
                 "tenant_gid": tenant_gid, "project_gid": project_gid,
             }.items() if value is not None
         }
+        if organization:
+            scope.update(project_gid=None, organization=True)
         graph: GraphDraft = self.repository.get_graph(
             version_gid, actor_gid=actor_gid, **scope,
         )
@@ -41,10 +43,26 @@ class OrchestrationService:
             for version in {binding.capability_version_gid for binding in graph.capability_bindings}
         }
         refs = [
-            {"ref_type": binding.ref_type, "ref_gid": binding.ref_gid}
+            {"ref_type": binding.ref_type, "ref_gid": binding.ref_gid,
+             **({'ref_version': binding.ref_version} if binding.ref_version is not None else {}),
+             **({'snapshot_gid': binding.snapshot_gid} if binding.snapshot_gid is not None else {})}
             for binding in graph.context_bindings
         ]
+        implementations = [node.implementation for node in graph.nodes]
+        if graph.workspace:
+            implementations.extend(override.implementation for variant in graph.workspace.variants
+                                   for override in variant.node_overrides.values() if override.implementation)
+        implementations = [option for implementation in implementations
+                           for option in [implementation,*implementation.alternatives]]
+        for implementation in implementations:
+            if implementation.skill_gid:
+                if not implementation.skill_version:
+                    raise PublishBlocked(f"skill {implementation.skill_gid} requires a fixed version")
+                refs.append({'ref_type':'skill','ref_gid':implementation.skill_gid,
+                             'ref_version':implementation.skill_version})
         resolved = self.reference_resolver.resolve_many(refs, actor_gid) if refs else []
+        if len(resolved) != len(refs):
+            raise PublishBlocked('governed reference resolver returned incomplete evidence')
         missing = [item.get("ref_gid", "unknown") for item in resolved if not item.get("resolved")]
         if missing:
             raise PublishBlocked(f"unresolved governed references: {', '.join(missing)}")

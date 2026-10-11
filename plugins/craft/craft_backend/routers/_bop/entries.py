@@ -184,30 +184,9 @@ class BopPicUploadBody(BaseModel):
 
 
 def _normalize_bop_pic_items(items):
-    # MySQL JSON 列返回的是字符串，先 parse
-    if isinstance(items, str):
-        try:
-            items = json.loads(items)
-        except Exception:
-            items = []
-    out = []
-    for item in items or []:
-        if isinstance(item, dict):
-            pic = dict(item)
-            url = str(pic.get('url') or '').strip()
-            object_key = str(pic.get('object_key') or '').strip().lstrip('/')
-            storage = str(pic.get('storage') or '').strip()
-            if url or object_key:
-                out.append({
-                    'url': url,
-                    'object_key': object_key,
-                    'storage': storage,
-                })
-        elif isinstance(item, str):
-            url = item.strip()
-            if url:
-                out.append({'url': url, 'object_key': '', 'storage': ''})
-    return out
+    from ...services.bop_picture_refs import normalize_bop_pictures
+
+    return normalize_bop_pictures(items)
 
 
 def _resolve_bop_pic_items(items):

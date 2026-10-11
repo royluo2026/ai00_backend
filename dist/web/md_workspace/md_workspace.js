@@ -75,7 +75,7 @@ function _renderDocList() {
 // ── 打开文档 ─────────────────────────────────────────────────────────────────
 async function _openDoc(filename) {
   if (_dirty && _currentFilename) {
-    if (!confirm('当前文档有未保存的修改，确定切换？')) return;
+    if (!(await window.AI00Dialogs.confirm('当前文档有未保存的修改，确定切换？'))) return;
     _dirty = false;
   }
   try {
@@ -91,7 +91,7 @@ async function _openDoc(filename) {
     _setMode('edit');
     _renderDocList();
   } catch (e) {
-    alert('打开文件失败: ' + e.message);
+    (await window.AI00Dialogs.alert('打开文件失败: ' + e.message));
   }
 }
 
@@ -109,7 +109,7 @@ async function _saveDoc() {
     await _loadDocs();
     await _loadWorkspaceInfo();
   } catch (e) {
-    alert('保存失败: ' + e.message);
+    (await window.AI00Dialogs.alert('保存失败: ' + e.message));
   }
   btn.disabled = false;
   btn.textContent = '保存';
@@ -136,16 +136,19 @@ async function _confirmNewDoc() {
     await _loadDocs();
     await _openDoc(filename);
   } catch (e) {
-    alert('新建失败: ' + e.message);
+    (await window.AI00Dialogs.alert('新建失败: ' + e.message));
   }
 }
 
 // ── 删除文档 ─────────────────────────────────────────────────────────────────
 async function _deleteDoc() {
   if (!_currentFilename) return;
-  if (!confirm(`确定删除 "${_currentFilename}"？此操作不可撤销。`)) return;
+  const filename = _currentFilename;
+  if (!await window.AI00Dialogs.confirm({title:'删除文档',message:`确定删除 "${filename}"？此操作不可撤销。`,tone:'danger',confirmText:'删除'})) return;
+  if (_currentFilename !== filename) return;
   try {
-    await callBridge('md', 'delete_doc', { filename: _currentFilename });
+    await callBridge('md', 'delete_doc', { filename });
+    if (_currentFilename !== filename) { await _loadDocs(); return; }
     _currentFilename = null;
     _dirty = false;
     $('editor-area').style.display  = 'none';
@@ -153,7 +156,7 @@ async function _deleteDoc() {
     await _loadDocs();
     await _loadWorkspaceInfo();
   } catch (e) {
-    alert('删除失败: ' + e.message);
+    (await window.AI00Dialogs.alert('删除失败: ' + e.message));
   }
 }
 
@@ -174,7 +177,7 @@ function _setMode(mode) {
 // ── 导入 .md ─────────────────────────────────────────────────────────────────
 async function _importMd() {
   const eApi = window.electronAPI;
-  if (!eApi?.openMdDialog) { alert('仅 Electron 环境支持文件导入'); return; }
+  if (!eApi?.openMdDialog) { (await window.AI00Dialogs.alert('仅 Electron 环境支持文件导入')); return; }
   const filePath = await eApi.openMdDialog();
   if (!filePath) return;
   try {
@@ -193,21 +196,21 @@ async function _importMd() {
       await _loadDocs();
       await _openDoc(filename);
     }
-  } catch (e) { alert('导入失败: ' + e.message); }
+  } catch (e) { (await window.AI00Dialogs.alert('导入失败: ' + e.message)); }
 }
 
 // ── 导出 .md ─────────────────────────────────────────────────────────────────
 async function _exportMd() {
   if (!_currentFilename) return;
   const eApi = window.electronAPI;
-  if (!eApi?.saveMdDialog) { alert('仅 Electron 环境支持文件导出'); return; }
+  if (!eApi?.saveMdDialog) { (await window.AI00Dialogs.alert('仅 Electron 环境支持文件导出')); return; }
   const savePath = await eApi.saveMdDialog(_currentFilename);
   if (!savePath) return;
   try {
     const content = $('md-textarea').value;
     await eApi.writeTextFile(savePath, content);
-    alert('导出成功: ' + savePath);
-  } catch (e) { alert('导出失败: ' + e.message); }
+    (await window.AI00Dialogs.alert('导出成功: ' + savePath));
+  } catch (e) { (await window.AI00Dialogs.alert('导出失败: ' + e.message)); }
 }
 
 // ── 图片粘贴处理 ─────────────────────────────────────────────────────────────

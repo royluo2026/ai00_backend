@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+
+<script src="/web/core/dialogs.js?rev=20260922-unified-1"></script>
+
   <script src="/web/core/business_facade.js"></script>
 <meta charset="UTF-8">
 <title>业务基础信息</title>
@@ -149,6 +152,7 @@ td { padding: 8px 12px; overflow: hidden; text-overflow: ellipsis; white-space: 
 }
 @keyframes fade-in { from { opacity: 0; transform: translateX(-50%) translateY(6px); } }
 </style>
+  <link rel="stylesheet" href="/assets/dialogs-e48cd6c5.css">
 </head>
 <body>
 <div class="md-root">
@@ -700,7 +704,7 @@ async function _saveModal() {
 }
 
 async function _deleteRow(gid, name) {
-  if (!confirm(`确定要删除「${name}」吗？`)) return;
+  if (!(await window.AI00Dialogs.confirm(`确定要删除「${name}」吗？`))) return;
   const cf = _cf();
   if (!cf) { _toast('未连接云端'); return; }
   try {

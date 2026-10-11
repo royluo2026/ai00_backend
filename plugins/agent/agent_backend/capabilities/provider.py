@@ -13,6 +13,7 @@ ERRORS = tuple(DomainErrorContract(code=code, meaning=meaning, retryable=retryab
     ("permission_denied", "The caller cannot access the Agent resource.", False),
     ("resource_not_found", "The Agent resource does not exist.", False),
     ("version_conflict", "The Agent resource changed concurrently.", False),
+    ("publish_blocked", "The business graph or governed references do not meet publication requirements.", False),
     ("catalog_release_unavailable", "The pinned Catalog release is unavailable.", True),
     ("delegation_expired", "The Agent delegation is missing or expired.", False),
     ("approval_required", "The delegated operation requires Base approval.", False),
@@ -59,9 +60,10 @@ def descriptor_for(spec) -> CapabilityDescriptorV2:
     base = descriptor_from_provider_spec(spec); write = base.side_effect_level is not SideEffectLevel.READ
     interaction = spec.id in {"agent.interaction.request", "agent.script.generate", *_CANVAS_COMMANDS}
     deferred_write = spec.id in _ORCHESTRATION_WRITE
+    organization = spec.id.startswith('agent.orchestration.organization.')
     values = {
         **base.model_dump(), "owner_domain": "agent",
-        "lifecycle_status": LifecycleStatus.EXPERIMENTAL if deferred_write else LifecycleStatus.STABLE,
+        "lifecycle_status": LifecycleStatus.EXPERIMENTAL if deferred_write or organization else LifecycleStatus.STABLE,
         "exposure": ExposurePolicy(
             web=not deferred_write, api=not deferred_write, plugin=not deferred_write,
             agent=(not deferred_write) and spec.id not in _MODEL_HIDDEN,
@@ -103,6 +105,27 @@ def descriptor_for(spec) -> CapabilityDescriptorV2:
             ),),
             "no_business_invariant_reason": None,
         })
+    if organization:
+        effect = {
+            'panorama.read': '读取当前组织统一业务全景及版本状态。',
+            'panorama.create': '为当前组织创建唯一业务全景草稿。',
+            'graph.read': '读取当前组织版本的业务节点、流与语义绑定。',
+            'graph.save': '按修订号保存当前组织的业务全景草稿。',
+            'version.publish': '通过业务契约和受治理引用校验发布组织全景版本。',
+            'version.revise': '从当前已发布组织全景创建完整修订草稿，保留原版本。',
+        }[spec.id.removeprefix('agent.orchestration.organization.')]
+        values.update(
+            title=effect, description=effect, business_effect=effect,
+            exposure=ExposurePolicy(web=True, api=True, plugin=False, agent=False, mcp=False),
+            resource_selectors=(),
+            business_acceptance_criteria=('组织身份由 Gateway 确定，同组织共享，跨组织访问被拒绝。',),
+            business_invariants=(BusinessInvariantContract(
+                rule_id=spec.id+'.scope', version=1,
+                statement='只允许服务端确定的组织作用域；写入检查草稿修订号，发布检查业务契约和引用。',
+                applies_when='每次组织业务全景调用', enforcement_ref='agent.orchestration.organization_scope',
+                error_code='permission_denied', test_refs=('backend/tests/test_organization_orchestration.py',),
+            ),), no_business_invariant_reason=None,
+        )
     return CapabilityDescriptorV2.model_validate(values)
 
 

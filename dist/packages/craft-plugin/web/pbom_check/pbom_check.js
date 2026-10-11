@@ -214,7 +214,7 @@ function _initTLS() {
 async function _runCheck() {
 
   const gid = _tls?.getSelectedList() || $verSel.value;
-  if (!gid) { alert('请先选择 PBOM 版本'); return; }
+  if (!gid) { (await window.AI00Dialogs.alert('请先选择 PBOM 版本')); return; }
 
   _setStatus('核对中…');
   $resultBody.innerHTML = '<div class="pc-empty">核对中，请稍候…</div>';
@@ -307,7 +307,7 @@ function _renderResult(res, ignRes) {
       btnText: `批量提交无主数据（${noDataErrs.length} 条）`,
       btnCls: 'warn',
       onRun: async (btn) => {
-        if (!confirm(`将 ${noDataErrs.length} 条无主数据 VPPS 写入 vpps_parts 知识库？`)) return false;
+        if (!(await window.AI00Dialogs.confirm(`将 ${noDataErrs.length} 条无主数据 VPPS 写入 vpps_parts 知识库？`))) return false;
         const verGid = _tls?.getSelectedList() || $verSel.value;
         const ver    = _versions.find(v => v.gid === verGid);
         const entries = noDataErrs.map(e => {
@@ -335,7 +335,7 @@ function _renderResult(res, ignRes) {
       btnText: `批量接受别名（${aliases.length} 条）`,
       btnCls: 'warn',
       onRun: async (btn) => {
-        if (!confirm(`批量接受全部 ${aliases.length} 条描述别名？`)) return false;
+        if (!(await window.AI00Dialogs.confirm(`批量接受全部 ${aliases.length} 条描述别名？`))) return false;
         btn.textContent = '查询中…';
         const items = [];
         for (const a of aliases) {
@@ -370,7 +370,7 @@ function _renderResult(res, ignRes) {
       btnCls: 'ignore',
       btnDisabled: r4Errs.length === 0,
       onRun: async () => {
-        if (!confirm(`将当前 ${r4Errs.length} 条规则4 NOK 标记为已忽略？`)) return false;
+        if (!(await window.AI00Dialogs.confirm(`将当前 ${r4Errs.length} 条规则4 NOK 标记为已忽略？`))) return false;
         await _bulkIgnoreR4(r4Errs);
         return true;
       },
@@ -433,7 +433,7 @@ function _appendBatchSection(wrap, { numA, lblA, numB, lblB, hint, btnText, btnC
       else setTimeout(() => _runCheck(), 600);
     } catch (e) {
       btn.disabled = !!btnDisabled; btn.textContent = orig;
-      alert('操作失败: ' + e.message);
+      (await window.AI00Dialogs.alert('操作失败: ' + e.message));
     }
   });
   sec.appendChild(btn);
@@ -446,7 +446,7 @@ function _appendBatchSection(wrap, { numA, lblA, numB, lblB, hint, btnText, btnC
     eb.addEventListener('click', async () => {
       eb.disabled = true;
       try { await extraBtn.onRun(); setTimeout(() => _runCheck(), 400); }
-      catch (e) { eb.disabled = false; alert('操作失败: ' + e.message); }
+      catch (e) { eb.disabled = false; (await window.AI00Dialogs.alert('操作失败: ' + e.message)); }
     });
     sec.appendChild(eb);
   }
@@ -551,18 +551,18 @@ async function _bulkIgnoreR4(errors) {
         actor_name: user.name || '',
       },{},new URLSearchParams());
     await _runCheck();
-  } catch (e) { alert('忽略失败: ' + e.message); }
+  } catch (e) { (await window.AI00Dialogs.alert('忽略失败: ' + e.message)); }
 }
 
 async function _revertAllR4(ops) {
 
-  if (!confirm(`确认撤销全部 ${ops.length} 条让步？`)) return;
+  if (!(await window.AI00Dialogs.confirm(`确认撤销全部 ${ops.length} 条让步？`))) return;
   let failed = 0;
   for (const op of ops) {
     try { await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.vpps_audit.change.apply", {version:1,payload:({operation:"revert",gid:path.gid,...(body.reverted_by_gid?{actor_gid:body.reverted_by_gid}:{}),actor_name:body.reverted_by_name||window._authUser?.name||window.parent?._authUser?.name||""})}); return result; })({},{"gid":decodeURIComponent(String(op.gid))},new URLSearchParams()); }
     catch (_) { failed++; }
   }
-  if (failed) alert(`${failed} 条撤销失败`);
+  if (failed) (await window.AI00Dialogs.alert(`${failed} 条撤销失败`));
   await _runCheck();
 }
 
@@ -739,7 +739,7 @@ function _showNokView() {
             actor_name: user.name || '',
           },{},new URLSearchParams());
         await _runCheck();
-      } catch (e) { alert('忽略失败: ' + e.message); }
+      } catch (e) { (await window.AI00Dialogs.alert('忽略失败: ' + e.message)); }
     });
   });
 
@@ -748,11 +748,11 @@ function _showNokView() {
     btn.addEventListener('click', async () => {
       const ignRes = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.vpps_audit.read", {version:1,payload:Object.fromEntries(Object.entries({operation:"list",pbom_version_gid:(query.has("pbom_version_gid")?query.get("pbom_version_gid"):null),operation_type:(query.has("operation_type")?query.get("operation_type"):null)}).filter(([,v])=>v!=null))}); return result; })({},{},new URLSearchParams((`/api/vpps-operations?pbom_row_gid=${btn.dataset.gid}`).split("?")[1]||"")).catch(() => null);
       const ops = ignRes?.data || [];
-      if (!ops.length) { alert('未找到可撤销的操作'); return; }
+      if (!ops.length) { (await window.AI00Dialogs.alert('未找到可撤销的操作')); return; }
       try {
         await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.vpps_audit.change.apply", {version:1,payload:({operation:"revert",gid:path.gid,...(body.reverted_by_gid?{actor_gid:body.reverted_by_gid}:{}),actor_name:body.reverted_by_name||window._authUser?.name||window.parent?._authUser?.name||""})}); return result; })({},{"gid":decodeURIComponent(String(ops[0].gid))},new URLSearchParams());
         await _runCheck();
-      } catch (e) { alert('撤销失败: ' + e.message); }
+      } catch (e) { (await window.AI00Dialogs.alert('撤销失败: ' + e.message)); }
     });
   });
 

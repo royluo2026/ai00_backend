@@ -25,6 +25,15 @@ class ArtifactAuthorizationError(ArtifactError):
     pass
 
 
+# Owning domains may explicitly publish an artifact for member-only downloads.
+# Upload/finalize authorization never consults these read-only policies.
+_shared_download_authorizers = {}
+
+
+def register_shared_download_authorizer(owner: str, authorize: Callable) -> None:
+    _shared_download_authorizers[owner] = authorize
+
+
 class UploadSession(FrozenModel):
     upload_id: str
     tenant_id: str
@@ -369,6 +378,9 @@ class SqlArtifactStore:
 class ArtifactService:
     def read(self, ref: ArtifactRef, requested_by: ConsumerIdentity, *, maximum: int, granted_resources=()) -> bytes:
         record=self.authorize_download(ref.artifact_id,requested_by,granted_resources=granted_resources)
+        return self._read_record(record, ref, maximum)
+
+    def _read_record(self, record: ArtifactRecord, ref: ArtifactRef, maximum: int) -> bytes:
         if record.artifact_ref!=ref or ref.byte_size>maximum:
             raise ArtifactIntegrityError('artifact reference or size limit mismatch')
         data=self._storage.read(record.object_key,maximum)
@@ -493,10 +505,12 @@ class ArtifactService:
         granted_resources: tuple[str, ...] = (),
     ) -> ArtifactRecord:
         record = self._store.get_artifact(artifact_id)
-        _authorize(
-            record.tenant_id, record.actor_id, record.resource_refs,
-            requested_by, granted_resources,
-        )
+        try:
+            _authorize(record.tenant_id, record.actor_id, record.resource_refs,
+                       requested_by, granted_resources)
+        except ArtifactAuthorizationError:
+            if not any(authorize(record, requested_by) for authorize in _shared_download_authorizers.values()):
+                raise
         return record
 
 

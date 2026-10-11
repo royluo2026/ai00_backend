@@ -4,36 +4,32 @@ from pathlib import Path
 import pytest
 
 from backend.scripts.generate_domain_grants import (
-    GrantPolicyError, build_grouped_grant_plan,
+    GrantPolicyError, build_domain_grant_plan,
 )
+from backend.governance import load_registry
 from backend.scripts.verify_single_database_grants import verify_grant_rows
 
 
 ROOT = Path(__file__).resolve().parents[2]
-ACCOUNTS = {
-    "craft": "ai00_dev_craft", "model_simulation": "ai00_dev_model_sim",
-    "device": "ai00_dev_device", "shared": "ai00_dev_shared",
-    "runtime": "ai00_runtime",
-}
+ACCOUNTS = {domain: f"user_{domain}" for domain in load_registry().product_domains}
 
 
 def _inventory():
     return json.loads((ROOT / "backend/governance/table_inventory.json").read_text(encoding="utf-8"))
 
 
-def test_runtime_grants_cover_all_owned_tables_without_ddl():
+def test_domain_grants_partition_all_owned_tables_without_ddl():
     inventory = _inventory()
-    plan = build_grouped_grant_plan(ACCOUNTS, inventory)
-    runtime = plan.require("runtime")
-    assert len(runtime.tables) == len(inventory["tables"])
-    assert runtime.privileges == ("SELECT", "INSERT", "UPDATE", "DELETE")
+    plan = build_domain_grant_plan(ACCOUNTS, inventory)
+    assert sum(len(item.tables) for item in plan.accounts) == len(inventory["tables"])
+    assert all(item.privileges == ("SELECT", "INSERT", "UPDATE", "DELETE") for item in plan.accounts)
 
 
 def test_developer_account_cannot_receive_foreign_domain_table():
     inventory = _inventory()
     inventory["tables"][0] = {**inventory["tables"][0], "runtime_domain": "device"}
-    with pytest.raises(GrantPolicyError, match="group_scope_violation"):
-        build_grouped_grant_plan(ACCOUNTS, inventory)
+    with pytest.raises(GrantPolicyError, match="inventory ownership mismatch"):
+        build_domain_grant_plan(ACCOUNTS, inventory)
 
 
 @pytest.mark.parametrize("grant", [

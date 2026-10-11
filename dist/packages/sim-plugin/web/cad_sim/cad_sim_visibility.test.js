@@ -30,6 +30,7 @@ test('command completion polling survives a transient provider failure without r
 test('uncertain command status preserves the adapter error code for recovery UI', async () => {
   const waiter = source.slice(source.indexOf('async function _waitVisMockupCommand'), source.indexOf('const _visReadQueues'));
   const context = vm.createContext({
+    performance, _simulationDebug:()=>{},
     _invokeCapability: async () => ({
       status: 'outcome_unknown',
       outcome: { steps: [{ error_code: 'teamcenter_login_required' }] },
@@ -335,8 +336,8 @@ test('product tree renders descendants only after a row is expanded', () => {
 
 test('dragging a product node carries its occurrence instead of the document root', () => {
   const documents = source.slice(source.indexOf('function _renderModelDocuments'), source.indexOf('function _renderAlternateHierarchies'));
-  assert.match(documents, /summary\.draggable = true/);
-  assert.match(documents, /line\.draggable = true/);
+  assert.match(documents, /summary\.draggable = item\.source_kind!=='teamcenter_cache_snapshot'/);
+  assert.match(documents, /line\.draggable = !cachedSnapshot/);
   assert.match(documents, /application\/x-ai00-model-node/);
   assert.match(documents, /node_key: item\.node_key/);
   assert.match(source, /modelNodeJson \? _placeModelNode/);

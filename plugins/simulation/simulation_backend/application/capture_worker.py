@@ -16,6 +16,7 @@ from backend.contracts.connector_execution_plan_v1 import (
 
 from .connector_plans import build_capture_plan, build_materialization_plan
 from .connector_workflow_v2 import matches_prepared_plan
+from ..domain.environment_manifest import REQUIRED_CONNECTOR_OPERATIONS
 
 
 class SimulationWorkflowError(RuntimeError):
@@ -49,6 +50,14 @@ class CaptureWorkflow:
             raise SimulationWorkflowError("capability_provenance_required")
         return version_gid, definition_hash
 
+    @staticmethod
+    def _require_render_contract(manifest) -> None:
+        contracts = {item.operation_id: item.contract_hash for item in manifest.connector_requirement.operations}
+        if contracts.get("vismockup.scene.render@1") != REQUIRED_CONNECTOR_OPERATIONS["vismockup.scene.render@1"]:
+            raise SimulationWorkflowError("simulation_capture_environment_upgrade_required")
+        if not manifest.operations:
+            raise SimulationWorkflowError("simulation_capture_operations_required")
+
     async def start_materialization(
         self, environment_id: str, environment_version: int, device_id: str,
         context: CapabilityContext,
@@ -59,6 +68,7 @@ class CaptureWorkflow:
         if manifest is None:
             raise SimulationWorkflowError("simulation_environment_not_found")
         run_id = self.id_factory("materialize")
+        self._require_render_contract(manifest)
         plan = build_materialization_plan(
             manifest, plan_id=run_id, device_id=device_id, tenant_id=tenant_id,
             user_id=user_id, issued_at=self.clock(),
@@ -120,6 +130,7 @@ class CaptureWorkflow:
         ):
             raise SimulationWorkflowError("simulation_result_not_ready")
         capture_run_id = self.id_factory("capture")
+        self._require_render_contract(manifest)
         ordered = sorted(
             manifest.operations, key=lambda item: (item.sequence, item.operation_id), reverse=True,
         )
@@ -133,12 +144,14 @@ class CaptureWorkflow:
         row = {
             "capture_run_id": capture_run_id, "environment_id": environment_id,
             "environment_version": environment_version, "manifest_hash": manifest.manifest_hash,
-            "device_id": device_id, "plan_id": plans[0].plan_id, "status": "queued",
+            "device_id": device_id, "plan_id": plans[0].plan_id,
+            "status": "queued" if any(item.product_node_keys for item in ordered) else "completed",
             "owner_gid": user_id, "team_gid": tenant_id,
-            "operation_ref": {"operation_id": plans[0].plan_id, "status": "accepted", "version": 1},
+            "operation_ref": {"operation_id": plans[0].plan_id,
+                              "status": "accepted" if any(item.product_node_keys for item in ordered) else "completed", "version": 1},
             "steps": [{
                 "operation_id": item.operation_id, "sequence": item.sequence,
-                "status": "queued", "attempt": 1, "artifact_ref": None,
+                "status": "queued" if item.product_node_keys else "skipped", "attempt": 1, "artifact_ref": None,
                 "artifact_attached": False, "expected_scene_hash": item.scene.scene_hash,
                 "plan": plan.model_dump(mode="json"),
             } for item, plan in zip(ordered, plans, strict=True)],
@@ -218,7 +231,7 @@ class CaptureWorkflow:
             )
             refreshed = self.repository.get_capture_run(capture_run_id, context)
             if all(
-                step["status"] == "completed" and step.get("artifact_attached")
+                step["status"] == "skipped" or (step["status"] == "completed" and step.get("artifact_attached"))
                 for step in refreshed["steps"]
             ):
                 self.repository.update_capture_run(capture_run_id, status="completed")
@@ -257,7 +270,7 @@ class CaptureWorkflow:
             raise SimulationWorkflowError("plan_outcome_invalid")
         materialization_operations = {
             "vismockup.application.probe@1", "vismockup.model.attach@1",
-            "vismockup.scene.apply@1", "vismockup.scene.verify@1",
+            "vismockup.scene.apply@1", "vismockup.scene.render@1", "vismockup.scene.verify@1",
         }
         if not plan.steps or any(
             step.operation_id not in materialization_operations for step in plan.steps
@@ -293,6 +306,7 @@ class CaptureWorkflow:
         run = self.repository.get_capture_run(capture_run_id, context)
         if run is None:
             raise SimulationWorkflowError("capture_run_not_found")
+        was_cancelling = run["status"] in {"cancelling", "cancelled"}
 
         results = {item.step_id: item for item in outcome.steps}
         known_steps = {item.step_id for item in plan.steps}
@@ -308,6 +322,17 @@ class CaptureWorkflow:
         if not matches_prepared_plan(expected_plan, plan):
             raise SimulationWorkflowError("plan_outcome_invalid")
         terminal_status = projection_status(outcome)
+        if any(step.operation_id == "vismockup.scene.render@1" for step in plan.steps):
+            complete = terminal_status == "completed" and all(
+                step.step_id in results and projection_status(results[step.step_id]) == "completed"
+                for step in plan.steps
+            )
+            if not complete:
+                status = "failed" if terminal_status == "failed" else "outcome_unknown"
+                if not persisted_step.get("artifact_attached"):
+                    self.record_step_result(capture_run_id, capture_operation_id, status=status)
+                    self.repository.update_capture_run(capture_run_id, status=status)
+                return self.repository.get_capture_run(capture_run_id, context)
         v2 = outcome.protocol == 'ai00.connector.execution-plan.v2'
         if (terminal_status == 'outcome_unknown' and (not outcome.steps or v2)) or (
             v2 and terminal_status == 'failed' and capture_steps[0].step_id not in results
@@ -352,6 +377,8 @@ class CaptureWorkflow:
                 capture_run_id,
                 status="partial" if terminal and "completed" in statuses else "failed",
             )
+        elif was_cancelling and "running" not in statuses:
+            self.repository.update_capture_run(capture_run_id, status="cancelled")
         return self.repository.get_capture_run(capture_run_id, context)
 
     async def retry_step(
@@ -371,6 +398,7 @@ class CaptureWorkflow:
         if manifest is None or manifest.manifest_hash != run["manifest_hash"]:
             raise SimulationWorkflowError("environment_source_changed")
         tenant_id, user_id = self._identity(context)
+        self._require_render_contract(manifest)
         version_gid, definition_hash = self._provenance(context)
         retry_plan_id = self.id_factory("retry")
         attempt = int(step.get("attempt") or 1) + 1
@@ -384,6 +412,7 @@ class CaptureWorkflow:
             capture_run_id, operation_id, status="queued", attempt=attempt,
             plan=plan.model_dump(mode="json"), artifact_ref=None, artifact_attached=False,
         )
+        self.repository.update_capture_run(capture_run_id, status="queued")
         return {"capture_run_id": capture_run_id, "operation_id": operation_id, "attempt": attempt, "plan_id": retry_plan_id, "status": "queued"}
 
     def cancel(self, capture_run_id: str, context: CapabilityContext) -> dict[str, Any]:

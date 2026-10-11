@@ -345,7 +345,7 @@
     const title = document.getElementById('slNTitle')?.value.trim();
     const desc  = document.getElementById('slNDesc')?.value.trim() || '';
     const scope = document.getElementById('slNScope')?.value || 'private';
-    if (!name || !title) { alert('标识符和显示名不能为空'); return; }
+    if (!name || !title) { (await window.AI00Dialogs.alert('标识符和显示名不能为空')); return; }
 
     let content = {};
     if (_newType === 'prompt') {
@@ -369,17 +369,17 @@
 
     try {
       const _cloudFetch = _cf();
-      if (!_cloudFetch) { alert('需要飞书登录才能保存'); return; }
+      if (!_cloudFetch) { (await window.AI00Dialogs.alert('需要飞书登录才能保存')); return; }
       const result = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.skill.create", {version:1,payload:Object.fromEntries(Object.entries({...body,visibility:body.scope||"private",content:typeof body.content==="string"?JSON.parse(body.content):body.content,tags:typeof body.tags==="string"?JSON.parse(body.tags):body.tags}).filter(([key,value])=>["name","title","description","skill_type","visibility","content","icon","tags","sort_order"].includes(key)&&value!==undefined))}); return result; })({
           name, title, skill_type: _newType, scope, description: desc,
           owner_gid: _getUserGid(),
           content: JSON.stringify(content),
         },{},new URLSearchParams());
-      if (result?.error) { alert(result.error); return; }
+      if (result?.error) { (await window.AI00Dialogs.alert(result.error)); return; }
       closeNewModal();
       await loadSkills();
     } catch (e) {
-      alert('保存失败: ' + e.message);
+      (await window.AI00Dialogs.alert('保存失败: ' + e.message));
     }
   }
 
@@ -511,23 +511,23 @@
 
     try {
       const _cloudFetch = _cf();
-      if (!_cloudFetch) { alert('需要飞书登录才能保存'); return; }
+      if (!_cloudFetch) { (await window.AI00Dialogs.alert('需要飞书登录才能保存')); return; }
       const result = await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.skill.update", {version:1,payload:({skill_gid:path.gid,changes:Object.fromEntries(Object.entries({...body,...(body.scope?{visibility:body.scope}:{}),...(body.content!==undefined?{content:typeof body.content==="string"?JSON.parse(body.content):body.content}:{}),...(body.tags!==undefined?{tags:typeof body.tags==="string"?JSON.parse(body.tags):body.tags}:{})}).filter(([key,value])=>["title","description","visibility","content","icon","tags","sort_order","status","is_pinned"].includes(key)&&value!==undefined))})}); return result; })(fields,{"gid":decodeURIComponent(String(s.gid))},new URLSearchParams());
-      if (result?.error) { alert(result.error); return; }
+      if (result?.error) { (await window.AI00Dialogs.alert(result.error)); return; }
       closeEditModal();
       await loadSkills();
-    } catch (e) { alert('保存失败: ' + e.message); }
+    } catch (e) { (await window.AI00Dialogs.alert('保存失败: ' + e.message)); }
   }
 
   async function deleteEditSkill() {
     if (!_editSkill) return;
-    if (!confirm(`确认删除 Skill「${_editSkill.title}」？此操作不可恢复。`)) return;
+    if (!(await window.AI00Dialogs.confirm(`确认删除 Skill「${_editSkill.title}」？此操作不可恢复。`))) return;
     try {
       const _cloudFetch = _cf();
       if (_cloudFetch) await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.skill.change.apply", {version:1,payload:Object.fromEntries(Object.entries({"operation":"delete","skill_gid":path.gid}).filter(([,v])=>v!=null))}); return result; })({},{"gid":decodeURIComponent(String(_editSkill.gid))},new URLSearchParams());
       closeEditModal();
       await loadSkills();
-    } catch (e) { alert('删除失败: ' + e.message); }
+    } catch (e) { (await window.AI00Dialogs.alert('删除失败: ' + e.message)); }
   }
 
   async function toggleEditSkillStatus() {
@@ -538,7 +538,7 @@
       if (_cloudFetch) await (async (body,path,query) => { const result = await window.AI00Business.invoke("agent.skill.update", {version:1,payload:({skill_gid:path.gid,changes:Object.fromEntries(Object.entries({...body,...(body.scope?{visibility:body.scope}:{}),...(body.content!==undefined?{content:typeof body.content==="string"?JSON.parse(body.content):body.content}:{}),...(body.tags!==undefined?{tags:typeof body.tags==="string"?JSON.parse(body.tags):body.tags}:{})}).filter(([key,value])=>["title","description","visibility","content","icon","tags","sort_order","status","is_pinned"].includes(key)&&value!==undefined))})}); return result; })({ status: newStatus },{"gid":decodeURIComponent(String(_editSkill.gid))},new URLSearchParams());
       closeEditModal();
       await loadSkills();
-    } catch (e) { alert('操作失败: ' + e.message); }
+    } catch (e) { (await window.AI00Dialogs.alert('操作失败: ' + e.message)); }
   }
 
   // ── 测试执行 Modal ─────────────────────────────────────────────────────────

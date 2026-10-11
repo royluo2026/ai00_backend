@@ -671,23 +671,34 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
 
 
 def register_capability(registry: Any, spec: Any, handler: Any) -> None:
+    from backend.capability_v2.reliability import TransactionalCapabilityOutput, transactional_provider
     governed = _governed_spec(spec)
     descriptor = descriptor_for(governed)
     selected = handler
     if (descriptor.side_effect_level is not SideEffectLevel.READ
             and governed.id.startswith("craft.bop.") and "experimental" not in governed.tags):
         def guarded(payload, context, _handler=handler, _id=governed.id):
-            from ..data.bop_migration_fence import legacy_write_lease
+            from ..data.bop_migration_fence import legacy_write_lease, LegacyLeaseTransaction
             lease=legacy_write_lease(_id,context);box=lease.__enter__()
+            def finish(value):
+                box["result"]=value.data if isinstance(value,TransactionalCapabilityOutput) else value
+                if isinstance(value,TransactionalCapabilityOutput):
+                    return TransactionalCapabilityOutput(data=value.data, evidence=value.evidence,
+                        transaction=LegacyLeaseTransaction(value.transaction,lease,box))
+                lease.__exit__(None,None,None)
+                return value
             try: result=_handler(payload,context)
             except BaseException as exc:lease.__exit__(type(exc),exc,exc.__traceback__);raise
             if inspect.isawaitable(result):
                 async def complete():
                     try:
-                        value=await result;box["result"]=value;lease.__exit__(None,None,None);return value
+                        value=await result
                     except BaseException as exc:lease.__exit__(type(exc),exc,exc.__traceback__);raise
+                    return finish(value)
                 return complete()
-            box["result"]=result;lease.__exit__(None,None,None);return result
+            return finish(result)
+        if getattr(handler,"__capability_transactional__",False):
+            transactional_provider(guarded)
         selected=guarded
     registry.register(governed, selected, descriptor=descriptor)
 

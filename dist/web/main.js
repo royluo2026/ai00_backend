@@ -528,6 +528,8 @@ document.addEventListener('DOMContentLoaded', () => {
   ]).catch(e => console.warn('[Main] PluginRegistry 加载失败:', e));
   // 飞书模式下启动通知轮询（auth 状态就绪后触发）
   window.electronAPI?.onAuthStateChanged?.((state) => {
+    const reloadTabs = AuthStateManager.shouldReloadTabs(
+      { mode: window._authMode, user: window._authUser }, state || {});
     // 更新全局 auth 状态（账户切换时确保 _authUser/_authMode 是最新值）
     AuthStateManager.publish(state || {});
     _renderAuthStatus(state);
@@ -543,9 +545,9 @@ document.addEventListener('DOMContentLoaded', () => {
     TabManager.closeUnauthorizedTabs();
     NavManager.render();          // 重新渲染导航（可见性可能因角色变化）
     _applyStatusbarFlags();       // 角色确认后重新计算可见/可用
-    // 工作台及所有已打开 Tab 的 iframe 重载：确保面板数据随新用户刷新
+    // 只有身份或角色变化才重载；同一用户的令牌续期不能打断正在打开的数模。
     // （工作台有 localStorage 前缀依赖，必须完整重载；其他 Tab 也可能有缓存数据）
-    WorkspaceEngine.reloadAllTabs();
+    if (reloadTabs) WorkspaceEngine.reloadAllTabs();
   });
   // auth_state.js 异步补全 /users/me 后更新角色和权限显示。
   window.addEventListener('ai00-auth-user-updated', () => _renderAuthStatus());

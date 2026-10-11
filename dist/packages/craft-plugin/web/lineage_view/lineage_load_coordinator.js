@@ -43,10 +43,10 @@
       return revision === undefined || token.revision === revision;
     }
 
-    runSingleFlight(key, fn) {
+    runSingleFlight(key, fn, options = {}) {
       if (this._disposed) return Promise.reject(new Error('LineageLoadCoordinator is disposed'));
       const existing = this._singleFlights.get(key);
-      if (existing) return existing;
+      if (existing && !options.force) return existing;
 
       let operation;
       try {

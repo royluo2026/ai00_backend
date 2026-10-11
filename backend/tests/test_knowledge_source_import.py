@@ -103,6 +103,29 @@ class TrackedConnection(Connection):
     def rollback(self): self.rollbacks += 1
 
 
+@pytest.mark.parametrize('author', [('ou_original', '飞书原作者'), (None, None)])
+def test_first_import_preserves_original_author_separately_from_operator(author):
+    class InitialCursor(SuccessCursor):
+        def fetchone(self):
+            if self.sql.startswith('SELECT gid FROM workmanship_know_spaces'):
+                return {'gid':'space_1'}
+            row = super().fetchone()
+            if row and 'workmanship_know_feishu_snapshots' in self.sql and 'baselines' not in self.sql:
+                return {**row,'linked_document_gid':None,'source_author_open_id':author[0],'source_author_name':author[1]}
+            return row
+    cursor = InitialCursor()
+    with patch('plugins.knowledge.knowledge_backend.capabilities.feishu_import_next.get_knowledge_conn',return_value=TrackedConnection(cursor)), \
+         patch('backend.platform_sdk.identity.get_active_identity_profile',return_value=_profile()), \
+         patch('plugins.knowledge.knowledge_backend.capabilities.feishu_import_next.get_immutable',return_value=b'# BOP\n'), \
+         patch('plugins.knowledge.knowledge_backend.capabilities.feishu_import_next.new_knowledge_id',side_effect=lambda kind:f'{kind}_new'), \
+         patch('plugins.knowledge.knowledge_backend.capabilities.feishu_import_next.store_markdown_revision',side_effect=lambda prepared:{'object_key':prepared.object_key,'sha256':prepared.sha256,'byte_size':len(prepared.data),'media_type':prepared.media_type}):
+        confirm_import({**_payload(),'expected_revision_gid':''},_context())
+    document = next(params for sql,params in cursor.calls if sql.startswith('INSERT INTO workmanship_know_documents'))
+    assert document[-3:] == ('admin',author[0],author[1])
+    revision = next(params for sql,params in cursor.calls if sql.startswith('INSERT INTO workmanship_know_revisions'))
+    assert revision[10] == 'admin'
+
+
 def test_confirm_advances_baseline_only_after_ois_revision_is_stored():
     cursor = SuccessCursor(); conn = TrackedConnection(cursor)
     with patch("plugins.knowledge.knowledge_backend.capabilities.feishu_import_next.get_knowledge_conn", return_value=conn), \

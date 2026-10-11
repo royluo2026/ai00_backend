@@ -577,15 +577,15 @@ class DiffManager {
 
   async _exportExcel(labelA, labelB) {
 const button=this._overlay.querySelector('#dm-export-btn');if(button){button.disabled=true;button.textContent='导出中…';}
- try{await window.AI00Business.invoke('craft.data_exchange.diff_report.export',{version:1,payload:window.AI00Business.diffPayload(this._columns,this._diffRows,{label_a:labelA,label_b:labelB,filename:'diff_'+this._moduleId+'_'+_dmDateStr()+'.xlsx'}),native_io:{save:true}});}catch(error){if(error.code!=='native_selection_cancelled')alert('导出失败：'+error.message);}finally{if(button){button.disabled=false;button.textContent='导出报告 ▾';}}
+ try{await window.AI00Business.invoke('craft.data_exchange.diff_report.export',{version:1,payload:window.AI00Business.diffPayload(this._columns,this._diffRows,{label_a:labelA,label_b:labelB,filename:'diff_'+this._moduleId+'_'+_dmDateStr()+'.xlsx'}),native_io:{save:true}});}catch(error){if(error.code!=='native_selection_cancelled')(await window.AI00Dialogs.alert('导出失败：'+error.message));}finally{if(button){button.disabled=false;button.textContent='导出报告 ▾';}}
 }
 
   // ── 导出飞书电子表格 ──────────────────────────────────────────────────────
 
   async _exportLarkSheet(labelA, labelB) {
-const token=prompt('请输入飞书电子表格 Token（URL 中 spreadsheets/ 后面的部分）：');if(!token)return;const sheetId=prompt('请输入 Sheet ID（默认 Sheet1）：','Sheet1')||'Sheet1';
+const token=(await window.AI00Dialogs.prompt('请输入飞书电子表格 Token（URL 中 spreadsheets/ 后面的部分）：'));if(!token)return;const sheetId=(await window.AI00Dialogs.prompt('请输入 Sheet ID（默认 Sheet1）：','Sheet1'))||'Sheet1';
  const button=this._overlay.querySelector('#dm-export-btn');if(button){button.disabled=true;button.textContent='写入中…';}
- try{const result=await window.AI00Business.invoke('craft.data_exchange.feishu_diff.write',{version:1,payload:window.AI00Business.diffPayload(this._columns,this._diffRows,{spreadsheet_token:token,sheet_id:sheetId,label_a:labelA,label_b:labelB})});alert('写入成功，共 '+result.written_rows+' 行');}catch(error){alert('写入失败：'+error.message);}finally{if(button){button.disabled=false;button.textContent='导出报告 ▾';}}
+ try{const result=await window.AI00Business.invoke('craft.data_exchange.feishu_diff.write',{version:1,payload:window.AI00Business.diffPayload(this._columns,this._diffRows,{spreadsheet_token:token,sheet_id:sheetId,label_a:labelA,label_b:labelB})});(await window.AI00Dialogs.alert('写入成功，共 '+result.written_rows+' 行'));}catch(error){(await window.AI00Dialogs.alert('写入失败：'+error.message));}finally{if(button){button.disabled=false;button.textContent='导出报告 ▾';}}
 }
 
   // ── 解析 Excel 文件 ───────────────────────────────────────────────────────

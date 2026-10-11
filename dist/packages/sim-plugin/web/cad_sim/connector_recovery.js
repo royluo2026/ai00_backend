@@ -219,12 +219,13 @@
       }
       const identities = batch.map(identity).join('\n');
       const prompt = `确认批量提交 ${batch.length} 项人工核对结果？\ndecision=${selectedDecision}\nreason=${explanation}\n${identities}`;
-      if (!root.confirm(prompt)) {
+      const intent = generation;
+      if (!(await root.AI00Dialogs.confirm(prompt))) {
         setStatus('已取消提交，未作更改');
         return;
       }
 
-      const intent = generation;
+      if (intent !== generation || submitting) return;
       submitting = true;
       stopRequested = false;
       results?.replaceChildren();

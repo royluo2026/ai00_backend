@@ -59,18 +59,18 @@ function _assetUpdates(row, orig) {
 // ── 操作函数（inline onclick 需要全局暴露）────────────────────────────────────
 async function sendMaintenance(gid) {
   try { const row = _assetRow(gid); await _factoryInvoke('factory.asset.maintenance.start', { gid, expected_version: row.version || 1 }); await loadAssets(); }
-  catch (e) { alert('送修失败: ' + e.message); }
+  catch (e) { (await window.AI00Dialogs.alert('送修失败: ' + e.message)); }
 }
 
 async function returnAsset(gid) {
   try { const row = _assetRow(gid); await _factoryInvoke('factory.asset.maintenance.complete', { gid, expected_version: row.version || 1 }); await loadAssets(); }
-  catch (e) { alert('归还失败: ' + e.message); }
+  catch (e) { (await window.AI00Dialogs.alert('归还失败: ' + e.message)); }
 }
 
 async function scrapAsset(gid) {
-  if (!confirm('确认报废该资产？')) return;
+  if (!(await window.AI00Dialogs.confirm('确认报废该资产？'))) return;
   try { const row = _assetRow(gid); await _factoryInvoke('factory.asset.scrap', { gid, expected_version: row.version || 1 }); await loadAssets(); }
-  catch (e) { alert('报废失败: ' + e.message); }
+  catch (e) { (await window.AI00Dialogs.alert('报废失败: ' + e.message)); }
 }
 
 // ── 单元格渲染 ────────────────────────────────────────────────────────────────

@@ -30,6 +30,56 @@ function bindEnvironment(dom, binding = { state: 'bound', workspace_gid: '10', d
   vm.runInContext('_invokeCapability = async () => window.__nativeBinding', dom.getInternalVMContext());
   vm.runInContext("_requestVisMockupCommand = async () => ({ steps: [{ status: 'succeeded', result: { process_id: 42, document_session: 'session-10' } }] })", dom.getInternalVMContext());
 }
+test('returning to an existing workspace refreshes TC status without a login-button click',()=>{
+ const dom=page(()=>{});dom.window.__refreshes=0;
+ vm.runInContext('_refreshTeamcenterSessionButton=async()=>{window.__refreshes++;}',dom.getInternalVMContext());
+ dom.window.dispatchEvent(new dom.window.MessageEvent('message',{data:{type:'workspace:visibility',visible:false}}));
+ assert.equal(dom.window.__refreshes,0);
+ dom.window.dispatchEvent(new dom.window.MessageEvent('message',{data:{type:'workspace:visibility',visible:true}}));
+ assert.equal(dom.window.__refreshes,1);dom.window.close();
+});
+
+test('shared dialog occludes native viewport and closing one overlay does not reveal through another',()=>{
+ const visible=[];const dom=page(()=>{throw Error('must not attach');},v=>visible.push(v));bindEnvironment(dom);
+ dom.window._completeLocalViewerPresentation();
+ const overlay=dom.window.document.createElement('dialog');overlay.className='ai00-dialog';overlay.open=true;dom.window.document.body.append(overlay);
+ vm.runInContext('_syncNativeViewportOcclusion()',dom.getInternalVMContext());assert.equal(visible.at(-1),false);
+ const form=dom.window.document.createElement('div');form.className='cs-modal-overlay';dom.window.document.body.append(form);overlay.remove();
+ vm.runInContext('_syncNativeViewportOcclusion()',dom.getInternalVMContext());assert.equal(visible.at(-1),false);
+ dom.window._liveDocumentContextUnavailable=true;form.remove();vm.runInContext('_syncNativeViewportOcclusion()',dom.getInternalVMContext());assert.equal(visible.at(-1),false);dom.window.close();
+});
+
+test('unbound viewport stages dimensions without revealing an unverified document',()=>{
+ const visibility=[],bounds=[];
+ const dom=page(()=>{throw Error('must_not_attach');},value=>visibility.push(value));
+ bindEnvironment(dom);
+ dom.window._liveDocumentContextUnavailable=true;
+ dom.window.electronAPI.visMockupNativeView.updateBounds=value=>bounds.push(value);
+ dom.window._notifyNativeViewportBounds();
+ assert.equal(bounds.length,1);
+ assert.equal(bounds[0].width,640);
+ assert.equal(bounds[0].height,480);
+ assert.equal(visibility.at(-1),false);
+ dom.window.close();
+});
+
+test('local readiness completes both the native presentation and legacy connected state',()=>{
+ const dom=page(()=>{throw Error('must_not_attach');});bindEnvironment(dom);
+ dom.window._liveDocumentContextUnavailable=true;
+ dom.window._completeLocalViewerPresentation();
+ assert.equal(vm.runInContext('_vmConnected',dom.getInternalVMContext()),true);
+ assert.equal(dom.window._liveDocumentContextUnavailable,false);
+ assert.equal(dom.window.document.getElementById('vmPlaceholder').classList.contains('hidden'),true);
+ dom.window.close();
+});
+
+test('restored current document hides the empty viewport placeholder',()=>{
+ const dom=page(()=>{});bindEnvironment(dom);
+ dom.window._completeLocalViewerPresentation();
+ dom.window._setVmStatus('connected','当前文档已显示');
+ assert.equal(dom.window.document.getElementById('vmPlaceholder').classList.contains('hidden'),true);
+ dom.window.close();
+});
 
 test('concurrent startup and environment attachment share one native operation', async () => {
   let calls = 0;

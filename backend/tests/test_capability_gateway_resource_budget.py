@@ -217,3 +217,24 @@ def test_write_reliability_rejection_releases_preacquired_capacity():
     result=asyncio.run(gateway.invoke(_envelope(catalog).model_copy(update=dict(idempotency_key='limited'))))
     assert result.error.code=='rate_limit_exceeded'
     assert gateway._admission.in_flight('craft.routing.get@1')==0
+
+
+def test_demo_capacity_log_is_payload_free_and_explicitly_opted_in(monkeypatch, caplog):
+    import json
+    async def scenario():
+        budget = ExecutionBudget(max_parallel_per_consumer=1, max_parallel_per_tenant=1)
+        gateway, envelope, admission, _metrics = _gateway(lambda *_: {'routing_id':'r1'}, budget)
+        gateway._admission_timeout_seconds = 0.001
+        held = await admission.acquire(capability_key='craft.routing.get@1', tenant_key=envelope.identity.tenant.tenant_id, consumer_key=gateway._consumer_key(envelope), budget=budget, timeout_seconds=0)
+        monkeypatch.delenv('AI00_DEMO_CAPACITY_DIAGNOSTICS', raising=False)
+        assert (await gateway.invoke(envelope)).error.code == 'capacity_unavailable'
+        assert not any(record.message.startswith('demo_capacity_admission ') for record in caplog.records)
+        monkeypatch.setenv('AI00_DEMO_CAPACITY_DIAGNOSTICS', '1')
+        assert (await gateway.invoke(envelope)).error.code == 'capacity_unavailable'
+        await held.release()
+    asyncio.run(scenario())
+    messages = [record.message for record in caplog.records if record.message.startswith('demo_capacity_admission ')]
+    assert len(messages) == 1
+    evidence = json.loads(messages[0].split(' ',1)[1])
+    assert set(evidence) == {'capability_id','version','code','reason','in_flight','tenant_in_flight','consumer_in_flight','tenant_limit','consumer_limit','wait_seconds'}
+    assert evidence['capability_id'] == 'craft.routing.get' and evidence['in_flight'] == 1

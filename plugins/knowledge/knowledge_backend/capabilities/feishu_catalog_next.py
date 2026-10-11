@@ -8,7 +8,7 @@ from backend.capability_v2.provider_contracts import CapabilityBusinessError, Ca
 from backend.platform_sdk.feishu import feishu_service, user_credential
 from plugins.knowledge.knowledge_backend.data.connection import get_knowledge_conn
 from plugins.knowledge.knowledge_backend.feishu_catalog import (
-    catalog_row, fetch_all_records, parse_catalog_url, reconcile_catalog_rows, sheet_catalog_records,
+    catalog_row, fetch_all_records, is_placeholder_title, parse_catalog_url, reconcile_catalog_rows, sheet_catalog_records,
 )
 from plugins.knowledge.knowledge_backend.ids import new_knowledge_id
 from plugins.knowledge.knowledge_backend.provider import register_capability
@@ -142,6 +142,17 @@ def sync_catalog(_payload: dict, context: CapabilityContext) -> dict:
                     (row["gid"], tenant, row["record_id"], row["title"][:512], row["document_url"],
                      row["document_token"], row["source_gid"], row["error"]),
                 )
+                if row["source_gid"] and not row["error"]:
+                    cur.execute(
+                        "SELECT d.gid,d.title FROM workmanship_know_documents d "
+                        "JOIN workmanship_know_feishu_sources s ON BINARY s.linked_document_gid=BINARY d.gid "
+                        "WHERE s.gid=%s AND s.tenant_gid=%s AND d.tenant_gid=%s FOR UPDATE",
+                        (row["source_gid"], tenant, tenant),
+                    )
+                    linked = cur.fetchone()
+                    if linked and is_placeholder_title(linked["title"], row["record_id"], row["document_token"]):
+                        cur.execute("UPDATE workmanship_know_documents SET title=%s WHERE gid=%s AND tenant_gid=%s",
+                                    (row["title"][:512], linked["gid"], tenant))
         conn.commit()
     return {
         "added": sum(1 for row in rows if row["record_id"] not in existing),
@@ -157,20 +168,37 @@ def list_catalog(payload: dict, context: CapabilityContext) -> dict:
     tenant = _tenant(context)
     _trusted_profile(context, tenant)
     limit = max(1, min(int(payload.get("limit") or 100), 500))
+    if payload.get('include_metadata'):
+        limit = min(limit, 20)
     offset = max(0, int(payload.get("offset") or 0))
     with get_knowledge_conn() as conn, conn.cursor() as cur:
         cur.execute(
             "SELECT r.gid,r.record_id,r.title,r.document_url,r.source_gid,r.error_code,r.active,r.updated_at,"
-            "s.linked_document_gid FROM workmanship_know_feishu_catalog_records r "
+            "s.linked_document_gid,d.source_author_name AS document_author_name,d.updated_at AS document_modified_at,"
+            "EXISTS(SELECT 1 FROM workmanship_know_feishu_snapshots snap "
+            "WHERE BINARY snap.source_gid=BINARY r.source_gid AND snap.tenant_gid=r.tenant_gid) AS has_source_snapshot "
+            "FROM workmanship_know_feishu_catalog_records r "
             "LEFT JOIN workmanship_know_feishu_sources s ON s.gid=r.source_gid "
+            "LEFT JOIN workmanship_know_documents d ON BINARY d.gid=BINARY s.linked_document_gid AND BINARY d.tenant_gid=BINARY r.tenant_gid "
             "WHERE r.tenant_gid=%s ORDER BY r.active DESC,r.title,r.record_id LIMIT %s OFFSET %s", (tenant, limit, offset),
         )
         rows = [dict(row) for row in cur.fetchall()]
         cur.execute("SELECT COUNT(*) AS n FROM workmanship_know_feishu_catalog_records WHERE tenant_gid=%s", (tenant,))
         total = int(cur.fetchone()["n"])
+    metadata = {}
+    if payload.get('include_metadata'):
+        from plugins.knowledge.knowledge_backend.feishu_metadata import read_source_metadata
+        try:
+            metadata = read_source_metadata(rows, user_gid=context.user_gid, access_token=user_credential(context))
+        except CapabilityBusinessError:
+            metadata = {row['gid']: {'feishu_author_name': None, 'feishu_modified_at': None,
+                                    'feishu_metadata_status': 'authorization_required'} for row in rows}
     for row in rows:
+        row['document_modified_at'] = row['document_modified_at'].isoformat() if row.get('document_modified_at') else None
+        row.update(metadata.get(row['gid'], {}))
         row["updated_at"] = row["updated_at"].isoformat() if row.get("updated_at") else None
         row["active"] = bool(row["active"])
+        row["has_source_snapshot"] = bool(row["has_source_snapshot"])
     return {"items": rows, "total": total, "limit": limit, "offset": offset}
 
 
@@ -186,7 +214,10 @@ def register_feishu_catalog_capabilities(registry) -> None:
             "required": ["gid", "record_id", "title", "document_url", "source_gid", "linked_document_gid", "error_code", "active", "updated_at"],
             "properties": {"gid": {"type": "string"}, "record_id": {"type": "string"}, "title": {"type": "string"},
                            "document_url": {"type": ["string", "null"]}, "source_gid": {"type": ["string", "null"]}, "linked_document_gid": {"type": ["string", "null"]},
-                           "error_code": {"type": ["string", "null"]}, "active": {"type": "boolean"}, "updated_at": {"type": ["string", "null"]}}}
+                           "error_code": {"type": ["string", "null"]}, "active": {"type": "boolean"}, "updated_at": {"type": ["string", "null"]},
+                           "has_source_snapshot": {"type": "boolean"}}}
+    item['properties'].update({key: {"type": ["string", "null"]} for key in
+                               ('document_author_name', 'document_modified_at', 'feishu_author_name', 'feishu_author_open_id', 'feishu_modified_at', 'feishu_metadata_status')})
     list_output = {"type": "object", "additionalProperties": False, "required": ["items", "total", "limit", "offset"],
                    "properties": {"items": {"type": "array", "items": item}, "total": {"type": "integer"},
                                   "limit": {"type": "integer"}, "offset": {"type": "integer"}}}
@@ -210,5 +241,5 @@ def register_feishu_catalog_capabilities(registry) -> None:
         **common, id="knowledge.source.catalog.list", description="List imported Feishu catalog rows and conversion status.",
         use_when="A user browses Feishu knowledge sources.", do_not_use_when="Reading a Markdown revision.",
         effects=("read:knowledge.source_catalog",),
-        input_schema={"type": "object", "properties": {"limit": {"type": "integer", "minimum": 1, "maximum": 500}, "offset": {"type": "integer", "minimum": 0}}},
+        input_schema={"type": "object", "properties": {"limit": {"type": "integer", "minimum": 1, "maximum": 500}, "offset": {"type": "integer", "minimum": 0}, "include_metadata": {"type": "boolean"}}},
         output_schema=list_output, tags=("knowledge", "source", "catalog", "read")), list_catalog)

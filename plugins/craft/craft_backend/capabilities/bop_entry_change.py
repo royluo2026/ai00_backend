@@ -15,6 +15,7 @@ from ..data.connection import get_craft_conn
 from ..rule_engine.checker import validate_with_proposed
 from ..routers._bop._constants import _AI00_LEVEL, _ENTRY_BY_GID_SQL, _LINK_TARGET_TABLES
 from ..routers._bop._helpers import _check_line_editable, _log_entry_op, _sync_child_vpps
+from .member_pictures import validate_picture_updates
 
 
 OPERATIONS = ("update", "delete")
@@ -308,6 +309,7 @@ def apply_bop_entry_change(payload: dict[str, Any], context: CapabilityContext) 
         if operation == "update":
             updates = dict(updates or {})
             properties = dict(properties or {})
+            validate_picture_updates(updates, context)
             sets: list[str] = []
             values: list[Any] = []
             for name in ("parent_gid", "node_type", "sort_order", "title", "vpps", "vpps_desc", "parent_bop_title"):

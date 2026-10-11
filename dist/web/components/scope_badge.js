@@ -147,13 +147,13 @@
     }[scope] || '';
   }
 
-  function _showToast(msg, type = 'info') {
+  async function _showToast(msg, type = 'info') {
     if (typeof window.parent?._showToast === 'function') {
       window.parent._showToast(msg, type);
     } else if (typeof window._showToast === 'function') {
       window._showToast(msg, type);
     } else {
-      alert(msg);
+      (await window.AI00Dialogs.alert(msg));
     }
   }
 

@@ -42,4 +42,21 @@ def equivalent_line_gids(project_gid: str, line_gid: str) -> list[str]:
             return [item["gid"] for item in cur.fetchall()]
 
 
-__all__ = ["equivalent_line_gids", "line_titles", "line_titles_for_project", "project_bop_lines"]
+def entry_project_gid(entry_gid, context):
+    """Resolve a live entry for a currently responsible project manager."""
+    from backend.capability_v2.provider_contracts import CapabilityBusinessError
+    from backend.platform_sdk.project_access import can_edit_project_bop
+    if not entry_gid or not context.user_gid or not context.team_gid or 'craft.read' not in context.permissions:
+        raise CapabilityBusinessError('permission_denied', 'Authenticated Craft read access is required.')
+    with get_conn() as conn, conn.cursor() as cur:
+        cur.execute('SELECT v.project_gid FROM workmanship_bop_bop_entries e '
+                    'JOIN workmanship_bop_bop_versions v ON v.gid=e.version_gid '
+                    'WHERE e.gid=%s AND e.is_deleted=FALSE AND v.archived_at IS NULL', (str(entry_gid),))
+        row = cur.fetchone()
+    project = str((row or {}).get('project_gid') or '')
+    if not project or not can_edit_project_bop(context.user_gid, project, None, ()):
+        raise CapabilityBusinessError('permission_denied', 'The Craft entry is unavailable in the managed project scope.')
+    return project
+
+
+__all__ = ["equivalent_line_gids", "line_titles", "line_titles_for_project", "project_bop_lines", "entry_project_gid"]

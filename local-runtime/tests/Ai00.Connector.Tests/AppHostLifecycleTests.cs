@@ -63,6 +63,47 @@ public sealed class AppHostLifecycleTests
         Assert.Equal(expected, transport.WakeEndpoint().AbsoluteUri);
     }
 
+    [Fact] public async Task HttpTimeoutIsTransientWithoutReplacingTheRuntimeSession()
+    {
+        using var http=new HttpClient(new TimeoutRequest());
+        var transport=new RuntimeTransport(http,new Uri("https://gateway.example.com"));
+        var error=await Assert.ThrowsAsync<RuntimeTransportException>(()=>transport.SendAsync(
+            HttpMethod.Post,"heartbeat",null,CancellationToken.None,OutcomeUnknownRecoveryTests.Session()));
+        Assert.True(error.Transient);Assert.Equal("cloud_request_timeout",error.Message);
+    }
+    [Fact] public async Task CallerCancellationIsNotConvertedToTransientFailure()
+    {
+        using var http=new HttpClient(new TimeoutRequest());using var cancel=new CancellationTokenSource();cancel.Cancel();
+        var transport=new RuntimeTransport(http,new Uri("https://gateway.example.com"));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(()=>transport.SendAsync(HttpMethod.Post,"heartbeat",null,cancel.Token));
+    }
+    [Theory] [InlineData("plans/lease",true)] [InlineData("heartbeat",false)]
+    public async Task OnlyPlanLeasesCanReceiveLargeAssemblyPayloads(string path,bool accepted)
+    {
+        var payload=new string('x',9*1024*1024);
+        using var http=new HttpClient(new InspectRequest(_=>new(System.Net.HttpStatusCode.OK){Content=new StringContent("{\"success\":true,\"data\":\""+payload+"\"}")}));
+        var transport=new RuntimeTransport(http,new Uri("https://gateway.example.com"));
+        if(accepted)Assert.Equal(payload, (await transport.SendAsync(HttpMethod.Post,path,null,CancellationToken.None)).GetString());
+        else Assert.Equal("cloud_response_size_invalid",(await Assert.ThrowsAsync<InvalidDataException>(()=>transport.SendAsync(HttpMethod.Post,path,null,CancellationToken.None))).Message);
+    }
+    [Fact] public async Task NormalWakeSocketCloseReturnsToPolling()
+    {
+        var probe=new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback,0);probe.Start();
+        var port=((System.Net.IPEndPoint)probe.LocalEndpoint).Port;probe.Stop();
+        using var listener=new System.Net.HttpListener();listener.Prefixes.Add($"http://127.0.0.1:{port}/");listener.Start();
+        var server=Task.Run(async()=>{var context=await listener.GetContextAsync();var connection=await context.AcceptWebSocketAsync(null);
+            using var socket=connection.WebSocket;await socket.CloseAsync(System.Net.WebSockets.WebSocketCloseStatus.NormalClosure,"idle",CancellationToken.None);});
+        var transport=new RuntimeTransport(new HttpClient(),new Uri($"http://127.0.0.1:{port}/"));
+        using var cancel=new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        try{await transport.WaitForWakeAsync(OutcomeUnknownRecoveryTests.Session(),cancel.Token);}
+        catch{if(server.IsFaulted)await server;throw;}
+        await server;
+    }
+    private sealed class TimeoutRequest:HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,CancellationToken ct)=>Task.FromException<HttpResponseMessage>(new TaskCanceledException("timeout"));
+    }
+
     [Theory]
     [InlineData("top_duplicate")] [InlineData("key_duplicate")] [InlineData("key_unknown")]
     [InlineData("jwk_duplicate")] [InlineData("jwk_unknown")] [InlineData("map_duplicate")]

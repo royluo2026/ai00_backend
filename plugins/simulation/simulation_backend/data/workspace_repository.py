@@ -495,7 +495,7 @@ class WorkspaceRepository:
     def insert_bop_projection(self, *, workspace_gid: str, plan: Mapping[str, Any],
                               expected_workspace_version: int, actor_gid: str,
                               tenant_gid: str, idempotency_key: str) -> dict[str, Any]:
-        """Persist one exact Craft-owned BOP skeleton without inventing a fork identity."""
+        """Persist one exact selected BOP hierarchy without inventing a Craft fork identity."""
         workspace_gid = _gid(workspace_gid, "workspace_gid")
         tenant_gid, actor_gid = _gid(tenant_gid, "tenant_gid"), _gid(actor_gid, "actor_gid")
         source_version_gid = _gid(plan.get("source_version_gid"), "source_version_gid")
@@ -509,7 +509,7 @@ class WorkspaceRepository:
         if not re.fullmatch(r"sha256:[0-9a-f]{64}", plan_hash):
             raise WorkspaceRepositoryError("bop_projection_plan_invalid")
         raw_nodes = [dict(item) for item in plan.get("nodes") or []]
-        if not raw_nodes or len(raw_nodes) > 10000:
+        if not raw_nodes or len(raw_nodes) > 20000:
             raise WorkspaceRepositoryError("bop_projection_node_invalid")
         normalized: dict[str, dict[str, Any]] = {}
         for item in raw_nodes:
@@ -535,6 +535,9 @@ class WorkspaceRepository:
             for item in ready:
                 ordered.append(item); pending.pop(item["source_gid"])
         projection_identity = f"craft-bop:{source_version_gid}:{plan.get('line_gid') or 'all'}:{plan.get('fork_depth')}:{source_hash}"
+        if plan.get("fork_depth") == "all":
+            # Legacy 'all' stored only process nodes. Keep it intact and permit the complete projection.
+            projection_identity += ":full-hierarchy-v1"
         source_refs = {"model_references": list(plan.get("model_references") or []),
                        "resource_references": list(plan.get("resource_references") or [])}
         hierarchy_gid = str(next_gid())
@@ -557,17 +560,23 @@ class WorkspaceRepository:
                  projection_identity, hierarchy_position))
             node_map = {item["source_gid"]: str(next_gid()) for item in ordered}
             sibling_positions: dict[str | None, int] = {}
-            node_rows = []
+            depths: dict[str, int] = {}
+            rows_by_depth: dict[int, list[tuple]] = {}
             for item in ordered:
                 parent_source = item["parent_source_gid"]
+                depth = depths[parent_source] + 1 if parent_source is not None else 0
+                depths[item["source_gid"]] = depth
                 position = sibling_positions.get(parent_source, 0); sibling_positions[parent_source] = position + 1
-                node_rows.append((node_map[item["source_gid"]], workspace_gid, tenant_gid, actor_gid,
+                rows_by_depth.setdefault(depth, []).append((node_map[item["source_gid"]], workspace_gid, tenant_gid, actor_gid,
                                   hierarchy_gid, node_map.get(parent_source), item["node_type"],
                                   item["name"], position, item["source_gid"], 1))
             # PyMySQL batches only placeholder-only VALUES; a literal 1 falls back to per-row queries.
             node_insert = "INSERT INTO workmanship_sim_workspace_nodes (gid,workspace_gid,tenant_gid,owner_gid,hierarchy_gid,parent_gid,node_type,name,sort_order,source_bop_node_gid,row_version) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-            for offset in range(0, len(node_rows), 500):
-                cursor.executemany(node_insert, node_rows[offset:offset + 500])
+            # OceanBase self-FKs cannot resolve a parent inserted in the same statement.
+            # Finish each parent depth before batching children; keep one transaction.
+            for node_rows in rows_by_depth.values():
+                for offset in range(0, len(node_rows), 500):
+                    cursor.executemany(node_insert, node_rows[offset:offset + 500])
             next_version, cache_hash = self._advance_workspace_revision(cursor, workspace_gid=workspace_gid,
                 current=workspace, patch={"op":"insert_bop_projection","hierarchy_gid":hierarchy_gid,
                     "source_version_gid":source_version_gid,"source_content_hash":source_hash,"plan_hash":plan_hash})
@@ -1532,6 +1541,83 @@ class WorkspaceRepository:
             )
             return result
 
+    def resume_cache_live_document(self, *, workspace_gid: str, document_gid: str,
+                                   tenant_gid: str, actor_gid: str, identity_operation_id: str,
+                                   expected_document_session: str, expected_workspace_row_version: int,
+                                   idempotency_key: str, session_nonce: str, now,
+                                   complete_binding) -> dict[str, Any]:
+        """Reauthorize one unchanged frozen package in the current native runtime."""
+        workspace_gid, document_gid = _gid(workspace_gid, 'workspace_gid'), _gid(document_gid, 'document_gid')
+        tenant_gid, actor_gid = _gid(tenant_gid, 'tenant_gid'), _gid(actor_gid, 'actor_gid')
+        from .connector_repository import SimulationConnectorRepository
+        from .viewer_interaction_repository import ViewerInteractionRepository
+        from ..application.cache_open_evidence import validated_cache_package_revision
+        with get_simulation_conn() as conn, conn.cursor() as cursor:
+            cursor.execute('SELECT row_version,cache_revision_hash,status FROM workmanship_sim_workspaces '
+                'WHERE gid=%s AND tenant_gid=%s AND owner_gid=%s AND removed_at IS NULL FOR UPDATE',
+                (workspace_gid, tenant_gid, actor_gid))
+            workspace = cursor.fetchone()
+            if not workspace or workspace['status'] == 'frozen':
+                raise WorkspaceRepositoryError('workspace_not_found')
+            request_hash, replay = self._idempotency_begin(cursor, workspace_gid=workspace_gid,
+                idempotency_key=idempotency_key, request=dict(op='resume_cache_live_document_v1',
+                    document_gid=document_gid, identity_operation_id=identity_operation_id,
+                    expected_document_session=expected_document_session,
+                    expected_workspace_row_version=expected_workspace_row_version,
+                    session_nonce=session_nonce))
+            if replay is not None:
+                return replay
+            if int(workspace['row_version']) != expected_workspace_row_version:
+                raise WorkspaceRepositoryError('version_conflict')
+            cursor.execute('SELECT source_kind,artifact_ref_json,content_sha256,connector_device_id '
+                'FROM workmanship_sim_vm_documents WHERE gid=%s AND workspace_gid=%s AND tenant_gid=%s '
+                "AND owner_gid=%s AND document_role IN ('primary','inserted') AND removed_at IS NULL FOR UPDATE",
+                (document_gid, workspace_gid, tenant_gid, actor_gid))
+            document = cursor.fetchone()
+            if not document or document['source_kind'] != 'teamcenter_cache_snapshot':
+                raise WorkspaceRepositoryError('cache_model_document_not_found')
+            try:
+                source_hash = validated_cache_package_revision(document)[7:]
+            except (ValueError, TypeError, KeyError) as exc:
+                raise WorkspaceRepositoryError('cache_source_identity_mismatch') from exc
+            cursor.execute('SELECT connector_device_id,document_session,state FROM workmanship_sim_live_document_bindings '
+                "WHERE workspace_gid=%s AND tenant_gid=%s AND actor_gid=%s AND state='bound' FOR UPDATE",
+                (workspace_gid, tenant_gid, actor_gid))
+            bindings = cursor.fetchall()
+            if len(bindings) != 1 or bindings[0]['document_session'] != expected_document_session:
+                raise WorkspaceRepositoryError('live_document_binding_stale')
+            cursor.execute('SELECT * FROM workmanship_sim_viewer_source_associations '
+                'WHERE workspace_gid=%s AND document_gid=%s AND tenant_gid=%s AND actor_gid=%s '
+                'AND active=1 FOR UPDATE', (workspace_gid, document_gid, tenant_gid, actor_gid))
+            associations = cursor.fetchall()
+            if len(associations) != 1:
+                raise WorkspaceRepositoryError('cache_source_association_unavailable')
+            old = associations[0]
+            if (old['document_session'] != expected_document_session or old['source_revision'] != source_hash
+                or old['device_id'] != bindings[0]['connector_device_id']
+                or old['device_id'] != document['connector_device_id']):
+                raise WorkspaceRepositoryError('cache_source_identity_mismatch')
+            identity = SimulationConnectorRepository.verified_existing_document_identity_evidence(
+                cursor, identity_operation_id, actor_id=actor_gid, tenant_id=tenant_gid, now=now)
+            if (identity['document_session'] != expected_document_session
+                or identity['connector_device_id'] != old['device_id']):
+                raise WorkspaceRepositoryError('live_document_identity_mismatch')
+            source_association_id = ViewerInteractionRepository.record_source_association(cursor,
+                tenant_gid=tenant_gid, actor_gid=actor_gid, workspace_gid=workspace_gid,
+                document_gid=document_gid, device_id=old['device_id'],
+                runtime_instance_id=identity['runtime_instance_id'],
+                runtime_generation=identity['runtime_generation'],
+                document_session=expected_document_session, source_revision=source_hash, now=now)
+            binding = dict(workspace_gid=workspace_gid, document_gid=document_gid, state='bound',
+                connector_device_id=old['device_id'], document_session=expected_document_session,
+                workspace_row_version=int(workspace['row_version']),
+                cache_revision_hash=workspace['cache_revision_hash'],
+                source_association_id=source_association_id)
+            result = complete_binding(cursor, binding)
+            self._idempotency_finish(cursor, workspace_gid=workspace_gid, idempotency_key=idempotency_key,
+                request_hash=request_hash, response=result)
+            return result
+
     def resume_online_live_document(self, *, workspace_gid: str, document_gid: str,
                                     tenant_gid: str, actor_gid: str, identity_operation_id: str,
                                     expected_document_session: str, expected_workspace_row_version: int,
@@ -1938,9 +2024,9 @@ class WorkspaceRepository:
             cursor.execute(
                 "SELECT w.gid AS workspace_gid,h.version_gid,w.owner_gid,w.name,w.review_type,w.version_label,w.status,w.visibility,w.primary_project_gid,w.cache_revision_hash,w.row_version,w.updated_at "
                 "FROM workmanship_sim_workspaces w JOIN workmanship_sim_workspace_heads h ON h.workspace_gid=w.gid "
-                "WHERE (w.owner_gid=%s OR w.visibility='shared') AND w.removed_at IS NULL "
+                "WHERE w.tenant_gid=%s AND (w.owner_gid=%s OR w.visibility='shared') AND w.removed_at IS NULL "
                 "ORDER BY w.updated_at DESC,w.gid DESC LIMIT %s OFFSET %s",
-                (_gid(owner_gid, "owner_gid"), page_size + 1, offset),
+                (_gid(tenant_gid, "tenant_gid"), _gid(owner_gid, "owner_gid"), page_size + 1, offset),
             )
             rows = [dict(row) for row in cursor.fetchall()]
             workspace_gids = [row["workspace_gid"] for row in rows]
@@ -1965,8 +2051,8 @@ class WorkspaceRepository:
             cursor.execute(
                 "SELECT w.gid AS workspace_gid,h.version_gid,w.tenant_gid AS workspace_tenant_gid,w.owner_gid,w.name,w.review_type,w.version_label,w.status,w.visibility,w.primary_project_gid,w.cache_revision_hash,w.row_version,w.updated_at "
                 "FROM workmanship_sim_workspaces w JOIN workmanship_sim_workspace_heads h ON h.workspace_gid=w.gid "
-                "WHERE w.gid=%s AND (w.owner_gid=%s OR w.visibility='shared') AND w.removed_at IS NULL" + suffix,
-                (_gid(workspace_gid, "workspace_gid"), _gid(owner_gid, "owner_gid")),
+                "WHERE w.gid=%s AND w.tenant_gid=%s AND (w.owner_gid=%s OR w.visibility='shared') AND w.removed_at IS NULL" + suffix,
+                (_gid(workspace_gid, "workspace_gid"), _gid(tenant_gid, "tenant_gid"), _gid(owner_gid, "owner_gid")),
             )
             workspace = cursor.fetchone()
             if not workspace:

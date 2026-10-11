@@ -16,6 +16,11 @@
     `<symbol id="${id}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${paths}</symbol>`;
 
   var sprite = `<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    ${S('icon-model-cache','<path d="M7 17H5a4 4 0 01-.7-7.94A6 6 0 0116 6a4.5 4.5 0 013 8.5"/><ellipse cx="13" cy="14" rx="5" ry="2"/><path d="M8 14v6c0 1.1 2.2 2 5 2s5-.9 5-2v-6M8 17c0 1.1 2.2 2 5 2s5-.9 5-2"/>')}
+    ${S('icon-plugin-marketplace',
+      '<path d="M3 10h18l-2-6H5l-2 6zM5 10v10h14V10M3 10a3 3 0 006 0 3 3 0 006 0 3 3 0 006 0"/>' +
+      '<path d="M10 20v-5h4v5M9 4l-1 6M15 4l1 6"/>'
+    )}
 
     ${/* ── 系统 / 导航 ────────────────────────────────────── */''}
     ${S('icon-settings',

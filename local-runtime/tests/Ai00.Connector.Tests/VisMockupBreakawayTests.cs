@@ -5,6 +5,35 @@ namespace Ai00.Connector.Tests;
 public sealed class VisMockupBreakawayTests
 {
     [Theory]
+    [InlineData(false, false, "inconclusive")]
+    [InlineData(true, false, "succeeded")]
+    [InlineData(true, true, "inconclusive")]
+    public async Task CloseRecoveryRequiresAnObservedEmptyDocumentInventory(
+        bool applicationAvailable, bool documentOpen, string classification)
+    {
+        var document = documentOpen ? new FakeDocument("document", "user", FakeNode.FlatTree(1)) : null;
+        var com = new FakeVisMockupCom { ExistingApplication = applicationAvailable ? new FakeApplication("14.2.0", document) : null };
+        using var sta = new StaDispatcher();
+        var probes = new PostConditionProbes(sta, com);
+        var input = System.Text.Json.JsonSerializer.SerializeToElement(new { expected_all_documents_closed = true });
+        var result = await probes.ObserveAsync("vismockup.application.probe@1", input, CancellationToken.None);
+        Assert.Contains($"classification = {classification}", result.ToString());
+        Assert.Equal(0, com.LaunchCalls);
+    }
+
+    [Fact]
+    public async Task CloseRecoveryDoesNotTreatNoActiveDocumentAsAnEmptyInventory()
+    {
+        var document = new FakeDocument("background", "user", FakeNode.FlatTree(1));
+        var app = new FakeApplication("14.2.0", null) { OpenDocuments = [document] };
+        using var sta = new StaDispatcher();
+        var probes = new PostConditionProbes(sta, new FakeVisMockupCom { ExistingApplication = app });
+        var input = System.Text.Json.JsonSerializer.SerializeToElement(new { expected_all_documents_closed = true });
+        var result = await probes.ObserveAsync("vismockup.application.probe@1", input, CancellationToken.None);
+        Assert.Contains("classification = inconclusive", result.ToString());
+    }
+
+    [Theory]
     [InlineData("development-local-only", "ANY-SIGNED-THUMBPRINT", true)]
     [InlineData("EXPECTED", "expected", true)]
     [InlineData("EXPECTED", "OTHER", false)]

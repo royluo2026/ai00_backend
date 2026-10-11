@@ -14,10 +14,12 @@ from ..application.rules import (
     validate_rule_definition_changes,
 )
 from ..data.connection import get_conn
+from .contracts import output_schema_for
 
 READ_OPERATIONS = ("list", "get")
 CHANGE_OPERATIONS = ("create", "update", "delete")
 _FIELDS = {"code", "name", "rule_type", "enforcement_level", "status", "share_scope", "list_gid", "context_class_gid", "rule_definition", "expression"}
+_VISIBLE_RULE = "(owner_user_gid=%s OR creator_gid=%s OR share_scope='global' OR (share_scope='team' AND JSON_UNQUOTE(JSON_EXTRACT(applicable_scope, '$.team_gid'))=%s))"
 RULE_DEFINITION_INPUT_SCHEMA = {
     "type": "object", "additionalProperties": False,
     "properties": {
@@ -82,12 +84,13 @@ def read_rule_library(payload: dict[str, Any], context: CapabilityContext) -> Ca
                 gid = str(payload.get("gid") or "")
                 if not gid:
                     raise ValueError("gid is required")
-                cur.execute("SELECT * FROM workmanship_know_craft_rules WHERE gid=%s", (gid,))
+                cur.execute(f"SELECT * FROM workmanship_know_craft_rules WHERE gid=%s AND {_VISIBLE_RULE}",
+                            (gid, context.user_gid, context.user_gid, context.team_gid))
                 row = cur.fetchone()
                 if not row:
                     raise ValueError("rule not found")
                 return CapabilityOutput(data={"success": True, "data": _row(dict(row))})
-            conditions = ["(owner_user_gid=%s OR creator_gid=%s OR share_scope='global' OR (share_scope='team' AND JSON_UNQUOTE(JSON_EXTRACT(applicable_scope, '$.team_gid'))=%s))"]
+            conditions = [_VISIBLE_RULE]
             params: list[Any] = [context.user_gid, context.user_gid, context.team_gid]
             status = payload.get("status")
             list_gid = payload.get("list_gid")
@@ -202,6 +205,6 @@ def register_rule_definition_change_capability(registry: Any) -> None:
 
 
 def register_rule_library_capabilities(registry: Any) -> None:
-    registry.register(CapabilitySpec(id="craft.rule.library.read", owner="craft", description="Read bounded Craft rule-library records.", use_when="A governed consumer needs Craft rule definitions or search results.", do_not_use_when="The request evaluates a rule or publishes a rule release.", risk="read", permissions=("craft.read",), input_schema={"type": "object", "required": ["operation"], "properties": {"operation": {"type": "string", "enum": list(READ_OPERATIONS)}, "gid": {"type": "string"}, "status": {"type": "string"}, "list_gid": {"type": "string"}, "q": {"type": "string", "maxLength": 200}, "limit": {"type": "integer", "minimum": 1, "maximum": 500}}, "additionalProperties": False}, output_schema={"type": "object", "required": ["success", "data"], "properties": {"success": {"type": "boolean"}, "data": {"type": "array", "maxItems": 500, "items": {"type": "object", "additionalProperties": True}}}, "additionalProperties": False}, tags=("craft", "rule", "library", "read")), read_rule_library)
+    registry.register(CapabilitySpec(id="craft.rule.library.read", owner="craft", description="Read bounded Craft rule-library records.", use_when="A governed consumer needs Craft rule definitions or search results.", do_not_use_when="The request evaluates a rule or publishes a rule release.", risk="read", permissions=("craft.read",), input_schema={"type": "object", "required": ["operation"], "properties": {"operation": {"type": "string", "enum": list(READ_OPERATIONS)}, "gid": {"type": "string"}, "status": {"type": "string"}, "list_gid": {"type": "string"}, "q": {"type": "string", "maxLength": 200}, "limit": {"type": "integer", "minimum": 1, "maximum": 500}}, "additionalProperties": False}, output_schema=output_schema_for("craft.rule.library.read", 1), tags=("craft", "rule", "library", "read")), read_rule_library)
     registry.register(CapabilitySpec(id="craft.rule.library.change.apply", owner="craft", description="Apply bounded Craft rule-library CRUD changes.", use_when="A governed consumer needs to create, update or delete a Craft rule definition.", do_not_use_when="The request evaluates a rule or changes a published rule release.", risk="write", confirmation="user", permissions=("craft.rule.write",), input_schema={"type": "object", "required": ["operation"], "properties": {"operation": {"type": "string", "enum": list(CHANGE_OPERATIONS)}, "gid": {"type": "string"}, "record": {"type": "object", "maxProperties": 20, "additionalProperties": True}}, "additionalProperties": False}, output_schema={"type": "object", "required": ["success"], "properties": {"success": {"type": "boolean"}, "data": {"type": "object", "additionalProperties": True}}, "additionalProperties": False}, tags=("craft", "rule", "library", "write")), change_rule_library)
     register_rule_definition_change_capability(registry)

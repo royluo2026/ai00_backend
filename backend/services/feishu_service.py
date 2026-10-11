@@ -1211,14 +1211,16 @@ class FeishuService:
             raise ValueError(f"Feishu Docx read failed: {body.get('code')}")
         return body["data"]
 
-    def resolve_wiki_node(self, wiki_token: str, *, access_token: str | None = None) -> dict:
+    def resolve_wiki_node(self, wiki_token: str, *, access_token: str | None = None, obj_type: str | None = None) -> dict:
         import re
         if not re.fullmatch(r"[A-Za-z0-9_-]{3,128}", wiki_token or ""):
             raise ValueError("invalid Wiki token")
+        if obj_type not in {None, 'docx', 'doc', 'sheet', 'bitable', 'mindnote', 'file', 'slides'}:
+            raise ValueError("invalid Wiki object type")
         response = requests.get(
             f"{FEISHU_API}/wiki/v2/spaces/get_node",
             headers={"Authorization": f"Bearer {access_token or self._get_tenant_token()}"},
-            params={"token": wiki_token}, timeout=20,
+            params={"token": wiki_token, **({"obj_type": obj_type} if obj_type else {})}, timeout=20,
         )
         response.raise_for_status()
         body = response.json()
@@ -1226,6 +1228,25 @@ class FeishuService:
         if body.get("code") != 0 or not isinstance(node, dict):
             raise ValueError(f"Feishu Wiki lookup failed: {body.get('code')}")
         return node
+
+    def get_user_names_as_user(self, user_ids: list[str], *, access_token: str) -> dict[str, str]:
+        """Resolve only the requested document creators using delegated read access."""
+        import re
+        if not user_ids:
+            return {}
+        if len(user_ids) > 50 or not all(re.fullmatch(r"ou_[A-Za-z0-9_-]+", item or "") for item in user_ids):
+            raise ValueError("invalid creator IDs")
+        response = requests.get(
+            f"{FEISHU_API}/contact/v3/users/batch",
+            headers={"Authorization": f"Bearer {access_token}"},
+            params={"user_id_type": "open_id", "user_ids": user_ids}, timeout=15,
+        )
+        response.raise_for_status()
+        body = response.json()
+        if body.get('code') != 0:
+            raise ValueError(f"Feishu user name read failed: {body.get('code')}")
+        return {item['open_id']: item['name'] for item in (body.get('data') or {}).get('items', [])
+                if item.get('open_id') and item.get('name')}
 
     def update_block_text(self, doc_token: str, block_id: str, text: str) -> dict:
         """更新指定 block 的文本内容（tenant token）。"""

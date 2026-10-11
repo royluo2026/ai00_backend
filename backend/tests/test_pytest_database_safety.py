@@ -32,7 +32,7 @@ def test_live_database_tests_require_explicit_opt_in(monkeypatch):
         "get_settings",
         lambda: type("Settings", (), {"get_db_params": lambda self: {
             "host": "test", "port": 3306, "user": "test", "password": "test", "db": "test",
-        }})(),
+        }, "public_url": ""})(),
     )
 
     connection.init_pool()

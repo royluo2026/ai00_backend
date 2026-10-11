@@ -171,15 +171,28 @@ def read_bop_entry_legacy(payload: dict[str, Any], _context: CapabilityContext) 
                     params.append(link_type)
                 cur.execute(query, params)
                 links = _rows(cur)
-                summary: dict[str, Any] = {}
+                targets: dict[tuple, dict[Any, None]] = {}
                 for link in links:
                     table_info = _LINK_TARGET_TABLES.get(link["link_type"])
-                    valid = True
                     if table_info and table_info[0]:
-                        table, gid_col, deleted_col = table_info
-                        deleted = f" AND {deleted_col} IS NULL" if deleted_col else ""
-                        cur.execute(f"SELECT {gid_col} FROM {table} WHERE {gid_col}=%s{deleted} LIMIT 1", (link["entity_gid"],))
-                        valid = bool(cur.fetchone())
+                        targets.setdefault(table_info, {})[link["entity_gid"]] = None
+                existing: dict[tuple, set[str]] = {}
+                for table_info, entities in targets.items():
+                    table, gid_col, deleted_col = table_info
+                    deleted = f" AND {deleted_col} IS NULL" if deleted_col else ""
+                    found: set[str] = set()
+                    ordered = list(entities)
+                    for start in range(0, len(ordered), 256):
+                        batch = ordered[start:start + 256]
+                        placeholders = ",".join(["%s"] * len(batch))
+                        cur.execute(f"SELECT {gid_col} FROM {table} WHERE {gid_col} IN ({placeholders}){deleted}", batch)
+                        found.update(str(row[gid_col]) for row in cur.fetchall())
+                    existing[table_info] = found
+                summary: dict[str, Any] = {}
+                # Preserve original order and last-link overwrite for each entity.
+                for link in links:
+                    table_info = _LINK_TARGET_TABLES.get(link["link_type"])
+                    valid = not table_info or not table_info[0] or str(link["entity_gid"]) in existing[table_info]
                     summary[link["entity_gid"]] = {"entry_gid": link["entry_gid"], "link_gid": link["gid"], "link_type": link["link_type"], "is_primary": link["is_primary"], "is_valid": valid, **({"snapshot_data": link["snapshot_data"]} if link.get("snapshot_data") else {})}
                 return CapabilityOutput(data={"data": summary})
 
@@ -218,8 +231,9 @@ def read_bop_entry_legacy(payload: dict[str, Any], _context: CapabilityContext) 
 
             if operation == "pbom_search":
                 q, vpps, snapshot_gid = payload.get("q"), payload.get("vpps"), payload.get("snapshot_gid")
+                project_gid = payload.get("project_gid")
                 like = f"%{q}%" if q else None
-                cur.execute("SELECT p.gid,p.part_no,p.title,p.quantity,p.unit,p.vpps,p.parent_gid,p.snapshot_gid,pv.version_tag FROM workmanship_bop_pbom p JOIN workmanship_bop_pbom_versions pv ON pv.gid=p.snapshot_gid WHERE (%s IS NULL OR p.part_no LIKE %s OR p.title LIKE %s) AND (%s IS NULL OR p.vpps=%s) AND (%s IS NULL OR p.snapshot_gid=%s) ORDER BY pv.version_tag,p.part_no LIMIT %s", (like, like, like, vpps, vpps, snapshot_gid, snapshot_gid, limit))
+                cur.execute("SELECT p.gid,p.part_no,p.title,p.quantity,p.unit,p.vpps,p.parent_gid,p.snapshot_gid,pv.version_tag FROM workmanship_bop_pbom p JOIN workmanship_bop_pbom_versions pv ON pv.gid=p.snapshot_gid WHERE (%s IS NULL OR p.part_no LIKE %s OR p.title LIKE %s) AND (%s IS NULL OR p.vpps=%s) AND (%s IS NULL OR p.snapshot_gid=%s) AND (%s IS NULL OR pv.project_gid=%s) ORDER BY pv.version_tag,p.part_no LIMIT %s", (like, like, like, vpps, vpps, snapshot_gid, snapshot_gid, project_gid, project_gid, limit))
                 rows = _rows(cur)
                 return CapabilityOutput(data={"data": rows, "total": len(rows)})
 

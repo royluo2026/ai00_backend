@@ -61,7 +61,7 @@
   function createController({ invoke, recordsView, treeView, elements, dialogView, forkDialogView, cache = null,
     getAuthSubjectGid = () => null,
     openFrozen = record => root._openFrozenSimulationEnvironment?.(record),
-    confirmDelete = message => root.confirm?.(message) !== false }) {
+    confirmDelete = async message => (await root.AI00Dialogs.confirm(message)) !== false }) {
     const store = root.AI00SimulationEnvironmentStore.createEnvironmentStore({
       invoke: async (capability, payload) => unwrap(await invoke(capability, {
         version: 1, payload,
@@ -156,7 +156,7 @@
           const record = kind === 'private'
             ? store.state.records.find(item => item.workspace_gid === gid)
             : store.state.spaces.find(item => item.space_gid === gid);
-          if (!record || !confirmDelete('确认删除？该操作保留历史证据，但环境将不再显示。')) return;
+          if (!record || !await confirmDelete('确认删除？该操作保留历史证据，但环境将不再显示。')) return;
           await store.deleteRecord(kind, record);
         } catch (_) { render(store.state); }
         return;

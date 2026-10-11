@@ -1197,14 +1197,14 @@ class WorkflowCanvas {
   async _expandSkillCallNode(nodeObj) {
     const skillGid = nodeObj.params?.skill_gid;
     if (!skillGid) {
-      alert('该 skill_call 节点未配置 skill_gid，无法展开');
+      (await window.AI00Dialogs.alert('该 skill_call 节点未配置 skill_gid，无法展开'));
       return;
     }
     let skill = null;
     try {
       skill = await window.call_bridge?.('skill', 'get_skill', { gid: skillGid });
     } catch (_) {}
-    if (!skill) { alert('未找到对应 Skill'); return; }
+    if (!skill) { (await window.AI00Dialogs.alert('未找到对应 Skill')); return; }
 
     let canvasData = null;
     try {
@@ -1217,7 +1217,7 @@ class WorkflowCanvas {
     } catch (_) {}
 
     if (!canvasData || !(canvasData.nodes || []).length) {
-      alert('该 Skill 没有预定义画布，无法展开');
+      (await window.AI00Dialogs.alert('该 Skill 没有预定义画布，无法展开'));
       return;
     }
 
@@ -2584,10 +2584,10 @@ Object.assign(WorkflowCanvas.prototype, {
   },
 
   /* 弹出输入框添加 iframe 标签页 */
-  _promptAddTab() {
-    const title = prompt('标签页标题：');
+  async _promptAddTab() {
+    const title = (await window.AI00Dialogs.prompt('标签页标题：'));
     if (!title) return;
-    const url = prompt('页面路径或 URL（如 ../lineage_view/index.html）：');
+    const url = (await window.AI00Dialogs.prompt('页面路径或 URL（如 ../lineage_view/index.html）：'));
     if (!url) return;
     const id = 'bc_' + Date.now();
     this.addBottomTab(id, title, url.startsWith('http') ? 'url' : 'local', { url });

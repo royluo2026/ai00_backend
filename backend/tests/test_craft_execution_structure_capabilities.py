@@ -108,6 +108,31 @@ def test_structure_hash_is_deterministic_for_input_order():
     assert one["operations"][1]["predecessor_ids"] == ["op-1"]
 
 
+def test_operation_projects_bindings_from_owned_leaf_nodes_only():
+    original = _aggregate()
+    aggregate = BopAggregate(version=original.version, entries=original.entries + (
+        {"gid": "part-leaf", "parent_gid": "op-1", "node_type": "part", "sort_order": 10},
+        {"gid": "nested-group", "parent_gid": "op-1", "node_type": "group", "sort_order": 20},
+        {"gid": "tool-leaf", "parent_gid": "nested-group", "node_type": "tool_need", "sort_order": 10},
+        {"gid": "nested-op", "parent_gid": "op-1", "node_type": "operation", "sort_order": 30},
+        {"gid": "nested-part", "parent_gid": "nested-op", "node_type": "part", "sort_order": 10},
+    ), links=original.links + (
+        {"entry_gid": "part-leaf", "link_type": "pbom_part", "entity_gid": "part-leaf-1", "entity_data": {"part_no": "LEAF-1"}},
+        {"entry_gid": "tool-leaf", "link_type": "project_tools", "entity_gid": "tool-leaf-1", "entity_data": {"code": "TOOL-1"}},
+        {"entry_gid": "nested-part", "link_type": "pbom_part", "entity_gid": "part-leaf-2", "entity_data": {"part_no": "LEAF-2"}},
+    ))
+    with patch.object(repository, "load_bop_aggregate", return_value=aggregate):
+        result = build_execution_structure("v1", expected_revision=None, preview=False)
+    operations = {item["operation_id"]: item for item in result["operations"]}
+    assert operations["op-1"]["products"] == [
+        {"product_ref": "A-1", "action": "use"}, {"product_ref": "LEAF-1", "action": "use"}]
+    assert operations["op-1"]["resources"] == [{"resource_type": "tool", "code": "TOOL-1"}]
+    assert operations["op-1"]["part_refs"] == ["part:part-1", "part:part-leaf-1"]
+    assert operations["nested-op"]["products"] == [{"product_ref": "LEAF-2", "action": "use"}]
+    assert operations["op-2"]["products"] == []
+    assert next(n for n in result["nodes"] if n["node_id"] == "op-1")["part_refs"] == ["part:part-1"]
+
+
 def test_linked_parts_reports_usage_locations():
     with patch.object(repository, "load_bop_aggregate", return_value=_aggregate()):
         result = get_linked_parts(

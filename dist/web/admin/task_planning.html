@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
+
+<script src="/web/core/dialogs.js?rev=20260922-unified-1"></script>
+
   <script src="/web/core/business_facade.js"></script>
 <meta charset="UTF-8">
 <title>任务规划</title>
@@ -638,6 +641,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);
   color:var(--text-muted);line-height:1.7;
 }
 </style>
+  <link rel="stylesheet" href="/assets/dialogs-e48cd6c5.css">
 </head>
 <body>
 <!-- SVG Sprite: 48 icons in 6 categories -->
@@ -2431,7 +2435,7 @@ function setTool(t) {
 document.getElementById('btnLinkDep').addEventListener('click', () => setTool(_tool === 'add_dep' ? 'select' : 'add_dep'));
 
 document.getElementById('btnAddNode').addEventListener('click', async () => {
-  if (!_currentListGid) return alert('请先选择或创建任务清单');
+  if (!_currentListGid) return (await window.AI00Dialogs.alert('请先选择或创建任务清单'));
   // place at center of viewport
   const rect = viewport.getBoundingClientRect();
   const cx = rect.width / 2, cy = rect.height / 2;
@@ -3053,7 +3057,7 @@ function _applyViewFilters(tasks, config) {
 let _importViewSelected = null;
 
 async function openImportFromView() {
-  if (!_currentListGid) { alert('请先选择一个任务清单'); return; }
+  if (!_currentListGid) { (await window.AI00Dialogs.alert('请先选择一个任务清单')); return; }
   const modal  = document.getElementById('importViewModal');
   const listEl = document.getElementById('importViewList');
   _importViewSelected = null;
@@ -3090,7 +3094,7 @@ async function doImportFromView() {
   // 加载全部任务（不限 placed_only）
   let allTasks;
   try { allTasks = await _apiListTasks(_currentListGid, false); }
-  catch(e) { alert('加载任务失败：' + e.message); return; }
+  catch(e) { (await window.AI00Dialogs.alert('加载任务失败：' + e.message)); return; }
   // 按视图筛选
   let toImport = _importViewSelected
     ? _applyViewFilters(allTasks, _importViewSelected.config)
@@ -3098,7 +3102,7 @@ async function doImportFromView() {
   // 排除已在画布上的
   const existing = new Set(_nodes.map(n => n.gid));
   toImport = toImport.filter(t => !existing.has(t.gid));
-  if (!toImport.length) { alert('所有符合条件的任务已在画布上，无需重复导入。'); modal.style.display = 'none'; return; }
+  if (!toImport.length) { (await window.AI00Dialogs.alert('所有符合条件的任务已在画布上，无需重复导入。')); modal.style.display = 'none'; return; }
   // 自动布局：从当前画布右下方开始，4列网格
   const baseX = 120, baseY = 120, colW = 200, rowH = 100, cols = 4;
   const maxY = _nodes.reduce((m, n) => Math.max(m, (n.canvas_y ?? 0) + 120), baseY - 100);

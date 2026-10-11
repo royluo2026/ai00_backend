@@ -399,7 +399,7 @@ function _openEditEntryModal(row) {
 }
 
 async function _deleteEntry(gid) {
-  if (!confirm('确定删除此节点及其所有子节点？')) return;
+  if (!(await window.AI00Dialogs.confirm('确定删除此节点及其所有子节点？'))) return;
   try {
     await _invokeCapability('craft.gbop.entity.change.apply', {
       operation: 'entry.delete',

@@ -178,6 +178,7 @@ _RESOURCES = {
     "simulation.environment.cache_source.open.request": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.cache_source.bind": (("simulation-workspace", "workspace_gid"),),
     "simulation.environment.cache_source.live_document.bind": (("simulation-workspace", "workspace_gid"),),
+    "simulation.environment.cache_source.live_document.resume": (("simulation-workspace", "workspace_gid"),),
     "simulation.product_structure.observation.begin": (("simulation-workspace", "workspace_gid"),),
     "simulation.product_structure.observation.page.append": (),
     "simulation.product_structure.observation.publish": (),
@@ -791,13 +792,14 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         updates.update({
             "exposure": ExposurePolicy(web=True),
             "business_effect": (
-                "Preview the exact published or explicitly selected active Craft BOP process skeleton for insertion into one owned Simulation environment."
+                "Preview the exact published or explicitly selected active Craft BOP hierarchy at the selected depth for insertion into one owned Simulation environment."
                 if governed.id.endswith(".preview") else
-                "Atomically insert the previously previewed exact Craft BOP process skeleton as one editable alternate hierarchy."
+                "Atomically insert the previously previewed exact Craft BOP hierarchy at the selected depth as one editable alternate hierarchy."
             ),
             "business_acceptance_criteria": (
                 "The source is read only through Craft's revision-pinned execution structure contract: published versions use get@1 and an explicitly selected active version uses preview@1 after resolving its current revision.",
-                "Product and resource references are counted as separate source references and are never copied into the editable process skeleton as hierarchy nodes.",
+                "All depth preserves every actual source BOP node and its parentage, including parts and resources, up to 20000 nodes; bounded process depths retain their existing truncation semantics.",
+                "Product and resource references remain separate source references and never generate additional or duplicate hierarchy nodes.",
                 "Apply recomputes the projection and rejects a changed source, target row version or plan hash without partial writes.",
             ),
             "business_invariants": (),
@@ -930,6 +932,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         from backend.capability_v2.identity import DESKTOP_CONSUMER_ID
         effects = {
             "simulation.environment.cache_source.live_document.bind": "Bind the exact frozen-cache package and returned native document identity without changing the cached source.",
+            "simulation.environment.cache_source.live_document.resume": "Renew only the current-runtime association and grant for the exact already-open frozen-cache document.",
             "simulation.vismockup.document.identity.read.request": "Queue one signed read identifying the active native document on the owner's current App workstation.",
             "simulation.vismockup.document.existing_identity.read.request": "Select an already-open VisMockup document by exact native session and persist its signed identity in the current App runtime.",
             "simulation.vismockup.document.hierarchy_inventory.read.request": "Queue one signed bounded read of alternate hierarchies from an exact active document session.",
@@ -1142,6 +1145,30 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
                     'backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql'],
                 'dependencies':['vismockup.model.open@3'],
                 'idempotency':'workspace/key plus exact cache open operation/document/revision/Main nonce'})
+    if governed.id == 'simulation.environment.cache_source.live_document.resume':
+        updates.update(
+            concurrency_policy='expected_version', expected_version_payload_path='expected_workspace_row_version',
+            business_acceptance_criteria=(
+                'Fresh signed existing-document identity matches the same owned device and bound native session.',
+                'Frozen batch/package/content and the active prior source revision match without another model open.',
+                'Association, signed grant and nonce-bound replay commit atomically without changing workspace content.'),
+            business_invariants=(BusinessInvariantContract(rule_id='simulation.viewer.cache_document_resume', version=1,
+                statement='Only a fresh current-runtime native identity and unchanged frozen source can renew cached control.',
+                applies_when='an already-open cached document is resumed after environment selection',
+                enforcement_ref='plugins/simulation/simulation_backend/data/workspace_repository.py:resume_cache_live_document',
+                error_code='cache_source_identity_mismatch',
+                test_refs=('plugins/simulation/tests/test_cache_document_resume.py::test_resume_cache_rejects_changed_pins',)),),
+            test_refs=({'path':'plugins/simulation/tests/test_cache_document_resume.py'},),
+            transaction_policy={**updates['transaction_policy'],
+                'atomicity':'signed current-runtime identity/immutable package/prior source/grant proof/idempotent completion in one transaction',
+                'tables':['workmanship_sim_connector_runtime_plans','workmanship_sim_connector_runtime_devices',
+                    'workmanship_sim_workspaces','workmanship_sim_vm_documents','workmanship_sim_live_document_bindings',
+                    'workmanship_sim_viewer_source_associations','workmanship_sim_viewer_interaction_grants',
+                    'workmanship_sim_viewer_grant_evidence','workmanship_sim_workspace_idempotency'],
+                'migration_refs':['backend/db/migrations/domains/simulation/0028_viewer_interaction.sql',
+                    'backend/db/migrations/domains/simulation/0029_viewer_grant_evidence.sql'],
+                'dependencies':['vismockup.document.existing_identity.read@1','simulation.environment.cache_source.live_document.bind@1'],
+                'idempotency':'workspace/key plus exact signed identity/document/session/revision/Main nonce; immutable replay'})
     if governed.id == 'simulation.teamcenter.model_cache.read':
         bulk=governed.version==2
         updates.update(

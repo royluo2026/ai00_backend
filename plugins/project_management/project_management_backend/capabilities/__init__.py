@@ -24,3 +24,5 @@ def register_capabilities(registry: Any) -> None:
     register_org_management_capabilities(registry)
     from .desktop_attachments import register_attachments
     register_attachments(registry)
+    from .scoped_writes import register_scoped_writes
+    register_scoped_writes(registry)

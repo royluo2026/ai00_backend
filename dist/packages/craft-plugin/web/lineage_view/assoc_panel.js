@@ -400,7 +400,7 @@ const ASSOC_ADAPTERS = {
         label: '撤销关联',
         danger: true,
         execute: async (cf, versionGid, toast) => {
-          if (!confirm('确定撤销所有已关联的工序、操作和零件节点？此操作不可恢复。')) return;
+          if (!(await window.AI00Dialogs.confirm('确定撤销所有已关联的工序、操作和零件节点？此操作不可恢复。'))) return;
           const res = await _assocInvoke(cf, 'craft.gbop.station_autolink.change.apply', {
             operation: 'undo',
             bop_gid: versionGid,
@@ -414,7 +414,7 @@ const ASSOC_ADAPTERS = {
         danger: true,
         superAdminOnly: true,
         execute: async (cf, versionGid, toast) => {
-          if (!confirm('【超管】硬删除：将彻底删除所有工序/操作/零件节点及其链接，无法恢复！确定继续？')) return;
+          if (!(await window.AI00Dialogs.confirm('【超管】硬删除：将彻底删除所有工序/操作/零件节点及其链接，无法恢复！确定继续？'))) return;
           const res = await _assocInvoke(cf, 'craft.gbop.station_autolink.change.apply', {
             operation: 'undo',
             bop_gid: versionGid,
@@ -440,11 +440,18 @@ const ASSOC_ADAPTERS = {
           toast('工序截图已启动…');
           // progressCb：每完成一个工序即更新状态栏 + 内联刷新缩略图
           let captureCount = 0;
-          capture(lineGid, async op => {
+          capture(lineGid, async (op, artifactRef) => {
+            if (panel._versionGid !== versionGid || (op.bop_version_gid && op.bop_version_gid !== versionGid)) return;
+            await panel._onCaptureAttached?.(op, artifactRef, versionGid);
             captureCount++;
             const topWin = window.top || window.parent;
             topWin?._showCaptureProgress?.(`工序截图 ${captureCount} ✓  ${op.title}`);
-            await panel._refreshPicMap();
+            if (panel._selectedLineGids.has(lineGid)) {
+              const url = await _resolvePictureDisplay({ artifact_ref: artifactRef }, versionGid);
+              if (panel._versionGid !== versionGid || !panel._selectedLineGids.has(lineGid)) return;
+              panel._picMap.set(op.bop_entry_gid, url);
+              panel._reRenderBody();
+            }
           });
         },
       },
@@ -455,7 +462,7 @@ const ASSOC_ADAPTERS = {
           const lineGids = [...(panel._selectedLineGids || [])];
           if (lineGids.length !== 1) { toast('请先选择一条线体', 'warn'); return; }
           const lineGid = lineGids[0];
-          if (!confirm('确定清除该线体所有工序的流程图片（process_flow_pic）？')) return;
+          if (!(await window.AI00Dialogs.confirm('确定清除该线体所有工序的流程图片（process_flow_pic）？'))) return;
 
           const opsRes = await _assocInvoke(cf, 'craft.bop.line_operation_catia.read', {
             line_entry_gid: lineGid,
@@ -493,6 +500,49 @@ const ASSOC_ADAPTERS = {
           await panel._runDemoAnimation(allItems);  // 等待演示完成
         },
       },
+      {
+        label: '▶ 演示工艺关系(W10)',
+        superAdminOnly: true,
+        skipPostRefresh: true,   // 手动控制节奏：先 connect，再 reload，最后播揭示动画
+        execute: async (cf, versionGid, toast, panel) => {
+          const lineGids = [...(panel?._selectedLineGids || [])];
+          const lineGid = lineGids.length === 1 ? lineGids[0] : null;  // 不选线则后端取第一条演示线
+          const res = await _assocInvoke(cf, 'craft.bop.demo.relation.change.apply', {
+            operation: 'connect',
+            bop_gid: versionGid,
+            line_gid: lineGid,
+          });
+          const data = res?.data || {};
+          if (!data.ok) { toast('演示连接未完成', 'warn'); return; }
+          toast(`已连接「${data.line_title || ''}」：${data.stations || 0} 工位 / ${data.processes_moved || 0} 工序 / ${data.part_links || 0} 装配零件`, 'ok');
+          // 重新加载面板与 BOP 树到连接后的最新结构，再按工位逐个揭示
+          panel?._cache?.clear?.();
+          await panel?._loadAndRender?.();
+          await panel?._onActionComplete?.();
+          await panel?._runRelationDemoAnimation?.(data.steps || [], data.line_gid || null);
+        },
+      },
+      {
+        label: '↺ 恢复待连接(演示)',
+        superAdminOnly: true,
+        danger: true,
+        skipPostRefresh: true,
+        execute: async (cf, versionGid, toast, panel) => {
+          if (!(await window.AI00Dialogs.confirm('确定把演示工序全部移回「待连接工序区」？仅影响演示数据，可反复演示。'))) return;
+          const lineGids = [...(panel?._selectedLineGids || [])];
+          const lineGid = lineGids.length === 1 ? lineGids[0] : null;
+          const res = await _assocInvoke(cf, 'craft.bop.demo.relation.change.apply', {
+            operation: 'reset',
+            bop_gid: versionGid,
+            line_gid: lineGid,
+          });
+          const data = res?.data || {};
+          toast(`已恢复待连接：移回 ${data.processes_moved || 0} 个工序，解除 ${data.part_links_removed || 0} 条装配零件关系`, 'ok');
+          panel?._cache?.clear?.();
+          await panel?._loadAndRender?.();
+          await panel?._onActionComplete?.();
+        },
+      },
     ],
   },
 };
@@ -519,6 +569,7 @@ class AssocPanel {
     this._showEntityDetailPopover = opts.showEntityDetailPopover || null;
     this._toast     = opts.toast || (() => {});
     this._onActionComplete  = opts.onActionComplete  || null;
+    this._onCaptureAttached = opts.onCaptureAttached || null;
     this._applyActiveState  = opts.applyActiveState  || null;
     // Demo 动画回调（由 lineage.js 传入）
     this._getBopLinkedNodes = opts.getBopLinkedNodes || null;
@@ -527,6 +578,7 @@ class AssocPanel {
     this._demoCleanup       = opts.demoCleanup       || null;
     this._demoSetupView     = opts.demoSetupView     || null;
     this._demoPanToStation  = opts.demoPanToStation  || null;
+    this._onDemoPauseChange = opts.onDemoPauseChange || null;
 
     this._tabs      = [];
     this._activeIdx = -1;
@@ -549,6 +601,7 @@ class AssocPanel {
     this._filterOptionsCache = new Map();
     this._demoRunning  = false;
     this._demoPaused   = false;
+    this._demoSpeed    = 1;      // 演示播放速度（由 lineage.js 工具栏设置，可播放中切换）
     this._demoControlEl = null;
     this._picMap       = new Map();  // bop_entry_gid → url（工序截图内联缩略图）
 
@@ -719,7 +772,7 @@ class AssocPanel {
     // action 按钮（支持 adapter.actions 数组 或 adapter.action 单对象）
     this._removeActionBar();
     const _authUser = (window.top || window.parent)?._authUser || window._authUser;
-    const _isSuperAdmin = (_authUser?.role || _authUser?.system_role) === 'super_admin';
+    const _isSuperAdmin = (_authUser?.org_role || _authUser?.system_role || _authUser?.role) === 'super_admin';
     const actionsArr = (adapter.actions
       ? adapter.actions
       : (adapter.action ? [adapter.action] : [])
@@ -964,12 +1017,19 @@ class AssocPanel {
     // 2. 取 BOP 树中已创建的 process/operation/part 节点（按工位顺序）
     const bopRows = this._getBopLinkedNodes?.() || [];
     if (bopRows.length > 0) {
-      this._demoHideNodes?.(bopRows.map(r => r.gid));
       // 设置初始视图：缩放 61%，定位到第一个工位
       const firstProcess = bopRows.find(r => r.node_type === 'process');
       if (firstProcess?.parent_gid) {
-        this._demoSetupView?.(firstProcess.parent_gid);
+        try {
+          await this._demoSetupView?.(firstProcess.parent_gid);
+        } catch (error) {
+          this._demoRunning = false;
+          this._demoPaused = false;
+          this._onDemoPauseChange?.();
+          throw error;
+        }
       }
+      this._demoHideNodes?.(bopRows.map(r => r.gid));
       // 等待两帧，确保浏览器已渲染隐藏状态再开始逐个出现
       await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
     }
@@ -1011,7 +1071,7 @@ class AssocPanel {
       const delay = revealed
         ? (row.node_type === 'process' ? 160 : row.node_type === 'operation' ? 80 : 50)
         : (row.node_type === 'process' ? 40 : 15);
-      await sleep(delay);
+      await sleep(delay / (this._demoSpeed || 1));
     }
 
     const stoppedEarly = !this._demoRunning;
@@ -1020,6 +1080,78 @@ class AssocPanel {
 
     if (stoppedEarly) {
       // 用户手动停止：恢复卡片可见，刷新面板
+      this._demoCleanup?.();
+      this._cache.clear();
+      this._loadAndRender();
+    }
+  }
+
+  /** W10 工艺关系演示：连接完成后按工位顺序逐个揭示 工序→操作→零件 节点 */
+  async _runRelationDemoAnimation(steps, lineGid = null, { prepared = false } = {}) {
+    if (this._demoRunning) return;
+    const runToken = Symbol('relation-demo');
+    this._demoRelationRun = runToken;
+    const isCurrent = () => this._demoRelationRun === runToken;
+    const rows = [];
+    for (const st of steps || []) {
+      for (const proc of st.processes || []) {
+        rows.push({ gid: proc.entry_gid, node_type: 'process', parent_gid: st.station_gid });
+        for (const op of proc.operations || []) {
+          rows.push({ gid: op.entry_gid, node_type: 'operation', parent_gid: proc.entry_gid });
+          for (const pt of op.parts || []) {
+            rows.push({ gid: pt.entry_gid, node_type: 'part', parent_gid: op.entry_gid });
+          }
+        }
+      }
+    }
+    if (!rows.length || !this._demoRevealNode) return;
+    this._demoRunning = true;
+    this._demoPaused  = false;
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    const waitWhilePaused = async () => {
+      while (isCurrent() && this._demoPaused && this._demoRunning) await sleep(80);
+    };
+    // 先确保目标线体已加载渲染并定位视图（懒加载线体不准备则画布上不可见），再隐藏节点并按工位顺序逐个出现
+    const canvas = document.getElementById('lvLayoutCanvas');
+    canvas?.classList.add('lv-demo-preparing');
+    try {
+      if (!prepared) await this._demoSetupView?.(steps[0].station_gid, lineGid);
+      if (!isCurrent()) return;
+      this._demoHideNodes?.(rows.map(r => r.gid));
+    } catch (error) {
+      if (!isCurrent()) return;
+      this._demoRunning = false;
+      this._demoPaused = false;
+      this._onDemoPauseChange?.();
+      throw error;
+    } finally {
+      if (isCurrent()) canvas?.classList.remove('lv-demo-preparing');
+    }
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    if (!isCurrent()) return;
+    this._showDemoControl();
+    let currentStationGid = null;
+    for (const row of rows) {
+      if (!isCurrent()) return;
+      if (!this._demoRunning) break;
+      await waitWhilePaused();
+      if (!isCurrent()) return;
+      if (!this._demoRunning) break;
+      if (row.node_type === 'process' && row.parent_gid && row.parent_gid !== currentStationGid) {
+        currentStationGid = row.parent_gid;
+        this._demoPanToStation?.(currentStationGid);
+      }
+      const revealed = this._demoRevealNode?.(row.gid);
+      const delay = revealed
+        ? (row.node_type === 'process' ? 160 : row.node_type === 'operation' ? 80 : 50)
+        : (row.node_type === 'process' ? 40 : 15);
+      await sleep(delay / (this._demoSpeed || 1));
+    }
+    if (!isCurrent()) return;
+    const stoppedEarly = !this._demoRunning;
+    this._demoRunning = false;
+    this._removeDemoControl();
+    if (stoppedEarly) {
       this._demoCleanup?.();
       this._cache.clear();
       this._loadAndRender();
@@ -1039,7 +1171,7 @@ class AssocPanel {
     setTimeout(() => {
       dot.classList.remove('lv-demo-flash', 'unbound');
       dot.classList.add('bound');
-    }, 350);
+    }, 350 / (this._demoSpeed || 1));
   }
 
   /** 显示演示控制栏（暂停/停止） */
@@ -1062,6 +1194,7 @@ class AssocPanel {
       pauseBtn.innerHTML = this._demoPaused
         ? '<svg viewBox="0 0 16 16" fill="currentColor" width="12" height="12"><polygon points="3,2 13,8 3,14"/></svg>'
         : '<svg viewBox="0 0 16 16" fill="currentColor" width="12" height="12"><rect x="3" y="2" width="4" height="12" rx="1"/><rect x="9" y="2" width="4" height="12" rx="1"/></svg>';
+      this._onDemoPauseChange?.();
     });
 
     const stopBtn = document.createElement('button');
@@ -1071,12 +1204,26 @@ class AssocPanel {
     stopBtn.addEventListener('click', () => {
       this._demoRunning = false;
       this._demoPaused  = false;
+      this._onDemoPauseChange?.();
     });
 
     bar.appendChild(label);
     bar.appendChild(pauseBtn);
     bar.appendChild(stopBtn);
-    this._bodyEl.parentNode.insertBefore(bar, this._bodyEl);
+    // 布局视图下关联面板整体隐藏，控制条改为悬浮在布局画布顶部
+    const panelHidden = !this._bodyEl || !this._bodyEl.offsetParent;
+    const cv = panelHidden ? document.getElementById('lvLayoutCanvas') : null;
+    if (cv) {
+      cv.style.position = 'relative';
+      bar.style.position = 'absolute';
+      bar.style.top = '12px';
+      bar.style.left = '50%';
+      bar.style.transform = 'translateX(-50%)';
+      bar.style.zIndex = '7';
+      cv.appendChild(bar);
+    } else {
+      this._bodyEl.parentNode.insertBefore(bar, this._bodyEl);
+    }
     this._demoControlEl = bar;
   }
 
@@ -1087,6 +1234,7 @@ class AssocPanel {
   stopDemo() {
     this._demoRunning = false;
     this._demoPaused  = false;
+    this._onDemoPauseChange?.();
   }
 
   /* ── 操作命令弹出窗口 ──────────────────────────────── */
@@ -1478,22 +1626,25 @@ class AssocPanel {
   /** 从 line-operations 端点加载已保存截图，填充 _picMap（bop_working 内联缩略图） */
   async _refreshPicMap() {
     if (!this._versionGid || this._selectedLineGids.size !== 1) return;
+    const versionGid = this._versionGid;
     const lineGid = [...this._selectedLineGids][0];
     try {
       const res = await _assocInvoke(this._cf, 'craft.bop.line_operation_catia.read', {
         line_entry_gid: lineGid,
       });
       const ops = res?.data || [];
-      this._picMap.clear();
+      const pictures = new Map();
       for (const op of ops) {
         const pics = op.process_flow_pic || [];
         if (!pics.length) continue;
         const raw = pics[0];
-        const url = typeof raw === 'string' ? raw : raw?.url;
-        if (url) this._picMap.set(op.bop_entry_gid, url);
+        const url = await _resolvePictureDisplay(raw, versionGid);
+        if (url) pictures.set(op.bop_entry_gid, url);
       }
-      if (this._picMap.size > 0) this._reRenderBody();
-    } catch (_) {}
+      if (this._versionGid !== versionGid || this._selectedLineGids.size !== 1 || !this._selectedLineGids.has(lineGid)) return;
+      this._picMap = pictures;
+      this._reRenderBody();
+    } catch (error) { console.warn('[capture] picture refresh failed', error); }
   }
 
   /** 统计未绑定条目并更新关联面板内联提示行 */

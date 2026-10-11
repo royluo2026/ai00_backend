@@ -195,6 +195,7 @@ OUTCOME_APPLY_OUTPUT = obj({
 DOCUMENT_SNAPSHOT_NODE = obj({
     "node_key": STRING, "parent_key": {"type": ["string", "null"]},
     "product_ref": STRING, "child_order": NONNEGATIVE_INTEGER,
+    "depth": NONNEGATIVE_INTEGER, "printable_name": STRING, "occurrence_id": STRING,
 }, ("node_key", "parent_key", "product_ref", "child_order"))
 DOCUMENT_SNAPSHOT = obj({
     "document_id": STRING, "root_node_key": STRING, "source_identity": STRING,
@@ -258,6 +259,10 @@ INPUT_SCHEMAS = {
     }, ("name", "device_id", "execution_plan_ref", "snapshot_request_id", "capture_profile")),
     "simulation.environment.bop_vm_binding_draft.preview": obj({
         "execution_plan_ref": EXECUTION_PLAN_REF, "snapshot_request_id": STRING,
+    }, ("execution_plan_ref", "snapshot_request_id")),
+    ("simulation.environment.bop_vm_binding_draft.preview", 2): obj({
+        "execution_plan_ref": EXECUTION_PLAN_REF, "snapshot_request_id": STRING,
+        "scope": EXECUTION_SCOPE,
     }, ("execution_plan_ref", "snapshot_request_id")),
     "simulation.document_snapshot.request": obj({"device_id": STRING, "request_key": STRING}, ("device_id", "request_key")),
     "simulation.document_snapshot.get": obj({"snapshot_request_id": STRING}, ("snapshot_request_id",)),

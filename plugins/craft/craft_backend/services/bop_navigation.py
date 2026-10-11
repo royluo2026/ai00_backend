@@ -275,23 +275,20 @@ class BopNavigationRepository:
                     (version_gid, cursor_sort, cursor_sort, cursor_gid, size + 1),
                 )
                 raw_lines = [dict(row) for row in db.fetchall()]
+                # This complete lightweight graph is also needed for page counts.
+                # Derive the exact total from it instead of scanning the version twice.
                 db.execute(
-                    "SELECT COUNT(*) AS total_count FROM workmanship_bop_bop_entries "
-                    "WHERE version_gid=%s AND is_deleted=0 AND node_type='line_process'",
+                    "SELECT gid,parent_gid,node_type FROM workmanship_bop_bop_entries "
+                    "WHERE version_gid=%s AND is_deleted=0",
                     (version_gid,),
                 )
-                total_row = db.fetchone() or {}
+                rows = [dict(row) for row in db.fetchall()]
+                total_lines = sum(row["node_type"] == "line_process" for row in rows)
                 page = raw_lines[:size]
                 counts: dict[str, dict[str, int]] = {
                     str(row["gid"]): {name: 0 for name in _COUNT_NAMES} for row in page
                 }
                 if page:
-                    db.execute(
-                        "SELECT gid,parent_gid,node_type FROM workmanship_bop_bop_entries "
-                        "WHERE version_gid=%s AND is_deleted=0",
-                        (version_gid,),
-                    )
-                    rows = [dict(row) for row in db.fetchall()]
                     parents = {str(row["gid"]): row.get("parent_gid") for row in rows}
                     roots: dict[str, str | None] = {gid: gid for gid in counts}
                     for row in rows:
@@ -318,7 +315,7 @@ class BopNavigationRepository:
         return {
             "version_gid": version_gid, "revision": revision,
             "root": dict(root) if root else None, "lines": lines,
-            "total_lines": int(total_row.get("total_count") or 0),
+            "total_lines": total_lines,
             "next_cursor": next_cursor,
         }
 
@@ -334,7 +331,7 @@ class BopNavigationRepository:
             with connection.cursor() as db:
                 self._assert_revision(db, version_gid, revision)
                 db.execute(
-                    "SELECT gid,node_type FROM workmanship_bop_bop_entries "
+                    "SELECT gid,parent_gid,node_type,sort_order FROM workmanship_bop_bop_entries "
                     "WHERE version_gid=%s AND gid=%s AND is_deleted=0",
                     (version_gid, scope_gid),
                 )
@@ -342,30 +339,37 @@ class BopNavigationRepository:
                 expected_type = "line_process" if scope_kind == "line" else "station_process"
                 if not scope or scope.get("node_type") != expected_type:
                     raise _error("scope_not_found", "BOP scope was not found", scope_gid=scope_gid)
-                db.execute(
-                    "SELECT gid,parent_gid,node_type,sort_order,title,vpps,"
-                    "meta,process_flow_pic,process_chart_pic,"
-                    "JSON_UNQUOTE(JSON_EXTRACT(meta,'$.tc_key')) AS bom_row_id "
-                    "FROM workmanship_bop_bop_entries "
-                    "WHERE version_gid=%s AND is_deleted=0 ORDER BY sort_order,gid",
-                    (version_gid,),
-                )
-                all_rows = [dict(row) for row in db.fetchall()]
-                children: dict[str, list[str]] = {}
-                rows_by_gid = {str(row["gid"]): row for row in all_rows}
-                for row in all_rows:
-                    parent_gid = str(row["parent_gid"]) if row.get("parent_gid") else ""
-                    children.setdefault(parent_gid, []).append(str(row["gid"]))
-                scoped_gids: set[str] = set()
-                pending = [scope_gid]
+                # Traverse only this scope using the existing parent index.
+                # Each SQL page and parent batch is bounded; every descendant
+                # is still collected before the original sort/count/keyset.
+                rows_by_gid = {str(scope['gid']): dict(scope)}
+                pending = [str(scope['gid'])]
                 while pending:
-                    gid = pending.pop()
-                    if gid in scoped_gids:
-                        continue
-                    scoped_gids.add(gid)
-                    pending.extend(children.get(gid, ()))
+                    next_level = []
+                    for offset in range(0, len(pending), 200):
+                        parents = pending[offset:offset + 200]
+                        placeholders = ','.join('%s' for _ in parents)
+                        after_gid = ''
+                        while True:
+                            db.execute(
+                                "SELECT gid,parent_gid,node_type,sort_order "
+                                "FROM workmanship_bop_bop_entries "
+                                "WHERE version_gid=%s AND is_deleted=0 "
+                                f"AND parent_gid IN ({placeholders}) AND gid>%s ORDER BY gid LIMIT 201",
+                                (version_gid, *parents, after_gid),
+                            )
+                            children = [dict(row) for row in db.fetchall()]
+                            for row in children[:200]:
+                                gid = str(row['gid'])
+                                if gid not in rows_by_gid:
+                                    rows_by_gid[gid] = row
+                                    next_level.append(gid)
+                            if len(children) <= 200:
+                                break
+                            after_gid = str(children[199]['gid'])
+                    pending = next_level
                 scoped_rows = sorted(
-                    (rows_by_gid[gid] for gid in scoped_gids if gid in rows_by_gid),
+                    rows_by_gid.values(),
                     key=lambda row: (float(row.get("sort_order") or 0), str(row["gid"])),
                 )
                 raw_nodes = [
@@ -377,6 +381,21 @@ class BopNavigationRepository:
                 links: list[dict[str, Any]] = []
                 if page:
                     placeholders = ",".join("%s" for _ in page)
+                    db.execute(
+                        "SELECT gid,parent_gid,node_type,sort_order,title,vpps,"
+                        "meta,process_flow_pic,process_chart_pic,"
+                        "JSON_UNQUOTE(JSON_EXTRACT(meta,'$.tc_key')) AS bom_row_id "
+                        "FROM workmanship_bop_bop_entries WHERE version_gid=%s AND is_deleted=0 "
+                        f"AND gid IN ({placeholders})",
+                        (version_gid, *(row["gid"] for row in page)),
+                    )
+                    hydrated = {str(row["gid"]): dict(row) for row in db.fetchall()}
+                    if (set(hydrated) != {str(row["gid"]) for row in page}
+                            or any(hydrated[str(row["gid"])].get(field) != row.get(field)
+                                   for row in page for field in ('parent_gid','node_type','sort_order'))):
+                        raise _error("revision_conflict", "BOP page changed during navigation read", version_gid=version_gid)
+                    # Preserve the existing keyset order; DB IN order is opaque.
+                    page = [hydrated[str(row["gid"])] for row in page]
                     db.execute(
                         _LINK_CARD_SELECT +
                         f" WHERE l.version_gid=%s AND l.is_deleted=0 AND l.deleted_at IS NULL"

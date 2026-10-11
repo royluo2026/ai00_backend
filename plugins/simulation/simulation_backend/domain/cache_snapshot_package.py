@@ -148,12 +148,18 @@ def build_cache_snapshot_package(*, identity: Mapping[str, Any], nodes: Sequence
         instance = ET.SubElement(graph, 'ProductInstance', {'id': instance_id, 'name': node['name'], 'partRef': '#view-' + instance_id})
         user = ET.SubElement(instance, 'UserData', {'id': 'metadata-' + instance_id})
         ET.SubElement(user, 'UserValue', {'title': 'bl_occurrence_uid', 'value': instance_id})
+        # Native COM snapshots read itemId; JT and revision UID alone do not carry it.
+        bom_item = re.match(r'^([A-Za-z0-9][A-Za-z0-9_.-]*)/[^/;]+;\d+-', node['name'])
+        if bom_item:
+            ET.SubElement(user, 'UserValue', {'title': 'itemId', 'value': bom_item[1]})
         ET.SubElement(instance, 'Transform', {'id': 'transform-' + instance_id}).text = transforms[key]
         attrs = {'id': 'view-' + instance_id, 'name': node['name']}
         if children[key]: attrs['instanceRefs'] = ' '.join(ids[child] for child in sorted(children[key]))
         view = ET.SubElement(graph, 'ProductRevisionView', attrs)
         user = ET.SubElement(view, 'UserData', {'id': 'revision-metadata-' + instance_id})
         ET.SubElement(user, 'UserValue', {'title': 'item_revision_uid', 'value': node['item_revision_uid']})
+        if bom_item:
+            ET.SubElement(user, 'UserValue', {'title': 'itemId', 'value': bom_item[1]})
         if node['parent_node_key'] is None:
             # VisMockup 14 keeps the root view's metadata, but drops the root
             # ProductInstance metadata. Views here are per occurrence, so this

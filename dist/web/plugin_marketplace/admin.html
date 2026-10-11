@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+
+<script src="/web/core/dialogs.js?rev=20260922-unified-1"></script>
+
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>插件市场 · 超管管理</title>
+  
+  <script src="../core/business_facade.js"></script><script src="../core/existing_capability_client.js"></script>
+  <link rel="stylesheet" href="/assets/dialogs-e48cd6c5.css">
+  <link rel="stylesheet" href="/assets/app-ui-6f33ba9e.css">
+  <link rel="stylesheet" href="/assets/marketplace-56fbcda1.css">
+</head>
+<body>
+  <script src="../core/web_compat.js"></script>
+  <main class="marketplace">
+    <header class="market-header"><div><h1>插件市场 · 超管管理</h1><p>审核平台版本，管理发布者和版本撤销。</p></div><a class="market-button" href="index.html">返回市场</a></header>
+    <p id="admin-access" class="market-hint">正在校验超管身份…</p>
+    <div id="admin-error" class="market-error" role="alert" hidden></div>
+    <section id="admin-panel" hidden>
+      <section class="upload-section">
+        <div><h2>上传插件文件</h2><p class="market-hint">选择签名插件包（.ai00pkg 或 .zip，最大 102 MiB）。校验通过后进入待审核列表，审核发布后可安装到当前团队。</p>
+          <details class="market-hint"><summary>插件包要求</summary>外层 ZIP 根目录包含 release.json、publisher.sig 和 plugin.zip。发布者须先登记公钥；普通源码 ZIP 不能直接安装。</details></div>
+        <button id="upload-package" class="market-button primary">选择并上传插件文件</button>
+      </section>
+      <div class="market-toolbar">
+        <select id="release-status" aria-label="版本状态"><option value="submitted">待审核</option><option value="published">已发布</option><option value="rejected">已拒绝</option><option value="revoked">已撤销</option><option value="">全部版本</option></select>
+        <input id="release-query" type="search" maxlength="200" placeholder="搜索名称或插件 ID" aria-label="搜索版本">
+        <button id="admin-refresh" class="market-button">刷新</button>
+      </div>
+      <div id="release-list" class="plugin-list" aria-live="polite"></div>
+      <button id="admin-more" class="market-button more" hidden>加载更多</button>
+      <details class="publisher-section"><summary>登记发布者（首次上传前必需）</summary>
+        <p class="market-hint">登记发布者命名空间和 Ed25519 公钥。请勿填写私钥。</p>
+        <form id="publisher-form" class="admin-form">
+          <label>发布者 ID<input name="publisher_id" required maxlength="128" pattern="[a-z0-9-]+" placeholder="小写字母、数字或连字符"></label>
+          <label>显示名称<input name="display_name" required maxlength="255"></label>
+          <label>Ed25519 公钥（PEM）<textarea name="public_key_pem" required minlength="80" maxlength="4096" rows="5"></textarea></label>
+          <button class="market-button" type="submit">登记发布者</button>
+        </form>
+      </details>
+    </section>
+  </main>
+  <dialog id="admin-confirm" aria-labelledby="admin-confirm-title">
+    <form method="dialog"><h2 id="admin-confirm-title"></h2><p id="admin-confirm-message"></p>
+      <label id="reason-label">审核意见 / 撤销原因<textarea id="admin-reason" rows="3" maxlength="4000"></textarea></label>
+      <div class="dialog-actions"><button value="cancel" formnovalidate class="market-button">取消</button><button id="admin-confirm-button" value="confirm" class="market-button primary">确认</button></div>
+    </form>
+  </dialog>
+  <div id="admin-feedback" role="status" class="market-hint"></div>
+  <script src="model.js"></script><script src="admin.js"></script>
+</body></html>

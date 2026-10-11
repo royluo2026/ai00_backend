@@ -105,7 +105,7 @@ return defaultName||'document.md';
             previewEl.innerHTML = _renderMd(currentContent);
           }
           if (pathLabel) pathLabel.textContent = path.split(/[\\/]/).pop();
-        } catch (e) { alert('打开失败: ' + e); }
+        } catch (e) { (await window.AI00Dialogs.alert('打开失败: ' + e)); }
       });
       toolbar.appendChild(openBtn);
 
@@ -117,7 +117,7 @@ return defaultName||'document.md';
         let path = currentPath;
         if (!path) {
           try { path = await _saveMdDialog(); }
-          catch (e) { alert('保存失败: ' + e); return; }
+          catch (e) { (await window.AI00Dialogs.alert('保存失败: ' + e)); return; }
           if (!path) return;
           currentPath = path;
         }
@@ -129,7 +129,7 @@ return defaultName||'document.md';
           saveBtn.textContent = '已保存';
           setTimeout(() => { saveBtn.textContent = '保存'; }, 1500);
           onSaveDone?.();
-        } catch (e) { alert('保存失败: ' + e); }
+        } catch (e) { (await window.AI00Dialogs.alert('保存失败: ' + e)); }
       });
       toolbar.appendChild(saveBtn);
 

@@ -96,6 +96,22 @@ def test_feishu_application_error_reports_delegated_permission_failure():
     assert not any(sql.startswith("INSERT") for sql, _ in cursor.calls)
 
 
+def test_docx_forbidden_is_a_permission_failure_without_creating_snapshot():
+    from requests import HTTPError, Response
+    response = Response()
+    response.status_code = 403
+    response._content = b'{"code":1770032,"msg":"forBidden"}'
+    cursor = Cursor()
+    with patch("plugins.knowledge.knowledge_backend.capabilities.feishu_source_next.get_knowledge_conn", return_value=Connection(cursor)), \
+         patch("backend.platform_sdk.identity.get_active_identity_profile", return_value=_profile()), \
+         patch("plugins.knowledge.knowledge_backend.capabilities.feishu_source_next.user_credential", return_value="user-token"), \
+         patch("plugins.knowledge.knowledge_backend.capabilities.feishu_source_next.read_document_blocks", side_effect=HTTPError(response=response)):
+        with pytest.raises(CapabilityBusinessError) as caught:
+            pull_source({"source_gid": "knf_1"}, CapabilityContext(user_gid="admin", team_gid="team_1"))
+    assert caught.value.code == "feishu_document_view_denied"
+    assert not any(sql.startswith("INSERT") for sql, _ in cursor.calls)
+
+
 def test_batch_pull_isolates_failed_sources_and_does_not_publish_markdown():
     class BatchCursor(Cursor):
         def fetchall(self):

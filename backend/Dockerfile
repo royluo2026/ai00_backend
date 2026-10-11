@@ -6,12 +6,16 @@ WORKDIR /chj/app
 
 ENV SOURCE_PATH=.
 ENV HOST=0.0.0.0
-ENV PORT=8080
+ENV PORT=80
+ENV ENV_FILE=/chj/app/backend/.env
 
 COPY ${SOURCE_PATH} .
 
 RUN pip install --upgrade pip && pip install -r backend/requirements.txt
 
-EXPOSE 8080
+# Fail the image build when code and the frozen Provider manifest differ.
+RUN python -m backend.scripts.audit_official_domain_artifacts
 
-CMD ["sh", "-c", "test -n \"$ENV_FILE\" || { echo 'ENV_FILE is required for container runtime' >&2; exit 2; }; exec gunicorn backend.main:app -c backend/gunicorn.conf.py"]
+EXPOSE 80
+
+CMD ["sh", "-c", "test -n \"$ENV_FILE\" || { echo 'ENV_FILE is required for container runtime' >&2; exit 2; }; exec python -m backend.scripts.supervise_environment"]

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>数模缓存</title>
+
+<script src="/web/core/business_facade.js"></script><script src="/web/core/dialogs.js"></script>  <link rel="stylesheet" href="/assets/index-e28e143f.css">
+  <link rel="stylesheet" href="/assets/list_shell-cfff51d1.css">
+  <link rel="stylesheet" href="/assets/app-ui-6f33ba9e.css">
+  <link rel="stylesheet" href="/assets/grid_editor-a4535559.css">
+  <link rel="stylesheet" href="/assets/dialogs-e48cd6c5.css">
+</head>
+<body><script src="/web/icons.js"></script>
+<header><div><svg width="24" height="24"><use href="#icon-model-cache"></use></svg><strong>数模缓存</strong><span>Teamcenter · 项目共享</span></div><div><button id="login">TC 登录</button><button id="refresh">刷新</button><button id="create" class="primary" hidden>新建缓存</button></div></header>
+<p id="notice" role="status" aria-live="polite"></p>
+<main><aside id="tree" aria-label="项目、阶段与缓存批次"></aside><section class="cache-content">
+<div class="batch-bar"><div><h2 id="batch-title">选择缓存批次</h2><p id="batch-meta">左侧按项目和阶段分组，最新缓存在上方</p></div><button id="control" hidden></button></div>
+<div class="toolbar"><input id="search" type="search" placeholder="搜索整批数据的所有字段和值" aria-label="搜索整批数据"><button id="add-filter">添加筛选</button><select id="mode" aria-label="筛选关系"><option value="and">满足全部条件</option><option value="or">满足任一条件</option></select><button id="columns-button">显示字段</button></div>
+<div id="filters"></div><details id="columns"><summary>字段列（完整批次的字段集合）</summary><div id="column-options"></div></details>
+<div id="grid" aria-label="TC 缓存数据表格"><p class="empty">选择批次后显示所有已返回字段。点击行可查看完整值。</p></div>
+<footer><span id="count"></span><button id="prev" disabled>上一页</button><button id="next" disabled>下一页</button></footer>
+</section><aside id="detail" hidden aria-label="全部字段详情"><div><strong>字段与完整值</strong><button id="close-detail">关闭</button></div><input id="detail-search" type="search" placeholder="查找本行字段或值"><div id="detail-values"></div><details><summary>查看完整原始数据（JSON）</summary><pre id="detail-raw"></pre></details></aside></main>
+<dialog id="create-dialog"><form id="create-form"><h2>新建项目缓存</h2><p>版本与配置时间固定后创建独立批次；缓存任务可暂停、续作。</p>
+<label>项目<select name="project" required></select></label><label>项目阶段（BOP 数据阶段）<select name="phase" required></select></label><p>批次版本由系统按项目和阶段自动编号：v1、v2…</p>
+<fieldset><legend>按项目组合选择 TC 数模</legend><label>TC 项目号<input name="projectNumber" readonly></label><p>沿用数模仿真的项目号搜索：自动组合 -ENG00001，查询版本 00。</p><label>修订规则<select name="rule"></select></label><p id="rule-status" role="status" aria-live="polite"></p><label>配置时间<input name="date" type="datetime-local" required></label><button id="tc-search" type="button">从 TC 查找</button><div id="tc-results"></div><p id="source-label">尚未选择数模</p></fieldset>
+<p id="create-error" role="status"></p><div class="dialog-actions"><button id="cancel-create" type="button">取消</button><button id="submit-create" class="primary" type="submit" disabled>开始缓存</button></div>
+</form></dialog>
+<dialog id="login-dialog"><form id="login-form"><h2>登录 Teamcenter</h2><label>账号<input name="username" autocomplete="username" required></label><label>密码<input name="password" type="password" autocomplete="current-password" required></label><p id="login-error" role="status"></p><div class="dialog-actions"><button id="cancel-login" type="button">取消</button><button type="submit" class="primary">登录</button></div></form></dialog>
+<script src="/web/components/grid_editor.js"></script><script src="../cad_sim/teamcenter_session.js"></script><script src="../cad_sim/teamcenter_online_source.js"></script><script src="cache_model.js"></script><script src="model_cache.js"></script></body></html>

@@ -596,7 +596,7 @@ function _renderVppsCheckTable(checkResult, targetRows) {
           } catch (e) {
             revertBtn.disabled = false;
             revertBtn.textContent = '撤销忽略';
-            alert('撤销失败：' + (e?.message || e));
+            (await window.AI00Dialogs.alert('撤销失败：' + (e?.message || e)));
           }
         };
         handlingTd.appendChild(revertBtn);
@@ -1366,7 +1366,7 @@ const vppsCheckDef = {
           try { await a.fn(); }
           catch (e) { failed++; console.error('[vpps] action failed:', a.desc, e); }
         }
-        if (failed) alert(`${failed} 条操作执行失败，请查看控制台`);
+        if (failed) (await window.AI00Dialogs.alert(`${failed} 条操作执行失败，请查看控制台`));
         const activeIdx = _shell?._activeCheckIdx ?? -1;
         if (activeIdx >= 0) await _shell.rerunCheck(activeIdx);
       },
@@ -1438,7 +1438,7 @@ const vppsCheckDef = {
           // 不手动清缓存 — 直接 rerunCheck 从 API 拿最新状态，确保本地与服务端一致
           const activeIdx = _shell?._activeCheckIdx ?? -1;
           if (activeIdx >= 0) await _shell.rerunCheck(activeIdx);
-          if (failed) alert(`${failed} 条撤销失败，已重新核对，请检查结果`);
+          if (failed) (await window.AI00Dialogs.alert(`${failed} 条撤销失败，已重新核对，请检查结果`));
         },
       } : null,
       onFilterByRule(rule) {
@@ -1576,7 +1576,7 @@ function _buildTargetExtraBtns() {
     {
       html: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="feat-label">增值工时</span>',
       title: '增值工时',
-      onClick: () => alert('增值工时：功能待实现'),
+      onClick: async () => (await window.AI00Dialogs.alert('增值工时：功能待实现')),
     },
   ];
 }
@@ -1606,7 +1606,7 @@ async function confirmPartModal() {
   const parent_gid = document.getElementById('inp-part-parent').value.trim() || null;
   const temp_vpps  = document.getElementById('inp-part-temp-vpps').value.trim() || null;
   const remark     = document.getElementById('inp-part-remark').value.trim() || null;
-  if (!part_no || !name) { alert('零件号和名称不能为空'); return; }
+  if (!part_no || !name) { (await window.AI00Dialogs.alert('零件号和名称不能为空')); return; }
 
   const targetTLS = _shell?.getTargetTLS();
   const targetGid = targetTLS ? targetTLS.getSelectedList() : null;
@@ -1627,7 +1627,7 @@ async function confirmPartModal() {
     document.getElementById('modal-part').classList.add('hidden');
     if (targetTLS) await targetTLS.refresh();
   } else {
-    alert('保存失败');
+    (await window.AI00Dialogs.alert('保存失败'));
   }
 }
 
@@ -1672,11 +1672,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('btn-nv-confirm')?.addEventListener('click', async () => {
     const name = nvNameInp?.value.trim();
     const projectGid = nvProjectSel?.value || null;
-    if (!name) { alert('版本名称不能为空'); return; }
+    if (!name) { (await window.AI00Dialogs.alert('版本名称不能为空')); return; }
     const res = await _invokeCapability('craft.pbom.version.create', {
       name, version_tag: name, project_gid: projectGid, source_type: 'manual',
     });
-    if (!res?.success) { alert('创建失败'); return; }
+    if (!res?.success) { (await window.AI00Dialogs.alert('创建失败')); return; }
     document.getElementById('modal-new-ver').classList.add('hidden');
     await loadVersions();
     const newGid = res.data?.gid;
@@ -1752,11 +1752,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       const projectGid = impProjectSel?.value || null;
       const verName    = impVerPreview?.value.trim();
       const sourceType = document.getElementById('imp-source')?.value || 'import';
-      if (!verName) { alert('版本名称不能为空'); return; }
+      if (!verName) { (await window.AI00Dialogs.alert('版本名称不能为空')); return; }
       const res = await _invokeCapability('craft.pbom.version.create', {
         name: verName, version_tag: verName, project_gid: projectGid, source_type: sourceType,
       });
-      if (!res?.success) { alert('创建版本失败'); return; }
+      if (!res?.success) { (await window.AI00Dialogs.alert('创建版本失败')); return; }
       const newGid = res.data?.gid;
       await loadVersions();
       if (newGid && _shell?.getTargetTLS()) await _shell.getTargetTLS().setSelectedList(newGid);
@@ -1764,7 +1764,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
       // 导入到现有版本
       const existGid = impExistingVer?.value;
-      if (!existGid) { alert('请选择一个现有版本'); return; }
+      if (!existGid) { (await window.AI00Dialogs.alert('请选择一个现有版本')); return; }
       if (_shell?.getTargetTLS()) await _shell.getTargetTLS().setSelectedList(existGid);
       localStorage.setItem(_lsk('pbom:targetGid'), existGid);
     }

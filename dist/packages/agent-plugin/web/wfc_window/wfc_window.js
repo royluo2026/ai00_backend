@@ -472,11 +472,11 @@
   }
 
   /** 进入固定模式（Skill 有预定义画布） */
-  function _enterFixedMode(skill, canvasData) {
+  async function _enterFixedMode(skill, canvasData) {
     const nextScope = `${skill.gid}@${skill.revision}`;
     if (_fixedSkillScope && _fixedSkillScope !== nextScope
       && (_canvasStartOperation || _canvasResumeOperation || _activeCanvasRun)) {
-      if (!confirm('当前 Skill 仍有待协调的执行。确认放弃该操作并切换 Skill？')) return;
+      if (!(await window.AI00Dialogs.confirm('当前 Skill 仍有待协调的执行。确认放弃该操作并切换 Skill？'))) return;
       _skillSandbox?.clearForInteraction({});
       _canvasStartOperation = null;
       _canvasResumeOperation = null;
@@ -555,10 +555,10 @@
 
   /** 手动切换模式（点击徽章触发） */
   function _initModeBadge() {
-    document.getElementById('wfcwModeBadge')?.addEventListener('click', () => {
+    document.getElementById('wfcwModeBadge')?.addEventListener('click', async () => {
       if (_wfcMode === 'fixed') {
         // 固定 → 探索：询问确认
-        if (confirm(`退出固定模式「${_fixedSkill?.title || ''}」并进入探索模式？\n（流程总览将关闭）`)) {
+        if ((await window.AI00Dialogs.confirm(`退出固定模式「${_fixedSkill?.title || ''}」并进入探索模式？\n（流程总览将关闭）`))) {
           _enterExploreMode(null);
         }
       } else {
@@ -570,7 +570,7 @@
   }
 
   /* ── 加载 Skill 画布（分两路：固定/探索） ─────────────────────────────── */
-  function _loadSkillCanvas(skill) {
+  async function _loadSkillCanvas(skill) {
     if (!_topCanvas) return;
     let canvasData = null;
     try {
@@ -586,14 +586,14 @@
 
     if (canvasData) {
       // Skill 有预定义画布 → 自动进入固定模式
-      _enterFixedMode(skill, canvasData);
+      await _enterFixedMode(skill, canvasData);
     } else {
       // Skill 无预定义画布 → 询问是否进入探索模式
-      if (confirm(
+      if ((await window.AI00Dialogs.confirm(
         `Skill「${skill.title}」没有预定义流程画布。\n` +
         `是否进入探索模式，开始为此 Skill 设计新流程？\n\n` +
         `（设计完成后可点击「转 Skill」保存）`
-      )) {
+      ))) {
         _enterExploreMode(skill);
       }
     }
@@ -757,8 +757,8 @@
       _showToast('执行流程为空，无法转 Skill');
       return;
     }
-    const title = prompt('请输入新 Skill 名称（显示名）：',
-      _fixedSkill ? `${_fixedSkill.title} (副本)` : '新 Skill');
+    const title = (await window.AI00Dialogs.prompt('请输入新 Skill 名称（显示名）：',
+      _fixedSkill ? `${_fixedSkill.title} (副本)` : '新 Skill'));
     if (!title?.trim()) return;
     const name = title.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^\w\u4e00-\u9fa5]/g, '');
     const content = JSON.stringify({ canvas: canvasData });
@@ -781,7 +781,9 @@
     if (!_fixedSkill) { _showToast('未加载任何 Skill'); return; }
     const canvasData = _getFlowCanvasJSON();
     if (!canvasData) { _showToast('执行流程为空'); return; }
-    if (!confirm(`将本次执行流程的修改更新到 Skill「${_fixedSkill.title}」？\n（原 Skill 内容将被覆盖）`)) return;
+    const confirmedSkill = _fixedSkill;
+    if (!(await window.AI00Dialogs.confirm(`将本次执行流程的修改更新到 Skill「${_fixedSkill.title}」？\n（原 Skill 内容将被覆盖）`))) return;
+    if (_fixedSkill !== confirmedSkill) return;
 
     // 解析原有 content，替换 canvas 字段
     let contentObj = {};
@@ -804,10 +806,10 @@
   });
 
   // 清空
-  document.getElementById('wfcClearBtn')?.addEventListener('click', () => {
+  document.getElementById('wfcClearBtn')?.addEventListener('click', async () => {
     if (!_wfCanvas) return;
     if (_wfCanvas._nodes.length === 0 && _wfCanvas._conns.length === 0) return;
-    if (confirm('确认清空画布？')) {
+    if ((await window.AI00Dialogs.confirm('确认清空画布？'))) {
       _wfCanvas._clear();
       _wfCanvas._addLane('主流程');
       _pushState();
@@ -817,7 +819,7 @@
   // 保存
   document.getElementById('wfcSaveBtn')?.addEventListener('click', async () => {
     if (!_wfCanvas) return;
-    const name = prompt('请输入画布名称：', '未命名画布');
+    const name = (await window.AI00Dialogs.prompt('请输入画布名称：', '未命名画布'));
     if (!name) return;
     const res = await _wfCanvas.save(name, _getUserGid(), _currentCanvasGid);
     if (res?.gid) {
@@ -834,7 +836,7 @@
     const saves = await _wfCanvas.listSaves(_getUserGid());
     if (!saves || saves.length === 0) { _showToast('暂无保存的画布'); return; }
     const names = saves.map((s, i) => `${i + 1}. ${s.title || s.gid}`).join('\n');
-    const idx = prompt(`请选择要加载的画布（输入序号）：\n${names}`);
+    const idx = (await window.AI00Dialogs.prompt(`请选择要加载的画布（输入序号）：\n${names}`));
     const n = parseInt(idx) - 1;
     if (isNaN(n) || n < 0 || n >= saves.length) return;
     const res = await _wfCanvas.load(saves[n].gid);
@@ -1259,7 +1261,7 @@
         s.title.toLowerCase() === q || (s.name || '').toLowerCase() === q
       );
       if (found) {
-        _loadSkillCanvas(found);
+        await _loadSkillCanvas(found);
         text = text.replace(m[0], '').trim();   // 从发送文本中剔除 @mention
         _skillMentionLoaded = true;
         break; // 只处理第一个匹配的 @skill
@@ -2104,12 +2106,12 @@
           }));
           e.dataTransfer.effectAllowed = 'copy';
         });
-        card.addEventListener('click', () => {
+        card.addEventListener('click', async () => {
           // 高亮选中
           $body.querySelectorAll('.wfcw-ns-skill-card').forEach(c => c.classList.remove('selected'));
           card.classList.add('selected');
           // 加载 Skill 预定义流程画布
-          _loadSkillCanvas(s);
+          await _loadSkillCanvas(s);
           // 关闭浮球聊天窗，让画布可见
           const $chat = document.getElementById('wfcwFloatChat');
           if ($chat && $chat.style.display !== 'none') $chat.style.display = 'none';
@@ -2267,8 +2269,8 @@
       if (!canvasData || (canvasData.nodes || []).length === 0) {
         _showToast('执行流程为空，无法转 Skill'); return;
       }
-      const title = prompt('请输入新 Skill 名称：',
-        _fixedSkill ? `${_fixedSkill.title} (副本)` : '新 Skill');
+      const title = (await window.AI00Dialogs.prompt('请输入新 Skill 名称：',
+        _fixedSkill ? `${_fixedSkill.title} (副本)` : '新 Skill'));
       if (!title?.trim()) return;
       const name = title.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^\w\u4e00-\u9fa5]/g, '');
       const res = await window.call_bridge?.('skill', 'create_skill', {
@@ -2285,7 +2287,9 @@
       if (!_fixedSkill) { _showToast('未加载任何 Skill'); return; }
       const canvasData = _getFlowCanvasJSON();
       if (!canvasData) { _showToast('执行流程为空'); return; }
-      if (!confirm(`将当前执行流程更新到 Skill「${_fixedSkill.title}」？`)) return;
+      const confirmedSkill = _fixedSkill;
+      if (!(await window.AI00Dialogs.confirm(`将当前执行流程更新到 Skill「${_fixedSkill.title}」？`))) return;
+      if (_fixedSkill !== confirmedSkill) return;
       let contentObj = {};
       try { contentObj = JSON.parse(_fixedSkill.content || '{}'); } catch (_) {}
       contentObj.canvas = canvasData;
@@ -2312,8 +2316,13 @@
       _showToast('Skill 版本不可用，无法安全执行'); return;
     }
     const $btn = document.getElementById('wfcwFsRunBtn');
-    if ($btn?.classList.contains('running')) return;
-    if (!confirm(`确认执行 Skill「${_fixedSkill.title}」？`)) return;
+    if ($btn?.classList.contains('running') || $btn?.dataset.confirmPending) return;
+    const confirmedSkill = _fixedSkill, confirmedScope = _fixedSkillScope;
+    if ($btn) $btn.dataset.confirmPending = 'true';
+    let approved;
+    try { approved = await window.AI00Dialogs.confirm({title:'执行 Skill',message:`确认执行 Skill「${confirmedSkill.title}」？`,confirmText:'执行'}); }
+    finally { if ($btn) delete $btn.dataset.confirmPending; }
+    if (!approved || _fixedSkill !== confirmedSkill || _fixedSkillScope !== confirmedScope) return;
     $btn?.classList.add('running');
 
     _showToast(`▶ 开始执行「${_fixedSkill.title}」…`);

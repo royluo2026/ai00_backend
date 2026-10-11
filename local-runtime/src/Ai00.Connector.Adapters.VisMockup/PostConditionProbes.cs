@@ -9,6 +9,21 @@ public sealed class PostConditionProbes(StaDispatcher sta,IVisMockupCom com,VisM
     public async Task<object> ObserveAsync(string probeId,JsonElement? probeInput,CancellationToken ct)
     {
         if(probeId!="vismockup.application.probe@1" && probeId!="vismockup.document.snapshot@1")throw new ConnectorException("post_condition_probe_unsupported");
+        if(probeId=="vismockup.application.probe@1" && probeInput is {ValueKind:JsonValueKind.Object} closeInput
+            && closeInput.TryGetProperty("expected_all_documents_closed",out var expectedClosed)
+            && expectedClosed.ValueKind==JsonValueKind.True)
+        {
+            return await sta.InvokeAsync<object>(()=>
+            {
+                // Process absence is not evidence. Only an owned COM application
+                // with a complete empty inventory establishes the closed state.
+                if(!com.TryGetActiveApplication(out var app))return new{classification="inconclusive",observed_result=(object?)null};
+                var documents=app!.OpenDocuments;
+                var closed=documents.Count==0 && app.ActiveDocument is null;
+                return new{classification=closed?"succeeded":"inconclusive",
+                    observed_result=(object)new{all_documents_closed=closed,open_document_count=documents.Count}};
+            }).WaitAsync(TimeSpan.FromSeconds(10),ct);
+        }
         if(probeId=="vismockup.document.snapshot@1" && adapter is not null && probeInput is {ValueKind:JsonValueKind.Object} input
             && input.TryGetProperty("node_key",out var nodeKey) && input.TryGetProperty("expected_visible",out var expected))
         {

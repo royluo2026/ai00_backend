@@ -13,16 +13,20 @@ if str(REPO_ROOT) not in sys.path:
 
 from backend.db.oceanbase_compat import verify_live_server
 from backend.db.prefixed_cursor import wrap_connection
-from backend.db.table_prefix import configure_table_prefix
+from backend.db.table_prefix import configure_table_prefix, validate_runtime_profile
 from backend.db.versioned_migrations import apply_bootstrap_schema, apply_migrations
+from backend.scripts.runtime_preflight import read_controlled_values
 
 
 def main() -> int:
     env_file = os.environ.get("ENV_FILE", "").strip()
+    target = os.environ
     if env_file:
-        from dotenv import load_dotenv
-        load_dotenv(env_file, override=True)
-    raw = os.environ.get("AI00_DDL_DB_URL", "")
+        try:
+            target, _ = read_controlled_values(Path(env_file))
+        except ValueError as error:
+            raise SystemExit(str(error)) from error
+    raw = str(target.get("AI00_DDL_DB_URL") or "")
     if not raw:
         raise SystemExit("AI00_DDL_DB_URL is required; application runtime credentials are refused")
     parsed = urlparse(raw)
@@ -30,7 +34,19 @@ def main() -> int:
         raise SystemExit("AI00_DDL_DB_URL must be a mysql:// URL with an explicit database")
     import pymysql
 
-    configure_table_prefix(os.environ.get("TABLE_PREFIX", ""))
+    prefix = str(target.get("TABLE_PREFIX") or "")
+    profile = str(target.get("AI00_DEPLOY_PROFILE") or "")
+    if env_file and not profile:
+        raise SystemExit("managed_deployment_requires_explicit_profile")
+    if prefix not in {"test_", "pp_"}:
+        raise SystemExit("migration TABLE_PREFIX must be test_ or pp_")
+    if prefix == "pp_" and not env_file:
+        raise SystemExit("pp_ migration requires ENV_FILE")
+    try:
+        validate_runtime_profile(profile, prefix, str(target.get("PUBLIC_URL") or ""))
+    except ValueError as error:
+        raise SystemExit(str(error)) from error
+    configure_table_prefix(prefix)
     conn = wrap_connection(pymysql.connect(
         host=parsed.hostname,
         port=parsed.port or 3306,

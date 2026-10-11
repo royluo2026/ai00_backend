@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+
+<script src="/web/core/dialogs.js?rev=20260922-unified-1"></script>
+
   <script src="/web/core/business_facade.js"></script>
 <meta charset="UTF-8">
 <title>开发沟通看板</title>
@@ -250,6 +253,7 @@ tr.grp-hdr:hover td { background: color-mix(in srgb,var(--accent) 6%,var(--bg2))
 .empty-state p { font-size: 13px; }
 </style>
   <link rel="stylesheet" href="/assets/bug_tracker-f2c1aaa9.css">
+  <link rel="stylesheet" href="/assets/dialogs-e48cd6c5.css">
 </head>
 <body>
 <!-- toolbar -->
@@ -430,7 +434,7 @@ async function openStandalone() {
   if (ea?.openTrackerWindow) {
     await ea.openTrackerWindow();
   } else {
-    alert('独立窗口仅在 Electron 桌面端可用');
+    (await window.AI00Dialogs.alert('独立窗口仅在 Electron 桌面端可用'));
   }
 }
 
@@ -512,7 +516,7 @@ function showInlineSel(e, idx, field, opts, clsMap) {
       ev.preventDefault(); ev.stopPropagation();
       // 状态改为“已完成”必须先验证为 ✓已验证
       if (field === 'status' && v === '已完成' && _items[idx].user_confirm !== '✓已验证') {
-        alert('请先将"已确认"设为"✓已验证"再完成。');
+        (await window.AI00Dialogs.alert('请先将"已确认"设为"✓已验证"再完成。'));
         wrap.remove(); _inlineWrap = null;
         return;
       }

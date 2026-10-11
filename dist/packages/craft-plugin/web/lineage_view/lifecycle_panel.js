@@ -160,7 +160,9 @@ class BopLifecyclePanel {
       await this._load();
       return;
     }
-    if (!window.confirm('确认重新计算并保存当前 BOP 版本的生命周期统计？')) return;
+    const versionGid = this._versionGid;
+    if (!(await window.AI00Dialogs.confirm('确认重新计算并保存当前 BOP 版本的生命周期统计？'))) return;
+    if (this._versionGid !== versionGid) return;
     try {
       const client = window.top?.AI00ExistingCapabilityClient
         || window.parent?.AI00ExistingCapabilityClient
@@ -440,8 +442,8 @@ class BopLifecyclePanel {
         `background:rgba(64,160,43,.12);color:var(--green,#40a02b)">${statusLbl}</span>` +
         `<span style="font-size:10px;color:var(--subtext0,#a6adc8);margin-left:auto">` +
         `${this._esc((s.change_note || '').slice(0, 30))}</span>`;
-      row.onclick = () => {
-        if (s.gid && confirm(`查看快照 ${s.version_tag}(${s.data_stage})?\n（历史快照为只读）`)) {
+      row.onclick = async () => {
+        if (s.gid && (await window.AI00Dialogs.confirm(`查看快照 ${s.version_tag}(${s.data_stage})?\n（历史快照为只读）`))) {
           // 让宿主（lineage.js）通过版本切换菜单处理快照查看
           if (this._onViewSnapshot) this._onViewSnapshot(s.gid);
         }
@@ -563,8 +565,10 @@ class BopLifecyclePanel {
         resetBtn.style.borderColor = 'var(--overlay0,#6c7086)';
         resetBtn.style.color = 'var(--subtext0,#a6adc8)';
       });
-      resetBtn.addEventListener('click', () => {
-        if (confirm('确认重置路线？当前步骤进度将清空，版本本身不受影响。')) {
+      resetBtn.addEventListener('click', async () => {
+        const versionGid = this._versionGid;
+        if ((await window.AI00Dialogs.confirm('确认重置路线？当前步骤进度将清空，版本本身不受影响。'))) {
+          if (this._versionGid !== versionGid) return;
           this._saveInitState({ route: null, checklist: {} });
         }
       });
@@ -1457,6 +1461,7 @@ class BopLifecyclePanel {
   }
 
   async _undoStep(stepKey) {
+    const versionGid = this._versionGid;
     const _STEP_WARN = {
       lines_added:     '将软删除所有线体条目及其子节点（工位/工序）和关联链接',
       stations_added:  '将软删除所有工位条目及其子节点和关联链接',
@@ -1468,22 +1473,23 @@ class BopLifecyclePanel {
     const msg  = warn
       ? `确认撤销此步骤？\n\n⚠️ ${warn}\n\n此操作不可直接恢复。`
       : '确认撤销此步骤？';
-    if (!confirm(msg)) return;
+    if (!await window.AI00Dialogs.confirm({title:'撤销步骤',message:msg,tone:'danger',confirmText:'撤销'})) return;
+    if (this._versionGid !== versionGid) return;
 
     // PBOM 导入步骤：获取关联的 PBOM 版本 GID
     let pbomVersionGid = '';
     if (stepKey === 'vpps_imported') {
       try {
-        const saved = JSON.parse(localStorage.getItem(`lc:pbom_import:${this._versionGid}`) || 'null');
+        const saved = JSON.parse(localStorage.getItem(`lc:pbom_import:${versionGid}`) || 'null');
         pbomVersionGid = saved?.gid || '';
       } catch (_) {}
       // 同时清除 localStorage 缓存
-      localStorage.removeItem(`lc:pbom_import:${this._versionGid || 'unknown'}`);
+      localStorage.removeItem(`lc:pbom_import:${versionGid || 'unknown'}`);
     }
 
     try {
       const res = await this._invokeCapability('craft.bop.lifecycle.step.rollback.apply', {
-        version_gid: this._versionGid, step_key: stepKey, pbom_version_gid: pbomVersionGid || null,
+        version_gid: versionGid, step_key: stepKey, pbom_version_gid: pbomVersionGid || null,
       });
       const d = res?.data?.deleted_entries || res?.deleted_entries || 0;
       const l = res?.data?.deleted_links || res?.deleted_links || 0;
@@ -1985,11 +1991,13 @@ class BopLifecyclePanel {
     btn.textContent = '冻结切片';
     btn.addEventListener('click', async () => {
       if (!stageSel.value) { this._toast('请选择目标数据阶段', 'warn'); return; }
-      if (!confirm(`确认冻结切片？活动版本将继续，副本变为 ${mChk.checked ? 'M' : 'baseline'}。`)) return;
+      const versionGid = this._versionGid;
+      if (!(await window.AI00Dialogs.confirm(`确认冻结切片？活动版本将继续，副本变为 ${mChk.checked ? 'M' : 'baseline'}。`))) return;
+      if (this._versionGid !== versionGid) return;
       btn.disabled = true; btn.textContent = '冻结中…';
       try {
         await this._invokeCapability('craft.bop.version.snapshot.change.apply', {
-          operation: 'freeze_snapshot', version_gid: this._versionGid,
+          operation: 'freeze_snapshot', version_gid: versionGid,
           target_data_stage: stageSel.value, change_note: noteInp.value || null,
           promote_to_m: mChk.checked,
         });
@@ -2119,13 +2127,15 @@ class BopLifecyclePanel {
   }
 
   async _publishCurrentVersion() {
-    if (!confirm('确认冻结并发布当前版本？')) return;
+    const versionGid = this._versionGid;
+    if (!(await window.AI00Dialogs.confirm('确认冻结并发布当前版本？'))) return;
+    if (this._versionGid !== versionGid) return;
     try {
       await this._invokeCapability('craft.bop.version.freeze.change.apply', {
-        operation: 'freeze', version_gid: this._versionGid,
+        operation: 'freeze', version_gid: versionGid,
       });
       await this._invokeCapability('craft.bop.version.lifecycle.change.apply', {
-        operation: 'publish', version_gid: this._versionGid,
+        operation: 'publish', version_gid: versionGid,
       });
       this._toast('版本已发布（M 状态）', 'ok');
       await this._load();
@@ -2804,12 +2814,14 @@ class BopLifecyclePanel {
 
     if (isActive) {
       btn.addEventListener('click', async () => {
-        if (!confirm('确认将本阶段标记为完成并推进到下一阶段？')) return;
+        const versionGid = this._versionGid;
+        if (!(await window.AI00Dialogs.confirm('确认将本阶段标记为完成并推进到下一阶段？'))) return;
+        if (this._versionGid !== versionGid) return;
         btn.disabled    = true;
         btn.textContent = '推进中…';
         try {
           const res = await this._invokeCapability('craft.bop.lifecycle.state.change.apply', {
-            operation: 'phase.confirm', version_gid: this._versionGid, note: null,
+            operation: 'phase.confirm', version_gid: versionGid, note: null,
           });
           const phaseValue = res?.data?.lifecycle_phase || res?.lifecycle_phase;
           this._viewPhase = phaseValue;
@@ -2828,11 +2840,13 @@ class BopLifecyclePanel {
   // ── Checkpoint ─────────────────────────────────────────────────────────────
 
   async _promptCheckpoint(lineGid) {
-    const label = prompt('快照标签（可留空）：');
+    const versionGid = this._versionGid;
+    const label = (await window.AI00Dialogs.prompt('快照标签（可留空）：'));
     if (label === null) return;
+    if (this._versionGid !== versionGid) return;
     try {
       await this._invokeCapability('craft.bop.lifecycle.checkpoint.change.apply', {
-        operation: 'create', version_gid: this._versionGid, line_gid: lineGid, label,
+        operation: 'create', version_gid: versionGid, line_gid: lineGid, label,
       });
       this._toast('快照已创建', 'ok');
       this._render();
@@ -2842,10 +2856,12 @@ class BopLifecyclePanel {
   }
 
   async _rollback(lineGid, checkpointGid, label) {
-    if (!confirm(`确认回滚到快照「${label}」？当前修改将丢失。`)) return;
+    const versionGid = this._versionGid;
+    if (!(await window.AI00Dialogs.confirm(`确认回滚到快照「${label}」？当前修改将丢失。`))) return;
+    if (this._versionGid !== versionGid) return;
     try {
       const res = await this._invokeCapability('craft.bop.lifecycle.checkpoint.rollback.apply', {
-        version_gid: this._versionGid, line_gid: lineGid, checkpoint_gid: checkpointGid,
+        version_gid: versionGid, line_gid: lineGid, checkpoint_gid: checkpointGid,
       });
       const restored = res?.data?.restored_entries || res?.restored_entries || 0;
       this._toast(`已回滚：恢复 ${restored} 条节点`, 'ok');

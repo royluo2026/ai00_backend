@@ -158,6 +158,20 @@ public sealed class VisMockupDocumentLimitTests
         Assert.Equal(0, app.OpenCalls);
     }
 
+    [Theory]
+    [InlineData(null, false, "count_read")]
+    [InlineData(-1, false, "count_invalid")]
+    [InlineData(1, true, "scope_read")]
+    public void Rejected_open_retains_the_failed_preflight_stage(int? count, bool invalidScope, string stage)
+    {
+        var application = new CountingApplication(count) { ScopeUnverifiable = invalidScope };
+        var error = Assert.Throws<ConnectorNoEffectException>(() =>
+            VisMockupDocumentOpen.Open(application, Path.GetFullPath("private-model.jt"), 123));
+        Assert.Equal("vismockup_document_limit_unverifiable", error.Code);
+        Assert.Equal(stage, error.Data["preflight_stage"]);
+        Assert.Equal(0, application.OpenCalls);
+    }
+
     private sealed class CountingApplication(int? count) : IVisMockupApplication
     {
         private int? _count = count;

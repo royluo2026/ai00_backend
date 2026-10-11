@@ -225,12 +225,13 @@ def get_concept(payload: dict[str, Any], _context: CapabilityContext, *, include
     repository = OntologyReleaseRepository()
     release = repository.resolve_release(str(payload.get("release_gid") or "").strip() or None)
     version = _version_ref(release)
-    item = repository.get_object(release["release_gid"], kind, stable_gid)
+    index = repository.get_read_index(release) if include_inherited and view == "schema" and kind == "concept" else None
+    item = index.get(kind, stable_gid) if index else repository.get_object(release["release_gid"], kind, stable_gid)
     if not item:
         raise LookupError("ontology object not found in the resolved release")
     objects = None
     if include_inherited and view == "schema" and kind == "concept":
-        objects = repository.list_objects(release["release_gid"], kinds={"concept", "property", "relation", "constraint"})
+        objects = index.schema_objects(stable_gid)
     return CapabilityOutput(
         data={
             "concept": _project_with_ref(item, view, version, objects), "view": view,
@@ -295,6 +296,29 @@ def assess_mapping(payload: dict[str, Any], _context: CapabilityContext) -> Capa
     return CapabilityOutput(data=assess_objects(source, target, existing))
 
 
+def list_graph_objects(payload: dict[str, Any], _context: CapabilityContext) -> CapabilityOutput:
+    kinds = set(payload.get("kinds") or ["concept", "relation"])
+    if not kinds or not kinds.issubset({"concept", "relation"}):
+        raise ValueError("graph kinds must be concept or relation")
+    limit, offset = int(payload.get("limit", 100)), int(payload.get("offset", 0))
+    query = str(payload.get("query") or "").strip()
+    if len(query) > 100:
+        raise ValueError("query must be at most 100 characters")
+    repository = OntologyReleaseRepository()
+    release = repository.resolve_release(str(payload.get("release_gid") or "").strip() or None)
+    version = _version_ref(release)
+    items, total = repository.get_read_index(release).graph_page(
+        kinds, limit=limit, offset=offset, query=query,
+        around_gid=str(payload.get("around_gid") or "").strip() or None,
+    )
+    return CapabilityOutput(data={
+        "items": [_project_with_ref(item, "schema", version) for item in items],
+        "total": total, "offset": offset, "limit": limit,
+        "release_gid": release["release_gid"], "release_sha256": release["content_sha256"],
+        "ontology_version_ref": version.model_dump(mode="json"),
+    }, evidence=(_release_evidence(release),))
+
+
 def register_ontology_concept_capabilities(registry: Any) -> None:
     object_ref = {
         "type": "object",
@@ -348,6 +372,29 @@ def register_ontology_concept_capabilities(registry: Any) -> None:
             "limit": {"type": "integer", "minimum": 1, "maximum": 100}, "offset": {"type": "integer", "minimum": 0},
             "query": {"type": "string", "maxLength": 100},
         }}), list_objects)
+    from ..read_index import GRAPH_FIELDS
+    graph_item_schema = {"type": "object", "required": ["kind", "stable_gid", "concept_ref"],
+                         "properties": {key: value for key, value in MEMBER_SCHEMA["properties"].items()
+                                        if key in GRAPH_FIELDS or key == "concept_ref"},
+                         "additionalProperties": False}
+    graph_output = deepcopy(OBJECT_LIST_SCHEMA)
+    graph_item_schema["properties"]["domain_code"] = _S
+    graph_output["properties"]["items"]["items"] = graph_item_schema
+    registry.register(CapabilitySpec(
+        **common, id="ontology.object.list", version=3,
+        description="Read lightweight graph summaries or the bidirectional neighbourhood of a stable concept GID.",
+        use_when="A semantic workspace needs a bounded graph page or selected concept neighbours.",
+        do_not_use_when="Full schemas, document bodies or an unbounded release export are needed.",
+        effects=("read:ontology.object",), output_schema=graph_output,
+        execution_budget=CapabilityExecutionBudget(memory_class=CapabilityMemoryClass.MEDIUM,
+            collection_policy=CapabilityCollectionPolicy.PAGED, max_page_size=100, max_output_bytes=2 * 1024 * 1024),
+        input_schema={"type": "object", "additionalProperties": False, "properties": {
+            "release_gid": {"type": "string"}, "around_gid": {"type": "string", "minLength": 1},
+            "kinds": {"type": "array", "minItems": 1, "maxItems": 2,
+                      "items": {"type": "string", "enum": ["concept", "relation"]}},
+            "limit": {"type": "integer", "minimum": 1, "maximum": 100},
+            "offset": {"type": "integer", "minimum": 0}, "query": {"type": "string", "maxLength": 100},
+        }}), list_graph_objects)
     registry.register(CapabilitySpec(
         **common, id="ontology.mapping.assess", description="Assess deterministic mapping compatibility without persisting a mapping.",
         use_when="Two typed ontology objects may correspond.", do_not_use_when="Only names are available and an automatic decision is expected.",

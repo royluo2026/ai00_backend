@@ -429,7 +429,7 @@ function _showVerCtxMenu(x, y, ver, familyGid, familyName) {
 }
 
 async function _freezeVersion(ver) {
-  if (!confirm(`确认冻结版本「${ver.version_tag}」？冻结后不可编辑。`)) return;
+  if (!(await window.AI00Dialogs.confirm(`确认冻结版本「${ver.version_tag}」？冻结后不可编辑。`))) return;
   try {
     await _bopInvokeCapability('craft.bop.version.freeze.change.apply', {
       operation: 'freeze', version_gid: ver.gid,
@@ -440,7 +440,7 @@ async function _freezeVersion(ver) {
 }
 
 async function _archiveFamily(familyGid) {
-  if (!confirm('确认归档此 BOP 的所有版本？归档后不再显示在主列表中，可在已归档区恢复。')) return;
+  if (!(await window.AI00Dialogs.confirm('确认归档此 BOP 的所有版本？归档后不再显示在主列表中，可在已归档区恢复。'))) return;
   try {
     await _bopInvokeCapability('craft.bop.version.lifecycle.change.apply', {
       operation: 'archive_family', family_gid: familyGid,
@@ -679,8 +679,8 @@ function _isSuperAdmin() {
 
 async function _purgeVersionEntries(ver, mode) {
   const modeLabel = mode === 'hard' ? '硬删（永久，不可恢复）' : '软删（可通过数据库恢复）';
-  if (!confirm(`确认对版本「${ver.version_tag}」执行 ${modeLabel}？\n将清空全部条目及关联实体记录。`)) return;
-  if (mode === 'hard' && !confirm('⚠️ 再次确认：硬删将永久清除所有数据，是否继续？')) return;
+  if (!(await window.AI00Dialogs.confirm(`确认对版本「${ver.version_tag}」执行 ${modeLabel}？\n将清空全部条目及关联实体记录。`))) return;
+  if (mode === 'hard' && !(await window.AI00Dialogs.confirm('⚠️ 再次确认：硬删将永久清除所有数据，是否继续？'))) return;
   try {
     const res = await _bopInvokeCapability('craft.bop.entry.bulk.change.apply', {
       operation: 'purge', version_gid: ver.gid, mode,
@@ -693,7 +693,7 @@ async function _purgeVersionEntries(ver, mode) {
 }
 
 async function _deleteVersion(ver) {
-  const confirmed = confirm(`确认删除版本「${ver.name || ver.version_tag}」？此操作不可恢复。`);
+  const confirmed = (await window.AI00Dialogs.confirm(`确认删除版本「${ver.name || ver.version_tag}」？此操作不可恢复。`));
   if (!confirmed) return;
   try {
     await (window.top?.AI00ExistingCapabilityClient || window.AI00ExistingCapabilityClient)
@@ -795,7 +795,7 @@ async function _saveEditEntry() {
 
 // ── 删除节点 ─────────────────────────────────────────────────────
 async function _deleteEntry(gid) {
-  if (!confirm('确定删除该节点？其子节点的父级引用将变为空。')) return;
+  if (!(await window.AI00Dialogs.confirm('确定删除该节点？其子节点的父级引用将变为空。'))) return;
   const _frozenVerD = _bopVersions.find(v => v.gid === _currentVersion);
   if (_frozenVerD?.frozen_at) { _toast('版本已冻结，不允许删除', 'warn'); return; }
   try {

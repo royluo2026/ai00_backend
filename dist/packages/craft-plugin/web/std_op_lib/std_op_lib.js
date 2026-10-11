@@ -100,15 +100,15 @@ async function publishOp(gid) {
   try {
     await _safe((async (body,path,query) => { const result = await window.AI00Business.invoke("craft.standard_operation.change.apply", {version:1,payload:Object.fromEntries(Object.entries({operation:"publish",gid:path.gid}).filter(([,v])=>v!=null))}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams()));
     await loadOps();
-  } catch (e) { alert('发布失败: ' + e.message); }
+  } catch (e) { (await window.AI00Dialogs.alert('发布失败: ' + e.message)); }
 }
 
 async function deprecateOp(gid) {
-  if (!confirm('确认废弃该工序？')) return;
+  if (!(await window.AI00Dialogs.confirm('确认废弃该工序？'))) return;
   try {
     await _safe((async (body,path,query) => { const result = await window.AI00Business.invoke("craft.standard_operation.change.apply", {version:1,payload:Object.fromEntries(Object.entries({operation:"deprecate",gid:path.gid}).filter(([,v])=>v!=null))}); return result; })({},{"gid":decodeURIComponent(String(gid))},new URLSearchParams()));
     await loadOps();
-  } catch (e) { alert('废弃失败: ' + e.message); }
+  } catch (e) { (await window.AI00Dialogs.alert('废弃失败: ' + e.message)); }
 }
 
 // ── 单元格渲染 ────────────────────────────────────────────────────────────────

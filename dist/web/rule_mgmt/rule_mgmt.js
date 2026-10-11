@@ -154,15 +154,15 @@ const _onRowsChange = ListShell.buildRowsChangeHandler({
 
 // ── 规则检验 ──────────────────────────────────────────────────────────────────
 async function _runRuleCheck(row) {
-  const contextStr = prompt(`输入 JSON context 测试规则「${row.name}」\n示例：{"torque": 12.0, "std_time": 60}`, '{}');
+  const contextStr = (await window.AI00Dialogs.prompt(`输入 JSON context 测试规则「${row.name}」\n示例：{"torque": 12.0, "std_time": 60}`, '{}'));
   if (contextStr === null) return;
   let context;
-  try { context = JSON.parse(contextStr); } catch { alert('JSON 格式错误，请检查输入'); return; }
+  try { context = JSON.parse(contextStr); } catch { (await window.AI00Dialogs.alert('JSON 格式错误，请检查输入')); return; }
   try {
     const resp = await (async (body,path,query) => { const result = await window.AI00Business.invoke("craft.rule.engine.evaluate", {version:1,payload:Object.fromEntries(Object.entries({operation:"check",dry_run:true,rule_gid:body.rule_gid,context:body.context}).filter(([,v])=>v!=null))}); return result; })({ rule_gid: row.gid, context },{},new URLSearchParams());
-    alert(`规则：${row.name}\n结果：${(resp.result || '').toUpperCase()}${resp.message ? '\n详情：' + resp.message : ''}`);
+    (await window.AI00Dialogs.alert(`规则：${row.name}\n结果：${(resp.result || '').toUpperCase()}${resp.message ? '\n详情：' + resp.message : ''}`));
   } catch (e) {
-    alert('检验请求失败：' + e);
+    (await window.AI00Dialogs.alert('检验请求失败：' + e));
   }
 }
 
@@ -257,7 +257,7 @@ function _showBindClassModal(row) {
       row.context_class_gid = val;
       _shell.setRows(_rules);
       overlay.remove();
-    } catch (e) { alert('保存失败：' + e); }
+    } catch (e) { (await window.AI00Dialogs.alert('保存失败：' + e)); }
   });
 }
 

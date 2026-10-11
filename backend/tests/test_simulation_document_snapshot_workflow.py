@@ -30,6 +30,24 @@ from plugins.simulation.simulation_backend.capabilities.document_snapshots impor
 
 
 NOW = datetime(2026, 9, 3, tzinfo=UTC)
+
+
+def test_native_snapshot_node_metadata_passes_output_contract():
+    from backend.capabilities.validation_next import validate_payload
+    from plugins.simulation.simulation_backend.capabilities.contracts import DOCUMENT_SNAPSHOT
+
+    snapshot = {**SNAPSHOT, "nodes": [
+        {"node_key": "root", "parent_key": None, "product_ref": "", "child_order": 0,
+         "depth": 0, "printable_name": "Test environment", "occurrence_id": ""},
+        {"node_key": "n-1", "parent_key": "root", "product_ref": "P-1", "child_order": 0,
+         "depth": 1, "printable_name": "P-1/01;1", "occurrence_id": "instance-1"},
+    ]}
+    validate_payload(DOCUMENT_SNAPSHOT, snapshot, label="snapshot")
+    snapshot["nodes"][1]["unexpected"] = True
+    with pytest.raises(ValueError):
+        validate_payload(DOCUMENT_SNAPSHOT, snapshot, label="snapshot")
+
+
 SNAPSHOT = {
     "document_id": "BOM-1", "root_node_key": "root",
     "source_identity": "tc://BOM-1/A", "snapshot_hash": "sha256:" + "a" * 64,

@@ -188,3 +188,19 @@ def test_large_capability_is_rejected_at_eighty_five_percent_memory():
         assert controller.in_flight("craft.large@1") == 0
 
     asyncio.run(scenario())
+
+
+def test_capacity_failure_reports_only_payload_free_counts_and_limits():
+    async def scenario():
+        controller = ResourceAdmissionController(_StaticSampler())
+        budget = ExecutionBudget(max_parallel_per_consumer=1, max_parallel_per_tenant=1)
+        lease = await controller.acquire(capability_key='craft.safe@1', tenant_key='private-tenant', consumer_key='private-consumer', budget=budget, timeout_seconds=0.01)
+        with pytest.raises(AdmissionRejected) as failure:
+            await controller.acquire(capability_key='craft.safe@1', tenant_key='private-tenant', consumer_key='private-consumer', budget=budget, timeout_seconds=0.001)
+        evidence = failure.value.diagnostics
+        assert evidence['reason'] == 'tenant_and_consumer_limit'
+        assert evidence['in_flight'] == 1 and evidence['consumer_limit'] == 1 and evidence['tenant_limit'] == 1
+        assert evidence['wait_seconds'] > 0
+        assert 'private-tenant' not in str(evidence) and 'private-consumer' not in str(evidence)
+        await lease.release()
+    asyncio.run(scenario())

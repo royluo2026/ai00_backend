@@ -187,6 +187,29 @@ class LiveDocumentProvider:
     def bind_cache(self, payload, context):
         return self._complete_open(payload, context, cache=True)
 
+    def resume_cache(self, payload, context):
+        from backend.contracts.viewer_cache_resume_v1 import CacheResumeRequest, CacheResumeResult
+        from ..application.viewer_interaction import authorize_interaction
+        from ..data.viewer_interaction_repository import ViewerInteractionRepository
+        scope = self._scope(payload, context, CacheResumeRequest.model_json_schema())
+        try:
+            request = CacheResumeRequest.model_validate(payload)
+            now = self.clock()
+
+            def complete(cursor, binding):
+                grant = authorize_interaction(context, dict(workspace_gid=request.workspace_gid,
+                    document_gid=request.document_gid, source_association_id=binding['source_association_id'],
+                    session_nonce=request.session_nonce, prior_grant_id=None),
+                    ViewerInteractionRepository(), self.signer, now, transaction=cursor,
+                    issuer=('simulation.environment.cache_source.live_document.resume', 1))
+                return CacheResumeResult(binding=binding, grant=grant).model_dump(mode='json')
+
+            result = self.workspaces.resume_cache_live_document(**scope, **request.model_dump(),
+                now=now, complete_binding=complete)
+        except (ConnectorRepositoryError, WorkspaceRepositoryError, ValueError) as exc:
+            raise CapabilityBusinessError(str(exc), str(exc)) from exc
+        return self._output(result)
+
     def bind_online_v3(self, payload, context):
         return self._complete_open(payload, context, cache=False)
 
@@ -267,3 +290,13 @@ def register_live_document_capabilities(registry, control_plane):
         risk=CapabilityRisk.WRITE, confirmation='user', permissions=('simulation.use',),
         input_schema=OpenCompletionRequest.model_json_schema(), output_schema=OpenCompletionResult.model_json_schema(),
         tags=('simulation', 'teamcenter_cache', 'live_document', 'experimental')), provider.bind_cache)
+
+    from backend.contracts.viewer_cache_resume_v1 import CacheResumeRequest, CacheResumeResult
+    register(registry, CapabilitySpec(
+        id='simulation.environment.cache_source.live_document.resume', owner='simulation', version=1,
+        description='Resume control of an unchanged already-open frozen-cache document from fresh signed native identity.',
+        use_when='Electron has selected the same previously bound native document and has a page-local loaded-scope candidate.',
+        do_not_use_when='The package, source, session, owner or current runtime differs, or an open outcome is unknown.',
+        risk=CapabilityRisk.WRITE, confirmation='none', permissions=('simulation.use',),
+        input_schema=CacheResumeRequest.model_json_schema(), output_schema=CacheResumeResult.model_json_schema(),
+        tags=('simulation', 'teamcenter_cache', 'live_document', 'experimental')), provider.resume_cache)

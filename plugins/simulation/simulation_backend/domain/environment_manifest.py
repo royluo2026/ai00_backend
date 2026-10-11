@@ -53,6 +53,7 @@ _OPERATION_FIELDS = {
     "vismockup.document.snapshot@1": (("max_nodes", "max_depth"), ("document_id", "root_node_key", "source_identity", "snapshot_hash", "nodes")),
     "vismockup.model.attach@1": (("document_id", "baseline_snapshot_hash", "binding",), ("node_key", "binding_id")),
     "vismockup.scene.apply@1": (("document_id", "baseline_snapshot_hash", "operation_id", "scene"), ("actual_scene_hash",)),
+    "vismockup.scene.render@1": (("document_id", "baseline_snapshot_hash", "operation_id", "scene", "highlight_products", "fit_all"), ("actual_scene_hash",)),
     "vismockup.scene.verify@1": (("document_id", "operation_id", "expected_scene_hash"), ("actual_scene_hash", "matches")),
     "vismockup.view.capture@1": (("operation_id", "capture_run_id", "attempt", "format", "width", "height", "background", "artifact_resource_refs"), ("artifact",)),
 }

@@ -75,8 +75,9 @@ class SimulationConnectorRepository:
         "vismockup.node.selection.change@1": {"highlight", "select", "unhighlight", "deselect"},
     }
 
-    def __init__(self, *, projection_protocol=None):
+    def __init__(self, *, projection_protocol=None, projection_plan_id=None):
         self.projection_v2 = projection_protocol == PROTOCOL_V2
+        self.projection_plan_id = projection_plan_id
         self.projection_table = ('workmanship_sim_connector_runtime_projection_outbox' if self.projection_v2
                                  else 'workmanship_sim_connector_projection_outbox')
 
@@ -1357,7 +1358,9 @@ class SimulationConnectorRepository:
                     f"FROM {self.projection_table} "
                     "WHERE status IN ('pending','retryable_failed') "
                     "AND (next_retry_at IS NULL OR next_retry_at<=NOW(6)) "
-                    "ORDER BY created_at LIMIT 1 FOR UPDATE"
+                    + ("AND plan_id=%s " if self.projection_plan_id else "")
+                    + "ORDER BY created_at LIMIT 1 FOR UPDATE",
+                    (self.projection_plan_id,) if self.projection_plan_id else (),
                 )
                 row = cursor.fetchone()
                 if not row:
@@ -1466,8 +1469,9 @@ class SimulationConnectorRepository:
                     f"UPDATE {self.projection_table} "
                     "SET status='retryable_failed',lease_owner=NULL,lease_until=NULL,"
                     "next_retry_at=%s,error_code='projection_lease_expired',updated_at=NOW(6) "
-                    "WHERE status='projecting' AND lease_until<=%s",
-                    (cutoff, cutoff),
+                    "WHERE status='projecting' AND lease_until<=%s"
+                    + (" AND plan_id=%s" if self.projection_plan_id else ""),
+                    (cutoff, cutoff, self.projection_plan_id) if self.projection_plan_id else (cutoff, cutoff),
                 )
                 return int(cursor.rowcount)
 

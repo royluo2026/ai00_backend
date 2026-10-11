@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+
+<script src="/web/core/dialogs.js?rev=20260922-unified-1"></script>
+
   <script src="/web/core/business_facade.js"></script>
 <meta charset="UTF-8">
 <title>VPPS 管理</title>
@@ -111,8 +114,9 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 }
 @keyframes fade-in { from { opacity: 0; transform: translateX(-50%) translateY(6px); } }
 </style>
-  <link rel="stylesheet" href="/assets/gbop_vpps-cfff51d1.css">
+  <link rel="stylesheet" href="/assets/dialogs-e48cd6c5.css">
   <link rel="stylesheet" href="/assets/view_manager-0b5250e9.css">
+  <link rel="stylesheet" href="/assets/list_shell-cfff51d1.css">
   <link rel="stylesheet" href="/assets/tree_list_shell-da642102.css">
 </head>
 <body>
@@ -1093,7 +1097,7 @@ async function _saveModal() {
 
 async function _deleteRow(gid, name) {
   if (_isResourceSection(_section) && !_canManageResourceRequirements()) return _toast('仅知识库管理员可停用');
-  if (!confirm(`确定要删除「${name}」吗？`)) return;
+  if (!(await window.AI00Dialogs.confirm(`确定要删除「${name}」吗？`))) return;
   const _cloudFetch = _cf();
   if (!_cloudFetch) { _toast('未连接云端'); return; }
   try {
@@ -1110,7 +1114,7 @@ async function _editResourceAliases(gid) {
   const row = _rawRowsMap[gid];
   if (!row) return;
   const current = row.aliases || [];
-  const input = prompt('别名（每行一个）', current.map(alias => alias.alias_value).join('\n'));
+  const input = (await window.AI00Dialogs.prompt('别名（每行一个）', current.map(alias => alias.alias_value).join('\n')));
   if (input === null) return;
   const wanted = [...new Set(input.split(/\r?\n/).map(value => value.trim()).filter(Boolean))];
 

@@ -111,9 +111,12 @@ def execute_historical_matrix(invoke=None):
             assert replay['migrated']==1 and replay['rejected']==[]
             assert entry.handler(payload,context)==data
             with pytest.raises(Exception):entry.handler({**payload,'reference_hash':'0'*64},context)
-            with pytest.raises(Exception):entry.handler(payload,SimpleNamespace(user_gid='owner',team_gid='other',active_roles=('super_admin',)))
-        assert db.db.execute('SELECT COUNT(*) FROM workmanship_base_legacy_artifact_bindings').fetchone()[0]==6
-        assert ois.call_count==5
+            if kind != 'bop_version':
+                with pytest.raises(Exception):entry.handler(payload,SimpleNamespace(user_gid='owner',team_gid='other',active_roles=('super_admin',)))
+            else:
+                assert entry.handler(payload,SimpleNamespace(user_gid='owner',team_gid='other',active_roles=('super_admin',)))['artifact_ref']
+        assert db.db.execute('SELECT COUNT(*) FROM workmanship_base_legacy_artifact_bindings').fetchone()[0]==7
+        assert ois.call_count==6
         db.db.execute('DELETE FROM workmanship_proj_tasks')
         with pytest.raises(Exception):registry.get('project.attachment.resolve',1).handler({'parent_type':'task','parent_gid':'tasks-one','reference_hash':reference_hash(record)},context)
     return rows
@@ -155,6 +158,7 @@ def test_bop_picture_access_is_batched_and_grant_is_identity_bound(monkeypatch):
     from backend.platform_sdk.historical_artifacts import reference_hash,redeem_picture_grant,read_stored_attachment
     from plugins.craft.craft_backend.capabilities.desktop_pictures import list_picture_access
     db=LocalDatabase();context=SimpleNamespace(user_gid='owner',team_gid='tenant',active_roles=('super_admin',))
+    monkeypatch.setattr('backend.platform_sdk.identity.get_conn',lambda:db)
     picture=b'\x89PNG\r\n\x1a\nfixture';photo={'storage':'ois','object_key':'owned/photo.png','name':'photo.png','mime':'image/png'}
     db.db.execute('INSERT INTO workmanship_bop_bop_versions VALUES(?,?,?,?,?,?)',('bop-one','owner','owner','tenant','team',None))
     db.db.execute('INSERT INTO workmanship_bop_bop_entries VALUES(?,?,?,?)',('bop-one',json.dumps([photo,photo]),'[]',0))
@@ -180,6 +184,7 @@ def test_bop_picture_access_survives_owner_team_move_with_original_provenance(mo
     from plugins.craft.craft_backend.capabilities.desktop_pictures import list_picture_access
 
     db=LocalDatabase();photo={'storage':'ois','object_key':'owned/moved-owner.png','name':'photo.png','mime':'image/png'}
+    monkeypatch.setattr('backend.platform_sdk.identity.get_conn',lambda:db)
     db.db.execute('INSERT INTO workmanship_bop_bop_versions VALUES(?,?,?,?,?,?)',('bop-one','owner','owner','tenant','team',None))
     db.db.execute('INSERT INTO workmanship_bop_bop_entries VALUES(?,?,?,?)',('bop-one',json.dumps([photo]),'[]',0))
     trust_fixture_upload(db,'ois','owned/moved-owner.png',b'\x89PNG\r\n\x1a\nfixture','image/png',
@@ -205,6 +210,7 @@ def test_bop_picture_access_keeps_valid_history_when_one_locator_is_invalid(monk
     from backend.platform_sdk.historical_artifacts import reference_hash
     from plugins.craft.craft_backend.capabilities.desktop_pictures import list_picture_access
     db=LocalDatabase();context=SimpleNamespace(user_gid='owner',team_gid='tenant',active_roles=('super_admin',))
+    monkeypatch.setattr('backend.platform_sdk.identity.get_conn',lambda:db)
     picture=b'\x89PNG\r\n\x1a\nfixture';photo={'storage':'ois','object_key':'owned/photo.png','name':'photo.png','mime':'image/png'}
     invalid={'url':'https://untrusted.invalid/broken.png'}
     db.db.execute('INSERT INTO workmanship_bop_bop_versions VALUES(?,?,?,?,?,?)',('bop-one','owner','owner','tenant','team',None))

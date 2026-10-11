@@ -1027,7 +1027,7 @@ class RowEditModal {
     const it = this._items[this._editIdx];
     const title = this._getItemTitle(it);
     const id = it[this._entryIssueIdField] || it.id || '';
-    if (!confirm(`确认删除 ${id}「${title}」？`)) return;
+    if (!(await window.AI00Dialogs.confirm(`确认删除 ${id}「${title}」？`))) return;
     try {
       await this._onDelete(it);
       this.close();

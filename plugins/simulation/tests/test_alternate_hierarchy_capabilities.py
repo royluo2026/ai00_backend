@@ -85,6 +85,49 @@ def test_bop_projection_plan_applies_line_scope_depth_and_separates_refs():
     assert plan["plan_hash"].startswith("sha256:")
 
 
+@pytest.mark.parametrize('line_gid,depth,expected', [
+    (None, 'all', ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']),
+    ('2', 'all', ['2', '3', '4', '5', '6', '7', '8', '9']),
+    ('2', 'operation', ['2', '3', '4']),
+])
+def test_bop_all_depth_preserves_source_parts_resources_and_parentage(line_gid, depth, expected):
+    # The process-only allowlist used to discard real part/resource BOP nodes even for all.
+    execution = {'source': {'bop_version_gid': '100', 'project_gid': '200', 'revision': 7},
+        'content_hash': 'sha256:' + 'a' * 64, 'nodes': [
+            {'node_id': str(gid), 'parent_id': parent, 'kind': kind,
+             'sequence': gid, 'name': kind, 'part_refs': ['part:99'] if gid == 5 else []}
+            for gid, parent, kind in [
+                (1, None, 'factory_bop'), (2, '1', 'line_process'),
+                (3, '2', 'station_process'), (4, '3', 'operation'),
+                (5, '4', 'part'), (6, '5', 'standard_part'),
+                (7, '5', 'non_standard_part'), (8, '4', 'tool_need'),
+                (9, '4', 'support_material'), (10, '1', 'line_process'),
+            ]]}
+    plan = build_bop_projection_plan(execution, workspace_gid='10', expected_workspace_version=3,
+        line_gid=line_gid, fork_depth=depth, hierarchy_name='Full BOP')
+    assert [item['source_gid'] for item in plan['nodes']] == expected
+    assert plan['nodes'][0]['parent_source_gid'] is None
+    if depth == 'all':
+        assert next(item for item in plan['nodes'] if item['source_gid'] == '6')['parent_source_gid'] == '5'
+    # A part reference remains a reference, not an invented extra hierarchy node.
+    assert plan['model_references'] == [{'source_node_gid': '5', 'reference': 'part:99'}]
+
+
+def test_bop_full_hierarchy_preview_contract_accepts_more_than_ten_thousand_nodes():
+    from backend.capabilities.validation_next import validate_payload
+    execution = {'source': {'bop_version_gid': '100', 'project_gid': '200', 'revision': 7},
+        'content_hash': 'sha256:' + 'a' * 64, 'nodes': [
+            {'node_id': str(gid), 'parent_id': '1' if gid > 1 else None,
+             'kind': 'part' if gid > 1 else 'line_process', 'sequence': gid, 'name': str(gid)}
+            for gid in range(1, 20001)]}
+    plan = build_bop_projection_plan(execution, workspace_gid='10', expected_workspace_version=3,
+        line_gid=None, fork_depth='all', hierarchy_name='Large BOP')
+    assert plan['node_count'] == 20000
+    descriptor = next(descriptor_for(spec) for spec, _ in specs()
+                      if spec.id == 'simulation.environment.bop_projection.preview')
+    validate_payload(descriptor.output_schema, plan)
+
+
 def test_bop_projection_preview_and_apply_recheck_owner_source_and_plan_hash():
     execution = {"source": {"bop_version_gid": "100", "project_gid": "200", "revision": 7},
         "content_hash": "sha256:" + "a" * 64, "nodes": [

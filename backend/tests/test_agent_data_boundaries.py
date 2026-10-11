@@ -86,9 +86,12 @@ def test_agent_transaction_reuses_domain_connection_and_persists_owned_outbox(mo
     cursor = Cursor()
 
     class TransactionConnection(Connection):
+        begun = False
         committed = False
         rolled_back = False
         closed = False
+
+        def begin(self): self.begun = True
 
         def commit(self): self.committed = True
         def rollback(self): self.rolled_back = True
@@ -102,7 +105,9 @@ def test_agent_transaction_reuses_domain_connection_and_persists_owned_outbox(mo
     monkeypatch.setattr(agent_connection, "_get_pool", lambda: Pool())
     transaction = agent_connection.begin_agent_transaction()
     with agent_connection.get_agent_conn() as owned:
-        assert owned is connection
+        assert owned is transaction.connection()
+        assert owned._inner is connection
+        assert connection.begun is True
     transaction.record_outbox(
         "agent.run.change.apply",
         1,

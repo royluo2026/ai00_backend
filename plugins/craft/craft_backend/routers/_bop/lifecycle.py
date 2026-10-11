@@ -1062,27 +1062,12 @@ def _legacy_undo_lifecycle_step(gid: str, body: UndoStepBody, _u=Depends(_WRITE)
             deleted_entries = 0
             deleted_links   = 0
 
-            # 检查 bop_entry_links 是否有 is_deleted 列
-            cur.execute("""
-                SELECT COUNT(*) FROM information_schema.columns
-                WHERE table_schema='ai00' AND table_name='bop_entry_links'
-                  AND column_name='is_deleted'
-            """)
-            _links_has_del = (cur.fetchone() or {}).get('count', 0) > 0
-
-            def _soft_or_hard_links(where_sql, params):
-                """软删或硬删 bop_entry_links，根据列是否存在决定。"""
+            def _soft_delete_links(where_sql, params):
                 nonlocal deleted_links
-                if _links_has_del:
-                    cur.execute(
-                        f"UPDATE workmanship_bop_bop_entry_links SET is_deleted=TRUE WHERE {where_sql} AND is_deleted=FALSE",
-                        params
-                    )
-                else:
-                    cur.execute(
-                        f"DELETE FROM workmanship_bop_bop_entry_links WHERE {where_sql}",
-                        params
-                    )
+                cur.execute(
+                    f"UPDATE workmanship_bop_bop_entry_links SET is_deleted=TRUE WHERE {where_sql} AND is_deleted=FALSE",
+                    params
+                )
                 deleted_links += cur.rowcount
                 node_types = _UNDO_STEP_NODE_TYPES[step]
                 placeholders = ','.join(['%s'] * len(node_types))
@@ -1129,19 +1114,19 @@ def _legacy_undo_lifecycle_step(gid: str, body: UndoStepBody, _u=Depends(_WRITE)
 
                 if deleted_entry_gids:
                     _ph = ",".join(["%s"] * len(deleted_entry_gids))
-                    _soft_or_hard_links(
+                    _soft_delete_links(
                         f"bop_entry_gid IN ({_ph})",
                         tuple(deleted_entry_gids)
                     )
 
             elif step == 'vpps_imported':
                 if body.pbom_version_gid:
-                    _soft_or_hard_links(
-                        "version_gid=%s AND link_type='pbom_part' AND ref_gid IN (SELECT gid FROM workmanship_bop_pbom WHERE snapshot_gid=%s)",
+                    _soft_delete_links(
+                        "version_gid=%s AND link_type='pbom_part' AND entity_gid IN (SELECT gid FROM workmanship_bop_pbom WHERE snapshot_gid=%s)",
                         (gid, body.pbom_version_gid)
                     )
                 else:
-                    _soft_or_hard_links(
+                    _soft_delete_links(
                         "version_gid=%s AND link_type='pbom_part'",
                         (gid,)
                     )
@@ -1207,19 +1192,12 @@ def _legacy_get_pbom_link_stats(gid: str, _u=Depends(_READ)):
             meta = dict(row)['meta'] or {}
             pbom_ver_gid = meta.get('pbom_match', {}).get('pbom_version_gid', '')
 
-            # 2. 已关联数：检查 is_deleted 列是否存在再过滤
-            cur.execute("""
-                SELECT COUNT(*) FROM information_schema.columns
-                WHERE table_schema='ai00' AND table_name='bop_entry_links'
-                  AND column_name='is_deleted'
-            """)
-            has_is_deleted = (cur.fetchone() or {}).get('count', 0) > 0
-
+            # 2. 已关联数
             link_sql = """
-                SELECT COUNT(DISTINCT ref_gid) AS linked
+                SELECT COUNT(DISTINCT entity_gid) AS linked
                 FROM workmanship_bop_bop_entry_links
-                WHERE version_gid=%s AND link_type='pbom_part'
-            """ + (" AND is_deleted=FALSE" if has_is_deleted else "")
+                WHERE version_gid=%s AND link_type='pbom_part' AND is_deleted=FALSE
+            """
             cur.execute(link_sql, (gid,))
             linked = (cur.fetchone() or {}).get('linked', 0) or 0
 

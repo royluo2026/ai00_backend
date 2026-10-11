@@ -36,6 +36,23 @@ def build(rows=None, spatial=None):
                                         spatial_semantics=SPATIAL if spatial is None else spatial)
 
 
+def test_bom_item_id_is_preserved_in_native_instance_and_revision_metadata():
+    rows = nodes()
+    rows[1]['name'] = 'LDP-25030016/01;1-油箱供油管总成III(OIL SUPPLY PIPE ASSY III)'
+    package = build(rows)
+    xml = ET.fromstring(package.plmxml)
+    ns = {'p': 'http://www.plmxml.org/Schemas/PLMXMLSchema'}
+    identity = package.node_map['a']['instance_id']
+    for tag, gid in [('ProductInstance', identity), ('ProductRevisionView', 'view-' + identity)]:
+        element = xml.find(f'.//p:{tag}[@id="{gid}"]', ns)
+        metadata = element.find('p:UserData/p:UserValue[@title="itemId"]', ns)
+        assert metadata is not None
+        assert metadata.attrib['value'] == 'LDP-25030016'
+    # A display label without a BOM item/revision prefix cannot invent an identity.
+    root = xml.find(f'.//p:ProductInstance[@id="{package.node_map["root"]["instance_id"]}"]', ns)
+    assert root.find('p:UserData/p:UserValue[@title="itemId"]', ns) is None
+
+
 def test_environment_instance_ids_survive_subtree_opens_and_rename_but_not_another_insertion():
     context = dict(workspace_gid='10', document_gid='20', name='W10 test2')
     def export(rows, **changes):

@@ -1055,9 +1055,9 @@ class ViewManager {
     };
   }
 
-  _notifyPersistenceError(error) {
+  async _notifyPersistenceError(error) {
     const message = `保存视图操作失败：${error?.message || String(error)}`;
-    if (typeof window?.alert === 'function') window.alert(message);
+    if (typeof window?.alert === 'function') (await window.AI00Dialogs.alert(message));
   }
 
   // ─── 公开快捷操作（供列表头右键菜单调用）────────────────────────────────────

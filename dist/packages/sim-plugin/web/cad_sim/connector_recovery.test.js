@@ -53,6 +53,7 @@ function page({ search = { items: [item] }, resolve, confirm = () => true, refre
     </div><button id="btnSwitchVmDocument">切换</button><button id="btnLaunchVm">启动</button>`, { runScripts: 'outside-only', url: 'https://ai00.test/' });
   const calls = [], refreshes = [], chooser = [];
   dom.window.confirm = confirm;
+  dom.window.AI00Dialogs = { confirm: (...args) => dom.window.confirm(...args) };
   dom.window.AI00Business = { invoke: async (id, envelope, confirmation) => {
     calls.push({ id, envelope, confirmation });
     if (confirmation && !await confirmation()) throw Error('confirmation_cancelled');
@@ -393,7 +394,7 @@ test('recovery rows use checkbox visuals and dialog has a viewport fallback arou
 });
 
 test('real page uses unique recovery CSS and script revisions with bounded wide wrapping layout',()=>{
-  const html=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');assert.match(html,/cad_sim\.css\?rev=20260917-online-binding-recovery-2/);assert.match(html,/connector_recovery\.js\?rev=20260916-recovery-fingerprint-1/);
+  const html=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');assert.match(html,/cad_sim\.css\?rev=20260918-teamcenter-session-button-1/);assert.match(html,/connector_recovery\.js\?rev=20260922-unified-dialogs-1/);
   const css=fs.readFileSync(path.join(__dirname,'cad_sim.css'),'utf8');assert.match(css,/\.cs-recovery-dialog\s*\{[^}]*width:\s*min\(900px, calc\(100vw - 32px\)\)/s);assert.match(css,/\.cs-recovery-items\s*\{[^}]*overflow(?:-y)?:\s*auto/s);assert.match(css,/\.cs-recovery-item-body\s*\{[^}]*min-width:\s*0/s);assert.match(css,/overflow-wrap:\s*anywhere/);
 });
 

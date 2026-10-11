@@ -399,7 +399,7 @@ async function init() {
       _closeTplPick(false);
       _openTplInst();
     } catch (e) {
-      alert('加载模板详情失败：' + e.message);
+      (await window.AI00Dialogs.alert('加载模板详情失败：' + e.message));
       document.getElementById('tplPickNext').disabled = false;
     }
   }
@@ -508,7 +508,7 @@ async function init() {
       setTimeout(() => hint.remove(), 2500);
     } catch (err) {
       console.error('[tpl instantiate]', err);
-      alert('创建失败：' + err.message);
+      (await window.AI00Dialogs.alert('创建失败：' + err.message));
     } finally {
       document.getElementById('tplInstConfirm').disabled = false;
     }

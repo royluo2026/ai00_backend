@@ -52,6 +52,7 @@ class Transaction:
 
 @pytest.fixture
 def cache_gateway(store,monkeypatch):
+    monkeypatch.setattr('backend.platform_sdk.access.build_access_scope',lambda user:{'team_gids':[user['team_id'],'10']})
     with store() as conn,conn.cursor() as cur:
         cur.execute('PRAGMA database_list');path=cur.fetchone()['file']
         cur.execute('CREATE TABLE workmanship_base_capability_outcomes ('
@@ -202,6 +203,16 @@ def test_cache_creation_handles_legacy_unowned_project_through_owner_policy(cach
     result=g.invoke('create',create_payload(),'legacy-project-gateway')
     assert result.ok,result.error
     assert result.data['project_gid']=='3' and g.project_row['team_id'] is None
+
+
+def test_cache_creation_accepts_parent_team_project_without_rewriting_ownership(cache_gateway):
+    g=cache_gateway;g.project_row['team_id']='10'
+    result=g.invoke('create',create_payload(),'parent-project-gateway')
+    assert result.ok,result.error
+    assert g.project_row['team_id']=='10'
+    with g.connections() as tx,tx.cursor() as cur:
+        cur.execute('SELECT tenant_gid FROM workmanship_sim_cloud_cache_batches WHERE batch_id=%s',(result.data['batch_id'],))
+        assert cur.fetchone()['tenant_gid']=='2'
 
 
 @pytest.mark.parametrize('failure',['projection','outbox'])
