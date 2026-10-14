@@ -126,16 +126,17 @@ def register_org_management_capabilities(registry: Any) -> None:
         "leader_user_gids": person_gid_array,
         "bop_line_gid": {"type": ["string", "null"], "maxLength": 256},
         "operation_gid": ID,
+        "line_gids": {"type": "array", "items": ID, "minItems": 1, "maxItems": 100, "uniqueItems": True},
     }, ("project_gid",))
     _register(registry, CapabilitySpec(
-        id="project.org_management.change.apply", description="Apply one revisioned manual-line change and durably project its BOP responsibility grants.",
-        use_when="A super administrator changes one manual project line.", do_not_use_when="The caller changes ordinary project membership.",
+        id="project.org_management.change.apply", description="Apply one revisioned responsibility change and durably project its BOP responsibility grants.",
+        use_when="A super administrator synchronizes BOP lines or changes project line responsibilities.", do_not_use_when="The caller changes ordinary project membership.",
         risk=CapabilityRisk.WRITE, confirmation="user", permissions=("system.user.manage",),
-        input_schema=_object({"operation": {"type": "string", "enum": ["managed_line.create", "managed_line.update", "managed_line.delete", "projection.retry"]}, "arguments": change_arguments, "expected_revision": {"type": "integer", "minimum": 0}, "idempotency_key": ID}, ("operation", "arguments", "expected_revision", "idempotency_key")),
+        input_schema=_object({"operation": {"type": "string", "enum": ["managed_line.create", "managed_line.update", "managed_line.delete", "managed_line.sync", "managed_line.assign", "projection.retry"]}, "arguments": change_arguments, "expected_revision": {"type": "integer", "minimum": 0}, "idempotency_key": ID}, ("operation", "arguments", "expected_revision", "idempotency_key")),
         output_schema=_object({"data": _object({"operation_gid": ID, "revision": {"type": "integer", "minimum": 1}, "status": {"type": "string", "enum": ["pending_projection", "completed", "failed_retryable", "failed_terminal"]}}, ("operation_gid", "revision", "status"))}, ("data",)),
         **common,
     ), ExposurePolicy(web=True, api=True),
-        "Commits one revision-checked manual responsibility change and starts its durable BOP authorization projection.",
+        "Commits one revision-checked project responsibility change and starts its durable BOP authorization projection.",
         org_management_change_provider)
 
 

@@ -14,6 +14,8 @@
 
 本机使用 `.runtime/start_current_backend.ps1` 启动 `.runtime/supervise_current_backend.py`。选择保存在 `.runtime/data-environment-state.json`，操作者与时间保存在同目录 `.audit.jsonl`。初始选择为 `test_`。功能只在本机受监督启动、显式开启开关且未使用部署 profile / ENV_FILE 时启用；已有受控部署的固定 profile 保护保留。
 
+远端部署使用独立规则：默认启动 `pp_`，不以 `test_` 作启动检查；只允许 `pp_` 与无前缀间切换，选择无前缀时以 `pp_` 为结构基准，在提交和生产环境重启时重新检查。`test_` 不参与远端准入。两方向仍检查当前和目标环境中的有效超管身份，并保留失败回退机制。
+
 Base 拥有三个 Capability：`base.runtime.data_environment.active.get`（已登录用户状态标签）、`.get`（超管检查）、`.change.apply`（超管切换）。切换经过 Gateway 身份、确认和审计，插件、Agent、MCP 不暴露此操作。Browser 使用固定后台兼容路由；Desktop 设置使用绑定设置窗口的专用 IPC，不暴露通用请求或令牌。
 
 2026-10-08 实库验证：当前 `test_`；`test_`、`pp_` 各 384 张相关表，结构一致；无前缀 119 张，结构准入失败。只验证了生产切换被拒绝，未实际切换生产环境。

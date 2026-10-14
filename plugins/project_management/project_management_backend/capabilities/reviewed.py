@@ -63,7 +63,7 @@ _ARGUMENT_FIELDS = {
         "item_title", "item_type", "jph", "key", "label", "list_gid",
         "local_gid", "message", "model_year", "name", "new_list_gid",
         "notify_on", "order_type", "owner_gid", "owner_team_gid", "owner_type",
-        "owner_user_gid", "permission", "platform", "priority", "project_code", "project_gid", "user_gid", "member_gid", "project_role",
+        "owner_user_gid", "permission", "platform", "priority", "project_code", "project_gid", "user_gid", "user_gids", "member_gid", "project_role",
         "q", "read_scope", "recipient_gid", "reviewer_gid", "scope",
         "section_gid", "share_scope", "shared_to", "sort_order", "source_gid",
         "source_ref", "start_date", "status", "storage_scope", "suffix",
@@ -74,6 +74,8 @@ _ARGUMENT_FIELDS = {
     )
 }
 
+
+_ARGUMENT_FIELDS["user_gids"] = {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 256}, "minItems": 1, "maxItems": 100, "uniqueItems": True}
 
 def _object(properties: dict[str, Any], *, required: tuple[str, ...] = ()) -> dict[str, Any]:
     schema: dict[str, Any] = {

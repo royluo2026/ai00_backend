@@ -48,6 +48,30 @@ def test_equal_schemas_and_missing_baseline():
     assert all(availability({p: {} for p in ('test_', 'pp_', '')}).values())
 
 
+def test_remote_baseline_requires_nonempty_pp_before_production_selection():
+    result = availability({'test_': {'a': [1]}, 'pp_': {}, '': {}}, baseline_prefix='pp_')
+    assert result['pp_'] == []
+    assert result['']
+
+
+def test_remote_schema_inspection_ignores_test_checks(monkeypatch):
+    from backend.base import data_environment as module
+    monkeypatch.setenv('AI00_DEPLOY_PROFILE', 'production')
+    queries = []
+    class Cursor:
+        def __enter__(self): return self
+        def __exit__(self, *args): pass
+        def execute(self, sql): queries.append(sql)
+        def fetchone(self): return {'Table': 'test_workmanship_a', 'Create Table': 'CREATE TABLE test_workmanship_a (a INT CHECK (a>0))'}
+        def fetchall(self):
+            if 'TRIGGERS' in queries[-1] or 'KEY_COLUMN_USAGE' in queries[-1]: return []
+            return [{'TABLE_NAME': 'test_workmanship_a'}]
+    from types import SimpleNamespace
+    schemas = module.inspect_schemas(SimpleNamespace(cursor=Cursor))
+    assert schemas['test_'] == {}
+    assert not any(query.startswith('SHOW CREATE') for query in queries)
+
+
 def test_business_field_prefix_is_preserved():
     row = normalize_record({'TABLE_NAME': 'pp_workmanship_a', 'COLUMN_NAME': 'pp_run_gid'}, 'pp_')
     assert row == {'TABLE_NAME': 'workmanship_a', 'COLUMN_NAME': 'pp_run_gid'}

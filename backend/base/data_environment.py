@@ -1,4 +1,4 @@
-"""Base-owned server-wide data environment selection; fixed test schema baseline."""
+"""Base-owned data environment selection with deployment-specific schema baselines."""
 from __future__ import annotations
 
 import json
@@ -96,10 +96,14 @@ def normalize_record(row, prefix):
     return result
 
 
-def availability(schemas):
+def availability(schemas, baseline_prefix='test_'):
     def differences(left, right):
         a, b = schemas[left], schemas[right]
         return [f'{NAMES[left]} / {NAMES[right]}：{name}' for name in sorted(set(a) | set(b)) if a.get(name) != b.get(name)]
+    if baseline_prefix == 'pp_':
+        # The remote deployment has no dependency on the local development schema.
+        production = differences('pp_', '') if schemas['pp_'] else ['pp_ 基准表结构不可读取或为空']
+        return {'test_': ['远端测试环境不可切换'], 'pp_': [], '': production}
     if not schemas['test_']:
         return {p: ['test_ 基准表结构不可读取或为空'] for p in PREFIXES}
     pp = differences('test_', 'pp_')
@@ -117,10 +121,13 @@ def connect():
 
 def inspect_schemas(connection):
     schemas = {p: defaultdict(list) for p in PREFIXES}
+    inspected_prefixes = ('pp_', '') if os.getenv('AI00_DEPLOY_PROFILE') == 'production' else PREFIXES
     def collect(category, rows, namekey='TABLE_NAME', drop=()):
         for row in rows:
             name = row[namekey]
             prefix = next((p for p in ('test_', 'pp_') if name.startswith(p)), '')
+            if prefix not in inspected_prefixes:
+                continue
             logical = _logical(name, prefix)
             if logical is None:
                 continue
@@ -142,6 +149,9 @@ def inspect_schemas(connection):
         collect('triggers', cursor.fetchall(), 'EVENT_OBJECT_TABLE')
         cursor.execute("SELECT TABLE_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA=DATABASE() AND CONSTRAINT_TYPE='CHECK'")
         for name in sorted({r['TABLE_NAME'] for r in cursor.fetchall()}):
+            prefix = next((p for p in ('test_', 'pp_') if name.startswith(p)), '')
+            if prefix not in inspected_prefixes or _logical(name, prefix) is None:
+                continue
             cursor.execute('SHOW CREATE TABLE `' + name.replace('`', '``') + '`')
             ddl = list(cursor.fetchone().values())[1]
             checks = [{'TABLE_NAME': name, 'EXPRESSION': re.sub(r'^\s*CONSTRAINT\s+`[^`]+`\s*', '', line).rstrip().rstrip(',')}
@@ -160,10 +170,16 @@ def _require_admin(connection, prefix, gid):
 
 def _status(connection):
     from backend.db.table_prefix import current_table_prefix
-    differences = availability(inspect_schemas(connection))
+    baseline = 'pp_' if os.getenv('AI00_DEPLOY_PROFILE') == 'production' else 'test_'
+    try:
+        differences = availability(inspect_schemas(connection), baseline_prefix=baseline)
+    except Exception:
+        if baseline != 'pp_':
+            raise
+        differences = {'test_': ['远端测试环境不可切换'], 'pp_': [], '': ['表结构检查失败，生产环境不可用']}
     enabled = switching_enabled()
     pending = environment_pending()
-    return {'active_prefix': current_table_prefix(), 'baseline_prefix': 'test_', 'pending': pending,
+    return {'active_prefix': current_table_prefix(), 'baseline_prefix': baseline, 'pending': pending,
             'switch_enabled': enabled, 'options': [
                 {'prefix': p, 'name': NAMES[p], 'available': p in allowed_prefixes() and not differences[p] and enabled and not pending,
                  'difference_count': len(differences[p]),
@@ -179,7 +195,7 @@ def get_environment(_payload, context):
         try:
             return _status(connection)
         except Exception:
-            return {'active_prefix': current_table_prefix(), 'baseline_prefix': 'test_', 'pending': _pending,
+            return {'active_prefix': current_table_prefix(), 'baseline_prefix': 'pp_' if os.getenv('AI00_DEPLOY_PROFILE') == 'production' else 'test_', 'pending': _pending,
                     'switch_enabled': False, 'options': [
                         {'prefix': p, 'name': NAMES[p], 'available': False, 'difference_count': 0,
                          'reasons': ['表结构检查失败，环境不可用']} for p in PREFIXES]}
@@ -212,10 +228,11 @@ def change_environment(payload, context):
         connection = connect()
         try:
             _require_admin(connection, active, context.user_gid)
-            status = _status(connection)  # Reinspect at submission; never trust client availability.
-            option = next(o for o in status['options'] if o['prefix'] == target)
-            if not option['available']:
-                raise ValueError('表结构不一致或检查失败，禁止切换')
+            if not (os.getenv('AI00_DEPLOY_PROFILE') == 'production' and target == 'pp_'):
+                status = _status(connection)  # Reinspect at submission; never trust client availability.
+                option = next(o for o in status['options'] if o['prefix'] == target)
+                if not option['available']:
+                    raise ValueError('表结构不一致或检查失败，禁止切换')
             _require_admin(connection, target, context.user_gid)
         finally:
             connection.close()

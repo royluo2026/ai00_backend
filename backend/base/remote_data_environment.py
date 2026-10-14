@@ -37,14 +37,15 @@ def activate_remote_environment():
     if os.getenv('AI00_REMOTE_ENVIRONMENT_SUPERVISED') != '1':
         raise RuntimeError('remote switching requires the managed environment supervisor')
     _active_prefix = selected_prefix(Path(os.environ['AI00_DATA_ENVIRONMENT_STATE_FILE']))
-    # Recheck persisted selections on every master start, before serving traffic.
-    from backend.base.data_environment import availability, connect, inspect_schemas
-    connection = connect()
-    try:
-        if availability(inspect_schemas(connection))[_active_prefix]:
-            raise RuntimeError('selected remote environment schema is unavailable')
-    finally:
-        connection.close()
+    # pp_ is the default remote environment. Only production selection requires parity.
+    if _active_prefix == '':
+        from backend.base.data_environment import availability, connect, inspect_schemas
+        connection = connect()
+        try:
+            if availability(inspect_schemas(connection), baseline_prefix='pp_')['']:
+                raise RuntimeError('selected remote environment schema is unavailable')
+        finally:
+            connection.close()
     from backend.base.data_environment import register_restart
     # The supervisor watches the atomic selection and restarts the whole master.
     register_restart(lambda: None)

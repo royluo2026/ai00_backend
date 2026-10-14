@@ -97,6 +97,26 @@ async def change(payload: dict[str, Any], context: object) -> dict[str, Any]:
         )
         if not checked.ok:
             raise CapabilityBusinessError("resource_not_found", "BOP 线体不存在、已失效或属于其他项目")
+    if payload["operation"] == "managed_line.sync":
+        bop_lines = []
+        cursor = None
+        while True:
+            checked = await context.domain_client.invoke(
+                DomainInvocation(capability_id="craft.bop.active_line.search", major_version=1,
+                    payload={"project_gid": str(payload["arguments"]["project_gid"]), "cursor": cursor, "page_size": 100}),
+                identity, correlation)
+            if not checked.ok:
+                raise CapabilityBusinessError("provider_unavailable", "BOP 线体读取失败")
+            page = checked.data.get("data", checked.data)
+            bop_lines.extend(page["items"])
+            cursor = page.get("next_cursor")
+            if len(bop_lines) > 5000:
+                raise CapabilityBusinessError("invalid_input", "项目线体超过 5000 条")
+            if not cursor:
+                break
+        superseded = {gid for line in bop_lines for gid in line.get('ancestor_gids', [])}
+        bop_lines = [line for line in bop_lines if line['gid'] not in superseded]
+        payload = {**payload, "arguments": {**payload["arguments"], "bop_lines": bop_lines}}
     result = repository.apply(
         tenant_gid=tenant_gid, actor_gid=str(getattr(context, "user_gid", "")),
         project_gid=str(payload["arguments"].get("project_gid") or ""),
@@ -123,22 +143,25 @@ async def change(payload: dict[str, Any], context: object) -> dict[str, Any]:
                                        authenticated_at=datetime.now(UTC)),
                 tenant_id=tenant_gid, worker_id=service_id,
             )
-            line = pending["line"]
-            outcome = await context.domain_client.invoke(
-                DomainInvocation(
-                    capability_id="base.project_responsibility.projection.apply", major_version=1,
-                    payload={"operation_gid": result["operation_gid"], "source_gid": line["gid"],
-                             "source_revision": pending["revision"], "project_gid": str(payload["arguments"]["project_gid"]),
-                             "bop_line_gid": line.get("bop_line_gid"),
-                             "user_gids": line.get("leader_user_gids", []),
-                             "idempotency_key": result["operation_gid"]},
-                    idempotency_key=result["operation_gid"],
-                ), identity,
-                CorrelationRef(request_id=str(getattr(context, "request_id", result["operation_gid"])),
-                               trace_id=str(getattr(context, "request_id", result["operation_gid"]))),
-            )
-        if not outcome.ok:
-            raise RuntimeError(outcome.error.message if outcome.error else "projection failed")
+            batch = pending["line"].get("lines")
+            lines = batch if batch is not None else [pending["line"]]
+            for line in lines:
+                projection_gid = result["operation_gid"] + ':' + line["gid"] if batch is not None else result["operation_gid"]
+                outcome = await context.domain_client.invoke(
+                    DomainInvocation(
+                        capability_id="base.project_responsibility.projection.apply", major_version=1,
+                        payload={"operation_gid": projection_gid, "source_gid": line["gid"],
+                                 "source_revision": pending["revision"], "project_gid": str(payload["arguments"]["project_gid"]),
+                                 "bop_line_gid": line.get("bop_line_gid"),
+                                 "user_gids": line.get("leader_user_gids", []),
+                                 "idempotency_key": projection_gid},
+                        idempotency_key=projection_gid,
+                    ), identity,
+                    CorrelationRef(request_id=str(getattr(context, "request_id", projection_gid)),
+                                   trace_id=str(getattr(context, "request_id", projection_gid))),
+                )
+                if not outcome.ok:
+                    raise RuntimeError(outcome.error.message if outcome.error else "projection failed")
         repository.complete_projection(result["operation_gid"], tenant_gid)
         result["status"] = "completed"
     except Exception as exc:

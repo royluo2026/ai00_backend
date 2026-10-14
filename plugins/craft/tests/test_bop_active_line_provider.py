@@ -34,6 +34,7 @@ class _Connection:
 
 def test_search_pages_line_nodes_without_scanning_the_whole_active_bop(monkeypatch) -> None:
     monkeypatch.setattr(bop_active_line, "get_craft_conn", lambda: _Connection())
+    monkeypatch.setattr('craft_backend.application.project_scope.line_ancestor_gids', lambda project, gids: {gid: [] for gid in gids})
 
     result = bop_active_line.search_active_lines(
         {"project_gid": "project-1", "page_size": 10}, None
@@ -41,5 +42,5 @@ def test_search_pages_line_nodes_without_scanning_the_whole_active_bop(monkeypat
 
     assert result == {"data": {"items": [{
         "gid": "line-1", "version_gid": "version-1", "version_tag": "V1",
-        "title": "焊装线", "path": "V1 / 焊装线",
+        "title": "焊装线", "path": "V1 / 焊装线", "ancestor_gids": [],
     }], "next_cursor": None}}

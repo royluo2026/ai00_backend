@@ -143,6 +143,7 @@ class OrgManagementRepository:
                         # keeping the stable source GID for ref-count cleanup.
                         projection_line = {**line, "bop_line_gid": None, "leader_user_gids": []}
                     needs_projection = bool(line and (
+                        line.get("lines") or
                         operation == "managed_line.delete" or line.get("bop_line_gid") or line.get("leader_user_gids")
                     ))
                     status = "pending_projection" if needs_projection else "completed"

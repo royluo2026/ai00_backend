@@ -1,6 +1,19 @@
 from __future__ import annotations
 
 from backend.base.bop_edit_authorization import check_bop_edit, get_bop_edit_scope
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def no_external_craft_storage(monkeypatch):
+    monkeypatch.setattr('backend.platform_sdk.craft_project_scope.line_ancestor_gids', lambda p, gids: {gid: [] for gid in gids})
+
+
+def test_upgraded_line_retains_old_responsibility_without_rebinding(monkeypatch):
+    monkeypatch.setattr('backend.platform_sdk.craft_project_scope.line_ancestor_gids', lambda p, gids: {'new': ['old']})
+    monkeypatch.setattr('backend.base.bop_edit_authorization.get_conn', lambda: Context([
+        {'managed': 1}, None, [], [{'bop_line_gid': 'old'}]]))
+    assert check_bop_edit(tenant_gid='t', user_gid='u', active_roles=('member',), project_gid='p', line_gid='new')['allowed'] is True
 
 
 class Cursor:

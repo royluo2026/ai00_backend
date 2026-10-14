@@ -267,6 +267,7 @@ def is_resumable_ddl(statement: str) -> bool:
         or
         re.match(r"^CREATE TABLE IF NOT EXISTS\b", normalized)
         or re.match(r"^CREATE (?:UNIQUE )?INDEX IF NOT EXISTS\b", normalized)
+        or re.match(r"^DROP INDEX IF EXISTS\b", normalized)
         or re.match(
             r"^ALTER TABLE\s+`?[A-Z0-9_]+`?\s+ADD COLUMN IF NOT EXISTS\b",
             normalized,
@@ -321,6 +322,14 @@ def _status_check_replacement(statement: str):
 
 def prepare_resumable_statement(conn, statement: str) -> str | None:
     """Translate declarative IF NOT EXISTS DDL for OceanBase 4.3.5."""
+    drop_index = re.search(r"\bDROP\s+INDEX\s+IF\s+EXISTS\s+`?([A-Za-z0-9_]+)`?\s+ON\s+`?([A-Za-z0-9_]+)`?", statement, re.I)
+    if drop_index:
+        index, table = drop_index.groups()
+        with conn.cursor() as cur:
+            cur.execute("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s AND INDEX_NAME=%s", (rewrite_sql(table), index))
+            if not int(_scalar(cur.fetchone())):
+                return None
+        return re.sub(r"\bINDEX\s+IF\s+EXISTS\b", "INDEX", statement, count=1, flags=re.I)
     replacement = _status_check_replacement(statement)
     if replacement:
         phase, table, constraint, values = replacement

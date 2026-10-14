@@ -79,7 +79,41 @@ def apply_line_change(meta: Any, *, operation: str, arguments: dict[str, Any],
         raise OrgManagementError("version_conflict", "项目责任配置已被其他人修改")
     lines = state["lines"]
     selected: dict[str, Any] | None = None
-    if operation == "managed_line.create":
+    if operation == "managed_line.assign":
+        gids = arguments.get("line_gids", [])
+        if not isinstance(gids, list) or not 1 <= len(gids) <= 100 or len(set(gids)) != len(gids):
+            raise OrgManagementError("invalid_input", "请选择 1 至 100 条线体")
+        targets = [line for line in lines if line["gid"] in gids]
+        if len(targets) != len(gids):
+            raise OrgManagementError("resource_not_found", "选中的线体已不存在")
+        people = _leaders(arguments.get("leader_user_gids", []))
+        if not people:
+            raise OrgManagementError("invalid_input", "请选择负责人")
+        for line in targets:
+            line["leader_user_gids"] = _leaders(line["leader_user_gids"] + people)
+        selected = {"lines": targets}
+    elif operation == "managed_line.sync":
+        targets = []
+        claimed = set()
+        original_mappings = {line["gid"]: line.get("bop_line_gid") for line in lines}
+        for source in arguments.get("bop_lines", []):
+            identity = {source["gid"], *source.get("ancestor_gids", [])}
+            matches = [line for line in lines if original_mappings.get(line["gid"]) in identity]
+            if len(matches) > 1 or (matches and matches[0]["gid"] in claimed):
+                raise OrgManagementError("invalid_input", "BOP 来源关系存在多条映射，请先检查绑定")
+            if matches:
+                target = matches[0]
+                claimed.add(target["gid"])
+                target["bop_line_gid"] = source["gid"]
+            else:
+                name = str(source.get("title") or source["gid"]).strip()
+                if any(line["name"] == name for line in lines):
+                    name = f'{name} ({source["gid"]})'
+                target = {"gid": new_gid(), "name": name, "leader_user_gids": [], "bop_line_gid": source["gid"]}
+                lines.append(target)
+            targets.append(target)
+        selected = {"lines": targets}
+    elif operation == "managed_line.create":
         name = str(arguments.get("name") or "").strip()
         if not name:
             raise OrgManagementError("invalid_input", "线体名称不能为空")
@@ -111,6 +145,8 @@ def apply_line_change(meta: Any, *, operation: str, arguments: dict[str, Any],
     else:
         raise OrgManagementError("invalid_input", "不支持的线体操作")
     _validate_lines(lines)
+    if len(lines) > 5000:
+        raise OrgManagementError("invalid_input", "项目线体最多 5000 条")
     root["org_management"] = {"revision": expected_revision + 1,
                                "lines": sorted(lines, key=lambda item: (item["name"], item["gid"]))}
     return root, deepcopy(selected)

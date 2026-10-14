@@ -208,8 +208,8 @@ def _legacy_fork_version(source_gid: str, body: ForkBody, _u=Depends(_WRITE)):
                     "INSERT INTO workmanship_bop_bop_entries "
                     "(gid, version_gid, parent_gid, node_type, sort_order, level, ai00_level,"
                     " title, vpps, vpps_desc, vpps_part, part_feed, catia_occurrence_name, parent_vpps_name,"
-                    " parent_bop_title, child_vpps, owner_gid, meta) "
-                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                    " parent_bop_title, child_vpps, owner_gid, meta, source_entry_gid) "
+                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                     (new_gid, new_ver_gid, new_parent,
                      e['node_type'], e['sort_order'], e.get('level', 0),
                      _AI00_LEVEL.get(e['node_type']),
@@ -218,7 +218,7 @@ def _legacy_fork_version(source_gid: str, body: ForkBody, _u=Depends(_WRITE)):
                      _fval('parent_bop_title'),
                      json.dumps(e.get('child_vpps') or []),
                      _fval('owner_gid'),
-                     json.dumps(new_meta))
+                     json.dumps(new_meta), e['gid'])
                 )
 
             conn.commit()
@@ -711,7 +711,7 @@ def _legacy_stage_advance(src_gid: str, body: StageAdvanceBody, _u=Depends(_WRIT
                 f"VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                 (new_ver_gid, body.stage_name,
                  src_ver.get('bop_name', ''),
-                 src_ver.get('version_family_gid', new_ver_gid),
+                 src_ver.get('version_family_gid') or src_gid,
                  src_ver.get('project_gid'), src_ver.get('factory_gid'),
                  src_ver.get('vehicle_model_gid'), src_ver.get('maturity', 'concept'),
                  src_ver.get('takt_time', 60),
@@ -743,15 +743,15 @@ def _legacy_stage_advance(src_gid: str, body: StageAdvanceBody, _u=Depends(_WRIT
                 cur.execute(
                     "INSERT INTO workmanship_bop_bop_entries "
                     "(gid, version_gid, parent_gid, node_type, sort_order, level, ai00_level,"
-                    " title, vpps, vpps_desc, parent_bop_title, child_vpps, owner_gid, meta) "
-                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                    " title, vpps, vpps_desc, parent_bop_title, child_vpps, owner_gid, meta, source_entry_gid) "
+                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                     (new_gid_sa, new_ver_gid, new_parent_sa,
                      e['node_type'], e['sort_order'], e.get('level', 0),
                      _AI00_LEVEL.get(e['node_type']),
                      e.get('title'), e.get('vpps'), e.get('vpps_desc'),
                      e.get('parent_bop_title'),
                      json.dumps(e.get('child_vpps') or []),
-                     e.get('owner_gid'), json.dumps(e.get('meta') or {}))
+                     e.get('owner_gid'), json.dumps(e.get('meta') or {}), e['gid'])
                 )
 
             cur.execute(

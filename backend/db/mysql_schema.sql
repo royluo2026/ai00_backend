@@ -69,9 +69,9 @@ CREATE TABLE IF NOT EXISTS workmanship_auth_project_members (
     created_at  DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 同角色同范围唯一索引（简化版，去掉 WHERE 条件）
-CREATE UNIQUE INDEX idx_pm_unique_global  ON workmanship_auth_project_members (project_gid, role(64));
-CREATE UNIQUE INDEX idx_pm_unique_scoped  ON workmanship_auth_project_members (project_gid, role(64), scope_gid(191));
+-- 一个项目角色或线体范围允许多名人员；成员去重由 Base 写入边界处理。
+CREATE INDEX idx_pm_global ON workmanship_auth_project_members (project_gid, role(64));
+CREATE INDEX idx_pm_scoped ON workmanship_auth_project_members (project_gid, role(64), scope_gid(191));
 CREATE INDEX idx_pm_project               ON workmanship_auth_project_members (project_gid);
 CREATE INDEX idx_pm_user                  ON workmanship_auth_project_members (user_gid);
 CREATE INDEX idx_pm_scope                 ON workmanship_auth_project_members (scope_type(32), scope_gid(191));

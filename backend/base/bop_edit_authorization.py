@@ -45,6 +45,19 @@ def get_bop_edit_scope(*, tenant_gid: str, user_gid: str, active_roles: tuple[st
                 (project_gid, user_gid, *requested),
             )
             editable = tuple(sorted(str(row["bop_line_gid"]) for row in cursor.fetchall()))
+            missing = [gid for gid in requested if gid not in editable]
+            if missing:
+                from backend.platform_sdk.craft_project_scope import line_ancestor_gids
+                ancestry = line_ancestor_gids(project_gid, missing)
+                ancestors = sorted({ancestor for values in ancestry.values() for ancestor in values})
+                if ancestors:
+                    placeholders = ','.join(['%s'] * len(ancestors))
+                    cursor.execute(
+                        "SELECT bop_line_gid FROM workmanship_base_line_responsibility_targets "
+                        "WHERE project_gid=%s AND user_gid=%s AND source_count>0 "
+                        f"AND bop_line_gid IN ({placeholders})", (project_gid, user_gid, *ancestors))
+                    granted = {str(row['bop_line_gid']) for row in cursor.fetchall()}
+                    editable = tuple(sorted(set(editable) | {gid for gid, values in ancestry.items() if granted.intersection(values)}))
     return {
         "project_wide": False,
         "editable_line_gids": editable,

@@ -59,4 +59,49 @@ def entry_project_gid(entry_gid, context):
     return project
 
 
-__all__ = ["equivalent_line_gids", "line_titles", "line_titles_for_project", "project_bop_lines", "entry_project_gid"]
+def line_ancestor_gids(project_gid: str, line_gids: list[str]) -> dict[str, list[str]]:
+    """Trace actual version-copy provenance, scoped to one project and BOP family."""
+    from backend.capability_v2.provider_contracts import CapabilityBusinessError
+    gids = list(dict.fromkeys(line_gids))
+    if len(gids) > 5000:
+        raise CapabilityBusinessError("graph_limit_exceeded", "Too many BOP lines")
+    by_gid = {}
+    frontier = gids
+    with get_conn() as conn, conn.cursor() as cur:
+        for _ in range(32):
+            if not frontier:
+                break
+            placeholders = ','.join(['%s'] * len(frontier))
+            cur.execute(
+                "SELECT e.gid,e.source_entry_gid,COALESCE(NULLIF(v.version_family_gid,''),v.gid) AS family_gid "
+                "FROM workmanship_bop_bop_entries e JOIN workmanship_bop_bop_versions v ON v.gid=e.version_gid "
+                "WHERE v.project_gid=%s AND e.node_type='line_process' "
+                f"AND e.gid IN ({placeholders})", (project_gid, *frontier))
+            rows = [dict(row) for row in cur.fetchall()]
+            by_gid.update({str(row['gid']): row for row in rows})
+            frontier = list({str(row['source_entry_gid']) for row in rows
+                             if row.get('source_entry_gid') and str(row['source_entry_gid']) not in by_gid})
+            if len(by_gid) > 5000:
+                raise CapabilityBusinessError("graph_limit_exceeded", "BOP provenance exceeds 5000 nodes")
+        else:
+            if frontier:
+                raise CapabilityBusinessError("graph_limit_exceeded", "BOP provenance exceeds depth 32")
+    result = {}
+    for gid in gids:
+        ancestors, seen = [], {gid}
+        row = by_gid.get(gid)
+        family = row.get('family_gid') if row else None
+        while row and row.get('source_entry_gid'):
+            parent = str(row['source_entry_gid'])
+            if parent in seen:
+                raise CapabilityBusinessError("graph_limit_exceeded", "Cyclic BOP provenance")
+            seen.add(parent)
+            row = by_gid.get(parent)
+            if not row or row.get('family_gid') != family:
+                break
+            ancestors.append(parent)
+        result[gid] = ancestors
+    return result
+
+
+__all__ = ["equivalent_line_gids", "line_titles", "line_titles_for_project", "project_bop_lines", "entry_project_gid", "line_ancestor_gids"]

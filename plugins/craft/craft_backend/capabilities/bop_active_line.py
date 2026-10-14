@@ -114,12 +114,15 @@ def search_active_lines(payload: dict[str, Any], _context: object) -> dict[str, 
     lines, by_gid = _active_line_page(project_gid, after, page_size)
     has_more = len(lines) > page_size
     selected = lines[:page_size]
+    from ..application.project_scope import line_ancestor_gids
+    ancestry = line_ancestor_gids(project_gid, [str(row['gid']) for row in selected])
     items = [{
         "gid": str(row["gid"]),
         "version_gid": str(row["version_gid"]),
         "version_tag": str(row.get("version_tag") or ""),
         "title": str(row.get("title") or ""),
         "path": _path(row, by_gid),
+        "ancestor_gids": ancestry.get(str(row['gid']), []),
     } for row in selected]
     return {"data": {"items": items, "next_cursor": _encode_cursor(items[-1]["gid"]) if has_more and items else None}}
 
@@ -172,7 +175,7 @@ def _descriptor(spec: CapabilitySpec, *, business_effect: str) -> CapabilityDesc
 
 
 def register_bop_active_line_capabilities(registry: Any) -> None:
-    item = _object({"gid": ID, "version_gid": ID, "version_tag": {"type": "string", "maxLength": 256}, "title": {"type": "string", "maxLength": 512}, "path": {"type": "string", "maxLength": 4096}}, ("gid", "version_gid", "version_tag", "title", "path"))
+    item = _object({"gid": ID, "version_gid": ID, "version_tag": {"type": "string", "maxLength": 256}, "title": {"type": "string", "maxLength": 512}, "path": {"type": "string", "maxLength": 4096}, "ancestor_gids": {"type": "array", "items": ID, "maxItems": 32}}, ("gid", "version_gid", "version_tag", "title", "path"))
     definitions = (
         ("craft.bop.active_line.search", search_active_lines, "Returns the bounded active BOP lines that may be assigned to a project responsibility node.", _object({"project_gid": ID, "cursor": {"type": ["string", "null"], "maxLength": 512}, "page_size": {"type": "integer", "minimum": 1, "maximum": 100}}, ("project_gid",)), _object({"data": _object({"items": {"type": "array", "items": item, "maxItems": 100}, "next_cursor": {"type": ["string", "null"], "maxLength": 512}}, ("items", "next_cursor"))}, ("data",))),
         ("craft.bop.active_line.validate", validate_active_line, "Confirms that a selected BOP line remains active, undeleted, and owned by the requested project.", _object({"project_gid": ID, "bop_line_gid": ID}, ("project_gid", "bop_line_gid")), _object({"data": _object({"gid": ID, "active": {"const": True}}, ("gid", "active"))}, ("data",))),

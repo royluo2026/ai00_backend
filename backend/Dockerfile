@@ -15,6 +15,7 @@ RUN pip install --upgrade pip && pip install -r backend/requirements.txt
 
 # Fail the image build when code and the frozen Provider manifest differ.
 RUN python -m backend.scripts.audit_official_domain_artifacts
+RUN ENV_FILE= AI00_DEPLOY_PROFILE=production python -c "from backend.capability_v2.bootstrap import build_capability_registry; from backend.capability_v2.gateway import configure_default_gateway; configure_default_gateway(build_capability_registry())"
 
 EXPOSE 80
 

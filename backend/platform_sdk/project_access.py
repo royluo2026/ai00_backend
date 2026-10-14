@@ -152,6 +152,34 @@ def add_project_member(
     return member_gid
 
 
+def add_project_members(project_gid: str, user_gids: list[str]) -> list[str]:
+    """Add ordinary members atomically; selecting existing members is a no-op."""
+    if not isinstance(user_gids, list) or not 1 <= len(user_gids) <= 100 or any(not isinstance(gid, str) or not gid.strip() for gid in user_gids):
+        raise ValueError("Select 1 to 100 registered users")
+    gids = _unique(user_gids)
+    if set(get_user_profiles(gids)) != set(gids):
+        raise ValueError("A selected user is missing or inactive")
+    added = []
+    with get_conn() as conn:
+        try:
+            with conn.cursor() as cur:
+                # Serialize additions for this project, including concurrent batches.
+                cur.execute("SELECT gid FROM workmanship_auth_project_members WHERE project_gid=%s FOR UPDATE", (project_gid,))
+                cur.execute("SELECT user_gid FROM workmanship_auth_project_members WHERE project_gid=%s AND role='member' AND scope_gid IS NULL", (project_gid,))
+                existing = {str(row['user_gid']) for row in cur.fetchall()}
+                for gid in gids:
+                    if gid in existing:
+                        continue
+                    member_gid = str(next_gid())
+                    cur.execute("INSERT INTO workmanship_auth_project_members (gid,project_gid,user_gid,role,scope_type,scope_gid) VALUES (%s,%s,%s,'member','project',NULL)", (member_gid, project_gid, gid))
+                    added.append(member_gid)
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+    return added
+
+
 def remove_project_member(project_gid: str, member_gid: str) -> bool:
     with get_conn() as conn:
         with conn.cursor() as cur:
