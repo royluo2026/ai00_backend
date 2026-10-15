@@ -189,6 +189,7 @@ _GRAPH_OUTPUT['properties']['workspace'] = {'anyOf': [_inline_model_schema(Works
 _node_properties = _GRAPH_OUTPUT['properties']['nodes']['items']['properties']
 _node_properties.update({
     'home_scope_gid': {'type':['string','null']},
+    'level': {'type':'integer','minimum':1,'maximum':9},
     'semantic_type': {'type':'string','enum':['target','decision','action','object','measurement','compare','disturbance','uncertainty']},
     'implementation': _inline_model_schema(Implementation),
 })
@@ -340,7 +341,7 @@ INPUT_SCHEMAS.update({
     _ORG_PREFIX+'version.revise': obj({'version_gid': STRING, 'expected_revision': REVISION}, required=('version_gid','expected_revision')),
 })
 OUTPUT_SCHEMAS.update({
-    _ORG_PREFIX+'panorama.read': obj({'panorama': {'anyOf': [_ORG_PANORAMA, {'type':'null'}]}, 'can_edit': {'type':'boolean'}}, required=('panorama','can_edit')),
+    _ORG_PREFIX+'panorama.read': obj({'panorama': {'anyOf': [_ORG_PANORAMA, {'type':'null'}]}, 'can_edit': {'type':'boolean'},'can_publish':{'type':'boolean'}}, required=('panorama','can_edit')),
     _ORG_PREFIX+'panorama.create': obj({'panorama_gid': STRING, 'version_gid': STRING, 'revision': REVISION}, required=('panorama_gid','version_gid','revision')),
     _ORG_PREFIX+'version.revise': obj({'version_gid':STRING,'revision':REVISION,'parent_version_gid':STRING},required=('version_gid','revision','parent_version_gid')),
     **{_ORG_PREFIX+suffix: OUTPUT_SCHEMAS['agent.orchestration.'+suffix] for suffix in ('graph.read','graph.save','version.publish')},

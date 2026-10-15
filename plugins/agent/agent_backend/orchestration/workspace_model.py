@@ -30,10 +30,11 @@ class Scope(Closed):
     gid: str = Field(min_length=1,max_length=128)
     title: str = Field(min_length=1,max_length=255)
     parent_gid: str | None = None
+    business_node_gid: str | None = None
 
 
 class Axis(Closed):
-    x_items: list[str] = Field(min_length=1,max_length=64)
+    x_items: list[str] = Field(min_length=0,max_length=64)
     y_items: list[str] = Field(min_length=1,max_length=64)
     column_width: int = Field(default=230,ge=180,le=600)
     row_height: int = Field(default=150,ge=120,le=600)
@@ -62,6 +63,7 @@ class Placement(Closed):
 class View(Closed):
     gid: str
     view_type: Literal['org','task']
+    axis_mode: Literal['inherited','independent','overview'] = 'inherited'
     scope_gid: str | None = None
     task_gid: str | None = None
     axis: Axis
@@ -121,7 +123,11 @@ class WorkspaceDefinition(Closed):
             if len({p.node_gid for p in view.placements})!=len(view.placements): raise ValueError('duplicate placement')
             slots=[(p.x_item_key,p.y_item_key,p.slot_x,p.slot_y) for p in view.placements if p.slot_x is not None]
             if len(slots)!=len(set(slots)): raise ValueError('duplicate local slot')
-            if any(p.x_item_key not in view.axis.x_items or p.y_item_key not in view.axis.y_items for p in view.placements): raise ValueError('placement outside axis')
+            if view.axis_mode=='overview':
+                if view.view_type!='org' or view.axis.x_items: raise ValueError('overview must be an org view without horizontal stages')
+            elif not view.axis.x_items: raise ValueError('horizontal axis required')
+            xs=['总览'] if view.axis_mode=='overview' else view.axis.x_items
+            if any(p.x_item_key not in xs or p.y_item_key not in view.axis.y_items for p in view.placements): raise ValueError('placement outside axis')
         if len({v.gid for v in self.variants})!=len(self.variants): raise ValueError('duplicate variant')
         for variant in self.variants:
             if variant.task_gid not in tasks: raise ValueError('variant task missing')
@@ -139,6 +145,11 @@ def validate_workspace(graph):
             if len(keys)!=len(set(keys)): raise ValueError('duplicate port key')
     if graph.workspace:
         scopes={s.gid for s in graph.workspace.scopes}
+        by_node={n.gid:n for n in graph.nodes}
+        for scope in graph.workspace.scopes:
+            if scope.business_node_gid:
+                node=by_node.get(scope.business_node_gid)
+                if not node or node.level!=1: raise ValueError('business scope must link to an L1 card')
         for node in graph.nodes:
             if node.home_scope_gid is not None and node.home_scope_gid not in scopes: raise ValueError('node scope missing')
         for view in graph.workspace.views:
@@ -194,6 +205,8 @@ def clone_revision_graph(graph):
     for b in data['capability_bindings']+data['context_bindings']:
         b['gid']=str(uuid.uuid4());b['source_item_gid']=item_ids[b['source_item_gid']]
     if data['workspace']:
+        for s in data['workspace']['scopes']:
+            if s.get('business_node_gid'): s['business_node_gid']=node_ids[s['business_node_gid']]
         for v in data['workspace']['views']:
             for p in v['placements']:p['node_gid']=node_ids[p['node_gid']]
         for v in data['workspace']['variants']:
@@ -204,3 +217,26 @@ def clone_revision_graph(graph):
                     for implementation in [o['implementation'],*o['implementation'].get('alternatives',[])]:
                         implementation['source_item_gids']=[item_ids[g] for g in implementation['source_item_gids']]
     return GraphDraft.model_validate(data)
+
+
+def normalize_org_axes(graph):
+    """Save-time canonical axes; reads remain compatible with old independent axes."""
+    if not graph.workspace:return
+    scopes={s.gid:s for s in graph.workspace.scopes}
+    views={v.scope_gid:v for v in graph.workspace.views if v.view_type=='org'}
+    planned=[]
+    for gid,view in views.items():
+        scope=scopes[gid];root=scope
+        while root.parent_gid:root=scopes[root.parent_gid]
+        root_view=views.get(root.gid)
+        source=view if view.axis_mode in ('independent','overview') else (root_view or view)
+        xs=list(source.axis.x_items)
+        children=[s for s in graph.workspace.scopes if s.parent_gid==gid]
+        ys=[s.title for s in children] if children else list(view.axis.y_items)
+        if len(ys)!=len(set(ys)):raise ValueError('同级组织标题不可重复')
+        effective_xs=['总览'] if view.axis_mode=='overview' else xs
+        if any(p.x_item_key not in effective_xs or p.y_item_key not in ys for p in view.placements):
+            raise ValueError('组织泳道需迁移：横轴继承顶级，纵轴使用下级组织标题')
+        Axis.model_validate({**view.axis.model_dump(),"x_items":xs,"y_items":ys})
+        planned.append((view,xs,ys,source.axis.column_width))
+    for view,xs,ys,width in planned:view.axis.x_items=xs;view.axis.y_items=ys;view.axis.column_width=width

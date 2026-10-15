@@ -121,7 +121,7 @@ def descriptor_for(spec) -> CapabilityDescriptorV2:
             business_acceptance_criteria=('组织身份由 Gateway 确定，同组织共享，跨组织访问被拒绝。',),
             business_invariants=(BusinessInvariantContract(
                 rule_id=spec.id+'.scope', version=1,
-                statement='只允许服务端确定的组织作用域；写入检查草稿修订号，发布检查业务契约和引用。',
+                statement='只允许服务端确定的组织作用域；写入检查草稿修订号，发布检查业务契约和引用。'+('发布仅允许服务端认证的 super_admin。' if spec.id.endswith('version.publish') else ''),
                 applies_when='每次组织业务全景调用', enforcement_ref='agent.orchestration.organization_scope',
                 error_code='permission_denied', test_refs=('backend/tests/test_organization_orchestration.py',),
             ),), no_business_invariant_reason=None,

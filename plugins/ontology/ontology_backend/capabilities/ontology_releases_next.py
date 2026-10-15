@@ -1,6 +1,7 @@
 """Publish, compare and guarded activation of immutable ontology releases."""
 from __future__ import annotations
 
+from datetime import date, datetime
 from typing import Any
 
 from ..infrastructure.storage import put_immutable
@@ -122,7 +123,9 @@ def _version_ref(release: dict[str, Any]) -> OntologyVersionRef:
 
 
 def _with_version_ref(release: dict[str, Any]) -> dict[str, Any]:
-    return {**release, "ontology_version_ref": _version_ref(release).model_dump(mode="json")}
+    serialized = {key: value.isoformat() if isinstance(value, (date, datetime)) else value
+                  for key, value in release.items()}
+    return {**serialized, "ontology_version_ref": _version_ref(release).model_dump(mode="json")}
 
 
 def get_ontology_impact_service() -> ImpactAnalysisService:
@@ -305,8 +308,8 @@ def activate_release(payload: dict[str, Any], context: CapabilityContext) -> Cap
 
 def register_ontology_release_capabilities(registry: Any) -> None:
     common = {"owner": "ontology", "plugin_callable": True, "subject_concepts": ("ontology.release",), "tags": ("ontology", "release")}
-    registry.register(CapabilitySpec(**common, id="ontology.release.get", description="Read one immutable or active release.", use_when="A release identity or current active release is needed.", do_not_use_when="Comparing two releases.", effects=("read:ontology.release",), output_schema=RELEASE_SCHEMA, input_schema={"type": "object"}), get_release)
-    registry.register(CapabilitySpec(**common, id="ontology.release.search", description="Search immutable release metadata.", use_when="Release history is required.", do_not_use_when="A release identity is known.", effects=("read:ontology.release",), output_schema=RELEASE_SEARCH_SCHEMA, input_schema={"type": "object"}), search_releases)
+    registry.register(CapabilitySpec(**common, id="ontology.release.get", description="Read one immutable or active release.", use_when="A release identity or current active release is needed.", do_not_use_when="Comparing two releases.", effects=("read:ontology.release",), output_schema=RELEASE_SCHEMA, input_schema={"type": "object", "properties": {"release_gid": {"type": "string", "minLength": 1}}, "additionalProperties": False}), get_release)
+    registry.register(CapabilitySpec(**common, id="ontology.release.search", description="Search immutable release metadata.", use_when="Release history is required.", do_not_use_when="A release identity is known.", effects=("read:ontology.release",), output_schema=RELEASE_SEARCH_SCHEMA, input_schema={"type": "object", "properties": {"limit": {"type": "integer", "minimum": 1, "maximum": 100}}, "additionalProperties": False}), search_releases)
     registry.register(CapabilitySpec(**common, id="ontology.release.diff", description="Compute a semantic stable-identity release diff.", use_when="Change impact between two releases is needed.", do_not_use_when="Raw JSON text differences are expected.", effects=("read:ontology.release",), output_schema=RELEASE_DIFF_SCHEMA, input_schema={"type": "object", "properties": {"from_release_gid": {"type": "string"}, "to_release_gid": {"type": "string"}}, "required": ["from_release_gid", "to_release_gid"]}), diff_releases)
     registry.register(CapabilitySpec(**common, id="ontology.release.publish", description="Publish an approved proposal as a new immutable inactive release.", use_when="An exact proposal revision has independent approval.", do_not_use_when="Changing the active release.", effects=("create:ontology.release",), risk="write", confirmation="admin", idempotent=False, permissions=("ontology.publish",), output_schema=RELEASE_SCHEMA, input_schema={"type": "object", "properties": {"proposal_gid": {"type": "string"}, "proposal_revision_gid": {"type": "string"}, "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$", "example": "0" * 64}}, "required": ["proposal_gid", "proposal_revision_gid", "content_sha256"]}), publish_release)
     registry.register(CapabilitySpec(**common, id="ontology.release.activate", description="Atomically activate a verified direct forward release.", use_when="All compatibility providers report zero blockers.", do_not_use_when="Publishing or rolling back directly.", effects=("update:ontology.active_ref",), risk="write", confirmation="admin", idempotent=False, permissions=("ontology.activate",), output_schema=ACTIVATION_SCHEMA, input_schema={"type": "object", "properties": {"release_gid": {"type": "string"}, "release_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$", "example": "0" * 64}, "expected_active_release_gid": {"anyOf": [{"type": "string"}, {"type": "null"}]}, "attestations": {"type": "array", "items": {"type": "object", "properties": {"provider": {"type": "string"}, "status": {"type": "string"}, "blocking_count": {"type": "integer", "minimum": 0}}, "required": ["provider", "status", "blocking_count"], "additionalProperties": False}}}, "required": ["release_gid", "release_sha256", "expected_active_release_gid", "attestations"]}), activate_release)

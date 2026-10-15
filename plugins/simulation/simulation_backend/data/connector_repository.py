@@ -105,6 +105,20 @@ class SimulationConnectorRepository:
             and prior_steps[0].get('operation_id') == plan.steps[0].operation_id
         )
 
+    @staticmethod
+    def _repeat_is_explicit_cache_open(plan: ConnectorExecutionPlanV2, prior: dict) -> bool:
+        # Only a completed old runtime may be replaced by a new explicit cache
+        # open. Uncertain attempts still require reconciliation below.
+        prior_steps = prior.get('steps', ())
+        return (
+            plan.capability_id == 'simulation.environment.cache_source.open.request'
+            and plan.major_version == 1
+            and plan.idempotency_key != prior.get('idempotency_key')
+            and len(plan.steps) == 1 and plan.steps[0].operation_id == 'vismockup.model.open@3'
+            and len(prior_steps) == 1 and prior_steps[0].get('operation_id') == 'vismockup.model.open@3'
+            and plan.steps[0].payload_hash == prior_steps[0].get('payload_hash')
+        )
+
     def runtime_device(self, device_id):
         with get_simulation_conn() as conn, conn.cursor() as cursor:
             return self._locked_runtime(cursor, device_id)
@@ -786,7 +800,8 @@ class SimulationConnectorRepository:
                             prior.get('runtime_generation'), prior.get('runtime_instance_id')
                         ) == (plan.runtime_generation, plan.runtime_instance_id)
                         safe_repeat = (self._repeat_is_intrinsically_safe(plan)
-                            or self._repeat_is_freshly_confirmed_document_launch(plan, prior))
+                            or self._repeat_is_freshly_confirmed_document_launch(plan, prior)
+                            or self._repeat_is_explicit_cache_open(plan, prior))
                         if write_plan and not same_runtime_session and not safe_repeat:
                             raise ConnectorRepositoryError('reconciliation_required')
                         continue

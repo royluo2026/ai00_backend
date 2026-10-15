@@ -100,3 +100,16 @@ def test_gateway_schema_accepts_closed_workspace_graph():
     from plugins.agent.agent_backend.capabilities.contracts import INPUT_SCHEMAS
     jsonschema.validate({'version_gid':'v','expected_revision':1,'graph':payload()},INPUT_SCHEMAS['agent.orchestration.organization.graph.save'])
 
+
+
+def test_org_axes_inherit_parent_and_level_survives_version_clone():
+    from plugins.agent.agent_backend.orchestration.workspace_model import normalize_org_axes,clone_revision_graph
+    data=payload();data['nodes'][0]['level']=1
+    data['workspace']['scopes'].append({'gid':'child','parent_gid':'root','title':'子组织'})
+    data['workspace']['views'] += [{'gid':'root-view','view_type':'org','scope_gid':'root','axis':{'x_items':['准备','校核'],'y_items':['职责']},'placements':[]},{'gid':'child-view','view_type':'org','scope_gid':'child','axis':{'x_items':['旧轴'],'y_items':['职责']},'placements':[]}]
+    graph=GraphDraft.model_validate(data);normalize_org_axes(graph)
+    assert graph.workspace.views[-2].axis.y_items==['子组织']
+    assert graph.workspace.views[-1].axis.x_items==['准备','校核']
+    assert clone_revision_graph(graph).nodes[0].level==1
+    data['nodes'][0]['level']=0
+    with pytest.raises(ValidationError):GraphDraft.model_validate(data)

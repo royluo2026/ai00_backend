@@ -445,7 +445,7 @@ class OrchestrationRepository:
             extension = _decoded((cur.fetchone() or {}).get('definition_json'), {})
             for node in nodes:
                 node.update({key: value for key, value in extension.get('nodes', {}).get(node['gid'], {}).items()
-                             if key in ('home_scope_gid','semantic_type','implementation')})
+                             if key in ('home_scope_gid','level','semantic_type','implementation')})
             for edge in edges:
                 edge.update({key: value for key, value in extension.get('edges', {}).get(edge['gid'], {}).items()
                              if key in ('relation_semantics','source_port_key','target_port_key')})
@@ -770,6 +770,8 @@ class OrchestrationRepository:
             version = self._owned_version_for_update(cur, version_gid, actor_gid, tenant_gid, project_gid, organization)
             if version["status"] != "draft" or int(version["revision"]) != expected_revision:
                 raise RevisionConflict("orchestration version is published or stale")
+            from .workspace_model import normalize_org_axes
+            normalize_org_axes(graph)
             cur.execute(
                 """UPDATE workmanship_agent_orch_versions
                    SET mode=%s, revision=revision+1, updated_at=NOW(6), updated_by=%s
@@ -798,7 +800,7 @@ class OrchestrationRepository:
             extension = {
                 'workspace': graph.workspace.model_dump(mode='json') if graph.workspace else None,
                 'nodes': {node.gid: {key: node.model_dump(mode='json')[key] for key in
-                          ('home_scope_gid','semantic_type','implementation')} for node in graph.nodes},
+                          ('home_scope_gid','level','semantic_type','implementation')} for node in graph.nodes},
                 'edges': {edge.gid: {key: edge.model_dump(mode='json')[key] for key in
                           ('relation_semantics','source_port_key','target_port_key')} for edge in graph.edges},
             }

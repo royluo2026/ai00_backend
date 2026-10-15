@@ -36,6 +36,7 @@ class BusinessNode(Contract):
     node_key: str = Field(min_length=1)
     title: str = Field(min_length=1)
     home_scope_gid: str | None = None
+    level: int = Field(default=2,ge=1,le=9)
     semantic_type: SemanticType = 'action'
     implementation: Implementation = Field(default_factory=Implementation)
     x_item_key: str

@@ -514,6 +514,32 @@ def test_absent_probe_classifies_manual_review():
     assert ReconciliationService().reconcile('plan-1', None) == 'manual_review_required'
 
 
+def test_explicit_cache_open_after_successful_previous_runtime(database):
+    service, key = setup_service(database)
+    session = register(service, key, database[1])
+    cloud, _ = signer()
+    raw = deepcopy(VECTOR['plan'])
+    raw.update(plan_id='original-cache-open', idempotency_key='original-cache-open',
+        capability_id='simulation.environment.cache_source.open.request', major_version=1,
+        device_id=database[1], runtime_instance_id='winner', confirmation_receipt_id=None,
+        issued_at='2026-09-07T12:00:00Z', expires_at='2026-09-07T12:10:00Z')
+    raw['steps'][0].update(operation_id='vismockup.model.open@3',
+        side_effect_classification='write', post_condition_probe_id='vismockup.application.probe@1')
+    original = cloud.sign(raw)
+    service.repository.insert_v2_plan(original, session.session_token, NOW)
+    pins = dict(device_id=database[1], generation=7, runtime_instance_id='winner', runtime_type='electron')
+    leased = service.lease(session.session_token, **pins)
+    service.outcome(session.session_token, outcome(original, leased, key), **pins)
+    service.clock = lambda: NOW + timedelta(minutes=6)
+    replacement_session = register(service, key, database[1], instance='replacement')
+    fresh = cloud.sign({**original.model_dump(mode='json'), 'plan_id':'fresh-cache-open',
+        'idempotency_key':'fresh-cache-open', 'runtime_instance_id':'replacement'})
+    service.repository.insert_v2_plan(fresh, replacement_session.session_token, service.clock())
+    with database[0]() as conn, conn.cursor() as cur:
+        cur.execute('SELECT status FROM workmanship_sim_connector_runtime_plans WHERE plan_id=%s', (fresh.plan_id,))
+        assert cur.fetchone()['status'] == 'queued'
+
+
 def test_worker_reads_verified_v2_payload_and_finishes_projection(database):
     import asyncio
     from plugins.simulation.simulation_backend.application.connector_projection_worker import ConnectorProjectionWorker

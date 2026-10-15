@@ -53,9 +53,20 @@ def read_slice(repo, version_gid, *, tenant_gid, actor_gid, projection, view_gid
             selected=next((v for v in workspace['views'] if v['gid']==view_gid),None)
             if not selected: raise ValueError('workspace view missing')
             local={p['node_gid'] for p in selected['placements']}
+            rollup_views=[]
+            if selected['view_type']=='org':
+                children={s['gid'] for s in workspace['scopes'] if s.get('parent_gid')==selected['scope_gid']}
+                for child_view in workspace['views']:
+                    if child_view['view_type']!='org' or child_view['scope_gid'] not in children:continue
+                    placements=[deepcopy(p) for p in child_view['placements'] if extension.get('nodes',{}).get(p['node_gid'],{}).get('level',2)==1 and extension.get('nodes',{}).get(p['node_gid'],{}).get('home_scope_gid')==child_view['scope_gid']]
+                    local.update(p['node_gid'] for p in placements)
+                    rollup_views.append((child_view['gid'],placements))
+
             result['loaded_view_gids']=[view_gid]
             for v in graph['workspace']['views']:
                 if v['gid']==view_gid:v.update(deepcopy(selected))
+                for gid,placements in rollup_views:
+                    if v['gid']==gid:v['placements']=placements
             # Restore selected task overrides from the authority, not the stripped directory.
             graph['workspace']['variants']=[deepcopy(next(a for a in workspace['variants'] if a['gid']==v['gid'])) if v['task_gid']==selected.get('task_gid') else v for v in graph['workspace']['variants']]
         else:
@@ -74,7 +85,8 @@ def read_slice(repo, version_gid, *, tenant_gid, actor_gid, projection, view_gid
             for v in graph['workspace']['views']:
                 if v['gid']!=view_gid:
                     original=next(a for a in workspace['views'] if a['gid']==v['gid'])
-                    v['placements']=[deepcopy(p) for p in original['placements'] if p['node_gid'] in ids-local]
+                    kept={p['node_gid'] for p in v['placements']}
+                    v['placements'] += [deepcopy(p) for p in original['placements'] if p['node_gid'] in ids-local and p['node_gid'] not in kept]
         if not ids:return result
         if len(ids)>500:raise ValueError('node bound exceeded')
         marks=','.join(['%s']*len(ids));values=tuple(sorted(ids))

@@ -47,7 +47,7 @@ def gateway(permissions):
 def test_real_gateway_reads_server_organization_and_projects_edit_permission():
     invoke,calls=gateway(('agent.read',))
     result=invoke('panorama.read')
-    assert result.ok and result.data=={'panorama':None,'can_edit':False}
+    assert result.ok and result.data=={'panorama':None,'can_edit':False,'can_publish':False}
     assert invoke('panorama.read',actor='member-2').ok
     assert calls==['organization-1','organization-1']
     editor,_=gateway(('agent.read','agent.write'))
@@ -80,3 +80,13 @@ def test_real_gateway_accepts_bounded_projection_and_preserves_server_scope():
     assert result.ok and result.data['complete'] is False
     assert calls[0]['tenant_gid']=='organization-1' and calls[0]['projection']=='directory'
     assert not invoke('graph.read',{'version_gid':'v','projection':'view','tenant_gid':'attacker'}).ok
+
+
+def test_only_org_draft_save_allows_autosave_without_publish_confirmation():
+    from plugins.agent.agent_backend.capabilities.descriptors import specs
+    by_id={s.id:s for s in specs()}
+    save=by_id[PREFIX+'graph.save']
+    assert save.confirmation=='none' and save.permissions==('agent.write',) and save.risk.value=='write'
+    for suffix in ('panorama.create','version.publish','version.revise'):
+        assert by_id[PREFIX+suffix].confirmation=='user'
+    assert by_id['agent.orchestration.graph.save'].confirmation=='user'

@@ -45,12 +45,15 @@ def make_handler(
             raise PermissionError('organization scope must come from authenticated Gateway identity')
         return {'tenant_gid': tenant_gid, 'project_gid': None, 'organization': True}
 
+    def can_publish(context):
+        return 'agent.write' in (getattr(context,'permissions',()) or ()) and 'super_admin' in (getattr(context,'active_roles',()) or ())
+
     if capability_id.startswith('agent.orchestration.organization.'):
         def organization_operation(payload, context):
             bounded = organization_scope(payload, context)
             if capability_id.endswith('panorama.read'):
                 return {'panorama': repository.get_organization_panorama(bounded['tenant_gid']),
-                        'can_edit': 'agent.write' in (getattr(context, 'permissions', ()) or ())}
+                        'can_edit': 'agent.write' in (getattr(context, 'permissions', ()) or ()), 'can_publish':can_publish(context)}
             if capability_id.endswith('panorama.create'):
                 return repository.create_organization_panorama(bounded['tenant_gid'], context.user_gid, payload['name'])
             if capability_id.endswith('graph.read'):
@@ -63,6 +66,8 @@ def make_handler(
                     actor_gid=context.user_gid, expected_revision=payload['expected_revision'], **bounded)}
             if capability_id.endswith('version.revise'):
                 return repository.create_organization_revision(payload['version_gid'],expected_revision=payload['expected_revision'],actor_gid=context.user_gid,tenant_gid=bounded['tenant_gid'])
+            if not can_publish(context):
+                raise CapabilityBusinessError('permission_denied','只有超管可以发布组织业务全景。')
             publish_service = service
             if authorization_checker_factory is not None:
                 publish_service = OrchestrationService(repository, resolver.for_authorization(authorization_checker_factory(context)))
@@ -118,6 +123,8 @@ def make_handler(
         return save
     if capability_id == "agent.orchestration.version.publish":
         def publish(payload, context):
+            if not can_publish(context):
+                raise CapabilityBusinessError('permission_denied','只有超管可以发布组织业务全景。')
             publish_service = service
             if authorization_checker_factory is not None:
                 publish_service = OrchestrationService(

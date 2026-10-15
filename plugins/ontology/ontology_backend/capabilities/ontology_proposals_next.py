@@ -10,6 +10,7 @@ from plugins.ontology.ontology_backend.proposals import (
     normalize_changes,
 )
 from plugins.ontology.ontology_backend.repository import OntologyReleaseRepository
+from plugins.ontology.ontology_backend.review_policy import is_publishable
 from backend.domain_ports.ontology import OntologyVersionRef
 from ..infrastructure.ids import next_gid
 
@@ -119,6 +120,22 @@ REVIEW_SCHEMA = {
 }
 
 
+REVIEWABLE_PROPOSAL_SCHEMA = {
+    **PROPOSAL_SCHEMA,
+    "properties": {
+        **PROPOSAL_SCHEMA["properties"],
+        "reviews": {"type": "array", "items": {
+            **REVIEW_SCHEMA,
+            "properties": {
+                **REVIEW_SCHEMA["properties"],
+                "comment": {"anyOf": [{"type": "string"}, {"type": "null"}]},
+                "created_at": {"type": "string"},
+            },
+        }},
+        "publishable": {"type": "boolean"},
+    },
+}
+
 def _serialize_record(record: dict[str, Any]) -> dict[str, Any]:
     result = dict(record)
     for field in ("created_at", "updated_at"):
@@ -183,6 +200,16 @@ def get_proposal(payload: dict[str, Any], _context: CapabilityContext) -> Capabi
     data["base_ontology_version_ref"] = _base_version_ref(base)
     return CapabilityOutput(data=data, evidence=(_proposal_evidence(data),))
 
+
+def get_reviewable_proposal(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+    output = get_proposal(payload, context)
+    data = dict(output.data)
+    reviews = OntologyProposalRepository().list_reviews(data["proposal_gid"], data["proposal_revision_gid"])
+    data["reviews"] = [_serialize_record(item) for item in reviews]
+    data["publishable"] = data["status"] == "review" and is_publishable(
+        reviews=reviews, author_gid=str(data["author_gid"]), content_sha256=data["content_sha256"],
+    )
+    return CapabilityOutput(data=data, evidence=output.evidence)
 
 def search_proposals(payload: dict[str, Any], _context: CapabilityContext) -> dict[str, Any]:
     status = str(payload.get("status") or "").strip() or None
@@ -268,11 +295,11 @@ def register_ontology_proposal_capabilities(registry: Any) -> None:
     registry.register(CapabilitySpec(
         **common, id="ontology.change.proposal.get", version=2,
         description="Read a structured immutable proposal revision.",
-        use_when="A proposal GID is known and its typed changes are required.",
+        use_when="A proposal GID is known and its typed changes and bound human reviews are required.",
         do_not_use_when="Searching proposals.", effects=("read:ontology.proposal",),
-        output_schema=PROPOSAL_SCHEMA,
+        output_schema=REVIEWABLE_PROPOSAL_SCHEMA,
         input_schema={"type": "object", "properties": {"proposal_gid": {"type": "string"}},
-                      "required": ["proposal_gid"], "additionalProperties": False}), get_proposal)
+                      "required": ["proposal_gid"], "additionalProperties": False}), get_reviewable_proposal)
     registry.register(CapabilitySpec(
         **common, id="ontology.change.proposal.search", version=2,
         description="Search structured proposal metadata by governed status.",

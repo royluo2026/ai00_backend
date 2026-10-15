@@ -66,7 +66,7 @@ def test_provider_uses_server_tenant_and_refuses_personal_identity():
         def get_organization_panorama(self, tenant_gid): return {'tenant':tenant_gid}
     handler = make_handler(PREFIX+'panorama.read', repository=Repo(), resolver=None)
     context = SimpleNamespace(user_gid='u', effective_identity=SimpleNamespace(tenant=SimpleNamespace(tenant_id='team-1', membership='member')))
-    assert handler({}, context) == {'panorama':{'tenant':'team-1'}, 'can_edit':False}
+    assert handler({}, context) == {'panorama':{'tenant':'team-1'}, 'can_edit':False,'can_publish':False}
     context.permissions=('agent.read','agent.write')
     assert handler({},context)['can_edit'] is True
     context.effective_identity.tenant.tenant_id = 'user:u'
@@ -81,3 +81,16 @@ def test_provider_returns_actionable_revision_conflict():
     with pytest.raises(CapabilityBusinessError) as conflict:
         handler({'version_gid':'v','expected_revision':1,'graph':{'nodes':[],'edges':[]}},context)
     assert conflict.value.code=='version_conflict'
+
+
+def test_only_server_authenticated_super_admin_may_publish_org_panorama():
+    class Repo:
+        def get_organization_panorama(self, tenant_gid):return None
+    context=SimpleNamespace(user_gid='u',permissions=('agent.read','agent.write'),active_roles=('team_admin',),effective_identity=SimpleNamespace(tenant=SimpleNamespace(tenant_id='team-1')))
+    handler=make_handler(PREFIX+'version.publish',repository=Repo(),resolver=None)
+    with pytest.raises(CapabilityBusinessError) as denied:handler({'version_gid':'v','expected_revision':1},context)
+    assert denied.value.code=='permission_denied'
+    read=make_handler(PREFIX+'panorama.read',repository=Repo(),resolver=None)
+    assert read({},context)['can_edit'] and not read({},context)['can_publish']
+    context.active_roles=('super_admin',)
+    assert read({},context)['can_publish'] is True
