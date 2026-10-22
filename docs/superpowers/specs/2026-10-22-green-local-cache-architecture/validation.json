@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-22",
+  "status": "documentation_checks_passed",
+  "spec_status": "draft_not_implemented",
+  "checks": {
+    "markdown_files": 8,
+    "local_links": "passed",
+    "frontend_backend_mirror": "byte_identical",
+    "required_topics": [
+      "flowgraph",
+      "bop",
+      "gbop",
+      "rules",
+      "baselines",
+      "cache",
+      "thumbnail",
+      "no_long_term_original",
+      "native_bidirectional",
+      "disk_monitor",
+      "conflicts",
+      "fence",
+      "recovery",
+      "unknown"
+    ],
+    "source_snapshot_tags": "verified_on_gitea",
+    "new_architecture_runtime": "not_run",
+    "full_regression": "not_run"
+  },
+  "snapshot_commits": {
+    "frontend": "3911ce2df87bfffed8ed4f2cd31dbe674f8d6a3d",
+    "backend": "39e83cceb0b837c79ff030218c10093a5137c9fa"
+  },
+  "files": [
+    {
+      "file": "01-identity-data-and-consistency.md",
+      "bytes": 6829,
+      "sha256": "ca141797114c6e18b299508ed5c8ba1949d48dd61431d8404a982330bd195516"
+    },
+    {
+      "file": "02-flowgraph-workset-and-media.md",
+      "bytes": 5747,
+      "sha256": "5690382c67e5c48023f2711d1a215b0caa65b53d62f697b2269cfb5408f26e84"
+    },
+    {
+      "file": "03-teamcenter-fcc-native-collaboration.md",
+      "bytes": 6385,
+      "sha256": "0da63d6d17ccfba95f82735e8745bdce7f62ea21c45773c4da2d9d847b00d38e"
+    },
+    {
+      "file": "04-automation-capture-and-delivery.md",
+      "bytes": 6204,
+      "sha256": "7a07089527060cadccb09f2e7efff39b6cff5f3b4ce1fe99ceb85cfc81e08c32"
+    },
+    {
+      "file": "05-baselines-and-comparison.md",
+      "bytes": 5091,
+      "sha256": "f31f38f6b185188f7071b80395cb950b0159bba67c9168d94605b5b4439b1d69"
+    },
+    {
+      "file": "06-storage-monitor-and-statusbar.md",
+      "bytes": 5646,
+      "sha256": "75f19f872e6e611083aba60a445e58f405e57ce62b8275b3185667919cb11401"
+    },
+    {
+      "file": "07-migration-acceptance-and-governance.md",
+      "bytes": 7829,
+      "sha256": "24ab8a1a3b021264ed7b3a2abe180365fe70fbd27d4217bd971fb3ea7585590a"
+    },
+    {
+      "file": "README.md",
+      "bytes": 5392,
+      "sha256": "5f9bd2cb7b4be46348246d7dbebd60cf2ee0568e9c6775ff7782a3fe7d1af796"
+    }
+  ]
+}
